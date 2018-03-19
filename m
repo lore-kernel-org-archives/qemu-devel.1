@@ -1,35 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1exrCO-000234-VJ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:35:30 -0400
+	(envelope-from <thuth@redhat.com>) id 1exrGi-00045c-F5
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1exrCM-0001aa-AV
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:35:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37158
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1exrCM-0001ZI-4k
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:35:22 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2J9R3F0116726
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 05:35:19 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gt91gur3p-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 05:35:19 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Mon, 19 Mar 2018 09:35:17 -0000
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Mon, 19 Mar 2018 10:35:09 +0100
-In-Reply-To: <20180319093509.50881-1-haoqf@linux.vnet.ibm.com>
-References: <20180319093509.50881-1-haoqf@linux.vnet.ibm.com>
-Message-Id: <20180319093509.50881-2-haoqf@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 1/1] iotests: fix test case 185
+	(envelope-from <thuth@redhat.com>) id 1exrGh-0004AT-6I
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:39:52 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 19 Mar 2018 10:39:36 +0100
+Message-Id: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices with
+ all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,37 +18,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, kwolf@redhat.com, famz@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_shutdown()".
-It's because of the newly introduced function vm_shutdown calls bdrv_drain_all,
-which is called later by bdrv_close_all. bdrv_drain_all resumes the jobs
-that doubles the speed and offset is doubled.
-Some jobs' status are changed as well.
+Many device introspection crashes only happen if you are using a
+certain machine, e.g.:
 
-Thus, let's not call bdrv_drain_all in vm_shutdown.
+$ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
+{"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+ "package": "build-all"}, "capabilities": []}}
+{ 'execute': 'qmp_capabilities' }
+{"return": {}}
+{ 'execute': 'device-list-properties',
+  'arguments': {'typename': 'macio-newworld'}}
+Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+Device 'serial0' is in use
+Aborted (core dumped)
 
-Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To be able to catch these problems, let's extend the device-introspect
+test to check the devices on all machine types. Since this is a rather
+slow operation, the test is only run in "SPEED=slow" mode.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- cpus.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ In case someone wants to help with creating some bug fix patches
+ during the QEMU hard freeze phase: This test can now be used to
+ trigger lots of introspection bugs that we were not aware of yet.
+ I think most of the bugs are due to wrong handling of instance_init
+ vs. realize functions.
+ For Example:
+ $ make check-qtest SPEED=slow
+  GTESTER check-qtest-aarch64
+ RAMBlock "integrator.flash" already registered, abort!
+ Broken pipe
+ GTester: last random seed: R02S8e52709605790d290d2c8261cefb8b0e
+ Unsupported NIC model: lan9118
+ Broken pipe
+ GTester: last random seed: R02S326d4ea43bfce860ebe2d554192540f7
+ qemu-system-aarch64: warning: nic lan9118.0 has no peer
+ Unsupported NIC model: smc91c111
+ Broken pipe
+ GTester: last random seed: R02Se9783b450806f350a14e757b175e3dc4
+ qemu-system-aarch64: missing SecureDigital device
+ Broken pipe
+ GTester: last random seed: R02S5c718b8f4c4fd48a358de8daafcf1b6f
+ qemu-system-aarch64: warning: nic lan9118.0 has no peer
+ Unexpected error in error_set_from_qdev_prop_error() at hw/core/qdev-properties.c:1095:
+ Property 'allwinner-emac.netdev' can't take value 'hub0port0', it's in use
+ Broken pipe
+ GTester: last random seed: R02S597848ddcfdc76a695a946a9d4e50146
+ qemu-system-aarch64: warning: nic ftgmac100.0 has no peer
+ GTester: last random seed: R02Seea0f0b769a2161fa53a50479fd68d84
+ qemu-system-aarch64: warning: nic imx.fec.0 has no peer
+ qemu-system-aarch64: missing SecureDigital device
+ Broken pipe
+ GTester: last random seed: R02S9c2d3e34427162e7a56aa4ac859f1a6b
+ Unsupported NIC model: virtio-net-pci
+ Broken pipe
+ GTester: last random seed: R02Sd61c0e9ed52d50a17c784213e5c6590c
+ Unsupported NIC model: mv88w8618
+ Broken pipe
+ GTester: last random seed: R02Sbfaecfe58dd643f2faca218e3051d464
+ qemu-system-aarch64: warning: nic mv88w8618_eth.0 has no peer
+ qemu-system-aarch64: missing SecureDigital device
+ Broken pipe
+ Unsupported NIC model: xgmac
+ Broken pipe
+ GTester: last random seed: R02Sc61e65e884e364652c3a0c4190023565
+ fsl,imx7: Only 2 CPUs are supported (4 requested)
+ Broken pipe
+ GTester: last random seed: R02S0cfda43bc17e3e052d5a994b2c96457b
+ etc.
 
-diff --git a/cpus.c b/cpus.c
-index 2e6701795b..ae2962508c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1006,8 +1006,9 @@ static int do_vm_stop(RunState state, bool send_stop)
-             qapi_event_send_stop(&error_abort);
-         }
-     }
--
--    bdrv_drain_all();
-+    if (send_stop) {
-+        bdrv_drain_all();
-+    }
-     replay_disable_events();
-     ret = bdrv_flush_all();
+ tests/device-introspect-test.c | 33 ++++++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+index b80058f..a9b9cf7 100644
+--- a/tests/device-introspect-test.c
++++ b/tests/device-introspect-test.c
+@@ -105,6 +105,8 @@ static void test_one_device(const char *type)
+     QDict *resp;
+     char *help, *qom_tree;
  
++    g_debug("Testing device '%s'", type);
++
+     resp = qmp("{'execute': 'device-list-properties',"
+                " 'arguments': {'typename': %s}}",
+                type);
+@@ -206,13 +208,13 @@ static void test_device_intro_abstract(void)
+     qtest_end();
+ }
+ 
+-static void test_device_intro_concrete(void)
++static void test_device_intro_concrete(gconstpointer args)
+ {
+     QList *types;
+     QListEntry *entry;
+     const char *type;
+ 
+-    qtest_start(common_args);
++    qtest_start((const char *)args);
+     types = device_type_list(false);
+ 
+     QLIST_FOREACH_ENTRY(types, entry) {
+@@ -224,6 +226,7 @@ static void test_device_intro_concrete(void)
+ 
+     QDECREF(types);
+     qtest_end();
++    g_free((void *)args);
+ }
+ 
+ static void test_abstract_interfaces(void)
+@@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
+     qtest_end();
+ }
+ 
++static void add_machine_test_case(const char *mname)
++{
++    char *path, *args;
++
++    /* Ignore blacklisted machines */
++    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
++        return;
++    }
++
++    path = g_strdup_printf("device/introspect/concrete-defaults-%s", mname);
++    args = g_strdup_printf("-machine %s", mname);
++    qtest_add_data_func(path, args, test_device_intro_concrete);
++    g_free(path);
++
++    path = g_strdup_printf("device/introspect/concrete-nodefaults-%s", mname);
++    args = g_strdup_printf("-nodefaults -machine %s", mname);
++    qtest_add_data_func(path, args, test_device_intro_concrete);
++    g_free(path);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -268,8 +291,12 @@ int main(int argc, char **argv)
+     qtest_add_func("device/introspect/list-fields", test_qom_list_fields);
+     qtest_add_func("device/introspect/none", test_device_intro_none);
+     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
+-    qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
+     qtest_add_func("device/introspect/abstract-interfaces", test_abstract_interfaces);
++    qtest_add_data_func("device/introspect/concrete", g_strdup(common_args),
++                        test_device_intro_concrete);
++    if (g_test_slow()) {
++        qtest_cb_for_every_machine(add_machine_test_case);
++    }
+ 
+     return g_test_run();
+ }
 -- 
-2.13.5
+1.8.3.1
