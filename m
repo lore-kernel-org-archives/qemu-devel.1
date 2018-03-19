@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1exxVB-0000C4-Vo
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:19:14 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1exxXt-0001Qu-Nw
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1exxVA-0002G4-Ug
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:19:13 -0400
-References: <20180119224735.12169-1-jsnow@redhat.com>
-	<086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
-	<56b7204f-a0d8-3a4e-6e48-6913b1f52a5f@redhat.com>
-	<20180319152932.GD30864@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b37d73f9-04c0-08d0-8a9a-bc5d034f6cc5@redhat.com>
-Date: Mon, 19 Mar 2018 12:18:55 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180319152932.GD30864@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] file-posix: specify expected filetypes
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1exxXp-00046Z-PU
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:22:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56768
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1exxXp-00045t-JV
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:21:57 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2JGGcRL111016
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 12:21:56 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gtfk9ujvm-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 12:21:56 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 19 Mar 2018 12:21:54 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 19 Mar 2018 12:21:45 -0400
+In-Reply-To: <1521476505-30584-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1521476505-30584-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1521476505-30584-2-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] tpm: Set tpmRegValidSts flag to '1' in
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +39,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
+Fix the initialization of the tpmRegValidSts flag and set it to '1'
+during device reset without expecting a write to another register.
+This seems to also be the default behavior of real hardware.
 
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_crb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 03/19/2018 11:29 AM, Kevin Wolf wrote:
-> Am 13.03.2018 um 18:20 hat John Snow geschrieben:
->>
->>
->> On 01/19/2018 06:03 PM, Eric Blake wrote:
->>> On 01/19/2018 04:47 PM, John Snow wrote:
->>>> Adjust each caller of raw_open_common to specify if they are expecting
->>>> host and character devices or not. Tighten expectations of file types upon
->>>> open in the common code and refuse types that are not expected.
->>>>
->>>> This has two effects:
->>>>
->>>> (1) Character and block devices are now considered deprecated for the
->>>>     'file' driver, which expects only S_IFREG, and
->>>> (2) no file-posix driver (file, host_cdrom, or host_device) can open
->>>>     directories now.
->>>>
->>>> I don't think there's a legitimate reason to open directories as if
->>>> they were files. This prevents QEMU from opening and attempting to probe
->>>> a directory inode, which can break in exciting ways. One of those ways
->>>> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
->>>> size instead of EISDIR. This can coax QEMU into responding with a
->>>> confusing "file too big" instead of "Hey, that's not a file".
->>>>
->>>> See: https://bugs.launchpad.net/qemu/+bug/1739304/
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
->> Whoops, I let this one rot. It could still be considered a bugfix for
->> next week.
-> 
-> Yes, we should take this as a bugfix. Needs a rebase, though.
-> 
-> Kevin
-> 
-
-You got it.
-
---js
+diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+index d8917cb..114b66e 100644
+--- a/hw/tpm/tpm_crb.c
++++ b/hw/tpm/tpm_crb.c
+@@ -145,8 +145,6 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
+                              beenSeized, 0);
+             ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
+                              locAssigned, 1);
+-            ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
+-                             tpmRegValidSts, 1);
+             break;
+         }
+         break;
+@@ -210,6 +208,8 @@ static void tpm_crb_reset(void *dev)
+ 
+     tpm_backend_reset(s->tpmbe);
+ 
++    ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
++                     tpmRegValidSts, 1);
+     ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+                      InterfaceType, CRB_INTF_TYPE_CRB_ACTIVE);
+     ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+-- 
+2.5.5
