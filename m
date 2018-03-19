@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1exqgY-0008L4-1P
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:02:35 -0400
+	(envelope-from <laurent@vivier.eu>) id 1exqlJ-0003IB-8M
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1exqgU-0007Ln-R1
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:02:30 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 19 Mar 2018 12:02:21 +0300
-Message-Id: <20180319090223.23336-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20180319090223.23336-1-vsementsov@virtuozzo.com>
-References: <20180319090223.23336-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] qcow2-bitmap: add
- qcow2_reopen_bitmaps_rw_hint()
+	(envelope-from <laurent@vivier.eu>) id 1exqlG-0000gW-3I
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:07:25 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:42609)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1exqlF-0000gN-Ou
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:07:22 -0400
+References: <20180318161228.21307-1-laurent@vivier.eu>
+	<2e64bf25-1318-2773-5d17-6c8a9bb835c9@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <755d05ce-50d1-a3c0-f3a5-822916916f03@vivier.eu>
+Date: Mon, 19 Mar 2018 10:07:12 +0100
+MIME-Version: 1.0
+In-Reply-To: <2e64bf25-1318-2773-5d17-6c8a9bb835c9@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/m68k: add a mechanism to
+ automatically free TCGv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,79 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-Add version of qcow2_reopen_bitmaps_rw, which do the same work but
-also return a hint about was header updated or not. This will be
-used in the following fix for bitmaps reloading after migration.
+Le 19/03/2018 à 09:39, Richard Henderson a écrit :
+> On 03/19/2018 12:12 AM, Laurent Vivier wrote:
+>> SRC_EA() and gen_extend() can return either a temporary
+>> TCGv or a memory allocated one. Mark them when they are
+>> allocated, and free them automatically at end of the
+>> instruction translation.
+>>
+>> We want to free locally allocated TCGv to avoid
+>> overflow in sequence like:
+>>
+>>   0xc00ae406:  movel %fp@(-132),%fp@(-268)
+>>   0xc00ae40c:  movel %fp@(-128),%fp@(-264)
+>>   0xc00ae412:  movel %fp@(-20),%fp@(-212)
+>>   0xc00ae418:  movel %fp@(-16),%fp@(-208)
+>>   0xc00ae41e:  movel %fp@(-60),%fp@(-220)
+>>   0xc00ae424:  movel %fp@(-56),%fp@(-216)
+>>   0xc00ae42a:  movel %fp@(-124),%fp@(-252)
+>>   0xc00ae430:  movel %fp@(-120),%fp@(-248)
+>>   0xc00ae436:  movel %fp@(-12),%fp@(-260)
+>>   0xc00ae43c:  movel %fp@(-8),%fp@(-256)
+>>   0xc00ae442:  movel %fp@(-52),%fp@(-276)
+>>   0xc00ae448:  movel %fp@(-48),%fp@(-272)
+>>   ...
+>>
+>> That can fill a lot of TCGv entries in a sequence,
+>> especially since 15fa08f845 ("tcg: Dynamically allocate TCGOps")
+>> we have no limit to fill the TCGOps cache and we can fill
+>> the entire TCG variables array and overflow it.
+>>
+>> Suggested-by: Richard Henderson <rth@twiddle.net>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+> 
+> This is a good start.  It's hard to see all of where else might have been
+> missed; at least the call to gen_load in gen_lea_indexed.
+> 
+> For next development cycle it would be good to convert the translator loop and
+> enable TCGv leak detection.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- block/qcow2.h        |  2 ++
- block/qcow2-bitmap.c | 15 ++++++++++++++-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+I agree.
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index ccb92a9696..d301f77cea 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -671,6 +671,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-+                                 Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 3010adb909..6e93ec43e1 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1004,7 +1004,8 @@ fail:
-     return false;
- }
- 
--int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-+int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-+                                 Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2BitmapList *bm_list;
-@@ -1012,6 +1013,10 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-     GSList *ro_dirty_bitmaps = NULL;
-     int ret = 0;
- 
-+    if (header_updated != NULL) {
-+        *header_updated = false;
-+    }
-+
-     if (s->nb_bitmaps == 0) {
-         /* No bitmaps - nothing to do */
-         return 0;
-@@ -1055,6 +1060,9 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-             error_setg_errno(errp, -ret, "Can't update bitmap directory");
-             goto out;
-         }
-+        if (header_updated != NULL) {
-+            *header_updated = true;
-+        }
-         g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-     }
- 
-@@ -1065,6 +1073,11 @@ out:
-     return ret;
- }
- 
-+int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-+{
-+    return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
-+}
-+
- /* store_bitmap_data()
-  * Store bitmap to image, filling bitmap table accordingly.
-  */
--- 
-2.11.1
+> That said, this looks good so far.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+I'm going to update the patch by splitting it in two as Philippe asked
+and mark the missing gen_load() in gen_lea_indexed().
+
+Thanks,
+Laurent
