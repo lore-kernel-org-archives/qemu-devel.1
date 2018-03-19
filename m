@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1exmit-0005Za-FB
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 00:48:40 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1exoJw-0001Az-G3
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 02:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1exmiq-0004IU-Da
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 00:48:39 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:37894 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jiang.biao2@zte.com.cn>)
-	id 1exmip-0004HU-Oj
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 00:48:36 -0400
-Date: Mon, 19 Mar 2018 12:48:26 +0800 (CST)
-Message-ID: <201803191248261240910@zte.com.cn>
-In-Reply-To: <4c7e78e1-da12-5346-e7e7-13b52882e31c@gmail.com>
-References: 201803190949243031468@zte.com.cn,
-	4c7e78e1-da12-5346-e7e7-13b52882e31c@gmail.com
-Mime-Version: 1.0
-From: <jiang.biao2@zte.com.cn>
+	(envelope-from <dovgaluk@ispras.ru>) id 1exoJt-0001k8-82
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 02:31:00 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:34570)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1exoJs-0001gd-Qi
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 02:30:57 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180319031545.29359-1-richard.henderson@linaro.org>
+In-Reply-To: <20180319031545.29359-1-richard.henderson@linaro.org>
+Date: Mon, 19 Mar 2018 09:30:53 +0300
+Message-ID: <001e01d3bf4b$d4f4ecf0$7edec6d0$@ru>
+MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_2/8=5D_migration=3A_stop_allocat?=
- =?utf-8?q?ing_andfreeingmemory_frequently?=
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v2] tcg: Really fix cpu_io_recompile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: 'Richard Henderson' <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Pavel.Dovgaluk@ispras.ru, peter.maydell@linaro.org, pbonzini@redhat.com
 
-Pj4+ICsgICAgZXJyID0gZGVmbGF0ZShzdHJlYW0sIFpfRklOSVNIKTsKPj4+ICsgICAgaWYgKGVy
-ciAhPSBaX1NUUkVBTV9FTkQpIHsKPj4+ICsgICAgICAgIHJldHVybiAtMTsKPj4+ICsgICAgfQo+
-Pj4gKwo+Pj4gKyAgICByZXR1cm4gc3RyZWFtLT5uZXh0X291dCAtIGRlc3Q7Cj4+PiArfQo+Pj4g
-Kwo+Pj4KPj4+IEBAIC02ODMsOCArNzA3LDEwIEBAIHNzaXplX3QgcWVtdV9wdXRfY29tcHJlc3Np
-b25fZGF0YShRRU1VRmlsZSAqZiwgY29uc3QgdWludDhfdCAqcCwgc2l6ZV90IHNpemUsCj4+PiBy
-ZXR1cm4gLTE7Cj4+PiB9Cj4+PiB9Cj4+PiAtICAgIGlmIChjb21wcmVzczIoZi0+YnVmICsgZi0+
-YnVmX2luZGV4ICsgc2l6ZW9mKGludDMyX3QpLCAodUxvbmdmICopJmJsZW4sCj4+PiAtICAgICAg
-ICAgICAgICAgICAgKEJ5dGVmICopcCwgc2l6ZSwgbGV2ZWwpICE9IFpfT0spIHsKPj4+ICsKPj4+
-ICsgICAgYmxlbiA9IHFlbXVfY29tcHJlc3NfZGF0YShzdHJlYW0sIGYtPmJ1ZiArIGYtPmJ1Zl9p
-bmRleCArIHNpemVvZihpbnQzMl90KSwKPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBibGVuLCBwLCBzaXplKTsKPj4gVGhlICJsZXZlbCIgcGFyYW1ldGVyIGlzIG5ldmVyIHVzZWQg
-YWZ0ZXIgdGhlIHBhdGNoLCBjb3VsZCB3ZSBqdXN0IHJlbW92ZWQgaXQ/Cj4+IE9uIHRoZSBvdGhl
-ciBoYW5kLCBkZWZsYXRlKCkgb2YgemxpYiBzdXBwb3J0cyBjb21wcmVzc2lvbiBsZXZlbCB0b28o
-YnkKPj4gZGVmbGF0ZUluaXQoc3RyZWFtLCBsZXZlbCkpLCBzaG91bGQgd2UganVzdCByZXVzZSB0
-aGUgbGV2ZWwgcHJvcGVybHk/ICBJZiBub3QsIHRoZQo+PiAqbWlncmF0ZSBwYXJhbWV0ZXIgY29t
-cHJlc3NfbGV2ZWwqIHdpbGwgYmUgdXNlbGVzcy4KPiAKPiBUaGUgJ2xldmVsJyBoYXMgYmVlbiBw
-dXNoZWQgdG8gQHN0cmVhbToKPiArICAgICAgICBpZiAoZGVmbGF0ZUluaXQoJmNvbXBfcGFyYW1b
-aV0uc3RyZWFtLAo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICBtaWdyYXRlX2NvbXByZXNz
-X2xldmVsKCkpICE9IFpfT0spIHsKPiArICAgICAgICAgICAgZ290byBleGl0Owo+ICsgICAgICAg
-IH0KSW5kZWVkLCBJIG1pc3NlZCB0aGF0LiAKUmV2aWV3ZWQtYnk6IEppYW5nIEJpYW8gPGppYW5n
-LmJpYW8yQHp0ZS5jb20uY24+
+> From: Richard Henderson [mailto:richard.henderson@linaro.org]
+> We have confused the number of instructions that have been
+> executed in the TB with the number of instructions needed
+> to repeat the I/O instruction.
+> 
+> We have used cpu_restore_state_from_tb, which means that
+> the guest pc is pointing to the I/O instruction.  The only
+> time the answer to the later question is not 1 is when
+> MIPS or SH4 need to re-execute the branch for the delay
+> slot as well.
+> 
+> We must rely on cpu->cflags_next_tb to generate the next TB,
+> as otherwise we have a race condition with other guest cpus
+> within the TB cache.
+> 
+> Fixes: 0790f86861079b1932679d0f011e431aaf4ee9e2
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> 
+> My v1 raced with Paolo's pull request, so v2 now fixes Pavel's fix.
+> 
+
+Works for Ciro's ARM sample and doesn't break icount and replay for i386.
+Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+
+
+Pavel Dovgalyuk
+> r~
+> 
+> ---
+>  accel/tcg/translate-all.c | 37 ++++++++++---------------------------
+>  1 file changed, 10 insertions(+), 27 deletions(-)
+> 
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 5ad1b919bc..d4190602d1 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1728,8 +1728,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>      CPUArchState *env = cpu->env_ptr;
+>  #endif
+>      TranslationBlock *tb;
+> -    uint32_t n, flags;
+> -    target_ulong pc, cs_base;
+> +    uint32_t n;
+> 
+>      tb_lock();
+>      tb = tb_find_pc(retaddr);
+> @@ -1737,44 +1736,33 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>          cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
+>                    (void *)retaddr);
+>      }
+> -    n = cpu->icount_decr.u16.low + tb->icount;
+>      cpu_restore_state_from_tb(cpu, tb, retaddr);
+> -    /* Calculate how many instructions had been executed before the fault
+> -       occurred.  */
+> -    n = n - cpu->icount_decr.u16.low;
+> -    /* Generate a new TB ending on the I/O insn.  */
+> -    n++;
+> +
+>      /* On MIPS and SH, delay slot instructions can only be restarted if
+>         they were already the first instruction in the TB.  If this is not
+>         the first instruction in a TB then re-execute the preceding
+>         branch.  */
+> +    n = 1;
+>  #if defined(TARGET_MIPS)
+> -    if ((env->hflags & MIPS_HFLAG_BMASK) != 0 && n > 1) {
+> +    if ((env->hflags & MIPS_HFLAG_BMASK) != 0
+> +        && env->active_tc.PC != tb->pc) {
+>          env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
+>          cpu->icount_decr.u16.low++;
+>          env->hflags &= ~MIPS_HFLAG_BMASK;
+> +        n = 2;
+>      }
+>  #elif defined(TARGET_SH4)
+>      if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0
+> -            && n > 1) {
+> +        && env->pc != tb->pc) {
+>          env->pc -= 2;
+>          cpu->icount_decr.u16.low++;
+>          env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+> +        n = 2;
+>      }
+>  #endif
+> -    /* This should never happen.  */
+> -    if (n > CF_COUNT_MASK) {
+> -        cpu_abort(cpu, "TB too big during recompile");
+> -    }
+> 
+> -    pc = tb->pc;
+> -    cs_base = tb->cs_base;
+> -    flags = tb->flags;
+> -    tb_phys_invalidate(tb, -1);
+> -
+> -    /* Execute one IO instruction without caching
+> -       instead of creating large TB. */
+> -    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | CF_NOCACHE | 1;
+> +    /* Generate a new TB executing the I/O insn.  */
+> +    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
+> 
+>      if (tb->cflags & CF_NOCACHE) {
+>          if (tb->orig_tb) {
+> @@ -1785,11 +1773,6 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>          tb_remove(tb);
+>      }
+> 
+> -    /* Generate new TB instead of the current one. */
+> -    /* FIXME: In theory this could raise an exception.  In practice
+> -       we have already translated the block once so it's probably ok.  */
+> -    tb_gen_code(cpu, pc, cs_base, flags, curr_cflags() | CF_LAST_IO | n);
+> -
+>      /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+>       * the first in the TB) then we end up generating a whole new TB and
+>       *  repeating the fault, which is horribly inefficient.
+> --
+> 2.14.3
