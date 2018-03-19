@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey2gf-0001Ny-8t
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:51:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ey2is-0002Sd-Mg
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey2gc-0003v5-7a
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:51:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42474 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ey2gc-0003tM-3M
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:51:22 -0400
-References: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
-	<20180319213101.6100-4-wsa+renesas@sang-engineering.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2071e85f-72b9-9fa5-e5d7-7faa41fb9074@redhat.com>
-Date: Mon, 19 Mar 2018 16:51:04 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ey2ip-0000Wr-Kt
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:42 -0400
+Resent-Message-Id: <E1ey2ip-0000Wr-Kt@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21015)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ey2ip-0000JB-Dp
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:39 -0400
+In-Reply-To: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152149637617.147.13144022271990330634@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <20180319213101.6100-4-wsa+renesas@sang-engineering.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] nvram: at24c: use standard error
- reporting
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 19 Mar 2018 14:52:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] nvram: at24c: fix problems related
+ to "rom-size"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org
-Cc: linux-renesas-soc@vger.kernel.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: wsa+renesas@sang-engineering.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, f4bug@amsat.org
 
-On 03/19/2018 04:31 PM, Wolfram Sang wrote:
-> Replace the ERR macro with error_report() because fprintf is deprecated.
-> This also fixes the prefix printed out twice.
-> 
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> ---
->   hw/nvram/eeprom_at24c.c | 17 ++++++-----------
->   1 file changed, 6 insertions(+), 11 deletions(-)
-> 
-
-> @@ -63,8 +61,7 @@ int at24c_eeprom_event(I2CSlave *s, enum i2c_event event)
->           if (ee->blk && ee->changed) {
->               int len = blk_pwrite(ee->blk, 0, ee->mem, ee->rsize, 0);
->               if (len != ee->rsize) {
-> -                ERR(TYPE_AT24C_EE
-> -                        " : failed to write backing file\n");
-> +                error_report("failed to write backing file\n");
-
-Drop the \n here and elsewhere in your patch; error_report() already 
-does that for you.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzE5MjEzMTAxLjYxMDAtMS13c2ErcmVuZXNhc0BzYW5nLWVuZ2luZWVy
+aW5nLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAvM10gbnZyYW06IGF0MjRj
+OiBmaXggcHJvYmxlbXMgcmVsYXRlZCB0byAicm9tLXNpemUiCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBb
+bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzE5MjEzMTAxLjYxMDAtMS13c2Er
+cmVuZXNhc0BzYW5nLWVuZ2luZWVyaW5nLmNvbSAtPiBwYXRjaGV3LzIwMTgwMzE5MjEzMTAxLjYx
+MDAtMS13c2ErcmVuZXNhc0BzYW5nLWVuZ2luZWVyaW5nLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBi
+cmFuY2ggJ3Rlc3QnCjAwMmQ3M2E4ZmEgbnZyYW06IGF0MjRjOiB1c2Ugc3RhbmRhcmQgZXJyb3Ig
+cmVwb3J0aW5nCjZjNGRmM2Y5ZTggbnZyYW06IGF0MjRjOiB1c2UgYSBzYW5lIGRlZmF1bHQgZm9y
+ICJyb20tc2l6ZSIKMjI2NDBlYTk4MSBudnJhbTogYXQyNGM6IHByZXZlbnQgc2VnZmF1bHQgYnkg
+Y2hlY2tpbmcgInJvbS1zaXplIgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS8zOiBudnJhbTogYXQyNGM6IHByZXZlbnQgc2VnZmF1bHQgYnkgY2hlY2tpbmcgInJvbS1zaXpl
+Ii4uLgpDaGVja2luZyBQQVRDSCAyLzM6IG52cmFtOiBhdDI0YzogdXNlIGEgc2FuZSBkZWZhdWx0
+IGZvciAicm9tLXNpemUiLi4uCkNoZWNraW5nIFBBVENIIDMvMzogbnZyYW06IGF0MjRjOiB1c2Ug
+c3RhbmRhcmQgZXJyb3IgcmVwb3J0aW5nLi4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQg
+bm90IGNvbnRhaW4gbmV3bGluZXMKIzQwOiBGSUxFOiBody9udnJhbS9lZXByb21fYXQyNGMuYzo2
+NDoKKyAgICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoImZhaWxlZCB0byB3cml0ZSBiYWNraW5n
+IGZpbGVcbiIpOwoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXds
+aW5lcwojNDk6IEZJTEU6IGh3L252cmFtL2VlcHJvbV9hdDI0Yy5jOjEyNToKKyAgICAgICAgZXJy
+b3JfcmVwb3J0KCJyb20tc2l6ZSBub3QgYWxsb3dlZCB0byBiZSAwXG4iKTsKCkVSUk9SOiBFcnJv
+ciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzU4OiBGSUxFOiBody9udnJh
+bS9lZXByb21fYXQyNGMuYzoxMzU6CisgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkJhY2tpbmcg
+ZmlsZSBzaXplICVsdSAhPSAldVxuIiwKCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90
+IGNvbnRhaW4gbmV3bGluZXMKIzY4OiBGSUxFOiBody9udnJhbS9lZXByb21fYXQyNGMuYzoxNDM6
+CisgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkJhY2tpbmcgZmlsZSBpbmNvcnJlY3QgcGVybWlz
+c2lvblxuIik7CgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xp
+bmVzCiM3ODogRklMRTogaHcvbnZyYW0vZWVwcm9tX2F0MjRjLmM6MTY1OgorICAgICAgICAgICAg
+ZXJyb3JfcmVwb3J0KCJGYWlsZWQgaW5pdGlhbCBzeW5jIHdpdGggYmFja2luZyBmaWxlXG4iKTsK
+CnRvdGFsOiA1IGVycm9ycywgMCB3YXJuaW5ncywgNTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
