@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2C2-0001Jm-5u
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:49 -0400
+	(envelope-from <mjc@sifive.com>) id 1ey2C6-0001KB-2r
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2By-0002WD-DU
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:46 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34943)
+	(envelope-from <mjc@sifive.com>) id 1ey2C2-0002ZZ-0l
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:50 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2By-0002Vk-56
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:42 -0400
-Received: by mail-pl0-x243.google.com with SMTP id p9-v6so8502426pls.2
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:19:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2C1-0002YV-RQ
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:45 -0400
+Received: by mail-pl0-x241.google.com with SMTP id k22-v6so10205902pls.6
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:19:45 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon, 19 Mar 2018 14:18:24 -0700
-Message-Id: <1521494329-19546-2-git-send-email-mjc@sifive.com>
+Date: Mon, 19 Mar 2018 14:18:28 -0700
+Message-Id: <1521494329-19546-6-git-send-email-mjc@sifive.com>
 In-Reply-To: <1521494329-19546-1-git-send-email-mjc@sifive.com>
 References: <1521494329-19546-1-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 01/26] RISC-V: Make virt create_fdt
- interface consistent
+Subject: [Qemu-devel] [PATCH v4 05/26] RISC-V: Remove identity_translate
+ from load_elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +32,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-create_fdt sets the fdt variable on RISCVVirtState and this is
-used to access the fdt. This reverts a change introduced in
-https://github.com/riscv/riscv-qemu/pull/109 which introduced
-a redundant return value, overlooking the RISCVVirtState
-structure member that made create_fdt inconsistent with the
-other RISC-V machines. The other alternative is to change
-the other boards to return the fdt. Note: the RISCVVirtState
-also contains fdt_size.
+When load_elf is called with NULL as an argument to the
+address translate callback, it does an identity translation.
+This commit removes the redundant identity_translate callback.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
@@ -47,60 +42,99 @@ Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/riscv/virt.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ hw/riscv/sifive_e.c | 7 +------
+ hw/riscv/sifive_u.c | 7 +------
+ hw/riscv/spike.c    | 7 +------
+ hw/riscv/virt.c     | 7 +------
+ 4 files changed, 4 insertions(+), 24 deletions(-)
 
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 19eca36..09c9d49 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -82,16 +82,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+     }
+ }
+ 
+-static uint64_t identity_translate(void *opaque, uint64_t addr)
+-{
+-    return addr;
+-}
+-
+ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf(kernel_filename, identity_translate, NULL,
++    if (load_elf(kernel_filename, NULL, NULL,
+                  &kernel_entry, NULL, &kernel_high,
+                  0, ELF_MACHINE, 1, 0) < 0) {
+         error_report("qemu: could not load kernel '%s'", kernel_filename);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index f3f7615..6116c38 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -68,16 +68,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+     }
+ }
+ 
+-static uint64_t identity_translate(void *opaque, uint64_t addr)
+-{
+-    return addr;
+-}
+-
+ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf(kernel_filename, identity_translate, NULL,
++    if (load_elf(kernel_filename, NULL, NULL,
+                  &kernel_entry, NULL, &kernel_high,
+                  0, ELF_MACHINE, 1, 0) < 0) {
+         error_report("qemu: could not load kernel '%s'", kernel_filename);
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 4c233ec..7710333 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -59,16 +59,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
+     }
+ }
+ 
+-static uint64_t identity_translate(void *opaque, uint64_t addr)
+-{
+-    return addr;
+-}
+-
+ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf_ram_sym(kernel_filename, identity_translate, NULL,
++    if (load_elf_ram_sym(kernel_filename, NULL, NULL,
+             &kernel_entry, NULL, &kernel_high, 0, ELF_MACHINE, 1, 0,
+             NULL, true, htif_symbol_callback) < 0) {
+         error_report("qemu: could not load kernel '%s'", kernel_filename);
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index e2c214e..37968d2 100644
+index 0d101fc..f8c19b4 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -108,7 +108,7 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
-     return *start + size;
- }
- 
--static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-+static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     uint64_t mem_size, const char *cmdline)
- {
-     void *fdt;
-@@ -264,8 +264,6 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-     qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-     g_free(nodename);
--
--    return fdt;
- }
- 
- static void riscv_virt_board_init(MachineState *machine)
-@@ -279,7 +277,6 @@ static void riscv_virt_board_init(MachineState *machine)
-     char *plic_hart_config;
-     size_t plic_hart_config_len;
-     int i;
--    void *fdt;
- 
-     /* Initialize SOC */
-     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-@@ -299,7 +296,7 @@ static void riscv_virt_board_init(MachineState *machine)
-         main_mem);
- 
-     /* create device tree */
--    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
-+    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
- 
-     /* boot rom */
-     memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
-@@ -314,9 +311,9 @@ static void riscv_virt_board_init(MachineState *machine)
-             hwaddr end = load_initrd(machine->initrd_filename,
-                                      machine->ram_size, kernel_entry,
-                                      &start);
--            qemu_fdt_setprop_cell(fdt, "/chosen",
--                                  "linux,initrd-start", start);
--            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-+            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-start",
-+                                  start);
-+            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-                                   end);
-         }
+@@ -62,16 +62,11 @@ static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t len)
      }
+ }
+ 
+-static uint64_t identity_translate(void *opaque, uint64_t addr)
+-{
+-    return addr;
+-}
+-
+ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf(kernel_filename, identity_translate, NULL,
++    if (load_elf(kernel_filename, NULL, NULL,
+                  &kernel_entry, NULL, &kernel_high,
+                  0, ELF_MACHINE, 1, 0) < 0) {
+         error_report("qemu: could not load kernel '%s'", kernel_filename);
 -- 
 2.7.0
