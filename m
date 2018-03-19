@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1exz3J-00025q-P8
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:58:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1exzTN-00088m-00
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1exz3G-0006yb-OR
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:58:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35578 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1exz3G-0006xr-KQ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:58:30 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 19 Mar 2018 18:58:23 +0100
-Message-Id: <20180319175823.22111-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1exzTL-0001S4-Rz
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:25:29 -0400
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:46710)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1exzTL-0001Rf-ME
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 14:25:27 -0400
+Received: by mail-oi0-x22a.google.com with SMTP id x12so15133506oie.13
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 11:25:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hmp: free sev info
+In-Reply-To: <20180319154020.6d668399@igors-macbook-pro.local>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-9-peter.maydell@linaro.org>
+	<MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
+	<CAFEAcA_9YQ4bSzHgM8yLAPtPZ2C70u13kTCLf4rHGPCBUgNiZA@mail.gmail.com>
+	<20180319154020.6d668399@igors-macbook-pro.local>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Mar 2018 18:25:06 +0000
+Message-ID: <CAFEAcA9fnw90pV462Aa5CYYdrgKAYG1RsuQbXHEd-5PcnXjE4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, pbonzini@redhat.com, brijesh.singh@amd.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
 
-Found thanks to ASAN:
+On 19 March 2018 at 14:40, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 15 Mar 2018 17:13:03 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Igor, can you help with this question? For a board that always
+>> has one CPU type (because the real hardware only ever has
+>> one SoC, and that SoC QOM object hard codes the CPU type)
+>> does it still need to set the mc->default_cpu_type field in
+>> its MachineClass, or does that become pointless ?
+>
+> Since board ignores whatever were specified on '-cpu' and
+> there aren't any checks in board code for current_machine->cpu_type,
+> removing mc->default_cpu_type won't really affect anything.
+>
+> With current code in vl.c and with default_cpu_type set, user will
+> get error if he specified non existing cpu_model with -cpu.
+> If default_cpu_type were NULL, -cpu is completely ignored.
+>
+> But once http://patchwork.ozlabs.org/patch/870297/ is applied
+> it will error out the same way as if default_cpu_type were
+> set since vl.c won't rely on it anymore for parsing cpu_model.
+>
+> So in short it's ok to remove mc->default_cpu_type here.
 
-Direct leak of 16 byte(s) in 1 object(s) allocated from:
-    #0 0x7efe20417a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
-8)
-    #1 0x7efe1f7b2f75 in g_malloc0 ../glib/gmem.c:124
-    #2 0x7efe1f7b3249 in g_malloc0_n ../glib/gmem.c:355
-    #3 0x558272879162 in sev_get_info /home/elmarco/src/qemu/target/i386/=
-sev.c:414
-    #4 0x55827285113b in hmp_info_sev /home/elmarco/src/qemu/target/i386/=
-monitor.c:684
-    #5 0x5582724043b8 in handle_hmp_command /home/elmarco/src/qemu/monito=
-r.c:3333
+Thanks for the explanation. I think what I'll do is put these
+in as-is, and then have a followup patch that cleans up the
+default_cpu_types from raspi.c once that patch 870297 is in.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- target/i386/monitor.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 011419eba2..a890b3c2ab 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -696,6 +696,8 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
-     } else {
-         monitor_printf(mon, "SEV is not enabled\n");
-     }
-+
-+    qapi_free_SevInfo(info);
- }
-=20
- SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
---=20
-2.16.2.521.g9aa15f885a
+-- PMM
