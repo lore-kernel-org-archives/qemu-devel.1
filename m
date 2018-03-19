@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim7-0006Yy-0T
+	(envelope-from <dgibson@ozlabs.org>) id 1exim7-0006Z4-6c
 	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim5-0000Lv-HP
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1exim5-0000N0-UM
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Mar 2018 11:35:21 +1100
-Message-Id: <20180319003524.28143-6-david@gibson.dropbear.id.au>
+Date: Mon, 19 Mar 2018 11:35:18 +1100
+Message-Id: <20180319003524.28143-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
 References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 5/8] PPC e500: Fix gap between u-boot and kernel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/8] tests/boot-serial: Check the 40p machine,
+ too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,44 +24,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Engraf <david.engraf@sysgo.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: David Engraf <david.engraf@sysgo.com>
+From: Thomas Huth <thuth@redhat.com>
 
-This patch moves the gap between u-boot and kernel at the correct location.
+The "40p" machine is using the Open Hack'Ware BIOS, just like the "prep"
+machine, so we can test it accordingly with the boot-serial tester, too.
+While we're at it, also change the strings that we are using for the
+"prep" machine, so that this test now also checks some CLI parameters.
 
-Signed-off-by: David Engraf <david.engraf@sysgo.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/e500.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ tests/boot-serial-test.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 2238f963c4..9a85a41362 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -1009,6 +1009,10 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     }
- 
-     cur_base = loadaddr + payload_size;
-+    if (cur_base < (32 * 1024 * 1024)) {
-+        /* u-boot occupies memory up to 32MB, so load blobs above */
-+        cur_base = (32 * 1024 * 1024);
-+    }
- 
-     /* Load bare kernel only if no bios/u-boot has been provided */
-     if (machine->kernel_filename && !kernel_as_payload) {
-@@ -1025,11 +1029,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-         cur_base += kernel_size;
-     }
- 
--    if (cur_base < (32 * 1024 * 1024)) {
--        /* u-boot occupies memory up to 32MB, so load blobs above */
--        cur_base = (32 * 1024 * 1024);
--    }
--
-     /* Load initrd. */
-     if (machine->initrd_filename) {
-         initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
--- 
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index ece25c694f..5b24cd26c1 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -75,11 +75,13 @@ typedef struct testdef {
+ static testdef_t tests[] =3D {
+     { "alpha", "clipper", "", "PCI:" },
+     { "ppc", "ppce500", "", "U-Boot" },
+-    { "ppc", "prep", "", "Open Hack'Ware BIOS" },
++    { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
++    { "ppc", "40p", "-boot d", "Booting from device d" },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+     { "ppc", "mac99", "", "PowerPC,G4" },
+     { "ppc64", "ppce500", "", "U-Boot" },
+-    { "ppc64", "prep", "", "Open Hack'Ware BIOS" },
++    { "ppc64", "prep", "-boot e", "Booting from device e" },
++    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+     { "ppc64", "mac99", "", "PowerPC,970FX" },
+     { "ppc64", "pseries", "", "Open Firmware" },
+     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
+--=20
 2.14.3
