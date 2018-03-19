@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1exsYk-0001Q8-O5
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:02:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1exsaV-0002G2-9E
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1exsYj-00070h-Lu
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:02:34 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Mar 2018 11:02:15 +0000
-Message-Id: <20180319110215.16755-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.12] hw/arm/bcm2836: Use the Cortex-A7
- instead of Cortex-A15
+	(envelope-from <kwolf@redhat.com>) id 1exsaU-00089m-30
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 07:04:23 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 19 Mar 2018 12:04:01 +0100
+Message-Id: <20180319110401.20878-1-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 00/46] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,57 +20,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Andrew Baumann <Andrew.Baumann@microsoft.com>, Pekka Enberg <penberg@iki.fi>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-The BCM2836 uses a Cortex-A7, not a Cortex-A15. Update the device to
-use the correct CPU.
-https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
+The following changes since commit e1e44a9916b4318e943aecd669e096222cb3ea=
+eb:
 
-When the BCM2836 was introduced (bad5623690b) the Cortex-A7 was not
-available, so the very similar Cortex-A15 was used. Since dcf578ed8ce
-we can model the correct core.
+  Merge remote-tracking branch 'remotes/xtensa/tags/20180316-xtensa' into=
+ staging (2018-03-17 14:15:03 +0000)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This was originally done by a patch from Alistair:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg00311.html
+are available in the git repository at:
 
-The refactor of bcm2836 means the code is different, but I'm using
-the same commit message.
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-Based-on: <20180313153458.26822-1-peter.maydell@linaro.org>
+for you to fetch changes up to 63ca8406beac44aa59c389ed8578d0c7b3da3402:
 
----
- hw/arm/bcm2836.c | 2 +-
- hw/arm/raspi.c   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+  iotests: Avoid realpath, for CentOS 6 (2018-03-19 12:01:39 +0100)
 
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 25e74b67d9..8c1e707d9c 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -32,7 +32,7 @@ struct BCM283XInfo {
- static const BCM283XInfo bcm283x_socs[] = {
-     {
-         .name = TYPE_BCM2836,
--        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a15"),
-+        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
-         .clusterid = 0xf,
-     },
-     {
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 06f1e08ca9..955a7c4e80 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -226,7 +226,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->no_parallel = 1;
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
--    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
-     mc->max_cpus = BCM283X_NCPUS;
-     mc->min_cpus = BCM283X_NCPUS;
-     mc->default_cpus = BCM283X_NCPUS;
--- 
-2.16.2
+----------------------------------------------------------------
+Block layer patches
+
+----------------------------------------------------------------
+Eric Blake (1):
+      iotests: Avoid realpath, for CentOS 6
+
+Fam Zheng (4):
+      block: Fix flags in reopen queue
+      iotests: Add regression test for commit base locking
+      vvfat: Fix inherit_options flags
+      block: Fix leak of ignore_children in error path
+
+Jeff Cody (1):
+      block: fix iotest 146 output expectations
+
+John Snow (21):
+      blockjobs: fix set-speed kick
+      blockjobs: model single jobs as transactions
+      Blockjobs: documentation touchup
+      blockjobs: add status enum
+      blockjobs: add state transition table
+      iotests: add pause_wait
+      blockjobs: add block_job_verb permission table
+      blockjobs: add ABORTING state
+      blockjobs: add CONCLUDED state
+      blockjobs: add NULL state
+      blockjobs: add block_job_dismiss
+      blockjobs: ensure abort is called for cancelled jobs
+      blockjobs: add commit, abort, clean helpers
+      blockjobs: add block_job_txn_apply function
+      blockjobs: add prepare callback
+      blockjobs: add waiting status
+      blockjobs: add PENDING status and event
+      blockjobs: add block-job-finalize
+      blockjobs: Expose manual property
+      iotests: test manual job dismissal
+      tests/test-blockjob: test cancellations
+
+Kevin Wolf (14):
+      luks: Separate image file creation from formatting
+      luks: Create block_crypto_co_create_generic()
+      luks: Support .bdrv_co_create
+      luks: Turn invalid assertion into check
+      luks: Catch integer overflow for huge sizes
+      qemu-iotests: Test luks QMP image creation
+      parallels: Support .bdrv_co_create
+      qemu-iotests: Enable write tests for parallels
+      qcow: Support .bdrv_co_create
+      qed: Support .bdrv_co_create
+      vdi: Make comments consistent with other drivers
+      vhdx: Support .bdrv_co_create
+      vpc: Support .bdrv_co_create
+      vpc: Require aligned size in .bdrv_co_create
+
+Liang Li (1):
+      block/mirror: change the semantic of 'force' of block-job-cancel
+
+Max Reitz (3):
+      vdi: Pull option parsing from vdi_co_create
+      vdi: Move file creation to vdi_co_create_opts
+      vdi: Implement .bdrv_co_create
+
+Paolo Bonzini (1):
+      iscsi: fix iSER compilation
+
+ qapi/block-core.json          | 363 ++++++++++++++++++++++++++++++++++++=
+++++--
+ include/block/blockjob.h      |  71 ++++++++-
+ include/block/blockjob_int.h  |  17 +-
+ block.c                       |  10 +-
+ block/backup.c                |   5 +-
+ block/commit.c                |   2 +-
+ block/crypto.c                | 150 ++++++++++++-----
+ block/iscsi.c                 |   2 +-
+ block/mirror.c                |  12 +-
+ block/parallels.c             | 199 +++++++++++++++++------
+ block/qcow.c                  | 196 +++++++++++++++--------
+ block/qed.c                   | 204 ++++++++++++++++--------
+ block/stream.c                |   2 +-
+ block/vdi.c                   | 147 +++++++++++++----
+ block/vhdx.c                  | 216 +++++++++++++++++++------
+ block/vpc.c                   | 241 +++++++++++++++++++++-------
+ block/vvfat.c                 |   2 +-
+ blockdev.c                    |  71 +++++++--
+ blockjob.c                    | 358 +++++++++++++++++++++++++++++++++++-=
+-----
+ tests/test-bdrv-drain.c       |   5 +-
+ tests/test-blockjob-txn.c     |  27 ++--
+ tests/test-blockjob.c         | 233 ++++++++++++++++++++++++++-
+ block/trace-events            |   7 +
+ hmp-commands.hx               |   3 +-
+ tests/qemu-iotests/030        |   6 +-
+ tests/qemu-iotests/055        |  17 +-
+ tests/qemu-iotests/056        | 187 ++++++++++++++++++++++
+ tests/qemu-iotests/056.out    |   4 +-
+ tests/qemu-iotests/109.out    |  24 +--
+ tests/qemu-iotests/146.out    |   2 +-
+ tests/qemu-iotests/153        |  12 ++
+ tests/qemu-iotests/153.out    |   5 +
+ tests/qemu-iotests/181        |   2 +-
+ tests/qemu-iotests/210        | 210 ++++++++++++++++++++++++
+ tests/qemu-iotests/210.out    | 136 ++++++++++++++++
+ tests/qemu-iotests/check      |  13 +-
+ tests/qemu-iotests/common.rc  |   2 +-
+ tests/qemu-iotests/group      |   1 +
+ tests/qemu-iotests/iotests.py |  12 +-
+ 39 files changed, 2652 insertions(+), 524 deletions(-)
+ create mode 100755 tests/qemu-iotests/210
+ create mode 100644 tests/qemu-iotests/210.out
