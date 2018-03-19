@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ey2is-0002Sd-Mg
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1ey2iv-0002TF-2O
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ey2ip-0000Wr-Kt
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:42 -0400
-Resent-Message-Id: <E1ey2ip-0000Wr-Kt@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ey2ip-0000JB-Dp
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:39 -0400
-In-Reply-To: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152149637617.147.13144022271990330634@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 19 Mar 2018 14:52:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] nvram: at24c: fix problems related
- to "rom-size"
+	(envelope-from <eblake@redhat.com>) id 1ey2is-0000d5-2X
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:53:45 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 19 Mar 2018 16:53:35 -0500
+Message-Id: <20180319215335.1119213-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12] rdma: Fix 32-bit compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +17,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wsa+renesas@sang-engineering.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzE5MjEzMTAxLjYxMDAtMS13c2ErcmVuZXNhc0BzYW5nLWVuZ2luZWVy
-aW5nLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAvM10gbnZyYW06IGF0MjRj
-OiBmaXggcHJvYmxlbXMgcmVsYXRlZCB0byAicm9tLXNpemUiCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
-bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBb
-bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzE5MjEzMTAxLjYxMDAtMS13c2Er
-cmVuZXNhc0BzYW5nLWVuZ2luZWVyaW5nLmNvbSAtPiBwYXRjaGV3LzIwMTgwMzE5MjEzMTAxLjYx
-MDAtMS13c2ErcmVuZXNhc0BzYW5nLWVuZ2luZWVyaW5nLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCjAwMmQ3M2E4ZmEgbnZyYW06IGF0MjRjOiB1c2Ugc3RhbmRhcmQgZXJyb3Ig
-cmVwb3J0aW5nCjZjNGRmM2Y5ZTggbnZyYW06IGF0MjRjOiB1c2UgYSBzYW5lIGRlZmF1bHQgZm9y
-ICJyb20tc2l6ZSIKMjI2NDBlYTk4MSBudnJhbTogYXQyNGM6IHByZXZlbnQgc2VnZmF1bHQgYnkg
-Y2hlY2tpbmcgInJvbS1zaXplIgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS8zOiBudnJhbTogYXQyNGM6IHByZXZlbnQgc2VnZmF1bHQgYnkgY2hlY2tpbmcgInJvbS1zaXpl
-Ii4uLgpDaGVja2luZyBQQVRDSCAyLzM6IG52cmFtOiBhdDI0YzogdXNlIGEgc2FuZSBkZWZhdWx0
-IGZvciAicm9tLXNpemUiLi4uCkNoZWNraW5nIFBBVENIIDMvMzogbnZyYW06IGF0MjRjOiB1c2Ug
-c3RhbmRhcmQgZXJyb3IgcmVwb3J0aW5nLi4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQg
-bm90IGNvbnRhaW4gbmV3bGluZXMKIzQwOiBGSUxFOiBody9udnJhbS9lZXByb21fYXQyNGMuYzo2
-NDoKKyAgICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoImZhaWxlZCB0byB3cml0ZSBiYWNraW5n
-IGZpbGVcbiIpOwoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXds
-aW5lcwojNDk6IEZJTEU6IGh3L252cmFtL2VlcHJvbV9hdDI0Yy5jOjEyNToKKyAgICAgICAgZXJy
-b3JfcmVwb3J0KCJyb20tc2l6ZSBub3QgYWxsb3dlZCB0byBiZSAwXG4iKTsKCkVSUk9SOiBFcnJv
-ciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzU4OiBGSUxFOiBody9udnJh
-bS9lZXByb21fYXQyNGMuYzoxMzU6CisgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkJhY2tpbmcg
-ZmlsZSBzaXplICVsdSAhPSAldVxuIiwKCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90
-IGNvbnRhaW4gbmV3bGluZXMKIzY4OiBGSUxFOiBody9udnJhbS9lZXByb21fYXQyNGMuYzoxNDM6
-CisgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkJhY2tpbmcgZmlsZSBpbmNvcnJlY3QgcGVybWlz
-c2lvblxuIik7CgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xp
-bmVzCiM3ODogRklMRTogaHcvbnZyYW0vZWVwcm9tX2F0MjRjLmM6MTY1OgorICAgICAgICAgICAg
-ZXJyb3JfcmVwb3J0KCJGYWlsZWQgaW5pdGlhbCBzeW5jIHdpdGggYmFja2luZyBmaWxlXG4iKTsK
-CnRvdGFsOiA1IGVycm9ycywgMCB3YXJuaW5ncywgNTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Use the correct printf formats, so that a 32-bit compile doesn't
+spit out lots of warnings about %lx being incompatible with uint64_t.
+Broken since initial commit ef6d4ccd.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+
+I don't know if 'make vm-build-ubuntu.i368' would catch this (it failed
+for me for other reasons); I found it via a 32-bit rawhide VM.
+
+ hw/rdma/rdma_backend.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index e306fba5344..89020fdcf62 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -656,7 +656,8 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp)
+ #define CHK_ATTR(req, dev, member, fmt) ({ \
+     pr_dbg("%s="fmt","fmt"\n", #member, dev.member, req->member); \
+     if (req->member > dev.member) { \
+-        warn_report("%s = 0x%lx is higher than host device capability 0x%lx", \
++        warn_report("%s = 0x%" PRIx64 " is higher than host device " \
++                    "capability 0x%" PRIx64, \
+                     #member, (uint64_t)req->member, (uint64_t)dev.member); \
+         req->member = dev.member; \
+     } \
+-- 
+2.14.3
