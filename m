@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1expp3-0006hy-IA
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:07:14 -0400
+	(envelope-from <wsa@the-dreams.de>) id 1exqF0-0002js-RW
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:34:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1expp0-0005lt-Al
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:07:13 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 19 Mar 2018 11:07:05 +0300
-Message-Id: <20180319080705.10310-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap
- directory
+	(envelope-from <wsa@the-dreams.de>) id 1exqEw-0006w6-Ro
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:34:02 -0400
+Received: from sauhun.de ([88.99.104.3]:54291 helo=pokefinder.org)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wsa@the-dreams.de>) id 1exqEw-0006vR-Kh
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:33:58 -0400
+Date: Mon, 19 Mar 2018 09:33:55 +0100
+From: Wolfram Sang <wsa@the-dreams.de>
+Message-ID: <20180319083355.vw5cxkwyb4zihlcz@ninjato>
+References: <20180312214230.17561-1-wsa+renesas@sang-engineering.com>
+	<20180312214230.17561-4-wsa+renesas@sang-engineering.com>
+	<5108cc9b-9fb9-d202-d4bc-a5c1dd4d4f76@amsat.org>
+	<20180313201649.w44jtdbk4bow2f7x@ninjato>
+	<f90bfd58-1f51-dc72-a67a-c0021345f9ba@amsat.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tvc27v433gqtec4q"
+Content-Disposition: inline
+In-Reply-To: <f90bfd58-1f51-dc72-a67a-c0021345f9ba@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 3/3] nvram: at24c: use a sane default for
+ "rom-size"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,175 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, eblake@redhat.com
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
-
-If it appropriate for 2.12, let's push it. If not - then for 2.13.
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
 
-v2: - squash 02 (indentation fix) to 01
-    - drop comment from qcow2_check_metadata_overlap()
-    - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in-place case in
-      bitmap_list_store. I don't think non-inplace case should be changed,
-      as it don't touch active bitmap directory.
+--tvc27v433gqtec4q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- block/qcow2.h          | 45 ++++++++++++++++++++++++---------------------
- block/qcow2-bitmap.c   |  7 ++++++-
- block/qcow2-refcount.c | 10 ++++++++++
- block/qcow2.c          | 22 ++++++++++++++--------
- 4 files changed, 54 insertions(+), 30 deletions(-)
+Hi Philippe,
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 6f0ff15dd0..896ad08e5b 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -98,6 +98,7 @@
- #define QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE "overlap-check.snapshot-table"
- #define QCOW2_OPT_OVERLAP_INACTIVE_L1 "overlap-check.inactive-l1"
- #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-l2"
-+#define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY "overlap-check.bitmap-directory"
- #define QCOW2_OPT_CACHE_SIZE "cache-size"
- #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
- #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
-@@ -398,34 +399,36 @@ typedef enum QCow2ClusterType {
- } QCow2ClusterType;
- 
- typedef enum QCow2MetadataOverlap {
--    QCOW2_OL_MAIN_HEADER_BITNR    = 0,
--    QCOW2_OL_ACTIVE_L1_BITNR      = 1,
--    QCOW2_OL_ACTIVE_L2_BITNR      = 2,
--    QCOW2_OL_REFCOUNT_TABLE_BITNR = 3,
--    QCOW2_OL_REFCOUNT_BLOCK_BITNR = 4,
--    QCOW2_OL_SNAPSHOT_TABLE_BITNR = 5,
--    QCOW2_OL_INACTIVE_L1_BITNR    = 6,
--    QCOW2_OL_INACTIVE_L2_BITNR    = 7,
--
--    QCOW2_OL_MAX_BITNR            = 8,
--
--    QCOW2_OL_NONE           = 0,
--    QCOW2_OL_MAIN_HEADER    = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
--    QCOW2_OL_ACTIVE_L1      = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
--    QCOW2_OL_ACTIVE_L2      = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
--    QCOW2_OL_REFCOUNT_TABLE = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
--    QCOW2_OL_REFCOUNT_BLOCK = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
--    QCOW2_OL_SNAPSHOT_TABLE = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
--    QCOW2_OL_INACTIVE_L1    = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
-+    QCOW2_OL_MAIN_HEADER_BITNR      = 0,
-+    QCOW2_OL_ACTIVE_L1_BITNR        = 1,
-+    QCOW2_OL_ACTIVE_L2_BITNR        = 2,
-+    QCOW2_OL_REFCOUNT_TABLE_BITNR   = 3,
-+    QCOW2_OL_REFCOUNT_BLOCK_BITNR   = 4,
-+    QCOW2_OL_SNAPSHOT_TABLE_BITNR   = 5,
-+    QCOW2_OL_INACTIVE_L1_BITNR      = 6,
-+    QCOW2_OL_INACTIVE_L2_BITNR      = 7,
-+    QCOW2_OL_BITMAP_DIRECTORY_BITNR = 8,
-+
-+    QCOW2_OL_MAX_BITNR              = 9,
-+
-+    QCOW2_OL_NONE             = 0,
-+    QCOW2_OL_MAIN_HEADER      = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
-+    QCOW2_OL_ACTIVE_L1        = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
-+    QCOW2_OL_ACTIVE_L2        = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
-+    QCOW2_OL_REFCOUNT_TABLE   = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
-+    QCOW2_OL_REFCOUNT_BLOCK   = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
-+    QCOW2_OL_SNAPSHOT_TABLE   = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
-+    QCOW2_OL_INACTIVE_L1      = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
-     /* NOTE: Checking overlaps with inactive L2 tables will result in bdrv
-      * reads. */
--    QCOW2_OL_INACTIVE_L2    = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
-+    QCOW2_OL_INACTIVE_L2      = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
-+    QCOW2_OL_BITMAP_DIRECTORY = (1 << QCOW2_OL_BITMAP_DIRECTORY_BITNR),
- } QCow2MetadataOverlap;
- 
- /* Perform all overlap checks which can be done in constant time */
- #define QCOW2_OL_CONSTANT \
-     (QCOW2_OL_MAIN_HEADER | QCOW2_OL_ACTIVE_L1 | QCOW2_OL_REFCOUNT_TABLE | \
--     QCOW2_OL_SNAPSHOT_TABLE)
-+     QCOW2_OL_SNAPSHOT_TABLE | QCOW2_OL_BITMAP_DIRECTORY)
- 
- /* Perform all overlap checks which don't require disk access */
- #define QCOW2_OL_CACHED \
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index f45e46cfbd..fb750ba8d3 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -776,7 +776,12 @@ static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm_list,
-         }
-     }
- 
--    ret = qcow2_pre_write_overlap_check(bs, 0, dir_offset, dir_size);
-+    /* Actually, even in in-place case ignoring QCOW2_OL_BITMAP_DIRECTORY is not
-+     * necessary, because we drop QCOW2_AUTOCLEAR_BITMAPS when updating bitmap
-+     * directory in-place (actually, turn-off the extension), which is checked
-+     * in qcow2_check_metadata_overlap() */
-+    ret = qcow2_pre_write_overlap_check(
-+            bs, in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0, dir_offset, dir_size);
-     if (ret < 0) {
-         goto fail;
-     }
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 3de1ab51ba..275a303cfa 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2585,6 +2585,16 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-         }
-     }
- 
-+    if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
-+        (s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS))
-+    {
-+        if (overlaps_with(s->bitmap_directory_offset,
-+                          s->bitmap_directory_size))
-+        {
-+            return QCOW2_OL_BITMAP_DIRECTORY;
-+        }
-+    }
-+
-     return 0;
- }
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1914a940e5..23f36a67c7 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -655,6 +655,11 @@ static QemuOptsList qcow2_runtime_opts = {
-             .help = "Check for unintended writes into an inactive L2 table",
-         },
-         {
-+            .name = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
-+            .type = QEMU_OPT_BOOL,
-+            .help = "Check for unintended writes into the bitmap directory",
-+        },
-+        {
-             .name = QCOW2_OPT_CACHE_SIZE,
-             .type = QEMU_OPT_SIZE,
-             .help = "Maximum combined metadata (L2 tables and refcount blocks) "
-@@ -682,14 +687,15 @@ static QemuOptsList qcow2_runtime_opts = {
- };
- 
- static const char *overlap_bool_option_names[QCOW2_OL_MAX_BITNR] = {
--    [QCOW2_OL_MAIN_HEADER_BITNR]    = QCOW2_OPT_OVERLAP_MAIN_HEADER,
--    [QCOW2_OL_ACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L1,
--    [QCOW2_OL_ACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L2,
--    [QCOW2_OL_REFCOUNT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
--    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
--    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
--    [QCOW2_OL_INACTIVE_L1_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L1,
--    [QCOW2_OL_INACTIVE_L2_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L2,
-+    [QCOW2_OL_MAIN_HEADER_BITNR]      = QCOW2_OPT_OVERLAP_MAIN_HEADER,
-+    [QCOW2_OL_ACTIVE_L1_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L1,
-+    [QCOW2_OL_ACTIVE_L2_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L2,
-+    [QCOW2_OL_REFCOUNT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
-+    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
-+    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
-+    [QCOW2_OL_INACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L1,
-+    [QCOW2_OL_INACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L2,
-+    [QCOW2_OL_BITMAP_DIRECTORY_BITNR] = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
- };
- 
- static void cache_clean_timer_cb(void *opaque)
--- 
-2.11.1
+> > I don't mind much, but why? My reasoning was "let's first fix the cause
+> > and then the symptom"?
+>=20
+> The '0' case is worst than incorrect, it segfaults, so you are right :)
+
+Ok, thanks.
+
+> >> Can you add a #define for this value? Such AT24C_ROMSIZE_MIN.
+> >=20
+> > Can do, of course. But won't that give room for regressions because
+> > people are already using it with lower values?
+>=20
+> Your patch already introduce the regression :)
+
+Not really. The current default setting (0) segfaults. This is how I
+discovered it. So, there can't be any active user of that.
+
+> I prefer self-explanatory #defines than magic value, but I see your
+> point, so if we can not decide a value, can you add a comment to explain
+> the magic value? I think the clearer is to add a #define with a comment.
+
+I wouldn't mind a macro AT24C_ROMSIZE_DEFAULT and a comment explaining
+why we chose this value. This is totally fine with me.
+
+It was just the MIN value I saw potential usage regressions with.
+
+> IMO there are too many AT24C eeproms to model, so the "rom-size"
+> variable is the easiest way. Your patch #2 is simple enough to avoid the
+> #DIV/0!
+
+Fine with me, too. I will update my series accordingly.
+
+Thanks,
+
+   Wolfram
+
+--tvc27v433gqtec4q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAlqvde4ACgkQFA3kzBSg
+KbZOHRAAjBMuJjj3SPYWkhYuHhpVGhOxnUIazf6rkz396XKFf+cuNgqSI4C7vDhN
+xzDUBsDpYkGdxwtTup282x2yQbvuC155Og+B0qzACE/qlIsr1b5xDnFWISQp9DrQ
+qfZjFnd9GYUVVqOz78IpB29oIed4R8vDkOZKv9wbmZxahVN5lpeVqrHm38aIsq4W
+sZLIKbLwLe0KesTwBZjPDPRupstynPav4NLT1KWHW015PYI5wwXZXwHP7qq0D4vs
+M4geyZ8hAhMOiyiPPZ/rIvggVNCicuri7mCyZg5KOLNnAu6wWgaBWfKAM7cozwqU
+boXmyt/m4EJohPYeucqB0bfGqdj9FPNyGtP8iaqI4glE5YjdKA9YfsvQuHmVP2Kk
+GsId0eznimI+Hg1Gce6uCBxocC7wwfp4LTfrQlY60sElCFhJdyOcDmoPS6K+P3Dk
+T44WOH3rtiLUtdaRD2+j2ypzca8Agex4BRCQF2nQGyx1Fu2Bef7ZomI4vURt7j2V
+iF71UsM+7HeQTHAC6r81K/QJd4Eya+aKQwc/XY5NKRw/SqIZ2kG0Tx6ESV/HLnQd
+TUQcs0qKGUyK2HoLFDI85IVNxVK23zthnmrfYsYw8RP0hY/NXvPzCHgjh1x80omd
++T92dJ9x/Y0QQ3vfrxXAhV49OQVNZYk97oSi4yLzqqTOJ6KA8Ms=
+=596v
+-----END PGP SIGNATURE-----
+
+--tvc27v433gqtec4q--
