@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1exp30-0002i0-FU
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 03:17:35 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1exp32-0002jd-ND
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 03:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1exp2z-0008Up-3k
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 03:17:34 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1exp31-0008WM-Bv
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 03:17:36 -0400
 Received: from mga11.intel.com ([192.55.52.93]:42870)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1exp2y-0008Rg-O9
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 03:17:33 -0400
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1exp31-0008Rg-1Q
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 03:17:35 -0400
 From: Tiwei Bie <tiwei.bie@intel.com>
-Date: Mon, 19 Mar 2018 15:15:34 +0800
-Message-Id: <20180319071537.28649-4-tiwei.bie@intel.com>
+Date: Mon, 19 Mar 2018 15:15:35 +0800
+Message-Id: <20180319071537.28649-5-tiwei.bie@intel.com>
 In-Reply-To: <20180319071537.28649-1-tiwei.bie@intel.com>
 References: <20180319071537.28649-1-tiwei.bie@intel.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] virtio: support adding sub-regions for
- notify region
+Subject: [Qemu-devel] [PATCH v2 4/6] vfio: support getting VFIOGroup from
+ groupfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,213 +27,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 Cc: cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com, tiwei.bie@intel.com
 
-Provide APIs to support querying whether the page-per-vq
-is enabled and adding sub-regions for notify region.
+Add an API to support getting VFIOGroup from groupfd. When
+groupfd is shared by another process, the VFIOGroup may not
+have its container and address space in QEMU.
+
+Besides, add a reference counter to better support getting
+VFIOGroup multiple times.
 
 Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
 ---
- Makefile.target            |  4 ++++
- hw/virtio/virtio-pci.c     | 48 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.h     |  5 +++++
- hw/virtio/virtio.c         | 39 +++++++++++++++++++++++++++++++++++++
- include/hw/virtio/virtio.h |  5 +++++
- include/qemu/osdep.h       |  1 +
- scripts/create_config      |  3 +++
- 7 files changed, 105 insertions(+)
+ hw/vfio/common.c              | 97 ++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/vfio/vfio-common.h |  2 +
+ 2 files changed, 98 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 6549481096..b2cf618dc9 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -39,6 +39,9 @@ STPFILES=
- config-target.h: config-target.h-timestamp
- config-target.h-timestamp: config-target.mak
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 5e84716218..24ec0f2c8d 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1038,6 +1038,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     int ret, fd;
+     VFIOAddressSpace *space;
  
-+config-devices.h: config-devices.h-timestamp
-+config-devices.h-timestamp: config-devices.mak
++    if (as == NULL) {
++        vfio_kvm_device_add_group(group);
++        return 0;
++    }
 +
- ifdef CONFIG_TRACE_SYSTEMTAP
- stap: $(QEMU_PROG).stp-installed $(QEMU_PROG).stp $(QEMU_PROG)-simpletrace.stp
+     space = vfio_get_address_space(as);
  
-@@ -224,4 +227,5 @@ ifdef CONFIG_TRACE_SYSTEMTAP
- endif
+     QLIST_FOREACH(container, &space->containers, next) {
+@@ -1237,6 +1242,10 @@ static void vfio_disconnect_container(VFIOGroup *group)
+ {
+     VFIOContainer *container = group->container;
  
- GENERATED_FILES += config-target.h
-+GENERATED_FILES += config-devices.h
- Makefile: $(GENERATED_FILES)
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 1e8ab7bbc5..b17471092a 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1534,6 +1534,54 @@ static void virtio_pci_modern_io_region_unmap(VirtIOPCIProxy *proxy,
-                                 &region->mr);
++    if (container == NULL) {
++        return;
++    }
++
+     QLIST_REMOVE(group, container_next);
+     group->container = NULL;
+ 
+@@ -1275,6 +1284,86 @@ static void vfio_disconnect_container(VFIOGroup *group)
+     }
  }
  
-+static VirtIOPCIProxy *virtio_device_to_virtio_pci_proxy(VirtIODevice *vdev)
++static int vfio_groupfd_to_groupid(int groupfd)
 +{
-+    VirtIOPCIProxy *proxy = NULL;
++    char linkname[PATH_MAX];
++    char pathname[PATH_MAX];
++    char *filename;
++    int groupid, len;
 +
-+    if (vdev->device_id == VIRTIO_ID_NET) {
-+        VirtIONetPCI *d = container_of(vdev, VirtIONetPCI, vdev.parent_obj);
-+        proxy = &d->parent_obj;
-+    }
++    snprintf(linkname, sizeof(linkname), "/proc/self/fd/%d", groupfd);
 +
-+    return proxy;
-+}
-+
-+bool virtio_pci_page_per_vq_enabled(VirtIODevice *vdev)
-+{
-+    VirtIOPCIProxy *proxy = virtio_device_to_virtio_pci_proxy(vdev);
-+
-+    if (proxy == NULL) {
-+        return false;
-+    }
-+
-+    return !!(proxy->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ);
-+}
-+
-+int virtio_pci_notify_region_map(VirtIODevice *vdev, int queue_idx,
-+                                 MemoryRegion *mr)
-+{
-+    VirtIOPCIProxy *proxy = virtio_device_to_virtio_pci_proxy(vdev);
-+    int offset;
-+
-+    if (proxy == NULL || !virtio_pci_modern(proxy)) {
++    len = readlink(linkname, pathname, sizeof(pathname));
++    if (len <= 0 || len >= sizeof(pathname)) {
 +        return -1;
 +    }
++    pathname[len] = '\0';
 +
-+    offset = virtio_pci_queue_mem_mult(proxy) * queue_idx;
-+    memory_region_add_subregion(&proxy->notify.mr, offset, mr);
++    filename = g_path_get_basename(pathname);
++    groupid = atoi(filename);
++    g_free(filename);
 +
-+    return 0;
++    return groupid;
 +}
 +
-+void virtio_pci_notify_region_unmap(VirtIODevice *vdev, MemoryRegion *mr)
++/*
++ * The @as param could be NULL. In this case, groupfd is shared by
++ * another process which will setup the DMA mapping for this group,
++ * and this group won't have container and address space in QEMU.
++ */
++VFIOGroup *vfio_get_group_from_fd(int groupfd, AddressSpace *as, Error **errp)
 +{
-+    VirtIOPCIProxy *proxy = virtio_device_to_virtio_pci_proxy(vdev);
++    VFIOGroup *group;
++    int groupid;
 +
-+    if (proxy != NULL) {
-+        memory_region_del_subregion(&proxy->notify.mr, mr);
++    groupid = vfio_groupfd_to_groupid(groupfd);
++    if (groupid < 0) {
++        return NULL;
 +    }
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        if (group->groupid == groupid) {
++            /* Found it.  Now is it already in the right context? */
++            if ((group->container == NULL && as == NULL) ||
++                (group->container && group->container->space->as == as)) {
++                    group->refcnt++;
++                    return group;
++            }
++            error_setg(errp, "group %d used in multiple address spaces",
++                       group->groupid);
++            return NULL;
++        }
++    }
++
++    group = g_malloc0(sizeof(*group));
++
++    group->fd = groupfd;
++    group->groupid = groupid;
++    group->refcnt = 1;
++
++    QLIST_INIT(&group->device_list);
++
++    if (vfio_connect_container(group, as, errp)) {
++        error_prepend(errp, "failed to setup container for group %d: ",
++                      groupid);
++        goto free_group_exit;
++    }
++
++    if (QLIST_EMPTY(&vfio_group_list)) {
++        qemu_register_reset(vfio_reset_handler, NULL);
++    }
++
++    QLIST_INSERT_HEAD(&vfio_group_list, group, next);
++
++    return group;
++
++free_group_exit:
++    g_free(group);
++
++    return NULL;
 +}
 +
- static void virtio_pci_pre_plugged(DeviceState *d, Error **errp)
++/* The @as param cannot be NULL. */
+ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
  {
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 813082b0d7..8061133741 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -213,6 +213,11 @@ static inline void virtio_pci_disable_modern(VirtIOPCIProxy *proxy)
-     proxy->disable_modern = true;
- }
+     VFIOGroup *group;
+@@ -1284,7 +1373,8 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+     QLIST_FOREACH(group, &vfio_group_list, next) {
+         if (group->groupid == groupid) {
+             /* Found it.  Now is it already in the right context? */
+-            if (group->container->space->as == as) {
++            if (group->container && group->container->space->as == as) {
++                group->refcnt++;
+                 return group;
+             } else {
+                 error_setg(errp, "group %d used in multiple address spaces",
+@@ -1317,6 +1407,7 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+     }
  
-+bool virtio_pci_page_per_vq_enabled(VirtIODevice *vdev);
-+int virtio_pci_notify_region_map(VirtIODevice *vdev, int queue_idx,
-+                                 MemoryRegion *mr);
-+void virtio_pci_notify_region_unmap(VirtIODevice *vdev, MemoryRegion *mr);
-+
- /*
-  * virtio-scsi-pci: This extends VirtioPCIProxy.
-  */
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 006d3d1148..90ee72984c 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -22,6 +22,7 @@
- #include "qemu/atomic.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
-+#include "hw/virtio/virtio-pci.h"
- #include "sysemu/dma.h"
+     group->groupid = groupid;
++    group->refcnt = 1;
+     QLIST_INIT(&group->device_list);
  
- /*
-@@ -2681,6 +2682,44 @@ void virtio_device_release_ioeventfd(VirtIODevice *vdev)
-     virtio_bus_release_ioeventfd(vbus);
- }
+     if (vfio_connect_container(group, as, errp)) {
+@@ -1348,6 +1439,10 @@ void vfio_put_group(VFIOGroup *group)
+         return;
+     }
  
-+bool virtio_device_parent_is_pci_device(VirtIODevice *vdev)
-+{
-+    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-+    const char *typename = object_get_typename(OBJECT(qbus->parent));
-+
-+    return strstr(typename, "pci") != NULL;
-+}
-+
-+bool virtio_device_page_per_vq_enabled(VirtIODevice *vdev)
-+{
-+#ifdef CONFIG_VIRTIO_PCI
-+    if (virtio_device_parent_is_pci_device(vdev)) {
-+        return virtio_pci_page_per_vq_enabled(vdev);
++    if (--group->refcnt > 0) {
++        return;
 +    }
-+#endif
-+    return false;
-+}
 +
-+int virtio_device_notify_region_map(VirtIODevice *vdev, int queue_idx,
-+                                    MemoryRegion *mr)
-+{
-+#ifdef CONFIG_VIRTIO_PCI
-+    if (virtio_device_parent_is_pci_device(vdev)) {
-+        return virtio_pci_notify_region_map(vdev, queue_idx, mr);
-+    }
-+#endif
-+    return -1;
-+}
-+
-+void virtio_device_notify_region_unmap(VirtIODevice *vdev, MemoryRegion *mr)
-+{
-+#ifdef CONFIG_VIRTIO_PCI
-+    if (virtio_device_parent_is_pci_device(vdev)) {
-+        virtio_pci_notify_region_unmap(vdev, mr);
-+    }
-+#endif
-+}
-+
- static void virtio_device_class_init(ObjectClass *klass, void *data)
- {
-     /* Set the default value here. */
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 098bdaaea3..b14accdb08 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -285,6 +285,11 @@ void virtio_device_stop_ioeventfd(VirtIODevice *vdev);
- int virtio_device_grab_ioeventfd(VirtIODevice *vdev);
- void virtio_device_release_ioeventfd(VirtIODevice *vdev);
- bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev);
-+bool virtio_device_parent_is_pci_device(VirtIODevice *vdev);
-+bool virtio_device_page_per_vq_enabled(VirtIODevice *vdev);
-+int virtio_device_notify_region_map(VirtIODevice *vdev, int queue_idx,
-+                                    MemoryRegion *mr);
-+void virtio_device_notify_region_unmap(VirtIODevice *vdev, MemoryRegion *mr);
- EventNotifier *virtio_queue_get_host_notifier(VirtQueue *vq);
- void virtio_queue_host_notifier_read(EventNotifier *n);
- void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContext *ctx,
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 41658060a7..2532c278ef 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -30,6 +30,7 @@
- #include "config-host.h"
- #ifdef NEED_CPU_H
- #include "config-target.h"
-+#include "config-devices.h"
- #else
- #include "exec/poison.h"
- #endif
-diff --git a/scripts/create_config b/scripts/create_config
-index d727e5e36e..e4541a51ed 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -58,6 +58,9 @@ case $line in
-     name=${line%=*}
-     echo "#define $name 1"
-     ;;
-+ CONFIG_*='$(CONFIG_'*')') # configuration
-+    continue
-+    ;;
-  CONFIG_*=*) # configuration
-     name=${line%=*}
-     value=${line#*=}
+     vfio_kvm_device_del_group(group);
+     vfio_disconnect_container(group);
+     QLIST_REMOVE(group, next);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index d9360148e6..b820f7984c 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -137,6 +137,7 @@ struct VFIODeviceOps {
+ typedef struct VFIOGroup {
+     int fd;
+     int groupid;
++    int refcnt;
+     VFIOContainer *container;
+     QLIST_HEAD(, VFIODevice) device_list;
+     QLIST_ENTRY(VFIOGroup) next;
+@@ -180,6 +181,7 @@ void vfio_region_exit(VFIORegion *region);
+ void vfio_region_finalize(VFIORegion *region);
+ void vfio_reset_handler(void *opaque);
+ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
++VFIOGroup *vfio_get_group_from_fd(int groupfd, AddressSpace *as, Error **errp);
+ void vfio_put_group(VFIOGroup *group);
+ int vfio_get_device(VFIOGroup *group, const char *name,
+                     VFIODevice *vbasedev, Error **errp);
 -- 
 2.11.0
