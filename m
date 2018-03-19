@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chao.qin@linux.intel.com>) id 1exqze-0006lP-9E
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:22:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1exvoN-0007ZL-Lm
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 10:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chao.qin@linux.intel.com>) id 1exqzZ-0003pJ-Dp
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:22:14 -0400
-Received: from mga11.intel.com ([192.55.52.93]:48368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chao.qin@linux.intel.com>)
-	id 1exqzZ-0003eg-2V
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:22:09 -0400
-From: chao.qin@linux.intel.com
-Date: Mon, 19 Mar 2018 17:04:49 +0800
-Message-Id: <1521450289-5005-1-git-send-email-chao.qin@linux.intel.com>
-Subject: [Qemu-devel] [PATCH] hax: Properly handle IA32_APIC_BASE MSR
+	(envelope-from <bounces@canonical.com>) id 1exvoK-0007k5-GA
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 10:30:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1exvoK-0007iX-98
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 10:30:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1exvoI-0002l3-9H
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:30:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 41FC72E80CD
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:30:50 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 19 Mar 2018 14:18:06 -0000
+From: ChristianEhrhardt <1756807@bugs.launchpad.net>
+Reply-To: Bug 1756807 <1756807@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152144414128.31022.3971379528979064267.malonedeb@wampee.canonical.com>
+Message-Id: <152146908641.3335.1426880459501386835.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1756807] Re: performance regression in qemu-user
+ + proot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,169 +38,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: yu.ning@linux.intel.com, Qin Chao <chao.qin@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Qin Chao <chao.qin@intel.com>
+Thanks for the check Alistar,
 
-Emulation of IA32_APIC_BASE MSR in HAXM is not correct, such as bit
-8, which is BSP flag and should be set to 1 for the bootstrap
-processor and set to 0 for the application processors, but it's set
-to 0 for all processors in HAXM. So guest OSes that expect a valid
-BSP flag, such as Zircon (the core of Google Fuchsia OS), cannot
-boot with "-accel hax". To solve this problem, HAXM (which lacks
-APIC virtualization) and QEMU must notify each other of any change
-to guest IA32_APIC_BASE MSR. The HAXM patch has been merged into
-HAXM source. QEMU needs to use the new HAXM API (apic_base in
-"struct hax_tunnel") to initialize the guest IA32_APIC_BASE MSR,
-and then, update its own copy at every return from
-HAX_VCPU_IOCTL_RUN.
+Lets add a Qemu (upstream) bug task so this one is mirrored to the ML.
 
-There will be a backward compatility issue caused by the new field
-"apic_base" added into "struct hax_tunnel". In order to fix the
-problem, the validation for size of "struct hax_tunnel" is removed
-and a new capability flag "HAX_CAP_TUNNEL_PAGE" is added, which
-means that one page (4KB) is allocated in HAXM kernel to store
-"struct hax_tunnel", instead of the size of "struct hax_tunnel".
+I'm not familiar with that area, but on the ML one can decide if it is a
+dup to https://bugs.launchpad.net/qemu/+bug/1740219 or not.
 
-Change-Id: I8505bc1d75c495dd2765e581d6014125dcb538f3
-Signed-off-by: Qin Chao <chao.qin@intel.com>
----
- target/i386/hax-all.c       | 24 +++++++++++++++++++-----
- target/i386/hax-darwin.c    |  6 ------
- target/i386/hax-i386.h      |  2 +-
- target/i386/hax-interface.h |  3 +++
- target/i386/hax-windows.c   |  5 -----
- 5 files changed, 23 insertions(+), 17 deletions(-)
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
 
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index cad7531..6a840d9 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -62,11 +62,6 @@ int hax_enabled(void)
-     return hax_allowed;
- }
- 
--int valid_hax_tunnel_size(uint16_t size)
--{
--    return size >= sizeof(struct hax_tunnel);
--}
--
- hax_fd hax_vcpu_get_fd(CPUArchState *env)
- {
-     struct hax_vcpu_state *vcpu = ENV_GET_CPU(env)->hax_vcpu;
-@@ -104,6 +99,7 @@ static int hax_get_capability(struct hax_state *hax)
-     }
- 
-     hax->supports_64bit_ramblock = !!(cap->winfo & HAX_CAP_64BIT_RAMBLOCK);
-+    hax->supports_tunnel_page = !!(cap->winfo & HAX_CAP_TUNNEL_PAGE);
- 
-     if (cap->wstatus & HAX_CAP_MEMQUOTA) {
-         if (cap->mem_quota < hax->mem_quota) {
-@@ -520,6 +516,21 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-         cpu_exec_end(cpu);
-         qemu_mutex_lock_iothread();
- 
-+        /*
-+         * Every time HAXM exits to QEMU, sync IA32_APIC_BASE MSR from HAXM and
-+         * pass it to the emulated APIC.
-+         */
-+        if (hax_global.supports_tunnel_page) {
-+            /*
-+             * ht->apic_base is not available in HAXM kernel module if HAXM does
-+             * not support HAX_CAP_SUPPORT_TUNNEL_PAGE.
-+             * TODO: HAX_CAP_SUPPORT_TUNNEL_PAGE is used for backward
-+             * compatibility with HAXM kernel module. Remove this check when we
-+             * drop support for HAXM versions that lack this feature.
-+             */
-+            cpu_set_apic_base(x86_cpu->apic_state, ht->apic_base);
-+        }
-+
-         /* Simply continue the vcpu_run if system call interrupted */
-         if (hax_ret == -EINTR || hax_ret == -EAGAIN) {
-             DPRINTF("io window interrupted\n");
-@@ -933,6 +944,9 @@ static int hax_set_msrs(CPUArchState *env)
-     hax_msr_entry_set(&msrs[n++], MSR_FMASK, env->fmask);
-     hax_msr_entry_set(&msrs[n++], MSR_KERNELGSBASE, env->kernelgsbase);
- #endif
-+    hax_msr_entry_set(&msrs[n++], MSR_IA32_APICBASE, \
-+                      cpu_get_apic_base(x86_env_get_cpu(env)->apic_state));
-+
-     md.nr_msr = n;
-     md.done = 0;
- 
-diff --git a/target/i386/hax-darwin.c b/target/i386/hax-darwin.c
-index acdde47..3e2fd4f 100644
---- a/target/i386/hax-darwin.c
-+++ b/target/i386/hax-darwin.c
-@@ -244,12 +244,6 @@ int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
-         return ret;
-     }
- 
--    if (!valid_hax_tunnel_size(info.size)) {
--        fprintf(stderr, "Invalid hax tunnel size %x\n", info.size);
--        ret = -EINVAL;
--        return ret;
--    }
--
-     vcpu->tunnel = (struct hax_tunnel *) (intptr_t) (info.va);
-     vcpu->iobuf = (unsigned char *) (intptr_t) (info.io_va);
-     return 0;
-diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-index 6abc156..b04bf24 100644
---- a/target/i386/hax-i386.h
-+++ b/target/i386/hax-i386.h
-@@ -38,6 +38,7 @@ struct hax_state {
-     struct hax_vm *vm;
-     uint64_t mem_quota;
-     bool supports_64bit_ramblock;
-+    bool supports_tunnel_page;
- };
- 
- #define HAX_MAX_VCPU 0x10
-@@ -53,7 +54,6 @@ struct hax_vm {
- #ifdef NEED_CPU_H
- /* Functions exported to host specific mode */
- hax_fd hax_vcpu_get_fd(CPUArchState *env);
--int valid_hax_tunnel_size(uint16_t size);
- 
- /* Host specific functions */
- int hax_mod_version(struct hax_state *hax, struct hax_module_version *version);
-diff --git a/target/i386/hax-interface.h b/target/i386/hax-interface.h
-index 93d5fcb..715a64a 100644
---- a/target/i386/hax-interface.h
-+++ b/target/i386/hax-interface.h
-@@ -280,6 +280,7 @@ struct hax_tunnel {
-         struct {
-         } state;
-     };
-+    uint64_t apic_base;
- } __attribute__ ((__packed__));
- 
- struct hax_module_version {
-@@ -335,6 +336,8 @@ struct hax_set_ram_info {
- #define HAX_CAP_MEMQUOTA           0x2
- #define HAX_CAP_UG                 0x4
- #define HAX_CAP_64BIT_RAMBLOCK     0x8
-+#define HAX_CAP_TUNNEL_PAGE        0x20
-+
- 
- struct hax_capabilityinfo {
-     /* bit 0: 1 - working
-diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-index b1ac737..6ed4f22 100644
---- a/target/i386/hax-windows.c
-+++ b/target/i386/hax-windows.c
-@@ -347,11 +347,6 @@ int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
-         return -1;
-     }
- 
--    if (!valid_hax_tunnel_size(info.size)) {
--        fprintf(stderr, "Invalid hax tunnel size %x\n", info.size);
--        ret = -EINVAL;
--        return ret;
--    }
-     vcpu->tunnel = (struct hax_tunnel *) (intptr_t) (info.va);
-     vcpu->iobuf = (unsigned char *) (intptr_t) (info.io_va);
-     return 0;
--- 
-1.9.1
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1756807
+
+Title:
+  performance regression in qemu-user + proot
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  To reproduce:
+
+  1. Install qemu-user-static and proot
+  2. Enter some arm chroot using them:
+
+      proot -0 -q qemu-arm-static -w / -r chroot/ /bin/bash
+
+  3. Run a command which normally takes a short but measurable amount of
+  time:
+
+      cd /usr/share/doc && time grep -R hello
+
+  Result:
+
+  This is over 100 times slower on 18.04 than it was on 16.04. I am not
+  sure if proot or qemu is causing the problem, but proot version has
+  not changed. Also note that on 16.04 I am using the cloud repo version
+  of qemu, which is newer than 16.04 stock, but still older than 18.04.
+
+  Although system 2 is lower spec than system 1, it should not be this
+  much slower. No other software seems to be affected.
+
+  If required I can supply a chroot tarball. It is essentially just a
+  Debian bootstrap though.
+
+  Logs:
+
+
+  System 1: i7-6700 3.4GHz, 32GB RAM, 512GB Crucial MX100 SSD, Ubuntu 16.04
+  qemu-arm version 2.10.1(Debian 1:2.10+dfsg-0ubuntu3.4~cloud0)
+  proot 5.1.0
+
+  al@al-desktop:~/rpi-ramdisk/raspbian$ proot -0 -q qemu-arm-static -w / -r=
+ root/ /bin/bash
+  root@al-desktop:/# cd /usr/share/doc
+  root@al-desktop:/usr/share/doc# time grep -R hello
+  dash/copyright:Debian GNU/Linux hello source package as the file COPYING.=
+  If not,
+
+  real	0m0.066s
+  user	0m0.040s
+  sys	0m0.008s
+
+
+
+  System 2: i5-5300U 2.30GHz, 8GB RAM, 256GB Crucial MX300 SSD, Ubuntu 18.04
+  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu4)
+  proot 5.1.0
+
+  al@al-thinkpad:~/rpi-ramdisk/raspbian$ proot -0 -q qemu-arm-static -w / -=
+r root/ /bin/bash
+  root@al-thinkpad:/# cd /usr/share/doc
+  root@al-thinkpad:/usr/share/doc# time grep -R hello
+  dash/copyright:Debian GNU/Linux hello source package as the file COPYING.=
+  If not,
+
+  real	0m24.176s
+  user	0m0.366s
+  sys	0m11.352s
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu (not installed)
+  ProcVersionSignature: Ubuntu 4.15.0-12.13-generic 4.15.7
+  Uname: Linux 4.15.0-12-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  Date: Mon Mar 19 07:13:25 2018
+  InstallationDate: Installed on 2018-03-18 (0 days ago)
+  InstallationMedia: Xubuntu 18.04 LTS "Bionic Beaver" - Alpha amd64 (20180=
+318)
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1756807/+subscriptions
