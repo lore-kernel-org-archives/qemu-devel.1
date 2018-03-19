@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1exxgO-0007AH-5P
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:30:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1exxga-0007I7-Bn
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1exxgK-00041J-0R
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:30:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51496)
+	(envelope-from <peter.maydell@linaro.org>) id 1exxgZ-0004Kh-49
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:31:00 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35699)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1exxgJ-00040B-QE
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:30:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1exxgI-0004k6-O6
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 16:30:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B34952E80C8
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 16:30:42 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1exxgY-0004KG-VO
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:30:59 -0400
+Received: by mail-ot0-x243.google.com with SMTP id r30-v6so18047554otr.2
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 09:30:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Mar 2018 16:21:45 -0000
-From: Vincent Siles <1756927@bugs.launchpad.net>
-Reply-To: Bug 1756927 <1756927@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152147650577.14987.10547442810122600910.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1756927] [NEW] ARMv7 LPAE: IFSR doesn't have the
- LPAE bit in case of BKPT
+In-Reply-To: <1521470177-14760-3-git-send-email-zhaoshenglong@huawei.com>
+References: <1521470177-14760-1-git-send-email-zhaoshenglong@huawei.com>
+	<1521470177-14760-3-git-send-email-zhaoshenglong@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Mar 2018 16:30:37 +0000
+Message-ID: <CAFEAcA8677=cuetsXuobJDWDEw1HKNZiecXAC8+PCzPQ8jP7TA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] arm_gicv3_kvm: kvm_dist_get/put: skip
+ the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-Public bug reported:
+On 19 March 2018 at 14:36, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> It should skip to getting/putting the registers banked by GICR so that
+> it could get/put the correct ones.
+>
+> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
 
-When a user application triggers a 'bkpt' instruction while LPAE is
-used, the bit [9] of IFSR is not correctly set during the prefetch abort
-exception.
-
-You'll find attached a minimal example to reproduce the issue (just run 'ma=
-ke all').
-The output I get is:
-
-supervisor
-user
-prefetch
-short-descriptor
-
-The last entry should read 'long-descriptor'.
+Can you explain what the consequences of the current code are
+(ie is there a bug here that we are fixing?), and why the changes
+are correct, please?
 
 
-Qemu revision: 48ae1f60d8c9a770e6da64407984d84e25253c69
-Ubuntu verison: 16.04 LTS
-Cross Compiler: gcc linaro 6.3.1-2017.02-x86_64_arm-eabi
+> ---
+>  hw/intc/arm_gicv3_kvm.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index 7000716..e967e4f 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -136,6 +136,8 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+>      int irq;
+>
+>      field = (uint32_t *)bmp;
+> +    /* The first 8 GICD_IPRIORITYR should skip. */
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+It would be helpful to explain why we can skip the first 8 registers;
+similarly below.
 
-** Attachment added: "Minimal example with linker script and makefile"
-   https://bugs.launchpad.net/bugs/1756927/+attachment/5084186/+files/ifsr_=
-br.tar.gz
+(I suspect the answer here is "for the KVM GICv3, affinity routing is always
+enabled, and the first 8 GICD_IPRIORITYR<n> registers are always RAZ/WI,
+so we don't need to sync them", for instance.)
 
--- =
+> +    offset += (8 * sizeof(uint32_t));
+>      for_each_dist_irq_reg(irq, s->num_irq, 8) {
+>          kvm_gicd_access(s, offset, &reg, false);
+>          *field = reg;
+> @@ -150,6 +152,8 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+>      int irq;
+>
+>      field = (uint32_t *)bmp;
+> +    /* The first 8 GICD_IPRIORITYR should skip. */
+> +    offset += (8 * sizeof(uint32_t));
+>      for_each_dist_irq_reg(irq, s->num_irq, 8) {
+>          reg = *field;
+>          kvm_gicd_access(s, offset, &reg, true);
+> @@ -164,6 +168,8 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
+>      uint32_t reg;
+>      int irq;
+>
+> +    /* The first 2 GICD_ICFGR should skip. */
+> +    offset += (2 * sizeof(uint32_t));
+>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
+>          kvm_gicd_access(s, offset, &reg, false);
+>          reg = half_unshuffle32(reg >> 1);
+> @@ -181,6 +187,8 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
+>      uint32_t reg;
+>      int irq;
+>
+> +    /* The first 2 GICD_ICFGR should skip. */
+> +    offset += (2 * sizeof(uint32_t));
+>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
+>          reg = *gic_bmp_ptr32(bmp, irq);
+>          if (irq % 32 != 0) {
+> @@ -222,6 +230,8 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
+>      uint32_t reg;
+>      int irq;
+>
+> +    /* The first 1 GICD_XXXX should skip. */
+> +    offset += (1 * sizeof(uint32_t));
+>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
+>          kvm_gicd_access(s, offset, &reg, false);
+>          *gic_bmp_ptr32(bmp, irq) = reg;
+> @@ -236,6 +246,10 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
+>      int irq;
+>
+>      clroffset_index = clroffset;
+> +    /* The first 1 GICD_XXXX should skip. */
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1756927
+This looks like placeholder text that hasn't been filled in ?
 
-Title:
-  ARMv7 LPAE: IFSR doesn't have the LPAE bit in case of BKPT
+> +    offset += (1 * sizeof(uint32_t));
+> +    if (clroffset != 0)
+> +        clroffset_index += (1 * sizeof(uint32_t));
+>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
+>          /* If this bitmap is a set/clear register pair, first write to the
+>           * clear-reg to clear all bits before using the set-reg to write
+> --
+> 2.0.4
 
-Status in QEMU:
-  New
-
-Bug description:
-  When a user application triggers a 'bkpt' instruction while LPAE is
-  used, the bit [9] of IFSR is not correctly set during the prefetch
-  abort exception.
-
-  You'll find attached a minimal example to reproduce the issue (just run '=
-make all').
-  The output I get is:
-
-  supervisor
-  user
-  prefetch
-  short-descriptor
-
-  The last entry should read 'long-descriptor'.
-
-  =
-
-  Qemu revision: 48ae1f60d8c9a770e6da64407984d84e25253c69
-  Ubuntu verison: 16.04 LTS
-  Cross Compiler: gcc linaro 6.3.1-2017.02-x86_64_arm-eabi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1756927/+subscriptions
+thanks
+-- PMM
