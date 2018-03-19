@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1exxMV-0005gP-IM
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:10:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1exxS9-0006v0-AK
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1exxMU-00059V-JQ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:10:15 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180319093509.50881-2-haoqf@linux.vnet.ibm.com>
-References: <20180319093509.50881-1-haoqf@linux.vnet.ibm.com>
-	<20180319093509.50881-2-haoqf@linux.vnet.ibm.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 19 Mar 2018 16:10:05 +0000
-Message-ID: <CAJSP0QVe4gXCvPdw15x3D_yp2v4mi8QqYujo5qgxyeGcCbGfpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v1 1/1] iotests: fix test case
- 185
+	(envelope-from <pm215@archaic.org.uk>) id 1exxS8-00008a-6w
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:16:05 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Mar 2018 16:15:54 +0000
+Message-Id: <20180319161556.16446-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.12 0/2] bcm2835_sdhost: fix interrupt
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +18,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-On Mon, Mar 19, 2018 at 9:35 AM, QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
-> Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_shutdown()".
-> It's because of the newly introduced function vm_shutdown calls bdrv_drain_all,
-> which is called later by bdrv_close_all. bdrv_drain_all resumes the jobs
-> that doubles the speed and offset is doubled.
-> Some jobs' status are changed as well.
->
-> Thus, let's not call bdrv_drain_all in vm_shutdown.
->
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> ---
->  cpus.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/cpus.c b/cpus.c
-> index 2e6701795b..ae2962508c 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1006,8 +1006,9 @@ static int do_vm_stop(RunState state, bool send_stop)
->              qapi_event_send_stop(&error_abort);
->          }
->      }
-> -
-> -    bdrv_drain_all();
-> +    if (send_stop) {
-> +        bdrv_drain_all();
-> +    }
+This patchset fixes the code in the bcm2835_sdhost device
+so that it raises interrupts in more plausible places.
 
-Thanks for looking into this bug!
+The Linux bcm2835_sdhost driver doesn't work on QEMU at the moment,
+because our model raises spurious data interrupts.  Our function
+bcm2835_sdhost_fifo_run() will flag an interrupt any time it is
+called with s->datacnt == 0, even if the host hasn't actually issued
+a data read or write command yet.  This means that the driver gets a
+spurious data interrupt as soon as it enables IRQs and then does
+something else that causes us to call the fifo_run routine, like
+writing to SDHCFG, and before it does the write to SDCMD to issue the
+read.  The driver's IRQ handler then spins forever complaining that
+there's no data and the SD controller isn't in a state where there's
+going to be any data:
+    
+[   41.040738] sdhost-bcm2835 3f202000.mmc: fsm 1, hsts 00000000
+[   41.042059] sdhost-bcm2835 3f202000.mmc: fsm 1, hsts 00000000
+(continues forever).
+    
+Move the interrupt flag setting to more plausible places:
+ * for BUSY, raise this as soon as a BUSYWAIT command has executed
+ * for DATA, raise this when the FIFO has any space free (for a write)
+   or any data in it (for a read)
+ * for BLOCK, raise this when the data count is 0 and we've
+   actually done some reading or writing
+    
+This is pure guesswork since the documentation for this hardware is
+not public, but it is sufficient to get the Linux bcm2835_sdhost
+driver to work.
 
-This if statement breaks the contract of the function when send_stop
-is false.  Drain ensures that pending I/O completes and that device
-emulation finishes before this function returns.  This is important
-for live migration, where there must be no more guest-related activity
-after vm_stop().
+If anybody has other OSes than Linux that use the sdhost SD
+controller (not the 'Arasan' one, which is a different bit of
+the SoC) testing with those would be appreciated. If anybody
+has documentation for this hardware that would be even better.
 
-This patch relies on the caller invoking bdrv_close_all() immediately
-after do_vm_stop(), which is not documented and could lead to more
-bugs in the future.
+With these patches plus the previous set, I can get the Debian
+raspi3 image to boot (though there are a lot of warnings relating
+to the pl011 UART for some reason).
 
-I suggest a different solution:
+thanks
+-- PMM
 
-Test 185 relies on internal QEMU behavior which can change from time
-to time.  Buffer sizes and block job iteration counts are
-implementation details that are not part of qapi-schema.json or other
-documented behavior.
+Peter Maydell (2):
+  hw/sd/bcm2835_sdhost: Add tracepoints
+  hw/sd/bcm2835_sdhost: Don't raise spurious interrupts
 
-In fact, the existing test case was already broken in IOThread mode
-since iothread_stop_all() -> bdrv_set_aio_context() also includes a
-bdrv_drain() with the side-effect of an extra blockjob iteration.
+ hw/sd/bcm2835_sdhost.c | 51 +++++++++++++++++++++++++++++++-------------------
+ hw/sd/trace-events     |  6 ++++++
+ 2 files changed, 38 insertions(+), 19 deletions(-)
 
-After 4486e89c219 ("vl: introduce vm_shutdown()") both IOThread and
-non-IOThread mode perform the drain.  This has caused the test
-failure.
-
-Instead of modifying QEMU to keep the same arbitrary internal behavior
-as before, please send a patch that updates tests/qemu-iotests/185.out
-with the latest output.
-
-Stefan
+-- 
+2.16.2
