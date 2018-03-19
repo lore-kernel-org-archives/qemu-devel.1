@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1exiQh-00014E-G7
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:13:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1exim4-0006Ye-2n
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1exiQc-0003II-GF
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:13:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35202 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1exiQc-0003Hh-AL
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:13:30 -0400
-Date: Mon, 19 Mar 2018 02:13:19 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180319015835-mutt-send-email-mst@kernel.org>
-References: <1514626559-162312-1-git-send-email-longpeng2@huawei.com>
-	<1514626559-162312-2-git-send-email-longpeng2@huawei.com>
-	<fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
-	<20180316181953-mutt-send-email-mst@kernel.org>
-	<29aa3e9f-ae34-8888-4ec2-2fd22b4d747f@linux.vnet.ibm.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1exim2-0000Ha-V1
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:40 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 19 Mar 2018 11:35:16 +1100
+Message-Id: <20180319003524.28143-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29aa3e9f-ae34-8888-4ec2-2fd22b4d747f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [v23 1/2] virtio-crypto: Add
- virtio crypto device specification
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/8] ppc-for-2.12 queue 20180319
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +20,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: "Longpeng(Mike)" <longpeng2@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
+To: peter.maydell@linaro.org
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Mar 16, 2018 at 07:18:45PM +0100, Halil Pasic wrote:
-> 
-> 
-> On 03/16/2018 05:27 PM, Michael S. Tsirkin wrote:
-> > On Tue, Jan 09, 2018 at 06:05:41PM +0100, Halil Pasic wrote:
-> >>> +\item[\field{max_cipher_key_len}] is the maximum length of cipher key supported by the device.
-> >>
-> >> I can't find what happens if this limit isn't honored by the driver. Moreover
-> >> reading it is only SHOULD. Is it undefined behavior or should the device reject/fail
-> >> such requests? I think in qemu implementation we fail the request.
-> >>
-> >> This question is only about niceness. We are already good enough, IMHO:
-> >> since the implementer of the driver can't be sure what is going to happen
-> >> if the driver disregards max_cipher_key_len it is already an implicit
-> >> SHOULD.
-> > 
-> > I am not sure documenting undefined behaviour is always required.
-> 
-> I kind of agree. But I'm afraid I did not get through my point. It's
-> about clarity. The driver supplying a cipher key larger that
-> max_cipher_key_len isn't violating any driver normative statement.
-> I find it strange make obtaining a piece of configuration a driver
-> normative
+The following changes since commit e1e44a9916b4318e943aecd669e096222cb3ea=
+eb:
 
+  Merge remote-tracking branch 'remotes/xtensa/tags/20180316-xtensa' into=
+ staging (2018-03-17 14:15:03 +0000)
 
-> but have neither a driver normative that says the driver must
-> (or should) operate according to the same (at least in certain)
-> circumstances
+are available in the Git repository at:
 
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180319
 
-I agree with that. I think it would be clearer to say
-that driver must not (or should not?) submit longer requests
-than to say that it should read this field.
+for you to fetch changes up to 91c60f124e682a78c9a2ef951e8e58ebab6441d0:
 
-> nor a device normative that implicitly educates the driver
-> implementer what happens if the driver is acting stupid (see below).
+  target/ppc: fix tlbsync to check privilege level depending on GTSE (201=
+8-03-18 21:03:20 +1100)
 
-About not saying what happens if driver does something stupid,
-we generally don't.
+----------------------------------------------------------------
+ppc patch queue for 2018-03-19
 
+This pull request supersedes the one for 2018-03-15.  The only
+difference is one patch is removed, since it exposed some code which
+triggers ubsan warnings.
 
-> 
-> > We certainly do not do this for all other devices> 
-> 
-> """
-> 5.2.6.2 Device Requirements: Device Operation
-> 
-> A device MUST set the status byte to VIRTIO_BLK_S_IOERR for a write request if the VIRTIO_BLK_F_RO feature if offered, and MUST NOT write any data.
-> """
-> 
-> I was under the impression, that we sometimes express what is naively
-> a driver-requirement (e.g. thou shall not write to a read only
-> device) as a device-requirement. This has benefits in my opinion:
-> the driver implementer is educated about a certain behavior being a no-no
-> and hopefully leading to sane error handling (with a compliant device
-> sitting on the other side) --- instead of  offending drivers landing beyond
-> the spec (in undefined behavior land) by violating a driver-normative.
-> 
-> > Reading a field being SHOULD seems reasonable: e.g.
-> > driver might read it once and cache it in memory.
-> 
-> I don't quite understand. Let me quote the normative section
-> 
-> +\drivernormative{\subsubsection}{Device configuration layout}{Device Types / Crypto Device / Device configuration layout}
-> +
-> +\begin{itemize*}
-> +\item The driver MUST read the \field{status} from the bottom bit of status to check whether the
-> +    VIRTIO_CRYPTO_S_HW_READY is set, and the driver MUST reread it after device reset.
-> +\item The driver MUST NOT transmit any requests to the device if the VIRTIO_CRYPTO_S_HW_READY is not set.
-> +\item The driver MUST read \field{max_dataqueues} field to discover the number of data queues the device supports.
-> 
-> [..]
-> 
-> +\item The driver SHOULD read \field{max_cipher_key_len} to discover the maximum length of cipher key
-> +    the device supports.
-> 
-> Does it mean it's OK for the driver (e.g. after a configuration change
-> notification to use a stale) \field{max_cipher_key_len} ) as it is SHOULD read
-> bit it's not OK to use a stale \field{max_dataqueues}?
-> 
-> AFAIU all configuration space stuff eligible for caching, but
-> under certain circumstances the cache invalidates and a re-read
-> is necessary.
+Here's the set of accumulated patches now that we're into soft freeze.
+I've split new functionality into a ppc-for-2.13 branch, so this only
+has bugfixes.  Well.. and a couple of simple cleanups to make bugfixes
+easier, some test improvements and a trivial change to make command
+line options more obvious.  I think those are all acceptable for soft
+freeze.
 
-So you are saying why aren't max_dataqueues and
-max_cipher_key_len consistent?
-It's a valid point.
+----------------------------------------------------------------
+BALATON Zoltan (2):
+      sii3112: Remove unneeded exit function
+      ppc440_pcix: Change some error_report to qemu_log_mask(LOG_UNIMP, .=
+..)
 
-> > 
-> > Halil, could you try to split your comments between requirements
-> > for more conformance clauses/clarifications as opposed to
-> > defects where it's wrong and does not match actual or
-> > expected behaviour?
-> 
-> Yes. I'm already trying to tag my comments. 'This question is only
->  about niceness. We are already good enough' was supposed to indicate
-> that this one is not requirement.
+C=C3=A9dric Le Goater (1):
+      target/ppc: fix tlbsync to check privilege level depending on GTSE
 
-to me most questions look like you have a rather specific wording in mind.
-How about instead of asking questions you just propose a
-specific fixed wording as your own patch?
+David Engraf (1):
+      PPC e500: Fix gap between u-boot and kernel
 
-That will make things converge faster.
+Thomas Huth (4):
+      tests/boot-serial: Check the 40p machine, too
+      hw/ppc/prep: Fix implicit creation of "-drive if=3Dscsi" devices
+      hw/misc/macio: Mark the macio devices with user_creatable =3D false
+      hw/ppc/spapr: Allow "spapr-vlan" as NIC model name beside "ibmveth"
 
-
-> Do you mean putting these in separate emails?
-
-That's up to you, wasn't very clear to me but maybe it's clear
-enough to Mike.
-
-> > 
-> > I think spec is better off with some documentation for this
-> > device than none at all like today.
-> > 
-> 
-> 
-> If the rest community says it's good enough, I won't fight against
-> inclusion neither in the repo nor in the next Committee Specification.
-> 
-> I would %100 agree with you if this were normal documentation.
-> The problem with standards is that both correctness and completeness
-> are crucial. What is not part of the standard, is not part of the
-> standard and period.
-
-I disagree here.
-
-Standards evolve too. A requirement to be 100% correct isn't realistic.
-
-Whoever implements the spec will come back to us and say
-"hey I did exactly as standard says and it does not work"
-and then we'll either fix the standard or say
-"too bad, fix the hypervisor" or say "we weren't clear,
-hypervisors implemented spec correctly but we meant something else,
-let's add a feature bit so future ones will get it right".
-
-
-> Virtio is especially tricky as there is no versions of the standard.
-> What once was a compliant device/driver must be kept compliant when
-> we change the text. That is why this better something than nothing
-> does not entirely work for me.
-> 
-> Regards,
-> Halil
-
-We can always add feature bits when we change behaviour in incompatible
-ways.
-
--- 
-MST
+ hw/ide/sii3112.c         | 12 ------------
+ hw/misc/macio/macio.c    |  2 ++
+ hw/ppc/e500.c            |  9 ++++-----
+ hw/ppc/ppc440_pcix.c     | 11 +++++++----
+ hw/ppc/prep.c            |  2 +-
+ hw/ppc/spapr.c           |  5 +++--
+ hw/scsi/lsi53c895a.c     |  7 +++++++
+ include/hw/pci/pci.h     |  1 +
+ target/ppc/translate.c   |  9 +++++++--
+ tests/boot-serial-test.c |  6 ++++--
+ 10 files changed, 36 insertions(+), 28 deletions(-)
