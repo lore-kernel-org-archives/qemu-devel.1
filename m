@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exsTP-0007pn-SR
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 06:57:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1exsVc-0000My-S9
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 06:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exsTP-0004CM-3k
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 06:57:03 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:45055)
+	(envelope-from <peter.maydell@linaro.org>) id 1exsVb-0005OX-S0
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 06:59:20 -0400
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:45142)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1exsTO-0004Bk-Uw
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 06:57:03 -0400
-Received: by mail-ot0-x230.google.com with SMTP id 79-v6so16831790oth.11
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 03:57:02 -0700 (PDT)
+	id 1exsVb-0005OA-MS
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 06:59:19 -0400
+Received: by mail-ot0-x235.google.com with SMTP id q5-v6so6216112oth.12
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 03:59:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
+In-Reply-To: <837c5be7-a153-5a7e-8e2c-dccdb9945a4e@amsat.org>
+References: <20180313153458.26822-1-peter.maydell@linaro.org>
+	<20180313153458.26822-9-peter.maydell@linaro.org>
+	<MWHPR21MB018983B74A652443B70680F19ED20@MWHPR21MB0189.namprd21.prod.outlook.com>
+	<CAFEAcA8O7EEhoS83eRLH5bVmog_Qu1tAgUzR6NsE+GD2a7FsDw@mail.gmail.com>
+	<837c5be7-a153-5a7e-8e2c-dccdb9945a4e@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Mar 2018 10:56:41 +0000
-Message-ID: <CAFEAcA8Wc3744Rn2TKHWLZeprVweALR7pmWV0B5da8FrG8aCsA@mail.gmail.com>
+Date: Mon, 19 Mar 2018 10:58:57 +0000
+Message-ID: <CAFEAcA974GJpqTCit4wwcC0DESAGtga34pLNnrvZ6kDZ4zaUpQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] ppc-for-2.12 queue 20180319
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/bcm2836: Hardcode correct CPU
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, surajjs@au1.ibm.com, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pekka Enberg <penberg@iki.fi>, "patches@linaro.org" <patches@linaro.org>
 
-On 19 March 2018 at 00:35, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit e1e44a9916b4318e943aecd669e096222cb3eaeb:
+On 13 March 2018 at 23:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+ote:
+> On 03/13/2018 06:09 PM, Peter Maydell wrote:
+>> On 13 March 2018 at 16:55, Andrew Baumann <Andrew.Baumann@microsoft.com>=
+ wrote:
+>>> At some point I remember seeing a patch to change this to cortex-a7. Is=
+ there a reason we didn't make that change?
+>>>
+>>> (Background: the real Pi2 has an A7. When I first implemented the machi=
+ne model there was no A7 emulation in QEMU, so I used the A15 which was the=
+ closest equivalent.)
+>>
+>> Yeah, we should do that. I'd forgotten about that, I think
+>> things just got lost in the shuffle of having several
+>> patchsets that tried to change the same things at once.
+>>
+>> I guess the simplest thing is to add a patch at the end of
+>> the series that fixes the cpu type for bcm2836.
 >
->   Merge remote-tracking branch 'remotes/xtensa/tags/20180316-xtensa' into staging (2018-03-17 14:15:03 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180319
->
-> for you to fetch changes up to 91c60f124e682a78c9a2ef951e8e58ebab6441d0:
->
->   target/ppc: fix tlbsync to check privilege level depending on GTSE (2018-03-18 21:03:20 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue for 2018-03-19
->
-> This pull request supersedes the one for 2018-03-15.  The only
-> difference is one patch is removed, since it exposed some code which
-> triggers ubsan warnings.
->
-> Here's the set of accumulated patches now that we're into soft freeze.
-> I've split new functionality into a ppc-for-2.13 branch, so this only
-> has bugfixes.  Well.. and a couple of simple cleanups to make bugfixes
-> easier, some test improvements and a trivial change to make command
-> line options more obvious.  I think those are all acceptable for soft
-> freeze.
->
+> Peter, here is the patch Andrew remembered (maybe can be applied at the
+> end):
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg04286.html
 
-Applied, thanks.
+Thanks for finding that. It doesn't apply after this refactoring,
+but I'll send out a patch which does the equivalent thing in the
+new code. In the meantime I'm going to apply this patchset to
+target-arm.next since I'm going to send out a pullreq with bugfixes
+for rc0 today.
 
+thanks
 -- PMM
