@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ey0G2-0003pf-9p
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:15:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ey0X5-00080m-1D
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ey0Fz-0003Gb-4c
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:15:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47064 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1ey0X0-0008VE-E2
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:33:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44308 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1ey0Fy-0003GT-Vu
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:15:43 -0400
-Date: Mon, 19 Mar 2018 15:15:34 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180319191534.GM12302@localhost.localdomain>
-References: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
-	<20180221052735.GA2919@localhost.localdomain>
-	<CAFEAcA8AA643WJGwF3fHEOtjw_Sx_1TeOf5UZFg9x_L2Ot6XYw@mail.gmail.com>
-	<alpine.BSF.2.21.1803191426370.9395@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ey0X0-0008V4-82
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:33:18 -0400
+Date: Mon, 19 Mar 2018 19:33:04 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180319193304.GH3206@work-vm>
+References: <20180319175823.22111-1-marcandre.lureau@redhat.com>
+	<272a2e2b-5a1f-d73c-8a74-6721ce9f63fc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1803191426370.9395@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] Moving seabios-hppa git submodule to use a
- qemu.org mirror
+In-Reply-To: <272a2e2b-5a1f-d73c-8a74-6721ce9f63fc@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hmp: free sev info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, brijesh.singh@amd.com
 
-On Mon, Mar 19, 2018 at 02:32:22PM +0100, BALATON Zoltan wrote:
-> On Mon, 19 Mar 2018, Peter Maydell wrote:
-> >On 21 February 2018 at 05:27, Jeff Cody <jcody@redhat.com> wrote:
-> >>On Tue, Feb 20, 2018 at 06:43:22PM +0000, Peter Maydell wrote:
-> >>>I just noticed that we seem to have acquired another git
-> >>>submodule that isn't pointing to a qemu.org git url:
-> >>>
-> >>>[submodule "roms/seabios-hppa"]
-> >>>        path = roms/seabios-hppa
-> >>>        url = git://github.com/hdeller/seabios-hppa.git
-> >>>
-> >>>Jeff, could we set up so we can mirror this repo on qemu.org?
-> >>>Then we can send a patch to update the .gitmodules to point to it.
-> >>>
-> >>
-> >>Yes, of course... Although Paolo has suggested making it a branch of the
-> >>existing SeaBIOS repo instead.  But I can go ahead and get the clone setup,
-> >>in case we go that route.
-> >
-> >Hi; can we get the mirror set up for seabios-hppa, and also for
-> >the other new repo:
-> >git://github.com/zbalaton/u-boot-sam460ex
-> 
-> I'd suggest to move the u-boot-sam460ex repo to qemu repo completely instead
-> of mirrorring it. I don't intend to change it in the future (apart from
-> maybe occasional bugfixes if needed which chould be submitted as patches) so
-> no need to keep an external repo and mirror it when it could be held in qemu
-> as primary.
-> 
-> Please let me know how you decide, I can then remove the the above repo and
-> refer to the qemu one in the future if you move it there or keep the current
-> one up if you choose to mirror it.
-> 
+* Eric Blake (eblake@redhat.com) wrote:
+> On 03/19/2018 12:58 PM, Marc-Andr=E9 Lureau wrote:
+> > Found thanks to ASAN:
+> >=20
+> > Direct leak of 16 byte(s) in 1 object(s) allocated from:
+> >      #0 0x7efe20417a38 in __interceptor_calloc (/lib64/libasan.so.4+0=
+xdea38)
+> >      #1 0x7efe1f7b2f75 in g_malloc0 ../glib/gmem.c:124
+> >      #2 0x7efe1f7b3249 in g_malloc0_n ../glib/gmem.c:355
+> >      #3 0x558272879162 in sev_get_info /home/elmarco/src/qemu/target/=
+i386/sev.c:414
+> >      #4 0x55827285113b in hmp_info_sev /home/elmarco/src/qemu/target/=
+i386/monitor.c:684
+> >      #5 0x5582724043b8 in handle_hmp_command /home/elmarco/src/qemu/m=
+onitor.c:3333
+> >=20
+> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >   target/i386/monitor.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Worth mentioning in the commit message that this was introduced in comm=
+it
+> 63036314.
+>=20
+> And safe for freeze, as it's fixing a memory usage bug in material new =
+to
+> the 2.12 release.
 
-I went ahead and created it as a mirror.  If there is consensus on moving it
-to qemu.org as a primary host, I can convert it (and I'll need to set you up
-an account on qemu.org as well at that point, for those occasional
-bugfixes).
+Thanks,  I'll pick that up for HMP.
 
-For now, keep your repo up as a primary source until we know if we are
-moving it to qemu.org rather than just mirroring it.
+Dave
 
--Jeff
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
