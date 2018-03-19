@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey1Ku-0001hF-1S
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:24:53 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1ey1V2-0004ed-Mt
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey1Ks-0007PJ-HC
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:24:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39876 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ey1Ks-0007Ol-C7
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:24:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6555040267D5
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 20:24:38 +0000 (UTC)
-Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 26F9E200BC7B
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 20:24:34 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 19 Mar 2018 15:23:54 -0500
-Message-Id: <20180319202432.1112431-1-eblake@redhat.com>
+	(envelope-from <alindsay@codeaurora.org>) id 1ey1V1-0000nF-KR
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:35:20 -0400
+Date: Mon, 19 Mar 2018 16:35:10 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180319203509.GD24561@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-2-git-send-email-alindsay@codeaurora.org>
+	<aeacd6da-0f45-f871-9a0a-2c8a524db510@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <aeacd6da-0f45-f871-9a0a-2c8a524db510@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v4 00/38] QAPI patches for 2018-03-12,
- 2.12 softfreeze
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 01/22] target/arm: A53:
+ Initialize PMCEID[01]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,172 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>
 
-The following changes since commit 2c8cfc0b52b5a4d123c26c0b5fdf941be24805=
-be:
+On Mar 18 23:35, Philippe Mathieu-Daud=E9 wrote:
+> Hi Aaron,
+>=20
+> On 03/16/2018 09:30 PM, Aaron Lindsay wrote:
+> > A53 advertises ARM_FEATURE_PMU, but wasn't initializing pmceid[01].
+> > pmceid[01] are already being initialized to zero for both A15 and A57=
+.
+> >=20
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> >  target/arm/cpu64.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >=20
+> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> > index 991d764..8c4db31 100644
+> > --- a/target/arm/cpu64.c
+> > +++ b/target/arm/cpu64.c
+> > @@ -201,6 +201,8 @@ static void aarch64_a53_initfn(Object *obj)
+> >      cpu->id_isar5 =3D 0x00011121;
+> >      cpu->id_aa64pfr0 =3D 0x00002222;
+> >      cpu->id_aa64dfr0 =3D 0x10305106;
+> > +    cpu->pmceid0 =3D 0x00000000;
+> > +    cpu->pmceid1 =3D 0x00000000;
+> >      cpu->id_aa64isar0 =3D 0x00011120;
+> >      cpu->id_aa64mmfr0 =3D 0x00001122; /* 40 bit physical addr */
+> >      cpu->dbgdidr =3D 0x3516d000;
+> >=20
+>=20
+> Maybe we can move this at a single place in arm_cpu_post_init():
+>=20
+>     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
+>         cpu->pmceid0 =3D 0x00000000;
+>         cpu->pmceid1 =3D 0x00000000;
+>     }
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
-ging (2018-03-19 11:44:26 +0000)
+I like consolidating the initialization - though I think it can go in
+arm_cpu_realizefn() with the preexisting PMU-related id_aa64dfr0
+initialization since it is constant once you've chosen a type of
+processor. One of the other patches in this set actually already adds
+some PMCEID initialization there based on PMCR.N.
 
-are available in the Git repository at:
+-Aaron
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-12-v4
-
-for you to fetch changes up to 02e3092db3f9b84ed6aae54e3b71d4dc4196c7eb:
-
-  qapi: Pass '-u' when doing non-silent diff (2018-03-19 14:58:38 -0500)
-
-since v3:
-silence clang's ubsan warnings about nonportable container_of(NULL)
-[sending only the one changed patch]
-
-----------------------------------------------------------------
-qapi patches for 2018-03-12, 2.12 softfreeze
-
-- Marc-Andr=C3=A9 Lureau: 0/4 qapi: generate a literal qobject for intros=
-pection
-- Max Reitz: 0/7 block: Handle null backing link
-- Daniel P. Berrange: chardev: tcp: postpone TLS work until machine done
-- Peter Xu: 00/23 QMP: out-of-band (OOB) execution support
-- Vladimir Sementsov-Ogievskiy: 0/2 block latency histogram
-- Eric Blake: qapi: Pass '-u' when doing non-silent diff
-
-----------------------------------------------------------------
-Daniel P. Berrang=C3=A9 (1):
-      chardev: tcp: postpone TLS work until machine done
-
-Eric Blake (2):
-      qmp: add new event "command-dropped"
-      qapi: Pass '-u' when doing non-silent diff
-
-Marc-Andr=C3=A9 Lureau (4):
-      qapi2texi: minor python code simplification
-      qlit: use QType instead of int
-      qlit: add qobject_from_qlit()
-      qapi: generate a literal qobject for introspection
-
-Max Reitz (7):
-      compiler: Add QEMU_BUILD_BUG_MSG() macro
-      qapi: Add qobject_to()
-      qapi: Replace qobject_to_X(o) by qobject_to(X, o)
-      qapi: Remove qobject_to_X() functions
-      qapi: Make more of qobject_to()
-      block: Handle null backing link
-      block: Deprecate "backing": ""
-
-Peter Xu (22):
-      docs: update QMP documents for OOB commands
-      qobject: introduce qstring_get_try_str()
-      qobject: introduce qobject_get_try_str()
-      qobject: let object_property_get_str() use new API
-      monitor: move skip_flush into monitor_data_init
-      monitor: move the cur_mon hack deeper for QMP
-      monitor: unify global init
-      monitor: let mon_list be tail queue
-      monitor: allow using IO thread for parsing
-      qmp: introduce QMPCapability
-      monitor: introduce monitor_qmp_respond()
-      monitor: let suspend_cnt be thread safe
-      monitor: let suspend/resume work even with QMPs
-      monitor: separate QMP parser and dispatcher
-      monitor: send event when command queue full
-      qapi: introduce new cmd option "allow-oob"
-      qmp: support out-of-band (oob) execution
-      qmp: isolate responses into io thread
-      monitor: enable IO thread for (qmp & !mux) typed
-      qmp: add command "x-oob-test"
-      tests: qmp-test: verify command batching
-      tests: qmp-test: add oob test
-
-Vladimir Sementsov-Ogievskiy (2):
-      block/accounting: introduce latency histogram
-      qapi: add block latency histogram interface
-
- docs/devel/qapi-code-gen.txt        |  87 ++++-
- docs/interop/qmp-spec.txt           |  36 +-
- qemu-doc.texi                       |   7 +
- qapi/block-core.json                | 115 +++++-
- qapi/introspect.json                |   6 +-
- qapi/misc.json                      |  87 ++++-
- scripts/qapi/commands.py            |  18 +-
- scripts/qapi/common.py              |  15 +-
- scripts/qapi/doc.py                 |   9 +-
- scripts/qapi/introspect.py          |  83 +++--
- include/block/accounting.h          |  35 ++
- include/monitor/monitor.h           |   2 +-
- include/qapi/qmp/dispatch.h         |   7 +-
- include/qapi/qmp/qbool.h            |   1 -
- include/qapi/qmp/qdict.h            |   1 -
- include/qapi/qmp/qlist.h            |   1 -
- include/qapi/qmp/qlit.h             |   4 +-
- include/qapi/qmp/qnum.h             |   1 -
- include/qapi/qmp/qobject.h          |  29 ++
- include/qapi/qmp/qstring.h          |   3 +-
- include/qemu/compiler.h             |  12 +-
- vl.c                                |   7 +-
- tests/libqtest.c                    |   6 +-
- block.c                             |  13 +-
- block/accounting.c                  |  91 +++++
- block/parallels.c                   |   2 +-
- block/qapi.c                        |  53 ++-
- block/qcow.c                        |   2 +-
- block/qcow2.c                       |   2 +-
- block/qed.c                         |   2 +-
- block/rbd.c                         |   8 +-
- block/sheepdog.c                    |   2 +-
- block/vhdx.c                        |   2 +-
- block/vpc.c                         |   2 +-
- blockdev.c                          |  64 +++-
- chardev/char-socket.c               |  10 +
- hw/i386/acpi-build.c                |  16 +-
- monitor.c                           | 706 ++++++++++++++++++++++++++++++=
-+-----
- qapi/qmp-dispatch.c                 |  35 +-
- qapi/qobject-input-visitor.c        |  24 +-
- qapi/qobject-output-visitor.c       |   4 +-
- qga/main.c                          |   2 +-
- qmp.c                               |  18 +-
- qobject/json-parser.c               |  13 +-
- qobject/qbool.c                     |  15 +-
- qobject/qdict.c                     |  65 ++--
- qobject/qjson.c                     |  10 +-
- qobject/qlist.c                     |  17 +-
- qobject/qlit.c                      |  47 ++-
- qobject/qnum.c                      |  17 +-
- qobject/qstring.c                   |  38 +-
- qom/object.c                        |  15 +-
- target/i386/cpu.c                   |   2 +-
- target/s390x/cpu_models.c           |   2 +-
- tests/check-qdict.c                 |  20 +-
- tests/check-qjson.c                 |  41 ++-
- tests/check-qlist.c                 |   4 +-
- tests/check-qlit.c                  |  30 +-
- tests/check-qnum.c                  |   4 +-
- tests/check-qobject.c               |   2 +-
- tests/check-qstring.c               |   2 +-
- tests/device-introspect-test.c      |  14 +-
- tests/numa-test.c                   |   8 +-
- tests/qmp-test.c                    |  97 ++++-
- tests/qom-test.c                    |   4 +-
- tests/test-char.c                   |   2 +-
- tests/test-keyval.c                 |   8 +-
- tests/test-qga.c                    |  19 +-
- tests/test-qmp-cmds.c               |  12 +-
- tests/test-qmp-event.c              |  16 +-
- tests/test-qobject-input-visitor.c  |  21 +-
- tests/test-qobject-output-visitor.c |  54 +--
- tests/test-x86-cpuid-compat.c       |  17 +-
- util/keyval.c                       |   4 +-
- util/qemu-config.c                  |   2 +-
- util/qemu-option.c                  |   6 +-
- qemu-options.hx                     |   4 +-
- tests/Makefile.include              |   8 +-
- tests/qapi-schema/test-qapi.py      |   2 +-
- tests/qemu-iotests/089              |  20 +
- tests/qemu-iotests/089.out          |   8 +
- trace-events                        |   3 +
- 82 files changed, 1809 insertions(+), 494 deletions(-)
+>=20
+> Regards,
+>=20
+> Phil.
 
 --=20
-2.14.3
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies=
+, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
