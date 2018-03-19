@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim7-0006ZR-Eu
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:44 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0000NA-0W
+	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0006Ys-4y
 	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1exim2-0000HM-U4
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Mar 2018 11:35:22 +1100
-Message-Id: <20180319003524.28143-7-david@gibson.dropbear.id.au>
+Date: Mon, 19 Mar 2018 11:35:19 +1100
+Message-Id: <20180319003524.28143-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
 References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 6/8] hw/ppc/spapr: Allow "spapr-vlan" as NIC
- model name beside "ibmveth"
+Subject: [Qemu-devel] [PULL 3/8] hw/ppc/prep: Fix implicit creation of
+ "-drive if=scsi" devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +25,65 @@ Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.o
 
 From: Thomas Huth <thuth@redhat.com>
 
-With the new "--nic" command line parameter option, the "old" way of
-specifying a NIC model via the nd_table[] is becoming more prominent
-again. But for the pseries "spapr-vlan" device, there is a confusing
-discrepancy between the model name that is used for "--device" (i.e.
-"spapr-vlan") and the model name that has to be used for "--net nic"
-or the new "--nic" parameter (i.e. "ibmveth"). Since "spapr-vlan" is
-the "real" name of the device, let's allow "spapr-vlan" to be used
-as model name for the nd_table[] entries, too.
+The global hack for creating SCSI devices has recently been removed,
+but this apparently broke SCSI devices on some boards that were not
+ready for this change yet. For the 40p machine you now get:
 
+$ ppc64-softmmu/qemu-system-ppc64 -M 40p -cdrom x.iso
+qemu-system-ppc64: -cdrom x.iso: machine type does not support if=scsi,bus=0,unit=2
+
+Fix it by providing a lsi53c810_create() function that takes care
+of calling scsi_bus_legacy_handle_cmdline() after creating the
+corresponding SCSI controller.
+
+Fixes: 1454509726719e0933c800fad00d6999752688ea
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/ppc/prep.c        | 2 +-
+ hw/scsi/lsi53c895a.c | 7 +++++++
+ include/hw/pci/pci.h | 1 +
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 032d03423f..fba76abee2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2607,10 +2607,11 @@ static void spapr_machine_init(MachineState *machine)
-         NICInfo *nd = &nd_table[i];
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 5c78503069..a1e7219db6 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -787,7 +787,7 @@ static void ibm_40p_init(MachineState *machine)
+         qdev_prop_set_uint32(dev, "equipment", 0xc0);
+         qdev_init_nofail(dev);
  
-         if (!nd->model) {
--            nd->model = g_strdup("ibmveth");
-+            nd->model = g_strdup("spapr-vlan");
-         }
+-        pci_create_simple(pci_bus, PCI_DEVFN(1, 0), "lsi53c810");
++        lsi53c810_create(pci_bus, PCI_DEVFN(1, 0));
  
--        if (strcmp(nd->model, "ibmveth") == 0) {
-+        if (g_str_equal(nd->model, "spapr-vlan") ||
-+            g_str_equal(nd->model, "ibmveth")) {
-             spapr_vlan_create(spapr->vio_bus, nd);
-         } else {
-             pci_nic_init_nofail(&nd_table[i], phb->bus, nd->model, NULL);
+         /* XXX: s3-trio at PCI_DEVFN(2, 0) */
+         pci_vga_init(pci_bus);
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index f3d4c4d230..160657f4b9 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -2279,3 +2279,10 @@ void lsi53c895a_create(PCIBus *bus)
+ 
+     scsi_bus_legacy_handle_cmdline(&s->bus);
+ }
++
++void lsi53c810_create(PCIBus *bus, int devfn)
++{
++    LSIState *s = LSI53C895A(pci_create_simple(bus, devfn, "lsi53c810"));
++
++    scsi_bus_legacy_handle_cmdline(&s->bus);
++}
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index d8c18c7fa4..e255941b5a 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -708,6 +708,7 @@ PCIDevice *pci_create(PCIBus *bus, int devfn, const char *name);
+ PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
+ 
+ void lsi53c895a_create(PCIBus *bus);
++void lsi53c810_create(PCIBus *bus, int devfn);
+ 
+ qemu_irq pci_allocate_irq(PCIDevice *pci_dev);
+ void pci_set_irq(PCIDevice *pci_dev, int level);
 -- 
 2.14.3
