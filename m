@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1exqlJ-0003IB-8M
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:07:26 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1exqn6-000464-9f
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1exqlG-0000gW-3I
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:07:25 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:42609)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1exqlF-0000gN-Ou
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:07:22 -0400
-References: <20180318161228.21307-1-laurent@vivier.eu>
-	<2e64bf25-1318-2773-5d17-6c8a9bb835c9@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <755d05ce-50d1-a3c0-f3a5-822916916f03@vivier.eu>
-Date: Mon, 19 Mar 2018 10:07:12 +0100
+	(envelope-from <aik@ozlabs.ru>) id 1exqn2-0001cG-5J
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:09:16 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:51518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1exqn1-0001bM-H6
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 05:09:11 -0400
+Received: by mail-it0-x243.google.com with SMTP id j137-v6so2357013ita.1
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 02:09:11 -0700 (PDT)
+References: <20180315212634.15150.88094.stgit@gimli.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <28b02805-fa03-7f7c-b603-fa8985b305aa@ozlabs.ru>
+Date: Mon, 19 Mar 2018 20:09:04 +1100
 MIME-Version: 1.0
-In-Reply-To: <2e64bf25-1318-2773-5d17-6c8a9bb835c9@linaro.org>
+In-Reply-To: <20180315212634.15150.88094.stgit@gimli.home>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/m68k: add a mechanism to
- automatically free TCGv
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] vfio/pci: ioeventfd support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, peterx@redhat.com, eric.auger@redhat.com
 
-Le 19/03/2018 à 09:39, Richard Henderson a écrit :
-> On 03/19/2018 12:12 AM, Laurent Vivier wrote:
->> SRC_EA() and gen_extend() can return either a temporary
->> TCGv or a memory allocated one. Mark them when they are
->> allocated, and free them automatically at end of the
->> instruction translation.
->>
->> We want to free locally allocated TCGv to avoid
->> overflow in sequence like:
->>
->>   0xc00ae406:  movel %fp@(-132),%fp@(-268)
->>   0xc00ae40c:  movel %fp@(-128),%fp@(-264)
->>   0xc00ae412:  movel %fp@(-20),%fp@(-212)
->>   0xc00ae418:  movel %fp@(-16),%fp@(-208)
->>   0xc00ae41e:  movel %fp@(-60),%fp@(-220)
->>   0xc00ae424:  movel %fp@(-56),%fp@(-216)
->>   0xc00ae42a:  movel %fp@(-124),%fp@(-252)
->>   0xc00ae430:  movel %fp@(-120),%fp@(-248)
->>   0xc00ae436:  movel %fp@(-12),%fp@(-260)
->>   0xc00ae43c:  movel %fp@(-8),%fp@(-256)
->>   0xc00ae442:  movel %fp@(-52),%fp@(-276)
->>   0xc00ae448:  movel %fp@(-48),%fp@(-272)
->>   ...
->>
->> That can fill a lot of TCGv entries in a sequence,
->> especially since 15fa08f845 ("tcg: Dynamically allocate TCGOps")
->> we have no limit to fill the TCGOps cache and we can fill
->> the entire TCG variables array and overflow it.
->>
->> Suggested-by: Richard Henderson <rth@twiddle.net>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
+On 16/3/18 8:31 am, Alex Williamson wrote:
+> A vfio ioeventfd will perform the pre-specified device write on
+> triggering of an eventfd.  When coupled with KVM ioeventfds, this
+> feature allows a VM to trap a device page for virtualization, while
+> also registering targeted ioeventfds to maintain performance of high
+> frequency register writes within the trapped range.  Much like the
+> existing interrupt eventfd/irqfd coupling, such writes can be handled
+> entirely in the host kernel.
 > 
-> This is a good start.  It's hard to see all of where else might have been
-> missed; at least the call to gen_load in gen_lea_indexed.
+> The new VFIO device ioctl may be supported by any vfio bus driver,
+> including mdev drivers, but the implementation here only enables
+> vfio-pci.  This is intended as an acceleration path, bus drivers
+> may choose which regions to support and userspace should always
+> intend to fall back to non-accelerated handling when unavailable.
 > 
-> For next development cycle it would be good to convert the translator loop and
-> enable TCGv leak detection.
+> v1->v2:
+>  * Peter & Eric Sign-offs on 1/3
+>  * mutex_destroy() in 3/3
+>  * Slight enhancement to uapi description
+>  * sparse clean - Sparse didn't like that we dropped the __iomem
+>    address space when calling iowriteXX, re-adding it via the opaque
+>    and data pointers of the virq was crude, and that was not a 32-bit
+>    friendly soluion anyway, so add the iomem address to our ioeventfd
+>    struct, pass that, and use a more simple, common handler.
+> 
+> RFC->v1:
+>  * An arbitrary limit is added for the number of ioeventfds supported
+>    per device.  The intention is to set this high enough to allow any
+>    reasonable use case, but limit malicious user behavior.
+>  * Split patches, including adding a patch for endian neutral io reads
+>    and writes.  This should be a nop for little-endian and avoid
+>    redundant swap on big-endian, and hopefully resolves Alexey's
+>    comments regarding the endian nature of this interface.
+>  * Rebase to v4.16-rc3
+> 
+> Thanks,
+> Alex
+> 
+> ---
+> 
+> Alex Williamson (3):
+>       vfio/pci: Pull BAR mapping setup from read-write path
+>       vfio/pci: Use endian neutral helpers
+>       vfio/pci: Add ioeventfd support
+> 
+> 
+>  drivers/vfio/pci/vfio_pci.c         |   35 +++++++
+>  drivers/vfio/pci/vfio_pci_private.h |   19 ++++
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  184 +++++++++++++++++++++++++++++++----
+>  include/uapi/linux/vfio.h           |   27 +++++
+>  4 files changed, 245 insertions(+), 20 deletions(-)
+> 
 
-I agree.
 
-> That said, this looks good so far.
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+LGTM, I gave it a try to make sure 2/3 does not break and it does not in
+all combinations of le/be host <=> le/be guest but I did not try the actual
+feature - cannot make up a test quickly...
 
-I'm going to update the patch by splitting it in two as Philippe asked
-and mark the missing gen_load() in gen_lea_indexed().
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Thanks,
-Laurent
+
+-- 
+Alexey
