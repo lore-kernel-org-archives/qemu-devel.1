@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey2vg-0006bM-GL
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:06:57 -0400
+	(envelope-from <wsa@the-dreams.de>) id 1ey2w6-0006qD-DG
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey2vb-0007o1-PN
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:06:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ey2vb-0007nI-KC
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:06:51 -0400
-References: <20180216164620.GA53727@humpty.home.comstyle.com>
-	<c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
-	<85dc7f9f-95e1-c666-ee17-8f04d008d21b@gmx.com>
-	<e625c026-2fa4-f3ea-d85e-080c65a4885f@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <128f62e5-9184-57e5-88c1-d5cc4bf27d4f@redhat.com>
-Date: Mon, 19 Mar 2018 17:06:37 -0500
+	(envelope-from <wsa@the-dreams.de>) id 1ey2w1-0008DJ-E0
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:07:22 -0400
+Received: from sauhun.de ([88.99.104.3]:57330 helo=pokefinder.org)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wsa@the-dreams.de>) id 1ey2w1-0008Ce-7E
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:07:17 -0400
+Date: Mon, 19 Mar 2018 23:07:15 +0100
+From: Wolfram Sang <wsa@the-dreams.de>
+Message-ID: <20180319220715.g2stcupst6ifsnrj@ninjato>
+References: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
+	<20180319213101.6100-4-wsa+renesas@sang-engineering.com>
+	<2071e85f-72b9-9fa5-e5d7-7faa41fb9074@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e625c026-2fa4-f3ea-d85e-080c65a4885f@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] make vm-test [was: [PATCH] maintainers: Add myself as
- a OpenBSD maintainer]
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dtcn2baqe4twlm7s"
+Content-Disposition: inline
+In-Reply-To: <2071e85f-72b9-9fa5-e5d7-7faa41fb9074@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] nvram: at24c: use standard error
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kamil Rytarowski <n54@gmx.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 02/16/2018 11:44 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 02/16/2018 02:41 PM, Kamil Rytarowski wrote:
->> On 16.02.2018 18:30, Philippe Mathieu-Daud=C3=A9 wrote:
->>> But before announcing the host OS being supported again, I'd rather s=
-ee
->>> reproducible build/tests logs, in a (public - if possible) continuous
->>> integration system. Else it is hard to notice when it get broken.
->>>
->>
->> This is already done for FreeBSD, NetBSD and OpenBSD.
+
+--dtcn2baqe4twlm7s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+
+> > -                ERR(TYPE_AT24C_EE
+> > -                        " : failed to write backing file\n");
+> > +                error_report("failed to write backing file\n");
 >=20
-> We have the ability to run those, but afaik no CI are using them.
->=20
-> $ make vm-test
-> vm-test: Test QEMU in preconfigured virtual machines
->=20
->    vm-build-ubuntu.i386            - Build QEMU in ubuntu i386 VM
->    vm-build-freebsd                - Build QEMU in FreeBSD VM
->    vm-build-netbsd                 - Build QEMU in NetBSD VM
->    vm-build-openbsd                - Build QEMU in OpenBSD VM
->=20
->>
->> CC: Fam who can confirm this.
+> Drop the \n here and elsewhere in your patch; error_report() already does
+> that for you.
 
-Thanks for this; today was my first day trying the various vm-build-=20
-targets.
+Darn, I haven't installed my automatic-checkpatch-script for qemu yet :(
+Sorry, will wait for more review comments and fix!
 
-Question: is this expected behavior?
 
-$ make vm-build-ubuntu.i386
-     VM-IMAGE ubuntu.i386
-...
-Image resized.
-debconf: unable to initialize frontend: Dialog
-debconf: (TERM is not set, so the dialog frontend is not usable.)
-debconf: falling back to frontend: Readline
-debconf: unable to initialize frontend: Readline
-debconf: (This frontend requires a controlling tty.)
-debconf: falling back to frontend: Teletype
-dpkg-preconfigure: unable to re-open stdin:
-Connection to 127.0.0.1 closed by remote host.
-...
-Cloning into=20
-'/home/eblake/qemu/vm-test-VoVkBv.tmp/data-5ba3c.tar.vroot/ui/keycodemapd=
-b'...
-sudo: unable to resolve host ubuntu-guest
-make[1]: flex: Command not found
-...
-make[1]: flex: Command not found
-Could not access KVM kernel module: No such file or directory
-qemu-system-i386: failed to initialize KVM: No such file or directory
-qemu-system-i386: Back to tcg accelerator
+--dtcn2baqe4twlm7s
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I'm wondering if the image initialized incorrectly, and as a result=20
-can't do as much as it's supposed to do, or runs way slower than it=20
-needs to?  The command eventually completed with status 0, but failed to=20
-find a 32-bit compile error in the rdma code, and the output log does=20
-not look like it actually attempted to compile anything in qemu (unless=20
-it did compile it, but the logs were not output to stdout/stderr).
+-----BEGIN PGP SIGNATURE-----
 
-make vm-build-freebsd was a lot faster at completing for me (but shows=20
-that we still have a lot of clang warnings about address of a packed=20
-struct member).
+iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAlqwNI8ACgkQFA3kzBSg
+KbbfLA/+JuW2+64mmglCTSDvScUWt+IkemJLJcC6J0SowjZ5lHUdWVH57v/vnzGH
+ihmoZWLPjbamcCjZLMbYKoKZigTbJoyHur6mcxUPMXdhI3qohvq+cAgB8jEKl+9J
+xVrlUYH6hI6OYmqD0tNYkQlHe0bvQw6fwTHjjB01kTihy3W3t5hhUG0X9+w2G1bX
+CTU7tpHZHXF+wM7VNwRmeCiZNhD44tHBBysK1dirjOQ24rGYdBIwJLylt5wqxjSb
+wLJFUhDO0sOZd9rHxcP7hqicJ5KEd+mhj41d53qaIUMTc8Nu8i7VUoAUo9Xtz333
+mzO7YAOVV16mBAunll70Auzx6UqCheuPSSF4At87g5l95OB6a0Qtfl2LNFge9Nro
+6E2NE6cFXW7VTf+8ECzq0Kfx7/vY2d+nnRTl7yYlcfGUHXWkN9xL1dLUm0TWwea5
+gQA5iqNd0ahvFTJ1qPuTTcdri5UsajCJKEEFiY2F8YUUucwNu6GYzFkuxeu5pTek
+qOGKq8ZAS5NvP0L+ofBg7VrCSq/nAnO5eUW2eD9vWLb/1hYG1ySvroq0hEIJF6zf
+A5YS4yziOsObEzhlsqhWYPLdSzMes+R1yKBGBYT4oIRm+s6goWfFyTqOKe63FKP/
+k1nvRU44U5oa55QSb7/TYfVyHI1OyQ+2UA0RTbQqDBkQUplh/m0=
+=IGpA
+-----END PGP SIGNATURE-----
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--dtcn2baqe4twlm7s--
