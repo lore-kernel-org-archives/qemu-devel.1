@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wsa@the-dreams.de>) id 1exqF0-0002js-RW
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:34:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1exqJz-0003tD-L9
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wsa@the-dreams.de>) id 1exqEw-0006w6-Ro
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:34:02 -0400
-Received: from sauhun.de ([88.99.104.3]:54291 helo=pokefinder.org)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wsa@the-dreams.de>) id 1exqEw-0006vR-Kh
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:33:58 -0400
-Date: Mon, 19 Mar 2018 09:33:55 +0100
-From: Wolfram Sang <wsa@the-dreams.de>
-Message-ID: <20180319083355.vw5cxkwyb4zihlcz@ninjato>
-References: <20180312214230.17561-1-wsa+renesas@sang-engineering.com>
-	<20180312214230.17561-4-wsa+renesas@sang-engineering.com>
-	<5108cc9b-9fb9-d202-d4bc-a5c1dd4d4f76@amsat.org>
-	<20180313201649.w44jtdbk4bow2f7x@ninjato>
-	<f90bfd58-1f51-dc72-a67a-c0021345f9ba@amsat.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1exqJv-00008Z-Di
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:39:11 -0400
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:41536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1exqJv-00007g-7u
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 04:39:07 -0400
+Received: by mail-io0-x22f.google.com with SMTP id m83so19747732ioi.8
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 01:39:07 -0700 (PDT)
+References: <20180318161228.21307-1-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2e64bf25-1318-2773-5d17-6c8a9bb835c9@linaro.org>
+Date: Mon, 19 Mar 2018 16:39:01 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tvc27v433gqtec4q"
-Content-Disposition: inline
-In-Reply-To: <f90bfd58-1f51-dc72-a67a-c0021345f9ba@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 3/3] nvram: at24c: use a sane default for
- "rom-size"
+In-Reply-To: <20180318161228.21307-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/m68k: add a mechanism to
+ automatically free TCGv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
+
+On 03/19/2018 12:12 AM, Laurent Vivier wrote:
+> SRC_EA() and gen_extend() can return either a temporary
+> TCGv or a memory allocated one. Mark them when they are
+> allocated, and free them automatically at end of the
+> instruction translation.
+> 
+> We want to free locally allocated TCGv to avoid
+> overflow in sequence like:
+> 
+>   0xc00ae406:  movel %fp@(-132),%fp@(-268)
+>   0xc00ae40c:  movel %fp@(-128),%fp@(-264)
+>   0xc00ae412:  movel %fp@(-20),%fp@(-212)
+>   0xc00ae418:  movel %fp@(-16),%fp@(-208)
+>   0xc00ae41e:  movel %fp@(-60),%fp@(-220)
+>   0xc00ae424:  movel %fp@(-56),%fp@(-216)
+>   0xc00ae42a:  movel %fp@(-124),%fp@(-252)
+>   0xc00ae430:  movel %fp@(-120),%fp@(-248)
+>   0xc00ae436:  movel %fp@(-12),%fp@(-260)
+>   0xc00ae43c:  movel %fp@(-8),%fp@(-256)
+>   0xc00ae442:  movel %fp@(-52),%fp@(-276)
+>   0xc00ae448:  movel %fp@(-48),%fp@(-272)
+>   ...
+> 
+> That can fill a lot of TCGv entries in a sequence,
+> especially since 15fa08f845 ("tcg: Dynamically allocate TCGOps")
+> we have no limit to fill the TCGOps cache and we can fill
+> the entire TCG variables array and overflow it.
+> 
+> Suggested-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+
+This is a good start.  It's hard to see all of where else might have been
+missed; at least the call to gen_load in gen_lea_indexed.
+
+For next development cycle it would be good to convert the translator loop and
+enable TCGv leak detection.
+
+That said, this looks good so far.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---tvc27v433gqtec4q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi Philippe,
-
-> > I don't mind much, but why? My reasoning was "let's first fix the cause
-> > and then the symptom"?
->=20
-> The '0' case is worst than incorrect, it segfaults, so you are right :)
-
-Ok, thanks.
-
-> >> Can you add a #define for this value? Such AT24C_ROMSIZE_MIN.
-> >=20
-> > Can do, of course. But won't that give room for regressions because
-> > people are already using it with lower values?
->=20
-> Your patch already introduce the regression :)
-
-Not really. The current default setting (0) segfaults. This is how I
-discovered it. So, there can't be any active user of that.
-
-> I prefer self-explanatory #defines than magic value, but I see your
-> point, so if we can not decide a value, can you add a comment to explain
-> the magic value? I think the clearer is to add a #define with a comment.
-
-I wouldn't mind a macro AT24C_ROMSIZE_DEFAULT and a comment explaining
-why we chose this value. This is totally fine with me.
-
-It was just the MIN value I saw potential usage regressions with.
-
-> IMO there are too many AT24C eeproms to model, so the "rom-size"
-> variable is the easiest way. Your patch #2 is simple enough to avoid the
-> #DIV/0!
-
-Fine with me, too. I will update my series accordingly.
-
-Thanks,
-
-   Wolfram
-
---tvc27v433gqtec4q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAlqvde4ACgkQFA3kzBSg
-KbZOHRAAjBMuJjj3SPYWkhYuHhpVGhOxnUIazf6rkz396XKFf+cuNgqSI4C7vDhN
-xzDUBsDpYkGdxwtTup282x2yQbvuC155Og+B0qzACE/qlIsr1b5xDnFWISQp9DrQ
-qfZjFnd9GYUVVqOz78IpB29oIed4R8vDkOZKv9wbmZxahVN5lpeVqrHm38aIsq4W
-sZLIKbLwLe0KesTwBZjPDPRupstynPav4NLT1KWHW015PYI5wwXZXwHP7qq0D4vs
-M4geyZ8hAhMOiyiPPZ/rIvggVNCicuri7mCyZg5KOLNnAu6wWgaBWfKAM7cozwqU
-boXmyt/m4EJohPYeucqB0bfGqdj9FPNyGtP8iaqI4glE5YjdKA9YfsvQuHmVP2Kk
-GsId0eznimI+Hg1Gce6uCBxocC7wwfp4LTfrQlY60sElCFhJdyOcDmoPS6K+P3Dk
-T44WOH3rtiLUtdaRD2+j2ypzca8Agex4BRCQF2nQGyx1Fu2Bef7ZomI4vURt7j2V
-iF71UsM+7HeQTHAC6r81K/QJd4Eya+aKQwc/XY5NKRw/SqIZ2kG0Tx6ESV/HLnQd
-TUQcs0qKGUyK2HoLFDI85IVNxVK23zthnmrfYsYw8RP0hY/NXvPzCHgjh1x80omd
-+T92dJ9x/Y0QQ3vfrxXAhV49OQVNZYk97oSi4yLzqqTOJ6KA8Ms=
-=596v
------END PGP SIGNATURE-----
-
---tvc27v433gqtec4q--
+r~
