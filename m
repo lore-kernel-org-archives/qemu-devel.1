@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0006Yu-Jc
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1exim7-0006ZR-Eu
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim5-0000Lp-Eu
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0000NA-0W
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Mar 2018 11:35:20 +1100
-Message-Id: <20180319003524.28143-5-david@gibson.dropbear.id.au>
+Date: Mon, 19 Mar 2018 11:35:22 +1100
+Message-Id: <20180319003524.28143-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
 References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 4/8] hw/misc/macio: Mark the macio devices with
- user_creatable = false
+Subject: [Qemu-devel] [PULL 6/8] hw/ppc/spapr: Allow "spapr-vlan" as NIC
+ model name beside "ibmveth"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +25,39 @@ Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.o
 
 From: Thomas Huth <thuth@redhat.com>
 
-The macio devices currently cause a crash when the user tries to
-instantiate them on a different machine:
-
-$ ppc64-softmmu/qemu-system-ppc64 -device macio-newworld
-Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-qemu-system-ppc64: -device macio-newworld: Device 'serial0' is in use
-Aborted (core dumped)
-
-These devices are clearly not intended to be creatable by the user
-since they are using serial_hds[] directly in their instance_init
-function. So let's mark them with user_creatable = false.
+With the new "--nic" command line parameter option, the "old" way of
+specifying a NIC model via the nd_table[] is becoming more prominent
+again. But for the pseries "spapr-vlan" device, there is a confusing
+discrepancy between the model name that is used for "--device" (i.e.
+"spapr-vlan") and the model name that has to be used for "--net nic"
+or the new "--nic" parameter (i.e. "ibmveth"). Since "spapr-vlan" is
+the "real" name of the device, let's allow "spapr-vlan" to be used
+as model name for the nd_table[] entries, too.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/macio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/ppc/spapr.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index af1bd46b4b..454244f59e 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -406,6 +406,8 @@ static void macio_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_OTHERS << 8;
-     dc->props = macio_properties;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    /* Reason: Uses serial_hds in macio_instance_init */
-+    dc->user_creatable = false;
- }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 032d03423f..fba76abee2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2607,10 +2607,11 @@ static void spapr_machine_init(MachineState *machine)
+         NICInfo *nd = &nd_table[i];
  
- static const TypeInfo macio_oldworld_type_info = {
+         if (!nd->model) {
+-            nd->model = g_strdup("ibmveth");
++            nd->model = g_strdup("spapr-vlan");
+         }
+ 
+-        if (strcmp(nd->model, "ibmveth") == 0) {
++        if (g_str_equal(nd->model, "spapr-vlan") ||
++            g_str_equal(nd->model, "ibmveth")) {
+             spapr_vlan_create(spapr->vio_bus, nd);
+         } else {
+             pci_nic_init_nofail(&nd_table[i], phb->bus, nd->model, NULL);
 -- 
 2.14.3
