@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1exxTk-0007iV-5A
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:17:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1exxVB-0000C4-Vo
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1exxTf-00018E-8A
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:17:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59994)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1exxTf-00017g-1c
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:17:39 -0400
-From: Andreas Schwab <schwab@suse.de>
-Date: Mon, 19 Mar 2018 17:17:36 +0100
-Message-ID: <mvm1sggjazj.fsf@suse.de>
+	(envelope-from <jsnow@redhat.com>) id 1exxVA-0002G4-Ug
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:19:13 -0400
+References: <20180119224735.12169-1-jsnow@redhat.com>
+	<086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
+	<56b7204f-a0d8-3a4e-6e48-6913b1f52a5f@redhat.com>
+	<20180319152932.GD30864@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b37d73f9-04c0-08d0-8a9a-bc5d034f6cc5@redhat.com>
+Date: Mon, 19 Mar 2018 12:18:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] qemu:handle_cpu_signal received signal outside vCPU
- context
+In-Reply-To: <20180319152932.GD30864@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] file-posix: specify expected filetypes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-I'm seeing this error while building gedit for riscv64 with linux-user
-emulation:
 
-$ LD_LIBRARY_PATH=gedit/.libs qemu-riscv64 gedit/.libs/gedit --introspect-dump=/tmp/tmp-introspectnj0xla07/functions.txt,/tmp/tmp-introspectnj0xla07/dump.xml
-qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6003d7d5
-qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60106a16
 
-This is qemu as of today with the patches from
-git://github.com/riscv/riscv-qemu / riscv-all on top.
+On 03/19/2018 11:29 AM, Kevin Wolf wrote:
+> Am 13.03.2018 um 18:20 hat John Snow geschrieben:
+>>
+>>
+>> On 01/19/2018 06:03 PM, Eric Blake wrote:
+>>> On 01/19/2018 04:47 PM, John Snow wrote:
+>>>> Adjust each caller of raw_open_common to specify if they are expecting
+>>>> host and character devices or not. Tighten expectations of file types upon
+>>>> open in the common code and refuse types that are not expected.
+>>>>
+>>>> This has two effects:
+>>>>
+>>>> (1) Character and block devices are now considered deprecated for the
+>>>>     'file' driver, which expects only S_IFREG, and
+>>>> (2) no file-posix driver (file, host_cdrom, or host_device) can open
+>>>>     directories now.
+>>>>
+>>>> I don't think there's a legitimate reason to open directories as if
+>>>> they were files. This prevents QEMU from opening and attempting to probe
+>>>> a directory inode, which can break in exciting ways. One of those ways
+>>>> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
+>>>> size instead of EISDIR. This can coax QEMU into responding with a
+>>>> confusing "file too big" instead of "Hey, that's not a file".
+>>>>
+>>>> See: https://bugs.launchpad.net/qemu/+bug/1739304/
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+>> Whoops, I let this one rot. It could still be considered a bugfix for
+>> next week.
+> 
+> Yes, we should take this as a bugfix. Needs a rebase, though.
+> 
+> Kevin
+> 
 
-Andreas.
+You got it.
 
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+--js
