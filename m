@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey026-0007Qw-Cf
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:01:23 -0400
+	(envelope-from <jcody@redhat.com>) id 1ey07r-0001Aq-7I
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:07:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ey023-0003mK-Bo
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:01:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43622 helo=mx1.redhat.com)
+	(envelope-from <jcody@redhat.com>) id 1ey07o-0007Nj-2n
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:07:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46642 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ey023-0003l0-6q
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:01:19 -0400
-References: <20180319164152.1077050-1-eblake@redhat.com>
-	<CAFEAcA_gF=tpvZLTJ_K5mU59VzByh7XRJSVHFms2i5RJBH7CoA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6686106c-3866-ede4-b1ae-75bf18a948e8@redhat.com>
-Date: Mon, 19 Mar 2018 14:01:01 -0500
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1ey07n-0007Ji-TN
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 15:07:15 -0400
+Date: Mon, 19 Mar 2018 15:06:56 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180319190656.GK12302@localhost.localdomain>
+References: <CAFEAcA887ukS-r6ECRG7rrCMzXO8PpJqjevR=sELc_LNfRazLA@mail.gmail.com>
+	<20180221052735.GA2919@localhost.localdomain>
+	<CAFEAcA8AA643WJGwF3fHEOtjw_Sx_1TeOf5UZFg9x_L2Ot6XYw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_gF=tpvZLTJ_K5mU59VzByh7XRJSVHFms2i5RJBH7CoA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v3 00/38] QAPI patches for 2018-03-12,
- 2.12 softfreeze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8AA643WJGwF3fHEOtjw_Sx_1TeOf5UZFg9x_L2Ot6XYw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Moving seabios-hppa git submodule to use a
+ qemu.org mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +30,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, BALATON Zoltan <balaton@eik.bme.hu>, pbonzini@redhat.com
 
-On 03/19/2018 01:43 PM, Peter Maydell wrote:
-> On 19 March 2018 at 16:41, Eric Blake <eblake@redhat.com> wrote:
->> The following changes since commit 2c8cfc0b52b5a4d123c26c0b5fdf941be24805be:
->>
->>    Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-03-19 11:44:26 +0000)
->>
->> are available in the Git repository at:
->>
->>    git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-12-v3
->>
->> for you to fetch changes up to ebf1105a7086897da6963edefdb247c80f605424:
->>
->>    qapi: Pass '-u' when doing non-silent diff (2018-03-19 11:32:36 -0500)
->>
->> in v3:
->> rebase to master (a few more qobject_to_qdict() uses crept in)
->> squash in Peter Xu's fixup for test failures
->> [if tests still fail, then I will send a v4 without OOB from 2.12]
->> sending only the patches that changed from v2
-
+On Mon, Mar 19, 2018 at 01:19:36PM +0000, Peter Maydell wrote:
+> On 21 February 2018 at 05:27, Jeff Cody <jcody@redhat.com> wrote:
+> > On Tue, Feb 20, 2018 at 06:43:22PM +0000, Peter Maydell wrote:
+> >> I just noticed that we seem to have acquired another git
+> >> submodule that isn't pointing to a qemu.org git url:
+> >>
+> >> [submodule "roms/seabios-hppa"]
+> >>         path = roms/seabios-hppa
+> >>         url = git://github.com/hdeller/seabios-hppa.git
+> >>
+> >> Jeff, could we set up so we can mirror this repo on qemu.org?
+> >> Then we can send a patch to update the .gitmodules to point to it.
+> >>
+> >
+> > Yes, of course... Although Paolo has suggested making it a branch of the
+> > existing SeaBIOS repo instead.  But I can go ahead and get the clone setup,
+> > in case we go that route.
 > 
-> The assert seems to have gone away,
-
-Progress! Peter's OOB patches are working; your ubsan errors are from a 
-different part of the series.
-
-> but I get over 10,000 new
-> clang sanitizer runtime errors like
+> Hi; can we get the mirror set up for seabios-hppa, and also for
+> the other new repo:
+>  git://github.com/zbalaton/u-boot-sam460ex
 > 
->    /visitor/input/large_number:                                         OK
->    /visitor/input/number_keyval:                                        OK
->    /visitor/input/number_str_keyval:                                    OK
->    /visitor/input/number_str_fail:
-> /home/petmay01/linaro/qemu-for-merges/qapi/qobject-input-visitor.c:550:12:
-> runtime error: member access within null pointer of type 'QNum' (aka
-> 'struct QNum')
-> OK
-
-> Here's some backtraces for some of those:
+> please?
 > 
-> /visitor/input/int_keyval:
-> /home/petmay01/linaro/qemu-for-merges/qapi/qobject-input-visitor.c:188:12:
-> runtime error: member access within null pointer of type 'QString'
-> (aka 'struct QString')
->      #0 0x56375e642549 in qobject_input_get_keyval
-> /home/petmay01/linaro/qemu-for-merges/qapi/qobject-input-visitor.c:188:12
->      #1 0x56375e63f76b in qobject_input_type_int64_keyval
-> /home/petmay01/linaro/qemu-for-merges/qapi/qobject-input-visitor.c:409:23
->      #2 0x56375e63c13d in visit_type_int
-> /home/petmay01/linaro/qemu-for-merges/qapi/qapi-visit-core.c:150:5
+> (I've just sent a patch which moves the qemu-palcode module
+> to the already-existing mirror.)
+> 
+> thanks
+> -- PMM
 
-Max, this is the qobject_to() macro that is making ubsan gripe :(
 
-     qstr = qobject_to(QString, qobj);
+Hi,
 
-which partially expands to
+Both of these mirrors have been created, and are set to automatically
+refresh like the other mirrors on qemu.org:
 
-     qstr = container_of(qobject_check_type(qobj,
-        QTYPE_CAST_TO_QString)) ?: QOBJECT((QString *)NULL), QString, base);
+git://git.qemu.org/u-boot-sam460ex.git
+https://git.qemu.org/git/u-boot-sam460ex.git
 
-I'm guessing that container_of(NULL, type, base) is what ubsan is 
-griping at?  Can we rewrite qobject_to() to only call container_of() if 
-qobject_check_type() returns non-NULL?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+git://git.qemu.org/seabios-hppa.git
+https://git.qemu.org/git/seabios-hppa.git
+
+
+Let me know if there are any issues.
+
+
+Paolo or Stefan,
+
+If you create the repos for each of these under the qemu user on github,
+I'll also enable pushing of these two mirrors to github (like we do with
+other mirrors).
+
+
+-Jeff
