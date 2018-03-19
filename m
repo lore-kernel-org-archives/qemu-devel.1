@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nia.alarie@gmail.com>) id 1exwHf-0000wC-Gc
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 11:01:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1exwHq-00015L-UX
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 11:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nia.alarie@gmail.com>) id 1exwHe-00079Y-Po
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 11:01:11 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:39284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nia.alarie@gmail.com>)
-	id 1exwHe-00076U-In
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 11:01:10 -0400
-Received: by mail-lf0-x243.google.com with SMTP id p142-v6so3236511lfd.6
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 08:01:10 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1exwHj-0007Gt-8H
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 11:01:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57488 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1exwHj-0007GA-3N
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 11:01:15 -0400
+Date: Mon, 19 Mar 2018 16:01:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180319160110.19c4ed52@igors-macbook-pro.local>
+In-Reply-To: <20180316192854.GM3417@localhost.localdomain>
+References: <20180315181420.8694-1-ehabkost@redhat.com>
+	<CAFEAcA9itE11dUF-Z22M13XT2_sgr0vgDPAsJ_QhUvdT07L5nQ@mail.gmail.com>
+	<20180316192854.GM3417@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <a89c0265-53a0-a708-11fd-1096b565776b@redhat.com>
-References: <20180316144047.30904-1-nia.alarie@gmail.com>
-	<a89c0265-53a0-a708-11fd-1096b565776b@redhat.com>
-From: nee <nia.alarie@gmail.com>
-Date: Mon, 19 Mar 2018 15:01:08 +0000
-Message-ID: <CA+k8WDrcRro0ifJC1AEKeyapMGL4VUbD05D4wGN6T9ySy0Wh7Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] audio: Convert use of atoi to qemu_strtoi
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v2 0/7] Machine queue, 2018-03-15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, kraxel@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Mon, Mar 19, 2018 at 2:47 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 03/16/2018 09:40 AM, Nia Alarie wrote:
->>
->> If qemu_strtoi indicates an error, return the default value.
->
->
-> Would it be better to diagnose the error instead of silently returning a
-> default value?
->
->>
->> Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
->> ---
->>   audio/audio.c | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/audio/audio.c b/audio/audio.c
->> index 6eccdb17ee..d6e91901aa 100644
->> --- a/audio/audio.c
->> +++ b/audio/audio.c
->> @@ -335,9 +335,8 @@ static int audio_get_conf_int (const char *key, int
->> defval, int *defaultp)
->>       char *strval;
->>         strval = getenv (key);
->> -    if (strval) {
->> +    if (strval && !qemu_strtoi(strval, NULL, 10, &val)) {
->>           *defaultp = 0;
->> -        val = atoi (strval);
->>           return val;
->>       }
->>       else {
->>
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+On Fri, 16 Mar 2018 16:28:54 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Possibly, while writing these patches I was just going by what was
-already there. I can see how that would be good.
+> On Fri, Mar 16, 2018 at 07:05:29PM +0000, Peter Maydell wrote:
+> > On 15 March 2018 at 18:14, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > Changes in v2 (v1 was 2018-03-12):
+> > > * Fix bsd-user build error
+> > >
+> > > The following changes since commit 56e8698ffa8aba9f762f980bc21b5340b006f24b:
+> > >
+> > >   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-speedup-130318-1' into staging (2018-03-15 14:48:09 +0000)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+> > >
+> > > for you to fetch changes up to 7cbb6fd8926b9b590c0725b9b7d0a11db6aefd08:
+> > >
+> > >   cpu: drop unnecessary NULL check and cpu_common_class_by_name() (2018-03-15 14:52:40 -0300)
+> > >
+> > > ----------------------------------------------------------------
+> > > Machine queue, 2018-03-15
+> > >
+> > 
+> > Hi. This produces several warning messages running make check:
+> > 
+> > WARNING: cpu name for target 'riscv32' isn't defined, add it to cpus_map
+> > WARNING: cpu name for target 'riscv64' isn't defined, add it to cpus_map
+> 
+> Ouch, another conflict with the commits that added target/riscv
+> after the original series was submitted.  :(
+> 
+> I will drop all the patches in this pull request except for the
+> only bug fix there ("pc: correct misspelled CPU model-id for pc
+> 2.2").
+>
+> Igor, can you resubmit the cpu_model/cpu_type series fixing the
+> warnings so I can queue it for v2.13?
+Fixup should be trivial, I'll post it here as reply to offending patch.
 
-Should the code provide a warning to the user and continue with the
-default, or provide the warning and exit? And is it more correct to
-use dolog() or AUD_log() in this context?
+This kind of tree wide changes tend to break often if not merged
+quickly and leaving old infrastructure around till 2.13 doesn't
+look like good idea as someone will copy it and queued for 2.13
+tree well be broken again.
+So I'd prefer if you'd send fixed up pull request instead of
+dropping patches.
