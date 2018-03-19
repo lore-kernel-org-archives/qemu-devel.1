@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim7-0006Z4-6c
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:44 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim5-0000N0-UM
+	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0006Yr-4p
 	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1exim2-0000HO-UO
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Mar 2018 11:35:18 +1100
-Message-Id: <20180319003524.28143-3-david@gibson.dropbear.id.au>
+Date: Mon, 19 Mar 2018 11:35:17 +1100
+Message-Id: <20180319003524.28143-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
 References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/8] tests/boot-serial: Check the 40p machine,
- too
+Subject: [Qemu-devel] [PULL 1/8] sii3112: Remove unneeded exit function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +20,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-The "40p" machine is using the Open Hack'Ware BIOS, just like the "prep"
-machine, so we can test it accordingly with the boot-serial tester, too.
-While we're at it, also change the strings that we are using for the
-"prep" machine, so that this test now also checks some CLI parameters.
+An exit function was mistakenly left here but it's not needed because
+the PCI bars are organised differently in this device. Calling this
+exit function during device_del was causing an abort with
+memory_region_del_subregion: `Assertion subregion->container == mr' failed.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/boot-serial-test.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/ide/sii3112.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index ece25c694f..5b24cd26c1 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -75,11 +75,13 @@ typedef struct testdef {
- static testdef_t tests[] =3D {
-     { "alpha", "clipper", "", "PCI:" },
-     { "ppc", "ppce500", "", "U-Boot" },
--    { "ppc", "prep", "", "Open Hack'Ware BIOS" },
-+    { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
-+    { "ppc", "40p", "-boot d", "Booting from device d" },
-     { "ppc", "g3beige", "", "PowerPC,750" },
-     { "ppc", "mac99", "", "PowerPC,G4" },
-     { "ppc64", "ppce500", "", "U-Boot" },
--    { "ppc64", "prep", "", "Open Hack'Ware BIOS" },
-+    { "ppc64", "prep", "-boot e", "Booting from device e" },
-+    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
-     { "ppc64", "mac99", "", "PowerPC,970FX" },
-     { "ppc64", "pseries", "", "Open Firmware" },
-     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
---=20
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+index e3896c65b4..743a50ed51 100644
+--- a/hw/ide/sii3112.c
++++ b/hw/ide/sii3112.c
+@@ -327,17 +327,6 @@ static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+     qemu_register_reset(sii3112_reset, s);
+ }
+ 
+-static void sii3112_pci_exitfn(PCIDevice *dev)
+-{
+-    PCIIDEState *d = PCI_IDE(dev);
+-    int i;
+-
+-    for (i = 0; i < 2; ++i) {
+-        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
+-        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
+-    }
+-}
+-
+ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -348,7 +337,6 @@ static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+     pd->class_id = PCI_CLASS_STORAGE_RAID;
+     pd->revision = 1;
+     pd->realize = sii3112_pci_realize;
+-    pd->exit = sii3112_pci_exitfn;
+     dc->desc = "SiI3112A SATA controller";
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ }
+-- 
 2.14.3
