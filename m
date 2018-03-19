@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim7-0006Z0-0r
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:44 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1exjvk-0000w4-DY
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 21:49:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim5-0000Mm-RA
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Mar 2018 11:35:23 +1100
-Message-Id: <20180319003524.28143-8-david@gibson.dropbear.id.au>
-In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 7/8] ppc440_pcix: Change some error_report to
- qemu_log_mask(LOG_UNIMP, ...)
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1exjvf-0007pp-IJ
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 21:49:44 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:62294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jiang.biao2@zte.com.cn>)
+	id 1exjvf-0007n4-6x
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 21:49:39 -0400
+Date: Mon, 19 Mar 2018 09:49:24 +0800 (CST)
+Message-ID: <201803190949243031468@zte.com.cn>
+In-Reply-To: <20180313075739.11194-3-xiaoguangrong@tencent.com>
+References: 20180313075739.11194-1-xiaoguangrong@tencent.com,
+	20180313075739.11194-3-xiaoguangrong@tencent.com
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_2/8=5D_migration=3A_stop_allocat?=
+ =?utf-8?q?ing_and_freeingmemory_frequently?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,57 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
-
-Using log unimp is more appropriate for these messages and this also
-silences them by default so they won't clobber make check output when
-tests are added for this board.
-
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/ppc440_pcix.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-index ab2626a9de..b1307e6477 100644
---- a/hw/ppc/ppc440_pcix.c
-+++ b/hw/ppc/ppc440_pcix.c
-@@ -21,6 +21,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
-+#include "qemu/log.h"
- #include "hw/hw.h"
- #include "hw/ppc/ppc.h"
- #include "hw/ppc/ppc4xx.h"
-@@ -286,8 +287,9 @@ static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
-         break;
- 
-     default:
--        error_report("%s: unhandled PCI internal register 0x%lx", __func__,
--                     (unsigned long)addr);
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: unhandled PCI internal register 0x%"HWADDR_PRIx"\n",
-+                      __func__, addr);
-         break;
-     }
- }
-@@ -377,8 +379,9 @@ static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
-         break;
- 
-     default:
--        error_report("%s: invalid PCI internal register 0x%lx", __func__,
--                     (unsigned long)addr);
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: invalid PCI internal register 0x%" HWADDR_PRIx "\n",
-+                      __func__, addr);
-         val = 0;
-     }
- 
--- 
-2.14.3
+SGksIGd1YW5ncm9uZwo+IAo+ICsvKiByZXR1cm4gdGhlIHNpemUgYWZ0ZXIgY29tcHJlc3Npb24s
+IG9yIG5lZ2F0aXZlIHZhbHVlIG9uIGVycm9yICovCj4gK3N0YXRpYyBpbnQgcWVtdV9jb21wcmVz
+c19kYXRhKHpfc3RyZWFtICpzdHJlYW0sIHVpbnQ4X3QgKmRlc3QsIHNpemVfdCBkZXN0X2xlbiwK
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgdWludDhfdCAqc291cmNlLCBz
+aXplX3Qgc291cmNlX2xlbikKPiArewo+ICsgICAgaW50IGVycjsKPiArCj4gKyAgICBlcnIgPSBk
+ZWZsYXRlUmVzZXQoc3RyZWFtKTsKPiArICAgIGlmIChlcnIgIT0gWl9PSykgewo+ICsgICAgICAg
+IHJldHVybiAtMTsKPiArICAgIH0KPiArCj4gKyAgICBzdHJlYW0tPmF2YWlsX2luID0gc291cmNl
+X2xlbjsKPiArICAgIHN0cmVhbS0+bmV4dF9pbiA9ICh1aW50OF90ICopc291cmNlOwo+ICsgICAg
+c3RyZWFtLT5hdmFpbF9vdXQgPSBkZXN0X2xlbjsKPiArICAgIHN0cmVhbS0+bmV4dF9vdXQgPSBk
+ZXN0Owo+KwpkdXBsaWNhdGVkIGNvZGUgd2l0aCBxZW11X3VuY29tcHJlc3MoKSwgd291bGQgaW5p
+dGlhbGl6aW5nIHN0cmVhbSBvdXRzaWRlIApvZiBxZW11X2NvbXByZXNzX2RhdGEoKSBiZSBiZXR0
+ZXI/IEluIHRoYXQgY2FzZSwgd2UgY291bGQgcGFzcyBtdWNoIGxlc3MKcGFyYW1ldGVycyBkb3du
+LCBhbmQgYXZvaWQgdGhlIGR1cGxpY2F0ZWQgY29kZS4gT3IgY291bGQgd2UgZW5jYXBzdWxhdGUg
+CnNvbWUgc3RydWN0IHRvIGVhc2UgdGhlIGNhc2U/Cj4gKyAgICBlcnIgPSBkZWZsYXRlKHN0cmVh
+bSwgWl9GSU5JU0gpOwo+ICsgICAgaWYgKGVyciAhPSBaX1NUUkVBTV9FTkQpIHsKPiArICAgICAg
+ICByZXR1cm4gLTE7Cj4gKyAgICB9Cj4gKwo+ICsgICAgcmV0dXJuIHN0cmVhbS0+bmV4dF9vdXQg
+LSBkZXN0Owo+ICt9Cj4gKwo+IAo+IEBAIC02ODMsOCArNzA3LDEwIEBAIHNzaXplX3QgcWVtdV9w
+dXRfY29tcHJlc3Npb25fZGF0YShRRU1VRmlsZSAqZiwgY29uc3QgdWludDhfdCAqcCwgc2l6ZV90
+IHNpemUsCj4gcmV0dXJuIC0xOwo+IH0KPiB9Cj4gLSAgICBpZiAoY29tcHJlc3MyKGYtPmJ1ZiAr
+IGYtPmJ1Zl9pbmRleCArIHNpemVvZihpbnQzMl90KSwgKHVMb25nZiAqKSZibGVuLAo+IC0gICAg
+ICAgICAgICAgICAgICAoQnl0ZWYgKilwLCBzaXplLCBsZXZlbCkgIT0gWl9PSykgewo+ICsKPiAr
+ICAgIGJsZW4gPSBxZW11X2NvbXByZXNzX2RhdGEoc3RyZWFtLCBmLT5idWYgKyBmLT5idWZfaW5k
+ZXggKyBzaXplb2YoaW50MzJfdCksCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJs
+ZW4sIHAsIHNpemUpOwpUaGUgImxldmVsIiBwYXJhbWV0ZXIgaXMgbmV2ZXIgdXNlZCBhZnRlciB0
+aGUgcGF0Y2gsIGNvdWxkIHdlIGp1c3QgcmVtb3ZlZCBpdD8gCk9uIHRoZSBvdGhlciBoYW5kLCBk
+ZWZsYXRlKCkgb2YgemxpYiBzdXBwb3J0cyBjb21wcmVzc2lvbiBsZXZlbCB0b28oYnkgCmRlZmxh
+dGVJbml0KHN0cmVhbSwgbGV2ZWwpKSwgc2hvdWxkIHdlIGp1c3QgcmV1c2UgdGhlIGxldmVsIHBy
+b3Blcmx5PyAgSWYgbm90LCB0aGUgCiptaWdyYXRlIHBhcmFtZXRlciBjb21wcmVzc19sZXZlbCog
+d2lsbCBiZSB1c2VsZXNzLiAKPiArICAgIGlmIChibGVuIDwgMCkgewo+IGVycm9yX3JlcG9ydCgi
+Q29tcHJlc3MgRmFpbGVkISIpOwo+IHJldHVybiAwOwo+IH0KPgo+ICsvKiByZXR1cm4gdGhlIHNp
+emUgYWZ0ZXIgZGVjb21wcmVzc2lvbiwgb3IgbmVnYXRpdmUgdmFsdWUgb24gZXJyb3IgKi8KPiAr
+c3RhdGljIGludCBxZW11X3VuY29tcHJlc3Moel9zdHJlYW0gKnN0cmVhbSwgdWludDhfdCAqZGVz
+dCwgc2l6ZV90IGRlc3RfbGVuLAo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90
+ICpzb3VyY2UsIHNpemVfdCBzb3VyY2VfbGVuKQpUaGUgbmFtZSBvZiAqcWVtdV91bmNvbXByZXNz
+KiBkb2VzIG5vdCBxdWl0ZSBtYXRjaCAqcWVtdV9jb21wcmVzc19kYXRhKiwKd291bGQgKnFlbXVf
+dW5jb21wcmVzc19kYXRhKiBiZSBiZXR0ZXI/CkJlc2lkZXMsIHRoZSBwcm90b3R5cGUgaXMgbm90
+IGNvbnNpc3RlbnQgd2l0aCAgKnFlbXVfY29tcHJlc3NfZGF0YSogZWl0aGVyLCAKc2hvdWxkIHRo
+ZSAtKnNvdXJjZS0gYmUgLWNvbnN0LSBhbHNvIGhlcmU/Cj4gK3sKPiArICAgIGludCBlcnI7Cj4g
+Kwo+ICsgICAgZXJyID0gaW5mbGF0ZVJlc2V0KHN0cmVhbSk7Cj4gKyAgICBpZiAoZXJyICE9IFpf
+T0spIHsKPiArICAgICAgICByZXR1cm4gLTE7Cj4gKyAgICB9Cj4gKwo+ICsgICAgc3RyZWFtLT5h
+dmFpbF9pbiA9IHNvdXJjZV9sZW47Cj4gKyAgICBzdHJlYW0tPm5leHRfaW4gPSBzb3VyY2U7Cj4g
+KyAgICBzdHJlYW0tPmF2YWlsX291dCA9IGRlc3RfbGVuOwo+ICsgICAgc3RyZWFtLT5uZXh0X291
+dCA9IGRlc3Q7Cj4gKwo+ICsgICAgZXJyID0gaW5mbGF0ZShzdHJlYW0sIFpfTk9fRkxVU0gpOwo+
+ICsgICAgaWYgKGVyciAhPSBaX1NUUkVBTV9FTkQpIHsKPiArICAgICAgICByZXR1cm4gLTE7Cj4g
+KyAgICB9Cj4gKwo+ICsgICAgcmV0dXJuIHN0cmVhbS0+dG90YWxfb3V0Owo+ICt9Cj4gKwoKSmlh
+bmcKUmVnYXJkcyw=
