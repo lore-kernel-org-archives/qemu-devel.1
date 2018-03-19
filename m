@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ey1k6-0008A9-CK
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:50:57 -0400
+	(envelope-from <mjc@sifive.com>) id 1ey1zs-000620-Vs
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:07:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ey1k5-0003MK-5Z
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:50:54 -0400
-References: <1518893216-9983-1-git-send-email-eric.auger@redhat.com>
-	<1518893216-9983-14-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA810AsyBgCJ2vSKcxqRYKGZgJ3RLEqmJt_c5aa9j9t_Kw@mail.gmail.com>
-	<5AAFCA19.7020507@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2908cad5-ffb8-29bd-0f10-a7600622429a@redhat.com>
-Date: Mon, 19 Mar 2018 21:50:35 +0100
+	(envelope-from <mjc@sifive.com>) id 1ey1zq-0000RY-PJ
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:07:12 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:36305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey1zq-0000Qa-FL
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:07:10 -0400
+Received: by mail-oi0-x234.google.com with SMTP id t16so2167983oih.3
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:07:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <5AAFCA19.7020507@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 13/14] hw/arm/virt-acpi-build: Add
- smmuv3 node in IORT table
+In-Reply-To: <34ebe3f6-3ae6-cd7f-ab52-727119666632@redhat.com>
+References: <1521229281-73637-1-git-send-email-mjc@sifive.com>
+	<1521229281-73637-11-git-send-email-mjc@sifive.com>
+	<34ebe3f6-3ae6-cd7f-ab52-727119666632@redhat.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Mon, 19 Mar 2018 14:07:09 -0700
+Message-ID: <CAHNT7NsjiXpLOAii3sWv9rGe0h-+xAwwuO5srNPNxX+sxi9Udg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 10/24] RISC-V: Hold rcu_read_lock when
+ accessing memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,191 +30,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Tomasz Nowicki <tn@semihalf.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linuc.decode@gmail.com, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger.pro@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Stefan O'Rear <sorear2@gmail.com>
 
-Hi Shannon,
+On Mon, Mar 19, 2018 at 2:41 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On 19/03/18 15:32, Shannon Zhao wrote:
-> 
-> 
-> On 2018/3/12 20:48, Peter Maydell wrote:
->> On 17 February 2018 at 18:46, Eric Auger <eric.auger@redhat.com> wrote:
->>> From: Prem Mallappa <prem.mallappa@broadcom.com>
->>>
->>> This patch builds the smmuv3 node in the ACPI IORT table.
->>>
->>> The RID space of the root complex, which spans 0x0-0x10000
->>> maps to streamid space 0x0-0x10000 in smmuv3, which in turn
->>> maps to deviceid space 0x0-0x10000 in the ITS group.
->>>
->>> The guest must feature the IOMMU probe deferral series
->>> (https://lkml.org/lkml/2017/4/10/214) which fixes streamid
->>> multiple lookup. This bug is not related to the SMMU emulation.
->>>
->>> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> ---
->>>
->>> v2 -> v3:
->>> - integrate into the existing IORT table made up of ITS, RC nodes
->>> - take into account vms->smmu
->>> - match linux actbl2.h acpi_iort_smmu_v3 field names
->>> ---
->>>  hw/arm/virt-acpi-build.c    | 56 +++++++++++++++++++++++++++++++++++++++------
->>>  include/hw/acpi/acpi-defs.h | 15 ++++++++++++
->>>  2 files changed, 64 insertions(+), 7 deletions(-)
->>
->> Since ACPI is definitely not my area of expertise, I've cc'd
->> Shannon on this patch. Shannon, could you take a look at it, please?
->>
-> Sure.
-> 
->>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>> index f7fa795..4b5ad91 100644
->>> --- a/hw/arm/virt-acpi-build.c
->>> +++ b/hw/arm/virt-acpi-build.c
->>> @@ -393,19 +393,26 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
->>>  }
->>>
->>>  static void
->>> -build_iort(GArray *table_data, BIOSLinker *linker)
->>> +build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->>>  {
->>> -    int iort_start = table_data->len;
->>> +    int nb_nodes, iort_start = table_data->len;
->>>      AcpiIortIdMapping *idmap;
->>>      AcpiIortItsGroup *its;
->>>      AcpiIortTable *iort;
->>> -    size_t node_size, iort_length;
->>> +    AcpiIortSmmu3 *smmu;
->>> +    size_t node_size, iort_length, smmu_offset = 0;
->>>      AcpiIortRC *rc;
->>>
->>>      iort = acpi_data_push(table_data, sizeof(*iort));
->>>
->>> +    if (vms->iommu) {
-> use if (vms->iommu == VIRT_IOMMU_SMMUV3) ? in case we support other
-> types of SMMU.
-OK
-> 
->>> +        nb_nodes = 3; /* RC, ITS, SMMUv3 */
->>> +    } else {
->>> +        nb_nodes = 2; /* RC, ITS */
->>> +    }
->>> +
->>>      iort_length = sizeof(*iort);
->>> -    iort->node_count = cpu_to_le32(2); /* RC and ITS nodes */
->>> +    iort->node_count = cpu_to_le32(nb_nodes);
->>>      iort->node_offset = cpu_to_le32(sizeof(*iort));
->>>
->>>      /* ITS group node */
->>> @@ -418,6 +425,35 @@ build_iort(GArray *table_data, BIOSLinker *linker)
->>>      its->its_count = cpu_to_le32(1);
->>>      its->identifiers[0] = 0; /* MADT translation_id */
->>>
->>> +    if (vms->iommu == VIRT_IOMMU_SMMUV3) {
->>> +        int irq =  vms->irqmap[VIRT_SMMU];
->>> +
->>> +        /* SMMUv3 node */
->>> +        smmu_offset = cpu_to_le32(iort->node_offset + node_size);
-> no need cpu_to_le32 here.
-> Otherwise: Reviewed-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> On 16/03/2018 20:41, Michael Clark wrote:
+> > From reading other code that accesses memory regions directly,
+> > it appears that the rcu_read_lock needs to be held. Note: the
+> > original code for accessing RAM directly was added because
+> > there is no other way to use atomic_cmpxchg on guest physical
+> > address space.
+> >
+> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> > Signed-off-by: Michael Clark <mjc@sifive.com>
+> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> > ---
+> >  target/riscv/helper.c | 14 ++++++++++++--
+> >  1 file changed, 12 insertions(+), 2 deletions(-)
+>
+> I think the bug here is that rcu_read_lock/unlock is missing in
+> cpu_memory_rw_debug.  Are there any other callers you had in mind?
 
-OK. Thank you for the review!
 
-Thanks
+So this is not a bug in our patch per se, rather a bug in
+cpu_memory_rw_debug?
 
-Eric
-> 
->>> +        node_size = sizeof(*smmu) + sizeof(*idmap);
->>> +        iort_length += node_size;
->>> +        smmu = acpi_data_push(table_data, node_size);
->>> +
->>> +
->>> +        smmu->type = ACPI_IORT_NODE_SMMU_V3;
->>> +        smmu->length = cpu_to_le16(node_size);
->>> +        smmu->mapping_count = cpu_to_le32(1);
->>> +        smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
->>> +        smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
->>> +        smmu->event_gsiv = cpu_to_le32(irq);
->>> +        smmu->pri_gsiv = cpu_to_le32(irq + 1);
->>> +        smmu->gerr_gsiv = cpu_to_le32(irq + 2);
->>> +        smmu->sync_gsiv = cpu_to_le32(irq + 3);
->>> +
->>> +        /* Identity RID mapping covering the whole input RID range */
->>> +        idmap = &smmu->id_mapping_array[0];
->>> +        idmap->input_base = 0;
->>> +        idmap->id_count = cpu_to_le32(0xFFFF);
->>> +        idmap->output_base = 0;
->>> +        /* output IORT node is the ITS group node (the first node) */
->>> +        idmap->output_reference = cpu_to_le32(iort->node_offset);
->>> +    }
->>> +
->>>      /* Root Complex Node */
->>>      node_size = sizeof(*rc) + sizeof(*idmap);
->>>      iort_length += node_size;
->>> @@ -438,8 +474,14 @@ build_iort(GArray *table_data, BIOSLinker *linker)
->>>      idmap->input_base = 0;
->>>      idmap->id_count = cpu_to_le32(0xFFFF);
->>>      idmap->output_base = 0;
->>> -    /* output IORT node is the ITS group node (the first node) */
->>> -    idmap->output_reference = cpu_to_le32(iort->node_offset);
->>> +
->>> +    if (vms->iommu) {
->>> +        /* output IORT node is the smmuv3 node */
->>> +        idmap->output_reference = cpu_to_le32(smmu_offset);
->>> +    } else {
->>> +        /* output IORT node is the ITS group node (the first node) */
->>> +        idmap->output_reference = cpu_to_le32(iort->node_offset);
->>> +    }
->>>
->>>      iort->length = cpu_to_le32(iort_length);
->>>
->>> @@ -786,7 +828,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>>
->>>      if (its_class_name() && !vmc->no_its) {
->>>          acpi_add_table(table_offsets, tables_blob);
->>> -        build_iort(tables_blob, tables->linker);
->>> +        build_iort(tables_blob, tables->linker, vms);
->>>      }
->>>
->>>      /* XSDT is pointed to by RSDP */
->>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
->>> index 80c8099..068ce28 100644
->>> --- a/include/hw/acpi/acpi-defs.h
->>> +++ b/include/hw/acpi/acpi-defs.h
->>> @@ -700,6 +700,21 @@ struct AcpiIortItsGroup {
->>>  } QEMU_PACKED;
->>>  typedef struct AcpiIortItsGroup AcpiIortItsGroup;
->>>
->>> +struct AcpiIortSmmu3 {
->>> +    ACPI_IORT_NODE_HEADER_DEF
->>> +    uint64_t base_address;
->>> +    uint32_t flags;
->>> +    uint32_t reserved2;
->>> +    uint64_t vatos_address;
->>> +    uint32_t model;
->>> +    uint32_t event_gsiv;
->>> +    uint32_t pri_gsiv;
->>> +    uint32_t gerr_gsiv;
->>> +    uint32_t sync_gsiv;
->>> +    AcpiIortIdMapping id_mapping_array[0];
->>> +} QEMU_PACKED;
->>> +typedef struct AcpiIortSmmu3 AcpiIortSmmu3;
->>> +
->>>  struct AcpiIortRC {
->>>      ACPI_IORT_NODE_HEADER_DEF
->>>      AcpiIortMemoryAccess memory_properties;
->>> --
->>> 2.5.5
->>>
->>
->> thanks
->> -- PMM
->>
->>
->> .
->>
-> 
+It seems that most other code that that uses the address_space_* interfaces
+(e.g. hw/virtio/virtio.c) holds the rcu_read_lock, presumably to handle
+cases where the memory map might change at runtime, e.g. during ballooning.
+This would be exhibited if a page walk collided with a balloon.
+
+Ideally we could add a cpu_physical_memory_atomic_cmpxchg API to generic
+code, and we could avoid holding the rcu_read_lock in target/riscv i.e.
+encapsulate guest physical memory atomic_cmpxchg. The atomic_cmpxchg
+wrapper handles multiple word widthes, so we would need
+cpu_physical_memory_atomic_cmpxchg32
+and cpu_physical_memory_atomic_cmpxchg64. We need to use atomic_cmpxchg in
+the PTE update to detect the case where the PTE has changed between reading
+it and updating the accessed dirty bits. As far as I can tell, the code is
+correct. In fact we are reading a very strong interpretation of the RISC-V
+specification.
+
+This is what The RISC-V Instruction Set Manual Volume II: Privileged
+Architecture says about accessed and dirty updates, which is the reason for
+the code in question:
+
+    When a virtual page is accessed and the A bit is clear, or is written
+and the D bit is clear,
+    the implementation sets the corresponding bit in the PTE. The PTE
+update must be atomic
+    with respect to other accesses to the PTE, and must atomically check
+that the PTE is valid
+    and grants suffi cient permissions. The PTE update must be exact (i.e.,
+not speculative), and
+    observed in program order by the local hart. The ordering on loads and
+stores provided by
+    FENCE instructions and the acquire/release bits on atomic instructions
+also orders the PTE
+    updates associated with those loads and stores as observed by remote
+harts.
+
+This is an interesting constraint. I believe the intent is that we just
+AMOOR bit A+D bits on the PTE (although we don't have AMOOR, we have
+atomic_cmpxchg), however we have read a stronger interpretation (while
+stronger, it is not incorrect), and that is that the atomicity guarantee
+extends from the page walker reading the PTE entry, checking its
+permissions and then updating it, which in hardware would require the page
+walker to take load reservations, and I don't think it does. Apparently the
+hardware just AMOORs the bits, so the PTE could actually be pointing
+somewhere else by the time we go to update the bits, although it is the
+same virtual address has been accessed or dirtied (albiet with a different
+physical translation). In any case, we have a very strong interpretation of
+the specification wording, potentially stronger than hardware may provide.
+We had a long discussion about this on the RISC-V QEMU issue tracker.
+Stefan O'Rear mentioned he might make a test that hammers a PTE from
+another thread while one thread is doing a page walk to try to cause the
+page walker to set the A+D bits on a PTE that is different to the one it
+used to create the virtual to physical mapping. That's some background
+around why the code exists in the first place, which provides the strongest
+possible gaurantee on PTE atomicity.
+
+- https://github.com/riscv/riscv-qemu/pull/103
+- https://github.com/riscv/riscv-qemu/pull/105
+
+The get_physical_address bug that this patch fixes does not show up in
+practice. i.e. we aren't actually hitting cases where we have page walks
+colliding with address space changes, however I think holding rcu_read_lock
+seems to be correct and this bug may show up in the future.
+
+> diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+> > index 02cbcea..e71633a 100644
+> > --- a/target/riscv/helper.c
+> > +++ b/target/riscv/helper.c
+> > @@ -209,6 +209,9 @@ restart:
+> >                     as the PTE is no longer valid */
+> >                  MemoryRegion *mr;
+> >                  hwaddr l = sizeof(target_ulong), addr1;
+> > +                enum { success, translate_fail, restart_walk} action =
+> success;
+> > +
+> > +                rcu_read_lock();
+> >                  mr = address_space_translate(cs->as, pte_addr,
+> >                      &addr1, &l, false);
+> >                  if (memory_access_is_direct(mr, true)) {
+> > @@ -222,7 +225,7 @@ restart:
+> >                      target_ulong old_pte =
+> >                          atomic_cmpxchg(pte_pa, pte, updated_pte);
+> >                      if (old_pte != pte) {
+> > -                        goto restart;
+> > +                        action = restart_walk;
+> >                      } else {
+> >                          pte = updated_pte;
+> >                      }
+> > @@ -230,7 +233,14 @@ restart:
+> >                  } else {
+> >                      /* misconfigured PTE in ROM (AD bits are not
+> preset) or
+> >                       * PTE is in IO space and can't be updated
+> atomically */
+> > -                    return TRANSLATE_FAIL;
+> > +                    action = translate_fail;
+> > +                }
+> > +                rcu_read_unlock();
+> > +
+> > +                switch (action) {
+> > +                    case success: break;
+> > +                    case translate_fail: return TRANSLATE_FAIL;
+> > +                    case restart_walk: goto restart;
+> >                  }
+> >              }
+> >
+> >
+>
+>
