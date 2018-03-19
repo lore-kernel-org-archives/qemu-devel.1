@@ -1,30 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1exyxx-0007yv-NQ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:02 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1exyyM-0008CZ-Tt
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1exyxu-0000mb-KM
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:01 -0400
-Received: from mail-ve1eur01hn0219.outbound.protection.outlook.com
-	([104.47.1.219]:6112
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1exyyJ-00019B-Sd
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44490
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1exyxt-0000kt-73
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:52:58 -0400
-Date: Mon, 19 Mar 2018 20:52:38 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180319175238.GB12962@rkaganb.sw.ru>
-References: <20180316170020.8212-1-vkuznets@redhat.com>
-	<20180316170020.8212-2-vkuznets@redhat.com>
-	<20180319170603.GA12962@rkaganb.sw.ru>
-	<87a7v47z4r.fsf@vitty.brq.redhat.com>
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1exyyJ-000175-MS
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:53:23 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2JHjBKG114419
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 13:53:21 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gtern9fbj-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 13:53:20 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 19 Mar 2018 17:53:19 -0000
+References: <20180319093509.50881-1-haoqf@linux.vnet.ibm.com>
+	<20180319093509.50881-2-haoqf@linux.vnet.ibm.com>
+	<CAJSP0QVe4gXCvPdw15x3D_yp2v4mi8QqYujo5qgxyeGcCbGfpw@mail.gmail.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 19 Mar 2018 18:53:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a7v47z4r.fsf@vitty.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] i386/kvm: add support for Hyper-V
- reenlightenment MSRs
+In-Reply-To: <CAJSP0QVe4gXCvPdw15x3D_yp2v4mi8QqYujo5qgxyeGcCbGfpw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1cc764c9-7bc1-365e-8af4-fe5357677aed@de.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v1 1/1] iotests: fix test case
+ 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,134 +45,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Mar 19, 2018 at 06:29:08PM +0100, Vitaly Kuznetsov wrote:
-> Roman Kagan <rkagan@virtuozzo.com> writes:
-> 
-> > On Fri, Mar 16, 2018 at 06:00:19PM +0100, Vitaly Kuznetsov wrote:
-> >> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
-> >> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
-> >> when INVTSC is not passed to it (and it is not passed by default in Qemu
-> >> as it effectively blocks migration).
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >> Changes since v1:
-> >> - add vmstate_msr_hyperv_reenlightenment subsection to vmstate_x86_cpu
-> >>   [Paolo Bonzini]
-> >> ---
-> >>  target/i386/cpu.h          |  3 +++
-> >>  target/i386/hyperv-proto.h |  9 ++++++++-
-> >>  target/i386/kvm.c          | 33 +++++++++++++++++++++++++++++++++
-> >>  target/i386/machine.c      | 24 ++++++++++++++++++++++++
-> >>  4 files changed, 68 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> >> index 2e2bab5ff3..0b1b556a56 100644
-> >> --- a/target/i386/cpu.h
-> >> +++ b/target/i386/cpu.h
-> >> @@ -1174,6 +1174,9 @@ typedef struct CPUX86State {
-> >>      uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
-> >>      uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
-> >>      uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
-> >> +    uint64_t msr_hv_reenlightenment_control;
-> >> +    uint64_t msr_hv_tsc_emulation_control;
-> >> +    uint64_t msr_hv_tsc_emulation_status;
-> >>  
-> >>      uint64_t msr_rtit_ctrl;
-> >>      uint64_t msr_rtit_status;
-> >> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-> >> index cb4d7f2b7a..93352ebd2a 100644
-> >> --- a/target/i386/hyperv-proto.h
-> >> +++ b/target/i386/hyperv-proto.h
-> >> @@ -35,7 +35,7 @@
-> >>  #define HV_RESET_AVAILABLE           (1u << 7)
-> >>  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
-> >>  #define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
-> >> -
-> >> +#define HV_ACCESS_REENLIGHTENMENTS_CONTROL  (1u << 13)
-> >>  
-> >>  /*
-> >>   * HV_CPUID_FEATURES.EDX bits
-> >> @@ -129,6 +129,13 @@
-> >>  #define HV_X64_MSR_CRASH_CTL                    0x40000105
-> >>  #define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
-> >>  
-> >> +/*
-> >> + * Reenlightenment notification MSRs
-> >> + */
-> >> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL      0x40000106
-> >> +#define HV_X64_MSR_TSC_EMULATION_CONTROL        0x40000107
-> >> +#define HV_X64_MSR_TSC_EMULATION_STATUS         0x40000108
-> >> +
-> >>  /*
-> >>   * Hypercall status code
-> >>   */
-> >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> >> index d23fff12f5..accf50eac3 100644
-> >> --- a/target/i386/kvm.c
-> >> +++ b/target/i386/kvm.c
-> >> @@ -90,6 +90,7 @@ static bool has_msr_hv_runtime;
-> >>  static bool has_msr_hv_synic;
-> >>  static bool has_msr_hv_stimer;
-> >>  static bool has_msr_hv_frequencies;
-> >> +static bool has_msr_hv_reenlightenment;
-> >>  static bool has_msr_xss;
-> >>  static bool has_msr_spec_ctrl;
-> >>  static bool has_msr_smi_count;
-> >> @@ -653,6 +654,11 @@ static int hyperv_handle_properties(CPUState *cs)
-> >>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
-> >>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
-> >>          }
-> >> +
-> >> +        if (has_msr_hv_reenlightenment) {
-> >> +            env->features[FEAT_HYPERV_EAX] |=
-> >> +                HV_ACCESS_REENLIGHTENMENTS_CONTROL;
-> >> +        }
-> >
-> > Can you please add a matching comment to the definition of
-> > feature_word_info[FEAT_HYPERV_EAX].feat_names[]?
-> >
-> 
-> Sure, missed that.
-> 
-> > Also there appears to be no cpu property to turn this on/off, does it?
-> > It's enabled based only on the support in the KVM it's running against.
-> > So I guess we may have a problem migrating between the hosts with
-> > different KVM versions, one supporting it and the other not.
-> 
-> Currently nested workloads don't migrate so I decided to take the
-> opportunity and squeeze the new feature in without adding a new
-> hv_reenlightenment cpu property (which would have to be added to libvirt
-> at least).
 
-Well, it (== L1) doesn't migrate with L2 running inside, but it
-certainly does without.
 
+On 03/19/2018 05:10 PM, Stefan Hajnoczi wrote:
+> On Mon, Mar 19, 2018 at 9:35 AM, QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
+>> Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_shutdown()".
+>> It's because of the newly introduced function vm_shutdown calls bdrv_drain_all,
+>> which is called later by bdrv_close_all. bdrv_drain_all resumes the jobs
+>> that doubles the speed and offset is doubled.
+>> Some jobs' status are changed as well.
+>>
+>> Thus, let's not call bdrv_drain_all in vm_shutdown.
+>>
+>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+>> ---
+>>  cpus.c | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 2e6701795b..ae2962508c 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -1006,8 +1006,9 @@ static int do_vm_stop(RunState state, bool send_stop)
+>>              qapi_event_send_stop(&error_abort);
+>>          }
+>>      }
+>> -
+>> -    bdrv_drain_all();
+>> +    if (send_stop) {
+>> +        bdrv_drain_all();
+>> +    }
 > 
-> > (This is also a problem with has_msr_hv_frequencies, and is in general a
-> > long-standing issue of hv_* properties being done differently from the
-> > rest of CPUID features.)
+> Thanks for looking into this bug!
 > 
-> Suggestions? (To be honest I don't really like us adding new hv_*
-> property for every new Hyper-V feature we support. I doubt anyone needs
-> 'partial' Hyper-V emulation. It would be nice to have a single versioned
-> 'hv' feature implying everything. We may then forbid migrations to older
-> hv versions. But I don't really know the history of why we decided to go
-> with a separate hv_* for every feature we add).
+> This if statement breaks the contract of the function when send_stop
+> is false.  Drain ensures that pending I/O completes and that device
+> emulation finishes before this function returns.  This is important
+> for live migration, where there must be no more guest-related activity
+> after vm_stop().
+> 
+> This patch relies on the caller invoking bdrv_close_all() immediately
+> after do_vm_stop(), which is not documented and could lead to more
+> bugs in the future.
+> 
+> I suggest a different solution:
+> 
+> Test 185 relies on internal QEMU behavior which can change from time
+> to time.  Buffer sizes and block job iteration counts are
+> implementation details that are not part of qapi-schema.json or other
+> documented behavior.
+> 
+> In fact, the existing test case was already broken in IOThread mode
+> since iothread_stop_all() -> bdrv_set_aio_context() also includes a
+> bdrv_drain() with the side-effect of an extra blockjob iteration.
+> 
+> After 4486e89c219 ("vl: introduce vm_shutdown()") both IOThread and
+> non-IOThread mode perform the drain.  This has caused the test
+> failure.
+> 
+> Instead of modifying QEMU to keep the same arbitrary internal behavior
+> as before, please send a patch that updates tests/qemu-iotests/185.out
+> with the latest output.
 
-IIRC those hv_* features were added before the generic CPUID feature bit
-naming scheme was introduced.  We probably need to actually add the
-respective feature names to those .feat_names arrays, introduce a
-compatibility translation to/from the existing hv_* features, and
-address the conflicts, but I vaguely remember an attempt to do so ended
-up nowhere...
-
-I guess for the time being we can go on with extending hv_* features,
-but will need to do a conversion in (preferrably not too distant)
-future.  But I'd rather have Eduardo's or Paolo's word on this.
-
-Thanks,
-Roman.
+Wouldnt it be better if the test actually masks out the values the are not
+really part of the "agreed upon" behaviour? Wouldnt block_job_offset from
+common.filter be what we want?
