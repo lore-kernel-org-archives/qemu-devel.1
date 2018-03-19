@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exxaZ-0003Nh-Fj
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:24:48 -0400
+	(envelope-from <stefanha@redhat.com>) id 1exxb2-0003pG-SM
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1exxaY-0006Nt-Ed
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:24:47 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45209)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1exxaY-0006Ma-AE
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:24:46 -0400
-Received: by mail-oi0-x241.google.com with SMTP id 71so3401290oie.12
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 09:24:46 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1exxay-000709-Un
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:25:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33472 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1exxay-0006yW-QE
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 12:25:12 -0400
+Date: Mon, 19 Mar 2018 16:25:02 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180319162502.GA21259@stefanha-x1.localdomain>
+References: <20180319131743.3885-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1521470177-14760-2-git-send-email-zhaoshenglong@huawei.com>
-References: <1521470177-14760-1-git-send-email-zhaoshenglong@huawei.com>
-	<1521470177-14760-2-git-send-email-zhaoshenglong@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Mar 2018 16:24:25 +0000
-Message-ID: <CAFEAcA8+Gqn=TMnu2X7YcSjtJxnGPGY15Epi_ds1x=dguycyvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] arm_gicv3_kvm: increase clroffset
- accordingly
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
+Content-Disposition: inline
+In-Reply-To: <20180319131743.3885-1-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-2.12] gitmodules: Use the QEMU mirror
+ of qemu-palcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-On 19 March 2018 at 14:36, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
-> It forgot to increase clroffset during the loop. So it only clear the
-> first 4 bytes.
->
-> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 19, 2018 at 01:17:43PM +0000, Peter Maydell wrote:
+> We have a mirror of the qemu-palcode repository on
+> git.qemu.org; use that instead of the upstream github,
+> in line with our general policy of keeping and using
+> a mirror for submodules.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/intc/arm_gicv3_kvm.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index ec37177..7000716 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -232,9 +232,10 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
->  static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
->                              uint32_t clroffset, uint32_t *bmp)
->  {
-> -    uint32_t reg;
-> +    uint32_t reg, clroffset_index;
->      int irq;
->
-> +    clroffset_index = clroffset;
->      for_each_dist_irq_reg(irq, s->num_irq, 1) {
->          /* If this bitmap is a set/clear register pair, first write to the
->           * clear-reg to clear all bits before using the set-reg to write
-> @@ -242,7 +243,8 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
->           */
->          if (clroffset != 0) {
->              reg = 0;
-> -            kvm_gicd_access(s, clroffset, &reg, true);
-> +            kvm_gicd_access(s, clroffset_index, &reg, true);
-> +            clroffset_index += 4;
->          }
->          reg = *gic_bmp_ptr32(bmp, irq);
->          kvm_gicd_access(s, offset, &reg, true);
+> We also currently have two submodules we don't have mirroring
+> for: seabios-hppa and u-boot-sam460ex.
+>=20
+>  .gitmodules | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-You might as well just use 'clroffset' directly rather than
-creating a new clroffset_index variable, I think.
+The git.qemu.org mirror appears up-to-date:
 
-thanks
--- PMM
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--LQksG6bCIzRHxTLp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJar+ReAAoJEJykq7OBq3PItXIIAJvhXrvSbsg1f14nv9812XX5
+kHmQRUC9CkPMQl26wjAaecDKHlwsqayXB2b3Wf3mhZq1ZwhNwGL8KHWP/h4pS6ZC
+KkNa3mDJVcS5DrKn70zyg6rki+ed4aOYqMC6x0XnxxBbX0wUO4RJz3y2OaU2RRii
+7eSMZDGgfILGJTnbJSc0e/gddhtSbUwqR4ftYb+Cnn4gWP1KYXiubXQfh4z330Us
+KQ87e4YDV88a70KKjUv1w95wQ8MBX4/tnKAN98I9GNsAyvtUCfugEw5J5pW/YEgs
+ZP4xFiZLW8MXmzB4/rDtJlBx52cDpbC8Zf3Av9imsFcIVMjPl0kDhKNlLgYSGec=
+=Giu1
+-----END PGP SIGNATURE-----
+
+--LQksG6bCIzRHxTLp--
