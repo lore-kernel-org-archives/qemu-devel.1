@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1exyb7-0001O4-FM
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:29:26 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1exyi6-0002tU-Vl
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1exyb2-00012i-GZ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:29:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34340 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1exyb2-00011f-Bf
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:29:20 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20180316170020.8212-1-vkuznets@redhat.com>
-	<20180316170020.8212-2-vkuznets@redhat.com>
-	<20180319170603.GA12962@rkaganb.sw.ru>
-Date: Mon, 19 Mar 2018 18:29:08 +0100
-In-Reply-To: <20180319170603.GA12962@rkaganb.sw.ru> (Roman Kagan's message of
-	"Mon, 19 Mar 2018 20:06:03 +0300")
-Message-ID: <87a7v47z4r.fsf@vitty.brq.redhat.com>
+	(envelope-from <alindsay@codeaurora.org>) id 1exyi6-0004kz-6P
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 13:36:39 -0400
+Date: Mon, 19 Mar 2018 13:36:24 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180319173624.GC24561@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-21-git-send-email-alindsay@codeaurora.org>
+	<b8b7a898-b714-3563-7f7a-84374db2b283@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] i386/kvm: add support for Hyper-V
- reenlightenment MSRs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <b8b7a898-b714-3563-7f7a-84374db2b283@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 20/22] target/arm: PMU: Add
+ instruction and cycle events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+On Mar 18 23:48, Philippe Mathieu-Daud=E9 wrote:
+> On 03/16/2018 09:31 PM, Aaron Lindsay wrote:
+> > The instruction event is only enabled when icount is used, cycles are
+> > always supported. Always defining get_cycle_count (but altering its
+> > behavior depending on CONFIG_USER_ONLY) allows us to remove some
+> > CONFIG_USER_ONLY #defines throughout the rest of the code.
+> >=20
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> [...]>  #define SUPPORTED_EVENT_SENTINEL UINT16_MAX
+> >  static const pm_event pm_events[] =3D {
+> > +#ifndef CONFIG_USER_ONLY
+> > +    { .number =3D 0x008, /* INST_RETIRED */
+>=20
+> "Instruction architecturally executed" seems more explicit to me.
 
-> On Fri, Mar 16, 2018 at 06:00:19PM +0100, Vitaly Kuznetsov wrote:
->> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
->> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
->> when INVTSC is not passed to it (and it is not passed by default in Qemu
->> as it effectively blocks migration).
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->> Changes since v1:
->> - add vmstate_msr_hyperv_reenlightenment subsection to vmstate_x86_cpu
->>   [Paolo Bonzini]
->> ---
->>  target/i386/cpu.h          |  3 +++
->>  target/i386/hyperv-proto.h |  9 ++++++++-
->>  target/i386/kvm.c          | 33 +++++++++++++++++++++++++++++++++
->>  target/i386/machine.c      | 24 ++++++++++++++++++++++++
->>  4 files changed, 68 insertions(+), 1 deletion(-)
->> 
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index 2e2bab5ff3..0b1b556a56 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -1174,6 +1174,9 @@ typedef struct CPUX86State {
->>      uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
->>      uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
->>      uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
->> +    uint64_t msr_hv_reenlightenment_control;
->> +    uint64_t msr_hv_tsc_emulation_control;
->> +    uint64_t msr_hv_tsc_emulation_status;
->>  
->>      uint64_t msr_rtit_ctrl;
->>      uint64_t msr_rtit_status;
->> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
->> index cb4d7f2b7a..93352ebd2a 100644
->> --- a/target/i386/hyperv-proto.h
->> +++ b/target/i386/hyperv-proto.h
->> @@ -35,7 +35,7 @@
->>  #define HV_RESET_AVAILABLE           (1u << 7)
->>  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
->>  #define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
->> -
->> +#define HV_ACCESS_REENLIGHTENMENTS_CONTROL  (1u << 13)
->>  
->>  /*
->>   * HV_CPUID_FEATURES.EDX bits
->> @@ -129,6 +129,13 @@
->>  #define HV_X64_MSR_CRASH_CTL                    0x40000105
->>  #define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
->>  
->> +/*
->> + * Reenlightenment notification MSRs
->> + */
->> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL      0x40000106
->> +#define HV_X64_MSR_TSC_EMULATION_CONTROL        0x40000107
->> +#define HV_X64_MSR_TSC_EMULATION_STATUS         0x40000108
->> +
->>  /*
->>   * Hypercall status code
->>   */
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index d23fff12f5..accf50eac3 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -90,6 +90,7 @@ static bool has_msr_hv_runtime;
->>  static bool has_msr_hv_synic;
->>  static bool has_msr_hv_stimer;
->>  static bool has_msr_hv_frequencies;
->> +static bool has_msr_hv_reenlightenment;
->>  static bool has_msr_xss;
->>  static bool has_msr_spec_ctrl;
->>  static bool has_msr_smi_count;
->> @@ -653,6 +654,11 @@ static int hyperv_handle_properties(CPUState *cs)
->>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
->>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
->>          }
->> +
->> +        if (has_msr_hv_reenlightenment) {
->> +            env->features[FEAT_HYPERV_EAX] |=
->> +                HV_ACCESS_REENLIGHTENMENTS_CONTROL;
->> +        }
->
-> Can you please add a matching comment to the definition of
-> feature_word_info[FEAT_HYPERV_EAX].feat_names[]?
->
+I've updated v4 to include this wording as well.
 
-Sure, missed that.
+> > +      .supported =3D instructions_supported,
+> > +      .get_count =3D instructions_get_count
+> > +    },
+> > +    { .number =3D 0x011, /* CPU_CYCLES */
+> > +      .supported =3D event_always_supported,
+> > +      .get_count =3D cycles_get_count
+> > +    },
+> > +#endif
+> [...]
 
-> Also there appears to be no cpu property to turn this on/off, does it?
-> It's enabled based only on the support in the KVM it's running against.
-> So I guess we may have a problem migrating between the hosts with
-> different KVM versions, one supporting it and the other not.
+-Aaron
 
-Currently nested workloads don't migrate so I decided to take the
-opportunity and squeeze the new feature in without adding a new
-hv_reenlightenment cpu property (which would have to be added to libvirt
-at least).
-
-> (This is also a problem with has_msr_hv_frequencies, and is in general a
-> long-standing issue of hv_* properties being done differently from the
-> rest of CPUID features.)
-
-Suggestions? (To be honest I don't really like us adding new hv_*
-property for every new Hyper-V feature we support. I doubt anyone needs
-'partial' Hyper-V emulation. It would be nice to have a single versioned
-'hv' feature implying everything. We may then forbid migrations to older
-hv versions. But I don't really know the history of why we decided to go
-with a separate hv_* for every feature we add).
-
--- 
-  Vitaly
+--=20
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies=
+, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
