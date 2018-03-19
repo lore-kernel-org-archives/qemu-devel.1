@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2Uy-0001V0-Rr
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:39:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1ey2gf-0001Ny-8t
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2Ux-0003Gv-L7
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:39:20 -0400
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:38180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2Ux-0003Ff-DP
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:39:19 -0400
-Received: by mail-ot0-x232.google.com with SMTP id 95-v6so18981916ote.5
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:39:19 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1ey2gc-0003v5-7a
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:51:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42474 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ey2gc-0003tM-3M
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:51:22 -0400
+References: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
+	<20180319213101.6100-4-wsa+renesas@sang-engineering.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2071e85f-72b9-9fa5-e5d7-7faa41fb9074@redhat.com>
+Date: Mon, 19 Mar 2018 16:51:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180319194242.GQ2787@redhat.com>
-References: <1521221171-47213-1-git-send-email-mjc@sifive.com>
-	<dec4f79c-a46e-f341-ef17-7ba85086bc9a@amsat.org>
-	<CAHNT7Nuv9G+e3-m-356HZDoiLju=vPCucfWhXLJ0QHPGM7NSQw@mail.gmail.com>
-	<20180319194242.GQ2787@redhat.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Mon, 19 Mar 2018 14:39:18 -0700
-Message-ID: <CAHNT7Ntu=LAm2r3G8ZiGioYC_FkhArA=0kXj8SxphaFTY6rV4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Fix riscv_isa_string memory
- size bug
+In-Reply-To: <20180319213101.6100-4-wsa+renesas@sang-engineering.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] nvram: at24c: use standard error
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org
+Cc: linux-renesas-soc@vger.kernel.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Mon, Mar 19, 2018 at 12:42 PM, Richard W.M. Jones <rjones@redhat.com>
-wrote:
+On 03/19/2018 04:31 PM, Wolfram Sang wrote:
+> Replace the ERR macro with error_report() because fprintf is deprecated.
+> This also fixes the prefix printed out twice.
+> 
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+> ---
+>   hw/nvram/eeprom_at24c.c | 17 ++++++-----------
+>   1 file changed, 6 insertions(+), 11 deletions(-)
+> 
 
-> On Mon, Mar 19, 2018 at 11:35:51AM -0700, Michael Clark wrote:
-> > The RISC-V post-merge spec conformance and cleanup series has had a lot
-> of
-> > testing. I've been using it to compile QEMU inside of QEMU using the
-> RISC-V
-> > Fedora Image and its native RISC-V GCC toolchain running inside SMP Linux
-> > 4.16-rc2. It appears to be pretty rock-solid. The rcu lock fix would
-> likely
-> > only affect users who are ballooning memory while a guest is under load.
-> > The page walker changes have also been tested under load (including
-> > performance tests).
->
-> Did you see the problem with restoring floating point registers on
-> context switch?  The test case is quite simple:
->
->   http://oirase.annexia.org/tmp/sched.c
+> @@ -63,8 +61,7 @@ int at24c_eeprom_event(I2CSlave *s, enum i2c_event event)
+>           if (ee->blk && ee->changed) {
+>               int len = blk_pwrite(ee->blk, 0, ee->mem, ee->rsize, 0);
+>               if (len != ee->rsize) {
+> -                ERR(TYPE_AT24C_EE
+> -                        " : failed to write backing file\n");
+> +                error_report("failed to write backing file\n");
 
+Drop the \n here and elsewhere in your patch; error_report() already 
+does that for you.
 
-No I didn't. Thanks.
-
-
-> Note you must compile it with gcc -O2 to manifest the bug.  (We
-> originally thought it was a problem with gcc's optimization, but it
-> isn't.)
->
-
-Okay. I must admit most of my testing has been integer heavy workloads.
-
-
-> In Fedora's qemu tree are carrying the following patch which is just a
-> workaround:
->
->   https://github.com/rwmjones/fedora-riscv-bootstrap/blob/
-> master/stage1-riscv-qemu/force-float-save.patch
-
-
-I will take a look...
-
-There were some changes around v4 of our port upstream patch series to add
-MSTATUS.FS (TB_FLAGS_FP_ENABLE) to to tb->flags to avoid checking the flags
-on all FP ops.
-
-static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong
-*pc,
-                                        target_ulong *cs_base, uint32_t
-*flags)
-{
-    *pc = env->pc;
-    *cs_base = 0;
-#ifdef CONFIG_USER_ONLY
-    *flags = TB_FLAGS_FP_ENABLE;
-#else
-    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
-#endif
-}
-
-I'll have to get my head around the implication of this or with the
-privilege level and how MSTATUS.FS is currently set...
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
