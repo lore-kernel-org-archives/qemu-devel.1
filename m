@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0006Ys-4y
-	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1exim6-0006Yv-Js
+	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1exim2-0000HM-U4
+	(envelope-from <dgibson@ozlabs.org>) id 1exim5-0000M7-J8
 	for qemu-devel@nongnu.org; Sun, 18 Mar 2018 20:35:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Mar 2018 11:35:19 +1100
-Message-Id: <20180319003524.28143-4-david@gibson.dropbear.id.au>
+Date: Mon, 19 Mar 2018 11:35:24 +1100
+Message-Id: <20180319003524.28143-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20180319003524.28143-1-david@gibson.dropbear.id.au>
 References: <20180319003524.28143-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 3/8] hw/ppc/prep: Fix implicit creation of
- "-drive if=scsi" devices
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 8/8] target/ppc: fix tlbsync to check privilege
+ level depending on GTSE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,69 +24,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, lvivier@redhat.com, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The global hack for creating SCSI devices has recently been removed,
-but this apparently broke SCSI devices on some boards that were not
-ready for this change yet. For the 40p machine you now get:
+tlbsync also needs to check the Guest Translation Shootdown Enable
+(GTSE) bit in the Logical Partition Control Register (LPCR) to
+determine at which privilege level it is running.
 
-$ ppc64-softmmu/qemu-system-ppc64 -M 40p -cdrom x.iso
-qemu-system-ppc64: -cdrom x.iso: machine type does not support if=scsi,bus=0,unit=2
+See commit c6fd28fd573d ("target/ppc: Update tlbie to check privilege
+level based on GTSE")
 
-Fix it by providing a lsi53c810_create() function that takes care
-of calling scsi_bus_legacy_handle_cmdline() after creating the
-corresponding SCSI controller.
-
-Fixes: 1454509726719e0933c800fad00d6999752688ea
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/prep.c        | 2 +-
- hw/scsi/lsi53c895a.c | 7 +++++++
- include/hw/pci/pci.h | 1 +
- 3 files changed, 9 insertions(+), 1 deletion(-)
+ target/ppc/translate.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 5c78503069..a1e7219db6 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -787,7 +787,7 @@ static void ibm_40p_init(MachineState *machine)
-         qdev_prop_set_uint32(dev, "equipment", 0xc0);
-         qdev_init_nofail(dev);
- 
--        pci_create_simple(pci_bus, PCI_DEVFN(1, 0), "lsi53c810");
-+        lsi53c810_create(pci_bus, PCI_DEVFN(1, 0));
- 
-         /* XXX: s3-trio at PCI_DEVFN(2, 0) */
-         pci_vga_init(pci_bus);
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index f3d4c4d230..160657f4b9 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -2279,3 +2279,10 @@ void lsi53c895a_create(PCIBus *bus)
- 
-     scsi_bus_legacy_handle_cmdline(&s->bus);
- }
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 0a0c090c99..218665b408 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -4526,7 +4526,7 @@ static void gen_tlbie(DisasContext *ctx)
+     TCGv_i32 t1;
+=20
+     if (ctx->gtse) {
+-        CHK_SV; /* If gtse is set then tblie is supervisor privileged */
++        CHK_SV; /* If gtse is set then tlbie is supervisor privileged */
+     } else {
+         CHK_HV; /* Else hypervisor privileged */
+     }
+@@ -4553,7 +4553,12 @@ static void gen_tlbsync(DisasContext *ctx)
+ #if defined(CONFIG_USER_ONLY)
+     GEN_PRIV;
+ #else
+-    CHK_HV;
 +
-+void lsi53c810_create(PCIBus *bus, int devfn)
-+{
-+    LSIState *s = LSI53C895A(pci_create_simple(bus, devfn, "lsi53c810"));
-+
-+    scsi_bus_legacy_handle_cmdline(&s->bus);
-+}
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index d8c18c7fa4..e255941b5a 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -708,6 +708,7 @@ PCIDevice *pci_create(PCIBus *bus, int devfn, const char *name);
- PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
- 
- void lsi53c895a_create(PCIBus *bus);
-+void lsi53c810_create(PCIBus *bus, int devfn);
- 
- qemu_irq pci_allocate_irq(PCIDevice *pci_dev);
- void pci_set_irq(PCIDevice *pci_dev, int level);
--- 
++    if (ctx->gtse) {
++        CHK_SV; /* If gtse is set then tlbsync is supervisor privileged =
+*/
++    } else {
++        CHK_HV; /* Else hypervisor privileged */
++    }
+=20
+     /* BookS does both ptesync and tlbsync make tlbsync a nop for server=
+ */
+     if (ctx->insns_flags & PPC_BOOKE) {
+--=20
 2.14.3
