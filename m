@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ey19V-00021R-OL
+	(envelope-from <ehabkost@redhat.com>) id 1ey19X-00021Z-7R
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:13:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ey19R-0006eX-7U
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:13:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29338)
+	(envelope-from <ehabkost@redhat.com>) id 1ey19W-0006hn-An
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:13:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ey19R-0006e1-1l
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:13:01 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ey19W-0006hU-5O
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:13:06 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 19 Mar 2018 17:12:48 -0300
-Message-Id: <20180319201255.9317-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v3 0/7] Machine and x86 queue, 2018-03-19
+Date: Mon, 19 Mar 2018 17:12:49 -0300
+Message-Id: <20180319201255.9317-2-ehabkost@redhat.com>
+In-Reply-To: <20180319201255.9317-1-ehabkost@redhat.com>
+References: <20180319201255.9317-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL v3 1/7] nios2: 10m50_devboard: replace cpu_model
+ with cpu_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +27,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Changes v2 (2018-03-15) -> v3 (2018-03-19):
-* Fix bogus warnings on machine-none-test
-* Included Intel PT CPUID fix
+From: Igor Mammedov <imammedo@redhat.com>
 
-Changes v1 (2018-03-12) -> v2 (2018-03-15):
-* Fix bsd-user build error
+use cpu_create() instead of being removed cpu_generic_init()
 
-The following changes since commit 2c8cfc0b52b5a4d123c26c0b5fdf941be24805be:
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <1518000027-274608-2-git-send-email-imammedo@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/nios2/10m50_devboard.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-03-19 11:44:26 +0000)
-
-are available in the Git repository at:
-
-  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
-
-for you to fetch changes up to c078ca968c6c7cb62781c1843d840cb0f5c72781:
-
-  i386: Disable Intel PT if packets IP payloads have LIP values (2018-03-19 17:05:57 -0300)
-
-----------------------------------------------------------------
-Machine and x86 queue, 2018-03-19
-
-* cpu_model/cpu_type cleanups
-* x86: Fix on Intel Processor Trace CPUID checks
-
-----------------------------------------------------------------
-
-Queue for Machine Core patches
-
-
-Igor Mammedov (6):
-  nios2: 10m50_devboard: replace cpu_model with cpu_type
-  tests: add machine 'none' with -cpu test
-  cpu: add CPU_RESOLVING_TYPE macro
-  Use cpu_create(type) instead of cpu_init(cpu_model)
-  cpu: get rid of unused cpu_init() defines
-  cpu: drop unnecessary NULL check and cpu_common_class_by_name()
-
-Luwei Kang (1):
-  i386: Disable Intel PT if packets IP payloads have LIP values
-
- include/hw/boards.h       |   1 -
- include/qom/cpu.h         |  16 +------
- target/alpha/cpu.h        |   3 +-
- target/arm/cpu.h          |   3 +-
- target/cris/cpu.h         |   3 +-
- target/hppa/cpu.h         |   2 +-
- target/i386/cpu.h         |   3 +-
- target/lm32/cpu.h         |   3 +-
- target/m68k/cpu.h         |   3 +-
- target/microblaze/cpu.h   |   2 +-
- target/mips/cpu.h         |   3 +-
- target/moxie/cpu.h        |   3 +-
- target/nios2/cpu.h        |   2 +-
- target/openrisc/cpu.h     |   3 +-
- target/ppc/cpu.h          |   3 +-
- target/riscv/cpu.h        |   1 +
- target/s390x/cpu.h        |   3 +-
- target/sh4/cpu.h          |   3 +-
- target/sparc/cpu.h        |   5 +--
- target/tilegx/cpu.h       |   2 +-
- target/tricore/cpu.h      |   3 +-
- target/unicore32/cpu.h    |   3 +-
- target/xtensa/cpu.h       |   3 +-
- bsd-user/main.c           |   4 +-
- exec.c                    |  23 +++++++++++
- hw/core/null-machine.c    |   6 +--
- hw/nios2/10m50_devboard.c |   2 +-
- linux-user/main.c         |   8 +++-
- qom/cpu.c                 |  61 +++------------------------
- target/i386/cpu.c         |  13 +++---
- tests/machine-none-test.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++
- vl.c                      |  10 ++---
- tests/Makefile.include    |   2 +
- 33 files changed, 178 insertions(+), 130 deletions(-)
- create mode 100644 tests/machine-none-test.c
-
+diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
+index e4007f6d7f..42053b2ca9 100644
+--- a/hw/nios2/10m50_devboard.c
++++ b/hw/nios2/10m50_devboard.c
+@@ -75,7 +75,7 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+                                 phys_ram_alias);
+ 
+     /* Create CPU -- FIXME */
+-    cpu = NIOS2_CPU(cpu_generic_init(TYPE_NIOS2_CPU, "nios2"));
++    cpu = NIOS2_CPU(cpu_create(TYPE_NIOS2_CPU));
+ 
+     /* Register: CPU interrupt controller (PIC) */
+     cpu_irq = nios2_cpu_pic_init(cpu);
 -- 
 2.14.3
