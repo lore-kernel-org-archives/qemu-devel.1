@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ey1XF-0005Rj-3x
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:37:38 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1ey1ja-0007rO-Rt
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:50:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ey1XE-0002Xr-8b
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:37:37 -0400
-Date: Mon, 19 Mar 2018 17:37:28 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180319203728.GT3417@localhost.localdomain>
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1ey1jY-0002rC-7h
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 16:50:22 -0400
+References: <20180209075503.16996-1-aik@ozlabs.ru>
+	<20180209075503.16996-3-aik@ozlabs.ru>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <410aeb28-e940-35f9-c7de-cb1c95422857@redhat.com>
+Date: Mon, 19 Mar 2018 21:49:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
- with all machines, not only with "none"
+In-Reply-To: <20180209075503.16996-3-aik@ozlabs.ru>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
+ for MMIO regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +24,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Mar 19, 2018 at 10:39:36AM +0100, Thomas Huth wrote:
-> Many device introspection crashes only happen if you are using a
-> certain machine, e.g.:
+Hi Alexey,
+
+On 09/02/18 08:55, Alexey Kardashevskiy wrote:
+> At the moment if vfio_memory_listener is registered in the system memory
+> address space, it maps/unmaps every RAM memory region for DMA.
+> It expects system page size aligned memory sections so vfio_dma_map
+> would not fail and so far this has been the case. A mapping failure
+> would be fatal. A side effect of such behavior is that some MMIO pages
+> would not be mapped silently.
 > 
-> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
-> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
->  "package": "build-all"}, "capabilities": []}}
-> { 'execute': 'qmp_capabilities' }
-> {"return": {}}
-> { 'execute': 'device-list-properties',
->   'arguments': {'typename': 'macio-newworld'}}
-> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-> Device 'serial0' is in use
-> Aborted (core dumped)
+> However we are going to change MSIX BAR handling so we will end having
+> non-aligned sections in vfio_memory_listener (more details is in
+> the next patch) and vfio_dma_map will exit QEMU.
 > 
-> To be able to catch these problems, let's extend the device-introspect
-> test to check the devices on all machine types. Since this is a rather
-> slow operation, the test is only run in "SPEED=slow" mode.
+> In order to avoid fatal failures on what previously was not a failure and
+> was just silently ignored, this checks the section alignment to
+> the smallest supported IOMMU page size and prints an error if not aligned;
+> it also prints an error if vfio_dma_map failed despite the page size check.
+> Both errors are not fatal; only MMIO RAM regions are checked
+> (aka "RAM device" regions).
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> If the amount of errors printed is overwhelming, the MSIX relocation
+> could be used to avoid excessive error output.
+> 
+> This is unlikely to cause any behavioral change.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
->  In case someone wants to help with creating some bug fix patches
->  during the QEMU hard freeze phase: This test can now be used to
->  trigger lots of introspection bugs that we were not aware of yet.
->  I think most of the bugs are due to wrong handling of instance_init
->  vs. realize functions.
-[...]
+>  hw/vfio/common.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 49 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index f895e3c..736f271 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -544,18 +544,40 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>  
+>      llsize = int128_sub(llend, int128_make64(iova));
+>  
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+> +
+> +        if ((iova & pgmask) || (llsize & pgmask)) {
+> +            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
+> +                         " is not aligned to 0x%"HWADDR_PRIx
+> +                         " and cannot be mapped for DMA",
+> +                         section->offset_within_region,
+> +                         int128_getlo(section->size),
+Didn't you want to print the section->offset_within_address_space
+instead of section->offset_within_region?
 
-This looks very useful, thanks!
+For an 1000e card*, with a 64kB page, it outputs:
+"Region 0x50..0xffb0 is not aligned to 0x10000 and cannot be mapped for DMA"
 
-I wonder if we could have something that would make it simpler
-for us to cover more command-line combinations + QMP commands in
-simple "validate output and check if QEMU won't crash" test cases
-without writing extra C or Python code every time.
+an absolute gpa range would be simpler I think.
 
-device-crash-test could be used for that, but I'd like to make it
-simpler to extend.
 
--- 
-Eduardo
+* where 	Region 3: Memory at 100e0000 (32-bit, non-prefetchable)
+[size=16K] contains the MSIX table
+
+	Capabilities: [a0] MSI-X: Enable+ Count=5 Masked-
+		Vector table: BAR=3 offset=00000000
+		PBA: BAR=3 offset=00002000
+
+Thanks
+
+Eric
+> +                         pgmask + 1);
+> +            return;
+> +        }
+> +    }
+> +
+>      ret = vfio_dma_map(container, iova, int128_get64(llsize),
+>                         vaddr, section->readonly);
+>      if (ret) {
+>          error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+>                       "0x%"HWADDR_PRIx", %p) = %d (%m)",
+>                       container, iova, int128_get64(llsize), vaddr, ret);
+> +        if (memory_region_is_ram_device(section->mr)) {
+> +            /* Allow unexpected mappings not to be fatal for RAM devices */
+> +            return;
+> +        }
+>          goto fail;
+>      }
+>  
+>      return;
+>  
+>  fail:
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        error_report("failed to vfio_dma_map. pci p2p may not work");
+> +        return;
+> +    }
+>      /*
+>       * On the initfn path, store the first error in the container so we
+>       * can gracefully fail.  Runtime, there's not much we can do other
+> @@ -577,6 +599,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>      hwaddr iova, end;
+>      Int128 llend, llsize;
+>      int ret;
+> +    bool try_unmap = true;
+>  
+>      if (vfio_listener_skipped_section(section)) {
+>          trace_vfio_listener_region_del_skip(
+> @@ -629,13 +652,33 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>  
+>      trace_vfio_listener_region_del(iova, end);
+>  
+> -    ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        hwaddr pgmask;
+> +        VFIOHostDMAWindow *hostwin;
+> +        bool hostwin_found = false;
+> +
+> +        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
+> +            if (hostwin->min_iova <= iova && end <= hostwin->max_iova) {
+> +                hostwin_found = true;
+> +                break;
+> +            }
+> +        }
+> +        assert(hostwin_found); /* or region_add() would have failed */
+> +
+> +        pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+> +        try_unmap = !((iova & pgmask) || (llsize & pgmask));
+> +    }
+> +
+> +    if (try_unmap) {
+> +        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
+> +        if (ret) {
+> +            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> +                         "0x%"HWADDR_PRIx") = %d (%m)",
+> +                         container, iova, int128_get64(llsize), ret);
+> +        }
+> +    }
+> +
+>      memory_region_unref(section->mr);
+> -    if (ret) {
+> -        error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> -                     "0x%"HWADDR_PRIx") = %d (%m)",
+> -                     container, iova, int128_get64(llsize), ret);
+> -    }
+>  
+>      if (container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
+>          vfio_spapr_remove_window(container,
+> 
