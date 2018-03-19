@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2zQ-0000cM-SH
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:10:49 -0400
+	(envelope-from <jonathan.helman@oracle.com>) id 1ey3NV-0006PA-5m
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2zP-00054g-Ip
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:10:48 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:40935)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2zP-00053n-Ct
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:10:47 -0400
-Received: by mail-oi0-x235.google.com with SMTP id c12so15657225oic.7
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 15:10:47 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <mvm1sggjazj.fsf@suse.de>
-References: <mvm1sggjazj.fsf@suse.de>
-From: Michael Clark <mjc@sifive.com>
-Date: Mon, 19 Mar 2018 15:10:46 -0700
-Message-ID: <CAHNT7NuOLVGyodcJ98ruM5t+m1s=in07dXfNp_77=vTOb=1yhQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] qemu:handle_cpu_signal received signal outside
- vCPU context
+	(envelope-from <jonathan.helman@oracle.com>) id 1ey3NS-0000mL-08
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:35:41 -0400
+Received: from hqdc-proxy-mwg015-o.oracle.com ([148.87.23.18]:41308
+	helo=jhdev.us.oracle.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jonathan.helman@oracle.com>) id 1ey3NR-0000lj-Ps
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 18:35:37 -0400
+From: Jonathan Helman <jonathan.helman@oracle.com>
+Date: Mon, 19 Mar 2018 15:28:49 -0700
+Message-Id: <1521498529-26762-1-git-send-email-jonathan.helman@oracle.com>
+Subject: [Qemu-devel] [PATCH v2] virtio-balloon: add hugetlb page allocation
+ counts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +22,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: mst@redhat.com
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, Jonathan Helman <jonathan.helman@oracle.com>
 
-On Mon, Mar 19, 2018 at 9:17 AM, Andreas Schwab <schwab@suse.de> wrote:
+qemu should read and report hugetlb page allocation
+counts exported in the following kernel patch:
 
-> I'm seeing this error while building gedit for riscv64 with linux-user
-> emulation:
->
-> $ LD_LIBRARY_PATH=gedit/.libs qemu-riscv64 gedit/.libs/gedit
-> --introspect-dump=/tmp/tmp-introspectnj0xla07/functions.txt,
-> /tmp/tmp-introspectnj0xla07/dump.xml
-> qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x6003d7d5
-> qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60106a16
->
+    commit 4c3ca37c4a4394978fd0f005625f6064ed2b9a64
+    Author: Jonathan Helman <jonathan.helman@oracle.com>
+    Date:   Mon Mar 19 11:00:35 2018 -0700
 
-Thanks. I can see this code in accel/tcg/user-exec.c
+    virtio_balloon: export hugetlb page allocation counts
 
-It would be nice if that log message included the signal number. I wonder
-if we are getting a SIGSEGV. I also wonder what thread is actually
-running...
+    Export the number of successful and failed hugetlb page
+    allocations via the virtio balloon driver. These 2 counts
+    come directly from the vm_events HTLB_BUDDY_PGALLOC and
+    HTLB_BUDDY_PGALLOC_FAIL.
 
+Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
+---
+ docs/virtio-balloon-stats.txt                   | 2 ++
+ hw/virtio/virtio-balloon.c                      | 2 ++
+ include/standard-headers/linux/virtio_balloon.h | 4 +++-
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-> This is qemu as of today with the patches from
-> git://github.com/riscv/riscv-qemu / riscv-all on top.
-
-
-Okay. We don't have any linux-user specific patches in our patch series so
-it likely the same in the master branch.
-
-I wonder what is the best way for me to reproduce on my side... a tarball
-with binaries that I can use to trigger the fault?
+diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+index 7a66d25..9985e1d 100644
+--- a/docs/virtio-balloon-stats.txt
++++ b/docs/virtio-balloon-stats.txt
+@@ -34,6 +34,8 @@ which will return a dictionary containing:
+       - stat-total-memory
+       - stat-available-memory
+       - stat-disk-caches
++      - stat-htlb-pgalloc
++      - stat-htlb-pgfail
+ 
+   o A key named last-update, which contains the last stats update
+     timestamp in seconds. Since this timestamp is generated by the host,
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index f456cea..1f7a87f 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -52,6 +52,8 @@ static const char *balloon_stat_names[] = {
+    [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
+    [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
+    [VIRTIO_BALLOON_S_CACHES] = "stat-disk-caches",
++   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-htlb-pgalloc",
++   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-htlb-pgfail",
+    [VIRTIO_BALLOON_S_NR] = NULL
+ };
+ 
+diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
+index 7b0a41b..e446805 100644
+--- a/include/standard-headers/linux/virtio_balloon.h
++++ b/include/standard-headers/linux/virtio_balloon.h
+@@ -53,7 +53,9 @@ struct virtio_balloon_config {
+ #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
+ #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
+ #define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */
+-#define VIRTIO_BALLOON_S_NR       8
++#define VIRTIO_BALLOON_S_HTLB_PGALLOC  8  /* Hugetlb page allocations */
++#define VIRTIO_BALLOON_S_HTLB_PGFAIL   9  /* Hugetlb page allocation failures */
++#define VIRTIO_BALLOON_S_NR       10
+ 
+ /*
+  * Memory statistics structure.
+-- 
+1.8.3.1
