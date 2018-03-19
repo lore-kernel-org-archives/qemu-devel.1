@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2C8-0001M5-5B
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:53 -0400
+	(envelope-from <mjc@sifive.com>) id 1ey2C3-0001Jo-CY
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ey2C5-0002cY-0i
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:52 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38194)
+	(envelope-from <mjc@sifive.com>) id 1ey2Bz-0002Wr-C3
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:47 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:39372)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2C4-0002c1-Ok
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:48 -0400
-Received: by mail-pl0-x241.google.com with SMTP id m22-v6so11049008pls.5
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:19:48 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ey2Bz-0002WO-3Z
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 17:19:43 -0400
+Received: by mail-pl0-x244.google.com with SMTP id k22-v6so10205825pls.6
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 14:19:43 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon, 19 Mar 2018 14:18:31 -0700
-Message-Id: <1521494329-19546-9-git-send-email-mjc@sifive.com>
+Date: Mon, 19 Mar 2018 14:18:25 -0700
+Message-Id: <1521494329-19546-3-git-send-email-mjc@sifive.com>
 In-Reply-To: <1521494329-19546-1-git-send-email-mjc@sifive.com>
 References: <1521494329-19546-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v4 08/26] RISC-V: Make sure rom has space for
- fdt
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 02/26] RISC-V: Replace hardcoded constants
+ with enum values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,175 +32,183 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-Remove a potential buffer overflow (not seen in practice).
-Perhaps cpu_physical_memory_write already has bound checks.
-This change however makes space for the maximum device tree
-size and adds an explicit bounds check and error message.
-It doesn't trigger, but it may help in the future if the
-device-tree size is exceeded. e.g. large bootargs.
+The RISC-V device-tree code has a number of hard-coded
+constants and this change moves them into header enums.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/riscv/sifive_u.c | 20 ++++++++++++--------
- hw/riscv/spike.c    | 16 +++++++++++-----
- hw/riscv/virt.c     | 13 +++++++++----
- 3 files changed, 32 insertions(+), 17 deletions(-)
+ hw/riscv/sifive_clint.c         | 9 +++------
+ hw/riscv/sifive_u.c             | 6 ++++--
+ hw/riscv/spike.c                | 6 ++++--
+ hw/riscv/virt.c                 | 6 ++++--
+ include/hw/riscv/sifive_clint.h | 4 ++++
+ include/hw/riscv/sifive_u.h     | 4 ++++
+ include/hw/riscv/spike.h        | 4 ++++
+ include/hw/riscv/virt.h         | 4 ++++
+ 8 files changed, 31 insertions(+), 12 deletions(-)
 
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index 4893453..7cc606e 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -26,13 +26,10 @@
+ #include "hw/riscv/sifive_clint.h"
+ #include "qemu/timer.h"
+ 
+-/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
+-#define TIMER_FREQ (10 * 1000 * 1000)
+-
+ static uint64_t cpu_riscv_read_rtc(void)
+ {
+-    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
+-                    NANOSECONDS_PER_SECOND);
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
++        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
+ }
+ 
+ /*
+@@ -59,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+     diff = cpu->env.timecmp - rtc_r;
+     /* back to ns (note args switched in muldiv64) */
+     next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
++        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
+     timer_mod(cpu->env.timer, next);
+ }
+ 
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 083043a..57b4f4f 100644
+index 1c2deef..f3f7615 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -52,7 +52,7 @@ static const struct MemmapEntry {
-     hwaddr size;
- } sifive_u_memmap[] = {
-     [SIFIVE_U_DEBUG] =    {        0x0,      0x100 },
--    [SIFIVE_U_MROM] =     {     0x1000,     0x2000 },
-+    [SIFIVE_U_MROM] =     {     0x1000,    0x11000 },
-     [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
-     [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
-     [SIFIVE_U_UART0] =    { 0x10013000,     0x1000 },
-@@ -221,7 +221,7 @@ static void riscv_sifive_u_init(MachineState *machine)
-     const struct MemmapEntry *memmap = sifive_u_memmap;
+@@ -122,7 +122,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
  
-     SiFiveUState *s = g_new0(SiFiveUState, 1);
--    MemoryRegion *sys_memory = get_system_memory();
-+    MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     qemu_fdt_add_subnode(fdt, "/cpus");
+-    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
++        SIFIVE_CLINT_TIMEBASE_FREQ);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
  
-@@ -239,7 +239,7 @@ static void riscv_sifive_u_init(MachineState *machine)
-     /* register RAM */
-     memory_region_init_ram(main_mem, NULL, "riscv.sifive.u.ram",
-                            machine->ram_size, &error_fatal);
--    memory_region_add_subregion(sys_memory, memmap[SIFIVE_U_DRAM].base,
-+    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DRAM].base,
-         main_mem);
- 
-     /* create device tree */
-@@ -247,9 +247,9 @@ static void riscv_sifive_u_init(MachineState *machine)
- 
-     /* boot rom */
-     memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
--                           memmap[SIFIVE_U_MROM].base, &error_fatal);
--    memory_region_set_readonly(mask_rom, true);
--    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
-+                           memmap[SIFIVE_U_MROM].size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
-+                                mask_rom);
- 
-     if (machine->kernel_filename) {
-         load_kernel(machine->kernel_filename);
-@@ -276,6 +276,10 @@ static void riscv_sifive_u_init(MachineState *machine)
-     copy_le32_to_phys(memmap[SIFIVE_U_MROM].base, reset_vec, sizeof(reset_vec));
- 
-     /* copy in the device tree */
-+    if (s->fdt_size >= memmap[SIFIVE_U_MROM].size - sizeof(reset_vec)) {
-+        error_report("qemu: not enough space to store device-tree");
-+        exit(1);
-+    }
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-     cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
-         sizeof(reset_vec), s->fdt, s->fdt_size);
-@@ -293,9 +297,9 @@ static void riscv_sifive_u_init(MachineState *machine)
-         SIFIVE_U_PLIC_CONTEXT_BASE,
-         SIFIVE_U_PLIC_CONTEXT_STRIDE,
-         memmap[SIFIVE_U_PLIC].size);
--    sifive_uart_create(sys_memory, memmap[SIFIVE_U_UART0].base,
-+    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
-         serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART0_IRQ]);
--    /* sifive_uart_create(sys_memory, memmap[SIFIVE_U_UART1].base,
-+    /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
-         serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART1_IRQ]); */
-     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-         memmap[SIFIVE_U_CLINT].size, smp_cpus,
+@@ -131,7 +132,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                              SIFIVE_U_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
 diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 64e585e..c7d937b 100644
+index 2d1f114..4c233ec 100644
 --- a/hw/riscv/spike.c
 +++ b/hw/riscv/spike.c
-@@ -46,7 +46,7 @@ static const struct MemmapEntry {
-     hwaddr base;
-     hwaddr size;
- } spike_memmap[] = {
--    [SPIKE_MROM] =     {     0x1000,     0x2000 },
-+    [SPIKE_MROM] =     {     0x1000,    0x11000 },
-     [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
-     [SPIKE_DRAM] =     { 0x80000000,        0x0 },
- };
-@@ -197,8 +197,9 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+@@ -115,7 +115,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
  
-     /* boot rom */
-     memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
--                           s->fdt_size + 0x2000, &error_fatal);
--    memory_region_add_subregion(system_memory, 0x0, mask_rom);
-+                           memmap[SPIKE_MROM].size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
-+                                mask_rom);
+     qemu_fdt_add_subnode(fdt, "/cpus");
+-    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
++        SIFIVE_CLINT_TIMEBASE_FREQ);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
  
-     if (machine->kernel_filename) {
-         load_kernel(machine->kernel_filename);
-@@ -225,6 +226,10 @@ static void spike_v1_10_0_board_init(MachineState *machine)
-     copy_le32_to_phys(memmap[SPIKE_MROM].base, reset_vec, sizeof(reset_vec));
- 
-     /* copy in the device tree */
-+    if (s->fdt_size >= memmap[SPIKE_MROM].size - sizeof(reset_vec)) {
-+        error_report("qemu: not enough space to store device-tree");
-+        exit(1);
-+    }
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-     cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
-         s->fdt, s->fdt_size);
-@@ -266,8 +271,9 @@ static void spike_v1_09_1_board_init(MachineState *machine)
- 
-     /* boot rom */
-     memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
--                           0x40000, &error_fatal);
--    memory_region_add_subregion(system_memory, 0x0, mask_rom);
-+                           memmap[SPIKE_MROM].size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
-+                                mask_rom);
- 
-     if (machine->kernel_filename) {
-         load_kernel(machine->kernel_filename);
+@@ -124,7 +125,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                              SPIKE_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 5913100..d680cbd 100644
+index 37968d2..a402856 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -45,8 +45,8 @@ static const struct MemmapEntry {
-     hwaddr size;
- } virt_memmap[] = {
-     [VIRT_DEBUG] =    {        0x0,      0x100 },
--    [VIRT_MROM] =     {     0x1000,     0x2000 },
--    [VIRT_TEST] =     {     0x4000,     0x1000 },
-+    [VIRT_MROM] =     {     0x1000,    0x11000 },
-+    [VIRT_TEST] =     {   0x100000,     0x1000 },
-     [VIRT_CLINT] =    {  0x2000000,    0x10000 },
-     [VIRT_PLIC] =     {  0xc000000,  0x4000000 },
-     [VIRT_UART0] =    { 0x10000000,      0x100 },
-@@ -297,8 +297,9 @@ static void riscv_virt_board_init(MachineState *machine)
+@@ -145,7 +145,8 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
  
-     /* boot rom */
-     memory_region_init_ram(mask_rom, NULL, "riscv_virt_board.mrom",
--                           s->fdt_size + 0x2000, &error_fatal);
--    memory_region_add_subregion(system_memory, 0x0, mask_rom);
-+                           memmap[VIRT_MROM].size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[VIRT_MROM].base,
-+                                mask_rom);
+     qemu_fdt_add_subnode(fdt, "/cpus");
+-    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
++                          SIFIVE_CLINT_TIMEBASE_FREQ);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
  
-     if (machine->kernel_filename) {
-         uint64_t kernel_entry = load_kernel(machine->kernel_filename);
-@@ -336,6 +337,10 @@ static void riscv_virt_board_init(MachineState *machine)
-     copy_le32_to_phys(memmap[VIRT_MROM].base, reset_vec, sizeof(reset_vec));
+@@ -155,7 +156,8 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                              VIRT_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
+index aaa2a58..e2865be 100644
+--- a/include/hw/riscv/sifive_clint.h
++++ b/include/hw/riscv/sifive_clint.h
+@@ -47,4 +47,8 @@ enum {
+     SIFIVE_TIME_BASE    = 0xBFF8
+ };
  
-     /* copy in the device tree */
-+    if (s->fdt_size >= memmap[VIRT_MROM].size - sizeof(reset_vec)) {
-+        error_report("qemu: not enough space to store device-tree");
-+        exit(1);
-+    }
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-     cpu_physical_memory_write(memmap[VIRT_MROM].base + sizeof(reset_vec),
-         s->fdt, s->fdt_size);
++enum {
++    SIFIVE_CLINT_TIMEBASE_FREQ = 10000000
++};
++
+ #endif
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 662e8a1..be38aa0 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -50,6 +50,10 @@ enum {
+     SIFIVE_U_UART1_IRQ = 4
+ };
+ 
++enum {
++    SIFIVE_U_CLOCK_FREQ = 1000000000
++};
++
+ #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+ #define SIFIVE_U_PLIC_NUM_SOURCES 127
+ #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+index cb55a14..d85a64e 100644
+--- a/include/hw/riscv/spike.h
++++ b/include/hw/riscv/spike.h
+@@ -42,6 +42,10 @@ enum {
+     SPIKE_DRAM
+ };
+ 
++enum {
++    SPIKE_CLOCK_FREQ = 1000000000
++};
++
+ #if defined(TARGET_RISCV32)
+ #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+ #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 7525647..2fbe808 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -55,6 +55,10 @@ enum {
+     VIRTIO_NDEV = 10
+ };
+ 
++enum {
++    VIRT_CLOCK_FREQ = 1000000000
++};
++
+ #define VIRT_PLIC_HART_CONFIG "MS"
+ #define VIRT_PLIC_NUM_SOURCES 127
+ #define VIRT_PLIC_NUM_PRIORITIES 7
 -- 
 2.7.0
