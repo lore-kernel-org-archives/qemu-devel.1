@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey78v-0002kx-Pj
+	(envelope-from <no-reply@patchew.org>) id 1ey78x-0002l3-4p
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey78r-0005Iv-Cu
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:36:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55722 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey78r-0005I5-6R
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:36:49 -0400
-Date: Tue, 20 Mar 2018 04:36:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180320043525-mutt-send-email-mst@kernel.org>
-References: <1521224390-425343-1-git-send-email-mst@redhat.com>
-	<B2D15215269B544CADD246097EACE7473ABF2928@DGGEMM505-MBS.china.huawei.com>
+	(envelope-from <no-reply@patchew.org>) id 1ey78s-0005KR-W6
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:36:55 -0400
+Resent-Message-Id: <E1ey78s-0005KR-W6@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ey78s-0005JO-R4
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:36:50 -0400
+In-Reply-To: <20180320013657.25038-1-tpiepho@impinj.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152151065509.147.16885257657383185128@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B2D15215269B544CADD246097EACE7473ABF2928@DGGEMM505-MBS.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: avoid misaligned access
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 19 Mar 2018 18:50:56 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] i.MX: Support serial RS-232 break properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: tpiepho@impinj.com
+Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, andrew.smirnov@gmail.com, pbonzini@redhat.com, peter.chubb@nicta.com.au
 
-On Tue, Mar 20, 2018 at 02:01:07AM +0000, Zhoujian (jay) wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > Sent: Saturday, March 17, 2018 2:20 AM
-> > To: qemu-devel@nongnu.org
-> > Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>
-> > Subject: [PATCH] vhost-user: avoid misaligned access
-> > 
-> > We can't pass a pointer to memory field directly since it's within a packed
-> > structure, so isn't aligned.
-> > Pass a pointer on stack and copy.
-> > 
-> > Fixes: 30c4cc7 ("vhost: used_memslots refactoring")
-> > Cc: Jay Zhou <jianjay.zhou@huawei.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> > 
-> > I had to apply this to fix make check errors with clang.
-> > Pls review, test and ack.
-> > 
-> > Thanks!
-> > 
-> >  hw/virtio/vhost-user.c | 14 +++++++++++---
-> >  1 file changed, 11 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c index
-> > c12fdd9..a44ee7f 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -396,6 +396,7 @@ static int vhost_user_set_mem_table_postcopy(struct
-> > vhost_dev *dev,
-> >      bool reply_supported = virtio_has_feature(dev->protocol_features,
-> > 
-> > VHOST_USER_PROTOCOL_F_REPLY_ACK);
-> >      VhostUserMsg msg_reply;
-> > +    VhostUserMemory memory = {};
-> >      int region_i, msg_i;
-> > 
-> >      VhostUserMsg msg = {
-> > @@ -407,10 +408,11 @@ static int vhost_user_set_mem_table_postcopy(struct
-> > vhost_dev *dev,
-> >          msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-> >      }
-> > 
-> > -    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-> > +    if (vhost_user_prepare_msg(dev, &memory, fds) < 0) {
-> >          error_report("Failed preparing vhost-user memory table msg");
-> >          return -1;
-> >      }
-> > +    msg.payload.memory = memory;
-> > 
-> >      fd_num = msg.payload.memory.nregions;
-> > 
-> > @@ -549,16 +551,19 @@ static int vhost_user_set_mem_table(struct vhost_dev
-> > *dev,
-> >          .hdr.request = VHOST_USER_SET_MEM_TABLE,
-> >          .hdr.flags = VHOST_USER_VERSION,
-> >      };
-> > +    VhostUserMemory memory = {};
-> > 
-> >      if (reply_supported) {
-> >          msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-> >      }
-> > 
-> > -    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-> > +    if (vhost_user_prepare_msg(dev, &memory, fds) < 0) {
-> >          error_report("Failed preparing vhost-user memory table msg");
-> >          return -1;
-> >      }
-> > 
-> > +    msg.payload.memory = memory;
-> > +
-> >      fd_num = msg.payload.memory.nregions;
-> > 
-> >      if (!fd_num) {
-> > @@ -1575,8 +1580,11 @@ static void vhost_user_set_used_memslots(struct
-> > vhost_dev *dev)  {
-> >      int fds[VHOST_MEMORY_MAX_NREGIONS];
-> >      VhostUserMsg msg;
-> > +    VhostUserMemory memory = {};
-> > +
-> > +    vhost_user_prepare_msg(dev, &memory, fds);
-> > 
-> > -    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
-> > +    msg.payload.memory = memory;
-> >  }
-
-FYI I think it's better to pass pointer to msg to
-avoid alignment issues.
-
-> Hi Michael, here should be like this:
-> 
-> 
-> static void vhost_user_set_used_memslots(struct vhost_dev *dev)
->  {
->      int fds[VHOST_MEMORY_MAX_NREGIONS];
-> -    VhostUserMsg msg;
-> +    VhostUserMemory memory = {};
->  
-> -    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
-> +    vhost_user_prepare_msg(dev, &memory, fds);
->  }
-> 
-> 
-> Regards,
-> Jay
-
-
-But what's the point of all this? The structure is discarded
-after being initialized. Doesn't look right to me.
-
-> > 
-> >  const VhostOps user_ops = {
-> > --
-> > MST
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzIwMDEzNjU3LjI1MDM4LTEtdHBpZXBob0BpbXBpbmouY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGkuTVg6IFN1cHBvcnQgc2VyaWFsIFJTLTIzMiBicmVh
+ayBwcm9wZXJseQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
+LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
+dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
+ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
+OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
+KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
+Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
+Y2hldy8xNTIxNDY4MDQ2LTEwNDAwLTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzE1MjE0NjgwNDYtMTA0MDAtMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQu
+Y29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMTkwMzE1NDUuMjkz
+NTktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODAzMTkwMzE1
+NDUuMjkzNTktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxODAzMTkxMTAyMTUuMTY3NTUtMS1wZXRlci5tYXlkZWxsQGxp
+bmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDMxOTExMDIxNS4xNjc1NS0xLXBldGVyLm1heWRlbGxA
+bGluYXJvLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzE5MTEz
+NTQ0LjcwNC0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxODAzMTkxMTM1NDQuNzA0
+LTEtbGF1cmVudEB2aXZpZXIuZXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8y
+MDE4MDMxOTExNTg0Ni45NjYyLTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRlIC0+IHBh
+dGNoZXcvMjAxODAzMTkxMTU4NDYuOTY2Mi0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9ybi5k
+ZQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzE5MTMxNzQzLjM4ODUt
+MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDMxOTEzMTc0My4zODg1
+LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBh
+dGNoZXcvMjAxODAzMTkyMTMxMDEuNjEwMC0xLXdzYStyZW5lc2FzQHNhbmctZW5naW5lZXJpbmcu
+Y29tIC0+IHBhdGNoZXcvMjAxODAzMTkyMTMxMDEuNjEwMC0xLXdzYStyZW5lc2FzQHNhbmctZW5n
+aW5lZXJpbmcuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMjAw
+MTM2NTcuMjUwMzgtMS10cGllcGhvQGltcGluai5jb20gLT4gcGF0Y2hldy8yMDE4MDMyMDAxMzY1
+Ny4yNTAzOC0xLXRwaWVwaG9AaW1waW5qLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjEwMjI0MTE1YTcgaS5NWDogU3VwcG9ydCBzZXJpYWwgUlMtMjMyIGJyZWFrIHByb3Blcmx5
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGkuTVg6IFN1cHBvcnQg
+c2VyaWFsIFJTLTIzMiBicmVhayBwcm9wZXJseS4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
+b3VuZCB0aGF0ICc8PCcgKGN0eDpWeFYpCiM1MzogRklMRTogaW5jbHVkZS9ody9jaGFyL2lteF9z
+ZXJpYWwuaDoyOToKKyNkZWZpbmUgVVJYRF9GUk1FUlIgICAgICgxPDwxMikgICAvKiBDaGFyYWN0
+ZXIgaGFzIGZyYW1lIGVycm9yICovCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFs
+OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
