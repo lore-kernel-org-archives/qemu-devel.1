@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7m8-0006Wf-Kw
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:25 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7mE-0006ak-6a
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7m7-00082j-1B
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:24 -0400
-Date: Tue, 20 Mar 2018 05:17:21 +0200
+	(envelope-from <mst@redhat.com>) id 1ey7mC-00087k-8T
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34240 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mC-00087O-1c
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:28 -0400
+Date: Tue, 20 Mar 2018 05:17:26 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-17-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-20-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 16/50] pc-dimm: make
- qmp_pc_dimm_device_list() sort devices by address
+Subject: [Qemu-devel] [PULL v2 19/50] tests/bios-tables-test: add test cases
+ for DIMM proximity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,219 +28,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson for ppc part <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Igor Mammedov <imammedo@redhat.com>
 
 From: Haozhong Zhang <haozhong.zhang@intel.com>
 
-Make qmp_pc_dimm_device_list() return sorted by start address
-list of devices so that it could be reused in places that
-would need sorted list*. Reuse existing pc_dimm_built_list()
-to get sorted list.
+QEMU now builds one SRAT memory affinity structure for each PC-DIMM
+and NVDIMM device presented at boot time with the proximity domain
+specified in the device option 'node', rather than only one SRAT
+memory affinity structure covering the entire hotpluggable address
+space with the proximity domain of the last node.
 
-While at it hide recursive callbacks from callers, so that:
+Add test cases on PC and Q35 machines with 4 proximity domains, and
+one PC-DIMM and one NVDIMM attached to the 2nd and 3rd proximity
+domains respectively. Check whether the QEMU-built SRAT tables match
+with the expected ones.
 
-  qmp_pc_dimm_device_list(qdev_get_machine(), &list);
-
-could be replaced with simpler:
-
-  list = qmp_pc_dimm_device_list();
-
-* follow up patch will use it in build_srat()
+The following ACPI tables need to be added for this test:
+  tests/acpi-test-data/pc/APIC.dimmpxm
+  tests/acpi-test-data/pc/DSDT.dimmpxm
+  tests/acpi-test-data/pc/NFIT.dimmpxm
+  tests/acpi-test-data/pc/SRAT.dimmpxm
+  tests/acpi-test-data/pc/SSDT.dimmpxm
+  tests/acpi-test-data/q35/APIC.dimmpxm
+  tests/acpi-test-data/q35/DSDT.dimmpxm
+  tests/acpi-test-data/q35/NFIT.dimmpxm
+  tests/acpi-test-data/q35/SRAT.dimmpxm
+  tests/acpi-test-data/q35/SSDT.dimmpxm
+New APIC and DSDT are needed because of the multiple processors
+configuration. New NFIT and SSDT are needed because of NVDIMM.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au> for ppc part
-Reviewed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/mem/pc-dimm.h |  2 +-
- hw/mem/pc-dimm.c         | 83 +++++++++++++++++++++++++-----------------------
- hw/ppc/spapr.c           |  3 +-
- numa.c                   |  4 +--
- qmp.c                    |  7 +---
- stubs/qmp_pc_dimm.c      |  4 +--
- 6 files changed, 50 insertions(+), 53 deletions(-)
+ tests/bios-tables-test.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index d83b957..1fc4792 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -93,7 +93,7 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
- 
- int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--int qmp_pc_dimm_device_list(Object *obj, void *opaque);
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void);
- uint64_t pc_existing_dimms_capacity(Error **errp);
- uint64_t get_plugged_memory_size(void);
- void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 6e74b61..4d050fe 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -162,45 +162,6 @@ uint64_t get_plugged_memory_size(void)
-     return pc_existing_dimms_capacity(&error_abort);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index cd753ff..bf3e193 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -823,6 +823,42 @@ static void test_acpi_piix4_tcg_numamem(void)
+     free_test_data(&data);
  }
  
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
--{
--    MemoryDeviceInfoList ***prev = opaque;
--
--    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
--        DeviceState *dev = DEVICE(obj);
--
--        if (dev->realized) {
--            MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
--            MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
--            PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
--            DeviceClass *dc = DEVICE_GET_CLASS(obj);
--            PCDIMMDevice *dimm = PC_DIMM(obj);
--
--            if (dev->id) {
--                di->has_id = true;
--                di->id = g_strdup(dev->id);
--            }
--            di->hotplugged = dev->hotplugged;
--            di->hotpluggable = dc->hotpluggable;
--            di->addr = dimm->addr;
--            di->slot = dimm->slot;
--            di->node = dimm->node;
--            di->size = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
--                                                NULL);
--            di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
--
--            info->u.dimm.data = di;
--            elem->value = info;
--            elem->next = NULL;
--            **prev = elem;
--            *prev = &elem->next;
--        }
--    }
--
--    object_child_foreach(obj, qmp_pc_dimm_device_list, opaque);
--    return 0;
--}
--
- static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
- {
-     unsigned long *bitmap = opaque;
-@@ -276,6 +237,50 @@ static int pc_dimm_built_list(Object *obj, void *opaque)
-     return 0;
- }
- 
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
++static void test_acpi_tcg_dimm_pxm(const char *machine)
 +{
-+    GSList *dimms = NULL, *item;
-+    MemoryDeviceInfoList *list = NULL, *prev = NULL;
++    test_data data;
 +
-+    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &dimms);
-+
-+    for (item = dimms; item; item = g_slist_next(item)) {
-+        PCDIMMDevice *dimm = PC_DIMM(item->data);
-+        Object *obj = OBJECT(dimm);
-+        MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
-+        MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
-+        PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+        DeviceClass *dc = DEVICE_GET_CLASS(obj);
-+        DeviceState *dev = DEVICE(obj);
-+
-+        if (dev->id) {
-+            di->has_id = true;
-+            di->id = g_strdup(dev->id);
-+        }
-+        di->hotplugged = dev->hotplugged;
-+        di->hotpluggable = dc->hotpluggable;
-+        di->addr = dimm->addr;
-+        di->slot = dimm->slot;
-+        di->node = dimm->node;
-+        di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
-+        di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
-+
-+        info->u.dimm.data = di;
-+        elem->value = info;
-+        elem->next = NULL;
-+        if (prev) {
-+            prev->next = elem;
-+        } else {
-+            list = elem;
-+        }
-+        prev = elem;
-+    }
-+
-+    g_slist_free(dimms);
-+
-+    return list;
++    memset(&data, 0, sizeof(data));
++    data.machine = machine;
++    data.variant = ".dimmpxm";
++    test_acpi_one(" -machine nvdimm=on"
++                  " -smp 4,sockets=4"
++                  " -m 128M,slots=3,maxmem=1G"
++                  " -numa node,mem=32M,nodeid=0"
++                  " -numa node,mem=32M,nodeid=1"
++                  " -numa node,mem=32M,nodeid=2"
++                  " -numa node,mem=32M,nodeid=3"
++                  " -numa cpu,node-id=0,socket-id=0"
++                  " -numa cpu,node-id=1,socket-id=1"
++                  " -numa cpu,node-id=2,socket-id=2"
++                  " -numa cpu,node-id=3,socket-id=3"
++                  " -object memory-backend-ram,id=ram0,size=128M"
++                  " -object memory-backend-ram,id=nvm0,size=128M"
++                  " -device pc-dimm,id=dimm0,memdev=ram0,node=1"
++                  " -device nvdimm,id=dimm1,memdev=nvm0,node=2",
++                  &data);
++    free_test_data(&data);
 +}
 +
- uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
-                                uint64_t address_space_size,
-                                uint64_t *hint, uint64_t align, uint64_t size,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7e1c858..44a0670 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -722,8 +722,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
++static void test_acpi_q35_tcg_dimm_pxm(void)
++{
++    test_acpi_tcg_dimm_pxm(MACHINE_Q35);
++}
++
++static void test_acpi_piix4_tcg_dimm_pxm(void)
++{
++    test_acpi_tcg_dimm_pxm(MACHINE_PC);
++}
++
+ int main(int argc, char *argv[])
+ {
+     const char *arch = qtest_get_arch();
+@@ -847,6 +883,8 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/q35/memhp", test_acpi_q35_tcg_memhp);
+         qtest_add_func("acpi/piix4/numamem", test_acpi_piix4_tcg_numamem);
+         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
++        qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
++        qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
      }
- 
-     if (hotplug_lmb_start) {
--        MemoryDeviceInfoList **prev = &dimms;
--        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-+        dimms = qmp_pc_dimm_device_list();
-     }
- 
-     /* ibm,dynamic-memory */
-diff --git a/numa.c b/numa.c
-index 398e2c9..9442704 100644
---- a/numa.c
-+++ b/numa.c
-@@ -520,12 +520,10 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
- 
- static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- {
--    MemoryDeviceInfoList *info_list = NULL;
--    MemoryDeviceInfoList **prev = &info_list;
-+    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
-     MemoryDeviceInfoList *info;
-     PCDIMMDeviceInfo     *pcdimm_info;
- 
--    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-     for (info = info_list; info; info = info->next) {
-         MemoryDeviceInfo *value = info->value;
- 
-diff --git a/qmp.c b/qmp.c
-index 8c7d1cc..4b2517d 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -731,12 +731,7 @@ void qmp_object_del(const char *id, Error **errp)
- 
- MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
- {
--    MemoryDeviceInfoList *head = NULL;
--    MemoryDeviceInfoList **prev = &head;
--
--    qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
--
--    return head;
-+    return qmp_pc_dimm_device_list();
- }
- 
- ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
-diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
-index 9ddc4f6..b6b2cca 100644
---- a/stubs/qmp_pc_dimm.c
-+++ b/stubs/qmp_pc_dimm.c
-@@ -2,9 +2,9 @@
- #include "qom/object.h"
- #include "hw/mem/pc-dimm.h"
- 
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-+MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
- {
--   return 0;
-+   return NULL;
- }
- 
- uint64_t get_plugged_memory_size(void)
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
 -- 
 MST
