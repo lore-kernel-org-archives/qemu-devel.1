@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1eyKD3-0001rG-Ih
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:34:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1eyKKd-00076d-6w
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1eyKD2-0001pl-E3
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:34:01 -0400
+	(envelope-from <berrange@redhat.com>) id 1eyKKc-0006nE-B4
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:41:51 -0400
+Date: Tue, 20 Mar 2018 16:40:48 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180320164048.GB4530@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <1521510562-529051-1-git-send-email-mst@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <b068cb91-b8ba-175c-40f5-a7c9c8163575@weilnetz.de>
-Date: Tue, 20 Mar 2018 17:33:42 +0100
+	<da3457a0-7f24-4759-7d98-9b2fdc87e87c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1521510562-529051-1-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <da3457a0-7f24-4759-7d98-9b2fdc87e87c@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] qemu: include generated files with <> and
  not ""
 List-Id: <qemu-devel.nongnu.org>
@@ -24,57 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, sheepdog@lists.wpkg.org, Stefan Hajnoczi <stefanha@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Josh Durgin <jdurgin@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Michael Walle <michael@walle.cc>, Keith Busch <keith.busch@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Fabien Chouteau <chouteau@adacore.com>, Amit Shah <amit@kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <minyard@acm.org>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Peter Chubb <peter.chubb@nicta.com.au>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Max Filippov <jcmvbkbc@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Yuval Shaia <yuval.shaia@oracle.com>, David Hildenbrand <david@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, kvm@vger.kernel.org, qemu-block@nongnu.org, sheepdog@lists.wpkg.org, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-Am 20.03.2018 um 02:54 schrieb Michael S. Tsirkin:
-> QEMU coding style at the moment asks for all non-system
-> include files to be used with #include "foo.h".
-> However this rule actually does not make sense and
-> creates issues for when the included file is generated.
->=20
-> In C, include "file" means look in current directory,
-> then on include search path. Current directory here
-> means the source file directory.
-> By comparison include <file> means look on include search path.
+On Tue, Mar 20, 2018 at 11:12:00AM -0500, Eric Blake wrote:
+> On 03/19/2018 08:54 PM, Michael S. Tsirkin wrote:
+> > QEMU coding style at the moment asks for all non-system
+> > include files to be used with #include "foo.h".
+> 
+> [I'm replying without having read the rest of the thread, so bear with me if
+> I repeat some of the other comments that have already been made]
+> 
+> And Markus even just did a cleanup along those lines.
+> 
+> > However this rule actually does not make sense and
+> > creates issues for when the included file is generated.
+> > 
+> > In C, include "file" means look in current directory,
+> > then on include search path. Current directory here
+> > means the source file directory.
+> > By comparison include <file> means look on include search path.
+> 
+> It's also nice when "file" means file belonging to our project, and <file>
+> means 3rd-party file.  So we have to choose which semantics are easier;
+> perhaps better Makefile rules that prevent us from seeing stale files is a
+> better solution than figuring out which files are generated.
+
+That's what I've attempted here:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg05421.html
 
 
-Hello Michael,
-
-the compiler (or to be more precise the preprocessor) works as you
-describe it, so technically all include files which are only found by
-searching the include paths would be found faster with <> than with "":
-the unsuccessful search relative to the source file directory would be
-omitted. Practically this will not save much build time because of
-caching effects. So the suggested change is not required to get faster
-build speed.
-
-Using <> for system include files and "" for local include files is a
-convention, and as far as I know most projects adhere to that
-convention. So does QEMU currently. Such conventions are not only
-important for humans, but also for tools. There are more tools than the
-C preprocessor which handle <> and "" differently. For example the GNU
-compiler uses -MD or -MMD to automatically generate dependency rules for
-make. While -MD generates dependencies to all include files, -MMD does
-so only for user include files, but not for system include files. "user"
-and "system" means the different forms how include statements are
-written. QEMU still seems to use -MMD:
-
-rules.mak:QEMU_DGFLAGS +=3D -MMD -MP -MT $@ -MF $(@D)/$(*F).d
-
-Other tools like static code analysers could restrict their warning and
-error messages to user include files and ignore problems in system
-include files.
-
-Very large projects often split in sub projects, maybe one of them
-describing the API. Then that API headers are similar to system headers
-and can be included using <>, although they still belong to the same
-larger project. Do we have a stable QEMU API described in a (small)
-number of include files which typically do not change? If yes, then
-those include files could be included using <> because we don't need
-them in dependency lists or in static code analysis reports.
-
-For all other QEMU include files, I'd stick to using "".
-
-Regards
-Stefan
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
