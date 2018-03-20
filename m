@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyGaC-0002Dc-8O
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:41:41 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1eyGz1-0007yJ-S9
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 09:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyGa7-0006Ut-Tc
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:41:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43544 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyGa7-0006UU-P1
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:41:35 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 20 Mar 2018 12:41:15 +0000
-Message-Id: <20180320124117.40573-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] hmp queue
+	(envelope-from <borntraeger@de.ibm.com>) id 1eyGyw-0002tP-25
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 09:07:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eyGyv-0002sR-QA
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 09:07:13 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2KD54CK067636
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:07:12 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gu2ba1rpm-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:07:10 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 20 Mar 2018 13:07:07 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 20 Mar 2018 13:07:02 +0000
+Message-Id: <20180320130702.188689-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] s390x/cpumodel: fix feature groups and
+ breakage of MSA8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, jixiang_zhang@h3c.com
+To: qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Since commit 46a99c9f73c7 ("s390x/cpumodel: model PTFF subfunctions
+for Multiple-epoch facility") -cpu help no longer shows the MSA8
+feature group. Turns out that we forgot to add the new MEPOCH_PTFF
+group enum.
 
-The following changes since commit 4bdc24fa018901892bb8a5bd1808ebd605f4c6=
-4d:
+Fixes: 46a99c9f73c7 ("s390x/cpumodel: model PTFF subfunctions for Multiple-epoch facility")
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ target/s390x/cpu_features.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-qapi-2018-03-12-v=
-4' into staging (2018-03-20 09:51:49 +0000)
-
-are available in the Git repository at:
-
-  git://github.com/dagrh/qemu.git tags/pull-hmp-20180320
-
-for you to fetch changes up to 95372184b7acdfd82ee748b6f0c6df1d839982ba:
-
-  hmp: free sev info (2018-03-20 12:32:06 +0000)
-
-----------------------------------------------------------------
-HMP fixes for 2.12
-
-----------------------------------------------------------------
-Marc-Andr=C3=A9 Lureau (1):
-      hmp: free sev info
-
-zhangjixiang (1):
-      HMP: Initialize err before using
-
- hmp.c                 | 2 +-
- target/i386/monitor.c | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+index e306aa7ab2..968b12fdfe 100644
+--- a/target/s390x/cpu_features.h
++++ b/target/s390x/cpu_features.h
+@@ -78,6 +78,7 @@ typedef enum {
+     S390_FEAT_GROUP_MSA_EXT_6,
+     S390_FEAT_GROUP_MSA_EXT_7,
+     S390_FEAT_GROUP_MSA_EXT_8,
++    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
+     S390_FEAT_GROUP_MAX,
+ } S390FeatGroup;
+ 
+-- 
+2.14.3
