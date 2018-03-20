@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyLbV-0005Tc-Tm
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:22 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eyLdI-0006z0-U1
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:05:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyLbV-0001ER-0a
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:21 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyLbU-0001EC-RK
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:20 -0400
-Received: by mail-ot0-x244.google.com with SMTP id 95-v6so2743710ote.5
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 11:03:20 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1eyLdE-0002Si-Mx
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:05:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37876 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyLdE-0002S2-Hc
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:05:08 -0400
+References: <1521566230-111929-1-git-send-email-mst@redhat.com>
+	<1521566230-111929-2-git-send-email-mst@redhat.com>
+	<CAFEAcA-mpWJf6e05Q-_5+Pfh_-Ae2vnbYM+C9bdyYQe_1Sxq9g@mail.gmail.com>
+	<20180320192839-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7e78c808-8ca3-e235-aa5c-f9529ea0c1d5@redhat.com>
+Date: Tue, 20 Mar 2018 19:05:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <1521556868-37974-1-git-send-email-mst@redhat.com>
-References: <1521556868-37974-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Mar 2018 18:02:59 +0000
-Message-ID: <CAFEAcA-E28itBd5z0FvAA05R_NH8J7QBhT0KiXWaJ8ZWNNukpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/51] virtio, vhost, pci, pc: features,
- cleanups
+In-Reply-To: <20180320192839-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] update-linux-headers.sh: add
+ unistd.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Cornelia Huck <cohuck@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 20 March 2018 at 14:42, Michael S. Tsirkin <mst@redhat.com> wrote:
-> Note: only patch 39/51 is attached.
-> The rest are unchanged from v2.
+On 20/03/2018 18:29, Michael S. Tsirkin wrote:
+>> For MIPS, KVM is supposed to be properly supported these days, right?
+>> That sounds like we should not be blacklisting them either, but instead
+>> sorting out whatever issues it was that made us exclude them.
 >
-> The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 1dc61e7b37d339c42ec9bd7a7eec1ef2c22f351c:
->
->   postcopy shared docs (2018-03-20 16:40:37 +0200)
->
-> ----------------------------------------------------------------
-> virtio,vhost,pci,pc: features, cleanups
->
-> SRAT tables for DIMM devices
-> new virtio net flags for speed/duplex
-> post-copy migration support in vhost
-> cleanups in pci
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+> I agree but I'd rather someone else looked at this.
 
-Applied, thanks.
+Yeah, this doesn't look like the best time to change that.
 
--- PMM
+Thanks,
+
+Paolo
