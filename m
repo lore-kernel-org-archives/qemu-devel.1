@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mj-00073S-C7
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:03 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7ml-00073c-K0
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mi-0008PP-8Y
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53480 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ey7mk-0008R1-JI
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53484 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mi-0008PA-3m
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:00 -0400
-Date: Tue, 20 Mar 2018 05:17:59 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mk-0008Qj-E1
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:02 -0400
+Date: Tue, 20 Mar 2018 05:18:01 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-46-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-51-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 45/50] vhost-user: Add
- VHOST_USER_POSTCOPY_END message
+Subject: [Qemu-devel] [PULL v2 50/50] postcopy shared docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +28,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This message is sent just before the end of postcopy to get the
-client to stop using userfault since we wont respond to any more
-requests.  It should close userfaultfd so that any other pages
-get mapped to the backing file automatically by the kernel, since
-at this point we know we've received everything.
+Add some notes to the migration documentation for shared memory
+postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/interop/vhost-user.txt           | 12 ++++++++++++
- contrib/libvhost-user/libvhost-user.h |  1 +
- contrib/libvhost-user/libvhost-user.c | 23 +++++++++++++++++++++++
- hw/virtio/vhost-user.c                |  1 +
- 4 files changed, 37 insertions(+)
+ docs/devel/migration.rst | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index e295ef1..c058c40 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -729,6 +729,18 @@ Master message types
-       This is always sent sometime after a VHOST_USER_POSTCOPY_ADVISE, a=
-nd
-       thus only when VHOST_USER_PROTOCOL_F_PAGEFAULT is supported.
-=20
-+ * VHOST_USER_POSTCOPY_END
-+      Id: 30
-+      Slave payload: u64
+diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+index 9d1b765..e32b087 100644
+--- a/docs/devel/migration.rst
++++ b/docs/devel/migration.rst
+@@ -577,3 +577,44 @@ Postcopy now works with hugetlbfs backed memory:
+      hugepages works well, however 1GB hugepages are likely to be proble=
+matic
+      since it takes ~1 second to transfer a 1GB hugepage across a 10Gbps=
+ link,
+      and until the full page is transferred the destination thread is bl=
+ocked.
 +
-+      Master advises that postcopy migration has now completed.  The
-+      slave must disable the userfaultfd. The response is an acknowledge=
-ment
-+      only.
-+      When VHOST_USER_PROTOCOL_F_PAGEFAULT is supported, this message
-+      is sent at the end of the migration, after VHOST_USER_POSTCOPY_LIS=
-TEN
-+      was previously sent.
-+      The value returned is an error indication; 0 is success.
++Postcopy with shared memory
++---------------------------
 +
- Slave message types
- -------------------
-=20
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index ed505cf..79f7a53 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -87,6 +87,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
-     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-+    VHOST_USER_POSTCOPY_END     =3D 30,
-     VHOST_USER_MAX
- } VhostUserRequest;
-=20
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index 5feed52..504ff5e 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -99,6 +99,7 @@ vu_request_to_string(unsigned int req)
-         REQ(VHOST_USER_SET_CONFIG),
-         REQ(VHOST_USER_POSTCOPY_ADVISE),
-         REQ(VHOST_USER_POSTCOPY_LISTEN),
-+        REQ(VHOST_USER_POSTCOPY_END),
-         REQ(VHOST_USER_MAX),
-     };
- #undef REQ
-@@ -1094,6 +1095,26 @@ vu_set_postcopy_listen(VuDev *dev, VhostUserMsg *v=
-msg)
-     vmsg->payload.u64 =3D 0; /* Success */
-     return true;
- }
++Postcopy migration with shared memory needs explicit support from the ot=
+her
++processes that share memory and from QEMU. There are restrictions on the=
+ type of
++memory that userfault can support shared.
 +
-+static bool
-+vu_set_postcopy_end(VuDev *dev, VhostUserMsg *vmsg)
-+{
-+    DPRINT("%s: Entry\n", __func__);
-+    dev->postcopy_listening =3D false;
-+    if (dev->postcopy_ufd > 0) {
-+        close(dev->postcopy_ufd);
-+        dev->postcopy_ufd =3D -1;
-+        DPRINT("%s: Done close\n", __func__);
-+    }
++The Linux kernel userfault support works on `/dev/shm` memory and on `hu=
+getlbfs`
++(although the kernel doesn't provide an equivalent to `madvise(MADV_DONT=
+NEED)`
++for hugetlbfs which may be a problem in some configurations).
 +
-+    vmsg->fd_num =3D 0;
-+    vmsg->payload.u64 =3D 0;
-+    vmsg->size =3D sizeof(vmsg->payload.u64);
-+    vmsg->flags =3D VHOST_USER_VERSION |  VHOST_USER_REPLY_MASK;
-+    DPRINT("%s: exit\n", __func__);
-+    return true;
-+}
++The vhost-user code in QEMU supports clients that have Postcopy support,
++and the `vhost-user-bridge` (in `tests/`) and the DPDK package have chan=
+ges
++to support postcopy.
 +
- static bool
- vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
- {
-@@ -1169,6 +1190,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_set_postcopy_advise(dev, vmsg);
-     case VHOST_USER_POSTCOPY_LISTEN:
-         return vu_set_postcopy_listen(dev, vmsg);
-+    case VHOST_USER_POSTCOPY_END:
-+        return vu_set_postcopy_end(dev, vmsg);
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index a785aef..230f2f9 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -82,6 +82,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_CLOSE_CRYPTO_SESSION =3D 27,
-     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-+    VHOST_USER_POSTCOPY_END     =3D 30,
-     VHOST_USER_MAX
- } VhostUserRequest;
-=20
++The client needs to open a userfaultfd and register the areas
++of memory that it maps with userfault.  The client must then pass the
++userfaultfd back to QEMU together with a mapping table that allows
++fault addresses in the clients address space to be converted back to
++RAMBlock/offsets.  The client's userfaultfd is added to the postcopy
++fault-thread and page requests are made on behalf of the client by QEMU.
++QEMU performs 'wake' operations on the client's userfaultfd to allow it
++to continue after a page has arrived.
++
++.. note::
++  There are two future improvements that would be nice:
++    a) Some way to make QEMU ignorant of the addresses in the clients
++       address space
++    b) Avoiding the need for QEMU to perform ufd-wake calls after the
++       pages have arrived
++
++Retro-fitting postcopy to existing clients is possible:
++  a) A mechanism is needed for the registration with userfault as above,
++     and the registration needs to be coordinated with the phases of
++     postcopy.  In vhost-user extra messages are added to the existing
++     control channel.
++  b) Any thread that can block due to guest memory accesses must be
++     identified and the implication understood; for example if the
++     guest memory access is made while holding a lock then all other
++     threads waiting for that lock will also be blocked.
 --=20
 MST
