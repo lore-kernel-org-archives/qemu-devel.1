@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eyId9-0001eB-Bp
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:52:52 -0400
+	(envelope-from <mst@redhat.com>) id 1eyIf0-0002it-03
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eyId8-00080i-Hd
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:52:51 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45930)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eyId8-0007yT-9Q
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:52:50 -0400
-Received: by mail-wr0-x241.google.com with SMTP id h2so1981698wre.12
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 07:52:49 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1eyIex-0001Cl-C7
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:54:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49804 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyIex-0001CM-5W
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:54:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A96FA80AD211
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 14:54:42 +0000 (UTC)
+Date: Tue, 20 Mar 2018 16:54:35 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180320164842-mutt-send-email-mst@kernel.org>
+References: <20180312172124.56461-1-dgilbert@redhat.com>
+	<20180312172124.56461-18-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1521476505-30584-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1521476505-30584-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 20 Mar 2018 15:52:47 +0100
-Message-ID: <CAJ+F1CK2uEhbQ6UaPY5JTiXxRD==OyqBXTBzQpzrh-ud1NcaDQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180312172124.56461-18-dgilbert@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tpm: Set tpmRegValidSts flag to '1' in
- device reset
+Subject: Re: [Qemu-devel] [PATCH v5 17/29] vhost+postcopy: Helper to send
+ requests to source for shared pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +35,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, quintela@redhat.com, aarcange@redhat.com
 
-Hi
-
-On Mon, Mar 19, 2018 at 5:21 PM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> Fix the initialization of the tpmRegValidSts flag and set it to '1'
-> during device reset without expecting a write to another register.
-> This seems to also be the default behavior of real hardware.
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On Mon, Mar 12, 2018 at 05:21:12PM +0000, Dr. David Alan Gilbert (git) wr=
+ote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Provide a helper to be used by shared waker functions to request
+> shared pages from the source.
+> The last_rb pointer is moved into the incoming state since this
+> helper can update it as well as the main fault thread function.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/tpm/tpm_crb.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> index d8917cb..114b66e 100644
-> --- a/hw/tpm/tpm_crb.c
-> +++ b/hw/tpm/tpm_crb.c
-> @@ -145,8 +145,6 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr a=
-ddr,
->                               beenSeized, 0);
->              ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
->                               locAssigned, 1);
-> -            ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
-> -                             tpmRegValidSts, 1);
->              break;
->          }
->          break;
-> @@ -210,6 +208,8 @@ static void tpm_crb_reset(void *dev)
->
->      tpm_backend_reset(s->tpmbe);
->
-> +    ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
-> +                     tpmRegValidSts, 1);
->      ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
->                       InterfaceType, CRB_INTF_TYPE_CRB_ACTIVE);
->      ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+>  migration/migration.h    |  2 ++
+>  migration/postcopy-ram.c | 32 +++++++++++++++++++++++++++++---
+>  migration/postcopy-ram.h |  3 +++
+>  migration/trace-events   |  2 ++
+>  4 files changed, 36 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/migration/migration.h b/migration/migration.h
+> index d02a759331..83dc36b57a 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -49,6 +49,8 @@ struct MigrationIncomingState {
+>      int       userfault_event_fd;
+>      QEMUFile *to_src_file;
+>      QemuMutex rp_mutex;    /* We send replies from multiple threads */
+> +    /* RAMBlock of last request sent to source */
+> +    RAMBlock *last_rb;
+>      void     *postcopy_tmp_page;
+>      void     *postcopy_tmp_zero_page;
+>      /* PostCopyFD's for external userfaultfds & handlers of shared mem=
+ory */
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 4ab1b7d36d..83780576ca 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -525,6 +525,32 @@ static int ram_block_enable_notify(const char *blo=
+ck_name, void *host_addr,
+>      return 0;
+>  }
+> =20
+> +/*
+> + * Callback from shared fault handlers to ask for a page,
+> + * the page must be specified by a RAMBlock and an offset in that rb
+> + * Note: Only for use by shared fault handlers (in fault thread)
+> + */
+> +int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb=
+,
+> +                                 uint64_t client_addr, uint64_t rb_off=
+set)
+> +{
+> +    size_t pagesize =3D qemu_ram_pagesize(rb);
+> +    uint64_t aligned_rbo =3D rb_offset & ~(pagesize - 1);
+> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
+> +
+> +    trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr=
+(rb),
+> +                                       rb_offset);
+> +    /* TODO: Check bitmap to see if we already have the page */
+> +    if (rb !=3D mis->last_rb) {
+> +        mis->last_rb =3D rb;
+> +        migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+> +                                  aligned_rbo, pagesize);
+> +    } else {
+> +        /* Save some space */
+> +        migrate_send_rp_req_pages(mis, NULL, aligned_rbo, pagesize);
+> +    }
+> +    return 0;
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -535,9 +561,9 @@ static void *postcopy_ram_fault_thread(void *opaque=
+)
+>      int ret;
+>      size_t index;
+>      RAMBlock *rb =3D NULL;
+> -    RAMBlock *last_rb =3D NULL; /* last RAMBlock we sent part of */
+> =20
+>      trace_postcopy_ram_fault_thread_entry();
+> +    mis->last_rb =3D NULL; /* last RAMBlock we sent part of */
+>      qemu_sem_post(&mis->fault_thread_sem);
+> =20
+>      struct pollfd *pfd;
+> @@ -636,8 +662,8 @@ static void *postcopy_ram_fault_thread(void *opaque=
+)
+>               * Send the request to the source - we want to request one
+>               * of our host page sizes (which is >=3D TPS)
+>               */
+> -            if (rb !=3D last_rb) {
+> -                last_rb =3D rb;
+> +            if (rb !=3D mis->last_rb) {
+> +                mis->last_rb =3D rb;
+>                  migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+>                                           rb_offset, qemu_ram_pagesize(=
+rb));
+>              } else {
+> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> index c8ced3470b..d7afab07d7 100644
+> --- a/migration/postcopy-ram.h
+> +++ b/migration/postcopy-ram.h
+> @@ -164,5 +164,8 @@ struct PostCopyFD {
+>   */
+>  void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
+>  void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
+> +/* Callback from shared fault handlers to ask for a page */
+> +int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb=
+,
+> +                                 uint64_t client_addr, uint64_t offset=
+);
+> =20
+>  #endif
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 1e617ad7a6..7c910b5479 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -198,6 +198,8 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+>  postcopy_ram_incoming_cleanup_join(void) ""
+> +postcopy_request_shared_page(const char *sharer, const char *rb, uint6=
+4_t rb_offset) "for %s in %s offset 0x%"PRIx64
+> +
+>  save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wa=
+it: %" PRIu64 " milliseconds, %d iterations"
 
-Hmm, the specification says they default to 0. Except tpmEstablished
-to 1, which we should probably manipulate somehow ("The TPM clears
-this bit to 0 upon receipt of _TPM_Hash_End The TPM sets this bit to a
-1 when the TPM_LOC_CTRL_x.resetEstablishment field is set to 1.").
-Help welcome!
+So this function was missing a stub.
 
-Shouldn't it also set locAssigned to 1 in this case ?
+For the record, since 1842bdfdbac2ec46f2934d8914c874db83dd1344 we have
+a copy of linux system headers so ifdef for NR_userfaultfd
+is unnecessary on linux.
 
-I am not very familiar with the locality support, since I didn't
-implement it for CRB. You may have more clues what is expected here.
+Let's just drop it?
 
---=20
-Marc-Andr=C3=A9 Lureau
+> --=20
+> 2.14.3
