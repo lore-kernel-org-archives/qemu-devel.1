@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyKpL-00005h-Ip
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:13:36 -0400
+	(envelope-from <mst@redhat.com>) id 1eyKtJ-0003PL-Iq
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyKpK-0007uk-Me
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:13:35 -0400
-Date: Tue, 20 Mar 2018 19:12:59 +0200
+	(envelope-from <mst@redhat.com>) id 1eyKtG-0002RR-EQ
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:17:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36246 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyKtG-0002Qu-AG
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:17:38 -0400
+Date: Tue, 20 Mar 2018 19:17:35 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180320191156-mutt-send-email-mst@kernel.org>
-References: <1521510562-529051-1-git-send-email-mst@redhat.com>
-	<8f06e1e3-4823-d8e8-43bd-c092c523849e@vivier.eu>
-	<20180320094406.GD4530@redhat.com>
-	<20180320141107-mutt-send-email-mst@kernel.org>
-	<20180320121841.GN4530@redhat.com>
-	<20180320142756-mutt-send-email-mst@kernel.org>
-	<20180320123900.GO4530@redhat.com>
-	<20180320133216.u4hdijttdnyjbfpu@sirius.home.kraxel.org>
-	<20180320134117.GS4530@redhat.com>
-	<8e14f681-6572-062b-c503-c5ad091793d7@redhat.com>
+Message-ID: <1521566230-111929-4-git-send-email-mst@redhat.com>
+References: <1521566230-111929-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8e14f681-6572-062b-c503-c5ad091793d7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu: include generated files with <> and
- not ""
+In-Reply-To: <1521566230-111929-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 3/3] postcopy: drop unnecessary conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Josh Durgin <jdurgin@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Michael Walle <michael@walle.cc>, Keith Busch <keith.busch@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Fabien Chouteau <chouteau@adacore.com>, Amit Shah <amit@kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <minyard@acm.org>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Peter Chubb <peter.chubb@nicta.com.au>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Max Filippov <jcmvbkbc@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Yuval Shaia <yuval.shaia@oracle.com>, David Hildenbrand <david@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, kvm@vger.kernel.org, qemu-block@nongnu.org, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>
 
-On Tue, Mar 20, 2018 at 02:54:37PM +0100, Max Reitz wrote:
-> But I guess the main advantage with using this rule I see is that it's
-> better for people reading the code.  It's just nice to know whether a
-> file belongs to qemu or not by just looking at the #include statement.
-> (Note that this implies that it is indeed more difficult to determine
-> whether a header belongs to qemu than whether it sits in the same
-> directory as the C file, though!)  So I think the old (current) rule is
-> better for reading code, Michael's rule would be better for writing
-> code.  I think reading code is what should be easier.
+We have our own copy of unistd so there is no
+need to check for symbols present there.
 
-How about prefixing all internal headers with qemu/ ?
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ migration/postcopy-ram.c | 4 +---
+ tests/migration-test.c   | 2 +-
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-That's a way to avoid namespace collisions that is actually standard.
-
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index efd7793..027c02c 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -86,7 +86,7 @@ int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
+ #include <asm/types.h> /* for __u64 */
+ #endif
+ 
+-#if defined(__linux__) && defined(__NR_userfaultfd) && defined(CONFIG_EVENTFD)
++#if defined(__linux__) && defined(CONFIG_EVENTFD)
+ #include <sys/eventfd.h>
+ #include <linux/userfaultfd.h>
+ 
+@@ -97,7 +97,6 @@ int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
+  *
+  * Returns: true on success
+  *
+- * __NR_userfaultfd - should be checked before
+  *  @features: out parameter will contain uffdio_api.features provided by kernel
+  *              in case of success
+  */
+@@ -107,7 +106,6 @@ static bool receive_ufd_features(uint64_t *features)
+     int ufd;
+     bool ret = true;
+ 
+-    /* if we are here __NR_userfaultfd should exists */
+     ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
+     if (ufd == -1) {
+         error_report("%s: syscall __NR_userfaultfd failed: %s", __func__,
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 422bf1a..e5dcedb 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -32,7 +32,7 @@ bool got_stop;
+ #include <sys/vfs.h>
+ #endif
+ 
+-#if defined(__linux__) && defined(__NR_userfaultfd) && defined(CONFIG_EVENTFD)
++#if defined(__linux__) && defined(CONFIG_EVENTFD)
+ #include <sys/eventfd.h>
+ #include <sys/ioctl.h>
+ #include <linux/userfaultfd.h>
 -- 
-MST 
+MST
