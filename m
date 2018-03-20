@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eyEPY-0001y6-Ut
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:22:33 -0400
+	(envelope-from <marcel@redhat.com>) id 1eyEXP-0006DN-Dr
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eyEPU-00020z-WD
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:22:32 -0400
-References: <1521468046-10400-1-git-send-email-thuth@redhat.com>
-	<66c6e02a-a082-b9ef-f13c-3cdd8b0775f7@ilande.co.uk>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <71f8966d-9c5f-a5c5-6a93-9fb11edeed43@redhat.com>
-Date: Tue, 20 Mar 2018 11:22:09 +0100
+	(envelope-from <marcel@redhat.com>) id 1eyEXL-0000yE-EY
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:30:39 -0400
+References: <20180319215335.1119213-1-eblake@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <56ec7ba5-a6e1-2268-3313-8babc640c024@redhat.com>
+Date: Tue, 20 Mar 2018 12:30:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <66c6e02a-a082-b9ef-f13c-3cdd8b0775f7@ilande.co.uk>
+In-Reply-To: <20180319215335.1119213-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/misc/macio: Fix crash when
- listing device properties of macio device
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12] rdma: Fix 32-bit compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+Cc: qemu-trivial@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>
 
-On 20.03.2018 06:05, Mark Cave-Ayland wrote:
-> On 19/03/18 14:00, Thomas Huth wrote:
->=20
->> The macio-newworld device can currently be used to abort QEMU
->> unexpectedly:
->>
->> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=3Dqtest -qmp stdio
->> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
->> =C2=A0 "package": "build-all"}, "capabilities": []}}
->> { 'execute': 'qmp_capabilities' }
->> {"return": {}}
->> { 'execute': 'device-list-properties',
->> =C2=A0=C2=A0 'arguments': {'typename': 'macio-newworld'}}
->> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
->> Device 'serial0' is in use
->> Aborted (core dumped)
->>
->> qdev properties should be set during realize(), not during
->> instance_init(),
->> so move the related code there to fix this problem.
->=20
-> Ah right, presumably this is because of the reference to serial_hds
-> again?
+Hi Eric,
 
-Right.
+On 19/03/2018 23:53, Eric Blake wrote:
+> Use the correct printf formats, so that a 32-bit compile doesn't
+> spit out lots of warnings about %lx being incompatible with uint64_t.
+> Broken since initial commit ef6d4ccd.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> I don't know if 'make vm-build-ubuntu.i368' would catch this (it failed
+> for me for other reasons); I found it via a 32-bit rawhide VM.
+> 
 
-> The patch looks good, although given that it affects
-> macio_instance_init() and macio_common_realize() then I would have
-> expected this to have failed on the macio-oldworld device too (or
-> perhaps you were just unlucky that this was the first macio-*world
-> device enumerated).
+I couldn't run 'make vm-build-ubuntu.i368' either. (Stuck on "Booting from Hard Disk...")
 
-Yes, the bug triggers also with the macio-oldworld device. I just hit it
-with the newworld device first.
+I run make docker-test-build@debian-win32-cross to be sure it compiles on 32bit arch,
+however I found out the docker configuration results in 'RDMA support no', so it will not help.
 
- Thomas
+Fam, is there any way the docker image can be updated with the RDMA libraries
+so we can check this too?
+
+>  hw/rdma/rdma_backend.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index e306fba5344..89020fdcf62 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -656,7 +656,8 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp)
+>  #define CHK_ATTR(req, dev, member, fmt) ({ \
+>      pr_dbg("%s="fmt","fmt"\n", #member, dev.member, req->member); \
+>      if (req->member > dev.member) { \
+> -        warn_report("%s = 0x%lx is higher than host device capability 0x%lx", \
+> +        warn_report("%s = 0x%" PRIx64 " is higher than host device " \
+> +                    "capability 0x%" PRIx64, \
+>                      #member, (uint64_t)req->member, (uint64_t)dev.member); \
+>          req->member = dev.member; \
+>      } \
+> 
+
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+
+
+Thanks,
+Marcel
