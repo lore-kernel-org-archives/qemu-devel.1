@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyLSq-0007e6-0R
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1eyLT7-0007sj-8d
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyLSo-000410-Rk
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:24 -0400
-References: <20180320135515.16823-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <665e0ccd-4440-4e0e-30f9-e38537795325@redhat.com>
-Date: Tue, 20 Mar 2018 12:54:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eyLT3-00043I-FT
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44200)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eyLT3-00042T-4m
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:37 -0400
+Date: Tue, 20 Mar 2018 14:54:27 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180320175427.GU3417@localhost.localdomain>
+References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
+	<1520888449-4352-3-git-send-email-babu.moger@amd.com>
+	<20180316180006.GH28578@localhost.localdomain>
+	<CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180320135515.16823-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] qcow2: Reset free_cluster_index
- when allocating a new refcount block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD Processor
+ Cache Information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "Hook, Gary" <Gary.Hook@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 03/20/2018 08:55 AM, Alberto Garcia wrote:
-> When we try to allocate new clusters we first look for available ones
-> starting from s->free_cluster_index and once we find them we increase
-> their reference counts. Before we get to call update_refcount() to do
-> this last step s->free_cluster_index is already pointing to the next
-> cluster after the ones we are trying to allocate.
+On Tue, Mar 20, 2018 at 05:25:52PM +0000, Moger, Babu wrote:
+> Hi Eduardo, Thanks for the comments. Please see the response inline.
 > 
- > During update_refcount() it may happen however that we also need to
- > allocate a new refcount block in order to store the refcounts of these
- > new clusters
-
-Your changes to test 121 covers this...
-
- > (and to complicate things further that may also require
- > us to grow the refcount table).
-
-...but not this.  Is it worth also trying to cover this case in the 
-testsuite as well?  Probably made easier if you use a refcount_order of 
-6 instead of the default of 4, so that it is easier to make the refcount 
-table spill into a second cluster because refcount blocks have fewer 
-entries.
-
-> This can be reproduced easily:
+> > -----Original Message-----
+> > From: Eduardo Habkost <ehabkost@redhat.com>
+> > Sent: Friday, March 16, 2018 1:00 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
+> > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> > <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
+> > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
+> > devel@nongnu.org
+> > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
+> > Processor Cache Information
+> > 
+> > On Mon, Mar 12, 2018 at 05:00:46PM -0400, Babu Moger wrote:
+> > > From: Stanislav Lanci <pixo@polepetko.eu>
+> > >
+> > > Add information for cpuid 0x8000001D leaf. Populate cache topology
+> > information
+> > > for different cache types(Data Cache, Instruction Cache, L2 and L3)
+> > supported
+> > > by 0x8000001D leaf. Please refer Processor Programming Reference (PPR)
+> > for AMD
+> > > Family 17h Model for more details.
+> > >
+> > > Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
+> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > 
+> > The new CPUID leaves don't seem to match the existing AMD cache
+> > information
+> > leaves.  Is this intentional?  Why?
 > 
->       qemu-img create -f qcow2 -o cluster_size=512 hd.qcow2 1M
->       qemu-io -c 'write 0 124k' hd.qcow2
+> It is not intentional. These values are from older family of processors. These values have changed from Family 14  or later.
+> The latest one is Family 17. You can see the differences here.
+>  https://support.amd.com/TechDocs/41131.pdf
+> https://support.amd.com/TechDocs/55072_AMD_Family_15h_Models_70h-7Fh_BKDG.pdf
+> https://support.amd.com/TechDocs/54945_PPR_Family_17h_Models_00h-0Fh.pdf
 > 
-> After this the image has 132608 bytes (256 clusters), and the refcount
-> block is full. If we write 512 more bytes it should allocate two new
-> clusters: the data cluster itself and a new refcount block.
+> Some of these are bugs in our code. For some we need to add checks for the family and correct these values.
+> You understand the code much better than me. Correct me if I missed something. 
 > 
->       qemu-io -c 'write 124k 512' hd.qcow2
+> Note that older family of processors don't support topology extensions.  
 
-Nice test case!  And yes, 512-byte clusters are easier for proving when 
-we have inefficient allocation strategies.
+If you want to make the cache size/topology look different
+depending on the CPU model/options, this would require more work,
+but it would be an interesting feature.
 
-> What this patch does is reset s->free_cluster_index to its previous
-> value when alloc_refcount_block() returns -EAGAIN. This way the caller
-> will try to allocate again the original clusters if they are still
-> free.
-> 
-> The output of iotest 026 also needs to be updated because now that
-> images have no holes some tests fail at a different point and the
-> number of leaked clusters is different.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->   block/qcow2-refcount.c     |  7 +++++++
->   tests/qemu-iotests/026.out |  6 +++---
->   tests/qemu-iotests/121     | 20 ++++++++++++++++++++
->   tests/qemu-iotests/121.out | 10 ++++++++++
->   4 files changed, 40 insertions(+), 3 deletions(-)
+The "i386: Helpers to encode cache information consistently"
+patch I sent last week might be a useful starting point for that.
 
-Long-standing bug, but it IS a bug fix, so I think it is safe for 2.12.
-
-> 
-> +            /* If the caller needs to restart the search for free clusters,
-> +             * try the same ones first to see if they're still free. */
-> +            if (ret == -EAGAIN) {
-> +                if (s->free_cluster_index > (start >> s->cluster_bits)) {
-> +                    s->free_cluster_index = (start >> s->cluster_bits);
-> +                }
-
-Is there any harm in making this assignment unconditional, instead of 
-only doing it when free_cluster_index has grown larger than start?  [And 
-unrelated, but it might be nice to do a followup cleanup to track 
-free_cluster_offset by bytes instead of having to shift 
-free_cluster_index everywhere]
-
-At any rate, my comments can be deferred to later if desired, so
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+If you plan to implement that, please keep in mind that existing
+CPUID cache info needs to be kept on previous machine-types (this
+is implemented by adding QOM properties that can be used to
+enable the old behavior, and by setting them at
+MachineClass::compat_props).
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
