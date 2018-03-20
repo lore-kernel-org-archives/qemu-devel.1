@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ey7w1-0006o2-BP
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:27:38 -0400
+	(envelope-from <jcody@redhat.com>) id 1ey7zB-0001bA-1Z
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ey7vy-0004bV-1U
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:27:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51352 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ey7vx-0004bG-Sc
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:27:33 -0400
-From: Jason Wang <jasowang@redhat.com>
-References: <152120204902.1103.7114773412109402452.stgit@bahia.lan>
-	<181e938f-76b7-84b2-96f1-1f8832236e23@redhat.com>
-Message-ID: <1301d99e-9cc8-e481-985e-4afe9bd6b82c@redhat.com>
-Date: Tue, 20 Mar 2018 11:27:26 +0800
+	(envelope-from <jcody@redhat.com>) id 1ey7z9-0006wO-T3
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:30:53 -0400
+Date: Mon, 19 Mar 2018 23:30:41 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180320033041.GF2962@localhost.localdomain>
+References: <20180228180507.3964-1-mreitz@redhat.com>
+	<20180228180507.3964-5-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <181e938f-76b7-84b2-96f1-1f8832236e23@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] virtio_net: flush uncompleted TX on
- reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180228180507.3964-5-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 04/16] block/mirror: Pull
+ out mirror_perform()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +24,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: R Nageswara Sastry <nasastry@in.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Wed, Feb 28, 2018 at 07:04:55PM +0100, Max Reitz wrote:
+> When converting mirror's I/O to coroutines, we are going to need a point
+> where these coroutines are created.  mirror_perform() is going to be
+> that point.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/mirror.c | 51 +++++++++++++++++++++++++++++----------------------
+>  1 file changed, 29 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index f5bf620942..d197c8936e 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -82,6 +82,12 @@ typedef struct MirrorOp {
+>      uint64_t bytes;
+>  } MirrorOp;
+>  
+> +typedef enum MirrorMethod {
+> +    MIRROR_METHOD_COPY,
+> +    MIRROR_METHOD_ZERO,
+> +    MIRROR_METHOD_DISCARD,
+> +} MirrorMethod;
+> +
+>  static BlockErrorAction mirror_error_action(MirrorBlockJob *s, bool read,
+>                                              int error)
+>  {
+> @@ -321,6 +327,22 @@ static void mirror_do_zero_or_discard(MirrorBlockJob *s,
+>      }
+>  }
+>  
+> +static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
+> +                               unsigned bytes, MirrorMethod mirror_method)
+> +{
+> +    switch (mirror_method) {
+> +    case MIRROR_METHOD_COPY:
+> +        return mirror_do_read(s, offset, bytes);
+> +    case MIRROR_METHOD_ZERO:
+> +    case MIRROR_METHOD_DISCARD:
+> +        mirror_do_zero_or_discard(s, offset, bytes,
+> +                                  mirror_method == MIRROR_METHOD_DISCARD);
+> +        return bytes;
+> +    default:
+> +        abort();
+> +    }
+> +}
+> +
+>  static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>  {
+>      BlockDriverState *source = s->source;
+> @@ -387,11 +409,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>          int ret;
+>          int64_t io_bytes;
+>          int64_t io_bytes_acct;
+> -        enum MirrorMethod {
+> -            MIRROR_METHOD_COPY,
+> -            MIRROR_METHOD_ZERO,
+> -            MIRROR_METHOD_DISCARD
+> -        } mirror_method = MIRROR_METHOD_COPY;
+> +        MirrorMethod mirror_method = MIRROR_METHOD_COPY;
+>  
+>          assert(!(offset % s->granularity));
+>          ret = bdrv_block_status_above(source, NULL, offset,
+> @@ -429,22 +447,11 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>          }
+>  
+>          io_bytes = mirror_clip_bytes(s, offset, io_bytes);
+> -        switch (mirror_method) {
+> -        case MIRROR_METHOD_COPY:
+> -            io_bytes = io_bytes_acct = mirror_do_read(s, offset, io_bytes);
+> -            break;
+> -        case MIRROR_METHOD_ZERO:
+> -        case MIRROR_METHOD_DISCARD:
+> -            mirror_do_zero_or_discard(s, offset, io_bytes,
+> -                                      mirror_method == MIRROR_METHOD_DISCARD);
+> -            if (write_zeroes_ok) {
+> -                io_bytes_acct = 0;
+> -            } else {
+> -                io_bytes_acct = io_bytes;
+> -            }
+> -            break;
+> -        default:
+> -            abort();
+> +        io_bytes = mirror_perform(s, offset, io_bytes, mirror_method);
+> +        if (mirror_method != MIRROR_METHOD_COPY && write_zeroes_ok) {
+> +            io_bytes_acct = 0;
+> +        } else {
+> +            io_bytes_acct = io_bytes;
+>          }
+>          assert(io_bytes);
+>          offset += io_bytes;
+> @@ -638,7 +645,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>                  continue;
+>              }
+>  
+> -            mirror_do_zero_or_discard(s, offset, bytes, false);
+> +            mirror_perform(s, offset, bytes, MIRROR_METHOD_ZERO);
+>              offset += bytes;
+>          }
+>  
+> -- 
+> 2.14.3
+> 
+> 
 
->> =C2=A0 -static
->> =C2=A0 void qemu_flush_or_purge_queued_packets(NetClientState *nc, boo=
-l=20
->> purge)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nc->receive_disabled =3D 0;
->>
->>
->
-> Applied and queued for -stable.
->
-> Thanks
->
-
-Unfortunately, this breaks hotplug test:
-
- =C2=A0TEST: tests/virtio-net-test... (pid=3D7117)
-/x86_64/virtio/net/pci/basic: OK
-/x86_64/virtio/net/pci/rx_stop_cont: OK
-/x86_64/virtio/net/pci/hotplug: Broken pipe
-FAIL
-
-Thanks
+Reviewed-by: Jeff Cody <jcody@redhat.com>
