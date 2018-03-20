@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyFZm-0005KW-LY
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:37:11 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1eyFa3-0005TU-CS
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyFZl-0007ks-MZ
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:37:10 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyFZl-0007kU-H4
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:37:09 -0400
-Received: by mail-oi0-x243.google.com with SMTP id t16-v6so1018701oih.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 04:37:09 -0700 (PDT)
+	(envelope-from <zhaoshenglong@huawei.com>) id 1eyFa2-0008HK-JA
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:37:27 -0400
+Message-ID: <5AB0F254.3050503@huawei.com>
+Date: Tue, 20 Mar 2018 19:36:52 +0800
+From: Shannon Zhao <zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20180319202432.1112431-1-eblake@redhat.com>
-References: <20180319202432.1112431-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Mar 2018 11:36:48 +0000
-Message-ID: <CAFEAcA9juCn04G2cixAejHO+d-XH4NbDdHzE06qdR-NV0wqu8A@mail.gmail.com>
+References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
+	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
+	<CAFEAcA96qV_f7i_36Yzb-QV7W9SRHKfJpg=rvv3tia2X-Xi7QQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA96qV_f7i_36Yzb-QV7W9SRHKfJpg=rvv3tia2X-Xi7QQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v4 00/38] QAPI patches for 2018-03-12,
- 2.12 softfreeze
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 2/2] arm_gicv3_kvm:
+ kvm_dist_get/put: skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-On 19 March 2018 at 20:23, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 2c8cfc0b52b5a4d123c26c0b5fdf941be24805=
-be:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
-ging (2018-03-19 11:44:26 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-12-v4
->
-> for you to fetch changes up to 02e3092db3f9b84ed6aae54e3b71d4dc4196c7eb:
->
->   qapi: Pass '-u' when doing non-silent diff (2018-03-19 14:58:38 -0500)
->
-> since v3:
-> silence clang's ubsan warnings about nonportable container_of(NULL)
-> [sending only the one changed patch]
->
-> ----------------------------------------------------------------
-> qapi patches for 2018-03-12, 2.12 softfreeze
->
-> - Marc-Andr=C3=A9 Lureau: 0/4 qapi: generate a literal qobject for intros=
-pection
-> - Max Reitz: 0/7 block: Handle null backing link
-> - Daniel P. Berrange: chardev: tcp: postpone TLS work until machine done
-> - Peter Xu: 00/23 QMP: out-of-band (OOB) execution support
-> - Vladimir Sementsov-Ogievskiy: 0/2 block latency histogram
-> - Eric Blake: qapi: Pass '-u' when doing non-silent diff
->
 
-Applied, thanks.
 
--- PMM
+On 2018/3/20 19:22, Peter Maydell wrote:
+> On 20 March 2018 at 07:26, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+>> While we skip the GIC_INTERNAL irqs, we don't change the register offset
+>> accordingly. This will overlap the GICR registers value and leave the
+>> last GIC_INTERNAL irq's registers out of update.
+>>
+>> Fix this by skipping the registers banked by GICR.
+>>
+> 
+> I'm still not entirely sure what the underlying problem
+> you're trying to fix is...
+> 
+> Do we fail to correctly migrate a VM without this change?
+> Does the code work on some host CPU/GIC implementations but
+> not others? Is this just improving efficiency by avoiding
+> doing some unnecessary work?
+> 
+When we reboot a VM and before entering uefi or guest kernel, we expect
+all these registers staying at the initial state. But currently these
+registers of the last 32 irqs are not reset. For example, the PRIORITY
+of irq from 32 to 255 is 0 but the PRIORITY of irq from 256 to 287 is
+0xa0(Linux kernel set the PRIORITY to 0xa0 by default).
+
+When migrating a VM, since we don't save and restore the registers of
+the last 32 irq, so the PRIORITY is 0 while we expecting 0xa0.
+And also it will overlap the PRIORITY of SGIs and PPIs.
+
+We don't fail to migrate a vm since currently we don't use the last 32
+irqs in virt machine. But the bug is still there.
+
+Thanks,
+-- 
+Shannon
