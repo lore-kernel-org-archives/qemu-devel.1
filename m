@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ey8xN-0003Kn-O9
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 00:33:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1ey90E-0004IM-6q
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 00:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ey8xK-0002cu-M7
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 00:33:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36856 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ey8xK-0002cD-H9
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 00:33:02 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 977A08D746
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 04:32:57 +0000 (UTC)
-References: <20180320033919-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <1e6df744-65d6-745d-81ee-cd5f8f65bd36@redhat.com>
-Date: Tue, 20 Mar 2018 06:32:45 +0200
+	(envelope-from <bounces@canonical.com>) id 1ey908-000469-Vz
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 00:36:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ey908-00045e-Q1
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 00:35:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ey907-0008SI-4C
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 04:35:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1253C2E80CD
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 04:35:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180320033919-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] pvrdma build with clang fails
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Mar 2018 04:17:21 -0000
+From: Launchpad Bug Tracker <1385934@bugs.launchpad.net>
+Reply-To: Bug 1385934 <1385934@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141026182810.4047.56419.malonedeb@soybean.canonical.com>
+Message-Id: <152151944145.32465.13809173126919772230.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1385934] Re: USB with passthrougth guest cannot
+ enumerate USB host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.a@redhat.com>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Hi Michael,
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On 20/03/2018 3:40, Michael S. Tsirkin wrote:
-> Marcel, could you pls try a pvrdma build with clang?
-> It seems to fail due to enum type mismatches.
-> I guess this is something worth fixing.
-> 
+-- =
 
-Sure, I will fix it.
-Marcel
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1385934
+
+Title:
+  USB with passthrougth guest cannot enumerate USB host
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Following the guide at http://www.linux-kvm.org/page/USB_Host_Device_Assi=
+gned_to_Guest
+  Qemu is launched with qemu-system-x86_64 /dev/vgstripe/kvm_wifi -enable-k=
+vm -m 512 -k fr -net nic -net tap,ifname=3Dtap1,script=3D/bin/ifup.script -=
+kernel /usr/src/linux_git/arch/x86_64/boot/bzImage -append root=3D/dev/sda =
+-usb -device usb-host,hostbus=3D1,hostaddr=3D6
+  The USB device does not show and USB stack seems not working
+  On the guest:
+  dmesg |grep -i usb
+  [    1.416966] hub 1-0:1.0: USB hub found
+  [    1.420431] usbcore: registered new interface driver usb-storage
+  [    1.445374] usbcore: registered new interface driver usbhid
+  [    1.446839] usbhid: USB HID core driver
+  [    1.863226] usb 1-1: new low-speed USB device number 2 using uhci_hcd
+  [    2.126173] usb 1-1: Invalid ep0 maxpacket: 64
+  [    2.373161] usb 1-1: new low-speed USB device number 3 using uhci_hcd
+  [    2.648112] usb 1-1: Invalid ep0 maxpacket: 64
+  [    2.892404] usb 1-1: new low-speed USB device number 4 using uhci_hcd
+  [    2.913001] usb 1-1: Invalid ep0 maxpacket: 64
+  [    3.161367] usb 1-1: new low-speed USB device number 5 using uhci_hcd
+  [    3.180070] usb 1-1: Invalid ep0 maxpacket: 64
+  [    3.181633] usb usb1-port1: unable to enumerate USB device
+  lsusb
+  Bus 001 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+
+  On the host:
+  lsusb
+  Bus 001 Device 006: ID 0457:0163 Silicon Integrated Systems Corp. SiS163U=
+ 802.11 Wireless LAN Adapter
+  qemu-system-x86_64 --version
+  QEMU emulator version 2.1.2, Copyright (c) 2003-2008 Fabrice Bellard
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1385934/+subscriptions
