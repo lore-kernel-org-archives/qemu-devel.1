@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyMEW-000283-FU
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:43:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyMFy-0003Tx-Fa
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyMEV-0002ME-On
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:43:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyMFx-0003Gm-MI
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:45:10 -0400
 References: <20180320173632.25480-1-kwolf@redhat.com>
-	<20180320173632.25480-10-kwolf@redhat.com>
+	<20180320173632.25480-11-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9f3f550c-2941-bf65-4a5f-1b3933c68352@redhat.com>
-Date: Tue, 20 Mar 2018 13:43:33 -0500
+Message-ID: <dcd4ff81-6f3d-b7ae-f334-70ae836e21aa@redhat.com>
+Date: Tue, 20 Mar 2018 13:45:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180320173632.25480-10-kwolf@redhat.com>
+In-Reply-To: <20180320173632.25480-11-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12 09/12] vhdx: Require power-of-two
- block size on create
+Subject: Re: [Qemu-devel] [PATCH for-2.12 10/12] vhdx: Don't use
+ error_setg_errno() with constant errno
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,22 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, den@openvz.org, jcody@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
 On 03/20/2018 12:36 PM, Kevin Wolf wrote:
-> Images with a non-power-of-two block size are invalid and cannot be
-> opened. Reject such block sizes when creating an image.
+> error_setg_errno() is meant for cases where we got an errno from the OS
+> that can add useful extra information to an error message. It's
+> pointless if we pass a constant errno, these cases should use plain
+> error_setg().
+
+Well, it DOES let you get the libc-specific spelling of the strerror for 
+that errno (not all libc report the same string) - but you're right that 
+it didn't add much here.
+
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->   block/vhdx.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
+>   block/vhdx.c | 9 ++++-----
+>   1 file changed, 4 insertions(+), 5 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/block/vhdx.c b/block/vhdx.c
-> index f1b97f4b49..ca211a3196 100644
-> --- a/block/vhdx.c
-> +++ b/block/vhdx.c
-> @@ -1877,6 +1877,10 @@ static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
->           error_setg_errno(errp, EINVAL, "Block size must be a multiple of 1 MB");
->           return -EINVAL;
->       }
-> +    if (!is_power_of_2(block_size)) {
-> +        error_setg(errp, "Block size must be a power of two");
-> +        return -EINVAL;
-> +    }
->       if (block_size > VHDX_BLOCK_SIZE_MAX) {
->           error_setg_errno(errp, EINVAL, "Block size must not exceed %d",
->                            VHDX_BLOCK_SIZE_MAX);
-> 
 
 -- 
 Eric Blake, Principal Software Engineer
