@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyCqb-0003ZL-RW
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:42:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1eyCzB-0005vD-HJ
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyCqa-0007ck-JV
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:42:21 -0400
-References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
-	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <33a7bc59-c457-03d0-90bf-ab5b2d2d46cd@redhat.com>
-Date: Tue, 20 Mar 2018 09:42:08 +0100
+	(envelope-from <bounces@canonical.com>) id 1eyCz8-00070w-6p
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:51:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eyCz7-0006xs-Vn
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:51:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eyCz4-0002mX-Jn
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:51:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 111DA2E80EB
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:51:06 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Mar 2018 08:36:11 -0000
+From: ChristianEhrhardt <1740219@bugs.launchpad.net>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <152153497175.14588.16746084648089001138.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Shannon,
-On 20/03/18 08:26, Shannon Zhao wrote:
-> While we skip the GIC_INTERNAL irqs, we don't change the register offset
-> accordingly. This will overlap the GICR registers value and leave the
-> last GIC_INTERNAL irq's registers out of update.
-> 
-> Fix this by skipping the registers banked by GICR.
-> 
-> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-> ---
->  hw/intc/arm_gicv3_kvm.c | 38 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 38 insertions(+)
-> 
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index 3536795..d423cba 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -136,6 +136,12 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
->      int irq;
->  
->      field = (uint32_t *)bmp;
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-> +     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
-> +     * sync them.
-> +     */
-> +    offset += (8 * sizeof(uint32_t));
->      for_each_dist_irq_reg(irq, s->num_irq, 8) {
->          kvm_gicd_access(s, offset, &reg, false);
->          *field = reg;
-> @@ -150,6 +156,12 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
->      int irq;
->  
->      field = (uint32_t *)bmp;
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-> +     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
-> +     * sync them.
-> +     */
-> +    offset += (8 * sizeof(uint32_t));
->      for_each_dist_irq_reg(irq, s->num_irq, 8) {
->          reg = *field;
->          kvm_gicd_access(s, offset, &reg, true);
-> @@ -164,6 +176,12 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
->      uint32_t reg;
->      int irq;
->  
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-> +     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
-> +     * them.
-> +     */
-> +    offset += (2 * sizeof(uint32_t));
->      for_each_dist_irq_reg(irq, s->num_irq, 2) {
->          kvm_gicd_access(s, offset, &reg, false);
->          reg = half_unshuffle32(reg >> 1);
-> @@ -181,6 +199,12 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
->      uint32_t reg;
->      int irq;
->  
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-> +     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
-> +     * them.
-> +     */
-> +    offset += (2 * sizeof(uint32_t));
->      for_each_dist_irq_reg(irq, s->num_irq, 2) {
->          reg = *gic_bmp_ptr32(bmp, irq);
->          if (irq % 32 != 0) {
-> @@ -222,6 +246,12 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
->      uint32_t reg;
->      int irq;
->  
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the
-> +     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
-> +     * are always RAZ/WI. The corresponding functionality is replaced by the
-> +     * GICR registers. So it doesn't need to sync them.
-> +     */
-> +    offset += (1 * sizeof(uint32_t));
->      for_each_dist_irq_reg(irq, s->num_irq, 1) {
->          kvm_gicd_access(s, offset, &reg, false);
->          *gic_bmp_ptr32(bmp, irq) = reg;
-> @@ -235,6 +265,14 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
->      uint32_t reg;
->      int irq;
->  
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the
-> +     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
-> +     * are always RAZ/WI. The corresponding functionality is replaced by the
-> +     * GICR registers. So it doesn't need to sync them.
-> +     */
-> +    offset += (1 * sizeof(uint32_t));
-I wonder we couldn't create a new for_each_dist_irq_reg() macro taking
-the offset and clroffset and integrating that shift inside?
+>From Alistair Buxton (a-j-buxton) on bug 1756807:
+I just tested the patch from https://bugs.launchpad.net/qemu/+bug/1740219 a=
+nd it fixes the problem for me. Specifically I only tried the final patch o=
+f the series.
 
-> +    if (clroffset != 0)
-nit style issue: brace needed here
+I duped the bugs onto this one since it is older and has a suggested
+patch on the ML.
 
-Besides Reviewed-by: Eric Auger <eric.auger@redhat.com>
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
 
-Thanks
+-- =
 
-Eric
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
 
-> +        clroffset += (1 * sizeof(uint32_t));
->      for_each_dist_irq_reg(irq, s->num_irq, 1) {
->          /* If this bitmap is a set/clear register pair, first write to the
->           * clear-reg to clear all bits before using the set-reg to write
-> 
+Title:
+  static linux-user ARM emulation has several-second startup time
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  static linux-user emulation has several-second startup time
+
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
+
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
+
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
+
+  ----
+
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
+
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
+
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
+
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
+
+  ----
+
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
