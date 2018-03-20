@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eyJAc-0001T0-Vf
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:27:30 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eyJHH-0003Oo-6y
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eyJAW-000708-UR
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:27:26 -0400
-Date: Tue, 20 Mar 2018 15:27:04 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180320152704.GW4530@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180320150421.GC4865@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1eyJHC-000489-Gw
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:34:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35128 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyJHC-000472-B4
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:34:14 -0400
+References: <41b63d9b-c551-4e22-28f5-1144724dff2e@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b446d661-f0f1-2fcb-ada1-b08af58a9c27@redhat.com>
+Date: Tue, 20 Mar 2018 16:34:01 +0100
 MIME-Version: 1.0
+In-Reply-To: <41b63d9b-c551-4e22-28f5-1144724dff2e@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180320150421.GC4865@localhost.localdomain>
-Subject: Re: [Qemu-devel] luks: Initial content of unwritten blocks
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Some thoughts about per-queue iothreads in
+ VirtIOBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com
+To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, "Denis V. Lunev" <den@openvz.org>
 
-On Tue, Mar 20, 2018 at 04:04:21PM +0100, Kevin Wolf wrote:
-> Hi,
+On 20/03/2018 15:45, Edgar Kaziakhmedov wrote:
+> Hi!
 > 
-> I just tried to add luks support to qemu-iotests 025, a basic resize
-> test, which made me realise that luks doesn't read zeros in unwritten
-> blocks (which makes the test fail).
+> Recently, I have started working on the real multi-queue implementation
+> for the VirtIOBlock device and came to conclusion
+> that for the time being it may work only with RAW images. The reason is
+> obviously lack of the true thread-safe multi-queue block
+> layer, but recently I have seen the following message from Stefan
 > 
-> The reason for this is that we get zeros on the protocol layer (i.e. in
-> the encrpyted data as it is on the disk), but not in the decrpyted
-> format layer.
+> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04791.html
+> 
+> It appears like Paolo has already started implementing this feature, so
+> I wonder whether the work is abandoned or not, and
+> could anyone point me out to any of those patches
 
-That is basically the same that you would see with dm-crypt luks impl
-over a physical device. ie if /dev/sda1 is filled with zeros (or sparse
-such that reading from unallocated sectors returns zeros), and you then
-format it with luks, and then read data you'll not get zeros - you'll
-get the decrypted zeros which is essentially random garbage. The user
-would have to make a concious decision to fill the disk with all zeros
-in the cipher text if they want their newly formatted luks voilume
-to return all zeros.
+I have almost finished getting rid of the AioContext lock
+(aio_context_acquire and aio_context_release), which is the final step
+of thread-safety and a prerequisite for multiqueue.  Unfortunately it's
+stalled a bit due to all the Meltdown and Spectre mess, which yes is
+still going on after some months. :(
 
-> Now I'm wondering if that's a problem. Not reading zeros in the guest is
-> unusual, but not unheard of (e.g. host_device), but visible zeros in the
-> image file could be considered an information leak. On the other hand,
-> qcow2 metadata for encrypted images is visible, too, so that's really
-> just the same thing.
+> As I understood from
+> Stefan description, it is expected to change significantly
+> the approach we use to interact with BlockDriverState.
 
-Leaking information to the guest on whether a sector in a qcow2 file is
-allocated or unallocated, might be considered undesirable, but I think
-that's one of the tradeoffs of using qcow2 in general not just when
-luks is enabled in qcow.
+I don't think the change is very large actually, at least for on-disk
+devices.  I haven't yet considered network devices such as libiscsi or ceph.
 
-> What do you think, is the current behaviour good enough or should we
-> essentially enforce full preallocation for luks images and initialise
-> the image so that zeros are visible on the format layer, but random
-> encrypted stuff on the protocol layer?
-
-I don't think that's neccessary, as long as users have the option to
-opt-in to do that, which they do.
-
-The more important missing piece of the puzzle currently is secure
-delete. We need to provide a 'qemu-img rm' command for deleting
-volumes that would explicitly overwrite the LUKS headers and key
-material, rather than having apps just run plain 'rm'.
-
-> Either way, we should probably document the decision somewhere as
-> intentional.
-
-Agreed.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
