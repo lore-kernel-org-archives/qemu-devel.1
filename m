@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eyEdU-000891-Hs
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:36:57 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1eyEkQ-0001ZB-Fx
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eyEdR-0005E8-DW
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:36:56 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1eyEkP-0001JV-Fg
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:44:06 -0400
+Date: Tue, 20 Mar 2018 12:43:49 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180320104348.GA3268@yuvallap>
 References: <20180319215335.1119213-1-eblake@redhat.com>
-	<831cddaa-3803-10b1-8d6a-e878c97cca73@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <c2da3eac-9646-fd8e-87e7-59766d1eafab@redhat.com>
-Date: Tue, 20 Mar 2018 12:36:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <831cddaa-3803-10b1-8d6a-e878c97cca73@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180319215335.1119213-1-eblake@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH for-2.12] rdma: Fix 32-bit compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,42 +22,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, yuval.shaia@oracle.com
 
-On 20/03/2018 0:08, Eric Blake wrote:
-> On 03/19/2018 04:53 PM, Eric Blake wrote:
->> Use the correct printf formats, so that a 32-bit compile doesn't
->> spit out lots of warnings about %lx being incompatible with uint64_t.
->> Broken since initial commit ef6d4ccd.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>
->> I don't know if 'make vm-build-ubuntu.i368' would catch this (it faile=
-d
->> for me for other reasons); I found it via a 32-bit rawhide VM.
->=20
-> That fixes most of the warnings,
+On Mon, Mar 19, 2018 at 04:53:35PM -0500, Eric Blake wrote:
+> Use the correct printf formats, so that a 32-bit compile doesn't
+> spit out lots of warnings about %lx being incompatible with uint64_t.
+> Broken since initial commit ef6d4ccd.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> I don't know if 'make vm-build-ubuntu.i368' would catch this (it failed
+> for me for other reasons); I found it via a 32-bit rawhide VM.
+> 
+>  hw/rdma/rdma_backend.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index e306fba5344..89020fdcf62 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -656,7 +656,8 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp)
+>  #define CHK_ATTR(req, dev, member, fmt) ({ \
+>      pr_dbg("%s="fmt","fmt"\n", #member, dev.member, req->member); \
+>      if (req->member > dev.member) { \
+> -        warn_report("%s = 0x%lx is higher than host device capability 0x%lx", \
+> +        warn_report("%s = 0x%" PRIx64 " is higher than host device " \
+> +                    "capability 0x%" PRIx64, \
+>                      #member, (uint64_t)req->member, (uint64_t)dev.member); \
 
-Thanks!
+Hmmm, interesting.
+I wonder why in first place to cast all members to uint64_t.
+Can you try the method that is used above in the call to pr_dbg, i.e. to
+use the given argument fmt?
 
-> but not:
->=20
-> /home/dummy/qemu/hw/rdma/rdma_backend.c: In function 'rdma_backend_crea=
-te_mr':
-> /home/dummy/qemu/hw/rdma/rdma_backend.c:409:37: error: cast to pointer =
-from integer of different size
-> [-Werror=3Dint-to-pointer-cast]
-> =C2=A0=C2=A0=C2=A0=C2=A0 m4->ibmr =3D ibv_reg_m4(pd->ibpd, (void *)addr=
-, length, access);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
->=20
+Something like this:
+	warn_report("%s = "fmt" is higher than host device capability "fmt, \
+	            #member, req->member, dev.member); \
 
-So the compilation actually brakes on 32bit machines?
-I'll create a VM.
-
-Thanks,
-Marcel
+>          req->member = dev.member; \
+>      } \
+> -- 
+> 2.14.3
+> 
