@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48180)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5Sq-0002hJ-DW
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:49:21 -0400
+	id 1ey5U2-0003aT-Hr
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:50:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5Sl-0005Zs-H7
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:49:20 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39313)
+	id 1ey5U1-0006Ti-76
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:50:34 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39324)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5Sl-0005Yg-Ao
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:49:15 -0400
-Received: by mail-wm0-x244.google.com with SMTP id f125so293878wme.4
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 17:49:15 -0700 (PDT)
+	id 1ey5U0-0006SW-MM
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:50:32 -0400
+Received: by mail-wm0-x244.google.com with SMTP id f125so297004wme.4
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 17:50:32 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
-	<20180319213101.6100-4-wsa+renesas@sang-engineering.com>
+References: <20180319113544.704-1-laurent@vivier.eu>
+	<20180319113544.704-2-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <eed94f45-6c1b-1192-3542-8c2380fa2062@amsat.org>
-Date: Tue, 20 Mar 2018 01:49:12 +0100
+Message-ID: <48fb3b7c-ce94-36eb-a3da-4cadb4e33525@amsat.org>
+Date: Tue, 20 Mar 2018 01:50:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180319213101.6100-4-wsa+renesas@sang-engineering.com>
+In-Reply-To: <20180319113544.704-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] nvram: at24c: use standard error
- reporting
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] target/m68k: add DisasContext
+ parameter to gen_extend()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,89 +36,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org
-Cc: linux-renesas-soc@vger.kernel.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On 03/19/2018 10:31 PM, Wolfram Sang wrote:
-> Replace the ERR macro with error_report() because fprintf is deprecated.
-> This also fixes the prefix printed out twice.
+On 03/19/2018 12:35 PM, Laurent Vivier wrote:
+> This parameter will be needed to manage automatic release
+> of temporary allocated TCG variables.
 > 
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> ---
->  hw/nvram/eeprom_at24c.c | 17 ++++++-----------
->  1 file changed, 6 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
-> index ab1ef686e2..1560c9a46b 100644
-> --- a/hw/nvram/eeprom_at24c.c
-> +++ b/hw/nvram/eeprom_at24c.c
-> @@ -13,6 +13,7 @@
->  #include "hw/hw.h"
->  #include "hw/i2c/i2c.h"
->  #include "sysemu/block-backend.h"
-> +#include "qemu/error-report.h"
->  
->  /* #define DEBUG_AT24C */
->  
-> @@ -22,9 +23,6 @@
->  #define DPRINTK(FMT, ...) do {} while (0)
->  #endif
->  
-> -#define ERR(FMT, ...) fprintf(stderr, TYPE_AT24C_EE " : " FMT, \
-> -                            ## __VA_ARGS__)
-> -
->  #define TYPE_AT24C_EE "at24c-eeprom"
->  #define AT24C_EE(obj) OBJECT_CHECK(EEPROMState, (obj), TYPE_AT24C_EE)
->  
-> @@ -63,8 +61,7 @@ int at24c_eeprom_event(I2CSlave *s, enum i2c_event event)
->          if (ee->blk && ee->changed) {
->              int len = blk_pwrite(ee->blk, 0, ee->mem, ee->rsize, 0);
->              if (len != ee->rsize) {
-> -                ERR(TYPE_AT24C_EE
-> -                        " : failed to write backing file\n");
-> +                error_report("failed to write backing file\n");
->              }
->              DPRINTK("Wrote to backing file\n");
->          }
-> @@ -125,7 +122,7 @@ int at24c_eeprom_init(I2CSlave *i2c)
->      EEPROMState *ee = AT24C_EE(i2c);
->  
->      if (!ee->rsize) {
-> -        ERR("rom-size not allowed to be 0\n");
-> +        error_report("rom-size not allowed to be 0\n");
->          exit(1);
->      }
->  
-> @@ -135,7 +132,7 @@ int at24c_eeprom_init(I2CSlave *i2c)
->          int64_t len = blk_getlength(ee->blk);
->  
->          if (len != ee->rsize) {
-> -            ERR(TYPE_AT24C_EE " : Backing file size %lu != %u\n",
-> +            error_report("Backing file size %lu != %u\n",
->                      (unsigned long)len, (unsigned)ee->rsize);
->              exit(1);
->          }
-> @@ -143,8 +140,7 @@ int at24c_eeprom_init(I2CSlave *i2c)
->          if (blk_set_perm(ee->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
->                           BLK_PERM_ALL, &error_fatal) < 0)
->          {
-> -            ERR(TYPE_AT24C_EE
-> -                    " : Backing file incorrect permission\n");
-> +            error_report("Backing file incorrect permission\n");
->              exit(1);
->          }
->      }
-> @@ -166,8 +162,7 @@ void at24c_eeprom_reset(DeviceState *state)
->          int len = blk_pread(ee->blk, 0, ee->mem, ee->rsize);
->  
->          if (len != ee->rsize) {
-> -            ERR(TYPE_AT24C_EE
-> -                    " : Failed initial sync with backing file\n");
-> +            error_report("Failed initial sync with backing file\n");
->          }
->          DPRINTK("Reset read backing file\n");
->      }
-> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-Without '\n':
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  target/m68k/translate.c | 46 +++++++++++++++++++++++-----------------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
+> 
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index cef6f663ad..1c2ff56305 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -617,7 +617,7 @@ static void gen_flush_flags(DisasContext *s)
+>      s->cc_op = CC_OP_FLAGS;
+>  }
+>  
+> -static inline TCGv gen_extend(TCGv val, int opsize, int sign)
+> +static inline TCGv gen_extend(DisasContext *s, TCGv val, int opsize, int sign)
+>  {
+>      TCGv tmp;
+>  
+> @@ -811,7 +811,7 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
+>              gen_partset_reg(opsize, reg, val);
+>              return store_dummy;
+>          } else {
+> -            return gen_extend(reg, opsize, what == EA_LOADS);
+> +            return gen_extend(s, reg, opsize, what == EA_LOADS);
+>          }
+>      case 1: /* Address register direct.  */
+>          reg = get_areg(s, reg0);
+> @@ -819,7 +819,7 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
+>              tcg_gen_mov_i32(reg, val);
+>              return store_dummy;
+>          } else {
+> -            return gen_extend(reg, opsize, what == EA_LOADS);
+> +            return gen_extend(s, reg, opsize, what == EA_LOADS);
+>          }
+>      case 2: /* Indirect register */
+>          reg = get_areg(s, reg0);
+> @@ -1759,8 +1759,8 @@ DISAS_INSN(abcd_reg)
+>  
+>      gen_flush_flags(s); /* !Z is sticky */
+>  
+> -    src = gen_extend(DREG(insn, 0), OS_BYTE, 0);
+> -    dest = gen_extend(DREG(insn, 9), OS_BYTE, 0);
+> +    src = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
+> +    dest = gen_extend(s, DREG(insn, 9), OS_BYTE, 0);
+>      bcd_add(dest, src);
+>      gen_partset_reg(OS_BYTE, DREG(insn, 9), dest);
+>  
+> @@ -1794,8 +1794,8 @@ DISAS_INSN(sbcd_reg)
+>  
+>      gen_flush_flags(s); /* !Z is sticky */
+>  
+> -    src = gen_extend(DREG(insn, 0), OS_BYTE, 0);
+> -    dest = gen_extend(DREG(insn, 9), OS_BYTE, 0);
+> +    src = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
+> +    dest = gen_extend(s, DREG(insn, 9), OS_BYTE, 0);
+>  
+>      bcd_sub(dest, src);
+>  
+> @@ -1856,7 +1856,7 @@ DISAS_INSN(addsub)
+>  
+>      add = (insn & 0x4000) != 0;
+>      opsize = insn_opsize(insn);
+> -    reg = gen_extend(DREG(insn, 9), opsize, 1);
+> +    reg = gen_extend(s, DREG(insn, 9), opsize, 1);
+>      dest = tcg_temp_new();
+>      if (insn & 0x100) {
+>          SRC_EA(env, tmp, opsize, 1, &addr);
+> @@ -2386,7 +2386,7 @@ DISAS_INSN(cas)
+>          return;
+>      }
+>  
+> -    cmp = gen_extend(DREG(ext, 0), opsize, 1);
+> +    cmp = gen_extend(s, DREG(ext, 0), opsize, 1);
+>  
+>      /* if  <EA> == Dc then
+>       *     <EA> = Du
+> @@ -3055,7 +3055,7 @@ DISAS_INSN(or)
+>      int opsize;
+>  
+>      opsize = insn_opsize(insn);
+> -    reg = gen_extend(DREG(insn, 9), opsize, 0);
+> +    reg = gen_extend(s, DREG(insn, 9), opsize, 0);
+>      dest = tcg_temp_new();
+>      if (insn & 0x100) {
+>          SRC_EA(env, src, opsize, 0, &addr);
+> @@ -3120,8 +3120,8 @@ DISAS_INSN(subx_reg)
+>  
+>      opsize = insn_opsize(insn);
+>  
+> -    src = gen_extend(DREG(insn, 0), opsize, 1);
+> -    dest = gen_extend(DREG(insn, 9), opsize, 1);
+> +    src = gen_extend(s, DREG(insn, 0), opsize, 1);
+> +    dest = gen_extend(s, DREG(insn, 9), opsize, 1);
+>  
+>      gen_subx(s, src, dest, opsize);
+>  
+> @@ -3176,7 +3176,7 @@ DISAS_INSN(cmp)
+>  
+>      opsize = insn_opsize(insn);
+>      SRC_EA(env, src, opsize, 1, NULL);
+> -    reg = gen_extend(DREG(insn, 9), opsize, 1);
+> +    reg = gen_extend(s, DREG(insn, 9), opsize, 1);
+>      gen_update_cc_cmp(s, reg, src, opsize);
+>  }
+>  
+> @@ -3329,8 +3329,8 @@ DISAS_INSN(addx_reg)
+>  
+>      opsize = insn_opsize(insn);
+>  
+> -    dest = gen_extend(DREG(insn, 9), opsize, 1);
+> -    src = gen_extend(DREG(insn, 0), opsize, 1);
+> +    dest = gen_extend(s, DREG(insn, 9), opsize, 1);
+> +    src = gen_extend(s, DREG(insn, 0), opsize, 1);
+>  
+>      gen_addx(s, src, dest, opsize);
+>  
+> @@ -3369,7 +3369,7 @@ static inline void shift_im(DisasContext *s, uint16_t insn, int opsize)
+>      int logical = insn & 8;
+>      int left = insn & 0x100;
+>      int bits = opsize_bytes(opsize) * 8;
+> -    TCGv reg = gen_extend(DREG(insn, 0), opsize, !logical);
+> +    TCGv reg = gen_extend(s, DREG(insn, 0), opsize, !logical);
+>  
+>      if (count == 0) {
+>          count = 8;
+> @@ -3419,7 +3419,7 @@ static inline void shift_reg(DisasContext *s, uint16_t insn, int opsize)
+>      int logical = insn & 8;
+>      int left = insn & 0x100;
+>      int bits = opsize_bytes(opsize) * 8;
+> -    TCGv reg = gen_extend(DREG(insn, 0), opsize, !logical);
+> +    TCGv reg = gen_extend(s, DREG(insn, 0), opsize, !logical);
+>      TCGv s32;
+>      TCGv_i64 t64, s64;
+>  
+> @@ -3556,7 +3556,7 @@ DISAS_INSN(shift_mem)
+>             while M68000 sets if the most significant bit is changed at
+>             any time during the shift operation */
+>          if (!logical && m68k_feature(s->env, M68K_FEATURE_M68000)) {
+> -            src = gen_extend(src, OS_WORD, 1);
+> +            src = gen_extend(s, src, OS_WORD, 1);
+>              tcg_gen_xor_i32(QREG_CC_V, QREG_CC_N, src);
+>          }
+>      } else {
+> @@ -3789,7 +3789,7 @@ DISAS_INSN(rotate8_im)
+>      TCGv shift;
+>      int tmp;
+>  
+> -    reg = gen_extend(DREG(insn, 0), OS_BYTE, 0);
+> +    reg = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
+>  
+>      tmp = (insn >> 9) & 7;
+>      if (tmp == 0) {
+> @@ -3816,7 +3816,7 @@ DISAS_INSN(rotate16_im)
+>      TCGv shift;
+>      int tmp;
+>  
+> -    reg = gen_extend(DREG(insn, 0), OS_WORD, 0);
+> +    reg = gen_extend(s, DREG(insn, 0), OS_WORD, 0);
+>      tmp = (insn >> 9) & 7;
+>      if (tmp == 0) {
+>          tmp = 8;
+> @@ -3876,7 +3876,7 @@ DISAS_INSN(rotate8_reg)
+>      TCGv t0, t1;
+>      int left = (insn & 0x100);
+>  
+> -    reg = gen_extend(DREG(insn, 0), OS_BYTE, 0);
+> +    reg = gen_extend(s, DREG(insn, 0), OS_BYTE, 0);
+>      src = DREG(insn, 9);
+>      /* shift in [0..63] */
+>      t0 = tcg_temp_new_i32();
+> @@ -3911,7 +3911,7 @@ DISAS_INSN(rotate16_reg)
+>      TCGv t0, t1;
+>      int left = (insn & 0x100);
+>  
+> -    reg = gen_extend(DREG(insn, 0), OS_WORD, 0);
+> +    reg = gen_extend(s, DREG(insn, 0), OS_WORD, 0);
+>      src = DREG(insn, 9);
+>      /* shift in [0..63] */
+>      t0 = tcg_temp_new_i32();
+> @@ -4353,7 +4353,7 @@ DISAS_INSN(chk)
+>          return;
+>      }
+>      SRC_EA(env, src, opsize, 1, NULL);
+> -    reg = gen_extend(DREG(insn, 9), opsize, 1);
+> +    reg = gen_extend(s, DREG(insn, 9), opsize, 1);
+>  
+>      gen_flush_flags(s);
+>      gen_helper_chk(cpu_env, reg, src);
+> 
