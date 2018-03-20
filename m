@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1eyKnS-0006Qy-3v
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:11:38 -0400
+	(envelope-from <mst@redhat.com>) id 1eyKpL-00005h-Ip
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1eyKnR-0006fz-7H
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:11:38 -0400
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:34285)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1eyKnR-0006f1-2P
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:11:37 -0400
-Received: by mail-ot0-x22a.google.com with SMTP id m7-v6so2554768otd.1
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 10:11:36 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1eyKpK-0007uk-Me
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:13:35 -0400
+Date: Tue, 20 Mar 2018 19:12:59 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180320191156-mutt-send-email-mst@kernel.org>
+References: <1521510562-529051-1-git-send-email-mst@redhat.com>
+	<8f06e1e3-4823-d8e8-43bd-c092c523849e@vivier.eu>
+	<20180320094406.GD4530@redhat.com>
+	<20180320141107-mutt-send-email-mst@kernel.org>
+	<20180320121841.GN4530@redhat.com>
+	<20180320142756-mutt-send-email-mst@kernel.org>
+	<20180320123900.GO4530@redhat.com>
+	<20180320133216.u4hdijttdnyjbfpu@sirius.home.kraxel.org>
+	<20180320134117.GS4530@redhat.com>
+	<8e14f681-6572-062b-c503-c5ad091793d7@redhat.com>
 MIME-Version: 1.0
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Tue, 20 Mar 2018 18:11:35 +0100
-Message-ID: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Bug AioContext polling is not implemented on Windows
- with qemu-system-ppc.exe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8e14f681-6572-062b-c503-c5ad091793d7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu: include generated files with <> and
+ not ""
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Josh Durgin <jdurgin@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Michael Walle <michael@walle.cc>, Keith Busch <keith.busch@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Fabien Chouteau <chouteau@adacore.com>, Amit Shah <amit@kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <minyard@acm.org>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Peter Chubb <peter.chubb@nicta.com.au>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Max Filippov <jcmvbkbc@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Yuval Shaia <yuval.shaia@oracle.com>, David Hildenbrand <david@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, kvm@vger.kernel.org, qemu-block@nongnu.org, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-Hi,
+On Tue, Mar 20, 2018 at 02:54:37PM +0100, Max Reitz wrote:
+> But I guess the main advantage with using this rule I see is that it's
+> better for people reading the code.  It's just nice to know whether a
+> file belongs to qemu or not by just looking at the #include statement.
+> (Note that this implies that it is indeed more difficult to determine
+> whether a header belongs to qemu than whether it sits in the same
+> directory as the C file, though!)  So I think the old (current) rule is
+> better for reading code, Michael's rule would be better for writing
+> code.  I think reading code is what should be easier.
 
-I just built qemu-system-ppc.exe for windows using a fully up-to-date Fedora 27.
-Command line for build:
+How about prefixing all internal headers with qemu/ ?
 
-./configure --cross-prefix=x86_64-w64-mingw32-
---target-list="ppc-softmmu ppc64-softmmu" --enable-gtk
---with-gtkabi=3.0 --enable-sdl --with-sdlabi=2.0
+That's a way to avoid namespace collisions that is actually standard.
 
-Command line to invoke Qemu:
-C:\qemu-master>qemu-system-ppc.exe -L pc-bios -boot c -m 256 -M mac99
--prom-env "boot-args=-v" -prom-env "auto-boot?=true" -prom-env
-"vga-ndrv?=true"  -drive
-file=c:\Mac-disks\9.1.img,format=raw,media=disk -netdev
-user,id=network01 -device
-sungem,netdev=network01,mac=52:54:00:12:34:66 -sdl -device usb-kbd
--device usb-mouse
-
-Error:
-Unexpected error in aio_context_set_poll_params() at util/aio-win32.c:413:
-qemu-system-ppc.exe: AioContext polling is not implemented on Windows
-
-Best,
-Howard
+-- 
+MST 
