@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eyOFn-0008M4-Pp
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:53:10 -0400
+	(envelope-from <mst@redhat.com>) id 1eyONa-0004wi-Rk
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eyOFj-00022f-7g
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:53:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eyOFi-00022K-Th
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:53:03 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2KKo40f014094
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 16:53:01 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gu6h6r6jx-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 16:53:01 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 20 Mar 2018 14:53:00 -0600
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 20 Mar 2018 16:52:50 -0400
-In-Reply-To: <1521579171-26213-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1521579171-26213-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Message-Id: <1521579171-26213-4-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] tpm: CRB: reset locAssigned upon
- relinquishing locality
+	(envelope-from <mst@redhat.com>) id 1eyONW-0007Hh-2S
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:01:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34006 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyONV-0007HK-UF
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:01:06 -0400
+Date: Tue, 20 Mar 2018 23:01:04 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1521579652-180248-2-git-send-email-mst@redhat.com>
+References: <1521579652-180248-1-git-send-email-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1521579652-180248-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/3] update-linux-headers.sh: add unistd.h
+ and kvm on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,25 +28,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <jhogan@kernel.org>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Rework the update script slightly, add the unistd.h header and its
+dependencies on all architectures.
+
+This also removes the IA64 and MIPS from a KVM blacklist:
+Linux dropped IA64, and there was never a reason to
+exclude MIPS from kvm specifically - it was
+excluded due to dependency of its unistd.h on sgidefs.h,
+which we also import.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/tpm/tpm_crb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/update-linux-headers.sh | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index 4bd76b5..e8c42f6 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -137,6 +137,8 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
-             /* not loc 3 or 4 */
-             break;
-         case CRB_LOC_CTRL_RELINQUISH:
-+            ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
-+                             locAssigned, 0);
-             break;
-         case CRB_LOC_CTRL_REQUEST_ACCESS:
-             ARRAY_FIELD_DP32(s->regs, CRB_LOC_STS,
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index d18e2f1..2a4dac8a 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -80,11 +80,6 @@ for arch in $ARCHLIST; do
+         continue
+     fi
+ 
+-    # Blacklist architectures which have KVM headers but are actually dead
+-    if [ "$arch" = "ia64" -o "$arch" = "mips" ]; then
+-        continue
+-    fi
+-
+     if [ "$arch" = x86 ]; then
+         arch_var=SRCARCH
+     else
+@@ -95,9 +90,18 @@ for arch in $ARCHLIST; do
+ 
+     rm -rf "$output/linux-headers/asm-$arch"
+     mkdir -p "$output/linux-headers/asm-$arch"
+-    for header in kvm.h kvm_para.h unistd.h; do
++    for header in unistd.h bitsperlong.h; do
++        cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
++    done
++
++    for header in kvm.h kvm_para.h; do
+         cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+     done
++
++    if [ $arch = mips ]; then
++        cp "$tmpdir/include/asm/sgidefs.h" "$output/linux-headers/asm-mips/"
++    fi
++
+     if [ $arch = powerpc ]; then
+         cp "$tmpdir/include/asm/epapr_hcalls.h" "$output/linux-headers/asm-powerpc/"
+     fi
+@@ -120,6 +124,10 @@ EOF
+         cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+     fi
++    if [ $arch = s390 ]; then
++        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-arm/"
++        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-arm/"
++    fi
+ done
+ 
+ rm -rf "$output/linux-headers/linux"
+@@ -130,7 +138,7 @@ for header in kvm.h kvm_para.h vfio.h vfio_ccw.h vhost.h \
+ done
+ rm -rf "$output/linux-headers/asm-generic"
+ mkdir -p "$output/linux-headers/asm-generic"
+-for header in kvm_para.h; do
++for header in kvm_para.h bitsperlong.h unistd.h; do
+     cp "$tmpdir/include/asm-generic/$header" "$output/linux-headers/asm-generic"
+ done
+ if [ -L "$linux/source" ]; then
 -- 
-2.5.5
+MST
