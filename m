@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eyLT7-0007sj-8d
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyLZ8-00049C-TG
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eyLT3-00043I-FT
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44200)
+	(envelope-from <eblake@redhat.com>) id 1eyLZ5-0007yR-0k
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:00:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50332 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eyLT3-00042T-4m
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:54:37 -0400
-Date: Tue, 20 Mar 2018 14:54:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180320175427.GU3417@localhost.localdomain>
-References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
-	<1520888449-4352-3-git-send-email-babu.moger@amd.com>
-	<20180316180006.GH28578@localhost.localdomain>
-	<CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eyLZ4-0007x7-Rk
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:00:50 -0400
+References: <20180320173324.30844-1-fl@n621.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <48d11603-23ba-ddbb-34a6-8ba345ac5d28@redhat.com>
+Date: Tue, 20 Mar 2018 13:00:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD Processor
- Cache Information
+In-Reply-To: <20180320173324.30844-1-fl@n621.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] os: truncate pidfile on creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "Hook, Gary" <Gary.Hook@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Florian Larysch <fl@n621.de>, qemu-devel@nongnu.org
+Cc: sw@weilnetz.de
 
-On Tue, Mar 20, 2018 at 05:25:52PM +0000, Moger, Babu wrote:
-> Hi Eduardo, Thanks for the comments. Please see the response inline.
+On 03/20/2018 12:33 PM, Florian Larysch wrote:
+> qemu_create_pidfile does not truncate the pidfile when it creates it,
+> but rather overwrites its contents with the new pid. This works fine as
+> long as the length of the pid doesn't decrease, but this might happen in
+> case of wraparounds, causing pidfiles to contain trailing garbage which
+> breaks operations such as 'kill $(cat pidfile)'.
 > 
-> > -----Original Message-----
-> > From: Eduardo Habkost <ehabkost@redhat.com>
-> > Sent: Friday, March 16, 2018 1:00 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>
-> > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
-> > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
-> > <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
-> > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
-> > devel@nongnu.org
-> > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
-> > Processor Cache Information
-> > 
-> > On Mon, Mar 12, 2018 at 05:00:46PM -0400, Babu Moger wrote:
-> > > From: Stanislav Lanci <pixo@polepetko.eu>
-> > >
-> > > Add information for cpuid 0x8000001D leaf. Populate cache topology
-> > information
-> > > for different cache types(Data Cache, Instruction Cache, L2 and L3)
-> > supported
-> > > by 0x8000001D leaf. Please refer Processor Programming Reference (PPR)
-> > for AMD
-> > > Family 17h Model for more details.
-> > >
-> > > Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
-> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > 
-> > The new CPUID leaves don't seem to match the existing AMD cache
-> > information
-> > leaves.  Is this intentional?  Why?
+> Instead, always truncate the file before writing it.
 > 
-> It is not intentional. These values are from older family of processors. These values have changed from Family 14  or later.
-> The latest one is Family 17. You can see the differences here.
->  https://support.amd.com/TechDocs/41131.pdf
-> https://support.amd.com/TechDocs/55072_AMD_Family_15h_Models_70h-7Fh_BKDG.pdf
-> https://support.amd.com/TechDocs/54945_PPR_Family_17h_Models_00h-0Fh.pdf
+> Note that the order is important here: We cannot simply use O_TRUNC in
+> the open() call because another qemu process might truncate the pidfile
+> of a process that is still running before reaching the lockf() barrier.
 > 
-> Some of these are bugs in our code. For some we need to add checks for the family and correct these values.
-> You understand the code much better than me. Correct me if I missed something. 
+> The Windows version suffers from a similar problem, but as it does not
+> provide effective mutual exclusion anyway (because the file handle is
+> closed immediately after writing to it), adopting this behavior still
+> seems to be an improvement, as it at least prevents garbled pidfiles.
 > 
-> Note that older family of processors don't support topology extensions.  
+> Signed-off-by: Florian Larysch <fl@n621.de>
+> ---
 
-If you want to make the cache size/topology look different
-depending on the CPU model/options, this would require more work,
-but it would be an interesting feature.
+Here after the --- is a nice place to summarize how v3 differs from v2, 
+to save reviewers some time.  In this particular case, it looks like all 
+you did was correct a commit message typo in v2; at which point, since I 
+gave Reviewed-by on v2, you could have pasted that into your amended v3 
+commit message to make it obvious that you didn't change the code.  At 
+any rate, my R-b still stands.
 
-The "i386: Helpers to encode cache information consistently"
-patch I sent last week might be a useful starting point for that.
+Also, if all that is wrong is a typo in the commit message, a maintainer 
+is often willing to fix that up without you having to send a new 
+revision, especially since the maintainer has to edit the commit message 
+anyways to add their Signed-off-by.  But you are also correct that a new 
+revision CAN save a maintainer time, in part because adding S-o-b can be 
+done by machine alone, so it is not a worthless exercise on your part to 
+send a respin just for typos.
 
-If you plan to implement that, please keep in mind that existing
-CPUID cache info needs to be kept on previous machine-types (this
-is implemented by adding QOM properties that can be used to
-enable the old behavior, and by setting them at
-MachineClass::compat_props).
+>   os-posix.c | 6 ++++++
+>   os-win32.c | 2 +-
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+> 
 
 -- 
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
