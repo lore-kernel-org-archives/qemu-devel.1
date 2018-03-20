@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mi-00073O-TC
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:03 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7mc-0006yI-JL
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mh-0008P6-RU
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34296 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ey7mb-0008LF-N4
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34276 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mh-0008Od-Ln
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:59 -0400
-Date: Tue, 20 Mar 2018 05:17:58 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mb-0008L4-GI
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:53 -0400
+Date: Tue, 20 Mar 2018 05:17:52 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-45-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-36-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 44/50] libvhost-user: mprotect & madvises for
- postcopy
+Subject: [Qemu-devel] [PULL v2 35/50] libvhost-user+postcopy: Register new
+ regions with the ufd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +29,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Yongji Xie <xieyongji@baidu.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Clear the area and turn off THP.
-PROT_NONE the area until after we've userfault advised it
-to catch any unexpected changes.
+When new regions are sent to the client using SET_MEM_TABLE, register
+them with the userfaultfd.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 47 +++++++++++++++++++++++++++++=
-++----
- 1 file changed, 42 insertions(+), 5 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 34 +++++++++++++++++++++++++++++=
++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
 r/libvhost-user.c
-index 6314549..5feed52 100644
+index b2de8ed..7c8cd587 100644
 --- a/contrib/libvhost-user/libvhost-user.c
 +++ b/contrib/libvhost-user/libvhost-user.c
-@@ -454,7 +454,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserM=
-sg *vmsg)
-     int i;
-     VhostUserMemory *memory =3D &vmsg->payload.memory;
-     dev->nregions =3D memory->nregions;
--    /* TODO: Postcopy specific code */
-+
-     DPRINT("Nregions: %d\n", memory->nregions);
-     for (i =3D 0; i < dev->nregions; i++) {
-         void *mmap_addr;
-@@ -478,9 +478,12 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
+@@ -494,6 +494,40 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
 Msg *vmsg)
+         close(vmsg->fds[i]);
+     }
 =20
-         /* We don't use offset argument of mmap() since the
-          * mapped address has to be page aligned, and we use huge
--         * pages.  */
-+         * pages.
-+         * In postcopy we're using PROT_NONE here to catch anyone
-+         * accessing it before we userfault
-+         */
-         mmap_addr =3D mmap(0, dev_region->size + dev_region->mmap_offset=
-,
--                         PROT_READ | PROT_WRITE, MAP_SHARED,
-+                         PROT_NONE, MAP_SHARED,
-                          vmsg->fds[i], 0);
-=20
-         if (mmap_addr =3D=3D MAP_FAILED) {
-@@ -519,12 +522,38 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUse=
-rMsg *vmsg)
-     /* OK, now we can go and register the memory and generate faults */
-     for (i =3D 0; i < dev->nregions; i++) {
-         VuDevRegion *dev_region =3D &dev->regions[i];
-+        int ret;
- #ifdef UFFDIO_REGISTER
-         /* We should already have an open ufd. Mark each memory
-          * range as ufd.
--         * Note: Do we need any madvises? Well it's not been accessed
--         * yet, still probably need no THP to be safe, discard to be saf=
++    /* TODO: Get address back to QEMU */
++    for (i =3D 0; i < dev->nregions; i++) {
++        VuDevRegion *dev_region =3D &dev->regions[i];
++#ifdef UFFDIO_REGISTER
++        /* We should already have an open ufd. Mark each memory
++         * range as ufd.
++         * Note: Do we need any madvises? Well it's not been accessed
++         * yet, still probably need no THP to be safe, discard to be saf=
 e?
-+         * Discard any mapping we have here; note I can't use MADV_REMOV=
-E
-+         * or fallocate to make the hole since I don't want to lose
-+         * data that's already arrived in the shared process.
-+         * TODO: How to do hugepage
-          */
-+        ret =3D madvise((void *)dev_region->mmap_addr,
-+                      dev_region->size + dev_region->mmap_offset,
-+                      MADV_DONTNEED);
-+        if (ret) {
-+            fprintf(stderr,
-+                    "%s: Failed to madvise(DONTNEED) region %d: %s\n",
-+                    __func__, i, strerror(errno));
-+        }
-+        /* Turn off transparent hugepages so we dont get lose wakeups
-+         * in neighbouring pages.
-+         * TODO: Turn this backon later.
 +         */
-+        ret =3D madvise((void *)dev_region->mmap_addr,
-+                      dev_region->size + dev_region->mmap_offset,
-+                      MADV_NOHUGEPAGE);
-+        if (ret) {
-+            /* Note: This can happen legally on kernels that are configu=
-red
-+             * without madvise'able hugepages
-+             */
-+            fprintf(stderr,
-+                    "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
-+                    __func__, i, strerror(errno));
-+        }
-         struct uffdio_register reg_struct;
-         reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
-         reg_struct.range.len =3D dev_region->size + dev_region->mmap_off=
++        struct uffdio_register reg_struct;
++        reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
++        reg_struct.range.len =3D dev_region->size + dev_region->mmap_off=
 set;
-@@ -546,6 +575,14 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
-Msg *vmsg)
-         }
-         DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
-                 __func__, i, reg_struct.range.start, reg_struct.range.le=
-n);
-+        /* Now it's registered we can let the client at it */
-+        if (mprotect((void *)dev_region->mmap_addr,
-+                     dev_region->size + dev_region->mmap_offset,
-+                     PROT_READ | PROT_WRITE)) {
-+            vu_panic(dev, "failed to mprotect region %d for postcopy (%s=
-)",
-+                     i, strerror(errno));
++        reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
++
++        if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
++            vu_panic(dev, "%s: Failed to userfault region %d "
++                          "@%p + size:%zx offset: %zx: (ufd=3D%d)%s\n",
++                     __func__, i,
++                     dev_region->mmap_addr,
++                     dev_region->size, dev_region->mmap_offset,
++                     dev->postcopy_ufd, strerror(errno));
 +            return false;
 +        }
-         /* TODO: Stash 'zero' support flags somewhere */
- #endif
-     }
++        if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
++            vu_panic(dev, "%s Region (%d) doesn't support COPY",
++                     __func__, i);
++            return false;
++        }
++        DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
++                __func__, i, reg_struct.range.start, reg_struct.range.le=
+n);
++        /* TODO: Stash 'zero' support flags somewhere */
++#endif
++    }
++
+     return false;
+ }
+=20
 --=20
 MST
