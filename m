@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyF80-0002s9-62
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyFLW-0008Hn-8c
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyF7w-0001nS-2u
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54552 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyF7v-0001nA-V4
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:24 -0400
-Date: Tue, 20 Mar 2018 11:08:17 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180320110816.GB7665@work-vm>
-References: <20180319175823.22111-1-marcandre.lureau@redhat.com>
-	<272a2e2b-5a1f-d73c-8a74-6721ce9f63fc@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eyFLV-0004TN-Ao
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:22:26 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34711)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eyFLV-0004Sh-5j
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:22:25 -0400
+Received: by mail-ot0-x243.google.com with SMTP id m7-v6so1275831otd.1
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 04:22:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <272a2e2b-5a1f-d73c-8a74-6721ce9f63fc@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hmp: free sev info
+In-Reply-To: <1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
+References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
+	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Mar 2018 11:22:03 +0000
+Message-ID: <CAFEAcA96qV_f7i_36Yzb-QV7W9SRHKfJpg=rvv3tia2X-Xi7QQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 2/2] arm_gicv3_kvm:
+ kvm_dist_get/put: skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, brijesh.singh@amd.com
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 03/19/2018 12:58 PM, Marc-Andr=E9 Lureau wrote:
-> > Found thanks to ASAN:
-> >=20
-> > Direct leak of 16 byte(s) in 1 object(s) allocated from:
-> >      #0 0x7efe20417a38 in __interceptor_calloc (/lib64/libasan.so.4+0=
-xdea38)
-> >      #1 0x7efe1f7b2f75 in g_malloc0 ../glib/gmem.c:124
-> >      #2 0x7efe1f7b3249 in g_malloc0_n ../glib/gmem.c:355
-> >      #3 0x558272879162 in sev_get_info /home/elmarco/src/qemu/target/=
-i386/sev.c:414
-> >      #4 0x55827285113b in hmp_info_sev /home/elmarco/src/qemu/target/=
-i386/monitor.c:684
-> >      #5 0x5582724043b8 in handle_hmp_command /home/elmarco/src/qemu/m=
-onitor.c:3333
-> >=20
-> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >   target/i386/monitor.c | 2 ++
-> >   1 file changed, 2 insertions(+)
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Worth mentioning in the commit message that this was introduced in comm=
-it
-> 63036314.
+On 20 March 2018 at 07:26, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> While we skip the GIC_INTERNAL irqs, we don't change the register offset
+> accordingly. This will overlap the GICR registers value and leave the
+> last GIC_INTERNAL irq's registers out of update.
+>
+> Fix this by skipping the registers banked by GICR.
+>
 
-Queued.  I've added:
-Fixes: 63036314
+I'm still not entirely sure what the underlying problem
+you're trying to fix is...
 
-to the commit message.
+Do we fail to correctly migrate a VM without this change?
+Does the code work on some host CPU/GIC implementations but
+not others? Is this just improving efficiency by avoiding
+doing some unnecessary work?
 
-Dave
-
-> And safe for freeze, as it's fixing a memory usage bug in material new =
-to
-> the 2.12 release.
->=20
-> --=20
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
