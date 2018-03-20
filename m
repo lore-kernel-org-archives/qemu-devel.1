@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5MI-0006mw-Sj
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:42:35 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ey5Mf-00071a-EO
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:42:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5ME-0006Wz-Pn
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:42:34 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180319110215.16755-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <440e1c88-a720-af20-5575-9720afbdc3bd@amsat.org>
-Date: Tue, 20 Mar 2018 01:42:27 +0100
+	(envelope-from <rth7680@gmail.com>) id 1ey5Ma-0006yn-HQ
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:42:57 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:40623)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ey5Ma-0006x3-Ab
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:42:52 -0400
+Received: by mail-pl0-x244.google.com with SMTP id x4-v6so2385295pln.7
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 17:42:52 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180319131743.3885-1-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <8294a6ab-ea9f-8537-3921-13a3513726c8@twiddle.net>
+Date: Tue, 20 Mar 2018 08:42:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180319110215.16755-1-peter.maydell@linaro.org>
+In-Reply-To: <20180319131743.3885-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12] hw/arm/bcm2836: Use
- the Cortex-A7 instead of Cortex-A15
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12] gitmodules: Use the QEMU mirror
+ of qemu-palcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>, patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 03/19/2018 12:02 PM, Peter Maydell wrote:
-> The BCM2836 uses a Cortex-A7, not a Cortex-A15. Update the device to
-> use the correct CPU.
-> https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
-> 
-> When the BCM2836 was introduced (bad5623690b) the Cortex-A7 was not
-> available, so the very similar Cortex-A15 was used. Since dcf578ed8ce
-> we can model the correct core.
+On 03/19/2018 09:17 PM, Peter Maydell wrote:
+> We have a mirror of the qemu-palcode repository on
+> git.qemu.org; use that instead of the upstream github,
+> in line with our general policy of keeping and using
+> a mirror for submodules.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> ---
-> This was originally done by a patch from Alistair:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg00311.html
-> 
-> The refactor of bcm2836 means the code is different, but I'm using
-> the same commit message.
-> 
-> Based-on: <20180313153458.26822-1-peter.maydell@linaro.org>
-> 
-> ---
->  hw/arm/bcm2836.c | 2 +-
->  hw/arm/raspi.c   | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> index 25e74b67d9..8c1e707d9c 100644
-> --- a/hw/arm/bcm2836.c
-> +++ b/hw/arm/bcm2836.c
-> @@ -32,7 +32,7 @@ struct BCM283XInfo {
->  static const BCM283XInfo bcm283x_socs[] = {
->      {
->          .name = TYPE_BCM2836,
-> -        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a15"),
-> +        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
->          .clusterid = 0xf,
->      },
->      {
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 06f1e08ca9..955a7c4e80 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -226,7 +226,7 @@ static void raspi2_machine_init(MachineClass *mc)
->      mc->no_parallel = 1;
->      mc->no_floppy = 1;
->      mc->no_cdrom = 1;
-> -    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
->      mc->max_cpus = BCM283X_NCPUS;
->      mc->min_cpus = BCM283X_NCPUS;
->      mc->default_cpus = BCM283X_NCPUS;
-> 
+
+r~
