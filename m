@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mi-000730-E5
+	(envelope-from <mst@redhat.com>) id 1ey7mi-00073O-TC
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mh-0008OR-An
+	(envelope-from <mst@redhat.com>) id 1ey7mh-0008P6-RU
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53476 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34296 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mh-0008O4-5m
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mh-0008Od-Ln
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:59 -0400
 Date: Tue, 20 Mar 2018 05:17:58 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-44-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-45-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 43/50] vhost+postcopy: Call wakeups
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 44/50] libvhost-user: mprotect & madvises for
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +29,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Cause the vhost-user client to be woken up whenever:
-  a) We place a page in postcopy mode
-  b) We get a fault and the page has already been received
+Clear the area and turn off THP.
+PROT_NONE the area until after we've userfault advised it
+to catch any unexpected changes.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- migration/postcopy-ram.c | 14 ++++++++++----
- migration/trace-events   |  1 +
- 2 files changed, 11 insertions(+), 4 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 47 +++++++++++++++++++++++++++++=
+++----
+ 1 file changed, 42 insertions(+), 5 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index d14a051..7754913 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -558,7 +558,11 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
- 
-     trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr(rb),
-                                        rb_offset);
--    /* TODO: Check bitmap to see if we already have the page */
-+    if (ramblock_recv_bitmap_test_byte_offset(rb, aligned_rbo)) {
-+        trace_postcopy_request_shared_page_present(pcfd->idstr,
-+                                        qemu_ram_get_idstr(rb), rb_offset);
-+        return postcopy_wake_shared(pcfd, client_addr, rb);
-+    }
-     if (rb != mis->last_rb) {
-         mis->last_rb = rb;
-         migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-@@ -866,7 +870,8 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-     }
- 
-     trace_postcopy_place_page(host);
--    return 0;
-+    return postcopy_notify_shared_wake(rb,
-+                                       qemu_ram_block_host_offset(rb, host));
- }
- 
- /*
-@@ -890,6 +895,9 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
- 
-             return -e;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 6314549..5feed52 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -454,7 +454,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserM=
+sg *vmsg)
+     int i;
+     VhostUserMemory *memory =3D &vmsg->payload.memory;
+     dev->nregions =3D memory->nregions;
+-    /* TODO: Postcopy specific code */
++
+     DPRINT("Nregions: %d\n", memory->nregions);
+     for (i =3D 0; i < dev->nregions; i++) {
+         void *mmap_addr;
+@@ -478,9 +478,12 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
+Msg *vmsg)
+=20
+         /* We don't use offset argument of mmap() since the
+          * mapped address has to be page aligned, and we use huge
+-         * pages.  */
++         * pages.
++         * In postcopy we're using PROT_NONE here to catch anyone
++         * accessing it before we userfault
++         */
+         mmap_addr =3D mmap(0, dev_region->size + dev_region->mmap_offset=
+,
+-                         PROT_READ | PROT_WRITE, MAP_SHARED,
++                         PROT_NONE, MAP_SHARED,
+                          vmsg->fds[i], 0);
+=20
+         if (mmap_addr =3D=3D MAP_FAILED) {
+@@ -519,12 +522,38 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUse=
+rMsg *vmsg)
+     /* OK, now we can go and register the memory and generate faults */
+     for (i =3D 0; i < dev->nregions; i++) {
+         VuDevRegion *dev_region =3D &dev->regions[i];
++        int ret;
+ #ifdef UFFDIO_REGISTER
+         /* We should already have an open ufd. Mark each memory
+          * range as ufd.
+-         * Note: Do we need any madvises? Well it's not been accessed
+-         * yet, still probably need no THP to be safe, discard to be saf=
+e?
++         * Discard any mapping we have here; note I can't use MADV_REMOV=
+E
++         * or fallocate to make the hole since I don't want to lose
++         * data that's already arrived in the shared process.
++         * TODO: How to do hugepage
+          */
++        ret =3D madvise((void *)dev_region->mmap_addr,
++                      dev_region->size + dev_region->mmap_offset,
++                      MADV_DONTNEED);
++        if (ret) {
++            fprintf(stderr,
++                    "%s: Failed to madvise(DONTNEED) region %d: %s\n",
++                    __func__, i, strerror(errno));
++        }
++        /* Turn off transparent hugepages so we dont get lose wakeups
++         * in neighbouring pages.
++         * TODO: Turn this backon later.
++         */
++        ret =3D madvise((void *)dev_region->mmap_addr,
++                      dev_region->size + dev_region->mmap_offset,
++                      MADV_NOHUGEPAGE);
++        if (ret) {
++            /* Note: This can happen legally on kernels that are configu=
+red
++             * without madvise'able hugepages
++             */
++            fprintf(stderr,
++                    "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
++                    __func__, i, strerror(errno));
++        }
+         struct uffdio_register reg_struct;
+         reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
+         reg_struct.range.len =3D dev_region->size + dev_region->mmap_off=
+set;
+@@ -546,6 +575,14 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUser=
+Msg *vmsg)
          }
-+        return postcopy_notify_shared_wake(rb,
-+                                           qemu_ram_block_host_offset(rb,
-+                                                                      host));
-     } else {
-         /* The kernel can't use UFFDIO_ZEROPAGE for hugepages */
-         if (!mis->postcopy_tmp_zero_page) {
-@@ -909,8 +917,6 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-         return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-                                    rb);
+         DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
+                 __func__, i, reg_struct.range.start, reg_struct.range.le=
+n);
++        /* Now it's registered we can let the client at it */
++        if (mprotect((void *)dev_region->mmap_addr,
++                     dev_region->size + dev_region->mmap_offset,
++                     PROT_READ | PROT_WRITE)) {
++            vu_panic(dev, "failed to mprotect region %d for postcopy (%s=
+)",
++                     i, strerror(errno));
++            return false;
++        }
+         /* TODO: Stash 'zero' support flags somewhere */
+ #endif
      }
--
--    return 0;
- }
- 
- /*
-diff --git a/migration/trace-events b/migration/trace-events
-index b0acaaa..1e353a3 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -199,6 +199,7 @@ postcopy_ram_incoming_cleanup_entry(void) ""
- postcopy_ram_incoming_cleanup_exit(void) ""
- postcopy_ram_incoming_cleanup_join(void) ""
- postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
-+postcopy_request_shared_page_present(const char *sharer, const char *rb, uint64_t rb_offset) "%s already %s offset 0x%"PRIx64
- postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
- 
- save_xbzrle_page_skipping(void) ""
--- 
+--=20
 MST
