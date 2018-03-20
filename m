@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <florolf@n621.de>) id 1eyJW7-00030K-EW
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:49:40 -0400
+	(envelope-from <mst@redhat.com>) id 1eyJY2-00040T-H6
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <florolf@n621.de>) id 1eyJW3-0004h9-Ob
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:49:38 -0400
-Received: from nyx.n621.de ([176.9.182.227]:34974)
+	(envelope-from <mst@redhat.com>) id 1eyJXz-0006a3-SU
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:51:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46378 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <florolf@n621.de>) id 1eyJW3-0004fC-HI
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:49:35 -0400
-Date: Tue, 20 Mar 2018 16:49:32 +0100
-From: Florian Larysch <fl@n621.de>
-Message-ID: <20180320154932.GC15157@nyx.n621.de>
-References: <20180320093135.26422-1-fl@n621.de>
-	<d5ad61b8-1570-0234-fd2a-97dfb174de59@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyJXz-0006Zh-O7
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:51:35 -0400
+Date: Tue, 20 Mar 2018 17:51:29 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180320174957-mutt-send-email-mst@kernel.org>
+References: <1521515720-612046-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_EbFC2qJvMGKj1gzTBnSgytLaJJfhDcn0FjEsjnvz1Sg@mail.gmail.com>
+	<20180320170328-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8Dxs9u1KyzGmND9H7mPi9+KrBdKzkxTB4+hQYN54JPmg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d5ad61b8-1570-0234-fd2a-97dfb174de59@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] os: truncate pidfile on creation
+In-Reply-To: <CAFEAcA8Dxs9u1KyzGmND9H7mPi9+KrBdKzkxTB4+hQYN54JPmg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v2 00/50] virtio, vhost, pci, pc: features,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, sw@weilnetz.de
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Mar 20, 2018 at 09:50:19AM -0500, Eric Blake wrote:
-> However, I have to wonder if we have the opposite problem - when the
-> file exists (truncated) but has not yet been written, how often do
-> we have a race where someone can see the empty file?
+On Tue, Mar 20, 2018 at 03:41:54PM +0000, Peter Maydell wrote:
+> On 20 March 2018 at 15:05, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > I'm curious why does it take that path though.
+> > Here's the rule
+> >
+> > #if defined(__linux__) && defined(__NR_userfaultfd) && defined(CONFIG_EVENTFD)
+> >
+> > If it's Linux we'll pick our own copy of the header
+> > and so __NR_userfaultfd is defined.
+> >
+> > CONFIG_EVENTFD is not set?
 > 
-> Should we be going even further and writing the pid into a temporary
-> file and then rename(2)ing that file onto the real destination, so
-> that if the pid file exists at all, it has stable contents that
-> can't cause confusion?
-
-I thought about doing that, but the window of opportunity is
-sufficiently small that this probably not a problem.
-
-Furthermore, the second purpose of the pid file is to provide mutual
-exclusion between qemu instances using the same pid file by means of the
-lockf() call. Given that the lock is associated with the inode, doing a
-rename() would defeat this if we didn't reopen the file before calling
-lockf(). However, doing that would in turn allow a race between multiple
-qemu instances (possibly resulting in the incorrect pid remaining in the
-file). That could also be fixed, but makes the whole affair even more
-complicated; not sure if this is worth the benefits.
-
-> >diff --git a/os-win32.c b/os-win32.c
-> >index 586a7c7d49..85dbad7af8 100644
-> >--- a/os-win32.c
-> >+++ b/os-win32.c
-> >@@ -108,7 +108,7 @@ int qemu_create_pidfile(const char *filename)
-> >      memset(&overlap, 0, sizeof(overlap));
-> >      file = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL,
-> >-                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-> >+                      CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+> CONFIG_EVENTFD is set. __NR_userfaultfd is not. It isn't
+> defined in the system headers, and it's not defined in
+> our linux-headers/asm-arm64/. Only x86, s390, powerpc
+> and arm (32-bit) define it. I suspect the build would also
+> fail on MIPS if I had a mips host in the build set.
 > 
-> I assume this is right (at least for looking comparable to the POSIX
-> case), although I'm trusting you here.
+> thanks
+> -- PMM
 
-I adapted this for consistency reasons, but I don't have a Windows
-platform available to test on. I based this on [1] and [2], which seems
-reasonable, but I'd be happy if someone who is familiar with the Windows
-API could ack this (get_maintainer.pl suggested Stefan Weil, who is
-CC'ed).
+Let's update headers for arm and mips then?
 
-[1] https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
-[2] https://stackoverflow.com/questions/14469607/difference-between-open-always-and-create-always-in-createfile-of-windows-api
-
-Florian
+-- 
+MST
