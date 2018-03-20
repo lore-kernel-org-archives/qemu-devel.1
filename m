@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyGXj-0008P3-6g
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:39:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1eyGa4-00026N-Bu
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyGXi-00041N-Ap
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:39:07 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 20 Mar 2018 13:37:36 +0100
-Message-Id: <1521549456-14072-15-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1521549456-14072-1-git-send-email-eric.auger@redhat.com>
-References: <1521549456-14072-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 14/14] hw/arm/virt: Introduce the iommu
- option
+	(envelope-from <dgilbert@redhat.com>) id 1eyGa3-0006Rs-Gw
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:41:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57156 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyGa3-0006RY-Cc
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:41:31 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue, 20 Mar 2018 12:41:17 +0000
+Message-Id: <20180320124117.40573-3-dgilbert@redhat.com>
+In-Reply-To: <20180320124117.40573-1-dgilbert@redhat.com>
+References: <20180320124117.40573-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/2] hmp: free sev info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,81 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
-Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, jixiang_zhang@h3c.com
 
-ARM virt machine now exposes a new "iommu" option.
-The SMMUv3 IOMMU is instantiated using -machine virt,iommu=smmuv3.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+Found thanks to ASAN:
 
+Direct leak of 16 byte(s) in 1 object(s) allocated from:
+    #0 0x7efe20417a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
+8)
+    #1 0x7efe1f7b2f75 in g_malloc0 ../glib/gmem.c:124
+    #2 0x7efe1f7b3249 in g_malloc0_n ../glib/gmem.c:355
+    #3 0x558272879162 in sev_get_info /home/elmarco/src/qemu/target/i386/=
+sev.c:414
+    #4 0x55827285113b in hmp_info_sev /home/elmarco/src/qemu/target/i386/=
+monitor.c:684
+    #5 0x5582724043b8 in handle_hmp_command /home/elmarco/src/qemu/monito=
+r.c:3333
+
+Fixes: 63036314
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180319175823.22111-1-marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-v9 -> v10:
-- remove no_iommu
+ target/i386/monitor.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-v7 -> v8:
-- Revert to machine option, now dubbed "iommu", preparing for virtio
-  instantiation.
-
-v5 -> v6: machine 2_11
----
- hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index cf83712..1ca7baf 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1557,6 +1557,34 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 011419eba2..a890b3c2ab 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -696,6 +696,8 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
+     } else {
+         monitor_printf(mon, "SEV is not enabled\n");
      }
++
++    qapi_free_SevInfo(info);
  }
- 
-+static char *virt_get_iommu(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    switch (vms->iommu) {
-+    case VIRT_IOMMU_NONE:
-+        return g_strdup("none");
-+    case VIRT_IOMMU_SMMUV3:
-+        return g_strdup("smmuv3");
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static void virt_set_iommu(Object *obj, const char *value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    if (!strcmp(value, "smmuv3")) {
-+        vms->iommu = VIRT_IOMMU_SMMUV3;
-+    } else if (!strcmp(value, "none")) {
-+        vms->iommu = VIRT_IOMMU_NONE;
-+    } else {
-+        error_setg(errp, "Invalid iommu value");
-+        error_append_hint(errp, "Valid values are none, smmuv3.\n");
-+    }
-+}
-+
- static CpuInstanceProperties
- virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- {
-@@ -1689,6 +1717,14 @@ static void virt_2_12_instance_init(Object *obj)
-                                         NULL);
-     }
- 
-+    /* Default disallows iommu instantiation */
-+    vms->iommu = VIRT_IOMMU_NONE;
-+    object_property_add_str(obj, "iommu", virt_get_iommu, virt_set_iommu, NULL);
-+    object_property_set_description(obj, "iommu",
-+                                    "Set the IOMMU model among "
-+                                    "none, smmuv3 (default none)",
-+                                    NULL);
-+
-     vms->memmap = a15memmap;
-     vms->irqmap = a15irqmap;
- }
--- 
-2.5.5
+=20
+ SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
+--=20
+2.14.3
