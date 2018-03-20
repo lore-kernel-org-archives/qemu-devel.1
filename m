@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ey9Sz-0002Al-P4
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:05:46 -0400
+	(envelope-from <chao.qin@linux.intel.com>) id 1ey9q1-00062Z-St
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ey9Sy-0000CZ-Mp
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:05:45 -0400
-References: <1521468046-10400-1-git-send-email-thuth@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <66c6e02a-a082-b9ef-f13c-3cdd8b0775f7@ilande.co.uk>
-Date: Tue, 20 Mar 2018 05:05:16 +0000
+	(envelope-from <chao.qin@linux.intel.com>) id 1ey9px-0006WP-P1
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:29:33 -0400
+Received: from mga14.intel.com ([192.55.52.115]:30774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chao.qin@linux.intel.com>)
+	id 1ey9px-0006VT-Br
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:29:29 -0400
+References: <1521450289-5005-1-git-send-email-chao.qin@linux.intel.com>
+	<20180319170525.1016391d@igors-macbook-pro.local>
+From: "Qin, Chao" <chao.qin@linux.intel.com>
+Message-ID: <c7354c76-afb6-e6f2-a0ca-86b6077228ea@linux.intel.com>
+Date: Tue, 20 Mar 2018 13:29:24 +0800
 MIME-Version: 1.0
-In-Reply-To: <1521468046-10400-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20180319170525.1016391d@igors-macbook-pro.local>
+Content-Language: en-US
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/misc/macio: Fix crash when
- listing device properties of macio device
+Subject: Re: [Qemu-devel] [PATCH] hax: Properly handle IA32_APIC_BASE MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
-
-On 19/03/18 14:00, Thomas Huth wrote:
-
-> The macio-newworld device can currently be used to abort QEMU unexpectedly:
-> 
-> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
-> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
->   "package": "build-all"}, "capabilities": []}}
-> { 'execute': 'qmp_capabilities' }
-> {"return": {}}
-> { 'execute': 'device-list-properties',
->    'arguments': {'typename': 'macio-newworld'}}
-> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-> Device 'serial0' is in use
-> Aborted (core dumped)
-> 
-> qdev properties should be set during realize(), not during instance_init(),
-> so move the related code there to fix this problem.
-
-Ah right, presumably this is because of the reference to serial_hds 
-again? The patch looks good, although given that it affects 
-macio_instance_init() and macio_common_realize() then I would have 
-expected this to have failed on the macio-oldworld device too (or 
-perhaps you were just unlucky that this was the first macio-*world 
-device enumerated).
-
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   hw/misc/macio/macio.c | 14 +++++++-------
->   1 file changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index 454244f..b74a657 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -115,6 +115,13 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
->       memory_region_add_subregion(&s->bar, 0x16000,
->                                   sysbus_mmio_get_region(sysbus_dev, 0));
->   
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
-> +    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hds[0]);
-> +    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hds[1]);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
-> +    qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
->       object_property_set_bool(OBJECT(&s->escc), true, "realized", &err);
->       if (err) {
->           error_propagate(errp, err);
-> @@ -341,13 +348,6 @@ static void macio_instance_init(Object *obj)
->       object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
->   
->       object_initialize(&s->escc, sizeof(s->escc), TYPE_ESCC);
-> -    qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
-> -    qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
-> -    qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
-> -    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hds[0]);
-> -    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hds[1]);
-> -    qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
-> -    qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
->       qdev_set_parent_bus(DEVICE(&s->escc), sysbus_get_default());
->       object_property_add_child(obj, "escc", OBJECT(&s->escc), NULL);
->   }
-> 
-
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, yu.ning@linux.intel.com, Qin Chao <chao.qin@intel.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
-ATB,
 
-Mark.
+On 3/20/2018 12:05 AM, Igor Mammedov wrote:
+> On Mon, 19 Mar 2018 17:04:49 +0800 chao.qin@linux.intel.com wrote:  > >> From: Qin Chao <chao.qin@intel.com> >> >> Emulation of 
+IA32_APIC_BASE MSR in HAXM is not correct, such as >> bit 8, which is 
+BSP flag and should be set to 1 for the bootstrap >> processor and set 
+to 0 for the application processors, but it's >> set to 0 for all 
+processors in HAXM. So guest OSes that expect a >> valid BSP flag, such 
+as Zircon (the core of Google Fuchsia OS), >> cannot boot with "-accel 
+hax". To solve this problem, HAXM (which >> lacks APIC virtualization) 
+and QEMU must notify each other of any >> change to guest IA32_APIC_BASE 
+MSR. The HAXM patch has been merged >> into HAXM source. QEMU needs to 
+use the new HAXM API (apic_base in >> "struct hax_tunnel") to initialize 
+the guest IA32_APIC_BASE MSR, >> and then, update its own copy at every 
+return from >> HAX_VCPU_IOCTL_RUN. >> >> There will be a backward 
+compatility issue caused by the new field >> "apic_base" added into 
+"struct hax_tunnel". In order to fix the >> problem, the validation for 
+size of "struct hax_tunnel" is removed >> and a new capability flag 
+"HAX_CAP_TUNNEL_PAGE" is added, which >> means that one page (4KB) is 
+allocated in HAXM kernel to store >> "struct hax_tunnel", instead of the 
+size of "struct hax_tunnel". >> >> Change-Id: 
+I8505bc1d75c495dd2765e581d6014125dcb538f3 Signed-off-by: >> Qin Chao 
+<chao.qin@intel.com> --- target/i386/hax-all.c | 24 >> 
++++++++++++++++++++----- target/i386/hax-darwin.c | 6 ------ >> 
+target/i386/hax-i386.h | 2 +- target/i386/hax-interface.h | >> 3 +++ 
+target/i386/hax-windows.c | 5 ----- 5 files changed, 23 >> 
+insertions(+), 17 deletions(-) >> >> diff --git a/target/i386/hax-all.c 
+b/target/i386/hax-all.c index >> cad7531..6a840d9 100644 --- 
+a/target/i386/hax-all.c +++ >> b/target/i386/hax-all.c > [...] >> @@ 
+-933,6 +944,9 @@ static int hax_set_msrs(CPUArchState *env) >> 
+hax_msr_entry_set(&msrs[n++], MSR_FMASK, env->fmask); >> 
+hax_msr_entry_set(&msrs[n++], MSR_KERNELGSBASE, >> env->kernelgsbase); 
+#endif + hax_msr_entry_set(&msrs[n++], >> MSR_IA32_APICBASE, \ + >> 
+cpu_get_apic_base(x86_env_get_cpu(env)->apic_state)); + md.nr_msr = >> 
+n; md.done = 0; > Does it work for you if you drop everything except of 
+this chunk?
+Yes, it works just with this chunk.
+
+>  > There is no much point in syncing BPS flag from HAXM since Seabios > 
+nor OVMF do not implement BSP selection protocol, it's hard-coded in > 
+QEMU that BSP is the first CPU. > > Considering that typically no sane 
+OS does change MSR_IA32_APICBASE > there is no need to sync it back to 
+QEMU. So no need to introduce all > that complexity for no gain.
+Yes, the BSP is hard-coded in QEMU. But other bits, not just BSP flag, are
+also needed to sync from HAXM, such as x2APIC mode flag (bit 10) and
+APIC enable/disable flag(bit 11). As in the Google Zircon
+(https://github.com/fuchsia-mirror/zircon/blob/master/kernel/arch/x86/lapic.cpp#L157),
+it will change IA32_APIC_BASE[10] and set the bit to 1 if x2APIC enabled.
+Although x2APIC mode is not supported yet for TCG mode, it's worthy to
+keep the codes that syncing IA32_APIC_BASE from HAXM to QEMU and if
+x2APIC mode is supported for TCG in future, there is no any effort needed
+to make HAXM to work with this mode. Also, in KVM it will synced the
+IA32_APIC_BASE MSR to QEMU at every VM-Exit.
+
+>  > [...] > > >
