@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyM2k-0005up-TW
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:31:32 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1eyM3y-0006Wx-Uo
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyM2f-00043w-Su
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:31:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eyM2f-00043B-MB
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:31:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eyM2d-00046N-0R
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 18:31:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 433542E8DE3
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 18:31:12 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1eyM3t-0004PT-Tu
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:32:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:24369)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eyM3t-0004PA-LR
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:32:41 -0400
+Date: Tue, 20 Mar 2018 15:32:27 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180320183227.GW3417@localhost.localdomain>
+References: <20180320173500.32065-1-vkuznets@redhat.com>
+	<20180320173500.32065-2-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Mar 2018 18:19:59 -0000
-From: LukeShu <lukeshu@sbcglobal.net>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152156999938.26200.10673862289302002614.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180320173500.32065-2-vkuznets@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] i386/kvm: add support for Hyper-V
+ reenlightenment MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +28,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>
 
-Everything except for the final patch (which has the actual fix) is now
-applied on the master branch.
+On Tue, Mar 20, 2018 at 06:34:59PM +0100, Vitaly Kuznetsov wrote:
+> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
+> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
+> when INVTSC is not passed to it (and it is not passed by default in Qemu
+> as it effectively blocks migration).
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+> Changes since v2:
+> - add hv-reenlightenment CPU property [Roman Kagan, Paolo Bonzini]
+> - add a comment to feature_word_info [Roman Kagan]
+> ---
+>  target/i386/cpu.c          |  4 +++-
+>  target/i386/cpu.h          |  4 ++++
+>  target/i386/hyperv-proto.h |  9 ++++++++-
+>  target/i386/kvm.c          | 39 ++++++++++++++++++++++++++++++++++++++-
+>  target/i386/machine.c      | 24 ++++++++++++++++++++++++
+>  5 files changed, 77 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 6bb4ce8719..02579f8234 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -407,7 +407,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              NULL /* hv_vpindex_access */, NULL /* hv_msr_reset_access */,
+>              NULL /* hv_msr_stats_access */, NULL /* hv_reftsc_access */,
+>              NULL /* hv_msr_idle_access */, NULL /* hv_msr_frequency_access */,
+> -            NULL, NULL, NULL, NULL,
+> +            NULL /* hv_msr_debug_access */, NULL /* hv_msr_reenlightenment_access */,
+> +            NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+> @@ -4764,6 +4765,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("hv-runtime", X86CPU, hyperv_runtime, false),
+>      DEFINE_PROP_BOOL("hv-synic", X86CPU, hyperv_synic, false),
+>      DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
+> +    DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
 
--- =
+Property is set to false by default, so compatibility is kept.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
+>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+>      DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+>      DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 2e2bab5ff3..98eed72937 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1174,6 +1174,9 @@ typedef struct CPUX86State {
+>      uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
+>      uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
+>      uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
+> +    uint64_t msr_hv_reenlightenment_control;
+> +    uint64_t msr_hv_tsc_emulation_control;
+> +    uint64_t msr_hv_tsc_emulation_status;
+>  
+>      uint64_t msr_rtit_ctrl;
+>      uint64_t msr_rtit_status;
+> @@ -1296,6 +1299,7 @@ struct X86CPU {
+>      bool hyperv_runtime;
+>      bool hyperv_synic;
+>      bool hyperv_stimer;
+> +    bool hyperv_reenlightenment;
+>      bool check_cpuid;
+>      bool enforce_cpuid;
+>      bool expose_kvm;
+> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+> index cb4d7f2b7a..93352ebd2a 100644
+> --- a/target/i386/hyperv-proto.h
+> +++ b/target/i386/hyperv-proto.h
+> @@ -35,7 +35,7 @@
+>  #define HV_RESET_AVAILABLE           (1u << 7)
+>  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
+>  #define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
+> -
+> +#define HV_ACCESS_REENLIGHTENMENTS_CONTROL  (1u << 13)
+>  
+>  /*
+>   * HV_CPUID_FEATURES.EDX bits
+> @@ -129,6 +129,13 @@
+>  #define HV_X64_MSR_CRASH_CTL                    0x40000105
+>  #define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
+>  
+> +/*
+> + * Reenlightenment notification MSRs
+> + */
+> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL      0x40000106
+> +#define HV_X64_MSR_TSC_EMULATION_CONTROL        0x40000107
+> +#define HV_X64_MSR_TSC_EMULATION_STATUS         0x40000108
+> +
+>  /*
+>   * Hypercall status code
+>   */
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index d23fff12f5..7d9f9ca0b1 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -90,6 +90,7 @@ static bool has_msr_hv_runtime;
+>  static bool has_msr_hv_synic;
+>  static bool has_msr_hv_stimer;
+>  static bool has_msr_hv_frequencies;
+> +static bool has_msr_hv_reenlightenment;
+>  static bool has_msr_xss;
+>  static bool has_msr_spec_ctrl;
+>  static bool has_msr_smi_count;
+> @@ -583,7 +584,8 @@ static bool hyperv_enabled(X86CPU *cpu)
+>              cpu->hyperv_vpindex ||
+>              cpu->hyperv_runtime ||
+>              cpu->hyperv_synic ||
+> -            cpu->hyperv_stimer);
+> +            cpu->hyperv_stimer ||
+> +            cpu->hyperv_reenlightenment);
+>  }
+>  
+>  static int kvm_arch_set_tsc_khz(CPUState *cs)
+> @@ -654,6 +656,14 @@ static int hyperv_handle_properties(CPUState *cs)
+>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+>          }
+>      }
+> +    if (cpu->hyperv_reenlightenment) {
+> +        if (!has_msr_hv_reenlightenment) {
+> +            fprintf(stderr,
+> +                    "Hyper-V Reenlightenment is not supported by kernel\n");
+> +            return -ENOSYS;
+> +        }
+> +        env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_REENLIGHTENMENTS_CONTROL;
+> +    }
+>      if (cpu->hyperv_crash && has_msr_hv_crash) {
+>          env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
+>      }
+> @@ -1185,6 +1195,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case HV_X64_MSR_TSC_FREQUENCY:
+>                      has_msr_hv_frequencies = true;
+>                      break;
+> +                case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
+> +                    has_msr_hv_reenlightenment = true;
+> +                    break;
+>                  case MSR_IA32_SPEC_CTRL:
+>                      has_msr_spec_ctrl = true;
+>                      break;
+> @@ -1747,6 +1760,15 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>              if (cpu->hyperv_time) {
+>                  kvm_msr_entry_add(cpu, HV_X64_MSR_REFERENCE_TSC,
+>                                    env->msr_hv_tsc);
+> +
+> +                if (has_msr_hv_reenlightenment) {
 
-Title:
-  static linux-user ARM emulation has several-second startup time
+I see that the current code is inconsistent: some entries check
+for has_msr_hv_*, other entries check cpu->hyperv_*.
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Incomplete
+I suggest changing all of them (including this one) to check
+cpu->hyperv_* instead.
 
-Bug description:
-  static linux-user emulation has several-second startup time
+The difference between both approaches is that checking just
+has_msr_hv_* would let a non-cooperating guest prevent itself
+from being migrated to an older host by writing a non-zero value
+to a MSR, even if hyperv support was not enabled in the VM
+configuration at all.  I don't think we want that.
 
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
 
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
+> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_REENLIGHTENMENT_CONTROL,
+> +                                      env->msr_hv_reenlightenment_control);
+> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_CONTROL,
+> +                                      env->msr_hv_tsc_emulation_control);
+> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_STATUS,
+> +                                      env->msr_hv_tsc_emulation_status);
 
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
+The 3 MSRs are added by the same KVM commit, so setting all 3
+based on the same has_msr_hv_*/cpu->hyperv_* flag is OK.
 
-  ----
+The rest of the patch looks good to me.
 
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
 
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
+> +                }
+>              }
+>          }
+>          if (cpu->hyperv_vapic) {
+> @@ -2109,6 +2131,12 @@ static int kvm_get_msrs(X86CPU *cpu)
+>      }
+>      if (cpu->hyperv_time) {
+>          kvm_msr_entry_add(cpu, HV_X64_MSR_REFERENCE_TSC, 0);
+> +
+> +        if (has_msr_hv_reenlightenment) {
+> +            kvm_msr_entry_add(cpu, HV_X64_MSR_REENLIGHTENMENT_CONTROL, 0);
+> +            kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_CONTROL, 0);
+> +            kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_STATUS, 0);
+> +        }
+>      }
+>      if (has_msr_hv_crash) {
+>          int j;
+> @@ -2367,6 +2395,15 @@ static int kvm_get_msrs(X86CPU *cpu)
+>              env->msr_hv_stimer_count[(index - HV_X64_MSR_STIMER0_COUNT)/2] =
+>                                  msrs[i].data;
+>              break;
+> +        case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
+> +            env->msr_hv_reenlightenment_control = msrs[i].data;
+> +            break;
+> +        case HV_X64_MSR_TSC_EMULATION_CONTROL:
+> +            env->msr_hv_tsc_emulation_control = msrs[i].data;
+> +            break;
+> +        case HV_X64_MSR_TSC_EMULATION_STATUS:
+> +            env->msr_hv_tsc_emulation_status = msrs[i].data;
+> +            break;
+>          case MSR_MTRRdefType:
+>              env->mtrr_deftype = msrs[i].data;
+>              break;
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index bd2d82e91b..fd99c0bbb4 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -713,6 +713,29 @@ static const VMStateDescription vmstate_msr_hyperv_stimer = {
+>      }
+>  };
+>  
+> +static bool hyperv_reenlightenment_enable_needed(void *opaque)
+> +{
+> +    X86CPU *cpu = opaque;
+> +    CPUX86State *env = &cpu->env;
+> +
+> +    return env->msr_hv_reenlightenment_control != 0 ||
+> +        env->msr_hv_tsc_emulation_control != 0 ||
+> +        env->msr_hv_tsc_emulation_status != 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_msr_hyperv_reenlightenment = {
+> +    .name = "cpu/msr_hyperv_reenlightenment",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = hyperv_reenlightenment_enable_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(env.msr_hv_reenlightenment_control, X86CPU),
+> +        VMSTATE_UINT64(env.msr_hv_tsc_emulation_control, X86CPU),
+> +        VMSTATE_UINT64(env.msr_hv_tsc_emulation_status, X86CPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static bool avx512_needed(void *opaque)
+>  {
+>      X86CPU *cpu = opaque;
+> @@ -1005,6 +1028,7 @@ VMStateDescription vmstate_x86_cpu = {
+>          &vmstate_msr_hyperv_runtime,
+>          &vmstate_msr_hyperv_synic,
+>          &vmstate_msr_hyperv_stimer,
+> +        &vmstate_msr_hyperv_reenlightenment,
+>          &vmstate_avx512,
+>          &vmstate_xss,
+>          &vmstate_tsc_khz,
+> -- 
+> 2.14.3
+> 
 
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+-- 
+Eduardo
