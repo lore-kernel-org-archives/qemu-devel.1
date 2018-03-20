@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyDbp-0001XE-KK
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1eyDi5-000483-Td
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyDbl-0003B0-Ge
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eyDbl-0003A3-9i
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eyDbj-0006dS-Hg
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:31:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 74D292E80CC
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:31:03 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1eyDi2-0004e1-Lv
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:37:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37202 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eyDi2-0004c4-GK
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:37:34 -0400
+Date: Tue, 20 Mar 2018 09:37:15 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180320093715.GC4530@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180319205040.1113423-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180319205040.1113423-1-eblake@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Mar 2018 09:19:16 -0000
-From: =?utf-8?b?5p2O56mX5oGS?= <1754542@bugs.launchpad.net>
-Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
-Message-Id: <152153755663.13804.14120077462217338880.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754542] Re: colo: vm crash with segmentation
- fault
+Subject: Re: [Qemu-devel] [PATCH for-2.12] qapi: Force UTF8 encoding when
+ parsing qapi files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-It is svn trace even
+On Mon, Mar 19, 2018 at 03:50:40PM -0500, Eric Blake wrote:
+> Commit d4e5ec877 already fixed things to work around Python 3's
+> lame bug of having LC_ALL=3DC not be 8-bit clean, when parsing the
+> main QMP qapi files; but failed to do likewise in the tests
+> directory.  As a result, running 'LC_ALL=3DC make check' fails on
+> escape-too-big and unicode-str when using python 3 with a nasty
+> stack trace instead of the intended graceful error message that
+> QAPI doesn't yet support 8-bit data (the two tests contain
+> Unicode =C3=A9, when parsed in UTF-8; they represent something
+> different when parsed in a proper single-byte C locale, but that
+> doesn't matter to the error message printed out, provided that
+> brain-dead Python hasn't first choked on the input instead of
+> being 8-bit clean).
+>=20
+> Ideally, we'd teach the qapi generator scripts to automatically
+> slurp things in using UTF-8 regardless of locale, and to honor
+> content that is not limited to 7 bit data rather than gracefully
+> erroring out; but until then, since our graceful error depends
+> on python parsing 8-bit data (even if nothing we generate uses
+> 8-bit data), our quick fix is to use the right locale when
+> running these tests.
+>=20
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>=20
+> Will go through my QAPI tree for post-freeze bug fixes
+>=20
+>  tests/Makefile.include | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-** Attachment added: "trace-svm.log"
-   https://bugs.launchpad.net/qemu/+bug/1754542/+attachment/5084771/+files/=
-trace-svm.log
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754542
-
-Title:
-  colo:  vm crash with segmentation fault
-
-Status in QEMU:
-  New
-
-Bug description:
-  I use Arch Linux x86_64
-  Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10)
-  Following document 'COLO-FT.txt',
-  I test colo feature on my hosts
-
-  I run this command
-  Primary:
-  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
-dio -name primary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfifo=
-,vote-threshold=3D1,\
-  children.0.file.filename=3D/var/lib/libvirt/images/1.raw,\
-  children.0.driver=3Draw -S
-
-  Secondary:
-  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
-dio -name secondary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D/var/lib/libvirt/im=
-ages/2.raw,driver=3Draw,node-name=3Dnode0 \
-  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
-y,\
-  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-  file.file.filename=3D/mnt/ramfs/active_disk.img,\
-  file.backing.driver=3Dqcow2,\
-  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
-  file.backing.backing=3Dsecondary-disk0 \
-  -incoming tcp:0:8888
-
-  Secondary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'nbd-server-start',
-    'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34',=
- 'port': '8889'} } }
-  }
-  {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', =
-'writable': true } }
-
-  Primary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'human-monitor-command',
-    'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,=
-mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.port=3D8889,=
-file.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
-  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', =
-'node': 'nbd_client0' } }
-  { 'execute': 'migrate-set-capabilities',
-        'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': t=
-rue } ] } }
-  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
-  And two VM with cash
-  Primary:
-  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
-RESUME"}
-  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
-ot c -enable-kvm -m 2048 -smp 2 -qm
-
-  Secondary:
-  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
-RESUME"}
-  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
-ot c -enable-kvm -m 2048 -smp 2 -qm
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
