@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eyOuU-0000dx-Po
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:35:12 -0400
+	(envelope-from <jsnow@redhat.com>) id 1eyP5a-0004D3-9G
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eyOuT-0005XE-Av
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:35:10 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:41944)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eyOuT-0005Wr-3N
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:35:09 -0400
-Received: by mail-ot0-x229.google.com with SMTP id i28-v6so3432398otf.8
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 14:35:08 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1eyP5Z-0005by-89
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 17:46:38 -0400
+References: <20180223152640.11459-1-pbonzini@redhat.com>
+	<20180223152640.11459-2-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <af95cb35-4a25-0082-ca54-6b344241f9f2@redhat.com>
+Date: Tue, 20 Mar 2018 17:46:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL4U11z9Oz0QkKFuAhoObnmK67cN0uzY8SsrcQCqtYWCKw@mail.gmail.com>
-References: <1521494329-19546-1-git-send-email-mjc@sifive.com>
-	<1521494329-19546-27-git-send-email-mjc@sifive.com>
-	<CAFEAcA8b+Py_=zf+GWYTzZAUpbfF7B6Hi5m8d0JnX6Z7nY4Cuw@mail.gmail.com>
-	<CAAdtpL4U11z9Oz0QkKFuAhoObnmK67cN0uzY8SsrcQCqtYWCKw@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Tue, 20 Mar 2018 14:35:07 -0700
-Message-ID: <CAHNT7NuQBtXDM8tx=A76SaJJ4Lfb8q_-px8hz1bdmKcZmw5Vig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [patches] Re: [PATCH v4 26/26] RISC-V: Fix
- riscv_isa_string memory size bug
+In-Reply-To: <20180223152640.11459-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] ide: push call to end_transfer_func
+ out of start_transfer callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: RISC-V Patches <patches@groups.riscv.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
 
-On Tue, Mar 20, 2018 at 1:51 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
 
-> Le mar. 20 mars 2018 12:52, Peter Maydell <peter.maydell@linaro.org> a
-> =C3=A9crit :
->
->> On 19 March 2018 at 21:18, Michael Clark <mjc@sifive.com> wrote:
->> > This version uses a constant size memory buffer sized for
->> > the maximum possible ISA string length. It also uses g_new
->> > instead of g_new0, uses more efficient logic to append
->> > extensions and adds manual zero termination of the string.
->> >
->> > Cc: Palmer Dabbelt <palmer@sifive.com>
->> > Cc: Peter Maydell <peter.maydell@linaro.org>
->> > Signed-off-by: Michael Clark <mjc@sifive.com>
->> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> > ---
->> >  target/riscv/cpu.c | 12 ++++++------
->> >  1 file changed, 6 insertions(+), 6 deletions(-)
->> >
->> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->> > index 1f25968..c82359f 100644
->> > --- a/target/riscv/cpu.c
->> > +++ b/target/riscv/cpu.c
->> > @@ -360,16 +360,16 @@ static void riscv_cpu_class_init(ObjectClass *c,
->> void *data)
->> >  char *riscv_isa_string(RISCVCPU *cpu)
->> >  {
->> >      int i;
->> > -    size_t maxlen =3D 5 + ctz32(cpu->env.misa);
->> > -    char *isa_string =3D g_new0(char, maxlen);
->> > -    snprintf(isa_string, maxlen, "rv%d", TARGET_LONG_BITS);
->> > +    const size_t maxlen =3D sizeof("rv128") + sizeof(riscv_exts) + 1;
->> > +    char *isa_str =3D g_new(char, maxlen);
->> > +    char *p =3D isa_str + snprintf(isa_str, maxlen, "rv%d",
->> TARGET_LONG_BITS);
->> >      for (i =3D 0; i < sizeof(riscv_exts); i++) {
->> >          if (cpu->env.misa & RV(riscv_exts[i])) {
->> > -            isa_string[strlen(isa_string)] =3D riscv_exts[i] - 'A' + =
-'a';
->> > -
->> > +            *p++ =3D tolower(riscv_exts[i]);
->>
->> This should be qemu_tolower(). Plain tolower() has an awkward problem
->> where if the 'char' type is signed and you hand tolower() a char that
->> happens to be a negative value you get undefined behaviour. This means
->> you need to cast the argument to 'unsigned char', which is what our
->>
->
-> Oh, good to know.
->
-> wrapper does. In this specific case the inputs are known constant
->> ASCII, so tolower() happens to be safe,
->
->
-> Yep.
->
-> but for consistency with
->> the rest of the codebase we should use our wrapper function.
->>
->
-> Ok.
->
->
->> >          }
->> >      }
->> > -    return isa_string;
->> > +    *p =3D '\0';
->> > +    return isa_str;
->> >  }
->> >
->> >  typedef struct RISCVCPUListState {
->>
->> Since this bug is causing the build tests to intermittently fail,
->> I'm going to apply this patch directly to master, with tolower()
->> replaced with qemu_tolower().
->>
->
-> Thanks Peter!
->
 
-Okay. I'll drop the patch from my post-merge spec conformance fixes series.
+On 02/23/2018 10:26 AM, Paolo Bonzini wrote:
+> Split the PIO transfer across two callbacks, thus pushing the (possibly
+> recursive) call to end_transfer_func up one level and out of the
+> AHCI-specific code.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/ide/ahci.c             | 7 ++++++-
+>  hw/ide/core.c             | 9 ++++++---
+>  include/hw/ide/internal.h | 1 +
+>  3 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index e22d7be05f..937bad55fb 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1321,8 +1321,12 @@ out:
+>  
+>      /* Update number of transferred bytes, destroy sglist */
+>      dma_buf_commit(s, size);
+> +}
+>  
+> -    s->end_transfer_func(s);
+> +static void ahci_end_transfer(IDEDMA *dma)
+> +{
+> +    AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+> +    IDEState *s = &ad->port.ifs[0];
+>  
+>      if (!(s->status & DRQ_STAT)) {
+>          /* done with PIO send/receive */
+> @@ -1444,6 +1448,7 @@ static const IDEDMAOps ahci_dma_ops = {
+>      .restart = ahci_restart,
+>      .restart_dma = ahci_restart_dma,
+>      .start_transfer = ahci_start_transfer,
+> +    .end_transfer = ahci_end_transfer,
+>      .prepare_buf = ahci_dma_prepare_buf,
+>      .commit_buf = ahci_commit_buf,
+>      .rw_buf = ahci_dma_rw_buf,
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 257b429381..92f4424dc3 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -532,16 +532,19 @@ static void ide_clear_retry(IDEState *s)
+>  void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
+>                          EndTransferFunc *end_transfer_func)
+>  {
+> -    s->end_transfer_func = end_transfer_func;
+>      s->data_ptr = buf;
+>      s->data_end = buf + size;
+>      ide_set_retry(s);
+>      if (!(s->status & ERR_STAT)) {
+>          s->status |= DRQ_STAT;
+>      }
+> -    if (s->bus->dma->ops->start_transfer) {
+> -        s->bus->dma->ops->start_transfer(s->bus->dma);
+> +    if (!s->bus->dma->ops->start_transfer) {
+> +        s->end_transfer_func = end_transfer_func;
+> +        return;
+>      }
+> +    s->bus->dma->ops->start_transfer(s->bus->dma);
+> +    end_transfer_func(s);
 
-I've addressed all feedback on the post-merge spec conformance series so
-i'll make a PR for it...
+wow, this makes me really uneasy to look at. The assumption now is: "If
+you have a start_transfer method, that method if successful implies that
+the transfer is *COMPLETED*."
 
-... these are the extra commits that were erroneously included in the v8.2
-pull. They now all have sign-offs... they've been in the riscv tree for a
-while and have had a lot of testing...
+It's implicit here, but I think anyone but the two of us would probably
+not understand that implication. (Or me in three months.) What can we do
+about that? Since AHCI is the only interface that uses this callback, I
+wonder if we can't just rename it to something more obvious.
+
+perform_transfer ? do_transfer ?
+
+Under normal circumstances this function really does just "start" a
+transfer and it's not obvious from context that some adapters have
+synchronous methods to finish the transfer without further PIO pingpong
+with the guest.
+
+> +    s->bus->dma->ops->end_transfer(s->bus->dma);
+>  }
+>  
+>  static void ide_cmd_done(IDEState *s)
+> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+> index 88212f59df..efaabbd815 100644
+> --- a/include/hw/ide/internal.h
+> +++ b/include/hw/ide/internal.h
+> @@ -445,6 +445,7 @@ struct IDEState {
+>  struct IDEDMAOps {
+>      DMAStartFunc *start_dma;
+>      DMAVoidFunc *start_transfer;
+> +    DMAVoidFunc *end_transfer;
+>      DMAInt32Func *prepare_buf;
+>      DMAu32Func *commit_buf;
+>      DMAIntFunc *rw_buf;
+> 
+
+Technically-OK-but-my-sadness-increased: John Snow <jsnow@redhat.com>
