@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kamensky@cisco.com>) id 1eyAWN-00056h-1t
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 02:13:20 -0400
+	(envelope-from <imammedo@redhat.com>) id 1eyBLH-0002zW-8D
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kamensky@cisco.com>) id 1eyAWM-0003WK-25
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 02:13:19 -0400
-From: Victor Kamensky <kamensky@cisco.com>
-Date: Mon, 19 Mar 2018 23:12:48 -0700
-Message-Id: <1521526368-1996-1-git-send-email-kamensky@cisco.com>
+	(envelope-from <imammedo@redhat.com>) id 1eyBLD-0004KP-EC
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:05:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35064 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eyBLD-0004In-9c
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:05:51 -0400
+Date: Tue, 20 Mar 2018 08:05:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180320080538.2e523aeb@redhat.com>
+In-Reply-To: <20180320043525-mutt-send-email-mst@kernel.org>
+References: <1521224390-425343-1-git-send-email-mst@redhat.com>
+	<B2D15215269B544CADD246097EACE7473ABF2928@DGGEMM505-MBS.china.huawei.com>
+	<20180320043525-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] arm/translate-a64: treat DISAS_UPDATE as
- variant of DISAS_EXIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: avoid misaligned access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +28,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-In OE project 4.15 linux kernel boot hang was observed under
-single cpu aarch64 qemu. Kernel code was in a loop waiting for
-vtimer arrival, spinning in TC generated blocks, while interrupt
-was pending unprocessed. This happened because when qemu tried to
-handle vtimer interrupt target had interrupts disabled, as
-result flag indicating TCG exit, cpu->icount_decr.u16.high,
-was cleared but arm_cpu_exec_interrupt function did not call
-arm_cpu_do_interrupt to process interrupt. Latter when target
-reenabled interrupts, it happened without exit into main loop, so
-following code that waited for result of interrupt execution
-run in infinite loop.
+On Tue, 20 Mar 2018 04:36:48 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-To solve the problem instructions that operate on CPU sys state
-(i.e enable/disable interrupt), and marked as DISAS_UPDATE,
-should be considered as DISAS_EXIT variant, and should be
-forced to exit back to main loop so qemu will have a chance
-processing pending CPU state updates, including pending
-interrupts.
+> On Tue, Mar 20, 2018 at 02:01:07AM +0000, Zhoujian (jay) wrote:
+> > 
+> >   
+> > > -----Original Message-----
+> > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > Sent: Saturday, March 17, 2018 2:20 AM
+> > > To: qemu-devel@nongnu.org
+> > > Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > > Subject: [PATCH] vhost-user: avoid misaligned access
+> > > 
+> > > We can't pass a pointer to memory field directly since it's within a packed
+> > > structure, so isn't aligned.
+> > > Pass a pointer on stack and copy.
+> > > 
+> > > Fixes: 30c4cc7 ("vhost: used_memslots refactoring")
+> > > Cc: Jay Zhou <jianjay.zhou@huawei.com>
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > > 
+> > > I had to apply this to fix make check errors with clang.
+> > > Pls review, test and ack.
+> > > 
+> > > Thanks!
+> > > 
+> > >  hw/virtio/vhost-user.c | 14 +++++++++++---
+> > >  1 file changed, 11 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c index
+> > > c12fdd9..a44ee7f 100644
+> > > --- a/hw/virtio/vhost-user.c
+> > > +++ b/hw/virtio/vhost-user.c
+> > > @@ -396,6 +396,7 @@ static int vhost_user_set_mem_table_postcopy(struct
+> > > vhost_dev *dev,
+> > >      bool reply_supported = virtio_has_feature(dev->protocol_features,
+> > > 
+> > > VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> > >      VhostUserMsg msg_reply;
+> > > +    VhostUserMemory memory = {};
+> > >      int region_i, msg_i;
+> > > 
+> > >      VhostUserMsg msg = {
+> > > @@ -407,10 +408,11 @@ static int vhost_user_set_mem_table_postcopy(struct
+> > > vhost_dev *dev,
+> > >          msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
+> > >      }
+> > > 
+> > > -    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
+> > > +    if (vhost_user_prepare_msg(dev, &memory, fds) < 0) {
+> > >          error_report("Failed preparing vhost-user memory table msg");
+> > >          return -1;
+> > >      }
+> > > +    msg.payload.memory = memory;
+> > > 
+> > >      fd_num = msg.payload.memory.nregions;
+> > > 
+> > > @@ -549,16 +551,19 @@ static int vhost_user_set_mem_table(struct vhost_dev
+> > > *dev,
+> > >          .hdr.request = VHOST_USER_SET_MEM_TABLE,
+> > >          .hdr.flags = VHOST_USER_VERSION,
+> > >      };
+> > > +    VhostUserMemory memory = {};
+> > > 
+> > >      if (reply_supported) {
+> > >          msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
+> > >      }
+> > > 
+> > > -    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
+> > > +    if (vhost_user_prepare_msg(dev, &memory, fds) < 0) {
+> > >          error_report("Failed preparing vhost-user memory table msg");
+> > >          return -1;
+> > >      }
+> > > 
+> > > +    msg.payload.memory = memory;
+> > > +
+> > >      fd_num = msg.payload.memory.nregions;
+> > > 
+> > >      if (!fd_num) {
+> > > @@ -1575,8 +1580,11 @@ static void vhost_user_set_used_memslots(struct
+> > > vhost_dev *dev)  {
+> > >      int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > >      VhostUserMsg msg;
+> > > +    VhostUserMemory memory = {};
+> > > +
+> > > +    vhost_user_prepare_msg(dev, &memory, fds);
+> > > 
+> > > -    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
+> > > +    msg.payload.memory = memory;
+> > >  }  
+> 
+> FYI I think it's better to pass pointer to msg to
+> avoid alignment issues.
+> 
+> > Hi Michael, here should be like this:
+> > 
+> > 
+> > static void vhost_user_set_used_memslots(struct vhost_dev *dev)
+> >  {
+> >      int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > -    VhostUserMsg msg;
+> > +    VhostUserMemory memory = {};
+> >  
+> > -    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
+> > +    vhost_user_prepare_msg(dev, &memory, fds);
+> >  }
+> > 
+> > 
+> > Regards,
+> > Jay  
+> 
+> 
+> But what's the point of all this? The structure is discarded
+> after being initialized. Doesn't look right to me.
+I think it was my idea,
+point is to share vhost_user_prepare_msg() between
+_set_used_memslots and _set_mem_table* instead of
+duplicating code, of cause at the cost of discarding
+results in vhost_user_set_used_memslots()
 
-This change brings consistency with how DISAS_UPDATE is treated
-in aarch32 case.
-
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Alex Bennée <alex.bennee@linaro.org>
-CC: qemu-stable@nongnu.org
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Victor Kamensky <kamensky@cisco.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-a64.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 31ff047..327513e 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -13378,12 +13378,12 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         case DISAS_UPDATE:
-             gen_a64_set_pc_im(dc->pc);
-             /* fall through */
--        case DISAS_JUMP:
--            tcg_gen_lookup_and_goto_ptr();
--            break;
-         case DISAS_EXIT:
-             tcg_gen_exit_tb(0);
-             break;
-+        case DISAS_JUMP:
-+            tcg_gen_lookup_and_goto_ptr();
-+            break;
-         case DISAS_NORETURN:
-         case DISAS_SWI:
-             break;
--- 
-2.7.4
+> 
+> > > 
+> > >  const VhostOps user_ops = {
+> > > --
+> > > MST  
+> 
