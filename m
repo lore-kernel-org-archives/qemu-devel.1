@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyLAZ-0007Y6-0M
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyLBi-00005J-8C
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyLAY-0008Ha-77
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:31 -0400
-References: <20180228180507.3964-1-mreitz@redhat.com>
-	<20180228180507.3964-16-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fea69d15-d7e4-6772-c583-c224b3dbe4a1@redhat.com>
-Date: Tue, 20 Mar 2018 12:35:23 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180228180507.3964-16-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/16] block/mirror: Add copy mode QAPI
- interface
+	(envelope-from <kwolf@redhat.com>) id 1eyLBh-0000Ou-E4
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:36:42 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 20 Mar 2018 18:36:20 +0100
+Message-Id: <20180320173632.25480-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12 00/12] block: Follow-up for
+ .bdrv_co_create (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +18,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, eblake@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-On 02/28/2018 12:05 PM, Max Reitz wrote:
-> This patch allows the user to specify whether to use active or only
-> background mode for mirror block jobs.  Currently, this setting will
-> remain constant for the duration of the entire block job.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   qapi/block-core.json      | 11 +++++++++--
->   include/block/block_int.h |  4 +++-
->   block/mirror.c            | 12 +++++++-----
->   blockdev.c                |  9 ++++++++-
->   4 files changed, 27 insertions(+), 9 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index c73b769c27..1186c007ae 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1573,6 +1573,9 @@
->   #         written. Both will result in identical contents.
->   #         Default is true. (Since 2.4)
->   #
-> +# @copy-mode: when to copy data to the destination; defaults to 'background'
-> +#             (Since: 2.12)
-> +#
+This series adds qemu-iotests for a few more block drivers (yet more to
+come in another series) and fixes a few things that previous review and
+these tests brought up.
 
-Are we still aiming for 2.12, or is this a feature which missed 
-softfreeze and should therefore be 2.13?
+The only major design change is that I converted the vdi block driver
+from a boolean 'static' create option to the standard 'preallocation'
+one that other drivers are using. This seems like a good move to make
+while the interface isn't stable yet.
+
+Kevin Wolf (12):
+  vdi: Change 'static' create option to 'preallocation' in QMP
+  vdi: Fix build with CONFIG_VDI_DEBUG
+  qemu-iotests: Test vdi image creation with QMP
+  qemu-iotests: Enable 025 for luks
+  luks: Turn another invalid assertion into check
+  qemu-iotests: Test invalid resize on luks
+  parallels: Check maximum cluster size on create
+  qemu-iotests: Test parallels image creation with QMP
+  vhdx: Require power-of-two block size on create
+  vhdx: Don't use error_setg_errno() with constant errno
+  vhdx: Check for 4 GB maximum log size on creation
+  qemu-iotests: Test vhdx image creation with QMP
+
+ qapi/block-core.json       |   6 +-
+ block/crypto.c             |   6 +-
+ block/parallels.c          |   5 +
+ block/vdi.c                |  46 ++++--
+ block/vhdx.c               |  17 ++-
+ tests/qemu-iotests/025     |   9 +-
+ tests/qemu-iotests/210     |  37 +++++
+ tests/qemu-iotests/211     | 256 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/211.out |  98 +++++++++++++
+ tests/qemu-iotests/212     | 326 ++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/212.out | 111 ++++++++++++++
+ tests/qemu-iotests/213     | 349 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/213.out | 121 ++++++++++++++++
+ tests/qemu-iotests/group   |   3 +
+ 14 files changed, 1365 insertions(+), 25 deletions(-)
+ create mode 100755 tests/qemu-iotests/211
+ create mode 100644 tests/qemu-iotests/211.out
+ create mode 100755 tests/qemu-iotests/212
+ create mode 100644 tests/qemu-iotests/212.out
+ create mode 100755 tests/qemu-iotests/213
+ create mode 100644 tests/qemu-iotests/213.out
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.13.6
