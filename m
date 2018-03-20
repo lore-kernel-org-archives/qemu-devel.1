@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eyBgX-0001CZ-HZ
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:27:55 -0400
+	(envelope-from <chao.qin@linux.intel.com>) id 1eyBxy-0006bK-Ir
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eyBgW-00007h-CV
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:27:53 -0400
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Tue, 20 Mar 2018 15:26:49 +0800
-Message-ID: <1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
-In-Reply-To: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
-References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
+	(envelope-from <chao.qin@linux.intel.com>) id 1eyBxv-00040T-Gb
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:45:54 -0400
+Received: from mga07.intel.com ([134.134.136.100]:25571)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chao.qin@linux.intel.com>)
+	id 1eyBxv-0003wP-6j
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 03:45:51 -0400
+References: <1521450289-5005-1-git-send-email-chao.qin@linux.intel.com>
+	<20180319170525.1016391d@igors-macbook-pro.local>
+	<c7354c76-afb6-e6f2-a0ca-86b6077228ea@linux.intel.com>
+	<20180320081226.66d4b92e@redhat.com>
+From: "Qin, Chao" <chao.qin@linux.intel.com>
+Message-ID: <05e0dd7c-6e0a-d126-cdc5-e0989bf9bdf6@linux.intel.com>
+Date: Tue, 20 Mar 2018 15:45:45 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/2] arm_gicv3_kvm: kvm_dist_get/put: skip
- the registers banked by GICR
+In-Reply-To: <20180320081226.66d4b92e@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hax: Properly handle IA32_APIC_BASE MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,103 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, yu.ning@linux.intel.com, Qin Chao <chao.qin@intel.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-While we skip the GIC_INTERNAL irqs, we don't change the register offset
-accordingly. This will overlap the GICR registers value and leave the
-last GIC_INTERNAL irq's registers out of update.
 
-Fix this by skipping the registers banked by GICR.
 
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
----
- hw/intc/arm_gicv3_kvm.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On 3/20/2018 3:12 PM, Igor Mammedov wrote:
+> On Tue, 20 Mar 2018 13:29:24 +0800 "Qin, Chao"  > <chao.qin@linux.intel.com> wrote: > >> On 3/20/2018 12:05 AM, Igor 
+Mammedov wrote: >>> On Mon, 19 Mar 2018 17:04:49 +0800 
+chao.qin@linux.intel.com >>> wrote: > >> From: Qin Chao 
+<chao.qin@intel.com> > / something horribly wrong with mail client used 
+for reply / >
+Very sorry for the wrong reply style.
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 3536795..d423cba 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -136,6 +136,12 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
-     int irq;
- 
-     field = (uint32_t *)bmp;
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-+     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
-+     * sync them.
-+     */
-+    offset += (8 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 8) {
-         kvm_gicd_access(s, offset, &reg, false);
-         *field = reg;
-@@ -150,6 +156,12 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
-     int irq;
- 
-     field = (uint32_t *)bmp;
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-+     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
-+     * sync them.
-+     */
-+    offset += (8 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 8) {
-         reg = *field;
-         kvm_gicd_access(s, offset, &reg, true);
-@@ -164,6 +176,12 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
-+     * them.
-+     */
-+    offset += (2 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         kvm_gicd_access(s, offset, &reg, false);
-         reg = half_unshuffle32(reg >> 1);
-@@ -181,6 +199,12 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
-+     * them.
-+     */
-+    offset += (2 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         reg = *gic_bmp_ptr32(bmp, irq);
-         if (irq % 32 != 0) {
-@@ -222,6 +246,12 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
-+     * are always RAZ/WI. The corresponding functionality is replaced by the
-+     * GICR registers. So it doesn't need to sync them.
-+     */
-+    offset += (1 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         kvm_gicd_access(s, offset, &reg, false);
-         *gic_bmp_ptr32(bmp, irq) = reg;
-@@ -235,6 +265,14 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
-+     * are always RAZ/WI. The corresponding functionality is replaced by the
-+     * GICR registers. So it doesn't need to sync them.
-+     */
-+    offset += (1 * sizeof(uint32_t));
-+    if (clroffset != 0)
-+        clroffset += (1 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         /* If this bitmap is a set/clear register pair, first write to the
-          * clear-reg to clear all bits before using the set-reg to write
--- 
-2.0.4
+>>> @@  >> -933,6 +944,9 @@ static int hax_set_msrs(CPUArchState *env) >> >> 
+hax_msr_entry_set(&msrs[n++], MSR_FMASK, env->fmask); >> >> 
+hax_msr_entry_set(&msrs[n++], MSR_KERNELGSBASE, >> >> 
+env->kernelgsbase); #endif + hax_msr_entry_set(&msrs[n++], >> >> 
+MSR_IA32_APICBASE, \ + >> >> 
+cpu_get_apic_base(x86_env_get_cpu(env)->apic_state)); + md.nr_msr = >> 
+ >> n; md.done = 0; > Does it work for you if you drop everything >> 
+except of this chunk? Yes, it works just with this chunk. > Could you 
+send v2 dropping unnecessary chunks pls? (provided that > Paolo would 
+drop queued v1).
+I think you may missed the clarification for the codes that syncing
+IA32_APIC_BASE MSR from HAXM to QEMU due to rhe wrong reply style.
+Sorry again for the inconvenience. Please refer to the following.
+
+Yes, the BSP is hard-coded in QEMU. But other bits, not just BSP flag, are
+alse needed to sync from HAXM, such as x2APIC mode flag (bit 10) and
+APIC enable/disable flag (bit 11). As in the Google Zircon
+(https://github.com/fuchsia-mirror/zircon/blob/master/kernel/arch/x86/lapic.cpp#L157),
+it will change IA32_APIC_BASE[10] and the the bit to 1 if x2APIC enabled.
+Although x2APIC mode is not supported yet for TCG mode, it's worthy to
+keep the codes that syncing IA32_APIC_BASE from HAXM to QEMU and
+if x2APIC mode is supported fro TCG in future, there is no any effort needed
+to make HAXM to work with this mode. Alos, in KVM it synced the 
+IA32_APIC_BASE
+MSR to QEMU at every VM-Exit.
