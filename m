@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1eyLAG-0007Gg-Oa
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyLAZ-0007Y6-0M
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1eyLAF-00082o-GV
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36988 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1eyLAF-0007tE-DA
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:11 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Tue, 20 Mar 2018 18:35:00 +0100
-Message-Id: <20180320173500.32065-3-vkuznets@redhat.com>
-In-Reply-To: <20180320173500.32065-1-vkuznets@redhat.com>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+	(envelope-from <eblake@redhat.com>) id 1eyLAY-0008Ha-77
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:35:31 -0400
+References: <20180228180507.3964-1-mreitz@redhat.com>
+	<20180228180507.3964-16-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fea69d15-d7e4-6772-c583-c224b3dbe4a1@redhat.com>
+Date: Tue, 20 Mar 2018 12:35:23 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180228180507.3964-16-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 15/16] block/mirror: Add copy mode QAPI
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
-nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
-Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
-these frequencies are stable, it just means they're available for reading.
+On 02/28/2018 12:05 PM, Max Reitz wrote:
+> This patch allows the user to specify whether to use active or only
+> background mode for mirror block jobs.  Currently, this setting will
+> remain constant for the duration of the entire block job.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   qapi/block-core.json      | 11 +++++++++--
+>   include/block/block_int.h |  4 +++-
+>   block/mirror.c            | 12 +++++++-----
+>   blockdev.c                |  9 ++++++++-
+>   4 files changed, 27 insertions(+), 9 deletions(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index c73b769c27..1186c007ae 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1573,6 +1573,9 @@
+>   #         written. Both will result in identical contents.
+>   #         Default is true. (Since 2.4)
+>   #
+> +# @copy-mode: when to copy data to the destination; defaults to 'background'
+> +#             (Since: 2.12)
+> +#
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- target/i386/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Are we still aiming for 2.12, or is this a feature which missed 
+softfreeze and should therefore be 2.13?
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 7d9f9ca0b1..74fc3d3b2c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -651,7 +651,7 @@ static int hyperv_handle_properties(CPUState *cs)
-         env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
-         env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
- 
--        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-+        if (has_msr_hv_frequencies && env->tsc_khz) {
-             env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
-             env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
-         }
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
