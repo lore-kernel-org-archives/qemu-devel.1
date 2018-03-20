@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eyO7S-0003VR-IS
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:44:33 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1eyO8U-0004Sr-KK
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:45:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eyO7P-0004eg-Ck
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:44:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:35061)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eyO7P-0004e5-1X
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:44:27 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 20 Mar 2018 21:43:51 +0100
-Message-Id: <20180320204351.28167-2-laurent@vivier.eu>
-In-Reply-To: <20180320204351.28167-1-laurent@vivier.eu>
-References: <20180320204351.28167-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 1/1] linux-user: init_guest_space: Try to make
- ARM space+commpage continuous
+	(envelope-from <alindsay@codeaurora.org>) id 1eyO8T-0005Ao-Jx
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 16:45:34 -0400
+Date: Tue, 20 Mar 2018 16:45:23 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180320204523.GE24561@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-9-git-send-email-alindsay@codeaurora.org>
+	<9c99641e-af00-e229-02a1-7d396b5132d1@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <9c99641e-af00-e229-02a1-7d396b5132d1@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 08/22] target/arm: Support
+ multiple EL change hooks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Luke Shumaker <lukeshu@parabola.nu>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, qemu-devel@nongnu.org, Digant Desai <digantd@codeaurora.org>
 
-From: Luke Shumaker <lukeshu@parabola.nu>
+On Mar 18 23:41, Philippe Mathieu-Daud=E9 wrote:
+> On 03/16/2018 09:31 PM, Aaron Lindsay wrote:
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> >  target/arm/cpu.c       | 15 ++++++++++-----
+> >  target/arm/cpu.h       | 23 ++++++++++++-----------
+> >  target/arm/internals.h |  7 ++++---
+> >  3 files changed, 26 insertions(+), 19 deletions(-)
+> >=20
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index 072cbbf..5f782bf 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -55,13 +55,16 @@ static bool arm_cpu_has_work(CPUState *cs)
+> >           | CPU_INTERRUPT_EXITTB);
+> >  }
+> > =20
+> > -void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHook *hook,
+> > +void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *hoo=
+k,
+> >                                   void *opaque)
+> >  {
+> > -    /* We currently only support registering a single hook function =
+*/
+> > -    assert(!cpu->el_change_hook);
+> > -    cpu->el_change_hook =3D hook;
+> > -    cpu->el_change_hook_opaque =3D opaque;
+> > +    ARMELChangeHook *entry;
+> > +    entry =3D g_malloc0(sizeof (*entry));
+>=20
+> imho g_malloc() is enough.
 
-At a fixed distance after the usable memory that init_guest_space maps, for
-32-bit ARM targets we also need to map a commpage.  The normal
-init_guest_space logic doesn't keep this in mind when searching for an
-address range.
+It seems like the only difference is between initializing it to zero
+(g_malloc0) and making it as uninitialized (g_malloc) for coverity. Are
+there coding standards for when we should choose which?
 
-If !host_start, then try to find a big continuous segment where we can put
-both the usable memory and the commpage; we then munmap that segment and
-set current_start to that address; and let the normal code mmap the usable
-memory and the commpage separately.  That is: if we don't have hint of
-where to start looking for memory, come up with one that is better than
-NULL.  Depending on host_size and guest_start, there may or may not be a
-gap between the usable memory and the commpage, so this is slightly more
-restrictive than it needs to be; but it's only a hint, so that's OK.
+>=20
+> > +
+> > +    entry->hook =3D hook;
+> > +    entry->opaque =3D opaque;
+> > +
+> > +    QLIST_INSERT_HEAD(&cpu->el_change_hooks, entry, node);
+> >  }
+> > =20
+> >  static void cp_reg_reset(gpointer key, gpointer value, gpointer opaq=
+ue)
+> > @@ -744,6 +747,8 @@ static void arm_cpu_realizefn(DeviceState *dev, E=
+rror **errp)
+> >          return;
+> >      }
+> > =20
+> > +    QLIST_INIT(&cpu->el_change_hooks);
+> > +
+>=20
+> You missed to fill arm_cpu_unrealizefn() with:
+>=20
+>     QLIST_FOREACH(...) {
+>         QLIST_REMOVE(...);
+>         g_free(...);
+>     }
 
-We only do that for !host start, because if host_start, then either:
- - we got an address passed in with -B, in which case we don't want to
-   interfere with what the user said;
- - or host_start is based off of the ELF image's loaddr.  The check "if
-   (host_start && real_start != current_start)" suggests that we really
-   want lowest available address that is >= loaddr.  I don't know why that
-   is, but I'm trusting that Paul Brook knew what he was doing when he
-   wrote the original version of that check in
-   c581deda322080e8beb88b2e468d4af54454e4b3 way back in 2010.
+Do you mean arm_cpu_finalizefn()?
 
-Signed-off-by: Luke Shumaker <lukeshu@parabola.nu>
-Message-Id: <20171228180814.9749-11-lukeshu@lukeshu.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/elfload.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+-Aaron
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 4563a3190b..23e34957f9 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1889,6 +1889,55 @@ unsigned long init_guest_space(unsigned long host_start,
- 
-     /* Otherwise, a non-zero size region of memory needs to be mapped
-      * and validated.  */
-+
-+#if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
-+    /* On 32-bit ARM, we need to map not just the usable memory, but
-+     * also the commpage.  Try to find a suitable place by allocating
-+     * a big chunk for all of it.  If host_start, then the naive
-+     * strategy probably does good enough.
-+     */
-+    if (!host_start) {
-+        unsigned long guest_full_size, host_full_size, real_start;
-+
-+        guest_full_size =
-+            (0xffff0f00 & qemu_host_page_mask) + qemu_host_page_size;
-+        host_full_size = guest_full_size - guest_start;
-+        real_start = (unsigned long)
-+            mmap(NULL, host_full_size, PROT_NONE, flags, -1, 0);
-+        if (real_start == (unsigned long)-1) {
-+            if (host_size < host_full_size - qemu_host_page_size) {
-+                /* We failed to map a continous segment, but we're
-+                 * allowed to have a gap between the usable memory and
-+                 * the commpage where other things can be mapped.
-+                 * This sparseness gives us more flexibility to find
-+                 * an address range.
-+                 */
-+                goto naive;
-+            }
-+            return (unsigned long)-1;
-+        }
-+        munmap((void *)real_start, host_full_size);
-+        if (real_start & ~qemu_host_page_mask) {
-+            /* The same thing again, but with an extra qemu_host_page_size
-+             * so that we can shift around alignment.
-+             */
-+            unsigned long real_size = host_full_size + qemu_host_page_size;
-+            real_start = (unsigned long)
-+                mmap(NULL, real_size, PROT_NONE, flags, -1, 0);
-+            if (real_start == (unsigned long)-1) {
-+                if (host_size < host_full_size - qemu_host_page_size) {
-+                    goto naive;
-+                }
-+                return (unsigned long)-1;
-+            }
-+            munmap((void *)real_start, real_size);
-+            real_start = HOST_PAGE_ALIGN(real_start);
-+        }
-+        current_start = real_start;
-+    }
-+ naive:
-+#endif
-+
-     while (1) {
-         unsigned long real_start, real_size, aligned_size;
-         aligned_size = real_size = host_size;
--- 
-2.14.3
+--=20
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies=
+, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
