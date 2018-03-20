@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boqun.feng@intel.com>) id 1ey4sL-0008Vy-D9
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:11:38 -0400
+	(envelope-from <alistair23@gmail.com>) id 1ey4yq-0001jC-43
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <boqun.feng@intel.com>) id 1ey4sH-0003yA-VW
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:11:37 -0400
-Received: from mga14.intel.com ([192.55.52.115]:17598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <boqun.feng@intel.com>)
-	id 1ey4sH-0003wR-MV
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:11:33 -0400
-From: Boqun Feng <boqun.feng@intel.com>
-Date: Tue, 20 Mar 2018 08:08:15 +0800
-Message-Id: <20180320000821.8337-1-boqun.feng@intel.com>
-Subject: [Qemu-devel] [PATCH v2] i386: add KnightsMill cpu model
+	(envelope-from <alistair23@gmail.com>) id 1ey4yo-0007qH-Sr
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:18:19 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180319110215.16755-1-peter.maydell@linaro.org>
+References: <20180319110215.16755-1-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 20 Mar 2018 10:17:43 +1000
+Message-ID: <CAKmqyKOO8AJooAj4V8zyuAOA-w76kFoMLee4Q6_knCTwtCCpEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/arm/bcm2836: Use the Cortex-A7
+ instead of Cortex-A15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,82 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, chao.p.peng@intel.com, Boqun Feng <boqun.feng@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Patch Tracking <patches@linaro.org>
 
-A new cpu model called "KnightsMill" is added to model Knights Mill
-processors.  Compared to "Skylake-Server" cpu model, the following
-features are added:
+n Mon, Mar 19, 2018 at 9:02 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The BCM2836 uses a Cortex-A7, not a Cortex-A15. Update the device to
+> use the correct CPU.
+> https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
+>
+> When the BCM2836 was introduced (bad5623690b) the Cortex-A7 was not
+> available, so the very similar Cortex-A15 was used. Since dcf578ed8ce
+> we can model the correct core.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-	avx512_4vnniw avx512_4fmaps avx512pf avx512er avx512_vpopcntdq
+Reviewed-by: Alistair Francis <alistair@alistair23.me>
 
-and the following features are removed:
+Alistair
 
-	pcid invpcid clflushopt avx512dq avx512bw clwb smap rtm mpx
-	xsavec xgetbv1 hle
-
-Signed-off-by: Boqun Feng <boqun.feng@intel.com>
----
-v1 --> v2:
-
-*	Change the model name to "KnightsMill" as per Daniel's
-	suggestion.
-
- target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 2c04645ceac9..c484afdb7023 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1795,6 +1795,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Skylake, IBRS)",
-     },
-+    {
-+        .name = "KnightsMill",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 133,
-+        .stepping = 0,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SS | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
-+            CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
-+            CPUID_MCA | CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC |
-+            CPUID_CX8 | CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
-+            CPUID_PSE | CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-+            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-+            CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-+            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_AVX512F |
-+            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_AVX512PF |
-+            CPUID_7_0_EBX_AVX512ER,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS,
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Xeon Phi Processor (Knights Mill)",
-+    },
-     {
-         .name = "Opteron_G1",
-         .level = 5,
--- 
-2.16.1
+> ---
+> This was originally done by a patch from Alistair:
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg00311.html
+>
+> The refactor of bcm2836 means the code is different, but I'm using
+> the same commit message.
+>
+> Based-on: <20180313153458.26822-1-peter.maydell@linaro.org>
+>
+> ---
+>  hw/arm/bcm2836.c | 2 +-
+>  hw/arm/raspi.c   | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 25e74b67d9..8c1e707d9c 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -32,7 +32,7 @@ struct BCM283XInfo {
+>  static const BCM283XInfo bcm283x_socs[] = {
+>      {
+>          .name = TYPE_BCM2836,
+> -        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a15"),
+> +        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
+>          .clusterid = 0xf,
+>      },
+>      {
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 06f1e08ca9..955a7c4e80 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -226,7 +226,7 @@ static void raspi2_machine_init(MachineClass *mc)
+>      mc->no_parallel = 1;
+>      mc->no_floppy = 1;
+>      mc->no_cdrom = 1;
+> -    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
+>      mc->max_cpus = BCM283X_NCPUS;
+>      mc->min_cpus = BCM283X_NCPUS;
+>      mc->default_cpus = BCM283X_NCPUS;
+> --
+> 2.16.2
+>
+>
