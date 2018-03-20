@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyIar-0000Uk-9r
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:50:35 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eyId9-0001eB-Bp
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyIan-0005W4-Vl
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:50:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43568 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eyIan-0005UE-RB
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:50:25 -0400
-References: <20180320093135.26422-1-fl@n621.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d5ad61b8-1570-0234-fd2a-97dfb174de59@redhat.com>
-Date: Tue, 20 Mar 2018 09:50:19 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eyId8-00080i-Hd
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:52:51 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45930)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eyId8-0007yT-9Q
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:52:50 -0400
+Received: by mail-wr0-x241.google.com with SMTP id h2so1981698wre.12
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 07:52:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180320093135.26422-1-fl@n621.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] os: truncate pidfile on creation
+In-Reply-To: <1521476505-30584-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1521476505-30584-1-git-send-email-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 20 Mar 2018 15:52:47 +0100
+Message-ID: <CAJ+F1CK2uEhbQ6UaPY5JTiXxRD==OyqBXTBzQpzrh-ud1NcaDQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tpm: Set tpmRegValidSts flag to '1' in
+ device reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Florian Larysch <fl@n621.de>, qemu-devel@nongnu.org
-Cc: sw@weilnetz.de
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On 03/20/2018 04:31 AM, Florian Larysch wrote:
-> qemu_create_pidfile does not truncate the pidfile when it creates it,
-> but rather overwrites its contents with the new pid. This works fine as
-> long as the length of the pid doesn't decrease, but this might happen in
-> case of wraparounds, causing pidfiles to contain trailing garbage which
-> breaks operations such as 'kill $(cat pidfile)'.
+Hi
 
-Ouch.  Good analysis.
-
-However, I have to wonder if we have the opposite problem - when the 
-file exists (truncated) but has not yet been written, how often do we 
-have a race where someone can see the empty file?
-
-Should we be going even further and writing the pid into a temporary 
-file and then rename(2)ing that file onto the real destination, so that 
-if the pid file exists at all, it has stable contents that can't cause 
-confusion?
-
-> 
-> Instead, always truncate the file before writing it.
-> 
-> Signed-off-by: Florian Larysch <fl@n621.de>
+On Mon, Mar 19, 2018 at 5:21 PM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> Fix the initialization of the tpmRegValidSts flag and set it to '1'
+> during device reset without expecting a write to another register.
+> This seems to also be the default behavior of real hardware.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 > ---
->   os-posix.c | 2 +-
->   os-win32.c | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/os-posix.c b/os-posix.c
-> index b9c2343b1e..9a6b874180 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -301,7 +301,7 @@ int qemu_create_pidfile(const char *filename)
->       int len;
->       int fd;
->   
-> -    fd = qemu_open(filename, O_RDWR | O_CREAT, 0600);
-> +    fd = qemu_open(filename, O_RDWR | O_CREAT | O_TRUNC, 0600);
+>  hw/tpm/tpm_crb.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index d8917cb..114b66e 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -145,8 +145,6 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr a=
+ddr,
+>                               beenSeized, 0);
+>              ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
+>                               locAssigned, 1);
+> -            ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
+> -                             tpmRegValidSts, 1);
+>              break;
+>          }
+>          break;
+> @@ -210,6 +208,8 @@ static void tpm_crb_reset(void *dev)
+>
+>      tpm_backend_reset(s->tpmbe);
+>
+> +    ARRAY_FIELD_DP32(s->regs, CRB_LOC_STATE,
+> +                     tpmRegValidSts, 1);
+>      ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+>                       InterfaceType, CRB_INTF_TYPE_CRB_ACTIVE);
+>      ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
 
-This part is right, if we don't care about the race with someone reading 
-an empty file.
+Hmm, the specification says they default to 0. Except tpmEstablished
+to 1, which we should probably manipulate somehow ("The TPM clears
+this bit to 0 upon receipt of _TPM_Hash_End The TPM sets this bit to a
+1 when the TPM_LOC_CTRL_x.resetEstablishment field is set to 1.").
+Help welcome!
 
->       if (fd == -1) {
->           return -1;
->       }
-> diff --git a/os-win32.c b/os-win32.c
-> index 586a7c7d49..85dbad7af8 100644
-> --- a/os-win32.c
-> +++ b/os-win32.c
-> @@ -108,7 +108,7 @@ int qemu_create_pidfile(const char *filename)
->       memset(&overlap, 0, sizeof(overlap));
->   
->       file = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL,
-> -                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-> +                      CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+Shouldn't it also set locAssigned to 1 in this case ?
 
-I assume this is right (at least for looking comparable to the POSIX 
-case), although I'm trusting you here.
+I am not very familiar with the locality support, since I didn't
+implement it for CRB. You may have more clues what is expected here.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Worth including in 2.12, unless we want to also avoid the race of an 
-empty pidfile.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--=20
+Marc-Andr=C3=A9 Lureau
