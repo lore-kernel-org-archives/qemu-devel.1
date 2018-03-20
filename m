@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyINH-0000I9-Kq
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:36:33 -0400
+	(envelope-from <mst@redhat.com>) id 1eyIO2-0000fs-FW
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyINC-0002Bj-Uq
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:36:27 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33872)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyINC-0002BL-Nx
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:36:22 -0400
-Received: by mail-ot0-x242.google.com with SMTP id m7-v6so1941140otd.1
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 07:36:22 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1eyINw-0002rm-Jt
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:37:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33542 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyINw-0002rB-Ed
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:37:08 -0400
+Date: Tue, 20 Mar 2018 16:37:03 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180320163618-mutt-send-email-mst@kernel.org>
+References: <1521515720-612046-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_EbFC2qJvMGKj1gzTBnSgytLaJJfhDcn0FjEsjnvz1Sg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180320142343.13867-1-berrange@redhat.com>
-References: <20180320142343.13867-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Mar 2018 14:36:01 +0000
-Message-ID: <CAFEAcA8dqLa2sTqOm9+z+sh4uft8OM06wNRTs1YkjsSa73yhRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] make: improve check for stale generated
- files in source dir
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_EbFC2qJvMGKj1gzTBnSgytLaJJfhDcn0FjEsjnvz1Sg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v2 00/50] virtio, vhost, pci, pc: features,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 20 March 2018 at 14:23, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
-ote:
-> When doing a build with builddir !=3D srcdir, if any generated files are
-> accidentally present in srcdir from a previous build, these can cause
-> unexpected failures.
->
-> Currently there is a rule that checks for existance of config-host.mak,
-> but there have been cases where config-host.mak is absent, while other
-> generated files still exist.
->
-> Update the check to look at every file listed in $(GENERATED_FILES). To
-> do this we must move the check further down after $(GENERATED_FILES) has
-> been populated.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  Makefile | 29 +++++++++++++++++++----------
->  1 file changed, 19 insertions(+), 10 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index c8116694a0..73caabc019 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -52,16 +52,6 @@ endif
->
->  .git-submodule-status: git-submodule-update config-host.mak
->
-> -# Check that we're not trying to do an out-of-tree build from
-> -# a tree that's been used for an in-tree build.
-> -ifneq ($(realpath $(SRC_PATH)),$(realpath .))
-> -ifneq ($(wildcard $(SRC_PATH)/config-host.mak),)
-> -$(error This is an out of tree build but your source tree ($(SRC_PATH)) =
-\
-> -seems to have been used for an in-tree build. You can fix this by runnin=
-g \
-> -"$(MAKE) distclean && rm -rf *-linux-user *-softmmu" in your source tree=
-)
-> -endif
-> -endif
-> -
->  CONFIG_SOFTMMU :=3D $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
->  CONFIG_USER_ONLY :=3D $(if $(filter %-user,$(TARGET_DIRS)),y)
->  CONFIG_XEN :=3D $(CONFIG_XEN_BACKEND)
-> @@ -1027,6 +1017,25 @@ ifdef SIGNCODE
->  endif # SIGNCODE
->  endif # CONFIG_WIN
->
-> +define nl
-> +
-> +
-> +endef
-> +
-> +CHECK_FILES =3D config-host.mak $(filter-out .git-submodule-status, $(GE=
-NERATED_FILES))
-> +UNEXPECTED_FILES =3D $(wildcard $(CHECK_FILES:%=3D$(SRC_PATH)/%))
-> +
-> +# Check that we're not trying to do an out-of-tree build from
-> +# a tree that's been used for an in-tree build.
-> +ifneq ($(realpath $(SRC_PATH)),$(realpath .))
-> +ifneq ($(UNEXPECTED_FILES),)
-> +$(error Stale files in source tree:${nl}${nl} $(UNEXPECTED_FILES:%=3D  %=
-${nl}) ${nl}\
-> +This is an out of tree build but your source tree ($(SRC_PATH)) \
-> +seems to have been used for an in-tree build. You can fix this by runnin=
-g \
-> +"$(MAKE) distclean && rm -rf *-linux-user *-softmmu" in your source tree=
-)
-> +endif
-> +endif
-> +
->  # Add a dependency on the generated files, so that they are always
->  # rebuilt before other object files
->  ifneq ($(wildcard config-host.mak),)
-> --
+On Tue, Mar 20, 2018 at 02:18:33PM +0000, Peter Maydell wrote:
+> On 20 March 2018 at 03:16, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > Changes from v1:
+> > - dropped include change for one generated file - proposed a tree-wide refactoring
+> > - dropped vhost used slot refactoring due to alignment issues found by clang
+> > - added vhost-user post-copy support
+> >
+> > The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
+> >
+> >   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to a466e2cdb09d7b1262e24bae8cc47a51550d3af3:
+> >
+> >   postcopy shared docs (2018-03-20 05:03:30 +0200)
+> >
+> > ----------------------------------------------------------------
+> > virtio,vhost,pci,pc: features, cleanups
+> >
+> > SRAT tables for DIMM devices
+> > new virtio net flags for speed/duplex
+> > post-copy migration support in vhost
+> > cleanups in pci
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> 
+> Link failure on aarch64 host:
+>   LINK    arm-softmmu/qemu-system-arm
+> hw/virtio/vhost-user.o: In function `vhost_user_postcopy_fault_handler':
+> /home/pm215/qemu/hw/virtio/vhost-user.c:1000: undefined reference to
+> `postcopy_request_shared_page'
+> 
+> I think this host is taking the "don't have userfaultfd" #ifdef
+> path in postcopy-ram.c, which doesn't define a stub
+> for the postcopy_request_shared_page function, but there's
+> no equivalent guard in vhost-user.c
+> 
+> thanks
+> -- PMM
 
-Does this still mean the check is made sufficiently early, before
-we start trying to build config-all-devices.mak and other things?
-This change has moved it down after 'include' directives which
-I think will cause make to try to build the file that it must
-include.
+Thanks for debugging this!
 
-It's also moved out of the "only run this if we've actually run
-configure" block, but I think that part is OK.
-
-thanks
--- PMM
+-- 
+MST
