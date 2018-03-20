@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48563)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5UI-0003mq-W9
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:50:52 -0400
+	id 1ey5WG-00055s-Vz
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5UF-0006b5-01
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:50:51 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36758)
+	id 1ey5WF-00080Q-T4
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:52:53 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54863)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ey5UE-0006aW-Lk
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:50:46 -0400
-Received: by mail-wm0-x243.google.com with SMTP id x82so314274wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 17:50:46 -0700 (PDT)
+	id 1ey5WF-0007zp-Ip
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:52:51 -0400
+Received: by mail-wm0-x243.google.com with SMTP id h76so292434wme.4
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 17:52:51 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180319113544.704-1-laurent@vivier.eu>
-	<20180319113544.704-3-laurent@vivier.eu>
+References: <20180319031545.29359-1-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <43dd52b8-ac7c-f005-0ff4-f9aa5454c6c8@amsat.org>
-Date: Tue, 20 Mar 2018 01:50:43 +0100
+Message-ID: <1b014796-f289-5531-8b67-86129912e2fb@amsat.org>
+Date: Tue, 20 Mar 2018 01:52:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180319113544.704-3-laurent@vivier.eu>
+In-Reply-To: <20180319031545.29359-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] target/m68k: add a mechanism to
- automatically free TCGv
+Subject: Re: [Qemu-devel] [PATCH v2] tcg: Really fix cpu_io_recompile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,205 +34,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Pavel.Dovgaluk@ispras.ru, pbonzini@redhat.com
 
-On 03/19/2018 12:35 PM, Laurent Vivier wrote:
-> SRC_EA() and gen_extend() can return either a temporary
-> TCGv or a memory allocated one. Mark them when they are
-> allocated, and free them automatically at end of the
-> instruction translation.
+On 03/19/2018 04:15 AM, Richard Henderson wrote:
+> We have confused the number of instructions that have been
+> executed in the TB with the number of instructions needed
+> to repeat the I/O instruction.
 > 
-> We want to free locally allocated TCGv to avoid
-> overflow in sequence like:
+> We have used cpu_restore_state_from_tb, which means that
+> the guest pc is pointing to the I/O instruction.  The only
+> time the answer to the later question is not 1 is when
+> MIPS or SH4 need to re-execute the branch for the delay
+> slot as well.
 > 
->   0xc00ae406:  movel %fp@(-132),%fp@(-268)
->   0xc00ae40c:  movel %fp@(-128),%fp@(-264)
->   0xc00ae412:  movel %fp@(-20),%fp@(-212)
->   0xc00ae418:  movel %fp@(-16),%fp@(-208)
->   0xc00ae41e:  movel %fp@(-60),%fp@(-220)
->   0xc00ae424:  movel %fp@(-56),%fp@(-216)
->   0xc00ae42a:  movel %fp@(-124),%fp@(-252)
->   0xc00ae430:  movel %fp@(-120),%fp@(-248)
->   0xc00ae436:  movel %fp@(-12),%fp@(-260)
->   0xc00ae43c:  movel %fp@(-8),%fp@(-256)
->   0xc00ae442:  movel %fp@(-52),%fp@(-276)
->   0xc00ae448:  movel %fp@(-48),%fp@(-272)
->   ...
+> We must rely on cpu->cflags_next_tb to generate the next TB,
+> as otherwise we have a race condition with other guest cpus
+> within the TB cache.
 > 
-> That can fill a lot of TCGv entries in a sequence,
-> especially since 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-> we have no limit to fill the TCGOps cache and we can fill
-> the entire TCG variables array and overflow it.
-> 
-> Suggested-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Fixes: 0790f86861079b1932679d0f011e431aaf4ee9e2
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/m68k/translate.c | 56 +++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 43 insertions(+), 13 deletions(-)
 > 
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index 1c2ff56305..6beaf9ed66 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -123,8 +123,34 @@ typedef struct DisasContext {
->      int done_mac;
->      int writeback_mask;
->      TCGv writeback[8];
-> +#define MAX_TO_RELEASE 8
-> +    int release_count;
-> +    TCGv release[MAX_TO_RELEASE];
->  } DisasContext;
+> My v1 raced with Paolo's pull request, so v2 now fixes Pavel's fix.
+> 
+> 
+> r~
+> 
+> ---
+>  accel/tcg/translate-all.c | 37 ++++++++++---------------------------
+>  1 file changed, 10 insertions(+), 27 deletions(-)
+> 
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 5ad1b919bc..d4190602d1 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1728,8 +1728,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>      CPUArchState *env = cpu->env_ptr;
+>  #endif
+>      TranslationBlock *tb;
+> -    uint32_t n, flags;
+> -    target_ulong pc, cs_base;
+> +    uint32_t n;
 >  
-> +static void init_release_array(DisasContext *s)
-> +{
-> +#ifdef CONFIG_DEBUG_TCG
-> +    memset(s->release, 0, sizeof(s->release));
-> +#endif
-> +    s->release_count = 0;
-> +}
-> +
-> +static void do_release(DisasContext *s)
-> +{
-> +    int i;
-> +    for (i = 0; i < s->release_count; i++) {
-> +        tcg_temp_free(s->release[i]);
-> +    }
-> +    init_release_array(s);
-> +}
-> +
-> +static TCGv mark_to_release(DisasContext *s, TCGv tmp)
-> +{
-> +    g_assert(s->release_count < MAX_TO_RELEASE);
-> +    return s->release[s->release_count++] = tmp;
-> +}
-> +
->  static TCGv get_areg(DisasContext *s, unsigned regno)
->  {
->      if (s->writeback_mask & (1 << regno)) {
-> @@ -347,7 +373,8 @@ static TCGv gen_ldst(DisasContext *s, int opsize, TCGv addr, TCGv val,
->          gen_store(s, opsize, addr, val, index);
->          return store_dummy;
->      } else {
-> -        return gen_load(s, opsize, addr, what == EA_LOADS, index);
-> +        return mark_to_release(s, gen_load(s, opsize, addr,
-> +                                           what == EA_LOADS, index));
+>      tb_lock();
+>      tb = tb_find_pc(retaddr);
+> @@ -1737,44 +1736,33 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>          cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
+>                    (void *)retaddr);
 >      }
->  }
+> -    n = cpu->icount_decr.u16.low + tb->icount;
+>      cpu_restore_state_from_tb(cpu, tb, retaddr);
+> -    /* Calculate how many instructions had been executed before the fault
+> -       occurred.  */
+> -    n = n - cpu->icount_decr.u16.low;
+> -    /* Generate a new TB ending on the I/O insn.  */
+> -    n++;
+> +
+>      /* On MIPS and SH, delay slot instructions can only be restarted if
+>         they were already the first instruction in the TB.  If this is not
+>         the first instruction in a TB then re-execute the preceding
+>         branch.  */
+> +    n = 1;
+>  #if defined(TARGET_MIPS)
+> -    if ((env->hflags & MIPS_HFLAG_BMASK) != 0 && n > 1) {
+> +    if ((env->hflags & MIPS_HFLAG_BMASK) != 0
+> +        && env->active_tc.PC != tb->pc) {
+>          env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
+>          cpu->icount_decr.u16.low++;
+>          env->hflags &= ~MIPS_HFLAG_BMASK;
+> +        n = 2;
+>      }
+>  #elif defined(TARGET_SH4)
+>      if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0
+> -            && n > 1) {
+> +        && env->pc != tb->pc) {
+>          env->pc -= 2;
+>          cpu->icount_decr.u16.low++;
+>          env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+> +        n = 2;
+>      }
+>  #endif
+> -    /* This should never happen.  */
+> -    if (n > CF_COUNT_MASK) {
+> -        cpu_abort(cpu, "TB too big during recompile");
+> -    }
 >  
-> @@ -439,7 +466,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->          } else {
->              bd = 0;
->          }
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          if ((ext & 0x44) == 0) {
->              /* pre-index */
->              add = gen_addr_index(s, ext, tmp);
-> @@ -449,7 +476,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->          if ((ext & 0x80) == 0) {
->              /* base not suppressed */
->              if (IS_NULL_QREG(base)) {
-> -                base = tcg_const_i32(offset + bd);
-> +                base = mark_to_release(s, tcg_const_i32(offset + bd));
->                  bd = 0;
->              }
->              if (!IS_NULL_QREG(add)) {
-> @@ -465,11 +492,11 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->                  add = tmp;
->              }
->          } else {
-> -            add = tcg_const_i32(bd);
-> +            add = mark_to_release(s, tcg_const_i32(bd));
->          }
->          if ((ext & 3) != 0) {
->              /* memory indirect */
-> -            base = gen_load(s, OS_LONG, add, 0, IS_USER(s));
-> +            base = mark_to_release(s, gen_load(s, OS_LONG, add, 0, IS_USER(s)));
->              if ((ext & 0x44) == 4) {
->                  add = gen_addr_index(s, ext, tmp);
->                  tcg_gen_add_i32(tmp, add, base);
-> @@ -494,7 +521,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
->          }
->      } else {
->          /* brief extension word format */
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          add = gen_addr_index(s, ext, tmp);
->          if (!IS_NULL_QREG(base)) {
->              tcg_gen_add_i32(tmp, add, base);
-> @@ -624,7 +651,7 @@ static inline TCGv gen_extend(DisasContext *s, TCGv val, int opsize, int sign)
->      if (opsize == OS_LONG) {
->          tmp = val;
->      } else {
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          gen_ext(tmp, val, opsize, sign);
+> -    pc = tb->pc;
+> -    cs_base = tb->cs_base;
+> -    flags = tb->flags;
+> -    tb_phys_invalidate(tb, -1);
+> -
+> -    /* Execute one IO instruction without caching
+> -       instead of creating large TB. */
+> -    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | CF_NOCACHE | 1;
+> +    /* Generate a new TB executing the I/O insn.  */
+> +    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
+>  
+>      if (tb->cflags & CF_NOCACHE) {
+>          if (tb->orig_tb) {
+> @@ -1785,11 +1773,6 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+>          tb_remove(tb);
 >      }
 >  
-> @@ -746,7 +773,7 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
->              return NULL_QREG;
->          }
->          reg = get_areg(s, reg0);
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          if (reg0 == 7 && opsize == OS_BYTE &&
->              m68k_feature(s->env, M68K_FEATURE_M68000)) {
->              tcg_gen_subi_i32(tmp, reg, 2);
-> @@ -756,7 +783,7 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
->          return tmp;
->      case 5: /* Indirect displacement.  */
->          reg = get_areg(s, reg0);
-> -        tmp = tcg_temp_new();
-> +        tmp = mark_to_release(s, tcg_temp_new());
->          ext = read_im16(env, s);
->          tcg_gen_addi_i32(tmp, reg, (int16_t)ext);
->          return tmp;
-> @@ -767,14 +794,14 @@ static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
->          switch (reg0) {
->          case 0: /* Absolute short.  */
->              offset = (int16_t)read_im16(env, s);
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          case 1: /* Absolute long.  */
->              offset = read_im32(env, s);
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          case 2: /* pc displacement  */
->              offset = s->pc;
->              offset += (int16_t)read_im16(env, s);
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          case 3: /* pc index+displacement.  */
->              return gen_lea_indexed(env, s, NULL_QREG);
->          case 4: /* Immediate.  */
-> @@ -900,7 +927,7 @@ static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
->              default:
->                  g_assert_not_reached();
->              }
-> -            return tcg_const_i32(offset);
-> +            return mark_to_release(s, tcg_const_i32(offset));
->          default:
->              return NULL_QREG;
->          }
-> @@ -6033,6 +6060,7 @@ static void disas_m68k_insn(CPUM68KState * env, DisasContext *s)
->      uint16_t insn = read_im16(env, s);
->      opcode_table[insn](env, s, insn);
->      do_writebacks(s);
-> +    do_release(s);
->  }
->  
->  /* generate intermediate code for basic block 'tb'.  */
-> @@ -6067,6 +6095,8 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->          max_insns = TCG_MAX_INSNS;
->      }
->  
-> +    init_release_array(dc);
-> +
->      gen_tb_start(tb);
->      do {
->          pc_offset = dc->pc - pc_start;
+> -    /* Generate new TB instead of the current one. */
+> -    /* FIXME: In theory this could raise an exception.  In practice
+> -       we have already translated the block once so it's probably ok.  */
+> -    tb_gen_code(cpu, pc, cs_base, flags, curr_cflags() | CF_LAST_IO | n);
+> -
+>      /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+>       * the first in the TB) then we end up generating a whole new TB and
+>       *  repeating the fault, which is horribly inefficient.
 > 
