@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wsa@the-dreams.de>) id 1eyF7Z-0002d5-QE
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1eyF80-0002s9-62
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wsa@the-dreams.de>) id 1eyF7V-0001RX-NV
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:01 -0400
-Received: from sauhun.de ([88.99.104.3]:59996 helo=pokefinder.org)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wsa@the-dreams.de>) id 1eyF7V-0001Pn-G8
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:07:57 -0400
-Date: Tue, 20 Mar 2018 12:07:55 +0100
-From: Wolfram Sang <wsa@the-dreams.de>
-Message-ID: <20180320110754.ndtt7h432hna26pz@ninjato>
-References: <20180319213101.6100-1-wsa+renesas@sang-engineering.com>
-	<20180319213101.6100-2-wsa+renesas@sang-engineering.com>
-	<3005cdd5-f3c4-a0c0-f6db-abc2b7bf759a@amsat.org>
+	(envelope-from <dgilbert@redhat.com>) id 1eyF7w-0001nS-2u
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyF7v-0001nA-V4
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:08:24 -0400
+Date: Tue, 20 Mar 2018 11:08:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180320110816.GB7665@work-vm>
+References: <20180319175823.22111-1-marcandre.lureau@redhat.com>
+	<272a2e2b-5a1f-d73c-8a74-6721ce9f63fc@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wuwvp23ufiaqwga7"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <3005cdd5-f3c4-a0c0-f6db-abc2b7bf759a@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] nvram: at24c: prevent segfault by
- checking "rom-size"
+In-Reply-To: <272a2e2b-5a1f-d73c-8a74-6721ce9f63fc@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hmp: free sev info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org
+To: Eric Blake <eblake@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, brijesh.singh@amd.com
 
-
---wuwvp23ufiaqwga7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-
-> > +    if (!ee->rsize) {
-> > +        ERR("rom-size not allowed to be 0\n");
+* Eric Blake (eblake@redhat.com) wrote:
+> On 03/19/2018 12:58 PM, Marc-Andr=E9 Lureau wrote:
+> > Found thanks to ASAN:
+> >=20
+> > Direct leak of 16 byte(s) in 1 object(s) allocated from:
+> >      #0 0x7efe20417a38 in __interceptor_calloc (/lib64/libasan.so.4+0=
+xdea38)
+> >      #1 0x7efe1f7b2f75 in g_malloc0 ../glib/gmem.c:124
+> >      #2 0x7efe1f7b3249 in g_malloc0_n ../glib/gmem.c:355
+> >      #3 0x558272879162 in sev_get_info /home/elmarco/src/qemu/target/=
+i386/sev.c:414
+> >      #4 0x55827285113b in hmp_info_sev /home/elmarco/src/qemu/target/=
+i386/monitor.c:684
+> >      #5 0x5582724043b8 in handle_hmp_command /home/elmarco/src/qemu/m=
+onitor.c:3333
+> >=20
+> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >   target/i386/monitor.c | 2 ++
+> >   1 file changed, 2 insertions(+)
 >=20
-> You can directly use error_report() in this patch.
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Worth mentioning in the commit message that this was introduced in comm=
+it
+> 63036314.
 
-My reasoning was that this patch is suitable for stable while the
-error_report() stuff is not. I neither wanted to mix those two here nor
-did I want to make the stable-patch depend on the non-stable patch. So,
-I chose to use ERR here and fix all of ERR later. OK?
+Queued.  I've added:
+Fixes: 63036314
 
+to the commit message.
 
---wuwvp23ufiaqwga7
-Content-Type: application/pgp-signature; name="signature.asc"
+Dave
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAlqw64cACgkQFA3kzBSg
-KbaUzA//Q7PUUNgoVQ2hnaIPo8kCc5AkIfWek2tUFLGYQaK+3a6v2YhrAj3NnfpP
-pZ3mH1LuX6WzIQ+0jK9Hx+Dl1rfBZ+TzBufuHRvifRkXL7I3RN5sMMk3ZKqldeHk
-aTY+qms11p5vj5lOncXeI3u1MrpO/nQYixfEe807B7Q2a7M20DZF1MUzyPpDM2Ke
-GVHt9xXv1CNcM6CsuKVezkFzKsy3iJgyLHWd8DVRF2ZWUR3ac/1STkAcGgmEM0Vv
-nSoVwnDM0gN8KyoyUJ1n4qP2M/m4xfaVLFEMw51F9cUfLZOvW1/4zrxsUiseeGTF
-SQ1FmWSwIDh+B5yRB8cclPK4AeaEb/rTCj5ZJ5WdYvWmMHIbebcLlMi278BOMBht
-HRVwu9j4XV7AtTuETZxtC66+HKCmJiRj+06PthgpqyDqLt7LFVDLtVSZR0LBaRCe
-N+96942fd3BYyVSPl5X71EHeSoVZLLF4rGbiRjDATCLjl8LQrGmtP8jgGQopnn0G
-0/G10yEcsghvrWxCFCQeyhI2Y3ZqmCACLrJRdgsYaBEYW05eEB2OI8aKnrlV9zrY
-PTF6c8mv5L2BhyazIURdi6ZpyuI79sjlm+eVmRL8oAjrs/6xtvMgmrB7O1PAXSSp
-KdtBV5+65N1CC/MXA/EyXaFBLZC9fIVHxRh7GdG+jq9m59K2+uo=
-=Y7Jl
------END PGP SIGNATURE-----
-
---wuwvp23ufiaqwga7--
+> And safe for freeze, as it's fixing a memory usage bug in material new =
+to
+> the 2.12 release.
+>=20
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
