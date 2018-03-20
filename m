@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eyMV4-0004Mf-MX
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 15:00:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyMXW-0005xK-EJ
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 15:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eyMV1-0005Ey-A9
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 15:00:46 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:41932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1eyMV1-0005En-1A
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 15:00:43 -0400
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 20 Mar 2018 21:00:23 +0200
-Message-Id: <20180320190023.24077-3-yuval.shaia@oracle.com>
-In-Reply-To: <20180320190023.24077-1-yuval.shaia@oracle.com>
-References: <20180320190023.24077-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v1 2/2] hw/rdma: Add support for Query QP verb
- to pvrdma device
+	(envelope-from <peter.maydell@linaro.org>) id 1eyMXV-0006CC-JY
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 15:03:18 -0400
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:43992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eyMXV-0006C1-Dp
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 15:03:17 -0400
+Received: by mail-ot0-x235.google.com with SMTP id m22-v6so2945275otf.10
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 12:03:17 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180320124117.40573-1-dgilbert@redhat.com>
+References: <20180320124117.40573-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Mar 2018 19:02:56 +0000
+Message-ID: <CAFEAcA9vG51UOBykQvaLxbji1FbgRaGpZiO=wYVEi0W3VHN4CA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] hmp queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com, marcel@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, jixiang_zhang@h3c.com
 
-This IB verb is needed by some applications - implement it.
+On 20 March 2018 at 12:41, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 4bdc24fa018901892bb8a5bd1808ebd605f4c6=
+4d:
+>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-qapi-2018-03-12-v=
+4' into staging (2018-03-20 09:51:49 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-hmp-20180320
+>
+> for you to fetch changes up to 95372184b7acdfd82ee748b6f0c6df1d839982ba:
+>
+>   hmp: free sev info (2018-03-20 12:32:06 +0000)
+>
+> ----------------------------------------------------------------
+> HMP fixes for 2.12
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (1):
+>       hmp: free sev info
+>
+> zhangjixiang (1):
+>       HMP: Initialize err before using
+>
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
----
- hw/rdma/vmw/pvrdma_cmd.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index 293dfed29f..cf8c50af31 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -515,6 +515,28 @@ static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     return rsp->hdr.err;
- }
- 
-+static int query_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_query_qp *cmd = &req->query_qp;
-+    struct pvrdma_cmd_query_qp_resp *resp = &rsp->query_qp_resp;
-+    struct ibv_qp_init_attr init_attr;
-+
-+    pr_dbg("qp_handle=%d\n", cmd->qp_handle);
-+
-+    memset(rsp, 0, sizeof(*rsp));
-+    rsp->hdr.response = cmd->hdr.response;
-+    rsp->hdr.ack = PVRDMA_CMD_QUERY_QP_RESP;
-+
-+    rsp->hdr.err = rdma_rm_query_qp(&dev->rdma_dev_res, &dev->backend_dev,
-+                                    cmd->qp_handle,
-+                                    (struct ibv_qp_attr *)&resp->attrs, -1,
-+                                    &init_attr);
-+
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
-+}
-+
- static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-                       union pvrdma_cmd_resp *rsp)
- {
-@@ -636,7 +658,7 @@ static struct cmd_handler cmd_handlers[] = {
-     {PVRDMA_CMD_DESTROY_CQ, destroy_cq},
-     {PVRDMA_CMD_CREATE_QP, create_qp},
-     {PVRDMA_CMD_MODIFY_QP, modify_qp},
--    {PVRDMA_CMD_QUERY_QP, NULL},
-+    {PVRDMA_CMD_QUERY_QP, query_qp},
-     {PVRDMA_CMD_DESTROY_QP, destroy_qp},
-     {PVRDMA_CMD_CREATE_UC, create_uc},
-     {PVRDMA_CMD_DESTROY_UC, destroy_uc},
--- 
-2.13.6
+-- PMM
