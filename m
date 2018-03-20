@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyGX8-0007dh-4x
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:31 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1eyGXG-0007n5-So
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyGX3-0003Rk-4H
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:30 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1eyGXC-0003aj-AA
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:38 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 20 Mar 2018 13:37:27 +0100
-Message-Id: <1521549456-14072-6-git-send-email-eric.auger@redhat.com>
+Date: Tue, 20 Mar 2018 13:37:29 +0100
+Message-Id: <1521549456-14072-8-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1521549456-14072-1-git-send-email-eric.auger@redhat.com>
 References: <1521549456-14072-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 05/14] hw/arm/smmuv3: Wired IRQ and GERROR
- helpers
+Subject: [Qemu-devel] [PATCH v10 07/14] hw/arm/smmuv3: Implement MMIO write
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,174 +23,282 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
 Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
 
-We introduce some helpers to handle wired IRQs and especially
-GERROR interrupt. SMMU writes GERROR register on GERROR event
-and SW acks GERROR interrupts by setting GERRORn.
-
-The Wired interrupts are edge sensitive hence the pulse usage.
+Now we have relevant helpers for queue and irq
+management, let's implement MMIO write operations.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 
 ---
-v9 - v10:
+v9 -> v10:
 - s/hwaddr/uint64_t in trace-events
-- use qemu_log_mask LOG_UNIMP on PRI IRQ
-- add a comment saying smmuv3_trigger_irq and smmuv3_write_gerrorn
-  will become static later on
-- write gerrorn without filtering (ie. even if the guest toggles non
-  active IRQs)
-- pulse if at least one new IRQ type
-- smmuv3_eventq_irq_enabled and smmuv3_gerror_irq_enabled become
-  static inline
+- added SMMU_FEATURE_2LVL_STE in this patch
+- removed smmu_write64 and created writel/writell infra
+- store capped log2size
+- mask CR0 reserved bits
 
 v7 -> v8:
-- remove SMMU_PENDING_GERRORS macro
-- properly toggle gerror
-- properly sanitize gerrorn write
+- precise in the commit message invalidation commands
+  are not yet treated.
+- use new queue helpers
+- do not decode unhandled commands at this stage
 ---
- hw/arm/smmuv3-internal.h | 36 +++++++++++----------------
- hw/arm/smmuv3.c          | 64 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/arm/trace-events      |  3 +++
- 3 files changed, 81 insertions(+), 22 deletions(-)
+ hw/arm/smmuv3-internal.h |   8 +--
+ hw/arm/smmuv3.c          | 172 +++++++++++++++++++++++++++++++++++++++++++++--
+ hw/arm/trace-events      |   6 ++
+ 3 files changed, 175 insertions(+), 11 deletions(-)
 
 diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index a6461fe..32f81d4 100644
+index 968fa25..8550be0 100644
 --- a/hw/arm/smmuv3-internal.h
 +++ b/hw/arm/smmuv3-internal.h
-@@ -129,28 +129,6 @@ typedef struct Evt  {
-     uint32_t word[8];
- } Evt;
+@@ -64,6 +64,8 @@ REG32(CR0,                 0x20)
+     FIELD(CR0, EVENTQEN,      2, 1)
+     FIELD(CR0, CMDQEN,        3, 1)
  
--/**
-- * smmu_read64 - 64-bit register read utility function supporting
-- * aligned 32-bit word access to both 32-bit halves and aligned 64-bit
-- * access.
-- *
-- * @r: register address
-- * @offset: byte offset if 32-bit access
-- * @size: read byte size
-- */
--static inline uint64_t smmu_read64(uint64_t r, unsigned offset,
--                                   unsigned size)
--{
--    if (size == 8) {
--        return r;
--    }
--
--    /* 32 bit access */
--    assert(!offset || offset == 4);
--
--    return extract64(r, offset << 3, 32);
--}
--
- static inline uint32_t smmuv3_idreg(int regoffset)
- {
-     /*
-@@ -164,4 +142,18 @@ static inline uint32_t smmuv3_idreg(int regoffset)
-     return smmuv3_ids[regoffset / 4];
++#define SMMU_CR0_RESERVED 0xFFFFFC20
++
+ REG32(CR0ACK,              0x24)
+ REG32(CR1,                 0x28)
+ REG32(CR2,                 0x2c)
+@@ -152,10 +154,6 @@ static inline bool smmuv3_gerror_irq_enabled(SMMUv3State *s)
+     return FIELD_EX32(s->irq_ctrl, IRQ_CTRL, GERROR_IRQEN);
  }
  
-+static inline bool smmuv3_eventq_irq_enabled(SMMUv3State *s)
-+{
-+    return FIELD_EX32(s->irq_ctrl, IRQ_CTRL, EVENTQ_IRQEN);
-+}
-+
-+static inline bool smmuv3_gerror_irq_enabled(SMMUv3State *s)
-+{
-+    return FIELD_EX32(s->irq_ctrl, IRQ_CTRL, GERROR_IRQEN);
-+}
-+
-+/* public until callers get introduced */
-+void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask);
-+void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t gerrorn);
-+
+-/* public until callers get introduced */
+-void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask);
+-void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t gerrorn);
+-
+ /* Queue Handling */
+ 
+ #define Q_BASE(q)          ((q)->base & SMMU_BASE_ADDR_MASK)
+@@ -308,6 +306,6 @@ enum { /* Command completion notification */
+             addr;                                             \
+         })
+ 
+-int smmuv3_cmdq_consume(SMMUv3State *s);
++#define SMMU_FEATURE_2LVL_STE (1 << 0)
+ 
  #endif
 diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 3472163..990c02e 100644
+index 6c9d68b..77ec58d 100644
 --- a/hw/arm/smmuv3.c
 +++ b/hw/arm/smmuv3.c
-@@ -30,6 +30,70 @@
- #include "hw/arm/smmuv3.h"
- #include "smmuv3-internal.h"
- 
-+/**
-+ * smmuv3_trigger_irq - pulse @irq if enabled and update
-+ * GERROR register in case of GERROR interrupt
-+ *
-+ * @irq: irq type
-+ * @gerror_mask: mask of gerrors to toggle (relevant if @irq is GERROR)
-+ */
-+void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask)
-+{
-+
-+    bool pulse = false;
-+
-+    switch (irq) {
-+    case SMMU_IRQ_EVTQ:
-+        pulse = smmuv3_eventq_irq_enabled(s);
-+        break;
-+    case SMMU_IRQ_PRIQ:
-+        qemu_log_mask(LOG_UNIMP, "PRI not yet supported\n");
-+        break;
-+    case SMMU_IRQ_CMD_SYNC:
-+        pulse = true;
-+        break;
-+    case SMMU_IRQ_GERROR:
-+    {
-+        uint32_t pending = s->gerror ^ s->gerrorn;
-+        uint32_t new_gerrors = ~pending & gerror_mask;
-+
-+        if (!new_gerrors) {
-+            /* only toggle non pending errors */
-+            return;
-+        }
-+        s->gerror ^= new_gerrors;
-+        trace_smmuv3_write_gerror(new_gerrors, s->gerror);
-+
-+        pulse = smmuv3_gerror_irq_enabled(s);
-+        break;
-+    }
-+    }
-+    if (pulse) {
-+            trace_smmuv3_trigger_irq(irq);
-+            qemu_irq_pulse(s->irq[irq]);
-+    }
-+}
-+
-+void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
-+{
-+    uint32_t pending = s->gerror ^ s->gerrorn;
-+    uint32_t toggled = s->gerrorn ^ new_gerrorn;
-+
-+    if (toggled & ~pending) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "guest toggles non pending errors = 0x%x\n",
-+                      toggled & ~pending);
-+    }
-+
-+    /*
-+     * We do not raise any error in case guest toggles bits corresponding
-+     * to not active IRQs (CONSTRAINED UNPREDICTABLE)
-+     */
-+    s->gerrorn = new_gerrorn;
-+
-+    trace_smmuv3_write_gerrorn(toggled & pending, s->gerrorn);
-+}
-+
- static void smmuv3_init_regs(SMMUv3State *s)
+@@ -37,7 +37,8 @@
+  * @irq: irq type
+  * @gerror_mask: mask of gerrors to toggle (relevant if @irq is GERROR)
+  */
+-void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask)
++static void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq,
++                               uint32_t gerror_mask)
  {
-     /**
+ 
+     bool pulse = false;
+@@ -74,7 +75,7 @@ void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask)
+     }
+ }
+ 
+-void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
++static void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
+ {
+     uint32_t pending = s->gerror ^ s->gerrorn;
+     uint32_t toggled = s->gerrorn ^ new_gerrorn;
+@@ -173,7 +174,7 @@ static void smmuv3_init_regs(SMMUv3State *s)
+     s->sid_split = 0;
+ }
+ 
+-int smmuv3_cmdq_consume(SMMUv3State *s)
++static int smmuv3_cmdq_consume(SMMUv3State *s)
+ {
+     SMMUCmdError cmd_error = SMMU_CERROR_NONE;
+     SMMUQueue *q = &s->cmdq;
+@@ -269,11 +270,170 @@ int smmuv3_cmdq_consume(SMMUv3State *s)
+     return 0;
+ }
+ 
+-static MemTxResult smmu_write_mmio(void *opaque, hwaddr offset, uint64_t data,
++static MemTxResult smmu_writell(SMMUv3State *s, hwaddr offset,
++                               uint64_t value, MemTxAttrs attrs)
++{
++    switch (offset) {
++    case A_GERROR_IRQ_CFG0:
++        s->gerror_irq_cfg0 = value;
++        return MEMTX_OK;
++    case A_STRTAB_BASE:
++        s->strtab_base = value;
++        return MEMTX_OK;
++    case A_CMDQ_BASE:
++        s->cmdq.base = value;
++        s->cmdq.log2size = extract64(s->cmdq.base, 0, 5);
++        if (s->cmdq.log2size > SMMU_CMDQS) {
++            s->cmdq.log2size = SMMU_CMDQS;
++        }
++        return MEMTX_OK;
++    case A_EVENTQ_BASE:
++        s->eventq.base = value;
++        s->eventq.log2size = extract64(s->eventq.base, 0, 5);
++        if (s->eventq.log2size > SMMU_EVENTQS) {
++            s->eventq.log2size = SMMU_EVENTQS;
++        }
++        return MEMTX_OK;
++    case A_EVENTQ_IRQ_CFG0:
++        s->eventq_irq_cfg0 = value;
++        return MEMTX_OK;
++    default:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s Unexpected 64-bit access to 0x%"PRIx64" (WI)\n",
++                      __func__, offset);
++        return MEMTX_OK;
++    }
++}
++
++static MemTxResult smmu_writel(SMMUv3State *s, hwaddr offset,
++                               uint64_t value, MemTxAttrs attrs)
++{
++    switch (offset) {
++    case A_CR0:
++        s->cr[0] = value;
++        s->cr0ack = value & ~SMMU_CR0_RESERVED;
++        /* in case the command queue has been enabled */
++        smmuv3_cmdq_consume(s);
++        return MEMTX_OK;
++    case A_CR1:
++        s->cr[1] = value;
++        return MEMTX_OK;
++    case A_CR2:
++        s->cr[2] = value;
++        return MEMTX_OK;
++    case A_IRQ_CTRL:
++        s->irq_ctrl = value;
++        return MEMTX_OK;
++    case A_GERRORN:
++        smmuv3_write_gerrorn(s, value);
++        /*
++         * By acknowledging the CMDQ_ERR, SW may notify cmds can
++         * be processed again
++         */
++        smmuv3_cmdq_consume(s);
++        return MEMTX_OK;
++    case A_GERROR_IRQ_CFG0: /* 64b */
++        s->gerror_irq_cfg0 = deposit64(s->gerror_irq_cfg0, 0, 32, value);
++        return MEMTX_OK;
++    case A_GERROR_IRQ_CFG0 + 4:
++        s->gerror_irq_cfg0 = deposit64(s->gerror_irq_cfg0, 32, 32, value);
++        return MEMTX_OK;
++    case A_GERROR_IRQ_CFG1:
++        s->gerror_irq_cfg1 = value;
++        return MEMTX_OK;
++    case A_GERROR_IRQ_CFG2:
++        s->gerror_irq_cfg2 = value;
++        return MEMTX_OK;
++    case A_STRTAB_BASE: /* 64b */
++        s->strtab_base = deposit64(s->strtab_base, 0, 32, value);
++        return MEMTX_OK;
++    case A_STRTAB_BASE + 4:
++        s->strtab_base = deposit64(s->strtab_base, 32, 32, value);
++        return MEMTX_OK;
++    case A_STRTAB_BASE_CFG:
++        s->strtab_base_cfg = value;
++        if (FIELD_EX32(value, STRTAB_BASE_CFG, FMT) == 1) {
++            s->sid_split = FIELD_EX32(value, STRTAB_BASE_CFG, SPLIT);
++            s->features |= SMMU_FEATURE_2LVL_STE;
++        }
++        return MEMTX_OK;
++    case A_CMDQ_BASE: /* 64b */
++        s->cmdq.base = deposit64(s->cmdq.base, 0, 32, value);
++        s->cmdq.log2size = extract64(s->cmdq.base, 0, 5);
++        if (s->cmdq.log2size > SMMU_CMDQS) {
++            s->cmdq.log2size = SMMU_CMDQS;
++        }
++        return MEMTX_OK;
++    case A_CMDQ_BASE + 4: /* 64b */
++        s->cmdq.base = deposit64(s->cmdq.base, 32, 32, value);
++        return MEMTX_OK;
++    case A_CMDQ_PROD:
++        s->cmdq.prod = value;
++        smmuv3_cmdq_consume(s);
++        return MEMTX_OK;
++    case A_CMDQ_CONS:
++        s->cmdq.cons = value;
++        return MEMTX_OK;
++    case A_EVENTQ_BASE: /* 64b */
++        s->eventq.base = deposit64(s->eventq.base, 0, 32, value);
++        s->eventq.log2size = extract64(s->eventq.base, 0, 5);
++        if (s->eventq.log2size > SMMU_EVENTQS) {
++            s->eventq.log2size = SMMU_EVENTQS;
++        }
++        return MEMTX_OK;
++    case A_EVENTQ_BASE + 4:
++        s->eventq.base = deposit64(s->eventq.base, 32, 32, value);
++        return MEMTX_OK;
++    case A_EVENTQ_PROD:
++        s->eventq.prod = value;
++        return MEMTX_OK;
++    case A_EVENTQ_CONS:
++        s->eventq.cons = value;
++        return MEMTX_OK;
++    case A_EVENTQ_IRQ_CFG0: /* 64b */
++        s->eventq_irq_cfg0 = deposit64(s->eventq_irq_cfg0, 0, 32, value);
++        return MEMTX_OK;
++    case A_EVENTQ_IRQ_CFG0 + 4:
++        s->eventq_irq_cfg0 = deposit64(s->eventq_irq_cfg0, 32, 32, value);
++        return MEMTX_OK;
++    case A_EVENTQ_IRQ_CFG1:
++        s->eventq_irq_cfg1 = value;
++        return MEMTX_OK;
++    case A_EVENTQ_IRQ_CFG2:
++        s->eventq_irq_cfg2 = value;
++        return MEMTX_OK;
++    default:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s Unexpected 32-bit access to 0x%"PRIx64" (WI)\n",
++                      __func__, offset);
++        return MEMTX_OK;
++    }
++}
++
++static MemTxResult smmu_write_mmio(void *opaque, hwaddr offset, uint64_t value,
+                                    unsigned size, MemTxAttrs attrs)
+ {
+-    /* not yet implemented */
+-    return MEMTX_ERROR;
++    SMMUState *sys = opaque;
++    SMMUv3State *s = ARM_SMMUV3(sys);
++    MemTxResult r;
++
++    /* CONSTRAINED UNPREDICTABLE choice to have page0/1 be exact aliases */
++    offset &= ~0x10000;
++
++    switch (size) {
++    case 8:
++        r = smmu_writell(s, offset, value, attrs);
++        break;
++    case 4:
++        r = smmu_writel(s, offset, value, attrs);
++        break;
++    default:
++        r = MEMTX_ERROR;
++        break;
++    }
++
++    trace_smmuv3_write_mmio(offset, value, size, r);
++    return r;
+ }
+ 
+ static MemTxResult smmu_readll(SMMUv3State *s, hwaddr offset,
 diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 2f3d74a..b77f8d2 100644
+index 38b35fa..781542a 100644
 --- a/hw/arm/trace-events
 +++ b/hw/arm/trace-events
-@@ -15,3 +15,6 @@ smmu_get_pte(uint64_t baseaddr, int index, uint64_t pteaddr, uint64_t pte) "base
- 
- #hw/arm/smmuv3.c
- smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
-+smmuv3_trigger_irq(int irq) "irq=%d"
-+smmuv3_write_gerror(uint32_t toggled, uint32_t gerror) "toggled=0x%x, new GERROR=0x%x"
-+smmuv3_write_gerrorn(uint32_t acked, uint32_t gerrorn) "acked=0x%x, new GERRORN=0x%x"
+@@ -23,3 +23,9 @@ smmuv3_cmdq_consume(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t con
+ smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
+ smmuv3_cmdq_consume_out(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod:%d, cons:%d, prod_wrap:%d, cons_wrap:%d "
+ smmuv3_cmdq_consume_error(const char *cmd_name, uint8_t cmd_error) "Error on %s command execution: %d"
++smmuv3_update(bool is_empty, uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "q empty:%d prod:%d cons:%d p.wrap:%d p.cons:%d"
++smmuv3_update_check_cmd(int error) "cmdq not enabled or error :0x%x"
++smmuv3_write_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
++smmuv3_write_mmio_idr(uint64_t addr, uint64_t val) "write to RO/Unimpl reg 0x%lx val64:0x%lx"
++smmuv3_write_mmio_evtq_cons_bef_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "Before clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
++smmuv3_write_mmio_evtq_cons_after_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "after clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
 -- 
 2.5.5
