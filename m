@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyDbq-0001ZL-Ql
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1eyDbp-0001XE-KK
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyDbk-0003AO-Ob
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51116)
+	(envelope-from <bounces@canonical.com>) id 1eyDbl-0003B0-Ge
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51142)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eyDbk-00039L-Hk
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:04 -0400
+	id 1eyDbl-0003A3-9i
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:31:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eyDbi-0006hx-SL
+	id 1eyDbj-0006dS-Hg
 	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:31:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D49892E80CD
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:31:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 74D292E80CC
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 09:31:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Mar 2018 09:18:00 -0000
+Date: Tue, 20 Mar 2018 09:19:16 -0000
 From: =?utf-8?b?5p2O56mX5oGS?= <1754542@bugs.launchpad.net>
 Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
-Message-Id: <152153748011.15312.10257450750410289981.malone@chaenomeles.canonical.com>
+Message-Id: <152153755663.13804.14120077462217338880.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1754542] Re: colo: vm crash with segmentation
  fault
@@ -39,14 +39,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-It is my trace event file.
-I read it many times, but still can't find the cause of the error.
-I just found after colo_vm_state_change ide_reset and ps2_kbd_reset ...
+It is svn trace even
 
-
-** Attachment added: "trace-pvm.log"
-   https://bugs.launchpad.net/qemu/+bug/1754542/+attachment/5084770/+files/=
-trace-pvm.log
+** Attachment added: "trace-svm.log"
+   https://bugs.launchpad.net/qemu/+bug/1754542/+attachment/5084771/+files/=
+trace-svm.log
 
 -- =
 
