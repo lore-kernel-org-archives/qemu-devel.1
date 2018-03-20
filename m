@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eyEPY-0001y3-9C
+	(envelope-from <thuth@redhat.com>) id 1eyEPY-0001y6-Ut
 	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eyEPU-00020n-AO
+	(envelope-from <thuth@redhat.com>) id 1eyEPU-00020z-WD
 	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:22:32 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:41327)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eyEPU-00020L-3c
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 06:22:28 -0400
-Received: from player771.ha.ovh.net (unknown [10.109.105.149])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 11727A76DF
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 11:22:25 +0100 (CET)
-Date: Tue, 20 Mar 2018 11:22:19 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180320112219.0546d56c@bahia.lan>
-In-Reply-To: <20180320020345.24930-1-david@gibson.dropbear.id.au>
-References: <20180320020345.24930-1-david@gibson.dropbear.id.au>
+References: <1521468046-10400-1-git-send-email-thuth@redhat.com>
+	<66c6e02a-a082-b9ef-f13c-3cdd8b0775f7@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <71f8966d-9c5f-a5c5-6a93-9fb11edeed43@redhat.com>
+Date: Tue, 20 Mar 2018 11:22:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Initialize lazy_tlb_flush
- correctly
+In-Reply-To: <66c6e02a-a082-b9ef-f13c-3cdd8b0775f7@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/misc/macio: Fix crash when
+ listing device properties of macio device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: thuth@redhat.com, peter.maydell@linaro.org, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Tue, 20 Mar 2018 13:03:45 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On 20.03.2018 06:05, Mark Cave-Ayland wrote:
+> On 19/03/18 14:00, Thomas Huth wrote:
+>=20
+>> The macio-newworld device can currently be used to abort QEMU
+>> unexpectedly:
+>>
+>> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=3Dqtest -qmp stdio
+>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+>> =C2=A0 "package": "build-all"}, "capabilities": []}}
+>> { 'execute': 'qmp_capabilities' }
+>> {"return": {}}
+>> { 'execute': 'device-list-properties',
+>> =C2=A0=C2=A0 'arguments': {'typename': 'macio-newworld'}}
+>> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+>> Device 'serial0' is in use
+>> Aborted (core dumped)
+>>
+>> qdev properties should be set during realize(), not during
+>> instance_init(),
+>> so move the related code there to fix this problem.
+>=20
+> Ah right, presumably this is because of the reference to serial_hds
+> again?
 
-> ppc_tr_init_disas_context() correctly sets lazy_tlb_flush to true on
-> certain CPU models.  However, it leaves it uninitialized, instead of
-> setting it to false on all others.
-> 
-> It wasn't caught before now because we didn't have examples in the tests
-> that exercised this path.  However it can now be caught using clang's
-> undefined behaviour sanitizer and the sam460ex board.
-> 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+Right.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+> The patch looks good, although given that it affects
+> macio_instance_init() and macio_common_realize() then I would have
+> expected this to have failed on the macio-oldworld device too (or
+> perhaps you were just unlucky that this was the first macio-*world
+> device enumerated).
 
->  target/ppc/translate.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 218665b408..3457d29f8e 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -7237,10 +7237,9 @@ static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
->      ctx->sf_mode = msr_is_64bit(env, env->msr);
->      ctx->has_cfar = !!(env->flags & POWERPC_FLAG_CFAR);
->  #endif
-> -    if (env->mmu_model == POWERPC_MMU_32B ||
-> -        env->mmu_model == POWERPC_MMU_601 ||
-> -        (env->mmu_model & POWERPC_MMU_64B))
-> -            ctx->lazy_tlb_flush = true;
-> +    ctx->lazy_tlb_flush = env->mmu_model == POWERPC_MMU_32B
-> +        || env->mmu_model == POWERPC_MMU_601
-> +        || (env->mmu_model & POWERPC_MMU_64B);
->  
->      ctx->fpu_enabled = !!msr_fp;
->      if ((env->flags & POWERPC_FLAG_SPE) && msr_spe)
+Yes, the bug triggers also with the macio-oldworld device. I just hit it
+with the newworld device first.
+
+ Thomas
