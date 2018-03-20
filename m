@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mk-00073X-Ek
+	(envelope-from <mst@redhat.com>) id 1ey7mh-00072R-Vu
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mj-0008QL-HD
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34305 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ey7mh-0008OD-0T
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51878 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mj-0008QA-Cq
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:18:01 -0400
-Date: Tue, 20 Mar 2018 05:18:00 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mg-0008Nt-PA
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:58 -0400
+Date: Tue, 20 Mar 2018 05:17:58 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-49-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-43-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 48/50] postcopy: Allow shared memory
+Subject: [Qemu-devel] [PULL v2 42/50] vhost+postcopy: Add vhost waker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Now that we have the mechanisms in here, allow shared memory in a
-postcopy.
-
-Note that QEMU can't tell who all the users of shared regions are
-and thus can't tell whether all the users of the shared regions
-have appropriate support for postcopy.  Those devices that explicitly
-support shared memory (e.g. vhost-user) must check, but it doesn't
-stop weirder configurations causing problems.
+Register a waker function in vhost-user code to be notified when
+pages arrive or requests to previously mapped pages get requested.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- migration/postcopy-ram.c | 6 ------
- 1 file changed, 6 deletions(-)
+ hw/virtio/vhost-user.c | 30 ++++++++++++++++++++++++++++++
+ hw/virtio/trace-events |  3 +++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 9cdee0f..188c2ca 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -215,12 +215,6 @@ static int test_ramblock_postcopiable(const char *bl=
-ock_name, void *host_addr,
-     RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
-     size_t pagesize =3D qemu_ram_pagesize(rb);
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 6dee1b5..a785aef 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1006,6 +1006,35 @@ static int vhost_user_postcopy_fault_handler(struc=
+t PostCopyFD *pcfd,
+     return -1;
+ }
 =20
--    if (qemu_ram_is_shared(rb)) {
--        error_report("Postcopy on shared RAM (%s) is not yet supported",
--                     block_name);
--        return 1;
--    }
--
-     if (length % pagesize) {
-         error_report("Postcopy requires RAM blocks to be a page size mul=
-tiple,"
-                      " block %s is 0x" RAM_ADDR_FMT " bytes with a "
++static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *=
+rb,
++                                     uint64_t offset)
++{
++    struct vhost_dev *dev =3D pcfd->data;
++    struct vhost_user *u =3D dev->opaque;
++    int i;
++
++    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
++
++    if (!u) {
++        return 0;
++    }
++    /* Translate the offset into an address in the clients address space=
+ */
++    for (i =3D 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
++        if (u->region_rb[i] =3D=3D rb &&
++            offset >=3D u->region_rb_offset[i] &&
++            offset < (u->region_rb_offset[i] +
++                      dev->mem->regions[i].memory_size)) {
++            uint64_t client_addr =3D (offset - u->region_rb_offset[i]) +
++                                   u->postcopy_client_bases[i];
++            trace_vhost_user_postcopy_waker_found(client_addr);
++            return postcopy_wake_shared(pcfd, client_addr, rb);
++        }
++    }
++
++    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offs=
+et);
++    return 0;
++}
++
+ /*
+  * Called at the start of an inbound postcopy on reception of the
+  * 'advise' command.
+@@ -1051,6 +1080,7 @@ static int vhost_user_postcopy_advise(struct vhost_=
+dev *dev, Error **errp)
+     u->postcopy_fd.fd =3D ufd;
+     u->postcopy_fd.data =3D dev;
+     u->postcopy_fd.handler =3D vhost_user_postcopy_fault_handler;
++    u->postcopy_fd.waker =3D vhost_user_postcopy_waker;
+     u->postcopy_fd.idstr =3D "vhost-user"; /* Need to find unique name *=
+/
+     postcopy_register_shared_ufd(&u->postcopy_fd);
+     return 0;
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 3afd12c..fe5e0ff 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -13,6 +13,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t=
+ region_offset, uint64_t
+ vhost_user_postcopy_listen(void) ""
+ vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, i=
+nt reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply =
+%d region %d"
+ vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t me=
+mory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t of=
+fset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" =
+RB offset:0x%"PRIx64
++vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"=
+PRIx64
++vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
++vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%=
+s + 0x%"PRIx64
+=20
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
+ out_num) "elem %p size %zd in_num %u out_num %u"
 --=20
 MST
