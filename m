@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eyDi5-000483-Td
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:37:38 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1eyDkR-0005Lt-7x
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:40:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eyDi2-0004e1-Lv
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:37:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37202 helo=mx1.redhat.com)
+	(envelope-from <frederic.konrad@adacore.com>) id 1eyDkO-0006YI-56
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:40:03 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:52725
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eyDi2-0004c4-GK
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:37:34 -0400
-Date: Tue, 20 Mar 2018 09:37:15 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180320093715.GC4530@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180319205040.1113423-1-eblake@redhat.com>
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1eyDkN-0006XG-UL
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:40:00 -0400
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Date: Tue, 20 Mar 2018 10:39:33 +0100
+Message-Id: <1521538773-30802-1-git-send-email-frederic.konrad@adacore.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180319205040.1113423-1-eblake@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12] qapi: Force UTF8 encoding when
- parsing qapi files
+Subject: [Qemu-devel] [PATCH v2 for-2.12] gdbstub: send a termination packet
+ instead of crashing gdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: f4bug@amsat.org, stefanha@redhat.com, peter.maydell@linaro.org, eblake@redhat.com, KONRAD Frederic <frederic.konrad@adacore.com>
 
-On Mon, Mar 19, 2018 at 03:50:40PM -0500, Eric Blake wrote:
-> Commit d4e5ec877 already fixed things to work around Python 3's
-> lame bug of having LC_ALL=3DC not be 8-bit clean, when parsing the
-> main QMP qapi files; but failed to do likewise in the tests
-> directory.  As a result, running 'LC_ALL=3DC make check' fails on
-> escape-too-big and unicode-str when using python 3 with a nasty
-> stack trace instead of the intended graceful error message that
-> QAPI doesn't yet support 8-bit data (the two tests contain
-> Unicode =C3=A9, when parsed in UTF-8; they represent something
-> different when parsed in a proper single-byte C locale, but that
-> doesn't matter to the error message printed out, provided that
-> brain-dead Python hasn't first choked on the input instead of
-> being 8-bit clean).
->=20
-> Ideally, we'd teach the qapi generator scripts to automatically
-> slurp things in using UTF-8 regardless of locale, and to honor
-> content that is not limited to 7 bit data rather than gracefully
-> erroring out; but until then, since our graceful error depends
-> on python parsing 8-bit data (even if nothing we generate uses
-> 8-bit data), our quick fix is to use the right locale when
-> running these tests.
->=20
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->=20
-> Will go through my QAPI tree for post-freeze bug fixes
->=20
->  tests/Makefile.include | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Since the commit:
+commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
+Author: Stefan Hajnoczi <stefanha@redhat.com>
+Date:   Wed Mar 7 14:42:05 2018 +0000
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+    vl: introduce vm_shutdown()
 
+GDB crashes when qemu exits (at least on sparc-softmmu):
+Remote communication error.  Target disconnected.: Connection reset by pe=
+er.
+Quitting: putpkt: write failed: Broken pipe.
 
-Regards,
-Daniel
+So send a packet to exit GDB before we exit QEMU:
+[Inferior 1 (Thread 0) exited normally]
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+
+Notes:
+    V1 -> V2:
+      * fix typos
+      * mark the patch for-2.12
+
+ gdbstub.c              | 7 +++++++
+ include/exec/gdbstub.h | 2 ++
+ vl.c                   | 2 ++
+ 3 files changed, 11 insertions(+)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index f1d5148..a76b2fa 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -2052,6 +2052,13 @@ int gdbserver_start(const char *device)
+     return 0;
+ }
+=20
++void gdbserver_cleanup(void)
++{
++    if (gdbserver_state) {
++        put_packet(gdbserver_state, "W00");
++    }
++}
++
+ static void register_types(void)
+ {
+     type_register_static(&char_gdb_type_info);
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 9aa7756..2e8a4b8 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -103,6 +103,8 @@ int gdbserver_start(int);
+ int gdbserver_start(const char *port);
+ #endif
+=20
++void gdbserver_cleanup(void);
++
+ /**
+  * gdb_has_xml:
+  * This is an ugly hack to cope with both new and old gdb.
+diff --git a/vl.c b/vl.c
+index 19340a3..cd8d5cb 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4725,6 +4725,8 @@ int main(int argc, char **argv, char **envp)
+=20
+     main_loop();
+=20
++    gdbserver_cleanup();
++
+     /* No more vcpu or device emulation activity beyond this point */
+     vm_shutdown();
+=20
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+1.8.3.1
