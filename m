@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ey5jK-0000bz-D1
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:06:23 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ey5uf-00035w-IX
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ey5jH-0007y0-4r
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:06:22 -0400
-Resent-Message-Id: <E1ey5jH-0007y0-4r@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21016)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ey5jG-0007xk-SZ
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:06:19 -0400
-In-Reply-To: <1521476567-21818-1-git-send-email-suhang16@mails.ucas.ac.cn>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152147994043.144.8759876168505157637@71c20359a636>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ey5ue-0007e1-KF
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 21:18:05 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1521468046-10400-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e7981b64-6631-9885-c4fe-7864bae65846@amsat.org>
+Date: Tue, 20 Mar 2018 02:17:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 19 Mar 2018 10:19:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH RFC v2] scripts/checkpatch.pl: Bug fix
+In-Reply-To: <1521468046-10400-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/misc/macio: Fix crash when
+ listing device properties of macio device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: suhang16@mails.ucas.ac.cn
-Cc: famz@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjE0NzY1NjctMjE4MTgtMS1naXQtc2VuZC1lbWFpbC1zdWhhbmcxNkBtYWls
-cy51Y2FzLmFjLmNuClN1YmplY3Q6IFtRZW11LWRldmVsXSAgW1BBVENIIFJGQyB2Ml0gc2NyaXB0
-cy9jaGVja3BhdGNoLnBsOiBCdWcgZml4Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
-ICAgICAgICAgICBwYXRjaGV3LzE1MjE0NzY1NjctMjE4MTgtMS1naXQtc2VuZC1lbWFpbC1zdWhh
-bmcxNkBtYWlscy51Y2FzLmFjLmNuIC0+IHBhdGNoZXcvMTUyMTQ3NjU2Ny0yMTgxOC0xLWdpdC1z
-ZW5kLWVtYWlsLXN1aGFuZzE2QG1haWxzLnVjYXMuYWMuY24KIHQgW3RhZyB1cGRhdGVdICAgICAg
-ICAgICAgcGF0Y2hldy8yMDE4MDMxOTEzMTc0My4zODg1LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8u
-b3JnIC0+IHBhdGNoZXcvMjAxODAzMTkxMzE3NDMuMzg4NS0xLXBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzE5MTYxNTU2LjE2
-NDQ2LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODAzMTkxNjE1NTYu
-MTY0NDYtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwpiMDk4YWVmODliIHNjcmlwdHMvY2hlY2twYXRjaC5wbDogQnVnIGZpeAoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6
-IEJ1ZyBmaXguLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMxOiBGSUxFOiBz
-Y3JpcHRzL2NoZWNrcGF0Y2gucGw6MjM2NjoKKwkJCQkJcHJpbnQgIkFQVzogQUxMT1dFRDogcHJl
-PCRwcmU+IGxpbmU8JGxpbmU+XG4iCgpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5l
-KHMpCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDMzIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 03/19/2018 03:00 PM, Thomas Huth wrote:
+> The macio-newworld device can currently be used to abort QEMU unexpectedly:
+> 
+> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> { 'execute': 'qmp_capabilities' }
+> {"return": {}}
+> { 'execute': 'device-list-properties',
+>   'arguments': {'typename': 'macio-newworld'}}
+> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+> Device 'serial0' is in use
+> Aborted (core dumped)
+> 
+> qdev properties should be set during realize(), not during instance_init(),
+> so move the related code there to fix this problem.
+
+Oops I missed that.
+
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  hw/misc/macio/macio.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+> index 454244f..b74a657 100644
+> --- a/hw/misc/macio/macio.c
+> +++ b/hw/misc/macio/macio.c
+> @@ -115,6 +115,13 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
+>      memory_region_add_subregion(&s->bar, 0x16000,
+>                                  sysbus_mmio_get_region(sysbus_dev, 0));
+>  
+> +    qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
+> +    qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
+> +    qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
+> +    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hds[0]);
+> +    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hds[1]);
+> +    qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
+> +    qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
+>      object_property_set_bool(OBJECT(&s->escc), true, "realized", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+> @@ -341,13 +348,6 @@ static void macio_instance_init(Object *obj)
+>      object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
+>  
+>      object_initialize(&s->escc, sizeof(s->escc), TYPE_ESCC);
+> -    qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
+> -    qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
+> -    qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
+> -    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hds[0]);
+> -    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hds[1]);
+> -    qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
+> -    qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
+>      qdev_set_parent_bus(DEVICE(&s->escc), sysbus_get_default());
+>      object_property_add_child(obj, "escc", OBJECT(&s->escc), NULL);
+>  }
+> 
