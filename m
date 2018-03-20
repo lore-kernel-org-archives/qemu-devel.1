@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ey7fh-0003Sw-OI
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:10:46 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7ia-0004Ub-9j
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ey7fg-0004rj-Mh
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:10:45 -0400
-Date: Mon, 19 Mar 2018 23:10:28 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180320031028.GD2962@localhost.localdomain>
-References: <20180228180507.3964-1-mreitz@redhat.com>
-	<20180228180507.3964-2-mreitz@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1ey7iX-0005yo-08
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:13:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34128 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7iW-0005yh-Qt
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:13:40 -0400
+Date: Tue, 20 Mar 2018 05:13:39 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180320051202-mutt-send-email-mst@kernel.org>
+References: <1520241169-22892-1-git-send-email-jianjay.zhou@huawei.com>
+	<20180320033051-mutt-send-email-mst@kernel.org>
+	<B2D15215269B544CADD246097EACE7473ABF2941@DGGEMM505-MBS.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180228180507.3964-2-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 01/16] block: BDS deletion
- during bdrv_drain_recurse
+In-Reply-To: <B2D15215269B544CADD246097EACE7473ABF2941@DGGEMM505-MBS.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v9] vhost: used_memslots refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
 
-On Wed, Feb 28, 2018 at 07:04:52PM +0100, Max Reitz wrote:
-> Draining a BDS child may lead to other children of the same parent being
-> detached and/or deleted.  We should prepare for the former case (by
-> copying the children list before iterating through it) and prevent the
-> latter (by bdrv_ref()'ing all nodes if we are in the main loop).
+On Tue, Mar 20, 2018 at 02:09:34AM +0000, Zhoujian (jay) wrote:
+> Hi Michael,
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/io.c | 40 ++++++++++++++++++++++++++++++----------
->  1 file changed, 30 insertions(+), 10 deletions(-)
+> > -----Original Message-----
+> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > Sent: Tuesday, March 20, 2018 9:34 AM
+> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Cc: qemu-devel@nongnu.org; imammedo@redhat.com; Huangweidong (C)
+> > <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>; Gonglei
+> > (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler) <liuzhe13@huawei.com>
+> > Subject: Re: [PATCH v9] vhost: used_memslots refactoring
+> > 
+> > On Mon, Mar 05, 2018 at 05:12:49PM +0800, Jay Zhou wrote:
+> > > Used_memslots is shared by vhost kernel and user, it is equal to
+> > > dev->mem->nregions, which is correct for vhost kernel, but not for
+> > > vhost user, the latter one uses memory regions that have file
+> > > descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
+> > > upper limit) memory slots, it will be failed to hotplug a new DIMM
+> > > device since vhost_has_free_slot() finds no free slot left. It should
+> > > be successful if only part of memory slots have file descriptor, so
+> > > setting used memslots for vhost-user and vhost-kernel respectively.
+> > 
+> > 
+> > Below should go after ---
 > 
-> diff --git a/block/io.c b/block/io.c
-> index 4d3d1f640a..ead12c4136 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -189,31 +189,51 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin, bool recursive)
->  
->  static bool bdrv_drain_recurse(BlockDriverState *bs)
->  {
-> -    BdrvChild *child, *tmp;
-> +    BdrvChild *child;
->      bool waited;
-> +    struct BDSToDrain {
-> +        BlockDriverState *bs;
-> +        QLIST_ENTRY(BDSToDrain) next;
-> +    };
-> +    QLIST_HEAD(, BDSToDrain) bs_list = QLIST_HEAD_INITIALIZER(bs_list);
-> +    bool in_main_loop =
-> +        qemu_get_current_aio_context() == qemu_get_aio_context();
->  
->      /* Wait for drained requests to finish */
->      waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
->  
-> -    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-> -        BlockDriverState *bs = child->bs;
-> -        bool in_main_loop =
-> -            qemu_get_current_aio_context() == qemu_get_aio_context();
-> -        assert(bs->refcnt > 0);
-> +    /* Draining children may result in other children being removed from this
-> +     * parent and maybe even deleted, so copy the children list first */
-> +    QLIST_FOREACH(child, &bs->children, next) {
-> +        struct BDSToDrain *bs2d = g_new0(struct BDSToDrain, 1);
-> +
-> +        bs2d->bs = child->bs;
->          if (in_main_loop) {
->              /* In case the recursive bdrv_drain_recurse processes a
->               * block_job_defer_to_main_loop BH and modifies the graph,
-> -             * let's hold a reference to bs until we are done.
-> +             * let's hold a reference to the BDS until we are done.
->               *
->               * IOThread doesn't have such a BH, and it is not safe to call
->               * bdrv_unref without BQL, so skip doing it there.
->               */
-> -            bdrv_ref(bs);
-> +            bdrv_ref(bs2d->bs);
->          }
-> -        waited |= bdrv_drain_recurse(bs);
-> +
-> +        QLIST_INSERT_HEAD(&bs_list, bs2d, next);
-> +    }
-> +
-> +    while (!QLIST_EMPTY(&bs_list)) {
-> +        struct BDSToDrain *bs2d = QLIST_FIRST(&bs_list);
-> +        QLIST_REMOVE(bs2d, next);
-> +
-> +        assert(bs2d->bs->refcnt > 0);
-> +
-> +        waited |= bdrv_drain_recurse(bs2d->bs);
->          if (in_main_loop) {
-> -            bdrv_unref(bs);
-> +            bdrv_unref(bs2d->bs);
->          }
-> +
-> +        g_free(bs2d);
->      }
->  
->      return waited;
-> -- 
-> 2.14.3
+> Thanks for reminding.
 > 
+> > 
+> > > v7 ... v9:
+> > >  - rebased on the master
+> > > v2 ... v6:
+> > >  - delete the "used_memslots" global variable, and add it
+> > >    for vhost-user and vhost-kernel separately
+> > >  - refine the function, commit log
+> > >  - used_memslots refactoring
+> > >
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > > Signed-off-by: Liuzhe <liuzhe13@huawei.com>
+> > 
+> > When built with clang this causes runtime warnings (during make check) about
+> > misaligned access to structures.
+> > 
+> > The issue is that vhost_user_prepare_msg requests VhostUserMemory which
+> > compiler assumes but is then used with a pointer into a packed structure -
+> > where fields are not aligned.
 > 
+> Sorry I missed the patch you have sent to fix the alignment, I have replied
+> to that thread.
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+I've dropped this from the pull for now.  Sorry about that.  Once next
+pull is merged, pls rebase and post a version fixing up the alignment
+issues.
+
+Thanks for your effort!
+
+-- 
+MST
