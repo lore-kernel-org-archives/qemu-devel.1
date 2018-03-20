@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7ln-0006Eu-BF
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:05 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7lw-0006Na-QJ
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7lm-0007rt-4N
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34218 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ey7lv-0007wf-Ps
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42534 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7ll-0007rS-Ul
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:02 -0400
-Date: Tue, 20 Mar 2018 05:17:00 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7lv-0007wH-Jw
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:11 -0400
+Date: Tue, 20 Mar 2018 05:17:10 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-4-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-8-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 03/50] virtio-net: add linkspeed and duplex
- settings to virtio-net
+Subject: [Qemu-devel] [PULL v2 07/50] acpi: add build_append_gas() helper
+ for Generic Address Structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +28,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Baron <jbaron@akamai.com>, Jason Wang <jasowang@redhat.com>, virtio-dev@lists.oasis-open.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-From: Jason Baron <jbaron@akamai.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Although linkspeed and duplex can be set in a linux guest via 'ethtool -s',
-this requires custom ethtool commands for virtio-net by default.
+it will help to add Generic Address Structure to ACPI tables
+without using packed C structures and avoid endianness
+issues as API doesn't need an explicit conversion.
 
-Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
-the hypervisor to export a linkspeed and duplex setting. The user can
-subsequently overwrite it later if desired via: 'ethtool -s'.
-
-Linkspeed and duplex settings can be set as:
-'-device virtio-net,speed=10000,duplex=full'
-
-where speed is [0...INT_MAX], and duplex is ["half"|"full"].
-
-Signed-off-by: Jason Baron <jbaron@akamai.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/virtio-net.h |  3 +++
- hw/net/virtio-net.c            | 26 ++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ include/hw/acpi/aml-build.h | 20 ++++++++++++++++++++
+ hw/acpi/aml-build.c         | 16 ++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index e7634c9..02484dc 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -38,6 +38,9 @@ typedef struct virtio_net_conf
-     uint16_t rx_queue_size;
-     uint16_t tx_queue_size;
-     uint16_t mtu;
-+    int32_t speed;
-+    char *duplex_str;
-+    uint8_t duplex;
- } virtio_net_conf;
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 88d0738..8692ccc 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -78,6 +78,15 @@ typedef enum {
+ } AmlUpdateRule;
  
- /* Maximum packet size we can receive from tap device: header + 64k */
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index ab06f93..67ad38c 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -26,6 +26,7 @@
- #include "qapi/qapi-events-net.h"
- #include "hw/virtio/virtio-access.h"
- #include "migration/misc.h"
-+#include "standard-headers/linux/ethtool.h"
+ typedef enum {
++    AML_AS_SYSTEM_MEMORY = 0X00,
++    AML_AS_SYSTEM_IO = 0X01,
++    AML_AS_PCI_CONFIG = 0X02,
++    AML_AS_EMBEDDED_CTRL = 0X03,
++    AML_AS_SMBUS = 0X04,
++    AML_AS_FFH = 0X7F,
++} AmlAddressSpace;
++
++typedef enum {
+     AML_SYSTEM_MEMORY = 0X00,
+     AML_SYSTEM_IO = 0X01,
+     AML_PCI_CONFIG = 0X02,
+@@ -389,6 +398,17 @@ int
+ build_append_named_dword(GArray *array, const char *name_format, ...)
+ GCC_FMT_ATTR(2, 3);
  
- #define VIRTIO_NET_VM_VERSION    11
++void build_append_gas(GArray *table, AmlAddressSpace as,
++                      uint8_t bit_width, uint8_t bit_offset,
++                      uint8_t access_width, uint64_t address);
++
++static inline void
++build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
++{
++    build_append_gas(table, s->space_id, s->bit_width, s->bit_offset,
++                     s->access_width, s->address);
++}
++
+ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+                        uint64_t len, int node, MemoryAffinityFlags flags);
  
-@@ -61,6 +62,8 @@ static VirtIOFeature feature_sizes[] = {
-      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
-     {.flags = 1ULL << VIRTIO_NET_F_MTU,
-      .end = endof(struct virtio_net_config, mtu)},
-+    {.flags = 1ULL << VIRTIO_NET_F_SPEED_DUPLEX,
-+     .end = endof(struct virtio_net_config, duplex)},
-     {}
- };
- 
-@@ -89,6 +92,8 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-     virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
-     virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
-     memcpy(netcfg.mac, n->mac, ETH_ALEN);
-+    virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
-+    netcfg.duplex = n->net_conf.duplex;
-     memcpy(config, &netcfg, n->config_size);
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 36a6cc4..3fef5f6 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -258,6 +258,22 @@ static void build_append_int(GArray *table, uint64_t value)
+     }
  }
  
-@@ -1941,6 +1946,25 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-         n->host_features |= (1ULL << VIRTIO_NET_F_MTU);
-     }
- 
-+    if (n->net_conf.duplex_str) {
-+        if (strncmp(n->net_conf.duplex_str, "half", 5) == 0) {
-+            n->net_conf.duplex = DUPLEX_HALF;
-+        } else if (strncmp(n->net_conf.duplex_str, "full", 5) == 0) {
-+            n->net_conf.duplex = DUPLEX_FULL;
-+        } else {
-+            error_setg(errp, "'duplex' must be 'half' or 'full'");
-+        }
-+        n->host_features |= (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
-+    } else {
-+        n->net_conf.duplex = DUPLEX_UNKNOWN;
-+    }
++/* Generic Address Structure (GAS)
++ * ACPI 2.0/3.0: 5.2.3.1 Generic Address Structure
++ * 2.0 compat note:
++ *    @access_width must be 0, see ACPI 2.0:Table 5-1
++ */
++void build_append_gas(GArray *table, AmlAddressSpace as,
++                      uint8_t bit_width, uint8_t bit_offset,
++                      uint8_t access_width, uint64_t address)
++{
++    build_append_int_noprefix(table, as, 1);
++    build_append_int_noprefix(table, bit_width, 1);
++    build_append_int_noprefix(table, bit_offset, 1);
++    build_append_int_noprefix(table, access_width, 1);
++    build_append_int_noprefix(table, address, 8);
++}
 +
-+    if (n->net_conf.speed < SPEED_UNKNOWN) {
-+        error_setg(errp, "'speed' must be between 0 and INT_MAX");
-+    } else if (n->net_conf.speed >= 0) {
-+        n->host_features |= (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
-+    }
-+
-     virtio_net_set_config_size(n, n->host_features);
-     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
- 
-@@ -2161,6 +2185,8 @@ static Property virtio_net_properties[] = {
-     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
-     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
-                      true),
-+    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
-+    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+ /*
+  * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
+  * and return the offset to 0x00000000 for runtime patching.
 -- 
 MST
