@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chao.qin@linux.intel.com>) id 1ey9q1-00062Z-St
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:29:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1eyB3C-0003aN-TZ
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 02:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chao.qin@linux.intel.com>) id 1ey9px-0006WP-P1
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:29:33 -0400
-Received: from mga14.intel.com ([192.55.52.115]:30774)
+	(envelope-from <imammedo@redhat.com>) id 1eyB39-0007tF-JL
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 02:47:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57640 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chao.qin@linux.intel.com>)
-	id 1ey9px-0006VT-Br
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 01:29:29 -0400
-References: <1521450289-5005-1-git-send-email-chao.qin@linux.intel.com>
-	<20180319170525.1016391d@igors-macbook-pro.local>
-From: "Qin, Chao" <chao.qin@linux.intel.com>
-Message-ID: <c7354c76-afb6-e6f2-a0ca-86b6077228ea@linux.intel.com>
-Date: Tue, 20 Mar 2018 13:29:24 +0800
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eyB39-0007s7-E1
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 02:47:11 -0400
+Date: Tue, 20 Mar 2018 07:46:58 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180320074658.19fe0668@redhat.com>
+In-Reply-To: <7a8ee5e0-d450-5d60-f388-278eb0b3083f@ozlabs.ru>
+References: <28028831-7306-3356-6018-c7dcf72dc349@ozlabs.ru>
+	<7a8ee5e0-d450-5d60-f388-278eb0b3083f@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <20180319170525.1016391d@igors-macbook-pro.local>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hax: Properly handle IA32_APIC_BASE MSR
+Subject: Re: [Qemu-devel] Partial NUMA config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, yu.ning@linux.intel.com, Qin Chao <chao.qin@intel.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+
+On Mon, 19 Mar 2018 15:28:50 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> On 13/3/18 1:26 pm, Alexey Kardashevskiy wrote:
+> > Hi Igor,
+> > 
+> > ec78f8114bc4c1 "numa: use possible_cpus for not mapped CPUs check" added a
+> > warning about "All CPU(s) up to maxcpus should be described in NUMA config,
+> > ability to start up with partial NUMA mappings is obsoleted and will be
+> > removed in future" and this is printed when I add a numa node without
+> > attached CPU like this:
+> > 
+> > -numa node,nodeid=0,cpus=0,mem=4G
+> > -numa node,nodeid=1,mem=131072M
+Warning you see is about CPU(s) not assigned to any node
+and it has noting to do with cpu-less node.
+
+What's the full CLI you are using?
 
 
+> > And the reason for this command line is that I am trying to pass some dodgy
+> > host RAM (actually belongs to a GPU but directly accessible via a fast
+> > NVLink, not PCI fabric) which let's say is equally far from all CPUs, at
+> > least in the host's NUMA config this memory is also not bound to any CPU:
+-numa node,nodeid=1,mem=131072M - will assign some chunk of initial RAM to
+cpu-less node. It might serve purpose of cpu-less node simulation and nothing else.
+You won't be able to pass it GPU memory this way though.
 
-On 3/20/2018 12:05 AM, Igor Mammedov wrote:
-> On Mon, 19 Mar 2018 17:04:49 +0800 chao.qin@linux.intel.com wrote:  > >> From: Qin Chao <chao.qin@intel.com> >> >> Emulation of 
-IA32_APIC_BASE MSR in HAXM is not correct, such as >> bit 8, which is 
-BSP flag and should be set to 1 for the bootstrap >> processor and set 
-to 0 for the application processors, but it's >> set to 0 for all 
-processors in HAXM. So guest OSes that expect a >> valid BSP flag, such 
-as Zircon (the core of Google Fuchsia OS), >> cannot boot with "-accel 
-hax". To solve this problem, HAXM (which >> lacks APIC virtualization) 
-and QEMU must notify each other of any >> change to guest IA32_APIC_BASE 
-MSR. The HAXM patch has been merged >> into HAXM source. QEMU needs to 
-use the new HAXM API (apic_base in >> "struct hax_tunnel") to initialize 
-the guest IA32_APIC_BASE MSR, >> and then, update its own copy at every 
-return from >> HAX_VCPU_IOCTL_RUN. >> >> There will be a backward 
-compatility issue caused by the new field >> "apic_base" added into 
-"struct hax_tunnel". In order to fix the >> problem, the validation for 
-size of "struct hax_tunnel" is removed >> and a new capability flag 
-"HAX_CAP_TUNNEL_PAGE" is added, which >> means that one page (4KB) is 
-allocated in HAXM kernel to store >> "struct hax_tunnel", instead of the 
-size of "struct hax_tunnel". >> >> Change-Id: 
-I8505bc1d75c495dd2765e581d6014125dcb538f3 Signed-off-by: >> Qin Chao 
-<chao.qin@intel.com> --- target/i386/hax-all.c | 24 >> 
-+++++++++++++++++++----- target/i386/hax-darwin.c | 6 ------ >> 
-target/i386/hax-i386.h | 2 +- target/i386/hax-interface.h | >> 3 +++ 
-target/i386/hax-windows.c | 5 ----- 5 files changed, 23 >> 
-insertions(+), 17 deletions(-) >> >> diff --git a/target/i386/hax-all.c 
-b/target/i386/hax-all.c index >> cad7531..6a840d9 100644 --- 
-a/target/i386/hax-all.c +++ >> b/target/i386/hax-all.c > [...] >> @@ 
--933,6 +944,9 @@ static int hax_set_msrs(CPUArchState *env) >> 
-hax_msr_entry_set(&msrs[n++], MSR_FMASK, env->fmask); >> 
-hax_msr_entry_set(&msrs[n++], MSR_KERNELGSBASE, >> env->kernelgsbase); 
-#endif + hax_msr_entry_set(&msrs[n++], >> MSR_IA32_APICBASE, \ + >> 
-cpu_get_apic_base(x86_env_get_cpu(env)->apic_state)); + md.nr_msr = >> 
-n; md.done = 0; > Does it work for you if you drop everything except of 
-this chunk?
-Yes, it works just with this chunk.
+It might be possible using -numa node,nodeid=1,memdev=foo
+but knowing nothing about NVLink, I'm not sure how it's shared with
+GPU (PCI) and per node memory controllers.
 
->  > There is no much point in syncing BPS flag from HAXM since Seabios > 
-nor OVMF do not implement BSP selection protocol, it's hard-coded in > 
-QEMU that BSP is the first CPU. > > Considering that typically no sane 
-OS does change MSR_IA32_APICBASE > there is no need to sync it back to 
-QEMU. So no need to introduce all > that complexity for no gain.
-Yes, the BSP is hard-coded in QEMU. But other bits, not just BSP flag, are
-also needed to sync from HAXM, such as x2APIC mode flag (bit 10) and
-APIC enable/disable flag(bit 11). As in the Google Zircon
-(https://github.com/fuchsia-mirror/zircon/blob/master/kernel/arch/x86/lapic.cpp#L157),
-it will change IA32_APIC_BASE[10] and set the bit to 1 if x2APIC enabled.
-Although x2APIC mode is not supported yet for TCG mode, it's worthy to
-keep the codes that syncing IA32_APIC_BASE from HAXM to QEMU and if
-x2APIC mode is supported for TCG in future, there is no any effort needed
-to make HAXM to work with this mode. Also, in KVM it will synced the
-IA32_APIC_BASE MSR to QEMU at every VM-Exit.
 
->  > [...] > > >
+> > [aik@aik ~]$ ssh yc02goos numactl -H
+> > available: 8 nodes (0,8,250-255)
+> > node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+> > 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
+> > 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+> > node 0 size: 261735 MB
+> > node 0 free: 258932 MB
+> > node 8 cpus: 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84
+> > 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106
+> > 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125
+> > 126 127
+> > node 8 size: 261739 MB
+> > node 8 free: 261414 MB
+> > node 250 cpus:
+> > node 250 size: 15360 MB
+> > node 250 free: 15359 MB
+> > node 251 cpus:
+> > node 251 size: 0 MB
+> > node 251 free: 0 MB
+> > node 252 cpus:
+> > node 252 size: 15360 MB
+> > node 252 free: 15359 MB
+> > node 253 cpus:
+> > node 253 size: 15360 MB
+> > node 253 free: 15359 MB
+> > node 254 cpus:
+> > node 254 size: 15360 MB
+> > node 254 free: 15359 MB
+> > node 255 cpus:
+> > node 255 size: 15360 MB
+> > node 255 free: 15359 MB
+> > node distances:
+> > node   0   8  250  251  252  253  254  255
+> >   0:  10  40  80  80  80  80  80  80
+> >   8:  40  10  80  80  80  80  80  80
+> >  250:  80  80  10  80  80  80  80  80
+> >  251:  80  80  80  10  80  80  80  80
+> >  252:  80  80  80  80  10  80  80  80
+> >  253:  80  80  80  80  80  10  80  80
+> >  254:  80  80  80  80  80  80  10  80
+> >  255:  80  80  80  80  80  80  80  10
+> > 
+> > 
+> > I am not sure I'll progress far enough to get this working with VFIO but if
+> > I do, I'd like to keep an ability to have such a partial config in the
+> > future. What was the reason for this warning in the first place?
+a CPU(including possible ones) shouldn't hung in nowhere,
+it should be assigned to some node to describe its relation to memory on nodes.
+
+> 
+> Ping?
+> 
+> 
+> 
