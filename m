@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7md-0006zM-I8
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:58 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7mg-00070J-7w
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7mc-0008LU-4m
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34282 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1ey7mc-0008Ls-Uj
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57042 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mb-0008LB-U2
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7mc-0008Lf-OT
 	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:54 -0400
-Date: Tue, 20 Mar 2018 05:17:53 +0200
+Date: Tue, 20 Mar 2018 05:17:54 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-37-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-39-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 36/50] vhost+postcopy: Send address back to
- qemu
+Subject: [Qemu-devel] [PULL v2 38/50] vhost+postcopy: Helper to send
+ requests to source for shared pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,248 +29,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We need a better way, but at the moment we need the address of the
-mappings sent back to qemu so it can interpret the messages on the
-userfaultfd it reads.
-
-This is done as a 3 stage set:
-   QEMU -> client
-      set_mem_table
-
-   mmap stuff, get addresses
-
-   client -> qemu
-       here are the addresses
-
-   qemu -> client
-       OK - now you can use them
-
-That ensures that qemu has registered the new addresses in it's
-userfault code before the client starts accessing them.
-
-Note: We don't ask for the default 'ack' reply since we've got our own.
+Provide a helper to be used by shared waker functions to request
+shared pages from the source.
+The last_rb pointer is moved into the incoming state since this
+helper can update it as well as the main fault thread function.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/interop/vhost-user.txt           |  9 +++++
- contrib/libvhost-user/libvhost-user.c | 24 ++++++++++++-
- hw/virtio/vhost-user.c                | 67 +++++++++++++++++++++++++++++=
-++++--
- hw/virtio/trace-events                |  1 +
- 4 files changed, 98 insertions(+), 3 deletions(-)
+ migration/migration.h    |  2 ++
+ migration/postcopy-ram.h |  3 +++
+ migration/postcopy-ram.c | 32 +++++++++++++++++++++++++++++---
+ migration/trace-events   |  2 ++
+ 4 files changed, 36 insertions(+), 3 deletions(-)
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index 0d24203..e295ef1 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -455,12 +455,21 @@ Master message types
-       Id: 5
-       Equivalent ioctl: VHOST_SET_MEM_TABLE
-       Master payload: memory regions description
-+      Slave payload: (postcopy only) memory regions description
+diff --git a/migration/migration.h b/migration/migration.h
+index d02a759..83dc36b 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -49,6 +49,8 @@ struct MigrationIncomingState {
+     int       userfault_event_fd;
+     QEMUFile *to_src_file;
+     QemuMutex rp_mutex;    /* We send replies from multiple threads */
++    /* RAMBlock of last request sent to source */
++    RAMBlock *last_rb;
+     void     *postcopy_tmp_page;
+     void     *postcopy_tmp_zero_page;
+     /* PostCopyFD's for external userfaultfds & handlers of shared memor=
+y */
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index c8ced34..d7afab0 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -164,5 +164,8 @@ struct PostCopyFD {
+  */
+ void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
+ void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
++/* Callback from shared fault handlers to ask for a page */
++int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
++                                 uint64_t client_addr, uint64_t offset);
 =20
-       Sets the memory map regions on the slave so it can translate the v=
-ring
-       addresses. In the ancillary data there is an array of file descrip=
-tors
-       for each memory mapped region. The size and ordering of the fds ma=
-tches
-       the number and ordering of memory regions.
+ #endif
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 6ce1577..146bc09 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -526,6 +526,32 @@ static int ram_block_enable_notify(const char *block=
+_name, void *host_addr,
+ }
 =20
-+      When VHOST_USER_POSTCOPY_LISTEN has been received, SET_MEM_TABLE r=
-eplies with
-+      the bases of the memory mapped regions to the master.  The slave m=
-ust
-+      have mmap'd the regions but not yet accessed them and should not y=
-et generate
-+      a userfault event. Note NEED_REPLY_MASK is not set in this case.
-+      QEMU will then reply back to the list of mappings with an empty
-+      VHOST_USER_SET_MEM_TABLE as an acknowledgment; only upon reception=
- of this
-+      message may the guest start accessing the memory and generating fa=
-ults.
+ /*
++ * Callback from shared fault handlers to ask for a page,
++ * the page must be specified by a RAMBlock and an offset in that rb
++ * Note: Only for use by shared fault handlers (in fault thread)
++ */
++int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
++                                 uint64_t client_addr, uint64_t rb_offse=
+t)
++{
++    size_t pagesize =3D qemu_ram_pagesize(rb);
++    uint64_t aligned_rbo =3D rb_offset & ~(pagesize - 1);
++    MigrationIncomingState *mis =3D migration_incoming_get_current();
 +
-  * VHOST_USER_SET_LOG_BASE
-=20
-       Id: 6
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index 7c8cd587..6314549 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -491,10 +491,32 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUse=
-rMsg *vmsg)
-                    dev_region->mmap_addr);
-         }
-=20
-+        /* Return the address to QEMU so that it can translate the ufd
-+         * fault addresses back.
-+         */
-+        msg_region->userspace_addr =3D (uintptr_t)(mmap_addr +
-+                                                 dev_region->mmap_offset=
-);
-         close(vmsg->fds[i]);
-     }
-=20
--    /* TODO: Get address back to QEMU */
-+    /* Send the message back to qemu with the addresses filled in */
-+    vmsg->fd_num =3D 0;
-+    if (!vu_message_write(dev, dev->sock, vmsg)) {
-+        vu_panic(dev, "failed to respond to set-mem-table for postcopy")=
-;
-+        return false;
++    trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr(r=
+b),
++                                       rb_offset);
++    /* TODO: Check bitmap to see if we already have the page */
++    if (rb !=3D mis->last_rb) {
++        mis->last_rb =3D rb;
++        migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
++                                  aligned_rbo, pagesize);
++    } else {
++        /* Save some space */
++        migrate_send_rp_req_pages(mis, NULL, aligned_rbo, pagesize);
 +    }
++    return 0;
++}
 +
-+    /* Wait for QEMU to confirm that it's registered the handler for the
-+     * faults.
-+     */
-+    if (!vu_message_read(dev, dev->sock, vmsg) ||
-+        vmsg->size !=3D sizeof(vmsg->payload.u64) ||
-+        vmsg->payload.u64 !=3D 0) {
-+        vu_panic(dev, "failed to receive valid ack for postcopy set-mem-=
-table");
-+        return false;
-+    }
-+
-+    /* OK, now we can go and register the memory and generate faults */
-     for (i =3D 0; i < dev->nregions; i++) {
-         VuDevRegion *dev_region =3D &dev->regions[i];
- #ifdef UFFDIO_REGISTER
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index b6757eb..1603d70 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -174,6 +174,7 @@ struct vhost_user {
-     int slave_fd;
-     NotifierWithReturn postcopy_notifier;
-     struct PostCopyFD  postcopy_fd;
-+    uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
-     /* True once we've entered postcopy_listen */
-     bool               postcopy_listen;
- };
-@@ -343,12 +344,15 @@ static int vhost_user_set_log_base(struct vhost_dev=
- *dev, uint64_t base,
- static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-                                              struct vhost_memory *mem)
- {
-+    struct vhost_user *u =3D dev->opaque;
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-     int i, fd;
-     size_t fd_num =3D 0;
-     bool reply_supported =3D virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPL=
-Y_ACK);
--    /* TODO: Add actual postcopy differences */
-+    VhostUserMsg msg_reply;
-+    int region_i, msg_i;
-+
-     VhostUserMsg msg =3D {
-         .hdr.request =3D VHOST_USER_SET_MEM_TABLE,
-         .hdr.flags =3D VHOST_USER_VERSION,
-@@ -395,6 +399,64 @@ static int vhost_user_set_mem_table_postcopy(struct =
-vhost_dev *dev,
-         return -1;
-     }
++/*
+  * Handle faults detected by the USERFAULT markings
+  */
+ static void *postcopy_ram_fault_thread(void *opaque)
+@@ -535,9 +561,9 @@ static void *postcopy_ram_fault_thread(void *opaque)
+     int ret;
+     size_t index;
+     RAMBlock *rb =3D NULL;
+-    RAMBlock *last_rb =3D NULL; /* last RAMBlock we sent part of */
 =20
-+    if (vhost_user_read(dev, &msg_reply) < 0) {
-+        return -1;
-+    }
-+
-+    if (msg_reply.hdr.request !=3D VHOST_USER_SET_MEM_TABLE) {
-+        error_report("%s: Received unexpected msg type."
-+                     "Expected %d received %d", __func__,
-+                     VHOST_USER_SET_MEM_TABLE, msg_reply.hdr.request);
-+        return -1;
-+    }
-+    /* We're using the same structure, just reusing one of the
-+     * fields, so it should be the same size.
-+     */
-+    if (msg_reply.hdr.size !=3D msg.hdr.size) {
-+        error_report("%s: Unexpected size for postcopy reply "
-+                     "%d vs %d", __func__, msg_reply.hdr.size, msg.hdr.s=
-ize);
-+        return -1;
-+    }
-+
-+    memset(u->postcopy_client_bases, 0,
-+           sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+
-+    /* They're in the same order as the regions that were sent
-+     * but some of the regions were skipped (above) if they
-+     * didn't have fd's
-+    */
-+    for (msg_i =3D 0, region_i =3D 0;
-+         region_i < dev->mem->nregions;
-+        region_i++) {
-+        if (msg_i < fd_num &&
-+            msg_reply.payload.memory.regions[msg_i].guest_phys_addr =3D=3D
-+            dev->mem->regions[region_i].guest_phys_addr) {
-+            u->postcopy_client_bases[region_i] =3D
-+                msg_reply.payload.memory.regions[msg_i].userspace_addr;
-+            trace_vhost_user_set_mem_table_postcopy(
-+                msg_reply.payload.memory.regions[msg_i].userspace_addr,
-+                msg.payload.memory.regions[msg_i].userspace_addr,
-+                msg_i, region_i);
-+            msg_i++;
-+        }
-+    }
-+    if (msg_i !=3D fd_num) {
-+        error_report("%s: postcopy reply not fully consumed "
-+                     "%d vs %zd",
-+                     __func__, msg_i, fd_num);
-+        return -1;
-+    }
-+    /* Now we've registered this with the postcopy code, we ack to the c=
-lient,
-+     * because now we're in the position to be able to deal with any fau=
-lts
-+     * it generates.
-+     */
-+    /* TODO: Use this for failure cases as well with a bad value */
-+    msg.hdr.size =3D sizeof(msg.payload.u64);
-+    msg.payload.u64 =3D 0; /* OK */
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
-+    }
-+
-     if (reply_supported) {
-         return process_message_reply(dev, &msg);
-     }
-@@ -411,7 +473,8 @@ static int vhost_user_set_mem_table(struct vhost_dev =
-*dev,
-     size_t fd_num =3D 0;
-     bool do_postcopy =3D u->postcopy_listen && u->postcopy_fd.handler;
-     bool reply_supported =3D virtio_has_feature(dev->protocol_features,
--                                              VHOST_USER_PROTOCOL_F_REPL=
-Y_ACK);
-+                                          VHOST_USER_PROTOCOL_F_REPLY_AC=
-K) &&
-+                                          !do_postcopy;
+     trace_postcopy_ram_fault_thread_entry();
++    mis->last_rb =3D NULL; /* last RAMBlock we sent part of */
+     qemu_sem_post(&mis->fault_thread_sem);
 =20
-     if (do_postcopy) {
-         /* Postcopy has enough differences that it's best done in it's o=
-wn
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 06ec03d..05d18ad 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -8,6 +8,7 @@ vhost_section(const char *name, int r) "%s:%d"
-=20
- # hw/virtio/vhost-user.c
- vhost_user_postcopy_listen(void) ""
-+vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, i=
-nt reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply =
-%d region %d"
-=20
- # hw/virtio/virtio.c
- virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
- out_num) "elem %p size %zd in_num %u out_num %u"
+     struct pollfd *pfd;
+@@ -636,8 +662,8 @@ static void *postcopy_ram_fault_thread(void *opaque)
+              * Send the request to the source - we want to request one
+              * of our host page sizes (which is >=3D TPS)
+              */
+-            if (rb !=3D last_rb) {
+-                last_rb =3D rb;
++            if (rb !=3D mis->last_rb) {
++                mis->last_rb =3D rb;
+                 migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+                                          rb_offset, qemu_ram_pagesize(rb=
+));
+             } else {
+diff --git a/migration/trace-events b/migration/trace-events
+index 1e617ad..7c910b5 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -198,6 +198,8 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
+ postcopy_ram_incoming_cleanup_entry(void) ""
+ postcopy_ram_incoming_cleanup_exit(void) ""
+ postcopy_ram_incoming_cleanup_join(void) ""
++postcopy_request_shared_page(const char *sharer, const char *rb, uint64_=
+t rb_offset) "for %s in %s offset 0x%"PRIx64
++
+ save_xbzrle_page_skipping(void) ""
+ save_xbzrle_page_overflow(void) ""
+ ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait=
+: %" PRIu64 " milliseconds, %d iterations"
 --=20
 MST
