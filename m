@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ey4yq-0001jC-43
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:18:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ey5J6-0005t7-Ld
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ey4yo-0007qH-Sr
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:18:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ey5J1-0003UG-OL
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:39:16 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:40441)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ey5J1-0003Sp-Hy
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 20:39:11 -0400
+Received: by mail-pg0-x235.google.com with SMTP id g8so7611324pgv.7
+	for <qemu-devel@nongnu.org>; Mon, 19 Mar 2018 17:39:11 -0700 (PDT)
+References: <20180319031545.29359-1-richard.henderson@linaro.org>
+	<cb280617-9d27-4f04-ae0d-f30130bd5b8f@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bc6e6998-cfcb-09ec-600f-f3c55e208186@linaro.org>
+Date: Tue, 20 Mar 2018 08:39:06 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180319110215.16755-1-peter.maydell@linaro.org>
-References: <20180319110215.16755-1-peter.maydell@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 20 Mar 2018 10:17:43 +1000
-Message-ID: <CAKmqyKOO8AJooAj4V8zyuAOA-w76kFoMLee4Q6_knCTwtCCpEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/arm/bcm2836: Use the Cortex-A7
- instead of Cortex-A15
+In-Reply-To: <cb280617-9d27-4f04-ae0d-f30130bd5b8f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] tcg: Really fix cpu_io_recompile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,65 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Patch Tracking <patches@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Pavel.Dovgaluk@ispras.ru, peter.maydell@linaro.org
 
-n Mon, Mar 19, 2018 at 9:02 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The BCM2836 uses a Cortex-A7, not a Cortex-A15. Update the device to
-> use the correct CPU.
-> https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
->
-> When the BCM2836 was introduced (bad5623690b) the Cortex-A7 was not
-> available, so the very similar Cortex-A15 was used. Since dcf578ed8ce
-> we can model the correct core.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 03/19/2018 11:54 PM, Paolo Bonzini wrote:
+> On 19/03/2018 04:15, Richard Henderson wrote:
+>> We have confused the number of instructions that have been
+>> executed in the TB with the number of instructions needed
+>> to repeat the I/O instruction.
+>>
+>> We have used cpu_restore_state_from_tb, which means that
+>> the guest pc is pointing to the I/O instruction.  The only
+>> time the answer to the later question is not 1 is when
+>> MIPS or SH4 need to re-execute the branch for the delay
+>> slot as well.
+>>
+>> We must rely on cpu->cflags_next_tb to generate the next TB,
+>> as otherwise we have a race condition with other guest cpus
+>> within the TB cache.
+>>
+>> Fixes: 0790f86861079b1932679d0f011e431aaf4ee9e2
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>
+>> My v1 raced with Paolo's pull request, so v2 now fixes Pavel's fix.
+> 
+> Thanks, let me know if you prefer to send a pull request yourself, or if
+> I should include it in the next.
 
-Reviewed-by: Alistair Francis <alistair@alistair23.me>
+I'm at Linaro Connect this week.  Please include this in your next.
 
-Alistair
 
-> ---
-> This was originally done by a patch from Alistair:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-02/msg00311.html
->
-> The refactor of bcm2836 means the code is different, but I'm using
-> the same commit message.
->
-> Based-on: <20180313153458.26822-1-peter.maydell@linaro.org>
->
-> ---
->  hw/arm/bcm2836.c | 2 +-
->  hw/arm/raspi.c   | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> index 25e74b67d9..8c1e707d9c 100644
-> --- a/hw/arm/bcm2836.c
-> +++ b/hw/arm/bcm2836.c
-> @@ -32,7 +32,7 @@ struct BCM283XInfo {
->  static const BCM283XInfo bcm283x_socs[] = {
->      {
->          .name = TYPE_BCM2836,
-> -        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a15"),
-> +        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
->          .clusterid = 0xf,
->      },
->      {
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 06f1e08ca9..955a7c4e80 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -226,7 +226,7 @@ static void raspi2_machine_init(MachineClass *mc)
->      mc->no_parallel = 1;
->      mc->no_floppy = 1;
->      mc->no_cdrom = 1;
-> -    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
->      mc->max_cpus = BCM283X_NCPUS;
->      mc->min_cpus = BCM283X_NCPUS;
->      mc->default_cpus = BCM283X_NCPUS;
-> --
-> 2.16.2
->
->
+r~
