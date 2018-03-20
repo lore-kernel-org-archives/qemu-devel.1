@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyCfl-00015o-0w
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:31:10 -0400
+	(envelope-from <laurent@vivier.eu>) id 1eyD9H-0000x1-Aw
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:01:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eyCfh-0007cv-28
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:31:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eyCfg-0007bu-Qm
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 04:31:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eyCfd-0007MD-Nr
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:31:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 597E22E8181
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:31:00 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1eyD9B-0006W8-3F
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:01:39 -0400
+References: <1521510562-529051-1-git-send-email-mst@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <8f06e1e3-4823-d8e8-43bd-c092c523849e@vivier.eu>
+Date: Tue, 20 Mar 2018 09:58:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Mar 2018 08:17:53 -0000
-From: Alistair Buxton <a.j.buxton@gmail.com>
-Reply-To: Bug 1756807 <1756807@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152144414128.31022.3971379528979064267.malonedeb@wampee.canonical.com>
-Message-Id: <152153387358.12267.12306090066710580654.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1756807] Re: performance regression in qemu-user
- + proot
+In-Reply-To: <1521510562-529051-1-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qemu: include generated files with <> and
+ not ""
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Josh Durgin <jdurgin@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Michael Walle <michael@walle.cc>, Keith Busch <keith.busch@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Fabien Chouteau <chouteau@adacore.com>, Amit Shah <amit@kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <minyard@acm.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Peter Chubb <peter.chubb@nicta.com.au>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Max Filippov <jcmvbkbc@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Yuval Shaia <yuval.shaia@oracle.com>, David Hildenbrand <david@redhat.com>, Hannes Reinecke <hare@suse.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Riku Voipio <riku.voipio@iki.fi>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, kvm@vger.kernel.org, qemu-block@nongnu.org, sheepdog@lists.wpkg.org, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-I just tested the patch from
-https://bugs.launchpad.net/qemu/+bug/1740219 and it fixes the problem
-for me. Specifically I only tried the final patch of the series.
+Le 20/03/2018 à 02:54, Michael S. Tsirkin a écrit :
+> QEMU coding style at the moment asks for all non-system
+> include files to be used with #include "foo.h".
+> However this rule actually does not make sense and
+> creates issues for when the included file is generated.
 
--- =
+If you change that, we can have issue when a system include has the same
+name as our local include. With "<FILE>", system header are taken first.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1756807
+> In C, include "file" means look in current directory,
+> then on include search path. Current directory here
+> means the source file directory.
+> By comparison include <file> means look on include search path.
 
-Title:
-  performance regression in qemu-user + proot
+Not exactly, there is the notion of "system header" too.
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
+https://gcc.gnu.org/onlinedocs/cpp/Include-Syntax.html
 
-Bug description:
-  To reproduce:
+#include <file>
+This variant is used for system header files. It searches for a file
+named file in a standard list of system directories. You can prepend
+directories to this list with the -I option (see Invocation).
 
-  1. Install qemu-user-static and proot
-  2. Enter some arm chroot using them:
+#include "file"
+This variant is used for header files of your own program. It searches
+for a file named file first in the directory containing the current
+file, then in the quote directories and then the same directories used
+for <file>. You can prepend directories to the list of quote directories
+with the -iquote option.
 
-      proot -0 -q qemu-arm-static -w / -r chroot/ /bin/bash
+> As generated files are not in the search directory (unless the build
+> directory happens to match the source directory), it does not make sense
+> to include them with "" - doing so is merely more work for preprocessor
+> and a source or errors if a stale file happens to exist in the source
+> directory.
 
-  3. Run a command which normally takes a short but measurable amount of
-  time:
+I agree there is a problem with stale files. But linux, for instance,
+asks for a "make mrproper" to avoid this.
 
-      cd /usr/share/doc && time grep -R hello
+> This changes include directives for all generated files, across the
+> tree. The idea is to avoid sending a huge amount of email.  But when
+> merging, the changes will be split with one commit per file, e.g. for
+> ease of bisect in case of build failures, and to ease merging.
+> 
+> Note that should some generated files be missed by this tree-wide
+> refactoring, it isn't a big deal - this merely maintains the status quo,
+> and this can be addressed by a separate patch on top.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-  Result:
+I think your idea conflicts with what Markus has started to do:
 
-  This is over 100 times slower on 18.04 than it was on 16.04. I am not
-  sure if proot or qemu is causing the problem, but proot version has
-  not changed. Also note that on 16.04 I am using the cloud repo version
-  of qemu, which is newer than 16.04 stock, but still older than 18.04.
+commit d8e39b70625d4ba1e998439d1a077b4b978930e7
+Author: Markus Armbruster <armbru@redhat.com>
+Date:   Thu Feb 1 12:18:28 2018 +0100
 
-  Although system 2 is lower spec than system 1, it should not be this
-  much slower. No other software seems to be affected.
+    Use #include "..." for our own headers, <...> for others
 
-  If required I can supply a chroot tarball. It is essentially just a
-  Debian bootstrap though.
+    System headers should be included with <...>, our own headers with
+    "...".  Offenders tracked down with an ugly, brittle and probably
+    buggy Perl script.  Previous iteration was commit a9c94277f0.
 
-  Logs:
+    Delete inclusions of "string.h" and "strings.h" instead of fixing them
+    to <string.h> and <strings.h>, because we always include these via
+    osdep.h.
 
+    Put the cleaned up system header includes first.
 
-  System 1: i7-6700 3.4GHz, 32GB RAM, 512GB Crucial MX100 SSD, Ubuntu 16.04
-  qemu-arm version 2.10.1(Debian 1:2.10+dfsg-0ubuntu3.4~cloud0)
-  proot 5.1.0
+    While there, separate #include from file comment with exactly one
+    blank line.
 
-  al@al-desktop:~/rpi-ramdisk/raspbian$ proot -0 -q qemu-arm-static -w / -r=
- root/ /bin/bash
-  root@al-desktop:/# cd /usr/share/doc
-  root@al-desktop:/usr/share/doc# time grep -R hello
-  dash/copyright:Debian GNU/Linux hello source package as the file COPYING.=
-  If not,
+commit a9c94277f07d19d3eb14f199c3e93491aa3eae0e
+Author: Markus Armbruster <armbru@redhat.com>
+Date:   Wed Jun 22 19:11:19 2016 +0200
 
-  real	0m0.066s
-  user	0m0.040s
-  sys	0m0.008s
+    Use #include "..." for our own headers, <...> for others
 
+    Tracked down with an ugly, brittle and probably buggy Perl script.
 
+    Also move includes converted to <...> up so they get included before
+    ours where that's obviously okay.
 
-  System 2: i5-5300U 2.30GHz, 8GB RAM, 256GB Crucial MX300 SSD, Ubuntu 18.04
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu4)
-  proot 5.1.0
-
-  al@al-thinkpad:~/rpi-ramdisk/raspbian$ proot -0 -q qemu-arm-static -w / -=
-r root/ /bin/bash
-  root@al-thinkpad:/# cd /usr/share/doc
-  root@al-thinkpad:/usr/share/doc# time grep -R hello
-  dash/copyright:Debian GNU/Linux hello source package as the file COPYING.=
-  If not,
-
-  real	0m24.176s
-  user	0m0.366s
-  sys	0m11.352s
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu (not installed)
-  ProcVersionSignature: Ubuntu 4.15.0-12.13-generic 4.15.7
-  Uname: Linux 4.15.0-12-generic x86_64
-  ApportVersion: 2.20.8-0ubuntu10
-  Architecture: amd64
-  Date: Mon Mar 19 07:13:25 2018
-  InstallationDate: Installed on 2018-03-18 (0 days ago)
-  InstallationMedia: Xubuntu 18.04 LTS "Bionic Beaver" - Alpha amd64 (20180=
-318)
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1756807/+subscriptions
+Thanks,
+Laurent
