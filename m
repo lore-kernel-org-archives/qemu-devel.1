@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyKhq-0001aq-36
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:05:50 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eyKkB-0003b8-QB
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyKhp-0001Wv-86
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:05:50 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyKhp-0001WQ-3n
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:05:49 -0400
-Received: by mail-oi0-x242.google.com with SMTP id f186-v6so1964430oig.4
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 10:05:49 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eyKk8-0003gq-Kj
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 13:08:15 -0400
+References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
+	<20180320170521.32152-4-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <4dc03165-f337-fec4-9cb8-4e06bf82f87d@virtuozzo.com>
+Date: Tue, 20 Mar 2018 20:07:56 +0300
 MIME-Version: 1.0
-In-Reply-To: <1521556868-37974-1-git-send-email-mst@redhat.com>
-References: <1521556868-37974-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Mar 2018 17:05:27 +0000
-Message-ID: <CAFEAcA8OXe1akE0qGfFOeZsA-rbXS3sitJngujxL8zEErNNCnA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/51] virtio, vhost, pci, pc: features,
- cleanups
+In-Reply-To: <20180320170521.32152-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] qcow2: handle reopening bitmaps on
+ bdrv_invalidate_cache DROP IT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
 
-On 20 March 2018 at 14:42, Michael S. Tsirkin <mst@redhat.com> wrote:
-> Note: only patch 39/51 is attached.
-> The rest are unchanged from v2.
->
-> The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 1dc61e7b37d339c42ec9bd7a7eec1ef2c22f351c:
->
->   postcopy shared docs (2018-03-20 16:40:37 +0200)
->
-> ----------------------------------------------------------------
-> virtio,vhost,pci,pc: features, cleanups
->
-> SRAT tables for DIMM devices
-> new virtio net flags for speed/duplex
-> post-copy migration support in vhost
-> cleanups in pci
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+Oh, sorry, just drop it.
+(the only difference is commit message subject)
 
-Applied, thanks.
+20.03.2018 20:05, Vladimir Sementsov-Ogievskiy wrote:
+> On reopen with existing bitmaps, instead of loading bitmaps, lets
+> reopen them if needed. This also fixes bitmaps migration through
+> shared storage.
+> Consider the case. Persistent bitmaps are stored on bdrv_inactivate.
+> Then, on destination process_incoming_migration_bh() calls
+> bdrv_invalidate_cache_all() which leads to
+> qcow2_load_autoloading_dirty_bitmaps() which fails if bitmaps are
+> already loaded on destination start.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/qcow2.c | 17 ++++++++++++++++-
+>   1 file changed, 16 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 7472af6931..d2d129a2e6 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1480,7 +1480,22 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>           s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+>       }
+>   
+> -    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+> +    if (bdrv_dirty_bitmap_next(bs, NULL)) {
+> +        /* It's some kind of reopen with already existing dirty bitmaps. There
+> +         * are no known cases where we need loading bitmaps in such situation,
+> +         * so it's safer don't load them.
+> +         *
+> +         * Moreover, if we have some readonly bitmaps and we are reopening for
+> +         * rw we should reopen bitmaps correspondingly.
+> +         */
+> +        if (bdrv_has_readonly_bitmaps(bs) &&
+> +            !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
+> +        {
+> +            bool header_updated = false;
+> +            qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+> +            update_header = update_header && !header_updated;
+> +        }
+> +    } else if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+>           update_header = false;
+>       }
+>       if (local_err != NULL) {
 
--- PMM
+
+-- 
+Best regards,
+Vladimir
