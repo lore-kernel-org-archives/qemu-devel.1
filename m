@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39148)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyKU0-0003so-75
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:51:33 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41261)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <fl@n621.de>)
+	id 1eyKbN-0006LA-Ec
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:59:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyKTz-0007JH-9T
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:51:32 -0400
-Date: Tue, 20 Mar 2018 18:51:02 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180320185013-mutt-send-email-mst@kernel.org>
-References: <1521510562-529051-1-git-send-email-mst@redhat.com>
-	<da3457a0-7f24-4759-7d98-9b2fdc87e87c@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da3457a0-7f24-4759-7d98-9b2fdc87e87c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu: include generated files with <> and
- not ""
+	(envelope-from <fl@n621.de>) id 1eyKbM-0005YV-J4
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:59:09 -0400
+Received: from nyx.n621.de ([2a01:4f8:151:8ffd:2::1]:60634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fl@n621.de>) id 1eyKbM-0005Xo-CH
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 12:59:08 -0400
+From: Florian Larysch <fl@n621.de>
+Date: Tue, 20 Mar 2018 17:58:55 +0100
+Message-Id: <20180320165855.23258-1-fl@n621.de>
+Subject: [Qemu-devel] [PATCH v2] os: truncate pidfile on creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +21,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Josh Durgin <jdurgin@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Michael Walle <michael@walle.cc>, Keith Busch <keith.busch@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Fabien Chouteau <chouteau@adacore.com>, Amit Shah <amit@kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <minyard@acm.org>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Peter Chubb <peter.chubb@nicta.com.au>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Max Filippov <jcmvbkbc@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Yuval Shaia <yuval.shaia@oracle.com>, David Hildenbrand <david@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, kvm@vger.kernel.org, qemu-block@nongnu.org, sheepdog@lists.wpkg.org, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, Florian Larysch <fl@n621.de>
 
-On Tue, Mar 20, 2018 at 11:12:00AM -0500, Eric Blake wrote:
-> 
-> Why can't we fix Makefile to include BOTH the build and the source
-> directories (to pick up generated files first, and then version-controlled
-> files), and possibly include logic to simplify to a single -I instead of two
-> when doing in-tree builds?
+qemu_create_pidfile does not truncate the pidfile when it creates it,
+but rather overwrites its contents with the new pid. This works fine as
+long as the length of the pid doesn't decrease, but this might happen in
+case of wraparounds, causing pidfiles to contain trailing garbage which
+breaks operations such as 'kill $(cat pidfile)'.
 
-That's the issue.  Whatever you do, #include "" pulls in the current
-directory first.
+Instead, always truncate the file before writing it.
 
+Note that the order is important here: We cannot simply use O_TRUNC in
+the open() call because another qemu process might truncate the pidfile
+of a process that is still running before reaching the lockf() barrier.
+
+The Windows version suffers from a similar problem, but as it does not
+provide effective mutual exclusion anyway (because the file handle is
+closed immediately after writing to it), adopting this behavior still
+seems to be an improvement, as it at least prevents garbeled pidfiles.
+
+Signed-off-by: Florian Larysch <fl@n621.de>
+---
+ os-posix.c | 6 ++++++
+ os-win32.c | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/os-posix.c b/os-posix.c
+index b9c2343b1e..f2318aef55 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -309,6 +309,12 @@ int qemu_create_pidfile(const char *filename)
+         close(fd);
+         return -1;
+     }
++
++    if (ftruncate(fd, 0)) {
++        close(fd);
++        return -1;
++    }
++
+     len = snprintf(buffer, sizeof(buffer), FMT_pid "\n", getpid());
+     if (write(fd, buffer, len) != len) {
+         close(fd);
+diff --git a/os-win32.c b/os-win32.c
+index 586a7c7d49..85dbad7af8 100644
+--- a/os-win32.c
++++ b/os-win32.c
+@@ -108,7 +108,7 @@ int qemu_create_pidfile(const char *filename)
+     memset(&overlap, 0, sizeof(overlap));
+ 
+     file = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL,
+-                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
++                      CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+ 
+     if (file == INVALID_HANDLE_VALUE) {
+         return -1;
 -- 
-MST
+2.16.2
