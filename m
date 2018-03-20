@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyGWw-0007Oq-Sw
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:21 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1eyGX3-0007U8-3W
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyGWt-0003Jf-D5
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:18 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1eyGX1-0003QI-AG
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 08:38:25 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 20 Mar 2018 13:37:25 +0100
-Message-Id: <1521549456-14072-4-git-send-email-eric.auger@redhat.com>
+Date: Tue, 20 Mar 2018 13:37:28 +0100
+Message-Id: <1521549456-14072-7-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1521549456-14072-1-git-send-email-eric.auger@redhat.com>
 References: <1521549456-14072-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 03/14] hw/arm/smmu-common: VMSAv8-64 page
- table walk
+Subject: [Qemu-devel] [PATCH v10 06/14] hw/arm/smmuv3: Queue helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,445 +22,371 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
 Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
 
-This patch implements the page table walk for VMSAv8-64.
+We introduce helpers to read/write into the command and event
+circular queues.
+
+smmuv3_write_eventq and smmuv3_cmq_consume will become static
+in subsequent patches.
+
+Invalidation commands are not yet dealt with. We do not cache
+data that need to be invalidated. This will change with vhost
+integration.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 
 ---
 v9 -> v10:
-- Add 64b single-copy atomicity comment related to PTE fetch
-- remove checks in get_block_pte_address and use formulae to compute
-  block address offset
-- remove check_perm
-- fix select_tt
-- in trace-events use PRIx64 instead of 0x%lx
-- commented the fact we cannot discriminate between user and
-  priviledged transactions
+- simplified macros
+- s/BASE/Q_BASE
+- use log2size field
+- static inline functions replacing some macros
+- simplified queue_prod_incr/queue_cons_incr and use deposit32
+- trace for cmdq_consume failure
 
 v8 -> v9:
-- remove guest error log on PTE fetch fault
-- rename  trace functions
-- fix smmu_page_walk_level_res_invalid_pte last arg
-- fix PTE_ADDRESS
-- turn functions into macros
-- make sure to return the actual pte access permission
-  into tlbe->perm
-- change proto of smmu_ptw*
+- fix CMD_SSID & CMD_ADDR + some renamings
+- do cons increment after the execution of the command
+- add Q_INCONSISTENT()
 
-v7 -> v8:
-- rework get_pte
-- use LOG_LEVEL_ERROR
-- remove error checking in get_block_pte_address
-- page table walk simplified (no VFIO replay anymore)
-- handle PTW error events
-- use dma_memory_read
-
-v6 -> v7:
-- fix wrong error handling in walk_page_table
-- check perm in smmu_translate
-
-v5 -> v6:
-- use IOMMUMemoryRegion
-- remove initial_lookup_level()
-- fix block replay
-
-v4 -> v5:
-- add initial level in translation config
-- implement block pte
-- rename must_translate into nofail
-- introduce call_entry_hook
-- small changes to dynamic traces
-- smmu_page_walk code moved from smmuv3.c to this file
-- remove smmu_translate*
-
-v3 -> v4:
-- reworked page table walk to prepare for VFIO integration
-  (capability to scan a range of IOVA). Same function is used
-  for translate for a single iova. This is largely inspired
-  from intel_iommu.c
-- as the translate function was not straightforward to me,
-  I tried to stick more closely to the VMSA spec.
-- remove support of nested stage (kernel driver does not
-  support it anyway)
-- use error_report and trace events
-- add aa64[] field in SMMUTransCfg
+v7 -> v8
+- use address_space_rw
+- helpers inspired from spec
 ---
- hw/arm/smmu-common.c         | 209 +++++++++++++++++++++++++++++++++++++++++++
- hw/arm/smmu-internal.h       | 102 +++++++++++++++++++++
- hw/arm/trace-events          |   9 +-
- include/hw/arm/smmu-common.h |  14 +++
- 4 files changed, 333 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/smmu-internal.h
+ hw/arm/smmuv3-internal.h | 154 +++++++++++++++++++++++++++++++++++++++++++++++
+ hw/arm/smmuv3.c          | 136 +++++++++++++++++++++++++++++++++++++++++
+ hw/arm/trace-events      |   5 ++
+ 3 files changed, 295 insertions(+)
 
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index fe0cd70..c7a9027 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -27,6 +27,215 @@
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index 32f81d4..968fa25 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -156,4 +156,158 @@ static inline bool smmuv3_gerror_irq_enabled(SMMUv3State *s)
+ void smmuv3_trigger_irq(SMMUv3State *s, SMMUIrq irq, uint32_t gerror_mask);
+ void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t gerrorn);
  
- #include "qemu/error-report.h"
- #include "hw/arm/smmu-common.h"
-+#include "smmu-internal.h"
++/* Queue Handling */
 +
-+/* VMSAv8-64 Translation */
++#define Q_BASE(q)          ((q)->base & SMMU_BASE_ADDR_MASK)
++#define WRAP_MASK(q)       (1 << (q)->log2size)
++#define INDEX_MASK(q)      (((1 << (q)->log2size)) - 1)
++#define WRAP_INDEX_MASK(q) ((1 << ((q)->log2size + 1)) - 1)
 +
-+/**
-+ * get_pte - Get the content of a page table entry located t
-+ * @base_addr[@index]
-+ */
-+static int get_pte(dma_addr_t baseaddr, uint32_t index, uint64_t *pte,
-+                   SMMUPTWEventInfo *info)
++#define Q_CONS(q) ((q)->cons & INDEX_MASK(q))
++#define Q_PROD(q) ((q)->prod & INDEX_MASK(q))
++
++#define Q_CONS_ENTRY(q)  (Q_BASE(q) + (q)->entry_size * Q_CONS(q))
++#define Q_PROD_ENTRY(q)  (Q_BASE(q) + (q)->entry_size * Q_PROD(q))
++
++#define Q_CONS_WRAP(q) (((q)->cons & WRAP_MASK(q)) >> (q)->log2size)
++#define Q_PROD_WRAP(q) (((q)->prod & WRAP_MASK(q)) >> (q)->log2size)
++
++static inline bool smmuv3_q_full(SMMUQueue *q)
 +{
-+    int ret;
-+    dma_addr_t addr = baseaddr + index * sizeof(*pte);
++    return ((q->cons ^ q->prod) & WRAP_INDEX_MASK(q)) == WRAP_MASK(q);
++}
 +
-+    /* TODO: guarantee 64-bit single-copy atomicity */
-+    ret = dma_memory_read(&address_space_memory, addr,
-+                          (uint8_t *)pte, sizeof(*pte));
++static inline bool smmuv3_q_empty(SMMUQueue *q)
++{
++    return (q->cons & WRAP_INDEX_MASK(q)) == (q->prod & WRAP_INDEX_MASK(q));
++}
 +
++static inline void queue_prod_incr(SMMUQueue *q)
++{
++    q->prod = (q->prod + 1) & WRAP_INDEX_MASK(q);
++}
++
++static inline void queue_cons_incr(SMMUQueue *q)
++{
++    q->cons = deposit32(q->cons, 0, q->log2size + 1, q->cons + 1);
++}
++
++static inline bool smmuv3_cmdq_enabled(SMMUv3State *s)
++{
++    return FIELD_EX32(s->cr[0], CR0, CMDQEN);
++}
++
++static inline bool smmuv3_eventq_enabled(SMMUv3State *s)
++{
++    return FIELD_EX32(s->cr[0], CR0, EVENTQEN);
++}
++
++static inline void smmu_write_cmdq_err(SMMUv3State *s, uint32_t err_type)
++{
++    s->cmdq.cons = FIELD_DP32(s->cmdq.cons, CMDQ_CONS, ERR, err_type);
++}
++
++void smmuv3_write_eventq(SMMUv3State *s, Evt *evt);
++
++/* Commands */
++
++typedef enum SMMUCommandType {
++    SMMU_CMD_PREFETCH_CONFIG = 0x01,
++    SMMU_CMD_PREFETCH_ADDR,
++    SMMU_CMD_CFGI_STE,
++    SMMU_CMD_CFGI_STE_RANGE,
++    SMMU_CMD_CFGI_CD,
++    SMMU_CMD_CFGI_CD_ALL,
++    SMMU_CMD_CFGI_ALL,
++    SMMU_CMD_TLBI_NH_ALL     = 0x10,
++    SMMU_CMD_TLBI_NH_ASID,
++    SMMU_CMD_TLBI_NH_VA,
++    SMMU_CMD_TLBI_NH_VAA,
++    SMMU_CMD_TLBI_EL3_ALL    = 0x18,
++    SMMU_CMD_TLBI_EL3_VA     = 0x1a,
++    SMMU_CMD_TLBI_EL2_ALL    = 0x20,
++    SMMU_CMD_TLBI_EL2_ASID,
++    SMMU_CMD_TLBI_EL2_VA,
++    SMMU_CMD_TLBI_EL2_VAA,  /* 0x23 */
++    SMMU_CMD_TLBI_S12_VMALL  = 0x28,
++    SMMU_CMD_TLBI_S2_IPA     = 0x2a,
++    SMMU_CMD_TLBI_NSNH_ALL   = 0x30,
++    SMMU_CMD_ATC_INV         = 0x40,
++    SMMU_CMD_PRI_RESP,
++    SMMU_CMD_RESUME          = 0x44,
++    SMMU_CMD_STALL_TERM,
++    SMMU_CMD_SYNC,          /* 0x46 */
++} SMMUCommandType;
++
++static const char *cmd_stringify[] = {
++    [SMMU_CMD_PREFETCH_CONFIG] = "SMMU_CMD_PREFETCH_CONFIG",
++    [SMMU_CMD_PREFETCH_ADDR]   = "SMMU_CMD_PREFETCH_ADDR",
++    [SMMU_CMD_CFGI_STE]        = "SMMU_CMD_CFGI_STE",
++    [SMMU_CMD_CFGI_STE_RANGE]  = "SMMU_CMD_CFGI_STE_RANGE",
++    [SMMU_CMD_CFGI_CD]         = "SMMU_CMD_CFGI_CD",
++    [SMMU_CMD_CFGI_CD_ALL]     = "SMMU_CMD_CFGI_CD_ALL",
++    [SMMU_CMD_CFGI_ALL]        = "SMMU_CMD_CFGI_ALL",
++    [SMMU_CMD_TLBI_NH_ALL]     = "SMMU_CMD_TLBI_NH_ALL",
++    [SMMU_CMD_TLBI_NH_ASID]    = "SMMU_CMD_TLBI_NH_ASID",
++    [SMMU_CMD_TLBI_NH_VA]      = "SMMU_CMD_TLBI_NH_VA",
++    [SMMU_CMD_TLBI_NH_VAA]     = "SMMU_CMD_TLBI_NH_VAA",
++    [SMMU_CMD_TLBI_EL3_ALL]    = "SMMU_CMD_TLBI_EL3_ALL",
++    [SMMU_CMD_TLBI_EL3_VA]     = "SMMU_CMD_TLBI_EL3_VA",
++    [SMMU_CMD_TLBI_EL2_ALL]    = "SMMU_CMD_TLBI_EL2_ALL",
++    [SMMU_CMD_TLBI_EL2_ASID]   = "SMMU_CMD_TLBI_EL2_ASID",
++    [SMMU_CMD_TLBI_EL2_VA]     = "SMMU_CMD_TLBI_EL2_VA",
++    [SMMU_CMD_TLBI_EL2_VAA]    = "SMMU_CMD_TLBI_EL2_VAA",
++    [SMMU_CMD_TLBI_S12_VMALL]  = "SMMU_CMD_TLBI_S12_VMALL",
++    [SMMU_CMD_TLBI_S2_IPA]     = "SMMU_CMD_TLBI_S2_IPA",
++    [SMMU_CMD_TLBI_NSNH_ALL]   = "SMMU_CMD_TLBI_NSNH_ALL",
++    [SMMU_CMD_ATC_INV]         = "SMMU_CMD_ATC_INV",
++    [SMMU_CMD_PRI_RESP]        = "SMMU_CMD_PRI_RESP",
++    [SMMU_CMD_RESUME]          = "SMMU_CMD_RESUME",
++    [SMMU_CMD_STALL_TERM]      = "SMMU_CMD_STALL_TERM",
++    [SMMU_CMD_SYNC]            = "SMMU_CMD_SYNC",
++};
++
++static inline const char *smmu_cmd_string(SMMUCommandType type)
++{
++    return cmd_stringify[type] ? cmd_stringify[type] : "UNKNOWN";
++}
++
++/* CMDQ fields */
++
++typedef enum {
++    SMMU_CERROR_NONE = 0,
++    SMMU_CERROR_ILL,
++    SMMU_CERROR_ABT,
++    SMMU_CERROR_ATC_INV_SYNC,
++} SMMUCmdError;
++
++enum { /* Command completion notification */
++    CMD_SYNC_SIG_NONE,
++    CMD_SYNC_SIG_IRQ,
++    CMD_SYNC_SIG_SEV,
++};
++
++#define CMD_TYPE(x)         extract32((x)->word[0], 0 , 8)
++#define CMD_SSEC(x)         extract32((x)->word[0], 10, 1)
++#define CMD_SSV(x)          extract32((x)->word[0], 11, 1)
++#define CMD_RESUME_AC(x)    extract32((x)->word[0], 12, 1)
++#define CMD_RESUME_AB(x)    extract32((x)->word[0], 13, 1)
++#define CMD_SYNC_CS(x)      extract32((x)->word[0], 12, 2)
++#define CMD_SSID(x)         extract32((x)->word[0], 12, 20)
++#define CMD_SID(x)          ((x)->word[1])
++#define CMD_VMID(x)         extract32((x)->word[1], 0 , 16)
++#define CMD_ASID(x)         extract32((x)->word[1], 16, 16)
++#define CMD_RESUME_STAG(x)  extract32((x)->word[2], 0 , 16)
++#define CMD_RESP(x)         extract32((x)->word[2], 11, 2)
++#define CMD_LEAF(x)         extract32((x)->word[2], 0 , 1)
++#define CMD_STE_RANGE(x)    extract32((x)->word[2], 0 , 5)
++#define CMD_ADDR(x) ({                                        \
++            uint64_t high = (uint64_t)(x)->word[3];           \
++            uint64_t low = extract32((x)->word[2], 12, 20);    \
++            uint64_t addr = high << 32 | (low << 12);         \
++            addr;                                             \
++        })
++
++int smmuv3_cmdq_consume(SMMUv3State *s);
++
+ #endif
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 990c02e..6c9d68b 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -94,6 +94,46 @@ void smmuv3_write_gerrorn(SMMUv3State *s, uint32_t new_gerrorn)
+     trace_smmuv3_write_gerrorn(toggled & pending, s->gerrorn);
+ }
+ 
++static inline MemTxResult queue_read(SMMUQueue *q, void *data)
++{
++    dma_addr_t addr = Q_CONS_ENTRY(q);
++
++    return dma_memory_read(&address_space_memory, addr, data, q->entry_size);
++}
++
++static MemTxResult queue_write(SMMUQueue *q, void *data)
++{
++    dma_addr_t addr = Q_PROD_ENTRY(q);
++    MemTxResult ret;
++
++    ret = dma_memory_write(&address_space_memory, addr, data, q->entry_size);
 +    if (ret != MEMTX_OK) {
-+        info->type = SMMU_PTW_ERR_WALK_EABT;
-+        info->addr = addr;
-+        return -EINVAL;
++        return ret;
 +    }
-+    trace_smmu_get_pte(baseaddr, index, addr, *pte);
++
++    queue_prod_incr(q);
++    return MEMTX_OK;
++}
++
++void smmuv3_write_eventq(SMMUv3State *s, Evt *evt)
++{
++    SMMUQueue *q = &s->eventq;
++
++    if (!smmuv3_eventq_enabled(s)) {
++        return;
++    }
++
++    if (smmuv3_q_full(q)) {
++        return;
++    }
++
++    queue_write(q, evt);
++
++    if (smmuv3_q_empty(q)) {
++        smmuv3_trigger_irq(s, SMMU_IRQ_EVTQ, 0);
++    }
++}
++
+ static void smmuv3_init_regs(SMMUv3State *s)
+ {
+     /**
+@@ -133,6 +173,102 @@ static void smmuv3_init_regs(SMMUv3State *s)
+     s->sid_split = 0;
+ }
+ 
++int smmuv3_cmdq_consume(SMMUv3State *s)
++{
++    SMMUCmdError cmd_error = SMMU_CERROR_NONE;
++    SMMUQueue *q = &s->cmdq;
++    SMMUCommandType type = 0;
++
++    if (!smmuv3_cmdq_enabled(s)) {
++        return 0;
++    }
++    /*
++     * some commands depend on register values, typically CR0. In case those
++     * register values change while handling the command, spec says it
++     * is UNPREDICTABLE whether the command is interpreted under the new
++     * or old value.
++     */
++
++    while (!smmuv3_q_empty(q)) {
++        uint32_t pending = s->gerror ^ s->gerrorn;
++        Cmd cmd;
++
++        trace_smmuv3_cmdq_consume(Q_PROD(q), Q_CONS(q),
++                                  Q_PROD_WRAP(q), Q_CONS_WRAP(q));
++
++        if (FIELD_EX32(pending, GERROR, CMDQ_ERR)) {
++            break;
++        }
++
++        if (queue_read(q, &cmd) != MEMTX_OK) {
++            cmd_error = SMMU_CERROR_ABT;
++            break;
++        }
++
++        type = CMD_TYPE(&cmd);
++
++        trace_smmuv3_cmdq_opcode(smmu_cmd_string(type));
++
++        switch (type) {
++        case SMMU_CMD_SYNC:
++            if (CMD_SYNC_CS(&cmd) & CMD_SYNC_SIG_IRQ) {
++                smmuv3_trigger_irq(s, SMMU_IRQ_CMD_SYNC, 0);
++            }
++            break;
++        case SMMU_CMD_PREFETCH_CONFIG:
++        case SMMU_CMD_PREFETCH_ADDR:
++        case SMMU_CMD_CFGI_STE:
++        case SMMU_CMD_CFGI_STE_RANGE: /* same as SMMU_CMD_CFGI_ALL */
++        case SMMU_CMD_CFGI_CD:
++        case SMMU_CMD_CFGI_CD_ALL:
++        case SMMU_CMD_TLBI_NH_ALL:
++        case SMMU_CMD_TLBI_NH_ASID:
++        case SMMU_CMD_TLBI_NH_VA:
++        case SMMU_CMD_TLBI_NH_VAA:
++        case SMMU_CMD_TLBI_EL3_ALL:
++        case SMMU_CMD_TLBI_EL3_VA:
++        case SMMU_CMD_TLBI_EL2_ALL:
++        case SMMU_CMD_TLBI_EL2_ASID:
++        case SMMU_CMD_TLBI_EL2_VA:
++        case SMMU_CMD_TLBI_EL2_VAA:
++        case SMMU_CMD_TLBI_S12_VMALL:
++        case SMMU_CMD_TLBI_S2_IPA:
++        case SMMU_CMD_TLBI_NSNH_ALL:
++        case SMMU_CMD_ATC_INV:
++        case SMMU_CMD_PRI_RESP:
++        case SMMU_CMD_RESUME:
++        case SMMU_CMD_STALL_TERM:
++            trace_smmuv3_unhandled_cmd(type);
++            break;
++        default:
++            cmd_error = SMMU_CERROR_ILL;
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "Illegal command type: %d\n", CMD_TYPE(&cmd));
++            break;
++        }
++        if (cmd_error) {
++            break;
++        }
++        /*
++         * We only increment the cons index after the completion of
++         * the command. We do that because the SYNC returns immediately
++         * and does not check the completion of previous commands
++         */
++        queue_cons_incr(q);
++    }
++
++    if (cmd_error) {
++        trace_smmuv3_cmdq_consume_error(smmu_cmd_string(type), cmd_error);
++        smmu_write_cmdq_err(s, cmd_error);
++        smmuv3_trigger_irq(s, SMMU_IRQ_GERROR, R_GERROR_CMDQ_ERR_MASK);
++    }
++
++    trace_smmuv3_cmdq_consume_out(Q_PROD(q), Q_CONS(q),
++                                  Q_PROD_WRAP(q), Q_CONS_WRAP(q));
++
 +    return 0;
 +}
 +
-+/* VMSAv8-64 Translation Table Format Descriptor Decoding */
-+
-+/**
-+ * get_page_pte_address - returns the L3 descriptor output address,
-+ * ie. the page frame
-+ * ARM ARM spec: Figure D4-17 VMSAv8-64 level 3 descriptor format
-+ */
-+static inline hwaddr get_page_pte_address(uint64_t pte, int granule_sz)
-+{
-+    return PTE_ADDRESS(pte, granule_sz);
-+}
-+
-+/**
-+ * get_table_pte_address - return table descriptor output address,
-+ * ie. address of next level table
-+ * ARM ARM Figure D4-16 VMSAv8-64 level0, level1, and level 2 descriptor formats
-+ */
-+static inline hwaddr get_table_pte_address(uint64_t pte, int granule_sz)
-+{
-+    return PTE_ADDRESS(pte, granule_sz);
-+}
-+
-+/**
-+ * get_block_pte_address - return block descriptor output address and block size
-+ * ARM ARM Figure D4-16 VMSAv8-64 level0, level1, and level 2 descriptor formats
-+ */
-+static inline hwaddr get_block_pte_address(uint64_t pte, int level,
-+                                           int granule_sz, uint64_t *bsz)
-+{
-+    int n = (granule_sz - 3) * (4 - level) + 3;
-+
-+    *bsz = 1 << n;
-+    return PTE_ADDRESS(pte, n);
-+}
-+
-+SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova)
-+{
-+    bool tbi = extract64(iova, 55, 1) ? TBI1(cfg->tbi) : TBI0(cfg->tbi);
-+    uint8_t tbi_byte = tbi * 8;
-+
-+    if (!extract64(iova, 64 - cfg->tt[0].tsz, cfg->tt[0].tsz - tbi_byte)) {
-+        return &cfg->tt[0];
-+    } else if (!extract64(iova, 64 - cfg->tt[1].tsz,
-+                          cfg->tt[1].tsz - tbi_byte)) {
-+        return &cfg->tt[1];
-+    }
-+    return NULL;
-+}
-+
-+/**
-+ * smmu_ptw_64 - VMSAv8-64 Walk of the page tables for a given IOVA
-+ * @cfg: translation config
-+ * @iova: iova to translate
-+ * @perm: access type
-+ * @tlbe: IOMMUTLBEntry (out)
-+ * @info: handle to an error info
-+ *
-+ * Return 0 on success, < 0 on error. In case of error, @info is filled
-+ * and tlbe->perm is set to IOMMU_NONE.
-+ * Upon success, @tlbe is filled with translated_addr and entry
-+ * permission rights.
-+ */
-+static int smmu_ptw_64(SMMUTransCfg *cfg,
-+                       dma_addr_t iova, IOMMUAccessFlags perm,
-+                       IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
-+{
-+    dma_addr_t baseaddr;
-+    int stage = cfg->stage;
-+    SMMUTransTableInfo *tt = select_tt(cfg, iova);
-+    uint8_t level;
-+    uint8_t granule_sz;
-+
-+    if (!tt || tt->disabled) {
-+        info->type = SMMU_PTW_ERR_TRANSLATION;
-+        goto error;
-+    }
-+
-+    level = tt->initial_level;
-+    granule_sz = tt->granule_sz;
-+    baseaddr = tt->ttb;
-+
-+    tlbe->iova = iova;
-+    tlbe->addr_mask = (1 << granule_sz) - 1;
-+
-+    while (level <= 3) {
-+        uint64_t subpage_size = 1ULL << level_shift(level, granule_sz);
-+        uint64_t mask = subpage_size - 1;
-+        uint32_t offset = iova_level_offset(iova, level, granule_sz);
-+        uint64_t pte;
-+        dma_addr_t pte_addr = baseaddr + offset * sizeof(pte);
-+        uint8_t ap;
-+
-+        if (get_pte(baseaddr, offset, &pte, info)) {
-+                goto error;
-+        }
-+        trace_smmu_ptw_level(level, iova, subpage_size,
-+                             baseaddr, offset, pte);
-+
-+        if (is_invalid_pte(pte) || is_reserved_pte(pte, level)) {
-+            trace_smmu_ptw_invalid_pte(stage, level, baseaddr,
-+                                       pte_addr, offset, pte);
-+            info->type = SMMU_PTW_ERR_TRANSLATION;
-+            goto error;
-+        }
-+
-+        if (is_page_pte(pte, level)) {
-+            uint64_t gpa = get_page_pte_address(pte, granule_sz);
-+
-+            ap = PTE_AP(pte);
-+            if (is_permission_fault(ap, perm)) {
-+                info->type = SMMU_PTW_ERR_PERMISSION;
-+                goto error;
-+            }
-+
-+            tlbe->translated_addr = gpa + (iova & mask);
-+            tlbe->perm = PTE_AP_TO_PERM(ap);
-+            trace_smmu_ptw_page_pte(stage, level, iova,
-+                                    baseaddr, pte_addr, pte, gpa);
-+            return 0;
-+        }
-+        if (is_block_pte(pte, level)) {
-+            uint64_t block_size;
-+            hwaddr gpa = get_block_pte_address(pte, level, granule_sz,
-+                                               &block_size);
-+
-+            ap = PTE_AP(pte);
-+            if (is_permission_fault(ap, perm)) {
-+                info->type = SMMU_PTW_ERR_PERMISSION;
-+                goto error;
-+            }
-+
-+            trace_smmu_ptw_block_pte(stage, level, baseaddr,
-+                                     pte_addr, pte, iova, gpa,
-+                                     block_size >> 20);
-+
-+            tlbe->translated_addr = gpa + (iova & mask);
-+            tlbe->perm = PTE_AP_TO_PERM(ap);
-+            return 0;
-+        }
-+
-+        /* table pte */
-+        ap = PTE_APTABLE(pte);
-+
-+        if (is_permission_fault(ap, perm)) {
-+            info->type = SMMU_PTW_ERR_PERMISSION;
-+            goto error;
-+        }
-+        baseaddr = get_table_pte_address(pte, granule_sz);
-+        level++;
-+    }
-+
-+    info->type = SMMU_PTW_ERR_TRANSLATION;
-+
-+error:
-+    tlbe->perm = IOMMU_NONE;
-+    return -EINVAL;
-+}
-+
-+/**
-+ * smmu_ptw - Walk the page tables for an IOVA, according to @cfg
-+ *
-+ * @cfg: translation configuration
-+ * @iova: iova to translate
-+ * @perm: tentative access type
-+ * @tlbe: returned entry
-+ * @info: ptw event handle
-+ *
-+ * return 0 on success
-+ */
-+inline int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
-+             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
-+{
-+    if (!cfg->aa64) {
-+        /*
-+         * This code path is not entered as we check this while decoding
-+         * the configuration data in the derived SMMU model.
-+         */
-+        assert(0);
-+    }
-+
-+    return smmu_ptw_64(cfg, iova, perm, tlbe, info);
-+}
- 
- /**
-  * The bus number is used for lookup when SID based invalidatation occurs.
-diff --git a/hw/arm/smmu-internal.h b/hw/arm/smmu-internal.h
-new file mode 100644
-index 0000000..3a3a9f8
---- /dev/null
-+++ b/hw/arm/smmu-internal.h
-@@ -0,0 +1,102 @@
-+/*
-+ * ARM SMMU support - Internal API
-+ *
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ * Copyright (C) 2014-2016 Broadcom Corporation
-+ * Written by Prem Mallappa, Eric Auger
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_ARM_SMMU_INTERNAL_H
-+#define HW_ARM_SMMU_INTERNAL_H
-+
-+#define TBI0(tbi) ((tbi) & 0x1)
-+#define TBI1(tbi) ((tbi) & 0x2 >> 1)
-+
-+/* PTE Manipulation */
-+
-+#define ARM_LPAE_PTE_TYPE_SHIFT         0
-+#define ARM_LPAE_PTE_TYPE_MASK          0x3
-+
-+#define ARM_LPAE_PTE_TYPE_BLOCK         1
-+#define ARM_LPAE_PTE_TYPE_TABLE         3
-+
-+#define ARM_LPAE_L3_PTE_TYPE_RESERVED   1
-+#define ARM_LPAE_L3_PTE_TYPE_PAGE       3
-+
-+#define ARM_LPAE_PTE_VALID              (1 << 0)
-+
-+#define PTE_ADDRESS(pte, shift) \
-+    (extract64(pte, shift, 47 - shift + 1) << shift)
-+
-+#define is_invalid_pte(pte) (!(pte & ARM_LPAE_PTE_VALID))
-+
-+#define is_reserved_pte(pte, level)                                      \
-+    ((level == 3) &&                                                     \
-+     ((pte & ARM_LPAE_PTE_TYPE_MASK) == ARM_LPAE_L3_PTE_TYPE_RESERVED))
-+
-+#define is_block_pte(pte, level)                                         \
-+    ((level < 3) &&                                                      \
-+     ((pte & ARM_LPAE_PTE_TYPE_MASK) == ARM_LPAE_PTE_TYPE_BLOCK))
-+
-+#define is_table_pte(pte, level)                                        \
-+    ((level < 3) &&                                                     \
-+     ((pte & ARM_LPAE_PTE_TYPE_MASK) == ARM_LPAE_PTE_TYPE_TABLE))
-+
-+#define is_page_pte(pte, level)                                         \
-+    ((level == 3) &&                                                    \
-+     ((pte & ARM_LPAE_PTE_TYPE_MASK) == ARM_LPAE_L3_PTE_TYPE_PAGE))
-+
-+/* access permissions */
-+
-+#define PTE_AP(pte) \
-+    (extract64(pte, 6, 2))
-+
-+#define PTE_APTABLE(pte) \
-+    (extract64(pte, 61, 2))
-+
-+/*
-+ * TODO: At the moment all transactions are considered as priviledged (EL1)
-+ * as IOMMU translation callback does not pass user/priv attributes.
-+ */
-+#define is_permission_fault(ap, perm) \
-+    (((perm) & IOMMU_WO) && ((ap) & 0x2))
-+
-+#define PTE_AP_TO_PERM(ap) \
-+    (IOMMU_ACCESS_FLAG(true, !((ap) & 0x2)))
-+
-+/* Level Indexing */
-+
-+static inline int level_shift(int level, int granule_sz)
-+{
-+    return granule_sz + (3 - level) * (granule_sz - 3);
-+}
-+
-+static inline uint64_t level_page_mask(int level, int granule_sz)
-+{
-+    return ~(MAKE_64BIT_MASK(0, level_shift(level, granule_sz)));
-+}
-+
-+/**
-+ * TODO: handle the case where the level resolves less than
-+ * granule_sz -3 IA bits.
-+ */
-+static inline
-+uint64_t iova_level_offset(uint64_t iova, int level, int granule_sz)
-+{
-+    return (iova >> level_shift(level, granule_sz)) &
-+            MAKE_64BIT_MASK(0, granule_sz - 3);
-+}
-+
-+#endif
+ static MemTxResult smmu_write_mmio(void *opaque, hwaddr offset, uint64_t data,
+                                    unsigned size, MemTxAttrs attrs)
+ {
 diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 8e8b53c..524964a 100644
+index b77f8d2..38b35fa 100644
 --- a/hw/arm/trace-events
 +++ b/hw/arm/trace-events
-@@ -4,4 +4,11 @@
- virt_acpi_setup(void) "No fw cfg or ACPI disabled. Bailing out."
- 
- # hw/arm/smmu-common.c
--smmu_add_mr(const char *name) "%s"
-\ No newline at end of file
-+smmu_add_mr(const char *name) "%s"
-+smmu_page_walk(int stage, uint64_t baseaddr, int first_level, uint64_t start, uint64_t end) "stage=%d, baseaddr=0x%"PRIx64", first level=%d, start=0x%"PRIx64", end=0x%"PRIx64
-+smmu_lookup_table(int level, uint64_t baseaddr, int granule_sz, uint64_t start, uint64_t end, int flags, uint64_t subpage_size) "level=%d baseaddr=0x%"PRIx64" granule=%d, start=0x%"PRIx64" end=0x%"PRIx64" flags=%d subpage_size=0x%"PRIx64
-+smmu_ptw_level(int level, uint64_t iova, size_t subpage_size, uint64_t baseaddr, uint32_t offset, uint64_t pte) "level=%d iova=0x%"PRIx64" subpage_sz=0x%lx baseaddr=0x%"PRIx64" offset=%d => pte=0x%"PRIx64
-+smmu_ptw_invalid_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr, uint32_t offset, uint64_t pte) "stage=%d level=%d base@=0x%"PRIx64" pte@=0x%"PRIx64" offset=%d pte=0x%"PRIx64
-+smmu_ptw_page_pte(int stage, int level,  uint64_t iova, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t address) "stage=%d level=%d iova=0x%"PRIx64" base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" page address = 0x%"PRIx64
-+smmu_ptw_block_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t iova, uint64_t gpa, int bsize_mb) "stage=%d level=%d base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" iova=0x%"PRIx64" block address = 0x%"PRIx64" block size = %d MiB"
-+smmu_get_pte(uint64_t baseaddr, int index, uint64_t pteaddr, uint64_t pte) "baseaddr=0x%"PRIx64" index=0x%x, pteaddr=0x%"PRIx64", pte=0x%"PRIx64
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index 76cf4aa..4ccd131 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -129,4 +129,18 @@ static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
- {
-     return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
- }
-+
-+/**
-+ * smmu_ptw - Perform the page table walk for a given iova / access flags
-+ * pair, according to @cfg translation config
-+ */
-+int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
-+             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
-+
-+/**
-+ * select_tt - compute which translation table shall be used according
-+ * the input iova and tranlsation config and return the TT specific info
-+ */
-+SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova);
-+
- #endif  /* HW_ARM_SMMU_COMMON */
+@@ -18,3 +18,8 @@ smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr:
+ smmuv3_trigger_irq(int irq) "irq=%d"
+ smmuv3_write_gerror(uint32_t toggled, uint32_t gerror) "toggled=0x%x, new GERROR=0x%x"
+ smmuv3_write_gerrorn(uint32_t acked, uint32_t gerrorn) "acked=0x%x, new GERRORN=0x%x"
++smmuv3_unhandled_cmd(uint32_t type) "Unhandled command type=%d"
++smmuv3_cmdq_consume(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod=%d cons=%d prod.wrap=%d cons.wrap=%d"
++smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
++smmuv3_cmdq_consume_out(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "prod:%d, cons:%d, prod_wrap:%d, cons_wrap:%d "
++smmuv3_cmdq_consume_error(const char *cmd_name, uint8_t cmd_error) "Error on %s command execution: %d"
 -- 
 2.5.5
