@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7m8-0006Wg-Lg
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:25 -0400
+	(envelope-from <mst@redhat.com>) id 1ey7mA-0006Yd-8L
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ey7m7-000835-Gp
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56984 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ey7m7-00082o-Aw
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:23 -0400
-Date: Tue, 20 Mar 2018 05:17:22 +0200
+	(envelope-from <mst@redhat.com>) id 1ey7m9-00084f-3S
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 23:17:26 -0400
+Date: Tue, 20 Mar 2018 05:17:16 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521515720-612046-18-git-send-email-mst@redhat.com>
+Message-ID: <1521515720-612046-13-git-send-email-mst@redhat.com>
 References: <1521515720-612046-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1521515720-612046-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 17/50] qmp: distinguish PC-DIMM and NVDIMM in
- MemoryDeviceInfoList
+Subject: [Qemu-devel] [PULL v2 12/50] virt_arm: acpi: reuse common
+ build_fadt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +24,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eric.auger@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
 
-From: Haozhong Zhang <haozhong.zhang@intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-It may need to treat PC-DIMM and NVDIMM differently, e.g., when
-deciding the necessity of non-volatile flag bit in SRAT memory
-affinity structures.
+Extend generic build_fadt() to support rev5.1 FADT
+and reuse it for 'virt' board, it would allow to
+phase out usage of AcpiFadtDescriptorRev5_1 and
+later ACPI_FADT_COMMON_DEF.
 
-A new field 'nvdimm' is added to the union type MemoryDeviceInfo for
-such purpose. Its type is currently PCDIMMDeviceInfo and will be
-updated when necessary in the future.
-
-It also fixes "info memory-devices"/query-memory-devices which
-currently show nvdimm devices as dimm devices since
-object_dynamic_cast(obj, TYPE_PC_DIMM) happily cast nvdimm to
-TYPE_PC_DIMM which it's been inherited from.
-
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- qapi/misc.json   |  6 +++++-
- hmp.c            | 14 +++++++++++---
- hw/mem/pc-dimm.c | 10 +++++++++-
- numa.c           | 19 +++++++++++++------
- 4 files changed, 38 insertions(+), 11 deletions(-)
+ include/hw/acpi/acpi-defs.h | 12 ++----------
+ hw/acpi/aml-build.c         | 23 +++++++++++++++++++++--
+ hw/arm/virt-acpi-build.c    | 33 ++++++++++++---------------------
+ 3 files changed, 35 insertions(+), 33 deletions(-)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index bcd5d10..6bf082f 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2852,7 +2852,11 @@
- #
- # Since: 2.1
- ##
--{ 'union': 'MemoryDeviceInfo', 'data': {'dimm': 'PCDIMMDeviceInfo'} }
-+{ 'union': 'MemoryDeviceInfo',
-+  'data': { 'dimm': 'PCDIMMDeviceInfo',
-+            'nvdimm': 'PCDIMMDeviceInfo'
-+          }
-+}
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 3fb0ace..fe15e95 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -165,16 +165,6 @@ struct AcpiFadtDescriptorRev3 {
+ } QEMU_PACKED;
+ typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
  
- ##
- # @query-memory-devices:
-diff --git a/hmp.c b/hmp.c
-index ba9e299..a277517 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2423,7 +2423,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-             switch (value->type) {
-             case MEMORY_DEVICE_INFO_KIND_DIMM:
-                 di = value->u.dimm.data;
-+                break;
-+
-+            case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-+                di = value->u.nvdimm.data;
-+                break;
-+
-+            default:
-+                di = NULL;
-+                break;
-+            }
- 
-+            if (di) {
-                 monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
-                                MemoryDeviceInfoKind_str(value->type),
-                                di->id ? di->id : "");
-@@ -2436,9 +2447,6 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-                                di->hotplugged ? "true" : "false");
-                 monitor_printf(mon, "  hotpluggable: %s\n",
-                                di->hotpluggable ? "true" : "false");
--                break;
--            default:
--                break;
-             }
-         }
-     }
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 4d050fe..51350d9 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -20,6 +20,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
- #include "qapi/error.h"
- #include "qemu/config-file.h"
- #include "qapi/visitor.h"
-@@ -250,6 +251,7 @@ MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-         MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
-         MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
-         PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+        bool is_nvdimm = object_dynamic_cast(obj, TYPE_NVDIMM);
-         DeviceClass *dc = DEVICE_GET_CLASS(obj);
-         DeviceState *dev = DEVICE(obj);
- 
-@@ -265,7 +267,13 @@ MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-         di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
-         di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
- 
--        info->u.dimm.data = di;
-+        if (!is_nvdimm) {
-+            info->u.dimm.data = di;
-+            info->type = MEMORY_DEVICE_INFO_KIND_DIMM;
-+        } else {
-+            info->u.nvdimm.data = di;
-+            info->type = MEMORY_DEVICE_INFO_KIND_NVDIMM;
-+        }
-         elem->value = info;
-         elem->next = NULL;
-         if (prev) {
-diff --git a/numa.c b/numa.c
-index 9442704..1116c90 100644
---- a/numa.c
-+++ b/numa.c
-@@ -529,18 +529,25 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- 
-         if (value) {
-             switch (value->type) {
--            case MEMORY_DEVICE_INFO_KIND_DIMM: {
-+            case MEMORY_DEVICE_INFO_KIND_DIMM:
-                 pcdimm_info = value->u.dimm.data;
-+                break;
-+
-+            case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-+                pcdimm_info = value->u.nvdimm.data;
-+                break;
-+
-+            default:
-+                pcdimm_info = NULL;
-+                break;
-+            }
-+
-+            if (pcdimm_info) {
-                 node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
-                 if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
-                     node_mem[pcdimm_info->node].node_plugged_mem +=
-                         pcdimm_info->size;
-                 }
--                break;
--            }
+-struct AcpiFadtDescriptorRev5_1 {
+-    ACPI_FADT_COMMON_DEF
+-    /* 64-bit Sleep Control register (ACPI 5.0) */
+-    struct AcpiGenericAddress sleep_control;
+-    /* 64-bit Sleep Status register (ACPI 5.0) */
+-    struct AcpiGenericAddress sleep_status;
+-} QEMU_PACKED;
 -
--            default:
--                break;
-             }
-         }
+-typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
+-
+ typedef struct AcpiFadtData {
+     struct AcpiGenericAddress pm1a_cnt;   /* PM1a_CNT_BLK */
+     struct AcpiGenericAddress pm1a_evt;   /* PM1a_EVT_BLK */
+@@ -192,6 +182,8 @@ typedef struct AcpiFadtData {
+     uint8_t  rtc_century;      /* CENTURY */
+     uint16_t plvl2_lat;        /* P_LVL2_LAT */
+     uint16_t plvl3_lat;        /* P_LVL3_LAT */
++    uint16_t arm_boot_arch;    /* ARM_BOOT_ARCH */
++    uint8_t minor_ver;         /* FADT Minor Version */
+ 
+     /*
+      * respective tables offsets within ACPI_BUILD_TABLE_FILE,
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 8f45298..3fa557c 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1679,7 +1679,7 @@ void build_slit(GArray *table_data, BIOSLinker *linker)
+                  table_data->len - slit_start, 1, NULL, NULL);
+ }
+ 
+-/* build rev1/rev3 FADT */
++/* build rev1/rev3/rev5.1 FADT */
+ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+                 const char *oem_id, const char *oem_table_id)
+ {
+@@ -1755,7 +1755,14 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+ 
+     build_append_gas_from_struct(tbl, &f->reset_reg); /* RESET_REG */
+     build_append_int_noprefix(tbl, f->reset_val, 1); /* RESET_VALUE */
+-    build_append_int_noprefix(tbl, 0, 3); /* Reserved, ACPI 3.0 */
++    /* Since ACPI 5.1 */
++    if ((f->rev >= 6) || ((f->rev == 5) && f->minor_ver > 0)) {
++        build_append_int_noprefix(tbl, f->arm_boot_arch, 2); /* ARM_BOOT_ARCH */
++        /* FADT Minor Version */
++        build_append_int_noprefix(tbl, f->minor_ver, 1);
++    } else {
++        build_append_int_noprefix(tbl, 0, 3); /* Reserved upto ACPI 5.0 */
++    }
+     build_append_int_noprefix(tbl, 0, 8); /* X_FIRMWARE_CTRL */
+ 
+     /* XDSDT address to be filled by Guest linker at runtime */
+@@ -1779,6 +1786,18 @@ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+     build_append_gas_from_struct(tbl, &f->gpe0_blk); /* X_GPE0_BLK */
+     build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0); /* X_GPE1_BLK */
+ 
++    if (f->rev <= 4) {
++        goto build_hdr;
++    }
++
++    /* SLEEP_CONTROL_REG */
++    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
++    /* SLEEP_STATUS_REG */
++    build_append_gas(tbl, AML_AS_SYSTEM_MEMORY, 0 , 0, 0, 0);
++
++    /* TODO: extra fields need to be added to support revisions above rev5 */
++    assert(f->rev == 5);
++
+ build_hdr:
+     build_header(linker, tbl, (void *)(tbl->data + fadt_start),
+                  "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index b644da9..c7c6a57 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -654,39 +654,30 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+                             VirtMachineState *vms, unsigned dsdt_tbl_offset)
+ {
+-    int fadt_start = table_data->len;
+-    AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+-    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+-    uint16_t bootflags;
++    /* ACPI v5.1 */
++    AcpiFadtData fadt = {
++        .rev = 5,
++        .minor_ver = 1,
++        .flags = 1 << ACPI_FADT_F_HW_REDUCED_ACPI,
++        .xdsdt_tbl_offset = &dsdt_tbl_offset,
++    };
+ 
+     switch (vms->psci_conduit) {
+     case QEMU_PSCI_CONDUIT_DISABLED:
+-        bootflags = 0;
++        fadt.arm_boot_arch = 0;
+         break;
+     case QEMU_PSCI_CONDUIT_HVC:
+-        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT | ACPI_FADT_ARM_PSCI_USE_HVC;
++        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
++                             ACPI_FADT_ARM_PSCI_USE_HVC;
+         break;
+     case QEMU_PSCI_CONDUIT_SMC:
+-        bootflags = ACPI_FADT_ARM_PSCI_COMPLIANT;
++        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
+         break;
+     default:
+         g_assert_not_reached();
      }
+ 
+-    /* Hardware Reduced = 1 and use PSCI 0.2+ */
+-    fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
+-    fadt->arm_boot_flags = cpu_to_le16(bootflags);
+-
+-    /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
+-    fadt->minor_revision = 0x1;
+-
+-    /* DSDT address to be filled by Guest linker */
+-    bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+-        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+-
+-    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
+-                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
++    build_fadt(table_data, linker, &fadt, NULL, NULL);
+ }
+ 
+ /* DSDT */
 -- 
 MST
