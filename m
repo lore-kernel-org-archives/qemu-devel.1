@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyJQe-0000Lh-Tf
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:44:01 -0400
+	(envelope-from <florolf@n621.de>) id 1eyJW7-00030K-EW
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyJQe-00077v-4y
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:44:00 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:46025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyJQe-00077M-18
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:44:00 -0400
-Received: by mail-oi0-x244.google.com with SMTP id 71-v6so1699490oie.12
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:43:59 -0700 (PDT)
+	(envelope-from <florolf@n621.de>) id 1eyJW3-0004h9-Ob
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:49:38 -0400
+Received: from nyx.n621.de ([176.9.182.227]:34974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <florolf@n621.de>) id 1eyJW3-0004fC-HI
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:49:35 -0400
+Date: Tue, 20 Mar 2018 16:49:32 +0100
+From: Florian Larysch <fl@n621.de>
+Message-ID: <20180320154932.GC15157@nyx.n621.de>
+References: <20180320093135.26422-1-fl@n621.de>
+	<d5ad61b8-1570-0234-fd2a-97dfb174de59@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180320090813.852-1-laurent@vivier.eu>
-References: <20180320090813.852-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Mar 2018 15:43:38 +0000
-Message-ID: <CAFEAcA-xx0SWaymZy6mUqgYscj8WUxMX19T6VYM+4w6xkyOdrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] M68k for 2.12 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d5ad61b8-1570-0234-fd2a-97dfb174de59@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12] os: truncate pidfile on creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, sw@weilnetz.de
 
-On 20 March 2018 at 09:08, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 55901900ec69d6fd6f332003d8ab81b2f8a38529:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-03-15 17:58:28 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
->
-> for you to fetch changes up to ecc207d2fc1d45fabb16c38742a6675a7ba56cbc:
->
->   target/m68k: add a mechanism to automatically free TCGv (2018-03-20 09:38:58 +0100)
->
-> ----------------------------------------------------------------
-> This series of patches is needed to fix a problem
-> in the m68k translator that can crash QEMU when translation
-> cache has too many instructions:
->
->   qemu-m68k: tcg/tcg.c:883: tcg_temp_alloc: Assertion `n < 512' failed.
->   qemu: uncaught target signal 11 (Segmentation fault) - core dumped
->
-> I have reproduced it in linux user mode, with "ghc", and in
-> system mode with the debian-installer for unstable distro
-> from debian-ports.
-> ----------------------------------------------------------------
->
-> Laurent Vivier (2):
->   target/m68k: add DisasContext parameter to gen_extend()
->   target/m68k: add a mechanism to automatically free TCGv
->
->  target/m68k/translate.c | 102 +++++++++++++++++++++++++++++++-----------------
->  1 file changed, 66 insertions(+), 36 deletions(-)
+On Tue, Mar 20, 2018 at 09:50:19AM -0500, Eric Blake wrote:
+> However, I have to wonder if we have the opposite problem - when the
+> file exists (truncated) but has not yet been written, how often do
+> we have a race where someone can see the empty file?
+> 
+> Should we be going even further and writing the pid into a temporary
+> file and then rename(2)ing that file onto the real destination, so
+> that if the pid file exists at all, it has stable contents that
+> can't cause confusion?
 
-Applied, thanks.
+I thought about doing that, but the window of opportunity is
+sufficiently small that this probably not a problem.
 
--- PMM
+Furthermore, the second purpose of the pid file is to provide mutual
+exclusion between qemu instances using the same pid file by means of the
+lockf() call. Given that the lock is associated with the inode, doing a
+rename() would defeat this if we didn't reopen the file before calling
+lockf(). However, doing that would in turn allow a race between multiple
+qemu instances (possibly resulting in the incorrect pid remaining in the
+file). That could also be fixed, but makes the whole affair even more
+complicated; not sure if this is worth the benefits.
+
+> >diff --git a/os-win32.c b/os-win32.c
+> >index 586a7c7d49..85dbad7af8 100644
+> >--- a/os-win32.c
+> >+++ b/os-win32.c
+> >@@ -108,7 +108,7 @@ int qemu_create_pidfile(const char *filename)
+> >      memset(&overlap, 0, sizeof(overlap));
+> >      file = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL,
+> >-                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+> >+                      CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+> 
+> I assume this is right (at least for looking comparable to the POSIX
+> case), although I'm trusting you here.
+
+I adapted this for consistency reasons, but I don't have a Windows
+platform available to test on. I based this on [1] and [2], which seems
+reasonable, but I'd be happy if someone who is familiar with the Windows
+API could ack this (get_maintainer.pl suggested Stefan Weil, who is
+CC'ed).
+
+[1] https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
+[2] https://stackoverflow.com/questions/14469607/difference-between-open-always-and-create-always-in-createfile-of-windows-api
+
+Florian
