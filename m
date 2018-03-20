@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyIf0-0002it-03
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:54:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyIog-0005rz-3u
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyIex-0001Cl-C7
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:54:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49804 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyIex-0001CM-5W
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 10:54:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A96FA80AD211
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 14:54:42 +0000 (UTC)
-Date: Tue, 20 Mar 2018 16:54:35 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180320164842-mutt-send-email-mst@kernel.org>
-References: <20180312172124.56461-1-dgilbert@redhat.com>
-	<20180312172124.56461-18-dgilbert@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1eyIoY-00005p-JW
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:04:46 -0400
+Date: Tue, 20 Mar 2018 16:04:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180320150421.GC4865@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180312172124.56461-18-dgilbert@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 17/29] vhost+postcopy: Helper to send
- requests to source for shared pages
+Subject: [Qemu-devel] luks: Initial content of unwritten blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,145 +20,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: berrange@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com
 
-On Mon, Mar 12, 2018 at 05:21:12PM +0000, Dr. David Alan Gilbert (git) wr=
-ote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Provide a helper to be used by shared waker functions to request
-> shared pages from the source.
-> The last_rb pointer is moved into the incoming state since this
-> helper can update it as well as the main fault thread function.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  migration/migration.h    |  2 ++
->  migration/postcopy-ram.c | 32 +++++++++++++++++++++++++++++---
->  migration/postcopy-ram.h |  3 +++
->  migration/trace-events   |  2 ++
->  4 files changed, 36 insertions(+), 3 deletions(-)
->=20
-> diff --git a/migration/migration.h b/migration/migration.h
-> index d02a759331..83dc36b57a 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -49,6 +49,8 @@ struct MigrationIncomingState {
->      int       userfault_event_fd;
->      QEMUFile *to_src_file;
->      QemuMutex rp_mutex;    /* We send replies from multiple threads */
-> +    /* RAMBlock of last request sent to source */
-> +    RAMBlock *last_rb;
->      void     *postcopy_tmp_page;
->      void     *postcopy_tmp_zero_page;
->      /* PostCopyFD's for external userfaultfds & handlers of shared mem=
-ory */
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 4ab1b7d36d..83780576ca 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -525,6 +525,32 @@ static int ram_block_enable_notify(const char *blo=
-ck_name, void *host_addr,
->      return 0;
->  }
-> =20
-> +/*
-> + * Callback from shared fault handlers to ask for a page,
-> + * the page must be specified by a RAMBlock and an offset in that rb
-> + * Note: Only for use by shared fault handlers (in fault thread)
-> + */
-> +int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb=
-,
-> +                                 uint64_t client_addr, uint64_t rb_off=
-set)
-> +{
-> +    size_t pagesize =3D qemu_ram_pagesize(rb);
-> +    uint64_t aligned_rbo =3D rb_offset & ~(pagesize - 1);
-> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
-> +
-> +    trace_postcopy_request_shared_page(pcfd->idstr, qemu_ram_get_idstr=
-(rb),
-> +                                       rb_offset);
-> +    /* TODO: Check bitmap to see if we already have the page */
-> +    if (rb !=3D mis->last_rb) {
-> +        mis->last_rb =3D rb;
-> +        migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-> +                                  aligned_rbo, pagesize);
-> +    } else {
-> +        /* Save some space */
-> +        migrate_send_rp_req_pages(mis, NULL, aligned_rbo, pagesize);
-> +    }
-> +    return 0;
-> +}
-> +
->  /*
->   * Handle faults detected by the USERFAULT markings
->   */
-> @@ -535,9 +561,9 @@ static void *postcopy_ram_fault_thread(void *opaque=
-)
->      int ret;
->      size_t index;
->      RAMBlock *rb =3D NULL;
-> -    RAMBlock *last_rb =3D NULL; /* last RAMBlock we sent part of */
-> =20
->      trace_postcopy_ram_fault_thread_entry();
-> +    mis->last_rb =3D NULL; /* last RAMBlock we sent part of */
->      qemu_sem_post(&mis->fault_thread_sem);
-> =20
->      struct pollfd *pfd;
-> @@ -636,8 +662,8 @@ static void *postcopy_ram_fault_thread(void *opaque=
-)
->               * Send the request to the source - we want to request one
->               * of our host page sizes (which is >=3D TPS)
->               */
-> -            if (rb !=3D last_rb) {
-> -                last_rb =3D rb;
-> +            if (rb !=3D mis->last_rb) {
-> +                mis->last_rb =3D rb;
->                  migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
->                                           rb_offset, qemu_ram_pagesize(=
-rb));
->              } else {
-> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-> index c8ced3470b..d7afab07d7 100644
-> --- a/migration/postcopy-ram.h
-> +++ b/migration/postcopy-ram.h
-> @@ -164,5 +164,8 @@ struct PostCopyFD {
->   */
->  void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
->  void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
-> +/* Callback from shared fault handlers to ask for a page */
-> +int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb=
-,
-> +                                 uint64_t client_addr, uint64_t offset=
-);
-> =20
->  #endif
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 1e617ad7a6..7c910b5479 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -198,6 +198,8 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
->  postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
->  postcopy_ram_incoming_cleanup_join(void) ""
-> +postcopy_request_shared_page(const char *sharer, const char *rb, uint6=
-4_t rb_offset) "for %s in %s offset 0x%"PRIx64
-> +
->  save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wa=
-it: %" PRIu64 " milliseconds, %d iterations"
+Hi,
 
-So this function was missing a stub.
+I just tried to add luks support to qemu-iotests 025, a basic resize
+test, which made me realise that luks doesn't read zeros in unwritten
+blocks (which makes the test fail).
 
-For the record, since 1842bdfdbac2ec46f2934d8914c874db83dd1344 we have
-a copy of linux system headers so ifdef for NR_userfaultfd
-is unnecessary on linux.
+The reason for this is that we get zeros on the protocol layer (i.e. in
+the encrpyted data as it is on the disk), but not in the decrpyted
+format layer.
 
-Let's just drop it?
+Now I'm wondering if that's a problem. Not reading zeros in the guest is
+unusual, but not unheard of (e.g. host_device), but visible zeros in the
+image file could be considered an information leak. On the other hand,
+qcow2 metadata for encrypted images is visible, too, so that's really
+just the same thing.
 
-> --=20
-> 2.14.3
+What do you think, is the current behaviour good enough or should we
+essentially enforce full preallocation for luks images and initialise
+the image so that zeros are visible on the format layer, but random
+encrypted stuff on the protocol layer?
+
+Either way, we should probably document the decision somewhere as
+intentional.
+
+Kevin
