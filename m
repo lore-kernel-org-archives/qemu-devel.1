@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyJOy-0007Wh-GV
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:42:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyJQe-0000Lh-Tf
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:44:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyJOx-0004Zv-Mh
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:42:16 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42298)
+	(envelope-from <peter.maydell@linaro.org>) id 1eyJQe-00077v-4y
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:44:00 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:46025)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyJOx-0004Yb-H2
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:42:15 -0400
-Received: by mail-ot0-x243.google.com with SMTP id v23-v6so2198264oth.9
-	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:42:15 -0700 (PDT)
+	id 1eyJQe-00077M-18
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 11:44:00 -0400
+Received: by mail-oi0-x244.google.com with SMTP id 71-v6so1699490oie.12
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 08:43:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180320170328-mutt-send-email-mst@kernel.org>
-References: <1521515720-612046-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_EbFC2qJvMGKj1gzTBnSgytLaJJfhDcn0FjEsjnvz1Sg@mail.gmail.com>
-	<20180320170328-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180320090813.852-1-laurent@vivier.eu>
+References: <20180320090813.852-1-laurent@vivier.eu>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Mar 2018 15:41:54 +0000
-Message-ID: <CAFEAcA8Dxs9u1KyzGmND9H7mPi9+KrBdKzkxTB4+hQYN54JPmg@mail.gmail.com>
+Date: Tue, 20 Mar 2018 15:43:38 +0000
+Message-ID: <CAFEAcA-xx0SWaymZy6mUqgYscj8WUxMX19T6VYM+4w6xkyOdrQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/50] virtio, vhost, pci, pc: features,
- cleanups
+Subject: Re: [Qemu-devel] [PULL 0/2] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 20 March 2018 at 15:05, Michael S. Tsirkin <mst@redhat.com> wrote:
-> I'm curious why does it take that path though.
-> Here's the rule
+On 20 March 2018 at 09:08, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 55901900ec69d6fd6f332003d8ab81b2f8a38529:
 >
-> #if defined(__linux__) && defined(__NR_userfaultfd) && defined(CONFIG_EVENTFD)
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-03-15 17:58:28 +0000)
 >
-> If it's Linux we'll pick our own copy of the header
-> and so __NR_userfaultfd is defined.
+> are available in the Git repository at:
 >
-> CONFIG_EVENTFD is not set?
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
+>
+> for you to fetch changes up to ecc207d2fc1d45fabb16c38742a6675a7ba56cbc:
+>
+>   target/m68k: add a mechanism to automatically free TCGv (2018-03-20 09:38:58 +0100)
+>
+> ----------------------------------------------------------------
+> This series of patches is needed to fix a problem
+> in the m68k translator that can crash QEMU when translation
+> cache has too many instructions:
+>
+>   qemu-m68k: tcg/tcg.c:883: tcg_temp_alloc: Assertion `n < 512' failed.
+>   qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+>
+> I have reproduced it in linux user mode, with "ghc", and in
+> system mode with the debian-installer for unstable distro
+> from debian-ports.
+> ----------------------------------------------------------------
+>
+> Laurent Vivier (2):
+>   target/m68k: add DisasContext parameter to gen_extend()
+>   target/m68k: add a mechanism to automatically free TCGv
+>
+>  target/m68k/translate.c | 102 +++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 66 insertions(+), 36 deletions(-)
 
-CONFIG_EVENTFD is set. __NR_userfaultfd is not. It isn't
-defined in the system headers, and it's not defined in
-our linux-headers/asm-arm64/. Only x86, s390, powerpc
-and arm (32-bit) define it. I suspect the build would also
-fail on MIPS if I had a mips host in the build set.
+Applied, thanks.
 
-thanks
 -- PMM
