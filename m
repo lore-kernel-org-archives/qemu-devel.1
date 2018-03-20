@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eyDkR-0005Lt-7x
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:40:08 -0400
+	(envelope-from <groug@kaod.org>) id 1eyDlk-0006Bh-Iz
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eyDkO-0006YI-56
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:40:03 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:52725
-	helo=smtp.eu.adacore.com)
+	(envelope-from <groug@kaod.org>) id 1eyDlh-0007Nr-HB
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:41:24 -0400
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:49242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1eyDkN-0006XG-UL
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:40:00 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Tue, 20 Mar 2018 10:39:33 +0100
-Message-Id: <1521538773-30802-1-git-send-email-frederic.konrad@adacore.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eyDlh-0007L9-AS
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 05:41:21 -0400
+Received: from player758.ha.ovh.net (unknown [10.109.122.233])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7CA2CA1064
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 10:41:12 +0100 (CET)
+Date: Tue, 20 Mar 2018 10:41:03 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180320104103.56d541c2@bahia.lan>
+In-Reply-To: <20180320022319.17199-1-david@gibson.dropbear.id.au>
+References: <20180320022319.17199-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 for-2.12] gdbstub: send a termination packet
- instead of crashing gdb
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fix backwards migration of
+ msr_mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: f4bug@amsat.org, stefanha@redhat.com, peter.maydell@linaro.org, eblake@redhat.com, KONRAD Frederic <frederic.konrad@adacore.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, wei.guo.simon@gmail.com, ldoktor@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Since the commit:
-commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
-Author: Stefan Hajnoczi <stefanha@redhat.com>
-Date:   Wed Mar 7 14:42:05 2018 +0000
+On Tue, 20 Mar 2018 13:23:19 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-    vl: introduce vm_shutdown()
+> 21b786f "PowerPC: Add TS bits into msr_mask" added the transaction states
+> to msr_mask for recent POWER CPUs to allow correct migration of machines
+> that are in certain interim transactional memory states.
+> 
+> This was correct, but unfortunately breaks backwards of pseries-2.7 and
+> earlier machine types which (stupidly) transferred the msr_mask in the
+> migration stream and failed if it wasn't equal on each end.
+> 
+> This works around the problem by masking out the new MSR bits in the
+> compatibility code to send the msr_mask on old machine types.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-GDB crashes when qemu exits (at least on sparc-softmmu):
-Remote communication error.  Target disconnected.: Connection reset by pe=
-er.
-Quitting: putpkt: write failed: Broken pipe.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-So send a packet to exit GDB before we exit QEMU:
-[Inferior 1 (Thread 0) exited normally]
+and
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
----
+Tested-by: Greg Kurz <groug@kaod.org>
 
-Notes:
-    V1 -> V2:
-      * fix typos
-      * mark the patch for-2.12
-
- gdbstub.c              | 7 +++++++
- include/exec/gdbstub.h | 2 ++
- vl.c                   | 2 ++
- 3 files changed, 11 insertions(+)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index f1d5148..a76b2fa 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2052,6 +2052,13 @@ int gdbserver_start(const char *device)
-     return 0;
- }
-=20
-+void gdbserver_cleanup(void)
-+{
-+    if (gdbserver_state) {
-+        put_packet(gdbserver_state, "W00");
-+    }
-+}
-+
- static void register_types(void)
- {
-     type_register_static(&char_gdb_type_info);
-diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-index 9aa7756..2e8a4b8 100644
---- a/include/exec/gdbstub.h
-+++ b/include/exec/gdbstub.h
-@@ -103,6 +103,8 @@ int gdbserver_start(int);
- int gdbserver_start(const char *port);
- #endif
-=20
-+void gdbserver_cleanup(void);
-+
- /**
-  * gdb_has_xml:
-  * This is an ugly hack to cope with both new and old gdb.
-diff --git a/vl.c b/vl.c
-index 19340a3..cd8d5cb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4725,6 +4725,8 @@ int main(int argc, char **argv, char **envp)
-=20
-     main_loop();
-=20
-+    gdbserver_cleanup();
-+
-     /* No more vcpu or device emulation activity beyond this point */
-     vm_shutdown();
-=20
---=20
-1.8.3.1
+>  target/ppc/machine.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+> index e475206c6a..0634cdb295 100644
+> --- a/target/ppc/machine.c
+> +++ b/target/ppc/machine.c
+> @@ -190,7 +190,15 @@ static int cpu_pre_save(void *opaque)
+>  
+>      /* Hacks for migration compatibility between 2.6, 2.7 & 2.8 */
+>      if (cpu->pre_2_8_migration) {
+> -        cpu->mig_msr_mask = env->msr_mask;
+> +        /* Mask out bits that got added to msr_mask since the versions
+> +         * which stupidly included it in the migration stream. */
+> +        target_ulong metamask = 0
+> +#if defined(TARGET_PPC64)
+> +            | (1ULL << MSR_TS0)
+> +            | (1ULL << MSR_TS1)
+> +#endif
+> +            ;
+> +        cpu->mig_msr_mask = env->msr_mask & ~metamask;
+>          cpu->mig_insns_flags = env->insns_flags & insns_compat_mask;
+>          cpu->mig_insns_flags2 = env->insns_flags2 & insns_compat_mask2;
+>          cpu->mig_nb_BATs = env->nb_BATs;
