@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ey6im-0003Ls-2M
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:09:54 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1ey6m3-0004K8-Qn
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ey6ii-0008I5-6k
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:09:52 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2386 helo=huawei.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1ey6m0-0001yt-KY
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:13:15 -0400
+Received: from mga12.intel.com ([192.55.52.136]:21473)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ey6ih-0008FF-C6
-	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:09:48 -0400
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Tue, 20 Mar 2018 02:09:34 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473ABF2941@DGGEMM505-MBS.china.huawei.com>
-References: <1520241169-22892-1-git-send-email-jianjay.zhou@huawei.com>
-	<20180320033051-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180320033051-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ey6m0-0001u4-9U
+	for qemu-devel@nongnu.org; Mon, 19 Mar 2018 22:13:12 -0400
+Message-ID: <5AB06EE9.1030306@intel.com>
+Date: Tue, 20 Mar 2018 10:16:09 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9] vhost: used_memslots refactoring
+References: <1521197309-13544-1-git-send-email-wei.w.wang@intel.com>
+	<1521197309-13544-5-git-send-email-wei.w.wang@intel.com>
+	<20180316165319-mutt-send-email-mst@kernel.org>
+	<5AAE4124.5010602@intel.com>
+	<20180319062023-mutt-send-email-mst@kernel.org>
+	<5AAF7C72.5070403@intel.com>
+	<20180320004900-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180320004900-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v5 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,403 +35,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Hi Michael,
+On 03/20/2018 06:55 AM, Michael S. Tsirkin wrote:
+> On Mon, Mar 19, 2018 at 05:01:38PM +0800, Wei Wang wrote:
+>> On 03/19/2018 12:24 PM, Michael S. Tsirkin wrote:
+>>> On Sun, Mar 18, 2018 at 06:36:20PM +0800, Wei Wang wrote:
+>>>> On 03/16/2018 11:16 PM, Michael S. Tsirkin wrote:
+>>>>> On Fri, Mar 16, 2018 at 06:48:28PM +0800, Wei Wang wrote:
+>>> OTOH it seems that if thread stops nothing will wake it up
+>>> whem vm is restarted. Such bahaviour change across vmstop/vmstart
+>>> is unexpected.
+>>> I do not understand why we want to increment the counter
+>>> on vm stop though. It does make sense to stop the thread
+>>> but why not resume where we left off when vm is resumed?
+>>>
+>> I'm not sure which counter we incremented. But it would be clear if we have
+>> a high level view of how it works (it is symmetric actually). Basically, we
+>> start the optimization when each round starts and stop it at the end of each
+>> round (i.e. before we do the bitmap sync), as shown below:
+>>
+>> 1) 1st Round starts --> free_page_start
+>> 2) 1st Round in progress..
+>> 3) 1st Round ends  --> free_page_stop
+>> 4) 2nd Round starts --> free_page_start
+>> 5) 2nd Round in progress..
+>> 6) 2nd Round ends --> free_page_stop
+>> ......
+>>
+>> For example, in 2), the VM is stopped. virtio_balloon_poll_free_page_hints
+>> finds the vq is empty (i.e. elem == NULL) and the runstate is stopped, the
+>> optimization thread exits immediately. That is, this optimization thread is
+>> gone forever (the optimization we can do for this round is done). We won't
+>> know when would the VM be woken up:
+>> A) If the VM is woken up very soon when the migration thread is still in
+>> progress of 2), then in 4) a new optimization thread (not the same one for
+>> the first round) will be created and start the optimization for the 2nd
+>> round as usual (If you have questions about 3) in this case, that
+>> free_page_stop will do nothing than just return, since the optimization
+>> thread has exited) ;
+>> B) If the VM is woken up after the whole migration has ended, there is still
+>> no point in resuming the optimization.
+>>
+>> I think this would be the simple design for the first release of this
+>> optimization. There are possibilities to improve case A) above by continuing
+>> optimization for the 1st Round as it is still in progress, but I think
+>> adding that complexity for this rare case wouldn't be worthwhile (at least
+>> for now). What would you think?
+>>
+>>
+>> Best,
+>> Wei
+> In my opinion this just makes the patch very messy.
+>
+> E.g. attempts to attach a debugger to the guest will call vmstop and
+> then behaviour changes. This is a receipe for heisenbugs which are then
+> extremely painful to debug.
+>
+> It is not really hard to make things symmetrical:
+> e.g. if you stop on vmstop then you should start on vmstart, etc.
+> And stopping thread should not involve a bunch of state
+> changes, just stop it and that's it.
+>
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Tuesday, March 20, 2018 9:34 AM
-> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
-> Cc: qemu-devel@nongnu.org; imammedo@redhat.com; Huangweidong (C)
-> <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>; Gon=
-glei
-> (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler) <liuzhe13@huawei.=
-com>
-> Subject: Re: [PATCH v9] vhost: used_memslots refactoring
->=20
-> On Mon, Mar 05, 2018 at 05:12:49PM +0800, Jay Zhou wrote:
-> > Used_memslots is shared by vhost kernel and user, it is equal to
-> > dev->mem->nregions, which is correct for vhost kernel, but not for
-> > vhost user, the latter one uses memory regions that have file
-> > descriptor. E.g. a VM has a vhost-user NIC and 8(vhost user memslot
-> > upper limit) memory slots, it will be failed to hotplug a new DIMM
-> > device since vhost_has_free_slot() finds no free slot left. It should
-> > be successful if only part of memory slots have file descriptor, so
-> > setting used memslots for vhost-user and vhost-kernel respectively.
->=20
->=20
-> Below should go after ---
+"stop it" - do you mean to
+1) make the thread exit (i.e.make virtio_balloon_poll_free_page_hints 
+exit the while loop and return NULL); or
+2) keep the thread staying in the while loop but yield running (e.g. 
+sleep(1) or block on a mutex)? (or please let me know if you suggested a 
+different implementation about stopping the thread)
 
-Thanks for reminding.
+If we go with 1), then we would not be able to resume the thread.
+If we go with 2), then there is no guarantee to make the thread continue 
+to run immediately (there will be a scheduling delay which is not 
+predictable) when the vm is woken up. If the thread cannot run 
+immediately when the the VM is woken up, it will be effectively the same 
+as 1).
 
->=20
-> > v7 ... v9:
-> >  - rebased on the master
-> > v2 ... v6:
-> >  - delete the "used_memslots" global variable, and add it
-> >    for vhost-user and vhost-kernel separately
-> >  - refine the function, commit log
-> >  - used_memslots refactoring
-> >
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > Signed-off-by: Liuzhe <liuzhe13@huawei.com>
->=20
-> When built with clang this causes runtime warnings (during make check) ab=
-out
-> misaligned access to structures.
->=20
-> The issue is that vhost_user_prepare_msg requests VhostUserMemory which
-> compiler assumes but is then used with a pointer into a packed structure =
--
-> where fields are not aligned.
+In terms of heisenbugs, I think we can recommend developers (of this 
+feature) to use methods that don't stop the VM (e.g. print).
 
-Sorry I missed the patch you have sent to fix the alignment, I have replied
-to that thread.
-
->=20
->=20
-> > ---
-> >  hw/virtio/vhost-backend.c         | 15 +++++++-
-> >  hw/virtio/vhost-user.c            | 77 ++++++++++++++++++++++++++-----=
-----
-> ----
-> >  hw/virtio/vhost.c                 | 13 +++----
-> >  include/hw/virtio/vhost-backend.h |  6 ++-
-> >  4 files changed, 75 insertions(+), 36 deletions(-)
-> >
-> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> > index 7f09efa..59def69 100644
-> > --- a/hw/virtio/vhost-backend.c
-> > +++ b/hw/virtio/vhost-backend.c
-> > @@ -15,6 +15,8 @@
-> >  #include "hw/virtio/vhost-backend.h"
-> >  #include "qemu/error-report.h"
-> >
-> > +static unsigned int vhost_kernel_used_memslots;
-> > +
-> >  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int
-> request,
-> >                               void *arg)  { @@ -62,6 +64,11 @@ static
-> > int vhost_kernel_memslots_limit(struct vhost_dev *dev)
-> >      return limit;
-> >  }
-> >
-> > +static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev) {
-> > +    return vhost_kernel_used_memslots <
-> > +vhost_kernel_memslots_limit(dev); }
-> > +
-> >  static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
-> >                                          struct vhost_vring_file
-> > *file)  { @@ -233,11 +240,16 @@ static void
-> > vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
-> >          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL,
-> > NULL);  }
-> >
-> > +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev) {
-> > +    vhost_kernel_used_memslots =3D dev->mem->nregions; }
-> > +
-> >  static const VhostOps kernel_ops =3D {
-> >          .backend_type =3D VHOST_BACKEND_TYPE_KERNEL,
-> >          .vhost_backend_init =3D vhost_kernel_init,
-> >          .vhost_backend_cleanup =3D vhost_kernel_cleanup,
-> > -        .vhost_backend_memslots_limit =3D vhost_kernel_memslots_limit,
-> > +        .vhost_backend_has_free_memslots =3D
-> > + vhost_kernel_has_free_memslots,
-> >          .vhost_net_set_backend =3D vhost_kernel_net_set_backend,
-> >          .vhost_scsi_set_endpoint =3D vhost_kernel_scsi_set_endpoint,
-> >          .vhost_scsi_clear_endpoint =3D
-> > vhost_kernel_scsi_clear_endpoint, @@ -264,6 +276,7 @@ static const
-> > VhostOps kernel_ops =3D {  #endif /* CONFIG_VHOST_VSOCK */
-> >          .vhost_set_iotlb_callback =3D vhost_kernel_set_iotlb_callback,
-> >          .vhost_send_device_iotlb_msg =3D
-> > vhost_kernel_send_device_iotlb_msg,
-> > +        .vhost_set_used_memslots =3D vhost_kernel_set_used_memslots,
-> >  };
-> >
-> >  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType
-> > backend_type) diff --git a/hw/virtio/vhost-user.c
-> > b/hw/virtio/vhost-user.c index 41ff5cf..ef14249 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -163,6 +163,8 @@ static VhostUserMsg m __attribute__ ((unused));
-> >  /* The version of the protocol we support */
-> >  #define VHOST_USER_VERSION    (0x1)
-> >
-> > +static bool vhost_user_free_memslots =3D true;
-> > +
-> >  struct vhost_user {
-> >      CharBackend *chr;
-> >      int slave_fd;
-> > @@ -330,12 +332,43 @@ static int vhost_user_set_log_base(struct vhost_d=
-ev
-> *dev, uint64_t base,
-> >      return 0;
-> >  }
-> >
-> > +static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemo=
-ry
-> *mem,
-> > +                                  int *fds) {
-> > +    int i, fd;
-> > +
-> > +    vhost_user_free_memslots =3D true;
-> > +    for (i =3D 0, mem->nregions =3D 0; i < dev->mem->nregions; ++i) {
-> > +        struct vhost_memory_region *reg =3D dev->mem->regions + i;
-> > +        ram_addr_t offset;
-> > +        MemoryRegion *mr;
-> > +
-> > +        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_ad=
-dr);
-> > +        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
-> >userspace_addr,
-> > +                                     &offset);
-> > +        fd =3D memory_region_get_fd(mr);
-> > +        if (fd > 0) {
-> > +            if (mem->nregions =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
-> > +                vhost_user_free_memslots =3D false;
-> > +                return -1;
-> > +            }
-> > +
-> > +            mem->regions[mem->nregions].userspace_addr =3D reg-
-> >userspace_addr;
-> > +            mem->regions[mem->nregions].memory_size =3D reg->memory_si=
-ze;
-> > +            mem->regions[mem->nregions].guest_phys_addr =3D reg-
-> >guest_phys_addr;
-> > +            mem->regions[mem->nregions].mmap_offset =3D offset;
-> > +            fds[mem->nregions++] =3D fd;
-> > +        }
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> >  static int vhost_user_set_mem_table(struct vhost_dev *dev,
-> >                                      struct vhost_memory *mem)  {
-> >      int fds[VHOST_MEMORY_MAX_NREGIONS];
-> > -    int i, fd;
-> > -    size_t fd_num =3D 0;
-> > +    size_t fd_num;
-> >      bool reply_supported =3D virtio_has_feature(dev->protocol_features=
-,
-> >
-> > VHOST_USER_PROTOCOL_F_REPLY_ACK);
-> >
-> > @@ -348,29 +381,12 @@ static int vhost_user_set_mem_table(struct vhost_=
-dev
-> *dev,
-> >          msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
-> >      }
-> >
-> > -    for (i =3D 0; i < dev->mem->nregions; ++i) {
-> > -        struct vhost_memory_region *reg =3D dev->mem->regions + i;
-> > -        ram_addr_t offset;
-> > -        MemoryRegion *mr;
-> > -
-> > -        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_ad=
-dr);
-> > -        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
-> >userspace_addr,
-> > -                                     &offset);
-> > -        fd =3D memory_region_get_fd(mr);
-> > -        if (fd > 0) {
-> > -            if (fd_num =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
-> > -                error_report("Failed preparing vhost-user memory table
-> msg");
-> > -                return -1;
-> > -            }
-> > -            msg.payload.memory.regions[fd_num].userspace_addr =3D reg-
-> >userspace_addr;
-> > -            msg.payload.memory.regions[fd_num].memory_size  =3D reg-
-> >memory_size;
-> > -            msg.payload.memory.regions[fd_num].guest_phys_addr =3D reg=
--
-> >guest_phys_addr;
-> > -            msg.payload.memory.regions[fd_num].mmap_offset =3D offset;
-> > -            fds[fd_num++] =3D fd;
-> > -        }
-> > +    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
-> > +        error_report("Failed preparing vhost-user memory table msg");
-> > +        return -1;
-> >      }
-> >
-> > -    msg.payload.memory.nregions =3D fd_num;
-> > +    fd_num =3D msg.payload.memory.nregions;
-> >
-> >      if (!fd_num) {
-> >          error_report("Failed initializing vhost-user memory map, "
-> > @@ -886,9 +902,9 @@ static int vhost_user_get_vq_index(struct vhost_dev
-> *dev, int idx)
-> >      return idx;
-> >  }
-> >
-> > -static int vhost_user_memslots_limit(struct vhost_dev *dev)
-> > +static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
-> >  {
-> > -    return VHOST_MEMORY_MAX_NREGIONS;
-> > +    return vhost_user_free_memslots;
-> >  }
-> >
-> >  static bool vhost_user_requires_shm_log(struct vhost_dev *dev) @@
-> > -1156,11 +1172,19 @@ vhost_user_crypto_close_session(struct vhost_dev *=
-dev,
-> uint64_t session_id)
-> >      return 0;
-> >  }
-> >
-> > +static void vhost_user_set_used_memslots(struct vhost_dev *dev) {
-> > +    int fds[VHOST_MEMORY_MAX_NREGIONS];
-> > +    VhostUserMsg msg;
-> > +
-> > +    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
->=20
-> Oops.  This is something I don't understand.
->=20
-> Why is the message prepared here and then discarded?
->=20
-
-The purpose of vhost_user_set_used_memslots() is to set the boolean value
-of vhost_user_free_memslots, which indicating whether there're free memeslo=
-ts
-for vhost user. Since there're code duplicating inside vhost_user_set_used_=
-memslots()
-and vhost_user_set_mem_table(), Igor suggested that we could create a new f=
-unction
-to avoid duplicating.
-Here, the value of VhostUserMsg is not needed by the caller vhost_user_set_=
-used_memslots(),
-so we just discarded.
-
-Regards,
-Jay
-
->=20
-> > +}
-> > +
-> >  const VhostOps user_ops =3D {
-> >          .backend_type =3D VHOST_BACKEND_TYPE_USER,
-> >          .vhost_backend_init =3D vhost_user_init,
-> >          .vhost_backend_cleanup =3D vhost_user_cleanup,
-> > -        .vhost_backend_memslots_limit =3D vhost_user_memslots_limit,
-> > +        .vhost_backend_has_free_memslots =3D
-> > + vhost_user_has_free_memslots,
-> >          .vhost_set_log_base =3D vhost_user_set_log_base,
-> >          .vhost_set_mem_table =3D vhost_user_set_mem_table,
-> >          .vhost_set_vring_addr =3D vhost_user_set_vring_addr, @@ -1184,=
-6
-> > +1208,7 @@ const VhostOps user_ops =3D {
-> >          .vhost_send_device_iotlb_msg =3D vhost_user_send_device_iotlb_=
-msg,
-> >          .vhost_get_config =3D vhost_user_get_config,
-> >          .vhost_set_config =3D vhost_user_set_config,
-> > +        .vhost_set_used_memslots =3D vhost_user_set_used_memslots,
-> >          .vhost_crypto_create_session =3D vhost_user_crypto_create_sess=
-ion,
-> >          .vhost_crypto_close_session =3D
-> > vhost_user_crypto_close_session,  }; diff --git a/hw/virtio/vhost.c
-> > b/hw/virtio/vhost.c index d8d0ef9..17262d2 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -44,20 +44,19 @@
-> >  static struct vhost_log *vhost_log;
-> >  static struct vhost_log *vhost_log_shm;
-> >
-> > -static unsigned int used_memslots;
-> >  static QLIST_HEAD(, vhost_dev) vhost_devices =3D
-> >      QLIST_HEAD_INITIALIZER(vhost_devices);
-> >
-> >  bool vhost_has_free_slot(void)
-> >  {
-> > -    unsigned int slots_limit =3D ~0U;
-> >      struct vhost_dev *hdev;
-> >
-> >      QLIST_FOREACH(hdev, &vhost_devices, entry) {
-> > -        unsigned int r =3D hdev->vhost_ops-
-> >vhost_backend_memslots_limit(hdev);
-> > -        slots_limit =3D MIN(slots_limit, r);
-> > +        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
-> > +            return false;
-> > +        }
-> >      }
-> > -    return slots_limit > used_memslots;
-> > +    return true;
-> >  }
-> >
-> >  static void vhost_dev_sync_region(struct vhost_dev *dev, @@ -446,7
-> > +445,6 @@ static void vhost_commit(MemoryListener *listener)
-> >                         dev->n_mem_sections * sizeof dev->mem->regions[=
-0];
-> >      dev->mem =3D g_realloc(dev->mem, regions_size);
-> >      dev->mem->nregions =3D dev->n_mem_sections;
-> > -    used_memslots =3D dev->mem->nregions;
-> >      for (i =3D 0; i < dev->n_mem_sections; i++) {
-> >          struct vhost_memory_region *cur_vmr =3D dev->mem->regions + i;
-> >          struct MemoryRegionSection *mrs =3D dev->mem_sections + i; @@
-> > -458,6 +456,7 @@ static void vhost_commit(MemoryListener *listener)
-> >              mrs->offset_within_region;
-> >          cur_vmr->flags_padding   =3D 0;
-> >      }
-> > +    dev->vhost_ops->vhost_set_used_memslots(dev);
-> >
-> >      if (!dev->started) {
-> >          goto out;
-> > @@ -1202,7 +1201,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void
-> *opaque,
-> >      memory_listener_register(&hdev->memory_listener,
-> &address_space_memory);
-> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
-> >
-> > -    if (used_memslots > hdev->vhost_ops-
-> >vhost_backend_memslots_limit(hdev)) {
-> > +    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
-> >          error_report("vhost backend memory slots limit is less"
-> >                  " than current number of present memory slots");
-> >          r =3D -1;
-> > diff --git a/include/hw/virtio/vhost-backend.h
-> > b/include/hw/virtio/vhost-backend.h
-> > index 5dac61f..ff06c2d 100644
-> > --- a/include/hw/virtio/vhost-backend.h
-> > +++ b/include/hw/virtio/vhost-backend.h
-> > @@ -36,7 +36,7 @@ struct vhost_iotlb_msg;
-> >
-> >  typedef int (*vhost_backend_init)(struct vhost_dev *dev, void
-> > *opaque);  typedef int (*vhost_backend_cleanup)(struct vhost_dev
-> > *dev); -typedef int (*vhost_backend_memslots_limit)(struct vhost_dev
-> > *dev);
-> > +typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev
-> > +*dev);
-> >
-> >  typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
-> >                                  struct vhost_vring_file *file); @@
-> > -94,6 +94,7 @@ typedef int (*vhost_set_config_op)(struct vhost_dev *dev=
-,
-> const uint8_t *data,
-> >                                     uint32_t flags);  typedef int
-> > (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
-> >                                     uint32_t config_len);
-> > +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
-> >
-> >  typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
-> >                                                void *session_info, @@
-> > -105,7 +106,7 @@ typedef struct VhostOps {
-> >      VhostBackendType backend_type;
-> >      vhost_backend_init vhost_backend_init;
-> >      vhost_backend_cleanup vhost_backend_cleanup;
-> > -    vhost_backend_memslots_limit vhost_backend_memslots_limit;
-> > +    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
-> >      vhost_net_set_backend_op vhost_net_set_backend;
-> >      vhost_net_set_mtu_op vhost_net_set_mtu;
-> >      vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint; @@ -136,6
-> > +137,7 @@ typedef struct VhostOps {
-> >      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-> >      vhost_get_config_op vhost_get_config;
-> >      vhost_set_config_op vhost_set_config;
-> > +    vhost_set_used_memslots_op vhost_set_used_memslots;
-> >      vhost_crypto_create_session_op vhost_crypto_create_session;
-> >      vhost_crypto_close_session_op vhost_crypto_close_session;  }
-> > VhostOps;
-> > --
-> > 1.8.3.1
-> >
+Best,
+Wei
