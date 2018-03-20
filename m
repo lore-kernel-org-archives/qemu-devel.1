@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyF4o-00015C-79
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:05:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyF4v-00018T-Gt
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:05:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyF4j-0007z0-6A
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:05:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41552 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyF4j-0007yc-1p
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:05:05 -0400
-Date: Tue, 20 Mar 2018 11:04:51 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180320110451.GA7665@work-vm>
-References: <CC0ED444C2C80B429092A9F3715307D9D457069E@H3CMLB12-EX.srv.huawei-3com.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eyF4p-00082t-CH
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:05:17 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:35703)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eyF4p-00082Q-8E
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 07:05:11 -0400
+Received: by mail-ot0-x241.google.com with SMTP id r30-v6so1225021otr.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 04:05:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CC0ED444C2C80B429092A9F3715307D9D457069E@H3CMLB12-EX.srv.huawei-3com.com>
-Subject: Re: [Qemu-devel] [PATCH] HMP: Initialize err before using
+In-Reply-To: <1521526368-1996-1-git-send-email-kamensky@cisco.com>
+References: <1521526368-1996-1-git-send-email-kamensky@cisco.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Mar 2018 11:04:49 +0000
+Message-ID: <CAFEAcA9haOX3wHXv4Lyp26nebzu7R=MgGN2m_0iV6HZ_wepWfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] arm/translate-a64: treat DISAS_UPDATE as
+ variant of DISAS_EXIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhangjixiang <jixiang_zhang@h3c.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Victor Kamensky <kamensky@cisco.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
 
-* Zhangjixiang (jixiang_zhang@h3c.com) wrote:
-> When bdrv_snapshot_delete return fail, the errp will not be
-> assigned a valid value in error_propagate as errp didn't be
-> initialized in hmp_delvm, then error_reportf_err will use an
-> uninitialized value(call by hmp_delvm), and qemu crash.
-> 
-> Signed-off-by: zhangjixiang <jixiang_zhang@h3c.com>
+On 20 March 2018 at 06:12, Victor Kamensky <kamensky@cisco.com> wrote:
+> In OE project 4.15 linux kernel boot hang was observed under
+> single cpu aarch64 qemu. Kernel code was in a loop waiting for
+> vtimer arrival, spinning in TC generated blocks, while interrupt
+> was pending unprocessed. This happened because when qemu tried to
+> handle vtimer interrupt target had interrupts disabled, as
+> result flag indicating TCG exit, cpu->icount_decr.u16.high,
+> was cleared but arm_cpu_exec_interrupt function did not call
+> arm_cpu_do_interrupt to process interrupt. Latter when target
+> reenabled interrupts, it happened without exit into main loop, so
+> following code that waited for result of interrupt execution
+> run in infinite loop.
+>
+> To solve the problem instructions that operate on CPU sys state
+> (i.e enable/disable interrupt), and marked as DISAS_UPDATE,
+> should be considered as DISAS_EXIT variant, and should be
+> forced to exit back to main loop so qemu will have a chance
+> processing pending CPU state updates, including pending
+> interrupts.
+>
+> This change brings consistency with how DISAS_UPDATE is treated
+> in aarch32 case.
+>
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> CC: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> CC: qemu-stable@nongnu.org
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Queued.
-Note, that even in this version something is corrupting the
-patch; something has lost the space at the start of the line in the
-first two lines of the patch; so something is still a bit odd in
-your mail/patch generation.
 
-Dave
 
-> ---
-> hmp.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 7870d6a300..4a4da004e9 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1340,7 +1340,7 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
-> void hmp_delvm(Monitor *mon, const QDict *qdict)
-> {
->      BlockDriverState *bs;
-> -    Error *err;
-> +    Error *err = NULL;
->      const char *name = qdict_get_str(qdict, "name");
->      if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
-> --
-> 2.11.0
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Applied to target-arm.next, thanks.
+
+-- PMM
