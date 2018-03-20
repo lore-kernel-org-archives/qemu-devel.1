@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eyLbG-0005Hy-2Q
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyLbV-0005Tc-Tm
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eyLbC-00012p-4v
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:06 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1520507908-16743-5-git-send-email-pl@kamp.de> (Peter Lieven's
-	message of "Thu, 8 Mar 2018 12:18:27 +0100")
-References: <1520507908-16743-1-git-send-email-pl@kamp.de>
-	<1520507908-16743-5-git-send-email-pl@kamp.de>
-Reply-To: quintela@redhat.com
-Date: Tue, 20 Mar 2018 19:02:44 +0100
-Message-ID: <871sge1v7f.fsf@secure.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1eyLbV-0001ER-0a
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:21 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eyLbU-0001EC-RK
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 14:03:20 -0400
+Received: by mail-ot0-x244.google.com with SMTP id 95-v6so2743710ote.5
+	for <qemu-devel@nongnu.org>; Tue, 20 Mar 2018 11:03:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/5] migration/block: limit the number of
- parallel I/O requests
+In-Reply-To: <1521556868-37974-1-git-send-email-mst@redhat.com>
+References: <1521556868-37974-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Mar 2018 18:02:59 +0000
+Message-ID: <CAFEAcA-E28itBd5z0FvAA05R_NH8J7QBhT0KiXWaJ8ZWNNukpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/51] virtio, vhost, pci, pc: features,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Peter Lieven <pl@kamp.de> wrote:
-> the current implementation submits up to 512 I/O requests in parallel
-> which is much to high especially for a background task.
-> This patch adds a maximum limit of 16 I/O requests that can
-> be submitted in parallel to avoid monopolizing the I/O device.
+On 20 March 2018 at 14:42, Michael S. Tsirkin <mst@redhat.com> wrote:
+> Note: only patch 39/51 is attached.
+> The rest are unchanged from v2.
 >
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-PD.  I can't see a trivial way to change things without refactoring the
-whole code.
-
-> ---
->  migration/block.c | 2 ++
->  1 file changed, 2 insertions(+)
+> The following changes since commit 026aaf47c02b79036feb830206cfebb2a726510d:
 >
-> diff --git a/migration/block.c b/migration/block.c
-> index 41b95d1..ce939e2 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -37,6 +37,7 @@
->  #define MAX_IS_ALLOCATED_SEARCH (65536 * BDRV_SECTOR_SIZE)
->  
->  #define MAX_IO_BUFFERS 512
-> +#define MAX_PARALLEL_IO 16
->  
->  //#define DEBUG_BLK_MIGRATION
->  
-> @@ -775,6 +776,7 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
->      while ((block_mig_state.submitted +
->              block_mig_state.read_done) * BLOCK_SIZE <
->             qemu_file_get_rate_limit(f) &&
-> +           block_mig_state.submitted < MAX_PARALLEL_IO &&
->             (block_mig_state.submitted + block_mig_state.read_done) <
->             MAX_IO_BUFFERS) {
->          blk_mig_unlock();
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2018-03-13 16:26:44 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 1dc61e7b37d339c42ec9bd7a7eec1ef2c22f351c:
+>
+>   postcopy shared docs (2018-03-20 16:40:37 +0200)
+>
+> ----------------------------------------------------------------
+> virtio,vhost,pci,pc: features, cleanups
+>
+> SRAT tables for DIMM devices
+> new virtio net flags for speed/duplex
+> post-copy migration support in vhost
+> cleanups in pci
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+
+Applied, thanks.
+
+-- PMM
