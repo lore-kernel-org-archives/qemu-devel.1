@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyfP7-0002l4-9b
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:11:54 -0400
+	(envelope-from <mst@redhat.com>) id 1eyfRB-0004ZT-Jc
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyfP3-0005oT-86
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:11:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41986 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyfP3-0005oD-2W
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:11:49 -0400
-Date: Wed, 21 Mar 2018 17:11:43 +0200
+	(envelope-from <mst@redhat.com>) id 1eyfRA-0006M0-CO
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:14:01 -0400
+Date: Wed, 21 Mar 2018 17:11:12 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521645091-237758-1-git-send-email-mst@redhat.com>
+Message-ID: <20180321170823-mutt-send-email-mst@kernel.org>
+References: <1521642402-197739-1-git-send-email-mst@redhat.com>
+	<3a819d04-b1d2-550e-7458-4ea7509db36d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] rdma: fix up include directives
+In-Reply-To: <3a819d04-b1d2-550e-7458-4ea7509db36d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,263 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Our rule right now is to use <> for external headers only.
-RDMA code violates that, fix it up.
+On Wed, Mar 21, 2018 at 04:04:29PM +0100, Paolo Bonzini wrote:
+> On 21/03/2018 15:46, Michael S. Tsirkin wrote:
+> > +if (m@^\s*#include\s+"qemu/@o) {
+> > +    s@^(\s*#include\s+)"qemu/([^"]+)"(.*)$@$1<qemu/common/$2>$3@o) {
+> > +} else {
+> > +    s@^(\s*#include\s+)"([^"]+)"(.*)$@$1<qemu/$2>$3@o) {
+> > +}
+> 
+> Can you explain the changes in the source tree layout?
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/rdma/rdma_backend.h        |  2 +-
- hw/rdma/rdma_backend_defs.h   |  2 +-
- hw/rdma/rdma_rm.h             |  2 +-
- hw/rdma/rdma_utils.h          |  6 +++---
- hw/rdma/vmw/pvrdma.h          |  8 ++++----
- hw/rdma/vmw/pvrdma_dev_ring.h |  2 +-
- hw/rdma/rdma_backend.c        |  6 +++---
- hw/rdma/rdma_rm.c             |  6 +++---
- hw/rdma/vmw/pvrdma_cmd.c      |  8 ++++----
- hw/rdma/vmw/pvrdma_dev_ring.c |  8 ++++----
- hw/rdma/vmw/pvrdma_main.c     | 24 ++++++++++++------------
- hw/rdma/vmw/pvrdma_qp_ops.c   |  4 ++--
- 12 files changed, 39 insertions(+), 39 deletions(-)
+include/qemu -> include/qemu/common
+include/* -> include/qemu/*
 
-diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-index 68f2b05..abae262 100644
---- a/hw/rdma/rdma_backend.h
-+++ b/hw/rdma/rdma_backend.h
-@@ -16,7 +16,7 @@
- #ifndef RDMA_BACKEND_H
- #define RDMA_BACKEND_H
- 
--#include <qapi/error.h>
-+#include "qapi/error.h"
- #include "rdma_rm_defs.h"
- #include "rdma_backend_defs.h"
- 
-diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-index 837e324..ff5cfc2 100644
---- a/hw/rdma/rdma_backend_defs.h
-+++ b/hw/rdma/rdma_backend_defs.h
-@@ -17,7 +17,7 @@
- #define RDMA_BACKEND_DEFS_H
- 
- #include <infiniband/verbs.h>
--#include <qemu/thread.h>
-+#include "qemu/thread.h"
- 
- typedef struct RdmaDeviceResources RdmaDeviceResources;
- 
-diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
-index be95c1b..82c1ddd 100644
---- a/hw/rdma/rdma_rm.h
-+++ b/hw/rdma/rdma_rm.h
-@@ -16,7 +16,7 @@
- #ifndef RDMA_RM_H
- #define RDMA_RM_H
- 
--#include <qapi/error.h>
-+#include "qapi/error.h"
- #include "rdma_backend_defs.h"
- #include "rdma_rm_defs.h"
- 
-diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-index cdac910..3dc0789 100644
---- a/hw/rdma/rdma_utils.h
-+++ b/hw/rdma/rdma_utils.h
-@@ -17,9 +17,9 @@
- #ifndef RDMA_UTILS_H
- #define RDMA_UTILS_H
- 
--#include <qemu/osdep.h>
--#include <include/hw/pci/pci.h>
--#include <include/sysemu/dma.h>
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "sysemu/dma.h"
- 
- #define pr_info(fmt, ...) \
-     fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma",  __func__, __LINE__,\
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index b05f94a..8c173cb 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -16,14 +16,14 @@
- #ifndef PVRDMA_PVRDMA_H
- #define PVRDMA_PVRDMA_H
- 
--#include <hw/pci/pci.h>
--#include <hw/pci/msix.h>
-+#include "hw/pci/pci.h"
-+#include "hw/pci/msix.h"
- 
- #include "../rdma_backend_defs.h"
- #include "../rdma_rm_defs.h"
- 
--#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h>
--#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h>
-+#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h"
-+#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
- #include "pvrdma_dev_ring.h"
- 
- /* BARs */
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.h b/hw/rdma/vmw/pvrdma_dev_ring.h
-index 02a590b..2d0461f 100644
---- a/hw/rdma/vmw/pvrdma_dev_ring.h
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.h
-@@ -16,7 +16,7 @@
- #ifndef PVRDMA_DEV_RING_H
- #define PVRDMA_DEV_RING_H
- 
--#include <qemu/typedefs.h>
-+#include "qemu/typedefs.h"
- 
- #define MAX_RING_NAME_SZ 32
- 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index e306fba..f85c7b2 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -13,9 +13,9 @@
-  *
-  */
- 
--#include <qemu/osdep.h>
--#include <qemu/error-report.h>
--#include <qapi/error.h>
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
- 
- #include <infiniband/verbs.h>
- 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index b5fc45d..80ffc94 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -13,9 +13,9 @@
-  *
-  */
- 
--#include <qemu/osdep.h>
--#include <qapi/error.h>
--#include <cpu.h>
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
- 
- #include "rdma_utils.h"
- #include "rdma_backend.h"
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index 293dfed..a9fa1ef 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -13,9 +13,9 @@
-  *
-  */
- 
--#include <qemu/osdep.h>
--#include <qemu/error-report.h>
--#include <cpu.h>
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "cpu.h"
- #include <linux/types.h>
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
-@@ -26,7 +26,7 @@
- #include "../rdma_utils.h"
- 
- #include "pvrdma.h"
--#include <standard-headers/rdma/vmw_pvrdma-abi.h>
-+#include "standard-headers/rdma/vmw_pvrdma-abi.h"
- 
- static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
-                                 uint32_t nchunks, size_t length)
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-index ec309da..ff19a9e 100644
---- a/hw/rdma/vmw/pvrdma_dev_ring.c
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-@@ -13,12 +13,12 @@
-  *
-  */
- 
--#include <qemu/osdep.h>
--#include <hw/pci/pci.h>
--#include <cpu.h>
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "cpu.h"
- 
- #include "../rdma_utils.h"
--#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h>
-+#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h"
- #include "pvrdma_dev_ring.h"
- 
- int pvrdma_ring_init(PvrdmaRing *ring, const char *name, PCIDevice *dev,
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 9978781..25ea02a 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -13,16 +13,16 @@
-  *
-  */
- 
--#include <qemu/osdep.h>
--#include <qapi/error.h>
--#include <hw/hw.h>
--#include <hw/pci/pci.h>
--#include <hw/pci/pci_ids.h>
--#include <hw/pci/msi.h>
--#include <hw/pci/msix.h>
--#include <hw/qdev-core.h>
--#include <hw/qdev-properties.h>
--#include <cpu.h>
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_ids.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/msix.h"
-+#include "hw/qdev-core.h"
-+#include "hw/qdev-properties.h"
-+#include "cpu.h"
- #include "trace.h"
- 
- #include "../rdma_rm.h"
-@@ -31,8 +31,8 @@
- 
- #include <infiniband/verbs.h>
- #include "pvrdma.h"
--#include <standard-headers/rdma/vmw_pvrdma-abi.h>
--#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h>
-+#include "standard-headers/rdma/vmw_pvrdma-abi.h"
-+#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
- #include "pvrdma_qp_ops.h"
- 
- static Property pvrdma_dev_properties[] = {
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index f0a1f9e..a693c06 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -13,14 +13,14 @@
-  *
-  */
- 
--#include <qemu/osdep.h>
-+#include "qemu/osdep.h"
- 
- #include "../rdma_utils.h"
- #include "../rdma_rm.h"
- #include "../rdma_backend.h"
- 
- #include "pvrdma.h"
--#include <standard-headers/rdma/vmw_pvrdma-abi.h>
-+#include "standard-headers/rdma/vmw_pvrdma-abi.h"
- #include "pvrdma_qp_ops.h"
- 
- typedef struct CompHandlerCtx {
+Thus one uses any qemu headers with
+
+#include <qemu/....>
+
+we can do the conversion gradually and avoid a flag day
+with some use of softlinks.
+
+> Also, s{}{} and m{} are a bit more readable.
+> 
+> Paolo
+
+Thanks, will use.
+
+
 -- 
 MST
