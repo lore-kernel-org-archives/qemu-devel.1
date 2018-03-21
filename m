@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eycYF-00042L-7O
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:09:09 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1eycZO-0005B7-VX
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eycYC-0000Hd-Hr
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:09:07 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Wed, 21 Mar 2018 13:08:53 +0100
-Message-Id: <20180321120853.14293-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH] dump: display cause of write failure
+	(envelope-from <rkagan@virtuozzo.com>) id 1eycZK-0001BU-Gr
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:10:18 -0400
+Received: from mail-he1eur01hn0247.outbound.protection.outlook.com
+	([104.47.0.247]:34560
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1eycZJ-00019X-FF
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:10:14 -0400
+Date: Wed, 21 Mar 2018 15:10:01 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180321121001.GD14983@rkaganb.sw.ru>
+References: <20180320173500.32065-1-vkuznets@redhat.com>
+	<20180320173500.32065-3-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180320173500.32065-3-vkuznets@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
+ Hyper-V frequency MSRs exposure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,333 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Yasmin Beatriz <yasmins@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
 
-Use error_setg_errno() to display the reason why data write
-has failed. For instance, instead of a laconic
+On Tue, Mar 20, 2018 at 06:35:00PM +0100, Vitaly Kuznetsov wrote:
+> Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
+> nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
+> Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
+> these frequencies are stable, it just means they're available for reading.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  target/i386/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 7d9f9ca0b1..74fc3d3b2c 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -651,7 +651,7 @@ static int hyperv_handle_properties(CPUState *cs)
+>          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
+>          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
+>  
+> -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
+> +        if (has_msr_hv_frequencies && env->tsc_khz) {
+>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+>          }
 
-  dump: failed to write elf header
-or
-  dump: failed to save memory
+I suggest that we add a corresponding cpu property here, too.  The guest
+may legitimately rely on these msrs when it sees the support in CPUID,
+and migrating from a kernel with the feature supported (4.14+) to an
+older one will make it crash.
 
-we have now:
-
-  dump: failed to write elf header: No space left on device
-or
-  dump: failed to save memory: No space left on device
-
-CC: Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
-CC: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- dump.c | 79 +++++++++++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 47 insertions(+), 32 deletions(-)
-
-diff --git a/dump.c b/dump.c
-index 6bdb0dbe23..d04e3f56b0 100644
---- a/dump.c
-+++ b/dump.c
-@@ -140,7 +140,7 @@ static void write_elf64_header(DumpState *s, Error **errp)
- 
-     ret = fd_write_vmcore(&elf_header, sizeof(elf_header), s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write elf header");
-+        error_setg_errno(errp, errno, "dump: failed to write elf header");
-     }
- }
- 
-@@ -171,7 +171,7 @@ static void write_elf32_header(DumpState *s, Error **errp)
- 
-     ret = fd_write_vmcore(&elf_header, sizeof(elf_header), s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write elf header");
-+        error_setg_errno(errp, errno, "dump: failed to write elf header");
-     }
- }
- 
-@@ -194,7 +194,8 @@ static void write_elf64_load(DumpState *s, MemoryMapping *memory_mapping,
- 
-     ret = fd_write_vmcore(&phdr, sizeof(Elf64_Phdr), s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write program header table");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write program header table");
-     }
- }
- 
-@@ -217,7 +218,8 @@ static void write_elf32_load(DumpState *s, MemoryMapping *memory_mapping,
- 
-     ret = fd_write_vmcore(&phdr, sizeof(Elf32_Phdr), s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write program header table");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write program header table");
-     }
- }
- 
-@@ -237,7 +239,8 @@ static void write_elf64_note(DumpState *s, Error **errp)
- 
-     ret = fd_write_vmcore(&phdr, sizeof(Elf64_Phdr), s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write program header table");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write program header table");
-     }
- }
- 
-@@ -254,7 +257,7 @@ static void write_guest_note(WriteCoreDumpFunction f, DumpState *s,
-     if (s->guest_note) {
-         ret = f(s->guest_note, s->guest_note_size, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to write guest note");
-+            error_setg_errno(errp, errno, "dump: failed to write guest note");
-         }
-     }
- }
-@@ -270,7 +273,7 @@ static void write_elf64_notes(WriteCoreDumpFunction f, DumpState *s,
-         id = cpu_index(cpu);
-         ret = cpu_write_elf64_note(f, cpu, id, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to write elf notes");
-+            error_setg_errno(errp, errno, "dump: failed to write elf notes");
-             return;
-         }
-     }
-@@ -278,7 +281,7 @@ static void write_elf64_notes(WriteCoreDumpFunction f, DumpState *s,
-     CPU_FOREACH(cpu) {
-         ret = cpu_write_elf64_qemunote(f, cpu, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to write CPU status");
-+            error_setg_errno(errp, errno, "dump: failed to write CPU status");
-             return;
-         }
-     }
-@@ -302,7 +305,8 @@ static void write_elf32_note(DumpState *s, Error **errp)
- 
-     ret = fd_write_vmcore(&phdr, sizeof(Elf32_Phdr), s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write program header table");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write program header table");
-     }
- }
- 
-@@ -317,7 +321,7 @@ static void write_elf32_notes(WriteCoreDumpFunction f, DumpState *s,
-         id = cpu_index(cpu);
-         ret = cpu_write_elf32_note(f, cpu, id, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to write elf notes");
-+            error_setg_errno(errp, errno, "dump: failed to write elf notes");
-             return;
-         }
-     }
-@@ -325,7 +329,7 @@ static void write_elf32_notes(WriteCoreDumpFunction f, DumpState *s,
-     CPU_FOREACH(cpu) {
-         ret = cpu_write_elf32_qemunote(f, cpu, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to write CPU status");
-+            error_setg_errno(errp, errno, "dump: failed to write CPU status");
-             return;
-         }
-     }
-@@ -355,7 +359,8 @@ static void write_elf_section(DumpState *s, int type, Error **errp)
- 
-     ret = fd_write_vmcore(&shdr, shdr_size, s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write section header table");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write section header table");
-     }
- }
- 
-@@ -365,7 +370,7 @@ static void write_data(DumpState *s, void *buf, int length, Error **errp)
- 
-     ret = fd_write_vmcore(buf, length, s);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to save memory");
-+        error_setg_errno(errp, errno, "dump: failed to save memory");
-     } else {
-         s->written_size += length;
-     }
-@@ -839,7 +844,7 @@ static void create_header32(DumpState *s, Error **errp)
-     dh->status = cpu_to_dump32(s, status);
- 
-     if (write_buffer(s->fd, 0, dh, size) < 0) {
--        error_setg(errp, "dump: failed to write disk dump header");
-+        error_setg_errno(errp, errno, "dump: failed to write disk dump header");
-         goto out;
-     }
- 
-@@ -870,7 +875,7 @@ static void create_header32(DumpState *s, Error **errp)
- 
-     if (write_buffer(s->fd, DISKDUMP_HEADER_BLOCKS *
-                      block_size, kh, size) < 0) {
--        error_setg(errp, "dump: failed to write kdump sub header");
-+        error_setg_errno(errp, errno, "dump: failed to write kdump sub header");
-         goto out;
-     }
- 
-@@ -886,7 +891,7 @@ static void create_header32(DumpState *s, Error **errp)
-     }
-     if (write_buffer(s->fd, offset_note, s->note_buf,
-                      s->note_size) < 0) {
--        error_setg(errp, "dump: failed to write notes");
-+        error_setg_errno(errp, errno, "dump: failed to write notes");
-         goto out;
-     }
- 
-@@ -951,7 +956,7 @@ static void create_header64(DumpState *s, Error **errp)
-     dh->status = cpu_to_dump32(s, status);
- 
-     if (write_buffer(s->fd, 0, dh, size) < 0) {
--        error_setg(errp, "dump: failed to write disk dump header");
-+        error_setg_errno(errp, errno, "dump: failed to write disk dump header");
-         goto out;
-     }
- 
-@@ -982,7 +987,7 @@ static void create_header64(DumpState *s, Error **errp)
- 
-     if (write_buffer(s->fd, DISKDUMP_HEADER_BLOCKS *
-                      block_size, kh, size) < 0) {
--        error_setg(errp, "dump: failed to write kdump sub header");
-+        error_setg_errno(errp, errno, "dump: failed to write kdump sub header");
-         goto out;
-     }
- 
-@@ -999,7 +1004,7 @@ static void create_header64(DumpState *s, Error **errp)
- 
-     if (write_buffer(s->fd, offset_note, s->note_buf,
-                      s->note_size) < 0) {
--        error_setg(errp, "dump: failed to write notes");
-+        error_setg_errno(errp, errno, "dump: failed to write notes");
-         goto out;
-     }
- 
-@@ -1183,7 +1188,7 @@ static void write_dump_bitmap(DumpState *s, Error **errp)
-     while (get_next_page(&block_iter, &pfn, NULL, s)) {
-         ret = set_dump_bitmap(last_pfn, pfn, true, dump_bitmap_buf, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to set dump_bitmap");
-+            error_setg_errno(errp, errno, "dump: failed to set dump_bitmap");
-             goto out;
-         }
- 
-@@ -1200,7 +1205,7 @@ static void write_dump_bitmap(DumpState *s, Error **errp)
-         ret = set_dump_bitmap(last_pfn, last_pfn + bits_per_buf, false,
-                               dump_bitmap_buf, s);
-         if (ret < 0) {
--            error_setg(errp, "dump: failed to sync dump_bitmap");
-+            error_setg_errno(errp, errno, "dump: failed to sync dump_bitmap");
-             goto out;
-         }
-     }
-@@ -1333,7 +1338,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
-     ret = write_cache(&page_data, buf, s->dump_info.page_size, false);
-     g_free(buf);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write page data (zero page)");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write page data (zero page)");
-         goto out;
-     }
- 
-@@ -1349,7 +1355,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
-             ret = write_cache(&page_desc, &pd_zero, sizeof(PageDescriptor),
-                               false);
-             if (ret < 0) {
--                error_setg(errp, "dump: failed to write page desc");
-+                error_setg_errno(errp, errno,
-+                                 "dump: failed to write page desc");
-                 goto out;
-             }
-         } else {
-@@ -1374,7 +1381,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
- 
-                 ret = write_cache(&page_data, buf_out, size_out, false);
-                 if (ret < 0) {
--                    error_setg(errp, "dump: failed to write page data");
-+                    error_setg_errno(errp, errno,
-+                                     "dump: failed to write page data");
-                     goto out;
-                 }
- #ifdef CONFIG_LZO
-@@ -1387,7 +1395,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
- 
-                 ret = write_cache(&page_data, buf_out, size_out, false);
-                 if (ret < 0) {
--                    error_setg(errp, "dump: failed to write page data");
-+                    error_setg_errno(errp, errno,
-+                                     "dump: failed to write page data");
-                     goto out;
-                 }
- #endif
-@@ -1401,7 +1410,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
- 
-                 ret = write_cache(&page_data, buf_out, size_out, false);
-                 if (ret < 0) {
--                    error_setg(errp, "dump: failed to write page data");
-+                    error_setg_errno(errp, errno,
-+                                     "dump: failed to write page data");
-                     goto out;
-                 }
- #endif
-@@ -1417,7 +1427,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
-                 ret = write_cache(&page_data, buf,
-                                   s->dump_info.page_size, false);
-                 if (ret < 0) {
--                    error_setg(errp, "dump: failed to write page data");
-+                    error_setg_errno(errp, errno,
-+                                     "dump: failed to write page data");
-                     goto out;
-                 }
-             }
-@@ -1429,7 +1440,8 @@ static void write_dump_pages(DumpState *s, Error **errp)
- 
-             ret = write_cache(&page_desc, &pd, sizeof(PageDescriptor), false);
-             if (ret < 0) {
--                error_setg(errp, "dump: failed to write page desc");
-+                error_setg_errno(errp, errno,
-+                                 "dump: failed to write page desc");
-                 goto out;
-             }
-         }
-@@ -1438,12 +1450,14 @@ static void write_dump_pages(DumpState *s, Error **errp)
- 
-     ret = write_cache(&page_desc, NULL, 0, true);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to sync cache for page_desc");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to sync cache for page_desc");
-         goto out;
-     }
-     ret = write_cache(&page_data, NULL, 0, true);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to sync cache for page_data");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to sync cache for page_data");
-         goto out;
-     }
- 
-@@ -1487,7 +1501,8 @@ static void create_kdump_vmcore(DumpState *s, Error **errp)
- 
-     ret = write_start_flat_header(s->fd);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write start flat header");
-+        error_setg_errno(errp, errno,
-+                         "dump: failed to write start flat header");
-         return;
-     }
- 
-@@ -1511,7 +1526,7 @@ static void create_kdump_vmcore(DumpState *s, Error **errp)
- 
-     ret = write_end_flat_header(s->fd);
-     if (ret < 0) {
--        error_setg(errp, "dump: failed to write end flat header");
-+        error_setg_errno(errp, errno, "dump: failed to write end flat header");
-         return;
-     }
- }
--- 
-2.14.3
+Roman.
