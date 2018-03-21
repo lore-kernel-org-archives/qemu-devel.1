@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eyi3R-0004yf-OM
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:01:43 -0400
+	(envelope-from <mjc@sifive.com>) id 1eyi6G-00070C-NO
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eyi3P-0003dK-WC
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:01:41 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:38934)
+	(envelope-from <mjc@sifive.com>) id 1eyi6F-000559-FJ
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:04:36 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38164)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eyi3P-0003cn-M9
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:01:39 -0400
-Received: by mail-wr0-x234.google.com with SMTP id c24so6125815wrc.6
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:01:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eyi6F-00054b-7Z
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:04:35 -0400
+Received: by mail-oi0-x244.google.com with SMTP id c3-v6so5084112oib.5
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:04:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180309090006.10018-15-peterx@redhat.com>
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-15-peterx@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 21 Mar 2018 19:01:36 +0100
-Message-ID: <CAJ+F1C+3f9RAC86YxRuvGWbX1tegA01iaY760yLOB2W5OyHaNA@mail.gmail.com>
+In-Reply-To: <81a5f105-5225-556a-a226-0bdfbf919095@redhat.com>
+References: <1521584722-39133-1-git-send-email-mjc@sifive.com>
+	<7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+	<81a5f105-5225-556a-a226-0bdfbf919095@redhat.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 21 Mar 2018 11:04:33 -0700
+Message-ID: <CAHNT7NsCuR=Rsjg=d1vU0Mwjc3AYfQ1uV7=uGrzsfgDSL1wt6w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
- dispatcher
+Subject: Re: [Qemu-devel] [PULL 00/25] RISC-V Post-merge spec conformance
+ and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,350 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Hi
+On Wed, Mar 21, 2018 at 4:09 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On Fri, Mar 9, 2018 at 9:59 AM, Peter Xu <peterx@redhat.com> wrote:
-> Originally QMP goes through these steps:
+> On 21/03/2018 08:05, Thomas Huth wrote:
+> > On 20.03.2018 23:25, Michael Clark wrote:
+> >> The following changes since commit f1a63fcfcd92c88be8942b5ae71aef
+> 9749a4f135:
+> >>
+> >>   Update version for v2.12.0-rc0 release (2018-03-20 19:04:22 +0000)
+> >>
+> >> are available in the git repository at:
+> >>
+> >>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-fixes
+> >>
+> >> for you to fetch changes up to e1a247183ac0816284dfda61423f70
+> 30b6686679:
+> >>
+> >>   RISC-V: Remove erroneous comment from translate.c (2018-03-20
+> 14:34:13 -0700)
+> >>
+> >> ----------------------------------------------------------------
+> >> This is a series of spec conformance bug fixes and code cleanups
+> >> that we would like to get in before the QEMU 2.12 release.
+> >
+> >  Hi Michael,
+> >
+> > for future PULL request, could you please send out all patches again
+> > that should be pulled, and not send the cover letter alone? I.e. do a
+> > "git format-patch --subject-prefix PULL ..." and then replace the
+> > contents of the cover letter with the output of "git request-pull".
+> >
+> > ... this is how all other maintainers are sending PULL requests (at
+> > least as far as I know) and this way everybody gets a very final chance
+> > to have a look at the patches in their final state (it does not happen
+> > very often that someone replies to such patches, but in some rare cases
+> > we already found problems this way).
 >
->   JSON Parser --> QMP Dispatcher --> Respond
->       /|\    (2)                (3)     |
->    (1) |                               \|/ (4)
->        +---------  main thread  --------+
+> In fact, I already explained on the mailing list that this patch:
 >
-> This patch does this:
+>       RISC-V: Hold rcu_read_lock when accessing memory
 >
->   JSON Parser     QMP Dispatcher --> Respond
->       /|\ |           /|\       (4)     |
->        |  | (2)        | (3)            |  (5)
->    (1) |  +----->      |               \|/
->        +---------  main thread  <-------+
->
-> So the parsing job and the dispatching job is isolated now.  It gives us
-> a chance in following up patches to totally move the parser outside.
->
-> The isolation is done using one QEMUBH. Only one dispatcher QEMUBH is
-> used for all the monitors.
->
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-=
-------
->  1 file changed, 178 insertions(+), 23 deletions(-)
->
-> diff --git a/monitor.c b/monitor.c
-> index de9343be87..5104e5db07 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -172,6 +172,13 @@ typedef struct {
->       */
->      QmpCommandList *commands;
->      bool qmp_caps[QMP_CAPABILITY__MAX];
-> +    /*
-> +     * Protects qmp request/response queue.  Please take monitor_lock
-> +     * first when used together.
-> +     */
-> +    QemuMutex qmp_queue_lock;
-> +    /* Input queue that holds all the parsed QMP requests */
-> +    GQueue *qmp_requests;
->  } MonitorQMP;
->
->  /*
-> @@ -218,6 +225,8 @@ struct Monitor {
->  /* Let's add monitor global variables to this struct. */
->  static struct {
->      IOThread *mon_iothread;
-> +    /* Bottom half to dispatch the requests received from IO thread */
-> +    QEMUBH *qmp_dispatcher_bh;
->  } mon_global;
->
->  /* QMP checker flags */
-> @@ -600,11 +609,13 @@ static void monitor_data_init(Monitor *mon, bool sk=
-ip_flush,
->  {
->      memset(mon, 0, sizeof(Monitor));
->      qemu_mutex_init(&mon->out_lock);
-> +    qemu_mutex_init(&mon->qmp.qmp_queue_lock);
->      mon->outbuf =3D qstring_new();
->      /* Use *mon_cmds by default. */
->      mon->cmd_table =3D mon_cmds;
->      mon->skip_flush =3D skip_flush;
->      mon->use_io_thr =3D use_io_thr;
-> +    mon->qmp.qmp_requests =3D g_queue_new();
->  }
->
->  static void monitor_data_destroy(Monitor *mon)
-> @@ -617,6 +628,8 @@ static void monitor_data_destroy(Monitor *mon)
->      readline_free(mon->rs);
->      QDECREF(mon->outbuf);
->      qemu_mutex_destroy(&mon->out_lock);
-> +    qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
-> +    g_queue_free(mon->qmp.qmp_requests);
->  }
->
->  char *qmp_human_monitor_command(const char *command_line, bool has_cpu_i=
-ndex,
-> @@ -1056,6 +1069,16 @@ static void monitor_init_qmp_commands(void)
->                           qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
->  }
->
-> +static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
-> +{
-> +    return mon->qmp.qmp_caps[cap];
-> +}
-> +
-> +static bool qmp_oob_enabled(Monitor *mon)
-> +{
-> +    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
-> +}
-> +
->  static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
->                             Error **errp)
->  {
-> @@ -3866,30 +3889,39 @@ static void monitor_qmp_respond(Monitor *mon, QOb=
-ject *rsp,
->      qobject_decref(rsp);
->  }
->
-> -static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens=
-)
-> +struct QMPRequest {
-> +    /* Owner of the request */
-> +    Monitor *mon;
-> +    /* "id" field of the request */
-> +    QObject *id;
-> +    /* Request object to be handled */
-> +    QObject *req;
-> +    /*
-> +     * Whether we need to resume the monitor afterward.  This flag is
-> +     * used to emulate the old QMP server behavior that the current
-> +     * command must be completed before execution of the next one.
-> +     */
-> +    bool need_resume;
-> +};
-> +typedef struct QMPRequest QMPRequest;
-> +
-> +/*
-> + * Dispatch one single QMP request. The function will free the req_obj
-> + * and objects inside it before return.
-> + */
-> +static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
->  {
-> -    QObject *req, *rsp =3D NULL, *id =3D NULL;
-> +    Monitor *mon, *old_mon;
-> +    QObject *req, *rsp =3D NULL, *id;
->      QDict *qdict =3D NULL;
-> -    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP, parser);
-> -    Monitor *old_mon, *mon =3D container_of(mon_qmp, Monitor, qmp);
-> -
-> -    Error *err =3D NULL;
-> +    bool need_resume;
->
-> -    req =3D json_parser_parse_err(tokens, NULL, &err);
-> -    if (!req && !err) {
-> -        /* json_parser_parse_err() sucks: can fail without setting @err =
-*/
-> -        error_setg(&err, QERR_JSON_PARSING);
-> -    }
-> -    if (err) {
-> -        goto err_out;
-> -    }
-> +    req =3D req_obj->req;
-> +    mon =3D req_obj->mon;
-> +    id =3D req_obj->id;
-> +    need_resume =3D req_obj->need_resume;
->
-> -    qdict =3D qobject_to_qdict(req);
-> -    if (qdict) {
-> -        id =3D qdict_get(qdict, "id");
-> -        qobject_incref(id);
-> -        qdict_del(qdict, "id");
-> -    } /* else will fail qmp_dispatch() */
-> +    g_free(req_obj);
->
->      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
->          QString *req_json =3D qobject_to_json(req);
-> @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
->      old_mon =3D cur_mon;
->      cur_mon =3D mon;
->
-> -    rsp =3D qmp_dispatch(cur_mon->qmp.commands, req);
-> +    rsp =3D qmp_dispatch(mon->qmp.commands, req);
->
->      cur_mon =3D old_mon;
->
-> @@ -3916,12 +3948,122 @@ static void handle_qmp_command(JSONMessageParser=
- *parser, GQueue *tokens)
->          }
->      }
->
-> -err_out:
-> -    monitor_qmp_respond(mon, rsp, err, id);
-> +    /* Respond if necessary */
-> +    monitor_qmp_respond(mon, rsp, NULL, id);
-> +
-> +    /* This pairs with the monitor_suspend() in handle_qmp_command(). */
-> +    if (need_resume) {
-> +        monitor_resume(mon);
-> +    }
->
->      qobject_decref(req);
->  }
->
-> +/*
-> + * Pop one QMP request from monitor queues, return NULL if not found.
-> + * We are using round-robin fashion to pop the request, to avoid
-> + * processing command only on a very busy monitor.  To achieve that,
-> + * when we processed one request on specific monitor, we put that
-> + * monitor to the end of mon_list queue.
-> + */
-> +static QMPRequest *monitor_qmp_requests_pop_one(void)
-> +{
-> +    QMPRequest *req_obj =3D NULL;
-> +    Monitor *mon;
-> +
-> +    qemu_mutex_lock(&monitor_lock);
-> +
-> +    QTAILQ_FOREACH(mon, &mon_list, entry) {
-> +        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-> +        req_obj =3D g_queue_pop_head(mon->qmp.qmp_requests);
-> +        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-> +        if (req_obj) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    if (req_obj) {
-> +        /*
-> +         * We found one request on the monitor. Degrade this monitor's
-> +         * priority to lowest by re-inserting it to end of queue.
-> +         */
-> +        QTAILQ_REMOVE(&mon_list, mon, entry);
-> +        QTAILQ_INSERT_TAIL(&mon_list, mon, entry);
-> +    }
-> +
-> +    qemu_mutex_unlock(&monitor_lock);
-> +
-> +    return req_obj;
-> +}
-> +
-> +static void monitor_qmp_bh_dispatcher(void *data)
-> +{
-> +    QMPRequest *req_obj =3D monitor_qmp_requests_pop_one();
-> +
-> +    if (req_obj) {
-> +        monitor_qmp_dispatch_one(req_obj);
-> +        /* Reschedule instead of looping so the main loop stays responsi=
-ve */
-> +        qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
-> +    }
-> +}
-> +
-> +static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens=
-)
-> +{
-> +    QObject *req, *id =3D NULL;
-> +    QDict *qdict =3D NULL;
-> +    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP, parser);
-> +    Monitor *mon =3D container_of(mon_qmp, Monitor, qmp);
-> +    Error *err =3D NULL;
-> +    QMPRequest *req_obj;
-> +
-> +    req =3D json_parser_parse_err(tokens, NULL, &err);
-> +    if (!req && !err) {
-> +        /* json_parser_parse_err() sucks: can fail without setting @err =
-*/
-> +        error_setg(&err, QERR_JSON_PARSING);
-> +    }
-> +    if (err) {
-> +        monitor_qmp_respond(mon, NULL, err, NULL);
-> +        qobject_decref(req);
-> +        return;
-> +    }
-> +
-> +    qdict =3D qobject_to_qdict(req);
-> +    if (qdict) {
-> +        id =3D qdict_get(qdict, "id");
-> +        qobject_incref(id);
-> +        qdict_del(qdict, "id");
-> +    } /* else will fail qmp_dispatch() */
-> +
-> +    req_obj =3D g_new0(QMPRequest, 1);
-> +    req_obj->mon =3D mon;
-> +    req_obj->id =3D id;
-> +    req_obj->req =3D req;
-> +    req_obj->need_resume =3D false;
-> +
-> +    /*
-> +     * If OOB is not enabled on current monitor, we'll emulate the old
-> +     * behavior that we won't process current monitor any more until
-> +     * it is responded.  This helps make sure that as long as OOB is
-> +     * not enabled, the server will never drop any command.
-> +     */
-> +    if (!qmp_oob_enabled(mon)) {
-> +        monitor_suspend(mon);
-> +        req_obj->need_resume =3D true;
-> +    }
-> +
-> +    /*
-> +     * Put the request to the end of queue so that requests will be
-> +     * handled in time order.  Ownership for req_obj, req, id,
-
-I think the order is not respected if subsequent messages have errors
-(in either json parsing, dispatch_check_obj, oob_check). So if I
-enable oob, and queue a few command, then send a bad command/message,
-I won't be able to tell for which command.
-
-> +     * etc. will be delivered to the handler side.
-> +     */
-> +    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-> +    g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
-> +    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-> +
-> +    /* Kick the dispatcher routine */
-> +    qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
-> +}
-> +
->  static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
->  {
->      Monitor *mon =3D opaque;
-> @@ -4134,6 +4276,15 @@ static void monitor_iothread_init(void)
->  {
->      mon_global.mon_iothread =3D iothread_create("mon_iothread",
->                                                &error_abort);
-> +
-> +    /*
-> +     * This MUST be on main loop thread since we have commands that
-> +     * have assumption to be run on main loop thread.  It would be
-> +     * nice that one day we can remove this assumption in the future.
-> +     */
-> +    mon_global.qmp_dispatcher_bh =3D aio_bh_new(qemu_get_aio_context(),
-> +                                              monitor_qmp_bh_dispatcher,
-> +                                              NULL);
->  }
->
->  void monitor_init_globals(void)
-> @@ -4280,6 +4431,10 @@ void monitor_cleanup(void)
->      }
->      qemu_mutex_unlock(&monitor_lock);
->
-> +    /* QEMUBHs needs to be deleted before destroying the IOThread. */
-> +    qemu_bh_delete(mon_global.qmp_dispatcher_bh);
-> +    mon_global.qmp_dispatcher_bh =3D NULL;
-> +
->      iothread_destroy(mon_global.mon_iothread);
->      mon_global.mon_iothread =3D NULL;
->  }
-> --
-> 2.14.3
->
+> is fixing the wrong place, so please remove it from the pull request too.
 >
 
+Okay. I really wasn't sure whether it was wrong at the time but now I know.
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+I'll drop that patch.
