@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eyg5D-0000gW-1K
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:55:23 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1eyg8Z-0002Sl-G5
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eyg58-00025G-UJ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:55:22 -0400
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:38717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eyg58-000252-PJ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:55:18 -0400
-Received: by mail-qt0-f196.google.com with SMTP id n12so5746386qtl.5
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 08:55:18 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
-References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
-	<20180321134005.8822-3-marcandre.lureau@redhat.com>
-	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 16:55:17 +0100
-Message-ID: <CAMxuvax_7QPP5rc3aAPKdUFWtfdEphfiN76mM6jnCKk4=QkauQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <Babu.Moger@amd.com>) id 1eyg8V-0003vj-Et
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:58:51 -0400
+Received: from mail-cys01nam02on0064.outbound.protection.outlook.com
+	([104.47.37.64]:32846
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1eyg8U-0003ue-Up
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:58:47 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Wed, 21 Mar 2018 15:58:41 +0000
+Message-ID: <CY4PR12MB1768A3CBE42AAFB03CB1081E95AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
+References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
+	<1520888449-4352-3-git-send-email-babu.moger@amd.com>
+	<20180316180006.GH28578@localhost.localdomain>
+	<CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
+	<20180320175427.GU3417@localhost.localdomain>
+In-Reply-To: <20180320175427.GU3417@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
- at offset 0
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD Processor
+ Cache Information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +34,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange,
-	Daniel" <berrange@redhat.com>, "Blake, Eric" <eblake@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "Lendacky,
+	Thomas" <Thomas.Lendacky@amd.com>, "Singh,
+	Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "Hook,
+	Gary" <Gary.Hook@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi
+Hi Eduardo,
 
-On Wed, Mar 21, 2018 at 3:01 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 21/03/2018 14:40, Marc-Andr=C3=A9 Lureau wrote:
->> +/* A typecast, checking for the type of arguments */
->> +/* QObject is at offset 0, for all QObject-derived types */
->> +#define QOBJECT(x) QEMU_GENERIC(x,              \
->> +    (QNull *, (QObject *) x),                   \
->> +    (const QNull *, (const QObject *) x),       \
->> +    (QNum *, (QObject *) x),                    \
->> +    (const QNum *, (const QObject *) x),        \
->> +    (QString *, (QObject *) x),                 \
->> +    (const QString *, (const QObject *) x),     \
->> +    (QDict *, (QObject *) x),                   \
->> +    (const QDict *, (const QObject *) x),       \
->> +    (QList *, (QObject *) x),                   \
->> +    (const QList *, (const QObject *) x),       \
->> +    (QBool *, (QObject *) x),                   \
->> +    (const QBool *, (const QObject *) x),       \
->> +    (QObject *, x),                             \
->> +    (const QObject *, x),                       \
->> +    qobject_unknown_type(x))
->
-> Why not just
->
->         QEMU_GENERIC(x,
->                 (QObject *, x),
->                 (const QObject *, x),
->                 ({ \
->                         QEMU_BUILD_BUG_ON(offsetof(typeof(*x), base));
->                         &(x)->base;
->                 }))
->
-> That is just an extension of what was being done before, and it is
-> resilient against people putting a random "QObject base" in the middle
-> of a struct.
->
+> -----Original Message-----
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: Tuesday, March 20, 2018 12:54 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
+> Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
+> mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
+> devel@nongnu.org
+> Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
+> Processor Cache Information
+>=20
+> On Tue, Mar 20, 2018 at 05:25:52PM +0000, Moger, Babu wrote:
+> > Hi Eduardo, Thanks for the comments. Please see the response inline.
+> >
+> > > -----Original Message-----
+> > > From: Eduardo Habkost <ehabkost@redhat.com>
+> > > Sent: Friday, March 16, 2018 1:00 PM
+> > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
+> > > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> > > <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
+> > > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
+> > > devel@nongnu.org
+> > > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
+> > > Processor Cache Information
+> > >
+> > > On Mon, Mar 12, 2018 at 05:00:46PM -0400, Babu Moger wrote:
+> > > > From: Stanislav Lanci <pixo@polepetko.eu>
+> > > >
+> > > > Add information for cpuid 0x8000001D leaf. Populate cache topology
+> > > information
+> > > > for different cache types(Data Cache, Instruction Cache, L2 and L3)
+> > > supported
+> > > > by 0x8000001D leaf. Please refer Processor Programming Reference
+> (PPR)
+> > > for AMD
+> > > > Family 17h Model for more details.
+> > > >
+> > > > Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
+> > > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > >
+> > > The new CPUID leaves don't seem to match the existing AMD cache
+> > > information
+> > > leaves.  Is this intentional?  Why?
+> >
+> > It is not intentional. These values are from older family of processors=
+.
+> These values have changed from Family 14  or later.
+> > The latest one is Family 17. You can see the differences here.
+> >  https://support.amd.com/TechDocs/41131.pdf
+> >
+> https://support.amd.com/TechDocs/55072_AMD_Family_15h_Models_70h-
+> 7Fh_BKDG.pdf
+> >
+> https://support.amd.com/TechDocs/54945_PPR_Family_17h_Models_00h-
+> 0Fh.pdf
+> >
+> > Some of these are bugs in our code. For some we need to add checks for
+> the family and correct these values.
+> > You understand the code much better than me. Correct me if I missed
+> something.
+> >
+> > Note that older family of processors don't support topology extensions.
+>=20
+> If you want to make the cache size/topology look different
+> depending on the CPU model/options, this would require more work,
+> but it would be an interesting feature.
+>=20
+> The "i386: Helpers to encode cache information consistently"
+> patch I sent last week might be a useful starting point for that.
+>=20
+> If you plan to implement that, please keep in mind that existing
+> CPUID cache info needs to be kept on previous machine-types (this
+> is implemented by adding QOM properties that can be used to
+> enable the old behavior, and by setting them at
+> MachineClass::compat_props).
 
-That would work with an anonymous union though:
+Wanted to get some confirmation what you meant by setting MachineClass::com=
+pat_props.
+Here is the patch I created to add new property for cpu. Now, I can use ena=
+ble_topoext to display
+new  change properly based on family.  Is that what you meant ? =20
 
-struct QObject {
-    union {
-        QType type;
-        QType base;
-    };
-    size_t refcnt;
-};
 
-If it's acceptable, I think I'll take this approach.
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index ffee841..d1ee053 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -369,6 +369,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_=
+t *);
+     HW_COMPAT_2_7 \
+     {\
+         .driver   =3D TYPE_X86_CPU,\
++        .property =3D "topoext",\
++        .value    =3D "off",\
++    },\
++    {\
++        .driver   =3D TYPE_X86_CPU,\
+         .property =3D "l3-cache",\
+         .value    =3D "off",\
+     },\
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 84d64de..557a2d6 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5080,6 +5080,7 @@ static Property x86_cpu_properties[] =3D {
+                      false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true)=
+,
+     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
++    DEFINE_PROP_BOOL("topoext", X86CPU, enable_topoext, true),
+
+     /*
+      * From "Requirements for Implementing the Microsoft
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 2e2bab5..3d3caa1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1333,6 +1333,11 @@ struct X86CPU {
+      */
+     bool enable_l3_cache;
+
++    /* Compatibility bits for old machine types.
++     * If true present the new cache topology information
++     */
++    bool enable_topoext;
++
+     /* Compatibility bits for old machine types: */
+     bool enable_cpuid_0xb;
+
+
+
+>=20
+> --
+> Eduardo
