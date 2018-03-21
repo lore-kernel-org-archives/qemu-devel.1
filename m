@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIK-00052A-1a
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:41 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIN-00054M-I7
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycII-0007md-Vv
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53198 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIM-0007oI-Do
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34912 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycII-0007mP-Ql
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	id 1eycIM-0007o4-8H
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F05E4040853
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:52:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C357BEB70F
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:52:41 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:51:30 +0100
-Message-Id: <20180321115211.17937-9-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:51:32 +0100
+Message-Id: <20180321115211.17937-11-marcandre.lureau@redhat.com>
 In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 08/49] qapi: add #if/#endif helpers
+Subject: [Qemu-devel] [PATCH v3 10/49] qapi-introspect: add preprocessor
+ conditions to generated QLit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,152 +37,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add helpers to wrap generated code with #if/#endif lines.
+The generator will take (obj, condition) tuples to wrap generated QLit
+objects for 'obj' with #if/#endif conditions.
 
-Add QAPIGenCSnippet class to write C snippet code, make QAPIGenC
-inherit from it, for full C files with copyright headers etc.
+This commit adds 'ifcond' condition to top-level QLit objects.
 
-Add a 'with' statement context manager that will be used to wrap
-generator visitor methods.  The manager will check if code was
-generated before adding #if/#endif lines on QAPIGenCSnippet
-objects. Used in the following patches.
+See generated tests/test-qmp-introspect.c. Example diff after this patch:
+
+    --- before	2018-01-08 11:55:24.757083654 +0100
+    +++ tests/test-qmp-introspect.c	2018-01-08 13:08:44.477641629 +0100
+    @@ -51,6 +51,8 @@
+             { "name", QLIT_QSTR("EVENT_F"), },
+             {}
+         })),
+    +#if defined(TEST_IF_CMD)
+    +#if defined(TEST_IF_STRUCT)
+         QLIT_QDICT(((QLitDictEntry[]) {
+             { "arg-type", QLIT_QSTR("5"), },
+             { "meta-type", QLIT_QSTR("command"), },
+    @@ -58,12 +60,16 @@
+             { "ret-type", QLIT_QSTR("0"), },
+             {}
+         })),
+    +#endif /* defined(TEST_IF_STRUCT) */
+    +#endif /* defined(TEST_IF_CMD) */
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/common.py | 82 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 78 insertions(+), 4 deletions(-)
+ scripts/qapi/introspect.py | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 47efe79758..60c1d0a783 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -12,6 +12,7 @@
- # See the COPYING file in the top-level directory.
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 1a8eb9e33e..cb4825f134 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -18,6 +18,15 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFa=
+lse):
+     def indent(level):
+         return level * 4 * ' '
 =20
- from __future__ import print_function
-+from contextlib import contextmanager
- import errno
- import os
- import re
-@@ -1964,6 +1965,40 @@ def guardend(name):
-                  name=3Dguardname(name))
++    if isinstance(obj, tuple):
++        ifobj, ifcond =3D obj
++        ret =3D gen_if(ifcond)
++        ret +=3D to_qlit(ifobj, level)
++        endif =3D gen_endif(ifcond)
++        if endif:
++            ret +=3D '\n' + endif
++        return ret
++
+     ret =3D ''
+     if not suppress_first_indent:
+         ret +=3D indent(level)
+@@ -26,7 +35,7 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFal=
+se):
+     elif isinstance(obj, str):
+         ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
+     elif isinstance(obj, list):
+-        elts =3D [to_qlit(elt, level + 1)
++        elts =3D [to_qlit(elt, level + 1).strip('\n')
+                 for elt in obj]
+         elts.append(indent(level + 1) + "{}")
+         ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+@@ -131,12 +140,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+             return '[' + self._use_type(typ.element_type) + ']'
+         return self._name(typ.name)
+=20
+-    def _gen_qlit(self, name, mtype, obj):
++    def _gen_qlit(self, name, mtype, obj, ifcond):
+         if mtype not in ('command', 'event', 'builtin', 'array'):
+             name =3D self._name(name)
+         obj['name'] =3D name
+         obj['meta-type'] =3D mtype
+-        self._qlits.append(obj)
++        self._qlits.append((obj, ifcond))
+=20
+     def _gen_member(self, member):
+         ret =3D {'name': member.name, 'type': self._use_type(member.type=
+)}
+@@ -152,26 +161,27 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         return {'case': variant.name, 'type': self._use_type(variant.typ=
+e)}
+=20
+     def visit_builtin_type(self, name, info, json_type):
+-        self._gen_qlit(name, 'builtin', {'json-type': json_type})
++        self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
+=20
+     def visit_enum_type(self, name, info, ifcond, values, prefix):
+-        self._gen_qlit(name, 'enum', {'values': values})
++        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+         element =3D self._use_type(element_type)
+-        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement})
++        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement},
++                       ifcond)
+=20
+     def visit_object_type_flat(self, name, info, ifcond, members, varian=
+ts):
+         obj =3D {'members': [self._gen_member(m) for m in members]}
+         if variants:
+             obj.update(self._gen_variants(variants.tag_member.name,
+                                           variants.variants))
+-        self._gen_qlit(name, 'object', obj)
++        self._gen_qlit(name, 'object', obj, ifcond)
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         self._gen_qlit(name, 'alternate',
+                        {'members': [{'type': self._use_type(m.type)}
+-                                    for m in variants.variants]})
++                                    for m in variants.variants]}, ifcond=
+)
+=20
+     def visit_command(self, name, info, ifcond, arg_type, ret_type,
+                       gen, success_response, boxed, allow_oob):
+@@ -180,11 +190,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         self._gen_qlit(name, 'command',
+                        {'arg-type': self._use_type(arg_type),
+                         'ret-type': self._use_type(ret_type),
+-                        'allow-oob': allow_oob})
++                        'allow-oob': allow_oob}, ifcond)
+=20
+     def visit_event(self, name, info, ifcond, arg_type, boxed):
+         arg_type =3D arg_type or self._schema.the_empty_object_type
+-        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)})
++        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)},
++                       ifcond)
 =20
 =20
-+def gen_if(ifcond):
-+    ret =3D ''
-+    for ifc in ifcond:
-+        ret +=3D mcgen('''
-+#if %(cond)s
-+''', cond=3Difc)
-+    return ret
-+
-+
-+def gen_endif(ifcond):
-+    ret =3D ''
-+    for ifc in reversed(ifcond):
-+        ret +=3D mcgen('''
-+#endif /* %(cond)s */
-+''', cond=3Difc)
-+    return ret
-+
-+
-+def wrap_ifcond(ifcond, before, after):
-+    if ifcond is None or before =3D=3D after:
-+        return after
-+
-+    assert after.startswith(before)
-+    out =3D before
-+    added =3D after[len(before):]
-+    if added[0] =3D=3D '\n':
-+        out +=3D '\n'
-+        added =3D added[1:]
-+    out +=3D gen_if(ifcond)
-+    out +=3D added
-+    out +=3D gen_endif(ifcond)
-+    return out
-+
-+
- def gen_enum_lookup(name, values, prefix=3DNone):
-     ret =3D mcgen('''
-=20
-@@ -2054,6 +2089,7 @@ class QAPIGen(object):
-     def __init__(self):
-         self._preamble =3D ''
-         self._body =3D ''
-+        self._ifcond =3D None
-=20
-     def preamble_add(self, text):
-         self._preamble +=3D text
-@@ -2061,6 +2097,23 @@ class QAPIGen(object):
-     def add(self, text):
-         self._body +=3D text
-=20
-+    def start_if(self, ifcond):
-+        self._ifcond =3D ifcond
-+        self._start_if_body =3D self._body
-+        self._start_if_preamble =3D self._preamble
-+
-+    def _wrap_ifcond(self):
-+        pass
-+
-+    def end_if(self):
-+        self._wrap_ifcond()
-+        self._ifcond =3D None
-+
-+    def get_content(self, fname=3DNone):
-+        assert self._ifcond is None
-+        return (self._top(fname) + self._preamble + self._body
-+                + self._bottom(fname))
-+
-     def _top(self, fname):
-         return ''
-=20
-@@ -2078,8 +2131,7 @@ class QAPIGen(object):
-                     raise
-         fd =3D os.open(pathname, os.O_RDWR | os.O_CREAT, 0o666)
-         f =3D os.fdopen(fd, 'r+')
--        text =3D (self._top(fname) + self._preamble + self._body
--                + self._bottom(fname))
-+        text =3D self.get_content(fname)
-         oldtext =3D f.read(len(text) + 1)
-         if text !=3D oldtext:
-             f.seek(0)
-@@ -2088,10 +2140,32 @@ class QAPIGen(object):
-         f.close()
-=20
-=20
--class QAPIGenC(QAPIGen):
-+@contextmanager
-+def ifcontext(ifcond, *args):
-+    saved =3D []
-+    for arg in args:
-+        arg.start_if(ifcond)
-+    yield
-+    for arg in args:
-+        arg.end_if()
-=20
--    def __init__(self, blurb, pydoc):
-+
-+class QAPIGenCSnippet(QAPIGen):
-+
-+    def __init__(self):
-         QAPIGen.__init__(self)
-+
-+    def _wrap_ifcond(self):
-+        self._body =3D wrap_ifcond(self._ifcond,
-+                                 self._start_if_body, self._body)
-+        self._preamble =3D wrap_ifcond(self._ifcond,
-+                                     self._start_if_preamble, self._prea=
-mble)
-+
-+
-+class QAPIGenC(QAPIGenCSnippet):
-+
-+    def __init__(self, blurb, pydoc):
-+        QAPIGenCSnippet.__init__(self)
-         self._blurb =3D blurb
-         self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*', py=
-doc,
-                                                   re.MULTILINE))
+ def gen_introspect(schema, output_dir, prefix, opt_unmask):
 --=20
 2.16.2.521.g9aa15f885a
