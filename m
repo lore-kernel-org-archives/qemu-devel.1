@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyf3L-0005So-DU
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:49:24 -0400
+	(envelope-from <mlureau@redhat.com>) id 1eyf57-0007ZL-2Q
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyf3K-00062C-Lf
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:49:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57030 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyf3K-00061x-HN
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:49:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C71814026788
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 14:49:18 +0000 (UTC)
-References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
-	<20180321134005.8822-3-marcandre.lureau@redhat.com>
-	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
-	<CAMxuvay1j+E1YRggpqm9+ETE_FxD-ThGtPBenUtvt8oeYweS8g@mail.gmail.com>
-	<4e876850-3057-e9d5-695b-69f4cde9aa9a@redhat.com>
-	<CAMxuvay+aMU7=kr2ED+7Hq596oeoZP+xKXMYwGB+r8AG5=5rdQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2467bc3b-c0da-b6e4-1201-48983ba5a5af@redhat.com>
-Date: Wed, 21 Mar 2018 15:49:13 +0100
+	(envelope-from <mlureau@redhat.com>) id 1eyf54-0006l8-0q
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:51:13 -0400
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:40299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eyf53-0006ki-Sc
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:51:09 -0400
+Received: by mail-qk0-f194.google.com with SMTP id o64so5697044qkl.7
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 07:51:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvay+aMU7=kr2ED+7Hq596oeoZP+xKXMYwGB+r8AG5=5rdQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <5321b7df-215e-e56d-ae6d-2ada8706cdcc@redhat.com>
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<20180321134005.8822-4-marcandre.lureau@redhat.com>
+	<5321b7df-215e-e56d-ae6d-2ada8706cdcc@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 15:51:08 +0100
+Message-ID: <CAMxuvazWmEuDeBPTPCatr_o0rKiUk8MddvTE6u70w_-ML8B7kA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
- at offset 0
+Subject: Re: [Qemu-devel] [PATCH 3/3] qobject: replace
+ qobject_incref/QINCREF qobject_decref/QDECREF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,30 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange,
+	Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, "Bonzini,
+	Paolo" <pbonzini@redhat.com>
 
-On 21/03/2018 15:21, Marc-Andr=C3=A9 Lureau wrote:
->>> Yeah, I tried a few of those approaches. Here the problem is that
->>> QObject doesn't have base field. So you get a compile time error with
->>> a QObject * as argument.
+On Wed, Mar 21, 2018 at 3:28 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 03/21/2018 08:40 AM, Marc-Andr=C3=A9 Lureau wrote:
 >>
->> So the compiler requires &(x)->base to resolve even when it is not on =
-the
->> branch that gets selected?
->=20
-> Unfortunately, yes, all branches must compile apparently (I know)...
+>> Now that we can safely call QOBJECT() on QObject * and children types,
+>> we can have a single macro to ref/unref the object.
+>>
+>> Change the incref/decref prefix name for the more common ref/unref.
+>
+>
+> I know you did this by sed (for the most part); but it would be worth
+> including the command line you used in the commit message to make it easi=
+er
+> to reproduce the same mechanical portion of the patch when rebasing.
 
-Ugh, and that's indeed true of _Generic too.  These don't compile:
+git sed QINCREF qobject_ref
+git sed QDECREF qobject_unref
+git sed qobject_incref qobject_ref
+git sed qobject_decref qobject_ref
 
-  struct s1 { int y; };
-  struct s2 { int z; };
+>
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>
+>
+>> +++ b/include/qapi/qmp/qobject.h
+>
+>
+>> @@ -74,13 +74,16 @@ qobject_unknown_type(const void *unused)
+>>       (const QObject *, x),                       \
+>>       qobject_unknown_type(x))
+>>   -/* High-level interface for qobject_incref() */
+>> -#define QINCREF(obj)      \
+>> -    qobject_incref(QOBJECT(obj))
+>> +/**
+>> + * qobject_ref(): Increment QObject's reference count
+>> + */
+>> +#define qobject_ref(x) qobject_ref_impl(QOBJECT(x))
+>
+>
+> The meat of the patch; looks fine to me.
+>
+>> +++ b/scripts/coccinelle/qobject.cocci
+>> @@ -3,11 +3,11 @@
+>>   expression Obj, Key, E;
+>>   @@
+>>   (
+>> -- qobject_incref(QOBJECT(E));
+>> -+ QINCREF(E);
+>> +- qobject_ref(QOBJECT(E));
+>> ++ qobject_ref(E);
+>>   |
+>> -- qobject_decref(QOBJECT(E));
+>> -+ QDECREF(E);
+>> +- qobject_unref(QOBJECT(E));
+>> ++ qobject_unref(E);
+>
+>
+> I wonder if these branches should just be removed; they made sense when w=
+e
+> had two spellings, but after your mass conversion, the .cocci script is
+> unlikely to ever find regressions on this front.
 
-  #define f(x)  _Generic(x, struct s1: (x).y, struct s2: (x).z)
+They would still remove extra cast, wouldn't they?
 
-  int f1(struct s1 *s) { return f(*s); }
-  int f2(struct s2 *s) { return f(*s); }
-
-:(  Then I guess Marc-Andr=C3=A9's realization is ugly but unavoidable.
-
-Paolo
+thanks
