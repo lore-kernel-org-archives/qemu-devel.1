@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eyeRu-0006SB-NK
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:10:44 -0400
+	(envelope-from <mlureau@redhat.com>) id 1eyea6-0002HN-DG
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:19:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eyeRr-0002NQ-I0
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:10:42 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180321135238.GA3898@localhost.localdomain>
-References: <20180321133852.3560-1-berto@igalia.com>
-	<20180321135238.GA3898@localhost.localdomain>
-Date: Wed, 21 Mar 2018 15:10:01 +0100
-Message-ID: <w51k1u5ikp2.fsf@maestria.local.igalia.com>
+	(envelope-from <mlureau@redhat.com>) id 1eyea2-0007iX-7L
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:19:10 -0400
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:43522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eyea2-0007i9-27
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:19:06 -0400
+Received: by mail-qk0-f194.google.com with SMTP id g184so5567385qkd.10
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 07:19:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qcow2: Reset
- free_cluster_index when allocating a new refcount block
+In-Reply-To: <9efff62f-1762-12ff-02c2-6d117163a1c9@redhat.com>
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<9efff62f-1762-12ff-02c2-6d117163a1c9@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 15:19:05 +0100
+Message-ID: <CAMxuvazUcPpfLZCy3nGX6kVbNepy4VDq7wsM7Ygz5DPGpRp6=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] RFC: simplify qobject refcount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange,
+	Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, "Bonzini,
+	Paolo" <pbonzini@redhat.com>
 
-On Wed 21 Mar 2018 02:52:38 PM CET, Kevin Wolf wrote:
+Hi
 
->>      qemu-img create -f qcow2 -o cluster_size=512 hd.qcow2 1M
->>      qemu-io -c 'write 0 124k' hd.qcow2
->>      qemu-io -c 'write 124k 512' hd.qcow2
+On Wed, Mar 21, 2018 at 3:09 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 03/21/2018 08:40 AM, Marc-Andr=C3=A9 Lureau wrote:
+>>
+>> Hi,
+>>
+>> This series aims to get rid of the distinction between QObject, that
+>> must use qobject_incref/qobject_decref and its various derived types
+>> that have to use QINCREF/QDECREF. Instead, replace it with
+>> qobject_ref/qobject_unref for all types.
 >
-> So if I understand correctly, this is what we get:
 >
-> 0x20000: free
-> 0x20200: refcount block
-> 0x20400: data cluster
-> 0x20600: potential next data cluster
+> I _like_ the fact that you don't have to use a different thing for the ba=
+se
+> class compared to the derived classes.  I'm not sure I like that the name
+> got longer in the QINCREF -> qobject_ref direction, but it got shorter in
+> the qobject_incref =3D> qobject_ref direction, so maybe bikeshedding on t=
+he
+> final name is still possible?
 
-Yes.
+sure :) Tbh, I'd rather keep the qobject prefix for clarity, but we
+could also go for qref/qunref ?
 
->> What this patch does is reset s->free_cluster_index to its previous
->> value when alloc_refcount_block() returns -EAGAIN. This way the caller
->> will try to allocate again the original clusters if they are still
->> free.
 >
-> This is an improvement, because now we should avoid the unused cluster:
+>>
+>> Marc-Andr=C3=A9 Lureau (3):
+>>    compiler: extend QEMU_GENERIC to handle more arguments
+>>    qobject: assume base of a qobject is at offset 0
+>>    qobject: replace qobject_incref/QINCREF qobject_decref/QDECREF
 >
-> 0x20000: data cluster
-> 0x20200: refcount block
-> 0x20400: potential next data cluster
-
-That's correct.
-
-> But now the data clusters are fragmented. Should we try to change the
-> logic so that already the refcount block allocation can make use of
-> the free space? That is:
 >
-> 0x20000: refcount block
-> 0x20200: data cluster
-> 0x20400: contiguous potential next data cluster
+> But I definitely think this is 2.13 material.  It is easy to do (mechanic=
+al
+> conversion in 3/3) but a conflict magnet, so it would need to land early
+> after the freeze is lifted.
 
-Well, the clusters before 0x20000 are also data clusters so there's
-going to be fragmentation anyway. Also, if you're writing more than 1
-data cluster in a single request when the refcount block allocation
-happens all those new data clusters are still going to be contiguous
-(before the new refcount block).
+Fortunately, it's a straightforward sed replacement.
 
-Another possibility that I considered was to make alloc_clusters_noref()
-return the offset but let free_cluster_index untouched until the
-refcounts are correct, but this requires more code and I fear that
-keeping free_cluster_index pointing to the clusters we're trying to
-allocate can lead to unexpected surprises.
-
-The solution I chose is -I think- the simplest and easiest to audit.
-
-On a related note, I'm using a script that I wrote myself to debug qcow2
-images. It prints the contents of the header and lists all host
-clusters, indicating the type of each one. I find it useful to debug
-problems like this one. If there's nothing similar already existing I
-can post it and we could put it in the scripts/ directory.
-
-Berto
+thanks
