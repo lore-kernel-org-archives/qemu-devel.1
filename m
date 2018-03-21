@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyYyE-0008BT-E8
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:19:43 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1eyZCP-0004Ae-DQ
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyYyB-0004C6-8X
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:19:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eyYyB-0004Bu-39
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:19:39 -0400
-Date: Wed, 21 Mar 2018 16:19:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180321081923.GB20571@xz-mi>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
-	<20180315102501.GA3062@work-vm>
-	<423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
+	(envelope-from <zhaoshenglong@huawei.com>) id 1eyZCO-00040u-9m
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:34:21 -0400
+Message-ID: <5AB218CE.1050000@huawei.com>
+Date: Wed, 21 Mar 2018 16:33:18 +0800
+From: Shannon Zhao <zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
+	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
+	<33a7bc59-c457-03d0-90bf-ab5b2d2d46cd@redhat.com>
+In-Reply-To: <33a7bc59-c457-03d0-90bf-ab5b2d2d46cd@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] arm_gicv3_kvm: kvm_dist_get/put:
+ skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +25,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, liang.z.li@intel.com, kvm@vger.kernel.org, quintela@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+To: Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Fri, Mar 16, 2018 at 04:05:14PM +0800, Xiao Guangrong wrote:
-> 
-> Hi David,
-> 
-> Thanks for your review.
-> 
-> On 03/15/2018 06:25 PM, Dr. David Alan Gilbert wrote:
-> 
-> > >   migration/ram.c | 32 ++++++++++++++++----------------
-> > 
-> > Hi,
-> >    Do you have some performance numbers to show this helps?  Were those
-> > taken on a normal system or were they taken with one of the compression
-> > accelerators (which I think the compression migration was designed for)?
-> 
-> Yes, i have tested it on my desktop, i7-4790 + 16G, by locally live migrate
-> the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to 350.
-> 
-> During the migration, a workload which has 8 threads repeatedly written total
-> 6G memory in the VM. Before this patchset, its bandwidth is ~25 mbps, after
-> applying, the bandwidth is ~50 mbps.
 
-Hi, Guangrong,
 
-Not really review comments, but I got some questions. :)
-
-IIUC this patch will only change the behavior when last_sent_block
-changed.  I see that the performance is doubled after the change,
-which is really promising.  However I don't fully understand why it
-brings such a big difference considering that IMHO current code is
-sending dirty pages per-RAMBlock.  I mean, IMHO last_sent_block should
-not change frequently?  Or am I wrong?
-
-Another follow-up question would be: have you measured how long time
-needed to compress a 4k page, and how many time to send it?  I think
-"sending the page" is not really meaningful considering that we just
-put a page into the buffer (which should be extremely fast since we
-don't really flush it every time), however I would be curious on how
-slow would compressing a page be.
-
-Thanks,
-
+On 2018/3/20 16:42, Auger Eric wrote:
+> Hi Shannon,
+> On 20/03/18 08:26, Shannon Zhao wrote:
+>> While we skip the GIC_INTERNAL irqs, we don't change the register offset
+>> accordingly. This will overlap the GICR registers value and leave the
+>> last GIC_INTERNAL irq's registers out of update.
+>>
+>> Fix this by skipping the registers banked by GICR.
+>>
+>> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+>> ---
+>>  hw/intc/arm_gicv3_kvm.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 38 insertions(+)
+>>
+>> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+>> index 3536795..d423cba 100644
+>> --- a/hw/intc/arm_gicv3_kvm.c
+>> +++ b/hw/intc/arm_gicv3_kvm.c
+>> @@ -136,6 +136,12 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+>>      int irq;
+>>  
+>>      field = (uint32_t *)bmp;
+>> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
+>> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
+>> +     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
+>> +     * sync them.
+>> +     */
+>> +    offset += (8 * sizeof(uint32_t));
+>>      for_each_dist_irq_reg(irq, s->num_irq, 8) {
+>>          kvm_gicd_access(s, offset, &reg, false);
+>>          *field = reg;
+>> @@ -150,6 +156,12 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+>>      int irq;
+>>  
+>>      field = (uint32_t *)bmp;
+>> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
+>> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
+>> +     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
+>> +     * sync them.
+>> +     */
+>> +    offset += (8 * sizeof(uint32_t));
+>>      for_each_dist_irq_reg(irq, s->num_irq, 8) {
+>>          reg = *field;
+>>          kvm_gicd_access(s, offset, &reg, true);
+>> @@ -164,6 +176,12 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
+>>      uint32_t reg;
+>>      int irq;
+>>  
+>> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
+>> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
+>> +     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
+>> +     * them.
+>> +     */
+>> +    offset += (2 * sizeof(uint32_t));
+>>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
+>>          kvm_gicd_access(s, offset, &reg, false);
+>>          reg = half_unshuffle32(reg >> 1);
+>> @@ -181,6 +199,12 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
+>>      uint32_t reg;
+>>      int irq;
+>>  
+>> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
+>> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
+>> +     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
+>> +     * them.
+>> +     */
+>> +    offset += (2 * sizeof(uint32_t));
+>>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
+>>          reg = *gic_bmp_ptr32(bmp, irq);
+>>          if (irq % 32 != 0) {
+>> @@ -222,6 +246,12 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
+>>      uint32_t reg;
+>>      int irq;
+>>  
+>> +    /* For the KVM GICv3, affinity routing is always enabled, and the
+>> +     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
+>> +     * are always RAZ/WI. The corresponding functionality is replaced by the
+>> +     * GICR registers. So it doesn't need to sync them.
+>> +     */
+>> +    offset += (1 * sizeof(uint32_t));
+>>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
+>>          kvm_gicd_access(s, offset, &reg, false);
+>>          *gic_bmp_ptr32(bmp, irq) = reg;
+>> @@ -235,6 +265,14 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
+>>      uint32_t reg;
+>>      int irq;
+>>  
+>> +    /* For the KVM GICv3, affinity routing is always enabled, and the
+>> +     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
+>> +     * are always RAZ/WI. The corresponding functionality is replaced by the
+>> +     * GICR registers. So it doesn't need to sync them.
+>> +     */
+>> +    offset += (1 * sizeof(uint32_t));
+> I wonder we couldn't create a new for_each_dist_irq_reg() macro taking
+> the offset and clroffset and integrating that shift inside?
 > 
-> BTW, Compression will use almost all valid bandwidth after all of our work
-> which i will post it out part by part.
+Peter, what's your opinion?
+
+>> +    if (clroffset != 0)
+> nit style issue: brace needed here
+>
+OK
+
+> Besides Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> 
+Thanks!
+
+> Thanks
+> 
+> Eric
+> 
+>> +        clroffset += (1 * sizeof(uint32_t));
+>>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
+>>          /* If this bitmap is a set/clear register pair, first write to the
+>>           * clear-reg to clear all bits before using the set-reg to write
+>>
+> 
+> .
 > 
 
 -- 
-Peter Xu
+Shannon
