@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyevg-0006td-Ez
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:41:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eyex8-0008Qf-Nh
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyevc-0002DQ-LQ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:41:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46722 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eyevc-0002DJ-GV
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:41:24 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Mar 2018 15:41:05 +0100
-Message-Id: <20180321144107.22770-4-kwolf@redhat.com>
-In-Reply-To: <20180321144107.22770-1-kwolf@redhat.com>
-References: <20180321144107.22770-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 3/5] tests/multiboot: Test exit code for every
- qemu run
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eyex5-0002ke-Lh
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:42:58 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eyex5-0002jk-F3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:42:55 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id z73so5455372wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 07:42:55 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180321113644.21899-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b024eb17-2f2c-75d4-5ff6-ba33a143b7c6@amsat.org>
+Date: Wed, 21 Mar 2018 15:42:52 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180321113644.21899-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] migration: fix pfd leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-Testing the exit code only once after a whole group of tests has
-completed is not enough, it catches errors only in the very last qemu
-invocation. We need to have the check after each qemu run.
+On 03/21/2018 12:36 PM, Marc-André Lureau wrote:
+> Fix leak spotted by ASAN:
+> 
+> Direct leak of 16 byte(s) in 1 object(s) allocated from:
+>     #0 0x7fe1abb80a38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea38)
+>     #1 0x7fe1aaf1bf75 in g_malloc0 ../glib/gmem.c:124
+>     #2 0x7fe1aaf1c249 in g_malloc0_n ../glib/gmem.c:355
+>     #3 0x55f4841cfaa9 in postcopy_ram_fault_thread /home/elmarco/src/qemu/migration/postcopy-ram.c:596
+>     #4 0x55f48479447b in qemu_thread_start /home/elmarco/src/qemu/util/qemu-thread-posix.c:504
+>     #5 0x7fe1a043550a in start_thread (/lib64/libpthread.so.0+0x750a)
+> 
+> Regression introduced with commit 00fa4fc85b00f1a8a810068d158a7a66e88658eb.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The logging and diff with the reference output is still done once per
-group to keep things more managable. This is not a problem because the
-log file accumulates the output of all runs.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Jack Schwartz <jack.schwartz@oracle.com>
----
- tests/multiboot/run_test.sh | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
-index 0278148b43..bc9c3670af 100755
---- a/tests/multiboot/run_test.sh
-+++ b/tests/multiboot/run_test.sh
-@@ -38,6 +38,17 @@ run_qemu() {
-     ret=$?
- 
-     cat test.out >> test.log
-+
-+    debugexit=$((ret & 0x1))
-+    ret=$((ret >> 1))
-+
-+    if [ $debugexit != 1 ]; then
-+        printf %b "\e[31m ?? \e[0m $kernel $* (no debugexit used, exit code $ret)\n"
-+        pass=0
-+    elif [ $ret != 0 ]; then
-+        printf %b "\e[31mFAIL\e[0m $kernel $* (exit code $ret)\n"
-+        pass=0
-+    fi
- }
- 
- mmap() {
-@@ -61,19 +72,8 @@ make all
- for t in mmap modules; do
- 
-     echo > test.log
--    $t
--
--    debugexit=$((ret & 0x1))
--    ret=$((ret >> 1))
-     pass=1
--
--    if [ $debugexit != 1 ]; then
--        printf %b "\e[31m ?? \e[0m $t (no debugexit used, exit code $ret)\n"
--        pass=0
--    elif [ $ret != 0 ]; then
--        printf %b "\e[31mFAIL\e[0m $t (exit code $ret)\n"
--        pass=0
--    fi
-+    $t
- 
-     if ! diff $t.out test.log > /dev/null 2>&1; then
-         printf %b "\e[31mFAIL\e[0m $t (output difference)\n"
--- 
-2.13.6
+> ---
+>  migration/postcopy-ram.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index efd77939af..4a0b33b373 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -754,6 +754,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          }
+>      }
+>      trace_postcopy_ram_fault_thread_exit();
+> +    g_free(pfd);
+>      return NULL;
+>  }
+>  
+> 
