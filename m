@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJo-0006rO-6l
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJq-0006tr-Bm
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJm-0000El-Vg
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42128 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJp-0000HI-0I
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34964 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycJm-0000EX-Rv
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1eycJo-0000GK-SA
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6E309406DE12
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:54:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 701117705E
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:54:12 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:52:07 +0100
-Message-Id: <20180321115211.17937-46-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:52:08 +0100
+Message-Id: <20180321115211.17937-47-marcandre.lureau@redhat.com>
 In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 45/49] qapi: make query-gic-capabilities
- depend on TARGET_ARM
+Subject: [Qemu-devel] [PATCH v3 46/49] qapi: make query-cpu-model-expansion
+ depend on s390 or x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,124 +38,159 @@ To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 ---
- qapi/misc.json       | 43 ------------------------------------------
- qapi/target.json     | 45 ++++++++++++++++++++++++++++++++++++++++++++
- monitor.c            | 11 -----------
- target/arm/monitor.c |  2 +-
- 4 files changed, 46 insertions(+), 55 deletions(-)
+ qapi/misc.json                         | 38 -------------------------
+ qapi/target.json                       | 39 ++++++++++++++++++++++++++
+ include/sysemu/arch_init.h             |  3 --
+ monitor.c                              |  3 --
+ qmp.c                                  |  7 -----
+ stubs/arch-query-cpu-model-expansion.c | 13 ---------
+ target/i386/cpu.c                      |  3 +-
+ target/s390x/cpu_models.c              |  2 +-
+ stubs/Makefile.objs                    |  1 -
+ 9 files changed, 42 insertions(+), 67 deletions(-)
+ delete mode 100644 stubs/arch-query-cpu-model-expansion.c
 
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 1753a81b1e..a0032120da 100644
+index a0032120da..602c99b174 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -2965,49 +2965,6 @@
- ##
- { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
+@@ -2102,44 +2102,6 @@
+   'data': { 'model': 'CpuModelInfo' } }
+=20
 =20
 -##
--# @GICCapability:
+-# @query-cpu-model-expansion:
 -#
--# The struct describes capability for a specific GIC (Generic
--# Interrupt Controller) version. These bits are not only decided by
--# QEMU/KVM software version, but also decided by the hardware that
--# the program is running upon.
+-# Expands a given CPU model (or a combination of CPU model + additional =
+options)
+-# to different granularities, allowing tooling to get an understanding w=
+hat a
+-# specific CPU model looks like in QEMU under a certain configuration.
 -#
--# @version:  version of GIC to be described. Currently, only 2 and 3
--#            are supported.
+-# This interface can be used to query the "host" CPU model.
 -#
--# @emulated: whether current QEMU/hardware supports emulated GIC
--#            device in user space.
+-# The data returned by this command may be affected by:
 -#
--# @kernel:   whether current QEMU/hardware supports hardware
--#            accelerated GIC device in kernel.
+-# * QEMU version: CPU models may look different depending on the QEMU ve=
+rsion.
+-#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
+-# * machine-type: CPU model  may look different depending on the machine=
+-type.
+-#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
+-# * machine options (including accelerator): in some architectures, CPU =
+models
+-#   may look different depending on machine and accelerator options. (Ex=
+cept for
+-#   CPU models reported as "static" in query-cpu-definitions.)
+-# * "-cpu" arguments and global properties: arguments to the -cpu option=
+ and
+-#   global properties may affect expansion of CPU models. Using
+-#   query-cpu-model-expansion while using these is not advised.
 -#
--# Since: 2.6
+-# Some architectures may not support all expansion types. s390x supports
+-# "full" and "static".
+-#
+-# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
+dels is
+-#          not supported, if the model cannot be expanded, if the model =
+contains
+-#          an unknown CPU definition name, unknown properties or propert=
+ies
+-#          with a wrong type. Also returns an error if an expansion type=
+ is
+-#          not supported.
+-#
+-# Since: 2.8.0
 -##
--{ 'struct': 'GICCapability',
--  'data': { 'version': 'int',
--            'emulated': 'bool',
--            'kernel': 'bool' } }
--
--##
--# @query-gic-capabilities:
--#
--# This command is ARM-only. It will return a list of GICCapability
--# objects that describe its capability bits.
--#
--# Returns: a list of GICCapability objects.
--#
--# Since: 2.6
--#
--# Example:
--#
--# -> { "execute": "query-gic-capabilities" }
--# <- { "return": [{ "version": 2, "emulated": true, "kernel": false },
--#                 { "version": 3, "emulated": false, "kernel": true } ] =
-}
--#
--##
--{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'] }
+-{ 'command': 'query-cpu-model-expansion',
+-  'data': { 'type': 'CpuModelExpansionType',
+-            'model': 'CpuModelInfo' },
+-  'returns': 'CpuModelExpansionInfo' }
 -
  ##
- # @CpuInstanceProperties:
+ # @CpuModelCompareResult:
  #
 diff --git a/qapi/target.json b/qapi/target.json
-index be0ff84a6e..2ab18b38a9 100644
+index 2ab18b38a9..323994a6ec 100644
 --- a/qapi/target.json
 +++ b/qapi/target.json
-@@ -294,3 +294,48 @@
-             'modelb': 'CpuModelInfo' },
-   'returns': 'CpuModelBaselineInfo',
-   'if': 'defined(TARGET_S390X)' }
+@@ -339,3 +339,42 @@
+ ##
+ { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
+   'if': 'defined(TARGET_ARM)' }
 +
 +##
-+# @GICCapability:
++# @query-cpu-model-expansion:
 +#
-+# The struct describes capability for a specific GIC (Generic
-+# Interrupt Controller) version. These bits are not only decided by
-+# QEMU/KVM software version, but also decided by the hardware that
-+# the program is running upon.
++# Expands a given CPU model (or a combination of CPU model + additional =
+options)
++# to different granularities, allowing tooling to get an understanding w=
+hat a
++# specific CPU model looks like in QEMU under a certain configuration.
 +#
-+# @version:  version of GIC to be described. Currently, only 2 and 3
-+#            are supported.
++# This interface can be used to query the "host" CPU model.
 +#
-+# @emulated: whether current QEMU/hardware supports emulated GIC
-+#            device in user space.
++# The data returned by this command may be affected by:
 +#
-+# @kernel:   whether current QEMU/hardware supports hardware
-+#            accelerated GIC device in kernel.
++# * QEMU version: CPU models may look different depending on the QEMU ve=
+rsion.
++#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
++# * machine-type: CPU model  may look different depending on the machine=
+-type.
++#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
++# * machine options (including accelerator): in some architectures, CPU =
+models
++#   may look different depending on machine and accelerator options. (Ex=
+cept for
++#   CPU models reported as "static" in query-cpu-definitions.)
++# * "-cpu" arguments and global properties: arguments to the -cpu option=
+ and
++#   global properties may affect expansion of CPU models. Using
++#   query-cpu-model-expansion while using these is not advised.
 +#
-+# Since: 2.6
++# Some architectures may not support all expansion types. s390x supports
++# "full" and "static".
++#
++# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
+dels is
++#          not supported, if the model cannot be expanded, if the model =
+contains
++#          an unknown CPU definition name, unknown properties or propert=
+ies
++#          with a wrong type. Also returns an error if an expansion type=
+ is
++#          not supported.
++#
++# Since: 2.8.0
 +##
-+{ 'struct': 'GICCapability',
-+  'data': { 'version': 'int',
-+            'emulated': 'bool',
-+            'kernel': 'bool' },
-+  'if': 'defined(TARGET_ARM)' }
-+
-+##
-+# @query-gic-capabilities:
-+#
-+# This command is ARM-only. It will return a list of GICCapability
-+# objects that describe its capability bits.
-+#
-+# Returns: a list of GICCapability objects.
-+#
-+# Since: 2.6
-+#
-+# Example:
-+#
-+# -> { "execute": "query-gic-capabilities" }
-+# <- { "return": [{ "version": 2, "emulated": true, "kernel": false },
-+#                 { "version": 3, "emulated": false, "kernel": true } ] =
-}
-+#
-+##
-+{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-+  'if': 'defined(TARGET_ARM)' }
++{ 'command': 'query-cpu-model-expansion',
++  'data': { 'type': 'CpuModelExpansionType',
++            'model': 'CpuModelInfo' },
++  'returns': 'CpuModelExpansionInfo',
++  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index f0ef652b2a..2497fd3351 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -33,7 +33,4 @@ int kvm_available(void);
+ int xen_available(void);
+=20
+ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
+-CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
+-                                                      CpuModelInfo *mode=
+,
+-                                                      Error **errp);
+ #endif
 diff --git a/monitor.c b/monitor.c
-index bd9a6950cf..67b433f12d 100644
+index 67b433f12d..63c51ee05d 100644
 --- a/monitor.c
 +++ b/monitor.c
 @@ -1157,9 +1157,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
@@ -163,39 +198,105 @@ ect **ret_data,
   */
  static void qmp_unregister_commands_hack(void)
  {
--#ifndef TARGET_ARM
--    qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
+-#if !defined(TARGET_S390X) && !defined(TARGET_I386)
+-    qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
 -#endif
- #if !defined(TARGET_S390X) && !defined(TARGET_I386)
-     qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
- #endif
-@@ -4696,14 +4693,6 @@ QemuOptsList qemu_mon_opts =3D {
-     },
- };
+ #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
+) \
+     && !defined(TARGET_S390X)
+     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
+diff --git a/qmp.c b/qmp.c
+index 14972b78df..9ded2f48c4 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -594,13 +594,6 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Err=
+or **errp)
+     return arch_query_cpu_definitions(errp);
+ }
 =20
--#ifndef TARGET_ARM
--GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+-CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
+pe type,
+-                                                     CpuModelInfo *model=
+,
+-                                                     Error **errp)
 -{
--    error_setg(errp, QERR_FEATURE_DISABLED, "query-gic-capabilities");
+-    return arch_query_cpu_model_expansion(type, model, errp);
+-}
+-
+ void qmp_add_client(const char *protocol, const char *fdname,
+                     bool has_skipauth, bool skipauth, bool has_tls, bool=
+ tls,
+                     Error **errp)
+diff --git a/stubs/arch-query-cpu-model-expansion.c b/stubs/arch-query-cp=
+u-model-expansion.c
+deleted file mode 100644
+index 26273a8b10..0000000000
+--- a/stubs/arch-query-cpu-model-expansion.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "sysemu/arch_init.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qerror.h"
+-
+-CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
+-                                                      CpuModelInfo *mode=
+,
+-                                                      Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
 -    return NULL;
 -}
--#endif
--
- HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
- {
-     MachineState *ms =3D MACHINE(qdev_get_machine());
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 4cdd2676dd..250405bf4d 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -23,7 +23,7 @@
- #include "qemu/osdep.h"
- #include "hw/boards.h"
- #include "kvm_arm.h"
--#include "qapi/qapi-commands-misc.h"
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 555ae79d29..563dad644c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -39,6 +39,7 @@
+ #include "qapi/visitor.h"
+ #include "qom/qom-qobject.h"
+ #include "sysemu/arch_init.h"
 +#include "qapi/target-qapi-commands.h"
 =20
- static GICCapability *gic_cap_new(int version)
+ #if defined(CONFIG_KVM)
+ #include <linux/kvm_para.h>
+@@ -3125,7 +3126,7 @@ out:
+ }
+=20
+ CpuModelExpansionInfo *
+-arch_query_cpu_model_expansion(CpuModelExpansionType type,
++qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+                                                       CpuModelInfo *mode=
+l,
+                                                       Error **errp)
  {
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index ffca1d9a2d..e25034231d 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -559,7 +559,7 @@ static void cpu_info_from_model(CpuModelInfo *info, c=
+onst S390CPUModel *model,
+     }
+ }
+=20
+-CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
++CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
+pe type,
+                                                       CpuModelInfo *mode=
+l,
+                                                       Error **errp)
+ {
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 9a91e49578..1cd325841c 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,5 +1,4 @@
+ stub-obj-y +=3D arch-query-cpu-def.o
+-stub-obj-y +=3D arch-query-cpu-model-expansion.o
+ stub-obj-y +=3D bdrv-next-monitor-owned.o
+ stub-obj-y +=3D blk-commit-all.o
+ stub-obj-y +=3D blockdev-close-all-bdrv-states.o
 --=20
 2.16.2.521.g9aa15f885a
