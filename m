@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ptoscano@redhat.com>) id 1eye7F-0005ze-A4
-	for Qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:49:22 -0400
+	(envelope-from <kraxel@redhat.com>) id 1eye8e-0006x8-0X
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ptoscano@redhat.com>) id 1eye7C-0006tL-79
-	for Qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:49:21 -0400
-From: Pino Toscano <ptoscano@redhat.com>
-Date: Wed, 21 Mar 2018 14:48:54 +0100
-Message-ID: <2075074.dXtERdIzXi@thyrus.usersys.redhat.com>
-In-Reply-To: <65a7365f-89d5-a66c-4e7a-ce8ae1bcf595@redhat.com>
-References: <20180321124417.29242-1-ptoscano@redhat.com>
-	<20180321125105.GJ19514@redhat.com>
-	<65a7365f-89d5-a66c-4e7a-ce8ae1bcf595@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2077856.cQrCGbDHyq";
-	micalg="pgp-sha256"; protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Libguestfs] [PATCH] tests: regressions: make
- test-big-heap use a temporary empty file
+	(envelope-from <kraxel@redhat.com>) id 1eye8b-0007sf-4B
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:50:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45252 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eye8a-0007rx-Uu
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:50:45 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 21 Mar 2018 14:50:36 +0100
+Message-Id: <20180321135041.15768-2-kraxel@redhat.com>
+In-Reply-To: <20180321135041.15768-1-kraxel@redhat.com>
+References: <20180321135041.15768-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/5] ui: add ctrl modifier support to
+ kbd_put_qcode_console()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: libguestfs@redhat.com
-Cc: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu block <qemu-block@nongnu.org>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, balaton@eik.bme.hu
 
---nextPart2077856.cQrCGbDHyq
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/console.h |  2 +-
+ ui/console.c         | 15 +++++++++++++--
+ ui/gtk.c             |  4 ++--
+ ui/sdl2-input.c      |  2 +-
+ 4 files changed, 17 insertions(+), 6 deletions(-)
 
-On Wednesday, 21 March 2018 14:45:38 CET Eric Blake wrote:
-> [adding qemu lists]
-> 
-> On 03/21/2018 07:51 AM, Richard W.M. Jones wrote:
-> > On Wed, Mar 21, 2018 at 01:44:17PM +0100, Pino Toscano wrote:
-> >> Newer versions of qemu use file locking for the images by default, and
-> >> apparently that does not work with /dev/null.  Since this test just
-> >> calls qemu-img to get the format of an empty image, create a temporary
-> >> one instead.
-> > 
-> > ACK, but feels like this is a bug in qemu-img to me.
-> 
-> You're right that file locking on a character device like /dev/null is 
-> not going to work as expected, but is it a case where fcntl() actually 
-> fails, or is it worse where the fcntl() claiming the locks "succeeds" 
-> but doesn't do what we want?  That is, what were the actual error 
-> messages you ran into?
-
-$ qemu-img --version
-qemu-img version 2.10.1(qemu-2.10.1-2.fc27)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-$ qemu-img info /dev/null 
-qemu-img: Could not open '/dev/null': Failed to get "consistent read" lock
-Is another process using the image?
-
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 6d2c052068..37a8d68d29 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -99,7 +99,7 @@ void hmp_mouse_set(Monitor *mon, const QDict *qdict);
+ #define QEMU_KEY_CTRL_PAGEDOWN   0xe407
+ 
+ void kbd_put_keysym_console(QemuConsole *s, int keysym);
+-bool kbd_put_qcode_console(QemuConsole *s, int qcode);
++bool kbd_put_qcode_console(QemuConsole *s, int qcode, bool ctrl);
+ void kbd_put_string_console(QemuConsole *s, const char *str, int len);
+ void kbd_put_keysym(int keysym);
+ 
+diff --git a/ui/console.c b/ui/console.c
+index 530a491987..3fb2f4e09f 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1191,11 +1191,22 @@ static const int qcode_to_keysym[Q_KEY_CODE__MAX] = {
+     [Q_KEY_CODE_BACKSPACE] = QEMU_KEY_BACKSPACE,
+ };
+ 
+-bool kbd_put_qcode_console(QemuConsole *s, int qcode)
++static const int ctrl_qcode_to_keysym[Q_KEY_CODE__MAX] = {
++    [Q_KEY_CODE_UP]     = QEMU_KEY_CTRL_UP,
++    [Q_KEY_CODE_DOWN]   = QEMU_KEY_CTRL_DOWN,
++    [Q_KEY_CODE_RIGHT]  = QEMU_KEY_CTRL_RIGHT,
++    [Q_KEY_CODE_LEFT]   = QEMU_KEY_CTRL_LEFT,
++    [Q_KEY_CODE_HOME]   = QEMU_KEY_CTRL_HOME,
++    [Q_KEY_CODE_END]    = QEMU_KEY_CTRL_END,
++    [Q_KEY_CODE_PGUP]   = QEMU_KEY_CTRL_PAGEUP,
++    [Q_KEY_CODE_PGDN]   = QEMU_KEY_CTRL_PAGEDOWN,
++};
++
++bool kbd_put_qcode_console(QemuConsole *s, int qcode, bool ctrl)
+ {
+     int keysym;
+ 
+-    keysym = qcode_to_keysym[qcode];
++    keysym = ctrl ? ctrl_qcode_to_keysym[qcode] : qcode_to_keysym[qcode];
+     if (keysym == 0) {
+         return false;
+     }
+diff --git a/ui/gtk.c b/ui/gtk.c
+index ef5bc42094..e98ac4d2fc 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1197,12 +1197,12 @@ static gboolean gd_text_key_down(GtkWidget *widget,
+     QemuConsole *con = vc->gfx.dcl.con;
+ 
+     if (key->keyval == GDK_KEY_Delete) {
+-        kbd_put_qcode_console(con, Q_KEY_CODE_DELETE);
++        kbd_put_qcode_console(con, Q_KEY_CODE_DELETE, false);
+     } else if (key->length) {
+         kbd_put_string_console(con, key->string, key->length);
+     } else {
+         int qcode = gd_map_keycode(key->hardware_keycode);
+-        kbd_put_qcode_console(con, qcode);
++        kbd_put_qcode_console(con, qcode, false);
+     }
+     return TRUE;
+ }
+diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
+index 605d781971..35d35c14c4 100644
+--- a/ui/sdl2-input.c
++++ b/ui/sdl2-input.c
+@@ -70,7 +70,7 @@ void sdl2_process_key(struct sdl2_console *scon,
+                 kbd_put_keysym_console(con, QEMU_KEY_BACKSPACE);
+                 break;
+             default:
+-                kbd_put_qcode_console(con, qcode);
++                kbd_put_qcode_console(con, qcode, false);
+                 break;
+             }
+         }
 -- 
-Pino Toscano
---nextPart2077856.cQrCGbDHyq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEbjdOQa52nq0tQalew9FMLZhkN80FAlqyYsYACgkQw9FMLZhk
-N81v6A/+ItfARU/N5BjeoBm4LZA4BnH02bvFCS1xYKyx21ul1dmx5UMnVfK4wBKf
-z1Tbas69ZHbYnGbjkLUuai3vBgKrKOKWcWvgMZXMxTnzCgtxG34hJCTxwQj6EZZ7
-PLO/dAGkpuwiU4H9Jok9PJCSw1m3dIABwhbvXzLSakUAVanvf3f64MaLbd+/lWYB
-Jp+DhRf31WagPxLuvE3oZrKvUnvTFSuAWNGc6bymn7BTjdIrDoLfFME3NNmDy/bX
-1ZnPtOGxhP0O0LHimec7e7bi7nc61ga6Wo1lcDqw6ZB+I/fwPzqziGICT5mWqdv4
-fNduDwFEk0xnRvH8wZbHp/3rQx8/s/GPHCMmBZS6OSJm55kM1ltbGmfdcWvGYiDe
-ZFnAXbapzPr6QbXHWXGZIkSWsmYny/GmFtXSa7mh/Vqqj9QiPV9HyPa+ESN5YPcE
-wxV68XdJ+9Jhich0Wbjjbx+wgKj+iTzHTuABYg0nwAY8na10DDqXefGcKjmZRE23
-B7Hh4ZE8wTwd5Fhp5Mrd8LIQ9C7yRpqC7xVPDH63weBambyHT8Jby642By7kSMQ+
-0jE1JT0+/xey1BHiwfqQs20sYUtq+q+RTc12IrxJDXCT99/u5qSaJARKKCLKgoGm
-GnwCBRKsSylWP/zlVGb/I+5iygBqZ1kUwWL1sJ5043C9W8lDiTQ=
-=cnFh
------END PGP SIGNATURE-----
-
---nextPart2077856.cQrCGbDHyq--
+2.9.3
