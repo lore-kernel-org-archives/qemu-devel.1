@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eyiGr-0003J7-W4
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:15:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1eyiN5-0004nF-CU
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eyiGn-00029O-VH
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:15:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50236)
+	(envelope-from <dgilbert@redhat.com>) id 1eyiN0-00059D-Ag
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:21:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36852 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eyiGn-000291-LD
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:15:29 -0400
-Date: Wed, 21 Mar 2018 15:15:26 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180321181526.GZ3417@localhost.localdomain>
-References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
-	<1520888449-4352-3-git-send-email-babu.moger@amd.com>
-	<20180316180006.GH28578@localhost.localdomain>
-	<CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
-	<20180320175427.GU3417@localhost.localdomain>
-	<CY4PR12MB1768A3CBE42AAFB03CB1081E95AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
-	<20180321170941.GX3417@localhost.localdomain>
-	<CY4PR12MB1768D466F00BF68AA552EBE195AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyiN0-000590-5m
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:21:54 -0400
+Date: Wed, 21 Mar 2018 18:21:35 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180321182135.GH3465@work-vm>
+References: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1521253498-6834-3-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CY4PR12MB1768D466F00BF68AA552EBE195AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD Processor
- Cache Information
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1521253498-6834-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5.2 for 2.13 2/4] tpm: extend TPM TIS with
+ state migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,139 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "Hook, Gary" <Gary.Hook@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com
 
-On Wed, Mar 21, 2018 at 05:47:28PM +0000, Moger, Babu wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Eduardo Habkost <ehabkost@redhat.com>
-> > Sent: Wednesday, March 21, 2018 12:10 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>
-> > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
-> > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
-> > <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
-> > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
-> > devel@nongnu.org
-> > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
-> > Processor Cache Information
-> > 
-> > On Wed, Mar 21, 2018 at 03:58:41PM +0000, Moger, Babu wrote:
-> > > Hi Eduardo,
-> > >
-> > > > -----Original Message-----
-> > > > From: Eduardo Habkost <ehabkost@redhat.com>
-> > > > Sent: Tuesday, March 20, 2018 12:54 PM
-> > > > To: Moger, Babu <Babu.Moger@amd.com>
-> > > > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
-> > > > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
-> > > > <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
-> > > > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
-> > > > devel@nongnu.org
-> > > > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
-> > > > Processor Cache Information
-> > > >
-> > > > On Tue, Mar 20, 2018 at 05:25:52PM +0000, Moger, Babu wrote:
-> > > > > Hi Eduardo, Thanks for the comments. Please see the response inline.
-> > > > >
-> > > > > > -----Original Message-----
-> > > > > > From: Eduardo Habkost <ehabkost@redhat.com>
-> > > > > > Sent: Friday, March 16, 2018 1:00 PM
-> > > > > > To: Moger, Babu <Babu.Moger@amd.com>
-> > > > > > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
-> > > > > > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
-> > > > > > <brijesh.singh@amd.com>; kvm@vger.kernel.org;
-> > kash@tripleback.net;
-> > > > > > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
-> > > > > > devel@nongnu.org
-> > > > > > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
-> > > > > > Processor Cache Information
-> > > > > >
-> > > > > > On Mon, Mar 12, 2018 at 05:00:46PM -0400, Babu Moger wrote:
-> > > > > > > From: Stanislav Lanci <pixo@polepetko.eu>
-> > > > > > >
-> > > > > > > Add information for cpuid 0x8000001D leaf. Populate cache topology
-> > > > > > information
-> > > > > > > for different cache types(Data Cache, Instruction Cache, L2 and L3)
-> > > > > > supported
-> > > > > > > by 0x8000001D leaf. Please refer Processor Programming Reference
-> > > > (PPR)
-> > > > > > for AMD
-> > > > > > > Family 17h Model for more details.
-> > > > > > >
-> > > > > > > Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
-> > > > > > > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > > > > >
-> > > > > > The new CPUID leaves don't seem to match the existing AMD cache
-> > > > > > information
-> > > > > > leaves.  Is this intentional?  Why?
-> > > > >
-> > > > > It is not intentional. These values are from older family of processors.
-> > > > These values have changed from Family 14  or later.
-> > > > > The latest one is Family 17. You can see the differences here.
-> > > > >  https://support.amd.com/TechDocs/41131.pdf
-> > > > >
-> > > >
-> > https://support.amd.com/TechDocs/55072_AMD_Family_15h_Models_70h-
-> > > > 7Fh_BKDG.pdf
-> > > > >
-> > > >
-> > https://support.amd.com/TechDocs/54945_PPR_Family_17h_Models_00h-
-> > > > 0Fh.pdf
-> > > > >
-> > > > > Some of these are bugs in our code. For some we need to add checks
-> > for
-> > > > the family and correct these values.
-> > > > > You understand the code much better than me. Correct me if I missed
-> > > > something.
-> > > > >
-> > > > > Note that older family of processors don't support topology extensions.
-> > > >
-> > > > If you want to make the cache size/topology look different
-> > > > depending on the CPU model/options, this would require more work,
-> > > > but it would be an interesting feature.
-> > > >
-> > > > The "i386: Helpers to encode cache information consistently"
-> > > > patch I sent last week might be a useful starting point for that.
-> > > >
-> > > > If you plan to implement that, please keep in mind that existing
-> > > > CPUID cache info needs to be kept on previous machine-types (this
-> > > > is implemented by adding QOM properties that can be used to
-> > > > enable the old behavior, and by setting them at
-> > > > MachineClass::compat_props).
-> > >
-> > > Wanted to get some confirmation what you meant by setting
-> > MachineClass::compat_props.
-> > > Here is the patch I created to add new property for cpu. Now, I can use
-> > enable_topoext to display
-> > > new  change properly based on family.  Is that what you meant ?
-> > 
-> > If the only change you introduce in the defaults is enabling
-> > topoext but keeping the same default cache sizes, the example
-> > following would make sense (but see comments below about
-> > implementation details).
-> > 
-> > But if you also want to change the default cache size, you will
-> > also need properties that control the cache size.
-> 
-> Yes. We will need cpu family information.  Let me see if that information is
->  already available or we need to add that as well.
+* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+> Extend the TPM TIS interface with state migration support.
+>=20
+> We need to synchronize with the backend thread to make sure that a command
+> being processed by the external TPM emulator has completed and its
+> response been received.
+>=20
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>  hw/tpm/tpm_tis.c    | 52 +++++++++++++++++++++++++++++++++++++++++++++++=
++++--
+>  hw/tpm/trace-events |  1 +
+>  2 files changed, 51 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 2ac7e74..fec3d73 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -894,9 +894,57 @@ static void tpm_tis_reset(DeviceState *dev)
+>      tpm_backend_startup_tpm(s->be_driver, s->be_buffer_size);
+>  }
+> =20
+> +/* persistent state handling */
+> +
+> +static int tpm_tis_pre_save(void *opaque)
+> +{
+> +    TPMState *s =3D opaque;
+> +    uint8_t locty =3D s->active_locty;
+> +
+> +    trace_tpm_tis_pre_save(locty, s->rw_offset);
+> +
+> +    if (DEBUG_TIS) {
+> +        tpm_tis_dump_state(opaque, 0);
+> +    }
+> +
+> +    /*
+> +     * Synchronize with backend completion.
+> +     */
+> +    tpm_backend_finish_sync(s->be_driver);
+> +
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_locty =3D {
+> +    .name =3D "tpm-tis/locty",
+> +    .version_id =3D 1,
+> +    .fields      =3D (VMStateField[]) {
+> +        VMSTATE_UINT32(state, TPMLocality),
 
-CPU family doesn't seem to be enough, if you want to keep
-compatibility on older machine-type versions.  e.g.:
+I was a little worried with that being an enum, but I'm told
+we're OK assuming enum's come out as UINT32's; so:
 
-If you want to make EPYC expose a different cache size, you'd
-just need a new field on X86CPUDefinition.  This is the easy
-part.
+=66rom the migration code side,
 
-But you still need "-machine pc-2.11 -cpu EPYC" to expose the old
-cache size, for guest ABI compatibility.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-This means you need an additional knob that pc-2.10 can use in
-compat_props, to override the new family/model-dependent cache
-size in EPYC, and force the old cache sizes to be used even with
-"-cpu EPYC".
-
--- 
-Eduardo
+> +        VMSTATE_UINT32(inte, TPMLocality),
+> +        VMSTATE_UINT32(ints, TPMLocality),
+> +        VMSTATE_UINT8(access, TPMLocality),
+> +        VMSTATE_UINT32(sts, TPMLocality),
+> +        VMSTATE_UINT32(iface_id, TPMLocality),
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_tpm_tis =3D {
+> -    .name =3D "tpm",
+> -    .unmigratable =3D 1,
+> +    .name =3D "tpm-tis",
+> +    .version_id =3D 1,
+> +    .pre_save  =3D tpm_tis_pre_save,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_BUFFER(buffer, TPMState),
+> +        VMSTATE_UINT16(rw_offset, TPMState),
+> +        VMSTATE_UINT8(active_locty, TPMState),
+> +        VMSTATE_UINT8(aborting_locty, TPMState),
+> +        VMSTATE_UINT8(next_locty, TPMState),
+> +
+> +        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 1,
+> +                             vmstate_locty, TPMLocality),
+> +
+> +        VMSTATE_END_OF_LIST()
+> +    }
+>  };
+> =20
+>  static Property tpm_tis_properties[] =3D {
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index c5bfbf1..25bee0c 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -50,3 +50,4 @@ tpm_tis_mmio_write_locty_seized(uint8_t locty, uint8_t =
+active) "Locality %d seiz
+>  tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+>  tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+>  tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
+d to TPM: 0x%08x (size=3D%d)"
+> +tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
+t =3D %u"
+> --=20
+> 2.5.5
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
