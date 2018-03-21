@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eydG7-0006iv-68
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:54:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1eydH6-0007ia-JW
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eydG4-0004hZ-4p
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:54:27 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 21 Mar 2018 13:54:11 +0100
-Message-Id: <20180321125411.25803-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] scsi: turn "is this a SCSI device?" into a
- conditional hint
+	(envelope-from <eblake@redhat.com>) id 1eydH1-0005NC-UT
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:55:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48144 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eydH1-0005Mf-Ph
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:55:23 -0400
+References: <20180321065506.21091-1-peterx@redhat.com>
+	<20180321065506.21091-4-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <820c6c94-2b95-0d02-a104-3d70ee76ea37@redhat.com>
+Date: Wed, 21 Mar 2018 07:55:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180321065506.21091-4-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] tests: more strict command batching
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,63 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, eblake@redhat.com, lvivier@redhat.com
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>
 
-If the user does not have permissions to send ioctls to the device (due to
-SELinux or cgroups, for example), the output can look like
+On 03/21/2018 01:55 AM, Peter Xu wrote:
+> Add "id" fields to the commands, and check that the command returns are
+> in order.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   tests/qmp-test.c | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+> 
 
-qemu-kvm: -device scsi-block,drive=disk: cannot get SG_IO version number:
-  Operation not permitted.  Is this a SCSI device?
+> +++ b/tests/qmp-test.c
+> @@ -83,6 +83,7 @@ static void test_qmp_protocol(void)
+>       const QListEntry *entry;
+>       QString *qstr;
+>       int i;
+> +    char buf[128];
 
-but this is confusing because the ioctl was blocked _before_ the device
-even received the SG_GET_VERSION_NUM ioctl.  Therefore, for EPERM errors
-the suggestion should be eliminated.  To make that simpler, change the
-code to use error_append_hint.
+Eww, we shouldn't need this.
 
-Reported-by: Ala Hino <ahino@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-disk.c    | 7 ++++---
- hw/scsi/scsi-generic.c | 7 ++++---
- 2 files changed, 8 insertions(+), 6 deletions(-)
+>   
+>       qts = qtest_init_without_qmp_handshake(common_args);
+>   
+> @@ -150,7 +151,10 @@ static void test_qmp_protocol(void)
+>        * best-effort test.
+>        */
+>       for (i = 0; i < 16; i++) {
+> -        qtest_async_qmp(qts, "{ 'execute': 'query-version' }");
+> +        snprintf(buf, sizeof(buf) - 1, "{ 'execute': 'query-version', "
+> +                 "'id': %d }", i);
+> +        buf[sizeof(buf) - 1] = '\0';
+> +        qtest_async_qmp(qts, buf);
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 94043ed024..3e29063a3f 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2637,9 +2637,10 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
-     /* check we are using a driver managing SG_IO (version 3 and after) */
-     rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
-     if (rc < 0) {
--        error_setg(errp, "cannot get SG_IO version number: %s.  "
--                     "Is this a SCSI device?",
--                     strerror(-rc));
-+        error_setg_errno(errp, -rc, "cannot get SG_IO version number");
-+        if (rc != -EPERM) {
-+            error_append_hint(errp, "Is this a SCSI device?\n");
-+        }
-         return;
-     }
-     if (sg_version < 30000) {
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 7414fe2d67..4753f8738f 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -500,9 +500,10 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
-     /* check we are using a driver managing SG_IO (version 3 and after */
-     rc = blk_ioctl(s->conf.blk, SG_GET_VERSION_NUM, &sg_version);
-     if (rc < 0) {
--        error_setg(errp, "cannot get SG_IO version number: %s.  "
--                         "Is this a SCSI device?",
--                         strerror(-rc));
-+        error_setg_errno(errp, -rc, "cannot get SG_IO version number");
-+        if (rc != -EPERM) {
-+            error_append_hint(errp, "Is this a SCSI device?\n");
-+        }
-         return;
-     }
-     if (sg_version < 30000) {
+snprintf() of JSON strings is prone to failures especially when the JSON 
+string is reinterpreted as a printf argument in qtest_async_qmp.  Better 
+is to let qtest_async_qmp() directly do the formatting, as in:
+
+qtest_async_qmp(qts, "{ 'execute':'query-version', 'id':%d}", i);
+
+And then I was right - you don't need buf.
+
+Otherwise the addition is good.
+
 -- 
-2.16.2
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
