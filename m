@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyeK8-0008G6-A8
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:02:47 -0400
+	(envelope-from <marcel@redhat.com>) id 1eyeKw-0000SQ-FH
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyeK3-0006Wk-GI
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:02:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50458 helo=mx1.redhat.com)
+	(envelope-from <marcel@redhat.com>) id 1eyeKq-0006vu-OR
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:03:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39468 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyeK3-0006WU-CR
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:02:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E898CA1BEB
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 14:02:34 +0000 (UTC)
-References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
-	<20180321134005.8822-3-marcandre.lureau@redhat.com>
-	<989e4d84-15a9-8867-4616-31fc6c6151fa@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ce6ecc00-30de-f98f-b4b1-0dbed853dd7a@redhat.com>
-Date: Wed, 21 Mar 2018 15:02:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <989e4d84-15a9-8867-4616-31fc6c6151fa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
- at offset 0
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eyeKq-0006vl-Jv
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:03:24 -0400
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Wed, 21 Mar 2018 16:03:16 +0200
+Message-Id: <20180321140316.96045-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH V2 for-2.12] hw/rdma: fix clang compilation
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +22,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: yuval.shaia@oracle.com, marcel@redhat.com, mst@redhat.com, eblake@redhat.com
 
-On 21/03/2018 15:01, Eric Blake wrote:
->>
->=20
-> Interesting.=C2=A0 If we do this, we should also simplify qobject_to() =
-from
-> its current:
->=20
-> #define qobject_to(type, obj) ({ \
-> =C2=A0=C2=A0=C2=A0 QObject *_tmp =3D qobject_check_type(obj, glue(QTYPE=
-_CAST_TO_, type)); \
-> =C2=A0=C2=A0=C2=A0 _tmp ? container_of(_tmp, type, base) : (type *)NULL=
-; })
->=20
-> to the simpler:
->=20
-> #define qobject_to(type, obj) \
-> =C2=A0=C2=A0=C2=A0 ((type *)qobject_check_type(obj, glue(QTYPE_CAST_TO_=
-, type)))
+Fix some enum castings and extra parentheses.
 
-Yes, indeed!
+Reported-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
 
-Paolo
+V1 -> V2:
+ - Addressed Yuval's and Eric's comments:
+   - Removed some parentheses
+   - Replaced PVRDMA_PORT_DOWN with IBV_PORT_DOWN
+   - Removed unneeded cast
+
+ hw/rdma/vmw/pvrdma_cmd.c  | 5 +++--
+ hw/rdma/vmw/pvrdma_main.c | 4 ++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index 293dfed29f..9e551c3250 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -73,7 +73,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
+     tbl_idx = 1;
+     addr_idx = 1;
+     while (addr_idx < nchunks) {
+-        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
++        if (tbl_idx == TARGET_PAGE_SIZE / sizeof(uint64_t)) {
+             tbl_idx = 0;
+             dir_idx++;
+             pr_dbg("Mapping to table %d\n", dir_idx);
+@@ -507,7 +507,8 @@ static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     rsp->hdr.err = rdma_rm_modify_qp(&dev->rdma_dev_res, &dev->backend_dev,
+                                  cmd->qp_handle, cmd->attr_mask,
+                                  (union ibv_gid *)&cmd->attrs.ah_attr.grh.dgid,
+-                                 cmd->attrs.dest_qp_num, cmd->attrs.qp_state,
++                                 cmd->attrs.dest_qp_num,
++                                 (enum ibv_qp_state)cmd->attrs.qp_state,
+                                  cmd->attrs.qkey, cmd->attrs.rq_psn,
+                                  cmd->attrs.sq_psn);
+ 
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 99787812ba..5e69a9f2c7 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -91,7 +91,7 @@ static int init_dev_ring(PvrdmaRing *ring, struct pvrdma_ring **ring_state,
+         goto out_free_tbl;
+     }
+     /* RX ring is the second */
+-    (struct pvrdma_ring *)(*ring_state)++;
++    (*ring_state)++;
+     rc = pvrdma_ring_init(ring, name, pci_dev,
+                           (struct pvrdma_ring *)*ring_state,
+                           (num_pages - 1) * TARGET_PAGE_SIZE /
+@@ -292,7 +292,7 @@ static void init_ports(PVRDMADev *dev, Error **errp)
+     memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
+ 
+     for (i = 0; i < MAX_PORTS; i++) {
+-        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
++        dev->rdma_dev_res.ports[i].state = IBV_PORT_DOWN;
+ 
+         dev->rdma_dev_res.ports[i].pkey_tbl =
+             g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
+-- 
+2.13.5
