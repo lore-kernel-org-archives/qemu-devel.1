@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eydHI-0007uG-Ax
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:55:41 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1eydIc-0000ek-4b
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:57:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eydHH-0005i5-JH
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:55:40 -0400
-References: <20180321125411.25803-1-pbonzini@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <2f80709e-22b1-ec58-ce28-8165fe578cd2@redhat.com>
-Date: Wed, 21 Mar 2018 13:55:30 +0100
+	(envelope-from <yuval.shaia@oracle.com>) id 1eydIX-0006lg-9S
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:57:02 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1eydIW-0006kr-Vg
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:56:57 -0400
+Date: Wed, 21 Mar 2018 14:56:20 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180321125619.GA12966@yuvallap>
+References: <20180321124026.70292-1-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180321125411.25803-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scsi: turn "is this a SCSI device?" into a
- conditional hint
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180321124026.70292-1-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/rdma: fix clang compilation
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, eblake@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, yuval.shaia@oracle.com
 
-On 21/03/2018 13:54, Paolo Bonzini wrote:
-> If the user does not have permissions to send ioctls to the device (due to
-> SELinux or cgroups, for example), the output can look like
+On Wed, Mar 21, 2018 at 02:40:26PM +0200, Marcel Apfelbaum wrote:
+> Fix some enum castings and extra parentheses.
 > 
-> qemu-kvm: -device scsi-block,drive=disk: cannot get SG_IO version number:
->   Operation not permitted.  Is this a SCSI device?
-> 
-> but this is confusing because the ioctl was blocked _before_ the device
-> even received the SG_GET_VERSION_NUM ioctl.  Therefore, for EPERM errors
-> the suggestion should be eliminated.  To make that simpler, change the
-> code to use error_append_hint.
-> 
-> Reported-by: Ala Hino <ahino@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 > ---
->  hw/scsi/scsi-disk.c    | 7 ++++---
->  hw/scsi/scsi-generic.c | 7 ++++---
->  2 files changed, 8 insertions(+), 6 deletions(-)
+>  hw/rdma/vmw/pvrdma_cmd.c  | 5 +++--
+>  hw/rdma/vmw/pvrdma_main.c | 5 +++--
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index 293dfed29f..25f747a190 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -73,7 +73,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
+>      tbl_idx = 1;
+>      addr_idx = 1;
+>      while (addr_idx < nchunks) {
+> -        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
+> +        if (tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t))) {
+>              tbl_idx = 0;
+>              dir_idx++;
+>              pr_dbg("Mapping to table %d\n", dir_idx);
+> @@ -507,7 +507,8 @@ static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>      rsp->hdr.err = rdma_rm_modify_qp(&dev->rdma_dev_res, &dev->backend_dev,
+>                                   cmd->qp_handle, cmd->attr_mask,
+>                                   (union ibv_gid *)&cmd->attrs.ah_attr.grh.dgid,
+> -                                 cmd->attrs.dest_qp_num, cmd->attrs.qp_state,
+> +                                 (enum ibv_qp_state)cmd->attrs.dest_qp_num,
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+This field is uint32_t and function gets uint32_t so we should be fine, it
+doesn't make sense to cast it to ibv_qp_state.
+
+> +                                 (enum ibv_qp_state)cmd->attrs.qp_state,
+>                                   cmd->attrs.qkey, cmd->attrs.rq_psn,
+>                                   cmd->attrs.sq_psn);
+>  
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index 99787812ba..0e3469287f 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -91,7 +91,7 @@ static int init_dev_ring(PvrdmaRing *ring, struct pvrdma_ring **ring_state,
+>          goto out_free_tbl;
+>      }
+>      /* RX ring is the second */
+> -    (struct pvrdma_ring *)(*ring_state)++;
+> +    (*ring_state)++;
+>      rc = pvrdma_ring_init(ring, name, pci_dev,
+>                            (struct pvrdma_ring *)*ring_state,
+>                            (num_pages - 1) * TARGET_PAGE_SIZE /
+> @@ -292,7 +292,8 @@ static void init_ports(PVRDMADev *dev, Error **errp)
+>      memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
+>  
+>      for (i = 0; i < MAX_PORTS; i++) {
+> -        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
+> +        dev->rdma_dev_res.ports[i].state =
+> +            (enum ibv_port_state)PVRDMA_PORT_DOWN;
+
+Suggesting to set it to IBV_PORT_DOWN and avoid this casting.
+
+>  
+>          dev->rdma_dev_res.ports[i].pkey_tbl =
+>              g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
+> -- 
+> 2.13.5
+> 
