@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyfZI-0000Kd-5r
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:22:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eyfal-0001FR-Qm
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:23:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyfZE-00040B-6K
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:22:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42306 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyfZE-0003zn-14
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:22:20 -0400
-Date: Wed, 21 Mar 2018 17:22:07 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1521645545-247351-2-git-send-email-mst@redhat.com>
-References: <1521645545-247351-1-git-send-email-mst@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eyfaj-0000TX-1G
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:23:55 -0400
+References: <1521642402-197739-1-git-send-email-mst@redhat.com>
+	<3a819d04-b1d2-550e-7458-4ea7509db36d@redhat.com>
+	<20180321170823-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e67f7f34-5b15-9939-df92-d081653a4683@redhat.com>
+Date: Wed, 21 Mar 2018 16:23:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1521645545-247351-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.12 2/2] make: switch from -I to -iquote
+In-Reply-To: <20180321170823-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=83=C2=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <famz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Our rule right now is to use <> for external headers,
-"" for internal ones. The idea was to avoid conflicts
-between e.g. a system file named <trace.h> and an
-internal one by the same name.
+On 21/03/2018 16:11, Michael S. Tsirkin wrote:
+>> Can you explain the changes in the source tree layout?
+> include/qemu -> include/qemu/common
+> include/* -> include/qemu/*
 
-Unfortunately we use -I compiler flag so it does not
-help: a system file doing #include <trace.h> will
-still pick up ours first.
+Ok, then perhaps "util" instead of common would match the source layout
+more.
 
-To fix, switch to -iquote which is supported by both
-gcc and clang and only affects #include "" directives.
+Paolo
 
-As a side effect, this catches any future uses of
- #include <> for internal headers.
-
-Suggested-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
-
-I still think we want to switch to a more formal rule such as qemu/
-prefix for all includes down the road, but this will at least catch any
-scheme violations from creeping in meanwhile.
-
-
- configure       | 16 ++++++++--------
- rules.mak       |  2 +-
- Makefile.target |  4 ++--
- 3 files changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/configure b/configure
-index af72fc8..23a4f3b 100755
---- a/configure
-+++ b/configure
-@@ -534,7 +534,7 @@ QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
- QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
--QEMU_INCLUDES="-I. -I\$(SRC_PATH) -I\$(SRC_PATH)/accel/tcg -I\$(SRC_PATH)/include"
-+QEMU_INCLUDES="-iquote . -iquote \$(SRC_PATH) -iquote \$(SRC_PATH)/accel/tcg -iquote \$(SRC_PATH)/include"
- if test "$debug_info" = "yes"; then
-     CFLAGS="-g $CFLAGS"
-     LDFLAGS="-g $LDFLAGS"
-@@ -6560,19 +6560,19 @@ if test "$vxhs" = "yes" ; then
- fi
- 
- if test "$tcg_interpreter" = "yes"; then
--  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
- elif test "$ARCH" = "sparc64" ; then
--  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
- elif test "$ARCH" = "s390x" ; then
--  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
- elif test "$ARCH" = "x86_64" -o "$ARCH" = "x32" ; then
--  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
- elif test "$ARCH" = "ppc64" ; then
--  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
- else
--  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
- fi
--QEMU_INCLUDES="-I\$(SRC_PATH)/tcg $QEMU_INCLUDES"
-+QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg $QEMU_INCLUDES"
- 
- echo "TOOLS=$tools" >> $config_host_mak
- echo "ROMS=$roms" >> $config_host_mak
-diff --git a/rules.mak b/rules.mak
-index 6e94333..93a0702 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -29,7 +29,7 @@ QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
- # dir, one absolute and the other relative to the compiler working
- # directory. These are the same for target-independent files, but
- # different for target-dependent ones.
--QEMU_LOCAL_INCLUDES = -I$(BUILD_DIR)/$(@D) -I$(@D)
-+QEMU_LOCAL_INCLUDES = -iquote $(BUILD_DIR)/$(@D) -iquote $(@D)
- 
- WL_U := -Wl,-u,
- find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
-diff --git a/Makefile.target b/Makefile.target
-index 6549481..d0ec77a 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -11,9 +11,9 @@ $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
- ifdef CONFIG_LINUX
- QEMU_CFLAGS += -I../linux-headers
- endif
--QEMU_CFLAGS += -I.. -I$(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DNEED_CPU_H
-+QEMU_CFLAGS += -iquote .. -iquote $(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DNEED_CPU_H
- 
--QEMU_CFLAGS+=-I$(SRC_PATH)/include
-+QEMU_CFLAGS+=-iquote $(SRC_PATH)/include
- 
- ifdef CONFIG_USER_ONLY
- # user emulator name
--- 
-MST
+> Thus one uses any qemu headers with
+> 
+> #include <qemu/....>
