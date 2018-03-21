@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eyURX-0007s2-Ar
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:29:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1eyURX-0007s1-Aq
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:29:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eyURU-0005JT-4E
+	(envelope-from <dgibson@ozlabs.org>) id 1eyURU-0005JU-44
 	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:29:39 -0400
-Date: Wed, 21 Mar 2018 14:19:35 +1100
+Date: Wed, 21 Mar 2018 14:29:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180321031935.GO3905@umbus.fritz.box>
-References: <20180315133402.13470-1-clg@kaod.org>
-	<20180315133402.13470-3-clg@kaod.org>
+Message-ID: <20180321032924.GP3905@umbus.fritz.box>
+References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
+	<20180306203103.25563-18-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Vy1A5eXR7jld12ZH"
+	protocol="application/pgp-signature"; boundary="U+NfgObvpQT1Q9Yq"
 Content-Disposition: inline
-In-Reply-To: <20180315133402.13470-3-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/ppc: add basic support for
- PTCR on POWER9
+In-Reply-To: <20180306203103.25563-18-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 17/19] uninorth: create new uninorth device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,227 +24,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---Vy1A5eXR7jld12ZH
-Content-Type: text/plain; charset=iso-8859-1
+--U+NfgObvpQT1Q9Yq
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 15, 2018 at 01:34:00PM +0000, C=E9dric Le Goater wrote:
-> The Partition Table Control Register (PTCR) is a hypervisor privileged
-> SPR. It contains the host real address of the Partition Table and its
-> size.
+On Tue, Mar 06, 2018 at 08:31:01PM +0000, Mark Cave-Ayland wrote:
+> Commit 4e46dcdbd3 "PPC: Newworld: Add uninorth token register" added a TO=
+DO
+> which was to convert the uninorth registers hack to a proper device. Move
+> these registers to a new uninorth device, removing the old hacks from
+> mac_newworld.c.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
+>  hw/pci-host/trace-events       |  2 ++
+>  hw/pci-host/uninorth.c         | 58 ++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/mac_newworld.c          | 41 +++++------------------------
+>  hw/ppc/trace-events            |  4 ---
+>  include/hw/pci-host/uninorth.h | 11 ++++++++
+>  5 files changed, 77 insertions(+), 39 deletions(-)
 >=20
->  Changes since v2:
->=20
->  - added an assert on MMU model in ppc_store_ptcr()
->  - renamed s/ptas/patbsize/
+> diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
+> index 341a87a702..dd7a398e96 100644
+> --- a/hw/pci-host/trace-events
+> +++ b/hw/pci-host/trace-events
+> @@ -18,3 +18,5 @@ unin_set_irq(int irq_num, int level) "setting INT %d =
+=3D %d"
+>  unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "conve=
+rted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
+>  unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0=
+x%"PRIx64 " len %d val 0x%"PRIx64
+>  unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%=
+"PRIx64 " len %d val 0x%"PRIx64
+> +unin_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x=
+%"PRIx64
+> +unin_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x%=
+"PRIx64
+> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+> index fada0ffd5f..dbfad01d9d 100644
+> --- a/hw/pci-host/uninorth.c
+> +++ b/hw/pci-host/uninorth.c
+> @@ -519,6 +519,62 @@ static const TypeInfo pci_unin_internal_info =3D {
+>      .class_init    =3D pci_unin_internal_class_init,
+>  };
 > =20
->  Changes since v1:
->=20
->  - renamed partition table definitions to match ISA
->  - moved definitions under mmu-book3s-v3.h
->=20
->  target/ppc/cpu.h            |  2 ++
->  target/ppc/helper.h         |  1 +
->  target/ppc/misc_helper.c    | 12 ++++++++++++
->  target/ppc/mmu-book3s-v3.h  |  6 ++++++
->  target/ppc/mmu_helper.c     | 29 +++++++++++++++++++++++++++++
->  target/ppc/translate.c      |  3 +++
->  target/ppc/translate_init.c | 18 ++++++++++++++++++
->  7 files changed, 71 insertions(+)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 4de0653a3984..7e900cf86a5f 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1314,6 +1314,7 @@ int ppc_cpu_handle_mmu_fault(CPUState *cpu, vaddr a=
-ddress, int size, int rw,
-> =20
->  #if !defined(CONFIG_USER_ONLY)
->  void ppc_store_sdr1 (CPUPPCState *env, target_ulong value);
-> +void ppc_store_ptcr(CPUPPCState *env, target_ulong value);
->  #endif /* !defined(CONFIG_USER_ONLY) */
->  void ppc_store_msr (CPUPPCState *env, target_ulong value);
-> =20
-> @@ -1605,6 +1606,7 @@ void ppc_compat_add_property(Object *obj, const cha=
-r *name,
->  #define SPR_BOOKE_GIVOR13     (0x1BC)
->  #define SPR_BOOKE_GIVOR14     (0x1BD)
->  #define SPR_TIR               (0x1BE)
-> +#define SPR_PTCR              (0x1D0)
->  #define SPR_BOOKE_SPEFSCR     (0x200)
->  #define SPR_Exxx_BBEAR        (0x201)
->  #define SPR_Exxx_BBTAR        (0x202)
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 5b739179b8b5..19453c68138a 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -709,6 +709,7 @@ DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG, tl=
-, env)
->  #if !defined(CONFIG_USER_ONLY)
->  #if defined(TARGET_PPC64)
->  DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
-> +DEF_HELPER_2(store_ptcr, void, env, tl)
->  #endif
->  DEF_HELPER_2(store_sdr1, void, env, tl)
->  DEF_HELPER_2(store_pidr, void, env, tl)
-> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-> index 0e4217821b8e..8c8cba5cc6f1 100644
-> --- a/target/ppc/misc_helper.c
-> +++ b/target/ppc/misc_helper.c
-> @@ -88,6 +88,18 @@ void helper_store_sdr1(CPUPPCState *env, target_ulong =
-val)
->      }
->  }
-> =20
-> +#if defined(TARGET_PPC64)
-> +void helper_store_ptcr(CPUPPCState *env, target_ulong val)
+> +/* UniN device */
+> +static void unin_write(void *opaque, hwaddr addr, uint64_t value,
+> +                       unsigned size)
 > +{
-> +    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-> +
-> +    if (env->spr[SPR_PTCR] !=3D val) {
-> +        ppc_store_ptcr(env, val);
-> +        tlb_flush(CPU(cpu));
+> +    trace_unin_write(addr, value);
+> +    if (addr =3D=3D 0x0) {
+> +        *(int *)opaque =3D value;
 > +    }
 > +}
-> +#endif /* defined(TARGET_PPC64) */
 > +
->  void helper_store_pidr(CPUPPCState *env, target_ulong val)
->  {
->      PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-> index 56095dab522c..fdf80987d7b2 100644
-> --- a/target/ppc/mmu-book3s-v3.h
-> +++ b/target/ppc/mmu-book3s-v3.h
-> @@ -22,6 +22,12 @@
-> =20
->  #ifndef CONFIG_USER_ONLY
-> =20
-> +/*
-> + * Partition table definitions
-> + */
-> +#define PTCR_PATB               0x0FFFFFFFFFFFF000ULL /* Partition Table=
- Base */
-> +#define PTCR_PATS               0x000000000000001FULL /* Partition Table=
- Size */
-> +
->  /* Partition Table Entry Fields */
->  #define PATBE1_GR 0x8000000000000000
-> =20
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index 5568d1642b34..03009eee723a 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -2028,6 +2028,35 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong=
- value)
->      env->spr[SPR_SDR1] =3D value;
->  }
-> =20
-> +#if defined(TARGET_PPC64)
-> +void ppc_store_ptcr(CPUPPCState *env, target_ulong value)
+> +static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
 > +{
-> +    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-> +    target_ulong ptcr_mask =3D PTCR_PATB | PTCR_PATS;
-> +    target_ulong patbsize =3D value & PTCR_PATS;
+> +    uint32_t value;
 > +
-> +    qemu_log_mask(CPU_LOG_MMU, "%s: " TARGET_FMT_lx "\n", __func__, valu=
-e);
-> +
-> +    assert(!cpu->vhyp);
-> +    assert(env->mmu_model & POWERPC_MMU_V3);
-> +
-> +    if (value & ~ptcr_mask) {
-> +        error_report("Invalid bits 0x"TARGET_FMT_lx" set in PTCR",
-> +                     value & ~ptcr_mask);
-> +        value &=3D ptcr_mask;
+> +    value =3D 0;
+> +    switch (addr) {
+> +    case 0:
+> +        value =3D *(int *)opaque;
 > +    }
 > +
-> +    if (patbsize > 24) {
-> +        error_report("Invalid Partition Table size 0x" TARGET_FMT_lx
-> +                     " stored in PTCR", patbsize);
-> +        return;
-> +    }
+> +    trace_unin_read(addr, value);
 > +
-> +    env->spr[SPR_PTCR] =3D value;
+> +    return value;
 > +}
 > +
-> +#endif /* defined(TARGET_PPC64) */
+> +static const MemoryRegionOps unin_ops =3D {
+> +    .read =3D unin_read,
+> +    .write =3D unin_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+
+DEVICE_NATIVE_ENDIAN is almost always wrong.  I'm pretty sure it
+should be DEVICE_BIG_ENDIAN.  I realize this is just a code motion,
+but while you're making a proper device of it, you might as well fix
+this to.
+
+> +};
 > +
->  /* Segment registers load and store */
->  target_ulong helper_load_sr(CPUPPCState *env, target_ulong sr_num)
+> +static void unin_init(Object *obj)
+> +{
+> +    UNINState *s =3D UNI_NORTH(obj);
+> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->mem, obj, &unin_ops, &s->token, "unin", 0x=
+1000);
+> +
+> +    sysbus_init_mmio(sbd, &s->mem);
+> +}
+> +
+> +static void unin_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +}
+> +
+> +static const TypeInfo unin_info =3D {
+> +    .name          =3D TYPE_UNI_NORTH,
+> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .instance_size =3D sizeof(UNINState),
+> +    .instance_init =3D unin_init,
+> +    .class_init    =3D unin_class_init,
+> +};
+> +
+>  static void unin_register_types(void)
 >  {
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 218665b4080b..172fbf35ae53 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -7136,6 +7136,9 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fpri=
-ntf_function cpu_fprintf,
->          if (env->spr_cb[SPR_SDR1].name) { /* SDR1 Exists */
->              cpu_fprintf(f, " SDR1 " TARGET_FMT_lx " ", env->spr[SPR_SDR1=
-]);
+>      type_register_static(&unin_main_pci_host_info);
+> @@ -530,6 +586,8 @@ static void unin_register_types(void)
+>      type_register_static(&pci_u3_agp_info);
+>      type_register_static(&pci_unin_agp_info);
+>      type_register_static(&pci_unin_internal_info);
+> +
+> +    type_register_static(&unin_info);
+>  }
+> =20
+>  type_init(unin_register_types)
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index ae0de4e36e..2fcb101982 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -83,36 +83,6 @@
+> =20
+>  #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+> =20
+> -/* UniN device */
+> -static void unin_write(void *opaque, hwaddr addr, uint64_t value,
+> -                       unsigned size)
+> -{
+> -    trace_mac99_uninorth_write(addr, value);
+> -    if (addr =3D=3D 0x0) {
+> -        *(int*)opaque =3D value;
+> -    }
+> -}
+> -
+> -static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
+> -{
+> -    uint32_t value;
+> -
+> -    value =3D 0;
+> -    switch (addr) {
+> -    case 0:
+> -        value =3D *(int*)opaque;
+> -    }
+> -
+> -    trace_mac99_uninorth_read(addr, value);
+> -
+> -    return value;
+> -}
+> -
+> -static const MemoryRegionOps unin_ops =3D {
+> -    .read =3D unin_read,
+> -    .write =3D unin_write,
+> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> -};
+> =20
+>  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>                              Error **errp)
+> @@ -146,7 +116,6 @@ static void ppc_core99_init(MachineState *machine)
+>      CPUPPCState *env =3D NULL;
+>      char *filename;
+>      qemu_irq *pic, **openpic_irqs;
+> -    MemoryRegion *unin_memory =3D g_new(MemoryRegion, 1);
+>      int linux_boot, i, j, k;
+>      MemoryRegion *ram =3D g_new(MemoryRegion, 1), *bios =3D g_new(Memory=
+Region, 1);
+>      hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
+> @@ -165,7 +134,6 @@ static void ppc_core99_init(MachineState *machine)
+>      int machine_arch;
+>      SysBusDevice *s;
+>      DeviceState *dev, *pic_dev;
+> -    int *token =3D g_new(int, 1);
+>      hwaddr nvram_addr =3D 0xFFF04000;
+>      uint64_t tbfreq;
+> =20
+> @@ -273,9 +241,12 @@ static void ppc_core99_init(MachineState *machine)
 >          }
-> +        if (env->spr_cb[SPR_PTCR].name) { /* PTCR Exists */
-> +            cpu_fprintf(f, " PTCR " TARGET_FMT_lx " ", env->spr[SPR_PTCR=
-]);
-> +        }
->          cpu_fprintf(f, "  DAR " TARGET_FMT_lx "  DSISR " TARGET_FMT_lx "=
-\n",
->                      env->spr[SPR_DAR], env->spr[SPR_DSISR]);
->          break;
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 391b94b97daa..e53cc8dfd188 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -420,6 +420,11 @@ static void spr_write_hior(DisasContext *ctx, int sp=
-rn, int gprn)
->      tcg_gen_st_tl(t0, cpu_env, offsetof(CPUPPCState, excp_prefix));
->      tcg_temp_free(t0);
->  }
-> +static void spr_write_ptcr(DisasContext *ctx, int sprn, int gprn)
-> +{
-> +    gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
-> +}
+>      }
+> =20
+> -    /* UniN init: XXX should be a real device */
+> -    memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0=
+x1000);
+> -    memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_me=
+mory);
+> +    /* UniN init */
+> +    dev =3D qdev_create(NULL, TYPE_UNI_NORTH);
+> +    qdev_init_nofail(dev);
+> +    s =3D SYS_BUS_DEVICE(dev);
+> +    memory_region_add_subregion(get_system_memory(), 0xf8000000,
+> +                                sysbus_mmio_get_region(s, 0));
+> =20
+>      openpic_irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
+>      openpic_irqs[0] =3D
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index 66ec7eda6e..dc5e65aee9 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -92,10 +92,6 @@ rs6000mc_size_read(uint32_t addr, uint32_t val) "read =
+addr=3D0x%x val=3D0x%x"
+>  rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D0x%x val=
+=3D0x%x"
+>  rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D0x%x val=
+=3D0x%x"
+> =20
+> -# hw/ppc/mac_newworld.c
+> -mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 =
+" val=3D0x%"PRIx64
+> -mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 "=
+ val=3D0x%"PRIx64
+> -
+>  # hw/ppc/ppc4xx_pci.c
+>  ppc4xx_pci_map_irq(int32_t devfn, int irq_num, int slot) "devfn 0x%x irq=
+ %d -> %d"
+>  ppc4xx_pci_set_irq(int irq_num) "PCI irq %d"
+> diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
+h.h
+> index d1424b165a..b0eb093e72 100644
+> --- a/include/hw/pci-host/uninorth.h
+> +++ b/include/hw/pci-host/uninorth.h
+> @@ -51,4 +51,15 @@ typedef struct UNINHostState {
+>      MemoryRegion pci_io;
+>  } UNINHostState;
+> =20
+> +typedef struct UNINState {
+> +    SysBusDevice parent_obj;
 > +
->  #endif
->  #endif
-> =20
-> @@ -8167,6 +8172,18 @@ static void gen_spr_power8_rpr(CPUPPCState *env)
->  #endif
->  }
-> =20
-> +static void gen_spr_power9_mmu(CPUPPCState *env)
-> +{
-> +#if !defined(CONFIG_USER_ONLY)
-> +    /* Partition Table Control */
-> +    spr_register_hv(env, SPR_PTCR, "PTCR",
-> +                    SPR_NOACCESS, SPR_NOACCESS,
-> +                    SPR_NOACCESS, SPR_NOACCESS,
-> +                    &spr_read_generic, &spr_write_ptcr,
-> +                    0x00000000);
-> +#endif
-> +}
+> +    MemoryRegion mem;
+> +    int token[1];
+> +} UNINState;
 > +
->  static void init_proc_book3s_common(CPUPPCState *env)
->  {
->      gen_spr_ne_601(env);
-> @@ -8761,6 +8778,7 @@ static void init_proc_POWER9(CPUPPCState *env)
->      gen_spr_power8_ic(env);
->      gen_spr_power8_book4(env);
->      gen_spr_power8_rpr(env);
-> +    gen_spr_power9_mmu(env);
-> =20
->      /* POWER9 Specific registers */
->      spr_register_kvm(env, SPR_TIDR, "TIDR", NULL, NULL,
+> +#define TYPE_UNI_NORTH "uni-north"
+> +#define UNI_NORTH(obj) \
+> +    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH)
+> +
+>  #endif /* UNINORTH_H */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -253,24 +274,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Vy1A5eXR7jld12ZH
+--U+NfgObvpQT1Q9Yq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqxz0cACgkQbDjKyiDZ
-s5JxjhAAn678581dvMqEHI4L8JYoN3tDlweOwS7ZarI72iHML8W5EGmxgCprteYA
-r69mDSIEB9HkDu/YrWnf7nV31ZI4slMpNEBweLAkKg9BzWdV35HYeqsROx3qDXXQ
-X2QRxy0X7PBJ2lWC53TjIIIdCNMM72kJRRmFDsPQQZm9QFNPslHFinXhRgHCl0n+
-r5MDXN3NC3JQY1mmU5nw7ErpRyb0Lr9DnHD3vCvVRQMeeT65dwdOmR5uj6Wfgdiz
-EhYe/jkYxthOW0yKiHzkOQsyMTiH62/6jzj1EugHjlb46cxbB5zQ+sZIr5AYaO0s
-qsXAvrIpc3Chqfiu14qjGYxABrri0YVuWwTUkxGM/0hL6hr3T0F/ckuvjjM27taK
-fNmv8DMjYOPeLAdHOTPuzFhTO4QwluIhtzGeMRyWFlIF1ISdML2vgPlKlqMm+mvT
-3o+1nPnAhR5uEwQtAEmkm2POLewGij1eAeugXKInlZuFGYzZgCWy2PJUUlLi/Bt8
-3Q77cwDYZ8UP4TsaG+ML3zbKH++rvJYP1JDviY8dssSOW55oyhiuCxq5VjXtYurk
-rNnRd2w5/QrIo8Y9WOMzvXpQEHHrM9/oAR54oemjxGRcCpjkdyJmh+4nC3VJLoEm
-VCr7HXQMEb9KEZFOzFkgNRyLBmmlW9XcSqK+7MQVPgtiE/hRB3U=
-=H5QB
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqx0ZQACgkQbDjKyiDZ
+s5JKdg//aKsqGXU7WzZ9NciBcSFJNQRbxB1cqzG7afHhTnxrpZfkH8QopVJtjDwX
+4qcemo7yRZJKHTshS4Nx8OmEzpt0LYsy3sBlnSlWWaM6Z5yzpvjK40rfNjdrIeZk
+iz8MML0oV1r8fGr2Xna0Jq2xQ8ql+vqhqSYS+blPw42RGYsgcgmmDStUMLy4TiD4
+gpFY66uxyF66WBH5d6GRM8ZXxqyL/FEZT1vMQWOG7wVVtih6n1mT4pvaN3xEIa+A
+Jgjr9MfJMyRU+INUzE5ibS7FXZnAS4Tj/LIYdLTPzQiw0tlENpoeo76Cd4Pbnaoq
+PeuD1WMMEKTi9U1bYQD8RcLjOOSNyInz0QsbxJ2Ku50PuuNkndo9su47Ga18TLCK
+mJRuj6/tFIek8/u9tncdKhu/QKYScBkBhAse/wWM7IVAQ3XkZyC3yAxsEbmVpgkd
+MIUMN1ltD2zrKgbE0DY3W6k7/V01ubmROqw4dlG9KdUCbaKlVR7qa1l6djjb9LNW
+8RQzA1K1hNtb48A+xGpE/5j15Wbvf4agVWP/Rw1w9eNvsEkQWnOtQ9DW2ZgwiGlX
+kLK/cd7jrJxaEFjY+5SKx4qQDEynlXDo7ej3heGZhyyspfOApEavY6Fbwd43t8eP
+dz2r24Bd/IRA54FfhOgan23NbPioq06FDZ6h8eiepAe3rcfYf8U=
+=tCrK
 -----END PGP SIGNATURE-----
 
---Vy1A5eXR7jld12ZH--
+--U+NfgObvpQT1Q9Yq--
