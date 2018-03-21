@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyg8h-0002XR-1U
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:58:59 -0400
+	(envelope-from <mst@redhat.com>) id 1eyg8m-0002eK-Ua
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyg8d-00040X-3a
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:58:59 -0400
-Received: from mail-wr0-f176.google.com ([209.85.128.176]:33398)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyg8c-000402-TM
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:58:55 -0400
-Received: by mail-wr0-f176.google.com with SMTP id z73so5722461wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 08:58:54 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6228d029-e799-8aa4-e5f5-68d58fa3268a@redhat.com>
-Date: Wed, 21 Mar 2018 16:58:50 +0100
+	(envelope-from <mst@redhat.com>) id 1eyg8k-00046Y-BF
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:59:05 -0400
+Date: Wed, 21 Mar 2018 17:58:49 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180321175452-mutt-send-email-mst@kernel.org>
+References: <1521642402-197739-1-git-send-email-mst@redhat.com>
+	<20180321153439.GC3898@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PSA] changelog and pull requests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180321153439.GC3898@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Alex Williamson <alex.williamson@redhat.com>, Daniel Berrange <berrange@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Corey Minyard <minyard@acm.org>, Jeff Cody <jcody@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Samuel Thibault <samuel.thibault@gnu.org>, Laurent Vivier <lvivier@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Hi all!
+On Wed, Mar 21, 2018 at 04:34:39PM +0100, Kevin Wolf wrote:
+> Am 21.03.2018 um 15:46 hat Michael S. Tsirkin geschrieben:
+> > Our current scheme is to use
+> >  #include ""
+> > for internal headers, and
+> >  #include <>
+> > for external ones.
+> > 
+> > Unfortunately this is not based on compiler support: from C point of
+> > view, the "" form merely looks up headers in the current directory
+> > and then falls back on <> directories.
+> > 
+> > Thus, for example, a system header trace.h - should it be present - will
+> > conflict with our local trace.h
+> 
+> You're right that there is a conflict, even though only in one
+> direction: "trace.h" is unambiguously the local trace.h in our source
+> tree, but <trace.h> refers to the same local header rather than the
+> system header as you would expect.
+> 
+> An easy way to resolve this conflict would be using -iquote rather than
+> -I for directories in the source tree, so that <trace.h> unambiguously
+> refers to the system header and "trace.h" unambiguously refers to the
+> QEMU header.
 
-If you are receiving this email, you have sent a pull request for QEMU
-2.12!  That's awesome, and some of you have also updated the ChangeLog
-for the upcoming release, which is doubly awesome!  I'm sure Santa will
-put you on the nice list and you can stop reading this email. :)
+I posted patches to that effect for 2.12. It's all still very much
+a non-standard convention and so less robust than
+prefixing file name with a project-specifix prefix.
 
-Even if you haven't updated the ChangeLog, don't worry, I have done it
-for you.  Please double check because QEMU is too big for one person to
-understand all the changes that were made.
+> > As another example of problems, a header by the same name in the source
+> > directory will always be picked up first - before any headers in
+> > the include directory.
+> > 
+> > Let's change the scheme: make sure all headers that are not
+> > in the source directory are included through a path
+> > starting with qemu/ , thus:
+> > 
+> >  #include <>
+> > 
+> > headers in the same directory as source are included with
+> > 
+> >  #include ""
+> > 
+> > as per standard.
+> > 
+> > This (untested) patch is just to start the discussion and does not
+> > change all of the codebase. If there's agreement, this will be
+> > run on all code to converting code to this scheme.
+> 
+> Renaming files is always painful. If that's the fix, the cure might be
+> worse than the disease. As far as I know, the conflict is only
+> theoretical, so in that case I'd say: If it ain't broke, don't fix it.
+> 
+> Kevin
 
-Some of you have spent time throughout the release to write nice
-messages for the pull requests.  That's very good too, and hopefully
-that has helped me and the ChangeLog entries for your subsystems are
-already acceptable.
+It's broke I think, it's very hard for new people to contribute to QEMU.
+Look e.g. at rdma which all has messed up includes - and that's from an
+experienced conributor who just isn't an experienced maintainer.
 
-Whoever remains, you have tagged your updates with messages like "xxx
-pull request".  Please don't do this, and please do double check the
-2.12 page on the wiki because chances are that I have missed or
-misunderstood something (no maintainer with poor tag messages has
-updated the ChangeLog[1]).
+Amount of time spent on teaching new people trivia about our
+conventions just isn't funny. They should be self-documenting
+and violations should cause the build to fail.
 
-Please, please think of the poor person who has spent about one hour
-collecting all your changes, and use 2 minutes after typing "git tag",
-while compiling the code one last time, to put together a short
-description of what is happening (especially features and user-visible
-hanges) in your pull request.
-
-To put it clearly: all that should be needed in order to write the 2.13
-ChangeLog should be "git log --merges --reverse v2.12.0..", and that's
-exactly what I'll do three months from now: if you don't write good
-messages for your tags, you'll have to write the ChangeLog for your
-subsystems yourself.
-
-Thanks,
-
-Paolo
-
-[1] If you did update the ChangeLog, you were supposed to stop reading,
-weren't you?
+-- 
+MST
