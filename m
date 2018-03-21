@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eye1F-0001dx-9q
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:43:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1eye3u-0003iY-1Y
+	for Qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eye1E-0002eZ-3p
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:43:09 -0400
-Date: Wed, 21 Mar 2018 15:42:22 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180321153510-mutt-send-email-mst@kernel.org>
-References: <1521510562-529051-1-git-send-email-mst@redhat.com>
-	<8f06e1e3-4823-d8e8-43bd-c092c523849e@vivier.eu>
-	<20180320135548-mutt-send-email-mst@kernel.org>
-	<459fa95d-8f0a-22fa-80fb-4af22ccf49b3@redhat.com>
-	<20180321150543-mutt-send-email-mst@kernel.org>
-	<20180321132953.GK8551@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eye3q-0004Mx-U7
+	for Qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:45:54 -0400
+References: <20180321124417.29242-1-ptoscano@redhat.com>
+	<20180321125105.GJ19514@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <65a7365f-89d5-a66c-4e7a-ce8ae1bcf595@redhat.com>
+Date: Wed, 21 Mar 2018 08:45:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180321132953.GK8551@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] qemu: include generated files
- with <> and not ""
+In-Reply-To: <20180321125105.GJ19514@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Libguestfs] [PATCH] tests: regressions: make
+ test-big-heap use a temporary empty file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, sheepdog@lists.wpkg.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>, Pino Toscano <ptoscano@redhat.com>
+Cc: libguestfs@redhat.com, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Wed, Mar 21, 2018 at 01:29:53PM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Mar 21, 2018 at 03:08:36PM +0200, Michael S. Tsirkin wrote:
-> > On Wed, Mar 21, 2018 at 08:16:00AM +0100, Thomas Huth wrote:
-> > > On 20.03.2018 13:05, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 20, 2018 at 09:58:23AM +0100, Laurent Vivier wrote:
-> > > >> Le 20/03/2018 =E0 02:54, Michael S. Tsirkin a =E9crit=A0:
-> > > >>> QEMU coding style at the moment asks for all non-system
-> > > >>> include files to be used with #include "foo.h".
-> > > >>> However this rule actually does not make sense and
-> > > >>> creates issues for when the included file is generated.
-> > > >>
-> > > >> If you change that, we can have issue when a system include has =
-the same
-> > > >> name as our local include. With "<FILE>", system header are take=
-n first.
-> > > >=20
-> > > > Are you sure? I just tested and that is not the case with
-> > > > either gcc or clang.
-> > > >=20
-> > > >>> In C, include "file" means look in current directory,
-> > > >>> then on include search path. Current directory here
-> > > >>> means the source file directory.
-> > > >>> By comparison include <file> means look on include search path.
-> > > >>
-> > > >> Not exactly, there is the notion of "system header" too.
-> > > >>
-> > > >> https://gcc.gnu.org/onlinedocs/cpp/Include-Syntax.html
-> > > >>
-> > > >> #include <file>
-> > > >> This variant is used for system header files. It searches for a =
-file
-> > > >> named file in a standard list of system directories. You can pre=
-pend
-> > > >> directories to this list with the -I option (see Invocation).
-> > > >=20
-> > > > This is exactly what we do.
-> > > >=20
-> > > >> #include "file"
-> > > >> This variant is used for header files of your own program. It se=
-arches
-> > > >> for a file named file first in the directory containing the curr=
-ent
-> > > >> file, then in the quote directories and then the same directorie=
-s used
-> > > >> for <file>. You can prepend directories to the list of quote dir=
-ectories
-> > > >> with the -iquote option.
-> > > >=20
-> > > > Since we do not use -iquote, "" just adds the current directory.
-> > >=20
-> > > So why don't we simply switch to use -iquote instead of -I for addi=
-ng
-> > > search paths for our own headers? We then would get a clean separat=
-ion
-> > > of QEMU headers from system headers.
-> > >=20
-> > >  Thomas
-> >=20
-> > It still leaves us with a host of problems e.g. the problem of stale
-> > headers in the source directory.
->=20
-> We have a patch on list which effectively solves the problem of stale
-> generated files in source directory, so that's largely a non-issue at
-> this point IMHO.
->=20
-> Regards,
-> Daniel
+[adding qemu lists]
 
-That was just one, and the solution is just to fail build.
-I think we can strive to address at least some of the following:
-- make sure that an incorrect use of a header fails to build
-- make it easier for new developers to understand the codebase
-- build correctly rather than fail in as many configurations as possible
-- actually support a mix of in and out of tree builds
+On 03/21/2018 07:51 AM, Richard W.M. Jones wrote:
+> On Wed, Mar 21, 2018 at 01:44:17PM +0100, Pino Toscano wrote:
+>> Newer versions of qemu use file locking for the images by default, and
+>> apparently that does not work with /dev/null.  Since this test just
+>> calls qemu-img to get the format of an empty image, create a temporary
+>> one instead.
+> 
+> ACK, but feels like this is a bug in qemu-img to me.
 
-I think my patch under discussion does not address all issues here.
-I'll post a new proposal now.
+You're right that file locking on a character device like /dev/null is 
+not going to work as expected, but is it a case where fcntl() actually 
+fails, or is it worse where the fcntl() claiming the locks "succeeds" 
+but doesn't do what we want?  That is, what were the actual error 
+messages you ran into?
 
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+Is it something where qemu should instead be checking fstat() results 
+and only doing locking on regular files and block devices?  At any rate, 
+I agree that qemu itself should behave nicer on attempts to use 
+/dev/null as an image.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
