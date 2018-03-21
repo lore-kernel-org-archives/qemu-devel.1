@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eybrj-0003pp-Dv
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1eybsQ-00049N-FP
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eybrf-0005Vz-9x
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:11 -0400
-Received: from mail-ve1eur01hn0232.outbound.protection.outlook.com
-	([104.47.1.232]:59582
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eybre-0005VK-RC
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:07 -0400
-Date: Wed, 21 Mar 2018 14:24:47 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180321112447.GC14983@rkaganb.sw.ru>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-2-vkuznets@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eybsP-0005yg-Gv
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:54 -0400
+References: <20180228180507.3964-1-mreitz@redhat.com>
+	<20180228180507.3964-16-mreitz@redhat.com>
+	<fea69d15-d7e4-6772-c583-c224b3dbe4a1@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e49e36f0-88a0-9e5b-1c3d-fab3d24a3c63@redhat.com>
+Date: Wed, 21 Mar 2018 12:25:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180320173500.32065-2-vkuznets@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] i386/kvm: add support for Hyper-V
- reenlightenment MSRs
+In-Reply-To: <fea69d15-d7e4-6772-c583-c224b3dbe4a1@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xJZ42SOkGZ8h5gBhTmxak0xPtEsbGkJso"
+Subject: Re: [Qemu-devel] [PATCH v3 15/16] block/mirror: Add copy mode QAPI
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, Mar 20, 2018 at 06:34:59PM +0100, Vitaly Kuznetsov wrote:
-> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
-> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
-> when INVTSC is not passed to it (and it is not passed by default in Qemu
-> as it effectively blocks migration).
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
-> Changes since v2:
-> - add hv-reenlightenment CPU property [Roman Kagan, Paolo Bonzini]
-> - add a comment to feature_word_info [Roman Kagan]
-> ---
->  target/i386/cpu.c          |  4 +++-
->  target/i386/cpu.h          |  4 ++++
->  target/i386/hyperv-proto.h |  9 ++++++++-
->  target/i386/kvm.c          | 39 ++++++++++++++++++++++++++++++++++++++-
->  target/i386/machine.c      | 24 ++++++++++++++++++++++++
->  5 files changed, 77 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 6bb4ce8719..02579f8234 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -407,7 +407,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              NULL /* hv_vpindex_access */, NULL /* hv_msr_reset_access */,
->              NULL /* hv_msr_stats_access */, NULL /* hv_reftsc_access */,
->              NULL /* hv_msr_idle_access */, NULL /* hv_msr_frequency_access */,
-> -            NULL, NULL, NULL, NULL,
-> +            NULL /* hv_msr_debug_access */, NULL /* hv_msr_reenlightenment_access */,
-> +            NULL, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
-> @@ -4764,6 +4765,7 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_BOOL("hv-runtime", X86CPU, hyperv_runtime, false),
->      DEFINE_PROP_BOOL("hv-synic", X86CPU, hyperv_synic, false),
->      DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
-> +    DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
->      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
->      DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
->      DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 2e2bab5ff3..98eed72937 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1174,6 +1174,9 @@ typedef struct CPUX86State {
->      uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
->      uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
->      uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
-> +    uint64_t msr_hv_reenlightenment_control;
-> +    uint64_t msr_hv_tsc_emulation_control;
-> +    uint64_t msr_hv_tsc_emulation_status;
->  
->      uint64_t msr_rtit_ctrl;
->      uint64_t msr_rtit_status;
-> @@ -1296,6 +1299,7 @@ struct X86CPU {
->      bool hyperv_runtime;
->      bool hyperv_synic;
->      bool hyperv_stimer;
-> +    bool hyperv_reenlightenment;
->      bool check_cpuid;
->      bool enforce_cpuid;
->      bool expose_kvm;
-> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-> index cb4d7f2b7a..93352ebd2a 100644
-> --- a/target/i386/hyperv-proto.h
-> +++ b/target/i386/hyperv-proto.h
-> @@ -35,7 +35,7 @@
->  #define HV_RESET_AVAILABLE           (1u << 7)
->  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
->  #define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
-> -
-> +#define HV_ACCESS_REENLIGHTENMENTS_CONTROL  (1u << 13)
->  
->  /*
->   * HV_CPUID_FEATURES.EDX bits
-> @@ -129,6 +129,13 @@
->  #define HV_X64_MSR_CRASH_CTL                    0x40000105
->  #define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
->  
-> +/*
-> + * Reenlightenment notification MSRs
-> + */
-> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL      0x40000106
-> +#define HV_X64_MSR_TSC_EMULATION_CONTROL        0x40000107
-> +#define HV_X64_MSR_TSC_EMULATION_STATUS         0x40000108
-> +
->  /*
->   * Hypercall status code
->   */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index d23fff12f5..7d9f9ca0b1 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -90,6 +90,7 @@ static bool has_msr_hv_runtime;
->  static bool has_msr_hv_synic;
->  static bool has_msr_hv_stimer;
->  static bool has_msr_hv_frequencies;
-> +static bool has_msr_hv_reenlightenment;
->  static bool has_msr_xss;
->  static bool has_msr_spec_ctrl;
->  static bool has_msr_smi_count;
-> @@ -583,7 +584,8 @@ static bool hyperv_enabled(X86CPU *cpu)
->              cpu->hyperv_vpindex ||
->              cpu->hyperv_runtime ||
->              cpu->hyperv_synic ||
-> -            cpu->hyperv_stimer);
-> +            cpu->hyperv_stimer ||
-> +            cpu->hyperv_reenlightenment);
->  }
->  
->  static int kvm_arch_set_tsc_khz(CPUState *cs)
-> @@ -654,6 +656,14 @@ static int hyperv_handle_properties(CPUState *cs)
->              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
->          }
->      }
-> +    if (cpu->hyperv_reenlightenment) {
-> +        if (!has_msr_hv_reenlightenment) {
-> +            fprintf(stderr,
-> +                    "Hyper-V Reenlightenment is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
-> +        env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_REENLIGHTENMENTS_CONTROL;
-> +    }
->      if (cpu->hyperv_crash && has_msr_hv_crash) {
->          env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
->      }
-> @@ -1185,6 +1195,9 @@ static int kvm_get_supported_msrs(KVMState *s)
->                  case HV_X64_MSR_TSC_FREQUENCY:
->                      has_msr_hv_frequencies = true;
->                      break;
-> +                case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
-> +                    has_msr_hv_reenlightenment = true;
-> +                    break;
->                  case MSR_IA32_SPEC_CTRL:
->                      has_msr_spec_ctrl = true;
->                      break;
-> @@ -1747,6 +1760,15 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->              if (cpu->hyperv_time) {
->                  kvm_msr_entry_add(cpu, HV_X64_MSR_REFERENCE_TSC,
->                                    env->msr_hv_tsc);
-> +
-> +                if (has_msr_hv_reenlightenment) {
-> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_REENLIGHTENMENT_CONTROL,
-> +                                      env->msr_hv_reenlightenment_control);
-> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_CONTROL,
-> +                                      env->msr_hv_tsc_emulation_control);
-> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_STATUS,
-> +                                      env->msr_hv_tsc_emulation_status);
-> +                }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xJZ42SOkGZ8h5gBhTmxak0xPtEsbGkJso
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <e49e36f0-88a0-9e5b-1c3d-fab3d24a3c63@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 15/16] block/mirror: Add copy mode QAPI
+ interface
+References: <20180228180507.3964-1-mreitz@redhat.com>
+ <20180228180507.3964-16-mreitz@redhat.com>
+ <fea69d15-d7e4-6772-c583-c224b3dbe4a1@redhat.com>
+In-Reply-To: <fea69d15-d7e4-6772-c583-c224b3dbe4a1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I second Eduardo's comment on testing cpu->hyperv_reenlightenment here.
+On 2018-03-20 18:35, Eric Blake wrote:
+> On 02/28/2018 12:05 PM, Max Reitz wrote:
+>> This patch allows the user to specify whether to use active or only
+>> background mode for mirror block jobs.=C2=A0 Currently, this setting w=
+ill
+>> remain constant for the duration of the entire block job.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 11 +++++++=
+++--
+>> =C2=A0 include/block/block_int.h |=C2=A0 4 +++-
+>> =C2=A0 block/mirror.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 | 12 +++++++-----
+>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 9 ++++++++-
+>> =C2=A0 4 files changed, 27 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index c73b769c27..1186c007ae 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1573,6 +1573,9 @@
+>> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 written. Both=
+ will result in identical contents.
+>> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Default is tr=
+ue. (Since 2.4)
+>> =C2=A0 #
+>> +# @copy-mode: when to copy data to the destination; defaults to
+>> 'background'
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 (Since: 2.12)
+>> +#
+>=20
+> Are we still aiming for 2.12, or is this a feature which missed
+> softfreeze and should therefore be 2.13?
 
-Besides, this hunk suggests that (!cpu->hyperv_time &&
-cpu->hyperv_reenlightenment) is illegal.  I think this should be
-enforced when enabling the feature.  BTW this also makes the addition to
-hyperv_enabled() unnecessary.
+The latter, I'll change it in v4.
 
-Thanks,
-Roman.
+Max
+
+
+--xJZ42SOkGZ8h5gBhTmxak0xPtEsbGkJso
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqyQSoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AxRoIAKCqzmGzBXZfQan92XSWk3En6W/8BX17
+Q2bgy4zZtqbSqO4hoRikOJGIP3rFArnlOX+ZXGNow9+QuviQESm4ZICUPogSOlIG
+s/15fVVfBRUB6W0ZYPrSmXAEfpNhzA9QF+eWv0kh913AArjg1iGOMf+gH9YXODZY
+MuXep0CaqwyODMr3cogdUTi3eH+gRP2KIwe3As+vxv+0tvlNcHdrs8dSWXAPmn5g
+xyb14so1tysmF7pLU4v9eZhXGJ9XopG1D67Qj6fHVbHXtNJvjyt0NGWNmtaRIQL9
+Ivz+ZVxBDrlpnVPULHMAc5khSdAGJjzEMz9E5d+ipflIU3PNEcLTNxc=
+=J9hZ
+-----END PGP SIGNATURE-----
+
+--xJZ42SOkGZ8h5gBhTmxak0xPtEsbGkJso--
