@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eycZO-0005B7-VX
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:10:24 -0400
+	(envelope-from <lvivier@redhat.com>) id 1eycgB-0003Ye-Vj
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:17:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eycZK-0001BU-Gr
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:10:18 -0400
-Received: from mail-he1eur01hn0247.outbound.protection.outlook.com
-	([104.47.0.247]:34560
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eycZJ-00019X-FF
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:10:14 -0400
-Date: Wed, 21 Mar 2018 15:10:01 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180321121001.GD14983@rkaganb.sw.ru>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-3-vkuznets@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1eycgA-0004tK-NV
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:17:19 -0400
+References: <20180321105830.22412-1-pbonzini@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <0b772d6c-d0df-f466-053e-29f0304ad52a@redhat.com>
+Date: Wed, 21 Mar 2018 13:17:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180320173500.32065-3-vkuznets@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+In-Reply-To: <20180321105830.22412-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scsi: turn "is this a SCSI device?" into a
+ conditional hint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-On Tue, Mar 20, 2018 at 06:35:00PM +0100, Vitaly Kuznetsov wrote:
-> Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
-> nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
-> Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
-> these frequencies are stable, it just means they're available for reading.
+On 21/03/2018 11:58, Paolo Bonzini wrote:
+> If the user does not have permissions to send ioctls to the device (due to
+> SELinux or cgroups, for example), the output can look like
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> qemu-kvm: -device scsi-block,drive=disk: cannot get SG_IO version number:
+>   Operation not permitted.  Is this a SCSI device?
+> 
+> but this is confusing because the ioctl was blocked _before_ the device
+> even received the SG_GET_VERSION_NUM ioctl.  Therefore, for EPERM errors
+> the suggestion should be eliminated.  To make that simpler, change the
+> code to use error_append_hint.
+> 
+> Reported-by: Ala Hino <ahino@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  target/i386/kvm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/scsi/scsi-disk.c    | 7 ++++---
+>  hw/scsi/scsi-generic.c | 7 ++++---
+>  2 files changed, 8 insertions(+), 6 deletions(-)
 > 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 7d9f9ca0b1..74fc3d3b2c 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -651,7 +651,7 @@ static int hyperv_handle_properties(CPUState *cs)
->          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
->          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
->  
-> -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-> +        if (has_msr_hv_frequencies && env->tsc_khz) {
->              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
->              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
->          }
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 94043ed024..ccc245589a 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -2637,9 +2637,10 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+>      /* check we are using a driver managing SG_IO (version 3 and after) */
+>      rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
+>      if (rc < 0) {
+> -        error_setg(errp, "cannot get SG_IO version number: %s.  "
+> -                     "Is this a SCSI device?",
+> -                     strerror(-rc));
+> +        error_setg(errp, "cannot get SG_IO version number: %s", strerror(-rc));
 
-I suggest that we add a corresponding cpu property here, too.  The guest
-may legitimately rely on these msrs when it sees the support in CPUID,
-and migrating from a kernel with the feature supported (4.14+) to an
-older one will make it crash.
 
-Roman.
+You could use:
+
+  error_setg_errno(errp, -rc, "cannot get SG_IO version number");
+
+Thanks,
+Laurent
