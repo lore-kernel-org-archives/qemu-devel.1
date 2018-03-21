@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eyT9q-00035F-Nx
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 22:07:19 -0400
+	(envelope-from <famz@redhat.com>) id 1eyTOx-0007IE-7y
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 22:22:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eyT9n-0001B6-Ii
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 22:07:18 -0400
-Date: Wed, 21 Mar 2018 10:07:09 +0800
+	(envelope-from <famz@redhat.com>) id 1eyTOs-0006Ls-K0
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 22:22:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36340 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eyTOs-0006LW-GC
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 22:22:50 -0400
+Date: Wed, 21 Mar 2018 10:22:34 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180321020709.GA16095@lemon.usersys.redhat.com>
-References: <20180319215335.1119213-1-eblake@redhat.com>
-	<56ec7ba5-a6e1-2268-3313-8babc640c024@redhat.com>
+Message-ID: <20180321022234.GB16095@lemon.usersys.redhat.com>
+References: <1521556695-35907-1-git-send-email-mst@redhat.com>
+	<152157445744.177.10520299969738107726@71c20359a636>
+	<20180321012530.GB12771@lemon.usersys.redhat.com>
+	<20180321040251-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <56ec7ba5-a6e1-2268-3313-8babc640c024@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] rdma: Fix 32-bit compilation
+In-Reply-To: <20180321040251-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] postcopy-ram: add a stub for
+ postcopy_request_shared_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
 
-On Tue, 03/20 12:30, Marcel Apfelbaum wrote:
-> Hi Eric,
+On Wed, 03/21 04:03, Michael S. Tsirkin wrote:
+> On Wed, Mar 21, 2018 at 09:25:30AM +0800, Fam Zheng wrote:
+> > On Tue, 03/20 12:34, no-reply@patchew.org wrote:
+> > > /tmp/qemu-test/src/migration/postcopy-ram.c:787:41: error: 'struct PostCopyFD' declared inside parameter list will not be visible outside of this definition or declaration [-Werror]
+> > >  int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+> > >                                          ^~~~~~~~~~
+> > > /tmp/qemu-test/src/migration/postcopy-ram.c:787:5: error: no previous prototype for 'postcopy_request_shared_page' [-Werror=missing-prototypes]
+> > >  int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+> > >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > cc1: all warnings being treated as errors
+> > 
+> > Is a "#include ..." line missing?
+> > 
+> > Fam
 > 
-> On 19/03/2018 23:53, Eric Blake wrote:
-> > Use the correct printf formats, so that a 32-bit compile doesn't
-> > spit out lots of warnings about %lx being incompatible with uint64_t.
-> > Broken since initial commit ef6d4ccd.
-> > 
-> > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > ---
-> > 
-> > I don't know if 'make vm-build-ubuntu.i368' would catch this (it failed
-> > for me for other reasons); I found it via a 32-bit rawhide VM.
-> > 
-> 
-> I couldn't run 'make vm-build-ubuntu.i368' either. (Stuck on "Booting from Hard Disk...")
+> This patch isn't against mainline.
 
-I tried this now and it works for me. Could you delete "$HOME/.cache/qemu-vm"
-and do it again from a git tree, then pastbin the full log?
+OK! BTW there is a syntax for patchew to attempt a different base than master:
 
-Fam
+Based-on: <the-base-series-cover-letter-messge-id>
