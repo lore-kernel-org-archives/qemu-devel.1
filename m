@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eykeJ-000208-Eb
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:47:56 -0400
+	(envelope-from <mjc@sifive.com>) id 1eykeH-0001zv-Em
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eykeH-00023S-Pc
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:47:54 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36668)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eykeH-00022w-JK
+	(envelope-from <mjc@sifive.com>) id 1eykeF-000228-3L
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:47:53 -0400
-Received: by mail-pf0-x241.google.com with SMTP id 68so2465089pfx.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 13:47:53 -0700 (PDT)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:45291)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eykeE-00021n-Sx
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:47:51 -0400
+Received: by mail-pf0-x242.google.com with SMTP id l27so2455425pfk.12
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 13:47:50 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 21 Mar 2018 13:46:40 -0700
-Message-Id: <1521665220-3869-5-git-send-email-mjc@sifive.com>
+Date: Wed, 21 Mar 2018 13:46:37 -0700
+Message-Id: <1521665220-3869-2-git-send-email-mjc@sifive.com>
 In-Reply-To: <1521665220-3869-1-git-send-email-mjc@sifive.com>
 References: <1521665220-3869-1-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/24] RISC-V: Use ROM base address and size
- from memmap
+Subject: [Qemu-devel] [PULL 01/24] RISC-V: Make virt create_fdt interface
+ consistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,8 +32,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-Another case of replacing hard coded constants, this time
-referring to the definition in the virt machine's memmap.
+create_fdt sets the fdt variable on RISCVVirtState and this is
+used to access the fdt. This reverts a change introduced in
+https://github.com/riscv/riscv-qemu/pull/109 which introduced
+a redundant return value, overlooking the RISCVVirtState
+structure member that made create_fdt inconsistent with the
+other RISC-V machines. The other alternative is to change
+the other boards to return the fdt. Note: the RISCVVirtState
+also contains fdt_size.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
@@ -41,40 +47,60 @@ Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/riscv/virt.c         | 4 ++--
- include/hw/riscv/virt.h | 2 --
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ hw/riscv/virt.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 0055439..0d101fc 100644
+index e2c214e..37968d2 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -338,11 +338,11 @@ static void riscv_virt_board_init(MachineState *machine)
-     };
+@@ -108,7 +108,7 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
+     return *start + size;
+ }
  
-     /* copy in the reset vector */
--    copy_le32_to_phys(ROM_BASE, reset_vec, sizeof(reset_vec));
-+    copy_le32_to_phys(memmap[VIRT_MROM].base, reset_vec, sizeof(reset_vec));
- 
-     /* copy in the device tree */
-     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
--    cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec),
-+    cpu_physical_memory_write(memmap[VIRT_MROM].base + sizeof(reset_vec),
-         s->fdt, s->fdt_size);
- 
-     /* create PLIC hart topology configuration string */
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index 2fbe808..655e85d 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -23,8 +23,6 @@
- #define VIRT(obj) \
-     OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_BOARD)
- 
--enum { ROM_BASE = 0x1000 };
+-static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
++static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     uint64_t mem_size, const char *cmdline)
+ {
+     void *fdt;
+@@ -264,8 +264,6 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+     qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+     g_free(nodename);
 -
- typedef struct {
-     /*< private >*/
-     SysBusDevice parent_obj;
+-    return fdt;
+ }
+ 
+ static void riscv_virt_board_init(MachineState *machine)
+@@ -279,7 +277,6 @@ static void riscv_virt_board_init(MachineState *machine)
+     char *plic_hart_config;
+     size_t plic_hart_config_len;
+     int i;
+-    void *fdt;
+ 
+     /* Initialize SOC */
+     object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+@@ -299,7 +296,7 @@ static void riscv_virt_board_init(MachineState *machine)
+         main_mem);
+ 
+     /* create device tree */
+-    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
++    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
+     /* boot rom */
+     memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
+@@ -314,9 +311,9 @@ static void riscv_virt_board_init(MachineState *machine)
+             hwaddr end = load_initrd(machine->initrd_filename,
+                                      machine->ram_size, kernel_entry,
+                                      &start);
+-            qemu_fdt_setprop_cell(fdt, "/chosen",
+-                                  "linux,initrd-start", start);
+-            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
++            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-start",
++                                  start);
++            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
+                                   end);
+         }
+     }
 -- 
 2.7.0
