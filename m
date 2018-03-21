@@ -1,22 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eyfgV-0005aL-6n
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:29:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyfgX-0005bJ-6D
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:29:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eyfgR-00069d-Tv
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:29:51 -0400
-Date: Wed, 21 Mar 2018 09:29:41 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180321092941.446a2aea@w520.home>
-In-Reply-To: <410aeb28-e940-35f9-c7de-cb1c95422857@redhat.com>
-References: <20180209075503.16996-1-aik@ozlabs.ru>
-	<20180209075503.16996-3-aik@ozlabs.ru>
-	<410aeb28-e940-35f9-c7de-cb1c95422857@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eyfgT-0006Au-V7
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:29:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48248 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eyfgT-0006Ab-QT
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:29:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 66A7C4023BB3
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 15:29:49 +0000 (UTC)
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<20180321134005.8822-3-marcandre.lureau@redhat.com>
+	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
+	<CAMxuvay1j+E1YRggpqm9+ETE_FxD-ThGtPBenUtvt8oeYweS8g@mail.gmail.com>
+	<4e876850-3057-e9d5-695b-69f4cde9aa9a@redhat.com>
+	<CAMxuvay+aMU7=kr2ED+7Hq596oeoZP+xKXMYwGB+r8AG5=5rdQ@mail.gmail.com>
+	<2467bc3b-c0da-b6e4-1201-48983ba5a5af@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <26a3cea8-20ff-34a3-945b-044a730812b6@redhat.com>
+Date: Wed, 21 Mar 2018 10:29:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
- for MMIO regions
+In-Reply-To: <2467bc3b-c0da-b6e4-1201-48983ba5a5af@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
+ at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,161 +40,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
 
-On Mon, 19 Mar 2018 21:49:58 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On 03/21/2018 09:49 AM, Paolo Bonzini wrote:
+> On 21/03/2018 15:21, Marc-Andr=C3=A9 Lureau wrote:
+>>>> Yeah, I tried a few of those approaches. Here the problem is that
+>>>> QObject doesn't have base field. So you get a compile time error wit=
+h
+>>>> a QObject * as argument.
+>>>
+>>> So the compiler requires &(x)->base to resolve even when it is not on=
+ the
+>>> branch that gets selected?
+>>
+>> Unfortunately, yes, all branches must compile apparently (I know)...
+>=20
+> Ugh, and that's indeed true of _Generic too.  These don't compile:
+>=20
+>    struct s1 { int y; };
+>    struct s2 { int z; };
+>=20
+>    #define f(x)  _Generic(x, struct s1: (x).y, struct s2: (x).z)
+>=20
+>    int f1(struct s1 *s) { return f(*s); }
+>    int f2(struct s2 *s) { return f(*s); }
+>=20
+> :(  Then I guess Marc-Andr=C3=A9's realization is ugly but unavoidable.
 
-> Hi Alexey,
-> 
-> On 09/02/18 08:55, Alexey Kardashevskiy wrote:
-> > At the moment if vfio_memory_listener is registered in the system memory
-> > address space, it maps/unmaps every RAM memory region for DMA.
-> > It expects system page size aligned memory sections so vfio_dma_map
-> > would not fail and so far this has been the case. A mapping failure
-> > would be fatal. A side effect of such behavior is that some MMIO pages
-> > would not be mapped silently.
-> > 
-> > However we are going to change MSIX BAR handling so we will end having
-> > non-aligned sections in vfio_memory_listener (more details is in
-> > the next patch) and vfio_dma_map will exit QEMU.
-> > 
-> > In order to avoid fatal failures on what previously was not a failure and
-> > was just silently ignored, this checks the section alignment to
-> > the smallest supported IOMMU page size and prints an error if not aligned;
-> > it also prints an error if vfio_dma_map failed despite the page size check.
-> > Both errors are not fatal; only MMIO RAM regions are checked
-> > (aka "RAM device" regions).
-> > 
-> > If the amount of errors printed is overwhelming, the MSIX relocation
-> > could be used to avoid excessive error output.
-> > 
-> > This is unlikely to cause any behavioral change.
-> > 
-> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> > ---
-> >  hw/vfio/common.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++------
-> >  1 file changed, 49 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index f895e3c..736f271 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -544,18 +544,40 @@ static void vfio_listener_region_add(MemoryListener *listener,
-> >  
-> >      llsize = int128_sub(llend, int128_make64(iova));
-> >  
-> > +    if (memory_region_is_ram_device(section->mr)) {
-> > +        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-> > +
-> > +        if ((iova & pgmask) || (llsize & pgmask)) {
-> > +            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
-> > +                         " is not aligned to 0x%"HWADDR_PRIx
-> > +                         " and cannot be mapped for DMA",
-> > +                         section->offset_within_region,
-> > +                         int128_getlo(section->size),  
-> Didn't you want to print the section->offset_within_address_space
-> instead of section->offset_within_region?
-> 
-> For an 1000e card*, with a 64kB page, it outputs:
-> "Region 0x50..0xffb0 is not aligned to 0x10000 and cannot be mapped for DMA"
-> 
-> an absolute gpa range would be simpler I think.
+Not necessarily - can we use multiple layers of macros?  (Untested)
 
-I agree, the offset within the address space seems like it'd be much
-easier to map back to the device.  Since we're handling it as
-non-fatal, perhaps we can even add "MMIO Region" to give the user a bit
-more context where the issue occurs.  Alexey, do you want to submit a
-follow-up patch, or Eric, you may have the best resources to tune the
-message.  Thanks,
+#define QOBJECT_0(x) x
+#define QOBJECT_1(x) ({ \
+     QEMU_BUILD_BUG_ON(offsetof(typeof(*x), base)); \
+     &(x)->base; })
+#define QOBJECT(x) QOBJECT_ ## QEMU_GENERIC(x, \
+     (QObject *, 0),
+     (const QObject *, 0),
+     1)(x)
 
-Alex
- 
-> * where 	Region 3: Memory at 100e0000 (32-bit, non-prefetchable)
-> [size=16K] contains the MSIX table
-> 
-> 	Capabilities: [a0] MSI-X: Enable+ Count=5 Masked-
-> 		Vector table: BAR=3 offset=00000000
-> 		PBA: BAR=3 offset=00002000
-> 
-> Thanks
-> 
-> Eric
-> > +                         pgmask + 1);
-> > +            return;
-> > +        }
-> > +    }
-> > +
-> >      ret = vfio_dma_map(container, iova, int128_get64(llsize),
-> >                         vaddr, section->readonly);
-> >      if (ret) {
-> >          error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-> >                       "0x%"HWADDR_PRIx", %p) = %d (%m)",
-> >                       container, iova, int128_get64(llsize), vaddr, ret);
-> > +        if (memory_region_is_ram_device(section->mr)) {
-> > +            /* Allow unexpected mappings not to be fatal for RAM devices */
-> > +            return;
-> > +        }
-> >          goto fail;
-> >      }
-> >  
-> >      return;
-> >  
-> >  fail:
-> > +    if (memory_region_is_ram_device(section->mr)) {
-> > +        error_report("failed to vfio_dma_map. pci p2p may not work");
-> > +        return;
-> > +    }
-> >      /*
-> >       * On the initfn path, store the first error in the container so we
-> >       * can gracefully fail.  Runtime, there's not much we can do other
-> > @@ -577,6 +599,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
-> >      hwaddr iova, end;
-> >      Int128 llend, llsize;
-> >      int ret;
-> > +    bool try_unmap = true;
-> >  
-> >      if (vfio_listener_skipped_section(section)) {
-> >          trace_vfio_listener_region_del_skip(
-> > @@ -629,13 +652,33 @@ static void vfio_listener_region_del(MemoryListener *listener,
-> >  
-> >      trace_vfio_listener_region_del(iova, end);
-> >  
-> > -    ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-> > +    if (memory_region_is_ram_device(section->mr)) {
-> > +        hwaddr pgmask;
-> > +        VFIOHostDMAWindow *hostwin;
-> > +        bool hostwin_found = false;
-> > +
-> > +        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
-> > +            if (hostwin->min_iova <= iova && end <= hostwin->max_iova) {
-> > +                hostwin_found = true;
-> > +                break;
-> > +            }
-> > +        }
-> > +        assert(hostwin_found); /* or region_add() would have failed */
-> > +
-> > +        pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-> > +        try_unmap = !((iova & pgmask) || (llsize & pgmask));
-> > +    }
-> > +
-> > +    if (try_unmap) {
-> > +        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-> > +        if (ret) {
-> > +            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-> > +                         "0x%"HWADDR_PRIx") = %d (%m)",
-> > +                         container, iova, int128_get64(llsize), ret);
-> > +        }
-> > +    }
-> > +
-> >      memory_region_unref(section->mr);
-> > -    if (ret) {
-> > -        error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-> > -                     "0x%"HWADDR_PRIx") = %d (%m)",
-> > -                     container, iova, int128_get64(llsize), ret);
-> > -    }
-> >  
-> >      if (container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
-> >          vfio_spapr_remove_window(container,
-> >   
+or with an additional layer of glue() if needed
+
+That is, reduce the QEMU_GENERIC expansion into something that generates=20
+only a single preprocessor token, where we then use to decide which=20
+OTHER macro to expand, so that we are only evaluating &(x)->base when we=20
+selected the derived types.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
