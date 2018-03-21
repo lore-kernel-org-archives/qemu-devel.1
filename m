@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyflU-0002QH-Vr
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:35:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyfmr-0003iQ-8Q
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyflT-0001Sa-Vp
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:35:01 -0400
-Date: Wed, 21 Mar 2018 16:34:39 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180321153439.GC3898@localhost.localdomain>
-References: <1521642402-197739-1-git-send-email-mst@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eyfml-0002L6-JL
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:36:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48808 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eyfml-0002Kw-EH
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:36:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0CE3640704B6
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 15:36:19 +0000 (UTC)
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<20180321134005.8822-4-marcandre.lureau@redhat.com>
+	<5321b7df-215e-e56d-ae6d-2ada8706cdcc@redhat.com>
+	<CAMxuvazWmEuDeBPTPCatr_o0rKiUk8MddvTE6u70w_-ML8B7kA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <467e9318-2da4-56f6-1743-09c4a9e48349@redhat.com>
+Date: Wed, 21 Mar 2018 10:36:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1521642402-197739-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
+In-Reply-To: <CAMxuvazWmEuDeBPTPCatr_o0rKiUk8MddvTE6u70w_-ML8B7kA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] qobject: replace
+ qobject_incref/QINCREF qobject_decref/QDECREF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +37,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-Am 21.03.2018 um 15:46 hat Michael S. Tsirkin geschrieben:
-> Our current scheme is to use
->  #include ""
-> for internal headers, and
->  #include <>
-> for external ones.
-> 
-> Unfortunately this is not based on compiler support: from C point of
-> view, the "" form merely looks up headers in the current directory
-> and then falls back on <> directories.
-> 
-> Thus, for example, a system header trace.h - should it be present - will
-> conflict with our local trace.h
+On 03/21/2018 09:51 AM, Marc-Andr=C3=A9 Lureau wrote:
+> On Wed, Mar 21, 2018 at 3:28 PM, Eric Blake <eblake@redhat.com> wrote:
+>> On 03/21/2018 08:40 AM, Marc-Andr=C3=A9 Lureau wrote:
+>>>
+>>> Now that we can safely call QOBJECT() on QObject * and children types=
+,
+>>> we can have a single macro to ref/unref the object.
+>>>
+>>> Change the incref/decref prefix name for the more common ref/unref.
+>>
+>>
+>> I know you did this by sed (for the most part); but it would be worth
+>> including the command line you used in the commit message to make it e=
+asier
+>> to reproduce the same mechanical portion of the patch when rebasing.
+>=20
+> git sed QINCREF qobject_ref
+> git sed QDECREF qobject_unref
+> git sed qobject_incref qobject_ref
+> git sed qobject_decref qobject_ref
 
-You're right that there is a conflict, even though only in one
-direction: "trace.h" is unambiguously the local trace.h in our source
-tree, but <trace.h> refers to the same local header rather than the
-system header as you would expect.
+Did any of these create longer lines that needed reflowing?  (Moot point=20
+if we bikeshed the ending macro name to be no longer than QDECREF)
 
-An easy way to resolve this conflict would be using -iquote rather than
--I for directories in the source tree, so that <trace.h> unambiguously
-refers to the system header and "trace.h" unambiguously refers to the
-QEMU header.
+>>> +++ b/scripts/coccinelle/qobject.cocci
+>>> @@ -3,11 +3,11 @@
+>>>    expression Obj, Key, E;
+>>>    @@
+>>>    (
+>>> -- qobject_incref(QOBJECT(E));
+>>> -+ QINCREF(E);
+>>> +- qobject_ref(QOBJECT(E));
+>>> ++ qobject_ref(E);
+>>>    |
+>>> -- qobject_decref(QOBJECT(E));
+>>> -+ QDECREF(E);
+>>> +- qobject_unref(QOBJECT(E));
+>>> ++ qobject_unref(E);
+>>
+>>
+>> I wonder if these branches should just be removed; they made sense whe=
+n we
+>> had two spellings, but after your mass conversion, the .cocci script i=
+s
+>> unlikely to ever find regressions on this front.
+>=20
+> They would still remove extra cast, wouldn't they?
 
-> As another example of problems, a header by the same name in the source
-> directory will always be picked up first - before any headers in
-> the include directory.
-> 
-> Let's change the scheme: make sure all headers that are not
-> in the source directory are included through a path
-> starting with qemu/ , thus:
-> 
->  #include <>
-> 
-> headers in the same directory as source are included with
-> 
->  #include ""
-> 
-> as per standard.
-> 
-> This (untested) patch is just to start the discussion and does not
-> change all of the codebase. If there's agreement, this will be
-> run on all code to converting code to this scheme.
+But the point I'm making is that the old code dealing with type-specific=20
+names actually happened multiple times (it was easy to overlook the=20
+macro definition that served as shorthand for decrementing a derived=20
+type, and thus spelling it out in longhand as a decrement on the=20
+conversion to the base type - and where because the two spellings were=20
+type-dependent the compiler flagged you if you tried to use the wrong=20
+spelling for the type at hand); in new code, where a single macro works=20
+for both base and derived types, no one is likely to mistakenly cast=20
+their derived type to the base type just to call the generic macro=20
+(because your naive attempt at just decrementing will work, regardless=20
+of the type at hand, so you don't have to throw in casts to shut up the=20
+compiler).
 
-Renaming files is always painful. If that's the fix, the cure might be
-worse than the disease. As far as I know, the conflict is only
-theoretical, so in that case I'd say: If it ain't broke, don't fix it.
+At the same time, you're right that keeping the .cocci doesn't hurt=20
+(even if it is unlikely to find future offenders).
 
-Kevin
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
