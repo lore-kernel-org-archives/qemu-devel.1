@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eya2X-0003vN-6k
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:28:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1eya3K-0004SD-98
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eya2S-0002Nx-CL
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:28:13 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <665e0ccd-4440-4e0e-30f9-e38537795325@redhat.com>
-References: <20180320135515.16823-1-berto@igalia.com>
-	<665e0ccd-4440-4e0e-30f9-e38537795325@redhat.com>
-Date: Wed, 21 Mar 2018 10:28:04 +0100
-Message-ID: <w51po3xixqz.fsf@maestria.local.igalia.com>
+	(envelope-from <laurent@vivier.eu>) id 1eya3F-0002ho-By
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:29:02 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:48081)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eya3F-0002hY-1G
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:28:57 -0400
+References: <1521584722-39133-1-git-send-email-mjc@sifive.com>
+	<7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <5d80ea1e-4092-3ba3-9a18-691de69489fe@vivier.eu>
+Date: Wed, 21 Mar 2018 10:28:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12] qcow2: Reset free_cluster_index
- when allocating a new refcount block
+In-Reply-To: <7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4sUCDQGD27oZqaEpRlol7KgHwoZPgjbSS"
+Subject: Re: [Qemu-devel] [PULL 00/25] RISC-V Post-merge spec conformance
+ and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Michael Clark <mjc@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Tue 20 Mar 2018 06:54:15 PM CET, Eric Blake wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4sUCDQGD27oZqaEpRlol7KgHwoZPgjbSS
+From: Laurent Vivier <laurent@vivier.eu>
+To: Thomas Huth <thuth@redhat.com>, Michael Clark <mjc@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <5d80ea1e-4092-3ba3-9a18-691de69489fe@vivier.eu>
+Subject: Re: [Qemu-devel] [PULL 00/25] RISC-V Post-merge spec conformance and
+ cleanup
+References: <1521584722-39133-1-git-send-email-mjc@sifive.com>
+ <7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+In-Reply-To: <7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->> When we try to allocate new clusters we first look for available ones
->> starting from s->free_cluster_index and once we find them we increase
->> their reference counts. Before we get to call update_refcount() to do
->> this last step s->free_cluster_index is already pointing to the next
->> cluster after the ones we are trying to allocate.
->>=20
->  > During update_refcount() it may happen however that we also need to
->  > allocate a new refcount block in order to store the refcounts of
->  > these new clusters
->
-> Your changes to test 121 covers this...
->
->  > (and to complicate things further that may also require us to grow
->  > the refcount table).
->
-> ...but not this.  Is it worth also trying to cover this case in the
-> testsuite as well?
+Le 21/03/2018 =C3=A0 08:05, Thomas Huth a =C3=A9crit=C2=A0:
+> On 20.03.2018 23:25, Michael Clark wrote:
+>> The following changes since commit f1a63fcfcd92c88be8942b5ae71aef9749a=
+4f135:
+>>
+>>   Update version for v2.12.0-rc0 release (2018-03-20 19:04:22 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-fixes
+>>
+>> for you to fetch changes up to e1a247183ac0816284dfda61423f7030b668667=
+9:
+>>
+>>   RISC-V: Remove erroneous comment from translate.c (2018-03-20 14:34:=
+13 -0700)
+>>
+>> ----------------------------------------------------------------
+>> This is a series of spec conformance bug fixes and code cleanups
+>> that we would like to get in before the QEMU 2.12 release.
+>=20
+>  Hi Michael,
+>=20
+> for future PULL request, could you please send out all patches again
+> that should be pulled, and not send the cover letter alone? I.e. do a
+> "git format-patch --subject-prefix PULL ..." and then replace the
+> contents of the cover letter with the output of "git request-pull".
+>=20
+> ... this is how all other maintainers are sending PULL requests (at
+> least as far as I know) and this way everybody gets a very final chance=
 
-I checked and the patch doesn't really fix that scenario. There's a
-different problem that I haven't debugged completely yet, because of two
-reasons:
+> to have a look at the patches in their final state (it does not happen
+> very often that someone replies to such patches, but in some rare cases=
 
- - One difference is that when we grow the refcount table we actually
-   allocate a new one, so s->free_cluster_index points to the beginning
-   of the image (where the previous table was) and any holes left during
-   the process are allocated after that (depending on how much data we
-   write though).
+> we already found problems this way).
 
- - This scenario is harder to reach: in order to fill a 1-cluster
-   refcount table the size of the image needs to be larger than
-   (cluster_size=C2=B3 / refcount_bits) bytes, that's 16TB with the default
-   parameters. So although it can be reproduced easily if you reduce the
-   cluster size I think it's very infrequent under normal conditions.
+You can also use git-publish that is a very simple tool to manage patch
+series revision and to send pull request in an easy way.
 
-But yes, it's a task left for the future.
+https://github.com/stefanha/git-publish
 
->> +            /* If the caller needs to restart the search for free clust=
-ers,
->> +             * try the same ones first to see if they're still free. */
->> +            if (ret =3D=3D -EAGAIN) {
->> +                if (s->free_cluster_index > (start >> s->cluster_bits))=
- {
->> +                    s->free_cluster_index =3D (start >> s->cluster_bits=
-);
->> +                }
->
-> Is there any harm in making this assignment unconditional, instead of
-> only doing it when free_cluster_index has grown larger than start?
+Thanks,
+Laurent
 
-It can happen that it is smaller than 'start' if we were moving the
-refcount table to a new location, so we want to keep the lowest value.
 
-> [And unrelated, but it might be nice to do a followup cleanup to track
-> free_cluster_offset by bytes instead of having to shift
-> free_cluster_index everywhere]
+--4sUCDQGD27oZqaEpRlol7KgHwoZPgjbSS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I've actually just seen that we already have free_byte_offset, we use
-that for compressed clusters, so it might be possible to use that one...
+-----BEGIN PGP SIGNATURE-----
 
-I'll put that in my TODO list.
+iQIzBAEBCAAdFiEEzS913cjjpNwuT1Fz8ww4vT8vvjwFAlqyJc8ACgkQ8ww4vT8v
+vjzwjA/+J7JIFTRMs1bMBA9AGPPUxqpxvkqPGvJf9tXnlZyZladVJYF9oYHOZkyx
+MjoBIEb2WEdNirFe//uPqG2baMI5+JzJ3r/nRhpL/Sm6cEqoPbIbHc9BfHudI8NU
+FqguxAffLDiK7d7sf0p2CudMaT25cDHbbfEMukV3xISrAfFdBGa8zCRg+tfE7GnG
+QOnsjjZwCtTkkiM5WjkbDKiKNjnw6r0n12EDPEESTDBJVM6Zg5ci3HlJiKE5Rqpt
+ftFzLEL0PxVbUktHC3Wo0k7/gHzO/HOMZsVnoIQ+rPCrNsx/G++Vx4DdiuS5hun0
+BRrb3UViapvwf8cjvhYpcW2od251pc6Ka0C7u83crjZiCllkK60aMC8WLGJxldin
+yr3tcRTUiF01nU1YbY8NJihTF0/OuVdPnrkfU0bk+6S2wRXGIa5oI1A4XiVQqe8y
+7GYHAKFaAd6b/kUXnE14+g+/XV3+zVU/K6e+D13QtYYqUjUWQDnaEglgoXwWf8UX
+GsU3QH1F6vFZJbPzUmUP8RUnIHzPMIFYqGTGotTTwTmIUDI/Vw27Kq8w4Iy5hFpK
+ezHwwdLFAef+lP+hmTWXP11D975JnFQqnYqlMQvHCrZ3yDgs1X6IzwttIZcxwU5X
+SJjNqjA/n7S9d/eJhrxh4tz2RViPdOYKG8JczqiBg7YrbnVji70=
+=SqHp
+-----END PGP SIGNATURE-----
 
-Berto
+--4sUCDQGD27oZqaEpRlol7KgHwoZPgjbSS--
