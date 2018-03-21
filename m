@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eyZCP-0004Ae-DQ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:34:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1eyZNO-0007j1-Hb
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eyZCO-00040u-9m
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:34:21 -0400
-Message-ID: <5AB218CE.1050000@huawei.com>
-Date: Wed, 21 Mar 2018 16:33:18 +0800
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1eyZNJ-0000nb-K3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:45:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eyZNJ-0000n9-D3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 04:45:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eyZNI-000732-ED
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 08:45:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A3D52E8042
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 08:45:36 +0000 (UTC)
 MIME-Version: 1.0
-References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
-	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
-	<33a7bc59-c457-03d0-90bf-ab5b2d2d46cd@redhat.com>
-In-Reply-To: <33a7bc59-c457-03d0-90bf-ab5b2d2d46cd@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Mar 2018 08:38:37 -0000
+From: dantachen <1757363@bugs.launchpad.net>
+Reply-To: Bug 1757363 <1757363@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152162151775.22331.14638507477656772309.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1757363] [NEW] infinite loop due to improper deal
+ with "eret" on mips32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,130 +36,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+1.qemu 2.9.1 release on the official web build with tcg
+2.cmd: qemu-system-mips -kernel kernelfile
+3. host: ubuntu 16.04.1 with linux kernel 4.6.2 x86_64
+   guest: mips bigendian 32bit (tplink firmware)
 
 
+detail:
 
-On 2018/3/20 16:42, Auger Eric wrote:
-> Hi Shannon,
-> On 20/03/18 08:26, Shannon Zhao wrote:
->> While we skip the GIC_INTERNAL irqs, we don't change the register offset
->> accordingly. This will overlap the GICR registers value and leave the
->> last GIC_INTERNAL irq's registers out of update.
->>
->> Fix this by skipping the registers banked by GICR.
->>
->> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
->> ---
->>  hw/intc/arm_gicv3_kvm.c | 38 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 38 insertions(+)
->>
->> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->> index 3536795..d423cba 100644
->> --- a/hw/intc/arm_gicv3_kvm.c
->> +++ b/hw/intc/arm_gicv3_kvm.c
->> @@ -136,6 +136,12 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
->>      int irq;
->>  
->>      field = (uint32_t *)bmp;
->> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
->> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
->> +     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
->> +     * sync them.
->> +     */
->> +    offset += (8 * sizeof(uint32_t));
->>      for_each_dist_irq_reg(irq, s->num_irq, 8) {
->>          kvm_gicd_access(s, offset, &reg, false);
->>          *field = reg;
->> @@ -150,6 +156,12 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
->>      int irq;
->>  
->>      field = (uint32_t *)bmp;
->> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
->> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
->> +     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
->> +     * sync them.
->> +     */
->> +    offset += (8 * sizeof(uint32_t));
->>      for_each_dist_irq_reg(irq, s->num_irq, 8) {
->>          reg = *field;
->>          kvm_gicd_access(s, offset, &reg, true);
->> @@ -164,6 +176,12 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
->>      uint32_t reg;
->>      int irq;
->>  
->> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
->> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
->> +     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
->> +     * them.
->> +     */
->> +    offset += (2 * sizeof(uint32_t));
->>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
->>          kvm_gicd_access(s, offset, &reg, false);
->>          reg = half_unshuffle32(reg >> 1);
->> @@ -181,6 +199,12 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
->>      uint32_t reg;
->>      int irq;
->>  
->> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
->> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
->> +     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
->> +     * them.
->> +     */
->> +    offset += (2 * sizeof(uint32_t));
->>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
->>          reg = *gic_bmp_ptr32(bmp, irq);
->>          if (irq % 32 != 0) {
->> @@ -222,6 +246,12 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
->>      uint32_t reg;
->>      int irq;
->>  
->> +    /* For the KVM GICv3, affinity routing is always enabled, and the
->> +     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
->> +     * are always RAZ/WI. The corresponding functionality is replaced by the
->> +     * GICR registers. So it doesn't need to sync them.
->> +     */
->> +    offset += (1 * sizeof(uint32_t));
->>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
->>          kvm_gicd_access(s, offset, &reg, false);
->>          *gic_bmp_ptr32(bmp, irq) = reg;
->> @@ -235,6 +265,14 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
->>      uint32_t reg;
->>      int irq;
->>  
->> +    /* For the KVM GICv3, affinity routing is always enabled, and the
->> +     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
->> +     * are always RAZ/WI. The corresponding functionality is replaced by the
->> +     * GICR registers. So it doesn't need to sync them.
->> +     */
->> +    offset += (1 * sizeof(uint32_t));
-> I wonder we couldn't create a new for_each_dist_irq_reg() macro taking
-> the offset and clroffset and integrating that shift inside?
-> 
-Peter, what's your opinion?
+static inline void exception_return(CPUMIPSState *env)
+{
+    debug_pre_eret(env);
+    if (env->CP0_Status & (1 << CP0St_ERL)) {
+        set_pc(env, env->CP0_ErrorEPC);
+        env->CP0_Status &=3D ~(1 << CP0St_ERL);
+    } else {
+        set_pc(env, env->CP0_EPC);
+        env->CP0_Status &=3D ~(1 << CP0St_EXL);=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D> ISSUE????
+    }
+    compute_hflags(env);
+    debug_post_eret(env);
+}
 
->> +    if (clroffset != 0)
-> nit style issue: brace needed here
->
-OK
+void helper_eret(CPUMIPSState *env)
+{
+    exception_return(env);
+    env->lladdr =3D 1;
+}
 
-> Besides Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
-Thanks!
 
-> Thanks
-> 
-> Eric
-> 
->> +        clroffset += (1 * sizeof(uint32_t));
->>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
->>          /* If this bitmap is a set/clear register pair, first write to the
->>           * clear-reg to clear all bits before using the set-reg to write
->>
-> 
-> .
-> 
+In the Issue Line, there is no check CP0_Status whether int is disabled (sh=
+ould not enter int routine),
+that result in the cpu can not jump out the int routine.
 
--- 
-Shannon
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1757363
+
+Title:
+  infinite loop due to improper deal with "eret" on mips32
+
+Status in QEMU:
+  New
+
+Bug description:
+  1.qemu 2.9.1 release on the official web build with tcg
+  2.cmd: qemu-system-mips -kernel kernelfile
+  3. host: ubuntu 16.04.1 with linux kernel 4.6.2 x86_64
+     guest: mips bigendian 32bit (tplink firmware)
+
+  =
+
+  detail:
+
+  static inline void exception_return(CPUMIPSState *env)
+  {
+      debug_pre_eret(env);
+      if (env->CP0_Status & (1 << CP0St_ERL)) {
+          set_pc(env, env->CP0_ErrorEPC);
+          env->CP0_Status &=3D ~(1 << CP0St_ERL);
+      } else {
+          set_pc(env, env->CP0_EPC);
+          env->CP0_Status &=3D ~(1 << CP0St_EXL);=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D> ISSUE????
+      }
+      compute_hflags(env);
+      debug_post_eret(env);
+  }
+
+  void helper_eret(CPUMIPSState *env)
+  {
+      exception_return(env);
+      env->lladdr =3D 1;
+  }
+
+  =
+
+  In the Issue Line, there is no check CP0_Status whether int is disabled (=
+should not enter int routine),
+  that result in the cpu can not jump out the int routine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1757363/+subscriptions
