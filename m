@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eyllB-0007Ms-Rw
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:59:06 -0400
+	(envelope-from <rjones@redhat.com>) id 1eym1R-0003Xs-Mv
+	for Qemu-devel@nongnu.org; Wed, 21 Mar 2018 18:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eyllA-0005Xt-Vn
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:59:05 -0400
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a80175c7-0d54-dc0b-5dbe-8bb05f51913b@redhat.com>
-Date: Wed, 21 Mar 2018 17:58:48 -0400
+	(envelope-from <rjones@redhat.com>) id 1eym1M-0006C5-JS
+	for Qemu-devel@nongnu.org; Wed, 21 Mar 2018 18:15:53 -0400
+Date: Wed, 21 Mar 2018 22:15:31 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180321221531.GF2787@redhat.com>
+References: <20180321124417.29242-1-ptoscano@redhat.com>
+	<20180321125105.GJ19514@redhat.com>
+	<65a7365f-89d5-a66c-4e7a-ce8ae1bcf595@redhat.com>
+	<2075074.dXtERdIzXi@thyrus.usersys.redhat.com>
+	<20180321204420.GL3898@localhost.localdomain>
+	<386fe69d-f45b-704a-e936-0211935977ce@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] raw iotest regressions in 2.12.0-rc0
+Content-Disposition: inline
+In-Reply-To: <386fe69d-f45b-704a-e936-0211935977ce@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [Libguestfs] [PATCH] tests:
+ regressions: make test-big-heap use a temporary empty file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Pino Toscano <ptoscano@redhat.com>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, libguestfs@redhat.com, mreitz@redhat.com
 
-./check -v -raw
-Failures: 109 132 136 148 152 183
+On Wed, Mar 21, 2018 at 03:58:05PM -0500, Eric Blake wrote:
+> On 03/21/2018 03:44 PM, Kevin Wolf wrote:
+> >>>
+> >>>You're right that file locking on a character device like /dev/null =
+is
+> >>>not going to work as expected, but is it a case where fcntl() actual=
+ly
+> >>>fails, or is it worse where the fcntl() claiming the locks "succeeds=
+"
+> >>>but doesn't do what we want?  That is, what were the actual error
+> >>>messages you ran into?
+> >>
+> >>$ qemu-img --version
+> >>qemu-img version 2.10.1(qemu-2.10.1-2.fc27)
+> >>Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project develope=
+rs
+> >>$ qemu-img info /dev/null
+> >>qemu-img: Could not open '/dev/null': Failed to get "consistent read"=
+ lock
+> >>Is another process using the image?
+> >
+> >Not sure where the difference is, but I can't reproduce this on
+> >upstream, neither git master nor the v2.10.1 tag:
+>=20
+> Is it a case where file locking actually works, and more than one
+> process is trying to lock /dev/null at once?  (qemu-img info is
+> short-lived, but could there be another longer-lived process also
+> using /dev/null)?
+>=20
+> Does using -r help (if the only reason you're telling qemu-img to
+> operate on /dev/null is to probe qemu-img features, can you probe
+> those same features without needing to write, which in turn requests
+> less locking)?
 
-3fd2457d18edf5736f713dfe1ada9c87a9badab1 is the first bad commit
-commit 3fd2457d18edf5736f713dfe1ada9c87a9badab1
-Author: Peter Xu <peterx@redhat.com>
-Date:   Fri Mar 9 17:00:03 2018 +0800
+The original test (before Pino's patch) runs =E2=80=98qemu-img info /dev/=
+null=E2=80=99
+purely as a way to fork qemu-img.  It's a regression test for some
+problem we had with the code that confines qemu-img using resource
+limits.  So really nothing much to do with qemu-img at all.  The fix
+is to create a temporary file and run qemu-img against that.
 
-    monitor: enable IO thread for (qmp & !mux) typed
+Rich.
 
-    Start to use dedicate IO thread for QMP monitors that are not using
-    MUXed chardev.
-
-    Reviewed-by: Fam Zheng <famz@redhat.com>
-    Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-    Signed-off-by: Peter Xu <peterx@redhat.com>
-    Message-Id: <20180309090006.10018-21-peterx@redhat.com>
-    Signed-off-by: Eric Blake <eblake@redhat.com>
-
-
-The symptom appears to be extra "RESUME" events in the stream that
-weren't expected by the original output for tests 109 and 183; the rest
-are python and I didn't dig yet.
-
-./check -v raw
-Failures: 055
-Failed 5 of 5 tests
-
-91ad45061af0fe44ac5dadb5bedaf4d7a08077c8 is the first bad commit
-commit 91ad45061af0fe44ac5dadb5bedaf4d7a08077c8
-Author: Peter Xu <peterx@redhat.com>
-Date:   Fri Mar 9 17:00:05 2018 +0800
-
-    tests: qmp-test: verify command batching
-
-    OOB introduced DROP event for flow control.  This should not affect old
-    QMP clients.  Add a command batching check to make sure of it.
-
-    Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-    Signed-off-by: Peter Xu <peterx@redhat.com>
-    Message-Id: <20180309090006.10018-23-peterx@redhat.com>
-    Reviewed-by: Eric Blake <eblake@redhat.com>
-    Signed-off-by: Eric Blake <eblake@redhat.com>
-
-
-
-Maybe these are known, but I wanted to consolidate them for rc0 for
-something easy to search for. There are others for qcow2 which I'll post
-in a bit...!
-
-
-Thanks,
---js
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
