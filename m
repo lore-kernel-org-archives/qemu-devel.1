@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eyl5Z-0001mQ-7o
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:16:06 -0400
+	(envelope-from <cota@braap.org>) id 1eylY7-00027B-De
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:45:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eyl5V-0006Oh-2h
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:16:05 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:37156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1eyl5U-0006OU-NI
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:16:00 -0400
-Date: Wed, 21 Mar 2018 23:15:43 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20180321211543.GA4394@yuvallap>
-References: <1521645545-247351-1-git-send-email-mst@redhat.com>
+	(envelope-from <cota@braap.org>) id 1eylY4-0000ax-SF
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:45:35 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:38987)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eylY3-0000ZL-T5
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 17:45:32 -0400
+Date: Wed, 21 Mar 2018 17:45:30 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180321214530.GA4256@flamenco>
+References: <1521663109-32262-1-git-send-email-cota@braap.org>
+	<1521663109-32262-8-git-send-email-cota@braap.org>
+	<b342cf3b-d594-9728-a12d-d5b8c7090e09@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1521645545-247351-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 1/2] rdma: fix up include
- directives
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b342cf3b-d594-9728-a12d-d5b8c7090e09@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v1 07/14] fpu: introduce hostfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,270 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On Wed, Mar 21, 2018 at 05:22:07PM +0200, Michael S. Tsirkin wrote:
-> Our rule right now is to use <> for external headers only.
-> RDMA code violates that, fix it up.
+On Wed, Mar 21, 2018 at 21:41:19 +0100, Laurent Vivier wrote:
+> Le 21/03/2018 à 21:11, Emilio G. Cota a écrit :
+> > diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
+> > index ac61948..2868b11 100644
+> > --- a/target/m68k/Makefile.objs
+> > +++ b/target/m68k/Makefile.objs
+> > @@ -1,5 +1,5 @@
+> >  obj-y += m68k-semi.o
+> >  obj-y += translate.o op_helper.o helper.o cpu.o
+> > -obj-y += fpu_helper.o softfloat.o
+> > +obj-y += fpu_helper.o softfloat.o hostfloat.o
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> I don't think you need to add hostfloat.o here,
+> the softfloat.o in this list contains function specific to m68k
+> emulation, it's not the one from fpu/
 
-Thanks.
+Aah yes indeed. Didn't consider there might be another softfloat.c =)
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Thanks,
 
-> ---
->  hw/rdma/rdma_backend.h        |  2 +-
->  hw/rdma/rdma_backend_defs.h   |  2 +-
->  hw/rdma/rdma_rm.h             |  2 +-
->  hw/rdma/rdma_utils.h          |  6 +++---
->  hw/rdma/vmw/pvrdma.h          |  8 ++++----
->  hw/rdma/vmw/pvrdma_dev_ring.h |  2 +-
->  hw/rdma/rdma_backend.c        |  6 +++---
->  hw/rdma/rdma_rm.c             |  6 +++---
->  hw/rdma/vmw/pvrdma_cmd.c      |  8 ++++----
->  hw/rdma/vmw/pvrdma_dev_ring.c |  8 ++++----
->  hw/rdma/vmw/pvrdma_main.c     | 24 ++++++++++++------------
->  hw/rdma/vmw/pvrdma_qp_ops.c   |  4 ++--
->  12 files changed, 39 insertions(+), 39 deletions(-)
-> 
-> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> index 68f2b05..abae262 100644
-> --- a/hw/rdma/rdma_backend.h
-> +++ b/hw/rdma/rdma_backend.h
-> @@ -16,7 +16,7 @@
->  #ifndef RDMA_BACKEND_H
->  #define RDMA_BACKEND_H
->  
-> -#include <qapi/error.h>
-> +#include "qapi/error.h"
->  #include "rdma_rm_defs.h"
->  #include "rdma_backend_defs.h"
->  
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> index 837e324..ff5cfc2 100644
-> --- a/hw/rdma/rdma_backend_defs.h
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -17,7 +17,7 @@
->  #define RDMA_BACKEND_DEFS_H
->  
->  #include <infiniband/verbs.h>
-> -#include <qemu/thread.h>
-> +#include "qemu/thread.h"
->  
->  typedef struct RdmaDeviceResources RdmaDeviceResources;
->  
-> diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
-> index be95c1b..82c1ddd 100644
-> --- a/hw/rdma/rdma_rm.h
-> +++ b/hw/rdma/rdma_rm.h
-> @@ -16,7 +16,7 @@
->  #ifndef RDMA_RM_H
->  #define RDMA_RM_H
->  
-> -#include <qapi/error.h>
-> +#include "qapi/error.h"
->  #include "rdma_backend_defs.h"
->  #include "rdma_rm_defs.h"
->  
-> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-> index cdac910..3dc0789 100644
-> --- a/hw/rdma/rdma_utils.h
-> +++ b/hw/rdma/rdma_utils.h
-> @@ -17,9 +17,9 @@
->  #ifndef RDMA_UTILS_H
->  #define RDMA_UTILS_H
->  
-> -#include <qemu/osdep.h>
-> -#include <include/hw/pci/pci.h>
-> -#include <include/sysemu/dma.h>
-> +#include "qemu/osdep.h"
-> +#include "hw/pci/pci.h"
-> +#include "sysemu/dma.h"
->  
->  #define pr_info(fmt, ...) \
->      fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma",  __func__, __LINE__,\
-> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-> index b05f94a..8c173cb 100644
-> --- a/hw/rdma/vmw/pvrdma.h
-> +++ b/hw/rdma/vmw/pvrdma.h
-> @@ -16,14 +16,14 @@
->  #ifndef PVRDMA_PVRDMA_H
->  #define PVRDMA_PVRDMA_H
->  
-> -#include <hw/pci/pci.h>
-> -#include <hw/pci/msix.h>
-> +#include "hw/pci/pci.h"
-> +#include "hw/pci/msix.h"
->  
->  #include "../rdma_backend_defs.h"
->  #include "../rdma_rm_defs.h"
->  
-> -#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h>
-> -#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h>
-> +#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h"
-> +#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
->  #include "pvrdma_dev_ring.h"
->  
->  /* BARs */
-> diff --git a/hw/rdma/vmw/pvrdma_dev_ring.h b/hw/rdma/vmw/pvrdma_dev_ring.h
-> index 02a590b..2d0461f 100644
-> --- a/hw/rdma/vmw/pvrdma_dev_ring.h
-> +++ b/hw/rdma/vmw/pvrdma_dev_ring.h
-> @@ -16,7 +16,7 @@
->  #ifndef PVRDMA_DEV_RING_H
->  #define PVRDMA_DEV_RING_H
->  
-> -#include <qemu/typedefs.h>
-> +#include "qemu/typedefs.h"
->  
->  #define MAX_RING_NAME_SZ 32
->  
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index e306fba..f85c7b2 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -13,9 +13,9 @@
->   *
->   */
->  
-> -#include <qemu/osdep.h>
-> -#include <qemu/error-report.h>
-> -#include <qapi/error.h>
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qapi/error.h"
->  
->  #include <infiniband/verbs.h>
->  
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index b5fc45d..80ffc94 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -13,9 +13,9 @@
->   *
->   */
->  
-> -#include <qemu/osdep.h>
-> -#include <qapi/error.h>
-> -#include <cpu.h>
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "cpu.h"
->  
->  #include "rdma_utils.h"
->  #include "rdma_backend.h"
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index 293dfed..a9fa1ef 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -13,9 +13,9 @@
->   *
->   */
->  
-> -#include <qemu/osdep.h>
-> -#include <qemu/error-report.h>
-> -#include <cpu.h>
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "cpu.h"
->  #include <linux/types.h>
->  #include "hw/hw.h"
->  #include "hw/pci/pci.h"
-> @@ -26,7 +26,7 @@
->  #include "../rdma_utils.h"
->  
->  #include "pvrdma.h"
-> -#include <standard-headers/rdma/vmw_pvrdma-abi.h>
-> +#include "standard-headers/rdma/vmw_pvrdma-abi.h"
->  
->  static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
->                                  uint32_t nchunks, size_t length)
-> diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-> index ec309da..ff19a9e 100644
-> --- a/hw/rdma/vmw/pvrdma_dev_ring.c
-> +++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-> @@ -13,12 +13,12 @@
->   *
->   */
->  
-> -#include <qemu/osdep.h>
-> -#include <hw/pci/pci.h>
-> -#include <cpu.h>
-> +#include "qemu/osdep.h"
-> +#include "hw/pci/pci.h"
-> +#include "cpu.h"
->  
->  #include "../rdma_utils.h"
-> -#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h>
-> +#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h"
->  #include "pvrdma_dev_ring.h"
->  
->  int pvrdma_ring_init(PvrdmaRing *ring, const char *name, PCIDevice *dev,
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 9978781..25ea02a 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -13,16 +13,16 @@
->   *
->   */
->  
-> -#include <qemu/osdep.h>
-> -#include <qapi/error.h>
-> -#include <hw/hw.h>
-> -#include <hw/pci/pci.h>
-> -#include <hw/pci/pci_ids.h>
-> -#include <hw/pci/msi.h>
-> -#include <hw/pci/msix.h>
-> -#include <hw/qdev-core.h>
-> -#include <hw/qdev-properties.h>
-> -#include <cpu.h>
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/hw.h"
-> +#include "hw/pci/pci.h"
-> +#include "hw/pci/pci_ids.h"
-> +#include "hw/pci/msi.h"
-> +#include "hw/pci/msix.h"
-> +#include "hw/qdev-core.h"
-> +#include "hw/qdev-properties.h"
-> +#include "cpu.h"
->  #include "trace.h"
->  
->  #include "../rdma_rm.h"
-> @@ -31,8 +31,8 @@
->  
->  #include <infiniband/verbs.h>
->  #include "pvrdma.h"
-> -#include <standard-headers/rdma/vmw_pvrdma-abi.h>
-> -#include <standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h>
-> +#include "standard-headers/rdma/vmw_pvrdma-abi.h"
-> +#include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
->  #include "pvrdma_qp_ops.h"
->  
->  static Property pvrdma_dev_properties[] = {
-> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> index f0a1f9e..a693c06 100644
-> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> @@ -13,14 +13,14 @@
->   *
->   */
->  
-> -#include <qemu/osdep.h>
-> +#include "qemu/osdep.h"
->  
->  #include "../rdma_utils.h"
->  #include "../rdma_rm.h"
->  #include "../rdma_backend.h"
->  
->  #include "pvrdma.h"
-> -#include <standard-headers/rdma/vmw_pvrdma-abi.h>
-> +#include "standard-headers/rdma/vmw_pvrdma-abi.h"
->  #include "pvrdma_qp_ops.h"
->  
->  typedef struct CompHandlerCtx {
-> -- 
-> MST
-> 
+		E.
