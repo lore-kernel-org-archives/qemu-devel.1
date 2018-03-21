@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eycnc-0002wr-Ch
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:25:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eycqY-0005ji-3R
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:28:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eycnZ-0000W1-7z
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:25:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58858 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eycnZ-0000N1-0V
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:24:57 -0400
-Date: Wed, 21 Mar 2018 12:24:37 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180321122436.GC3465@work-vm>
-References: <1520952824-3172-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20180313145358eucas1p295b153bb8ec4760668449dbc80613cf4@eucas1p2.samsung.com>
-	<1520952824-3172-4-git-send-email-a.perevalov@samsung.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eycqX-0003f1-45
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:28:02 -0400
+References: <20180321105830.22412-1-pbonzini@redhat.com>
+	<0b772d6c-d0df-f466-053e-29f0304ad52a@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8f27a973-3ac1-b0b9-626f-dbde7bf67421@redhat.com>
+Date: Wed, 21 Mar 2018 13:27:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520952824-3172-4-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] migration: calculate vCPU blocktime
- on dst side
+In-Reply-To: <0b772d6c-d0df-f466-053e-29f0304ad52a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scsi: turn "is this a SCSI device?" into a
+ conditional hint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,245 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> This patch provides blocktime calculation per vCPU,
-> as a summary and as a overlapped value for all vCPUs.
+On 21/03/2018 13:17, Laurent Vivier wrote:
+> On 21/03/2018 11:58, Paolo Bonzini wrote:
+>> If the user does not have permissions to send ioctls to the device (due to
+>> SELinux or cgroups, for example), the output can look like
+>>
+>> qemu-kvm: -device scsi-block,drive=disk: cannot get SG_IO version number:
+>>   Operation not permitted.  Is this a SCSI device?
+>>
+>> but this is confusing because the ioctl was blocked _before_ the device
+>> even received the SG_GET_VERSION_NUM ioctl.  Therefore, for EPERM errors
+>> the suggestion should be eliminated.  To make that simpler, change the
+>> code to use error_append_hint.
+>>
+>> Reported-by: Ala Hino <ahino@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  hw/scsi/scsi-disk.c    | 7 ++++---
+>>  hw/scsi/scsi-generic.c | 7 ++++---
+>>  2 files changed, 8 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+>> index 94043ed024..ccc245589a 100644
+>> --- a/hw/scsi/scsi-disk.c
+>> +++ b/hw/scsi/scsi-disk.c
+>> @@ -2637,9 +2637,10 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+>>      /* check we are using a driver managing SG_IO (version 3 and after) */
+>>      rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
+>>      if (rc < 0) {
+>> -        error_setg(errp, "cannot get SG_IO version number: %s.  "
+>> -                     "Is this a SCSI device?",
+>> -                     strerror(-rc));
+>> +        error_setg(errp, "cannot get SG_IO version number: %s", strerror(-rc));
 > 
-> This approach was suggested by Peter Xu, as an improvements of
-> previous approch where QEMU kept tree with faulted page address and cpus bitmask
-> in it. Now QEMU is keeping array with faulted page address as value and vCPU
-> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-> list for blocktime per vCPU (could be traced with page_fault_addr)
 > 
-> Blocktime will not calculated if postcopy_blocktime field of
-> MigrationIncomingState wasn't initialized.
+> You could use:
 > 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/postcopy-ram.c | 149 ++++++++++++++++++++++++++++++++++++++++++++++-
->  migration/trace-events   |   5 +-
->  2 files changed, 152 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 9144102..9e51e84 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -546,6 +546,148 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->      return 0;
->  }
->  
-> +static int get_mem_fault_cpu_index(uint32_t pid)
-> +{
-> +    CPUState *cpu_iter;
-> +
-> +    CPU_FOREACH(cpu_iter) {
-> +        if (cpu_iter->thread_id == pid) {
-> +            trace_get_mem_fault_cpu_index(cpu_iter->cpu_index, pid);
-> +            return cpu_iter->cpu_index;
-> +        }
-> +    }
-> +    trace_get_mem_fault_cpu_index(-1, pid);
-> +    return -1;
-> +}
-> +
-> +static uint32_t get_low_time_offset(PostcopyBlocktimeContext *dc)
-> +{
-> +    int64_t start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
-> +                                    dc->start_time;
-> +    return start_time_offset < 1 ? 1 : start_time_offset & UINT32_MAX;
-> +}
-> +
-> +/*
-> + * This function is being called when pagefault occurs. It
-> + * tracks down vCPU blocking time.
-> + *
-> + * @addr: faulted host virtual address
-> + * @ptid: faulted process thread id
-> + * @rb: ramblock appropriate to addr
-> + */
-> +static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
-> +                                          RAMBlock *rb)
-> +{
-> +    int cpu, already_received;
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> +    uint32_t low_time_offset;
-> +
-> +    if (!dc || ptid == 0) {
-> +        return;
-> +    }
-> +    cpu = get_mem_fault_cpu_index(ptid);
-> +    if (cpu < 0) {
-> +        return;
-> +    }
-> +
-> +    low_time_offset = get_low_time_offset(dc);
-> +    if (dc->vcpu_addr[cpu] == 0) {
-> +        atomic_inc(&dc->smp_cpus_down);
-> +    }
-> +
-> +    atomic_xchg(&dc->last_begin, low_time_offset);
-> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
-> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
-> +
-> +    /* check it here, not at the begining of the function,
-> +     * due to, check could accur early than bitmap_set in
-> +     * qemu_ufd_copy_ioctl */
-> +    already_received = ramblock_recv_bitmap_test(rb, (void *)addr);
-> +    if (already_received) {
-> +        atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0);
-> +        atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], 0);
+>   error_setg_errno(errp, -rc, "cannot get SG_IO version number");
 
-Those don't need to be __nocheck do they?  vcpu_addr is uintptr_t so I
-think should always be the right size, and page_fault_vcpu_time is
-uint32_t now, so again should be fine (and same below).
+Nice, thanks.  Will do.
 
-Dave
-
-> +        atomic_dec(&dc->smp_cpus_down);
-> +    }
-> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-> +                                        cpu, already_received);
-> +}
-> +
-> +/*
-> + *  This function just provide calculated blocktime per cpu and trace it.
-> + *  Total blocktime is calculated in mark_postcopy_blocktime_end.
-> + *
-> + *
-> + * Assume we have 3 CPU
-> + *
-> + *      S1        E1           S1               E1
-> + * -----***********------------xxx***************------------------------> CPU1
-> + *
-> + *             S2                E2
-> + * ------------****************xxx---------------------------------------> CPU2
-> + *
-> + *                         S3            E3
-> + * ------------------------****xxx********-------------------------------> CPU3
-> + *
-> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
-> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
-> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
-> + *            it's a part of total blocktime.
-> + * S1 - here is last_begin
-> + * Legend of the picture is following:
-> + *              * - means blocktime per vCPU
-> + *              x - means overlapped blocktime (total blocktime)
-> + *
-> + * @addr: host virtual address
-> + */
-> +static void mark_postcopy_blocktime_end(uintptr_t addr)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> +    int i, affected_cpu = 0;
-> +    bool vcpu_total_blocktime = false;
-> +    uint32_t read_vcpu_time, low_time_offset;
-> +
-> +    if (!dc) {
-> +        return;
-> +    }
-> +
-> +    low_time_offset = get_low_time_offset(dc);
-> +    /* lookup cpu, to clear it,
-> +     * that algorithm looks straighforward, but it's not
-> +     * optimal, more optimal algorithm is keeping tree or hash
-> +     * where key is address value is a list of  */
-> +    for (i = 0; i < smp_cpus; i++) {
-> +        uint32_t vcpu_blocktime = 0;
-> +
-> +        read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
-> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
-> +            read_vcpu_time == 0) {
-> +            continue;
-> +        }
-> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
-> +        vcpu_blocktime = low_time_offset - read_vcpu_time;
-> +        affected_cpu += 1;
-> +        /* we need to know is that mark_postcopy_end was due to
-> +         * faulted page, another possible case it's prefetched
-> +         * page and in that case we shouldn't be here */
-> +        if (!vcpu_total_blocktime &&
-> +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
-> +            vcpu_total_blocktime = true;
-> +        }
-> +        /* continue cycle, due to one page could affect several vCPUs */
-> +        dc->vcpu_blocktime[i] += vcpu_blocktime;
-> +    }
-> +
-> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
-> +    if (vcpu_total_blocktime) {
-> +        dc->total_blocktime += low_time_offset - atomic_fetch_add(
-> +                &dc->last_begin, 0);
-> +    }
-> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
-> +                                      affected_cpu);
-> +}
-> +
->  /*
->   * Handle faults detected by the USERFAULT markings
->   */
-> @@ -633,8 +775,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
->          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
->                                                  qemu_ram_get_idstr(rb),
-> -                                                rb_offset);
-> +                                                rb_offset,
-> +                                                msg.arg.pagefault.feat.ptid);
->  
-> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
-> +                                      msg.arg.pagefault.feat.ptid, rb);
->          /*
->           * Send the request to the source - we want to request one
->           * of our host page sizes (which is >= TPS)
-> @@ -724,6 +869,8 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
->      if (!ret) {
->          ramblock_recv_bitmap_set_range(rb, host_addr,
->                                         pagesize / qemu_target_page_size());
-> +        mark_postcopy_blocktime_end((uintptr_t)host_addr);
-> +
->      }
->      return ret;
->  }
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 93961de..22ced40 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -115,6 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->  process_incoming_migration_co_postcopy_end_main(void) ""
->  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
-> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
-> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
->  
->  # migration/rdma.c
->  qemu_rdma_accept_incoming_migration(void) ""
-> @@ -191,7 +193,7 @@ postcopy_ram_enable_notify(void) ""
->  postcopy_ram_fault_thread_entry(void) ""
->  postcopy_ram_fault_thread_exit(void) ""
->  postcopy_ram_fault_thread_quit(void) ""
-> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx"
-> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx pid=%u"
->  postcopy_ram_incoming_cleanup_closeuf(void) ""
->  postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
-> @@ -200,6 +202,7 @@ save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
->  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
-> +get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
->  
->  # migration/exec.c
->  migration_exec_outgoing(const char *cmd) "cmd=%s"
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
