@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyhVj-0001Xt-J0
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:26:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1eyhcQ-0003b8-Ei
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyhVi-0005Rg-MV
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:26:51 -0400
-Date: Wed, 21 Mar 2018 18:26:27 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180321172627.GH3898@localhost.localdomain>
-References: <20180320173632.25480-1-kwolf@redhat.com>
-	<20180320173632.25480-13-kwolf@redhat.com>
-	<e457c30d-2276-ff0d-5211-a98d25ea49ed@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eyhcP-0007qQ-H0
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:33:46 -0400
+References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
+	<20180321121940.39426-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8b6eccd8-90ee-3475-5005-df9f59f59709@redhat.com>
+Date: Wed, 21 Mar 2018 12:33:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e457c30d-2276-ff0d-5211-a98d25ea49ed@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 12/12] qemu-iotests: Test vhdx
- image creation with QMP
+In-Reply-To: <20180321121940.39426-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] qapi: new qmp command
+ nbd-server-add-bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Am 20.03.2018 um 19:53 hat Eric Blake geschrieben:
-> On 03/20/2018 12:36 PM, Kevin Wolf wrote:
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   tests/qemu-iotests/213     | 349 +++++++++++++++++++++++++++++++++++++++++++++
-> >   tests/qemu-iotests/213.out | 121 ++++++++++++++++
-> >   tests/qemu-iotests/group   |   1 +
-> >   3 files changed, 471 insertions(+)
-> >   create mode 100755 tests/qemu-iotests/213
-> >   create mode 100644 tests/qemu-iotests/213.out
-> > 
+On 03/21/2018 07:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   qapi/block.json | 27 +++++++++++++++++++++++++++
+>   blockdev-nbd.c  | 23 +++++++++++++++++++++++
+>   2 files changed, 50 insertions(+)
 > 
-> > +
-> > +echo
-> > +echo "=== Invalid sizes ==="
-> > +echo
-> > +
-> > +# TODO Negative image sizes aren't handled correctly, but this is a problem
-> > +# with QAPI's implementation of the 'size' type and affects other commands as
-> > +# well. Once this is fixed, we may want to add a test case here.
-> > +
-> > +# 1. 2^64 - 512
-> > +# 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
-> > +# 3. 2^63 - 512 (generally valid, but with the crypto header the file will
-> > +#                exceed 63 bits)
-> 
-> Same comments as before on whether this comment is slightly stale after
-> copy-and-paste.
+> diff --git a/qapi/block.json b/qapi/block.json
+> index c694524002..4afbbcd7b7 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -269,6 +269,33 @@
+>     'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
+>   
+>   ##
+> +# @nbd-server-add-bitmap:
+> +#
+> +# Export dirty bitmap through selected export. Bitmaps are searched for in
+> +# device attached to the export and in all its backings. Exported bitmap
+> +# is locked until NBD export is removed.
 
-Will do the same thing as there ("image header").
+Expose a dirty bitmap associated with the selected export.  The bitmap 
+search starts at the device attached to the export, and includes all 
+backing files.  The exported bitmap is then locked until the NBD export 
+is removed.
 
-> > +# 4. 2^46 + 1 (512 bytes more than maximum image size)
-> 
-> Does this image format require 512-byte alignment?  If so, are you missing a
-> test of unaligned sizes?  If not, why not just 1 byte more than the maximum?
+> +#
+> +# @name: Export name.
+> +#
+> +# @bitmap: Bitmap name to search.
 
-The comment is wrong, the code already does just 1 byte more.
+s/search./search for./
 
-Kevin
+> +#
+> +# @bitmap-export-name: How the bitmap will be seen by nbd clients
+> +#                      (default @bitmap)
+
+Maybe mention that the client must use NBD_OPT_SET_META_CONTEXT with a 
+query of "qemu-dirty-bitmap:NAME" (where NAME matches 
+bitmap-export-name) to access the exposed bitmap.  (May need to be 
+adjusted by my suggestion to use just the namespace "qemu:")
+
+> +#
+> +#
+> +# Returns: error on one of the following conditions:
+> +#           - the server is not running
+> +#           - export is not found
+> +#           - bitmap is not found
+> +#           - bitmap is disabled
+> +#           - bitmap is locked
+
+Do we really need to list all the error conditions?  My worry is that a 
+list this specific might go stale, compared to the obvious default that 
+the command succeeds only if it was able to expose the bitmap and that 
+the error message is specific enough for a human to figure out what to 
+fix if it failed.
+
+> +#
+> +# Since: 2.13
+> +##
+> +  { 'command': 'nbd-server-add-bitmap',
+> +    'data': {'name': 'str', 'bitmap': 'str', '*bitmap-export-name': 'str'} }
+> +
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
