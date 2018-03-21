@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eyhQO-0004kF-3u
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:21:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyhQc-0004rY-3u
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eyhQK-0003LJ-Vz
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:21:20 -0400
-Date: Wed, 21 Mar 2018 18:20:39 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20180321172039.GB13477@grep.be>
-References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-	<20180321121940.39426-2-vsementsov@virtuozzo.com>
-	<af833096-cbc3-24db-0cf0-a446f231c5fd@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1eyhQb-0003Tf-8F
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:21:34 -0400
+Date: Wed, 21 Mar 2018 18:21:15 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180321172115.GF3898@localhost.localdomain>
+References: <20180320173632.25480-1-kwolf@redhat.com>
+	<20180320173632.25480-9-kwolf@redhat.com>
+	<5609865f-8d08-bf92-23f3-fba625012e1d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <af833096-cbc3-24db-0cf0-a446f231c5fd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] nbd/server: refactor
- nbd_negotiate_meta_query for several namespaces
+In-Reply-To: <5609865f-8d08-bf92-23f3-fba625012e1d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 08/12] qemu-iotests: Test
+ parallels image creation with QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +26,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, nbd list <nbd@other.debian.org>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Mar 21, 2018 at 09:56:36AM -0500, Eric Blake wrote:
-> no further qemu patches are submitted.  Is it worth me proposing a doc
-> change to demonstrate what the difference would look like, along with
-> corresponding qemu changes to match, to decide if including it in 2.12 is
-> worth it?
+Am 20.03.2018 um 19:42 hat Eric Blake geschrieben:
+> On 03/20/2018 12:36 PM, Kevin Wolf wrote:
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   tests/qemu-iotests/212     | 326 +++++++++++++++++++++++++++++++++++++++++++++
+> >   tests/qemu-iotests/212.out | 111 +++++++++++++++
+> >   tests/qemu-iotests/group   |   1 +
+> >   3 files changed, 438 insertions(+)
+> >   create mode 100755 tests/qemu-iotests/212
+> >   create mode 100644 tests/qemu-iotests/212.out
+> > 
+> 
+> > +echo
+> > +echo "=== Invalid sizes ==="
+> > +echo
+> > +
+> > +# TODO Negative image sizes aren't handled correctly, but this is a problem
+> > +# with QAPI's implementation of the 'size' type and affects other commands as
+> > +# well. Once this is fixed, we may want to add a test case here.
+> > +
+> > +# 1. Misaligned image size
+> > +# 2. 2^64 - 512
+> > +# 3. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
+> > +# 4. 2^63 - 512 (generally valid, but with the crypto header the file will
+> > +#                exceed 63 bits)
+> 
+> Is this part of the comment stale copy-and-paste? There's no crypto header,
+> and the real max is much smaller...
 
-If you're willing to spend the effort, I won't stop you :-) but I think the
-pain of parsing a string once (during negotiation) is not that bad, and
-I'm not too bothered about it.
+Yeah... Not sure if the case is all that useful, but it can't hurt, so
+I'll just s/crypto header/image header/ rather than removing it.
 
-Put otherwise, I'm not convinced that the downside (which I agree
-exists) outweighs the downside of having to introduce yet another
-command, or add some ugliness for backwards compat reasons.
-
-But hey, go ahead, prove me wrong ;-)
-
--- 
-Could you people please use IRC like normal people?!?
-
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+Kevin
