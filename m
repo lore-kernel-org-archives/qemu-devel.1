@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eyebE-000350-9p
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:20:22 -0400
+	(envelope-from <mlureau@redhat.com>) id 1eyecq-0004H8-O9
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eyeb8-0008Nr-Oj
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:20:20 -0400
-Received: from mail-qt0-f169.google.com ([209.85.216.169]:39023)
+	(envelope-from <mlureau@redhat.com>) id 1eyecn-0000bv-Jj
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:22:00 -0400
+Received: from mail-qt0-f196.google.com ([209.85.216.196]:42514)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eyeb8-0008Nf-KW
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:20:14 -0400
-Received: by mail-qt0-f169.google.com with SMTP id v11so5380428qtj.6
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 07:20:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eyecn-0000bn-Fd
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:21:57 -0400
+Received: by mail-qt0-f196.google.com with SMTP id q11so5398017qtl.9
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 07:21:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ea65708d-6d34-31d4-0891-ed058d4d668a@redhat.com>
-References: <20180212142506.28445-1-danielhb@linux.vnet.ibm.com>
-	<4efcdcb9-d226-2d20-91ac-3365a4115c5d@linux.vnet.ibm.com>
-	<ea65708d-6d34-31d4-0891-ed058d4d668a@redhat.com>
+In-Reply-To: <4e876850-3057-e9d5-695b-69f4cde9aa9a@redhat.com>
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<20180321134005.8822-3-marcandre.lureau@redhat.com>
+	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
+	<CAMxuvay1j+E1YRggpqm9+ETE_FxD-ThGtPBenUtvt8oeYweS8g@mail.gmail.com>
+	<4e876850-3057-e9d5-695b-69f4cde9aa9a@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 15:20:13 +0100
-Message-ID: <CAMxuvax8gtVXyKWXWaMn4yiqTfEaTPtYzTWrRs_zeFzJ4FN1rQ@mail.gmail.com>
+Date: Wed, 21 Mar 2018 15:21:56 +0100
+Message-ID: <CAMxuvay+aMU7=kr2ED+7Hq596oeoZP+xKXMYwGB+r8AG5=5rdQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.12? 0/1] dump.c: allow
- fd_write_vmcore to return errno on failure
+Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
+ at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +34,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Armbruster,
+	Markus" <armbru@redhat.com>
 
 Hi
 
-On Wed, Mar 21, 2018 at 2:56 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 03/21/2018 08:29 AM, Daniel Henrique Barboza wrote:
+On Wed, Mar 21, 2018 at 3:19 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 03/21/2018 09:08 AM, Marc-Andr=C3=A9 Lureau wrote:
 >>
->> Ping
+>> Hi
 >>
->> On 02/12/2018 12:25 PM, Daniel Henrique Barboza wrote:
+>> On Wed, Mar 21, 2018 at 3:01 PM, Paolo Bonzini <pbonzini@redhat.com>
+>> wrote:
 >>>
->>> v3:
->>> - added set_errg_errno() to all callers of fd_write_vmcore
->>> - changed patch subject to reflect what it is addressing now
->>> - link to previous version:
->>> http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02787.html
+>>> On 21/03/2018 14:40, Marc-Andr=C3=A9 Lureau wrote:
+>>>>
+>>>> +/* A typecast, checking for the type of arguments */
+>>>> +/* QObject is at offset 0, for all QObject-derived types */
+>>>> +#define QOBJECT(x) QEMU_GENERIC(x,              \
+>>>> +    (QNull *, (QObject *) x),                   \
+>>>> +    (const QNull *, (const QObject *) x),       \
+>>>> +    (QNum *, (QObject *) x),                    \
+>>>> +    (const QNum *, (const QObject *) x),        \
+>>>> +    (QString *, (QObject *) x),                 \
+>>>> +    (const QString *, (const QObject *) x),     \
+>>>> +    (QDict *, (QObject *) x),                   \
+>>>> +    (const QDict *, (const QObject *) x),       \
+>>>> +    (QList *, (QObject *) x),                   \
+>>>> +    (const QList *, (const QObject *) x),       \
+>>>> +    (QBool *, (QObject *) x),                   \
+>>>> +    (const QBool *, (const QObject *) x),       \
+>>>> +    (QObject *, x),                             \
+>>>> +    (const QObject *, x),                       \
+>>>> +    qobject_unknown_type(x))
 >>>
 >>>
->>> Yasmin Beatriz (1):
->>>    dump.c: allow fd_write_vmcore to return errno on failure
+>>> Why not just
 >>>
->>>   dump.c | 23 ++++++++++++++---------
->>>   1 file changed, 14 insertions(+), 9 deletions(-)
+>>>          QEMU_GENERIC(x,
+>>>                  (QObject *, x),
+>>>                  (const QObject *, x),
+>>>                  ({ \
+>>>                          QEMU_BUILD_BUG_ON(offsetof(typeof(*x), base));
+>>>                          &(x)->base;
+>>>                  }))
 >>>
+>>> That is just an extension of what was being done before, and it is
+>>> resilient against people putting a random "QObject base" in the middle
+>>> of a struct.
+>>>
+>>
+>> Yeah, I tried a few of those approaches. Here the problem is that
+>> QObject doesn't have base field. So you get a compile time error with
+>> a QObject * as argument.
 >
-> This seems like an appropriate bug-fix patch for inclusion in 2.12.
-> Marc-Andr=C3=A9, are you planning a pull request, or should we bundle thi=
-s
-> through another miscellaneous tree?
+>
+> So the compiler requires &(x)->base to resolve even when it is not on the
+> branch that gets selected?
+>
 
-Ok, I'll prepare a pull request.
-
-Thanks
+Unfortunately, yes, all branches must compile apparently (I know)...
