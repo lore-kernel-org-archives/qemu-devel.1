@@ -1,15 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eydxa-0007Hw-2I
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:39:23 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eydyQ-0007oz-43
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eydxW-00085H-Q7
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:39:22 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed, 21 Mar 2018 15:38:52 +0200
-Message-Id: <20180321133852.3560-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH for-2.12 v2] qcow2: Reset free_cluster_index
- when allocating a new refcount block
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eydyO-0000I0-L6
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:40:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54906 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1eydyO-0000H4-Gk
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:40:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A5C3412A023
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 13:40:12 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 14:40:03 +0100
+Message-Id: <20180321134005.8822-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/3] compiler: extend QEMU_GENERIC to handle
+ more arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,176 +35,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: berrange@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-When we try to allocate new clusters we first look for available ones
-starting from s->free_cluster_index and once we find them we increase
-their reference counts. Before we get to call update_refcount() to do
-this last step s->free_cluster_index is already pointing to the next
-cluster after the ones we are trying to allocate.
+The following patch is going to use more than 10 arguments to
+QEMU_GENERIC.
 
-During update_refcount() it may happen however that we also need to
-allocate a new refcount block in order to store the refcounts of these
-new clusters (and to complicate things further that may also require
-us to grow the refcount table). After all this we don't know if the
-clusters that we originally tried to allocate are still available, so
-we return -EAGAIN to ask the caller to restart the search for free
-clusters.
-
-This is what can happen in a common scenario:
-
-  1) We want to allocate a new cluster and we see that cluster N is
-     free.
-
-  2) We try to increase N's refcount but all refcount blocks are full,
-     so we allocate a new one at N+1 (where s->free_cluster_index was
-     pointing at).
-
-  3) Once we're done we return -EAGAIN to look again for a free
-     cluster, but now s->free_cluster_index points at N+2, so that's
-     the one we allocate. Cluster N remains unallocated and we have a
-     hole in the qcow2 file.
-
-This can be reproduced easily:
-
-     qemu-img create -f qcow2 -o cluster_size=512 hd.qcow2 1M
-     qemu-io -c 'write 0 124k' hd.qcow2
-
-After this the image has 132608 bytes (256 clusters), and the refcount
-block is full. If we write 512 more bytes it should allocate two new
-clusters: the data cluster itself and a new refcount block.
-
-     qemu-io -c 'write 124k 512' hd.qcow2
-
-However the image has now three new clusters (259 in total), and the
-first one of them is empty (and unallocated):
-
-     dd if=hd.qcow2 bs=512c skip=256 count=1 | hexdump -C
-
-If we write larger amounts of data in the last step instead of the 512
-bytes used in this example we can create larger holes in the qcow2
-file.
-
-What this patch does is reset s->free_cluster_index to its previous
-value when alloc_refcount_block() returns -EAGAIN. This way the caller
-will try to allocate again the original clusters if they are still
-free.
-
-The output of iotest 026 also needs to be updated because now that
-images have no holes some tests fail at a different point and the
-number of leaked clusters is different.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
+ include/qemu/compiler.h | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-v2: Force refcount_bits=16 in iotest 121 [Eric]
-
----
- block/qcow2-refcount.c     |  7 +++++++
- tests/qemu-iotests/026.out |  6 +++---
- tests/qemu-iotests/121     | 20 ++++++++++++++++++++
- tests/qemu-iotests/121.out | 10 ++++++++++
- 4 files changed, 40 insertions(+), 3 deletions(-)
-
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 362deaf303..6b8b63514a 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -839,6 +839,13 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-                 qcow2_cache_put(s->refcount_block_cache, &refcount_block);
-             }
-             ret = alloc_refcount_block(bs, cluster_index, &refcount_block);
-+            /* If the caller needs to restart the search for free clusters,
-+             * try the same ones first to see if they're still free. */
-+            if (ret == -EAGAIN) {
-+                if (s->free_cluster_index > (start >> s->cluster_bits)) {
-+                    s->free_cluster_index = (start >> s->cluster_bits);
-+                }
-+            }
-             if (ret < 0) {
-                 goto fail;
-             }
-diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
-index 86a50a2e13..8e89416a86 100644
---- a/tests/qemu-iotests/026.out
-+++ b/tests/qemu-iotests/026.out
-@@ -533,7 +533,7 @@ Failed to flush the L2 table cache: No space left on device
- Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
--11 leaked clusters were found on the image.
-+10 leaked clusters were found on the image.
- This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- 
-@@ -561,7 +561,7 @@ Failed to flush the L2 table cache: No space left on device
- Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
--11 leaked clusters were found on the image.
-+10 leaked clusters were found on the image.
- This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- 
-@@ -589,7 +589,7 @@ Failed to flush the L2 table cache: No space left on device
- Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
--11 leaked clusters were found on the image.
-+10 leaked clusters were found on the image.
- This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- 
-diff --git a/tests/qemu-iotests/121 b/tests/qemu-iotests/121
-index 1307b4e327..6d6f55a5dc 100755
---- a/tests/qemu-iotests/121
-+++ b/tests/qemu-iotests/121
-@@ -93,6 +93,26 @@ $QEMU_IO -c 'write 63M 130K' "$TEST_IMG" | _filter_qemu_io
- 
- _check_test_img
- 
-+echo
-+echo '=== Allocating a new refcount block must not leave holes in the image ==='
-+echo
-+
-+IMGOPTS='cluster_size=512,refcount_bits=16' _make_test_img 1M
-+
-+# This results in an image with 256 used clusters: the qcow2 header,
-+# the refcount table, one refcount block, the L1 table, four L2 tables
-+# and 248 data clusters
-+$QEMU_IO -c 'write 0 124k' "$TEST_IMG" | _filter_qemu_io
-+
-+# 256 clusters of 512 bytes each give us a 128K image
-+stat -c "size=%s (expected 131072)" $TEST_IMG
-+
-+# All 256 entries of the refcount block are used, so writing a new
-+# data cluster also allocates a new refcount block
-+$QEMU_IO -c 'write 124k 512' "$TEST_IMG" | _filter_qemu_io
-+
-+# Two more clusters, the image size should be 129K now
-+stat -c "size=%s (expected 132096)" $TEST_IMG
- 
- # success, all done
- echo
-diff --git a/tests/qemu-iotests/121.out b/tests/qemu-iotests/121.out
-index 5961a44cd9..613d56185e 100644
---- a/tests/qemu-iotests/121.out
-+++ b/tests/qemu-iotests/121.out
-@@ -20,4 +20,14 @@ wrote 133120/133120 bytes at offset 66060288
- 130 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
- 
-+=== Allocating a new refcount block must not leave holes in the image ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+wrote 126976/126976 bytes at offset 0
-+124 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+size=131072 (expected 131072)
-+wrote 512/512 bytes at offset 126976
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+size=132096 (expected 132096)
-+
- *** done
--- 
-2.11.0
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 9f762695d1..1c11f10ebb 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -129,12 +129,17 @@
+  */
+=20
+ /* First, find out the number of generic cases.  */
+-#define QEMU_GENERIC(x, ...) \
+-    QEMU_GENERIC_(typeof(x), __VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,=
+ 0)
++#define QEMU_GENERIC(x, ...)                                \
++    QEMU_GENERIC_(typeof(x), __VA_ARGS__,                   \
++                  20, 19, 18, 17, 16, 15, 14, 13, 12, 11,   \
++                  10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+=20
+ /* There will be extra arguments, but they are not used.  */
+-#define QEMU_GENERIC_(x, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, count, =
+...) \
+-    QEMU_GENERIC##count(x, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9)
++#define QEMU_GENERIC_(x, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9,        =
+\
++                      a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, =
+\
++                      count, ...)                                       =
+\
++    QEMU_GENERIC##count(x, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9,      =
+\
++                        a10, a11, a12, a13, a14, a15, a16, a17, a18, a19=
+)
+=20
+ /* Two more helper macros, this time to extract items from a parenthesiz=
+ed
+  * list.
+@@ -159,5 +164,15 @@
+ #define QEMU_GENERIC8(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC7(x=
+, __VA_ARGS__))
+ #define QEMU_GENERIC9(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC8(x=
+, __VA_ARGS__))
+ #define QEMU_GENERIC10(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC9(=
+x, __VA_ARGS__))
++#define QEMU_GENERIC11(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC10=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC12(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC11=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC13(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC12=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC14(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC13=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC15(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC14=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC16(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC15=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC17(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC16=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC18(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC17=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC19(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC18=
+(x, __VA_ARGS__))
++#define QEMU_GENERIC20(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC19=
+(x, __VA_ARGS__))
+=20
+ #endif /* COMPILER_H */
+--=20
+2.16.2.521.g9aa15f885a
