@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyZi0-0004wm-1n
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:07:04 -0400
+	(envelope-from <laurent@vivier.eu>) id 1eyZqk-0008Eh-Hz
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyZhw-00034z-Sm
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:07:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37442 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eyZhw-00034j-Nv
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:06:56 -0400
-Date: Wed, 21 Mar 2018 17:06:44 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180321090644.GC20571@xz-mi>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-3-xiaoguangrong@tencent.com>
+	(envelope-from <laurent@vivier.eu>) id 1eyZqh-0006Z5-BP
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:16:02 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:36615)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eyZqh-0006Yd-1R
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 05:15:59 -0400
+References: <20180320142343.13867-1-berrange@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <bec59193-cb03-b300-474c-e8692f336e33@vivier.eu>
+Date: Wed, 21 Mar 2018 10:15:50 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180320142343.13867-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180313075739.11194-3-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 2/8] migration: stop allocating and freeing
- memory frequently
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] make: improve check for stale generated
+ files in source dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Mar 13, 2018 at 03:57:33PM +0800, guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+Le 20/03/2018 à 15:23, Daniel P. Berrangé a écrit :
+> When doing a build with builddir != srcdir, if any generated files are
+> accidentally present in srcdir from a previous build, these can cause
+> unexpected failures.
 > 
-> Current code uses compress2()/uncompress() to compress/decompress
-> memory, these two function manager memory allocation and release
-> internally, that causes huge memory is allocated and freed very
-> frequently
+> Currently there is a rule that checks for existance of config-host.mak,
+> but there have been cases where config-host.mak is absent, while other
+> generated files still exist.
 > 
-> More worse, frequently returning memory to kernel will flush TLBs
-> and trigger invalidation callbacks on mmu-notification which
-> interacts with KVM MMU, that dramatically reduce the performance
-> of VM
+> Update the check to look at every file listed in $(GENERATED_FILES). To
+> do this we must move the check further down after $(GENERATED_FILES) has
+> been populated.
 > 
-> So, we maintain the memory by ourselves and reuse it for each
-> compression and decompression
-> 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 > ---
->  migration/qemu-file.c |  34 ++++++++++--
->  migration/qemu-file.h |   6 ++-
->  migration/ram.c       | 142 +++++++++++++++++++++++++++++++++++++-------------
->  3 files changed, 140 insertions(+), 42 deletions(-)
-> 
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> index 2ab2bf362d..1ff33a1ffb 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -658,6 +658,30 @@ uint64_t qemu_get_be64(QEMUFile *f)
->      return v;
->  }
->  
-> +/* return the size after compression, or negative value on error */
-> +static int qemu_compress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-> +                              const uint8_t *source, size_t source_len)
-> +{
-> +    int err;
-> +
-> +    err = deflateReset(stream);
+>  Makefile | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
 
-I'm not familiar with zlib, but I saw this in manual:
+Tested-by: Laurent Vivier <laurent@vivier.eu>
 
- https://www.zlib.net/manual.html
+I had a stale qemu-version.h and this change has correctly detected it.
 
- This function is equivalent to deflateEnd followed by deflateInit,
- but does not free and reallocate the internal compression state. The
- stream will leave the compression level and any other attributes that
- may have been set unchanged.
+The problem was:
 
-I thought it was deflateInit() who is slow?  Can we avoid the reset as
-long as we make sure to deflateInit() before doing anything else?
+$ make -C build/all
+...
+./qemu-nbd.c: In function ‘version’:
+./qemu-nbd.c:133:7: error: expected ‘)’ before ‘QEMU_FULL_VERSION’
+ "%s " QEMU_FULL_VERSION "\n"
+       ^~~~~~~~~~~~~~~~~
+./qemu-nbd.c:133:3: error: format ‘%s’ expects a matching ‘char *’
+argument [-Werror=format=]
+ "%s " QEMU_FULL_VERSION "\n"
+  ~^
+cc1: all warnings being treated as errors
+make: *** [./rules.mak:66: qemu-nbd.o] Error 1
+make: *** Waiting for unfinished jobs....
+make: Leaving directory './build/all'
 
-Meanwhile, is there any performance number for this single patch?
-Since I thought the old code is calling compress2() which contains
-deflateInit() and deflateEnd() too, just like what current patch do?
-
-It would be nice too if we can split the patch into two (decode,
-encode) if you want, but that's optional.
+once the file removed, the build can be done.
 
 Thanks,
-
--- 
-Peter Xu
+Laurent
