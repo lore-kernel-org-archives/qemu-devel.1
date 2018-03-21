@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyihg-0007Dj-J9
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:43:17 -0400
+	(envelope-from <mst@redhat.com>) id 1eyjBB-0008NL-AG
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 15:13:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyihd-0000dF-GJ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:43:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36394 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1eyjB7-0000TT-C2
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 15:13:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33744 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyihd-0000cN-B4
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:43:13 -0400
-Date: Wed, 21 Mar 2018 18:42:59 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180321184259.GI3465@work-vm>
-References: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1521253498-6834-4-git-send-email-stefanb@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eyjB7-0000Su-64
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 15:13:41 -0400
+Date: Wed, 21 Mar 2018 21:13:25 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180321211301-mutt-send-email-mst@kernel.org>
+References: <1521645545-247351-1-git-send-email-mst@redhat.com>
+	<1521645545-247351-2-git-send-email-mst@redhat.com>
+	<20180321153651.GS8551@redhat.com>
+	<20180321174022-mutt-send-email-mst@kernel.org>
+	<f3035a2e-acce-ba73-3984-4c2d379ba249@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1521253498-6834-4-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5.2 for 2.13 3/4] docs: tpm: add VM
- save/restore example and troubleshooting guide
+In-Reply-To: <f3035a2e-acce-ba73-3984-4c2d379ba249@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] make: switch from -I to
+ -iquote
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +32,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <famz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> Extend the docs related to TPM with specs related to VM save and
-> restore and a troubleshooting guide for TPM migration.
-> 
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On Wed, Mar 21, 2018 at 06:40:23PM +0200, Marcel Apfelbaum wrote:
+> On 21/03/2018 18:02, Michael S. Tsirkin wrote:
+> > On Wed, Mar 21, 2018 at 03:36:51PM +0000, Daniel P. Berrang=E9 wrote:
+> >> On Wed, Mar 21, 2018 at 05:22:07PM +0200, Michael S. Tsirkin wrote:
+> >>> Our rule right now is to use <> for external headers,
+> >>> "" for internal ones. The idea was to avoid conflicts
+> >>> between e.g. a system file named <trace.h> and an
+> >>> internal one by the same name.
+> >>>
+> >>> Unfortunately we use -I compiler flag so it does not
+> >>> help: a system file doing #include <trace.h> will
+> >>> still pick up ours first.
+> >>
+> >> Has that actually hit you practice ?  I'm wondering if this
+> >> is just theoretical in which case it could wait till 2.13
+> >> since this scenario has existed in QEMU along time, or
+> >> a real problem right now requiring fix in 2.12.
+> >=20
+> > It's borderline.
+> >=20
+> > In particular there is at least one instance where we already have a
+> > conflict (yes, there are probably other ways to address this, but
+> > I consider them less robust):
+> >=20
+> > util/getauxval.c:#include <sys/auxv.h>
+> > /usr/include/sys/auxv.h:#include <elf.h>
+> >=20
+> > So it really does build by luck.
+> >=20
+> >=20
+> >>> To fix, switch to -iquote which is supported by both
+> >>> gcc and clang and only affects #include "" directives.
+> >>
+> >> Fine since we don't support anything other than
+> >> gcc and clang. I'm assuming -iquote has been supported
+> >> by these two compilers for a long time though ? The GCC
+> >> docs annoyingly don't ever mention what release features
+> >> appear in :-(
+> >=20
+> > Judging by git log output:
+> >=20
+> > For clang it appears to be there since 2007 that's pretty
+> > close to day 1.
+> >=20
+> > gcc's log is better documented, it's been there since 2004-05-03
+> >=20
+> >>>
+> >>> As a side effect, this catches any future uses of
+> >>>  #include <> for internal headers.
+> >>>
+> >>> Suggested-by: Stefan Weil <sw@weilnetz.de>
+> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >>> ---
+> >>
+> >> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> >=20
+> >=20
+> > Thanks!
+> >=20
+>=20
+> Hi Michael,
+> Should I add this patch to the RDMA pull request?
+>=20
+> Thanks,
+> Marcel
 
-This seems ok, so:
+Go ahead and add both of them pls.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-but comments below:
-
-> ---
->  docs/specs/tpm.txt | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 106 insertions(+)
-> 
-> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> index d1d7157..c230c4c 100644
-> --- a/docs/specs/tpm.txt
-> +++ b/docs/specs/tpm.txt
-> @@ -200,3 +200,109 @@ crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
->  PCR-00: 35 4E 3B CE 23 9F 38 59 ...
->  ...
->  PCR-23: 00 00 00 00 00 00 00 00 ...
-> +
-> +
-> +=== Migration with the TPM emulator ===
-> +
-> +The TPM emulator supports the following types of virtual machine migration:
-> +
-> +- VM save / restore (migration into a file)
-> +- Network migration
-> +- Snapshotting (migration into storage like QoW2 or QED)
-> +
-> +The following command sequences can be used to test VM save / restore.
-> +
-> +
-> +In a 1st terminal start an instance of a swtpm using the following command:
-> +
-> +mkdir /tmp/mytpm1
-> +swtpm socket --tpmstate dir=/tmp/mytpm1 \
-> +  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
-> +  --log level=20 --tpm2
-> +
-> +In a 2nd terminal start the VM:
-> +
-> +qemu-system-x86_64 -display sdl -enable-kvm \
-> +  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \
-> +  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \
-> +  -tpmdev emulator,id=tpm0,chardev=chrtpm \
-> +  -device tpm-tis,tpmdev=tpm0 \
-> +  -monitor stdio \
-> +  test.img
-> +
-> +Verify that the attached TPM is working as expected using applications inside
-> +the VM.
-> +
-> +To store the state of the VM use the following command in the QEMU monitor in
-> +the 2nd terminal:
-> +
-> +(qemu) migrate "exec:cat > testvm.bin"
-> +(qemu) quit
-> +
-> +At this point a file called 'testvm.bin' should exists and the swtpm and QEMU
-> +processes should have ended.
-> +
-> +To test 'VM restore' you have to start the swtpm with the same parameters
-> +as before. If previously a TPM 2 [--tpm2] was saved, --tpm2 must now be
-> +passed again on the command line.
-> +
-> +In the 1st terminal restart the swtpm with the same command line as before:
-> +
-> +swtpm socket --tpmstate dir=/tmp/mytpm1 \
-> +  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
-> +  --log level=20 --tpm2
-> +
-> +In the 2nd terminal restore the state of the VM using the additonal
-> +'-incoming' option.
-> +
-> +qemu-system-x86_64 -display sdl -enable-kvm \
-> +  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \
-> +  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \
-> +  -tpmdev emulator,id=tpm0,chardev=chrtpm \
-> +  -device tpm-tis,tpmdev=tpm0 \
-> +  -incoming "exec:cat < testvm.bin" \
-> +  test.img
-> +
-> +
-> +Troubleshooting migration:
-> +
-> +There are several reasons why migration may fail. In case of problems,
-> +please ensure that the command lines adhere to the following rules and,
-> +if possible, that identical versions of QEMU and swtpm are used at all
-> +times.
-> +
-> +VM save and restore:
-> + - QEMU command line parameters should be identical apart from the
-> +   '-incoming' option on VM restore
-> + - swtpm command line parameters should be identical
-> +
-> +VM migration to 'localhost':
-> + - QEMU command line parameters should be identical apart from the
-> +   '-incoming' option on the destination side
-> + - swtpm command line parameters should point to two different
-> +   directories on the source and destination swtpm (--tpmstate dir=...)
-> +   (especially if different versions of libtpms were to be used on the
-> +   same machine).
-> +
-> +VM migration across the network:
-> + - QEMU command line parameters should be identical apart from the
-> +   '-incoming' option on the destination side
-> + - swtpm command line parameters should be identical
-> +
-> +VM Snapshotting:
-> + - QEMU command line parameters should be identical
-
-Well, they don't actually need to be identical; they just need to be
-identically configured as far as the state goes.  For example all the
-paths to storage can be completely different on the two QEMUs.
-
-> + - swtpm command line parameters should be identical
-> +
-> +
-> +Besides that, migration failure reasons on the swtpm level may include
-> +the following:
-> +
-> + - the versions of the swtpm on the source and destination sides are
-> +   incompatible
-> +   - downgrading of TPM state may not be supported
-> +   - the source and destination libtpms were compiled with different
-> +     compile-time options and the destination side refuses to accept the
-> +     state
-> + - different migration keys are used on the source and destination side
-> +   and the destination side cannot decrypt the migrated state
-> +   (swtpm ... --migration-key ... )
-
-Are there particular error messages swtpm will produce in these cases
-to make it easy for people to tell which has happened?
-
-Dave
-
-> -- 
-> 2.5.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+> >>
+> >>>
+> >>> I still think we want to switch to a more formal rule such as qemu/
+> >>> prefix for all includes down the road, but this will at least catch=
+ any
+> >>> scheme violations from creeping in meanwhile.
+> >>>
+> >>>
+> >>>  configure       | 16 ++++++++--------
+> >>>  rules.mak       |  2 +-
+> >>>  Makefile.target |  4 ++--
+> >>>  3 files changed, 11 insertions(+), 11 deletions(-)
+> >>>
+> >>> diff --git a/configure b/configure
+> >>> index af72fc8..23a4f3b 100755
+> >>> --- a/configure
+> >>> +++ b/configure
+> >>> @@ -534,7 +534,7 @@ QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common=
+ -fwrapv $QEMU_CFLAGS"
+> >>>  QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissing-prototypes =
+$QEMU_CFLAGS"
+> >>>  QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+> >>>  QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE=
+_SOURCE $QEMU_CFLAGS"
+> >>> -QEMU_INCLUDES=3D"-I. -I\$(SRC_PATH) -I\$(SRC_PATH)/accel/tcg -I\$(=
+SRC_PATH)/include"
+> >>> +QEMU_INCLUDES=3D"-iquote . -iquote \$(SRC_PATH) -iquote \$(SRC_PAT=
+H)/accel/tcg -iquote \$(SRC_PATH)/include"
+> >>>  if test "$debug_info" =3D "yes"; then
+> >>>      CFLAGS=3D"-g $CFLAGS"
+> >>>      LDFLAGS=3D"-g $LDFLAGS"
+> >>> @@ -6560,19 +6560,19 @@ if test "$vxhs" =3D "yes" ; then
+> >>>  fi
+> >>> =20
+> >>>  if test "$tcg_interpreter" =3D "yes"; then
+> >>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+> >>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+> >>>  elif test "$ARCH" =3D "sparc64" ; then
+> >>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
+> >>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
+> >>>  elif test "$ARCH" =3D "s390x" ; then
+> >>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
+> >>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
+> >>>  elif test "$ARCH" =3D "x86_64" -o "$ARCH" =3D "x32" ; then
+> >>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
+> >>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
+> >>>  elif test "$ARCH" =3D "ppc64" ; then
+> >>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
+> >>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
+> >>>  else
+> >>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+> >>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDE=
+S"
+> >>>  fi
+> >>> -QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg $QEMU_INCLUDES"
+> >>> +QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg $QEMU_INCLUDES"
+> >>> =20
+> >>>  echo "TOOLS=3D$tools" >> $config_host_mak
+> >>>  echo "ROMS=3D$roms" >> $config_host_mak
+> >>> diff --git a/rules.mak b/rules.mak
+> >>> index 6e94333..93a0702 100644
+> >>> --- a/rules.mak
+> >>> +++ b/rules.mak
+> >>> @@ -29,7 +29,7 @@ QEMU_DGFLAGS +=3D -MMD -MP -MT $@ -MF $(@D)/$(*F)=
+.d
+> >>>  # dir, one absolute and the other relative to the compiler working
+> >>>  # directory. These are the same for target-independent files, but
+> >>>  # different for target-dependent ones.
+> >>> -QEMU_LOCAL_INCLUDES =3D -I$(BUILD_DIR)/$(@D) -I$(@D)
+> >>> +QEMU_LOCAL_INCLUDES =3D -iquote $(BUILD_DIR)/$(@D) -iquote $(@D)
+> >>> =20
+> >>>  WL_U :=3D -Wl,-u,
+> >>>  find-symbols =3D $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
+> >>> diff --git a/Makefile.target b/Makefile.target
+> >>> index 6549481..d0ec77a 100644
+> >>> --- a/Makefile.target
+> >>> +++ b/Makefile.target
+> >>> @@ -11,9 +11,9 @@ $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
+> >>>  ifdef CONFIG_LINUX
+> >>>  QEMU_CFLAGS +=3D -I../linux-headers
+> >>>  endif
+> >>> -QEMU_CFLAGS +=3D -I.. -I$(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DN=
+EED_CPU_H
+> >>> +QEMU_CFLAGS +=3D -iquote .. -iquote $(SRC_PATH)/target/$(TARGET_BA=
+SE_ARCH) -DNEED_CPU_H
+> >>> =20
+> >>> -QEMU_CFLAGS+=3D-I$(SRC_PATH)/include
+> >>> +QEMU_CFLAGS+=3D-iquote $(SRC_PATH)/include
+> >>> =20
+> >>>  ifdef CONFIG_USER_ONLY
+> >>>  # user emulator name
+> >>> --=20
+> >>> MST
+> >>>
+> >>
+> >> Regards,
+> >> Daniel
+> >> --=20
+> >> |: https://berrange.com      -o-    https://www.flickr.com/photos/db=
+errange :|
+> >> |: https://libvirt.org         -o-            https://fstop138.berra=
+nge.com :|
+> >> |: https://entangle-photo.org    -o-    https://www.instagram.com/db=
+errange :|
