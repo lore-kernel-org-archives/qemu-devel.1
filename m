@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eyk5V-00029q-Sc
+	(envelope-from <cota@braap.org>) id 1eyk5V-0002A2-W5
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eyk5R-0000zb-EA
+	(envelope-from <cota@braap.org>) id 1eyk5R-0000zw-Sq
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:11:57 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:34761)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:56221)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eyk5R-0000yR-6S
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eyk5R-0000zX-L8
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:11:53 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 21 Mar 2018 16:11:45 -0400
-Message-Id: <1521663109-32262-11-git-send-email-cota@braap.org>
+Date: Wed, 21 Mar 2018 16:11:47 -0400
+Message-Id: <1521663109-32262-13-git-send-email-cota@braap.org>
 In-Reply-To: <1521663109-32262-1-git-send-email-cota@braap.org>
 References: <1521663109-32262-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v1 10/14] hostfloat: support float32/64 division
+Subject: [Qemu-devel] [PATCH v1 12/14] hostfloat: support float32/64 square
+ root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +31,115 @@ Performance results for fp-bench run under aarch64-linux-user
 on an Intel(R) Core(TM) i7-4790K CPU @ 4.00GHz host:
 
 - before:
-div-single: 29.77 MFlops
-div-double: 29.85 MFlops
+sqrt-single: 13.23 MFlops
+sqrt-double: 13.24 MFlops
 
 - after:
-div-single: 85.90 MFlops
-div-double: 86.10 MFlops
+sqrt-single: 15.02 MFlops
+sqrt-double: 15.07 MFlops
+
+Note that sqrt in soft-ft is relatively fast, which means
+that fp-bench is not very sensitive to changes to sqrt's
+emulation speed.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
  include/fpu/hostfloat.h |  2 ++
  include/fpu/softfloat.h |  4 ++--
- fpu/hostfloat.c         | 28 ++++++++++++++++++++++++++++
- fpu/softfloat.c         |  4 ++--
- 4 files changed, 34 insertions(+), 4 deletions(-)
+ fpu/hostfloat.c         | 20 ++++++++++++++++++++
+ fpu/softfloat.c         |  6 ++++--
+ 4 files changed, 28 insertions(+), 4 deletions(-)
 
 diff --git a/include/fpu/hostfloat.h b/include/fpu/hostfloat.h
-index 7049f7e..61a8525 100644
+index c006576..b1e0689 100644
 --- a/include/fpu/hostfloat.h
 +++ b/include/fpu/hostfloat.h
-@@ -14,9 +14,11 @@
- float32 float32_add(float32 a, float32 b, float_status *status);
- float32 float32_sub(float32 a, float32 b, float_status *status);
+@@ -16,11 +16,13 @@ float32 float32_sub(float32 a, float32 b, float_status *status);
  float32 float32_mul(float32 a, float32 b, float_status *status);
-+float32 float32_div(float32 a, float32 b, float_status *status);
+ float32 float32_div(float32 a, float32 b, float_status *status);
+ float32 float32_muladd(float32 a, float32 b, float32 c, int f, float_status *s);
++float32 float32_sqrt(float32 a, float_status *status);
  
  float64 float64_add(float64 a, float64 b, float_status *status);
  float64 float64_sub(float64 a, float64 b, float_status *status);
  float64 float64_mul(float64 a, float64 b, float_status *status);
-+float64 float64_div(float64 a, float64 b, float_status *status);
+ float64 float64_div(float64 a, float64 b, float_status *status);
+ float64 float64_muladd(float64 a, float64 b, float64 c, int f, float_status *s);
++float64 float64_sqrt(float64 a, float_status *status);
  
  #endif /* HOSTFLOAT_H */
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 2b07ae8..a690a57 100644
+index 866bd3b..8d5a50a 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -345,7 +345,7 @@ float32 float32_round_to_int(float32, float_status *status);
- float32 soft_float32_add(float32, float32, float_status *status);
- float32 soft_float32_sub(float32, float32, float_status *status);
- float32 soft_float32_mul(float32, float32, float_status *status);
--float32 float32_div(float32, float32, float_status *status);
-+float32 soft_float32_div(float32, float32, float_status *status);
+@@ -348,7 +348,7 @@ float32 soft_float32_mul(float32, float32, float_status *status);
+ float32 soft_float32_div(float32, float32, float_status *status);
  float32 float32_rem(float32, float32, float_status *status);
- float32 float32_muladd(float32, float32, float32, int, float_status *status);
- float32 float32_sqrt(float32, float_status *status);
-@@ -485,7 +485,7 @@ float64 float64_trunc_to_int(float64, float_status *status);
- float64 soft_float64_add(float64, float64, float_status *status);
- float64 soft_float64_sub(float64, float64, float_status *status);
- float64 soft_float64_mul(float64, float64, float_status *status);
--float64 float64_div(float64, float64, float_status *status);
-+float64 soft_float64_div(float64, float64, float_status *status);
+ float32 soft_float32_muladd(float32, float32, float32, int, float_status *s);
+-float32 float32_sqrt(float32, float_status *status);
++float32 soft_float32_sqrt(float32, float_status *status);
+ float32 float32_exp2(float32, float_status *status);
+ float32 float32_log2(float32, float_status *status);
+ int float32_eq(float32, float32, float_status *status);
+@@ -488,7 +488,7 @@ float64 soft_float64_mul(float64, float64, float_status *status);
+ float64 soft_float64_div(float64, float64, float_status *status);
  float64 float64_rem(float64, float64, float_status *status);
- float64 float64_muladd(float64, float64, float64, int, float_status *status);
- float64 float64_sqrt(float64, float_status *status);
+ float64 soft_float64_muladd(float64, float64, float64, int, float_status *s);
+-float64 float64_sqrt(float64, float_status *status);
++float64 soft_float64_sqrt(float64, float_status *status);
+ float64 float64_log2(float64, float_status *status);
+ int float64_eq(float64, float64, float_status *status);
+ int float64_le(float64, float64, float_status *status);
 diff --git a/fpu/hostfloat.c b/fpu/hostfloat.c
-index 985d6f1..ff980ac 100644
+index a56b70a..974bd57 100644
 --- a/fpu/hostfloat.c
 +++ b/fpu/hostfloat.c
-@@ -178,3 +178,31 @@ GEN_FPU_ADDSUB(float64_add, float64_sub, float64, double, fabs, DBL_MIN)
- GEN_FPU_MUL(float32_mul, float32, float, fabsf, FLT_MIN)
- GEN_FPU_MUL(float64_mul, float64, double, fabs, DBL_MIN)
- #undef GEN_FPU_MUL
+@@ -270,3 +270,23 @@ GEN_FPU_DIV(float64_div, float64, double, fabs, DBL_MIN)
+ GEN_FPU_FMA(float32_muladd, float32, float, fmaf, fabsf, FLT_MIN)
+ GEN_FPU_FMA(float64_muladd, float64, double, fma, fabs, DBL_MIN)
+ #undef GEN_FPU_FMA
 +
-+#define GEN_FPU_DIV(name, soft_t, host_t, host_abs_func, min_normal)    \
-+    soft_t name(soft_t a, soft_t b, float_status *s)                    \
++#define GEN_FPU_SQRT(name, soft_t, host_t, host_sqrt_func)              \
++    soft_t name(soft_t a, float_status *s)                              \
 +    {                                                                   \
-+        soft_t ## _input_flush2(&a, &b, s);                             \
-+        if (likely(soft_t ## _is_normal(a) &&                           \
-+                   soft_t ## _is_normal(b) &&                           \
++        soft_t ## _input_flush1(&a, s);                                 \
++        if (likely((soft_t ## _is_normal(a) || soft_t ## _is_zero(a)) && \
++                   !soft_t ## _is_neg(a) &&                             \
 +                   s->float_exception_flags & float_flag_inexact &&     \
 +                   s->float_rounding_mode == float_round_nearest_even)) { \
 +            host_t ha = soft_t ## _to_ ## host_t(a);                    \
-+            host_t hb = soft_t ## _to_ ## host_t(b);                    \
-+            host_t hr = ha / hb;                                        \
-+            soft_t r = host_t ## _to_ ## soft_t(hr);                    \
++            host_t hr = host_sqrt_func(ha);                             \
 +                                                                        \
-+            if (unlikely(soft_t ## _is_infinity(r))) {                  \
-+                s->float_exception_flags |= float_flag_overflow;        \
-+            } else if (unlikely(host_abs_func(hr) <= min_normal)) {     \
-+                goto soft;                                              \
-+            }                                                           \
-+            return r;                                                   \
++            return host_t ## _to_ ## soft_t(hr);                        \
 +        }                                                               \
-+     soft:                                                              \
-+        return soft_ ## soft_t ## _div(a, b, s);                        \
++        return soft_ ## soft_t ## _sqrt(a, s);                          \
 +    }
 +
-+GEN_FPU_DIV(float32_div, float32, float, fabsf, FLT_MIN)
-+GEN_FPU_DIV(float64_div, float64, double, fabs, DBL_MIN)
-+#undef GEN_FPU_DIV
++GEN_FPU_SQRT(float32_sqrt, float32, float, sqrtf)
++GEN_FPU_SQRT(float64_sqrt, float64, double, sqrt)
++#undef GEN_FPU_SQRT
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index e3f2918..ebc59be 100644
+index da81ec9..096b658 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1176,7 +1176,7 @@ float16 float16_div(float16 a, float16 b, float_status *status)
+@@ -1980,14 +1980,16 @@ float16 __attribute__((flatten)) float16_sqrt(float16 a, float_status *status)
      return float16_round_pack_canonical(pr, status);
  }
  
--float32 float32_div(float32 a, float32 b, float_status *status)
-+float32 soft_float32_div(float32 a, float32 b, float_status *status)
+-float32 __attribute__((flatten)) float32_sqrt(float32 a, float_status *status)
++float32 __attribute__((flatten))
++soft_float32_sqrt(float32 a, float_status *status)
  {
      FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1185,7 +1185,7 @@ float32 float32_div(float32 a, float32 b, float_status *status)
+     FloatParts pr = sqrt_float(pa, status, &float32_params);
      return float32_round_pack_canonical(pr, status);
  }
  
--float64 float64_div(float64 a, float64 b, float_status *status)
-+float64 soft_float64_div(float64 a, float64 b, float_status *status)
+-float64 __attribute__((flatten)) float64_sqrt(float64 a, float_status *status)
++float64 __attribute__((flatten))
++soft_float64_sqrt(float64 a, float_status *status)
  {
      FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
+     FloatParts pr = sqrt_float(pa, status, &float64_params);
 -- 
 2.7.4
