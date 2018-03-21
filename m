@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyflT-0002P0-Km
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:35:00 -0400
+	(envelope-from <jcody@redhat.com>) id 1eyflS-0002OC-M4
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:35:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyflS-0001Rt-Te
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:34:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42906 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyflS-0001RT-Pd
+	(envelope-from <jcody@redhat.com>) id 1eyflR-0001R0-NQ
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:34:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 650AFEBFE8
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 15:34:58 +0000 (UTC)
-References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
-	<20180321134005.8822-3-marcandre.lureau@redhat.com>
-	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
-	<CAMxuvay1j+E1YRggpqm9+ETE_FxD-ThGtPBenUtvt8oeYweS8g@mail.gmail.com>
-	<4e876850-3057-e9d5-695b-69f4cde9aa9a@redhat.com>
-	<CAMxuvay+aMU7=kr2ED+7Hq596oeoZP+xKXMYwGB+r8AG5=5rdQ@mail.gmail.com>
-	<2467bc3b-c0da-b6e4-1201-48983ba5a5af@redhat.com>
-	<26a3cea8-20ff-34a3-945b-044a730812b6@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d91d87e4-e3f0-c21f-669a-d3e70258a949@redhat.com>
-Date: Wed, 21 Mar 2018 16:34:53 +0100
+Date: Wed, 21 Mar 2018 11:34:53 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180321153453.GS12302@localhost.localdomain>
+References: <20180321153124.5357-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <26a3cea8-20ff-34a3-945b-044a730812b6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180321153124.5357-1-berrange@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
- at offset 0
+Subject: Re: [Qemu-devel] [PATCH] block: drop moderated sheepdog mailing
+ list from MAINTAINERS file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,32 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>
 
-On 21/03/2018 16:29, Eric Blake wrote:
->=20
-> Not necessarily - can we use multiple layers of macros?=C2=A0 (Untested=
-)
->=20
-> #define QOBJECT_0(x) x
-> #define QOBJECT_1(x) ({ \
-> =C2=A0=C2=A0=C2=A0 QEMU_BUILD_BUG_ON(offsetof(typeof(*x), base)); \
-> =C2=A0=C2=A0=C2=A0 &(x)->base; })
-> #define QOBJECT(x) QOBJECT_ ## QEMU_GENERIC(x, \
-> =C2=A0=C2=A0=C2=A0 (QObject *, 0),
-> =C2=A0=C2=A0=C2=A0 (const QObject *, 0),
-> =C2=A0=C2=A0=C2=A0 1)(x)
->=20
-> or with an additional layer of glue() if needed
->=20
-> That is, reduce the QEMU_GENERIC expansion into something that generate=
+On Wed, Mar 21, 2018 at 03:31:24PM +0000, Daniel P. Berrang=E9 wrote:
+> The sheepdog mailing list is setup to stop and queue messages from
+> non-subscribers, pending moderator approval. Unfortunately it seems
+> that the moderation queue is not actively dealt with. Even when message=
 s
-> only a single preprocessor token, where we then use to decide which
-> OTHER macro to expand, so that we are only evaluating &(x)->base when w=
-e
-> selected the derived types.
+> are approved, the sender is never added to the whitelist, so every
+> future mail the same sender continues to get stopped for moderation.
+>=20
+> MAINTAINERS entries should be responsive and not uneccessarily block
+> mails from QEMU contributors, so drop the sheepdog mailing list.
+>=20
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 
-I don't think so.  Macro expansion happens way earlier.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Paolo
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 354a18ce49..7eea869dcd 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1871,7 +1871,6 @@ M: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+>  M: Liu Yuan <namei.unix@gmail.com>
+>  M: Jeff Cody <jcody@redhat.com>
+>  L: qemu-block@nongnu.org
+> -L: sheepdog@lists.wpkg.org
+>  S: Supported
+>  F: block/sheepdog.c
+>  T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> --=20
+> 2.14.3
+>=20
