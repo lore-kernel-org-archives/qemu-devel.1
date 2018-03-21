@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eydfg-0007pJ-DR
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:20:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1eydfv-000826-TH
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eydfa-0002aF-Fg
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:20:52 -0400
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a4c5e82c-b5c7-f5ba-111b-9a6a3f8a7b5a@redhat.com>
-Date: Wed, 21 Mar 2018 14:20:31 +0100
+	(envelope-from <eblake@redhat.com>) id 1eydfq-0002oH-7G
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:21:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55656 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eydfq-0002nO-1T
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:21:02 -0400
+References: <20180321124026.70292-1-marcel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8fc94472-c9dc-edf6-d89b-90f6d6ac281a@redhat.com>
+Date: Wed, 21 Mar 2018 08:20:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TaDVrVIJQOBHzVudjII0w02IUUbID3xKb"
-Subject: Re: [Qemu-devel] [PATCH v4 for 2.12 0/3] fix bitmaps migration
- through shared storage
+In-Reply-To: <20180321124026.70292-1-marcel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/rdma: fix clang compilation
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: yuval.shaia@oracle.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TaDVrVIJQOBHzVudjII0w02IUUbID3xKb
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <a4c5e82c-b5c7-f5ba-111b-9a6a3f8a7b5a@redhat.com>
-Subject: Re: [PATCH v4 for 2.12 0/3] fix bitmaps migration through shared
- storage
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 03/21/2018 07:40 AM, Marcel Apfelbaum wrote:
+> Fix some enum castings and extra parentheses.
+> 
+> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+>   hw/rdma/vmw/pvrdma_cmd.c  | 5 +++--
+>   hw/rdma/vmw/pvrdma_main.c | 5 +++--
+>   2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index 293dfed29f..25f747a190 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -73,7 +73,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
+>       tbl_idx = 1;
+>       addr_idx = 1;
+>       while (addr_idx < nchunks) {
+> -        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
+> +        if (tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t))) {
 
-On 2018-03-20 18:05, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all.
->=20
-> This fixes bitmaps migration through shared storage. Look at 02 for
-> details.
->=20
-> The bug introduced in 2.10 with the whole qcow2 bitmaps feature, so
-> qemu-stable in CC. However I doubt that someone really suffered from th=
-is.
->=20
-> Do we need dirty bitmaps at all in inactive case? - that was a question=
- in v2.
-> And, keeping in mind that we are going to use inactive mode not only fo=
-r
-> incoming migration, I'm not sure that answer is NO (but, it may be "NO"=
- for=20
-> 2.10, 2.11), so let's fix it in proposed here manner at least for 2.12.=
+Can't you still simplify that further to
 
+if (tbl_idx == TARGET_PAGE_SIZE / sizeof(uint64_t)) {
 
-Thanks, applied to my block branch:
+> @@ -292,7 +292,8 @@ static void init_ports(PVRDMADev *dev, Error **errp)
+>       memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
+>   
+>       for (i = 0; i < MAX_PORTS; i++) {
+> -        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
+> +        dev->rdma_dev_res.ports[i].state =
+> +            (enum ibv_port_state)PVRDMA_PORT_DOWN;
+>   
 
-https://github.com/XanClic/qemu/commits/block
+This one looks suspicious - shouldn't you instead be using IBV_PORT_DOWN 
+instead of having to cast?  (Even if IBV_PORT_DOWN and PVRDMA_PORT_DOWN 
+both have the value of 1 for now, the compiler warning is telling you 
+that either one of the two enums can change independently in the future, 
+and using a cast to shut up the compiler feels unsafe).
 
-Max
-
-
---TaDVrVIJQOBHzVudjII0w02IUUbID3xKb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqyXB8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AwHUH/jgaW+8AXeM0fMlagV28laNh8bWO4Goc
-UAx7Hg+H2p2ZYEzFSFGCOD4MIwuQ91Oxjjn68cSSjAvb3OSKSlTi+VWgvWtFyeOa
-BIphzxf43JZ+edoIpEW7MkE8Pcp6QEZ3NsVOqpSwOPnzosbJTI5/jWVP4QOENIAa
-cmJSkp6NsWZAOg8DxzkWc+5lt4+Nai4GhASa4VWlchB8foMYY4KHZcLJtqzTnALB
-UFgx603op/We7k3u525OJUXULAlbLlpmqNzG2xOed1RX7b42ywOmK9wjDuhVioG2
-0fh1leoQosTzZIfRZiigldHTaGWFFolnxgtfL/Me/iOYkn3svwnps/8=
-=t7IN
------END PGP SIGNATURE-----
-
---TaDVrVIJQOBHzVudjII0w02IUUbID3xKb--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
