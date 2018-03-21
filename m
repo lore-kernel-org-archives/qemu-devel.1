@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eydjZ-0004Lk-Kl
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:24:55 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eydk8-0004qv-3h
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eydjW-00062F-D8
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:24:53 -0400
-Date: Wed, 21 Mar 2018 15:24:37 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180321152306-mutt-send-email-mst@kernel.org>
-References: <1521510562-529051-1-git-send-email-mst@redhat.com>
-	<8f06e1e3-4823-d8e8-43bd-c092c523849e@vivier.eu>
-	<20180320135548-mutt-send-email-mst@kernel.org>
-	<459fa95d-8f0a-22fa-80fb-4af22ccf49b3@redhat.com>
-	<20180321150543-mutt-send-email-mst@kernel.org>
-	<7890493f-cbda-f56a-54a1-448cde871a14@weilnetz.de>
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eydk4-0006gf-JO
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:25:28 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41906
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eydk4-0006gA-C6
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:25:24 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2LDOYU4103907
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 09:25:23 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gup8mwbgp-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 09:25:23 -0400
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 21 Mar 2018 07:25:22 -0600
+References: <20180321120853.14293-1-lvivier@redhat.com>
+	<5193a40a-33fb-5b55-5fea-608a5573980e@linux.vnet.ibm.com>
+	<7e3215e0-aa21-e2ae-7d07-c07ef66360fe@redhat.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Wed, 21 Mar 2018 10:25:16 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7890493f-cbda-f56a-54a1-448cde871a14@weilnetz.de>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] qemu: include generated files
- with <> and not ""
+In-Reply-To: <7e3215e0-aa21-e2ae-7d07-c07ef66360fe@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <08e6029e-98e7-290f-6443-5ad3caca15c0@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] dump: display cause of write failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +44,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, sheepdog@lists.wpkg.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Yasmin Beatriz <yasmins@linux.vnet.ibm.com>
 
-On Wed, Mar 21, 2018 at 02:15:20PM +0100, Stefan Weil wrote:
-> Am 21.03.2018 um 14:08 schrieb Michael S. Tsirkin:
-> > It still leaves us with a host of problems e.g. the problem of stale
-> > headers in the source directory.
-> 
-> There have already been suggestions in the past to forbid in-tree
-> builds. Would it help if configure would refuse to run from the root
-> source directory? At least .gitignore could be much smaller then.
-> 
-> Stefan
 
-I think I have a better idea, not relying on external tools.
-Will post a proposal shortly.
 
--- 
-MST
+On 03/21/2018 10:22 AM, Laurent Vivier wrote:
+> On 21/03/2018 14:16, Daniel Henrique Barboza wrote:
+>> Laurent,
+>>
+>> There is already a v3 version of Yasmin's patch that was approved and
+>> it is supposedly waiting to be merged:
+>>
+>> http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03035.html
+> Ok, sorry, I've missed it because the subject line changed between v2
+> and v3.
+
+True. I've changed the subject because the patch was doing a little more
+than what was being said in the subject. Mea culpa.
+
+
+Daniel
+
+>
+> Thanks,
+> Laurent
+>
