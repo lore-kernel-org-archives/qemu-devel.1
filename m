@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eydVk-0007wZ-3w
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:37 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1eydXi-0001DG-Py
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:12:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eydVj-0005lX-5O
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:36 -0400
-Date: Wed, 21 Mar 2018 09:10:23 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180321131023.GP12302@localhost.localdomain>
-References: <20180320173632.25480-1-kwolf@redhat.com>
-	<20180320173632.25480-12-kwolf@redhat.com>
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1eydXc-0006dF-UN
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:12:38 -0400
+References: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
+	<1518461904-5305-16-git-send-email-eric.auger@redhat.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <895f039a-ade7-cf1a-6c47-81fd093f75e9@arm.com>
+Date: Wed, 21 Mar 2018 13:15:43 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180320173632.25480-12-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 11/12] vhdx: Check for 4 GB
- maximum log size on creation
+In-Reply-To: <1518461904-5305-16-git-send-email-eric.auger@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v6 15/22] virtio-iommu: Implement fault
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Will Deacon <Will.Deacon@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "tn@semihalf.com" <tn@semihalf.com>, "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>, "peterx@redhat.com" <peterx@redhat.com>, "linuc.decode@gmail.com" <linuc.decode@gmail.com>
 
-On Tue, Mar 20, 2018 at 06:36:31PM +0100, Kevin Wolf wrote:
-> It's unclear what the real maximum is, but we use an uint32_t to store
-> the log size in vhdx_co_create(), so we should check that the given
-> value fits in 32 bits.
-> 
+Hi Eric,
 
-It's a uint32 in the on-disk header per spec, so I agree the implied max is
-UINT32_MAX
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/vhdx.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/block/vhdx.c b/block/vhdx.c
-> index 0e48179b81..a1a0302799 100644
-> --- a/block/vhdx.c
-> +++ b/block/vhdx.c
-> @@ -1829,6 +1829,10 @@ static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
->      if (!vhdx_opts->has_log_size) {
->          log_size = DEFAULT_LOG_SIZE;
->      } else {
-> +        if (vhdx_opts->log_size > UINT32_MAX) {
-> +            error_setg(errp, "Log size must be smaller than 4 GB");
-> +            return -EINVAL;
+On 12/02/18 18:58, Eric Auger wrote:
+[...]
+> +    for (;;) {
+> +        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+> +
+> +        if (!elem) {
+> +            virtio_error(vdev,
+> +                         "no buffer available in event queue to report event");
+> +            return;
 > +        }
->          log_size = vhdx_opts->log_size;
->      }
->      if (log_size < MiB || (log_size % MiB) != 0) {
-> -- 
-> 2.13.6
-> 
+
+When $user attempts something silly like trying VFIO without the VFIO
+patches, this outputs thousands of messages per second... I guess it would
+also happen if the driver isn't consuming error reports fast enough. Is
+there a simple way of ratelimiting printfs so the context of the error
+doesn't get washed away?
+
+Thanks,
+Jean
