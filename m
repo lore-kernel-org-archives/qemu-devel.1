@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eydVR-0007ic-4D
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:18 -0400
+	(envelope-from <jcody@redhat.com>) id 1eydVk-0007wZ-3w
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eydVL-0005UU-GG
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:17 -0400
-Received: from mail-he1eur02hn0245.outbound.protection.outlook.com
-	([104.47.5.245]:63857
-	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eydVK-0005Ta-AA
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:11 -0400
-Date: Wed, 21 Mar 2018 16:09:54 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180321130954.GA31776@rkaganb.sw.ru>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-2-vkuznets@redhat.com>
-	<20180320183227.GW3417@localhost.localdomain>
+	(envelope-from <jcody@redhat.com>) id 1eydVj-0005lX-5O
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:10:36 -0400
+Date: Wed, 21 Mar 2018 09:10:23 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180321131023.GP12302@localhost.localdomain>
+References: <20180320173632.25480-1-kwolf@redhat.com>
+	<20180320173632.25480-12-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180320183227.GW3417@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] i386/kvm: add support for Hyper-V
- reenlightenment MSRs
+In-Reply-To: <20180320173632.25480-12-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 11/12] vhdx: Check for 4 GB
+ maximum log size on creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Mar 20, 2018 at 03:32:27PM -0300, Eduardo Habkost wrote:
-> The difference between both approaches is that checking just
-> has_msr_hv_* would let a non-cooperating guest prevent itself
-> from being migrated to an older host by writing a non-zero value
-> to a MSR, even if hyperv support was not enabled in the VM
-> configuration at all.  I don't think we want that.
+On Tue, Mar 20, 2018 at 06:36:31PM +0100, Kevin Wolf wrote:
+> It's unclear what the real maximum is, but we use an uint32_t to store
+> the log size in vhdx_co_create(), so we should check that the given
+> value fits in 32 bits.
+> 
 
-Thinking some more of what we do want in this regard, I wonder if we're
-doing the right thing by not generating #GP on access to MSRs whose
-support is present in KVM but disabled via cpu properties in QEMU?
+It's a uint32 in the on-disk header per spec, so I agree the implied max is
+UINT32_MAX
 
-Roman.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/vhdx.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 0e48179b81..a1a0302799 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -1829,6 +1829,10 @@ static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
+>      if (!vhdx_opts->has_log_size) {
+>          log_size = DEFAULT_LOG_SIZE;
+>      } else {
+> +        if (vhdx_opts->log_size > UINT32_MAX) {
+> +            error_setg(errp, "Log size must be smaller than 4 GB");
+> +            return -EINVAL;
+> +        }
+>          log_size = vhdx_opts->log_size;
+>      }
+>      if (log_size < MiB || (log_size % MiB) != 0) {
+> -- 
+> 2.13.6
+> 
