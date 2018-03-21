@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eyk0b-00079W-Fe
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:06:54 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1eyk1j-000886-5I
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eyk0Y-0006LZ-BP
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:06:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eyk0Y-0006L6-4Z
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:06:50 -0400
-Date: Wed, 21 Mar 2018 17:06:46 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180321200646.GD3417@localhost.localdomain>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-3-vkuznets@redhat.com>
-	<46c08ea1-27f7-e581-f93f-cf635950062f@redhat.com>
-	<87605p768t.fsf@vitty.brq.redhat.com>
-	<20180321171755.GJ14983@rkaganb.sw.ru>
+	(envelope-from <Babu.Moger@amd.com>) id 1eyk1f-0006sj-UJ
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:08:03 -0400
+Received: from mail-bn3nam01on0054.outbound.protection.outlook.com
+	([104.47.33.54]:19072
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1eyk1f-0006sI-Hh
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:07:59 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Wed, 21 Mar 2018 20:07:54 +0000
+Message-ID: <CY4PR12MB176862E1B2C32BA91A25660595AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
+References: <1520888449-4352-1-git-send-email-babu.moger@amd.com>
+	<1520888449-4352-3-git-send-email-babu.moger@amd.com>
+	<20180316180006.GH28578@localhost.localdomain>
+	<CY4PR12MB17686EB283987B8A5EDCF49295AB0@CY4PR12MB1768.namprd12.prod.outlook.com>
+	<20180320175427.GU3417@localhost.localdomain>
+	<CY4PR12MB1768A3CBE42AAFB03CB1081E95AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
+	<20180321170941.GX3417@localhost.localdomain>
+	<CY4PR12MB1768D466F00BF68AA552EBE195AA0@CY4PR12MB1768.namprd12.prod.outlook.com>
+	<20180321181526.GZ3417@localhost.localdomain>
+In-Reply-To: <20180321181526.GZ3417@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180321171755.GJ14983@rkaganb.sw.ru>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD Processor
+ Cache Information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +38,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "Lendacky,
+	Thomas" <Thomas.Lendacky@amd.com>, "Singh,
+	Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "Hook,
+	Gary" <Gary.Hook@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Wed, Mar 21, 2018 at 08:17:55PM +0300, Roman Kagan wrote:
-> On Wed, Mar 21, 2018 at 05:17:38PM +0100, Vitaly Kuznetsov wrote:
-> > (What I'm worried about with all our hv_* knobs is that more of them we
-> > have easier it is to assemble some frankenstien which won't look like
-> > any existing Hyper-V version; we're probably not doing a very good job
-> > tesing all possible hv_* combinations as people probably use 'all or
-> > nothing'. In case we end up finding a bug in Windows with some weird
-> > hv_* combination it's unlikely Microsoft will bother fixing at as it
-> > doesn't reproduce on any existent Hyper-V version.
-> 
-> I agree that this is getting cumbersome, but, given that features get
-> added incrementally and we need to be able to maintain backwards
-> compatibility, I'm afraid this is unavoidable.
-> 
-> > That said, it would be great to eventually have something like
-> > 'hv_ws2012r2' property making us look exactly the same real WS2012R2
-> > looks like. Unfortunatelly, I'm unsure about a path to get there).
-> 
-> I'm tempted to delegate this -- combining features into user-friendly
-> sets -- to the upper layers: libvirt or even something on top of it.
 
-Sounds simpler to me, otherwise we would need a mechanism to tell
-the upper layers which of those named are usable on the current
-host.
+> -----Original Message-----
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: Wednesday, March 21, 2018 1:15 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
+> Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
+> mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
+> devel@nongnu.org
+> Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
+> Processor Cache Information
+>=20
+> On Wed, Mar 21, 2018 at 05:47:28PM +0000, Moger, Babu wrote:
+> >
+> >
+> > > -----Original Message-----
+> > > From: Eduardo Habkost <ehabkost@redhat.com>
+> > > Sent: Wednesday, March 21, 2018 12:10 PM
+> > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
+> > > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> > > <brijesh.singh@amd.com>; kvm@vger.kernel.org; kash@tripleback.net;
+> > > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
+> > > devel@nongnu.org
+> > > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AMD
+> > > Processor Cache Information
+> > >
+> > > On Wed, Mar 21, 2018 at 03:58:41PM +0000, Moger, Babu wrote:
+> > > > Hi Eduardo,
+> > > >
+> > > > > -----Original Message-----
+> > > > > From: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > Sent: Tuesday, March 20, 2018 12:54 PM
+> > > > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > > > Cc: pbonzini@redhat.com; rth@twiddle.net; rkrcmar@redhat.com;
+> > > > > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> > > > > <brijesh.singh@amd.com>; kvm@vger.kernel.org;
+> kash@tripleback.net;
+> > > > > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>; qemu-
+> > > > > devel@nongnu.org
+> > > > > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populate AM=
+D
+> > > > > Processor Cache Information
+> > > > >
+> > > > > On Tue, Mar 20, 2018 at 05:25:52PM +0000, Moger, Babu wrote:
+> > > > > > Hi Eduardo, Thanks for the comments. Please see the response
+> inline.
+> > > > > >
+> > > > > > > -----Original Message-----
+> > > > > > > From: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > > Sent: Friday, March 16, 2018 1:00 PM
+> > > > > > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > > > > > Cc: pbonzini@redhat.com; rth@twiddle.net;
+> rkrcmar@redhat.com;
+> > > > > > > Lendacky, Thomas <Thomas.Lendacky@amd.com>; Singh, Brijesh
+> > > > > > > <brijesh.singh@amd.com>; kvm@vger.kernel.org;
+> > > kash@tripleback.net;
+> > > > > > > mtosatti@redhat.com; Hook, Gary <Gary.Hook@amd.com>;
+> qemu-
+> > > > > > > devel@nongnu.org
+> > > > > > > Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/i386: Populat=
+e
+> AMD
+> > > > > > > Processor Cache Information
+> > > > > > >
+> > > > > > > On Mon, Mar 12, 2018 at 05:00:46PM -0400, Babu Moger wrote:
+> > > > > > > > From: Stanislav Lanci <pixo@polepetko.eu>
+> > > > > > > >
+> > > > > > > > Add information for cpuid 0x8000001D leaf. Populate cache
+> topology
+> > > > > > > information
+> > > > > > > > for different cache types(Data Cache, Instruction Cache, L2=
+ and
+> L3)
+> > > > > > > supported
+> > > > > > > > by 0x8000001D leaf. Please refer Processor Programming
+> Reference
+> > > > > (PPR)
+> > > > > > > for AMD
+> > > > > > > > Family 17h Model for more details.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
+> > > > > > > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > > > > >
+> > > > > > > The new CPUID leaves don't seem to match the existing AMD
+> cache
+> > > > > > > information
+> > > > > > > leaves.  Is this intentional?  Why?
+> > > > > >
+> > > > > > It is not intentional. These values are from older family of
+> processors.
+> > > > > These values have changed from Family 14  or later.
+> > > > > > The latest one is Family 17. You can see the differences here.
+> > > > > >  https://support.amd.com/TechDocs/41131.pdf
+> > > > > >
+> > > > >
+> > >
+> https://support.amd.com/TechDocs/55072_AMD_Family_15h_Models_70h-
+> > > > > 7Fh_BKDG.pdf
+> > > > > >
+> > > > >
+> > >
+> https://support.amd.com/TechDocs/54945_PPR_Family_17h_Models_00h-
+> > > > > 0Fh.pdf
+> > > > > >
+> > > > > > Some of these are bugs in our code. For some we need to add
+> checks
+> > > for
+> > > > > the family and correct these values.
+> > > > > > You understand the code much better than me. Correct me if I
+> missed
+> > > > > something.
+> > > > > >
+> > > > > > Note that older family of processors don't support topology
+> extensions.
+> > > > >
+> > > > > If you want to make the cache size/topology look different
+> > > > > depending on the CPU model/options, this would require more work,
+> > > > > but it would be an interesting feature.
+> > > > >
+> > > > > The "i386: Helpers to encode cache information consistently"
+> > > > > patch I sent last week might be a useful starting point for that.
+> > > > >
+> > > > > If you plan to implement that, please keep in mind that existing
+> > > > > CPUID cache info needs to be kept on previous machine-types (this
+> > > > > is implemented by adding QOM properties that can be used to
+> > > > > enable the old behavior, and by setting them at
+> > > > > MachineClass::compat_props).
+> > > >
+> > > > Wanted to get some confirmation what you meant by setting
+> > > MachineClass::compat_props.
+> > > > Here is the patch I created to add new property for cpu. Now, I can=
+ use
+> > > enable_topoext to display
+> > > > new  change properly based on family.  Is that what you meant ?
+> > >
+> > > If the only change you introduce in the defaults is enabling
+> > > topoext but keeping the same default cache sizes, the example
+> > > following would make sense (but see comments below about
+> > > implementation details).
+> > >
+> > > But if you also want to change the default cache size, you will
+> > > also need properties that control the cache size.
+> >
+> > Yes. We will need cpu family information.  Let me see if that informati=
+on is
+> >  already available or we need to add that as well.
+>=20
+> CPU family doesn't seem to be enough, if you want to keep
+> compatibility on older machine-type versions.  e.g.:
+>=20
+> If you want to make EPYC expose a different cache size, you'd
+> just need a new field on X86CPUDefinition.  This is the easy
+> part.
 
--- 
-Eduardo
+Actually, I already have this information.  I can just decode cpuid_version=
+ information.
+I may not need to add new field in new field on X86CPUDefinition.
+
+>=20
+> But you still need "-machine pc-2.11 -cpu EPYC" to expose the old
+> cache size, for guest ABI compatibility.
+>=20
+> This means you need an additional knob that pc-2.10 can use in
+> compat_props, to override the new family/model-dependent cache
+> size in EPYC, and force the old cache sizes to be used even with
+> "-cpu EPYC".
+
+Ok.  Will add a new property legacy_cache(or something). I can use this to =
+ override
+all the new information. Will plan to send first version tomorrow.
+=20
+>=20
+> --
+> Eduardo
