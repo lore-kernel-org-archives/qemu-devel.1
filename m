@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eyfoh-0005FU-R6
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:38:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyfqh-0007Zf-Hr
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eyfoe-0003DH-LL
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:38:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59688 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eyfoe-0003Ct-GZ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:38:16 -0400
-Date: Wed, 21 Mar 2018 15:38:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180321153809.GT8551@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1521645545-247351-1-git-send-email-mst@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1eyfqd-00049y-OZ
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:40:23 -0400
+Date: Wed, 21 Mar 2018 16:40:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180321154000.GD3898@localhost.localdomain>
+References: <20180321133852.3560-1-berto@igalia.com>
+	<20180321135238.GA3898@localhost.localdomain>
+	<w51k1u5ikp2.fsf@maestria.local.igalia.com>
+	<20180321150728.GB3898@localhost.localdomain>
+	<w51h8p9igv1.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1521645545-247351-1-git-send-email-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 1/2] rdma: fix up include
- directives
+In-Reply-To: <w51h8p9igv1.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qcow2: Reset
+ free_cluster_index when allocating a new refcount block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, jsnow@redhat.com
 
-On Wed, Mar 21, 2018 at 05:22:07PM +0200, Michael S. Tsirkin wrote:
-> Our rule right now is to use <> for external headers only.
-> RDMA code violates that, fix it up.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/rdma/rdma_backend.h        |  2 +-
->  hw/rdma/rdma_backend_defs.h   |  2 +-
->  hw/rdma/rdma_rm.h             |  2 +-
->  hw/rdma/rdma_utils.h          |  6 +++---
->  hw/rdma/vmw/pvrdma.h          |  8 ++++----
->  hw/rdma/vmw/pvrdma_dev_ring.h |  2 +-
->  hw/rdma/rdma_backend.c        |  6 +++---
->  hw/rdma/rdma_rm.c             |  6 +++---
->  hw/rdma/vmw/pvrdma_cmd.c      |  8 ++++----
->  hw/rdma/vmw/pvrdma_dev_ring.c |  8 ++++----
->  hw/rdma/vmw/pvrdma_main.c     | 24 ++++++++++++------------
->  hw/rdma/vmw/pvrdma_qp_ops.c   |  4 ++--
->  12 files changed, 39 insertions(+), 39 deletions(-)
+Am 21.03.2018 um 16:32 hat Alberto Garcia geschrieben:
+> On Wed 21 Mar 2018 04:07:28 PM CET, Kevin Wolf wrote:
+> > I just remembered that when I looked at an image recently, I noticed
+> > that the refcount block wasn't in the first cluster and I disliked it,
+> > though mostly because it felt untidy rather than being a problem.
+> 
+> I don't think you can fix that in general. In my test case I'm writing
+> new data when the existing refcount block is already full, so we can
+> allocate the new one before the new data and keep everything tidy.
+> 
+> But if there are, say, two refcount entries available and you write four
+> data clusters you don't want the new refcount block in the middle of
+> those four clusters just to have it at the beginning :-)
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Agreed. I think if implemented like I suggested (hard error in
+update_refcount() and then allocate a new refcount block in the caller),
+we'd actually end up with the refcount block covered by an old refcount
+block rather than being self-describing. And that in turn wouldn't make
+things much tidier, so I guess you're right. :-)
 
+> > Having a qcow2 analysis script in the repo sounds like a good
+> > idea. John has something, too. Maybe we can check whether the two
+> > things complement each other and then check in a script that combines
+> > both (or if one provides a superset of the other, just check in that
+> > one).
+> 
+> I'll take a look.
 
-I'm assuming these were detected by build failures caused by the 2nd
-patch in this series, so other areas of the codebase are all correct
-already.
+Thanks!
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Kevin
