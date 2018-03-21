@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1eydYM-0001jm-5J
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:13:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1eydZU-0002ga-6Y
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:14:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1eydYL-0006wu-2H
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:13:18 -0400
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:47091)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1eydYK-0006wZ-SX
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:13:17 -0400
-Received: by mail-ot0-x232.google.com with SMTP id g97-v6so5483070otg.13
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 06:13:16 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1eydZQ-0007Ox-5L
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:14:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60182 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eydZP-0007Ob-Q1
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:14:24 -0400
+References: <20180216164620.GA53727@humpty.home.comstyle.com>
+	<c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
+	<85dc7f9f-95e1-c666-ee17-8f04d008d21b@gmx.com>
+	<e625c026-2fa4-f3ea-d85e-080c65a4885f@amsat.org>
+	<128f62e5-9184-57e5-88c1-d5cc4bf27d4f@redhat.com>
+	<20180321081112.GE26017@lemon.usersys.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9b247ea1-7a91-6d39-6c80-7c1679c6a098@redhat.com>
+Date: Wed, 21 Mar 2018 08:14:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
-References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
-	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Wed, 21 Mar 2018 14:13:15 +0100
-Message-ID: <CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
- Windows with qemu-system-ppc.exe
+In-Reply-To: <20180321081112.GE26017@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] make vm-test [was: [PATCH] maintainers: Add myself
+ as a OpenBSD maintainer]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kamil Rytarowski <n54@gmx.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
 
-> Can you get a backtrace on the Windows system?  Perhaps by putting a
-> breakpoint in aio_context_set_poll_params.
->
-> Paolo
+On 03/21/2018 03:11 AM, Fam Zheng wrote:
+>> Thanks for this; today was my first day trying the various vm-build-
+>> targets.
+>>
+>> Question: is this expected behavior?
+>>
+>> $ make vm-build-ubuntu.i386
+>>      VM-IMAGE ubuntu.i386
+>> ...
+>> Image resized.
+>> debconf: unable to initialize frontend: Dialog
+>> debconf: (TERM is not set, so the dialog frontend is not usable.)
 
-I built qemu-master RC0 with --enable-debug. This is what a bt provides:
+>>
+>> I'm wondering if the image initialized incorrectly, and as a result can't do
+>> as much as it's supposed to do, or runs way slower than it needs to?  The
+>> command eventually completed with status 0, but failed to find a 32-bit
+>> compile error in the rdma code, and the output log does not look like it
+>> actually attempted to compile anything in qemu (unless it did compile it,
+>> but the logs were not output to stdout/stderr).
+>>
+>> make vm-build-freebsd was a lot faster at completing for me (but shows that
+>> we still have a lot of clang warnings about address of a packed struct
+>> member).
+>>
+> 
+> Was it a clean repo? Did you try "rm -rf ~/.cache/qemu-vm"? This morning the
+> command worked for me from a clean env (on RHEL 7, using a QEMU built from
+> qemu.git), and I didn't see the errors/warnings you pasted. (BTW I don't
+> understand how sudo has anything to do with the dummy host name.)
 
-(gdb) attach 9692
-Attaching to program `c:\qemu-master\qemu-system-ppc.exe', process 9692
-[New Thread 9692.0x670]
-[New Thread 9692.0x238c]
-[New Thread 9692.0xb94]
-[New Thread 9692.0x10bc]
-[New Thread 9692.0x90c]
-[New Thread 9692.0x29a0]
-(gdb) thread apply all bt full
+I repeated the test twice this morning after 'rm -rf ~/.cache/qemu-vm', 
+first after 'rm tests/vm/ubuntu.i386.img' in an incremental tree, and 
+second in a fresh git checkout.  Here's a full pastebin of the first try 
+(I hit ^C after seeing it look the same as yesterday, even after the 
+fresh redownload that took more than 10 minutes):
+https://paste.fedoraproject.org/paste/p8Th7AroLAprGY03ffzGHA
 
-Thread 6 (Thread 9692.0x29a0):
-#0  0x00007ff980ec3811 in ?? ()
-No symbol table info available.
-#1  0x00007ff980ef020b in ?? ()
-No symbol table info available.
-Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+The results are the same; debconf is somehow unable to connect to the 
+guest, and as a result, the guest is not properly initialized with the 
+additional packages it needs, and then everything else about the image 
+is broken.
 
-Thread 5 (Thread 9692.0x90c):
-#0  0x00007ff980ebff04 in ?? ()
-No symbol table info available.
-#1  0x00007ff97d673b7f in ?? ()
-No symbol table info available.
-Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+Then on the second try, I got a dreaded message about my /home being 
+nearly full, (having multiple .img files in two different build 
+directories pushed me over limits), and it died a much harder death due 
+to ENOSPC.  Let me resize my /home and retry (thankfully I still have 
+some disk space free to throw at the problem), and I'll report back if 
+that makes a difference.
 
-Thread 4 (Thread 9692.0x10bc):
-#0  0x00007ff980ec3794 in ?? ()
-No symbol table info available.
-#1  0x00007ff980e549dd in ?? ()
-No symbol table info available.
-Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-
-Thread 3 (Thread 9692.0xb94):
-#0  0x00007ff980ec3794 in ?? ()
----Type <return> to continue, or q <return> to quit---
-No symbol table info available.
-#1  0x00007ff980e549dd in ?? ()
-No symbol table info available.
-Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-
-Thread 2 (Thread 9692.0x238c):
-#0  0x00007ff980ec3794 in ?? ()
-No symbol table info available.
-#1  0x00007ff980e549dd in ?? ()
-No symbol table info available.
-Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-
-Thread 1 (Thread 9692.0x670):
-#0  0x00007ff980ec09d4 in ?? ()
-No symbol table info available.
-#1  0x00007ff97d6ba9c6 in ?? ()
-No symbol table info available.
-Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-(gdb)
-
-Best,
-Howard
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
