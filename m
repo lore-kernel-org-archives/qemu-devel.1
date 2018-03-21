@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyg8m-0002eK-Ua
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:59:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eygA4-0003tm-S3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eyg8k-00046Y-BF
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:59:05 -0400
-Date: Wed, 21 Mar 2018 17:58:49 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180321175452-mutt-send-email-mst@kernel.org>
-References: <1521642402-197739-1-git-send-email-mst@redhat.com>
-	<20180321153439.GC3898@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1eygA0-0004oR-U3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:00:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54878 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eygA0-0004nF-Mw
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:00:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A5D4F6166F
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 16:00:16 +0000 (UTC)
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<20180321134005.8822-3-marcandre.lureau@redhat.com>
+	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
+	<CAMxuvax_7QPP5rc3aAPKdUFWtfdEphfiN76mM6jnCKk4=QkauQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <407fd6f2-b88f-02fd-b4f8-9b4abb6a03a9@redhat.com>
+Date: Wed, 21 Mar 2018 17:00:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180321153439.GC3898@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
+In-Reply-To: <CAMxuvax_7QPP5rc3aAPKdUFWtfdEphfiN76mM6jnCKk4=QkauQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
+ at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +37,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Blake, Eric" <eblake@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
 
-On Wed, Mar 21, 2018 at 04:34:39PM +0100, Kevin Wolf wrote:
-> Am 21.03.2018 um 15:46 hat Michael S. Tsirkin geschrieben:
-> > Our current scheme is to use
-> >  #include ""
-> > for internal headers, and
-> >  #include <>
-> > for external ones.
-> > 
-> > Unfortunately this is not based on compiler support: from C point of
-> > view, the "" form merely looks up headers in the current directory
-> > and then falls back on <> directories.
-> > 
-> > Thus, for example, a system header trace.h - should it be present - will
-> > conflict with our local trace.h
-> 
-> You're right that there is a conflict, even though only in one
-> direction: "trace.h" is unambiguously the local trace.h in our source
-> tree, but <trace.h> refers to the same local header rather than the
-> system header as you would expect.
-> 
-> An easy way to resolve this conflict would be using -iquote rather than
-> -I for directories in the source tree, so that <trace.h> unambiguously
-> refers to the system header and "trace.h" unambiguously refers to the
-> QEMU header.
+On 21/03/2018 16:55, Marc-Andr=C3=A9 Lureau wrote:
+> That would work with an anonymous union though:
+>=20
+> struct QObject {
+>     union {
+>         QType type;
+>         QType base;
+>     };
+>     size_t refcnt;
+> };
+>=20
+> If it's acceptable, I think I'll take this approach.
 
-I posted patches to that effect for 2.12. It's all still very much
-a non-standard convention and so less robust than
-prefixing file name with a project-specifix prefix.
+You don't need QEMU_GENERIC at all then, don't you?
 
-> > As another example of problems, a header by the same name in the source
-> > directory will always be picked up first - before any headers in
-> > the include directory.
-> > 
-> > Let's change the scheme: make sure all headers that are not
-> > in the source directory are included through a path
-> > starting with qemu/ , thus:
-> > 
-> >  #include <>
-> > 
-> > headers in the same directory as source are included with
-> > 
-> >  #include ""
-> > 
-> > as per standard.
-> > 
-> > This (untested) patch is just to start the discussion and does not
-> > change all of the codebase. If there's agreement, this will be
-> > run on all code to converting code to this scheme.
-> 
-> Renaming files is always painful. If that's the fix, the cure might be
-> worse than the disease. As far as I know, the conflict is only
-> theoretical, so in that case I'd say: If it ain't broke, don't fix it.
-> 
-> Kevin
-
-It's broke I think, it's very hard for new people to contribute to QEMU.
-Look e.g. at rdma which all has messed up includes - and that's from an
-experienced conributor who just isn't an experienced maintainer.
-
-Amount of time spent on teaching new people trivia about our
-conventions just isn't funny. They should be self-documenting
-and violations should cause the build to fail.
-
--- 
-MST
+Paolo
