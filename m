@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eyhNP-0003lJ-F4
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:18:16 -0400
+	(envelope-from <wouter@grep.be>) id 1eyhQO-0004kF-3u
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eyhNM-0001vP-BP
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:18:15 -0400
-Received: from mail-am5eur03hn0215.outbound.protection.outlook.com
-	([104.47.8.215]:17753
-	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eyhNL-0001uf-37
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:18:12 -0400
-Date: Wed, 21 Mar 2018 20:17:55 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180321171755.GJ14983@rkaganb.sw.ru>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-3-vkuznets@redhat.com>
-	<46c08ea1-27f7-e581-f93f-cf635950062f@redhat.com>
-	<87605p768t.fsf@vitty.brq.redhat.com>
+	(envelope-from <wouter@grep.be>) id 1eyhQK-0003LJ-Vz
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:21:20 -0400
+Date: Wed, 21 Mar 2018 18:20:39 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20180321172039.GB13477@grep.be>
+References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
+	<20180321121940.39426-2-vsementsov@virtuozzo.com>
+	<af833096-cbc3-24db-0cf0-a446f231c5fd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87605p768t.fsf@vitty.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+In-Reply-To: <af833096-cbc3-24db-0cf0-a446f231c5fd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] nbd/server: refactor
+ nbd_negotiate_meta_query for several namespaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, nbd list <nbd@other.debian.org>
 
-On Wed, Mar 21, 2018 at 05:17:38PM +0100, Vitaly Kuznetsov wrote:
-> (What I'm worried about with all our hv_* knobs is that more of them we
-> have easier it is to assemble some frankenstien which won't look like
-> any existing Hyper-V version; we're probably not doing a very good job
-> tesing all possible hv_* combinations as people probably use 'all or
-> nothing'. In case we end up finding a bug in Windows with some weird
-> hv_* combination it's unlikely Microsoft will bother fixing at as it
-> doesn't reproduce on any existent Hyper-V version.
+On Wed, Mar 21, 2018 at 09:56:36AM -0500, Eric Blake wrote:
+> no further qemu patches are submitted.  Is it worth me proposing a doc
+> change to demonstrate what the difference would look like, along with
+> corresponding qemu changes to match, to decide if including it in 2.12 is
+> worth it?
 
-I agree that this is getting cumbersome, but, given that features get
-added incrementally and we need to be able to maintain backwards
-compatibility, I'm afraid this is unavoidable.
+If you're willing to spend the effort, I won't stop you :-) but I think the
+pain of parsing a string once (during negotiation) is not that bad, and
+I'm not too bothered about it.
 
-> That said, it would be great to eventually have something like
-> 'hv_ws2012r2' property making us look exactly the same real WS2012R2
-> looks like. Unfortunatelly, I'm unsure about a path to get there).
+Put otherwise, I'm not convinced that the downside (which I agree
+exists) outweighs the downside of having to introduce yet another
+command, or add some ugliness for backwards compat reasons.
 
-I'm tempted to delegate this -- combining features into user-friendly
-sets -- to the upper layers: libvirt or even something on top of it.
+But hey, go ahead, prove me wrong ;-)
 
-Roman.
+-- 
+Could you people please use IRC like normal people?!?
+
+  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
+     Hacklab
