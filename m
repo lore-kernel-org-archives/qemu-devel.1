@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eygjw-0000bz-7F
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:37:32 -0400
+	(envelope-from <marcel@redhat.com>) id 1eygnC-00021q-OV
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eygjt-0004Pa-JZ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:37:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60406 helo=mx1.redhat.com)
+	(envelope-from <marcel@redhat.com>) id 1eygn9-0005g6-Jj
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:40:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56782 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eygjt-0004PT-Cs
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:37:25 -0400
-References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
-	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
-	<CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
-	<035198fa-b9e1-6084-d9c2-4d344e7058d7@redhat.com>
-	<CABLmASFEhaKB1Hh91p+RM+TX+zTTDuNixWy=16rUC+GC_0KKtg@mail.gmail.com>
-	<397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
-	<CABLmASHkjz=UDbHMRRtJKhu1bF28NGTzRjTo-GKbCd6dp-6qQQ@mail.gmail.com>
-	<84d2ded7-fdd5-0367-ad5d-b0443c4a945a@redhat.com>
-	<CABLmASFvQED-tsDGCgmw3LYx_CkLeKTGoQ_oU9qLHpGu=a=-hg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ed9c25bd-e5be-bde1-2447-775c3bfc93ad@redhat.com>
-Date: Wed, 21 Mar 2018 17:37:22 +0100
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eygn9-0005g0-E8
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:40:47 -0400
+References: <1521645545-247351-1-git-send-email-mst@redhat.com>
+	<1521645545-247351-2-git-send-email-mst@redhat.com>
+	<20180321153651.GS8551@redhat.com>
+	<20180321174022-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <f3035a2e-acce-ba73-3984-4c2d379ba249@redhat.com>
+Date: Wed, 21 Mar 2018 18:40:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <CABLmASFvQED-tsDGCgmw3LYx_CkLeKTGoQ_oU9qLHpGu=a=-hg@mail.gmail.com>
+In-Reply-To: <20180321174022-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
- Windows with qemu-system-ppc.exe
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] make: switch from -I to
+ -iquote
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,155 +31,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=83=c2=a9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On 21/03/2018 17:31, Howard Spoelstra wrote:
-> On Wed, Mar 21, 2018 at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 21/03/2018 17:23, Howard Spoelstra wrote:
->>> warning: FTH: (10844): *** Fault tolerant heap shim applied to current
->>> process. This is usually due to previous crashes. ***
->>> [New Thread 10844.0x1224]
->>> [New Thread 10844.0x2a30]
->>> [New Thread 10844.0x2594]
->>> [New Thread 10844.0x32a8]
+On 21/03/2018 18:02, Michael S. Tsirkin wrote:
+> On Wed, Mar 21, 2018 at 03:36:51PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+>> On Wed, Mar 21, 2018 at 05:22:07PM +0200, Michael S. Tsirkin wrote:
+>>> Our rule right now is to use <> for external headers,
+>>> "" for internal ones. The idea was to avoid conflicts
+>>> between e.g. a system file named <trace.h> and an
+>>> internal one by the same name.
 >>>
->>> Thread 1 hit Breakpoint 1, aio_context_set_poll_params (ctx=0xc14a9b0,
->>> max_ns=32768, grow=0, shrink=0, errp=0x362f968)
->>>     at util/aio-win32.c:413
->>> 413     in util/aio-win32.c
->>> (gdb) s
->>> error_setg_internal (errp=0x362f968, src=0xe166e0 <__func__.58569+32>
->>> "util/aio-win32.c", line=413,
->>>     func=0xe16740 <__func__.59050> "aio_context_set_poll_params",
->>>     fmt=0xe16708 <__func__.58569+72> "AioContext polling is not
->>> implemented on Windows") at util/error.c:91
->>> 91      util/error.c: No such file or directory.
->>> (gdb) s
->>> 94      in util/error.c
+>>> Unfortunately we use -I compiler flag so it does not
+>>> help: a system file doing #include <trace.h> will
+>>> still pick up ours first.
 >>
->> Great!  Now do "bt".
+>> Has that actually hit you practice ?  I'm wondering if this
+>> is just theoretical in which case it could wait till 2.13
+>> since this scenario has existed in QEMU along time, or
+>> a real problem right now requiring fix in 2.12.
+>=20
+> It's borderline.
+>=20
+> In particular there is at least one instance where we already have a
+> conflict (yes, there are probably other ways to address this, but
+> I consider them less robust):
+>=20
+> util/getauxval.c:#include <sys/auxv.h>
+> /usr/include/sys/auxv.h:#include <elf.h>
+>=20
+> So it really does build by luck.
+>=20
+>=20
+>>> To fix, switch to -iquote which is supported by both
+>>> gcc and clang and only affects #include "" directives.
 >>
->> Paolo
-> 
-> (gdb) bt full
-> #0  aio_context_set_poll_params (ctx=0xc16a9b0, max_ns=32768, grow=0,
-> shrink=0, errp=0x362f968) at util/aio-win32.c:413
->         __func__ = "aio_context_set_poll_params"
-> #1  0x00000000005f7563 in iothread_complete (obj=0xc16a290,
-> errp=0x362fa50) at iothread.c:143
->         local_error = 0x0
->         iothread = 0xc16a290
->         __func__ = "iothread_complete"
->         name = 0xde8be9 <container_info+265> "user-creatable"
->         thread_name = 0x400000000 <error: Cannot access memory at
-> address 0x400000000>
-> #2  0x0000000000831716 in user_creatable_complete (obj=0xc16a290,
-> errp=0x362fa50) at qom/object_interfaces.c:24
->         ucc = 0x7fec650
->         uc = 0xc16a290
->         __func__ = "user_creatable_complete"
-> #3  0x000000000082cde1 in object_new_with_propv (typename=0xc4b14b
-> <__func__.56984+43> "iothread", parent=0xc169e50,
->     id=0xc12494 <__emutls_t.iothread_locked+19167> "mon_iothread",
-> errp=0x14ae260 <error_abort>, vargs=0x362fb20 "")
->     at qom/object.c:555
->         obj = 0xc16a290
->         klass = 0x7fec020
->         local_err = 0x0
->         __func__ = "object_new_with_propv"
-> #4  0x000000000082cc67 in object_new_with_props (typename=0xc4b14b
-> <__func__.56984+43> "iothread", parent=0xc169e50,
->     id=0xc12494 <__emutls_t.iothread_locked+19167> "mon_iothread",
-> errp=0x14ae260 <error_abort>) at qom/object.c:516
->         vargs = 0x362fb20 ""
->         obj = 0xd34e26fdf887
-> #5  0x00000000005f7ced in iothread_create (id=0xc12494
-> <__emutls_t.iothread_locked+19167> "mon_iothread",
-> ---Type <return> to continue, or q <return> to quit---
->     errp=0x14ae260 <error_abort>) at iothread.c:352
->         obj = 0x45bef7 <sortcmdlist+137>
->         __func__ = "iothread_create"
-> #6  0x000000000045bf53 in monitor_iothread_init () at
-> /home/hsp/src/qemu-master/monitor.c:4436
-> No locals.
-> #7  0x000000000045bfcb in monitor_init_globals () at
-> /home/hsp/src/qemu-master/monitor.c:4464
-> No locals.
-> #8  0x00000000006064d5 in qemu_main (argc=28, argv=0x5679620,
-> envp=0x0) at vl.c:4545
->         i = 1
->         snapshot = 0
->         linux_boot = 0
->         initrd_filename = 0x0
->         kernel_filename = 0x0
->         kernel_cmdline = 0xc4e286 <runstate_transitions_def+6918> ""
->         boot_order = 0x57052c0 "d"
->         boot_once = 0x0
->         ds = 0x7ff94aced24c
->         opts = 0x5705100
->         machine_opts = 0x5705560
->         icount_opts = 0x0
->         accel_opts = 0x0
->         olist = 0xa6e000 <qemu_machine_opts>
->         optind = 28
->         optarg = 0x56793dd "file=c:\\Mac-disks\\9.2.img,format=raw,media=disk"
-> ---Type <return> to continue, or q <return> to quit---
->         loadvm = 0x0
->         machine_class = 0x7fb28f0
->         cpu_model = 0x0
->         vga_model = 0x0
->         qtest_chrdev = 0x0
->         qtest_log = 0x0
->         pid_file = 0x0
->         incoming = 0x0
->         userconfig = true
->         nographic = false
->         display_remote = 0
->         log_mask = 0x0
->         log_file = 0x0
->         trace_file = 0x0
->         maxram_size = 268435456
->         ram_slots = 0
->         vmstate_dump_file = 0x0
->         main_loop_err = 0x0
->         err = 0x0
->         list_data_dirs = false
->         dir = 0x8026a80 "c:\\qemu-master"
->         dirs = 0x8026980
->         bdo_queue = {sqh_first = 0x0, sqh_last = 0x362fda0}
->         __func__ = "qemu_main"
-> ---Type <return> to continue, or q <return> to quit---
-> #9  0x00000000005fc507 in SDL_main (argc=28, argv=0x5679620) at vl.c:43
-> No locals.
-> #10 0x000000000096e4e8 in main_getcmdline ()
-> No symbol table info available.
-> #11 0x00000000004013f7 in __tmainCRTStartup () at ../crt/crtexe.c:334
->         lock_free = <optimized out>
->         fiberid = <optimized out>
->         nested = <optimized out>
->         lpszCommandLine = <optimized out>
->         StartupInfo = {cb = 104, lpReserved = 0x5787680 "", lpDesktop
-> = 0x57881f0 "Winsta0\\Default",
->           lpTitle = 0x578c000 "c:\\qemu-master\\qemu-system-ppc.exe",
-> dwX = 0, dwY = 0, dwXSize = 0, dwYSize = 0,
->           dwXCountChars = 0, dwYCountChars = 0, dwFillAttribute = 0,
-> dwFlags = 0, wShowWindow = 0, cbReserved2 = 0,
->           lpReserved2 = 0x0, hStdInput = 0xffffffffffffffff,
-> hStdOutput = 0xffffffffffffffff,
->           hStdError = 0xffffffffffffffff}
->         inDoubleQuote = <optimized out>
-> #12 0x00000000004014fb in WinMainCRTStartup () at ../crt/crtexe.c:184
->         ret = 255
-> (gdb)
-> 
-> Finally ;-)
+>> Fine since we don't support anything other than
+>> gcc and clang. I'm assuming -iquote has been supported
+>> by these two compilers for a long time though ? The GCC
+>> docs annoyingly don't ever mention what release features
+>> appear in :-(
+>=20
+> Judging by git log output:
+>=20
+> For clang it appears to be there since 2007 that's pretty
+> close to day 1.
+>=20
+> gcc's log is better documented, it's been there since 2004-05-03
+>=20
+>>>
+>>> As a side effect, this catches any future uses of
+>>>  #include <> for internal headers.
+>>>
+>>> Suggested-by: Stefan Weil <sw@weilnetz.de>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>
+>> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>=20
+>=20
+> Thanks!
+>=20
 
-Great, thanks.  Peter, can you look at it?  I think we should:
+Hi Michael,
+Should I add this patch to the RDMA pull request?
 
-1) make aio_context_set_poll_params succeed in aio-win32.c if
-poll_max_ns is zero
+Thanks,
+Marcel
 
-2) set IOTHREAD_POLL_MAX_NS_DEFAULT to zero on windows.
 
-Paolo
+>>
+>>>
+>>> I still think we want to switch to a more formal rule such as qemu/
+>>> prefix for all includes down the road, but this will at least catch a=
+ny
+>>> scheme violations from creeping in meanwhile.
+>>>
+>>>
+>>>  configure       | 16 ++++++++--------
+>>>  rules.mak       |  2 +-
+>>>  Makefile.target |  4 ++--
+>>>  3 files changed, 11 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/configure b/configure
+>>> index af72fc8..23a4f3b 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -534,7 +534,7 @@ QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -=
+fwrapv $QEMU_CFLAGS"
+>>>  QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $Q=
+EMU_CFLAGS"
+>>>  QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+>>>  QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_S=
+OURCE $QEMU_CFLAGS"
+>>> -QEMU_INCLUDES=3D"-I. -I\$(SRC_PATH) -I\$(SRC_PATH)/accel/tcg -I\$(SR=
+C_PATH)/include"
+>>> +QEMU_INCLUDES=3D"-iquote . -iquote \$(SRC_PATH) -iquote \$(SRC_PATH)=
+/accel/tcg -iquote \$(SRC_PATH)/include"
+>>>  if test "$debug_info" =3D "yes"; then
+>>>      CFLAGS=3D"-g $CFLAGS"
+>>>      LDFLAGS=3D"-g $LDFLAGS"
+>>> @@ -6560,19 +6560,19 @@ if test "$vxhs" =3D "yes" ; then
+>>>  fi
+>>> =20
+>>>  if test "$tcg_interpreter" =3D "yes"; then
+>>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+>>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+>>>  elif test "$ARCH" =3D "sparc64" ; then
+>>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
+>>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
+>>>  elif test "$ARCH" =3D "s390x" ; then
+>>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
+>>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
+>>>  elif test "$ARCH" =3D "x86_64" -o "$ARCH" =3D "x32" ; then
+>>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
+>>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
+>>>  elif test "$ARCH" =3D "ppc64" ; then
+>>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
+>>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
+>>>  else
+>>> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+>>> +  QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+>>>  fi
+>>> -QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg $QEMU_INCLUDES"
+>>> +QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg $QEMU_INCLUDES"
+>>> =20
+>>>  echo "TOOLS=3D$tools" >> $config_host_mak
+>>>  echo "ROMS=3D$roms" >> $config_host_mak
+>>> diff --git a/rules.mak b/rules.mak
+>>> index 6e94333..93a0702 100644
+>>> --- a/rules.mak
+>>> +++ b/rules.mak
+>>> @@ -29,7 +29,7 @@ QEMU_DGFLAGS +=3D -MMD -MP -MT $@ -MF $(@D)/$(*F).d
+>>>  # dir, one absolute and the other relative to the compiler working
+>>>  # directory. These are the same for target-independent files, but
+>>>  # different for target-dependent ones.
+>>> -QEMU_LOCAL_INCLUDES =3D -I$(BUILD_DIR)/$(@D) -I$(@D)
+>>> +QEMU_LOCAL_INCLUDES =3D -iquote $(BUILD_DIR)/$(@D) -iquote $(@D)
+>>> =20
+>>>  WL_U :=3D -Wl,-u,
+>>>  find-symbols =3D $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
+>>> diff --git a/Makefile.target b/Makefile.target
+>>> index 6549481..d0ec77a 100644
+>>> --- a/Makefile.target
+>>> +++ b/Makefile.target
+>>> @@ -11,9 +11,9 @@ $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
+>>>  ifdef CONFIG_LINUX
+>>>  QEMU_CFLAGS +=3D -I../linux-headers
+>>>  endif
+>>> -QEMU_CFLAGS +=3D -I.. -I$(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DNEE=
+D_CPU_H
+>>> +QEMU_CFLAGS +=3D -iquote .. -iquote $(SRC_PATH)/target/$(TARGET_BASE=
+_ARCH) -DNEED_CPU_H
+>>> =20
+>>> -QEMU_CFLAGS+=3D-I$(SRC_PATH)/include
+>>> +QEMU_CFLAGS+=3D-iquote $(SRC_PATH)/include
+>>> =20
+>>>  ifdef CONFIG_USER_ONLY
+>>>  # user emulator name
+>>> --=20
+>>> MST
+>>>
+>>
+>> Regards,
+>> Daniel
+>> --=20
+>> |: https://berrange.com      -o-    https://www.flickr.com/photos/dber=
+range :|
+>> |: https://libvirt.org         -o-            https://fstop138.berrang=
+e.com :|
+>> |: https://entangle-photo.org    -o-    https://www.instagram.com/dber=
+range :|
