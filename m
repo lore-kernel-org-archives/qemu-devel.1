@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eykCp-00015d-Te
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:19:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eykIc-0005fu-1I
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eykCk-0004NA-Vx
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:19:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eykCk-0004Mm-Mc
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:19:26 -0400
-Date: Wed, 21 Mar 2018 17:19:24 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180321201924.GE3417@localhost.localdomain>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-3-vkuznets@redhat.com>
-	<20180321121001.GD14983@rkaganb.sw.ru>
-	<87bmfh7eip.fsf@vitty.brq.redhat.com>
-	<20180321165729.GH14983@rkaganb.sw.ru>
+	(envelope-from <kwolf@redhat.com>) id 1eykIa-0000S9-UB
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:25:30 -0400
+Date: Wed, 21 Mar 2018 21:25:01 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180321202501.GJ3898@localhost.localdomain>
+References: <20180321200114.10981-1-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180321165729.GH14983@rkaganb.sw.ru>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+In-Reply-To: <20180321200114.10981-1-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5] file-posix: specify expected filetypes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +22,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Mar 21, 2018 at 07:57:29PM +0300, Roman Kagan wrote:
-> On Wed, Mar 21, 2018 at 02:18:54PM +0100, Vitaly Kuznetsov wrote:
-> > Roman Kagan <rkagan@virtuozzo.com> writes:
-> > 
-> > > On Tue, Mar 20, 2018 at 06:35:00PM +0100, Vitaly Kuznetsov wrote:
-> > >> Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
-> > >> nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
-> > >> Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
-> > >> these frequencies are stable, it just means they're available for reading.
-> > >> 
-> > >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > >> ---
-> > >>  target/i386/kvm.c | 2 +-
-> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >> 
-> > >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > >> index 7d9f9ca0b1..74fc3d3b2c 100644
-> > >> --- a/target/i386/kvm.c
-> > >> +++ b/target/i386/kvm.c
-> > >> @@ -651,7 +651,7 @@ static int hyperv_handle_properties(CPUState *cs)
-> > >>          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
-> > >>          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
-> > >>  
-> > >> -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-> > >> +        if (has_msr_hv_frequencies && env->tsc_khz) {
-> > >>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
-> > >>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
-> > >>          }
-> > >
-> > > I suggest that we add a corresponding cpu property here, too.  The guest
-> > > may legitimately rely on these msrs when it sees the support in CPUID,
-> > > and migrating from a kernel with the feature supported (4.14+) to an
-> > > older one will make it crash.
-> > >
-> > 
-> > This can be arranged, but what happens to people who use these features
-> > today? Assuming they also passed 'invtsc' they have stable TSC page
-> > clocksource already (when Hyper-V role is enabled) but when we start
-> > requesting a new 'hv_frequency' cpu property they'll suddenly lose what
-> > they have...
+Am 21.03.2018 um 21:01 hat John Snow geschrieben:
+> Adjust each caller of raw_open_common to specify if they are expecting
+> host and character devices or not. Tighten expectations of file types upon
+> open in the common code and refuse types that are not expected.
 > 
-> I see two cases here:
+> This has two effects:
 > 
-> 1) people start a new VM, and discover that their old configuration is
->    not enough for this feature to work.
+> (1) Character and block devices are now considered deprecated for the
+>     'file' driver, which expects only S_IFREG, and
+> (2) no file-posix driver (file, host_cdrom, or host_device) can open
+>     directories now.
 > 
->    They need to reconfigure and restart the VM.  This costs them some
->    time investigating and restarting, but not data.
-
-If we keep machine-type compatibility, people will need to do
-that only if they change the machine-type (or use the "pc" or
-"q35" aliases).  If they copy the old configuration, it will keep
-working.
-
-machine-type compatibility also makes the following case a bit
-safer:
-
+> I don't think there's a legitimate reason to open directories as if
+> they were files. This prevents QEMU from opening and attempting to probe
+> a directory inode, which can break in exciting ways. One of those ways
+> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
+> size instead of EISDIR. This can coax QEMU into responding with a
+> confusing "file too big" instead of "Hey, that's not a file".
 > 
-> 2) people migrate from a QEMU without ->hv_frequency, to a new one with
->    ->hv_frequency=off (assuming on both ends KVM supports the frequency
->    MSRs).
+> See: https://bugs.launchpad.net/qemu/+bug/1739304/
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
 > 
->    With the current implementation in KVM, this will only result in the
->    feature bits disappearing from the respective CPUID leaf, but the
->    MSRs themselves will continue working as they used to.  So the guest
->    either won't notice or will check the CPUID and adjust.
+> v5: rebase for 2.12.0-rc0
+> 
+>  block/file-posix.c | 37 +++++++++++++++++++++++++++++--------
+>  qemu-doc.texi      |  6 ++++++
+>  2 files changed, 35 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index d7fb772c14..31d9afe026 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -420,7 +420,8 @@ static QemuOptsList raw_runtime_opts = {
+>  };
+>  
+>  static int raw_open_common(BlockDriverState *bs, QDict *options,
+> -                           int bdrv_flags, int open_flags, Error **errp)
+> +                           int bdrv_flags, int open_flags,
+> +                           bool device, Error **errp)
+>  {
+>      BDRVRawState *s = bs->opaque;
+>      QemuOpts *opts;
+> @@ -558,10 +559,30 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+>          error_setg_errno(errp, errno, "Could not stat file");
+>          goto fail;
+>      }
+> -    if (S_ISREG(st.st_mode)) {
+> -        s->discard_zeroes = true;
+> -        s->has_fallocate = true;
+> +
+> +    if (!device) {
+> +        if (S_ISBLK(st.st_mode)) {
+> +            warn_report("Opening a block device as file using 'file' "
+> +                        "driver is deprecated");
+> +        } else if (S_ISCHR(st.st_mode)) {
+> +            warn_report("Opening a character device as file using the 'file' "
+> +                        "driver is deprecated");
+> +        } else if (!S_ISREG(st.st_mode)) {
+> +            error_setg(errp, "A regular file was expected by the 'file' driver, "
+> +                       "but something else was given");
+> +            goto fail;
 
-If we keep machine-type compatibility, the CPUID bit won't
-disappear for the guest while the MSRs keep working.
+ret needs to be set here, otherwise we return success. In my test, I
+still got the wrong message: "Could not refresh total sector count:
+Invalid argument"
 
+> +        } else {
+> +            s->discard_zeroes = true;
+> +            s->has_fallocate = true;
+> +        }
+> +    } else {
+> +        if (!(S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
+> +            error_setg(errp, "host_device/host_cdrom driver expects either "
+> +                       "a character or block device");
+> +            goto fail;
 
-Whichever solution we choose, we can still have guests crashing
-if migrating a pc-2.11 machine from a 4.14+ host kernel to a host
-with an older kernel.  But I don't think there's a way out of
-this, except requiring an explicit "hv-frequencies" CPU option on
-newer machine-types.
+Same here.
 
--- 
-Eduardo
+> +        }
+>      }
+
+Do we want a qemu-iotests case for this?
+
+Kevin
