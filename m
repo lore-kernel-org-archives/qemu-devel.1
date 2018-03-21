@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJl-0006mx-Qx
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:10 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJl-0006mo-1e
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJl-0000Dc-2t
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42126 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJh-0000Bq-9z
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42122 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycJk-0000DJ-Us
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:09 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1eycJh-0000BY-4T
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:54:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7773F406DE12
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:54:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A64E2406DE12
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:54:04 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:52:06 +0100
-Message-Id: <20180321115211.17937-45-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:52:04 +0100
+Message-Id: <20180321115211.17937-43-marcandre.lureau@redhat.com>
 In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 44/49] target.json: add a note about
- query-cpu* not being s390x-specific
+Subject: [Qemu-devel] [PATCH v3 42/49] qapi: make rtc-reset-reinjection and
+ SEV depend on TARGET_I386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,37 +37,473 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
----
- qapi/target.json | 6 ++++++
- 1 file changed, 6 insertions(+)
+Move rtc-reset-reinjection and SEV in target.json and make them
+conditional on TARGET_I386.
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qapi/misc.json         | 166 --------------------------------------
+ qapi/target.json       | 175 ++++++++++++++++++++++++++++++++++++++++-
+ target/i386/sev_i386.h |   2 +-
+ hw/timer/mc146818rtc.c |   2 +-
+ monitor.c              |  31 --------
+ 5 files changed, 175 insertions(+), 201 deletions(-)
+
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 5636f4a149..690eeda41f 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3005,24 +3005,6 @@
+ { 'event': 'ACPI_DEVICE_OST',
+      'data': { 'info': 'ACPIOSTInfo' } }
+=20
+-##
+-# @rtc-reset-reinjection:
+-#
+-# This command will reset the RTC interrupt reinjection backlog.
+-# Can be used if another mechanism to synchronize guest time
+-# is in effect, for example QEMU guest agent's guest-set-time
+-# command.
+-#
+-# Since: 2.1
+-#
+-# Example:
+-#
+-# -> { "execute": "rtc-reset-reinjection" }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'rtc-reset-reinjection' }
+-
+ ##
+ # @RTC_CHANGE:
+ #
+@@ -3247,154 +3229,6 @@
+ ##
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+=20
+-
+-##
+-# @SevState:
+-#
+-# An enumeration of SEV state information used during @query-sev.
+-#
+-# @uninit: The guest is uninitialized.
+-#
+-# @launch-update: The guest is currently being launched; plaintext data =
+and
+-#                 register state is being imported.
+-#
+-# @launch-secret: The guest is currently being launched; ciphertext data
+-#                 is being imported.
+-#
+-# @running: The guest is fully launched or migrated in.
+-#
+-# @send-update: The guest is currently being migrated out to another mac=
+hine.
+-#
+-# @receive-update: The guest is currently being migrated from another ma=
+chine.
+-#
+-# Since: 2.12
+-##
+-{ 'enum': 'SevState',
+-  'data': ['uninit', 'launch-update', 'launch-secret', 'running',
+-           'send-update', 'receive-update' ] }
+-
+-##
+-# @SevInfo:
+-#
+-# Information about Secure Encrypted Virtualization (SEV) support
+-#
+-# @enabled: true if SEV is active
+-#
+-# @api-major: SEV API major version
+-#
+-# @api-minor: SEV API minor version
+-#
+-# @build-id: SEV FW build id
+-#
+-# @policy: SEV policy value
+-#
+-# @state: SEV guest state
+-#
+-# @handle: SEV firmware handle
+-#
+-# Since: 2.12
+-##
+-{ 'struct': 'SevInfo',
+-    'data': { 'enabled': 'bool',
+-              'api-major': 'uint8',
+-              'api-minor' : 'uint8',
+-              'build-id' : 'uint8',
+-              'policy' : 'uint32',
+-              'state' : 'SevState',
+-              'handle' : 'uint32'
+-            }
+-}
+-
+-##
+-# @query-sev:
+-#
+-# Returns information about SEV
+-#
+-# Returns: @SevInfo
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# -> { "execute": "query-sev" }
+-# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
+-#                  "build-id" : 0, "policy" : 0, "state" : "running",
+-#                  "handle" : 1 } }
+-#
+-##
+-{ 'command': 'query-sev', 'returns': 'SevInfo' }
+-
+-##
+-# @SevLaunchMeasureInfo:
+-#
+-# SEV Guest Launch measurement information
+-#
+-# @data: the measurement value encoded in base64
+-#
+-# Since: 2.12
+-#
+-##
+-{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
+-
+-##
+-# @query-sev-launch-measure:
+-#
+-# Query the SEV guest launch information.
+-#
+-# Returns: The @SevLaunchMeasureInfo for the guest
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# -> { "execute": "query-sev-launch-measure" }
+-# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
+-#
+-##
+-{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInf=
+o' }
+-
+-##
+-# @SevCapability:
+-#
+-# The struct describes capability for a Secure Encrypted Virtualization
+-# feature.
+-#
+-# @pdh:  Platform Diffie-Hellman key (base64 encoded)
+-#
+-# @cert-chain:  PDH certificate chain (base64 encoded)
+-#
+-# @cbitpos: C-bit location in page table entry
+-#
+-# @reduced-phys-bits: Number of physical Address bit reduction when SEV =
+is
+-#                     enabled
+-#
+-# Since: 2.12
+-##
+-{ 'struct': 'SevCapability',
+-  'data': { 'pdh': 'str',
+-            'cert-chain': 'str',
+-            'cbitpos': 'int',
+-            'reduced-phys-bits': 'int'} }
+-
+-##
+-# @query-sev-capabilities:
+-#
+-# This command is used to get the SEV capabilities, and is supported on =
+AMD
+-# X86 platforms only.
+-#
+-# Returns: SevCapability objects.
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# -> { "execute": "query-sev-capabilities" }
+-# <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
+-#                  "cbitpos": 47, "reduced-phys-bits": 5}}
+-#
+-##
+-{ 'command': 'query-sev-capabilities', 'returns': 'SevCapability' }
+-
+ ##
+ # @CommandDropReason:
+ #
 diff --git a/qapi/target.json b/qapi/target.json
-index b07a8926d8..be0ff84a6e 100644
+index be2360ca34..f277b69a2a 100644
 --- a/qapi/target.json
 +++ b/qapi/target.json
-@@ -241,6 +241,9 @@
- #          an unknown cpu definition name, unknown properties or propert=
-ies
- #          with wrong types.
- #
-+# Note: this command isn't specific to s390x, but is only implemented
-+# on this architecture currently.
-+#
- # Since: 2.8.0
+@@ -8,6 +8,177 @@
+ { 'pragma': { 'top-unit': 'target' } }
+=20
  ##
- { 'command': 'query-cpu-model-comparison',
-@@ -281,6 +284,9 @@
- #          an unknown cpu definition name, unknown properties or propert=
-ies
- #          with wrong types.
- #
-+# Note: this command isn't specific to s390x, but is only implemented
-+# on this architecture currently.
+-# @DUMMY:
++# @rtc-reset-reinjection:
 +#
- # Since: 2.8.0
++# This command will reset the RTC interrupt reinjection backlog.
++# Can be used if another mechanism to synchronize guest time
++# is in effect, for example QEMU guest agent's guest-set-time
++# command.
++#
++# Since: 2.1
++#
++# Example:
++#
++# -> { "execute": "rtc-reset-reinjection" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'rtc-reset-reinjection',
++  'if': 'defined(TARGET_I386)' }
++
++
++##
++# @SevState:
++#
++# An enumeration of SEV state information used during @query-sev.
++#
++# @uninit: The guest is uninitialized.
++#
++# @launch-update: The guest is currently being launched; plaintext data =
+and
++#                 register state is being imported.
++#
++# @launch-secret: The guest is currently being launched; ciphertext data
++#                 is being imported.
++#
++# @running: The guest is fully launched or migrated in.
++#
++# @send-update: The guest is currently being migrated out to another mac=
+hine.
++#
++# @receive-update: The guest is currently being migrated from another ma=
+chine.
++#
++# Since: 2.12
++##
++{ 'enum': 'SevState',
++  'data': ['uninit', 'launch-update', 'launch-secret', 'running',
++           'send-update', 'receive-update' ],
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @SevInfo:
++#
++# Information about Secure Encrypted Virtualization (SEV) support
++#
++# @enabled: true if SEV is active
++#
++# @api-major: SEV API major version
++#
++# @api-minor: SEV API minor version
++#
++# @build-id: SEV FW build id
++#
++# @policy: SEV policy value
++#
++# @state: SEV guest state
++#
++# @handle: SEV firmware handle
++#
++# Since: 2.12
++##
++{ 'struct': 'SevInfo',
++    'data': { 'enabled': 'bool',
++              'api-major': 'uint8',
++              'api-minor' : 'uint8',
++              'build-id' : 'uint8',
++              'policy' : 'uint32',
++              'state' : 'SevState',
++              'handle' : 'uint32'
++            },
++  'if': 'defined(TARGET_I386)'
++}
++
++##
++# @query-sev:
++#
++# Returns information about SEV
++#
++# Returns: @SevInfo
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev" }
++# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
++#                  "build-id" : 0, "policy" : 0, "state" : "running",
++#                  "handle" : 1 } }
++#
++##
++{ 'command': 'query-sev', 'returns': 'SevInfo',
++  'if': 'defined(TARGET_I386)' }
++
++
++##
++# @SevLaunchMeasureInfo:
++#
++# SEV Guest Launch measurement information
++#
++# @data: the measurement value encoded in base64
++#
++# Since: 2.12
++#
++##
++{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'},
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @query-sev-launch-measure:
++#
++# Query the SEV guest launch information.
++#
++# Returns: The @SevLaunchMeasureInfo for the guest
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev-launch-measure" }
++# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
++#
++##
++{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInf=
+o',
++  'if': 'defined(TARGET_I386)' }
++
++
++##
++# @SevCapability:
++#
++# The struct describes capability for a Secure Encrypted Virtualization
++# feature.
++#
++# @pdh:  Platform Diffie-Hellman key (base64 encoded)
++#
++# @cert-chain:  PDH certificate chain (base64 encoded)
++#
++# @cbitpos: C-bit location in page table entry
++#
++# @reduced-phys-bits: Number of physical Address bit reduction when SEV =
+is
++#                     enabled
++#
++# Since: 2.12
++##
++{ 'struct': 'SevCapability',
++  'data': { 'pdh': 'str',
++            'cert-chain': 'str',
++            'cbitpos': 'int',
++            'reduced-phys-bits': 'int'},
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @query-sev-capabilities:
++#
++# This command is used to get the SEV capabilities, and is supported on =
+AMD
++# X86 platforms only.
++#
++# Returns: SevCapability objects.
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev-capabilities" }
++# <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
++#                  "cbitpos": 47, "reduced-phys-bits": 5}}
++#
  ##
- { 'command': 'query-cpu-model-baseline',
+-{ 'event': 'DUMMY' }
++{ 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
++  'if': 'defined(TARGET_I386)' }
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index b8622dfb1e..8f88f86952 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -19,7 +19,7 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/sev.h"
+ #include "qemu/error-report.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/target-qapi-commands.h"
+=20
+ #define SEV_POLICY_NODBG        0x1
+ #define SEV_POLICY_NOKS         0x2
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 6f1f723b1f..dd575ffbdf 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -31,7 +31,7 @@
+ #include "sysemu/replay.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/target-qapi-commands.h"
+ #include "qapi/qapi-events-misc.h"
+ #include "qapi/visitor.h"
+=20
+diff --git a/monitor.c b/monitor.c
+index 0b96285e94..4ad9225425 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1157,12 +1157,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QOb=
+ject **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#ifndef TARGET_I386
+-    qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+-    qmp_unregister_command(&qmp_commands, "query-sev");
+-    qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
+-    qmp_unregister_command(&qmp_commands, "query-sev-capabilities");
+-#endif
+ #ifndef TARGET_S390X
+     qmp_unregister_command(&qmp_commands, "dump-skeys");
+ #endif
+@@ -4709,31 +4703,6 @@ QemuOptsList qemu_mon_opts =3D {
+     },
+ };
+=20
+-#ifndef TARGET_I386
+-void qmp_rtc_reset_reinjection(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "rtc-reset-reinjection");
+-}
+-
+-SevInfo *qmp_query_sev(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
+-    return NULL;
+-}
+-
+-SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
+-    return NULL;
+-}
+-
+-SevCapability *qmp_query_sev_capabilities(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-capabilities");
+-    return NULL;
+-}
+-#endif
+-
+ #ifndef TARGET_S390X
+ void qmp_dump_skeys(const char *filename, Error **errp)
+ {
 --=20
 2.16.2.521.g9aa15f885a
