@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eycib-00061l-4e
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:19:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1eycnc-0002wr-Ch
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eyciX-0005ix-3J
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:19:49 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Mar 2018 15:19:39 +0300
-Message-Id: <20180321121940.39426-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/4] nbd/server: implement dirty bitmap export
+	(envelope-from <dgilbert@redhat.com>) id 1eycnZ-0000W1-7z
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:25:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58858 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eycnZ-0000N1-0V
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:24:57 -0400
+Date: Wed, 21 Mar 2018 12:24:37 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180321122436.GC3465@work-vm>
+References: <1520952824-3172-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20180313145358eucas1p295b153bb8ec4760668449dbc80613cf4@eucas1p2.samsung.com>
+	<1520952824-3172-4-git-send-email-a.perevalov@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520952824-3172-4-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] migration: calculate vCPU blocktime
+ on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,318 +29,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/nbd.h |   2 +
- nbd/server.c        | 207 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 203 insertions(+), 6 deletions(-)
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> This patch provides blocktime calculation per vCPU,
+> as a summary and as a overlapped value for all vCPUs.
+> 
+> This approach was suggested by Peter Xu, as an improvements of
+> previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> list for blocktime per vCPU (could be traced with page_fault_addr)
+> 
+> Blocktime will not calculated if postcopy_blocktime field of
+> MigrationIncomingState wasn't initialized.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/postcopy-ram.c | 149 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events   |   5 +-
+>  2 files changed, 152 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 9144102..9e51e84 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -546,6 +546,148 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+>      return 0;
+>  }
+>  
+> +static int get_mem_fault_cpu_index(uint32_t pid)
+> +{
+> +    CPUState *cpu_iter;
+> +
+> +    CPU_FOREACH(cpu_iter) {
+> +        if (cpu_iter->thread_id == pid) {
+> +            trace_get_mem_fault_cpu_index(cpu_iter->cpu_index, pid);
+> +            return cpu_iter->cpu_index;
+> +        }
+> +    }
+> +    trace_get_mem_fault_cpu_index(-1, pid);
+> +    return -1;
+> +}
+> +
+> +static uint32_t get_low_time_offset(PostcopyBlocktimeContext *dc)
+> +{
+> +    int64_t start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
+> +                                    dc->start_time;
+> +    return start_time_offset < 1 ? 1 : start_time_offset & UINT32_MAX;
+> +}
+> +
+> +/*
+> + * This function is being called when pagefault occurs. It
+> + * tracks down vCPU blocking time.
+> + *
+> + * @addr: faulted host virtual address
+> + * @ptid: faulted process thread id
+> + * @rb: ramblock appropriate to addr
+> + */
+> +static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+> +                                          RAMBlock *rb)
+> +{
+> +    int cpu, already_received;
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> +    uint32_t low_time_offset;
+> +
+> +    if (!dc || ptid == 0) {
+> +        return;
+> +    }
+> +    cpu = get_mem_fault_cpu_index(ptid);
+> +    if (cpu < 0) {
+> +        return;
+> +    }
+> +
+> +    low_time_offset = get_low_time_offset(dc);
+> +    if (dc->vcpu_addr[cpu] == 0) {
+> +        atomic_inc(&dc->smp_cpus_down);
+> +    }
+> +
+> +    atomic_xchg(&dc->last_begin, low_time_offset);
+> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
+> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
+> +
+> +    /* check it here, not at the begining of the function,
+> +     * due to, check could accur early than bitmap_set in
+> +     * qemu_ufd_copy_ioctl */
+> +    already_received = ramblock_recv_bitmap_test(rb, (void *)addr);
+> +    if (already_received) {
+> +        atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0);
+> +        atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], 0);
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index fcdcd54502..f0b459283f 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -315,6 +315,8 @@ void nbd_client_put(NBDClient *client);
- void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-                       Error **errp);
- 
-+void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
-+                       const char *bitmap_export_name, Error **errp);
- 
- /* nbd_read
-  * Reads @size bytes from @ioc. Returns 0 on success.
-diff --git a/nbd/server.c b/nbd/server.c
-index 8fe53ffd4b..6554919ef2 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -23,6 +23,12 @@
- #include "nbd-internal.h"
- 
- #define NBD_META_ID_BASE_ALLOCATION 0
-+#define NBD_META_ID_DIRTY_BITMAP 1
-+
-+#define NBD_MAX_BITMAP_EXTENTS (0x100000 / 8) /* 1 mb of extents data */
-+#define MAX_EXTENT_LENGTH QEMU_ALIGN_DOWN(INT32_MAX, 512)
-+
-+#define NBD_STATE_DIRTY 1
- 
- static int system_errno_to_nbd_errno(int err)
- {
-@@ -80,6 +86,9 @@ struct NBDExport {
- 
-     BlockBackend *eject_notifier_blk;
-     Notifier eject_notifier;
-+
-+    BdrvDirtyBitmap *export_bitmap;
-+    char *export_bitmap_name;
- };
- 
- static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
-@@ -92,6 +101,7 @@ typedef struct NBDExportMetaContexts {
-     bool valid; /* means that negotiation of the option finished without
-                    errors */
-     bool base_allocation; /* export base:allocation context (block status) */
-+    bool dirty_bitmap; /* export qemu-dirty-bitmap:<export_bitmap_name> */
- } NBDExportMetaContexts;
- 
- struct NBDClient {
-@@ -786,12 +796,32 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-                                  &meta->base_allocation, errp);
- }
- 
-+/* nbd_meta_bitmap_query
-+ *
-+ * Handle query to 'qemu-dirty-bitmap' namespace.
-+ * 'len' is the amount of text remaining to be read from the current name, after
-+ * the 'qemu-dirty-bitmap:' portion has been stripped.
-+ *
-+ * Return -errno on I/O error, 0 if option was completely handled by
-+ * sending a reply about inconsistent lengths, or 1 on success. */
-+static int nbd_meta_bitmap_query(NBDClient *client, NBDExportMetaContexts *meta,
-+                                 uint32_t len, Error **errp)
-+{
-+    if (!client->exp->export_bitmap) {
-+        return nbd_opt_skip(client, len, errp);
-+    }
-+
-+    return nbd_meta_single_query(client, client->exp->export_bitmap_name, len,
-+                                 &meta->dirty_bitmap, errp);
-+}
-+
- struct {
-     const char *ns;
-     int (*func)(NBDClient *, NBDExportMetaContexts *, uint32_t, Error **);
- } meta_namespace_handlers[] = {
-     /* namespaces should go in non-decreasing order by name length */
-     {.ns = "base:", .func = nbd_meta_base_query},
-+    {.ns = "qemu-dirty-bitmap:", .func = nbd_meta_bitmap_query},
- };
- 
- /* nbd_negotiate_meta_query
-@@ -921,6 +951,17 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
-         }
-     }
- 
-+    if (meta->dirty_bitmap) {
-+        char *context = g_strdup_printf("qemu-dirty-bitmap:%s",
-+                                        exp->export_bitmap_name);
-+        ret = nbd_negotiate_send_meta_context(client, context,
-+                                              NBD_META_ID_DIRTY_BITMAP,
-+                                              errp);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-+
-     ret = nbd_negotiate_send_rep(client, NBD_REP_ACK, errp);
-     if (ret == 0) {
-         meta->valid = true;
-@@ -1549,6 +1590,11 @@ void nbd_export_put(NBDExport *exp)
-             exp->blk = NULL;
-         }
- 
-+        if (exp->export_bitmap) {
-+            bdrv_dirty_bitmap_set_qmp_locked(exp->export_bitmap, false);
-+            g_free(exp->export_bitmap_name);
-+        }
-+
-         g_free(exp);
-     }
- }
-@@ -1790,6 +1836,9 @@ static int blockstatus_to_extent_be(BlockDriverState *bs, uint64_t offset,
- }
- 
- /* nbd_co_send_extents
-+ *
-+ * NBD_REPLY_FLAG_DONE is not set, don't forget to send it.
-+ *
-  * @extents should be in big-endian */
- static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
-                                NBDExtent *extents, unsigned nb_extents,
-@@ -1802,7 +1851,7 @@ static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
-         {.iov_base = extents, .iov_len = nb_extents * sizeof(extents[0])}
-     };
- 
--    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_BLOCK_STATUS,
-+    set_be_chunk(&chunk.h, 0, NBD_REPLY_TYPE_BLOCK_STATUS,
-                  handle, sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
-     stl_be_p(&chunk.context_id, context_id);
- 
-@@ -1827,6 +1876,91 @@ static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
-     return nbd_co_send_extents(client, handle, &extent, 1, context_id, errp);
- }
- 
-+/* Set several extents, describing region of given @length with given @flags.
-+ * Do not set more than @nb_extents, return number of set extents.
-+ */
-+static unsigned add_extents(NBDExtent *extents, unsigned nb_extents,
-+                            uint64_t length, uint32_t flags)
-+{
-+    unsigned i = 0;
-+    uint32_t max_extent_be = cpu_to_be32(MAX_EXTENT_LENGTH);
-+    uint32_t flags_be = cpu_to_be32(flags);
-+
-+    for (i = 0; i < nb_extents && length > MAX_EXTENT_LENGTH;
-+         i++, length -= MAX_EXTENT_LENGTH)
-+    {
-+        extents[i].length = max_extent_be;
-+        extents[i].flags = flags_be;
-+    }
-+
-+    if (length > 0 && i < nb_extents) {
-+        extents[i].length = cpu_to_be32(length);
-+        extents[i].flags = flags_be;
-+        i++;
-+    }
-+
-+    return i;
-+}
-+
-+static unsigned bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
-+                                  uint64_t length, NBDExtent *extents,
-+                                  unsigned nb_extents)
-+{
-+    uint64_t begin = offset, end;
-+    uint64_t overall_end = offset + length;
-+    unsigned i = 0;
-+    BdrvDirtyBitmapIter *it;
-+    bool dirty;
-+
-+    bdrv_dirty_bitmap_lock(bitmap);
-+
-+    it = bdrv_dirty_iter_new(bitmap);
-+    dirty = bdrv_get_dirty_locked(NULL, bitmap, offset);
-+
-+    while (begin < overall_end && i < nb_extents) {
-+        if (dirty) {
-+            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
-+        } else {
-+            bdrv_set_dirty_iter(it, begin);
-+            end = bdrv_dirty_iter_next(it);
-+        }
-+        if (end == -1) {
-+            end = overall_end;
-+        }
-+
-+        i += add_extents(extents + i, nb_extents - i, end - begin,
-+                         dirty ? NBD_STATE_DIRTY : 0);
-+        begin = end;
-+        dirty = !dirty;
-+    }
-+
-+    bdrv_dirty_iter_free(it);
-+
-+    bdrv_dirty_bitmap_unlock(bitmap);
-+
-+    return i;
-+}
-+
-+static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
-+                              BdrvDirtyBitmap *bitmap, uint64_t offset,
-+                              uint64_t length, uint32_t context_id,
-+                              Error **errp)
-+{
-+    int ret;
-+    unsigned nb_extents;
-+    NBDExtent *extents = g_new(NBDExtent, NBD_MAX_BITMAP_EXTENTS);
-+
-+    nb_extents = bitmap_to_extents(bitmap, offset, length, extents,
-+                                   NBD_MAX_BITMAP_EXTENTS);
-+
-+    ret = nbd_co_send_extents(client, handle, extents, nb_extents, context_id,
-+                              errp);
-+
-+    g_free(extents);
-+
-+    return ret;
-+}
-+
- /* nbd_co_receive_request
-  * Collect a client request. Return 0 if request looks valid, -EIO to drop
-  * connection right away, and any other negative value to report an error to
-@@ -2040,11 +2174,32 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-                                       "discard failed", errp);
- 
-     case NBD_CMD_BLOCK_STATUS:
--        if (client->export_meta.valid && client->export_meta.base_allocation) {
--            return nbd_co_send_block_status(client, request->handle,
--                                            blk_bs(exp->blk), request->from,
--                                            request->len,
--                                            NBD_META_ID_BASE_ALLOCATION, errp);
-+        if (client->export_meta.valid &&
-+            (client->export_meta.base_allocation ||
-+             client->export_meta.dirty_bitmap))
-+        {
-+            if (client->export_meta.base_allocation) {
-+                ret = nbd_co_send_block_status(client, request->handle,
-+                                               blk_bs(exp->blk), request->from,
-+                                               request->len,
-+                                               NBD_META_ID_BASE_ALLOCATION,
-+                                               errp);
-+                if (ret < 0) {
-+                    return ret;
-+                }
-+            }
-+
-+            if (client->export_meta.dirty_bitmap) {
-+                ret = nbd_co_send_bitmap(client, request->handle,
-+                                         client->exp->export_bitmap,
-+                                         request->from, request->len,
-+                                         NBD_META_ID_DIRTY_BITMAP, errp);
-+                if (ret < 0) {
-+                    return ret;
-+                }
-+            }
-+
-+            return nbd_co_send_structured_done(client, request->handle, errp);
-         } else {
-             return nbd_send_generic_reply(client, request->handle, -EINVAL,
-                                           "CMD_BLOCK_STATUS not negotiated",
-@@ -2196,3 +2351,43 @@ void nbd_client_new(NBDExport *exp,
-     co = qemu_coroutine_create(nbd_co_client_start, client);
-     qemu_coroutine_enter(co);
- }
-+
-+void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
-+                       const char *bitmap_export_name, Error **errp)
-+{
-+    BdrvDirtyBitmap *bm = NULL;
-+    BlockDriverState *bs = blk_bs(exp->blk);
-+
-+    if (exp->export_bitmap) {
-+        error_setg(errp, "Export bitmap is already set");
-+        return;
-+    }
-+
-+    while (true) {
-+        bm = bdrv_find_dirty_bitmap(bs, bitmap);
-+        if (bm != NULL || bs->backing == NULL) {
-+            break;
-+        }
-+
-+        bs = bs->backing->bs;
-+    }
-+
-+    if (bm == NULL) {
-+        error_setg(errp, "Bitmap '%s' is not found", bitmap);
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_enabled(bm)) {
-+        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_qmp_locked(bm)) {
-+        error_setg(errp, "Bitmap '%s' is locked", bitmap);
-+        return;
-+    }
-+
-+    bdrv_dirty_bitmap_set_qmp_locked(bm, true);
-+    exp->export_bitmap = bm;
-+    exp->export_bitmap_name = g_strdup(bitmap_export_name);
-+}
--- 
-2.11.1
+Those don't need to be __nocheck do they?  vcpu_addr is uintptr_t so I
+think should always be the right size, and page_fault_vcpu_time is
+uint32_t now, so again should be fine (and same below).
+
+Dave
+
+> +        atomic_dec(&dc->smp_cpus_down);
+> +    }
+> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> +                                        cpu, already_received);
+> +}
+> +
+> +/*
+> + *  This function just provide calculated blocktime per cpu and trace it.
+> + *  Total blocktime is calculated in mark_postcopy_blocktime_end.
+> + *
+> + *
+> + * Assume we have 3 CPU
+> + *
+> + *      S1        E1           S1               E1
+> + * -----***********------------xxx***************------------------------> CPU1
+> + *
+> + *             S2                E2
+> + * ------------****************xxx---------------------------------------> CPU2
+> + *
+> + *                         S3            E3
+> + * ------------------------****xxx********-------------------------------> CPU3
+> + *
+> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
+> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
+> + *            it's a part of total blocktime.
+> + * S1 - here is last_begin
+> + * Legend of the picture is following:
+> + *              * - means blocktime per vCPU
+> + *              x - means overlapped blocktime (total blocktime)
+> + *
+> + * @addr: host virtual address
+> + */
+> +static void mark_postcopy_blocktime_end(uintptr_t addr)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> +    int i, affected_cpu = 0;
+> +    bool vcpu_total_blocktime = false;
+> +    uint32_t read_vcpu_time, low_time_offset;
+> +
+> +    if (!dc) {
+> +        return;
+> +    }
+> +
+> +    low_time_offset = get_low_time_offset(dc);
+> +    /* lookup cpu, to clear it,
+> +     * that algorithm looks straighforward, but it's not
+> +     * optimal, more optimal algorithm is keeping tree or hash
+> +     * where key is address value is a list of  */
+> +    for (i = 0; i < smp_cpus; i++) {
+> +        uint32_t vcpu_blocktime = 0;
+> +
+> +        read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
+> +            read_vcpu_time == 0) {
+> +            continue;
+> +        }
+> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> +        vcpu_blocktime = low_time_offset - read_vcpu_time;
+> +        affected_cpu += 1;
+> +        /* we need to know is that mark_postcopy_end was due to
+> +         * faulted page, another possible case it's prefetched
+> +         * page and in that case we shouldn't be here */
+> +        if (!vcpu_total_blocktime &&
+> +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
+> +            vcpu_total_blocktime = true;
+> +        }
+> +        /* continue cycle, due to one page could affect several vCPUs */
+> +        dc->vcpu_blocktime[i] += vcpu_blocktime;
+> +    }
+> +
+> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
+> +    if (vcpu_total_blocktime) {
+> +        dc->total_blocktime += low_time_offset - atomic_fetch_add(
+> +                &dc->last_begin, 0);
+> +    }
+> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
+> +                                      affected_cpu);
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -633,8 +775,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+>          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+>                                                  qemu_ram_get_idstr(rb),
+> -                                                rb_offset);
+> +                                                rb_offset,
+> +                                                msg.arg.pagefault.feat.ptid);
+>  
+> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
+> +                                      msg.arg.pagefault.feat.ptid, rb);
+>          /*
+>           * Send the request to the source - we want to request one
+>           * of our host page sizes (which is >= TPS)
+> @@ -724,6 +869,8 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+>      if (!ret) {
+>          ramblock_recv_bitmap_set_range(rb, host_addr,
+>                                         pagesize / qemu_target_page_size());
+> +        mark_postcopy_blocktime_end((uintptr_t)host_addr);
+> +
+>      }
+>      return ret;
+>  }
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 93961de..22ced40 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -115,6 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
+> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
+> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> @@ -191,7 +193,7 @@ postcopy_ram_enable_notify(void) ""
+>  postcopy_ram_fault_thread_entry(void) ""
+>  postcopy_ram_fault_thread_exit(void) ""
+>  postcopy_ram_fault_thread_quit(void) ""
+> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx"
+> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx pid=%u"
+>  postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+> @@ -200,6 +202,7 @@ save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+>  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
+> +get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
+>  
+>  # migration/exec.c
+>  migration_exec_outgoing(const char *cmd) "cmd=%s"
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
