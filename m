@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eycib-00061d-3m
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eycib-00061q-4g
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:19:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eyciW-0005ij-WB
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eyciX-0005ir-0h
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:19:49 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Mar 2018 15:19:37 +0300
-Message-Id: <20180321121940.39426-2-vsementsov@virtuozzo.com>
+Date: Wed, 21 Mar 2018 15:19:40 +0300
+Message-Id: <20180321121940.39426-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20180321121940.39426-1-vsementsov@virtuozzo.com>
 References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 1/4] nbd/server: refactor
- nbd_negotiate_meta_query for several namespaces
+Subject: [Qemu-devel] [PATCH 4/4] qapi: new qmp command nbd-server-add-bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +24,78 @@ Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com,
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/server.c | 60 +++++++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 43 insertions(+), 17 deletions(-)
+ qapi/block.json | 27 +++++++++++++++++++++++++++
+ blockdev-nbd.c  | 23 +++++++++++++++++++++++
+ 2 files changed, 50 insertions(+)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index cea158913b..b830997114 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -771,13 +771,19 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-     return 1;
+diff --git a/qapi/block.json b/qapi/block.json
+index c694524002..4afbbcd7b7 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -269,6 +269,33 @@
+   'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
+ 
+ ##
++# @nbd-server-add-bitmap:
++#
++# Export dirty bitmap through selected export. Bitmaps are searched for in
++# device attached to the export and in all its backings. Exported bitmap
++# is locked until NBD export is removed.
++#
++# @name: Export name.
++#
++# @bitmap: Bitmap name to search.
++#
++# @bitmap-export-name: How the bitmap will be seen by nbd clients
++#                      (default @bitmap)
++#
++#
++# Returns: error on one of the following conditions:
++#           - the server is not running
++#           - export is not found
++#           - bitmap is not found
++#           - bitmap is disabled
++#           - bitmap is locked
++#
++# Since: 2.13
++##
++  { 'command': 'nbd-server-add-bitmap',
++    'data': {'name': 'str', 'bitmap': 'str', '*bitmap-export-name': 'str'} }
++
++##
+ # @nbd-server-stop:
+ #
+ # Stop QEMU's embedded NBD server, and unregister all devices previously
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 65a84739ed..6b0c50732c 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -220,3 +220,26 @@ void qmp_nbd_server_stop(Error **errp)
+     nbd_server_free(nbd_server);
+     nbd_server = NULL;
  }
- 
-+struct {
-+    const char *ns;
-+    int (*func)(NBDClient *, NBDExportMetaContexts *, uint32_t, Error **);
-+} meta_namespace_handlers[] = {
-+    /* namespaces should go in non-decreasing order by name length */
-+    {.ns = "base:", .func = nbd_meta_base_query},
-+};
 +
- /* nbd_negotiate_meta_query
-  *
-  * Parse namespace name and call corresponding function to parse body of the
-  * query.
-  *
-- * The only supported namespace now is 'base'.
-- *
-  * The function aims not wasting time and memory to read long unknown namespace
-  * names.
-  *
-@@ -787,9 +793,12 @@ static int nbd_negotiate_meta_query(NBDClient *client,
-                                     NBDExportMetaContexts *meta, Error **errp)
- {
-     int ret;
--    char query[sizeof("base:") - 1];
--    size_t baselen = strlen("base:");
-+    int i;
-     uint32_t len;
-+    int bytes_done = 0;
-+    char *query;
-+    int nb_ns = sizeof(meta_namespace_handlers) /
-+                sizeof(meta_namespace_handlers[0]);
- 
-     ret = nbd_opt_read(client, &len, sizeof(len), errp);
-     if (ret <= 0) {
-@@ -797,22 +806,39 @@ static int nbd_negotiate_meta_query(NBDClient *client,
-     }
-     cpu_to_be32s(&len);
- 
--    /* The only supported namespace for now is 'base'. So query should start
--     * with 'base:'. Otherwise, we can ignore it and skip the remainder. */
--    if (len < baselen) {
--        return nbd_opt_skip(client, len, errp);
--    }
-+    query = g_malloc(strlen(meta_namespace_handlers[nb_ns - 1].ns));
- 
--    len -= baselen;
--    ret = nbd_opt_read(client, query, baselen, errp);
--    if (ret <= 0) {
--        return ret;
--    }
--    if (strncmp(query, "base:", baselen) != 0) {
--        return nbd_opt_skip(client, len, errp);
-+    for (i = 0; i < nb_ns; i++) {
-+        const char *ns = meta_namespace_handlers[i].ns;
-+        int ns_len = strlen(ns);
-+        int diff_len = strlen(ns) - bytes_done;
++void qmp_nbd_server_add_bitmap(const char *name, const char *bitmap,
++                               bool has_bitmap_export_name,
++                               const char *bitmap_export_name,
++                               Error **errp)
++{
++    NBDExport *exp;
 +
-+        assert(diff_len >= 0);
++    if (!nbd_server) {
++        error_setg(errp, "NBD server not running");
++        return;
++    }
 +
-+        if (diff_len > 0) {
-+            if (len < diff_len) {
-+                ret = nbd_opt_skip(client, len, errp);
-+                goto out;
-+            }
++    exp = nbd_export_find(name);
++    if (exp == NULL) {
++        error_setg(errp, "Export '%s' is not found", name);
++        return;
++    }
 +
-+            len -= diff_len;
-+            ret = nbd_opt_read(client, query + bytes_done, diff_len, errp);
-+            if (ret <= 0) {
-+                goto out;
-+            }
-+        }
-+
-+        if (!strncmp(query, ns, ns_len)) {
-+            ret = meta_namespace_handlers[i].func(client, meta, len, errp);
-+            goto out;
-+        }
-     }
- 
--    return nbd_meta_base_query(client, meta, len, errp);
-+    ret = nbd_opt_skip(client, len, errp);
-+
-+out:
-+    g_free(query);
-+    return ret;
- }
- 
- /* nbd_negotiate_meta_queries
++    nbd_export_bitmap(exp, bitmap,
++                      has_bitmap_export_name ? bitmap_export_name : bitmap,
++                      errp);
++}
 -- 
 2.11.1
