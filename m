@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <roy.fan.zhang@intel.com>) id 1eyUc1-0003nN-S8
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:40:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1eyUdm-0004ZB-PD
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <roy.fan.zhang@intel.com>) id 1eyUbw-0000CH-Qk
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:40:29 -0400
-Received: from mga09.intel.com ([134.134.136.24]:26321)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <roy.fan.zhang@intel.com>)
-	id 1eyUbw-0000Au-II
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:40:24 -0400
-From: "Zhang, Roy Fan" <roy.fan.zhang@intel.com>
-Date: Wed, 21 Mar 2018 03:40:15 +0000
-Message-ID: <9F7182E3F746AB4EA17801C148F3C60433102472@IRSMSX101.ger.corp.intel.com>
-References: <1516111613-18988-1-git-send-email-jianjay.zhou@huawei.com>
-	<1516111613-18988-4-git-send-email-jianjay.zhou@huawei.com>
-In-Reply-To: <1516111613-18988-4-git-send-email-jianjay.zhou@huawei.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgibson@ozlabs.org>) id 1eyUdl-0000nz-PK
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:42:18 -0400
+Date: Wed, 21 Mar 2018 14:40:40 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180321034040.GQ3905@umbus.fritz.box>
+References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
+	<20180306203103.25563-19-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] cryptodev-vhost-user: add crypto
- session handler
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vIXBmblrD40XNCy4"
+Content-Disposition: inline
+In-Reply-To: <20180306203103.25563-19-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 18/19] mac_newworld: remove pics IRQ array
+ and wire up macio to OpenPIC directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +25,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "weidong.huang@huawei.com" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "longpeng2@huawei.com" <longpeng2@huawei.com>, "Zeng, Xin" <xin.zeng@intel.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>
-
-Hi Jay,
-
-Excellent work! The patch, although need some minor rework, has improved th=
-e performance.
-Some comments:
-
-1. you need to set up capabilities for virtio_crypto PMD. As in Qemu vhost =
-crypto proxy backend only AESCBC and SHA1 are supported (in cryptodev_vhost=
-_user_init() definition), I believe in this version these two algorithms sh=
-all be enough.  Actually for the same reason I suggest you to remove all AE=
-S_CTR test cases in the virtio_crypto PMD functional test, as they will fai=
-l when vhost_user crypto backend is used.
-
-You may use driver/crypto/qat/qat_crypto_capabilities.h as example. The con=
-st capabilities array shall be returned to the application when virtio_cryp=
-to_dev_info_get() is called.
-2. there is a bug in virtio_crypto_queue_setup(), you declared " uint32_t i=
-, j;" while i may be used uninitialized later.
-
-Regards,
-Fan
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-> -----Original Message-----
-> From: Jay Zhou [mailto:jianjay.zhou@huawei.com]
-> Sent: Tuesday, January 16, 2018 2:07 PM
-> To: qemu-devel@nongnu.org
-> Cc: mst@redhat.com; pbonzini@redhat.com; weidong.huang@huawei.com;
-> stefanha@redhat.com; jianjay.zhou@huawei.com;
-> pasic@linux.vnet.ibm.com; longpeng2@huawei.com; Zeng, Xin
-> <xin.zeng@intel.com>; Zhang, Roy Fan <roy.fan.zhang@intel.com>;
-> arei.gonglei@huawei.com
-> Subject: [PATCH v3 3/4] cryptodev-vhost-user: add crypto session handler
+--vIXBmblrD40XNCy4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Mar 06, 2018 at 08:31:02PM +0000, Mark Cave-Ayland wrote:
+> Introduce constants for the pre-defined New World IRQs to help keep things
+> readable.
 >=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/ppc/mac.h          |  8 ++++++++
+>  hw/ppc/mac_newworld.c | 29 +++++++++++++++--------------
+>  2 files changed, 23 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+> index 5f5916252a..3819058310 100644
+> --- a/hw/ppc/mac.h
+> +++ b/hw/ppc/mac.h
+> @@ -47,6 +47,14 @@
+> =20
+>  #define ESCC_CLOCK 3686400
+> =20
+> +/* New World IRQs */
+> +#define NEWWORLD_CUDA_IRQ      0x19
+> +#define NEWWORLD_ESCCB_IRQ     0x24
+> +#define NEWWORLD_ESCCA_IRQ     0x25
+> +#define NEWWORLD_IDE0_IRQ      0xd
+> +#define NEWWORLD_IDE0_DMA_IRQ  0x2
+> +#define NEWWORLD_IDE1_IRQ      0xe
+> +#define NEWWORLD_IDE1_DMA_IRQ  0x3
+> =20
+>  /* MacIO */
+>  #define TYPE_MACIO_IDE "macio-ide"
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 2fcb101982..3cde507065 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -115,7 +115,7 @@ static void ppc_core99_init(MachineState *machine)
+>      PowerPCCPU *cpu =3D NULL;
+>      CPUPPCState *env =3D NULL;
+>      char *filename;
+> -    qemu_irq *pic, **openpic_irqs;
+> +    qemu_irq **openpic_irqs;
+>      int linux_boot, i, j, k;
+>      MemoryRegion *ram =3D g_new(MemoryRegion, 1), *bios =3D g_new(Memory=
+Region, 1);
+>      hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
+> @@ -292,8 +292,6 @@ static void ppc_core99_init(MachineState *machine)
+>          }
+>      }
+> =20
+> -    pic =3D g_new0(qemu_irq, 64);
+> -
+>      pic_dev =3D qdev_create(NULL, TYPE_OPENPIC);
+>      qdev_prop_set_uint32(pic_dev, "model", OPENPIC_MODEL_KEYLARGO);
+>      qdev_init_nofail(pic_dev);
+> @@ -305,10 +303,6 @@ static void ppc_core99_init(MachineState *machine)
+>          }
+>      }
+> =20
+> -    for (i =3D 0; i < 64; i++) {
+> -        pic[i] =3D qdev_get_gpio_in(pic_dev, i);
+> -    }
+> -
+>      if (PPC_INPUT(env) =3D=3D PPC_FLAGS_INPUT_970) {
+>          /* 970 gets a U3 bus */
+>          /* Uninorth AGP bus */
+> @@ -382,13 +376,20 @@ static void ppc_core99_init(MachineState *machine)
+>      /* MacIO */
+>      macio =3D NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO=
+));
+>      dev =3D DEVICE(macio);
+> -    qdev_connect_gpio_out(dev, 0, pic[0x19]); /* CUDA */
+> -    qdev_connect_gpio_out(dev, 1, pic[0x24]); /* ESCC-B */
+> -    qdev_connect_gpio_out(dev, 2, pic[0x25]); /* ESCC-A */
+> -    qdev_connect_gpio_out(dev, 3, pic[0x0d]); /* IDE */
+> -    qdev_connect_gpio_out(dev, 4, pic[0x02]); /* IDE DMA */
+> -    qdev_connect_gpio_out(dev, 5, pic[0x0e]); /* IDE */
+> -    qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE DMA */
+> +    qdev_connect_gpio_out(dev, 0,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_CUDA_IRQ));
+> +    qdev_connect_gpio_out(dev, 1,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCB_IRQ));
+> +    qdev_connect_gpio_out(dev, 2,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCA_IRQ));
+> +    qdev_connect_gpio_out(dev, 3,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ));
+> +    qdev_connect_gpio_out(dev, 4,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ));
+> +    qdev_connect_gpio_out(dev, 5,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ));
+> +    qdev_connect_gpio_out(dev, 6,
+> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ));
+>      qdev_prop_set_uint64(dev, "frequency", tbfreq);
+>      object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+>                               &error_abort);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--vIXBmblrD40XNCy4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqx1DUACgkQbDjKyiDZ
+s5KCmhAAu3HHjxeWJ9CDKloOH+l3hCslLajOcyujvr9wOu4OXrcZDsJNX9Q6QlkE
+CuHBNB+Rj0PAAu5Rsj8ZVhO7ZCcZOohNbG5FC+a8DMmyc5VT08wH0K+6FwavyC3y
+uW6eozUgTYmlUFdw0N527yohZmbyJaIpZ9k4Mzw3XwOQYzQ6KKbNJL+YRiEwaWqu
+tAxcZlE8lJil4XLkDmFWVAHxurLAMGDnotlJpxwcr22peDZKFX6rLphsa7/PQKqN
+9rZ2aXh8gKDOiP0SGeO67F6F2q3iWFErNwKpXwvzuEu9BKW9VssDQN5Ijg0pPUn8
+GOS2JdRBRG9EC2is/rkDUzxuvoyrJIlV0CJbSdhrsIlCRwFXmLN953a284AYU47q
+yqpVoAz4edrQG+YVhOtFUFbBdWVQJStVbalRsiw37cHg92G8R0aerTyKDvTCVFTT
+ulB47UMcuy+Xn0TModhhlZf6i6Ep13gdO+06q+9aDNUmGfNqKeLK0xljjUJjCW++
+UfK7Vt6wMge7sO4uwJvRm6FlVWM1liVIShiahtrQnkGoTQK60/Fo9D+Dpd09i4iD
+jyCw8PzoESjaQxMs0IDPfSoO0XulHhN+9r1MQANg1DvAMc9/4SuNeQZvuYkWN555
+83dg7u744O5rvHkj4YKAD5ucKdiTUX0w00SZNqP39SBxjFCkzS0=
+=o7Wy
+-----END PGP SIGNATURE-----
+
+--vIXBmblrD40XNCy4--
