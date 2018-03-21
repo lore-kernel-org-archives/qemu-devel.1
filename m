@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIH-00050s-G7
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIK-000529-0V
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIF-0007kL-32
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58148 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIG-0007lK-QB
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42044 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycIE-0007k3-Tz
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	id 1eycIG-0007l8-Lm
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6709780AD20C
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:52:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 34103406DE12
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:52:36 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:51:28 +0100
-Message-Id: <20180321115211.17937-7-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:51:29 +0100
+Message-Id: <20180321115211.17937-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 06/49] qapi: add 'ifcond' to visitor methods
+Subject: [Qemu-devel] [PATCH v3 07/49] qapi: mcgen() shouldn't indent # lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,433 +36,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Modify the test visitor to check correct passing of values.
+Skip preprocessor lines when adding indentation, since that would
+likely result in invalid code.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/commands.py               |  2 +-
- scripts/qapi/common.py                 | 31 ++++++++++++++------------
- scripts/qapi/doc.py                    | 10 ++++-----
- scripts/qapi/events.py                 |  2 +-
- scripts/qapi/introspect.py             | 12 +++++-----
- scripts/qapi/types.py                  |  8 +++----
- scripts/qapi/visit.py                  |  8 +++----
- tests/qapi-schema/qapi-schema-test.out |  9 ++++++++
- tests/qapi-schema/test-qapi.py         | 19 +++++++++++-----
- 9 files changed, 61 insertions(+), 40 deletions(-)
- mode change 100644 =3D> 100755 scripts/qapi/doc.py
+ scripts/qapi/common.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 0c5da3a54d..e2366b4801 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -275,7 +275,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
-s);
-                        c_prefix=3Dc_name(self._prefix, protect=3DFalse))=
-)
-         genc.add(gen_registry(self._regy, self._prefix))
-=20
--    def visit_command(self, name, info, arg_type, ret_type,
-+    def visit_command(self, name, info, ifcond, arg_type, ret_type,
-                       gen, success_response, boxed, allow_oob):
-         if not gen:
-             return
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index eb07d641ab..bc4ecd6c76 100644
+index bc4ecd6c76..47efe79758 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1067,26 +1067,26 @@ class QAPISchemaVisitor(object):
-     def visit_builtin_type(self, name, info, json_type):
-         pass
+@@ -1931,8 +1931,8 @@ def cgen(code, **kwds):
+     if indent_level:
+         indent =3D genindent(indent_level)
+         # re.subn() lacks flags support before Python 2.7, use re.compil=
+e()
+-        raw =3D re.subn(re.compile(r'^.', re.MULTILINE),
+-                      indent + r'\g<0>', raw)
++        raw =3D re.subn(re.compile(r'^(?!(#|$))', re.MULTILINE),
++                      indent, raw)
+         raw =3D raw[0]
+     return re.sub(re.escape(eatspace) + r' *', '', raw)
 =20
--    def visit_enum_type(self, name, info, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, values, prefix):
-         pass
-=20
--    def visit_array_type(self, name, info, element_type):
-+    def visit_array_type(self, name, info, ifcond, element_type):
-         pass
-=20
--    def visit_object_type(self, name, info, base, members, variants):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-         pass
-=20
--    def visit_object_type_flat(self, name, info, members, variants):
-+    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
-         pass
-=20
--    def visit_alternate_type(self, name, info, variants):
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-         pass
-=20
--    def visit_command(self, name, info, arg_type, ret_type,
-+    def visit_command(self, name, info, ifcond, arg_type, ret_type,
-                       gen, success_response, boxed, allow_oob):
-         pass
-=20
--    def visit_event(self, name, info, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, arg_type, boxed):
-         pass
-=20
-=20
-@@ -1196,7 +1196,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-         return 'string'
-=20
-     def visit(self, visitor):
--        visitor.visit_enum_type(self.name, self.info,
-+        visitor.visit_enum_type(self.name, self.info, self.ifcond,
-                                 self.member_names(), self.prefix)
-=20
-=20
-@@ -1230,7 +1230,8 @@ class QAPISchemaArrayType(QAPISchemaType):
-         return 'array of ' + elt_doc_type
-=20
-     def visit(self, visitor):
--        visitor.visit_array_type(self.name, self.info, self.element_type=
-)
-+        visitor.visit_array_type(self.name, self.info, self.ifcond,
-+                                 self.element_type)
-=20
-=20
- class QAPISchemaObjectType(QAPISchemaType):
-@@ -1312,9 +1313,9 @@ class QAPISchemaObjectType(QAPISchemaType):
-         return 'object'
-=20
-     def visit(self, visitor):
--        visitor.visit_object_type(self.name, self.info,
-+        visitor.visit_object_type(self.name, self.info, self.ifcond,
-                                   self.base, self.local_members, self.va=
-riants)
--        visitor.visit_object_type_flat(self.name, self.info,
-+        visitor.visit_object_type_flat(self.name, self.info, self.ifcond=
-,
-                                        self.members, self.variants)
-=20
-=20
-@@ -1459,7 +1460,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
-         return 'value'
-=20
-     def visit(self, visitor):
--        visitor.visit_alternate_type(self.name, self.info, self.variants=
-)
-+        visitor.visit_alternate_type(self.name, self.info, self.ifcond,
-+                                     self.variants)
-=20
-     def is_empty(self):
-         return False
-@@ -1501,7 +1503,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-             assert isinstance(self.ret_type, QAPISchemaType)
-=20
-     def visit(self, visitor):
--        visitor.visit_command(self.name, self.info,
-+        visitor.visit_command(self.name, self.info, self.ifcond,
-                               self.arg_type, self.ret_type,
-                               self.gen, self.success_response,
-                               self.boxed, self.allow_oob)
-@@ -1533,7 +1535,8 @@ class QAPISchemaEvent(QAPISchemaEntity):
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-=20
-     def visit(self, visitor):
--        visitor.visit_event(self.name, self.info, self.arg_type, self.bo=
-xed)
-+        visitor.visit_event(self.name, self.info, self.ifcond,
-+                            self.arg_type, self.boxed)
-=20
-=20
- class QAPISchema(object):
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-old mode 100644
-new mode 100755
-index 9b312b2c51..d5cfd2336b
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -204,14 +204,14 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
-aVisitor):
-     def write(self, output_dir):
-         self._gen.write(output_dir, self._prefix + 'qapi-doc.texi')
-=20
--    def visit_enum_type(self, name, info, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, values, prefix):
-         doc =3D self.cur_doc
-         self._gen.add(TYPE_FMT(type=3D'Enum',
-                                name=3Ddoc.symbol,
-                                body=3Dtexi_entity(doc, 'Values',
-                                                 member_func=3Dtexi_enum_=
-value)))
-=20
--    def visit_object_type(self, name, info, base, members, variants):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-         doc =3D self.cur_doc
-         if base and base.is_implicit():
-             base =3D None
-@@ -220,13 +220,13 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
-aVisitor):
-                                body=3Dtexi_entity(doc, 'Members',
-                                                 base, variants)))
-=20
--    def visit_alternate_type(self, name, info, variants):
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-         doc =3D self.cur_doc
-         self._gen.add(TYPE_FMT(type=3D'Alternate',
-                                name=3Ddoc.symbol,
-                                body=3Dtexi_entity(doc, 'Members')))
-=20
--    def visit_command(self, name, info, arg_type, ret_type,
-+    def visit_command(self, name, info, ifcond, arg_type, ret_type,
-                       gen, success_response, boxed, allow_oob):
-         doc =3D self.cur_doc
-         if boxed:
-@@ -240,7 +240,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-                               name=3Ddoc.symbol,
-                               body=3Dbody))
-=20
--    def visit_event(self, name, info, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, arg_type, boxed):
-         doc =3D self.cur_doc
-         self._gen.add(MSG_FMT(type=3D'Event',
-                               name=3Ddoc.symbol,
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 3e448ae523..26ae00f6f7 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -184,7 +184,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
-itor):
-         genh.add(gen_enum(self._enum_name, self._event_names))
-         genc.add(gen_enum_lookup(self._enum_name, self._event_names))
-=20
--    def visit_event(self, name, info, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, arg_type, boxed):
-         self._genh.add(gen_event_send_decl(name, arg_type, boxed))
-         self._genc.add(gen_event_send(name, arg_type, boxed, self._enum_=
-name))
-         self._event_names.append(name)
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index f9e67e8227..6cb95cf53e 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -152,26 +152,26 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-     def visit_builtin_type(self, name, info, json_type):
-         self._gen_qlit(name, 'builtin', {'json-type': json_type})
-=20
--    def visit_enum_type(self, name, info, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, values, prefix):
-         self._gen_qlit(name, 'enum', {'values': values})
-=20
--    def visit_array_type(self, name, info, element_type):
-+    def visit_array_type(self, name, info, ifcond, element_type):
-         element =3D self._use_type(element_type)
-         self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement})
-=20
--    def visit_object_type_flat(self, name, info, members, variants):
-+    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
-         obj =3D {'members': [self._gen_member(m) for m in members]}
-         if variants:
-             obj.update(self._gen_variants(variants.tag_member.name,
-                                           variants.variants))
-         self._gen_qlit(name, 'object', obj)
-=20
--    def visit_alternate_type(self, name, info, variants):
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-         self._gen_qlit(name, 'alternate',
-                        {'members': [{'type': self._use_type(m.type)}
-                                     for m in variants.variants]})
-=20
--    def visit_command(self, name, info, arg_type, ret_type,
-+    def visit_command(self, name, info, ifcond, arg_type, ret_type,
-                       gen, success_response, boxed, allow_oob):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         ret_type =3D ret_type or self._schema.the_empty_object_type
-@@ -180,7 +180,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                         'ret-type': self._use_type(ret_type),
-                         'allow-oob': allow_oob})
-=20
--    def visit_event(self, name, info, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, arg_type, boxed):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)})
-=20
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 64d9c0fb37..298a80db62 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -206,16 +206,16 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVi=
-sitor):
-         self._genh.add(gen_type_cleanup_decl(name))
-         self._genc.add(gen_type_cleanup(name))
-=20
--    def visit_enum_type(self, name, info, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, values, prefix):
-         self._genh.preamble_add(gen_enum(name, values, prefix))
-         self._genc.add(gen_enum_lookup(name, values, prefix))
-=20
--    def visit_array_type(self, name, info, element_type):
-+    def visit_array_type(self, name, info, ifcond, element_type):
-         self._genh.preamble_add(gen_fwd_object_or_array(name))
-         self._genh.add(gen_array(name, element_type))
-         self._gen_type_cleanup(name)
-=20
--    def visit_object_type(self, name, info, base, members, variants):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
-@@ -229,7 +229,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
-tor):
-             # implicit types won't be directly allocated/freed
-             self._gen_type_cleanup(name)
-=20
--    def visit_alternate_type(self, name, info, variants):
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-         self._genh.preamble_add(gen_fwd_object_or_array(name))
-         self._genh.add(gen_object(name, None,
-                                   [variants.tag_member], variants))
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 3c5ea1289e..9ea2e04f81 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -301,15 +301,15 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCV=
-isitor):
- ''',
-                                       types=3Dtypes))
-=20
--    def visit_enum_type(self, name, info, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, values, prefix):
-         self._genh.add(gen_visit_decl(name, scalar=3DTrue))
-         self._genc.add(gen_visit_enum(name))
-=20
--    def visit_array_type(self, name, info, element_type):
-+    def visit_array_type(self, name, info, ifcond, element_type):
-         self._genh.add(gen_visit_decl(name))
-         self._genc.add(gen_visit_list(name, element_type))
-=20
--    def visit_object_type(self, name, info, base, members, variants):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
-@@ -322,7 +322,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
-itor):
-             self._genh.add(gen_visit_decl(name))
-             self._genc.add(gen_visit_object(name, base, members, variant=
-s))
-=20
--    def visit_alternate_type(self, name, info, variants):
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-         self._genh.add(gen_visit_decl(name))
-         self._genc.add(gen_visit_alternate(name, variants))
-=20
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index b11682314c..8fe9d7a3a8 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -232,23 +232,32 @@ command __org.qemu_x-command q_obj___org.qemu_x-com=
-mand-arg -> __org.qemu_x-Unio
-    gen=3DTrue success_response=3DTrue boxed=3DFalse
- object TestIfStruct
-     member foo: int optional=3DFalse
-+    if ['defined(TEST_IF_STRUCT)']
- enum TestIfEnum ['foo', 'bar']
-+    if ['defined(TEST_IF_ENUM)']
- object q_obj_TestStruct-wrapper
-     member data: TestStruct optional=3DFalse
- enum TestIfUnionKind ['foo']
-+    if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
- object TestIfUnion
-     member type: TestIfUnionKind optional=3DFalse
-     tag type
-     case foo: q_obj_TestStruct-wrapper
-+    if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
- alternate TestIfAlternate
-     tag type
-     case foo: int
-     case bar: TestStruct
-+    if ['defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)']
- object q_obj_TestIfCmd-arg
-     member foo: TestIfStruct optional=3DFalse
-+    if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
- command TestIfCmd q_obj_TestIfCmd-arg -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse
-+    if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
- object q_obj_TestIfEvent-arg
-     member foo: TestIfStruct optional=3DFalse
-+    if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
- event TestIfEvent q_obj_TestIfEvent-arg
-    boxed=3DFalse
-+    if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index 10e68b01d9..6d25a37dda 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -23,12 +23,13 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-     def visit_include(self, name, info):
-         print('include %s' % name)
-=20
--    def visit_enum_type(self, name, info, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, values, prefix):
-         print('enum %s %s' % (name, values))
-         if prefix:
-             print('    prefix %s' % prefix)
-+        self._print_if(ifcond)
-=20
--    def visit_object_type(self, name, info, base, members, variants):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-         print('object %s' % name)
-         if base:
-             print('    base %s' % base.name)
-@@ -36,21 +37,25 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             print('    member %s: %s optional=3D%s' % \
-                   (m.name, m.type.name, m.optional))
-         self._print_variants(variants)
-+        self._print_if(ifcond)
-=20
--    def visit_alternate_type(self, name, info, variants):
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-         print('alternate %s' % name)
-         self._print_variants(variants)
-+        self._print_if(ifcond)
-=20
--    def visit_command(self, name, info, arg_type, ret_type,
-+    def visit_command(self, name, info, ifcond, arg_type, ret_type,
-                       gen, success_response, boxed, allow_oob):
-         print('command %s %s -> %s' % \
-               (name, arg_type and arg_type.name, ret_type and ret_type.n=
-ame))
-         print('   gen=3D%s success_response=3D%s boxed=3D%s' % \
-               (gen, success_response, boxed))
-+        self._print_if(ifcond)
-=20
--    def visit_event(self, name, info, arg_type, boxed):
-+    def visit_event(self, name, info, ifcond, arg_type, boxed):
-         print('event %s %s' % (name, arg_type and arg_type.name))
-         print('   boxed=3D%s' % boxed)
-+        self._print_if(ifcond)
-=20
-     @staticmethod
-     def _print_variants(variants):
-@@ -59,6 +64,10 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             for v in variants.variants:
-                 print('    case %s: %s' % (v.name, v.type.name))
-=20
-+    @staticmethod
-+    def _print_if(ifcond, indent=3D4):
-+        if ifcond:
-+            print('%sif %s' % (' ' * indent, ifcond))
-=20
- try:
-     schema =3D QAPISchema(sys.argv[1])
 --=20
 2.16.2.521.g9aa15f885a
