@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1eygWe-0001fS-FA
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:23:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eygX4-000272-JY
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:24:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1eygWd-0008F8-Jn
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:23:44 -0400
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:44667)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1eygWd-0008Es-F0
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:23:43 -0400
-Received: by mail-ot0-x22d.google.com with SMTP id x6-v6so4759585otg.11
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 09:23:43 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1eygX1-0008MP-Ca
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:24:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50264 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eygX1-0008MB-6Q
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:24:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E8CD4023BB3
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 16:24:03 +0000 (UTC)
+References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
+	<20180321134005.8822-3-marcandre.lureau@redhat.com>
+	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
+	<CAMxuvax_7QPP5rc3aAPKdUFWtfdEphfiN76mM6jnCKk4=QkauQ@mail.gmail.com>
+	<407fd6f2-b88f-02fd-b4f8-9b4abb6a03a9@redhat.com>
+	<CAMxuvawM+oOH7wHEMdcjJAZVaL9PbjfHA+UfMLu5+SbZgchrTw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2da23a16-51c7-fdcc-dfc5-7eed08f60d6f@redhat.com>
+Date: Wed, 21 Mar 2018 17:23:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
-References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
-	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
-	<CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
-	<035198fa-b9e1-6084-d9c2-4d344e7058d7@redhat.com>
-	<CABLmASFEhaKB1Hh91p+RM+TX+zTTDuNixWy=16rUC+GC_0KKtg@mail.gmail.com>
-	<397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Wed, 21 Mar 2018 17:23:42 +0100
-Message-ID: <CABLmASHkjz=UDbHMRRtJKhu1bF28NGTzRjTo-GKbCd6dp-6qQQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
- Windows with qemu-system-ppc.exe
+In-Reply-To: <CAMxuvawM+oOH7wHEMdcjJAZVaL9PbjfHA+UfMLu5+SbZgchrTw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
+ at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +39,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange, Daniel" <berrange@redhat.com>, "Blake, Eric" <eblake@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
 
-> You need to "r"un the program here. :)
->
-> Also probably "b aio_context_set_poll_params" is useful before you run
-> the program, to trap the moment in which the function is called.
->
+On 21/03/2018 17:11, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Wed, Mar 21, 2018 at 5:00 PM, Paolo Bonzini <pbonzini@redhat.com> wr=
+ote:
+>> On 21/03/2018 16:55, Marc-Andr=C3=A9 Lureau wrote:
+>>> That would work with an anonymous union though:
+>>>
+>>> struct QObject {
+>>>     union {
+>>>         QType type;
+>>>         QType base;
+>>>     };
+>>>     size_t refcnt;
+>>> };
+>>>
+>>> If it's acceptable, I think I'll take this approach.
+>>
+>> You don't need QEMU_GENERIC at all then, don't you?
+>=20
+> Ah ah, that's what I thought too, but the type of QObject * &x->base
+> isn't QObject * :)
+>=20
+> I don't think we can fool it there (without loosing some type safety)
 
-Hi, that got me here:
+Hmm, perhaps by making it "struct {} base"?
 
-(gdb) run
-Starting program: c:\qemu-master\qemu-system-ppc.exe -L
-c:\qemu-master\pc-bios -boot d -m 256 -M mac99 -prom-env
-"boot-args=-v" -prom-env "auto-boot?=true" -prom-env "vga-ndrv?=true"
--drive "file=c:\Mac-disks\debian-9.0-powerpc-NETINST-1.iso,format=raw,media=cdrom"
--device usb-mouse -device usb-kbd -netdev "user,id=network01" -device
-"sungem,netdev=network01,mac=52:54:00:12:34:56" -sdl -drive
-"file=c:\Mac-disks\9.2.img,format=raw,media=disk"
-[New Thread 10844.0x24d0]
-warning: FTH: (10844): *** Fault tolerant heap shim applied to current
-process. This is usually due to previous crashes. ***
-[New Thread 10844.0x1224]
-[New Thread 10844.0x2a30]
-[New Thread 10844.0x2594]
-[New Thread 10844.0x32a8]
+Or even:
 
-Thread 1 hit Breakpoint 1, aio_context_set_poll_params (ctx=0xc14a9b0,
-max_ns=32768, grow=0, shrink=0, errp=0x362f968)
-    at util/aio-win32.c:413
-413     in util/aio-win32.c
-(gdb) s
-error_setg_internal (errp=0x362f968, src=0xe166e0 <__func__.58569+32>
-"util/aio-win32.c", line=413,
-    func=0xe16740 <__func__.59050> "aio_context_set_poll_params",
-    fmt=0xe16708 <__func__.58569+72> "AioContext polling is not
-implemented on Windows") at util/error.c:91
-91      util/error.c: No such file or directory.
-(gdb) s
-94      in util/error.c
+struct QObjectCommon {
+    QType type;
+    size_t refcnt;
+}
+
+struct QObject {
+    QObjectCommon base;
+}
+
+struct QString {
+    QObjectCommon base;
+    ...
+}
+
+Paolo
