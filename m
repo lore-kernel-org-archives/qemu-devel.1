@@ -1,18 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eyd2i-0001lc-GX
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:40:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1eyd3T-0002Pb-8m
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eyd2f-00045j-EP
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:40:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59422 helo=mx1.redhat.com)
+	(envelope-from <mreitz@redhat.com>) id 1eyd3Q-0004YP-6y
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:41:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59440 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eyd2f-00045F-9j
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:40:33 -0400
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Wed, 21 Mar 2018 14:40:26 +0200
-Message-Id: <20180321124026.70292-1-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.12] hw/rdma: fix clang compilation errors
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eyd3Q-0004YE-00
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 08:41:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A65D80AD211
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 12:41:19 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+References: <20180312183628.394722-1-eblake@redhat.com>
+	<20180312183628.394722-32-eblake@redhat.com>
+	<c1197340-adb8-4caa-d101-65722797e7eb@redhat.com>
+Message-ID: <83914ef6-2285-5554-4711-e069040e4fa8@redhat.com>
+Date: Wed, 21 Mar 2018 13:41:14 +0100
+MIME-Version: 1.0
+In-Reply-To: <c1197340-adb8-4caa-d101-65722797e7eb@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="b5hbE1lePlvaKIur6dewDzo1n6suMSjHn"
+Subject: Re: [Qemu-devel] [PULL 31/36] monitor: enable IO thread for (qmp &
+ !mux) typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,63 +36,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yuval.shaia@oracle.com, marcel@redhat.com, mst@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Fix some enum castings and extra parentheses.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--b5hbE1lePlvaKIur6dewDzo1n6suMSjHn
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <83914ef6-2285-5554-4711-e069040e4fa8@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 31/36] monitor: enable IO thread for (qmp &
+ !mux) typed
+References: <20180312183628.394722-1-eblake@redhat.com>
+ <20180312183628.394722-32-eblake@redhat.com>
+ <c1197340-adb8-4caa-d101-65722797e7eb@redhat.com>
+In-Reply-To: <c1197340-adb8-4caa-d101-65722797e7eb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- hw/rdma/vmw/pvrdma_cmd.c  | 5 +++--
- hw/rdma/vmw/pvrdma_main.c | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+On 2018-03-21 13:37, Max Reitz wrote:
+> On 2018-03-12 19:36, Eric Blake wrote:
+>> From: Peter Xu <peterx@redhat.com>
+>>
+>> Start to use dedicate IO thread for QMP monitors that are not using
+>> MUXed chardev.
+>>
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> Message-Id: <20180309090006.10018-21-peterx@redhat.com>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  monitor.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> It seems the iotests aren't quite ready for this change (breakage in
+> 040, 041, 051, 060, 085, 087, 093, 095, 109, 124, 127, 132, 136, 144,
+> 148, 152, 182, 183, 185, 186; and 030 hangs).
 
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index 293dfed29f..25f747a190 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -73,7 +73,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
-     tbl_idx = 1;
-     addr_idx = 1;
-     while (addr_idx < nchunks) {
--        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
-+        if (tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t))) {
-             tbl_idx = 0;
-             dir_idx++;
-             pr_dbg("Mapping to table %d\n", dir_idx);
-@@ -507,7 +507,8 @@ static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     rsp->hdr.err = rdma_rm_modify_qp(&dev->rdma_dev_res, &dev->backend_dev,
-                                  cmd->qp_handle, cmd->attr_mask,
-                                  (union ibv_gid *)&cmd->attrs.ah_attr.grh.dgid,
--                                 cmd->attrs.dest_qp_num, cmd->attrs.qp_state,
-+                                 (enum ibv_qp_state)cmd->attrs.dest_qp_num,
-+                                 (enum ibv_qp_state)cmd->attrs.qp_state,
-                                  cmd->attrs.qkey, cmd->attrs.rq_psn,
-                                  cmd->attrs.sq_psn);
- 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 99787812ba..0e3469287f 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -91,7 +91,7 @@ static int init_dev_ring(PvrdmaRing *ring, struct pvrdma_ring **ring_state,
-         goto out_free_tbl;
-     }
-     /* RX ring is the second */
--    (struct pvrdma_ring *)(*ring_state)++;
-+    (*ring_state)++;
-     rc = pvrdma_ring_init(ring, name, pci_dev,
-                           (struct pvrdma_ring *)*ring_state,
-                           (num_pages - 1) * TARGET_PAGE_SIZE /
-@@ -292,7 +292,8 @@ static void init_ports(PVRDMADev *dev, Error **errp)
-     memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
- 
-     for (i = 0; i < MAX_PORTS; i++) {
--        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
-+        dev->rdma_dev_res.ports[i].state =
-+            (enum ibv_port_state)PVRDMA_PORT_DOWN;
- 
-         dev->rdma_dev_res.ports[i].pkey_tbl =
-             g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
--- 
-2.13.5
+(On second thought, 051, 185, and 186 have probably broken because of
+something else.
+
+Max)
+
+
+--b5hbE1lePlvaKIur6dewDzo1n6suMSjHn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlqyUuoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8TIIAMSSs3HJoI6fQ9boCSvRhyRgVcJzrzvO
+vFv0ekk+CDklNT6tTZkJfgN4deSvv5mzZh9d2vifqXd29GKXdj8tsiCCpP/dHxYz
+26Y9xZ8+HT2/ZGPcp63UeZggCW+49tw5CjoKK+XF2OUg61EkSZb6gKtHDuQli4l5
+yXvao4XyhoJkbid/Wsk9tdYsMip9EEB8eojekvy9hky/L6930A7xi/xKwl+sZqQN
++Hsmf87kpR/fS3VxKF0Hwyydz68aSghFDH9anlYfkqtWwCevCQlW+vbsIirsA1c0
+kPvmQskbfU6NaQ58P4BRsB9W7fKn4GNCWhk18cezGHDytF1VwY6NAuk=
+=LnPI
+-----END PGP SIGNATURE-----
+
+--b5hbE1lePlvaKIur6dewDzo1n6suMSjHn--
