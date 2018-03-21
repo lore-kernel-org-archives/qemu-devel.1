@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJS-0006W5-RH
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:52 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJU-0006Y4-Vv
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJR-0008UA-Hm
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42110 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJT-0008VM-BA
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42112 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycJR-0008Tq-Cd
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	id 1eycJT-0008V8-5Z
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA726406DE12
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:53:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AEE86406DE12
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:53:50 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:51:58 +0100
-Message-Id: <20180321115211.17937-37-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:51:59 +0100
+Message-Id: <20180321115211.17937-38-marcandre.lureau@redhat.com>
 In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 36/49] qapi: add conditions to SPICE
- type/commands/events on the schema
+Subject: [Qemu-devel] [PATCH v3 37/49] qapi: add conditions to REPLICATION
+ type/commands on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,232 +37,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add #if defined(CONFIG_SPICE) in generated code, and adjust the
-qmp/hmp code accordingly.
+Add #if defined(CONFIG_REPLICATION) in generated code, and adjust the
+code accordingly.
 
-query-qmp-schema no longer reports the command/events etc as
-available when disabled at compile time.
+Made conditional:
 
-Commands made conditional:
+* xen-set-replication, query-xen-replication-status,
+  xen-colo-do-checkpoint
 
-* query-spice
+  Before the patch, we first register the commands unconditionally in
+  generated code (requires a stub), then conditionally unregister in
+  qmp_unregister_commands_hack().
 
-  Before the patch, the command for !CONFIG_SPICE is unregistered. It
-  will fail with the same error.
+  Afterwards, we register only when CONFIG_REPLICATION.  The command
+  fails exactly the same, with CommandNotFound.
 
-Events made conditional:
+  Improvement, because now query-qmp-schema is accurate, and we're one
+  step closer to killing qmp_unregister_commands_hack().
 
-* SPICE_CONNECTED, SPICE_INITIALIZED, SPICE_DISCONNECTED,
-  SPICE_MIGRATE_COMPLETED
+* enum BlockdevDriver value "replication" in command blockdev-add
 
-Chardev made conditional:
+* BlockdevOptions variant @replication
 
-* spiceport, spicevmc
-
-  Before and after the patch for !CONFIG_SPICE, the error is the
-  same ('spiceport' is not a valid char driver name).
-
-No HMP change, the code was already conditional.
+And related structures.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- qapi/char.json | 10 ++++++----
- qapi/ui.json   | 30 ++++++++++++++++++++----------
- monitor.c      |  3 ---
- qmp.c          | 16 ----------------
- 4 files changed, 26 insertions(+), 33 deletions(-)
+ qapi/block-core.json | 13 +++++++++----
+ qapi/migration.json  | 12 ++++++++----
+ migration/colo.c     | 16 ++++------------
+ monitor.c            |  5 -----
+ 4 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/qapi/char.json b/qapi/char.json
-index ae19dcd1ed..7fa1762ae5 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -318,7 +318,8 @@
- # Since: 1.5
- ##
- { 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
--  'base': 'ChardevCommon' }
-+  'base': 'ChardevCommon',
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @ChardevSpicePort:
-@@ -330,7 +331,8 @@
- # Since: 1.5
- ##
- { 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
--  'base': 'ChardevCommon' }
-+  'base': 'ChardevCommon',
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @ChardevVC:
-@@ -384,8 +386,8 @@
-                                        'testdev': 'ChardevCommon',
-                                        'stdio'  : 'ChardevStdio',
-                                        'console': 'ChardevCommon',
--                                       'spicevmc' : 'ChardevSpiceChannel=
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1088ab0c78..c20d39049b 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2514,7 +2514,9 @@
+             'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs=
 ',
--                                       'spiceport' : 'ChardevSpicePort',
-+                                       'spicevmc' : { 'type': 'ChardevSp=
-iceChannel', 'if': 'defined(CONFIG_SPICE)' },
-+                                       'spiceport' : { 'type': 'ChardevS=
-picePort', 'if': 'defined(CONFIG_SPICE)' },
-                                        'vc'     : 'ChardevVC',
-                                        'ringbuf': 'ChardevRingbuf',
-                                        # next one is just for compatibil=
-ity
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 4b96509446..e47fae2e90 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -118,7 +118,8 @@
- { 'struct': 'SpiceBasicInfo',
-   'data': { 'host': 'str',
-             'port': 'str',
--            'family': 'NetworkAddressFamily' } }
-+            'family': 'NetworkAddressFamily' },
-+  'if': 'defined(CONFIG_SPICE)' }
+             'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2',=
+ 'qed',
+-            'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
++            'quorum', 'raw', 'rbd',
++            { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)'=
+ },
++            'sheepdog', 'ssh',
+             'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] =
+}
 =20
  ##
- # @SpiceServerInfo:
-@@ -131,7 +132,8 @@
- ##
- { 'struct': 'SpiceServerInfo',
-   'base': 'SpiceBasicInfo',
--  'data': { '*auth': 'str' } }
-+  'data': { '*auth': 'str' },
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceChannel:
-@@ -156,7 +158,8 @@
- { 'struct': 'SpiceChannel',
-   'base': 'SpiceBasicInfo',
-   'data': {'connection-id': 'int', 'channel-type': 'int', 'channel-id': =
-'int',
--           'tls': 'bool'} }
-+           'tls': 'bool'},
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceQueryMouseMode:
-@@ -175,7 +178,8 @@
- # Since: 1.1
- ##
- { 'enum': 'SpiceQueryMouseMode',
--  'data': [ 'client', 'server', 'unknown' ] }
-+  'data': [ 'client', 'server', 'unknown' ],
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceInfo:
-@@ -212,7 +216,8 @@
- { 'struct': 'SpiceInfo',
-   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str', '*port=
-': 'int',
-            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str=
-',
--           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChan=
-nel']} }
-+           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChan=
-nel']},
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @query-spice:
-@@ -257,7 +262,8 @@
- #    }
+@@ -3228,7 +3230,8 @@
  #
+ # Since: 2.9
  ##
--{ 'command': 'query-spice', 'returns': 'SpiceInfo' }
-+{ 'command': 'query-spice', 'returns': 'SpiceInfo',
-+  'if': 'defined(CONFIG_SPICE)' }
+-{ 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ] }
++{ 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ],
++  'if': 'defined(CONFIG_REPLICATION)' }
 =20
  ##
- # @SPICE_CONNECTED:
-@@ -282,7 +288,8 @@
- ##
- { 'event': 'SPICE_CONNECTED',
-   'data': { 'server': 'SpiceBasicInfo',
--            'client': 'SpiceBasicInfo' } }
-+            'client': 'SpiceBasicInfo' },
-+  'if': 'defined(CONFIG_SPICE)' }
+ # @BlockdevOptionsReplication:
+@@ -3246,7 +3249,8 @@
+ { 'struct': 'BlockdevOptionsReplication',
+   'base': 'BlockdevOptionsGenericFormat',
+   'data': { 'mode': 'ReplicationMode',
+-            '*top-id': 'str' } }
++            '*top-id': 'str' },
++  'if': 'defined(CONFIG_REPLICATION)' }
 =20
  ##
- # @SPICE_INITIALIZED:
-@@ -310,7 +317,8 @@
+ # @NFSTransport:
+@@ -3545,7 +3549,8 @@
+       'quorum':     'BlockdevOptionsQuorum',
+       'raw':        'BlockdevOptionsRaw',
+       'rbd':        'BlockdevOptionsRbd',
+-      'replication':'BlockdevOptionsReplication',
++      'replication': { 'type': 'BlockdevOptionsReplication',
++                       'if': 'defined(CONFIG_REPLICATION)' },
+       'sheepdog':   'BlockdevOptionsSheepdog',
+       'ssh':        'BlockdevOptionsSsh',
+       'throttle':   'BlockdevOptionsThrottle',
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 9d0bf82cf4..d2c6e4d646 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1121,7 +1121,8 @@
+ # Since: 2.9
  ##
- { 'event': 'SPICE_INITIALIZED',
-   'data': { 'server': 'SpiceServerInfo',
--            'client': 'SpiceChannel' } }
-+            'client': 'SpiceChannel' },
-+  'if': 'defined(CONFIG_SPICE)' }
+ { 'command': 'xen-set-replication',
+-  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } =
+}
++  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' },
++  'if': 'defined(CONFIG_REPLICATION)' }
 =20
  ##
- # @SPICE_DISCONNECTED:
-@@ -335,7 +343,8 @@
+ # @ReplicationStatus:
+@@ -1136,7 +1137,8 @@
+ # Since: 2.9
  ##
- { 'event': 'SPICE_DISCONNECTED',
-   'data': { 'server': 'SpiceBasicInfo',
--            'client': 'SpiceBasicInfo' } }
-+            'client': 'SpiceBasicInfo' },
-+  'if': 'defined(CONFIG_SPICE)' }
+ { 'struct': 'ReplicationStatus',
+-  'data': { 'error': 'bool', '*desc': 'str' } }
++  'data': { 'error': 'bool', '*desc': 'str' },
++  'if': 'defined(CONFIG_REPLICATION)' }
 =20
  ##
- # @SPICE_MIGRATE_COMPLETED:
-@@ -350,7 +359,8 @@
- #      "event": "SPICE_MIGRATE_COMPLETED" }
+ # @query-xen-replication-status:
+@@ -1153,7 +1155,8 @@
+ # Since: 2.9
+ ##
+ { 'command': 'query-xen-replication-status',
+-  'returns': 'ReplicationStatus' }
++  'returns': 'ReplicationStatus',
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @xen-colo-do-checkpoint:
+@@ -1169,4 +1172,5 @@
  #
+ # Since: 2.9
  ##
--{ 'event': 'SPICE_MIGRATE_COMPLETED' }
-+{ 'event': 'SPICE_MIGRATE_COMPLETED',
-+  'if': 'defined(CONFIG_SPICE)' }
+-{ 'command': 'xen-colo-do-checkpoint' }
++{ 'command': 'xen-colo-do-checkpoint',
++  'if': 'defined(CONFIG_REPLICATION)' }
+diff --git a/migration/colo.c b/migration/colo.c
+index 4381067ed4..2329e78e7f 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -24,7 +24,9 @@
+ #include "trace.h"
+ #include "qemu/error-report.h"
+ #include "migration/failover.h"
++#ifdef CONFIG_REPLICATION
+ #include "replication.h"
++#endif
 =20
- ##
- # =3D=3D VNC
-diff --git a/monitor.c b/monitor.c
-index 6ccd2fc089..8a5539579b 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1087,9 +1087,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
-ect **ret_data,
-  */
- static void qmp_unregister_commands_hack(void)
- {
--#ifndef CONFIG_SPICE
--    qmp_unregister_command(&qmp_commands, "query-spice");
--#endif
- #ifndef CONFIG_REPLICATION
-     qmp_unregister_command(&qmp_commands, "xen-set-replication");
-     qmp_unregister_command(&qmp_commands, "query-xen-replication-status"=
-);
-diff --git a/qmp.c b/qmp.c
-index ee1a816a42..d8f80cb04e 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -129,22 +129,6 @@ void qmp_cpu_add(int64_t id, Error **errp)
+ static bool vmstate_loading;
+=20
+@@ -148,11 +150,11 @@ void colo_do_failover(MigrationState *s)
      }
  }
 =20
--#ifndef CONFIG_SPICE
--/*
-- * qmp_unregister_commands_hack() ensures that QMP command query-spice
-- * exists only #ifdef CONFIG_SPICE.  Necessary for an accurate
-- * query-commands result.  However, the QAPI schema is blissfully
-- * unaware of that, and the QAPI code generator happily generates a
-- * dead qmp_marshal_query_spice() that calls qmp_query_spice().
-- * Provide it one, or else linking fails.  FIXME Educate the QAPI
-- * schema on CONFIG_SPICE.
-- */
--SpiceInfo *qmp_query_spice(Error **errp)
--{
--    abort();
--};
--#endif
--
- void qmp_cont(Error **errp)
++#ifdef CONFIG_REPLICATION
+ void qmp_xen_set_replication(bool enable, bool primary,
+                              bool has_failover, bool failover,
+                              Error **errp)
  {
-     BlockBackend *blk;
+-#ifdef CONFIG_REPLICATION
+     ReplicationMode mode =3D primary ?
+                            REPLICATION_MODE_PRIMARY :
+                            REPLICATION_MODE_SECONDARY;
+@@ -171,14 +173,10 @@ void qmp_xen_set_replication(bool enable, bool prim=
+ary,
+         }
+         replication_stop_all(failover, failover ? NULL : errp);
+     }
+-#else
+-    abort();
+-#endif
+ }
+=20
+ ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
+ {
+-#ifdef CONFIG_REPLICATION
+     Error *err =3D NULL;
+     ReplicationStatus *s =3D g_new0(ReplicationStatus, 1);
+=20
+@@ -193,19 +191,13 @@ ReplicationStatus *qmp_query_xen_replication_status=
+(Error **errp)
+=20
+     error_free(err);
+     return s;
+-#else
+-    abort();
+-#endif
+ }
+=20
+ void qmp_xen_colo_do_checkpoint(Error **errp)
+ {
+-#ifdef CONFIG_REPLICATION
+     replication_do_checkpoint_all(errp);
+-#else
+-    abort();
+-#endif
+ }
++#endif
+=20
+ static void colo_send_message(QEMUFile *f, COLOMessage msg,
+                               Error **errp)
+diff --git a/monitor.c b/monitor.c
+index 8a5539579b..88e6fd2e6f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1087,11 +1087,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QOb=
+ject **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#ifndef CONFIG_REPLICATION
+-    qmp_unregister_command(&qmp_commands, "xen-set-replication");
+-    qmp_unregister_command(&qmp_commands, "query-xen-replication-status"=
+);
+-    qmp_unregister_command(&qmp_commands, "xen-colo-do-checkpoint");
+-#endif
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+     qmp_unregister_command(&qmp_commands, "query-sev");
 --=20
 2.16.2.521.g9aa15f885a
