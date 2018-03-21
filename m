@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyfAd-0002lF-Bc
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:56:56 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1eyfDx-0004Pv-W3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyfAc-0000AU-9l
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:56:55 -0400
-References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-	<20180321121940.39426-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <af833096-cbc3-24db-0cf0-a446f231c5fd@redhat.com>
-Date: Wed, 21 Mar 2018 09:56:36 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1eyfDs-0001G5-Vu
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:00:22 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:53262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1eyfDs-0001Ee-4F
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:00:16 -0400
+Date: Wed, 21 Mar 2018 17:00:08 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180321150007.GA12925@yuvallap>
+References: <20180321140316.96045-1-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180321121940.39426-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] nbd/server: refactor
- nbd_negotiate_meta_query for several namespaces
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180321140316.96045-1-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 for-2.12] hw/rdma: fix clang compilation
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, nbd list <nbd@other.debian.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, eblake@redhat.com, yuval.shaia@oracle.com
 
-[adding NBD list]
-
-On 03/21/2018 07:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Wed, Mar 21, 2018 at 04:03:16PM +0200, Marcel Apfelbaum wrote:
+> Fix some enum castings and extra parentheses.
+> 
+> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 > ---
->   nbd/server.c | 60 +++++++++++++++++++++++++++++++++++++++++++-----------------
->   1 file changed, 43 insertions(+), 17 deletions(-)
+> 
+> V1 -> V2:
+>  - Addressed Yuval's and Eric's comments:
+>    - Removed some parentheses
+>    - Replaced PVRDMA_PORT_DOWN with IBV_PORT_DOWN
+>    - Removed unneeded cast
+> 
+>  hw/rdma/vmw/pvrdma_cmd.c  | 5 +++--
+>  hw/rdma/vmw/pvrdma_main.c | 4 ++--
+>  2 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index 293dfed29f..9e551c3250 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -73,7 +73,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
+>      tbl_idx = 1;
+>      addr_idx = 1;
+>      while (addr_idx < nchunks) {
+> -        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
+> +        if (tbl_idx == TARGET_PAGE_SIZE / sizeof(uint64_t)) {
+>              tbl_idx = 0;
+>              dir_idx++;
+>              pr_dbg("Mapping to table %d\n", dir_idx);
+> @@ -507,7 +507,8 @@ static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>      rsp->hdr.err = rdma_rm_modify_qp(&dev->rdma_dev_res, &dev->backend_dev,
+>                                   cmd->qp_handle, cmd->attr_mask,
+>                                   (union ibv_gid *)&cmd->attrs.ah_attr.grh.dgid,
+> -                                 cmd->attrs.dest_qp_num, cmd->attrs.qp_state,
+> +                                 cmd->attrs.dest_qp_num,
+> +                                 (enum ibv_qp_state)cmd->attrs.qp_state,
+>                                   cmd->attrs.qkey, cmd->attrs.rq_psn,
+>                                   cmd->attrs.sq_psn);
+>  
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index 99787812ba..5e69a9f2c7 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -91,7 +91,7 @@ static int init_dev_ring(PvrdmaRing *ring, struct pvrdma_ring **ring_state,
+>          goto out_free_tbl;
+>      }
+>      /* RX ring is the second */
+> -    (struct pvrdma_ring *)(*ring_state)++;
+> +    (*ring_state)++;
+>      rc = pvrdma_ring_init(ring, name, pci_dev,
+>                            (struct pvrdma_ring *)*ring_state,
+>                            (num_pages - 1) * TARGET_PAGE_SIZE /
+> @@ -292,7 +292,7 @@ static void init_ports(PVRDMADev *dev, Error **errp)
+>      memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
+>  
+>      for (i = 0; i < MAX_PORTS; i++) {
+> -        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
+> +        dev->rdma_dev_res.ports[i].state = IBV_PORT_DOWN;
+>  
+>          dev->rdma_dev_res.ports[i].pkey_tbl =
+>              g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
 
-> +struct {
-> +    const char *ns;
-> +    int (*func)(NBDClient *, NBDExportMetaContexts *, uint32_t, Error **);
-> +} meta_namespace_handlers[] = {
-> +    /* namespaces should go in non-decreasing order by name length */
-> +    {.ns = "base:", .func = nbd_meta_base_query},
-> +};
-> +
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-> @@ -787,9 +793,12 @@ static int nbd_negotiate_meta_query(NBDClient *client,
->                                       NBDExportMetaContexts *meta, Error **errp)
->   {
->       int ret;
-> -    char query[sizeof("base:") - 1];
-> -    size_t baselen = strlen("base:");
-> +    int i;
->       uint32_t len;
-> +    int bytes_done = 0;
-> +    char *query;
-> +    int nb_ns = sizeof(meta_namespace_handlers) /
-> +                sizeof(meta_namespace_handlers[0]);
-
-Use the ARRAY_SIZE() macro here.
-
-> +    query = g_malloc(strlen(meta_namespace_handlers[nb_ns - 1].ns));
-
-So this sizes a buffer according to the largest namespace we expect to 
-handle,...
-
->   
-> -    len -= baselen;
-> -    ret = nbd_opt_read(client, query, baselen, errp);
-> -    if (ret <= 0) {
-> -        return ret;
-> -    }
-> -    if (strncmp(query, "base:", baselen) != 0) {
-> -        return nbd_opt_skip(client, len, errp);
-> +    for (i = 0; i < nb_ns; i++) {
-> +        const char *ns = meta_namespace_handlers[i].ns;
-> +        int ns_len = strlen(ns);
-> +        int diff_len = strlen(ns) - bytes_done;
-> +
-> +        assert(diff_len >= 0);
-> +
-> +        if (diff_len > 0) {
-> +            if (len < diff_len) {
-> +                ret = nbd_opt_skip(client, len, errp);
-> +                goto out;
-> +            }
-> +
-> +            len -= diff_len;
-> +            ret = nbd_opt_read(client, query + bytes_done, diff_len, errp);
-> +            if (ret <= 0) {
-> +                goto out;
-> +            }
-> +        }
-> +
-> +        if (!strncmp(query, ns, ns_len)) {
-> +            ret = meta_namespace_handlers[i].func(client, meta, len, errp);
-> +            goto out;
-> +        }
-
-
-...then you do multiple iterative reads as you step through the list. 
-You know, if you encounter a ':' at any point in the iterative reads, 
-you don't have to continue through the rest of the handlers (the query 
-belongs to a short-named namespace we didn't recognize).
-
-Is it any smarter to just blindly do a single read of MIN(querylen, 
-maxlen), then strchr() for ':' (if not found, it's not a namespace we 
-recognize), and then look up if the name matches, at which point we then 
-read the rest of the query and refactor the namespace handler to be 
-passed the already-parsed leafname, rather than having to parse the 
-leafname off the wire in the handler?
-
-I'm STILL wondering if the NBD spec should specify namespace and 
-leafname as separate fields rather than requiring the server to parse 
-for ':'.  We have only a couple of weeks before the qemu 2.12 release 
-cements in place an implementation of the BLOCK_STATUS extension.  And 
-we've already discussed that if we make a change, we have to consider 
-using a different constant for NBD_OPT_SET_META_CONTEXT to play nicely 
-with the existing Virtuozzo implementation that currently matches what 
-is slated to land in qemu 2.12 if no further qemu patches are submitted. 
-  Is it worth me proposing a doc change to demonstrate what the 
-difference would look like, along with corresponding qemu changes to 
-match, to decide if including it in 2.12 is worth it?
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> -- 
+> 2.13.5
+> 
