@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyiN5-0004nF-CU
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:22:00 -0400
+	(envelope-from <mjc@sifive.com>) id 1eyiSO-0007nz-84
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eyiN0-00059D-Ag
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:21:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36852 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eyiN0-000590-5m
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:21:54 -0400
-Date: Wed, 21 Mar 2018 18:21:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180321182135.GH3465@work-vm>
-References: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1521253498-6834-3-git-send-email-stefanb@linux.vnet.ibm.com>
+	(envelope-from <mjc@sifive.com>) id 1eyiSM-0007qM-Ub
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:27:28 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eyiSM-0007px-NA
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 14:27:26 -0400
+Received: by mail-ot0-x243.google.com with SMTP id v23-v6so6665337oth.9
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:27:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <1521253498-6834-3-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5.2 for 2.13 2/4] tpm: extend TPM TIS with
- state migration support
+In-Reply-To: <7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+References: <1521584722-39133-1-git-send-email-mjc@sifive.com>
+	<7534728b-1511-3ba1-57b1-03423b83ad87@redhat.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 21 Mar 2018 11:27:25 -0700
+Message-ID: <CAHNT7NvJ42AApKcprrZ+s7bMxxbL1S1ZdX9aTjQTwd=fbFQU6w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/25] RISC-V Post-merge spec conformance
+ and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> Extend the TPM TIS interface with state migration support.
->=20
-> We need to synchronize with the backend thread to make sure that a command
-> being processed by the external TPM emulator has completed and its
-> response been received.
->=20
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> ---
->  hw/tpm/tpm_tis.c    | 52 +++++++++++++++++++++++++++++++++++++++++++++++=
-+++--
->  hw/tpm/trace-events |  1 +
->  2 files changed, 51 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index 2ac7e74..fec3d73 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -894,9 +894,57 @@ static void tpm_tis_reset(DeviceState *dev)
->      tpm_backend_startup_tpm(s->be_driver, s->be_buffer_size);
->  }
-> =20
-> +/* persistent state handling */
-> +
-> +static int tpm_tis_pre_save(void *opaque)
-> +{
-> +    TPMState *s =3D opaque;
-> +    uint8_t locty =3D s->active_locty;
-> +
-> +    trace_tpm_tis_pre_save(locty, s->rw_offset);
-> +
-> +    if (DEBUG_TIS) {
-> +        tpm_tis_dump_state(opaque, 0);
-> +    }
-> +
-> +    /*
-> +     * Synchronize with backend completion.
-> +     */
-> +    tpm_backend_finish_sync(s->be_driver);
-> +
-> +    return 0;
-> +}
-> +
-> +static const VMStateDescription vmstate_locty =3D {
-> +    .name =3D "tpm-tis/locty",
-> +    .version_id =3D 1,
-> +    .fields      =3D (VMStateField[]) {
-> +        VMSTATE_UINT32(state, TPMLocality),
+On Wed, Mar 21, 2018 at 12:05 AM, Thomas Huth <thuth@redhat.com> wrote:
 
-I was a little worried with that being an enum, but I'm told
-we're OK assuming enum's come out as UINT32's; so:
+> On 20.03.2018 23:25, Michael Clark wrote:
+> > The following changes since commit f1a63fcfcd92c88be8942b5ae71aef
+> 9749a4f135:
+> >
+> >   Update version for v2.12.0-rc0 release (2018-03-20 19:04:22 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-fixes
+> >
+> > for you to fetch changes up to e1a247183ac0816284dfda61423f7030b6686679:
+> >
+> >   RISC-V: Remove erroneous comment from translate.c (2018-03-20 14:34:13
+> -0700)
+> >
+> > ----------------------------------------------------------------
+> > This is a series of spec conformance bug fixes and code cleanups
+> > that we would like to get in before the QEMU 2.12 release.
+>
+>  Hi Michael,
+>
+> for future PULL request, could you please send out all patches again
+> that should be pulled, and not send the cover letter alone? I.e. do a
+> "git format-patch --subject-prefix PULL ..." and then replace the
+> contents of the cover letter with the output of "git request-pull".
+>
 
-=66rom the migration code side,
+No problem. Thanks for the advice. I was grappling with this part of the
+process. This is now very clear and makes complete sense.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> +        VMSTATE_UINT32(inte, TPMLocality),
-> +        VMSTATE_UINT32(ints, TPMLocality),
-> +        VMSTATE_UINT8(access, TPMLocality),
-> +        VMSTATE_UINT32(sts, TPMLocality),
-> +        VMSTATE_UINT32(iface_id, TPMLocality),
-> +        VMSTATE_END_OF_LIST(),
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_tpm_tis =3D {
-> -    .name =3D "tpm",
-> -    .unmigratable =3D 1,
-> +    .name =3D "tpm-tis",
-> +    .version_id =3D 1,
-> +    .pre_save  =3D tpm_tis_pre_save,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_BUFFER(buffer, TPMState),
-> +        VMSTATE_UINT16(rw_offset, TPMState),
-> +        VMSTATE_UINT8(active_locty, TPMState),
-> +        VMSTATE_UINT8(aborting_locty, TPMState),
-> +        VMSTATE_UINT8(next_locty, TPMState),
-> +
-> +        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 1,
-> +                             vmstate_locty, TPMLocality),
-> +
-> +        VMSTATE_END_OF_LIST()
-> +    }
->  };
-> =20
->  static Property tpm_tis_properties[] =3D {
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index c5bfbf1..25bee0c 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -50,3 +50,4 @@ tpm_tis_mmio_write_locty_seized(uint8_t locty, uint8_t =
-active) "Locality %d seiz
->  tpm_tis_mmio_write_init_abort(void) "Initiating abort"
->  tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
->  tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
-> +tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
-> --=20
-> 2.5.5
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> ... this is how all other maintainers are sending PULL requests (at
+> least as far as I know) and this way everybody gets a very final chance
+> to have a look at the patches in their final state (it does not happen
+> very often that someone replies to such patches, but in some rare cases
+> we already found problems this way).
+>
+>  Thank you very much for your efforts,
+>   Thomas
+>
+>
