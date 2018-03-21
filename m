@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyhcQ-0003b8-Ei
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:33:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyhfy-0004wC-P6
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyhcP-0007qQ-H0
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:33:46 -0400
-References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-	<20180321121940.39426-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b6eccd8-90ee-3475-5005-df9f59f59709@redhat.com>
-Date: Wed, 21 Mar 2018 12:33:22 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180321121940.39426-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] qapi: new qmp command
- nbd-server-add-bitmap
+	(envelope-from <kwolf@redhat.com>) id 1eyhfx-0001fl-Tj
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:37:26 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 21 Mar 2018 18:37:04 +0100
+Message-Id: <20180321173714.14741-3-kwolf@redhat.com>
+In-Reply-To: <20180321173714.14741-1-kwolf@redhat.com>
+References: <20180321173714.14741-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12 v2 02/12] vdi: Fix build with
+ CONFIG_VDI_DEBUG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +20,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, eblake@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-On 03/21/2018 07:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   qapi/block.json | 27 +++++++++++++++++++++++++++
->   blockdev-nbd.c  | 23 +++++++++++++++++++++++
->   2 files changed, 50 insertions(+)
-> 
-> diff --git a/qapi/block.json b/qapi/block.json
-> index c694524002..4afbbcd7b7 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -269,6 +269,33 @@
->     'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
->   
->   ##
-> +# @nbd-server-add-bitmap:
-> +#
-> +# Export dirty bitmap through selected export. Bitmaps are searched for in
-> +# device attached to the export and in all its backings. Exported bitmap
-> +# is locked until NBD export is removed.
+Use qemu_uuid_unparse() instead of uuid_unparse() to make vdi.c compile
+again when CONFIG_VDI_DEBUG is set. In order to prevent future bitrot,
+replace '#ifdef CONFIG_VDI_DEBUG' by 'if (VDI_DEBUG)' so that the
+compiler always sees the code.
 
-Expose a dirty bitmap associated with the selected export.  The bitmap 
-search starts at the device attached to the export, and includes all 
-backing files.  The exported bitmap is then locked until the NBD export 
-is removed.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/vdi.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-> +#
-> +# @name: Export name.
-> +#
-> +# @bitmap: Bitmap name to search.
-
-s/search./search for./
-
-> +#
-> +# @bitmap-export-name: How the bitmap will be seen by nbd clients
-> +#                      (default @bitmap)
-
-Maybe mention that the client must use NBD_OPT_SET_META_CONTEXT with a 
-query of "qemu-dirty-bitmap:NAME" (where NAME matches 
-bitmap-export-name) to access the exposed bitmap.  (May need to be 
-adjusted by my suggestion to use just the namespace "qemu:")
-
-> +#
-> +#
-> +# Returns: error on one of the following conditions:
-> +#           - the server is not running
-> +#           - export is not found
-> +#           - bitmap is not found
-> +#           - bitmap is disabled
-> +#           - bitmap is locked
-
-Do we really need to list all the error conditions?  My worry is that a 
-list this specific might go stale, compared to the obvious default that 
-the command succeeds only if it was able to expose the bitmap and that 
-the error message is specific enough for a human to figure out what to 
-fix if it failed.
-
-> +#
-> +# Since: 2.13
-> +##
-> +  { 'command': 'nbd-server-add-bitmap',
-> +    'data': {'name': 'str', 'bitmap': 'str', '*bitmap-export-name': 'str'} }
-> +
-
+diff --git a/block/vdi.c b/block/vdi.c
+index 73c059e69d..4a2d1ff88d 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -235,7 +235,6 @@ static void vdi_header_to_le(VdiHeader *header)
+     qemu_uuid_bswap(&header->uuid_parent);
+ }
+ 
+-#if defined(CONFIG_VDI_DEBUG)
+ static void vdi_header_print(VdiHeader *header)
+ {
+     char uuid[37];
+@@ -257,16 +256,15 @@ static void vdi_header_print(VdiHeader *header)
+     logout("block extra 0x%04x\n", header->block_extra);
+     logout("blocks tot. 0x%04x\n", header->blocks_in_image);
+     logout("blocks all. 0x%04x\n", header->blocks_allocated);
+-    uuid_unparse(header->uuid_image, uuid);
++    qemu_uuid_unparse(&header->uuid_image, uuid);
+     logout("uuid image  %s\n", uuid);
+-    uuid_unparse(header->uuid_last_snap, uuid);
++    qemu_uuid_unparse(&header->uuid_last_snap, uuid);
+     logout("uuid snap   %s\n", uuid);
+-    uuid_unparse(header->uuid_link, uuid);
++    qemu_uuid_unparse(&header->uuid_link, uuid);
+     logout("uuid link   %s\n", uuid);
+-    uuid_unparse(header->uuid_parent, uuid);
++    qemu_uuid_unparse(&header->uuid_parent, uuid);
+     logout("uuid parent %s\n", uuid);
+ }
+-#endif
+ 
+ static int coroutine_fn vdi_co_check(BlockDriverState *bs, BdrvCheckResult *res,
+                                      BdrvCheckMode fix)
+@@ -387,9 +385,9 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     vdi_header_to_cpu(&header);
+-#if defined(CONFIG_VDI_DEBUG)
+-    vdi_header_print(&header);
+-#endif
++    if (VDI_DEBUG) {
++        vdi_header_print(&header);
++    }
+ 
+     if (header.disk_size > VDI_DISK_SIZE_MAX) {
+         error_setg(errp, "Unsupported VDI image size (size is 0x%" PRIx64
+@@ -825,9 +823,9 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+     qemu_uuid_generate(&header.uuid_image);
+     qemu_uuid_generate(&header.uuid_last_snap);
+     /* There is no need to set header.uuid_link or header.uuid_parent here. */
+-#if defined(CONFIG_VDI_DEBUG)
+-    vdi_header_print(&header);
+-#endif
++    if (VDI_DEBUG) {
++        vdi_header_print(&header);
++    }
+     vdi_header_to_le(&header);
+     ret = blk_pwrite(blk, offset, &header, sizeof(header), 0);
+     if (ret < 0) {
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.13.6
