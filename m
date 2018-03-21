@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eybd2-0006Vq-Mo
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:10:01 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1eybrj-0003pp-Dv
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eybcx-0008Ce-Kw
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:10:00 -0400
-Received: from mail-he1eur01hn0211.outbound.protection.outlook.com
-	([104.47.0.211]:15497
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	(envelope-from <rkagan@virtuozzo.com>) id 1eybrf-0005Vz-9x
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:11 -0400
+Received: from mail-ve1eur01hn0232.outbound.protection.outlook.com
+	([104.47.1.232]:59582
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eybcx-0008Bg-7v
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:09:55 -0400
-Date: Wed, 21 Mar 2018 14:09:39 +0300
+	id 1eybre-0005VK-RC
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:25:07 -0400
+Date: Wed, 21 Mar 2018 14:24:47 +0300
 From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180321110939.GB14983@rkaganb.sw.ru>
+Message-ID: <20180321112447.GC14983@rkaganb.sw.ru>
 References: <20180320173500.32065-1-vkuznets@redhat.com>
 	<20180320173500.32065-2-vkuznets@redhat.com>
-	<20180320183227.GW3417@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180320183227.GW3417@localhost.localdomain>
+In-Reply-To: <20180320173500.32065-2-vkuznets@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3 1/2] i386/kvm: add support for Hyper-V
  reenlightenment MSRs
 List-Id: <qemu-devel.nongnu.org>
@@ -32,32 +31,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Mar 20, 2018 at 03:32:27PM -0300, Eduardo Habkost wrote:
-> On Tue, Mar 20, 2018 at 06:34:59PM +0100, Vitaly Kuznetsov wrote:
-> > @@ -1747,6 +1760,15 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-> >              if (cpu->hyperv_time) {
-> >                  kvm_msr_entry_add(cpu, HV_X64_MSR_REFERENCE_TSC,
-> >                                    env->msr_hv_tsc);
-> > +
-> > +                if (has_msr_hv_reenlightenment) {
+On Tue, Mar 20, 2018 at 06:34:59PM +0100, Vitaly Kuznetsov wrote:
+> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
+> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
+> when INVTSC is not passed to it (and it is not passed by default in Qemu
+> as it effectively blocks migration).
 > 
-> I see that the current code is inconsistent: some entries check
-> for has_msr_hv_*, other entries check cpu->hyperv_*.
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+> Changes since v2:
+> - add hv-reenlightenment CPU property [Roman Kagan, Paolo Bonzini]
+> - add a comment to feature_word_info [Roman Kagan]
+> ---
+>  target/i386/cpu.c          |  4 +++-
+>  target/i386/cpu.h          |  4 ++++
+>  target/i386/hyperv-proto.h |  9 ++++++++-
+>  target/i386/kvm.c          | 39 ++++++++++++++++++++++++++++++++++++++-
+>  target/i386/machine.c      | 24 ++++++++++++++++++++++++
+>  5 files changed, 77 insertions(+), 3 deletions(-)
 > 
-> I suggest changing all of them (including this one) to check
-> cpu->hyperv_* instead.
-> 
-> The difference between both approaches is that checking just
-> has_msr_hv_* would let a non-cooperating guest prevent itself
-> from being migrated to an older host by writing a non-zero value
-> to a MSR, even if hyperv support was not enabled in the VM
-> configuration at all.  I don't think we want that.
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 6bb4ce8719..02579f8234 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -407,7 +407,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              NULL /* hv_vpindex_access */, NULL /* hv_msr_reset_access */,
+>              NULL /* hv_msr_stats_access */, NULL /* hv_reftsc_access */,
+>              NULL /* hv_msr_idle_access */, NULL /* hv_msr_frequency_access */,
+> -            NULL, NULL, NULL, NULL,
+> +            NULL /* hv_msr_debug_access */, NULL /* hv_msr_reenlightenment_access */,
+> +            NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+> @@ -4764,6 +4765,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("hv-runtime", X86CPU, hyperv_runtime, false),
+>      DEFINE_PROP_BOOL("hv-synic", X86CPU, hyperv_synic, false),
+>      DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
+> +    DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
+>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+>      DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+>      DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 2e2bab5ff3..98eed72937 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1174,6 +1174,9 @@ typedef struct CPUX86State {
+>      uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
+>      uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
+>      uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
+> +    uint64_t msr_hv_reenlightenment_control;
+> +    uint64_t msr_hv_tsc_emulation_control;
+> +    uint64_t msr_hv_tsc_emulation_status;
+>  
+>      uint64_t msr_rtit_ctrl;
+>      uint64_t msr_rtit_status;
+> @@ -1296,6 +1299,7 @@ struct X86CPU {
+>      bool hyperv_runtime;
+>      bool hyperv_synic;
+>      bool hyperv_stimer;
+> +    bool hyperv_reenlightenment;
+>      bool check_cpuid;
+>      bool enforce_cpuid;
+>      bool expose_kvm;
+> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+> index cb4d7f2b7a..93352ebd2a 100644
+> --- a/target/i386/hyperv-proto.h
+> +++ b/target/i386/hyperv-proto.h
+> @@ -35,7 +35,7 @@
+>  #define HV_RESET_AVAILABLE           (1u << 7)
+>  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
+>  #define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
+> -
+> +#define HV_ACCESS_REENLIGHTENMENTS_CONTROL  (1u << 13)
+>  
+>  /*
+>   * HV_CPUID_FEATURES.EDX bits
+> @@ -129,6 +129,13 @@
+>  #define HV_X64_MSR_CRASH_CTL                    0x40000105
+>  #define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
+>  
+> +/*
+> + * Reenlightenment notification MSRs
+> + */
+> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL      0x40000106
+> +#define HV_X64_MSR_TSC_EMULATION_CONTROL        0x40000107
+> +#define HV_X64_MSR_TSC_EMULATION_STATUS         0x40000108
+> +
+>  /*
+>   * Hypercall status code
+>   */
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index d23fff12f5..7d9f9ca0b1 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -90,6 +90,7 @@ static bool has_msr_hv_runtime;
+>  static bool has_msr_hv_synic;
+>  static bool has_msr_hv_stimer;
+>  static bool has_msr_hv_frequencies;
+> +static bool has_msr_hv_reenlightenment;
+>  static bool has_msr_xss;
+>  static bool has_msr_spec_ctrl;
+>  static bool has_msr_smi_count;
+> @@ -583,7 +584,8 @@ static bool hyperv_enabled(X86CPU *cpu)
+>              cpu->hyperv_vpindex ||
+>              cpu->hyperv_runtime ||
+>              cpu->hyperv_synic ||
+> -            cpu->hyperv_stimer);
+> +            cpu->hyperv_stimer ||
+> +            cpu->hyperv_reenlightenment);
+>  }
+>  
+>  static int kvm_arch_set_tsc_khz(CPUState *cs)
+> @@ -654,6 +656,14 @@ static int hyperv_handle_properties(CPUState *cs)
+>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+>          }
+>      }
+> +    if (cpu->hyperv_reenlightenment) {
+> +        if (!has_msr_hv_reenlightenment) {
+> +            fprintf(stderr,
+> +                    "Hyper-V Reenlightenment is not supported by kernel\n");
+> +            return -ENOSYS;
+> +        }
+> +        env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_REENLIGHTENMENTS_CONTROL;
+> +    }
+>      if (cpu->hyperv_crash && has_msr_hv_crash) {
+>          env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
+>      }
+> @@ -1185,6 +1195,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case HV_X64_MSR_TSC_FREQUENCY:
+>                      has_msr_hv_frequencies = true;
+>                      break;
+> +                case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
+> +                    has_msr_hv_reenlightenment = true;
+> +                    break;
+>                  case MSR_IA32_SPEC_CTRL:
+>                      has_msr_spec_ctrl = true;
+>                      break;
+> @@ -1747,6 +1760,15 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>              if (cpu->hyperv_time) {
+>                  kvm_msr_entry_add(cpu, HV_X64_MSR_REFERENCE_TSC,
+>                                    env->msr_hv_tsc);
+> +
+> +                if (has_msr_hv_reenlightenment) {
+> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_REENLIGHTENMENT_CONTROL,
+> +                                      env->msr_hv_reenlightenment_control);
+> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_CONTROL,
+> +                                      env->msr_hv_tsc_emulation_control);
+> +                    kvm_msr_entry_add(cpu, HV_X64_MSR_TSC_EMULATION_STATUS,
+> +                                      env->msr_hv_tsc_emulation_status);
+> +                }
 
-Agreed.  We accumulated a number of these over time; it's mostly my
-fault, so I don't feel it's just to ask Vitaly to fix the existing ones,
-but let's not add new ones.  
+I second Eduardo's comment on testing cpu->hyperv_reenlightenment here.
 
+Besides, this hunk suggests that (!cpu->hyperv_time &&
+cpu->hyperv_reenlightenment) is illegal.  I think this should be
+enforced when enabling the feature.  BTW this also makes the addition to
+hyperv_enabled() unnecessary.
+
+Thanks,
 Roman.
