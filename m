@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eyk5W-0002A3-06
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:12:01 -0400
+	(envelope-from <cota@braap.org>) id 1eyk5V-00029z-Vh
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eyk5S-00010L-EX
+	(envelope-from <cota@braap.org>) id 1eyk5Q-0000yQ-TO
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:11:57 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:55663)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:54791)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eyk5S-000108-9k
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:11:54 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eyk5Q-0000xO-M5
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:11:52 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 21 Mar 2018 16:11:49 -0400
-Message-Id: <1521663109-32262-15-git-send-email-cota@braap.org>
+Date: Wed, 21 Mar 2018 16:11:37 -0400
+Message-Id: <1521663109-32262-3-git-send-email-cota@braap.org>
 In-Reply-To: <1521663109-32262-1-git-send-email-cota@braap.org>
 References: <1521663109-32262-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v1 14/14] hostfloat: support float32_to_float64
+Subject: [Qemu-devel] [PATCH v1 02/14] tests: add fp-test,
+ a floating point test suite
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,168 +27,1326 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Performance improvement for SPEC06fp for the last few commits:
+This will allow us to run correctness tests against our
+FP implementation. The test can be run in two modes (called
+"testers"): host and soft. With the former we check the results
+and FP flags on the host machine against the model.
+With the latter we check QEMU's fpu primitives against the
+model. Note that in soft mode we are not instantiating any
+particular CPU (hence the HW_POISON_H hack to avoid macro poisoning);
+for that we need to run the test in host mode under QEMU.
 
-                               qemu-aarch64 SPEC06fp (test set) speedup over QEMU f6d81cdec8
-                                      Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-                                            error bars: 95% confidence interval
+The input files are taken from IBM's FPGen test suite:
+https://www.research.ibm.com/haifa/projects/verification/fpgen/
 
-    5 +-+---+-----+----+-----+-----+-----+-----+----+-----+-----+-----+----+-----+-----+-----+-----+----+-----+---+-+
-  4.5 +-+..........................+&&+...........................................................................+-+
-  3.5 +-+................+++.......@@&...............+++............................................+++dsub       +-+
-  2 3 +-+....+++.++++++%%&=+......+@@&....+++...==+..&&=..........................................++&=+++++++     +-+
-    2 +-+..%%@&+.%%@=++%%&=.......+%@&..%%@&+.%%@=++%%&=.++&&+.......++&=+.+++++.......+&&=.%%@&+.%%@= +%%@=++%%&=+-+
-  1.5 +-+++$%@&+#$%@=+#$%&=##$%&**#$@&**#%@&**$%@=**$%&=##%@&**#+&&**#%@=**$%@=+++&&=##$@&**#%@&**#%@=*+f%@=*#$%&=+-+
-  0 1 +-+**#%@&**$%@=**$%&=*#$%&**#$@&**#%@&**$%@=**$%&=*#$@&**#$@&**#%@=**$%@=*#$%&=*#$@&**#%@&**#%@=+sqr@=*#$%&=+-+
-    0 +-+**#%@&**$%@=**$%&=*#$%&**#$@&**#%@&**$%@=**$%&=*#$@&**#$@&**#%@=**$%@=*#$%&=*#$@&**#%@&**#%@=*+cmp=*#$%&=+-+
-  410.bw416.gam433.434.z435.436.cac437.lesli444.447.de450.so453454.ca459.GemsF465.tont470.lb4482.sph+f32f64ean
-  png: https://imgur.com/5BErNz7
+I see no license file in there so I am just downloading them
+with wget. We might want to keep a copy on a qemu server though,
+in case IBM takes those files down in the future.
 
-That is, a final geomean speedup of 2.21X.
+The "IBM" syntax of those files (for now the only syntax supported
+in fp-test) is documented here:
+https://www.research.ibm.com/haifa/projects/verification/fpgen/papers/ieee-test-suite-v2.pdf
 
-The floating point workloads from nbench show similar improvements:
+Note that the syntax document has some inaccuracies; the appended
+parsing code works around some of those.
 
-                                       qemu-aarch64 NBench score; higher is better
-                                     Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+The exception flag (-e) is important: many of the optimizations
+included in the following commits assume that the inexact flag
+is set, so "-e x" is necessary in order to test those code paths.
 
-  16 +-+-------------------+---------------------+----------------------+---------------------+-------------------+-+
-  14 +-+..............................................====**............@@@&&&==**................................+-+
-  12 +-+.........................................@@@@&&..=.*............@.@..&.=.*..................+before       +-+
-  10 +-+.........................................@..@.&..=.*............@.@..&.=.*............@@@&&&==***ub       +-+
-   8 +-+....................................$$$$%%..@.&..=.*............@.@..&.=.*............@.@..&+= +*ul       +-+
-   6 +-+...................@@@@&&===**..***##..$.%..@.&..=.*..++####$$%%%.@..&.=.*....####$$%%%.@..&+= +*iv       +-+
-   4 +-+............###$$$%%..@.&..=.*..*+*.#..$.%..@.&..=.*..***..#.$..%.@..&.=.*..***..#.$..%.@..&+= +*ma       +-+
-   2 +-+.........****.#..$.%..@.&..=.*..*.*.#..$.%..@.&..=.*..*.*..#.$..%.@..&.=.*..*.*..#.$..%.@..&+=+s*rt       +-+
-   0 +-+---------****##$$$%%@@@&&===**--***##$$$%%@@@&&===**--***###$$%%%@@&&&==**--***###$$%%%@@&&&==***mp-------+-+
-                    FOURIER            NEURAL NET       LU DECOMPOSITION                 gmean      +f32f64
-  png: https://imgur.com/KjLHumh
+The whitelist flag (-w) points to a file with test cases to be ignored.
+I have put some whitelist files online, but we should have them
+on a QEMU-related server.
 
-That is, a ~2.6X speedup. [error bars here are just the standard deviation of
-just a few measurements; this explains the noisy results.]
+Thus, a typical of fp-test is as follows:
 
-Results for the i386 target are very similar; the only major
-difference is that they're much more sensitive to the multiplication
-optimization, since the i386 target does not currently use floatX_muladd
-(aka fma).
+  $ cd qemu/build/tests/fp-test
+  $ make -j && \
+	./fp-test -t soft ibm/*.fptest \
+	-w whitelist.txt \
+	-e x
 
-Below are the x86_64 SPEC06fp results, although note that they are from
-a development branch, so each bar does not match the patches in this,
-and the final numbers might be slightly different from those you'd
-get with these patches.
+If we want to test after-rounding tininess detection, then we need to
+pass "-a -w whitelist-tininess-after.txt" in addition to the above.
+(NB. we can pass "-w" as many times as we want.)
 
-                               qemu-x86_64 SPEC06fp (train set) speedup over QEMU f6d81cdec8
-                                      Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-                                            error bars: 95% confidence interval
+The patch immediately after this one fixes a mismatch against the model
+in softfloat, but after that is applied the above should finish with a 0
+return code, and print something like:
+  All tests OK.
+  Tests passed: 76572. Not handled: 51237, whitelisted: 2662
 
-    4 +-+---+-----+----+-----+-----+%%---+-----+----+-----+-----+-----+----+-----+-----+-----+-----+----+-----+---+-+
-  3.5 +-+..........................$$%............................................................................+-+
-    3 +-+............**$$$......+**#$%............**$$++..................................+add+sub++%%+sq+++      +-+
-  2.5 +-+..+++.**##$%**#+$%......**#$%..+$$%..++%%**#$%%.............+++.**#$$%........$$%+**$$%+###$%is#$$%  $$%%+-+
-  1.5 +-+***#$%**.#$%**#.$%..$$%+**#$%***#$%**##$%**#$.%**#$%+++$$%***#$%**#+$%..$$++**#$%+fas$%path$%ul(0$%**#$ %+-+
-    1 +-+*+*#$%**+#$%**#+$%**#$%+**#$%*+*#$%**+#$%**#$+%**#$%-**#$%*+*#$%**#+$%**#$%%**#$%+**+f%2 to %4+div%**#$+%+-+
-  0.5 +-+*.*#$%**.#$%**#.$%**#$%.**#$%*.*#$%**.#$%**#$.%**#$%.**#$%*.*#$%**#.$%**#$.%**#$%.**#$%**.#$%**#.$%**#$.%+-+
-    0 +-+***#$%**##$%**#$$%**#$%-**#$%***#$%**##$%**#$%%**#$%-**#$%***#$%**#$$%**#$%%**#$%-**#$%**##$%**#$$%**#$%%+-+
-  410.bw416.gam433.434.z435.436.cac437.lesli444.447.de450.so453454.ca459.GemsF465.tont470.lb4482.sphinxgeomean
-  png: https://imgur.com/MfvTb3H
+The tests pass on "host" mode on x86_64 and aarch64 machines.
+On an IBM Power8 machine some exception flags are different from the
+model files, which is interesting given that the model comes from IBM.
 
-Two points are worth mentioning:
+Running on host mode under QEMU reports flag mismatches (e.g. for
+x86_64-linux-user), but that isn't too surprising given how little
+love the i386 frontend gets. Host mode under aarch64-linux-user
+passes OK.
 
-- Special-casing 0-inputs for multiplication pays off handsomely (the same
-  thing happens for FMA for targets that use it). I was surprised to
-  see that some benchmarks (e.g. GemsFDTD) compute >99% of their
-  multiplications with at least one operand being Zero (and this is
-  without flush-to-zero!).
-
-- Avoiding comparisons via the host FPU (i.e. using soft_t ## _is_normal()
-  instead of glibc's isnormal()) gives a small speedup.
-
-Finally, the same results using native execution time as the baseline,
-where we plot the slowdown instead of the speedup.
-We bring down the slowdown of SPEC06fp w.r.t. native from ~21X to ~10X:
-
-                         qemu-x86_64 SPEC06fp (train set) slowdown over native (lower is better)
-                                     Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-                                           error bars: 95% confidence interval
-
-  90 +-+---+-----+-----+----+-----+-----+-----+-----+-----+----+-----+-----+-----+-----+-----+----+-----+-----+---+-+
-  80 +-+.......................+**................................................................................+-+
-  70 +-+........................**........................................................+          before       +-+
-  50 +-+........................**........................................................+add+sub+mul+sqrt       +-+
-  40 +-+......+++...............**................................+++.....................+  +integer isinf       +-+
-  30 +-+**+...**+...............**#$%@**.........**+..............+**++.............**+...+fast path mul(0++**    +-+
-  10 +-+**#$%@**#$%@**$$@@**#$%@**#$%@**#$%**#$%+**#$%@**#$%@**#$%+**#$%@**#$%@*#$%@**#$%@**#+f@2 to @4+div@**#$%@+-+
-   0 +-+**#$%@**#$%@**#$%@**#$%@**#$%@**#$%**#$%@**#$%@**#$%@**#$%@**#$%@**#$%@*#$%@**#$%@**#$%@**#$%@**#$%@**#$%@+-+
- 410.bw416.game433434.z435.436.cac437.leslie444.447.d450.so453.454.ca459.GemsF465.tont470.l48482.sphinxgeomean
-  png: https://imgur.com/iTmVkJL
-
-All png's shown above can be found here: https://imgur.com/a/YSxxR
+Flush-to-zero and flush-inputs-to-zero modes can be tested with the
+-z and -Z flags. Note however that the IBM input files are only
+IEEE-compliant, so for now I've tested these modes by diff'ing
+the reported errors against the model files. We should look into
+generating files for these non-standard modes to make testing
+these modes less painful.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/fpu/hostfloat.h |  2 ++
- include/fpu/softfloat.h |  2 +-
- fpu/hostfloat.c         | 14 ++++++++++++++
- fpu/softfloat.c         |  2 +-
- 4 files changed, 18 insertions(+), 2 deletions(-)
+ configure                |    2 +
+ tests/fp-test/fp-test.c  | 1159 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/.gitignore         |    1 +
+ tests/fp-test/.gitignore |    3 +
+ tests/fp-test/Makefile   |   34 ++
+ 5 files changed, 1199 insertions(+)
+ create mode 100644 tests/fp-test/fp-test.c
+ create mode 100644 tests/fp-test/.gitignore
+ create mode 100644 tests/fp-test/Makefile
 
-diff --git a/include/fpu/hostfloat.h b/include/fpu/hostfloat.h
-index aa555f6..79e9b6c 100644
---- a/include/fpu/hostfloat.h
-+++ b/include/fpu/hostfloat.h
-@@ -29,4 +29,6 @@ float64 float64_sqrt(float64 a, float_status *status);
- int float64_compare(float64 a, float64 b, float_status *s);
- int float64_compare_quiet(float64 a, float64 b, float_status *s);
+diff --git a/configure b/configure
+index 6f3921c..8ea3825 100755
+--- a/configure
++++ b/configure
+@@ -7046,12 +7046,14 @@ fi
  
-+float64 float32_to_float64(float32, float_status *status);
+ # build tree in object directory in case the source is not in the current directory
+ DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
++DIRS="$DIRS tests/fp-test"
+ DIRS="$DIRS docs docs/interop fsdev scsi"
+ DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+ DIRS="$DIRS roms/seabios roms/vgabios"
+ FILES="Makefile tests/tcg/Makefile qdict-test-data.txt"
+ FILES="$FILES tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
+ FILES="$FILES tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
++FILES="$FILES tests/fp-test/Makefile"
+ FILES="$FILES pc-bios/optionrom/Makefile pc-bios/keymaps"
+ FILES="$FILES pc-bios/spapr-rtas/Makefile"
+ FILES="$FILES pc-bios/s390-ccw/Makefile"
+diff --git a/tests/fp-test/fp-test.c b/tests/fp-test/fp-test.c
+new file mode 100644
+index 0000000..27637c4
+--- /dev/null
++++ b/tests/fp-test/fp-test.c
+@@ -0,0 +1,1159 @@
++/*
++ * fp-test.c - Floating point test suite.
++ *
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#ifndef HW_POISON_H
++#error Must define HW_POISON_H to work around TARGET_* poisoning
++#endif
 +
- #endif /* HOSTFLOAT_H */
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index cb57942..b0a4d75 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -334,7 +334,7 @@ int64_t float32_to_int64(float32, float_status *status);
- uint64_t float32_to_uint64(float32, float_status *status);
- uint64_t float32_to_uint64_round_to_zero(float32, float_status *status);
- int64_t float32_to_int64_round_to_zero(float32, float_status *status);
--float64 float32_to_float64(float32, float_status *status);
-+float64 soft_float32_to_float64(float32, float_status *status);
- floatx80 float32_to_floatx80(float32, float_status *status);
- float128 float32_to_float128(float32, float_status *status);
- 
-diff --git a/fpu/hostfloat.c b/fpu/hostfloat.c
-index 139e419..b635839 100644
---- a/fpu/hostfloat.c
-+++ b/fpu/hostfloat.c
-@@ -326,3 +326,17 @@ GEN_FPU_SQRT(float64_sqrt, float64, double, sqrt)
- GEN_FPU_COMPARE(float32_compare, float32, float)
- GEN_FPU_COMPARE(float64_compare, float64, double)
- #undef GEN_FPU_COMPARE
++#include "qemu/osdep.h"
++#include "fpu/softfloat.h"
 +
-+float64 float32_to_float64(float32 a, float_status *status)
++#include <fenv.h>
++#include <math.h>
++
++enum error {
++    ERROR_NONE,
++    ERROR_NOT_HANDLED,
++    ERROR_WHITELISTED,
++    ERROR_COMMENT,
++    ERROR_INPUT,
++    ERROR_RESULT,
++    ERROR_EXCEPTIONS,
++    ERROR_MAX,
++};
++
++enum input_fmt {
++    INPUT_FMT_IBM,
++};
++
++struct input {
++    const char * const name;
++    enum error (*test_line)(const char *line);
++};
++
++enum precision {
++    PREC_FLOAT,
++    PREC_DOUBLE,
++    PREC_QUAD,
++    PREC_FLOAT_TO_DOUBLE,
++};
++
++struct op_desc {
++    const char * const name;
++    int n_operands;
++};
++
++enum op {
++    OP_ADD,
++    OP_SUB,
++    OP_MUL,
++    OP_MULADD,
++    OP_DIV,
++    OP_SQRT,
++    OP_MINNUM,
++    OP_MAXNUM,
++    OP_MAXNUMMAG,
++    OP_ABS,
++    OP_IS_NAN,
++    OP_IS_INF,
++    OP_FLOAT_TO_DOUBLE,
++};
++
++static const struct op_desc ops[] = {
++    [OP_ADD] =       { "+", 2 },
++    [OP_SUB] =       { "-", 2 },
++    [OP_MUL] =       { "*", 2 },
++    [OP_MULADD] =    { "*+", 3 },
++    [OP_DIV] =       { "/", 2 },
++    [OP_SQRT] =      { "V", 1 },
++    [OP_MINNUM] =    { "<C", 2 },
++    [OP_MAXNUM] =    { ">C", 2 },
++    [OP_MAXNUMMAG] = { ">A", 2 },
++    [OP_ABS] =       { "A", 1 },
++    [OP_IS_NAN] =    { "?N", 1 },
++    [OP_IS_INF] =    { "?i", 1 },
++    [OP_FLOAT_TO_DOUBLE] = { "cff", 1 },
++};
++
++/*
++ * We could enumerate all the types here. But really we only care about
++ * QNaN and SNaN since only those can vary across ISAs.
++ */
++enum op_type {
++    OP_TYPE_NUMBER,
++    OP_TYPE_QNAN,
++    OP_TYPE_SNAN,
++};
++
++struct operand {
++    uint64_t val;
++    enum op_type type;
++};
++
++struct test_op {
++    struct operand operands[3];
++    struct operand expected_result;
++    enum precision prec;
++    enum op op;
++    signed char round;
++    uint8_t trapped_exceptions;
++    uint8_t exceptions;
++    bool expected_result_is_valid;
++};
++
++typedef enum error (*tester_func_t)(struct test_op *);
++
++struct tester {
++    tester_func_t func;
++    const char *name;
++};
++
++struct whitelist {
++    char **lines;
++    size_t n;
++    GHashTable *ht;
++};
++
++static uint64_t test_stats[ERROR_MAX];
++static struct whitelist whitelist;
++static uint8_t default_exceptions;
++static bool die_on_error = true;
++static struct float_status soft_status = {
++    .float_detect_tininess = float_tininess_before_rounding,
++};
++
++static inline float u64_to_float(uint64_t v)
 +{
-+    if (likely(float32_is_normal(a))) {
-+        float f = *(float *)&a;
-+        double r = f;
++    uint32_t v32 = v;
++    uint32_t *v32p = &v32;
 +
-+        return *(float64 *)&r;
-+    } else if (float32_is_zero(a)) {
-+        return float64_set_sign(float64_zero, float32_is_neg(a));
++    return *(float *)v32p;
++}
++
++static inline double u64_to_double(uint64_t v)
++{
++    uint64_t *vp = &v;
++
++    return *(double *)vp;
++}
++
++static inline uint64_t float_to_u64(float f)
++{
++    float *fp = &f;
++
++    return *(uint32_t *)fp;
++}
++
++static inline uint64_t double_to_u64(double d)
++{
++    double *dp = &d;
++
++    return *(uint64_t *)dp;
++}
++
++static inline bool is_err(enum error err)
++{
++    return err != ERROR_NONE &&
++        err != ERROR_NOT_HANDLED &&
++        err != ERROR_WHITELISTED &&
++        err != ERROR_COMMENT;
++}
++
++static int host_exceptions_translate(int host_flags)
++{
++    int flags = 0;
++
++    if (host_flags & FE_INEXACT) {
++        flags |= float_flag_inexact;
++    }
++    if (host_flags & FE_UNDERFLOW) {
++        flags |= float_flag_underflow;
++    }
++    if (host_flags & FE_OVERFLOW) {
++        flags |= float_flag_overflow;
++    }
++    if (host_flags & FE_DIVBYZERO) {
++        flags |= float_flag_divbyzero;
++    }
++    if (host_flags & FE_INVALID) {
++        flags |= float_flag_invalid;
++    }
++    return flags;
++}
++
++static inline uint8_t host_get_exceptions(void)
++{
++    return host_exceptions_translate(fetestexcept(FE_ALL_EXCEPT));
++}
++
++static void host_set_exceptions(uint8_t flags)
++{
++    int host_flags = 0;
++
++    if (flags & float_flag_inexact) {
++        host_flags |= FE_INEXACT;
++    }
++    if (flags & float_flag_underflow) {
++        host_flags |= FE_UNDERFLOW;
++    }
++    if (flags & float_flag_overflow) {
++        host_flags |= FE_OVERFLOW;
++    }
++    if (flags & float_flag_divbyzero) {
++        host_flags |= FE_DIVBYZERO;
++    }
++    if (flags & float_flag_invalid) {
++        host_flags |= FE_INVALID;
++    }
++    feraiseexcept(host_flags);
++}
++
++#define STANDARD_EXCEPTIONS \
++    (float_flag_inexact | float_flag_underflow | \
++     float_flag_overflow | float_flag_divbyzero | float_flag_invalid)
++#define FMT_EXCEPTIONS "%s%s%s%s%s%s"
++#define PR_EXCEPTIONS(x)                                \
++        ((x) & STANDARD_EXCEPTIONS ? "" : "none"),      \
++        (((x) & float_flag_inexact)   ? "x" : ""),      \
++        (((x) & float_flag_underflow) ? "u" : ""),      \
++        (((x) & float_flag_overflow)  ? "o" : ""),      \
++        (((x) & float_flag_divbyzero) ? "z" : ""),      \
++        (((x) & float_flag_invalid)   ? "i" : "")
++
++static enum error tester_check(const struct test_op *t, uint64_t res64,
++                               bool res_is_nan, uint8_t flags)
++{
++    enum error err = ERROR_NONE;
++
++    if (t->expected_result_is_valid) {
++        if (t->expected_result.type == OP_TYPE_QNAN ||
++            t->expected_result.type == OP_TYPE_SNAN) {
++            if (!res_is_nan) {
++                err = ERROR_RESULT;
++                goto out;
++            }
++        } else if (res64 != t->expected_result.val) {
++            err = ERROR_RESULT;
++            goto out;
++        }
++    }
++    if (t->exceptions && flags != (t->exceptions | default_exceptions)) {
++        err = ERROR_EXCEPTIONS;
++        goto out;
++    }
++
++ out:
++    if (is_err(err)) {
++        int i;
++
++        fprintf(stderr, "%s ", ops[t->op].name);
++        for (i = 0; i < ops[t->op].n_operands; i++) {
++            fprintf(stderr, "0x%" PRIx64 "%s", t->operands[i].val,
++                    i < ops[t->op].n_operands - 1 ? " " : "");
++        }
++        fprintf(stderr, ", expected: 0x%" PRIx64 ", returned: 0x%" PRIx64,
++                t->expected_result.val, res64);
++        if (err == ERROR_EXCEPTIONS) {
++            fprintf(stderr, ", expected exceptions: " FMT_EXCEPTIONS
++                    ", returned: " FMT_EXCEPTIONS,
++                    PR_EXCEPTIONS(t->exceptions), PR_EXCEPTIONS(flags));
++        }
++        fprintf(stderr, "\n");
++    }
++    return err;
++}
++
++static enum error host_tester(struct test_op *t)
++{
++    uint64_t res64;
++    bool result_is_nan;
++    uint8_t flags = 0;
++
++    feclearexcept(FE_ALL_EXCEPT);
++    if (default_exceptions) {
++        host_set_exceptions(default_exceptions);
++    }
++
++    if (t->prec == PREC_FLOAT) {
++        float a, b, c;
++        float *in[] = { &a, &b, &c };
++        float res;
++        int i;
++
++        g_assert(ops[t->op].n_operands <= ARRAY_SIZE(in));
++        for (i = 0; i < ops[t->op].n_operands; i++) {
++            /* use the host's QNaN/SNaN patterns */
++            if (t->operands[i].type == OP_TYPE_QNAN) {
++                *in[i] = __builtin_nanf("");
++            } else if (t->operands[i].type == OP_TYPE_SNAN) {
++                *in[i] = __builtin_nansf("");
++            } else {
++                *in[i] = u64_to_float(t->operands[i].val);
++            }
++        }
++
++        if (t->expected_result.type == OP_TYPE_QNAN) {
++            t->expected_result.val = float_to_u64(__builtin_nanf(""));
++        } else if (t->expected_result.type == OP_TYPE_SNAN) {
++            t->expected_result.val = float_to_u64(__builtin_nansf(""));
++        }
++
++        switch (t->op) {
++        case OP_ADD:
++            res = a + b;
++            break;
++        case OP_SUB:
++            res = a - b;
++            break;
++        case OP_MUL:
++            res = a * b;
++            break;
++        case OP_MULADD:
++            res = fmaf(a, b, c);
++            break;
++        case OP_DIV:
++            res = a / b;
++            break;
++        case OP_SQRT:
++            res = sqrtf(a);
++            break;
++        case OP_ABS:
++            res = fabsf(a);
++            break;
++        case OP_IS_NAN:
++            res = !!isnan(a);
++            break;
++        case OP_IS_INF:
++            res = !!isinf(a);
++            break;
++        default:
++            return ERROR_NOT_HANDLED;
++        }
++        flags = host_get_exceptions();
++        res64 = float_to_u64(res);
++        result_is_nan = isnan(res);
++    } else if (t->prec == PREC_DOUBLE) {
++        double a, b, c;
++        double *in[] = { &a, &b, &c };
++        double res;
++        int i;
++
++        g_assert(ops[t->op].n_operands <= ARRAY_SIZE(in));
++        for (i = 0; i < ops[t->op].n_operands; i++) {
++            /* use the host's QNaN/SNaN patterns */
++            if (t->operands[i].type == OP_TYPE_QNAN) {
++                *in[i] = __builtin_nan("");
++            } else if (t->operands[i].type == OP_TYPE_SNAN) {
++                *in[i] = __builtin_nans("");
++            } else {
++                *in[i] = u64_to_double(t->operands[i].val);
++            }
++        }
++
++        if (t->expected_result.type == OP_TYPE_QNAN) {
++            t->expected_result.val = double_to_u64(__builtin_nan(""));
++        } else if (t->expected_result.type == OP_TYPE_SNAN) {
++            t->expected_result.val = double_to_u64(__builtin_nans(""));
++        }
++
++        switch (t->op) {
++        case OP_ADD:
++            res = a + b;
++            break;
++        case OP_SUB:
++            res = a - b;
++            break;
++        case OP_MUL:
++            res = a * b;
++            break;
++        case OP_MULADD:
++            res = fma(a, b, c);
++            break;
++        case OP_DIV:
++            res = a / b;
++            break;
++        case OP_SQRT:
++            res = sqrt(a);
++            break;
++        case OP_ABS:
++            res = fabs(a);
++            break;
++        case OP_IS_NAN:
++            res = !!isnan(a);
++            break;
++        case OP_IS_INF:
++            res = !!isinf(a);
++            break;
++        default:
++            return ERROR_NOT_HANDLED;
++        }
++        flags = host_get_exceptions();
++        res64 = double_to_u64(res);
++        result_is_nan = isnan(res);
++    } else if (t->prec == PREC_FLOAT_TO_DOUBLE) {
++        float a;
++        double res;
++
++        if (t->operands[0].type == OP_TYPE_QNAN) {
++            a = __builtin_nanf("");
++        } else if (t->operands[0].type == OP_TYPE_SNAN) {
++            a = __builtin_nansf("");
++        } else {
++            a = u64_to_float(t->operands[0].val);
++        }
++
++        if (t->expected_result.type == OP_TYPE_QNAN) {
++            t->expected_result.val = double_to_u64(__builtin_nan(""));
++        } else if (t->expected_result.type == OP_TYPE_SNAN) {
++            t->expected_result.val = double_to_u64(__builtin_nans(""));
++        }
++
++        switch (t->op) {
++        case OP_FLOAT_TO_DOUBLE:
++            res = a;
++            break;
++        default:
++            return ERROR_NOT_HANDLED;
++        }
++        flags = host_get_exceptions();
++        res64 = double_to_u64(res);
++        result_is_nan = isnan(res);
 +    } else {
-+        return soft_float32_to_float64(a, status);
++        return ERROR_NOT_HANDLED; /* XXX */
++    }
++    return tester_check(t, res64, result_is_nan, flags);
++}
++
++static enum error soft_tester(struct test_op *t)
++{
++    float_status *s = &soft_status;
++    uint64_t res64;
++    enum error err = ERROR_NONE;
++    bool result_is_nan;
++
++    s->float_rounding_mode = t->round;
++    s->float_exception_flags = default_exceptions;
++
++    if (t->prec == PREC_FLOAT) {
++        float32 a, b, c;
++        float32 *in[] = { &a, &b, &c };
++        float32 res;
++        int i;
++
++        g_assert(ops[t->op].n_operands <= ARRAY_SIZE(in));
++        for (i = 0; i < ops[t->op].n_operands; i++) {
++            *in[i] = t->operands[i].val;
++        }
++
++        switch (t->op) {
++        case OP_ADD:
++            res = float32_add(a, b, s);
++            break;
++        case OP_SUB:
++            res = float32_sub(a, b, s);
++            break;
++        case OP_MUL:
++            res = float32_mul(a, b, s);
++            break;
++        case OP_MULADD:
++            res = float32_muladd(a, b, c, 0, s);
++            break;
++        case OP_DIV:
++            res = float32_div(a, b, s);
++            break;
++        case OP_SQRT:
++            res = float32_sqrt(a, s);
++            break;
++        case OP_MINNUM:
++            res = float32_minnum(a, b, s);
++            break;
++        case OP_MAXNUM:
++            res = float32_maxnum(a, b, s);
++            break;
++        case OP_MAXNUMMAG:
++            res = float32_maxnummag(a, b, s);
++            break;
++        case OP_IS_NAN:
++        {
++            float f = !!float32_is_any_nan(a);
++
++            res = float_to_u64(f);
++            break;
++        }
++        case OP_IS_INF:
++        {
++            float f = !!float32_is_infinity(a);
++
++            res = float_to_u64(f);
++            break;
++        }
++        case OP_ABS:
++            /* Fall-through: float32_abs does not handle NaN's */
++        default:
++            return ERROR_NOT_HANDLED;
++        }
++        res64 = res;
++        result_is_nan = isnan(*(float *)&res);
++    } else if (t->prec == PREC_DOUBLE) {
++        float64 a, b, c;
++        float64 *in[] = { &a, &b, &c };
++        int i;
++
++        g_assert(ops[t->op].n_operands <= ARRAY_SIZE(in));
++        for (i = 0; i < ops[t->op].n_operands; i++) {
++            *in[i] = t->operands[i].val;
++        }
++
++        switch (t->op) {
++        case OP_ADD:
++            res64 = float64_add(a, b, s);
++            break;
++        case OP_SUB:
++            res64 = float64_sub(a, b, s);
++            break;
++        case OP_MUL:
++            res64 = float64_mul(a, b, s);
++            break;
++        case OP_MULADD:
++            res64 = float64_muladd(a, b, c, 0, s);
++            break;
++        case OP_DIV:
++            res64 = float64_div(a, b, s);
++            break;
++        case OP_SQRT:
++            res64 = float64_sqrt(a, s);
++            break;
++        case OP_MINNUM:
++            res64 = float64_minnum(a, b, s);
++            break;
++        case OP_MAXNUM:
++            res64 = float64_maxnum(a, b, s);
++            break;
++        case OP_MAXNUMMAG:
++            res64 = float64_maxnummag(a, b, s);
++            break;
++        case OP_IS_NAN:
++        {
++            double d = !!float64_is_any_nan(a);
++
++            res64 = double_to_u64(d);
++            break;
++        }
++        case OP_IS_INF:
++        {
++            double d = !!float64_is_infinity(a);
++
++            res64 = double_to_u64(d);
++            break;
++        }
++        case OP_ABS:
++            /* Fall-through: float64_abs does not handle NaN's */
++        default:
++            return ERROR_NOT_HANDLED;
++        }
++        result_is_nan = isnan(*(double *)&res64);
++    } else if (t->prec == PREC_FLOAT_TO_DOUBLE) {
++        float32 a = t->operands[0].val;
++
++        switch (t->op) {
++        case OP_FLOAT_TO_DOUBLE:
++            res64 = float32_to_float64(a, s);
++            break;
++        default:
++            return ERROR_NOT_HANDLED;
++        }
++        result_is_nan = isnan(*(double *)&res64);
++    } else {
++        return ERROR_NOT_HANDLED; /* XXX */
++    }
++    return tester_check(t, res64, result_is_nan, s->float_exception_flags);
++    return err;
++}
++
++static const struct tester valid_testers[] = {
++    [0] = {
++        .name = "soft",
++        .func = soft_tester,
++    },
++    [1] = {
++        .name = "host",
++        .func = host_tester,
++    },
++};
++static const struct tester *tester = &valid_testers[0];
++
++static int ibm_get_exceptions(const char *p, uint8_t *excp)
++{
++    while (*p) {
++        switch (*p) {
++        case 'x':
++            *excp |= float_flag_inexact;
++            break;
++        case 'u':
++            *excp |= float_flag_underflow;
++            break;
++        case 'o':
++            *excp |= float_flag_overflow;
++            break;
++        case 'z':
++            *excp |= float_flag_divbyzero;
++            break;
++        case 'i':
++            *excp |= float_flag_invalid;
++            break;
++        default:
++            return 1;
++        }
++        p++;
++    }
++    return 0;
++}
++
++static uint64_t fp_choose(enum precision prec, uint64_t f, uint64_t d)
++{
++    switch (prec) {
++    case PREC_FLOAT:
++        return f;
++    case PREC_DOUBLE:
++        return d;
++    default:
++        g_assert_not_reached();
 +    }
 +}
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 1a32216..cf8d6ec 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -3149,7 +3149,7 @@ float128 uint64_to_float128(uint64_t a, float_status *status)
- | Arithmetic.
- *----------------------------------------------------------------------------*/
- 
--float64 float32_to_float64(float32 a, float_status *status)
-+float64 soft_float32_to_float64(float32 a, float_status *status)
- {
-     flag aSign;
-     int aExp;
++
++static int
++ibm_fp_hex(const char *p, enum precision prec, struct operand *ret)
++{
++    int len;
++
++    ret->type = OP_TYPE_NUMBER;
++
++    /* QNaN */
++    if (unlikely(!strcmp("Q", p))) {
++        ret->val = fp_choose(prec, 0xffc00000, 0xfff8000000000000);
++        ret->type = OP_TYPE_QNAN;
++        return 0;
++    }
++    /* SNaN */
++    if (unlikely(!strcmp("S", p))) {
++        ret->val = fp_choose(prec, 0xffb00000, 0xfff7000000000000);
++        ret->type = OP_TYPE_SNAN;
++        return 0;
++    }
++    if (unlikely(!strcmp("+Zero", p))) {
++        ret->val = fp_choose(prec, 0x00000000, 0x0000000000000000);
++        return 0;
++    }
++    if (unlikely(!strcmp("-Zero", p))) {
++        ret->val = fp_choose(prec, 0x80000000, 0x8000000000000000);
++        return 0;
++    }
++    if (unlikely(!strcmp("+inf", p) || !strcmp("+Inf", p))) {
++        ret->val = fp_choose(prec, 0x7f800000, 0x7ff0000000000000);
++        return 0;
++    }
++    if (unlikely(!strcmp("-inf", p) || !strcmp("-Inf", p))) {
++        ret->val = fp_choose(prec, 0xff800000, 0xfff0000000000000);
++        return 0;
++    }
++
++    len = strlen(p);
++
++    if (strchr(p, 'P')) {
++        bool negative = p[0] == '-';
++        char *pos;
++        bool denormal;
++
++        if (len <= 4) {
++            return 1;
++        }
++        denormal = p[1] == '0';
++        if (prec == PREC_FLOAT) {
++            uint32_t exponent;
++            uint32_t significand;
++            uint32_t h;
++
++            significand = strtoul(&p[3], &pos, 16);
++            if (*pos != 'P') {
++                return 1;
++            }
++            pos++;
++            exponent = strtol(pos, &pos, 10) + 127;
++            if (pos != p + len) {
++                return 1;
++            }
++            /*
++             * When there's a leading zero, we have a denormal number. We'd
++             * expect the input (unbiased) exponent to be -127, but for some
++             * reason -126 is used. Correct that here.
++             */
++            if (denormal) {
++                if (exponent != 1) {
++                    return 1;
++                }
++                exponent = 0;
++            }
++            h = negative ? (1 << 31) : 0;
++            h |= exponent << 23;
++            h |= significand;
++            ret->val = h;
++            return 0;
++        } else if (prec == PREC_DOUBLE) {
++            uint64_t exponent;
++            uint64_t significand;
++            uint64_t h;
++
++            significand = strtoul(&p[3], &pos, 16);
++            if (*pos != 'P') {
++                return 1;
++            }
++            pos++;
++            exponent = strtol(pos, &pos, 10) + 1023;
++            if (pos != p + len) {
++                return 1;
++            }
++            if (denormal) {
++                return 1; /* XXX */
++            }
++            h = negative ? (1ULL << 63) : 0;
++            h |= exponent << 52;
++            h |= significand;
++            ret->val = h;
++            return 0;
++        } else { /* XXX */
++            return 1;
++        }
++    } else if (strchr(p, 'e')) {
++        char *pos;
++
++        if (prec == PREC_FLOAT) {
++            float f = strtof(p, &pos);
++
++            if (*pos) {
++                return 1;
++            }
++            ret->val = float_to_u64(f);
++            return 0;
++        }
++        if (prec == PREC_DOUBLE) {
++            double d = strtod(p, &pos);
++
++            if (*pos) {
++                return 1;
++            }
++            ret->val = double_to_u64(d);
++            return 0;
++        }
++        return 0;
++    } else if (!strcmp(p, "0x0")) {
++        if (prec == PREC_FLOAT) {
++            ret->val = float_to_u64(0.0);
++        } else if (prec == PREC_DOUBLE) {
++            ret->val = double_to_u64(0.0);
++        } else {
++            g_assert_not_reached();
++        }
++        return 0;
++    } else if (!strcmp(p, "0x1")) {
++        if (prec == PREC_FLOAT) {
++            ret->val = float_to_u64(1.0);
++        } else if (prec == PREC_DOUBLE) {
++            ret->val = double_to_u64(1.0);
++        } else {
++            g_assert_not_reached();
++        }
++        return 0;
++    }
++    return 1;
++}
++
++static int find_op(const char *name, enum op *op)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(ops); i++) {
++        if (strcmp(ops[i].name, name) == 0) {
++            *op = i;
++            return 0;
++        }
++    }
++    return 1;
++}
++
++/* Syntax of IBM FP test cases:
++ * https://www.research.ibm.com/haifa/projects/verification/fpgen/syntax.txt
++ */
++static enum error ibm_test_line(const char *line)
++{
++    struct test_op t;
++    /* at most nine fields; this should be more than enough for each field */
++    char s[9][64];
++    char *p;
++    int n, field;
++    int i;
++
++    /* data lines start with either b32 or d(64|128) */
++    if (unlikely(line[0] != 'b' && line[0] != 'd')) {
++        return ERROR_COMMENT;
++    }
++    n = sscanf(line, "%63s %63s %63s %63s %63s %63s %63s %63s %63s",
++               s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7], s[8]);
++    if (unlikely(n < 5 || n > 9)) {
++        return ERROR_INPUT;
++    }
++
++    field = 0;
++    p = s[field];
++    if (unlikely(strlen(p) < 4)) {
++        return ERROR_INPUT;
++    }
++    if (strcmp("b32b64cff", p) == 0) {
++        t.prec = PREC_FLOAT_TO_DOUBLE;
++        if (find_op(&p[6], &t.op)) {
++            return ERROR_NOT_HANDLED;
++        }
++    } else {
++        if (strncmp("b32", p, 3) == 0) {
++            t.prec = PREC_FLOAT;
++        } else if (strncmp("d64", p, 3) == 0) {
++            t.prec = PREC_DOUBLE;
++        } else if (strncmp("d128", p, 4) == 0) {
++            return ERROR_NOT_HANDLED; /* XXX */
++        } else {
++            return ERROR_INPUT;
++        }
++        if (find_op(&p[3], &t.op)) {
++            return ERROR_NOT_HANDLED;
++        }
++    }
++
++    field = 1;
++    p = s[field];
++    if (!strncmp("=0", p, 2)) {
++        t.round = float_round_nearest_even;
++    } else {
++        return ERROR_NOT_HANDLED; /* XXX */
++    }
++
++    /* The trapped exceptions field is optional */
++    t.trapped_exceptions = 0;
++    field = 2;
++    p = s[field];
++    if (ibm_get_exceptions(p, &t.trapped_exceptions)) {
++        if (unlikely(n == 9)) {
++            return ERROR_INPUT;
++        }
++    } else {
++        field++;
++    }
++
++    for (i = 0; i < ops[t.op].n_operands; i++) {
++        enum precision prec = t.prec == PREC_FLOAT_TO_DOUBLE ?
++            PREC_FLOAT : t.prec;
++
++        p = s[field++];
++        if (ibm_fp_hex(p, prec, &t.operands[i])) {
++            return ERROR_INPUT;
++        }
++    }
++
++    p = s[field++];
++    if (strcmp("->", p)) {
++        return ERROR_INPUT;
++    }
++
++    p = s[field++];
++    if (unlikely(strcmp("#", p) == 0)) {
++        t.expected_result_is_valid = false;
++    } else {
++        enum precision prec = t.prec == PREC_FLOAT_TO_DOUBLE ?
++            PREC_DOUBLE : t.prec;
++
++        if (ibm_fp_hex(p, prec, &t.expected_result)) {
++            return ERROR_INPUT;
++        }
++        t.expected_result_is_valid = true;
++    }
++
++    /*
++     * A 0 here means "do not check the exceptions", i.e. it does NOT mean
++     * "there should be no exceptions raised".
++     */
++    t.exceptions = 0;
++    /* the expected exceptions field is optional */
++    if (field == n - 1) {
++        p = s[field++];
++        if (ibm_get_exceptions(p, &t.exceptions)) {
++            return ERROR_INPUT;
++        }
++    }
++
++    /*
++     * We ignore "trapped exceptions" because we're not testing the trapping
++     * mechanism of the host CPU.
++     * We test though that the exception bits are correctly set.
++     */
++    if (t.trapped_exceptions) {
++        return ERROR_NOT_HANDLED;
++    }
++    return tester->func(&t);
++}
++
++static const struct input valid_input_types[] = {
++    [INPUT_FMT_IBM] = {
++        .name = "ibm",
++        .test_line = ibm_test_line,
++    },
++};
++
++static const struct input *input_type = &valid_input_types[INPUT_FMT_IBM];
++
++static bool line_is_whitelisted(const char *line)
++{
++    if (whitelist.ht == NULL) {
++        return false;
++    }
++    return !!g_hash_table_lookup(whitelist.ht, line);
++}
++
++static void test_file(const char *filename)
++{
++    static char line[256];
++    unsigned int i;
++    FILE *fp;
++
++    fp = fopen(filename, "r");
++    if (fp == NULL) {
++        fprintf(stderr, "cannot open file '%s': %s\n",
++                filename, strerror(errno));
++        exit(EXIT_FAILURE);
++    }
++    i = 0;
++    while (fgets(line, sizeof(line), fp)) {
++        enum error err;
++
++        i++;
++        if (unlikely(line_is_whitelisted(line))) {
++            test_stats[ERROR_WHITELISTED]++;
++            continue;
++        }
++        err = input_type->test_line(line);
++        if (unlikely(is_err(err))) {
++            switch (err) {
++            case ERROR_INPUT:
++                fprintf(stderr, "error: malformed input @ %s:%d:\n",
++                        filename, i);
++                break;
++            case ERROR_RESULT:
++                fprintf(stderr, "error: result mismatch for input @ %s:%d:\n",
++                        filename, i);
++                break;
++            case ERROR_EXCEPTIONS:
++                fprintf(stderr, "error: flags mismatch for input @ %s:%d:\n",
++                        filename, i);
++                break;
++            default:
++                g_assert_not_reached();
++            }
++            fprintf(stderr, "%s", line);
++            if (die_on_error) {
++                exit(EXIT_FAILURE);
++            }
++        }
++        test_stats[err]++;
++    }
++    if (fclose(fp)) {
++        fprintf(stderr, "warning: cannot close file '%s': %s\n",
++                filename, strerror(errno));
++    }
++}
++
++static void set_input_fmt(const char *optarg)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(valid_input_types); i++) {
++        const struct input *type = &valid_input_types[i];
++
++        if (strcmp(optarg, type->name) == 0) {
++            input_type = type;
++            return;
++        }
++    }
++    fprintf(stderr, "Unknown input format '%s'", optarg);
++    exit(EXIT_FAILURE);
++}
++
++static void set_tester(const char *optarg)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(valid_testers); i++) {
++        const struct tester *t = &valid_testers[i];
++
++        if (strcmp(optarg, t->name) == 0) {
++            tester = t;
++            return;
++        }
++    }
++    fprintf(stderr, "Unknown tester '%s'", optarg);
++    exit(EXIT_FAILURE);
++}
++
++static void whitelist_add_line(const char *orig_line)
++{
++    char *line;
++    bool inserted;
++
++    if (whitelist.ht == NULL) {
++        whitelist.ht = g_hash_table_new(g_str_hash, g_str_equal);
++    }
++    line = g_hash_table_lookup(whitelist.ht, orig_line);
++    if (unlikely(line != NULL)) {
++        return;
++    }
++    whitelist.n++;
++    whitelist.lines = g_realloc_n(whitelist.lines, whitelist.n, sizeof(line));
++    line = strdup(orig_line);
++    whitelist.lines[whitelist.n - 1] = line;
++    /* if we pass key == val GLib will not reserve space for the value */
++    inserted = g_hash_table_insert(whitelist.ht, line, line);
++    g_assert(inserted);
++}
++
++static void set_whitelist(const char *filename)
++{
++    FILE *fp;
++    static char line[256];
++
++    fp = fopen(filename, "r");
++    if (fp == NULL) {
++        fprintf(stderr, "warning: cannot open white list file '%s': %s\n",
++                filename, strerror(errno));
++        return;
++    }
++    while (fgets(line, sizeof(line), fp)) {
++        if (isspace(line[0]) || line[0] == '#') {
++            continue;
++        }
++        whitelist_add_line(line);
++    }
++    if (fclose(fp)) {
++        fprintf(stderr, "warning: cannot close file '%s': %s\n",
++                filename, strerror(errno));
++    }
++}
++
++static void set_default_exceptions(const char *str)
++{
++    if (ibm_get_exceptions(str, &default_exceptions)) {
++        fprintf(stderr, "Invalid exception '%s'\n", str);
++        exit(EXIT_FAILURE);
++    }
++}
++
++static void usage_complete(int argc, char *argv[])
++{
++    fprintf(stderr, "Usage: %s [options] file1 [file2 ...]\n", argv[0]);
++    fprintf(stderr, "options:\n");
++    fprintf(stderr, "  -a = Perform tininess detection after rounding "
++            "(soft tester only). Default: before\n");
++    fprintf(stderr, "  -n = do not die on error. Default: dies on error\n");
++    fprintf(stderr, "  -e = default exception flags (xiozu). Default: none\n");
++    fprintf(stderr, "  -f = format of the input file(s). Default: %s\n",
++            valid_input_types[0].name);
++    fprintf(stderr, "  -t = tester. Default: %s\n", valid_testers[0].name);
++    fprintf(stderr, "  -w = path to file with test cases to be whitelisted\n");
++    fprintf(stderr, "  -z = flush inputs to zero (soft tester only). "
++            "Default: disabled\n");
++    fprintf(stderr, "  -Z = flush output to zero (soft tester only). "
++            "Default: disabled\n");
++}
++
++static void parse_opts(int argc, char *argv[])
++{
++    int c;
++
++    for (;;) {
++        c = getopt(argc, argv, "ae:f:hnt:w:zZ");
++        if (c < 0) {
++            return;
++        }
++        switch (c) {
++        case 'a':
++            soft_status.float_detect_tininess = float_tininess_after_rounding;
++            break;
++        case 'e':
++            set_default_exceptions(optarg);
++            break;
++        case 'f':
++            set_input_fmt(optarg);
++            break;
++        case 'h':
++            usage_complete(argc, argv);
++            exit(EXIT_SUCCESS);
++        case 'n':
++            die_on_error = false;
++            break;
++        case 't':
++            set_tester(optarg);
++            break;
++        case 'w':
++            set_whitelist(optarg);
++            break;
++        case 'z':
++            soft_status.flush_inputs_to_zero = 1;
++            break;
++        case 'Z':
++            soft_status.flush_to_zero = 1;
++            break;
++        }
++    }
++    g_assert_not_reached();
++}
++
++static uint64_t count_errors(void)
++{
++    uint64_t ret = 0;
++    int i;
++
++    for (i = ERROR_INPUT; i < ERROR_MAX; i++) {
++        ret += test_stats[i];
++    }
++    return ret;
++}
++
++int main(int argc, char *argv[])
++{
++    uint64_t n_errors;
++    int i;
++
++    if (argc == 1) {
++        usage_complete(argc, argv);
++        exit(EXIT_FAILURE);
++    }
++    parse_opts(argc, argv);
++    for (i = optind; i < argc; i++) {
++        test_file(argv[i]);
++    }
++
++    n_errors = count_errors();
++    if (n_errors) {
++        printf("Tests failed: %"PRIu64". Parsing: %"PRIu64
++               ", result:%"PRIu64", flags:%"PRIu64"\n",
++               n_errors, test_stats[ERROR_INPUT], test_stats[ERROR_RESULT],
++               test_stats[ERROR_EXCEPTIONS]);
++    } else {
++        printf("All tests OK.\n");
++    }
++    printf("Tests passed: %" PRIu64 ". Not handled: %" PRIu64
++           ", whitelisted: %"PRIu64 "\n",
++           test_stats[ERROR_NONE], test_stats[ERROR_NOT_HANDLED],
++           test_stats[ERROR_WHITELISTED]);
++    return !!n_errors;
++}
+diff --git a/tests/.gitignore b/tests/.gitignore
+index df69175..f9b0f08 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -97,5 +97,6 @@ test-netfilter
+ test-filter-mirror
+ test-filter-redirector
+ *-test
++!fp-test
+ qapi-schema/*.test.*
+ vm/*.img
+diff --git a/tests/fp-test/.gitignore b/tests/fp-test/.gitignore
+new file mode 100644
+index 0000000..e1e175c
+--- /dev/null
++++ b/tests/fp-test/.gitignore
+@@ -0,0 +1,3 @@
++ibm
++whitelist.txt
++fp-test
+diff --git a/tests/fp-test/Makefile b/tests/fp-test/Makefile
+new file mode 100644
+index 0000000..703434f
+--- /dev/null
++++ b/tests/fp-test/Makefile
+@@ -0,0 +1,34 @@
++BUILD_DIR=$(CURDIR)/../..
++
++include ../../config-host.mak
++include $(SRC_PATH)/rules.mak
++
++$(call set-vpath, $(SRC_PATH)/tests/fp-test $(SRC_PATH)/fpu)
++
++QEMU_INCLUDES += -I../..
++QEMU_INCLUDES += -I$(SRC_PATH)/fpu
++# work around TARGET_* poisoning
++QEMU_CFLAGS += -DHW_POISON_H
++
++IBMFP := ibm-fptests.zip
++
++OBJS := fp-test$(EXESUF)
++
++WHITELIST_FILES := whitelist.txt whitelist-tininess-after.txt
++
++all: $(OBJS) ibm $(WHITELIST_FILES)
++
++ibm:
++	wget -nv -O $(IBMFP) http://www.haifa.il.ibm.com/projects/verification/fpgen/download/test_suite.zip
++	mkdir -p $@
++	unzip $(IBMFP) -d $@
++	rm -rf $(IBMFP)
++
++# XXX: upload this to a qemu server, or just commit it.
++$(WHITELIST_FILES):
++	wget -nv -O $@ http://www.cs.columbia.edu/~cota/qemu/fpbench-$@
++
++fp-test$(EXESUF): fp-test.o softfloat.o
++
++clean:
++	rm -f *.o *.d $(OBJS)
 -- 
 2.7.4
