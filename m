@@ -1,15 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eybSG-0000fs-Ch
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 06:58:53 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1eybSS-0000lH-QF
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 06:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eybSF-0003Rb-Le
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 06:58:52 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 21 Mar 2018 11:58:30 +0100
-Message-Id: <20180321105830.22412-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] scsi: turn "is this a SCSI device?" into a
- conditional hint
+	(envelope-from <rkagan@virtuozzo.com>) id 1eybSP-0003YM-Mf
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 06:59:04 -0400
+Received: from mail-db5eur01hn0226.outbound.protection.outlook.com
+	([104.47.2.226]:1991
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1eybSP-0003Ve-71
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 06:59:01 -0400
+Date: Wed, 21 Mar 2018 13:58:44 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180321105844.GA14983@rkaganb.sw.ru>
+References: <20180316170020.8212-1-vkuznets@redhat.com>
+	<20180316170020.8212-2-vkuznets@redhat.com>
+	<20180319170603.GA12962@rkaganb.sw.ru>
+	<87a7v47z4r.fsf@vitty.brq.redhat.com>
+	<20180320181652.GV3417@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180320181652.GV3417@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] i386/kvm: add support for Hyper-V
+ reenlightenment MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,62 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
 
-If the user does not have permissions to send ioctls to the device (due to
-SELinux or cgroups, for example), the output can look like
+On Tue, Mar 20, 2018 at 03:16:52PM -0300, Eduardo Habkost wrote:
+> On Mon, Mar 19, 2018 at 06:29:08PM +0100, Vitaly Kuznetsov wrote:
+> > Roman Kagan <rkagan@virtuozzo.com> writes:
+> > > (This is also a problem with has_msr_hv_frequencies, and is in general a
+> > > long-standing issue of hv_* properties being done differently from the
+> > > rest of CPUID features.)
+> > 
+> > Suggestions? (To be honest I don't really like us adding new hv_*
+> > property for every new Hyper-V feature we support. I doubt anyone needs
+> > 'partial' Hyper-V emulation. It would be nice to have a single versioned
+> > 'hv' feature implying everything. We may then forbid migrations to older
+> > hv versions. But I don't really know the history of why we decided to go
+> > with a separate hv_* for every feature we add).
+> 
+> You will need "partial" emulation if you want to support
+> live-migration to/from a host where the KVM or QEMU don't support
+> all the features from the current host.
+> 
+> Is this something the current Hyper-V code already supports, or
+> it's something known to be broken?
 
-qemu-kvm: -device scsi-block,drive=disk: cannot get SG_IO version number:
-  Operation not permitted.  Is this a SCSI device?
+There's at least one case I mentioned above where it's broken, but, as
+Paolo pointed out, the real Windows guests wouldn't notice because they
+didn't use the feature due to missing INVTSC.
 
-but this is confusing because the ioctl was blocked _before_ the device
-even received the SG_GET_VERSION_NUM ioctl.  Therefore, for EPERM errors
-the suggestion should be eliminated.  To make that simpler, change the
-code to use error_append_hint.
+I myself haven't tested all possible combinations of hv_* flags and KVM
+versions, but from code inspection I don't immediately see anything else
+that's obviously broken in this regard.
 
-Reported-by: Ala Hino <ahino@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-disk.c    | 7 ++++---
- hw/scsi/scsi-generic.c | 7 ++++---
- 2 files changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 94043ed024..ccc245589a 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2637,9 +2637,10 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
-     /* check we are using a driver managing SG_IO (version 3 and after) */
-     rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
-     if (rc < 0) {
--        error_setg(errp, "cannot get SG_IO version number: %s.  "
--                     "Is this a SCSI device?",
--                     strerror(-rc));
-+        error_setg(errp, "cannot get SG_IO version number: %s", strerror(-rc));
-+        if (rc != -EPERM) {
-+            error_append_hint(errp, "Is this a SCSI device?");
-+        }
-         return;
-     }
-     if (sg_version < 30000) {
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 7414fe2d67..b3de5df324 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -500,9 +500,10 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
-     /* check we are using a driver managing SG_IO (version 3 and after */
-     rc = blk_ioctl(s->conf.blk, SG_GET_VERSION_NUM, &sg_version);
-     if (rc < 0) {
--        error_setg(errp, "cannot get SG_IO version number: %s.  "
--                         "Is this a SCSI device?",
--                         strerror(-rc));
-+        error_setg(errp, "cannot get SG_IO version number: %s", strerror(-rc));
-+        if (rc != -EPERM) {
-+            error_append_hint(errp, "Is this a SCSI device?");
-+        }
-         return;
-     }
-     if (sg_version < 30000) {
--- 
-2.16.2
+Roman.
