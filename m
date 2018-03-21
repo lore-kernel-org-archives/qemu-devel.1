@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyhg0-0004xo-Vl
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:37:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyhfy-0004wA-MH
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:37:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eyhg0-0001h3-51
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:37:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1eyhfx-0001fg-O1
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:37:26 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 21 Mar 2018 18:37:06 +0100
-Message-Id: <20180321173714.14741-5-kwolf@redhat.com>
-In-Reply-To: <20180321173714.14741-1-kwolf@redhat.com>
-References: <20180321173714.14741-1-kwolf@redhat.com>
+Date: Wed, 21 Mar 2018 18:37:02 +0100
+Message-Id: <20180321173714.14741-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.12 v2 04/12] qemu-iotests: Enable 025 for
- luks
+Subject: [Qemu-devel] [PATCH for-2.12 v2 00/12] block: Follow-up for
+ .bdrv_co_create (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +24,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jcody@redhat.com, eblake@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-We want to test resizing even for luks. The only change that is needed
-is to explicitly zero out new space for luks because it's undefined.
+This series adds qemu-iotests for a few more block drivers (yet more to
+come in another series) and fixes a few things that previous review and
+these tests brought up.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tests/qemu-iotests/025 | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+The only major design change is that I converted the vdi block driver
+from a boolean 'static' create option to the standard 'preallocation'
+one that other drivers are using. This seems like a good move to make
+while the interface isn't stable yet.
 
-diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-index f5e672e6b3..70dd5f10aa 100755
---- a/tests/qemu-iotests/025
-+++ b/tests/qemu-iotests/025
-@@ -38,7 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.filter
- . ./common.pattern
-=20
--_supported_fmt raw qcow2 qed
-+_supported_fmt raw qcow2 qed luks
- _supported_proto file sheepdog rbd nfs
- _supported_os Linux
-=20
-@@ -62,6 +62,13 @@ length
- EOF
- _check_test_img
-=20
-+# bdrv_truncate() doesn't zero the new space, so we need to do that expl=
-icitly.
-+# We still want to test automatic zeroing for other formats even though
-+# bdrv_truncate() doesn't guarantee it.
-+if [ "$IMGFMT" =3D=3D "luks" ]; then
-+    $QEMU_IO -c "write -z $small_size $((big_size - small_size))" "$TEST=
-_IMG" > /dev/null
-+fi
-+
- echo
- echo "=3D=3D=3D Verifying image size after reopen"
- $QEMU_IO -c "length" "$TEST_IMG"
+v2:
+- Patch 1: Mention allowed values for 'preallocation' [Eric]
+- Patch 3: Fixed comments, removed 2^63-512 case [Eric]
+- Patch 6: Added missing reference output change [Eric]
+- Patch 7: s/UINT64_MAX/INT64_MAX/ [Eric]
+- Patches 8 and 12: Fixed comments [Eric]
+
+Kevin Wolf (12):
+  vdi: Change 'static' create option to 'preallocation' in QMP
+  vdi: Fix build with CONFIG_VDI_DEBUG
+  qemu-iotests: Test vdi image creation with QMP
+  qemu-iotests: Enable 025 for luks
+  luks: Turn another invalid assertion into check
+  qemu-iotests: Test invalid resize on luks
+  parallels: Check maximum cluster size on create
+  qemu-iotests: Test parallels image creation with QMP
+  vhdx: Require power-of-two block size on create
+  vhdx: Don't use error_setg_errno() with constant errno
+  vhdx: Check for 4 GB maximum log size on creation
+  qemu-iotests: Test vhdx image creation with QMP
+
+ qapi/block-core.json       |   7 +-
+ block/crypto.c             |   6 +-
+ block/parallels.c          |   5 +
+ block/vdi.c                |  46 ++++--
+ block/vhdx.c               |  17 ++-
+ tests/qemu-iotests/025     |   9 +-
+ tests/qemu-iotests/210     |  37 +++++
+ tests/qemu-iotests/210.out |  16 +++
+ tests/qemu-iotests/211     | 246 ++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/211.out |  97 +++++++++++++
+ tests/qemu-iotests/212     | 326 +++++++++++++++++++++++++++++++++++++++=
++++
+ tests/qemu-iotests/212.out | 111 ++++++++++++++
+ tests/qemu-iotests/213     | 349 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/213.out | 121 ++++++++++++++++
+ tests/qemu-iotests/group   |   3 +
+ 15 files changed, 1371 insertions(+), 25 deletions(-)
+ create mode 100755 tests/qemu-iotests/211
+ create mode 100644 tests/qemu-iotests/211.out
+ create mode 100755 tests/qemu-iotests/212
+ create mode 100644 tests/qemu-iotests/212.out
+ create mode 100755 tests/qemu-iotests/213
+ create mode 100644 tests/qemu-iotests/213.out
+
 --=20
 2.13.6
