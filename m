@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyhgs-0005kI-5C
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:38:23 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eyhjY-0008SH-Kl
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:41:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eyhgn-0001xm-Gd
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:38:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40052 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eyhgn-0001xd-C3
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:38:17 -0400
-References: <20180321134005.8822-1-marcandre.lureau@redhat.com>
-	<20180321134005.8822-3-marcandre.lureau@redhat.com>
-	<3ec274aa-0dea-0932-e560-f388c1cbac41@redhat.com>
-	<CAMxuvax_7QPP5rc3aAPKdUFWtfdEphfiN76mM6jnCKk4=QkauQ@mail.gmail.com>
-	<407fd6f2-b88f-02fd-b4f8-9b4abb6a03a9@redhat.com>
-	<CAMxuvawM+oOH7wHEMdcjJAZVaL9PbjfHA+UfMLu5+SbZgchrTw@mail.gmail.com>
-	<2da23a16-51c7-fdcc-dfc5-7eed08f60d6f@redhat.com>
-	<CAJ+F1C+NCwxnGSSE=5JAzf-grC3L4ebtZuXCXfxm9vv84FSPGQ@mail.gmail.com>
-	<e9d6720a-19d9-b5d5-19dc-5c1f9a7a1665@redhat.com>
-	<CAJ+F1CJAy9jDoF-Q8MpOFkjqy0LGJ9EWC3qvwbkpc=eD7_srwA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <858d67db-409f-c23a-3f3c-2812ab1cc1b5@redhat.com>
-Date: Wed, 21 Mar 2018 12:38:16 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eyhjU-0002sS-Jo
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:41:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35584)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eyhjU-0002s2-8U
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 13:41:04 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2LHd55H033036
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 13:41:02 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2gure4k52f-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 13:41:01 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 21 Mar 2018 11:41:01 -0600
+References: <20180313164334.20340-1-danielhb@linux.vnet.ibm.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Wed, 21 Mar 2018 14:40:56 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJAy9jDoF-Q8MpOFkjqy0LGJ9EWC3qvwbkpc=eD7_srwA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180313164334.20340-1-danielhb@linux.vnet.ibm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] qobject: assume base of a qobject is
- at offset 0
+Message-Id: <113b956b-a378-0e0e-2f81-6d846de3121b@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] hw/scsi: support SCSI-2 passthrough
+ without PI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +42,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Armbruster, Markus" <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com
 
-On 03/21/2018 12:23 PM, Marc-Andr=C3=A9 Lureau wrote:
+Ping
 
->>>> struct QObjectCommon {
->>>>       QType type;
->>>>       size_t refcnt;
->>>> }
->>>>
->>>> struct QObject {
->>>>       QObjectCommon base;
->>>> }
->>>>
->>>> struct QString {
->>>>       QObjectCommon base;
->>>>       ...
->>>> }
-
-> What is the QOJECT() macro you proposed with that?
-
-Here's what you can do while still leaving all "subtypes" of QObject=20
-free to put base at a non-zero offset:
-
-#define QOBJECT(o) ((QObject *)(&(o)->base))
-
-QEMU_BUILD_BUG_MSG(offsetof(QObject, base),
-     "base of QObject must be at offset 0");
-
-#define qobject_to(type, obj) ({ \
-     QObjectCommon *_tmp =3D qobject_check_type(obj, glue(QTYPE_CAST_TO_,=
-=20
-type)); \
-     _tmp ? container_of(_tmp, type, base) : (type *)NULL; })
+Can this one be able to hit 2.12?
 
 
-static inline QObjectCommon *qobject_check_type(const QObject *obj,=20
-QType type)
-{
-     if (obj && qobject_type(obj) =3D=3D type) {
-         return QOBJECT(obj);
-     } else {
-         return NULL;
-     }
-}
+Thanks,
 
 
-Or, you keep your idea of requiring ALL subtypes to put base at offset=20
-0, so that qobject_to() also becomes simpler.
+Daniel
 
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+On 03/13/2018 01:43 PM, Daniel Henrique Barboza wrote:
+> QEMU SCSI code makes assumptions about how the PROTECT and BYTCHK
+> works in the protocol, denying support for PI (Protection
+> Information) in case the guest OS requests it. However, in SCSI versions 2
+> and older, there is no PI concept in the protocol.
+>
+> This means that when dealing with such devices:
+>
+> - there is no PROTECT bit in byte 5 of the standard INQUIRY response. The
+> whole byte is marked as "Reserved";
+>
+> - there is no RDPROTECT in byte 2 of READ. We have 'Logical Unit Number'
+> in this field instead;
+>
+> - there is no VRPROTECT in byte 2 of VERIFY. We have 'Logical Unit Number'
+> in this field instead. This also means that the BYTCHK bit in this case
+> is not related to PI.
+>
+> Since QEMU does not consider these changes, a SCSI passthrough using
+> a SCSI-2 device will not work. It will mistake these fields with
+> PI information and return Illegal Request SCSI SENSE thinking
+> that the driver is asking for PI support.
+>
+> This patch fixes it by adding a new attribute called 'scsi_version'
+> that is read from the standard INQUIRY response of passthrough
+> devices. This allows for a version verification before applying
+> conditions related to PI that doesn't apply for older versions.
+>
+> Reported-by: Dac Nguyen <dacng@us.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> ---
+>
+> Changes in v2:
+> - removed "scsi_version" as a property
+> - scsi_version is now initialized with -1 in scsi_realize (that is
+> used by scsi_hd_realize, scsi_cd_realize, scsi_disk_realize and
+> scsi_block_realize) and scsi_generic_realize
+>
+>
+>   hw/scsi/scsi-disk.c    | 14 +++++++++++---
+>   hw/scsi/scsi-generic.c | 42 +++++++++++++++++++++++++++++++-----------
+>   include/hw/scsi/scsi.h |  1 +
+>   3 files changed, 43 insertions(+), 14 deletions(-)
+>
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 49d2559d93..80b1eb92ae 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -2176,7 +2176,7 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+>       case READ_12:
+>       case READ_16:
+>           DPRINTF("Read (sector %" PRId64 ", count %u)\n", r->req.cmd.lba, len);
+> -        if (r->req.cmd.buf[1] & 0xe0) {
+> +        if ((r->req.cmd.buf[1] & 0xe0) && (s->qdev.scsi_version > 2)) {
+>               goto illegal_request;
+>           }
+>           if (!check_lba_range(s, r->req.cmd.lba, len)) {
+> @@ -2206,8 +2206,12 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+>           /* We get here only for BYTCHK == 0x01 and only for scsi-block.
+>            * As far as DMA is concerned, we can treat it the same as a write;
+>            * scsi_block_do_sgio will send VERIFY commands.
+> +         *
+> +         * For scsi versions 2 and older, the BYTCHK isn't related
+> +         * to VRPROTECT (in fact, there is no VRPROTECT). Skip
+> +         * this check in these versions.
+>            */
+> -        if (r->req.cmd.buf[1] & 0xe0) {
+> +        if ((r->req.cmd.buf[1] & 0xe0) && (s->qdev.scsi_version > 2)) {
+>               goto illegal_request;
+>           }
+>           if (!check_lba_range(s, r->req.cmd.lba, len)) {
+> @@ -2383,6 +2387,8 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+>           return;
+>       }
+>
+> +    dev->scsi_version = -1;
+> +
+>       if ((s->features & (1 << SCSI_DISK_F_REMOVABLE)) &&
+>               !(s->features & (1 << SCSI_DISK_F_NO_REMOVABLE_DEVOPS))) {
+>           blk_set_dev_ops(s->qdev.conf.blk, &scsi_disk_removable_block_ops, s);
+> @@ -2796,6 +2802,8 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
+>   static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
+>   {
+>       SCSIBlockReq *r = (SCSIBlockReq *)req;
+> +    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, req->dev);
+> +
+>       r->cmd = req->cmd.buf[0];
+>       switch (r->cmd >> 5) {
+>       case 0:
+> @@ -2821,7 +2829,7 @@ static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
+>           abort();
+>       }
+>
+> -    if (r->cdb1 & 0xe0) {
+> +    if ((r->cdb1 & 0xe0) && (s->qdev.scsi_version > 2)) {
+>           /* Protection information is not supported.  */
+>           scsi_check_condition(&r->req, SENSE_CODE(INVALID_FIELD));
+>           return 0;
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index 7414fe2d67..5cc5598983 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -194,17 +194,35 @@ static void scsi_read_complete(void * opaque, int ret)
+>               r->buf[3] |= 0x80;
+>           }
+>       }
+> -    if (s->type == TYPE_DISK &&
+> -        r->req.cmd.buf[0] == INQUIRY &&
+> -        r->req.cmd.buf[2] == 0xb0) {
+> -        uint32_t max_transfer =
+> -            blk_get_max_transfer(s->conf.blk) / s->blocksize;
+> -
+> -        assert(max_transfer);
+> -        stl_be_p(&r->buf[8], max_transfer);
+> -        /* Also take care of the opt xfer len. */
+> -        stl_be_p(&r->buf[12],
+> -                 MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12])));
+> +    if (r->req.cmd.buf[0] == INQUIRY) {
+> +        /*
+> +         *  EVPD set to zero returns the standard INQUIRY data.
+> +         *
+> +         *  Check if scsi_version is unset (-1) to avoid re-defining it
+> +         *  each time an INQUIRY with standard data is received.
+> +         *
+> +         *  On SCSI-2 and older, first 3 bits of byte 2 is the
+> +         *  ANSI-approved version, while on later versions the
+> +         *  whole byte 2 contains the version. Check if we're dealing
+> +         *  with a newer version and, in that case, assign the
+> +         *  whole byte.
+> +         */
+> +        if ((s->scsi_version == -1) && ((r->req.cmd.buf[1] & 0x01) == 0)) {
+> +            s->scsi_version = r->buf[2] & 0x07;
+> +            if (s->scsi_version > 2) {
+> +                s->scsi_version = r->buf[2];
+> +            }
+> +        }
+> +        if (s->type == TYPE_DISK && r->req.cmd.buf[2] == 0xb0) {
+> +            uint32_t max_transfer =
+> +                blk_get_max_transfer(s->conf.blk) / s->blocksize;
+> +
+> +            assert(max_transfer);
+> +            stl_be_p(&r->buf[8], max_transfer);
+> +            /* Also take care of the opt xfer len. */
+> +            stl_be_p(&r->buf[12],
+> +                     MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12])));
+> +        }
+>       }
+>       scsi_req_data(&r->req, len);
+>       scsi_req_unref(&r->req);
+> @@ -525,6 +543,8 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+>       s->type = scsiid.scsi_type;
+>       DPRINTF("device type %d\n", s->type);
+>
+> +    s->scsi_version = -1;
+> +
+>       switch (s->type) {
+>       case TYPE_TAPE:
+>           s->blocksize = get_stream_blocksize(s->conf.blk);
+> diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+> index 7ecaddac9d..a698c7f60c 100644
+> --- a/include/hw/scsi/scsi.h
+> +++ b/include/hw/scsi/scsi.h
+> @@ -85,6 +85,7 @@ struct SCSIDevice
+>       uint64_t max_lba;
+>       uint64_t wwn;
+>       uint64_t port_wwn;
+> +    int scsi_version;
+>   };
+>
+>   extern const VMStateDescription vmstate_scsi_device;
