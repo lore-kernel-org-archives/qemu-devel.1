@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eyURX-0007s1-Aq
-	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:29:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1eyURX-0007s0-As
+	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eyURU-0005JU-44
+	(envelope-from <dgibson@ozlabs.org>) id 1eyURU-0005Jc-4X
 	for qemu-devel@nongnu.org; Tue, 20 Mar 2018 23:29:39 -0400
-Date: Wed, 21 Mar 2018 14:29:24 +1100
+Date: Wed, 21 Mar 2018 14:17:18 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180321032924.GP3905@umbus.fritz.box>
-References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-	<20180306203103.25563-18-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20180321031718.GN3905@umbus.fritz.box>
+References: <20180315133402.13470-1-clg@kaod.org>
+	<20180315133402.13470-2-clg@kaod.org>
+	<20180317041504.GF4525@umbus.fritz.box>
+	<94790f82-e8d4-0d9d-ec4c-cf80f7afbace@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="U+NfgObvpQT1Q9Yq"
+	protocol="application/pgp-signature"; boundary="N/GrjenRD+RJfyz+"
 Content-Disposition: inline
-In-Reply-To: <20180306203103.25563-18-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 17/19] uninorth: create new uninorth device
+In-Reply-To: <94790f82-e8d4-0d9d-ec4c-cf80f7afbace@kaod.org>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 1/4] target/ppc: export
+ external HPT via virtual hypervisor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,249 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
 
---U+NfgObvpQT1Q9Yq
-Content-Type: text/plain; charset=us-ascii
+--N/GrjenRD+RJfyz+
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 06, 2018 at 08:31:01PM +0000, Mark Cave-Ayland wrote:
-> Commit 4e46dcdbd3 "PPC: Newworld: Add uninorth token register" added a TO=
-DO
-> which was to convert the uninorth registers hack to a proper device. Move
-> these registers to a new uninorth device, removing the old hacks from
-> mac_newworld.c.
+On Sat, Mar 17, 2018 at 09:55:28AM +0100, C=E9dric Le Goater wrote:
+> On 03/17/2018 05:15 AM, David Gibson wrote:
+> > On Thu, Mar 15, 2018 at 01:33:59PM +0000, C=E9dric Le Goater wrote:
+> >> commit e57ca75ce3b2 ("target/ppc: Manage external HPT via virtual
+> >> hypervisor") exported a set of methods to manipulate the HPT from the
+> >> core hash MMU but the base address of the HPT was not part of them and
+> >> SPR_SDR1 is still used under some circumstances, which is incorrect
+> >> for the sPAPR machines.
+> >>
+> >> This is not a major change as only the logging should be impacted but
+> >> nevertheless, it will help to introduce support for the hash MMU on
+> >> POWER9 PowerNV machines.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > This doesn't make sense.  The whole point of the "virtual hypervisor"
+> > is that the hash table doesn't live within the guest address space,
+> > and therefore it *has* no meaningful base address.  Basically
+> > ppc_hash64_hpt_base() should never be called if vhyp is set.  If it
+> > is, that's a bug.
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/pci-host/trace-events       |  2 ++
->  hw/pci-host/uninorth.c         | 58 ++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/ppc/mac_newworld.c          | 41 +++++------------------------
->  hw/ppc/trace-events            |  4 ---
->  include/hw/pci-host/uninorth.h | 11 ++++++++
->  5 files changed, 77 insertions(+), 39 deletions(-)
 >=20
-> diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-> index 341a87a702..dd7a398e96 100644
-> --- a/hw/pci-host/trace-events
-> +++ b/hw/pci-host/trace-events
-> @@ -18,3 +18,5 @@ unin_set_irq(int irq_num, int level) "setting INT %d =
-=3D %d"
->  unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "conve=
-rted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
->  unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0=
-x%"PRIx64 " len %d val 0x%"PRIx64
->  unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%=
-"PRIx64 " len %d val 0x%"PRIx64
-> +unin_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x=
-%"PRIx64
-> +unin_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x%=
-"PRIx64
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index fada0ffd5f..dbfad01d9d 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -519,6 +519,62 @@ static const TypeInfo pci_unin_internal_info =3D {
->      .class_init    =3D pci_unin_internal_class_init,
->  };
-> =20
-> +/* UniN device */
-> +static void unin_write(void *opaque, hwaddr addr, uint64_t value,
-> +                       unsigned size)
-> +{
-> +    trace_unin_write(addr, value);
-> +    if (addr =3D=3D 0x0) {
-> +        *(int *)opaque =3D value;
-> +    }
-> +}
-> +
-> +static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    uint32_t value;
-> +
-> +    value =3D 0;
-> +    switch (addr) {
-> +    case 0:
-> +        value =3D *(int *)opaque;
-> +    }
-> +
-> +    trace_unin_read(addr, value);
-> +
-> +    return value;
-> +}
-> +
-> +static const MemoryRegionOps unin_ops =3D {
-> +    .read =3D unin_read,
-> +    .write =3D unin_write,
-> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> ppc_hash64_hpt_base() is being called in a couple of places but the
+> returned value is only used if the machines is not a pseries :
+>=20
+>   static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
+>   {
+>       if (cpu->vhyp) {
+>           PPCVirtualHypervisorClass *vhc =3D
+>               PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+>           return vhc->hpt_mask(cpu->vhyp);
+>       }
+>       ....
+>=20
+>   const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
+>                                                hwaddr ptex, int n)
+>   {
+>       hwaddr pte_offset =3D ptex * HASH_PTE_SIZE_64;
+>       hwaddr base =3D ppc_hash64_hpt_base(cpu);
+>       hwaddr plen =3D n * HASH_PTE_SIZE_64;
+>       const ppc_hash_pte64_t *hptes;
+>  =20
+>       if (cpu->vhyp) {
+>           PPCVirtualHypervisorClass *vhc =3D
+>               PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+>           return vhc->map_hptes(cpu->vhyp, ptex, n);
+>       } =20
+>       ....
+>  =20
+> and also :
+>  =20
+>   void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>                              uint64_t pte0, uint64_t pte1)
+>   {
+>       hwaddr base =3D ppc_hash64_hpt_base(cpu);
+>       hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
+>  =20
+>       if (cpu->vhyp) {
+>           PPCVirtualHypervisorClass *vhc =3D
+>               PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+>           vhc->store_hpte(cpu->vhyp, ptex, pte0, pte1);
+>           return;
+>       }
+>       ....
 
-DEVICE_NATIVE_ENDIAN is almost always wrong.  I'm pretty sure it
-should be DEVICE_BIG_ENDIAN.  I realize this is just a code motion,
-but while you're making a proper device of it, you might as well fix
-this to.
+Right.. so called, but not really used.  A little ugly, but we get
+away with it for now.
 
-> +};
-> +
-> +static void unin_init(Object *obj)
-> +{
-> +    UNINState *s =3D UNI_NORTH(obj);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->mem, obj, &unin_ops, &s->token, "unin", 0x=
-1000);
-> +
-> +    sysbus_init_mmio(sbd, &s->mem);
-> +}
-> +
-> +static void unin_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> +}
-> +
-> +static const TypeInfo unin_info =3D {
-> +    .name          =3D TYPE_UNI_NORTH,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(UNINState),
-> +    .instance_init =3D unin_init,
-> +    .class_init    =3D unin_class_init,
-> +};
-> +
->  static void unin_register_types(void)
->  {
->      type_register_static(&unin_main_pci_host_info);
-> @@ -530,6 +586,8 @@ static void unin_register_types(void)
->      type_register_static(&pci_u3_agp_info);
->      type_register_static(&pci_unin_agp_info);
->      type_register_static(&pci_unin_internal_info);
-> +
-> +    type_register_static(&unin_info);
->  }
-> =20
->  type_init(unin_register_types)
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index ae0de4e36e..2fcb101982 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -83,36 +83,6 @@
-> =20
->  #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
-> =20
-> -/* UniN device */
-> -static void unin_write(void *opaque, hwaddr addr, uint64_t value,
-> -                       unsigned size)
-> -{
-> -    trace_mac99_uninorth_write(addr, value);
-> -    if (addr =3D=3D 0x0) {
-> -        *(int*)opaque =3D value;
-> -    }
-> -}
-> -
-> -static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
-> -{
-> -    uint32_t value;
-> -
-> -    value =3D 0;
-> -    switch (addr) {
-> -    case 0:
-> -        value =3D *(int*)opaque;
-> -    }
-> -
-> -    trace_mac99_uninorth_read(addr, value);
-> -
-> -    return value;
-> -}
-> -
-> -static const MemoryRegionOps unin_ops =3D {
-> -    .read =3D unin_read,
-> -    .write =3D unin_write,
-> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> -};
-> =20
->  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
->                              Error **errp)
-> @@ -146,7 +116,6 @@ static void ppc_core99_init(MachineState *machine)
->      CPUPPCState *env =3D NULL;
->      char *filename;
->      qemu_irq *pic, **openpic_irqs;
-> -    MemoryRegion *unin_memory =3D g_new(MemoryRegion, 1);
->      int linux_boot, i, j, k;
->      MemoryRegion *ram =3D g_new(MemoryRegion, 1), *bios =3D g_new(Memory=
-Region, 1);
->      hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
-> @@ -165,7 +134,6 @@ static void ppc_core99_init(MachineState *machine)
->      int machine_arch;
->      SysBusDevice *s;
->      DeviceState *dev, *pic_dev;
-> -    int *token =3D g_new(int, 1);
->      hwaddr nvram_addr =3D 0xFFF04000;
->      uint64_t tbfreq;
-> =20
-> @@ -273,9 +241,12 @@ static void ppc_core99_init(MachineState *machine)
->          }
->      }
-> =20
-> -    /* UniN init: XXX should be a real device */
-> -    memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0=
-x1000);
-> -    memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_me=
-mory);
-> +    /* UniN init */
-> +    dev =3D qdev_create(NULL, TYPE_UNI_NORTH);
-> +    qdev_init_nofail(dev);
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    memory_region_add_subregion(get_system_memory(), 0xf8000000,
-> +                                sysbus_mmio_get_region(s, 0));
-> =20
->      openpic_irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
->      openpic_irqs[0] =3D
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index 66ec7eda6e..dc5e65aee9 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -92,10 +92,6 @@ rs6000mc_size_read(uint32_t addr, uint32_t val) "read =
-addr=3D0x%x val=3D0x%x"
->  rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D0x%x val=
-=3D0x%x"
->  rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D0x%x val=
-=3D0x%x"
-> =20
-> -# hw/ppc/mac_newworld.c
-> -mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 =
-" val=3D0x%"PRIx64
-> -mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 "=
- val=3D0x%"PRIx64
-> -
->  # hw/ppc/ppc4xx_pci.c
->  ppc4xx_pci_map_irq(int32_t devfn, int irq_num, int slot) "devfn 0x%x irq=
- %d -> %d"
->  ppc4xx_pci_set_irq(int irq_num) "PCI irq %d"
-> diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
-h.h
-> index d1424b165a..b0eb093e72 100644
-> --- a/include/hw/pci-host/uninorth.h
-> +++ b/include/hw/pci-host/uninorth.h
-> @@ -51,4 +51,15 @@ typedef struct UNINHostState {
->      MemoryRegion pci_io;
->  } UNINHostState;
-> =20
-> +typedef struct UNINState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion mem;
-> +    int token[1];
-> +} UNINState;
-> +
-> +#define TYPE_UNI_NORTH "uni-north"
-> +#define UNI_NORTH(obj) \
-> +    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH)
-> +
->  #endif /* UNINORTH_H */
+> And, in ppc_hash64_htab_lookup(), the HPT base is logged so we need
+> some value returned (today, this is SPR_SDR1 which equals zero but=20
+> that's confusing I think).
+>=20
+>=20
+> If you don't agree with the hpt_base() op, we can change it to
+> something like :
+
+I certainly don't agree with the definition proposed - that can return
+either a guest address or a host userspace address depending on
+various factors.  That's definitely not a sensible interface.
+
+>   static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
+>   {
+>       if (cpu->vhyp) {
+>           /* Unused on sPAPR machines */
+>           return 0;
+>       }
+>       return ppc_hash64_hpt_reg(cpu) & SDR_64_HTABORG;
+>   }
+>=20
+> to be consistent with the other routines. I would like to make sure we
+> don't reach ppc_hash64_hpt_reg() on pseries machines. see patch 3/4.
+
+We could do that, since this routine is basically only used for
+logging / debugging, the 0 acts as just a placeholder.
+
+The more strictly correct (but a bit more work) option would be to put
+an assert(!cpu->vhyp) in there, and fix the code so that we
+really don't call ppc_hash64_hpt_base() in the vhyp cases.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -274,24 +141,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---U+NfgObvpQT1Q9Yq
+--N/GrjenRD+RJfyz+
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqx0ZQACgkQbDjKyiDZ
-s5JKdg//aKsqGXU7WzZ9NciBcSFJNQRbxB1cqzG7afHhTnxrpZfkH8QopVJtjDwX
-4qcemo7yRZJKHTshS4Nx8OmEzpt0LYsy3sBlnSlWWaM6Z5yzpvjK40rfNjdrIeZk
-iz8MML0oV1r8fGr2Xna0Jq2xQ8ql+vqhqSYS+blPw42RGYsgcgmmDStUMLy4TiD4
-gpFY66uxyF66WBH5d6GRM8ZXxqyL/FEZT1vMQWOG7wVVtih6n1mT4pvaN3xEIa+A
-Jgjr9MfJMyRU+INUzE5ibS7FXZnAS4Tj/LIYdLTPzQiw0tlENpoeo76Cd4Pbnaoq
-PeuD1WMMEKTi9U1bYQD8RcLjOOSNyInz0QsbxJ2Ku50PuuNkndo9su47Ga18TLCK
-mJRuj6/tFIek8/u9tncdKhu/QKYScBkBhAse/wWM7IVAQ3XkZyC3yAxsEbmVpgkd
-MIUMN1ltD2zrKgbE0DY3W6k7/V01ubmROqw4dlG9KdUCbaKlVR7qa1l6djjb9LNW
-8RQzA1K1hNtb48A+xGpE/5j15Wbvf4agVWP/Rw1w9eNvsEkQWnOtQ9DW2ZgwiGlX
-kLK/cd7jrJxaEFjY+5SKx4qQDEynlXDo7ej3heGZhyyspfOApEavY6Fbwd43t8eP
-dz2r24Bd/IRA54FfhOgan23NbPioq06FDZ6h8eiepAe3rcfYf8U=
-=tCrK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlqxzrwACgkQbDjKyiDZ
+s5LmFhAAtgc2ZuJSFAUDN716mfqRfCwNSwhWRYIsKfJd8eiR2z/7wAtX0UvH9qK9
+z2c8eaEVoZSBYR4tGvy5ZGn4fKBGmntgpy2RJnHqFAaKeoleCTL2F7OoK7leGzzf
+2vhAmG09UykZM+OCBSifsPAgUDoBCp1Bs09948wJeua6Z/MY3cCO9MeKc1JWtMX8
+3iT9D69S3RN3GsuCKpb2YOYaneBs/NL13G2id2P05hG4iZgICeenaHJCFgfQkjj+
+iV8BHFNYQrwOKfYGY7ZrqHmN4sjTi0wL9uXujcn2emq+e/kIeyu9lTTjpfmOvFOb
+/kPjC6I67fLyd62AEAPSsaaVrjg7rtsAnHyjIlLurYCtnbE5movgM85pPzu+kyjH
+C7JfuGfQKGg/8iBEWcyDs90VJTvtvLMdFOLtHylLGjyT81MtCaMjPlQSaPnbWkvt
+s3HE89+WzRThBNNHb5PlvOqwzeNPj13zXPOFiSfXt5TS74CyG4V4la1lY9/cHngf
+CGVkpMxi71xAfwnyLoAmqy3FzQH7ciKuLzPxZ0T9mbfoPxP+38oThkVcIkviZwfT
+n9OqljgFcuoRViuwdsgzpIJe8yqDtUNS8N87kcuNJjpx2oQ5v03mG7AOZy9A16g7
+tjkSEXKFK8NY53kxdsEi0IQW3IIFE2OmrJIIkPMtte595mvcyT0=
+=vjf8
 -----END PGP SIGNATURE-----
 
---U+NfgObvpQT1Q9Yq--
+--N/GrjenRD+RJfyz+--
