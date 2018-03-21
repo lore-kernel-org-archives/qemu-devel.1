@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIC-0004wC-UC
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:34 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycID-0004wR-8D
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIB-0007hL-2T
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycIA-0007h6-Uj
 	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34892 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34890 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycIA-0007gs-Tg
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:31 -0400
+	id 1eycIA-0007gk-PU
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:52:30 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6729D76FB9
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:52:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4D3F67705E
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:52:20 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:51:26 +0100
-Message-Id: <20180321115211.17937-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:51:22 +0100
+Message-Id: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 04/49] qapi: pass 'if' condition into
- QAPISchemaEntity objects
+Subject: [Qemu-devel] [PATCH v3 00/49] qapi: add #if pre-processor
+ conditions to generated code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,316 +35,365 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Built-in objects remain unconditional.  Explicitly defined objects
-use the condition specified in the schema.  Implicitly defined
-objects inherit their condition from their users.  For most of them,
-there is exactly one user, so the condition to use is obvious.  The
-exception is the wrapped type's generated for simple union variants,
-which can be shared by any number of simple unions.  The tight
-condition would be the disjunction of the conditions of these simple
-unions.  For now, use wrapped type's condition instead.  Much
-simpler and good enough for now.
+Hi,
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/common.py | 97 ++++++++++++++++++++++++++++--------------
- 1 file changed, 65 insertions(+), 32 deletions(-)
+In order to clean-up some hacks in qapi (having to unregister commands
+at runtime), I proposed a "[PATCH v5 02/20] qapi.py: add a simple #ifdef =
+condition"
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 4f9e02b0b4..d8ab3d8f7f 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1006,8 +1006,16 @@ def check_exprs(exprs):
- # Schema compiler frontend
- #
-=20
-+def listify_cond(ifcond):
-+    if not ifcond:
-+        return []
-+    if not isinstance(ifcond, list):
-+        return [ifcond]
-+    return ifcond
-+
-+
- class QAPISchemaEntity(object):
--    def __init__(self, name, info, doc):
-+    def __init__(self, name, info, doc, ifcond=3DNone):
-         assert name is None or isinstance(name, str)
-         self.name =3D name
-         self.module =3D None
-@@ -1018,6 +1026,7 @@ class QAPISchemaEntity(object):
-         # such place).
-         self.info =3D info
-         self.doc =3D doc
-+        self.ifcond =3D listify_cond(ifcond)
-=20
-     def c_name(self):
-         return c_name(self.name)
-@@ -1150,8 +1159,8 @@ class QAPISchemaBuiltinType(QAPISchemaType):
-=20
-=20
- class QAPISchemaEnumType(QAPISchemaType):
--    def __init__(self, name, info, doc, values, prefix):
--        QAPISchemaType.__init__(self, name, info, doc)
-+    def __init__(self, name, info, doc, ifcond, values, prefix):
-+        QAPISchemaType.__init__(self, name, info, doc, ifcond)
-         for v in values:
-             assert isinstance(v, QAPISchemaMember)
-             v.set_owner(name)
-@@ -1186,7 +1195,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-=20
- class QAPISchemaArrayType(QAPISchemaType):
-     def __init__(self, name, info, element_type):
--        QAPISchemaType.__init__(self, name, info, None)
-+        QAPISchemaType.__init__(self, name, info, None, None)
-         assert isinstance(element_type, str)
-         self._element_type_name =3D element_type
-         self.element_type =3D None
-@@ -1194,6 +1203,7 @@ class QAPISchemaArrayType(QAPISchemaType):
-     def check(self, schema):
-         self.element_type =3D schema.lookup_type(self._element_type_name=
-)
-         assert self.element_type
-+        self.ifcond =3D self.element_type.ifcond
-=20
-     def is_implicit(self):
-         return True
-@@ -1215,11 +1225,12 @@ class QAPISchemaArrayType(QAPISchemaType):
-=20
-=20
- class QAPISchemaObjectType(QAPISchemaType):
--    def __init__(self, name, info, doc, base, local_members, variants):
-+    def __init__(self, name, info, doc, ifcond,
-+                 base, local_members, variants):
-         # struct has local_members, optional base, and no variants
-         # flat union has base, variants, and no local_members
-         # simple union has local_members, variants, and no base
--        QAPISchemaType.__init__(self, name, info, doc)
-+        QAPISchemaType.__init__(self, name, info, doc, ifcond)
-         assert base is None or isinstance(base, str)
-         for m in local_members:
-             assert isinstance(m, QAPISchemaObjectTypeMember)
-@@ -1407,8 +1418,8 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectT=
-ypeMember):
-=20
-=20
- class QAPISchemaAlternateType(QAPISchemaType):
--    def __init__(self, name, info, doc, variants):
--        QAPISchemaType.__init__(self, name, info, doc)
-+    def __init__(self, name, info, doc, ifcond, variants):
-+        QAPISchemaType.__init__(self, name, info, doc, ifcond)
-         assert isinstance(variants, QAPISchemaObjectTypeVariants)
-         assert variants.tag_member
-         variants.set_owner(name)
-@@ -1444,9 +1455,9 @@ class QAPISchemaAlternateType(QAPISchemaType):
-=20
-=20
- class QAPISchemaCommand(QAPISchemaEntity):
--    def __init__(self, name, info, doc, arg_type, ret_type,
-+    def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
-                  gen, success_response, boxed, allow_oob):
--        QAPISchemaEntity.__init__(self, name, info, doc)
-+        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-         self._arg_type_name =3D arg_type
-@@ -1485,8 +1496,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
-=20
-=20
- class QAPISchemaEvent(QAPISchemaEntity):
--    def __init__(self, name, info, doc, arg_type, boxed):
--        QAPISchemaEntity.__init__(self, name, info, doc)
-+    def __init__(self, name, info, doc, ifcond, arg_type, boxed):
-+        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-         assert not arg_type or isinstance(arg_type, str)
-         self._arg_type_name =3D arg_type
-         self.arg_type =3D None
-@@ -1581,22 +1592,22 @@ class QAPISchema(object):
-                   ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type =3D QAPISchemaObjectType(
--            'q_empty', None, None, None, [], None)
-+            'q_empty', None, None, None, None, [], None)
-         self._def_entity(self.the_empty_object_type)
-         qtype_values =3D self._make_enum_members(['none', 'qnull', 'qnum=
-',
-                                                 'qstring', 'qdict', 'qli=
-st',
-                                                 'qbool'])
--        self._def_entity(QAPISchemaEnumType('QType', None, None,
-+        self._def_entity(QAPISchemaEnumType('QType', None, None, None,
-                                             qtype_values, 'QTYPE'))
-=20
-     def _make_enum_members(self, values):
-         return [QAPISchemaMember(v) for v in values]
-=20
--    def _make_implicit_enum_type(self, name, info, values):
-+    def _make_implicit_enum_type(self, name, info, ifcond, values):
-         # See also QAPISchemaObjectTypeMember._pretty_owner()
-         name =3D name + 'Kind'   # Use namespace reserved by add_name()
-         self._def_entity(QAPISchemaEnumType(
--            name, info, None, self._make_enum_members(values), None))
-+            name, info, None, ifcond, self._make_enum_members(values), N=
-one))
-         return name
-=20
-     def _make_array_type(self, element_type, info):
-@@ -1605,22 +1616,37 @@ class QAPISchema(object):
-             self._def_entity(QAPISchemaArrayType(name, info, element_typ=
-e))
-         return name
-=20
--    def _make_implicit_object_type(self, name, info, doc, role, members)=
-:
-+    def _make_implicit_object_type(self, name, info, doc, ifcond,
-+                                   role, members):
-         if not members:
-             return None
-         # See also QAPISchemaObjectTypeMember._pretty_owner()
-         name =3D 'q_obj_%s-%s' % (name, role)
--        if not self.lookup_entity(name, QAPISchemaObjectType):
--            self._def_entity(QAPISchemaObjectType(name, info, doc, None,
--                                                  members, None))
-+        typ =3D self.lookup_entity(name, QAPISchemaObjectType)
-+        if typ:
-+            # The implicit object type has multiple users.  This can
-+            # happen only for simple unions' implicit wrapper types.
-+            # Its ifcond should be the disjunction of its user's
-+            # ifconds.  Not implemented.  Instead, we always pass the
-+            # wrapped type's ifcond, which is trivially the same for all
-+            # users.  It's also necessary for the wrapper to compile.
-+            # But it's not tight: the disjunction need not imply it.  We
-+            # may end up compiling useless wrapper types.
-+            # TODO kill simple unions or implement the disjunction
-+            assert ifcond =3D=3D typ.ifcond
-+        else:
-+            self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
-d,
-+                                                  None, members, None))
-         return name
-=20
-     def _def_enum_type(self, expr, info, doc):
-         name =3D expr['enum']
-         data =3D expr['data']
-         prefix =3D expr.get('prefix')
-+        ifcond =3D expr.get('if')
-         self._def_entity(QAPISchemaEnumType(
--            name, info, doc, self._make_enum_members(data), prefix))
-+            name, info, doc, ifcond,
-+            self._make_enum_members(data), prefix))
-=20
-     def _make_member(self, name, typ, info):
-         optional =3D False
-@@ -1640,7 +1666,8 @@ class QAPISchema(object):
-         name =3D expr['struct']
-         base =3D expr.get('base')
-         data =3D expr['data']
--        self._def_entity(QAPISchemaObjectType(name, info, doc, base,
-+        ifcond =3D expr.get('if')
-+        self._def_entity(QAPISchemaObjectType(name, info, doc, ifcond, b=
-ase,
-                                               self._make_members(data, i=
-nfo),
-                                               None))
-=20
-@@ -1652,18 +1679,21 @@ class QAPISchema(object):
-             assert len(typ) =3D=3D 1
-             typ =3D self._make_array_type(typ[0], info)
-         typ =3D self._make_implicit_object_type(
--            typ, info, None, 'wrapper', [self._make_member('data', typ, =
-info)])
-+            typ, info, None, self.lookup_type(typ).ifcond,
-+            'wrapper', [self._make_member('data', typ, info)])
-         return QAPISchemaObjectTypeVariant(case, typ)
-=20
-     def _def_union_type(self, expr, info, doc):
-         name =3D expr['union']
-         data =3D expr['data']
-         base =3D expr.get('base')
-+        ifcond =3D expr.get('if')
-         tag_name =3D expr.get('discriminator')
-         tag_member =3D None
-         if isinstance(base, dict):
--            base =3D (self._make_implicit_object_type(
--                name, info, doc, 'base', self._make_members(base, info))=
-)
-+            base =3D self._make_implicit_object_type(
-+                name, info, doc, ifcond,
-+                'base', self._make_members(base, info))
-         if tag_name:
-             variants =3D [self._make_variant(key, value)
-                         for (key, value) in data.items()]
-@@ -1671,12 +1701,12 @@ class QAPISchema(object):
-         else:
-             variants =3D [self._make_simple_variant(key, value, info)
-                         for (key, value) in data.items()]
--            typ =3D self._make_implicit_enum_type(name, info,
-+            typ =3D self._make_implicit_enum_type(name, info, ifcond,
-                                                 [v.name for v in variant=
-s])
-             tag_member =3D QAPISchemaObjectTypeMember('type', typ, False=
-)
-             members =3D [tag_member]
-         self._def_entity(
--            QAPISchemaObjectType(name, info, doc, base, members,
-+            QAPISchemaObjectType(name, info, doc, ifcond, base, members,
-                                  QAPISchemaObjectTypeVariants(tag_name,
-                                                               tag_member=
-,
-                                                               variants))=
-)
-@@ -1684,11 +1714,12 @@ class QAPISchema(object):
-     def _def_alternate_type(self, expr, info, doc):
-         name =3D expr['alternate']
-         data =3D expr['data']
-+        ifcond =3D expr.get('if')
-         variants =3D [self._make_variant(key, value)
-                     for (key, value) in data.items()]
-         tag_member =3D QAPISchemaObjectTypeMember('type', 'QType', False=
-)
-         self._def_entity(
--            QAPISchemaAlternateType(name, info, doc,
-+            QAPISchemaAlternateType(name, info, doc, ifcond,
-                                     QAPISchemaObjectTypeVariants(None,
-                                                                  tag_mem=
-ber,
-                                                                  variant=
-s)))
-@@ -1701,13 +1732,14 @@ class QAPISchema(object):
-         success_response =3D expr.get('success-response', True)
-         boxed =3D expr.get('boxed', False)
-         allow_oob =3D expr.get('allow-oob', False)
-+        ifcond =3D expr.get('if')
-         if isinstance(data, OrderedDict):
-             data =3D self._make_implicit_object_type(
--                name, info, doc, 'arg', self._make_members(data, info))
-+                name, info, doc, ifcond, 'arg', self._make_members(data,=
- info))
-         if isinstance(rets, list):
-             assert len(rets) =3D=3D 1
-             rets =3D self._make_array_type(rets[0], info)
--        self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
-+        self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data=
-, rets,
-                                            gen, success_response,
-                                            boxed, allow_oob))
-=20
-@@ -1715,10 +1747,11 @@ class QAPISchema(object):
-         name =3D expr['event']
-         data =3D expr.get('data')
-         boxed =3D expr.get('boxed', False)
-+        ifcond =3D expr.get('if')
-         if isinstance(data, OrderedDict):
-             data =3D self._make_implicit_object_type(
--                name, info, doc, 'arg', self._make_members(data, info))
--        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed))
-+                name, info, doc, ifcond, 'arg', self._make_members(data,=
- info))
-+        self._def_entity(QAPISchemaEvent(name, info, doc, ifcond, data, =
-boxed))
-=20
-     def _def_exprs(self, exprs):
-         for expr_elem in exprs:
+(see http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03106.html).
+
+However, we decided to drop that patch from the series and solve the
+problem later. The main issues were:
+- the syntax was awkward to the JSON schema and documentation
+- the evaluation of the condition was done in the qapi scripts, with
+  very limited capability
+- each target/config would need different generated files.
+
+Instead, it could defer the #if evaluation to the C-preprocessor.
+
+With this series, top-level qapi JSON entity can take 'if' keys:
+
+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+  'if': 'defined(TEST_IF_STRUCT)' }
+
+Members can be exploded as dictionnary with 'type'/'if' keys:
+
+{ 'struct': 'TestIfStruct', 'data':
+  { 'foo': 'int',
+    'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
+
+Enum values can be exploded as dictionnary with 'type'/'if' keys:
+
+{ 'enum': 'TestIfEnum', 'data':
+  [ 'foo',
+    { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
+
+A benefit from having conditional schema is that introspection will
+reflect more accurately the capability of the server. Another benefit
+is that it may help to remove some dead code when disabling a
+functionality.
+
+Starting from patch "qapi: add conditions to VNC type/commands/events
+on the schema", the series demonstrates adding conditions.
+
+The schema is splitted in common and per-target parts starting from
+"RFC: qapi: learn to split schema by 'top-unit'" patch. This allows a
+target schema to use target-poisoned defines as conditions (such as
+TARGET_I386).
+
+There are a lot more things one can make conditional in the QAPI
+schema, like pci/kvm/xen/numa/vde/slirp/posix/win32/vsock/lzo etc etc,
+however I am still evaluating the implication of such changes both
+externally and internally, for those interested, I can share my wip
+branch.
+
+Comments welcome,
+
+v5:
+- adapt to the new 'modular' / single generator design, making
+  splitting schema a bit more complicated than before, when it was
+  only at build-sys level. See "RFC: qapi: learn to split schema by
+  'top-unit'" for the new apporach at splitting common and target
+  parts.
+- replace the #if-wrapper decorator with a @contextmanager (if necessary,
+  this could be replaced by explicit begin/end calls instead now)
+- better split of target events, introducing seperate limiter/emitter
+- add a 'RFC: make RTC_CHANGE per-target' to show how conditional
+  could be used and exercice the 'per-unit' event limiter
+- +painful rebase
+- add some r-b tags
+
+v4:
+- added "qlit: use QType instead of int" patch
+- use a "default:" case in qobject_from_qlit()
+- added a test for invalid 'if': ['']
+- listify ifcond in constructors
+- added "qapi: leave the ifcond attribute undefined until check()"
+  patch (could be squashed)
+- use a negative lookahead in "qapi: mcgen() shouldn't indent # lines"
+- fix extra empty line in "qapi-introspect: add preprocessor
+  conditions to generated QLit"
+- added desugar/normalization passes, such as NAME -> { 'name': NAME }
+- splitted "qapi: change enum visitor to take QAPISchemaMember"
+- prettify test-qapi.py members output
+- added missing #if wrapping for enum members in generated introspection
+- clarified some error messages
+- added "qapi: rename allow_dict to allow_implicit" patch for clarity
+- added a seperate patch for "qapi: add a dictionnary form" for enum
+  names
+- added a seperate patch for "qapi: add a dictionnary form" for struct
+  members
+- squashed the patches adding #if to generated code (some types
+  generate both enum and struct members for example, so a step-by-step
+  is unnecessarily complicated to deal with)
+- squashed some tests with related patch
+- added "qapi: add an error in case a discriminator is conditionnal"
+- add back VNC-specific crypto 'des-rfb' when VNC is disabled
+- change the way unit filtering is done (so no -u means no filtering)
+- made target.json the top-level documentation schema
+- removed some blank lines in generated code output
+- improve documentation, add various tests
+- commit message improvements
+- misc pycodestyle/pep8 fixes
+- add r-b tags
+
+v3:
+- rebased (qlit is now merged upstream)
+- solve the per-target #ifdef problem by using a target.json
+  and new qapi generated target files
+- update some commit messages based on Markus review
+- more schema error reporting
+- move the ifcond argument closer to info/doc
+- use mcgen() in gen_if()/gen_endif()
+- simplify "modify to_qlit() to take an optional suffix"
+- fix generated qlit indentation
+- fix temporary build break by merging #if types & visitors patch
+- fix some redundant condtionals generation
+- change enum visitor to take QAPISchemaMember
+- reject unknown dictionnary keys in { .., 'if': ..}
+- split qapi test visitor print() with trailing ',' trick
+
+v2: after Markus review
+ - "qboject: add literal qobject type", splitted & many updates
+ - "qapi: generate a literal qobject for introspection", fixed leak
+ - "visitor: pass size of strings array to enum visitor", rewrote as a
+  series of patches to change char*[] to struct { int n, char *[] }.
+ - split the "if" patches in parsing, tests, generation
+ - added a docs/devel/qapi-code-gen.txt patch
+ - added a patch to remove enum value assignment, to avoid "holes"
+   with #if values
+ - update #if VNC patch, compile out "info vnc", compile out des-rfb
+ - dropped "qobject: replace dump_qobject() by qobject_to_string()" patch
+ - dropped qapi.mk patch
+ - other smaller changes
+
+Marc-Andr=C3=A9 Lureau (49):
+  qapi/visit: remove useless prefix argument
+  qapi/events: generate event enum in main module
+  qapi: add 'if' to top-level expressions
+  qapi: pass 'if' condition into QAPISchemaEntity objects
+  qapi: leave the ifcond attribute undefined until check()
+  qapi: add 'ifcond' to visitor methods
+  qapi: mcgen() shouldn't indent # lines
+  qapi: add #if/#endif helpers
+  qapi-introspect: modify to_qlit() to append ',' on level > 0
+  qapi-introspect: add preprocessor conditions to generated QLit
+  qapi/commands: add #if conditions to commands
+  qapi/events: add #if conditions to events
+  qapi-types: refactor variants handling
+  qapi-types: add #if conditions to types & visitors
+  qapi: do not define enumeration value explicitely
+  qapi: rename QAPISchemaEnumType.values to .members
+  qapi: change enum visitor to take QAPISchemaMember
+  tests: modify visit_enum_type() in test-qapi to print members
+  qapi: factor out check_known_keys()
+  qapi: add a dictionnary form with 'name' key for enum members
+  qapi: add 'if' to enum members
+  qapi-event: add 'if' condition to implicit event enum
+  qapi: rename allow_dict to allow_implicit
+  qapi: add a dictionary form with 'type' key for members
+  qapi: add 'if' to implicit struct members
+  qapi: add an error in case a discriminator is conditionnal
+  qapi: add 'if' on union members
+  qapi: add 'if' to alternate members
+  qapi: add #if conditions to generated code members
+  docs: document schema configuration
+  qapi2texi: add 'If:' section to generated documentation
+  qapi2texi: add 'If:' condition to enum values
+  qapi2texi: add 'If:' condition to struct members
+  qapi2texi: add condition to variants
+  qapi: add conditions to VNC type/commands/events on the schema
+  qapi: add conditions to SPICE type/commands/events on the schema
+  qapi: add conditions to REPLICATION type/commands on the schema
+  build-sys: move qmp-introspect per target
+  qapi-commands: don't initialize command list in qmp_init_marshall()
+  RFC: qapi: learn to split schema by 'top-unit'
+  qapi: add a top-unit 'target' schema
+  qapi: make rtc-reset-reinjection and SEV depend on TARGET_I386
+  qapi: make s390 commands depend on TARGET_S390X
+  target.json: add a note about query-cpu* not being s390x-specific
+  qapi: make query-gic-capabilities depend on TARGET_ARM
+  qapi: make query-cpu-model-expansion depend on s390 or x86
+  qapi: make query-cpu-definitions depend on specific targets
+  qapi: remove qmp_unregister_command()
+  RFC: make RTC_CHANGE per-target
+
+ qapi/block-core.json                          |  13 +-
+ qapi/char.json                                |  10 +-
+ qapi/migration.json                           |  12 +-
+ qapi/misc.json                                | 380 -----------
+ qapi/qapi-schema.json                         |   1 +
+ qapi/target.json                              | 415 ++++++++++++
+ qapi/ui.json                                  |  75 ++-
+ scripts/qapi/commands.py                      |  43 +-
+ scripts/qapi/common.py                        | 599 +++++++++++++-----
+ scripts/qapi/doc.py                           |  46 +-
+ scripts/qapi/events.py                        |  45 +-
+ scripts/qapi/introspect.py                    |  57 +-
+ scripts/qapi/types.py                         |  98 +--
+ scripts/qapi/visit.py                         |  59 +-
+ include/qapi/qmp-event.h                      |   4 +
+ include/qapi/qmp/dispatch.h                   |   1 -
+ include/sysemu/arch_init.h                    |  11 -
+ target/i386/sev_i386.h                        |   2 +-
+ ui/vnc.h                                      |   2 +
+ hmp.c                                         |   9 +-
+ hw/ppc/spapr_rtc.c                            |   2 +-
+ hw/s390x/s390-skeys.c                         |   2 +-
+ hw/timer/mc146818rtc.c                        |   4 +-
+ migration/colo.c                              |  16 +-
+ monitor.c                                     | 297 +++++----
+ qapi/qmp-event.c                              |  11 +
+ qapi/qmp-registry.c                           |   8 -
+ qga/main.c                                    |   1 +
+ qmp.c                                         |  72 +--
+ stubs/arch-query-cpu-def.c                    |  11 -
+ stubs/arch-query-cpu-model-baseline.c         |  13 -
+ stubs/arch-query-cpu-model-comparison.c       |  13 -
+ stubs/arch-query-cpu-model-expansion.c        |  13 -
+ target/arm/helper.c                           |   3 +-
+ target/arm/monitor.c                          |   2 +-
+ target/i386/cpu.c                             |   6 +-
+ target/ppc/translate_init.c                   |   3 +-
+ target/s390x/cpu_models.c                     |   9 +-
+ tests/test-qmp-cmds.c                         |   7 +
+ tests/test-qobject-input-visitor.c            |   1 -
+ Makefile                                      |   1 +
+ Makefile.objs                                 |   2 -
+ Makefile.target                               |   4 +
+ docs/devel/qapi-code-gen.txt                  |  38 ++
+ hmp-commands-info.hx                          |   2 +
+ stubs/Makefile.objs                           |   4 -
+ tests/Makefile.include                        |  14 +-
+ tests/qapi-schema/alternate-base.err          |   2 +-
+ tests/qapi-schema/alternate-invalid-dict.err  |   1 +
+ ...ember.exit =3D> alternate-invalid-dict.exit} |   0
+ tests/qapi-schema/alternate-invalid-dict.json |   4 +
+ ...-member.out =3D> alternate-invalid-dict.out} |   0
+ tests/qapi-schema/bad-if-empty-list.err       |   1 +
+ tests/qapi-schema/bad-if-empty-list.exit      |   1 +
+ tests/qapi-schema/bad-if-empty-list.json      |   3 +
+ tests/qapi-schema/bad-if-empty-list.out       |   0
+ tests/qapi-schema/bad-if-empty.err            |   1 +
+ tests/qapi-schema/bad-if-empty.exit           |   1 +
+ tests/qapi-schema/bad-if-empty.json           |   3 +
+ tests/qapi-schema/bad-if-empty.out            |   0
+ tests/qapi-schema/bad-if-list.err             |   1 +
+ tests/qapi-schema/bad-if-list.exit            |   1 +
+ tests/qapi-schema/bad-if-list.json            |   3 +
+ tests/qapi-schema/bad-if-list.out             |   0
+ tests/qapi-schema/bad-if.err                  |   1 +
+ tests/qapi-schema/bad-if.exit                 |   1 +
+ tests/qapi-schema/bad-if.json                 |   3 +
+ tests/qapi-schema/bad-if.out                  |   0
+ tests/qapi-schema/comments.out                |  14 +-
+ tests/qapi-schema/doc-bad-section.out         |  13 +-
+ tests/qapi-schema/doc-good.json               |  11 +-
+ tests/qapi-schema/doc-good.out                |  23 +-
+ tests/qapi-schema/doc-good.texi               |  10 +-
+ tests/qapi-schema/double-type.err             |   2 +-
+ tests/qapi-schema/empty.out                   |   9 +-
+ tests/qapi-schema/enum-bad-member.err         |   1 +
+ tests/qapi-schema/enum-bad-member.exit        |   1 +
+ tests/qapi-schema/enum-bad-member.json        |   2 +
+ tests/qapi-schema/enum-bad-member.out         |   0
+ .../qapi-schema/enum-dict-member-unknown.err  |   1 +
+ .../qapi-schema/enum-dict-member-unknown.exit |   1 +
+ .../qapi-schema/enum-dict-member-unknown.json |   2 +
+ .../qapi-schema/enum-dict-member-unknown.out  |   0
+ tests/qapi-schema/enum-dict-member.err        |   1 -
+ tests/qapi-schema/enum-dict-member.json       |   2 -
+ tests/qapi-schema/enum-if-invalid.err         |   1 +
+ tests/qapi-schema/enum-if-invalid.exit        |   1 +
+ tests/qapi-schema/enum-if-invalid.json        |   3 +
+ tests/qapi-schema/enum-if-invalid.out         |   0
+ tests/qapi-schema/enum-missing-data.err       |   2 +-
+ tests/qapi-schema/event-case.out              |   9 +-
+ tests/qapi-schema/event-nest-struct.err       |   2 +-
+ tests/qapi-schema/flat-union-inline.err       |   2 +-
+ .../flat-union-invalid-if-discriminator.err   |   1 +
+ .../flat-union-invalid-if-discriminator.exit  |   1 +
+ .../flat-union-invalid-if-discriminator.json  |  17 +
+ .../flat-union-invalid-if-discriminator.out   |   0
+ tests/qapi-schema/ident-with-escape.out       |   9 +-
+ tests/qapi-schema/include-relpath.out         |  14 +-
+ tests/qapi-schema/include-repetition.out      |  14 +-
+ tests/qapi-schema/include-simple.out          |  14 +-
+ tests/qapi-schema/indented-expr.out           |   9 +-
+ tests/qapi-schema/nested-struct-data.err      |   2 +-
+ tests/qapi-schema/qapi-schema-test.json       |  46 +-
+ tests/qapi-schema/qapi-schema-test.out        | 100 ++-
+ .../struct-member-invalid-dict.err            |   1 +
+ .../struct-member-invalid-dict.exit           |   1 +
+ .../struct-member-invalid-dict.json           |   3 +
+ .../struct-member-invalid-dict.out            |   0
+ tests/qapi-schema/test-qapi.py                |  39 +-
+ .../qapi-schema/union-branch-invalid-dict.err |   1 +
+ .../union-branch-invalid-dict.exit            |   1 +
+ .../union-branch-invalid-dict.json            |   4 +
+ .../qapi-schema/union-branch-invalid-dict.out |   0
+ tests/qapi-schema/unknown-expr-key.err        |   2 +-
+ tests/qapi-schema/unknown-expr-key.json       |   2 +-
+ 116 files changed, 1768 insertions(+), 1094 deletions(-)
+ create mode 100644 qapi/target.json
+ mode change 100644 =3D> 100755 scripts/qapi/doc.py
+ delete mode 100644 stubs/arch-query-cpu-def.c
+ delete mode 100644 stubs/arch-query-cpu-model-baseline.c
+ delete mode 100644 stubs/arch-query-cpu-model-comparison.c
+ delete mode 100644 stubs/arch-query-cpu-model-expansion.c
+ create mode 100644 tests/qapi-schema/alternate-invalid-dict.err
+ rename tests/qapi-schema/{enum-dict-member.exit =3D> alternate-invalid-d=
+ict.exit} (100%)
+ create mode 100644 tests/qapi-schema/alternate-invalid-dict.json
+ rename tests/qapi-schema/{enum-dict-member.out =3D> alternate-invalid-di=
+ct.out} (100%)
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.err
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.exit
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.json
+ create mode 100644 tests/qapi-schema/bad-if-empty-list.out
+ create mode 100644 tests/qapi-schema/bad-if-empty.err
+ create mode 100644 tests/qapi-schema/bad-if-empty.exit
+ create mode 100644 tests/qapi-schema/bad-if-empty.json
+ create mode 100644 tests/qapi-schema/bad-if-empty.out
+ create mode 100644 tests/qapi-schema/bad-if-list.err
+ create mode 100644 tests/qapi-schema/bad-if-list.exit
+ create mode 100644 tests/qapi-schema/bad-if-list.json
+ create mode 100644 tests/qapi-schema/bad-if-list.out
+ create mode 100644 tests/qapi-schema/bad-if.err
+ create mode 100644 tests/qapi-schema/bad-if.exit
+ create mode 100644 tests/qapi-schema/bad-if.json
+ create mode 100644 tests/qapi-schema/bad-if.out
+ create mode 100644 tests/qapi-schema/enum-bad-member.err
+ create mode 100644 tests/qapi-schema/enum-bad-member.exit
+ create mode 100644 tests/qapi-schema/enum-bad-member.json
+ create mode 100644 tests/qapi-schema/enum-bad-member.out
+ create mode 100644 tests/qapi-schema/enum-dict-member-unknown.err
+ create mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
+ create mode 100644 tests/qapi-schema/enum-dict-member-unknown.json
+ create mode 100644 tests/qapi-schema/enum-dict-member-unknown.out
+ delete mode 100644 tests/qapi-schema/enum-dict-member.err
+ delete mode 100644 tests/qapi-schema/enum-dict-member.json
+ create mode 100644 tests/qapi-schema/enum-if-invalid.err
+ create mode 100644 tests/qapi-schema/enum-if-invalid.exit
+ create mode 100644 tests/qapi-schema/enum-if-invalid.json
+ create mode 100644 tests/qapi-schema/enum-if-invalid.out
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.err
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.exit
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.json
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.out
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.err
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.json
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.out
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.err
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.json
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.out
+
 --=20
 2.16.2.521.g9aa15f885a
