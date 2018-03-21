@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eyeOT-0003bX-My
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:07:15 -0400
+	(envelope-from <famz@redhat.com>) id 1eyeP2-0003zX-3A
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eyeON-0000Uw-VY
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:07:09 -0400
-Date: Wed, 21 Mar 2018 15:06:54 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180321140654.7h3nkkdlztu6mtrq@sirius.home.kraxel.org>
-References: <alpine.BSF.2.21.1803202324320.13789@zero.eik.bme.hu>
+	(envelope-from <famz@redhat.com>) id 1eyeOv-0000of-T6
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:07:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33576 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eyeOv-0000oH-NP
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 10:07:37 -0400
+Date: Wed, 21 Mar 2018 22:07:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180321140734.GB2188@lemon.usersys.redhat.com>
+References: <20180216164620.GA53727@humpty.home.comstyle.com>
+	<c4407146-8ec6-c317-9ec8-a47ab909fb94@amsat.org>
+	<85dc7f9f-95e1-c666-ee17-8f04d008d21b@gmx.com>
+	<e625c026-2fa4-f3ea-d85e-080c65a4885f@amsat.org>
+	<128f62e5-9184-57e5-88c1-d5cc4bf27d4f@redhat.com>
+	<20180321081112.GE26017@lemon.usersys.redhat.com>
+	<9b247ea1-7a91-6d39-6c80-7c1679c6a098@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1803202324320.13789@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] Monitor and serial output window broken with SDL2
+In-Reply-To: <9b247ea1-7a91-6d39-6c80-7c1679c6a098@redhat.com>
+Subject: Re: [Qemu-devel] make vm-test [was: [PATCH] maintainers: Add myself
+ as a OpenBSD maintainer]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Kamil Rytarowski <n54@gmx.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
 
-On Tue, Mar 20, 2018 at 11:43:08PM +0100, BALATON Zoltan wrote:
-> Hello,
+On Wed, 03/21 08:14, Eric Blake wrote:
+> On 03/21/2018 03:11 AM, Fam Zheng wrote:
+> > > Thanks for this; today was my first day trying the various vm-build-
+> > > targets.
+> > > 
+> > > Question: is this expected behavior?
+> > > 
+> > > $ make vm-build-ubuntu.i386
+> > >      VM-IMAGE ubuntu.i386
+> > > ...
+> > > Image resized.
+> > > debconf: unable to initialize frontend: Dialog
+> > > debconf: (TERM is not set, so the dialog frontend is not usable.)
 > 
-> With SDL2 the monitor and serial output windows behave differently than they
-> used to with SDL1.2 in that they are opening in separate windows. This is an
-> unexpected change we've discussed before but other than this there are
-> actual bugs with SDL2:
+> > > 
+> > > I'm wondering if the image initialized incorrectly, and as a result can't do
+> > > as much as it's supposed to do, or runs way slower than it needs to?  The
+> > > command eventually completed with status 0, but failed to find a 32-bit
+> > > compile error in the rdma code, and the output log does not look like it
+> > > actually attempted to compile anything in qemu (unless it did compile it,
+> > > but the logs were not output to stdout/stderr).
+> > > 
+> > > make vm-build-freebsd was a lot faster at completing for me (but shows that
+> > > we still have a lot of clang warnings about address of a packed struct
+> > > member).
+> > > 
+> > 
+> > Was it a clean repo? Did you try "rm -rf ~/.cache/qemu-vm"? This morning the
+> > command worked for me from a clean env (on RHEL 7, using a QEMU built from
+> > qemu.git), and I didn't see the errors/warnings you pasted. (BTW I don't
+> > understand how sudo has anything to do with the dummy host name.)
 > 
-> 1. Scrollback does not work. With SDL1.2 it is possible to scroll the
-> monitor (and maybe other output windows as well, I'm not sure about that)
-> with Ctrl+PgUp/PgDn but this does not work with SDL2. Without this the small
-> monitor window is not really usable.
+> I repeated the test twice this morning after 'rm -rf ~/.cache/qemu-vm',
+> first after 'rm tests/vm/ubuntu.i386.img' in an incremental tree, and second
+> in a fresh git checkout.  Here's a full pastebin of the first try (I hit ^C
+> after seeing it look the same as yesterday, even after the fresh redownload
+> that took more than 10 minutes):
+> https://paste.fedoraproject.org/paste/p8Th7AroLAprGY03ffzGHA
+> 
+> The results are the same; debconf is somehow unable to connect to the guest,
+> and as a result, the guest is not properly initialized with the additional
+> packages it needs, and then everything else about the image is broken.
+> 
+> Then on the second try, I got a dreaded message about my /home being nearly
+> full, (having multiple .img files in two different build directories pushed
+> me over limits), and it died a much harder death due to ENOSPC.  Let me
+> resize my /home and retry (thankfully I still have some disk space free to
+> throw at the problem), and I'll report back if that makes a difference.
 
-Fixed (patches on the list).
+Now I see the problem. I always use V=1 so stdout is different for the spawned
+commands (qemu and ssh) in the script. I will send a patch tomorrow. Thanks!
 
-> 2. With at least qemu-system-ppc the serial and parallel output are not
-> accessible (Ctrl+Alt+3 opens an empty window and Ctrl+Alt+4 does nothing)
-
-Doesn't reproduce.  Ctrl-Alt-3 open serial for me, which shows some
-openbios output.  Ctrl-Alt-4 shows parallel.  powermac (default machine
-type).
-
-Tried ppc64 too.  pseries (also default machine type).  Seems there is
-no parallel port.  Serial works fine though (shows SLOF output).
-
-> while the serial output seems to be behind the monitor output in the window
-> opening with Ctrl+Alt+2 and flashes when I type in this window. (This
-> doesn't seem to happen with qemu-system-x86_64, maybe that's why it was not
-> catched.)
-
-Doesn't reproduce too.  It's also not clear why x86_64 should behave
-different that ppc.  There is no arch-specific code ui/, so there should
-be no difference, exept for hardware like paralle ports which are not
-supported by all machine types.
-
-Any chance you have tested an old ppc binary?
-
-> Could these be fixed please to make SDL2 a viable alternative before
-> deprecating SDL1.2?
-
-SDL-1.2 will stay deprecated.  Actually dropping SDL-1.2 support will
-possibly be delayed though, depending on SDL2 state.  SDL2 in 2.12
-should already be alot better than in 2.11.  Switching the default
-appearently causes many people try SDL2 and report issues, we have quite
-a number of bugs fixed in response to these reports.
-
-cheers,
-  Gerd
+Fam
