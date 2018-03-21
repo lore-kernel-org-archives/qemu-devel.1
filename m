@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1eydXi-0001DG-Py
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:12:42 -0400
+	(envelope-from <hsp.cat7@gmail.com>) id 1eydYM-0001jm-5J
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:13:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1eydXc-0006dF-UN
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:12:38 -0400
-References: <1518461904-5305-1-git-send-email-eric.auger@redhat.com>
-	<1518461904-5305-16-git-send-email-eric.auger@redhat.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <895f039a-ade7-cf1a-6c47-81fd093f75e9@arm.com>
-Date: Wed, 21 Mar 2018 13:15:43 +0000
+	(envelope-from <hsp.cat7@gmail.com>) id 1eydYL-0006wu-2H
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:13:18 -0400
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:47091)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1eydYK-0006wZ-SX
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 09:13:17 -0400
+Received: by mail-ot0-x232.google.com with SMTP id g97-v6so5483070otg.13
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 06:13:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1518461904-5305-16-git-send-email-eric.auger@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v6 15/22] virtio-iommu: Implement fault
- reporting
+In-Reply-To: <fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
+References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
+	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Wed, 21 Mar 2018 14:13:15 +0100
+Message-ID: <CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
+ Windows with qemu-system-ppc.exe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Will Deacon <Will.Deacon@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "tn@semihalf.com" <tn@semihalf.com>, "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>, "peterx@redhat.com" <peterx@redhat.com>, "linuc.decode@gmail.com" <linuc.decode@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Hi Eric,
+> Can you get a backtrace on the Windows system?  Perhaps by putting a
+> breakpoint in aio_context_set_poll_params.
+>
+> Paolo
 
-On 12/02/18 18:58, Eric Auger wrote:
-[...]
-> +    for (;;) {
-> +        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-> +
-> +        if (!elem) {
-> +            virtio_error(vdev,
-> +                         "no buffer available in event queue to report event");
-> +            return;
-> +        }
+I built qemu-master RC0 with --enable-debug. This is what a bt provides:
 
-When $user attempts something silly like trying VFIO without the VFIO
-patches, this outputs thousands of messages per second... I guess it would
-also happen if the driver isn't consuming error reports fast enough. Is
-there a simple way of ratelimiting printfs so the context of the error
-doesn't get washed away?
+(gdb) attach 9692
+Attaching to program `c:\qemu-master\qemu-system-ppc.exe', process 9692
+[New Thread 9692.0x670]
+[New Thread 9692.0x238c]
+[New Thread 9692.0xb94]
+[New Thread 9692.0x10bc]
+[New Thread 9692.0x90c]
+[New Thread 9692.0x29a0]
+(gdb) thread apply all bt full
 
-Thanks,
-Jean
+Thread 6 (Thread 9692.0x29a0):
+#0  0x00007ff980ec3811 in ?? ()
+No symbol table info available.
+#1  0x00007ff980ef020b in ?? ()
+No symbol table info available.
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+Thread 5 (Thread 9692.0x90c):
+#0  0x00007ff980ebff04 in ?? ()
+No symbol table info available.
+#1  0x00007ff97d673b7f in ?? ()
+No symbol table info available.
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+Thread 4 (Thread 9692.0x10bc):
+#0  0x00007ff980ec3794 in ?? ()
+No symbol table info available.
+#1  0x00007ff980e549dd in ?? ()
+No symbol table info available.
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+Thread 3 (Thread 9692.0xb94):
+#0  0x00007ff980ec3794 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+No symbol table info available.
+#1  0x00007ff980e549dd in ?? ()
+No symbol table info available.
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+Thread 2 (Thread 9692.0x238c):
+#0  0x00007ff980ec3794 in ?? ()
+No symbol table info available.
+#1  0x00007ff980e549dd in ?? ()
+No symbol table info available.
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+Thread 1 (Thread 9692.0x670):
+#0  0x00007ff980ec09d4 in ?? ()
+No symbol table info available.
+#1  0x00007ff97d6ba9c6 in ?? ()
+No symbol table info available.
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+(gdb)
+
+Best,
+Howard
