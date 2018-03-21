@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eygVU-0000Zw-12
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:22:33 -0400
+	(envelope-from <hsp.cat7@gmail.com>) id 1eygWe-0001fS-FA
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:23:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eygVS-0007k7-KS
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:22:32 -0400
-Date: Wed, 21 Mar 2018 17:22:03 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180321162203.GE3898@localhost.localdomain>
-References: <1521642402-197739-1-git-send-email-mst@redhat.com>
-	<20180321153439.GC3898@localhost.localdomain>
-	<20180321175452-mutt-send-email-mst@kernel.org>
+	(envelope-from <hsp.cat7@gmail.com>) id 1eygWd-0008F8-Jn
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:23:44 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:44667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1eygWd-0008Es-F0
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 12:23:43 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id x6-v6so4759585otg.11
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 09:23:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180321175452-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
+In-Reply-To: <397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
+References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
+	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
+	<CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
+	<035198fa-b9e1-6084-d9c2-4d344e7058d7@redhat.com>
+	<CABLmASFEhaKB1Hh91p+RM+TX+zTTDuNixWy=16rUC+GC_0KKtg@mail.gmail.com>
+	<397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Wed, 21 Mar 2018 17:23:42 +0100
+Message-ID: <CABLmASHkjz=UDbHMRRtJKhu1bF28NGTzRjTo-GKbCd6dp-6qQQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
+ Windows with qemu-system-ppc.exe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Am 21.03.2018 um 16:58 hat Michael S. Tsirkin geschrieben:
-> On Wed, Mar 21, 2018 at 04:34:39PM +0100, Kevin Wolf wrote:
-> > Am 21.03.2018 um 15:46 hat Michael S. Tsirkin geschrieben:
-> > > Our current scheme is to use
-> > >  #include ""
-> > > for internal headers, and
-> > >  #include <>
-> > > for external ones.
-> > > 
-> > > Unfortunately this is not based on compiler support: from C point of
-> > > view, the "" form merely looks up headers in the current directory
-> > > and then falls back on <> directories.
-> > > 
-> > > Thus, for example, a system header trace.h - should it be present - will
-> > > conflict with our local trace.h
-> > 
-> > You're right that there is a conflict, even though only in one
-> > direction: "trace.h" is unambiguously the local trace.h in our source
-> > tree, but <trace.h> refers to the same local header rather than the
-> > system header as you would expect.
-> > 
-> > An easy way to resolve this conflict would be using -iquote rather than
-> > -I for directories in the source tree, so that <trace.h> unambiguously
-> > refers to the system header and "trace.h" unambiguously refers to the
-> > QEMU header.
-> 
-> I posted patches to that effect for 2.12.
+> You need to "r"un the program here. :)
+>
+> Also probably "b aio_context_set_poll_params" is useful before you run
+> the program, to trap the moment in which the function is called.
+>
 
-Ah, I missed those. That's good (and imho enough).
+Hi, that got me here:
 
-> It's all still very much a non-standard convention and so less robust
-> than prefixing file name with a project-specifix prefix.
+(gdb) run
+Starting program: c:\qemu-master\qemu-system-ppc.exe -L
+c:\qemu-master\pc-bios -boot d -m 256 -M mac99 -prom-env
+"boot-args=-v" -prom-env "auto-boot?=true" -prom-env "vga-ndrv?=true"
+-drive "file=c:\Mac-disks\debian-9.0-powerpc-NETINST-1.iso,format=raw,media=cdrom"
+-device usb-mouse -device usb-kbd -netdev "user,id=network01" -device
+"sungem,netdev=network01,mac=52:54:00:12:34:56" -sdl -drive
+"file=c:\Mac-disks\9.2.img,format=raw,media=disk"
+[New Thread 10844.0x24d0]
+warning: FTH: (10844): *** Fault tolerant heap shim applied to current
+process. This is usually due to previous crashes. ***
+[New Thread 10844.0x1224]
+[New Thread 10844.0x2a30]
+[New Thread 10844.0x2594]
+[New Thread 10844.0x32a8]
 
-I've always had the impression that it's by far the most common
-convention, to the point that I'd blindly assume it when joining a new
-project.
-
-> > > As another example of problems, a header by the same name in the source
-> > > directory will always be picked up first - before any headers in
-> > > the include directory.
-> > > 
-> > > Let's change the scheme: make sure all headers that are not
-> > > in the source directory are included through a path
-> > > starting with qemu/ , thus:
-> > > 
-> > >  #include <>
-> > > 
-> > > headers in the same directory as source are included with
-> > > 
-> > >  #include ""
-> > > 
-> > > as per standard.
-> > > 
-> > > This (untested) patch is just to start the discussion and does not
-> > > change all of the codebase. If there's agreement, this will be
-> > > run on all code to converting code to this scheme.
-> > 
-> > Renaming files is always painful. If that's the fix, the cure might be
-> > worse than the disease. As far as I know, the conflict is only
-> > theoretical, so in that case I'd say: If it ain't broke, don't fix it.
-> > 
-> > Kevin
-> 
-> It's broke I think, it's very hard for new people to contribute to QEMU.
-> Look e.g. at rdma which all has messed up includes - and that's from an
-> experienced conributor who just isn't an experienced maintainer.
-
-I don't think the problem is that the convention is hard to apply (it's
-definitely not). It's knowing about the convention. This problem isn't
-going away by switching to a different, less common convention. We're
-only going to see more offenders then.
-
-> Amount of time spent on teaching new people trivia about our
-> conventions just isn't funny. They should be self-documenting
-> and violations should cause the build to fail.
-
-Yes, but your proposal doesn't achieve this. You can still use
-"qemu/foo.h" instead of <qemu/foo.h> and it will build successfully.
-That's something we can't change, as far as I know, because the include
-path for "foo.h" is always a superset of <foo.h>.
-
-If anything, this means that we should prefer "foo.h" for local headers
-(i.e. the way it currently is) because we can let the compiler enforce
-it: <foo.h> for "foo.h" can become a build error, and does so with your
--iquote patch, but the other way round doesn't work.
-
-Then it's only system headers that you can possibly get wrong, but for
-those everyone should be used to using <foo.h> anyway.
-
-Kevin
+Thread 1 hit Breakpoint 1, aio_context_set_poll_params (ctx=0xc14a9b0,
+max_ns=32768, grow=0, shrink=0, errp=0x362f968)
+    at util/aio-win32.c:413
+413     in util/aio-win32.c
+(gdb) s
+error_setg_internal (errp=0x362f968, src=0xe166e0 <__func__.58569+32>
+"util/aio-win32.c", line=413,
+    func=0xe16740 <__func__.59050> "aio_context_set_poll_params",
+    fmt=0xe16708 <__func__.58569+72> "AioContext polling is not
+implemented on Windows") at util/error.c:91
+91      util/error.c: No such file or directory.
+(gdb) s
+94      in util/error.c
