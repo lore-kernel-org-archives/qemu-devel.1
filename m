@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJG-00067G-1d
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:41 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJJ-0006FZ-UA
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJE-0008Mf-Tk
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42086 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eycJJ-0008Pu-3b
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42102 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eycJE-0008MD-Ol
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:36 -0400
+	id 1eycJI-0008Pf-W3
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 07:53:41 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AB99406DE12
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:53:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F4A8407519B
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 11:53:40 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 21 Mar 2018 12:51:53 +0100
-Message-Id: <20180321115211.17937-32-marcandre.lureau@redhat.com>
+Date: Wed, 21 Mar 2018 12:51:55 +0100
+Message-Id: <20180321115211.17937-34-marcandre.lureau@redhat.com>
 In-Reply-To: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 31/49] qapi2texi: add 'If:' section to
- generated documentation
+Subject: [Qemu-devel] [PATCH v3 33/49] qapi2texi: add 'If:' condition to
+ struct members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,156 +37,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The documentation is generated only once, and doesn't know C
-pre-conditions. Add 'If:' sections for top-level entities.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/doc.py             | 22 ++++++++++++----------
- tests/qapi-schema/doc-good.json |  2 +-
- tests/qapi-schema/doc-good.out  |  1 +
- tests/qapi-schema/doc-good.texi |  2 ++
- 4 files changed, 16 insertions(+), 11 deletions(-)
+ scripts/qapi/doc.py             | 4 +++-
+ tests/qapi-schema/doc-good.json | 3 ++-
+ tests/qapi-schema/doc-good.out  | 1 +
+ tests/qapi-schema/doc-good.texi | 2 ++
+ 4 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 6c2bf98e1d..783b13303a 100755
+index f629425f53..42e34e1fe3 100755
 --- a/scripts/qapi/doc.py
 +++ b/scripts/qapi/doc.py
-@@ -174,7 +174,7 @@ def texi_members(doc, what, base, variants, member_fu=
-nc):
-     return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
+@@ -138,9 +138,11 @@ def texi_member(member, suffix=3D''):
+     """Format a table of members item for an object type member"""
+     typ =3D member.type.doc_type()
+     membertype =3D ': ' + typ if typ else ''
+-    return '@item @code{%s%s}%s%s\n' % (
++    return '@item @code{%s%s}%s%s%s\n' % (
+         member.name, membertype,
+         ' (optional)' if member.optional else '',
++        '\n@b{If:} @code{%s}\n' %
++        ', '.join(member.ifcond) if member.ifcond else '',
+         suffix)
 =20
 =20
--def texi_sections(doc):
-+def texi_sections(doc, ifcond):
-     """Format additional sections following arguments"""
-     body =3D ''
-     for section in doc.sections:
-@@ -185,14 +185,16 @@ def texi_sections(doc):
-             body +=3D texi_example(section.text)
-         else:
-             body +=3D texi_format(section.text)
-+    if ifcond:
-+        body +=3D '\n\n@b{If:} @code{%s}' % ", ".join(ifcond)
-     return body
-=20
-=20
--def texi_entity(doc, what, base=3DNone, variants=3DNone,
-+def texi_entity(doc, what, ifcond, base=3DNone, variants=3DNone,
-                 member_func=3Dtexi_member):
-     return (texi_body(doc)
-             + texi_members(doc, what, base, variants, member_func)
--            + texi_sections(doc))
-+            + texi_sections(doc, ifcond))
-=20
-=20
- class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
-@@ -208,7 +210,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-         doc =3D self.cur_doc
-         self._gen.add(TYPE_FMT(type=3D'Enum',
-                                name=3Ddoc.symbol,
--                               body=3Dtexi_entity(doc, 'Values',
-+                               body=3Dtexi_entity(doc, 'Values', ifcond,
-                                                 member_func=3Dtexi_enum_=
-value)))
-=20
-     def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-@@ -217,14 +219,14 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
-aVisitor):
-             base =3D None
-         self._gen.add(TYPE_FMT(type=3D'Object',
-                                name=3Ddoc.symbol,
--                               body=3Dtexi_entity(doc, 'Members',
-+                               body=3Dtexi_entity(doc, 'Members', ifcond=
-,
-                                                 base, variants)))
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-         doc =3D self.cur_doc
-         self._gen.add(TYPE_FMT(type=3D'Alternate',
-                                name=3Ddoc.symbol,
--                               body=3Dtexi_entity(doc, 'Members')))
-+                               body=3Dtexi_entity(doc, 'Members', ifcond=
-)))
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type,
-                       gen, success_response, boxed, allow_oob):
-@@ -233,9 +235,9 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-             body =3D texi_body(doc)
-             body +=3D ('\n@b{Arguments:} the members of @code{%s}\n'
-                      % arg_type.name)
--            body +=3D texi_sections(doc)
-+            body +=3D texi_sections(doc, ifcond)
-         else:
--            body =3D texi_entity(doc, 'Arguments')
-+            body =3D texi_entity(doc, 'Arguments', ifcond)
-         self._gen.add(MSG_FMT(type=3D'Command',
-                               name=3Ddoc.symbol,
-                               body=3Dbody))
-@@ -244,7 +246,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-         doc =3D self.cur_doc
-         self._gen.add(MSG_FMT(type=3D'Event',
-                               name=3Ddoc.symbol,
--                              body=3Dtexi_entity(doc, 'Arguments')))
-+                              body=3Dtexi_entity(doc, 'Arguments', ifcon=
-d)))
-=20
-     def symbol(self, doc, entity):
-         if self._gen._body:
-@@ -257,7 +259,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-         assert not doc.args
-         if self._gen._body:
-             self._gen.add('\n')
--        self._gen.add(texi_body(doc) + texi_sections(doc))
-+        self._gen.add(texi_body(doc) + texi_sections(doc, None))
-=20
-=20
- def gen_doc(schema, output_dir, prefix):
 diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
 .json
-index 97ab4625ff..984cd8ed06 100644
+index c7fe08c530..158443b1a3 100644
 --- a/tests/qapi-schema/doc-good.json
 +++ b/tests/qapi-schema/doc-good.json
-@@ -55,7 +55,7 @@
+@@ -72,7 +72,8 @@
  #
- # @two is undocumented
+ # Another paragraph (but no @var: line)
  ##
--{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
-+{ 'enum': 'Enum', 'data': [ 'one', 'two' ], 'if': 'defined(IFCOND)' }
+-{ 'struct': 'Variant1', 'data': { 'var1': 'str' } }
++{ 'struct': 'Variant1',
++  'data': { 'var1': { 'type': 'str', 'if': 'defined(IFSTR)' } } }
 =20
  ##
- # @Base:
+ # @Variant2:
 diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
 out
-index 3cd5c094aa..e4054e293c 100644
+index d27d345de2..9976d29eb0 100644
 --- a/tests/qapi-schema/doc-good.out
 +++ b/tests/qapi-schema/doc-good.out
-@@ -12,6 +12,7 @@ module doc-good.json
- enum Enum
-     member one
-     member two
-+    if ['defined(IFCOND)']
- object Base
+@@ -18,6 +18,7 @@ object Base
      member base1: Enum optional=3DFalse
  object Variant1
+     member var1: str optional=3DFalse
++        if ['defined(IFSTR)']
+ object Variant2
+ object Object
+     base Base
 diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
 .texi
-index 0aed2300a5..e42eace474 100644
+index 2446a1c702..255eed9a30 100644
 --- a/tests/qapi-schema/doc-good.texi
 +++ b/tests/qapi-schema/doc-good.texi
-@@ -89,6 +89,8 @@ Not documented
- @end table
- @code{two} is undocumented
-=20
+@@ -120,6 +120,8 @@ Another paragraph (but no @code{var}: line)
+ @b{Members:}
+ @table @asis
+ @item @code{var1: string}
++@b{If:} @code{defined(IFSTR)}
 +
-+@b{If:} @code{defined(IFCOND)}
- @end deftp
-=20
+ Not documented
+ @end table
 =20
 --=20
 2.16.2.521.g9aa15f885a
