@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyWYh-0004xx-6J
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 01:45:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eyWeN-0006XL-P8
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 01:51:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eyWYg-000272-FT
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 01:45:11 -0400
-References: <20180223152640.11459-1-pbonzini@redhat.com>
-	<20180223152640.11459-5-pbonzini@redhat.com>
-	<2464c1eb-2ada-7105-3029-2ff28dc5bfa0@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eyWeI-0001pc-Tc
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 01:51:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41382 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eyWeI-0001of-OL
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 01:50:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A0A8412A020
+	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 05:50:52 +0000 (UTC)
+References: <20180320151857.26340-1-pbonzini@redhat.com>
+	<20180321032547.GB20227@xz-mi>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d696a0fc-543b-69e5-cc65-f97c412124af@redhat.com>
-Date: Wed, 21 Mar 2018 06:44:52 +0100
+Message-ID: <0378f258-f357-5fb9-b98f-8dd5d95b8db9@redhat.com>
+Date: Wed, 21 Mar 2018 06:50:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <2464c1eb-2ada-7105-3029-2ff28dc5bfa0@redhat.com>
+In-Reply-To: <20180321032547.GB20227@xz-mi>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] atapi: call ide_set_irq before
- ide_transfer_start
+Subject: Re: [Qemu-devel] [PATCH] chardev-socket: remove useless if
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +34,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 21/03/2018 01:35, John Snow wrote:
->> The ATAPI_INT_REASON_IO interrupt is raised when I/O starts, but in the
->> AHCI case ide_set_irq was actually called at the end of a mutual recursion.
->> Move it early, with the side effect that ide_transfer_start becomes a tail
->> call in ide_atapi_cmd_reply_end.
+On 21/03/2018 04:25, Peter Xu wrote:
+> On Tue, Mar 20, 2018 at 04:18:57PM +0100, Paolo Bonzini wrote:
+>> This trips Coverity, which believes the subsequent qio_channel_create_watch
+>> can dereference a NULL pointer.  In reality, tcp_chr_connect's callers
+>> all have s->ioc properly initialized, since they are all rooted at
+>> tcp_chr_new_client.
 >>
-> Do you know in which spec it specifies that we should interrupt?
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> Seems okay, but I wanted to double check the wording in the spec (was
-> looking in scsi MMC and ATA8) and couldn't find it quickly.
+> (maybe replacing with an assertion would be nicer? No big deal.)
 
-I have an "Interrupt Reason" field in my copy of the ATA/ATAPI spec:
-
----
-6.4.3 Input/Output (I/O) bit
-The Input/Output bit shall be cleared to zero if the transfer is to the
-device. The Input/Output bit shall be set to one if the transfer is to
-the host. In ATA/ATAPI-7 this bit was documented as the I/O bit.
----
-
-I suppose the commit message needs some improvement---the point is that
-since this is a READ, the I/O bit must be set before we start the
-transfer.  It can be done after the disk I/O starts, but it must be done
-before the PIO transfer starts; in other words, the bug is only there
-for AHCI.
+It's already asserting, it just raises SIGSEGV instead of SIGABRT. :)
 
 Paolo
