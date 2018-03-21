@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eykJM-0006CY-4f
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:26:17 -0400
+	(envelope-from <lersek@redhat.com>) id 1eykJT-0006JG-Jx
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eykJK-0000v1-O6
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:26:16 -0400
-References: <20180321200114.10981-1-jsnow@redhat.com>
-	<20180321202501.GJ3898@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <77891eaa-a0db-981e-ffba-7073143cb23c@redhat.com>
-Date: Wed, 21 Mar 2018 16:26:06 -0400
+	(envelope-from <lersek@redhat.com>) id 1eykJP-0000w5-LI
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:26:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36326 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eykJP-0000uo-Gz
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 16:26:19 -0400
+References: <0a6260e2-f844-bc4e-aee8-874d147bc663@acm.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2c5fe495-3948-d6cc-7665-7badacf2cbcd@redhat.com>
+Date: Wed, 21 Mar 2018 21:26:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180321202501.GJ3898@localhost.localdomain>
+In-Reply-To: <0a6260e2-f844-bc4e-aee8-874d147bc663@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5] file-posix: specify expected filetypes
+Subject: Re: [Qemu-devel] Wiki account for me
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +27,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: minyard@acm.org
 
+On 03/21/18 20:47, Corey Minyard wrote:
+> Could someone create a wiki account for me so I can update the changlog?
 
+I've created the account and am about to send the credentials to Corey
+off-list. Just posting this notice to synchronize with other wiki users
+reading this list.
 
-On 03/21/2018 04:25 PM, Kevin Wolf wrote:
-> Am 21.03.2018 um 21:01 hat John Snow geschrieben:
->> Adjust each caller of raw_open_common to specify if they are expecting
->> host and character devices or not. Tighten expectations of file types upon
->> open in the common code and refuse types that are not expected.
->>
->> This has two effects:
->>
->> (1) Character and block devices are now considered deprecated for the
->>     'file' driver, which expects only S_IFREG, and
->> (2) no file-posix driver (file, host_cdrom, or host_device) can open
->>     directories now.
->>
->> I don't think there's a legitimate reason to open directories as if
->> they were files. This prevents QEMU from opening and attempting to probe
->> a directory inode, which can break in exciting ways. One of those ways
->> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
->> size instead of EISDIR. This can coax QEMU into responding with a
->> confusing "file too big" instead of "Hey, that's not a file".
->>
->> See: https://bugs.launchpad.net/qemu/+bug/1739304/
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>
->> v5: rebase for 2.12.0-rc0
->>
->>  block/file-posix.c | 37 +++++++++++++++++++++++++++++--------
->>  qemu-doc.texi      |  6 ++++++
->>  2 files changed, 35 insertions(+), 8 deletions(-)
->>
->> diff --git a/block/file-posix.c b/block/file-posix.c
->> index d7fb772c14..31d9afe026 100644
->> --- a/block/file-posix.c
->> +++ b/block/file-posix.c
->> @@ -420,7 +420,8 @@ static QemuOptsList raw_runtime_opts = {
->>  };
->>  
->>  static int raw_open_common(BlockDriverState *bs, QDict *options,
->> -                           int bdrv_flags, int open_flags, Error **errp)
->> +                           int bdrv_flags, int open_flags,
->> +                           bool device, Error **errp)
->>  {
->>      BDRVRawState *s = bs->opaque;
->>      QemuOpts *opts;
->> @@ -558,10 +559,30 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
->>          error_setg_errno(errp, errno, "Could not stat file");
->>          goto fail;
->>      }
->> -    if (S_ISREG(st.st_mode)) {
->> -        s->discard_zeroes = true;
->> -        s->has_fallocate = true;
->> +
->> +    if (!device) {
->> +        if (S_ISBLK(st.st_mode)) {
->> +            warn_report("Opening a block device as file using 'file' "
->> +                        "driver is deprecated");
->> +        } else if (S_ISCHR(st.st_mode)) {
->> +            warn_report("Opening a character device as file using the 'file' "
->> +                        "driver is deprecated");
->> +        } else if (!S_ISREG(st.st_mode)) {
->> +            error_setg(errp, "A regular file was expected by the 'file' driver, "
->> +                       "but something else was given");
->> +            goto fail;
-> 
-> ret needs to be set here, otherwise we return success. In my test, I
-> still got the wrong message: "Could not refresh total sector count:
-> Invalid argument"
-> 
->> +        } else {
->> +            s->discard_zeroes = true;
->> +            s->has_fallocate = true;
->> +        }
->> +    } else {
->> +        if (!(S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
->> +            error_setg(errp, "host_device/host_cdrom driver expects either "
->> +                       "a character or block device");
->> +            goto fail;
-> 
-> Same here.
-> 
->> +        }
->>      }
-> 
-> Do we want a qemu-iotests case for this?
-> 
-> Kevin
-> 
-
-I'll take the hint :)
-
---js
+Thanks
+Laszlo
