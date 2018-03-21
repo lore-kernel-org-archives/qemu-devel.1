@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eyfDx-0004Pv-W3
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:00:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eyfIw-0007P0-5Y
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eyfDs-0001G5-Vu
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:00:22 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:53262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1eyfDs-0001Ee-4F
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:00:16 -0400
-Date: Wed, 21 Mar 2018 17:00:08 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20180321150007.GA12925@yuvallap>
-References: <20180321140316.96045-1-marcel@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eyfIu-0003U3-G8
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 11:05:30 -0400
+References: <1521642402-197739-1-git-send-email-mst@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a819d04-b1d2-550e-7458-4ea7509db36d@redhat.com>
+Date: Wed, 21 Mar 2018 16:04:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180321140316.96045-1-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2 for-2.12] hw/rdma: fix clang compilation
- errors
+In-Reply-To: <1521642402-197739-1-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +23,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, eblake@redhat.com, yuval.shaia@oracle.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Wed, Mar 21, 2018 at 04:03:16PM +0200, Marcel Apfelbaum wrote:
-> Fix some enum castings and extra parentheses.
-> 
-> Reported-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
-> 
-> V1 -> V2:
->  - Addressed Yuval's and Eric's comments:
->    - Removed some parentheses
->    - Replaced PVRDMA_PORT_DOWN with IBV_PORT_DOWN
->    - Removed unneeded cast
-> 
->  hw/rdma/vmw/pvrdma_cmd.c  | 5 +++--
->  hw/rdma/vmw/pvrdma_main.c | 4 ++--
->  2 files changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index 293dfed29f..9e551c3250 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -73,7 +73,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
->      tbl_idx = 1;
->      addr_idx = 1;
->      while (addr_idx < nchunks) {
-> -        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
-> +        if (tbl_idx == TARGET_PAGE_SIZE / sizeof(uint64_t)) {
->              tbl_idx = 0;
->              dir_idx++;
->              pr_dbg("Mapping to table %d\n", dir_idx);
-> @@ -507,7 +507,8 @@ static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->      rsp->hdr.err = rdma_rm_modify_qp(&dev->rdma_dev_res, &dev->backend_dev,
->                                   cmd->qp_handle, cmd->attr_mask,
->                                   (union ibv_gid *)&cmd->attrs.ah_attr.grh.dgid,
-> -                                 cmd->attrs.dest_qp_num, cmd->attrs.qp_state,
-> +                                 cmd->attrs.dest_qp_num,
-> +                                 (enum ibv_qp_state)cmd->attrs.qp_state,
->                                   cmd->attrs.qkey, cmd->attrs.rq_psn,
->                                   cmd->attrs.sq_psn);
->  
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 99787812ba..5e69a9f2c7 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -91,7 +91,7 @@ static int init_dev_ring(PvrdmaRing *ring, struct pvrdma_ring **ring_state,
->          goto out_free_tbl;
->      }
->      /* RX ring is the second */
-> -    (struct pvrdma_ring *)(*ring_state)++;
-> +    (*ring_state)++;
->      rc = pvrdma_ring_init(ring, name, pci_dev,
->                            (struct pvrdma_ring *)*ring_state,
->                            (num_pages - 1) * TARGET_PAGE_SIZE /
-> @@ -292,7 +292,7 @@ static void init_ports(PVRDMADev *dev, Error **errp)
->      memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
->  
->      for (i = 0; i < MAX_PORTS; i++) {
-> -        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
-> +        dev->rdma_dev_res.ports[i].state = IBV_PORT_DOWN;
->  
->          dev->rdma_dev_res.ports[i].pkey_tbl =
->              g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
+On 21/03/2018 15:46, Michael S. Tsirkin wrote:
+> +if (m@^\s*#include\s+"qemu/@o) {
+> +    s@^(\s*#include\s+)"qemu/([^"]+)"(.*)$@$1<qemu/common/$2>$3@o) {
+> +} else {
+> +    s@^(\s*#include\s+)"([^"]+)"(.*)$@$1<qemu/$2>$3@o) {
+> +}
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Can you explain the changes in the source tree layout?
 
-> -- 
-> 2.13.5
-> 
+Also, s{}{} and m{} are a bit more readable.
+
+Paolo
