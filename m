@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ez1tZ-0000Vh-QZ
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:12:50 -0400
+	(envelope-from <mst@redhat.com>) id 1ez1uc-0001Tl-O2
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ez1tW-00012T-Km
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:12:49 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:33335)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ez1tW-000120-AB
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:12:46 -0400
-References: <1521663109-32262-1-git-send-email-cota@braap.org>
-	<1521663109-32262-9-git-send-email-cota@braap.org>
-	<67b8c0f8-3fd9-ba7c-a666-d0715b5a3329@linaro.org>
-	<20180322055710.GA22376@flamenco>
-	<959d13eb-498e-0bd6-2553-1b621a87f1bd@linaro.org>
-	<20180322150821.GA10288@flamenco>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3274eb47-4f72-5939-6382-04816cc7f572@vivier.eu>
-Date: Thu, 22 Mar 2018 16:12:21 +0100
+	(envelope-from <mst@redhat.com>) id 1ez1uX-0001Tq-OA
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:13:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43224 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ez1uX-0001TU-HZ
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:13:49 -0400
+Date: Thu, 22 Mar 2018 17:13:41 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180322165800-mutt-send-email-mst@kernel.org>
+References: <20180319071537.28649-1-tiwei.bie@intel.com>
+	<20180319071537.28649-3-tiwei.bie@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180322150821.GA10288@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 08/14] hostfloat: support float32/64
- addition and subtraction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180319071537.28649-3-tiwei.bie@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] vhost-user: introduce shared
+ vhost-user state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-Le 22/03/2018 à 16:08, Emilio G. Cota a écrit :
-> On Thu, Mar 22, 2018 at 14:41:05 +0800, Richard Henderson wrote:
->> On 03/22/2018 01:57 PM, Emilio G. Cota wrote:
->>>> Is there any especially good reason you want to not put this code into the
->>>> normal softfloat function?  Does it really many any measurable difference at
->>>> all to force this code to be inlined into a helper?
-> (snip)
->> Well, not quite.  I meant putting all of the new code into softfloat.c,
-> 
-> I put all this in a separate file because I didn't want to spend time
-> trying to understand the licensing of softfloat. It isn't clear to
-> me whether what goes into softfloat.[ch] is only GPL'ed or also BSD'ed.
+On Mon, Mar 19, 2018 at 03:15:33PM +0800, Tiwei Bie wrote:
+> @@ -22,7 +23,7 @@
+>  
+>  typedef struct VhostUserState {
+>      NetClientState nc;
+> -    CharBackend chr; /* only queue index 0 */
+> +    VhostUser vhost_user; /* only queue index 0 */
+>      VHostNetState *vhost_net;
+>      guint watch;
+>      uint64_t acked_features;
 
-It's in the header of sofltloat.c:
+Is the comment still valid?
 
-...
- * so some portions are provided under:
- *  the SoftFloat-2a license
- *  the BSD license
- *  GPL-v2-or-later
- *
- * Any future contributions to this file after December 1st 2014 will be
- * taken to be licensed under the Softfloat-2a license unless specifically
- * indicated otherwise.
- */
+> @@ -64,7 +65,7 @@ static void vhost_user_stop(int queues, NetClientState *ncs[])
+>      }
+>  }
+>  
+> -static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
+> +static int vhost_user_start(int queues, NetClientState *ncs[], void *be)
+>  {
+>      VhostNetOptions options;
+>      struct vhost_net *net = NULL;
 
-and
+Type safety going away here. This is actually pretty scary:
+are we sure no users cast this pointer to CharBackend?
 
-/* Portions of this work are licensed under the terms of the GNU GPL,
- * version 2 or later. See the COPYING file in the top-level directory.
- */
+For example it seems that vhost_user_init does exactly that.
 
-So you can choose your license, just say what you want.
+Need to find a way to add type safety before making
+such a change.
 
-Thanks,
-Laurent
+
+> @@ -158,7 +159,7 @@ static void vhost_user_cleanup(NetClientState *nc)
+>              g_source_remove(s->watch);
+>              s->watch = 0;
+>          }
+> -        qemu_chr_fe_deinit(&s->chr, true);
+> +        qemu_chr_fe_deinit(&s->vhost_user.chr, true);
+>      }
+>  
+>      qemu_purge_queued_packets(nc);
+> @@ -192,7 +193,7 @@ static gboolean net_vhost_user_watch(GIOChannel *chan, GIOCondition cond,
+>  {
+>      VhostUserState *s = opaque;
+>  
+> -    qemu_chr_fe_disconnect(&s->chr);
+> +    qemu_chr_fe_disconnect(&s->vhost_user.chr);
+>  
+>      return TRUE;
+>  }
+> @@ -217,7 +218,8 @@ static void chr_closed_bh(void *opaque)
+>      qmp_set_link(name, false, &err);
+>      vhost_user_stop(queues, ncs);
+>  
+> -    qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event,
+> +    qemu_chr_fe_set_handlers(&s->vhost_user.chr, NULL, NULL,
+> +                             net_vhost_user_event,
+>                               NULL, opaque, NULL, true);
+>  
+>      if (err) {
+> @@ -240,15 +242,15 @@ static void net_vhost_user_event(void *opaque, int event)
+>      assert(queues < MAX_QUEUE_NUM);
+>  
+>      s = DO_UPCAST(VhostUserState, nc, ncs[0]);
+> -    chr = qemu_chr_fe_get_driver(&s->chr);
+> +    chr = qemu_chr_fe_get_driver(&s->vhost_user.chr);
+>      trace_vhost_user_event(chr->label, event);
+>      switch (event) {
+>      case CHR_EVENT_OPENED:
+> -        if (vhost_user_start(queues, ncs, &s->chr) < 0) {
+> -            qemu_chr_fe_disconnect(&s->chr);
+> +        if (vhost_user_start(queues, ncs, &s->vhost_user) < 0) {
+> +            qemu_chr_fe_disconnect(&s->vhost_user.chr);
+>              return;
+>          }
+> -        s->watch = qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
+> +        s->watch = qemu_chr_fe_add_watch(&s->vhost_user.chr, G_IO_HUP,
+>                                           net_vhost_user_watch, s);
+>          qmp_set_link(name, true, &err);
+>          s->started = true;
+> @@ -264,8 +266,8 @@ static void net_vhost_user_event(void *opaque, int event)
+>  
+>              g_source_remove(s->watch);
+>              s->watch = 0;
+> -            qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL, NULL,
+> -                                     NULL, NULL, false);
+> +            qemu_chr_fe_set_handlers(&s->vhost_user.chr, NULL, NULL, NULL,
+> +                                     NULL, NULL, NULL, false);
+>  
+>              aio_bh_schedule_oneshot(ctx, chr_closed_bh, opaque);
+>          }
+> @@ -297,7 +299,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+>          if (!nc0) {
+>              nc0 = nc;
+>              s = DO_UPCAST(VhostUserState, nc, nc);
+> -            if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
+> +            if (!qemu_chr_fe_init(&s->vhost_user.chr, chr, &err)) {
+>                  error_report_err(err);
+>                  return -1;
+>              }
+> @@ -307,11 +309,11 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+>  
+>      s = DO_UPCAST(VhostUserState, nc, nc0);
+>      do {
+> -        if (qemu_chr_fe_wait_connected(&s->chr, &err) < 0) {
+> +        if (qemu_chr_fe_wait_connected(&s->vhost_user.chr, &err) < 0) {
+>              error_report_err(err);
+>              return -1;
+>          }
+> -        qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+> +        qemu_chr_fe_set_handlers(&s->vhost_user.chr, NULL, NULL,
+>                                   net_vhost_user_event, NULL, nc0->name, NULL,
+>                                   true);
+>      } while (!s->started);
+> -- 
+> 2.11.0
