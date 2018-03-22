@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eysS7-0001Hx-EE
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:07:52 -0400
+	(envelope-from <peterx@redhat.com>) id 1eysdt-000495-DG
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eysS4-0006oG-8l
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:07:51 -0400
-Resent-Message-Id: <E1eysS4-0006oG-8l@eggs.gnu.org>
-In-Reply-To: <20180321211056.3339-1-yuval.shaia@oracle.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152169525471.222.10982135661238361362@71c20359a636>
+	(envelope-from <peterx@redhat.com>) id 1eysdq-0005oN-3g
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:20:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53802 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eysdp-0005oE-Tb
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:19:58 -0400
+Date: Thu, 22 Mar 2018 13:19:38 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180322051938.GG32362@xz-mi>
+References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
+	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
+	<CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
+	<035198fa-b9e1-6084-d9c2-4d344e7058d7@redhat.com>
+	<CABLmASFEhaKB1Hh91p+RM+TX+zTTDuNixWy=16rUC+GC_0KKtg@mail.gmail.com>
+	<397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
+	<CABLmASHkjz=UDbHMRRtJKhu1bF28NGTzRjTo-GKbCd6dp-6qQQ@mail.gmail.com>
+	<84d2ded7-fdd5-0367-ad5d-b0443c4a945a@redhat.com>
+	<CABLmASFvQED-tsDGCgmw3LYx_CkLeKTGoQ_oU9qLHpGu=a=-hg@mail.gmail.com>
+	<ed9c25bd-e5be-bde1-2447-775c3bfc93ad@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 21 Mar 2018 22:07:35 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] hw/rdma: Fix 32-bit compilation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ed9c25bd-e5be-bde1-2447-775c3bfc93ad@redhat.com>
+Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
+ Windows with qemu-system-ppc.exe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +36,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com
-Cc: famz@redhat.com, marcel@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzIxMjExMDU2LjMzMzktMS15dXZhbC5zaGFpYUBvcmFjbGUuY29tClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBody9yZG1hOiBGaXggMzItYml0IGNvbXBp
-bGF0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjc5Njg0MDI1NDUgaHcvcmRtYTogRml4IDMyLWJpdCBjb21waWxhdGlvbgozOTI0
-ZTA2MzVkIGh3L3JkbWE6IFVzZSBjb3JyZWN0IHByaW50IGZvcm1hdCBpbiBDSEtfQVRUUiBtYWNy
-bwo5MjhlZGIwNTU0IGh3L3JkbWE6IENoYW5nZSBob3N0X3ZpcnQgdG8gdm9pZCAqCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IGh3L3JkbWE6IENoYW5nZSBob3N0X3Zp
-cnQgdG8gdm9pZCAqLi4uCkNoZWNraW5nIFBBVENIIDIvMzogaHcvcmRtYTogVXNlIGNvcnJlY3Qg
-cHJpbnQgZm9ybWF0IGluIENIS19BVFRSIG1hY3JvLi4uCkNoZWNraW5nIFBBVENIIDMvMzogaHcv
-cmRtYTogRml4IDMyLWJpdCBjb21waWxhdGlvbi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNDA6IEZJTEU6IGh3L3JkbWEvcmRtYV9iYWNrZW5kLmM6MTgwOgorICAgICAgICAg
-ICAgcHJfZGJnKCJpYnZfY3JlYXRlX2FoIGZhaWxlZCBmb3IgZ2lkIDwweCUiIFBSSXg2NCAiLCAw
-eCUiIFBSSXg2NCAiPlxuIiwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNs
-b3NlIHBhcmVudGhlc2lzICcpJwojNzg6IEZJTEU6IGh3L3JkbWEvcmRtYV9iYWNrZW5kLmM6Njcz
-OgorICAgIENIS19BVFRSKGRldl9hdHRyLCBiYWNrZW5kX2Rldi0+ZGV2X2F0dHIsIG1heF9tcl9z
-aXplLCAiJSIgUFJJZDY0ICk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ0
-OiBGSUxFOiBody9yZG1hL3Ztdy9wdnJkbWFfbWFpbi5jOjM0NToKKyAgICAgICAgcHJfZXJyKCJF
-cnJvciB0cnlpbmcgdG8gc2V0IFJFRyB2YWx1ZSwgYWRkcj0weCUiIFBSSXg2NCAiLCB2YWw9MHgl
-IiBQUkl4NjQgIlxuIiwKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgMjQ4IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Wed, Mar 21, 2018 at 05:37:22PM +0100, Paolo Bonzini wrote:
+> On 21/03/2018 17:31, Howard Spoelstra wrote:
+> > On Wed, Mar 21, 2018 at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >> On 21/03/2018 17:23, Howard Spoelstra wrote:
+> >>> warning: FTH: (10844): *** Fault tolerant heap shim applied to current
+> >>> process. This is usually due to previous crashes. ***
+> >>> [New Thread 10844.0x1224]
+> >>> [New Thread 10844.0x2a30]
+> >>> [New Thread 10844.0x2594]
+> >>> [New Thread 10844.0x32a8]
+> >>>
+> >>> Thread 1 hit Breakpoint 1, aio_context_set_poll_params (ctx=0xc14a9b0,
+> >>> max_ns=32768, grow=0, shrink=0, errp=0x362f968)
+> >>>     at util/aio-win32.c:413
+> >>> 413     in util/aio-win32.c
+> >>> (gdb) s
+> >>> error_setg_internal (errp=0x362f968, src=0xe166e0 <__func__.58569+32>
+> >>> "util/aio-win32.c", line=413,
+> >>>     func=0xe16740 <__func__.59050> "aio_context_set_poll_params",
+> >>>     fmt=0xe16708 <__func__.58569+72> "AioContext polling is not
+> >>> implemented on Windows") at util/error.c:91
+> >>> 91      util/error.c: No such file or directory.
+> >>> (gdb) s
+> >>> 94      in util/error.c
+> >>
+> >> Great!  Now do "bt".
+> >>
+> >> Paolo
+> > 
+> > (gdb) bt full
+> > #0  aio_context_set_poll_params (ctx=0xc16a9b0, max_ns=32768, grow=0,
+> > shrink=0, errp=0x362f968) at util/aio-win32.c:413
+> >         __func__ = "aio_context_set_poll_params"
+> > #1  0x00000000005f7563 in iothread_complete (obj=0xc16a290,
+> > errp=0x362fa50) at iothread.c:143
+> >         local_error = 0x0
+> >         iothread = 0xc16a290
+> >         __func__ = "iothread_complete"
+> >         name = 0xde8be9 <container_info+265> "user-creatable"
+> >         thread_name = 0x400000000 <error: Cannot access memory at
+> > address 0x400000000>
+> > #2  0x0000000000831716 in user_creatable_complete (obj=0xc16a290,
+> > errp=0x362fa50) at qom/object_interfaces.c:24
+> >         ucc = 0x7fec650
+> >         uc = 0xc16a290
+> >         __func__ = "user_creatable_complete"
+> > #3  0x000000000082cde1 in object_new_with_propv (typename=0xc4b14b
+> > <__func__.56984+43> "iothread", parent=0xc169e50,
+> >     id=0xc12494 <__emutls_t.iothread_locked+19167> "mon_iothread",
+> > errp=0x14ae260 <error_abort>, vargs=0x362fb20 "")
+> >     at qom/object.c:555
+> >         obj = 0xc16a290
+> >         klass = 0x7fec020
+> >         local_err = 0x0
+> >         __func__ = "object_new_with_propv"
+> > #4  0x000000000082cc67 in object_new_with_props (typename=0xc4b14b
+> > <__func__.56984+43> "iothread", parent=0xc169e50,
+> >     id=0xc12494 <__emutls_t.iothread_locked+19167> "mon_iothread",
+> > errp=0x14ae260 <error_abort>) at qom/object.c:516
+> >         vargs = 0x362fb20 ""
+> >         obj = 0xd34e26fdf887
+> > #5  0x00000000005f7ced in iothread_create (id=0xc12494
+> > <__emutls_t.iothread_locked+19167> "mon_iothread",
+> > ---Type <return> to continue, or q <return> to quit---
+> >     errp=0x14ae260 <error_abort>) at iothread.c:352
+> >         obj = 0x45bef7 <sortcmdlist+137>
+> >         __func__ = "iothread_create"
+> > #6  0x000000000045bf53 in monitor_iothread_init () at
+> > /home/hsp/src/qemu-master/monitor.c:4436
+> > No locals.
+> > #7  0x000000000045bfcb in monitor_init_globals () at
+> > /home/hsp/src/qemu-master/monitor.c:4464
+> > No locals.
+> > #8  0x00000000006064d5 in qemu_main (argc=28, argv=0x5679620,
+> > envp=0x0) at vl.c:4545
+> >         i = 1
+> >         snapshot = 0
+> >         linux_boot = 0
+> >         initrd_filename = 0x0
+> >         kernel_filename = 0x0
+> >         kernel_cmdline = 0xc4e286 <runstate_transitions_def+6918> ""
+> >         boot_order = 0x57052c0 "d"
+> >         boot_once = 0x0
+> >         ds = 0x7ff94aced24c
+> >         opts = 0x5705100
+> >         machine_opts = 0x5705560
+> >         icount_opts = 0x0
+> >         accel_opts = 0x0
+> >         olist = 0xa6e000 <qemu_machine_opts>
+> >         optind = 28
+> >         optarg = 0x56793dd "file=c:\\Mac-disks\\9.2.img,format=raw,media=disk"
+> > ---Type <return> to continue, or q <return> to quit---
+> >         loadvm = 0x0
+> >         machine_class = 0x7fb28f0
+> >         cpu_model = 0x0
+> >         vga_model = 0x0
+> >         qtest_chrdev = 0x0
+> >         qtest_log = 0x0
+> >         pid_file = 0x0
+> >         incoming = 0x0
+> >         userconfig = true
+> >         nographic = false
+> >         display_remote = 0
+> >         log_mask = 0x0
+> >         log_file = 0x0
+> >         trace_file = 0x0
+> >         maxram_size = 268435456
+> >         ram_slots = 0
+> >         vmstate_dump_file = 0x0
+> >         main_loop_err = 0x0
+> >         err = 0x0
+> >         list_data_dirs = false
+> >         dir = 0x8026a80 "c:\\qemu-master"
+> >         dirs = 0x8026980
+> >         bdo_queue = {sqh_first = 0x0, sqh_last = 0x362fda0}
+> >         __func__ = "qemu_main"
+> > ---Type <return> to continue, or q <return> to quit---
+> > #9  0x00000000005fc507 in SDL_main (argc=28, argv=0x5679620) at vl.c:43
+> > No locals.
+> > #10 0x000000000096e4e8 in main_getcmdline ()
+> > No symbol table info available.
+> > #11 0x00000000004013f7 in __tmainCRTStartup () at ../crt/crtexe.c:334
+> >         lock_free = <optimized out>
+> >         fiberid = <optimized out>
+> >         nested = <optimized out>
+> >         lpszCommandLine = <optimized out>
+> >         StartupInfo = {cb = 104, lpReserved = 0x5787680 "", lpDesktop
+> > = 0x57881f0 "Winsta0\\Default",
+> >           lpTitle = 0x578c000 "c:\\qemu-master\\qemu-system-ppc.exe",
+> > dwX = 0, dwY = 0, dwXSize = 0, dwYSize = 0,
+> >           dwXCountChars = 0, dwYCountChars = 0, dwFillAttribute = 0,
+> > dwFlags = 0, wShowWindow = 0, cbReserved2 = 0,
+> >           lpReserved2 = 0x0, hStdInput = 0xffffffffffffffff,
+> > hStdOutput = 0xffffffffffffffff,
+> >           hStdError = 0xffffffffffffffff}
+> >         inDoubleQuote = <optimized out>
+> > #12 0x00000000004014fb in WinMainCRTStartup () at ../crt/crtexe.c:184
+> >         ret = 255
+> > (gdb)
+> > 
+> > Finally ;-)
+> 
+> Great, thanks.  Peter, can you look at it?  I think we should:
+> 
+> 1) make aio_context_set_poll_params succeed in aio-win32.c if
+> poll_max_ns is zero
+> 
+> 2) set IOTHREAD_POLL_MAX_NS_DEFAULT to zero on windows.
+
+Thanks Paolo!
+
+Hi, Howard,
+
+Thanks for reporting the problem.  Could you try applying below patch
+to your rc0 tree and rebuild QEMU, to see whether it fixes your problem?
+
+-----------------------------
+diff --git a/iothread.c b/iothread.c
+index 1b3463cb00..9f52270ae1 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -31,11 +31,15 @@ typedef ObjectClass IOThreadClass;
+ #define IOTHREAD_CLASS(klass) \
+    OBJECT_CLASS_CHECK(IOThreadClass, klass, TYPE_IOTHREAD)
+ 
++#ifdef CONFIG_LINUX
+ /* Benchmark results from 2016 on NVMe SSD drives show max polling times around
+  * 16-32 microseconds yield IOPS improvements for both iodepth=1 and iodepth=32
+  * workloads.
+  */
+ #define IOTHREAD_POLL_MAX_NS_DEFAULT 32768ULL
++#else
++#define IOTHREAD_POLL_MAX_NS_DEFAULT 0ULL
++#endif
+ 
+ static __thread IOThread *my_iothread;
+ 
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index d6d5e02f00..a67b00c6ad 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -410,5 +410,7 @@ void aio_context_setup(AioContext *ctx)
+ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+                                  int64_t grow, int64_t shrink, Error **errp)
+ {
+-    error_setg(errp, "AioContext polling is not implemented on Windows");
++    if (max_ns) {
++        error_setg(errp, "AioContext polling is not implemented on Windows");
++    }
+ }
+-----------------------------
+
+Thanks,
+
+-- 
+Peter Xu
