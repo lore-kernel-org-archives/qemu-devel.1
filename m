@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyy73-0005f2-FA
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:10:30 -0400
+	(envelope-from <laurent@vivier.eu>) id 1eyy9s-0007C9-64
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyy72-00039I-Kz
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:10:29 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:37993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyy72-000395-Fs
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:10:28 -0400
-Received: by mail-ot0-x244.google.com with SMTP id 95-v6so8985043ote.5
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 04:10:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <2bc48c10-9347-3bb5-0f80-822bc240273a@vivier.eu>
+	(envelope-from <laurent@vivier.eu>) id 1eyy9n-0005Br-40
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:13:24 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:33589)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eyy9m-0005BY-Pz
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:13:19 -0400
 References: <20180123144807.5618-1-laurent@vivier.eu>
 	<20180123144807.5618-13-laurent@vivier.eu>
 	<758f54da-d733-6e95-57cf-cc8b25a81dd5@vivier.eu>
 	<bf9d1394-f78d-b6ba-8893-d4c7fd592de3@vivier.eu>
 	<CAFEAcA9==FswwaKG_eWncv7Eo-zF+OTOKmSC7N-mpTrSEzUJmg@mail.gmail.com>
-	<2bc48c10-9347-3bb5-0f80-822bc240273a@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Mar 2018 11:10:07 +0000
-Message-ID: <CAFEAcA-2ueNP71UJnJHdOjiYaa3W6FRa5C+tWrbpaoR1RMKvsA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	<CAFEAcA9ZAxkvc-Rn=oP5Bgksk6zo8PYNkhP8SC1+aaWN_vQduw@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <5e841941-8517-fec8-69b2-be0961b3ff0d@vivier.eu>
+Date: Thu, 22 Mar 2018 12:13:16 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9ZAxkvc-Rn=oP5Bgksk6zo8PYNkhP8SC1+aaWN_vQduw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PULL 12/13] page_unprotect(): handle calls to
  pages that are PAGE_WRITE
 List-Id: <qemu-devel.nongnu.org>
@@ -35,17 +33,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 22 March 2018 at 11:07, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 22/03/2018 =C3=A0 12:05, Peter Maydell a =C3=A9crit :
->> On 22 March 2018 at 10:36, Laurent Vivier <laurent@vivier.eu> wrote:re.
+Le 22/03/2018 à 12:07, Peter Maydell a écrit :
+> On 22 March 2018 at 11:05, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 22 March 2018 at 10:36, Laurent Vivier <laurent@vivier.eu> wrote:
 >>> It goes wrong in this part:
 >>>
 >>> +     */
->>> +    if (is_write && info->si_signo =3D=3D SIGSEGV && info->si_code =3D=
-=3D
+>>> +    if (is_write && info->si_signo == SIGSEGV && info->si_code ==
 >>> SEGV_ACCERR &&
 >>> +        h2g_valid(address)) {
 >>>
@@ -55,16 +52,17 @@ On 22 March 2018 at 11:07, Laurent Vivier <laurent@vivier.eu> wrote:
 >> So on PPC if you have a page mapped, and you access it with
 >> the wrong permissions, you get SEGV_MAPERR? This seems like
 >> a host kernel bug to me.
->
-> Are we sure it is mapped? How to know?
+> 
+> ...in particular, kernel commit ecb101aed86156e (dated Dec 2017)
+> fixes a regression introduced in commit c3350602e876 that broke
+> the ppc kernels so they started returning SEGV_MAPERR here
+> instead of SEGV_ACCERR. Presumably your host kernel is missing
+> this fix.
 
-We know it's mapped because the kernel doesn't give us the
-SEGV_MAPERR code :-) Access to unmapped pages must be the
-guest binary's problem -- the thing we're trying to detect
-here is "is this a write access to a page that we mapped
-read-only because we have a cache of code translated for it",
-which is always going to be "mapped but not with the right
-permissions".
+Yes, you're right, my kernel is 4.14-rc1 (6e80ecd) with
+c3350602e876 but without ecb101aed86156e.
 
-thanks
--- PMM
+I'm going to update it.
+
+Thanks,
+Laurent
