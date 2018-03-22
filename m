@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ez4y1-0007hu-JK
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:29:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ez56S-0002Ok-3O
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ez4y0-0000KP-Ol
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:29:37 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44594)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ez4y0-0000Jc-JC
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:29:36 -0400
-Received: by mail-ot0-x243.google.com with SMTP id x6-v6so9085500otg.11
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 11:29:36 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1ez56O-0005Ka-UN
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:38:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36524)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ez56O-0005KK-L5
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:38:16 -0400
+Date: Thu, 22 Mar 2018 15:38:13 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180322183813.GA28161@localhost.localdomain>
+References: <20180320173500.32065-1-vkuznets@redhat.com>
+	<20180320173500.32065-3-vkuznets@redhat.com>
+	<20180321121001.GD14983@rkaganb.sw.ru>
+	<87bmfh7eip.fsf@vitty.brq.redhat.com>
+	<20180321165729.GH14983@rkaganb.sw.ru>
+	<20180321201924.GE3417@localhost.localdomain>
+	<20180322130013.GB4500@rkaganb.sw.ru>
+	<20180322132218.GH3417@localhost.localdomain>
+	<20180322135803.GC4500@rkaganb.sw.ru>
 MIME-Version: 1.0
-In-Reply-To: <20180322142343.jvc6pxxvl5zhfjgy@hawk.localdomain>
-References: <20180315133441.24149-1-peter.maydell@linaro.org>
-	<20180322142343.jvc6pxxvl5zhfjgy@hawk.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Mar 2018 18:29:15 +0000
-Message-ID: <CAFEAcA8Vti8NnrQK4U4kLuk=nNMC5=KiKjc6wT7cLDnCHFj-8w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/intc/arm_gicv3: Fix secure-GIC
- NS ICC_PMR and ICC_RPR accesses
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180322135803.GC4500@rkaganb.sw.ru>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
+ Hyper-V frequency MSRs exposure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +35,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Roman Kagan <rkagan@virtuozzo.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
 
-On 22 March 2018 at 14:23, Andrew Jones <drjones@redhat.com> wrote:
-> On Thu, Mar 15, 2018 at 01:34:41PM +0000, Peter Maydell wrote:
->> If the GIC has the security extension support enabled, then a
->> non-secure access to ICC_PMR must take account of the non-secure
->> view of interrupt priorities, where real priorities 0..0x7f
->> are secure-only and not visible to the non-secure guest, and
->> priorities 0x80..0xff are shown to the guest as if they were
->> 0x00..0xff. We had the logic here wrong:
->
-> 0x00..0x7f
+On Thu, Mar 22, 2018 at 04:58:03PM +0300, Roman Kagan wrote:
+> On Thu, Mar 22, 2018 at 10:22:18AM -0300, Eduardo Habkost wrote:
+> > On Thu, Mar 22, 2018 at 04:00:14PM +0300, Roman Kagan wrote:
+> > > On Wed, Mar 21, 2018 at 05:19:24PM -0300, Eduardo Habkost wrote:
+> > > > On Wed, Mar 21, 2018 at 07:57:29PM +0300, Roman Kagan wrote:
+> > > > > On Wed, Mar 21, 2018 at 02:18:54PM +0100, Vitaly Kuznetsov wrote:
+> > > > > > Roman Kagan <rkagan@virtuozzo.com> writes:
+> > > > > > 
+> > > > > > > On Tue, Mar 20, 2018 at 06:35:00PM +0100, Vitaly Kuznetsov wrote:
+> > > > > > >> Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
+> > > > > > >> nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
+> > > > > > >> Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
+> > > > > > >> these frequencies are stable, it just means they're available for reading.
+> > > > > > >> 
+> > > > > > >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > > > > > >> ---
+> > > > > > >>  target/i386/kvm.c | 2 +-
+> > > > > > >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > >> 
+> > > > > > >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > > > > > >> index 7d9f9ca0b1..74fc3d3b2c 100644
+> > > > > > >> --- a/target/i386/kvm.c
+> > > > > > >> +++ b/target/i386/kvm.c
+> > > > > > >> @@ -651,7 +651,7 @@ static int hyperv_handle_properties(CPUState *cs)
+> > > > > > >>          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
+> > > > > > >>          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
+> > > > > > >>  
+> > > > > > >> -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
+> > > > > > >> +        if (has_msr_hv_frequencies && env->tsc_khz) {
+> > > > > > >>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+> > > > > > >>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+> > > > > > >>          }
+> > > > > > >
+> > > > > > > I suggest that we add a corresponding cpu property here, too.  The guest
+> > > > > > > may legitimately rely on these msrs when it sees the support in CPUID,
+> > > > > > > and migrating from a kernel with the feature supported (4.14+) to an
+> > > > > > > older one will make it crash.
+> > > > > > >
+> > > > > > 
+> > > > > > This can be arranged, but what happens to people who use these features
+> > > > > > today? Assuming they also passed 'invtsc' they have stable TSC page
+> > > > > > clocksource already (when Hyper-V role is enabled) but when we start
+> > > > > > requesting a new 'hv_frequency' cpu property they'll suddenly lose what
+> > > > > > they have...
+> > > > > 
+> > > > > I see two cases here:
+> > > > > 
+> > > > > 1) people start a new VM, and discover that their old configuration is
+> > > > >    not enough for this feature to work.
+> > > > > 
+> > > > >    They need to reconfigure and restart the VM.  This costs them some
+> > > > >    time investigating and restarting, but not data.
+> > > > 
+> > > > If we keep machine-type compatibility, people will need to do
+> > > > that only if they change the machine-type (or use the "pc" or
+> > > > "q35" aliases).  If they copy the old configuration, it will keep
+> > > > working.
+> > > 
+> > > The problem is that the feature is not fixed by the machine-type, due to
+> > > the forgotten property: it only depends on the KVM version.  So, once
+> > > (if) we add the property and make the feature deterministic, we'll lose
+> > > compatibility one way or another.
+> > > 
+> > > Or are you suggesting that for pre-2.12 machine types we leave the
+> > > property at "decided by your KVM" state?
+> > 
+> > Yes, that's what I mean.  This looks like the only way to avoid
+> > losing features by just cold-rebooting an existing VM.
+> > 
+> > The scenario I'm thinking is this:
+> > 
+> > 1) pc-2.11 VM started on host running QEMU 2.11
+> > 2) VM migrated to a host containing this patch
+> > 3) 1 year later, the VM is shut down and booted again.
+> > 4) Things stop working inside the VM because hv-frequency is
+> >    unexpectedly gone.
+> > 
+> > Machine-type compatibility code would avoid (4).
+> 
+> Right, but (4) typically means that you fail to start your workload from
+> a clean state, so you just go and fix it; no data is lost.
+> 
+> Compare this to a migration to an older KVM which results in your guest
+> crashing, where you risk data loss and still have to meddle with
+> configs.
 
-I think 0x00..0xff is correct. The conversion from actual
-priority value to the NS-view is
-   if (prio & 0x80 == 0) {
-       nsview = 0;
-   } else {
-       nsview = (prio << 1) & 0xff;
-   }
+True. To make it worse, we are already unable to avoid this crash
+on existing VMs without a reboot.  The only case where we can fix
+this is if live-migration to older KVM happens after the guest
+was rebooted when running on a newer QEMU version.  :(
 
-so:
-   real priority     NS view
-    0x80              0x00
-    0x90              0x20
-    0xa0              0x40
-    0xb0              0x60
-    0xc0              0x80
-    0xd0              0xa0
-    0xe0              0xc0
-    0xf0              0xe0
 
-the NS view covers the whole 0x00..0xff range, but more sparsely.
-(OK, technically you can't ever read 0xff, only 0xfe.)
 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> 
+> > > > machine-type compatibility also makes the following case a bit
+> > > > safer:
+> > > > 
+> > > > > 
+> > > > > 2) people migrate from a QEMU without ->hv_frequency, to a new one with
+> > > > >    ->hv_frequency=off (assuming on both ends KVM supports the frequency
+> > > > >    MSRs).
+> > > > > 
+> > > > >    With the current implementation in KVM, this will only result in the
+> > > > >    feature bits disappearing from the respective CPUID leaf, but the
+> > > > >    MSRs themselves will continue working as they used to.  So the guest
+> > > > >    either won't notice or will check the CPUID and adjust.
+> > > > 
+> > > > If we keep machine-type compatibility, the CPUID bit won't
+> > > > disappear for the guest while the MSRs keep working.
+> > > > 
+> > > > 
+> > > > Whichever solution we choose, we can still have guests crashing
+> > > > if migrating a pc-2.11 machine from a 4.14+ host kernel to a host
+> > > > with an older kernel.  But I don't think there's a way out of
+> > > > this, except requiring an explicit "hv-frequencies" CPU option on
+> > > > newer machine-types.
+> > > 
+> > > What's wrong with requiring it, as we do for all other hv_* properties?
+> > 
+> > On new machine-types, nothing wrong.
+> > 
+> > On existing machine-types, see above.
+> 
+> I wonder if the following can cater to all relevant cases:
+> 
+> - hv_frequencies property is added, defaulting to "off", so that new
+>   users of this feature would need to explicitly turn it on;
+> 
+> - on pre-2.12 machine types, it's set to the value of hv_time property
+>   by the compat code, so that on VMs where this feature could
+>   potentially be present it would become required; as a result, these
+>   configurations will refuse to start on insufficiently capable KVM,
+>   preventing the migration attempts.
 
-Thanks for the review.
+This sounds like the safest option.  The cost will be the
+inconvenience of being unable to run pc-2.11 on hosts with older
+KVM (Linux < v4.14, without commit
+72c139bacfa386145d7bbb68c47c8824716153b6), and the need to
+explicitly enable hv-frequencies on pc-2.12 and newer.
 
--- PMM
+> 
+> Am I missing any scenarios that aren't covered?
+> 
+
+It looks like the guest can still crash if we migrate
+"QEMU-2.12 -machine pc-2.11 -cpu ...,+hv-time" to a host running
+QEMU 2.11 and Linux < 4.14.  I wonder if there's a way to avoid
+that?  If there's a way to avoid that with extra migration
+subsections, is it worth the effort/complexity?
+
+-- 
+Eduardo
