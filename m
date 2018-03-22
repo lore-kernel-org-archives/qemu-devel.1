@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ez72M-0003HC-DH
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:42:15 -0400
+	(envelope-from <mjc@sifive.com>) id 1ez7Po-00041j-JY
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ez72J-0007NM-Ag
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:42:14 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180315133441.24149-1-peter.maydell@linaro.org>
-	<20180322142343.jvc6pxxvl5zhfjgy@hawk.localdomain>
-	<CAFEAcA8Vti8NnrQK4U4kLuk=nNMC5=KiKjc6wT7cLDnCHFj-8w@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <48f559bd-9f54-bcdd-1f3c-f6fafccfc54e@amsat.org>
-Date: Thu, 22 Mar 2018 17:42:02 -0300
+	(envelope-from <mjc@sifive.com>) id 1ez7Pm-0006p4-QZ
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:06:28 -0400
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:47088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ez7Pm-0006o0-IR
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:06:26 -0400
+Received: by mail-ot0-x22b.google.com with SMTP id g97-v6so11026230otg.13
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 14:06:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Vti8NnrQK4U4kLuk=nNMC5=KiKjc6wT7cLDnCHFj-8w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12] hw/intc/arm_gicv3: Fix
- secure-GIC NS ICC_PMR and ICC_RPR accesses
+In-Reply-To: <CAHNT7Ntu=LAm2r3G8ZiGioYC_FkhArA=0kXj8SxphaFTY6rV4Q@mail.gmail.com>
+References: <1521221171-47213-1-git-send-email-mjc@sifive.com>
+	<dec4f79c-a46e-f341-ef17-7ba85086bc9a@amsat.org>
+	<CAHNT7Nuv9G+e3-m-356HZDoiLju=vPCucfWhXLJ0QHPGM7NSQw@mail.gmail.com>
+	<20180319194242.GQ2787@redhat.com>
+	<CAHNT7Ntu=LAm2r3G8ZiGioYC_FkhArA=0kXj8SxphaFTY6rV4Q@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Thu, 22 Mar 2018 14:06:24 -0700
+Message-ID: <CAHNT7NsJBVruEQq1kR53wpadizjaHzJ5M-8D3_grmSzeogmtZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Fix riscv_isa_string memory
+ size bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Peter,
+On Mon, Mar 19, 2018 at 2:39 PM, Michael Clark <mjc@sifive.com> wrote:
 
-On 03/22/2018 03:29 PM, Peter Maydell wrote:
-> On 22 March 2018 at 14:23, Andrew Jones <drjones@redhat.com> wrote:
->> On Thu, Mar 15, 2018 at 01:34:41PM +0000, Peter Maydell wrote:
->>> If the GIC has the security extension support enabled, then a
->>> non-secure access to ICC_PMR must take account of the non-secure
->>> view of interrupt priorities, where real priorities 0..0x7f
->>> are secure-only and not visible to the non-secure guest, and
->>> priorities 0x80..0xff are shown to the guest as if they were
->>> 0x00..0xff. We had the logic here wrong:
+>
+>
+> On Mon, Mar 19, 2018 at 12:42 PM, Richard W.M. Jones <rjones@redhat.com>
+> wrote:
+>
+>> On Mon, Mar 19, 2018 at 11:35:51AM -0700, Michael Clark wrote:
+>> > The RISC-V post-merge spec conformance and cleanup series has had a lot
+>> of
+>> > testing. I've been using it to compile QEMU inside of QEMU using the
+>> RISC-V
+>> > Fedora Image and its native RISC-V GCC toolchain running inside SMP
+>> Linux
+>> > 4.16-rc2. It appears to be pretty rock-solid. The rcu lock fix would
+>> likely
+>> > only affect users who are ballooning memory while a guest is under load.
+>> > The page walker changes have also been tested under load (including
+>> > performance tests).
 >>
->> 0x00..0x7f
-> 
-> I think 0x00..0xff is correct.
+>> Did you see the problem with restoring floating point registers on
+>> context switch?  The test case is quite simple:
+>>
+>>   http://oirase.annexia.org/tmp/sched.c
+>
+>
+> No I didn't. Thanks.
+>
+>
+>> Note you must compile it with gcc -O2 to manifest the bug.  (We
+>> originally thought it was a problem with gcc's optimization, but it
+>> isn't.)
+>>
+>
+> Okay. I must admit most of my testing has been integer heavy workloads.
+>
+>
+>> In Fedora's qemu tree are carrying the following patch which is just a
+>> workaround:
+>>
+>>   https://github.com/rwmjones/fedora-riscv-bootstrap/blob/mast
+>> er/stage1-riscv-qemu/force-float-save.patch
+>
+>
+> I will take a look...
+>
 
-I guess Andrew only suggested to correct the hex prefix in your comment:
-- ... where real priorities 0..0x7f
-+ ... where real priorities 0x00..0x7f
+>From my local testing, it appears to only show up with SMP enabled. With 1
+CPU enabled the sched.c test passes.
 
-> The conversion from actual
-> priority value to the NS-view is
->    if (prio & 0x80 == 0) {
->        nsview = 0;
->    } else {
->        nsview = (prio << 1) & 0xff;
->    }
-> 
-> so:
->    real priority     NS view
->     0x80              0x00
->     0x90              0x20
->     0xa0              0x40
->     0xb0              0x60
->     0xc0              0x80
->     0xd0              0xa0
->     0xe0              0xc0
->     0xf0              0xe0
-> 
-> the NS view covers the whole 0x00..0xff range, but more sparsely.
-> (OK, technically you can't ever read 0xff, only 0xfe.)
+
+> There were some changes around v4 of our port upstream patch series to add
+> MSTATUS.FS (TB_FLAGS_FP_ENABLE) to to tb->flags to avoid checking the flags
+> on all FP ops.
+>
+
+I'm curious about the change in v4 of our upstream patch series "Enforce
+MSTATUS_FS via TB flags"
+
+-
+https://github.com/riscv/riscv-qemu/commit/1b0631573008d19b2cb4bb1ef388bd51d6a1d722
+
+I'll could try and revert this and see if it makes any difference...
+however I think the float code has changed substantially with respect to
+handling of flags. We could backport the more conservative approach of
+handling MSTATUS_FS in the float routines. We should also run the test case
+on hardware to rule out linux-kernel MSTATIS_FS bugs...
+
+BTW We didn't have MTTCG enabled until v6 of our patch series so given it
+only shows up on SMP, it wouldn't have been visible until v6 or after.
+
+static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong
+> *pc,
+>                                         target_ulong *cs_base, uint32_t
+> *flags)
+> {
+>     *pc = env->pc;
+>     *cs_base = 0;
+> #ifdef CONFIG_USER_ONLY
+>     *flags = TB_FLAGS_FP_ENABLE;
+> #else
+>     *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
+> #endif
+> }
+>
+> I'll have to get my head around the implication of this or with the
+> privilege level and how MSTATUS.FS is currently set...
+>
