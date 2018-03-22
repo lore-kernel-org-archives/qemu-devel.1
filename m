@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ez04V-0006JT-Vp
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:16:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1ez05y-0007KH-7M
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ez04V-0002Nq-20
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:15:59 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ez04U-0002NE-S7
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:15:58 -0400
-Received: by mail-oi0-x244.google.com with SMTP id u141-v6so7285626oif.1
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 06:15:58 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1ez05t-0003qj-Cl
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:17:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40336 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ez05t-0003px-7o
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:17:25 -0400
+References: <cover.1521717086.git.berto@igalia.com>
+	<cb7dcdf3685e430783b24cce3a3cbd3aaa997cb7.1521717086.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <297790d0-cac0-8609-7516-d6025b4759a8@redhat.com>
+Date: Thu, 22 Mar 2018 08:17:23 -0500
 MIME-Version: 1.0
-In-Reply-To: <1521634071-16519-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1521634071-16519-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Mar 2018 13:15:37 +0000
-Message-ID: <CAFEAcA-AAB1YB40+oG=PjnVAdFzCpfaYgraw76RUatvHvFGX8w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/4] Merge tpm 2018/03/21
+In-Reply-To: <cb7dcdf3685e430783b24cce3a3cbd3aaa997cb7.1521717086.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 2/2] iotests: Update 186 after
+ commit ac64273c66ab136c44043259162
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 21 March 2018 at 12:07, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> This series of patches fixes the initialization and setting of a few
-> flags of the TPM CRB interface.
->
-> The following changes since commit f1a63fcfcd92c88be8942b5ae71aef9749a4f135:
->
->   Update version for v2.12.0-rc0 release (2018-03-20 19:04:22 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-03-21-1
->
-> for you to fetch changes up to ffbf24bdb223914d5805fef15bfe9c4489868fad:
->
->   tpm: CRB: query backend for TPM established flag (2018-03-21 08:01:03 -0400)
->
-> ----------------------------------------------------------------
-> Stefan Berger (4):
->       tpm: CRB: Set tpmRegValidSts flag to '1' in device reset
->       tpm: CRB: set registers to 0 by default
->       tpm: CRB: reset locAssigned upon relinquishing locality
->       tpm: CRB: query backend for TPM established flag
->
->  hw/tpm/tpm_crb.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+On 03/22/2018 06:14 AM, Alberto Garcia wrote:
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>   tests/qemu-iotests/186.out | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+> index ec75c0fc60..5020162826 100644
+> --- a/tests/qemu-iotests/186.out
+> +++ b/tests/qemu-iotests/186.out
+> @@ -404,7 +404,7 @@ Testing: -drive if=3Dfloppy
+>   QEMU X.Y.Z monitor - type 'help' for more information
+>   (qemu) info block
+>   floppy0: [not inserted]
+> -    Attached to:      /machine/unattached/device[17]
+> +    Attached to:      /machine/unattached/device[13]
 
-Applied, thanks.
+It looks like this name is quite flexible; would it not be better to=20
+enhance 186 to sed out the name (s/Attached to:.*/Attached to: PATH/)=20
+and then adjust the .out so that it is no longer sensitive to these=20
+types of internal renames?
 
--- PMM
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
