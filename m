@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ez0Ai-0002It-DL
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:22:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1ez0DM-0003Kt-W6
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ez0Af-0003dY-5e
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:22:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35242)
+	(envelope-from <eblake@redhat.com>) id 1ez0DH-0001IW-3a
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:25:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42998 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ez0Ae-0003c4-SM
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:22:21 -0400
-Date: Thu, 22 Mar 2018 10:22:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180322132218.GH3417@localhost.localdomain>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-3-vkuznets@redhat.com>
-	<20180321121001.GD14983@rkaganb.sw.ru>
-	<87bmfh7eip.fsf@vitty.brq.redhat.com>
-	<20180321165729.GH14983@rkaganb.sw.ru>
-	<20180321201924.GE3417@localhost.localdomain>
-	<20180322130013.GB4500@rkaganb.sw.ru>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ez0DG-0001Hf-Tk
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:25:03 -0400
+References: <20180309090006.10018-1-peterx@redhat.com>
+	<20180309090006.10018-15-peterx@redhat.com>
+	<CAJ+F1C+3f9RAC86YxRuvGWbX1tegA01iaY760yLOB2W5OyHaNA@mail.gmail.com>
+	<20180321200933.GB3466@work-vm>
+	<3e0a2365-a90e-3798-2c73-70ef2df67977@redhat.com>
+	<CAJ+F1C+mcAxMVGXzYhbOoh932rKkEue22rk0ApqMHuOqbDDNGg@mail.gmail.com>
+	<20180322050002.GF32362@xz-mi>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <95dcaa7a-fe49-02b1-a5e9-4e0583668e80@redhat.com>
+Date: Thu, 22 Mar 2018 08:24:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180322130013.GB4500@rkaganb.sw.ru>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386/kvm: lower requirements for
- Hyper-V frequency MSRs exposure
+In-Reply-To: <20180322050002.GF32362@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,116 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Mar 22, 2018 at 04:00:14PM +0300, Roman Kagan wrote:
-> On Wed, Mar 21, 2018 at 05:19:24PM -0300, Eduardo Habkost wrote:
-> > On Wed, Mar 21, 2018 at 07:57:29PM +0300, Roman Kagan wrote:
-> > > On Wed, Mar 21, 2018 at 02:18:54PM +0100, Vitaly Kuznetsov wrote:
-> > > > Roman Kagan <rkagan@virtuozzo.com> writes:
-> > > > 
-> > > > > On Tue, Mar 20, 2018 at 06:35:00PM +0100, Vitaly Kuznetsov wrote:
-> > > > >> Requiring tsc_is_stable_and_known() is too restrictive: even without INVTCS
-> > > > >> nested Hyper-V-on-KVM enables TSC pages for its guests e.g. when
-> > > > >> Reenlightenment MSRs are present. Presence of frequency MSRs doesn't mean
-> > > > >> these frequencies are stable, it just means they're available for reading.
-> > > > >> 
-> > > > >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > > >> ---
-> > > > >>  target/i386/kvm.c | 2 +-
-> > > > >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >> 
-> > > > >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > > > >> index 7d9f9ca0b1..74fc3d3b2c 100644
-> > > > >> --- a/target/i386/kvm.c
-> > > > >> +++ b/target/i386/kvm.c
-> > > > >> @@ -651,7 +651,7 @@ static int hyperv_handle_properties(CPUState *cs)
-> > > > >>          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
-> > > > >>          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
-> > > > >>  
-> > > > >> -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-> > > > >> +        if (has_msr_hv_frequencies && env->tsc_khz) {
-> > > > >>              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
-> > > > >>              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
-> > > > >>          }
-> > > > >
-> > > > > I suggest that we add a corresponding cpu property here, too.  The guest
-> > > > > may legitimately rely on these msrs when it sees the support in CPUID,
-> > > > > and migrating from a kernel with the feature supported (4.14+) to an
-> > > > > older one will make it crash.
-> > > > >
-> > > > 
-> > > > This can be arranged, but what happens to people who use these features
-> > > > today? Assuming they also passed 'invtsc' they have stable TSC page
-> > > > clocksource already (when Hyper-V role is enabled) but when we start
-> > > > requesting a new 'hv_frequency' cpu property they'll suddenly lose what
-> > > > they have...
-> > > 
-> > > I see two cases here:
-> > > 
-> > > 1) people start a new VM, and discover that their old configuration is
-> > >    not enough for this feature to work.
-> > > 
-> > >    They need to reconfigure and restart the VM.  This costs them some
-> > >    time investigating and restarting, but not data.
-> > 
-> > If we keep machine-type compatibility, people will need to do
-> > that only if they change the machine-type (or use the "pc" or
-> > "q35" aliases).  If they copy the old configuration, it will keep
-> > working.
+On 03/22/2018 12:00 AM, Peter Xu wrote:
+
+>>>> Doesn't OOB insist on having an ID field with the command?
+>>>
+>>>
+>>> OOB insists on an id field - but there is the situation that SOME errors
+>>> occur even before the id field has been encountered (for example, if you
+>>> send non-JSON, the parser gets all confused - it has to emit SOME error, but
+>>> that error can't refer to an id because it wasn't able to parse one yet).  A
+>>> well-formed client will never do this, but we MUST be robust even in the
+>>> face of a malicious client (or even a well-intentioned client but a noisy
+>>> communication medium that manages to corrupt bytes). I'm not sure if the
+>>> testsuite adequately covers what happens in this scenario.  Peter?
+>>
+>> I think a solution would be to queue the error reply (the reply only)
+>> instead of replying directly.
 > 
-> The problem is that the feature is not fixed by the machine-type, due to
-> the forgotten property: it only depends on the KVM version.  So, once
-> (if) we add the property and make the feature deterministic, we'll lose
-> compatibility one way or another.
-> 
-> Or are you suggesting that for pre-2.12 machine types we leave the
-> property at "decided by your KVM" state?
+> IMHO this should be fine.
 
-Yes, that's what I mean.  This looks like the only way to avoid
-losing features by just cold-rebooting an existing VM.
-
-The scenario I'm thinking is this:
-
-1) pc-2.11 VM started on host running QEMU 2.11
-2) VM migrated to a host containing this patch
-3) 1 year later, the VM is shut down and booted again.
-4) Things stop working inside the VM because hv-frequency is
-   unexpectedly gone.
-
-Machine-type compatibility code would avoid (4).
-
+Seems reasonable - conceptually, the error reply comes no sooner than 
+pre-patch (the client wouldn't see a parse error message until after all 
+earlier successful parsed messages completed), making a parse error a 
+sort of synchronization barrier (if the client gets one, then all 
+outstanding message prior to the parse error have finished sending 
+replies to the client, and nothing after the parse error has been 
+processed at the time the error message was sent).
 
 > 
-> > 
-> > machine-type compatibility also makes the following case a bit
-> > safer:
-> > 
-> > > 
-> > > 2) people migrate from a QEMU without ->hv_frequency, to a new one with
-> > >    ->hv_frequency=off (assuming on both ends KVM supports the frequency
-> > >    MSRs).
-> > > 
-> > >    With the current implementation in KVM, this will only result in the
-> > >    feature bits disappearing from the respective CPUID leaf, but the
-> > >    MSRs themselves will continue working as they used to.  So the guest
-> > >    either won't notice or will check the CPUID and adjust.
-> > 
-> > If we keep machine-type compatibility, the CPUID bit won't
-> > disappear for the guest while the MSRs keep working.
-> > 
-> > 
-> > Whichever solution we choose, we can still have guests crashing
-> > if migrating a pc-2.11 machine from a 4.14+ host kernel to a host
-> > with an older kernel.  But I don't think there's a way out of
-> > this, except requiring an explicit "hv-frequencies" CPU option on
-> > newer machine-types.
+> Note that to be compatible with existing QMP we'll suspend the monitor
+> if OOB is not enabled in the session on receiving the first command.
+> It means even if another faulty command is sent after the good one,
+> it'll not be read by QMP parser until the first one is fully complete.
 > 
-> What's wrong with requiring it, as we do for all other hv_* properties?
+> Since I'm working on some test patches after all, I'll try to add a
+> test case for this to see whether Eric would like them too.
 
-On new machine-types, nothing wrong.
+Yes, these are the sorts of bug fixes and test suite coverage that we 
+want to include during freeze, for better robustness.
 
-On existing machine-types, see above.
+> 
+>>
+>> Another problem I see with the current solution is that pending
+>> commands are not discarded when a new client connects. So I suppose a
+>> new client can receive replies for commands it didn't make, with id
+>> namespace that may conflict with its own. breaking ordering etc. A
+>> possible solution is to mark the pending request to not send the reply
+>> somehow?
+> 
+> Yeah, to be simpler - maybe we can even drop the commands that have
+> not yet been dispatched?
+> 
+> I'll treat a command as "complete" only until the client receives a
+> response, otherwise if a client disconnects before receiving a reply
+> then I think it's fine the behavior is undefined - IMHO it's fine
+> either the QMP server executes the command or not (and no matter what,
+> we drop the responses).  Would that work?
+
+If a client disconnects before receiving a reply, I'm fine with either 
+approach (the command gets discarded from the queue and never run - 
+which matches if the client disconnect raced with the server actually 
+getting the command, or the command ran but the response is dropped - 
+which matches pre-patch behavior), while agreeing that sending the 
+response to the next client is probably not a good idea (clients are 
+supposed to ignore unknown id's, but we can't guarantee an 'id' 
+collision will not confuse the client).
 
 -- 
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
