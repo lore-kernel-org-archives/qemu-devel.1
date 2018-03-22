@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eywC2-0003fA-WC
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 05:07:32 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eywFY-0005Rn-0L
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 05:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eywBz-0005E7-Rg
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 05:07:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49262 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eywBz-0005Da-Li
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 05:07:27 -0400
-Date: Thu, 22 Mar 2018 09:07:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180322090714.GA3205@work-vm>
-References: <1521253498-6834-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1521253498-6834-2-git-send-email-stefanb@linux.vnet.ibm.com>
-	<20180321171402.GF3465@work-vm>
-	<ec539c1c-37bb-afaf-9a8b-99e6c4f44f4f@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eywFU-0006vq-QE
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 05:11:07 -0400
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:40731)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eywFU-0006vS-Im
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 05:11:04 -0400
+Received: by mail-wm0-f65.google.com with SMTP id t6so14656434wmt.5
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 02:11:04 -0700 (PDT)
+References: <20180322073822.25795-1-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <be2cad56-c486-1123-efa3-9b28eff96772@redhat.com>
+Date: Thu, 22 Mar 2018 10:11:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec539c1c-37bb-afaf-9a8b-99e6c4f44f4f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5.2 for 2.13 1/4] tpm: extend TPM emulator
- with state migration support
+In-Reply-To: <20180322073822.25795-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scsi-disk: Don't enlarge min_io_size to
+ max_io_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> On 03/21/2018 01:14 PM, Dr. David Alan Gilbert wrote:
-> > * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> > > +
-> > > +    if (totlength > 0) {
-> > > +        tsb->buffer = g_try_malloc(totlength);
-> > > +        if (!tsb->buffer) {
-> > > +            error_report("tpm-emulator: Out of memory allocating %u bytes",
-> > > +                         totlength);
-> > > +            return -1;
-> > > +        }
-> > > +
-> > > +        n = qemu_chr_fe_read_all(&tpm_emu->ctrl_chr, tsb->buffer, totlength);
-> > > +        if (n != totlength) {
-> > > +            error_report("tpm-emulator: Could not read stateblob (type %d); "
-> > > +                         "expected %u bytes, got %zd",
-> > > +                         type, totlength, n);
-> > I think you need to free tsb->buffer here.
+On 22/03/2018 08:38, Fam Zheng wrote:
+> Some backends report big max_io_sectors. Making min_io_size the same
+> value in this case will make it impossible for guest to align memory,
+> therefore the disk may not be usable at all.
 > 
-> tpm_emulator_get_state_blobs() below clears all 3 buffers in case one error
-> is encountered.
+> Change the default behavior (when min_io_size and opt_io_size are not
+> specified in the command line), do not assume max_io_sectors is a good
+> value for opt_io_size and min_io_size, use 512 instead.
+> 
+> Reported-by: David Gibson <dgibson@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  hw/scsi/scsi-disk.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 5b7a48f5a5..76e3c9eaa4 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -714,10 +714,8 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
+>  
+>                  /* min_io_size and opt_io_size can't be greater than
+>                   * max_io_sectors */
+> -                min_io_size =
+> -                    MIN_NON_ZERO(min_io_size, max_io_sectors);
+> -                opt_io_size =
+> -                    MIN_NON_ZERO(opt_io_size, max_io_sectors);
+> +                min_io_size = MIN(min_io_size ? : 512, max_io_sectors);
+> +                opt_io_size = MIN(opt_io_size ? : 512, max_io_sectors);
 
-Ah OK.
+There are a few easily fixed issues with your chosen defaults, though
+the problem obviously makes sense:
 
-Dave
+1) the values are in sectors - since you chose 512, it's not clear if
+you meant it to be 512 bytes or 512 sectors.  :)  512 sectors (256 KiB
+or 2 MiB depending on logical block size) is still too much for the
+min_io_size.  The min_io_size default (if it is 0) is the physical block
+size, so I think we should make the min_io_size either 0 or the physical
+block size.
 
-> > 
-> > Other than that, I think:
-> > 
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > 
-> > 
-> > > +            return -1;
-> > > +        }
-> > > +    }
-> > > +    tsb->size = totlength;
-> > > +
-> > > +    trace_tpm_emulator_get_state_blob(type, tsb->size, *flags);
-> > > +
-> > > +    return 0;
-> > > +}
-> > > +
-> > > +static int tpm_emulator_get_state_blobs(TPMEmulator *tpm_emu)
-> > > +{
-> > > +    TPMBlobBuffers *state_blobs = &tpm_emu->state_blobs;
-> > > +
-> > > +    if (tpm_emulator_get_state_blob(tpm_emu, PTM_BLOB_TYPE_PERMANENT,
-> > > +                                    &state_blobs->permanent,
-> > > +                                    &state_blobs->permanent_flags) < 0 ||
-> > > +        tpm_emulator_get_state_blob(tpm_emu, PTM_BLOB_TYPE_VOLATILE,
-> > > +                                    &state_blobs->volatil,
-> > > +                                    &state_blobs->volatil_flags) < 0 ||
-> > > +        tpm_emulator_get_state_blob(tpm_emu, PTM_BLOB_TYPE_SAVESTATE,
-> > > +                                    &state_blobs->savestate,
-> > > +                                    &state_blobs->savestate_flags) < 0) {
-> > > +        goto err_exit;
-> > > +    }
-> > > +
-> > > +    return 0;
-> > > +
-> > > + err_exit:
-> > > +    tpm_sized_buffer_reset(&state_blobs->volatil);
-> > > +    tpm_sized_buffer_reset(&state_blobs->permanent);
-> > > +    tpm_sized_buffer_reset(&state_blobs->savestate);
+2) For the opt_io_size, 256 KiB on the other hand is probably too
+little.  On my laptop (NVMe disk) a transfer size of 8 MiB is twice as
+fast compared to a transfer size of 256 KiB, and 16 MiB or 32 MiB is a
+little faster too.  I would either leave zero as the default, or pick
+something around 16-32 MiB.
+
+Thanks,
+
+Paolo
+
+>              }
+>              /* required VPD size with unmap support */
+>              buflen = 0x40;
 > 
-> ^^^ here
-> 
-> > > +
-> > > +    return -1;
-> > > +}
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
