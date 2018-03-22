@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ez1wG-000352-LR
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:15:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ez26g-0007ZE-IL
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:26:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ez1wB-0002bq-QY
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:15:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34278 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ez1wB-0002bG-ME
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:15:31 -0400
-Date: Thu, 22 Mar 2018 17:15:30 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180322171450-mutt-send-email-mst@kernel.org>
-References: <20180319071537.28649-1-tiwei.bie@intel.com>
-	<20180319071537.28649-6-tiwei.bie@intel.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ez26e-0006xg-6W
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:26:21 -0400
+References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
+	<20180321121940.39426-4-vsementsov@virtuozzo.com>
+	<e21af76d-977d-cadf-0a27-14a2d2aa228a@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <17359493-4ac4-59d7-0407-03c2d38cb54f@virtuozzo.com>
+Date: Thu, 22 Mar 2018 18:26:06 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180319071537.28649-6-tiwei.bie@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] vfio: remove DPRINTF() definition
- from vfio-common.h
+In-Reply-To: <e21af76d-977d-cadf-0a27-14a2d2aa228a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 3/4] nbd/server: implement dirty bitmap
+ export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, nbd list <nbd@other.debian.org>
 
-On Mon, Mar 19, 2018 at 03:15:36PM +0800, Tiwei Bie wrote:
-> This macro isn't used by any VFIO code. And its name is
-> too generic. The vfio-common.h (in include/hw/vfio) can
-> be included by other modules in QEMU. It can introduce
-> conflicts.
-> 
-> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+21.03.2018 19:57, Eric Blake wrote:
+> On 03/21/2018 07:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> Rather sparse on the details in the commit message; I had to read the=20
+> patch to even learn what the new namespace is.
 
-This one can go ahead immediately.
-Try posting as a separate patch.
+oh, yes, sorry :(
 
-> ---
->  include/hw/vfio/vfio-common.h | 9 ---------
->  1 file changed, 9 deletions(-)
-> 
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index b820f7984c..f6aa4ae959 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -34,15 +34,6 @@
->  #define ERR_PREFIX "vfio error: %s: "
->  #define WARN_PREFIX "vfio warning: %s: "
->  
-> -/*#define DEBUG_VFIO*/
-> -#ifdef DEBUG_VFIO
-> -#define DPRINTF(fmt, ...) \
-> -    do { fprintf(stderr, "vfio: " fmt, ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) \
-> -    do { } while (0)
-> -#endif
-> -
->  enum {
->      VFIO_DEVICE_TYPE_PCI = 0,
->      VFIO_DEVICE_TYPE_PLATFORM = 1,
-> -- 
-> 2.11.0
+>> @@ -92,6 +101,7 @@ typedef struct NBDExportMetaContexts {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool valid; /* means that negotiation of =
+the option finished=20
+>> without
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errors */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool base_allocation; /* export base:allo=
+cation context (block=20
+>> status) */
+>> +=C2=A0=C2=A0=C2=A0 bool dirty_bitmap; /* export=20
+>> qemu-dirty-bitmap:<export_bitmap_name> */
+>
+> That's a LONG namespace name, and it does not lend itself well to=20
+> other qemu extensions; so future qemu BLOCK_STATUS additions would=20
+> require consuming yet another namespace and additional upstream NBD=20
+> registration.=C2=A0 Wouldn't it be better to have the namespace be 'qemu:=
+'=20
+> (which we register with upstream NBD just once), where we are then=20
+> free to document leafnames to look like 'dirty-bitmap:name' or 'foo:bar'?
+
+No doubts. (and this shows, that we may want namespaces in namespaces,=20
+so we'll parse ':' anyway).
+
+Only one note here (I'm ashamed): 'qemu-dirty-bitmap' namespace is used=20
+in Virtuozzo for the feature, yes, without 'x-' prefix. It's my fault,=20
+and it should not influence final solution. The probability of problems=20
+is near to zero (especially if we decide now to use 'qemu:' namespace=20
+for all qemu-specific things. But I'm not sure about, should we mention=20
+this fact in the spec.
+[cc NBD list]
+
+--=20
+Best regards,
+Vladimir
