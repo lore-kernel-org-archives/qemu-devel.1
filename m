@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eyvVj-0002eW-RD
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:23:49 -0400
+	id 1eyvXV-0003zU-Oz
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eyvVh-0002ow-0I
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:23:47 -0400
+	id 1eyvXU-0003dK-Ir
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:25:37 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180320134114.30418-1-peter.maydell@linaro.org>
-	<20180320134114.30418-4-peter.maydell@linaro.org>
+References: <20180321211056.3339-1-yuval.shaia@oracle.com>
+	<20180321211056.3339-2-yuval.shaia@oracle.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a1381141-9f62-7305-aa8c-424d190c446f@amsat.org>
-Date: Thu, 22 Mar 2018 05:23:39 -0300
+Message-ID: <1679c87d-9378-03d7-6292-5d17818bab32@amsat.org>
+Date: Thu, 22 Mar 2018 05:25:26 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180320134114.30418-4-peter.maydell@linaro.org>
+In-Reply-To: <20180321211056.3339-2-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12 3/4] target/arm: Set
- FSR for BKPT, BRK when raising exception
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/3] hw/rdma: Change
+ host_virt to void *
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Yuval Shaia <yuval.shaia@oracle.com>, marcel@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 03/20/2018 10:41 AM, Peter Maydell wrote:
-> Now that we have a helper function specifically for the BRK and
-> BKPT instructions, we can set the exception.fsr there rather
-> than in arm_cpu_do_interrupt_aarch32(). This allows us to
-> use our new arm_debug_exception_fsr() helper.
+On 03/21/2018 06:10 PM, Yuval Shaia wrote:
+> To avoid compilation warnings on 32-bit machines:
+> rdma_backend.c: In function 'rdma_backend_create_mr':
+> rdma_backend.c:409:37: error: cast to pointer from integer of different
+> size [-Werror=int-to-pointer-cast]
+> 	mr->ibmr = ibv_reg_mr(pd->ibpd, (void *)addr, length, access);
 > 
-> In particular this fixes a bug where we were hardcoding the
-> short-form IFSR value, which is wrong if the target exception
-> level has LPAE enabled.
-> 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1756927
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/arm/helper.c    | 1 -
->  target/arm/op_helper.c | 2 ++
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  hw/rdma/rdma_backend.c |  8 ++++----
+>  hw/rdma/rdma_backend.h |  2 +-
+>  hw/rdma/rdma_rm.c      | 10 +++++-----
+>  hw/rdma/rdma_rm_defs.h |  2 +-
+>  4 files changed, 11 insertions(+), 11 deletions(-)
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 09893e3f72..dcb8476d9e 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -7910,7 +7910,6 @@ static void arm_cpu_do_interrupt_aarch32(CPUState *cs)
->          offset = 0;
->          break;
->      case EXCP_BKPT:
-> -        env->exception.fsr = 2;
->          /* Fall through to prefetch abort.  */
->      case EXCP_PREFETCH_ABORT:
->          A32_BANKED_CURRENT_REG_SET(env, ifsr, env->exception.fsr);
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 75efff9edf..8e1e521193 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -488,6 +488,8 @@ void HELPER(exception_with_syndrome)(CPUARMState *env, uint32_t excp,
->   */
->  void HELPER(exception_bkpt_insn)(CPUARMState *env, uint32_t syndrome)
->  {
-> +    /* FSR will only be used if the debug target EL is AArch32. */
-> +    env->exception.fsr = arm_debug_exception_fsr(env);
->      raise_exception(env, EXCP_BKPT, syndrome, arm_debug_target_el(env));
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index e306fba534..f1a37ba4a2 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -222,7 +222,7 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+>              return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
+>          }
+>  
+> -        dsge->addr = mr->user_mr.host_virt + ssge[ssge_idx].addr -
+> +        dsge->addr = (uintptr_t)mr->user_mr.host_virt + ssge[ssge_idx].addr -
+>                       mr->user_mr.guest_start;
+>          dsge->length = ssge[ssge_idx].length;
+>          dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+> @@ -401,12 +401,12 @@ void rdma_backend_destroy_pd(RdmaBackendPD *pd)
+>      }
 >  }
 >  
+> -int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, uint64_t addr,
+> +int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, void *addr,
+>                             size_t length, int access)
+>  {
+> -    pr_dbg("addr=0x%lx\n", addr);
+> +    pr_dbg("addr=0x%p\n", addr);
+>      pr_dbg("len=%ld\n", length);
+> -    mr->ibmr = ibv_reg_mr(pd->ibpd, (void *)addr, length, access);
+> +    mr->ibmr = ibv_reg_mr(pd->ibpd, addr, length, access);
+>      if (mr->ibmr) {
+>          pr_dbg("lkey=0x%x\n", mr->ibmr->lkey);
+>          pr_dbg("rkey=0x%x\n", mr->ibmr->rkey);
+> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+> index 68f2b05ca7..07f6fed768 100644
+> --- a/hw/rdma/rdma_backend.h
+> +++ b/hw/rdma/rdma_backend.h
+> @@ -61,7 +61,7 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
+>  int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd);
+>  void rdma_backend_destroy_pd(RdmaBackendPD *pd);
+>  
+> -int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, uint64_t addr,
+> +int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, void *addr,
+>                             size_t length, int access);
+>  void rdma_backend_destroy_mr(RdmaBackendMR *mr);
+>  
+> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> index b5fc45ddab..296e40518e 100644
+> --- a/hw/rdma/rdma_rm.c
+> +++ b/hw/rdma/rdma_rm.c
+> @@ -146,7 +146,7 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
+>      RdmaRmMR *mr;
+>      int ret = 0;
+>      RdmaRmPD *pd;
+> -    uint64_t addr;
+> +    void *addr;
+>      size_t length;
+>  
+>      pd = rdma_rm_get_pd(dev_res, pd_handle);
+> @@ -165,10 +165,10 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
+>          /* TODO: This is my guess but not so sure that this needs to be
+>           * done */
+>          length = TARGET_PAGE_SIZE;
+> -        addr = (uint64_t)g_malloc(length);
+> +        addr = g_malloc(length);
+>      } else {
+> -        mr->user_mr.host_virt = (uint64_t) host_virt;
+> -        pr_dbg("host_virt=0x%lx\n", mr->user_mr.host_virt);
+> +        mr->user_mr.host_virt = host_virt;
+> +        pr_dbg("host_virt=0x%p\n", mr->user_mr.host_virt);
+>          mr->user_mr.length = guest_length;
+>          pr_dbg("length=0x%lx\n", guest_length);
+>          mr->user_mr.guest_start = guest_start;
+> @@ -216,7 +216,7 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
+>  
+>      if (mr) {
+>          rdma_backend_destroy_mr(&mr->backend_mr);
+> -        munmap((void *)mr->user_mr.host_virt, mr->user_mr.length);
+> +        munmap(mr->user_mr.host_virt, mr->user_mr.length);
+>          res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
+>      }
+>  }
+> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> index 6522dca68f..fc646da61f 100644
+> --- a/hw/rdma/rdma_rm_defs.h
+> +++ b/hw/rdma/rdma_rm_defs.h
+> @@ -56,7 +56,7 @@ typedef struct RdmaRmCQ {
+>  } RdmaRmCQ;
+>  
+>  typedef struct RdmaRmUserMR {
+> -    uint64_t host_virt;
+> +    void *host_virt;
+>      uint64_t guest_start;
+>      size_t length;
+>  } RdmaRmUserMR;
 > 
