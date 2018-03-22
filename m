@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyqee-0008WG-Qb
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1eyqrL-0003zp-Rd
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyqeZ-0004LB-OZ
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39986 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eyqeZ-0004Kx-Ju
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 515FE402277B
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 03:12:35 +0000 (UTC)
-Date: Thu, 22 Mar 2018 11:12:29 +0800
+	(envelope-from <peterx@redhat.com>) id 1eyqrK-0003Wt-UZ
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:25:47 -0400
+Date: Thu, 22 Mar 2018 11:25:19 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180322031229.GB32362@xz-mi>
-References: <20180321113644.21899-1-marcandre.lureau@redhat.com>
+Message-ID: <20180322032519.GC32362@xz-mi>
+References: <a80175c7-0d54-dc0b-5dbe-8bb05f51913b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180321113644.21899-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: fix pfd leak
+In-Reply-To: <a80175c7-0d54-dc0b-5dbe-8bb05f51913b@redhat.com>
+Subject: Re: [Qemu-devel] raw iotest regressions in 2.12.0-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +22,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
 
-On Wed, Mar 21, 2018 at 12:36:44PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Fix leak spotted by ASAN:
->=20
-> Direct leak of 16 byte(s) in 1 object(s) allocated from:
->     #0 0x7fe1abb80a38 in __interceptor_calloc (/lib64/libasan.so.4+0xde=
-a38)
->     #1 0x7fe1aaf1bf75 in g_malloc0 ../glib/gmem.c:124
->     #2 0x7fe1aaf1c249 in g_malloc0_n ../glib/gmem.c:355
->     #3 0x55f4841cfaa9 in postcopy_ram_fault_thread /home/elmarco/src/qe=
-mu/migration/postcopy-ram.c:596
->     #4 0x55f48479447b in qemu_thread_start /home/elmarco/src/qemu/util/=
-qemu-thread-posix.c:504
->     #5 0x7fe1a043550a in start_thread (/lib64/libpthread.so.0+0x750a)
->=20
-> Regression introduced with commit 00fa4fc85b00f1a8a810068d158a7a66e8865=
-8eb.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Wed, Mar 21, 2018 at 05:58:48PM -0400, John Snow wrote:
+> ./check -v -raw
+> Failures: 109 132 136 148 152 183
+> 
+> 3fd2457d18edf5736f713dfe1ada9c87a9badab1 is the first bad commit
+> commit 3fd2457d18edf5736f713dfe1ada9c87a9badab1
+> Author: Peter Xu <peterx@redhat.com>
+> Date:   Fri Mar 9 17:00:03 2018 +0800
+> 
+>     monitor: enable IO thread for (qmp & !mux) typed
+> 
+>     Start to use dedicate IO thread for QMP monitors that are not using
+>     MUXed chardev.
+> 
+>     Reviewed-by: Fam Zheng <famz@redhat.com>
+>     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>     Signed-off-by: Peter Xu <peterx@redhat.com>
+>     Message-Id: <20180309090006.10018-21-peterx@redhat.com>
+>     Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> 
+> The symptom appears to be extra "RESUME" events in the stream that
+> weren't expected by the original output for tests 109 and 183; the rest
+> are python and I didn't dig yet.
+> 
+> ./check -v raw
+> Failures: 055
+> Failed 5 of 5 tests
+> 
+> 91ad45061af0fe44ac5dadb5bedaf4d7a08077c8 is the first bad commit
+> commit 91ad45061af0fe44ac5dadb5bedaf4d7a08077c8
+> Author: Peter Xu <peterx@redhat.com>
+> Date:   Fri Mar 9 17:00:05 2018 +0800
+> 
+>     tests: qmp-test: verify command batching
+> 
+>     OOB introduced DROP event for flow control.  This should not affect old
+>     QMP clients.  Add a command batching check to make sure of it.
+> 
+>     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>     Signed-off-by: Peter Xu <peterx@redhat.com>
+>     Message-Id: <20180309090006.10018-23-peterx@redhat.com>
+>     Reviewed-by: Eric Blake <eblake@redhat.com>
+>     Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> 
+> 
+> Maybe these are known, but I wanted to consolidate them for rc0 for
+> something easy to search for. There are others for qcow2 which I'll post
+> in a bit...!
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+I'll have a look on this today and see whether this is the same
+problem as reported by Max.  Sorry for that, and thanks for reporting!
 
---=20
+-- 
 Peter Xu
