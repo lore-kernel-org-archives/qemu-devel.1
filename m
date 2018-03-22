@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ez67I-0007f0-4j
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:43:17 -0400
+	(envelope-from <cota@braap.org>) id 1ez6L0-0004nA-Pd
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ez67G-0008VT-Tr
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:43:16 -0400
-References: <1521746188-496856-1-git-send-email-mst@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e149388d-eb17-ffd3-b54c-cbdf6a309882@redhat.com>
-Date: Thu, 22 Mar 2018 14:42:55 -0500
+	(envelope-from <cota@braap.org>) id 1ez6Kx-0000zI-LK
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:57:26 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:59571)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1ez6Kx-0000ys-E2
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:57:23 -0400
+Date: Thu, 22 Mar 2018 15:57:21 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180322195721.GA22594@flamenco>
+References: <1521663109-32262-1-git-send-email-cota@braap.org>
+	<1521663109-32262-9-git-send-email-cota@braap.org>
+	<67b8c0f8-3fd9-ba7c-a666-d0715b5a3329@linaro.org>
+	<20180322055710.GA22376@flamenco>
+	<959d13eb-498e-0bd6-2553-1b621a87f1bd@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1521746188-496856-1-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] make: move generated headers to
- qemu-build/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <959d13eb-498e-0bd6-2553-1b621a87f1bd@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v1 08/14] hostfloat: support float32/64
+ addition and subtraction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 03/22/2018 02:27 PM, Michael S. Tsirkin wrote:
-> Make sure all generated files go into qemu-build subdirectory.
-> We can then include them like this:
->   #include "qemu-build/trace.h"
+On Thu, Mar 22, 2018 at 14:41:05 +0800, Richard Henderson wrote:
+(snip)
+> Another thought re all of the soft_is_normal || soft_is_zero checks that you're
+> performing.  I think it would be nice if we could work with
+> float*_unpack_canonical so that we don't have to duplicate work.  E.g.
 > 
-> This serves two purposes:
-> - make it easy to detect which files are in the source
->    directory (a bit more work for writers, easier for readers)
-> - reduce chances of conflicts with possible stale files in source
->    directory (which could be left over from e.g. old patches, etc)
+> /* Return true for float_class_normal && float_class_zero.  */
+> static inline bool is_finite(FloatClass c) { return c <= float_class_zero; }
 > 
-> This patch needs to be merged with patch 2  of series updating all
-> files: sending it separately to avoid spamming the list.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
+> float32 float32_add(float32 a, float32 b, float_status *s)
+> {
+>   FloatClass a_cls = float32_classify(a);
+>   FloatClass b_cls = float32_classify(b);
 
-> +++ b/Makefile
-> @@ -89,102 +89,102 @@ endif
->   
->   include $(SRC_PATH)/rules.mak
->   
-> -GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
-> -GENERATED_FILES += qapi/qapi-builtin-types.h qapi/qapi-builtin-types.c
+Just looked at this. It can be done, although it comes at the
+price of some performance for fp-bench -o add:
+180 Mflops vs. 196 Mflops, i.e. a 8% slowdown. That is with
+adequate inlining etc., otherwise perf is worse.
 
-Uggh - I really need to follow up on my threat to make smarter use of 
-make variables and string manipulation to cut down on the boilerplate 
-involved here.  Sadly, I'm not convinced that doing so is a 2.12 bugfix 
-priority, so it isn't at the top of my work queue.
+I'm not convinced that we can gain much in simplicity to
+justify the perf impact. Yes, we'd simplify canonicalize(),
+but we'd probably need a float_class_denormal[*], which
+would complicate everything else.
 
-Overall, the patch is an interesting idea.  I'm still not 100% sold on 
-it (as you say, it's now slightly more work for writers), but I'm not 
-coming up with any solid reasons why it should not be applied (at least, 
-for 2.13 - doing it during freeze for 2.12 is a bit harder to justify).
+I think it makes sense to keep some inlines that work on
+the float32/64's directly.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>   if (is_finite(a_cls) && is_finite(b_cls) && ...) {
+>       /* do hardfp thing */
+>   }
+
+[*] Taking 0, denormals and normals would be OK from correctness,
+but we really don't want to compute ops with denormal inputs on
+the host; it is very likely that the output will also be denormal,
+and we'll end up deferring to soft-fp anyway to avoid
+computing whether the underflow exception has occurred,
+which is expensive.
+
+>   pa = float32_unpack(a, ca, s);
+>   pb = float32_unpack(b, cb, s);
+>   pr = addsub_floats(pa, pb, s, false);
+>   return float32_round_pack(pr, s);
+> }
+
+It pays off to have two separate functions (add & sub) for the
+slow path. With soft_f32_add/sub factored out:
+
+$ taskset -c 0 x86_64-linux-user/qemu-x86_64 tests/fp-bench -o add
+197.53 MFlops
+
+With the above four lines (pa...return) as an else branch:
+169.16 MFlops
+
+BTW flattening makes things worse (150.63 MFlops).
+
+Note that fp-bench only tests normal numbers. But I think it's fair
+to assume that this is the path we want to speed up.
+
+Thanks,
+
+		E.
