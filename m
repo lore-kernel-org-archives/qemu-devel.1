@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eysdt-000495-DG
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:20:02 -0400
+	(envelope-from <yuchenlin@synology.com>) id 1eyqCS-0002iN-An
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 22:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eysdq-0005oN-3g
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:20:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53802 helo=mx1.redhat.com)
+	(envelope-from <yuchenlin@synology.com>) id 1eyqCO-0000yD-9P
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 22:43:32 -0400
+Received: from synology.com ([59.124.61.242]:53142)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eysdp-0005oE-Tb
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:19:58 -0400
-Date: Thu, 22 Mar 2018 13:19:38 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180322051938.GG32362@xz-mi>
-References: <CABLmASFYSu4zQ_35WJLJ6izNGdyn-JuLTzgVm_Bxc3MOkkGo6w@mail.gmail.com>
-	<fc09dac9-edbb-cd35-d02a-8db797879363@redhat.com>
-	<CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
-	<035198fa-b9e1-6084-d9c2-4d344e7058d7@redhat.com>
-	<CABLmASFEhaKB1Hh91p+RM+TX+zTTDuNixWy=16rUC+GC_0KKtg@mail.gmail.com>
-	<397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
-	<CABLmASHkjz=UDbHMRRtJKhu1bF28NGTzRjTo-GKbCd6dp-6qQQ@mail.gmail.com>
-	<84d2ded7-fdd5-0367-ad5d-b0443c4a945a@redhat.com>
-	<CABLmASFvQED-tsDGCgmw3LYx_CkLeKTGoQ_oU9qLHpGu=a=-hg@mail.gmail.com>
-	<ed9c25bd-e5be-bde1-2447-775c3bfc93ad@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ed9c25bd-e5be-bde1-2447-775c3bfc93ad@redhat.com>
-Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
- Windows with qemu-system-ppc.exe
+	(Exim 4.71) (envelope-from <yuchenlin@synology.com>)
+	id 1eyqCN-0000pJ-O0
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 22:43:28 -0400
+From: yuchenlin@synology.com
+Date: Thu, 22 Mar 2018 10:40:56 +0800
+Message-Id: <20180322024056.29599-1-yuchenlin@synology.com>
+Subject: [Qemu-devel] [PATCH] vmdk: return ENOTSUP before offset overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,202 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, yuchenlin <yuchenlin@synology.com>
 
-On Wed, Mar 21, 2018 at 05:37:22PM +0100, Paolo Bonzini wrote:
-> On 21/03/2018 17:31, Howard Spoelstra wrote:
-> > On Wed, Mar 21, 2018 at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> On 21/03/2018 17:23, Howard Spoelstra wrote:
-> >>> warning: FTH: (10844): *** Fault tolerant heap shim applied to current
-> >>> process. This is usually due to previous crashes. ***
-> >>> [New Thread 10844.0x1224]
-> >>> [New Thread 10844.0x2a30]
-> >>> [New Thread 10844.0x2594]
-> >>> [New Thread 10844.0x32a8]
-> >>>
-> >>> Thread 1 hit Breakpoint 1, aio_context_set_poll_params (ctx=0xc14a9b0,
-> >>> max_ns=32768, grow=0, shrink=0, errp=0x362f968)
-> >>>     at util/aio-win32.c:413
-> >>> 413     in util/aio-win32.c
-> >>> (gdb) s
-> >>> error_setg_internal (errp=0x362f968, src=0xe166e0 <__func__.58569+32>
-> >>> "util/aio-win32.c", line=413,
-> >>>     func=0xe16740 <__func__.59050> "aio_context_set_poll_params",
-> >>>     fmt=0xe16708 <__func__.58569+72> "AioContext polling is not
-> >>> implemented on Windows") at util/error.c:91
-> >>> 91      util/error.c: No such file or directory.
-> >>> (gdb) s
-> >>> 94      in util/error.c
-> >>
-> >> Great!  Now do "bt".
-> >>
-> >> Paolo
-> > 
-> > (gdb) bt full
-> > #0  aio_context_set_poll_params (ctx=0xc16a9b0, max_ns=32768, grow=0,
-> > shrink=0, errp=0x362f968) at util/aio-win32.c:413
-> >         __func__ = "aio_context_set_poll_params"
-> > #1  0x00000000005f7563 in iothread_complete (obj=0xc16a290,
-> > errp=0x362fa50) at iothread.c:143
-> >         local_error = 0x0
-> >         iothread = 0xc16a290
-> >         __func__ = "iothread_complete"
-> >         name = 0xde8be9 <container_info+265> "user-creatable"
-> >         thread_name = 0x400000000 <error: Cannot access memory at
-> > address 0x400000000>
-> > #2  0x0000000000831716 in user_creatable_complete (obj=0xc16a290,
-> > errp=0x362fa50) at qom/object_interfaces.c:24
-> >         ucc = 0x7fec650
-> >         uc = 0xc16a290
-> >         __func__ = "user_creatable_complete"
-> > #3  0x000000000082cde1 in object_new_with_propv (typename=0xc4b14b
-> > <__func__.56984+43> "iothread", parent=0xc169e50,
-> >     id=0xc12494 <__emutls_t.iothread_locked+19167> "mon_iothread",
-> > errp=0x14ae260 <error_abort>, vargs=0x362fb20 "")
-> >     at qom/object.c:555
-> >         obj = 0xc16a290
-> >         klass = 0x7fec020
-> >         local_err = 0x0
-> >         __func__ = "object_new_with_propv"
-> > #4  0x000000000082cc67 in object_new_with_props (typename=0xc4b14b
-> > <__func__.56984+43> "iothread", parent=0xc169e50,
-> >     id=0xc12494 <__emutls_t.iothread_locked+19167> "mon_iothread",
-> > errp=0x14ae260 <error_abort>) at qom/object.c:516
-> >         vargs = 0x362fb20 ""
-> >         obj = 0xd34e26fdf887
-> > #5  0x00000000005f7ced in iothread_create (id=0xc12494
-> > <__emutls_t.iothread_locked+19167> "mon_iothread",
-> > ---Type <return> to continue, or q <return> to quit---
-> >     errp=0x14ae260 <error_abort>) at iothread.c:352
-> >         obj = 0x45bef7 <sortcmdlist+137>
-> >         __func__ = "iothread_create"
-> > #6  0x000000000045bf53 in monitor_iothread_init () at
-> > /home/hsp/src/qemu-master/monitor.c:4436
-> > No locals.
-> > #7  0x000000000045bfcb in monitor_init_globals () at
-> > /home/hsp/src/qemu-master/monitor.c:4464
-> > No locals.
-> > #8  0x00000000006064d5 in qemu_main (argc=28, argv=0x5679620,
-> > envp=0x0) at vl.c:4545
-> >         i = 1
-> >         snapshot = 0
-> >         linux_boot = 0
-> >         initrd_filename = 0x0
-> >         kernel_filename = 0x0
-> >         kernel_cmdline = 0xc4e286 <runstate_transitions_def+6918> ""
-> >         boot_order = 0x57052c0 "d"
-> >         boot_once = 0x0
-> >         ds = 0x7ff94aced24c
-> >         opts = 0x5705100
-> >         machine_opts = 0x5705560
-> >         icount_opts = 0x0
-> >         accel_opts = 0x0
-> >         olist = 0xa6e000 <qemu_machine_opts>
-> >         optind = 28
-> >         optarg = 0x56793dd "file=c:\\Mac-disks\\9.2.img,format=raw,media=disk"
-> > ---Type <return> to continue, or q <return> to quit---
-> >         loadvm = 0x0
-> >         machine_class = 0x7fb28f0
-> >         cpu_model = 0x0
-> >         vga_model = 0x0
-> >         qtest_chrdev = 0x0
-> >         qtest_log = 0x0
-> >         pid_file = 0x0
-> >         incoming = 0x0
-> >         userconfig = true
-> >         nographic = false
-> >         display_remote = 0
-> >         log_mask = 0x0
-> >         log_file = 0x0
-> >         trace_file = 0x0
-> >         maxram_size = 268435456
-> >         ram_slots = 0
-> >         vmstate_dump_file = 0x0
-> >         main_loop_err = 0x0
-> >         err = 0x0
-> >         list_data_dirs = false
-> >         dir = 0x8026a80 "c:\\qemu-master"
-> >         dirs = 0x8026980
-> >         bdo_queue = {sqh_first = 0x0, sqh_last = 0x362fda0}
-> >         __func__ = "qemu_main"
-> > ---Type <return> to continue, or q <return> to quit---
-> > #9  0x00000000005fc507 in SDL_main (argc=28, argv=0x5679620) at vl.c:43
-> > No locals.
-> > #10 0x000000000096e4e8 in main_getcmdline ()
-> > No symbol table info available.
-> > #11 0x00000000004013f7 in __tmainCRTStartup () at ../crt/crtexe.c:334
-> >         lock_free = <optimized out>
-> >         fiberid = <optimized out>
-> >         nested = <optimized out>
-> >         lpszCommandLine = <optimized out>
-> >         StartupInfo = {cb = 104, lpReserved = 0x5787680 "", lpDesktop
-> > = 0x57881f0 "Winsta0\\Default",
-> >           lpTitle = 0x578c000 "c:\\qemu-master\\qemu-system-ppc.exe",
-> > dwX = 0, dwY = 0, dwXSize = 0, dwYSize = 0,
-> >           dwXCountChars = 0, dwYCountChars = 0, dwFillAttribute = 0,
-> > dwFlags = 0, wShowWindow = 0, cbReserved2 = 0,
-> >           lpReserved2 = 0x0, hStdInput = 0xffffffffffffffff,
-> > hStdOutput = 0xffffffffffffffff,
-> >           hStdError = 0xffffffffffffffff}
-> >         inDoubleQuote = <optimized out>
-> > #12 0x00000000004014fb in WinMainCRTStartup () at ../crt/crtexe.c:184
-> >         ret = 255
-> > (gdb)
-> > 
-> > Finally ;-)
-> 
-> Great, thanks.  Peter, can you look at it?  I think we should:
-> 
-> 1) make aio_context_set_poll_params succeed in aio-win32.c if
-> poll_max_ns is zero
-> 
-> 2) set IOTHREAD_POLL_MAX_NS_DEFAULT to zero on windows.
+From: yuchenlin <yuchenlin@synology.com>
 
-Thanks Paolo!
+VMDK has a hard limitation of extent size, which is due to the size of grain
+table entry is 32 bits. It means it can only point to a grain located at
+offset = 2^32. To prevent offset overflow and record a useless offset
+in grain table. We should return un-support here.
 
-Hi, Howard,
+Signed-off-by: yuchenlin <yuchenlin@synology.com>
+---
+ block/vmdk.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Thanks for reporting the problem.  Could you try applying below patch
-to your rc0 tree and rebuild QEMU, to see whether it fixes your problem?
-
------------------------------
-diff --git a/iothread.c b/iothread.c
-index 1b3463cb00..9f52270ae1 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -31,11 +31,15 @@ typedef ObjectClass IOThreadClass;
- #define IOTHREAD_CLASS(klass) \
-    OBJECT_CLASS_CHECK(IOThreadClass, klass, TYPE_IOTHREAD)
+diff --git a/block/vmdk.c b/block/vmdk.c
+index f94c49a9c0..d8fc961940 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -47,6 +47,9 @@
+ #define VMDK4_FLAG_MARKER (1 << 17)
+ #define VMDK4_GD_AT_END 0xffffffffffffffffULL
  
-+#ifdef CONFIG_LINUX
- /* Benchmark results from 2016 on NVMe SSD drives show max polling times around
-  * 16-32 microseconds yield IOPS improvements for both iodepth=1 and iodepth=32
-  * workloads.
-  */
- #define IOTHREAD_POLL_MAX_NS_DEFAULT 32768ULL
-+#else
-+#define IOTHREAD_POLL_MAX_NS_DEFAULT 0ULL
-+#endif
++/* 2TB */
++#define VMDK_EXTENT_SIZE_LIMIT (2199023255552)
++
+ #define VMDK_GTE_ZEROED 0x1
  
- static __thread IOThread *my_iothread;
- 
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index d6d5e02f00..a67b00c6ad 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -410,5 +410,7 @@ void aio_context_setup(AioContext *ctx)
- void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
-                                  int64_t grow, int64_t shrink, Error **errp)
- {
--    error_setg(errp, "AioContext polling is not implemented on Windows");
-+    if (max_ns) {
-+        error_setg(errp, "AioContext polling is not implemented on Windows");
-+    }
- }
------------------------------
-
-Thanks,
-
+ /* VMDK internal error codes */
+@@ -1645,6 +1648,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+                 return ret;
+             }
+             if (m_data.valid) {
++                if (cluster_offset > VMDK_EXTENT_SIZE_LIMIT) {
++                    return -ENOTSUP;
++                }
+                 /* update L2 tables */
+                 if (vmdk_L2update(extent, &m_data,
+                                   cluster_offset >> BDRV_SECTOR_BITS)
 -- 
-Peter Xu
+2.16.2
