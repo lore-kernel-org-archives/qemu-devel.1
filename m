@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyrDY-0001Gb-FP
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:48:45 -0400
+	(envelope-from <famz@redhat.com>) id 1eyrPc-0004Uq-Gt
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 00:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eyrDX-0004Gf-K7
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:48:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52132 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1eyrPZ-0005K8-7n
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 00:01:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50948 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eyrDX-0004GM-Er
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:48:43 -0400
-Date: Thu, 22 Mar 2018 11:48:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180322034835.GE32362@xz-mi>
-References: <20180321065506.21091-1-peterx@redhat.com>
-	<20180321065506.21091-4-peterx@redhat.com>
-	<820c6c94-2b95-0d02-a104-3d70ee76ea37@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eyrPZ-0005Jj-32
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 00:01:09 -0400
+Date: Thu, 22 Mar 2018 12:00:48 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180322040048.GE26618@lemon.usersys.redhat.com>
+References: <20180322024056.29599-1-yuchenlin@synology.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <820c6c94-2b95-0d02-a104-3d70ee76ea37@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] tests: more strict command batching
- test
+In-Reply-To: <20180322024056.29599-1-yuchenlin@synology.com>
+Subject: Re: [Qemu-devel] [PATCH] vmdk: return ENOTSUP before offset overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>
+To: yuchenlin@synology.com
+Cc: qemu-devel@nongnu.org
 
-On Wed, Mar 21, 2018 at 07:55:19AM -0500, Eric Blake wrote:
-> On 03/21/2018 01:55 AM, Peter Xu wrote:
-> > Add "id" fields to the commands, and check that the command returns are
-> > in order.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >   tests/qmp-test.c | 8 +++++++-
-> >   1 file changed, 7 insertions(+), 1 deletion(-)
-> > 
+On Thu, 03/22 10:40, yuchenlin@synology.com wrote:
+> From: yuchenlin <yuchenlin@synology.com>
 > 
-> > +++ b/tests/qmp-test.c
-> > @@ -83,6 +83,7 @@ static void test_qmp_protocol(void)
-> >       const QListEntry *entry;
-> >       QString *qstr;
-> >       int i;
-> > +    char buf[128];
+> VMDK has a hard limitation of extent size, which is due to the size of grain
+> table entry is 32 bits. It means it can only point to a grain located at
+> offset = 2^32. To prevent offset overflow and record a useless offset
+> in grain table. We should return un-support here.
 > 
-> Eww, we shouldn't need this.
+> Signed-off-by: yuchenlin <yuchenlin@synology.com>
+> ---
+>  block/vmdk.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> >       qts = qtest_init_without_qmp_handshake(common_args);
-> > @@ -150,7 +151,10 @@ static void test_qmp_protocol(void)
-> >        * best-effort test.
-> >        */
-> >       for (i = 0; i < 16; i++) {
-> > -        qtest_async_qmp(qts, "{ 'execute': 'query-version' }");
-> > +        snprintf(buf, sizeof(buf) - 1, "{ 'execute': 'query-version', "
-> > +                 "'id': %d }", i);
-> > +        buf[sizeof(buf) - 1] = '\0';
-> > +        qtest_async_qmp(qts, buf);
-> 
-> snprintf() of JSON strings is prone to failures especially when the JSON
-> string is reinterpreted as a printf argument in qtest_async_qmp.  Better is
-> to let qtest_async_qmp() directly do the formatting, as in:
-> 
-> qtest_async_qmp(qts, "{ 'execute':'query-version', 'id':%d}", i);
-> 
-> And then I was right - you don't need buf.
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index f94c49a9c0..d8fc961940 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -47,6 +47,9 @@
+>  #define VMDK4_FLAG_MARKER (1 << 17)
+>  #define VMDK4_GD_AT_END 0xffffffffffffffffULL
+>  
+> +/* 2TB */
+> +#define VMDK_EXTENT_SIZE_LIMIT (2199023255552)
+> +
+>  #define VMDK_GTE_ZEROED 0x1
+>  
+>  /* VMDK internal error codes */
+> @@ -1645,6 +1648,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>                  return ret;
+>              }
+>              if (m_data.valid) {
+> +                if (cluster_offset > VMDK_EXTENT_SIZE_LIMIT) {
 
-Ouch. :)
+I think this should be >=?
 
-Will fix that. Thanks,
+Also the check should be done earlier, in get_cluster_offset even before
+m_data.valid is set. We can peek at extent->next_cluster_sector to tell if the
+allocation will succeed or not, and avoid writing the user data.
 
-> 
-> Otherwise the addition is good.
-> 
+Fam
+
+> +                    return -ENOTSUP;
+> +                }
+>                  /* update L2 tables */
+>                  if (vmdk_L2update(extent, &m_data,
+>                                    cluster_offset >> BDRV_SECTOR_BITS)
 > -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-
--- 
-Peter Xu
+> 2.16.2
+> 
