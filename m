@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyuyT-0007hZ-6u
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 03:49:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1eyv08-0000is-NC
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 03:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eyuyP-0000hJ-5X
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 03:49:25 -0400
-References: <20180209075503.16996-1-aik@ozlabs.ru>
-	<20180209075503.16996-3-aik@ozlabs.ru>
-	<410aeb28-e940-35f9-c7de-cb1c95422857@redhat.com>
-	<20180321092941.446a2aea@w520.home>
-	<27c15570-fb04-5ab0-6dd4-d100a5f30179@ozlabs.ru>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8e29da20-701e-c2f4-a3c0-37f3a906cf58@redhat.com>
-Date: Thu, 22 Mar 2018 08:48:57 +0100
+	(envelope-from <bounces@canonical.com>) id 1eyv04-0001Um-Lt
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 03:51:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eyv04-0001Tw-FZ
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 03:51:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eyv02-0006Dh-Qz
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 07:51:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 504B72E8D38
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 07:51:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <27c15570-fb04-5ab0-6dd4-d100a5f30179@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v7 2/4] vfio/pci: Relax DMA map errors
- for MMIO regions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Mar 2018 07:39:39 -0000
+From: =?utf-8?b?5p2O56mX5oGS?= <1754542@bugs.launchpad.net>
+Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
+Message-Id: <152170437931.22293.11837329271515179619.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1754542] Re: colo: vm crash with segmentation
+ fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,186 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-Hi Alexey,
+SVM error photo
 
-On 22/03/18 08:45, Alexey Kardashevskiy wrote:
-> On 22/3/18 2:29 am, Alex Williamson wrote:
->> On Mon, 19 Mar 2018 21:49:58 +0100
->> Auger Eric <eric.auger@redhat.com> wrote:
->>
->>> Hi Alexey,
->>>
->>> On 09/02/18 08:55, Alexey Kardashevskiy wrote:
->>>> At the moment if vfio_memory_listener is registered in the system memory
->>>> address space, it maps/unmaps every RAM memory region for DMA.
->>>> It expects system page size aligned memory sections so vfio_dma_map
->>>> would not fail and so far this has been the case. A mapping failure
->>>> would be fatal. A side effect of such behavior is that some MMIO pages
->>>> would not be mapped silently.
->>>>
->>>> However we are going to change MSIX BAR handling so we will end having
->>>> non-aligned sections in vfio_memory_listener (more details is in
->>>> the next patch) and vfio_dma_map will exit QEMU.
->>>>
->>>> In order to avoid fatal failures on what previously was not a failure and
->>>> was just silently ignored, this checks the section alignment to
->>>> the smallest supported IOMMU page size and prints an error if not aligned;
->>>> it also prints an error if vfio_dma_map failed despite the page size check.
->>>> Both errors are not fatal; only MMIO RAM regions are checked
->>>> (aka "RAM device" regions).
->>>>
->>>> If the amount of errors printed is overwhelming, the MSIX relocation
->>>> could be used to avoid excessive error output.
->>>>
->>>> This is unlikely to cause any behavioral change.
->>>>
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>> ---
->>>>  hw/vfio/common.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++------
->>>>  1 file changed, 49 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->>>> index f895e3c..736f271 100644
->>>> --- a/hw/vfio/common.c
->>>> +++ b/hw/vfio/common.c
->>>> @@ -544,18 +544,40 @@ static void vfio_listener_region_add(MemoryListener *listener,
->>>>  
->>>>      llsize = int128_sub(llend, int128_make64(iova));
->>>>  
->>>> +    if (memory_region_is_ram_device(section->mr)) {
->>>> +        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
->>>> +
->>>> +        if ((iova & pgmask) || (llsize & pgmask)) {
->>>> +            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
->>>> +                         " is not aligned to 0x%"HWADDR_PRIx
->>>> +                         " and cannot be mapped for DMA",
->>>> +                         section->offset_within_region,
->>>> +                         int128_getlo(section->size),  
->>> Didn't you want to print the section->offset_within_address_space
->>> instead of section->offset_within_region?
-> 
-> 
-> I do, my bad - this offset_within_region is a leftover from an earlier
-> version, iova is offset_within_address_space essentially.
-> 
-> 
->>>
->>> For an 1000e card*, with a 64kB page, it outputs:
->>> "Region 0x50..0xffb0 is not aligned to 0x10000 and cannot be mapped for DMA"
->>>
->>> an absolute gpa range would be simpler I think.
->>
->> I agree, the offset within the address space seems like it'd be much
->> easier to map back to the device.  Since we're handling it as
->> non-fatal, perhaps we can even add "MMIO Region" to give the user a bit
->> more context where the issue occurs.  Alexey, do you want to submit a
->> follow-up patch, or Eric, you may have the best resources to tune the
->> message.  Thanks,
-> 
-> 
-> I can if somebody gives a hint about what needs to be tuned in the message.
-> I am also fine if Eric does this too :)
+** Attachment removed: "SVM_error.HEIC"
+   https://bugs.launchpad.net/qemu/+bug/1754542/+attachment/5086650/+files/=
+SVM_error.HEIC
 
-I propose to send a follow-up patch as I have the proper HW to test it now.
+** Attachment added: "SVM.err.jpg"
+   https://bugs.launchpad.net/qemu/+bug/1754542/+attachment/5086654/+files/=
+SVM.err.jpg
 
-Thanks
+-- =
 
-Eric
-> 
-> 
->>
->> Alex
->>  
->>> * where 	Region 3: Memory at 100e0000 (32-bit, non-prefetchable)
->>> [size=16K] contains the MSIX table
->>>
->>> 	Capabilities: [a0] MSI-X: Enable+ Count=5 Masked-
->>> 		Vector table: BAR=3 offset=00000000
->>> 		PBA: BAR=3 offset=00002000
->>>
->>> Thanks
->>>
->>> Eric
->>>> +                         pgmask + 1);
->>>> +            return;
->>>> +        }
->>>> +    }
->>>> +
->>>>      ret = vfio_dma_map(container, iova, int128_get64(llsize),
->>>>                         vaddr, section->readonly);
->>>>      if (ret) {
->>>>          error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
->>>>                       "0x%"HWADDR_PRIx", %p) = %d (%m)",
->>>>                       container, iova, int128_get64(llsize), vaddr, ret);
->>>> +        if (memory_region_is_ram_device(section->mr)) {
->>>> +            /* Allow unexpected mappings not to be fatal for RAM devices */
->>>> +            return;
->>>> +        }
->>>>          goto fail;
->>>>      }
->>>>  
->>>>      return;
->>>>  
->>>>  fail:
->>>> +    if (memory_region_is_ram_device(section->mr)) {
->>>> +        error_report("failed to vfio_dma_map. pci p2p may not work");
->>>> +        return;
->>>> +    }
->>>>      /*
->>>>       * On the initfn path, store the first error in the container so we
->>>>       * can gracefully fail.  Runtime, there's not much we can do other
->>>> @@ -577,6 +599,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
->>>>      hwaddr iova, end;
->>>>      Int128 llend, llsize;
->>>>      int ret;
->>>> +    bool try_unmap = true;
->>>>  
->>>>      if (vfio_listener_skipped_section(section)) {
->>>>          trace_vfio_listener_region_del_skip(
->>>> @@ -629,13 +652,33 @@ static void vfio_listener_region_del(MemoryListener *listener,
->>>>  
->>>>      trace_vfio_listener_region_del(iova, end);
->>>>  
->>>> -    ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
->>>> +    if (memory_region_is_ram_device(section->mr)) {
->>>> +        hwaddr pgmask;
->>>> +        VFIOHostDMAWindow *hostwin;
->>>> +        bool hostwin_found = false;
->>>> +
->>>> +        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
->>>> +            if (hostwin->min_iova <= iova && end <= hostwin->max_iova) {
->>>> +                hostwin_found = true;
->>>> +                break;
->>>> +            }
->>>> +        }
->>>> +        assert(hostwin_found); /* or region_add() would have failed */
->>>> +
->>>> +        pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
->>>> +        try_unmap = !((iova & pgmask) || (llsize & pgmask));
->>>> +    }
->>>> +
->>>> +    if (try_unmap) {
->>>> +        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
->>>> +        if (ret) {
->>>> +            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
->>>> +                         "0x%"HWADDR_PRIx") = %d (%m)",
->>>> +                         container, iova, int128_get64(llsize), ret);
->>>> +        }
->>>> +    }
->>>> +
->>>>      memory_region_unref(section->mr);
->>>> -    if (ret) {
->>>> -        error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
->>>> -                     "0x%"HWADDR_PRIx") = %d (%m)",
->>>> -                     container, iova, int128_get64(llsize), ret);
->>>> -    }
->>>>  
->>>>      if (container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
->>>>          vfio_spapr_remove_window(container,
->>>>   
->>
-> 
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754542
+
+Title:
+  colo:  vm crash with segmentation fault
+
+Status in QEMU:
+  New
+
+Bug description:
+  I use Arch Linux x86_64
+  Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10)
+  Following document 'COLO-FT.txt',
+  I test colo feature on my hosts
+
+  I run this command
+  Primary:
+  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
+dio -name primary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfifo=
+,vote-threshold=3D1,\
+  children.0.file.filename=3D/var/lib/libvirt/images/1.raw,\
+  children.0.driver=3Draw -S
+
+  Secondary:
+  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
+dio -name secondary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D/var/lib/libvirt/im=
+ages/2.raw,driver=3Draw,node-name=3Dnode0 \
+  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
+y,\
+  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
+  file.file.filename=3D/mnt/ramfs/active_disk.img,\
+  file.backing.driver=3Dqcow2,\
+  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
+  file.backing.backing=3Dsecondary-disk0 \
+  -incoming tcp:0:8888
+
+  Secondary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'nbd-server-start',
+    'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34',=
+ 'port': '8889'} } }
+  }
+  {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', =
+'writable': true } }
+
+  Primary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'human-monitor-command',
+    'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,=
+mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.port=3D8889,=
+file.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
+  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', =
+'node': 'nbd_client0' } }
+  { 'execute': 'migrate-set-capabilities',
+        'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': t=
+rue } ] } }
+  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
+  And two VM with cash
+  Primary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
+RESUME"}
+  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+
+  Secondary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
+RESUME"}
+  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
