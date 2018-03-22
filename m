@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eyy9s-0007C9-64
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:13:25 -0400
+	(envelope-from <berto@igalia.com>) id 1eyyBo-0000M9-RR
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eyy9n-0005Br-40
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:13:24 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:33589)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eyy9m-0005BY-Pz
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:13:19 -0400
-References: <20180123144807.5618-1-laurent@vivier.eu>
-	<20180123144807.5618-13-laurent@vivier.eu>
-	<758f54da-d733-6e95-57cf-cc8b25a81dd5@vivier.eu>
-	<bf9d1394-f78d-b6ba-8893-d4c7fd592de3@vivier.eu>
-	<CAFEAcA9==FswwaKG_eWncv7Eo-zF+OTOKmSC7N-mpTrSEzUJmg@mail.gmail.com>
-	<CAFEAcA9ZAxkvc-Rn=oP5Bgksk6zo8PYNkhP8SC1+aaWN_vQduw@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <5e841941-8517-fec8-69b2-be0961b3ff0d@vivier.eu>
-Date: Thu, 22 Mar 2018 12:13:16 +0100
+	(envelope-from <berto@igalia.com>) id 1eyyBn-00066H-Ee
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:15:24 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:33514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1eyyBm-000656-Ts
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:15:23 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Thu, 22 Mar 2018 13:14:53 +0200
+Message-Id: <cb7dcdf3685e430783b24cce3a3cbd3aaa997cb7.1521717086.git.berto@igalia.com>
+In-Reply-To: <cover.1521717086.git.berto@igalia.com>
+References: <cover.1521717086.git.berto@igalia.com>
+In-Reply-To: <cover.1521717086.git.berto@igalia.com>
+References: <cover.1521717086.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9ZAxkvc-Rn=oP5Bgksk6zo8PYNkhP8SC1+aaWN_vQduw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 12/13] page_unprotect(): handle calls to
- pages that are PAGE_WRITE
+Subject: [Qemu-devel] [PATCH for-2.12 v3 2/2] iotests: Update 186 after
+ commit ac64273c66ab136c44043259162
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Le 22/03/2018 à 12:07, Peter Maydell a écrit :
-> On 22 March 2018 at 11:05, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 22 March 2018 at 10:36, Laurent Vivier <laurent@vivier.eu> wrote:
->>> It goes wrong in this part:
->>>
->>> +     */
->>> +    if (is_write && info->si_signo == SIGSEGV && info->si_code ==
->>> SEGV_ACCERR &&
->>> +        h2g_valid(address)) {
->>>
->>> Because, on ppc, si_code is SEGV_MAPERR and not SEGV_ACCERR
->>> (on x86_64, si_code is SEGV_ACCERR as expected)
->>
->> So on PPC if you have a page mapped, and you access it with
->> the wrong permissions, you get SEGV_MAPERR? This seems like
->> a host kernel bug to me.
-> 
-> ...in particular, kernel commit ecb101aed86156e (dated Dec 2017)
-> fixes a regression introduced in commit c3350602e876 that broke
-> the ppc kernels so they started returning SEGV_MAPERR here
-> instead of SEGV_ACCERR. Presumably your host kernel is missing
-> this fix.
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/qemu-iotests/186.out | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes, you're right, my kernel is 4.14-rc1 (6e80ecd) with
-c3350602e876 but without ecb101aed86156e.
-
-I'm going to update it.
-
-Thanks,
-Laurent
+diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+index ec75c0fc60..5020162826 100644
+--- a/tests/qemu-iotests/186.out
++++ b/tests/qemu-iotests/186.out
+@@ -404,7 +404,7 @@ Testing: -drive if=floppy
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) info block
+ floppy0: [not inserted]
+-    Attached to:      /machine/unattached/device[17]
++    Attached to:      /machine/unattached/device[13]
+     Removable device: not locked, tray closed
+ (qemu) quit
+ 
+@@ -412,7 +412,7 @@ Testing: -drive if=floppy,driver=null-co
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) info block
+ floppy0 (NODE_NAME): null-co:// (null-co)
+-    Attached to:      /machine/unattached/device[17]
++    Attached to:      /machine/unattached/device[13]
+     Removable device: not locked, tray closed
+     Cache mode:       writeback
+ (qemu) quit
+-- 
+2.11.0
