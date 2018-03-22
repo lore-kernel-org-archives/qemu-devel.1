@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ez2DB-0003ec-AG
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:33:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ez2N9-0002F1-8Z
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ez2D6-0001UG-Gm
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:33:05 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ez2N4-0005tm-Fq
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 11:43:23 -0400
 References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-	<20180321121940.39426-4-vsementsov@virtuozzo.com>
-	<e21af76d-977d-cadf-0a27-14a2d2aa228a@redhat.com>
+	<20180321121940.39426-5-vsementsov@virtuozzo.com>
+	<8b6eccd8-90ee-3475-5005-df9f59f59709@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20c96aa9-8c47-e99a-8c89-1e23aa64eb4b@virtuozzo.com>
-Date: Thu, 22 Mar 2018 18:32:45 +0300
+Message-ID: <f3f02fac-35d9-2a4d-0fef-ba66f75aa929@virtuozzo.com>
+Date: Thu, 22 Mar 2018 18:43:08 +0300
 MIME-Version: 1.0
-In-Reply-To: <e21af76d-977d-cadf-0a27-14a2d2aa228a@redhat.com>
+In-Reply-To: <8b6eccd8-90ee-3475-5005-df9f59f59709@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 3/4] nbd/server: implement dirty bitmap
- export
+Subject: Re: [Qemu-devel] [PATCH 4/4] qapi: new qmp command
+ nbd-server-add-bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +29,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-21.03.2018 19:57, Eric Blake wrote:
+21.03.2018 20:33, Eric Blake wrote:
 > On 03/21/2018 07:19 AM, Vladimir Sementsov-Ogievskiy wrote:
 >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> =C2=A0 qapi/block.json | 27 +++++++++++++++++++++++++++
+>> =C2=A0 blockdev-nbd.c=C2=A0 | 23 +++++++++++++++++++++++
+>> =C2=A0 2 files changed, 50 insertions(+)
+>>
+>> diff --git a/qapi/block.json b/qapi/block.json
+>> index c694524002..4afbbcd7b7 100644
+>> --- a/qapi/block.json
+>> +++ b/qapi/block.json
+>> @@ -269,6 +269,33 @@
+>> =C2=A0=C2=A0=C2=A0 'data': {'name': 'str', '*mode': 'NbdServerRemoveMode=
+'} }
+>> =C2=A0 =C2=A0 ##
+>> +# @nbd-server-add-bitmap:
+>> +#
+>> +# Export dirty bitmap through selected export. Bitmaps are searched=20
+>> for in
+>> +# device attached to the export and in all its backings. Exported=20
+>> bitmap
+>> +# is locked until NBD export is removed.
 >
+> Expose a dirty bitmap associated with the selected export.=C2=A0 The bitm=
+ap=20
+> search starts at the device attached to the export, and includes all=20
+> backing files.=C2=A0 The exported bitmap is then locked until the NBD=20
+> export is removed.
+>
+>> +#
+>> +# @name: Export name.
+>> +#
+>> +# @bitmap: Bitmap name to search.
+>
+> s/search./search for./
+>
+>> +#
+>> +# @bitmap-export-name: How the bitmap will be seen by nbd clients
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (default @bitmap)
+>
+> Maybe mention that the client must use NBD_OPT_SET_META_CONTEXT with a=20
+> query of "qemu-dirty-bitmap:NAME" (where NAME matches=20
+> bitmap-export-name) to access the exposed bitmap.=C2=A0 (May need to be=20
+> adjusted by my suggestion to use just the namespace "qemu:")
 
-[...]
+ok
 
 >
+>> +#
+>> +#
+>> +# Returns: error on one of the following conditions:
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - the ser=
+ver is not running
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - export =
+is not found
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - bitmap =
+is not found
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - bitmap =
+is disabled
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - bitmap =
+is locked
+>
+> Do we really need to list all the error conditions?=C2=A0 My worry is tha=
+t=20
+> a list this specific might go stale, compared to the obvious default=20
+> that the command succeeds only if it was able to expose the bitmap and=20
+> that the error message is specific enough for a human to figure out=20
+> what to fix if it failed.
+
+
+Hmm, I've just doing it similar with other commands in the file. Is=20
+there any requirements on this part of qapi documentation? I can write=20
+only "# Returns: nothing on success" line, is it appropriate?=20
+blockdev-mirror do so, but other commands tries to describe errors.=20
+Looks like we lack some specified format for return code description=20
+like we have for parameters..
+
+>
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +=C2=A0 { 'command': 'nbd-server-add-bitmap',
+>> +=C2=A0=C2=A0=C2=A0 'data': {'name': 'str', 'bitmap': 'str', '*bitmap-ex=
+port-name':=20
+>> 'str'} }
 >> +
->> +#define NBD_STATE_DIRTY 1
->
-> Does this belong better in nbd.h, alongside NBD_STATE_HOLE?=C2=A0 (And=20
-> defining it as (1 << 0) might be nicer, too).
-
-It's not used anywhere else, but it may be worth moving, for consistency=20
-and for future users. Ok, I'll move.
-
-
-[...]
-
->> =C2=A0 +/* nbd_meta_bitmap_query
->> + *
->> + * Handle query to 'qemu-dirty-bitmap' namespace.
->> + * 'len' is the amount of text remaining to be read from the current=20
->> name, after
->> + * the 'qemu-dirty-bitmap:' portion has been stripped.
->> + *
->> + * Return -errno on I/O error, 0 if option was completely handled by
->> + * sending a reply about inconsistent lengths, or 1 on success. */
->> +static int nbd_meta_bitmap_query(NBDClient *client,=20
->> NBDExportMetaContexts *meta,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t len, Error **errp=
-)
->> +{
->> +=C2=A0=C2=A0=C2=A0 if (!client->exp->export_bitmap) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbd_opt_skip(client, =
-len, errp);
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 return nbd_meta_single_query(client,=20
->> client->exp->export_bitmap_name, len,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &meta->dirty_bitmap, errp)=
-;
->
-> So if I'm reading this right, a client can do _LIST_=20
-> 'qemu-dirty-bitmap:' (or 'qemu:dirty-bitmap:' if we choose a shorter=20
-> initial namespace) and get back the exported bitmap name; or the user=20
-> already knows the bitmap name and both _LIST_ and _SET_=20
-> 'qemu-dirty-bitmap:name' return the one supported bitmap for that NBD=20
-> server.
-
-yes
-
->
->
->> =C2=A0 /* nbd_co_send_extents
->> + *
->> + * NBD_REPLY_FLAG_DONE is not set, don't forget to send it.
->> + *
->> =C2=A0=C2=A0 * @extents should be in big-endian */
->> =C2=A0 static int nbd_co_send_extents(NBDClient *client, uint64_t handle=
-,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExtent *extents, unsigned=
-=20
->> nb_extents,
->
-> Worth a bool flag that the caller can inform this function whether to=20
-> include FLAG_DONE?
-
-It was simpler to just send it separately, after all BLOCK_STATUS=20
-replies. So, I didn't need it.
-
->> +
->> +static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bitmap, uint64_t offset,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t length, uint32_t context_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
->> +{
->> +=C2=A0=C2=A0=C2=A0 int ret;
->> +=C2=A0=C2=A0=C2=A0 unsigned nb_extents;
->> +=C2=A0=C2=A0=C2=A0 NBDExtent *extents =3D g_new(NBDExtent, NBD_MAX_BITM=
-AP_EXTENTS);
->
-> Is this correct even when the client used NBD_CMD_FLAG_REQ_ONE?
 >
 
-Oops, looks like a bug.
 
 --=20
 Best regards,
