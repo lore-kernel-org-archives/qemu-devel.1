@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1ez4BO-0006w5-6G
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 13:39:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ez4Bd-00075T-5f
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 13:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1ez4BJ-0001wF-R7
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 13:39:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39178 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1ez4BJ-0001tp-Ke
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 13:39:17 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20180320173500.32065-1-vkuznets@redhat.com>
-	<20180320173500.32065-2-vkuznets@redhat.com>
-	<20180322170920.GA23446@amt.cnet>
-Date: Thu, 22 Mar 2018 18:39:09 +0100
-In-Reply-To: <20180322170920.GA23446@amt.cnet> (Marcelo Tosatti's message of
-	"Thu, 22 Mar 2018 14:09:21 -0300")
-Message-ID: <87efkc57sy.fsf@vitty.brq.redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1ez4Bc-0002Gy-8I
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 13:39:37 -0400
+Date: Thu, 22 Mar 2018 18:39:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180322173925.GA4079@localhost.localdomain>
+References: <20180322172053.7343-1-dionbosschieter@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] i386/kvm: add support for Hyper-V
- reenlightenment MSRs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180322172053.7343-1-dionbosschieter@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] block/file-posix.c: fix not reopened
+ lock file descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +23,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>
+To: Dion Bosschieter <dionbosschieter@gmail.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, famz@redhat.com, qemu-block@nongnu.org
 
-Marcelo Tosatti <mtosatti@redhat.com> writes:
+[ Cc: qemu-block ]
 
-> On Tue, Mar 20, 2018 at 06:34:59PM +0100, Vitaly Kuznetsov wrote:
->> KVM recently gained support for Hyper-V Reenlightenment MSRs which are
->> required to make KVM-on-Hyper-V enable TSC page clocksource to its guests
->> when INVTSC is not passed to it (and it is not passed by default in Qemu
->> as it effectively blocks migration).
->
-> Hi Vitaly,
->
-> From Microsoft's documentation:
->
-> "An L1 hypervisor can request to be notified when its partition is
-> migrated. This capability is enumerated in CPUID as
-> AccessReenlightenmentControls privilege (see 2.4.10)."
->
-> The L0 hypervisor exposes a synthetic MSR
-> (HV_X64_MSR_REENLIGHTENMENT_CONTROL) that may be used by the L1
-> hypervisor to configure an interrupt vector and target processor. The L0
-> hypervisor will inject an interrupt with the specified vector after each
-> migration.
->
-> What prevents a guest from setting the enable bit, and expect
-> to receive an interrupt, if the reenlightenment MSRs are exposed ?
->
+Am 22.03.2018 um 18:20 hat Dion Bosschieter geschrieben:
+> In commit 244a5668106297378391b768e7288eb157616f64 another
+> file descriptor to BDRVRawState is added. When we try to issue the
+> reopen command only s->fd is reopened; lock_fd could still hold an old
+> file descriptor "possibly" pointing to another file.
+> 
+> - change raw_reopen_prepare so it checks use_lock from BDRVRawState and
+> tries to reopen lock_fd accordingly
+> - change raw_reopen_commit so it closes the old lock_fd on use_lock
+> 
+> Signed-off-by: Dion Bosschieter <dionbosschieter@gmail.com>
 
-This is actually desired: Hyper-V on KVM will set this bit and expect to
-receive an interrupt. Currently, we don't send it because we don't
-migrate nested workloads but eventually, when we learn how to do this in
-KVM, sending an interrupt and doint TSC access emulation will be required.
+bdrv_reopen() is not meant for opening a different file, it is meant to
+change the flags and options of the same file. Do you have a use case
+where you would actually need to switch to a different file?
 
-Normal Windows on KVM won't use the feature as it doesn't need it: upon
-migration we update TSC page in KVM and readings from it stay correct.
+As far as I know, lock_fd was specifically introduced _because_ it stays
+the same across reopen, so we don't need a racy release/reacquire pair.
+Fam (CCed) should know more.
 
--- 
-  Vitaly
+In any case, doesn't your patch drop all the locks without reacquiring
+them on the new lock_fd?
+
+Kevin
+
+>  block/file-posix.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index d7fb772c14..16d83fc49e 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -167,6 +167,7 @@ typedef struct BDRVRawState {
+>  
+>  typedef struct BDRVRawReopenState {
+>      int fd;
+> +    int lock_fd;
+>      int open_flags;
+>  } BDRVRawReopenState;
+>  
+> @@ -795,6 +796,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
+>      raw_parse_flags(state->flags, &rs->open_flags);
+>  
+>      rs->fd = -1;
+> +    rs->lock_fd = -1;
+>  
+>      int fcntl_flags = O_APPEND | O_NONBLOCK;
+>  #ifdef O_NOATIME
+> @@ -820,6 +822,17 @@ static int raw_reopen_prepare(BDRVReopenState *state,
+>                  rs->fd = -1;
+>              }
+>          }
+> +
+> +        if (s->use_lock) {
+> +            rs->lock_fd = qemu_dup(s->lock_fd);
+> +            if (rs->lock_fd >= 0) {
+> +                ret = fcntl_setfl(rs->lock_fd, rs->open_flags);
+> +                if (ret) {
+> +                    qemu_close(rs->lock_fd);
+> +                    rs->lock_fd = -1;
+> +                }
+> +            }
+> +        }
+>      }
+>  
+>      /* If we cannot use fcntl, or fcntl failed, fall back to qemu_open() */
+> @@ -835,6 +848,14 @@ static int raw_reopen_prepare(BDRVReopenState *state,
+>                  error_setg_errno(errp, errno, "Could not reopen file");
+>                  ret = -1;
+>              }
+> +
+> +            if (s->use_lock) {
+> +                rs->lock_fd = qemu_open(normalized_filename, rs->open_flags);
+> +                if (rs->lock_fd == -1) {
+> +                    error_setg_errno(errp, errno, "Could not reopen file for locking");
+> +                    ret = -1;
+> +                }
+> +            }
+>          }
+>      }
+>  
+> @@ -861,7 +882,11 @@ static void raw_reopen_commit(BDRVReopenState *state)
+>      s->open_flags = rs->open_flags;
+>  
+>      qemu_close(s->fd);
+> +    if (s->use_lock) {
+> +        qemu_close(s->lock_fd);
+> +    }
+>      s->fd = rs->fd;
+> +    s->lock_fd = rs->lock_fd;
+>  
+>      g_free(state->opaque);
+>      state->opaque = NULL;
+> -- 
+> 2.14.2
+> 
