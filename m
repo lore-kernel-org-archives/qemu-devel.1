@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1eyyXM-0006Oc-QB
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:37:41 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1eyyqV-0002bR-KO
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1eyyXJ-000367-N4
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:37:40 -0400
-Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:36730)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1eyyqR-0004XS-A6
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:57:27 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:35631)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1eyyXJ-00034f-Gf
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:37:37 -0400
-Received: by mail-io0-x233.google.com with SMTP id o4so10552933iod.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 04:37:37 -0700 (PDT)
+	id 1eyyqR-0004WE-3f
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:57:23 -0400
+Received: by mail-it0-x241.google.com with SMTP id v194-v6so10785835itb.0
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 04:57:22 -0700 (PDT)
 References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
-	<20180315102501.GA3062@work-vm>
-	<423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
-	<20180321081923.GB20571@xz-mi>
+	<20180313075739.11194-3-xiaoguangrong@tencent.com>
+	<20180321090644.GC20571@xz-mi>
 From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <b957b756-4996-7e79-406d-9587000839c1@gmail.com>
-Date: Thu, 22 Mar 2018 19:38:07 +0800
+Message-ID: <044788cf-fd00-83b3-6cd2-7df605397418@gmail.com>
+Date: Thu, 22 Mar 2018 19:57:54 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180321081923.GB20571@xz-mi>
+In-Reply-To: <20180321090644.GC20571@xz-mi>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/8] migration: stop allocating and freeing
+ memory frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +34,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, liang.z.li@intel.com, kvm@vger.kernel.org, quintela@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
 
 
-On 03/21/2018 04:19 PM, Peter Xu wrote:
-> On Fri, Mar 16, 2018 at 04:05:14PM +0800, Xiao Guangrong wrote:
+On 03/21/2018 05:06 PM, Peter Xu wrote:
+> On Tue, Mar 13, 2018 at 03:57:33PM +0800, guangrong.xiao@gmail.com wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 >>
->> Hi David,
+>> Current code uses compress2()/uncompress() to compress/decompress
+>> memory, these two function manager memory allocation and release
+>> internally, that causes huge memory is allocated and freed very
+>> frequently
 >>
->> Thanks for your review.
+>> More worse, frequently returning memory to kernel will flush TLBs
+>> and trigger invalidation callbacks on mmu-notification which
+>> interacts with KVM MMU, that dramatically reduce the performance
+>> of VM
 >>
->> On 03/15/2018 06:25 PM, Dr. David Alan Gilbert wrote:
+>> So, we maintain the memory by ourselves and reuse it for each
+>> compression and decompression
 >>
->>>>    migration/ram.c | 32 ++++++++++++++++----------------
->>>
->>> Hi,
->>>     Do you have some performance numbers to show this helps?  Were those
->>> taken on a normal system or were they taken with one of the compression
->>> accelerators (which I think the compression migration was designed for)?
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+>> ---
+>>   migration/qemu-file.c |  34 ++++++++++--
+>>   migration/qemu-file.h |   6 ++-
+>>   migration/ram.c       | 142 +++++++++++++++++++++++++++++++++++++-------------
+>>   3 files changed, 140 insertions(+), 42 deletions(-)
 >>
->> Yes, i have tested it on my desktop, i7-4790 + 16G, by locally live migrate
->> the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to 350.
->>
->> During the migration, a workload which has 8 threads repeatedly written total
->> 6G memory in the VM. Before this patchset, its bandwidth is ~25 mbps, after
->> applying, the bandwidth is ~50 mbps.
+>> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+>> index 2ab2bf362d..1ff33a1ffb 100644
+>> --- a/migration/qemu-file.c
+>> +++ b/migration/qemu-file.c
+>> @@ -658,6 +658,30 @@ uint64_t qemu_get_be64(QEMUFile *f)
+>>       return v;
+>>   }
+>>   
+>> +/* return the size after compression, or negative value on error */
+>> +static int qemu_compress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
+>> +                              const uint8_t *source, size_t source_len)
+>> +{
+>> +    int err;
+>> +
+>> +    err = deflateReset(stream);
 > 
-> Hi, Guangrong,
+> I'm not familiar with zlib, but I saw this in manual:
 > 
-> Not really review comments, but I got some questions. :)
-
-Your comments are always valuable to me! :)
-
+>   https://www.zlib.net/manual.html
 > 
-> IIUC this patch will only change the behavior when last_sent_block
-> changed.  I see that the performance is doubled after the change,
-> which is really promising.  However I don't fully understand why it
-> brings such a big difference considering that IMHO current code is
-> sending dirty pages per-RAMBlock.  I mean, IMHO last_sent_block should
-> not change frequently?  Or am I wrong?
+>   This function is equivalent to deflateEnd followed by deflateInit,
+>   but does not free and reallocate the internal compression state. The
+>   stream will leave the compression level and any other attributes that
+>   may have been set unchanged.
+> 
+> I thought it was deflateInit() who is slow?  Can we avoid the reset as
 
-It's depends on the configuration, each memory-region which is ram or
-file backend has a RAMBlock.
+deflateEnd() is worse as it frees memory to kernel which triggers
+TLB flush and mmu-notifier.
 
-Actually, more benefits comes from the fact that the performance & throughput
-of the multithreads has been improved as the threads is fed by the
-migration thread and the result is consumed by the migration
-thread.
+> long as we make sure to deflateInit() before doing anything else?
+
+Actually, deflateReset() is cheap... :)
 
 > 
-> Another follow-up question would be: have you measured how long time
-> needed to compress a 4k page, and how many time to send it?  I think
-> "sending the page" is not really meaningful considering that we just
-> put a page into the buffer (which should be extremely fast since we
-> don't really flush it every time), however I would be curious on how
-> slow would compressing a page be.
+> Meanwhile, is there any performance number for this single patch?
+> Since I thought the old code is calling compress2() which contains
+> deflateInit() and deflateEnd() too, just like what current patch do?
 
-I haven't benchmark the performance of zlib, i think it is CPU intensive
-workload, particularly, there no compression-accelerator (e.g, QAT) on
-our production. BTW, we were using lzo instead of zlib which worked
-better for some workload.
+No, after the patch, we just call deflateInit() / deflateEnd() one
+time (in _setup() handler and _cleanup handler).
 
-Putting a page into buffer should depend on the network, i,e, if the
-network is congested it should take long time. :)
+Yes. This is the perf data from our production,
+after revert this patch:
++  57.88%  kqemu  [kernel.kallsyms]        [k] queued_spin_lock_slowpath
++  10.55%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
++   4.83%  kqemu  [kernel.kallsyms]        [k] flush_tlb_func_common
+
+-   1.16%  kqemu  [kernel.kallsyms]        [k] lock_acquire                                       ▒
+    - lock_acquire                                                                                 ▒
+       - 15.68% _raw_spin_lock                                                                     ▒
+          + 29.42% __schedule                                                                      ▒
+          + 29.14% perf_event_context_sched_out                                                    ▒
+          + 23.60% tdp_page_fault                                                                  ▒
+          + 10.54% do_anonymous_page                                                               ▒
+          + 2.07% kvm_mmu_notifier_invalidate_range_start                                          ▒
+          + 1.83% zap_pte_range                                                                    ▒
+          + 1.44% kvm_mmu_notifier_invalidate_range_end
+
+
+apply our work:
++  51.92%  kqemu  [kernel.kallsyms]        [k] queued_spin_lock_slowpath
++  14.82%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
++   1.47%  kqemu  [kernel.kallsyms]        [k] mark_lock.clone.0
++   1.46%  kqemu  [kernel.kallsyms]        [k] native_sched_clock
++   1.31%  kqemu  [kernel.kallsyms]        [k] lock_acquire
++   1.24%  kqemu  libc-2.12.so             [.] __memset_sse2
+
+-  14.82%  kqemu  [kernel.kallsyms]        [k] __lock_acquire                                     ▒
+    - __lock_acquire                                                                               ▒
+       - 99.75% lock_acquire                                                                       ▒
+          - 18.38% _raw_spin_lock                                                                  ▒
+             + 39.62% tdp_page_fault                                                               ▒
+             + 31.32% __schedule                                                                   ▒
+             + 27.53% perf_event_context_sched_out                                                 ▒
+             + 0.58% hrtimer_interrupt
+
+
+You can see the TLB flush and mmu-lock contention have gone after this patch.
+
+> 
+> It would be nice too if we can split the patch into two (decode,
+> encode) if you want, but that's optional.
+
+That's good to me, thank you, Peter.
