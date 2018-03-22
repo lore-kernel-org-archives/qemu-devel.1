@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eyvkM-0002Va-25
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:38:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1eyvy6-0005fy-I3
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eyvkL-0004cK-2d
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:38:54 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180306203103.25563-1-mark.cave-ayland@ilande.co.uk>
-	<20180306203103.25563-19-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <941f2d8e-fd0a-f413-7fb9-08254c99c958@amsat.org>
-Date: Thu, 22 Mar 2018 05:38:42 -0300
+	(envelope-from <peterx@redhat.com>) id 1eyvy3-0004yt-Fe
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:53:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59602 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eyvy3-0004yh-AK
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 04:53:03 -0400
+Date: Thu, 22 Mar 2018 16:52:50 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180322085250.GH32362@xz-mi>
+References: <CABLmASEF+e-h-nKunLd6QrnKaCAiR0d=GJZq9tN+CrvZh5iL7A@mail.gmail.com>
+	<035198fa-b9e1-6084-d9c2-4d344e7058d7@redhat.com>
+	<CABLmASFEhaKB1Hh91p+RM+TX+zTTDuNixWy=16rUC+GC_0KKtg@mail.gmail.com>
+	<397a5759-de49-33a1-300a-67e8b7022678@redhat.com>
+	<CABLmASHkjz=UDbHMRRtJKhu1bF28NGTzRjTo-GKbCd6dp-6qQQ@mail.gmail.com>
+	<84d2ded7-fdd5-0367-ad5d-b0443c4a945a@redhat.com>
+	<CABLmASFvQED-tsDGCgmw3LYx_CkLeKTGoQ_oU9qLHpGu=a=-hg@mail.gmail.com>
+	<ed9c25bd-e5be-bde1-2447-775c3bfc93ad@redhat.com>
+	<20180322051938.GG32362@xz-mi>
+	<CABLmASEOqo3cixnksUNg9kiHrA+NdLkE9+RcYTnK0BM+CjhVig@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180306203103.25563-19-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 18/19] mac_newworld: remove pics IRQ array
- and wire up macio to OpenPIC directly
+Content-Disposition: inline
+In-Reply-To: <CABLmASEOqo3cixnksUNg9kiHrA+NdLkE9+RcYTnK0BM+CjhVig@mail.gmail.com>
+Subject: Re: [Qemu-devel] Bug AioContext polling is not implemented on
+ Windows with qemu-system-ppc.exe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +36,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 03/06/2018 05:31 PM, Mark Cave-Ayland wrote:
-> Introduce constants for the pre-defined New World IRQs to help keep things
-> readable.
+On Thu, Mar 22, 2018 at 09:28:34AM +0100, Howard Spoelstra wrote:
+> > Hi, Howard,
+> >
+> > Thanks for reporting the problem.  Could you try applying below patch
+> > to your rc0 tree and rebuild QEMU, to see whether it fixes your problem?
+> >
+> > -----------------------------
+> > diff --git a/iothread.c b/iothread.c
+> > index 1b3463cb00..9f52270ae1 100644
+> > --- a/iothread.c
+> > +++ b/iothread.c
+> > @@ -31,11 +31,15 @@ typedef ObjectClass IOThreadClass;
+> >  #define IOTHREAD_CLASS(klass) \
+> >     OBJECT_CLASS_CHECK(IOThreadClass, klass, TYPE_IOTHREAD)
+> >
+> > +#ifdef CONFIG_LINUX
+> >  /* Benchmark results from 2016 on NVMe SSD drives show max polling times around
+> >   * 16-32 microseconds yield IOPS improvements for both iodepth=1 and iodepth=32
+> >   * workloads.
+> >   */
+> >  #define IOTHREAD_POLL_MAX_NS_DEFAULT 32768ULL
+> > +#else
+> > +#define IOTHREAD_POLL_MAX_NS_DEFAULT 0ULL
+> > +#endif
+> >
+> >  static __thread IOThread *my_iothread;
+> >
+> > diff --git a/util/aio-win32.c b/util/aio-win32.c
+> > index d6d5e02f00..a67b00c6ad 100644
+> > --- a/util/aio-win32.c
+> > +++ b/util/aio-win32.c
+> > @@ -410,5 +410,7 @@ void aio_context_setup(AioContext *ctx)
+> >  void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+> >                                   int64_t grow, int64_t shrink, Error **errp)
+> >  {
+> > -    error_setg(errp, "AioContext polling is not implemented on Windows");
+> > +    if (max_ns) {
+> > +        error_setg(errp, "AioContext polling is not implemented on Windows");
+> > +    }
+> >  }
+> > -----------------------------
+> >
+> > Thanks,
+> >
+> > --
+> > Peter Xu
 > 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/ppc/mac.h          |  8 ++++++++
->  hw/ppc/mac_newworld.c | 29 +++++++++++++++--------------
->  2 files changed, 23 insertions(+), 14 deletions(-)
+> Hi Peter,
 > 
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index 5f5916252a..3819058310 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -47,6 +47,14 @@
->  
->  #define ESCC_CLOCK 3686400
->  
-> +/* New World IRQs */
+> Thanks, that patch does indeed fix the problem.
 
-Related type could be enum {
+Thank you for testing that.  I'll post a formal patch soon.  Hopefully
+it can reach rc1.
 
-> +#define NEWWORLD_CUDA_IRQ      0x19
-> +#define NEWWORLD_ESCCB_IRQ     0x24
-> +#define NEWWORLD_ESCCA_IRQ     0x25
-> +#define NEWWORLD_IDE0_IRQ      0xd
-> +#define NEWWORLD_IDE0_DMA_IRQ  0x2
-> +#define NEWWORLD_IDE1_IRQ      0xe
-> +#define NEWWORLD_IDE1_DMA_IRQ  0x3
-
-}
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->  
->  /* MacIO */
->  #define TYPE_MACIO_IDE "macio-ide"
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 2fcb101982..3cde507065 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -115,7 +115,7 @@ static void ppc_core99_init(MachineState *machine)
->      PowerPCCPU *cpu = NULL;
->      CPUPPCState *env = NULL;
->      char *filename;
-> -    qemu_irq *pic, **openpic_irqs;
-> +    qemu_irq **openpic_irqs;
->      int linux_boot, i, j, k;
->      MemoryRegion *ram = g_new(MemoryRegion, 1), *bios = g_new(MemoryRegion, 1);
->      hwaddr kernel_base, initrd_base, cmdline_base = 0;
-> @@ -292,8 +292,6 @@ static void ppc_core99_init(MachineState *machine)
->          }
->      }
->  
-> -    pic = g_new0(qemu_irq, 64);
-> -
->      pic_dev = qdev_create(NULL, TYPE_OPENPIC);
->      qdev_prop_set_uint32(pic_dev, "model", OPENPIC_MODEL_KEYLARGO);
->      qdev_init_nofail(pic_dev);
-> @@ -305,10 +303,6 @@ static void ppc_core99_init(MachineState *machine)
->          }
->      }
->  
-> -    for (i = 0; i < 64; i++) {
-> -        pic[i] = qdev_get_gpio_in(pic_dev, i);
-> -    }
-> -
->      if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
->          /* 970 gets a U3 bus */
->          /* Uninorth AGP bus */
-> @@ -382,13 +376,20 @@ static void ppc_core99_init(MachineState *machine)
->      /* MacIO */
->      macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
->      dev = DEVICE(macio);
-> -    qdev_connect_gpio_out(dev, 0, pic[0x19]); /* CUDA */
-> -    qdev_connect_gpio_out(dev, 1, pic[0x24]); /* ESCC-B */
-> -    qdev_connect_gpio_out(dev, 2, pic[0x25]); /* ESCC-A */
-> -    qdev_connect_gpio_out(dev, 3, pic[0x0d]); /* IDE */
-> -    qdev_connect_gpio_out(dev, 4, pic[0x02]); /* IDE DMA */
-> -    qdev_connect_gpio_out(dev, 5, pic[0x0e]); /* IDE */
-> -    qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE DMA */
-> +    qdev_connect_gpio_out(dev, 0,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_CUDA_IRQ));
-> +    qdev_connect_gpio_out(dev, 1,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCB_IRQ));
-> +    qdev_connect_gpio_out(dev, 2,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCA_IRQ));
-> +    qdev_connect_gpio_out(dev, 3,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ));
-> +    qdev_connect_gpio_out(dev, 4,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ));
-> +    qdev_connect_gpio_out(dev, 5,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ));
-> +    qdev_connect_gpio_out(dev, 6,
-> +        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ));
->      qdev_prop_set_uint64(dev, "frequency", tbfreq);
->      object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
->                               &error_abort);
 > 
+> Best,
+> Howard
+
+-- 
+Peter Xu
