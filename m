@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ez3R9-0000e4-8E
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:51:36 -0400
+	(envelope-from <lvivier@redhat.com>) id 1ez3Y7-0005Bm-HQ
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:58:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ez3R8-00062O-Dj
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:51:35 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180322161226.29796-5-lvivier@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1ez3Y6-0002K8-QM
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:58:47 -0400
 References: <20180322161226.29796-1-lvivier@redhat.com>
 	<20180322161226.29796-5-lvivier@redhat.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 22 Mar 2018 09:51:32 -0700
-Message-ID: <CAMo8BfKkwM0wzX1yCBvwJ-Av4SZbgSrxmOGzD+Z_+bY0DTcgYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAMo8BfKkwM0wzX1yCBvwJ-Av4SZbgSrxmOGzD+Z_+bY0DTcgYg@mail.gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <6fd26097-aa7e-38cf-0d9e-09d0d36bd88b@redhat.com>
+Date: Thu, 22 Mar 2018 17:58:17 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAMo8BfKkwM0wzX1yCBvwJ-Av4SZbgSrxmOGzD+Z_+bY0DTcgYg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 4/4] Remove unnecessary variables for
  function return value
 List-Id: <qemu-devel.nongnu.org>
@@ -23,22 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Mar 22, 2018 at 9:12 AM, Laurent Vivier <lvivier@redhat.com> wrote:
-> Re-run Coccinelle script scripts/coccinelle/return_directly.cocci
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  target/xtensa/core-dc232b/xtensa-modules.c         | 56 ++++++----------------
->  target/xtensa/core-dc233c/xtensa-modules.c         | 56 ++++++----------------
->  target/xtensa/core-de212/xtensa-modules.c          | 48 +++++--------------
->  target/xtensa/core-fsf/xtensa-modules.c            | 32 ++++---------
->  .../xtensa/core-sample_controller/xtensa-modules.c | 24 +++-------
+On 22/03/2018 17:51, Max Filippov wrote:
+> On Thu, Mar 22, 2018 at 9:12 AM, Laurent Vivier <lvivier@redhat.com> wrote:
+>> Re-run Coccinelle script scripts/coccinelle/return_directly.cocci
+>>
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>> ---
+>>  target/xtensa/core-dc232b/xtensa-modules.c         | 56 ++++++----------------
+>>  target/xtensa/core-dc233c/xtensa-modules.c         | 56 ++++++----------------
+>>  target/xtensa/core-de212/xtensa-modules.c          | 48 +++++--------------
+>>  target/xtensa/core-fsf/xtensa-modules.c            | 32 ++++---------
+>>  .../xtensa/core-sample_controller/xtensa-modules.c | 24 +++-------
+> 
+> These files were autogenerated, fixing them doesn't make much sense.
 
-These files were autogenerated, fixing them doesn't make much sense.
+Good to know. They have been already updated by a couple of patches:
 
--- 
-Thanks.
--- Max
+8f0a3716e4 Clean up includes
+d8e39b7062 Use #include "..." for our own headers, <...> for others
+
+Perhaps import_core.sh can be updated?
+
+Thanks,
+Laurent
