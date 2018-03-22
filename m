@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ez7Po-00041j-JY
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:06:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1ez7dy-0008EG-Ib
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ez7Pm-0006p4-QZ
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:06:28 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:47088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ez7Pm-0006o0-IR
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:06:26 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id g97-v6so11026230otg.13
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 14:06:26 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1ez7dv-0005Ky-10
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:21:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55442 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ez7du-0005Ko-RM
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:21:02 -0400
+Date: Thu, 22 Mar 2018 21:20:35 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180322212035.GA16426@stefanha-x1.localdomain>
+References: <1521645545-247351-1-git-send-email-mst@redhat.com>
+	<1521645545-247351-2-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7Ntu=LAm2r3G8ZiGioYC_FkhArA=0kXj8SxphaFTY6rV4Q@mail.gmail.com>
-References: <1521221171-47213-1-git-send-email-mjc@sifive.com>
-	<dec4f79c-a46e-f341-ef17-7ba85086bc9a@amsat.org>
-	<CAHNT7Nuv9G+e3-m-356HZDoiLju=vPCucfWhXLJ0QHPGM7NSQw@mail.gmail.com>
-	<20180319194242.GQ2787@redhat.com>
-	<CAHNT7Ntu=LAm2r3G8ZiGioYC_FkhArA=0kXj8SxphaFTY6rV4Q@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Thu, 22 Mar 2018 14:06:24 -0700
-Message-ID: <CAHNT7NsJBVruEQq1kR53wpadizjaHzJ5M-8D3_grmSzeogmtZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Fix riscv_isa_string memory
- size bug
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
+Content-Disposition: inline
+In-Reply-To: <1521645545-247351-2-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] make: switch from -I to
+ -iquote
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
-
-On Mon, Mar 19, 2018 at 2:39 PM, Michael Clark <mjc@sifive.com> wrote:
-
->
->
-> On Mon, Mar 19, 2018 at 12:42 PM, Richard W.M. Jones <rjones@redhat.com>
-> wrote:
->
->> On Mon, Mar 19, 2018 at 11:35:51AM -0700, Michael Clark wrote:
->> > The RISC-V post-merge spec conformance and cleanup series has had a lot
->> of
->> > testing. I've been using it to compile QEMU inside of QEMU using the
->> RISC-V
->> > Fedora Image and its native RISC-V GCC toolchain running inside SMP
->> Linux
->> > 4.16-rc2. It appears to be pretty rock-solid. The rcu lock fix would
->> likely
->> > only affect users who are ballooning memory while a guest is under load.
->> > The page walker changes have also been tested under load (including
->> > performance tests).
->>
->> Did you see the problem with restoring floating point registers on
->> context switch?  The test case is quite simple:
->>
->>   http://oirase.annexia.org/tmp/sched.c
->
->
-> No I didn't. Thanks.
->
->
->> Note you must compile it with gcc -O2 to manifest the bug.  (We
->> originally thought it was a problem with gcc's optimization, but it
->> isn't.)
->>
->
-> Okay. I must admit most of my testing has been integer heavy workloads.
->
->
->> In Fedora's qemu tree are carrying the following patch which is just a
->> workaround:
->>
->>   https://github.com/rwmjones/fedora-riscv-bootstrap/blob/mast
->> er/stage1-riscv-qemu/force-float-save.patch
->
->
-> I will take a look...
->
-
->From my local testing, it appears to only show up with SMP enabled. With 1
-CPU enabled the sched.c test passes.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <famz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
 
-> There were some changes around v4 of our port upstream patch series to add
-> MSTATUS.FS (TB_FLAGS_FP_ENABLE) to to tb->flags to avoid checking the flags
-> on all FP ops.
->
+--pf9I7BMVVzbSWLtt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm curious about the change in v4 of our upstream patch series "Enforce
-MSTATUS_FS via TB flags"
+On Wed, Mar 21, 2018 at 05:22:07PM +0200, Michael S. Tsirkin wrote:
+> Our rule right now is to use <> for external headers,
+> "" for internal ones. The idea was to avoid conflicts
+> between e.g. a system file named <trace.h> and an
+> internal one by the same name.
+>=20
+> Unfortunately we use -I compiler flag so it does not
+> help: a system file doing #include <trace.h> will
+> still pick up ours first.
+>=20
+> To fix, switch to -iquote which is supported by both
+> gcc and clang and only affects #include "" directives.
+>=20
+> As a side effect, this catches any future uses of
+>  #include <> for internal headers.
+>=20
+> Suggested-by: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>=20
+> I still think we want to switch to a more formal rule such as qemu/
+> prefix for all includes down the road, but this will at least catch any
+> scheme violations from creeping in meanwhile.
+>=20
+>=20
+>  configure       | 16 ++++++++--------
+>  rules.mak       |  2 +-
+>  Makefile.target |  4 ++--
+>  3 files changed, 11 insertions(+), 11 deletions(-)
 
--
-https://github.com/riscv/riscv-qemu/commit/1b0631573008d19b2cb4bb1ef388bd51d6a1d722
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-I'll could try and revert this and see if it makes any difference...
-however I think the float code has changed substantially with respect to
-handling of flags. We could backport the more conservative approach of
-handling MSTATUS_FS in the float routines. We should also run the test case
-on hardware to rule out linux-kernel MSTATIS_FS bugs...
+--pf9I7BMVVzbSWLtt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-BTW We didn't have MTTCG enabled until v6 of our patch series so given it
-only shows up on SMP, it wouldn't have been visible until v6 or after.
+-----BEGIN PGP SIGNATURE-----
 
-static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong
-> *pc,
->                                         target_ulong *cs_base, uint32_t
-> *flags)
-> {
->     *pc = env->pc;
->     *cs_base = 0;
-> #ifdef CONFIG_USER_ONLY
->     *flags = TB_FLAGS_FP_ENABLE;
-> #else
->     *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
-> #endif
-> }
->
-> I'll have to get my head around the implication of this or with the
-> privilege level and how MSTATUS.FS is currently set...
->
+iQEcBAEBAgAGBQJatB4jAAoJEJykq7OBq3PI1sAH/2GDdYJmvQeJG8lkgTzpRKlX
+REr6mAOFUim8Rxp7uXaJsRhQjq+gAbQsDWmqBjM2Tss+/lWwZRYonINC9XjUxWtF
++NIq2FJKDrESvWSqlboZhkwYhnb86Plw3onUwrsqdzV1bKA1oYniOmEewveBriWL
+P/dpzjSHkG4gSOmrX2ozVpeXU3ypAX5fR20iznV8VYVuPLjzj+v3Gza48dclBhJY
+CFtwIlTymje/PBaq6i9juU3ZZ6h+0BJNOeH0rtt/fqh+K8jgvZhoarAt1ThQ3EOi
+N1dstfgHzFTjyoGgpxkVJ7vyuDcxPUqJglMCHjumhF734XSV+1BP6nfzOh2GjVE=
+=yC5Q
+-----END PGP SIGNATURE-----
+
+--pf9I7BMVVzbSWLtt--
