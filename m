@@ -1,15 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eyqeP-0008LT-0b
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1eyqee-0008WG-Qb
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eyqeO-0004Fv-5c
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:24 -0400
-From: Wei Huang <wei@redhat.com>
-Date: Wed, 21 Mar 2018 22:12:16 -0500
-Message-Id: <20180322031216.14569-1-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/1] mach-virt: Set VM's SMBIOS system version
- to mc->desc
+	(envelope-from <peterx@redhat.com>) id 1eyqeZ-0004LB-OZ
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39986 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eyqeZ-0004Kx-Ju
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 515FE402277B
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 03:12:35 +0000 (UTC)
+Date: Thu, 22 Mar 2018 11:12:29 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180322031229.GB32362@xz-mi>
+References: <20180321113644.21899-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180321113644.21899-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: fix pfd leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,55 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, drjones@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Instead of using "1.0" as the system version of SMBIOS, we should use
-mc->desc for mach-virt machine type. With this patch, "dmidecode -t 1"
-(e.g., "-M virt-2.12,accel=kvm") will show:
+On Wed, Mar 21, 2018 at 12:36:44PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Fix leak spotted by ASAN:
+>=20
+> Direct leak of 16 byte(s) in 1 object(s) allocated from:
+>     #0 0x7fe1abb80a38 in __interceptor_calloc (/lib64/libasan.so.4+0xde=
+a38)
+>     #1 0x7fe1aaf1bf75 in g_malloc0 ../glib/gmem.c:124
+>     #2 0x7fe1aaf1c249 in g_malloc0_n ../glib/gmem.c:355
+>     #3 0x55f4841cfaa9 in postcopy_ram_fault_thread /home/elmarco/src/qe=
+mu/migration/postcopy-ram.c:596
+>     #4 0x55f48479447b in qemu_thread_start /home/elmarco/src/qemu/util/=
+qemu-thread-posix.c:504
+>     #5 0x7fe1a043550a in start_thread (/lib64/libpthread.so.0+0x750a)
+>=20
+> Regression introduced with commit 00fa4fc85b00f1a8a810068d158a7a66e8865=
+8eb.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-    Handle 0x0100, DMI type 1, 27 bytes
-    System Information
-            Manufacturer: QEMU
-            Product Name: KVM Virtual Machine
-            Version: QEMU 2.12 ARM Virtual Machine
-            Serial Number: Not Specified
-            ...
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-instead of:
-    Handle 0x0100, DMI type 1, 27 bytes
-    System Information
-            Manufacturer: QEMU
-            Product Name: KVM Virtual Machine
-            Version: 1.0
-            Serial Number: Not Specified
-            ...
-
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- hw/arm/virt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2c07245047..da7228b297 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1132,6 +1132,7 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
- 
- static void virt_build_smbios(VirtMachineState *vms)
- {
-+    MachineClass *mc = MACHINE_GET_CLASS(vms);
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-     const char *product = "QEMU Virtual Machine";
-@@ -1145,7 +1146,7 @@ static void virt_build_smbios(VirtMachineState *vms)
-     }
- 
-     smbios_set_defaults("QEMU", product,
--                        "1.0", false, true, SMBIOS_ENTRY_POINT_30);
-+                        mc->desc, false, true, SMBIOS_ENTRY_POINT_30);
- 
-     smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
-                       &smbios_anchor, &smbios_anchor_len);
--- 
-2.14.3
+--=20
+Peter Xu
