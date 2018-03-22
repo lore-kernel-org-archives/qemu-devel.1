@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyxxA-00019c-DZ
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:00:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyy2I-0002j6-0H
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyxx9-0004bJ-KW
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:00:16 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34935)
+	(envelope-from <peter.maydell@linaro.org>) id 1eyy2B-0008Ao-Ju
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:05:33 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:37175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyxx9-0004ay-ET
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:00:15 -0400
-Received: by mail-ot0-x243.google.com with SMTP id r30-v6so8954354otr.2
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 04:00:15 -0700 (PDT)
+	id 1eyy2B-0008AY-Ex
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:05:27 -0400
+Received: by mail-ot0-x244.google.com with SMTP id t2-v6so8982921otj.4
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 04:05:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8f878d04-d5c2-77ae-9fb9-d98d41efac3c@amsat.org>
-References: <20180320134114.30418-1-peter.maydell@linaro.org>
-	<20180320134114.30418-5-peter.maydell@linaro.org>
-	<8f878d04-d5c2-77ae-9fb9-d98d41efac3c@amsat.org>
+In-Reply-To: <bf9d1394-f78d-b6ba-8893-d4c7fd592de3@vivier.eu>
+References: <20180123144807.5618-1-laurent@vivier.eu>
+	<20180123144807.5618-13-laurent@vivier.eu>
+	<758f54da-d733-6e95-57cf-cc8b25a81dd5@vivier.eu>
+	<bf9d1394-f78d-b6ba-8893-d4c7fd592de3@vivier.eu>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Mar 2018 10:59:54 +0000
-Message-ID: <CAFEAcA-nShiCLTDvgeLxCoUJciB3uTLCGeLLD0mRLtRFj8WN1w@mail.gmail.com>
+Date: Thu, 22 Mar 2018 11:05:06 +0000
+Message-ID: <CAFEAcA9==FswwaKG_eWncv7Eo-zF+OTOKmSC7N-mpTrSEzUJmg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 4/4] target/arm: Always set FAR to
- a known unknown value for debug exceptions
+Subject: Re: [Qemu-devel] [PULL 12/13] page_unprotect(): handle calls to
+ pages that are PAGE_WRITE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 21 March 2018 at 22:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> On 03/20/2018 02:41 PM, Peter Maydell wrote:
->> For debug exceptions due to breakpoints or the BKPT instruction which
->> are taken to AArch32, the Fault Address Register is architecturally
->> UNKNOWN.  We were using that as license to simply not set
->> env->exception.vaddress, but this isn't correct, because it will
->> expose to the guest whatever old value was in that field when
->> arm_cpu_do_interrupt_aarch32() writes it to the guest IFSR.  That old
->> value might be a FAR for a previous guest EL2 or secure exception, in
->> which case we shouldn't show it to an EL1 or non-secure exception
->> handler. It might also be a non-deterministic value, which is bad
->> for record-and-replay.
+On 22 March 2018 at 10:36, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 22/03/2018 =C3=A0 02:52, Laurent Vivier a =C3=A9crit :
+>> It seems this patch breaks something in linux-user mode emulation for
+>> m68k (32bit BE) on ppc (32bit BE).
 >>
->> Clear env->exception.vaddress before taking breakpoint debug
->> exceptions, to avoid this minor information leak.
+>> What I have:
+>>
+>>   ~/chroot$ sudo QEMU_CPU=3Dm68040 chroot m68k/sid/
+>>   I have no name!@localhost:/# ls
+>>   bin   debootstrap  etc       lib   qemu-m68k  run   sys  usr
+>>   boot  dev      home  proc  root       sbin  tmp  var
+>>   qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+>>   ~/chroot$
+>>
+>> It seems "bash" crashes on "ls" exit.
+>>
+>> My chroot has been installed with:
+>>
+>>   ARCH=3Dm68k
+>>   TARGET=3Dsid
+>>   CHROOT=3D$HOME/chroot/m68k/sid/
+>>   REPOT=3Dhttp://cdn-fastly.deb.debian.org/debian-ports/
+>>   debootstrap --arch=3D$ARCH --foreign --variant=3Dminbase \
+>>               --no-check-gpg $TARGET $CHROOT $REPO
+>>
+>> I didn't investigate more.
 >
-> So this series is worth Cc'ing qemu-stable...?
+> It goes wrong in this part:
+>
+> +     */
+> +    if (is_write && info->si_signo =3D=3D SIGSEGV && info->si_code =3D=
+=3D
+> SEGV_ACCERR &&
+> +        h2g_valid(address)) {
+>
+> Because, on ppc, si_code is SEGV_MAPERR and not SEGV_ACCERR
+> (on x86_64, si_code is SEGV_ACCERR as expected)
 
-I don't think so. This isn't a regression -- we've behaved this
-way ever since we introduced LPAE support, five years or so ago.
-In particular Linux doesn't care about it.
+So on PPC if you have a page mapped, and you access it with
+the wrong permissions, you get SEGV_MAPERR? This seems like
+a host kernel bug to me.
 
 thanks
 -- PMM
