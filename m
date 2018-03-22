@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eyzY1-0001ml-Bx
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 08:42:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyzhF-0004PE-B8
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 08:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eyzXy-0005eJ-9Z
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 08:42:25 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 22 Mar 2018 14:41:55 +0200
-Message-Id: <20180322124155.16257-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH for-2.12 v4] iotests: Test abnormally large
- size in compressed cluster descriptor
+	(envelope-from <peter.maydell@linaro.org>) id 1eyzhE-0002vL-7t
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 08:51:57 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eyzhE-0002vA-1s
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 08:51:56 -0400
+Received: by mail-ot0-x243.google.com with SMTP id v23-v6so9297703oth.9
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 05:51:55 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180315133441.24149-1-peter.maydell@linaro.org>
+References: <20180315133441.24149-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Mar 2018 12:51:34 +0000
+Message-ID: <CAFEAcA_hAmDDdbTpR2PYu0SLd5nJvwcw34xRgiHXtiU_5kQxWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/intc/arm_gicv3: Fix secure-GIC
+ NS ICC_PMR and ICC_RPR accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,172 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-L2 entries for compressed clusters have a field that indicates the
-number of sectors used to store the data in the image.
+Ping for code review -- it would be nice to put this bugfix
+into rc1.
 
-That's however not the size of the compressed data itself, just the
-number of sectors where that data is located. The actual data size is
-usually not a multiple of the sector size, and therefore cannot be
-represented with this field.
+thanks
+-- PMM
 
-The way it works is that QEMU reads all the specified sectors and
-starts decompressing the data until there's enough to recover the
-original uncompressed cluster. If there are any bytes left that
-haven't been decompressed they are simply ignored.
-
-One consequence of this is that even if the size field is larger than
-it needs to be QEMU can handle it just fine: it will read more data
-from disk but it will ignore the extra bytes.
-
-This test creates an image with two compressed clusters that use 5
-sectors (2.5 KB) each, increases the size field to the maximum (8192
-sectors, or 4 MB) and verifies that the data can be read without
-problems.
-
-This test is important because while the decompressed data takes
-exactly one cluster, the maximum value allowed in the compressed size
-field is twice the cluster size. So although QEMU won't produce images
-with such large values we need to make sure that it can handle them.
-
-Another effect of increasing the size field is that it can make
-it include data from the following host cluster(s). In this case
-'qemu-img check' will detect that the refcounts are not correct, and
-we'll need to rebuild them.
-
-Additionally, this patch also tests that decreasing the size corrupts
-the image since the original data can no longer be recovered. In this
-case QEMU returns an error when trying to read the compressed data,
-but 'qemu-img check' doesn't see anything wrong if the refcounts are
-consistent.
-
-One possible task for the future is to make 'qemu-img check' verify
-the sizes of the compressed clusters, by trying to decompress the data
-and checking that the size stored in the L2 entry is correct.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
-v4: Resend for 2.12
-
-v3: Add TODO comment, as suggested by Eric.
-
-    Corrupt the length of the second compressed cluster as well so the
-    uncompressed data would span three host clusters.
-
-v2: We now have two scenarios where we make QEMU read data from the
-    next host cluster and from beyond the end of the image. This
-    version also runs qemu-img check on the corrupted image.
-
-    If the size field is too small, reading fails but qemu-img check
-    succeeds.
-
-    If the size field is too large, reading succeeds but qemu-img
-    check fails (this can be repaired, though).
----
- tests/qemu-iotests/122     | 45 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/122.out | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+)
-
-diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-index 45b359c2ba..5b9593016c 100755
---- a/tests/qemu-iotests/122
-+++ b/tests/qemu-iotests/122
-@@ -130,6 +130,51 @@ $QEMU_IO -c "read -P 0    1024k 1022k" "$TEST_IMG" 2>&1 | _filter_qemu_io | _fil
- 
- 
- echo
-+echo "=== Corrupted size field in compressed cluster descriptor ==="
-+echo
-+# Create an empty image, fill half of it with data and compress it.
-+# The L2 entries of the two compressed clusters are located at
-+# 0x800000 and 0x800008, their original values are 0x4008000000a00000
-+# and 0x4008000000a00802 (5 sectors for compressed data each).
-+TEST_IMG="$TEST_IMG".1 _make_test_img 8M
-+$QEMU_IO -c "write -P 0x11 0 4M" "$TEST_IMG".1 2>&1 | _filter_qemu_io | _filter_testdir
-+$QEMU_IMG convert -c -O qcow2 -o cluster_size=2M "$TEST_IMG".1 "$TEST_IMG"
-+
-+# Reduce size of compressed data to 4 sectors: this corrupts the image.
-+poke_file "$TEST_IMG" $((0x800000)) "\x40\x06"
-+$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+
-+# 'qemu-img check' however doesn't see anything wrong because it
-+# doesn't try to decompress the data and the refcounts are consistent.
-+# TODO: update qemu-img so this can be detected
-+_check_test_img
-+
-+# Increase size of compressed data to the maximum (8192 sectors).
-+# This makes QEMU read more data (8192 sectors instead of 5, host
-+# addresses [0xa00000, 0xdfffff]), but the decompression algorithm
-+# stops once we have enough to restore the uncompressed cluster, so
-+# the rest of the data is ignored.
-+poke_file "$TEST_IMG" $((0x800000)) "\x7f\xfe"
-+# Do it also for the second compressed cluster (L2 entry at 0x800008).
-+# In this case the compressed data would span 3 host clusters
-+# (host addresses: [0xa00802, 0xe00801])
-+poke_file "$TEST_IMG" $((0x800008)) "\x7f\xfe"
-+
-+# Here the image is too small so we're asking QEMU to read beyond the
-+# end of the image.
-+$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+# But if we grow the image we won't be reading beyond its end anymore.
-+$QEMU_IO -c "write -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+
-+# The refcount data is however wrong because due to the increased size
-+# of the compressed data it now reaches the following host clusters.
-+# This can be repaired by qemu-img check.
-+_check_test_img -r all
-+$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+$QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
-+
-+echo
- echo "=== Full allocation with -S 0 ==="
- echo
- 
-diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
-index 47d8656db8..bdda75650f 100644
---- a/tests/qemu-iotests/122.out
-+++ b/tests/qemu-iotests/122.out
-@@ -99,6 +99,37 @@ read 1024/1024 bytes at offset 1047552
- read 1046528/1046528 bytes at offset 1048576
- 1022 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-+=== Corrupted size field in compressed cluster descriptor ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.1', fmt=IMGFMT size=8388608
-+wrote 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read failed: Input/output error
-+No errors were found on the image.
-+read 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 4194304/4194304 bytes at offset 4194304
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+ERROR cluster 6 refcount=1 reference=3
-+ERROR cluster 7 refcount=1 reference=2
-+Repairing cluster 6 refcount=1 reference=3
-+Repairing cluster 7 refcount=1 reference=2
-+Repairing OFLAG_COPIED data cluster: l2_entry=8000000000c00000 refcount=3
-+Repairing OFLAG_COPIED data cluster: l2_entry=8000000000e00000 refcount=2
-+The following inconsistencies were found and repaired:
-+
-+    0 leaked clusters
-+    4 corruptions
-+
-+Double checking the fixed image now...
-+No errors were found on the image.
-+read 4194304/4194304 bytes at offset 0
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4194304/4194304 bytes at offset 4194304
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
- === Full allocation with -S 0 ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
--- 
-2.11.0
+On 15 March 2018 at 13:34, Peter Maydell <peter.maydell@linaro.org> wrote:
+> If the GIC has the security extension support enabled, then a
+> non-secure access to ICC_PMR must take account of the non-secure
+> view of interrupt priorities, where real priorities 0..0x7f
+> are secure-only and not visible to the non-secure guest, and
+> priorities 0x80..0xff are shown to the guest as if they were
+> 0x00..0xff. We had the logic here wrong:
+>  * on reads, the priority is in the secure range if bit 7
+>    is clear, not if it is set
+>  * on writes, we want to set bit 7, not mask everything else
+>
+> Our ICC_RPR read code had the same error as ICC_PMR.
+>
+> (Compare the GICv3 spec pseudocode functions ICC_RPR_EL1
+> and ICC_PMR_EL1.)
+>
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1748434
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/intc/arm_gicv3_cpuif.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+> index 5cbafaf497..26f5eeda94 100644
+> --- a/hw/intc/arm_gicv3_cpuif.c
+> +++ b/hw/intc/arm_gicv3_cpuif.c
+> @@ -836,7 +836,7 @@ static uint64_t icc_pmr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>          /* NS access and Group 0 is inaccessible to NS: return the
+>           * NS view of the current priority
+>           */
+> -        if (value & 0x80) {
+> +        if ((value & 0x80) == 0) {
+>              /* Secure priorities not visible to NS */
+>              value = 0;
+>          } else if (value != 0xff) {
+> @@ -871,7 +871,7 @@ static void icc_pmr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>              /* Current PMR in the secure range, don't allow NS to change it */
+>              return;
+>          }
+> -        value = (value >> 1) & 0x80;
+> +        value = (value >> 1) | 0x80;
+>      }
+>      cs->icc_pmr_el1 = value;
+>      gicv3_cpuif_update(cs);
+> @@ -1609,7 +1609,7 @@ static uint64_t icc_rpr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>      if (arm_feature(env, ARM_FEATURE_EL3) &&
+>          !arm_is_secure(env) && (env->cp15.scr_el3 & SCR_FIQ)) {
+>          /* NS GIC access and Group 0 is inaccessible to NS */
+> -        if (prio & 0x80) {
+> +        if ((prio & 0x80) == 0) {
+>              /* NS mustn't see priorities in the Secure half of the range */
+>              prio = 0;
+>          } else if (prio != 0xff) {
+> --
+> 2.16.2
