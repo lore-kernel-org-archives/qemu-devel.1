@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ez0UH-0001co-83
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:42:38 -0400
+	(envelope-from <wei@redhat.com>) id 1ez0Zc-00041e-0B
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ez0UB-0005S0-Mk
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:42:37 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:57422)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1ez0UB-0005P5-9b
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:42:31 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <297790d0-cac0-8609-7516-d6025b4759a8@redhat.com>
-References: <cover.1521717086.git.berto@igalia.com>
-	<cb7dcdf3685e430783b24cce3a3cbd3aaa997cb7.1521717086.git.berto@igalia.com>
-	<297790d0-cac0-8609-7516-d6025b4759a8@redhat.com>
-Date: Thu, 22 Mar 2018 14:42:27 +0100
-Message-ID: <w51sh8sdy64.fsf@maestria.local.igalia.com>
+	(envelope-from <wei@redhat.com>) id 1ez0Zb-0000Vt-6M
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 09:48:08 -0400
+References: <20180322031216.14569-1-wei@redhat.com>
+	<20180322080156.x2q7w6wtdrvc3wk3@hawk.localdomain>
+	<CAFEAcA_Sb6iz-8cg00JXhNF5pMS3z2=QxhoEhwSgG6PG04nKqg@mail.gmail.com>
+From: Wei Huang <wei@redhat.com>
+Message-ID: <1571d9c0-de78-3daa-20f6-3e0e293f6658@redhat.com>
+Date: Thu, 22 Mar 2018 08:47:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 2/2] iotests: Update 186 after
- commit ac64273c66ab136c44043259162
+In-Reply-To: <CAFEAcA_Sb6iz-8cg00JXhNF5pMS3z2=QxhoEhwSgG6PG04nKqg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] mach-virt: Set VM's SMBIOS system
+ version to mc->desc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu 22 Mar 2018 02:17:23 PM CET, Eric Blake wrote:
->> --- a/tests/qemu-iotests/186.out
->> +++ b/tests/qemu-iotests/186.out
->> @@ -404,7 +404,7 @@ Testing: -drive if=floppy
->>   QEMU X.Y.Z monitor - type 'help' for more information
->>   (qemu) info block
->>   floppy0: [not inserted]
->> -    Attached to:      /machine/unattached/device[17]
->> +    Attached to:      /machine/unattached/device[13]
->
-> It looks like this name is quite flexible; would it not be better to
-> enhance 186 to sed out the name (s/Attached to:.*/Attached to: PATH/)
-> and then adjust the .out so that it is no longer sensitive to these
-> types of internal renames?
 
-That's a good idea, shall we hide the number only?  (i.e. leave
-"/machine/unattached/device[INDEX]" or something like that), or can the
-rest of the path also change?
 
-Berto
+On 03/22/2018 05:53 AM, Peter Maydell wrote:
+> On 22 March 2018 at 08:01, Andrew Jones <drjones@redhat.com> wrote:
+>> I agree we should change the useless 1.0, but shouldn't we use
+>> mc->name instead of mc->desc? mc->name would make it consistent
+>> with pc-piix and q35 and also be a less verbose "version". We'd
+>> get e.g.
+>>
+>>  System Information
+>>         Manufacturer: QEMU
+>>         Product Name: KVM Virtual Machine
+>>         Version: virt-2.12
+>>         Serial Number: Not Specified
+> 
+> I would vote for consistency with x86, I think.
+
+Drew and you like ->name better because of its conciseness consistency
+with x86. In my view virt-2.xx is not very informative. "Version" info
+in real machine could be verbose. Using my Thinkpad as example:
+
+	Manufacturer: LENOVO
+	Product Name: 20FAS1EG0N
+	Version: ThinkPad T460s
+
+With that said, I will change it to mc->name.
+
+> 
+> thanks
+> -- PMM
+> 
