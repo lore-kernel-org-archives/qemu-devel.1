@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ez1Ua-0003wX-Fs
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 10:47:04 -0400
+	(envelope-from <berto@igalia.com>) id 1ez1Ue-0003wt-KY
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 10:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ez1UX-0007Jz-84
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 10:47:00 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:38303)
+	(envelope-from <berto@igalia.com>) id 1ez1UX-0007K4-8h
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 10:47:03 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:38286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1ez1UW-00070R-PN
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1ez1UW-0006yZ-PQ
 	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 10:46:57 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 22 Mar 2018 16:45:51 +0200
-Message-Id: <e81480c3296f69b32527170890249e0d7731df93.1521729843.git.berto@igalia.com>
+Date: Thu, 22 Mar 2018 16:45:50 +0200
+Message-Id: <662d2860f0b334049730c0c9fe6d556ad30d63da.1521729843.git.berto@igalia.com>
 In-Reply-To: <cover.1521729843.git.berto@igalia.com>
 References: <cover.1521729843.git.berto@igalia.com>
 In-Reply-To: <cover.1521729843.git.berto@igalia.com>
 References: <cover.1521729843.git.berto@igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-2.12 v4 2/2] iotests: Update 186 after
- commit ac64273c66ab136c44043259162
+Subject: [Qemu-devel] [PATCH for-2.12 v4 1/2] iotests: Update 051 and 186
+ after commit 1454509726719e0933c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,308 +27,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Thomas Huth <thuth@redhat.com>
 
-Commit ac64273c66ab136c44 modified the output of iotest 186, changing
-the QOM path of floppy drives from /machine/unattached/device[17] to
-/machine/unattached/device[13].
-
-Instead of updating the test output to reflect this change, this patch
-adds a new filter that hides all QOM paths from the 'Attached to:'
-line of the 'info block' command.
+SCSI controllers are no longer created automatically for
+-drive if=scsi, so this patch updates the tests that relied
+on that.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/186           |  2 +-
- tests/qemu-iotests/186.out       | 56 ++++++++++++++++++++--------------------
- tests/qemu-iotests/common.filter |  5 ++++
- 3 files changed, 34 insertions(+), 29 deletions(-)
+ tests/qemu-iotests/051.pc.out | 20 --------------------
+ tests/qemu-iotests/186        |  4 ----
+ tests/qemu-iotests/186.out    | 28 ----------------------------
+ 3 files changed, 52 deletions(-)
 
+diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+index 830c11880a..b01f9a90d7 100644
+--- a/tests/qemu-iotests/051.pc.out
++++ b/tests/qemu-iotests/051.pc.out
+@@ -117,20 +117,10 @@ Testing: -drive if=ide,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+ 
+-Testing: -drive if=scsi,media=cdrom
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+-quit
+-
+ Testing: -drive if=ide
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
+ 
+-Testing: -drive if=scsi
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
+-QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
+-
+ Testing: -drive if=virtio
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) QEMU_PROG: -drive if=virtio: Device needs media, but drive is empty
+@@ -170,20 +160,10 @@ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,media=cdrom,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+ 
+-Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+-quit
+-
+ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
+ 
+-Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
+-quit
+-
+ Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
 diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-index 9687243d34..0aa4395a57 100755
+index 44cc01ed87..9687243d34 100755
 --- a/tests/qemu-iotests/186
 +++ b/tests/qemu-iotests/186
-@@ -64,7 +64,7 @@ function check_info_block()
- {
-     echo "info block" |
-     do_run_qemu "$@" | _filter_win32 | _filter_hmp | _filter_qemu |
--        _filter_generated_node_ids
-+        _filter_generated_node_ids | _filter_qom_path
- }
+@@ -133,10 +133,6 @@ check_info_block -drive if=ide,driver=null-co
+ check_info_block -drive if=ide,media=cdrom
+ check_info_block -drive if=ide,driver=null-co,media=cdrom
  
+-check_info_block -drive if=scsi,driver=null-co
+-check_info_block -drive if=scsi,media=cdrom
+-check_info_block -drive if=scsi,driver=null-co,media=cdrom
+-
+ check_info_block -drive if=virtio,driver=null-co
  
+ check_info_block -drive if=pflash,driver=null-co,size=1M
 diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
-index ec75c0fc60..716b01ac3d 100644
+index c8377fe146..ec75c0fc60 100644
 --- a/tests/qemu-iotests/186.out
 +++ b/tests/qemu-iotests/186.out
-@@ -7,7 +7,7 @@ Testing: -device floppy
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- /machine/peripheral-anon/device[1]: [not inserted]
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -23,7 +23,7 @@ Testing: -device ide-cd
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- /machine/peripheral-anon/device[1]: [not inserted]
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -39,7 +39,7 @@ Testing: -device scsi-cd
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- /machine/peripheral-anon/device[1]: [not inserted]
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -58,7 +58,7 @@ Testing: -blockdev driver=null-co,node-name=null -device ide-hd,drive=null
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
+@@ -442,34 +442,6 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
      Cache mode:       writeback
  (qemu) quit
  
-@@ -74,7 +74,7 @@ Testing: -blockdev driver=null-co,node-name=null -device scsi-hd,drive=null
+-Testing: -drive if=scsi,driver=null-co
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
+-info block
+-scsi0-hd0 (NODE_NAME): null-co:// (null-co)
+-    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+-    Cache mode:       writeback
+-(qemu) quit
+-
+-Testing: -drive if=scsi,media=cdrom
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+-info block
+-scsi0-cd0: [not inserted]
+-    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+-    Removable device: not locked, tray closed
+-(qemu) quit
+-
+-Testing: -drive if=scsi,driver=null-co,media=cdrom
+-QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+-info block
+-scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+-    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+-    Removable device: not locked, tray closed
+-    Cache mode:       writeback
+-(qemu) quit
+-
+ Testing: -drive if=virtio,driver=null-co
  QEMU X.Y.Z monitor - type 'help' for more information
  (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -90,7 +90,7 @@ Testing: -blockdev driver=null-co,node-name=null -device virtio-blk-pci,drive=nu
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]/virtio-backend
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -98,7 +98,7 @@ Testing: -blockdev driver=null-co,node-name=null -device virtio-blk-pci,drive=nu
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral/qdev_id/virtio-backend
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -106,7 +106,7 @@ Testing: -blockdev driver=null-co,node-name=null -device floppy,drive=null
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -124,7 +124,7 @@ Testing: -blockdev driver=null-co,node-name=null -device ide-cd,drive=null
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -142,7 +142,7 @@ Testing: -blockdev driver=null-co,node-name=null -device scsi-cd,drive=null
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -191,7 +191,7 @@ none0 (null): null-co:// (null-co)
-     Cache mode:       writeback
- 
- null: null-co:// (null-co)
--    Attached to:      /machine/peripheral/qdev_id/virtio-backend
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -241,7 +241,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device ide-hd,drive=none0
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -257,7 +257,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device scsi-hd,drive=none
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -273,7 +273,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device virtio-blk-pci,dri
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]/virtio-backend
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -281,7 +281,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device virtio-blk-pci,dri
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral/qdev_id/virtio-backend
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -289,7 +289,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device floppy,drive=none0
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -307,7 +307,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device ide-cd,drive=none0
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -325,7 +325,7 @@ Testing: -drive if=none,driver=null-co,node-name=null -device scsi-cd,drive=none
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0 (null): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -353,7 +353,7 @@ Testing: -drive if=none -device floppy,drive=none0
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0: [not inserted]
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -369,7 +369,7 @@ Testing: -drive if=none -device ide-cd,drive=none0
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0: [not inserted]
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -385,7 +385,7 @@ Testing: -drive if=none -device scsi-cd,drive=none0
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- none0: [not inserted]
--    Attached to:      /machine/peripheral-anon/device[1]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -404,7 +404,7 @@ Testing: -drive if=floppy
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- floppy0: [not inserted]
--    Attached to:      /machine/unattached/device[17]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -412,7 +412,7 @@ Testing: -drive if=floppy,driver=null-co
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- floppy0 (NODE_NAME): null-co:// (null-co)
--    Attached to:      /machine/unattached/device[17]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -421,7 +421,7 @@ Testing: -drive if=ide,driver=null-co
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- ide0-hd0 (NODE_NAME): null-co:// (null-co)
--    Attached to:      /machine/unattached/device[18]
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -429,7 +429,7 @@ Testing: -drive if=ide,media=cdrom
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- ide0-cd0: [not inserted]
--    Attached to:      /machine/unattached/device[18]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
- (qemu) quit
- 
-@@ -437,7 +437,7 @@ Testing: -drive if=ide,driver=null-co,media=cdrom
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
--    Attached to:      /machine/unattached/device[18]
-+    Attached to:      PATH
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- (qemu) quit
-@@ -446,7 +446,7 @@ Testing: -drive if=virtio,driver=null-co
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- virtio0 (NODE_NAME): null-co:// (null-co)
--    Attached to:      /machine/peripheral-anon/device[1]/virtio-backend
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-@@ -454,7 +454,7 @@ Testing: -drive if=pflash,driver=null-co,size=1M
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) info block
- pflash0 (NODE_NAME): json:{"driver": "null-co", "size": "1M"} (null-co)
--    Attached to:      /machine/unattached/device[2]
-+    Attached to:      PATH
-     Cache mode:       writeback
- (qemu) quit
- 
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index cb2be23340..c5f4bcf578 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -32,6 +32,11 @@ _filter_generated_node_ids()
-      sed -re 's/\#block[0-9]{3,}/NODE_NAME/'
- }
- 
-+_filter_qom_path()
-+{
-+    sed -e 's#\(Attached to: *\) /.*#\1 PATH#'
-+}
-+
- # replace occurrences of the actual TEST_DIR value with TEST_DIR
- _filter_testdir()
- {
 -- 
 2.11.0
