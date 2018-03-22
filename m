@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zijian@h3c.com>) id 1eyr9H-0007bv-2m
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:44:19 -0400
+	(envelope-from <famz@redhat.com>) id 1eyrCw-0000pt-4u
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zijian@h3c.com>) id 1eyr9D-0002GI-WA
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:44:19 -0400
-Received: from smtp.h3c.com ([60.191.123.56]:18267 helo=h3cmg01-ex.h3c.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zijian@h3c.com>) id 1eyr9D-0002CH-DX
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:44:15 -0400
-From: Zhangzijian <zhang.zijian@h3c.com>
-Date: Thu, 22 Mar 2018 03:44:00 +0000
-Message-ID: <BEF9E38582252C4BB07E4CB23BD2FB1C02287BDD65@H3CMLB12-EX.srv.huawei-3com.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] =?gb2312?b?IHNuYXBzaG90o7pjcmVhdGUgc25hcHNob3QgZm9y?=
- =?gb2312?b?IHJiZCBkaXNrIGZhaWxlZC4=?=
+	(envelope-from <famz@redhat.com>) id 1eyrCt-0003x7-2D
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:48:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56642 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eyrCs-0003x1-Sq
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:48:02 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 22 Mar 2018 11:47:53 +0800
+Message-Id: <20180322034753.6301-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests: Fix ubuntu.i386 image initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +21,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, eblake@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-SGVsbG8sDQoNCkluICdiZHJ2X2FsbF9jcmVhdGVfc25hcHNob3QnLCBlYWNoIGJsb2NrIHdpbGwg
-Y3JlYXRlIHNuYXBzaG90IGluIGEgZm9yIGxvb3AuIElmIGEgZG9tYWluIGNvbmZpZ3VyZWQgZGlz
-ayBtaXhlZCB3aXRoIHFjb3cyIGFuZCByYmQuDQpJbiAncWNvdzJfc25hcHNob3RfY3JlYXRlJywg
-c25faW5mby0+aWRfc3RyIHdpbGwgYmUgc2V0LiBCdXQgaW4gJ3FlbXVfcmJkX3NuYXBfY3JlYXRl
-JyB0aGUgJ2lkX3N0cicgaXMgY2hlY2tlZC4gDQpPbiB0aGlzIGNvbmRpdGlvbiwgJ2lkX3N0cicg
-Y2hlY2sgd2lsbCBiZSBmYWlsZWQuIFNpbmNlICdpZF9zdHInIGlzIHVzZWxlc3MgZm9yIHJiZCwg
-d2h5IHRoaXMgY2hlY2sgaXMgbmVlZGVkLCBDYW4gaXQgYmUgcmVtb3ZlZD8NCg0KIzAgIHFlbXVf
-cmJkX3NuYXBfY3JlYXRlIChicz0weDU1NTk2YTUxZWJhMCwgc25faW5mbz0weDdmZmY0YjBhMGQ2
-MCkgYXQgL3Jvb3QvY29kZS9xZW11XzIwMTgwMS9ibG9jay9yYmQuYzo5ODINCiMxICAweDAwMDA1
-NTU5NjdmY2ExNWUgaW4gYmRydl9zbmFwc2hvdF9jcmVhdGUgKGJzPTB4NTU1OTZhNTFlYmEwLCBz
-bl9pbmZvPTB4N2ZmZjRiMGEwZDYwKSBhdCAvcm9vdC9jb2RlL3FlbXVfMjAxODAxL2Jsb2NrL3Nu
-YXBzaG90LmM6MTcxDQojMiAgMHgwMDAwNTU1OTY3ZmNhMThkIGluIGJkcnZfc25hcHNob3RfY3Jl
-YXRlIChicz0weDU1NTk2YTUxODg5MCwgc25faW5mbz0weDdmZmY0YjBhMGQ2MCkgYXQgL3Jvb3Qv
-Y29kZS9xZW11XzIwMTgwMS9ibG9jay9zbmFwc2hvdC5jOjE3NA0KIzMgIDB4MDAwMDU1NTk2N2Zj
-YWY0MyBpbiBiZHJ2X2FsbF9jcmVhdGVfc25hcHNob3QgKHNuPTB4N2ZmZjRiMGEwZDYwLCB2bV9z
-dGF0ZV9icz0weDU1NTk2YTUwOTc1MCwgdm1fc3RhdGVfc2l6ZT0wLCBmaXJzdF9iYWRfYnM9MHg3
-ZmZmNGIwYTBkMTApDQogICAgYXQgL3Jvb3QvY29kZS9xZW11XzIwMTgwMS9ibG9jay9zbmFwc2hv
-dC5jOjUzMQ0KIzQgIDB4MDAwMDU1NTk2N2VkOTM2MiBpbiBzYXZlX3NuYXBzaG90IChuYW1lPTB4
-NTU1OTZiYzM3YmYwICJzbmFwMSIsIG5vc3RhdGU9dHJ1ZSwgZXJycD0weDdmZmY0YjBhMTBjMCkg
-YXQgL3Jvb3QvY29kZS9xZW11XzIwMTgwMS9taWdyYXRpb24vc2F2ZXZtLmM6MjI1Ng0KIzUgIDB4
-MDAwMDU1NTk2N2NhOWFkNyBpbiBobXBfc2F2ZXZtIChtb249MHg3ZmZmNGIwYTExODAsIHFkaWN0
-PTB4NTU1OTZhZjQwZDYwKSBhdCAvcm9vdC9jb2RlL3FlbXVfMjAxODAxL2htcC5jOjEzMzQNCiM2
-ICAweDAwMDA1NTU5NjdiMGYwMzQgaW4gaGFuZGxlX2htcF9jb21tYW5kIChtb249MHg3ZmZmNGIw
-YTExODAsIGNtZGxpbmU9MHg1NTU5NmI0NzQxZTcgIi1uIHNuYXAxIikgYXQgL3Jvb3QvY29kZS9x
-ZW11XzIwMTgwMS9tb25pdG9yLmM6MzExMA0KIzcgIDB4MDAwMDU1NTk2N2IwODcyYiBpbiBxbXBf
-aHVtYW5fbW9uaXRvcl9jb21tYW5kIChjb21tYW5kX2xpbmU9MHg1NTU5NmI0NzQxZTAgInNhdmV2
-bSAtbiBzbmFwMSIsIGhhc19jcHVfaW5kZXg9ZmFsc2UsIGNwdV9pbmRleD0wLCBlcnJwPTB4N2Zm
-ZjRiMGExMmYwKQ0KICAgIGF0IC9yb290L2NvZGUvcWVtdV8yMDE4MDEvbW9uaXRvci5jOjYxNA0K
-DQo=
+The apt-get commands we run through ssh expect certain features of the
+tty, and refuses to work if /dev/null is used. It is ugly, but easy to
+satisfy.
+
+Actually, there is no reason to hide the output. It just makes things
+harder to diagnose. We can always redirect in the Makefile, so don't do
+it conditionally here.
+
+Reported-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/vm/basevm.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 686d88decf..3a2d508c35 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -107,10 +107,7 @@ class BaseVM(object):
+         assert not isinstance(cmd, str)
+         ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
+         logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+-        r = subprocess.call(ssh_cmd,
+-                            stdin=sys.stdin if interactive else self._devnull,
+-                            stdout=sys.stdout if interactive else self._stdout,
+-                            stderr=sys.stderr if interactive else self._stderr)
++        r = subprocess.call(ssh_cmd)
+         if check and r != 0:
+             raise Exception("SSH command failed: %s" % cmd)
+         return r
+-- 
+2.14.3
