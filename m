@@ -1,35 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eyqcn-0007R8-75
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:10:46 -0400
+	(envelope-from <wei@redhat.com>) id 1eyqeP-0008LT-0b
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eyqcj-0003Sr-Ul
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:10:45 -0400
-Received: from mga06.intel.com ([134.134.136.31]:26005)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eyqcj-0003Rf-HF
-	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:10:41 -0400
-Message-ID: <5AB31F68.8000605@intel.com>
-Date: Thu, 22 Mar 2018 11:13:44 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1521197309-13544-1-git-send-email-wei.w.wang@intel.com>
-	<1521197309-13544-5-git-send-email-wei.w.wang@intel.com>
-	<20180316165319-mutt-send-email-mst@kernel.org>
-	<5AAE4124.5010602@intel.com>
-	<20180319062023-mutt-send-email-mst@kernel.org>
-	<5AAF7C72.5070403@intel.com>
-	<20180320004900-mutt-send-email-mst@kernel.org>
-	<5AB06EE9.1030306@intel.com>
-	<20180320045134-mutt-send-email-mst@kernel.org>
-	<5AB07D7F.90205@intel.com>
-	<20180320051840-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180320051840-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v5 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+	(envelope-from <wei@redhat.com>) id 1eyqeO-0004Fv-5c
+	for qemu-devel@nongnu.org; Wed, 21 Mar 2018 23:12:24 -0400
+From: Wei Huang <wei@redhat.com>
+Date: Wed, 21 Mar 2018 22:12:16 -0500
+Message-Id: <20180322031216.14569-1-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/1] mach-virt: Set VM's SMBIOS system version
+ to mc->desc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,114 +18,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, drjones@redhat.com
 
-On 03/20/2018 11:24 AM, Michael S. Tsirkin wrote:
-> On Tue, Mar 20, 2018 at 11:18:23AM +0800, Wei Wang wrote:
->> On 03/20/2018 10:59 AM, Michael S. Tsirkin wrote:
->>> On Tue, Mar 20, 2018 at 10:16:09AM +0800, Wei Wang wrote:
->>>> On 03/20/2018 06:55 AM, Michael S. Tsirkin wrote:
->>>>> On Mon, Mar 19, 2018 at 05:01:38PM +0800, Wei Wang wrote:
->>>>>> On 03/19/2018 12:24 PM, Michael S. Tsirkin wrote:
->>>>>>> On Sun, Mar 18, 2018 at 06:36:20PM +0800, Wei Wang wrote:
->>>>>>>> On 03/16/2018 11:16 PM, Michael S. Tsirkin wrote:
->>>>>>>>> On Fri, Mar 16, 2018 at 06:48:28PM +0800, Wei Wang wrote:
->>>>>>> OTOH it seems that if thread stops nothing will wake it up
->>>>>>> whem vm is restarted. Such bahaviour change across vmstop/vmstart
->>>>>>> is unexpected.
->>>>>>> I do not understand why we want to increment the counter
->>>>>>> on vm stop though. It does make sense to stop the thread
->>>>>>> but why not resume where we left off when vm is resumed?
->>>>>>>
->>>>>> I'm not sure which counter we incremented. But it would be clear if we have
->>>>>> a high level view of how it works (it is symmetric actually). Basically, we
->>>>>> start the optimization when each round starts and stop it at the end of each
->>>>>> round (i.e. before we do the bitmap sync), as shown below:
->>>>>>
->>>>>> 1) 1st Round starts --> free_page_start
->>>>>> 2) 1st Round in progress..
->>>>>> 3) 1st Round ends  --> free_page_stop
->>>>>> 4) 2nd Round starts --> free_page_start
->>>>>> 5) 2nd Round in progress..
->>>>>> 6) 2nd Round ends --> free_page_stop
->>>>>> ......
->>>>>>
->>>>>> For example, in 2), the VM is stopped. virtio_balloon_poll_free_page_hints
->>>>>> finds the vq is empty (i.e. elem == NULL) and the runstate is stopped, the
->>>>>> optimization thread exits immediately. That is, this optimization thread is
->>>>>> gone forever (the optimization we can do for this round is done). We won't
->>>>>> know when would the VM be woken up:
->>>>>> A) If the VM is woken up very soon when the migration thread is still in
->>>>>> progress of 2), then in 4) a new optimization thread (not the same one for
->>>>>> the first round) will be created and start the optimization for the 2nd
->>>>>> round as usual (If you have questions about 3) in this case, that
->>>>>> free_page_stop will do nothing than just return, since the optimization
->>>>>> thread has exited) ;
->>>>>> B) If the VM is woken up after the whole migration has ended, there is still
->>>>>> no point in resuming the optimization.
->>>>>>
->>>>>> I think this would be the simple design for the first release of this
->>>>>> optimization. There are possibilities to improve case A) above by continuing
->>>>>> optimization for the 1st Round as it is still in progress, but I think
->>>>>> adding that complexity for this rare case wouldn't be worthwhile (at least
->>>>>> for now). What would you think?
->>>>>>
->>>>>>
->>>>>> Best,
->>>>>> Wei
->>>>> In my opinion this just makes the patch very messy.
->>>>>
->>>>> E.g. attempts to attach a debugger to the guest will call vmstop and
->>>>> then behaviour changes. This is a receipe for heisenbugs which are then
->>>>> extremely painful to debug.
->>>>>
->>>>> It is not really hard to make things symmetrical:
->>>>> e.g. if you stop on vmstop then you should start on vmstart, etc.
->>>>> And stopping thread should not involve a bunch of state
->>>>> changes, just stop it and that's it.
->>>>>
->>>> "stop it" - do you mean to
->>>> 1) make the thread exit (i.e.make virtio_balloon_poll_free_page_hints exit
->>>> the while loop and return NULL); or
->>>> 2) keep the thread staying in the while loop but yield running (e.g.
->>>> sleep(1) or block on a mutex)? (or please let me know if you suggested a
->>>> different implementation about stopping the thread)
->>> I would say it makes more sense to make it block on something.
->>>
->>> BTW I still think you are engaging in premature optimization here.
->>> What you are doing here is a "data plane for balloon".
->>> I would make the feature work first by processing this in a BH.
->>> Creating threads immediately opens up questions of isolation,
->>> cgroups etc.
->>>
->> Could you please share more about how creating threads affects isolation and
->> cgroup?
-> When threads are coming and going, they are hard to control.
->
-> Consider the rich API libvirt exposes for controlling the io threads:
->
-> https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
->
->
->> and how does BH solve it? Thanks.
->> Best,
->> Wei
-> It's late at night so I don't remember whether it's the emulator
-> or the io thread that runs the BH, but the point is it's
-> already controlled by libvirt.
->
+Instead of using "1.0" as the system version of SMBIOS, we should use
+mc->desc for mach-virt machine type. With this patch, "dmidecode -t 1"
+(e.g., "-M virt-2.12,accel=kvm") will show:
 
-OK. I've tried to implement it this way: create an iothread via the qemu 
-cmdline option: --device 
-virtio-balloon,free-page-hint=true,iothread=iothread10, and schedule a 
-BH to run in the iothread context when free_page_start() is called.
+    Handle 0x0100, DMI type 1, 27 bytes
+    System Information
+            Manufacturer: QEMU
+            Product Name: KVM Virtual Machine
+            Version: QEMU 2.12 ARM Virtual Machine
+            Serial Number: Not Specified
+            ...
 
-I think the drawback of this method is that the iothread exists during 
-the whole QEMU lifetime, which wastes CPU cycles (e.g. when live 
-migration isn't in progress). The method in v5 is like migration thread, 
-which comes only when the migration request is received and goes when 
-migration is done. Any thought?
+instead of:
+    Handle 0x0100, DMI type 1, 27 bytes
+    System Information
+            Manufacturer: QEMU
+            Product Name: KVM Virtual Machine
+            Version: 1.0
+            Serial Number: Not Specified
+            ...
 
-Best,
-Wei
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ hw/arm/virt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 2c07245047..da7228b297 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1132,6 +1132,7 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+ 
+ static void virt_build_smbios(VirtMachineState *vms)
+ {
++    MachineClass *mc = MACHINE_GET_CLASS(vms);
+     uint8_t *smbios_tables, *smbios_anchor;
+     size_t smbios_tables_len, smbios_anchor_len;
+     const char *product = "QEMU Virtual Machine";
+@@ -1145,7 +1146,7 @@ static void virt_build_smbios(VirtMachineState *vms)
+     }
+ 
+     smbios_set_defaults("QEMU", product,
+-                        "1.0", false, true, SMBIOS_ENTRY_POINT_30);
++                        mc->desc, false, true, SMBIOS_ENTRY_POINT_30);
+ 
+     smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
+                       &smbios_anchor, &smbios_anchor_len);
+-- 
+2.14.3
