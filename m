@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ez3GX-0002Ry-DZ
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:40:39 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ez3Hi-0003Lc-Bf
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ez3GS-00010R-Rn
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:40:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46854 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ez3GS-0000zY-9T
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:40:32 -0400
-Date: Thu, 22 Mar 2018 18:40:18 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180322181952-mutt-send-email-mst@kernel.org>
-References: <20180319071537.28649-1-tiwei.bie@intel.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ez3Hh-0001Y3-Hf
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:41:50 -0400
+References: <20180322152834.12656-1-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c80e31f8-b049-6634-6eb5-c81914983922@redhat.com>
+Date: Thu, 22 Mar 2018 17:41:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180319071537.28649-1-tiwei.bie@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Extend vhost-user to support VFIO
- based accelerators
+In-Reply-To: <20180322152834.12656-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] coroutine: avoid co_queue_wakeup
+ recursion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,181 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, Mar 19, 2018 at 03:15:31PM +0800, Tiwei Bie wrote:
-> This patch set does some small extensions to vhost-user protocol
-> to support VFIO based accelerators, and makes it possible to get
-> the similar performance of VFIO based PCI passthru while keeping
-> the virtio device emulation in QEMU.
+On 22/03/2018 16:28, Stefan Hajnoczi wrote:
+> co_queue_wakeup is currently implemented in a recursive fashion.  Pathological
+> patterns of aio_co_enter() between coroutines can cause stack exhaustion.
 > 
-> How does accelerator accelerate vhost (data path)
-> =================================================
+> This patch series implements co_queue_wakeup iteratively and avoids stack
+> exhaustion.
 > 
-> Any virtio ring compatible devices potentially can be used as the
-> vhost data path accelerators. We can setup the accelerator based
-> on the informations (e.g. memory table, features, ring info, etc)
-> available on the vhost backend. And accelerator will be able to use
-> the virtio ring provided by the virtio driver in the VM directly.
-> So the virtio driver in the VM can exchange e.g. network packets
-> with the accelerator directly via the virtio ring. That is to say,
-> we will be able to use the accelerator to accelerate the vhost
-> data path. We call it vDPA: vhost Data Path Acceleration.
+> This issue was originally reported with qemu-img convert but I don't have a
+> good reproducer.  See Patch 3 for a test-aio test case instead.
 > 
-> Notice: Although the accelerator can talk with the virtio driver
-> in the VM via the virtio ring directly. The control path events
-> (e.g. device start/stop) in the VM will still be trapped and handled
-> by QEMU, and QEMU will deliver such events to the vhost backend
-> via standard vhost protocol.
+> Stefan Hajnoczi (3):
+>   queue: add QSIMPLEQ_PREPEND()
+>   coroutine: avoid co_queue_wakeup recursion
+>   coroutine: add test-aio coroutine queue chaining test case
 > 
-> Below link is an example showing how to setup a such environment
-> via nested VM. In this case, the virtio device in the outer VM is
-> the accelerator. It will be used to accelerate the virtio device
-> in the inner VM. In reality, we could use virtio ring compatible
-> hardware device as the accelerators.
+>  include/qemu/coroutine_int.h |   1 -
+>  include/qemu/queue.h         |   8 ++++
+>  block/io.c                   |   3 +-
+>  tests/test-aio.c             |  65 ++++++++++++++++++++-----
+>  util/qemu-coroutine-lock.c   |  34 -------------
+>  util/qemu-coroutine.c        | 110 +++++++++++++++++++++++--------------------
+>  6 files changed, 120 insertions(+), 101 deletions(-)
 > 
-> http://dpdk.org/ml/archives/dev/2017-December/085044.html
 
-I understand that it might be challenging due to
-the tight coupling with VFIO. Still - isn't there
-a way do make it easier to set a testing rig up?
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-In particular can we avoid the dpdk requirement for testing?
+I was a little surprised by the disappearing of the "do not use co
+anymore" comments, but they seem unnecessary indeed with the new code.
 
-
-
-> In above example, it doesn't require any changes to QEMU, but
-> it has lower performance compared with the traditional VFIO
-> based PCI passthru. And that's the problem this patch set wants
-> to solve.
-> 
-> The performance issue of vDPA/vhost-user and solutions
-> ======================================================
-> 
-> For vhost-user backend, the critical issue in vDPA is that the
-> data path performance is relatively low and some host threads are
-> needed for the data path, because some necessary mechanisms are
-> missing to support:
-> 
-> 1) guest driver notifies the device directly;
-> 2) device interrupts the guest directly;
-> 
-> So this patch set does some small extensions to the vhost-user
-> protocol to make both of them possible. It leverages the same
-> mechanisms (e.g. EPT and Posted-Interrupt on Intel platform) as
-> the PCI passthru.
-
-Not all platforms support posted interrupts, and EPT isn't
-required for MMIO to be mapped to devices.
-
-It probably makes sense to separate the more portable
-host notification offload from the less portable
-guest notification offload.
-
-
-
-> A new protocol feature bit is added to negotiate the accelerator
-> feature support. Two new slave message types are added to control
-> the notify region and queue interrupt passthru for each queue.
-> >From the view of vhost-user protocol design, it's very flexible.
-> The passthru can be enabled/disabled for each queue individually,
-> and it's possible to accelerate each queue by different devices.
-> More design and implementation details can be found from the last
-> patch.
-> 
-> Difference between vDPA and PCI passthru
-> ========================================
-> 
-> The key difference between PCI passthru and vDPA is that, in vDPA
-> only the data path of the device (e.g. DMA ring, notify region and
-> queue interrupt) is pass-throughed to the VM, the device control
-> path (e.g. PCI configuration space and MMIO regions) is still
-> defined and emulated by QEMU.
-> 
-> The benefits of keeping virtio device emulation in QEMU compared
-> with virtio device PCI passthru include (but not limit to):
-> 
-> - consistent device interface for guest OS in the VM;
-> - max flexibility on the hardware (i.e. the accelerators) design;
-> - leveraging the existing virtio live-migration framework;
-> 
-> Why extend vhost-user for vDPA
-> ==============================
-> 
-> We have already implemented various virtual switches (e.g. OVS-DPDK)
-> based on vhost-user for VMs in the Cloud. They are purely software
-> running on CPU cores. When we have accelerators for such NFVi applications,
-> it's ideal if the applications could keep using the original interface
-> (i.e. vhost-user netdev) with QEMU, and infrastructure is able to decide
-> when and how to switch between CPU and accelerators within the interface.
-> And the switching (i.e. switch between CPU and accelerators) can be done
-> flexibly and quickly inside the applications.
-> 
-> More details about this can be found from the Cunming's discussions on
-> the RFC patch set.
-> 
-> Update notes
-> ============
-> 
-> IOMMU feature bit check is removed in this version, because:
-> 
-> The IOMMU feature is negotiable, when an accelerator is used and
-> it doesn't support virtual IOMMU, its driver just won't provide
-> this feature bit when vhost library querying its features. And if
-> it supports the virtual IOMMU, its driver can provide this feature
-> bit. It's not reasonable to add this limitation in this patch set.
-
-Fair enough. Still:
-Can hardware on intel platforms actually support IOTLB requests?
-Don't you need to add support for vIOMMU shadowing instead?
-
-
-> The previous links:
-> RFC: http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg04844.html
-> v1:  http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg06028.html
-> 
-> v1 -> v2:
-> - Add some explanations about why extend vhost-user in commit log (Paolo);
-> - Bug fix in slave_read() according to Stefan's fix in DPDK;
-> - Remove IOMMU feature check and related commit log;
-> - Some minor refinements;
-> - Rebase to the latest QEMU;
-> 
-> RFC -> v1:
-> - Add some details about how vDPA works in cover letter (Alexey)
-> - Add some details about the OVS offload use-case in cover letter (Jason)
-> - Move PCI specific stuffs out of vhost-user (Jason)
-> - Handle the virtual IOMMU case (Jason)
-> - Move VFIO group management code into vfio/common.c (Alex)
-> - Various refinements;
-> (approximately sorted by comment posting time)
-> 
-> Tiwei Bie (6):
->   vhost-user: support receiving file descriptors in slave_read
->   vhost-user: introduce shared vhost-user state
->   virtio: support adding sub-regions for notify region
->   vfio: support getting VFIOGroup from groupfd
->   vfio: remove DPRINTF() definition from vfio-common.h
->   vhost-user: add VFIO based accelerators support
-> 
->  Makefile.target                 |   4 +
->  docs/interop/vhost-user.txt     |  57 +++++++++
->  hw/scsi/vhost-user-scsi.c       |   6 +-
->  hw/vfio/common.c                |  97 +++++++++++++++-
->  hw/virtio/vhost-user.c          | 248 +++++++++++++++++++++++++++++++++++++++-
->  hw/virtio/virtio-pci.c          |  48 ++++++++
->  hw/virtio/virtio-pci.h          |   5 +
->  hw/virtio/virtio.c              |  39 +++++++
->  include/hw/vfio/vfio-common.h   |  11 +-
->  include/hw/virtio/vhost-user.h  |  34 ++++++
->  include/hw/virtio/virtio-scsi.h |   6 +-
->  include/hw/virtio/virtio.h      |   5 +
->  include/qemu/osdep.h            |   1 +
->  net/vhost-user.c                |  30 ++---
->  scripts/create_config           |   3 +
->  15 files changed, 561 insertions(+), 33 deletions(-)
->  create mode 100644 include/hw/virtio/vhost-user.h
-> 
-> -- 
-> 2.11.0
+Paolo
