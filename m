@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ez5HQ-0005kB-Bl
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:49:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ez5TF-00021O-Bw
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ez5HN-00017D-AT
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:49:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42684)
+	(envelope-from <ehabkost@redhat.com>) id 1ez5TC-0001cB-A2
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:01:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48194)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ez5HN-000170-3k
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:49:37 -0400
-Date: Thu, 22 Mar 2018 15:49:33 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ez5TC-0001bj-5D
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 15:01:50 -0400
+Date: Thu, 22 Mar 2018 16:01:46 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180322184933.GI3417@localhost.localdomain>
+Message-ID: <20180322190146.GA1396@localhost.localdomain>
 References: <20180322131358.15096-1-vkuznets@redhat.com>
 	<20180322131358.15096-3-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Richard Henderson <rth@twiddle.net>
 
 On Thu, Mar 22, 2018 at 02:13:58PM +0100, Vitaly Kuznetsov wrote:
 > We can also expose Hyper-V frequency MSRs when reenlightenment feature is
@@ -54,19 +54,35 @@ On Thu, Mar 22, 2018 at 02:13:58PM +0100, Vitaly Kuznetsov wrote:
 >  
 > -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
 > +        if (has_msr_hv_frequencies && env->tsc_khz &&
-
-Why is the check for env->tsc_khz necessary?
-
-Are there known circumstances where HV_X64_MSR_TSC_FREQUENCY will be supported
-by KVM but ioctl(KVM_GET_TSC_KHZ) will return 0, or this is just for extra
-safety?
-
 > +            (tsc_is_stable_and_known(env) || cpu->hyperv_reenlightenment)) {
+
+Continuing the discussion we had in v3 about being possible to
+crash when migrating to a host running an older kernel:
+
+This patch doesn't fix the issue, because it is still implicitly
+enabling hv-frequencies.
+
+But I don't think this patch will make the situation any worse,
+because we don't have any KVM versions that support
+HV_X64_MSR_REENLIGHTENMENT_CONTROL but not
+HV_X64_MSR_TSC_FREQUENCY.
+
+This means that we can safely make "hv-reenlightenment=on"
+automatically set "hv-frequencies=on", when we finally introduce
+a hv-frequencies property.
+
+Roman, do you agree?
+
+The next question is: do we need to fix this and introduce a
+hv-frequencies property in 2.12, or can this wait for 2.13?
+
+
 >              env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
 >              env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
 >          }
 > -- 
 > 2.14.3
+> 
 > 
 
 -- 
