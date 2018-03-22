@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ez3LB-0004hQ-3V
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:45:26 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ez3LM-0004uq-PU
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ez3LA-0002kp-32
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:45:25 -0400
-References: <20180322161226.29796-1-lvivier@redhat.com>
-	<20180322161226.29796-5-lvivier@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5a2e612c-368c-bc36-a852-0ce29bc36ab4@redhat.com>
-Date: Thu, 22 Mar 2018 11:45:02 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ez3LL-0002r4-M7
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:45:36 -0400
+References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
+	<20180321121940.39426-5-vsementsov@virtuozzo.com>
+	<8b6eccd8-90ee-3475-5005-df9f59f59709@redhat.com>
+	<f3f02fac-35d9-2a4d-0fef-ba66f75aa929@virtuozzo.com>
+	<eb213846-5a39-fcae-4a1b-ca10fced25b8@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3ad3aa0c-963f-8df7-92dd-c922a7864d5f@virtuozzo.com>
+Date: Thu, 22 Mar 2018 19:45:21 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180322161226.29796-5-lvivier@redhat.com>
+In-Reply-To: <eb213846-5a39-fcae-4a1b-ca10fced25b8@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] Remove unnecessary variables for
- function return value
+Subject: Re: [Qemu-devel] [PATCH 4/4] qapi: new qmp command
+ nbd-server-add-bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 03/22/2018 11:12 AM, Laurent Vivier wrote:
-> Re-run Coccinelle script scripts/coccinelle/return_directly.cocci
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
+22.03.2018 19:19, Eric Blake wrote:
+> On 03/22/2018 10:43 AM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>>>> +# Returns: error on one of the following conditions:
+>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - the s=
+erver is not running
+>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - expor=
+t is not found
+>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - bitma=
+p is not found
+>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - bitma=
+p is disabled
+>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - bitma=
+p is locked
+>>>
+>>> Do we really need to list all the error conditions?=C2=A0 My worry is=20
+>>> that a list this specific might go stale, compared to the obvious=20
+>>> default that the command succeeds only if it was able to expose the=20
+>>> bitmap and that the error message is specific enough for a human to=20
+>>> figure out what to fix if it failed.
+>>
+>>
+>> Hmm, I've just doing it similar with other commands in the file. Is=20
+>> there any requirements on this part of qapi documentation? I can=20
+>> write only "# Returns: nothing on success" line, is it appropriate?=20
+>> blockdev-mirror do so, but other commands tries to describe errors.=20
+>> Looks like we lack some specified format for return code description=20
+>> like we have for parameters..
+>
+> Yeah, for returns, it's been very ad hoc.=C2=A0 My personal feel (althoug=
+h=20
+> it's not very well documented and certainly not enforced): all=20
+> commands can reasonably return errors, presumably for a good reason;=20
+> but exhaustively auditing WHICH errors is a huge task with little=20
+> benefits. A few commands return non-generic errors, but if all error=20
+> paths used error_setg(), there's nothing that a machine can do to tell=20
+> the difference between the errors, so documenting different error=20
+> reasons doesn't add much.
+>
+> Thus, if a command returns nothing on success, I'm fine with omitting=20
+> 'Returns:' entirely, and the doc generator permits that. But if you=20
+> have bothered to list Returns: for certain errors, I'm not going to=20
+> blindly throw away the documentation work, even though the list may=20
+> become incomplete over time.
+>
 
-> +++ b/hw/arm/exynos4210.c
-> @@ -156,12 +156,7 @@ void exynos4210_write_secondary(ARMCPU *cpu,
->   
->   static uint64_t exynos4210_calc_affinity(int cpu)
->   {
-> -    uint64_t mp_affinity;
-> -
-> -    /* Exynos4210 has 0x9 as cluster ID */
-> -    mp_affinity = (0x9 << ARM_AFF1_SHIFT) | cpu;
-> -
-> -    return mp_affinity;
-> +    return (0x9 << ARM_AFF1_SHIFT) | cpu;
+So, only something interesting worth documenting.
 
-Unchanged by this rewrite, but since this is converting a signed 32-bit 
-int to an unsigned 64-bit value, are we sure that the upper 32 bits are 
-always set correctly?  (Using unsigned values earlier in the expression 
-would require less head-scratching on whether it is correct).  Any 
-changes should be a separate fix by the file's maintainer.
+Hmm, interesting: consider for example bloc-dirty-bitmap-remove. It says:
+# Returns: nothing on success
+#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 If @node is not a v=
+alid block device or node, DeviceNotFound
 
+But the code uses bdrv_lookup_bs, which uses simple error_setg, so it=20
+will return GenericError, isn't it? And, it's not the only place..
 
-> +++ b/hw/misc/mos6522.c
-> @@ -176,12 +176,8 @@ static void mos6522_set_sr_int(MOS6522State *s)
->   
->   static uint64_t mos6522_get_counter_value(MOS6522State *s, MOS6522Timer *ti)
->   {
-> -    uint64_t d;
-> -
-> -    d = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
-> +    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
->                    ti->frequency, NANOSECONDS_PER_SECOND);
-
-Coccinelle missed that indentation is now off here.
-
-> +++ b/hw/ppc/pnv_lpc.c
-> @@ -125,25 +125,15 @@ static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom_offset)
->   static bool opb_read(PnvLpcController *lpc, uint32_t addr, uint8_t *data,
->                        int sz)
->   {
-> -    bool success;
-> -
-> -    /* XXX Handle access size limits and FW read caching here */
-> -    success = !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-> +    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
->                                   data, sz, false);
-
-and here.
-
-> +++ b/target/xtensa/translate.c
-> @@ -1272,11 +1272,8 @@ XtensaOpcodeOps *
->   xtensa_find_opcode_ops(const XtensaOpcodeTranslators *t,
->                          const char *name)
->   {
-> -    XtensaOpcodeOps *ops;
-> -
-> -    ops = bsearch(name, t->opcode, t->num_opcodes,
-> +    return bsearch(name, t->opcode, t->num_opcodes,
->                     sizeof(XtensaOpcodeOps), compare_opcode_ops);
-
-and here
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--=20
+Best regards,
+Vladimir
