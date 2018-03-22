@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ez6od-0005ae-Md
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:28:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ez6uz-0008Ha-JD
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ez6oZ-0001Lb-Jx
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:28:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ez6oZ-0001Jc-Cw
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:27:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ez6oX-0001m7-EM
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 20:27:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 12DC82E8D5A
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 20:27:57 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1ez6uy-0004nV-I7
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 16:34:37 -0400
+References: <1521642402-197739-1-git-send-email-mst@redhat.com>
+	<20180321153439.GC3898@localhost.localdomain>
+	<20180321175452-mutt-send-email-mst@kernel.org>
+	<20180321162203.GE3898@localhost.localdomain>
+	<20180322211902-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aba29cf7-637a-c967-9b2f-59060a1c1330@redhat.com>
+Date: Thu, 22 Mar 2018 21:33:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180322211902-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Mar 2018 20:16:41 -0000
-From: LukeShu <lukeshu@lukeshu.com>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152174980115.21901.13133122144636261339.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+Subject: Re: [Qemu-devel] [PATCH v2] qemu: replace "" with <> in headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-This is now fixed on master, as of
-3be2e41b3323169852dca11ffe6ff772c33e5aaa.
+On 22/03/2018 20:29, Michael S. Tsirkin wrote:
+> On Wed, Mar 21, 2018 at 05:22:03PM +0100, Kevin Wolf wrote:
+>>> It's all still very much a non-standard convention and so less robust
+>>> than prefixing file name with a project-specifix prefix.
+>> I've always had the impression that it's by far the most common
+>> convention, to the point that I'd blindly assume it when joining a new
+>> project.
+>=20
+> Any examples?
 
--- =
+GCC - https://github.com/gcc-mirror/gcc/blob/master/gcc/reload.c
+Libvirt - https://github.com/libvirt/libvirt/blob/master/src/util/virproc=
+ess.c
+SDL - https://github.com/SDL-mirror/SDL/blob/master/src/core/unix/SDL_pol=
+l.c
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
+Anything but Linux really.
 
-Title:
-  static linux-user ARM emulation has several-second startup time
+I find <qemu/foo/bar.h> verbose and unnecessary.  The only advantage
+of your proposal is that files included from the source directory would b=
+e
+clearly noticeable.  That said, it's easy to add a checkpatch.pl rule tha=
+t
+detects when ".../..." is used on a file not under include/.
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+Paolo
