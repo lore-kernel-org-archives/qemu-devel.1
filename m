@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1eysoq-0000ah-OV
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:31:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1eyt0I-0003rS-9M
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1eysom-0002yI-Ly
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:31:20 -0400
-Received: from phx2.ddci.com ([184.183.10.180]:56384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alarson@ddci.com>) id 1eysom-0002p1-5X
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:31:16 -0400
-In-Reply-To: <CAFEAcA9hNNT_ooL+YKsU-V8X_FKT9x-ca+ae03DtybV13s7GoA@mail.gmail.com>
-References: <OF802C7AAD.A9501847-ON0625823D.000350FE-0625823D.0003998B@ddci.com>
-	<CAFEAcA9hNNT_ooL+YKsU-V8X_FKT9x-ca+ae03DtybV13s7GoA@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1eyt0E-00011y-Ar
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:43:10 -0400
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-44-marcandre.lureau@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <16df2073-4c45-1ca8-5477-5c9a5de26a57@redhat.com>
+Date: Thu, 22 Mar 2018 06:42:44 +0100
 MIME-Version: 1.0
-From: alarson@ddci.com
-Message-ID: <OF03E560EC.20D03DEC-ON88258258.001D166A-86258258.001E50AC@ddci.com>
-Date: Wed, 21 Mar 2018 22:31:07 -0700
-Content-Type: multipart/mixed; boundary="=_mixed 001E504586258258_="
-Subject: Re: [Qemu-devel] -icount changes physical address assignments in
- QEMU 2.10/2.11
+In-Reply-To: <20180321115211.17937-44-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 43/49] qapi: make s390 commands depend
+ on TARGET_S390X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,420 +25,445 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: armbru@redhat.com, Qemu-s390x list <qemu-s390x@nongnu.org>
 
---=_mixed 001E504586258258_=
-Content-Type: text/plain; charset="US-ASCII"
+On 21.03.2018 12:52, Marc-Andr=C3=A9 Lureau wrote:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  qapi/misc.json                          | 101 ----------------------
+>  qapi/target.json                        | 106 ++++++++++++++++++++++++
+>  include/sysemu/arch_init.h              |   7 --
+>  hw/s390x/s390-skeys.c                   |   2 +-
+>  monitor.c                               |  14 ----
+>  qmp.c                                   |  14 ----
+>  stubs/arch-query-cpu-model-baseline.c   |  13 ---
+>  stubs/arch-query-cpu-model-comparison.c |  13 ---
+>  target/s390x/cpu_models.c               |   5 +-
+>  stubs/Makefile.objs                     |   2 -
+>  10 files changed, 110 insertions(+), 167 deletions(-)
+>  delete mode 100644 stubs/arch-query-cpu-model-baseline.c
+>  delete mode 100644 stubs/arch-query-cpu-model-comparison.c
+>=20
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 690eeda41f..1753a81b1e 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1821,27 +1821,6 @@
+>  { 'command': 'query-dump-guest-memory-capability',
+>    'returns': 'DumpGuestMemoryCapability' }
+> =20
+> -##
+> -# @dump-skeys:
+> -#
+> -# Dump guest's storage keys
+> -#
+> -# @filename: the path to the file to dump to
+> -#
+> -# This command is only supported on s390 architecture.
+> -#
+> -# Since: 2.5
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "dump-skeys",
+> -#      "arguments": { "filename": "/tmp/skeys" } }
+> -# <- { "return": {} }
+> -#
+> -##
+> -{ 'command': 'dump-skeys',
+> -  'data': { 'filename': 'str' } }
+> -
+>  ##
+>  # @object-add:
+>  #
+> @@ -2208,46 +2187,6 @@
+>            }
+>  }
+> =20
+> -##
+> -# @query-cpu-model-comparison:
+> -#
+> -# Compares two CPU models, returning how they compare in a specific
+> -# configuration. The results indicates how both models compare regardi=
+ng
+> -# runnability. This result can be used by tooling to make decisions if=
+ a
+> -# certain CPU model will run in a certain configuration or if a compat=
+ible
+> -# CPU model has to be created by baselining.
+> -#
+> -# Usually, a CPU model is compared against the maximum possible CPU mo=
+del
+> -# of a certain configuration (e.g. the "host" model for KVM). If that =
+CPU
+> -# model is identical or a subset, it will run in that configuration.
+> -#
+> -# The result returned by this command may be affected by:
+> -#
+> -# * QEMU version: CPU models may look different depending on the QEMU =
+version.
+> -#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> -# * machine-type: CPU model may look different depending on the machin=
+e-type.
+> -#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> -# * machine options (including accelerator): in some architectures, CP=
+U models
+> -#   may look different depending on machine and accelerator options. (=
+Except for
+> -#   CPU models reported as "static" in query-cpu-definitions.)
+> -# * "-cpu" arguments and global properties: arguments to the -cpu opti=
+on and
+> -#   global properties may affect expansion of CPU models. Using
+> -#   query-cpu-model-expansion while using these is not advised.
+> -#
+> -# Some architectures may not support comparing CPU models. s390x suppo=
+rts
+> -# comparing CPU models.
+> -#
+> -# Returns: a CpuModelBaselineInfo. Returns an error if comparing CPU m=
+odels is
+> -#          not supported, if a model cannot be used, if a model contai=
+ns
+> -#          an unknown cpu definition name, unknown properties or prope=
+rties
+> -#          with wrong types.
+> -#
+> -# Since: 2.8.0
+> -##
+> -{ 'command': 'query-cpu-model-comparison',
+> -  'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
+> -  'returns': 'CpuModelCompareInfo' }
+> -
+>  ##
+>  # @CpuModelBaselineInfo:
+>  #
+> @@ -2260,46 +2199,6 @@
+>  { 'struct': 'CpuModelBaselineInfo',
+>    'data': { 'model': 'CpuModelInfo' } }
+> =20
+> -##
+> -# @query-cpu-model-baseline:
+> -#
+> -# Baseline two CPU models, creating a compatible third model. The crea=
+ted
+> -# model will always be a static, migration-safe CPU model (see "static=
+"
+> -# CPU model expansion for details).
+> -#
+> -# This interface can be used by tooling to create a compatible CPU mod=
+el out
+> -# two CPU models. The created CPU model will be identical to or a subs=
+et of
+> -# both CPU models when comparing them. Therefore, the created CPU mode=
+l is
+> -# guaranteed to run where the given CPU models run.
+> -#
+> -# The result returned by this command may be affected by:
+> -#
+> -# * QEMU version: CPU models may look different depending on the QEMU =
+version.
+> -#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> -# * machine-type: CPU model may look different depending on the machin=
+e-type.
+> -#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> -# * machine options (including accelerator): in some architectures, CP=
+U models
+> -#   may look different depending on machine and accelerator options. (=
+Except for
+> -#   CPU models reported as "static" in query-cpu-definitions.)
+> -# * "-cpu" arguments and global properties: arguments to the -cpu opti=
+on and
+> -#   global properties may affect expansion of CPU models. Using
+> -#   query-cpu-model-expansion while using these is not advised.
+> -#
+> -# Some architectures may not support baselining CPU models. s390x supp=
+orts
+> -# baselining CPU models.
+> -#
+> -# Returns: a CpuModelBaselineInfo. Returns an error if baselining CPU =
+models is
+> -#          not supported, if a model cannot be used, if a model contai=
+ns
+> -#          an unknown cpu definition name, unknown properties or prope=
+rties
+> -#          with wrong types.
+> -#
+> -# Since: 2.8.0
+> -##
+> -{ 'command': 'query-cpu-model-baseline',
+> -  'data': { 'modela': 'CpuModelInfo',
+> -            'modelb': 'CpuModelInfo' },
+> -  'returns': 'CpuModelBaselineInfo' }
+> -
+>  ##
+>  # @AddfdInfo:
+>  #
+> diff --git a/qapi/target.json b/qapi/target.json
+> index f277b69a2a..b07a8926d8 100644
+> --- a/qapi/target.json
+> +++ b/qapi/target.json
+> @@ -7,6 +7,8 @@
+> =20
+>  { 'pragma': { 'top-unit': 'target' } }
+> =20
+> +{ 'include': 'misc.json' }
+> +
+>  ##
+>  # @rtc-reset-reinjection:
+>  #
+> @@ -182,3 +184,107 @@
+>  ##
+>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+>    'if': 'defined(TARGET_I386)' }
+> +
+> +##
+> +# @dump-skeys:
+> +#
+> +# Dump guest's storage keys
+> +#
+> +# @filename: the path to the file to dump to
+> +#
+> +# This command is only supported on s390 architecture.
+> +#
+> +# Since: 2.5
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "dump-skeys",
+> +#      "arguments": { "filename": "/tmp/skeys" } }
+> +# <- { "return": {} }
+> +#
+> +##
+> +{ 'command': 'dump-skeys',
+> +  'data': { 'filename': 'str' },
+> +  'if': 'defined(TARGET_S390X)' }
+> +
+> +##
+> +# @query-cpu-model-comparison:
+> +#
+> +# Compares two CPU models, returning how they compare in a specific
+> +# configuration. The results indicates how both models compare regardi=
+ng
+> +# runnability. This result can be used by tooling to make decisions if=
+ a
+> +# certain CPU model will run in a certain configuration or if a compat=
+ible
+> +# CPU model has to be created by baselining.
+> +#
+> +# Usually, a CPU model is compared against the maximum possible CPU mo=
+del
+> +# of a certain configuration (e.g. the "host" model for KVM). If that =
+CPU
+> +# model is identical or a subset, it will run in that configuration.
+> +#
+> +# The result returned by this command may be affected by:
+> +#
+> +# * QEMU version: CPU models may look different depending on the QEMU =
+version.
+> +#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> +# * machine-type: CPU model may look different depending on the machin=
+e-type.
+> +#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> +# * machine options (including accelerator): in some architectures, CP=
+U models
+> +#   may look different depending on machine and accelerator options. (=
+Except for
+> +#   CPU models reported as "static" in query-cpu-definitions.)
+> +# * "-cpu" arguments and global properties: arguments to the -cpu opti=
+on and
+> +#   global properties may affect expansion of CPU models. Using
+> +#   query-cpu-model-expansion while using these is not advised.
+> +#
+> +# Some architectures may not support comparing CPU models. s390x suppo=
+rts
+> +# comparing CPU models.
+> +#
+> +# Returns: a CpuModelBaselineInfo. Returns an error if comparing CPU m=
+odels is
+> +#          not supported, if a model cannot be used, if a model contai=
+ns
+> +#          an unknown cpu definition name, unknown properties or prope=
+rties
+> +#          with wrong types.
+> +#
+> +# Since: 2.8.0
+> +##
+> +{ 'command': 'query-cpu-model-comparison',
+> +  'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
+> +  'returns': 'CpuModelCompareInfo',
+> +  'if': 'defined(TARGET_S390X)' }
+> +
+> +##
+> +# @query-cpu-model-baseline:
+> +#
+> +# Baseline two CPU models, creating a compatible third model. The crea=
+ted
+> +# model will always be a static, migration-safe CPU model (see "static=
+"
+> +# CPU model expansion for details).
+> +#
+> +# This interface can be used by tooling to create a compatible CPU mod=
+el out
+> +# two CPU models. The created CPU model will be identical to or a subs=
+et of
+> +# both CPU models when comparing them. Therefore, the created CPU mode=
+l is
+> +# guaranteed to run where the given CPU models run.
+> +#
+> +# The result returned by this command may be affected by:
+> +#
+> +# * QEMU version: CPU models may look different depending on the QEMU =
+version.
+> +#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> +# * machine-type: CPU model may look different depending on the machin=
+e-type.
+> +#   (Except for CPU models reported as "static" in query-cpu-definitio=
+ns.)
+> +# * machine options (including accelerator): in some architectures, CP=
+U models
+> +#   may look different depending on machine and accelerator options. (=
+Except for
+> +#   CPU models reported as "static" in query-cpu-definitions.)
+> +# * "-cpu" arguments and global properties: arguments to the -cpu opti=
+on and
+> +#   global properties may affect expansion of CPU models. Using
+> +#   query-cpu-model-expansion while using these is not advised.
+> +#
+> +# Some architectures may not support baselining CPU models. s390x supp=
+orts
+> +# baselining CPU models.
+> +#
+> +# Returns: a CpuModelBaselineInfo. Returns an error if baselining CPU =
+models is
+> +#          not supported, if a model cannot be used, if a model contai=
+ns
+> +#          an unknown cpu definition name, unknown properties or prope=
+rties
+> +#          with wrong types.
+> +#
+> +# Since: 2.8.0
+> +##
+> +{ 'command': 'query-cpu-model-baseline',
+> +  'data': { 'modela': 'CpuModelInfo',
+> +            'modelb': 'CpuModelInfo' },
+> +  'returns': 'CpuModelBaselineInfo',
+> +  'if': 'defined(TARGET_S390X)' }
+> diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+> index 32abdfe6a1..f0ef652b2a 100644
+> --- a/include/sysemu/arch_init.h
+> +++ b/include/sysemu/arch_init.h
+> @@ -36,11 +36,4 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Er=
+ror **errp);
+>  CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansio=
+nType type,
+>                                                        CpuModelInfo *mo=
+de,
+>                                                        Error **errp);
+> -CpuModelCompareInfo *arch_query_cpu_model_comparison(CpuModelInfo *mod=
+ela,
+> -                                                     CpuModelInfo *mod=
+elb,
+> -                                                     Error **errp);
+> -CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *mode=
+la,
+> -                                                    CpuModelInfo *mode=
+lb,
+> -                                                    Error **errp);
+> -
+>  #endif
+> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+> index 76241c240e..59d28c2358 100644
+> --- a/hw/s390x/s390-skeys.c
+> +++ b/hw/s390x/s390-skeys.c
+> @@ -13,7 +13,7 @@
+>  #include "hw/boards.h"
+>  #include "hw/s390x/storage-keys.h"
+>  #include "qapi/error.h"
+> -#include "qapi/qapi-commands-misc.h"
+> +#include "qapi/target-qapi-commands.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/kvm.h"
+> diff --git a/monitor.c b/monitor.c
+> index 4ad9225425..bd9a6950cf 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1157,19 +1157,12 @@ static void qmp_query_qmp_schema(QDict *qdict, =
+QObject **ret_data,
+>   */
+>  static void qmp_unregister_commands_hack(void)
+>  {
+> -#ifndef TARGET_S390X
+> -    qmp_unregister_command(&qmp_commands, "dump-skeys");
+> -#endif
+>  #ifndef TARGET_ARM
+>      qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
+>  #endif
+>  #if !defined(TARGET_S390X) && !defined(TARGET_I386)
+>      qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion")=
+;
+>  #endif
+> -#if !defined(TARGET_S390X)
+> -    qmp_unregister_command(&qmp_commands, "query-cpu-model-baseline");
+> -    qmp_unregister_command(&qmp_commands, "query-cpu-model-comparison"=
+);
+> -#endif
+>  #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I3=
+86) \
+>      && !defined(TARGET_S390X)
+>      qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
+> @@ -4703,13 +4696,6 @@ QemuOptsList qemu_mon_opts =3D {
+>      },
+>  };
+> =20
+> -#ifndef TARGET_S390X
+> -void qmp_dump_skeys(const char *filename, Error **errp)
+> -{
+> -    error_setg(errp, QERR_FEATURE_DISABLED, "dump-skeys");
+> -}
+> -#endif
+> -
+>  #ifndef TARGET_ARM
+>  GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+>  {
+> diff --git a/qmp.c b/qmp.c
+> index d8f80cb04e..14972b78df 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -601,20 +601,6 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansi=
+on(CpuModelExpansionType type,
+>      return arch_query_cpu_model_expansion(type, model, errp);
+>  }
+> =20
+> -CpuModelCompareInfo *qmp_query_cpu_model_comparison(CpuModelInfo *mode=
+la,
+> -                                                    CpuModelInfo *mode=
+lb,
+> -                                                    Error **errp)
+> -{
+> -    return arch_query_cpu_model_comparison(modela, modelb, errp);
+> -}
+> -
+> -CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuModelInfo *model=
+a,
+> -                                                   CpuModelInfo *model=
+b,
+> -                                                   Error **errp)
+> -{
+> -    return arch_query_cpu_model_baseline(modela, modelb, errp);
+> -}
 
-"Peter Maydell" <peter.maydell@linaro.org> wrote on 03/15/2018 11:55:19 
-AM:
+Not sure, but couldn't these two commands be implemented on other
+architectures in the long run, too? So removing them now here seems
+somewhat counterproductive?
 
-> From: "Peter Maydell" <peter.maydell@linaro.org>
-> To: alarson@ddci.com
-> Cc: "QEMU Developers" <qemu-devel@nongnu.org>
-> Date: 03/15/2018 11:55 AM
-> Subject: Re: [Qemu-devel] -icount changes physical address assignments 
-in QEMU 2.10/2.11
-> 
-> On 23 February 2018 at 00:39,  <alarson@ddci.com> wrote:
-> > When porting our RTOS from QEMU 2.8 to 2.10/2.11, I ran into a problem
-> > where 16-bit writes to the "bochs dispi interface" were being reported
-> > differently depending on whether or not "-icount" was given to QEMU.
-> >
-> > For example, info mtree:
-> >   ...
-> >   11000500-11000515 (prio 0, i/o): bochs dispi interface
-> >
-> > A 16-bit write to 0x11000500 was delivered to pci_vga_bochs_write() as
-> > having
-> > address 0, when -icount was not specified, but as address 2 when
-> > -icount was specified.  Correspondingly writes to 0x11000502 were 2
-> > and 0 respectively.  Essentially the words were swapped depending on
-> > the presence of -icount.
-> >
-> > I suspect a similar problem for the AARCH64 GIC (generic interrupt
-> > controller), but other than observing the GIC changing from working to
-> > non-working depending on the absence/presence of -icount I haven't
-> > confirmed the underlying cause.
-> >
-> > 2.10 and 2.11 were built from source on Cygwin using mingw, 2.8 from a
-> > "native" MinGW.  The results are consistent for 2.10 and 2.11.  2.8
-> > does not have the -icount dependency.  The "broken" command line was:
-> >
-> > qemu-system-aarch64 -m 1077 -name "arm" -M virt,virtualization=on
-> >   -cpu cortex-a53 -icount align=off,shift=0,sleep=on
-> >   -vga std -device secondary-vga
-> >   -device
-> > 
-virtio-net,netdev=vlan0,addr=2,disable-modern=false,mac=52:54:00:12:67:56
-> >   -kernel ...deosBoot.bin -initrd "deosBoot.qemu" -netdev
-> > tap,id=vlan0,ifname="DDCI-tap0"
-> >
-> > The "working" command line omitted -icount and its argument.
-> >
-> > FWIW, the error from the GIC with -icount was:
-> >
-> >   qemu: fatal: IO on conditional branch instruction
-> >
-> > Any pointers?
-> 
-> Can you try with this patch applied?
-> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06595.html
-> (that will go into git master within the next week or so but isn't
-> yet applied; it does fix at least some -icount related problems).
-> 
-> If that doesn't help, can you provide a demonstration test
-> binary that I can use to reproduce the bug?
-> 
-> thanks
-> -- PMM
-
-Peter, thanks for the patch, and sorry for the long delay getting back
-to you.  I was on extended travel.
-
-Your patch (applied to 2.11 source release) changed the behavior
-somewhat, but did not fix the problem.  Attached is a binary that when
-run should show a CGA fontset and color bars.
-
-This command should "work":
-
-qemu-system-aarch64 -M virt,virtualization=on -cpu cortex-a53 -vga std 
--device secondary-vga -device virtio-net,netdev=vlan0,addr=2 -kernel 
-icount-bug.bin -netdev user,id=vlan0
-
-If you add "-icount 2" the display will appear, but be mangled. 
-
-I didn't spend too much time trimming the source code, so if you need
-to step by step debug walking through the guest code, I'll have to
-prune it down some more.
-
-For the record, the QEMU source I have is modified slightly to add ARM WFE
-support, something I will submit once this is all straightened out,
-but this bug appeared before I made that patch.
-
-If you need me to update sources to head, or to 2.12 and re-apply your
-patch I can do that.
-
-md5sum: 
-f4626a1b8edb0d64cba14fe3b43e3357 *icount-bug.bin
-
-
---=_mixed 001E504586258258_=
-Content-Type: application/octet-stream; name="icount-bug.bin"
-Content-Disposition: attachment; filename="icount-bug.bin"
-Content-Transfer-Encoding: base64
-
-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
-BECN5QYwlecIMI3lIyyg4RQgzeVTKOfnFSDN5VMk5+cWIM3lFzDN5RQwneUBMEPiCABT4wPxn5dP
-AADqgJcCAJSYAgAImAIAnJgCAJyYAgCcmAIAnJgCAJyYAgCkmAIABACE4gEAV+MAMKATATCgAwAA
-WOMBAFcDDQAAGgEQS+IDQITiATDx5QEg9OUCAFPhAgAAGgAAU+P5//8aOgAA6kAAUuMAAFMDATCg
-AwAwoBMEAADqAABV4wQAAAoCAFjjMwAACgowA+AAAFPjMgAAGgFwh+IDAwDrBACA4gMAwOMAUIXg
-JAAA6gEAWOMRAAAaCDCU5QwwjeUjLKDhFCDN5VMo5+cVIM3lUyTn5xYgzeUXMM3lEBCZ5RQwneUB
-MIPgABCZ5QMQgeALAKDhzgIA6wAAUOMaAAAKBDCU5RAwjeUjLKDhFCDN5VMo5+cVIM3lUyTn5xYg
-zeUXMM3lFDCd5QMwg+IDMMPjCDCD4gNQheABAADqAXBX4gsAAAoEUIXinf//6gAAoOMIAADqBACd
-5QYAAOoEAJ3lBAAA6gQAneUCAADqBACd5QAAAOoAAKDjHNCN4vCPvegw0E3iADCQ5SMsoOEsIM3l
-Uyjn5y0gzeVTJOfnLiDN5S8wzeUsIJ3laDcN4wIwQOMEIIPl7T4P4w0wTeMDAFLhAACgE2gAABoE
-MJDlIyyg4SwgzeVTKOfnLSDN5VMk5+cuIM3lLzDN5Wg3DeMCMEDjLCCd5Qggg+UIIJDlIhyg4SwQ
-zeVSGOfnLRDN5VIU5+cuEM3lLyDN5SwgneUMIIPlDCCQ5SIcoOEsEM3lUhjn5y0QzeVSFOfnLhDN
-5S8gzeUsIJ3lECCD5RAgkOUiHKDhLBDN5VIY5+ctEM3lUhTn5y4QzeUvIM3lLCCd5RQgg+UUIJDl
-Ihyg4SwQzeVSGOfnLRDN5VIU5+cuEM3lLyDN5SwgneUYIIPlEABS4wAAoJMxAACaGDCQ5SMsoOEs
-IM3lUyjn5y0gzeVTJOfnLiDN5S8wzeUsIJ3laDcN4wIwQOMcIIPlEQBS4wAAoIMiAACKHDCQ5SMs
-oOEsIM3lUyjn5y0gzeVTJOfnLiDN5S8wzeVoNw3jAjBA4ywgneUgIIPlICCQ5SIcoOEsEM3lUhjn
-5y0QzeVSFOfnLhDN5S8gzeUsIJ3lJCCD5SQgkOUiHKDhLBDN5VIY5+ctEM3lUhTn5y4QzeUvIM3l
-LCCd5Sggg+UAAIPlAQCg4////+ow0I3iHv8v4fBJLekYsI3iDNBN4gBgoOEBQKDhSAIA6wgAgOIH
-AMDjANBN4A1QoOEGEKDhDQCg4SwCAOscgEviADCg4wQwKOWEdA3jAnBA4wNgoOEAAFTjCwAACggg
-oOEHEKDhBQCg4b0CAOsAAFDjBQAACgYgoOEEEKDh6f7/6wBAoOEGUKDh8f//6gQAoOEY0Evi8Im9
-6BBALeloNw3jAjBA4wAQk+UMMJPlAxCB4NT//+sQgL3oEEAt6QIgoOMAEKDhAACg49b+/+sQgL3o
-EEAt6QMgoOMAEKDhAACg49D+/+sQgL3oBACA4h7/L+EQQC3pATCg4QEgoOMAEKDhAwCg4cf+/+sQ
-gL3oCNBN4gQwkOUjLKDhBCDN5VMo5+cFIM3lUyTn5wYgzeUHMM3lBACd5QjQjeIe/y/hARCA4AwA
-0eUe/y/hARCA4Lww0eFzAO/mIzSg4QAEg+BwAP/mHv8v4QjQTeIBEIDgDDCR5SMsoOEEIM3lUyjn
-5wUgzeVTJOfnBiDN5QcwzeUEAJ3lCNCN4h7/L+FwQC3pAFCg4QFgoOHu///rAECg4QQQhuIFAKDh
-6v//6wAgoOMEMKDhACCC4QIAoOEDEKDhcIC96BBALekBAFLjAgAAGuD//+sAEKDjEIC96Or//+sQ
-gL3oDACA4h7/L+Ee/y/hsC8Q7v8gAuKSIcPgAtBA4B7/L+EgMMDjQTBD4hkAU+MEAACaMABA4gkA
-UOMAAKCDAQCgkx7/L+EBAKDjHv8v4TAAQOIJAFDjAACggwEAoJMe/y/hCTBA4iAAUOMEAFMTAQCg
-kwAAoIMe/y/hEEAt6Q8QoOEA8CDjOE0J4wJAQOMBQFTgEQAACgAVDeMCEEDjAMAJ4wLAQOMBEGzg
-DDBk4AMgweMCIGTgDMCC4AwAU+EEIIMQBACTFAAAghX6//8aACCg4wAACeMCAEDjGP7/6/w/D+P/
-P0/jAzBk4ADFDeMCwEDjDDCD4AAlDeMCIEDjMAUN4wIAQOMAEGLgAxDB4wQQQeIBEGTgDBCB4AEA
-U+EEALMVBACCFPv//xowNQ3jAjBA4+AnDeMCIEDjAiBj4AMgwuMDIILgABCg4wIAU+EEEIMU/P//
-GuA3DeMCMEDj4CcN4wIgQOMCIGPgAyDC4wMgguAAEKDjAgBT4QQQgxT8//8aHAEJ4wIAQOMQgL3o
-ADDQ5UQAU+MKAAAaATDQ5UUAU+MJAAAaAjDQ5U8AU+MIAAAaAwDQ5VMAUOMAAKATAQCgAx7/L+EA
-AKDjHv8v4QAAoOMe/y/hAACg4x7/L+HwQC3pDNBN4gAwoOEBcKDhAFCg4wBQgeUgAJDllEcN4wJA
-QOMAAITlJGCT5QYgoOEDEKDhmAAA6wRQjeUAUI3lBTCg4QYgoOEAEJTlBgCg47T8/+sFIKDhBhCg
-4QAAlOW//f/rAECU5QQAoOHP///rBQBQ4QQAoAMNAAAKBGBG4gYQoOEEAKDh5P3/65Q3DeMCMEDj
-ADCT5QYgk+cCAFDhxT2DAgAwkwUAMIcFBQCgAQYAoBMM0I3i8IC96FUlBeMSKN/noCAC4AAAYuAz
-MwPjEzjf5yAxA+AzIwPjEijf5wIAAOAAAIPgIAKA4A8/AOMTON/nAwAA4CAEgOAgCIDgPwAA4h7/
-L+FwQC3pAECg4QFQoOEQIKDjABCg4xwAgOLAAQDrAABQ45g3DeMCMEDjAACDFQAg4AMAIIMFmDcN
-4wIwQOMAAJPlAQCA4wAg4OMSBcDhAACD5df//+tb8H/1ICUN4wIgQOMUMJTlACCS5QIwg+ADAFDh
-ICUNIwIgQCMAMIIlIDUNMwIwQDMAAIM1cIC96BBALelb8H/1IDUN4wIwQOMAMJPlHgBQ4wAw4JMT
-AOCRAADgg5g3DeMCMEDjADCT5QMAAOC7///rEIC96Fvwf/UgNQ3jAjBA4wAwk+WYNw3jAjBA4wAw
-k+UBIKDjEjAT4AgAAAoQQC3p5P//6yA1DeMCMEDjADCT5QMAUOEAAKAjAQCgMxCAvegAAKDjHv8v
-4Vvwf/UgNQ3jAjBA4wAAk+Ue/y/hMEAt6QEwgOEDABPjAOCgEwkAABoi4aDhBMBA4g5RgeABMKDh
-BQBT4QRAkxQEQKwV+///GgMgAuL////qDuGg4Q4wgeAOwIDgDiCC4AIQgeABAFPhMIC9CAHg0+QB
-4Mzk+v//6hBALekAQKDhAABR4RoAAAoCAACKAjCB4AAAU+ECAAAqBACg4dz//+sTAADqADCB4QMA
-E+MiMaABAyACAgAwoBMDwaDhDCCC4AIAgeACIITgDBCB4AEAUOEB4HAVAeBiFfv//xoMIITgAABT
-4wEwQxIEADEVBAAiFfr//xoEAKDhEIC96ATgLeUhGqDhAcGA4ATgneUOEIHgAQGA4AAAXOEE8J0E
-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
-QTDg4xUwzeVAEODjFhDN5QAwoOMYMM3lGSDN5RowzeUPIKDjGyDN5RwwzeUdMM3lHjDN5R8wzeVw
-MODjIjDN5SUwzeVoMODjIDDN5QkwoOMhMM3lJhDN5SgwoOMjMM3lHzCg4yQwzeVcIODjJyDN5QAg
-4OMoIM3lFzDN5QIgjeAoUI3iOACN4gUwoOEBEPLlARDj5QMAUOH7//8aDDCg4zkwzeUAQKDjOkDN
-5Q8woOM7MM3lPEDN5T1AzeUBcKDjSHDN5QMwoONJMM3lSkDN5QJgoONLYM3lPkDN5T9AzeVAQM3l
-QUDN5UJAzeUQMKDjQzDN5Q4woONEMM3lRUDN5QAw4ONGMM3lBhCg4WcAoOPVAADrBBCg4wQAoOHS
-AADrBRCg4wQAoOHPAADrBBCg4wcAoOHMAADrBRCg4yEAoOPJAADrSHCN4gZAoOEEgKDjBWCg4wgQ
-oOEEAKDhwgAA6wYQoOEBAPflvwAA6wFAhOJ0QO/mBQBU4/X//xoEEKDjAACg47gAAOsFEKDjAwCg
-47UAAOsUEKDjEQCg47IAAOsVEKDjCQCg468AAOsQYI3iKZCN4gZAoOEUgKDjFXCg4wQAZuAIEKDh
-cADv5qYAAOsHEKDhAQDU5KMAAOsEAFnh9v//Gj1gjeIAQKDjDoCg4w9woOMIEKDhdADv5poAAOsH
-EKDhAQD25ZcAAOsBQITiCQBU4/b//xoAQKDjGnCg4wRgoOEHAKDhjAAA6wYQoOF0AO/mjAAA6wYQ
-oOEBAPXliQAA6wFAhOIVAFTj9P//GggQoOMAAKDjgwAA63hrC+MCYEDjEECG4tBghuIJUKDjBRCg
-4QAA1OV7AADrBRCg4QEA1OV4AADrBRCg4QIA1OV1AADrA0CE4gYAVOHz//8aBhCg4/8AoONvAADr
-GgCg42oAAOsAEKDjIACg42oAAOsEEKDjAQCg42cAAOsFEKDjAQCg42QAAOsaAKDjXwAA6wAQoOMg
-AKDjXwAA61TQjeLwg73oEEAt6RAAoOMi///rAECg4RoAoONUAADrABCg4xAAoONUAADr8AAE4gAQ
-oOMBAIDjUAAA6wIAoOME///rAECg4QQQoOMCAKDjSgAA6w8AhOMFEKDjcADv5kYAAOsEAKDj+v7/
-6wBAoOEEEKDjAQCg4UAAAOsEAITjBRCg43AA7+Y8AADrBQCg4/b+/+sAQKDhDhCg4wUAoOM2AADr
-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
-8DvYN1OuvKnFnrvef8+yR+n/tTAc8r29isK6yjCTs1Omo7QkBTbQupMG180pV95Uv2fZIy56ZrO4
-SmHEAhtoXZQrbyo3vgu0oY4MwxvfBVqN7wItMDEyMzQ1Njc4OUFCQ0RFRkdISUpLTE1OT1BRUlNU
-VVZXWFlaAAAAADAxMjM0NTY3ODlBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWgAAAAAwMTIzNDU2
-Nzg5QUJDREVGAAAAAAABAgMEBRQHODk6Ozw9Pj8AAAAAACoAKgAAKioqAAAqACoqKgAqKioAABUA
-AD8AKhUAKj8qABUqAD8qKhUqKj8AFQAAFSoAPwAAPyoqFQAqFSoqPwAqPyoAFRUAFT8APxUAPz8q
-FRUqFT8qPxUqPz8VAAAVACoVKgAVKio/AAA/ACo/KgA/KioVABUVAD8VKhUVKj8/ABU/AD8/KhU/
-Kj8VFQAVFSoVPwAVPyo/FQA/FSo/PwA/PyoVFRUVFT8VPxUVPz8/FRU/FT8/PxU/Pz8AABUAoAK1
-AgBUFVRAVbVWSilfKeor/ytKfV996n//fwAAAAAAAAAA/v7+/v7+/v5sAHzGxsZ8AGz+/v58OBAA
-EDh8/nw4EAA4fDj+/tYQOBA4fP7+fBA4AAAYPDwYAAD//+fDw+f//wA8ZkJCZjwA/8OZvb2Zw/8P
-Bw99zMzMeDxmZmY8GH4YPzM/MDBw8OB/Y39jY2fmwBjbPOfnPNsYgOD4/vjggAACDj7+Pg4CABg8
-fhgYfjwYZmZmZmYAZgB/29t7GxsbAD5hPGZmPIZ8AAAAAH5+fgAYPH4YfjwY/xg8fhgYGBgAGBgY
-GH48GAAAGAz+DBgAAAAwYP5gMAAAAADAwMD+AAAAJGb/ZiQAAAAYPH7//wAAAP//fjwYAAAAAAAA
-AAAAABg8PBgYABgAZmYkAAAAAABsbP5s/mxsABg+YDwGfBgAAMbMGDBmxgA4bDh23Mx2ABgYMAAA
-AAAADBgwMDAYDAAwGAwMDBgwAABmPP88ZgAAABgYfhgYAAAAAAAAABgYMAAAAH4AAAAAAAAAAAAY
-GAAGDBgwYMCAADhsxtbGbDgAGDgYGBgYfgB8xgYcMGb+AHzGBjwGxnwAHDxszP4MHgD+wMD8BsZ8
-ADhgwPzGxnwA/sYMGDAwMAB8xsZ8xsZ8AHzGxn4GDHgAABgYAAAYGAAAGBgAABgYMAYMGDAYDAYA
-AAB+AAB+AABgMBgMGDBgAHzGDBgYABgAfMbe3t7AeAA4bMb+xsbGAPxmZnxmZvwAPGbAwMBmPAD4
-bGZmZmz4AP5iaHhoYv4A/mJoeGhg8AA8ZsDAzmY6AMbGxv7GxsYAPBgYGBgYPAAeDAwMzMx4AOZm
-bHhsZuYA8GBgYGJm/gDG7v7+1sbGAMbm9t7OxsYAfMbGxsbGfAD8ZmZ8YGDwAHzGxsbGznwO/GZm
-fGxm5gA8ZjAYDGY8AH5+WhgYGDwAxsbGxsbGfADGxsbGxmw4AMbGxtbW/mwAxsZsOGzGxgBmZmY8
-GBg8AP7GjBgyZv4APDAwMDAwPADAYDAYDAYCADwMDAwMDDwAEDhsxgAAAAAAAAAAAAAA/zAYDAAA
-AAAAAAB4DHzMdgDgYHxmZmbcAAAAfMbAxnwAHAx8zMzMdgAAAHzG/sB8ADxmYPhgYPAAAAB2zMx8
-DPjgYGx2ZmbmABgAOBgYGDwABgAGBgZmZjzgYGZseGzmADgYGBgYGDwAAADs/tbW1gAAANxmZmZm
-AAAAfMbGxnwAAADcZmZ8YPAAAHbMzHwMHgAA3HZgYPAAAAB+wHwG/AAwMPwwMDYcAAAAzMzMzHYA
-AADGxsZsOAAAAMbW1v5sAAAAxmw4bMYAAADGxsZ+BvwAAH5MGDJ+AA4YGHAYGA4AGBgYGBgYGABw
-GBgOGBhwAHbcAAAAAAAAABA4bMbG/gB8xsDAxnwMeMwAzMzMzHYADBh8xv7AfAB8gngMfMx2AMYA
-eAx8zHYAMBh4DHzMdgAwMHgMfMx2AAAAfsDAfgw4fIJ8xv7AfADGAHzG/sB8ADAYfMb+wHwAZgA4
-GBgYPAB8gjgYGBg8ADAYADgYGDwAxjhsxv7GxgA4bHzG/sbGABgw/sD4wP4AAAB+GH7YfgA+bMz+
-zMzOAHyCfMbGxnwAxgB8xsbGfAAwGHzGxsZ8AHiEAMzMzHYAYDDMzMzMdgDGAMbGxn4G/MY4bMbG
-bDgAxgDGxsbGfAAYGH7AwH4YGDhsZPBgZvwAZmY8fhh+GBj4zMz6xs/Gxw4bGDwY2HAAGDB4DHzM
-dgAMGAA4GBg8AAwYfMbGxnwAGDDMzMzMdgB23ADcZmZmAHbcAOb23s4APGxsPgB+AAA4bGw4AHwA
-ABgAGBgwYz4AAAAA/sDAAAAAAAD+BgYAAGPmbH4zZswPY+ZsejZq3wYYABgYPDwYAAAzZsxmMwAA
-AMxmM2bMAAAiiCKIIogiiFWqVapVqlWqd9133Xfdd90YGBgYGBgYGBgYGBj4GBgYGBj4GPgYGBg2
-NjY29jY2NgAAAAD+NjY2AAD4GPgYGBg2NvYG9jY2NjY2NjY2NjY2AAD+BvY2NjY2NvYG/gAAADY2
-Njb+AAAAGBj4GPgAAAAAAAAA+BgYGBgYGBgfAAAAGBgYGP8AAAAAAAAA/xgYGBgYGBgfGBgYAAAA
-AP8AAAAYGBgY/xgYGBgYHxgfGBgYNjY2Njc2NjY2NjcwPwAAAAAAPzA3NjY2Njb3AP8AAAAAAP8A
-9zY2NjY2NzA3NjY2AAD/AP8AAAA2NvcA9zY2NhgY/wD/AAAANjY2Nv8AAAAAAP8A/xgYGAAAAAD/
-NjY2NjY2Nj8AAAAYGB8YHwAAAAAAHxgfGBgYAAAAAD82NjY2NjY2/zY2NhgY/xj/GBgYGBgYGPgA
-AAAAAAAAHxgYGP//////////AAAAAP/////w8PDw8PDw8A8PDw8PDw8P/////wAAAAAAAHbcyNx2
-AHjMzNjMxswA/sbAwMDAwAAAAP5sbGxsAP7GYDBgxv4AAAB+2NjYcAAAAGZmZmZ8wAB23BgYGBgA
-fhg8ZmY8GH44bMb+xmw4ADhsxsZsbO4ADhgMPmZmPAAAAH7b234AAAYMftvbfmDAHjBgfmAwHgAA
-fMbGxsbGAAD+AP4A/gAAGBh+GBgAfgAwGAwYMAB+AAwYMBgMAH4ADhsbGBgYGBgYGBgYGNjYcAAY
-AH4AGAAAAHbcAHbcAAA4bGw4AAAAAAAAABgYAAAAAAAAGAAAAAAPDAwM7Gw8HGw2NjY2AAAAeAwY
-MHwAAAAAADw8PDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfoGlgYG9mYGBfgAAAAAAAH7/
-2///w+f//34AAAAAAAAAAGz+/v7+fDgQAAAAAAAAAAAQOHz+fDgQAAAAAAAAAAAYPDzn5+cYGDwA
-AAAAAAAAGDx+//9+GBg8AAAAAAAAAAAAABg8PBgAAAAAAAD////////nw8Pn////////AAAAAAA8
-ZkJCZjwAAAAAAP//////w5m9vZnD//////8AAB4OGjJ4zMzMzHgAAAAAAAA8ZmZmZjwYfhgYAAAA
-AAAAPzM/MDAwMHDw4AAAAAAAAH9jf2NjY2Nn5+bAAAAAAAAAGBjbPOc82xgYAAAAAACAwODw+P74
-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
-wMDGfAAAAAAAEDhsAHgMfMzMzHYAAAAAAADMAAB4DHzMzMx2AAAAAABgMBgAeAx8zMzMdgAAAAAA
-OGw4AHgMfMzMzHYAAAAAAAAAAAB8xsDAwMZ8GHAAAAAQOGwAfMb+wMDGfAAAAAAAAMYAAHzG/sDA
-xnwAAAAAAGAwGAB8xv7AwMZ8AAAAAAAAZgAAOBgYGBgYPAAAAAAAGDxmADgYGBgYGDwAAAAAAGAw
-GAA4GBgYGBg8AAAAAADGABA4bMbG/sbGxgAAAAA4bDgQOGzG/sbGxsYAAAAADBgA/mZiaHhoYmb+
-AAAAAAAAAAAA7DY2ftjYbgAAAAAAAD5szMz+zMzMzM4AAAAAABA4bAB8xsbGxsZ8AAAAAAAAxgAA
-fMbGxsbGfAAAAAAAYDAYAHzGxsbGxnwAAAAAADB4zADMzMzMzMx2AAAAAABgMBgAzMzMzMzMdgAA
-AAAAAMYAAMbGxsbGxn4GDHgAAMYAfMbGxsbGxsZ8AAAAAADGAMbGxsbGxsbGfAAAAAAAGBh8xsDA
-wMZ8GBgAAAAAADhsZGDwYGBgYOb8AAAAAAAAZmY8GH4YfhgYGAAAAAAA+MzM+MTM3szMzMYAAAAA
-AA4bGBgYfhgYGNhwAAAAAAAYMGAAeAx8zMzMdgAAAAAADBgwADgYGBgYGDwAAAAAABgwYAB8xsbG
-xsZ8AAAAAAAYMGAAzMzMzMzMdgAAAAAAAHbcANxmZmZmZmYAAAAAdtwAxub2/t7OxsbGAAAAAAAA
-PGxsPgB+AAAAAAAAAAAAADhsbDgAfAAAAAAAAAAAAAAwMAAwMGDAxsZ8AAAAAAAAAAAAAP7AwMDA
-AAAAAAAAAAAAAAD+BgYGBgAAAAAAAGDgYmZsGDBg3IYMGD4AAABg4GJmbBgwZs6aPwYGAAAAABgY
-ABgYGDw8PBgAAAAAAAAAAAA2bNhsNgAAAAAAAAAAAAAA2Gw2bNgAAAAAAAARRBFEEUQRRBFEEUQR
-RBFEVapVqlWqVapVqlWqVapVqt133Xfdd9133Xfdd9133XcYGBgYGBgYGBgYGBgYGBgYGBgYGBgY
-GPgYGBgYGBgYGBgYGBgY+Bj4GBgYGBgYGBg2NjY2NjY29jY2NjY2NjY2AAAAAAAAAP42NjY2NjY2
-NgAAAAAA+Bj4GBgYGBgYGBg2NjY2NvYG9jY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NgAAAAAA/gb2
-NjY2NjY2NjY2NjY2NvYG/gAAAAAAAAAANjY2NjY2Nv4AAAAAAAAAABgYGBgY+Bj4AAAAAAAAAAAA
-AAAAAAAA+BgYGBgYGBgYGBgYGBgYGB8AAAAAAAAAABgYGBgYGBj/AAAAAAAAAAAAAAAAAAAA/xgY
-GBgYGBgYGBgYGBgYGB8YGBgYGBgYGAAAAAAAAAD/AAAAAAAAAAAYGBgYGBgY/xgYGBgYGBgYGBgY
-GBgfGB8YGBgYGBgYGDY2NjY2NjY3NjY2NjY2NjY2NjY2NjcwPwAAAAAAAAAAAAAAAAA/MDc2NjY2
-NjY2NjY2NjY29wD/AAAAAAAAAAAAAAAAAP8A9zY2NjY2NjY2NjY2NjY3MDc2NjY2NjY2NgAAAAAA
-/wD/AAAAAAAAAAA2NjY2NvcA9zY2NjY2NjY2GBgYGBj/AP8AAAAAAAAAADY2NjY2Njb/AAAAAAAA
-AAAAAAAAAP8A/xgYGBgYGBgYAAAAAAAAAP82NjY2NjY2NjY2NjY2NjY/AAAAAAAAAAAYGBgYGB8Y
-HwAAAAAAAAAAAAAAAAAfGB8YGBgYGBgYGAAAAAAAAAA/NjY2NjY2NjY2NjY2NjY2/zY2NjY2NjY2
-GBgYGBj/GP8YGBgYGBgYGBgYGBgYGBj4AAAAAAAAAAAAAAAAAAAAHxgYGBgYGBgY////////////
-/////////wAAAAAAAAD////////////w8PDw8PDw8PDw8PDw8PDwDw8PDw8PDw8PDw8PDw8PD///
-//////8AAAAAAAAAAAAAAAAAAHbc2NjY3HYAAAAAAAB4zMzM2MzGxsbMAAAAAAAA/sbGwMDAwMDA
-wAAAAAAAAAAAAP5sbGxsbGwAAAAAAAD+xmAwGBgwYMb+AAAAAAAAAAAAftjY2NjYcAAAAAAAAAAA
-AGZmZmZmZnxgYMAAAAAAAHbcGBgYGBgYAAAAAAAAfhg8ZmZmZjwYfgAAAAAAADhsxsb+xsbGbDgA
-AAAAAAA4bMbGxmxsbGzuAAAAAAAAHjAYDD5mZmZmPAAAAAAAAAAAAH7b29t+AAAAAAAAAAAAAwZ+
-29vzfmDAAAAAAAAAHDBgYHxgYGAwHAAAAAAAAAB8xsbGxsbGxsYAAAAAAAAAAP4AAP4AAP4AAAAA
-AAAAAAAYGH4YGAAAfgAAAAAAAAAwGAwGDBgwAH4AAAAAAAAADBgwYDAYDAB+AAAAAAAADhsbGBgY
-GBgYGBgYGBgYGBgYGBgYGBjY2NhwAAAAAAAAAAAYAH4AGAAAAAAAAAAAAAAAdtwAdtwAAAAAAAAA
-OGxsOAAAAAAAAAAAAAAAAAAAAAAAABgYAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAADwwMDAwM7Gxs
-PBwAAAAAAGw2NjY2NgAAAAAAAAAAAAA8ZgwYMn4AAAAAAAAAAAAAAAAAfn5+fn5+fgAAAAAAAAAA
-AAAAAAAAAAAAAAAAAGNob3NlbgAAbGludXgsaW5pdHJkLXN0YXJ0AAAvAAAAbG9uZyBsb25nIG5v
-dCBzdXBwb3J0ZWQgZm9yICdkJyAoZGVjaW1hbCkAAAAweAAAZHByaW50ZjogdW5yZWNvZ25pemVk
-IGZvcm1hdCBjaGFyYWN0ZXI6ICclYycAAAAAJXg6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAA/////wAAAAAAAAAA
-
---=_mixed 001E504586258258_=--
+ Thomas
