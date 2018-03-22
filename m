@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyxui-0008Nh-8F
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 06:57:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eyxxA-00019c-DZ
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:00:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eyxuh-0003D7-9u
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 06:57:44 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:38931)
+	(envelope-from <peter.maydell@linaro.org>) id 1eyxx9-0004bJ-KW
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:00:16 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34935)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eyxuh-0003Ct-4e
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 06:57:43 -0400
-Received: by mail-oi0-x243.google.com with SMTP id q71-v6so6937876oic.6
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 03:57:42 -0700 (PDT)
+	id 1eyxx9-0004ay-ET
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 07:00:15 -0400
+Received: by mail-ot0-x243.google.com with SMTP id r30-v6so8954354otr.2
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 04:00:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <899fd41e-46cf-44e8-2df5-24d9e705e264@amsat.org>
+In-Reply-To: <8f878d04-d5c2-77ae-9fb9-d98d41efac3c@amsat.org>
 References: <20180320134114.30418-1-peter.maydell@linaro.org>
-	<20180320134114.30418-3-peter.maydell@linaro.org>
-	<899fd41e-46cf-44e8-2df5-24d9e705e264@amsat.org>
+	<20180320134114.30418-5-peter.maydell@linaro.org>
+	<8f878d04-d5c2-77ae-9fb9-d98d41efac3c@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Mar 2018 10:57:21 +0000
-Message-ID: <CAFEAcA82jYWDPUK7d6o_gfgvUPb1O+3PbNxCnHAVbSAAKokBGA@mail.gmail.com>
+Date: Thu, 22 Mar 2018 10:59:54 +0000
+Message-ID: <CAFEAcA-nShiCLTDvgeLxCoUJciB3uTLCGeLLD0mRLtRFj8WN1w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12 2/4] target/arm: Factor
- out code to calculate FSR for debug exceptions
+Subject: Re: [Qemu-devel] [PATCH for-2.12 4/4] target/arm: Always set FAR to
+ a known unknown value for debug exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +35,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 21 March 2018 at 22:26, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+On 21 March 2018 at 22:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
 ote:
-> Hi Peter,
->
-> This patch might be split in 2.
-
-For a +27-10 patch, it doesn't really seem necessary.
-
 > On 03/20/2018 02:41 PM, Peter Maydell wrote:
->> When a debug exception is taken to AArch32, it appears as a Prefetch
->> Abort, and the Instruction Fault Status Register (IFSR) must be set.
->> The IFSR has two possible formats, depending on whether LPAE is in
->
-> ^ intro
->
->> use. Factor out the code in arm_debug_excp_handler() which picks
->> an FSR value into its own utility function, update it to use
->> arm_fi_to_lfsc() and arm_fi_to_sfsc() rather than hard-coded constants,
->
-> ^ part 1 (refactor):
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->> and use the correct condition to select long or short format.
->
-> ^ part 2 (fix) looks correct:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
+>> For debug exceptions due to breakpoints or the BKPT instruction which
+>> are taken to AArch32, the Fault Address Register is architecturally
+>> UNKNOWN.  We were using that as license to simply not set
+>> env->exception.vaddress, but this isn't correct, because it will
+>> expose to the guest whatever old value was in that field when
+>> arm_cpu_do_interrupt_aarch32() writes it to the guest IFSR.  That old
+>> value might be a FAR for a previous guest EL2 or secure exception, in
+>> which case we shouldn't show it to an EL1 or non-secure exception
+>> handler. It might also be a non-deterministic value, which is bad
+>> for record-and-replay.
 >>
->> In particular this fixes a bug where we could select the short
->> format because we're at EL0 and the EL1 translation regime is
->> not using LPAE, but then route the debug exception to EL2 because
->> of MDCR_EL2.TDE and hand EL2 the wrong format FSR.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  target/arm/internals.h | 25 +++++++++++++++++++++++++
->>  target/arm/op_helper.c | 12 ++----------
->>  2 files changed, 27 insertions(+), 10 deletions(-)
->>
->> diff --git a/target/arm/internals.h b/target/arm/internals.h
->> index 47cc224a46..8ce944b7a0 100644
->> --- a/target/arm/internals.h
->> +++ b/target/arm/internals.h
->> @@ -763,4 +763,29 @@ static inline bool regime_is_secure(CPUARMState *en=
-v, ARMMMUIdx mmu_idx)
->>      }
->>  }
->>
->> +/* Return the FSR value for a debug exception (watchpoint, hardware
->> + * breakpoint or BKPT insn) targeting the specified exception level.
->> + */
->> +static inline uint32_t arm_debug_exception_fsr(CPUARMState *env)
->> +{
->> +    ARMMMUFaultInfo fi =3D { .type =3D ARMFault_Debug };
->> +    int target_el =3D arm_debug_target_el(env);
->> +    bool using_lpae =3D false;
->> +
->> +    if (target_el =3D=3D 2 || arm_el_is_aa64(env, target_el)) {
->> +        using_lpae =3D true;
->> +    } else {
->> +        if (arm_feature(env, ARM_FEATURE_LPAE) &&
->> +            (env->cp15.tcr_el[target_el].raw_tcr & TTBCR_EAE)) {
->> +            using_lpae =3D true;
->> +        }
->> +    }
+>> Clear env->exception.vaddress before taking breakpoint debug
+>> exceptions, to avoid this minor information leak.
 >
-> This looks pretty similar to regime_using_lpae_format() but for
-> ARMFault_Debug.
+> So this series is worth Cc'ing qemu-stable...?
 
-Yeah, it's basically similar logic.
-
-I'm a bit confused overall -- are you giving a reviewed-by for
-this patch, or do you want changes?
+I don't think so. This isn't a regression -- we've behaved this
+way ever since we introduced LPAE support, five years or so ago.
+In particular Linux doesn't care about it.
 
 thanks
 -- PMM
