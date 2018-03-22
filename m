@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1ez2qI-0002dc-FG
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:13:33 -0400
+	(envelope-from <mst@redhat.com>) id 1ez2wW-0008UG-HK
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:19:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1ez2qF-0007ge-KG
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:13:30 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Thu, 22 Mar 2018 17:12:26 +0100
-Message-Id: <20180322161226.29796-5-lvivier@redhat.com>
-In-Reply-To: <20180322161226.29796-1-lvivier@redhat.com>
-References: <20180322161226.29796-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] Remove unnecessary variables for function
- return value
+	(envelope-from <mst@redhat.com>) id 1ez2wT-0004EQ-AU
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:19:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49536 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ez2wT-0004Cl-2B
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 12:19:53 -0400
+Date: Thu, 22 Mar 2018 18:19:44 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180322171740-mutt-send-email-mst@kernel.org>
+References: <20180319071537.28649-1-tiwei.bie@intel.com>
+	<20180319071537.28649-7-tiwei.bie@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180319071537.28649-7-tiwei.bie@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] vhost-user: add VFIO based
+ accelerators support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,1006 +28,599 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-Re-run Coccinelle script scripts/coccinelle/return_directly.cocci
+On Mon, Mar 19, 2018 at 03:15:37PM +0800, Tiwei Bie wrote:
+> This patch does some small extensions to vhost-user protocol to
+> support VFIO based accelerators, and makes it possible to get the
+> similar performance of VFIO based PCI passthru while keeping the
+> virtio device emulation in QEMU.
+> 
+> Any virtio ring compatible devices potentially can be used as the
+> vhost data path accelerators. We can setup the accelerator based
+> on the informations (e.g. memory table, features, ring info, etc)
+> available on the vhost backend. And accelerator will be able to use
+> the virtio ring provided by the virtio driver in the VM directly.
+> So the virtio driver in the VM can exchange e.g. network packets
+> with the accelerator directly via the virtio ring.
+> 
+> But for vhost-user, the critical issue in this case is that the
+> data path performance is relatively low and some host threads are
+> needed for the data path, because some necessary mechanisms are
+> missing to support:
+> 
+> 1) guest driver notifies the device directly;
+> 2) device interrupts the guest directly;
+> 
+> So this patch does some small extensions to vhost-user protocol
+> to make both of them possible. It leverages the same mechanisms
+> as the VFIO based PCI passthru.
+> 
+> A new protocol feature bit is added to negotiate the accelerator
+> feature support. Two new slave message types are added to control
+> the notify region and queue interrupt passthru for each queue.
+> >From the view of vhost-user protocol design, it's very flexible.
+> The passthru can be enabled/disabled for each queue individually,
+> and it's possible to accelerate each queue by different devices.
+> 
+> The key difference with PCI passthru is that, in this case only
+> the data path of the device (e.g. DMA ring, notify region and
+> queue interrupt) is pass-throughed to the VM, the device control
+> path (e.g. PCI configuration space and MMIO regions) is still
+> defined and emulated by QEMU.
+> 
+> The benefits of keeping virtio device emulation in QEMU compared
+> with virtio device PCI passthru include (but not limit to):
+> 
+> - consistent device interface for guest OS in the VM;
+> - max flexibility on the hardware (i.e. the accelerators) design;
+> - leveraging the existing virtio live-migration framework;
+> 
+> Normally, vhost-user is meant for connecting to e.g. user-space
+> switch which is shared between multiple VMs. Typically, a vhost
+> accelerator isn't a simple NIC which is just for packet I/O, but
+> e.g. an switch accelerator which is also shared between multiple
+> VMs. This commit extends vhost-user to better support connecting
+> to e.g. a user-space switch that has an accelerator.
+> 
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> ---
+>  docs/interop/vhost-user.txt    |  57 ++++++++++++
+>  hw/virtio/vhost-user.c         | 198 +++++++++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user.h |  17 ++++
+>  3 files changed, 272 insertions(+)
+> 
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index cb3a7595aa..264a58a800 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -132,6 +132,15 @@ Depending on the request type, payload can be:
+>     Payload: Size bytes array holding the contents of the virtio
+>         device's configuration space
+>  
+> + * Vring area description
+> +   -----------------------
+> +   | u64 | size | offset |
+> +   -----------------------
+> +
+> +   u64: a 64-bit unsigned integer
+> +   Size: a 64-bit size
+> +   Offset: a 64-bit offset
+> +
+>  In QEMU the vhost-user message is implemented with the following struct:
+>  
+>  typedef struct VhostUserMsg {
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- accel/tcg/translate-all.c                          |  5 +-
- block/quorum.c                                     |  6 +--
- hw/arm/exynos4210.c                                |  7 +--
- hw/block/vhost-user-blk.c                          |  5 +-
- hw/hppa/dino.c                                     |  5 +-
- hw/misc/mos6522.c                                  |  6 +--
- hw/net/ftgmac100.c                                 |  5 +-
- hw/ppc/pnv_lpc.c                                   | 14 +-----
- io/net-listener.c                                  |  6 +--
- target/i386/hax-darwin.c                           | 10 ++--
- target/mips/dsp_helper.c                           | 15 ++----
- target/xtensa/core-dc232b/xtensa-modules.c         | 56 ++++++----------------
- target/xtensa/core-dc233c/xtensa-modules.c         | 56 ++++++----------------
- target/xtensa/core-de212/xtensa-modules.c          | 48 +++++--------------
- target/xtensa/core-fsf/xtensa-modules.c            | 32 ++++---------
- .../xtensa/core-sample_controller/xtensa-modules.c | 24 +++-------
- target/xtensa/translate.c                          |  5 +-
- tests/m48t59-test.c                                |  6 +--
- tests/test-thread-pool.c                           |  6 +--
- util/uri.c                                         |  5 +-
- 20 files changed, 75 insertions(+), 247 deletions(-)
+I see you modeled this after a generic message such as vring state
+description, but that one is used in many msgs, that is
+why it is not documented in a single place.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 5ad1b919bc..55d822d410 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -644,11 +644,8 @@ static inline void *alloc_code_gen_buffer(void)
- static inline void *alloc_code_gen_buffer(void)
- {
-     size_t size = tcg_ctx->code_gen_buffer_size;
--    void *buf;
--
--    buf = VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT,
-+    return VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT,
-                         PAGE_EXECUTE_READWRITE);
--    return buf;
- }
- #else
- static inline void *alloc_code_gen_buffer(void)
-diff --git a/block/quorum.c b/block/quorum.c
-index 14333c18aa..304442ef65 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -608,7 +608,7 @@ static void read_quorum_children_entry(void *opaque)
- static int read_quorum_children(QuorumAIOCB *acb)
- {
-     BDRVQuorumState *s = acb->bs->opaque;
--    int i, ret;
-+    int i;
- 
-     acb->children_read = s->num_children;
-     for (i = 0; i < s->num_children; i++) {
-@@ -643,9 +643,7 @@ static int read_quorum_children(QuorumAIOCB *acb)
-         qemu_coroutine_yield();
-     }
- 
--    ret = acb->vote_ret;
--
--    return ret;
-+    return acb->vote_ret;
- }
- 
- static int read_fifo_child(QuorumAIOCB *acb)
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 06f9d1ffa4..d5ce275b21 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -156,12 +156,7 @@ void exynos4210_write_secondary(ARMCPU *cpu,
- 
- static uint64_t exynos4210_calc_affinity(int cpu)
- {
--    uint64_t mp_affinity;
--
--    /* Exynos4210 has 0x9 as cluster ID */
--    mp_affinity = (0x9 << ARM_AFF1_SHIFT) | cpu;
--
--    return mp_affinity;
-+    return (0x9 << ARM_AFF1_SHIFT) | cpu;
- }
- 
- Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index f840f07dfe..3f41ca9e26 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -196,7 +196,6 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-                                             Error **errp)
- {
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
--    uint64_t get_features;
- 
-     /* Turn on pre-defined features */
-     virtio_add_feature(&features, VIRTIO_BLK_F_SEG_MAX);
-@@ -215,9 +214,7 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-         virtio_add_feature(&features, VIRTIO_BLK_F_MQ);
-     }
- 
--    get_features = vhost_get_features(&s->dev, user_feature_bits, features);
--
--    return get_features;
-+    return vhost_get_features(&s->dev, user_feature_bits, features);
- }
- 
- static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index 15aefde09c..c5dcf3104d 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -403,13 +403,10 @@ static void dino_set_irq(void *opaque, int irq, int level)
- static int dino_pci_map_irq(PCIDevice *d, int irq_num)
- {
-     int slot = d->devfn >> 3;
--    int local_irq;
- 
-     assert(irq_num >= 0 && irq_num <= 3);
- 
--    local_irq = slot & 0x03;
--
--    return local_irq;
-+    return slot & 0x03;
- }
- 
- static void dino_set_timer_irq(void *opaque, int irq, int level)
-diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
-index 8ad9fc831e..606532aa65 100644
---- a/hw/misc/mos6522.c
-+++ b/hw/misc/mos6522.c
-@@ -176,12 +176,8 @@ static void mos6522_set_sr_int(MOS6522State *s)
- 
- static uint64_t mos6522_get_counter_value(MOS6522State *s, MOS6522Timer *ti)
- {
--    uint64_t d;
--
--    d = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
-+    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
-                  ti->frequency, NANOSECONDS_PER_SECOND);
--
--    return d;
- }
- 
- static uint64_t mos6522_get_load_time(MOS6522State *s, MOS6522Timer *ti)
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 704f452067..3300e8ef4a 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -511,7 +511,6 @@ static uint32_t ftgmac100_rxpoll(FTGMAC100State *s)
- 
-     uint32_t cnt = 1024 * FTGMAC100_APTC_RXPOLL_CNT(s->aptcr);
-     uint32_t speed = (s->maccr & FTGMAC100_MACCR_FAST_MODE) ? 1 : 0;
--    uint32_t period;
- 
-     if (s->aptcr & FTGMAC100_APTC_RXPOLL_TIME_SEL) {
-         cnt <<= 4;
-@@ -521,9 +520,7 @@ static uint32_t ftgmac100_rxpoll(FTGMAC100State *s)
-         speed = 2;
-     }
- 
--    period = cnt / div[speed];
--
--    return period;
-+    return cnt / div[speed];
- }
- 
- static void ftgmac100_reset(DeviceState *d)
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index c42b4a8f6c..a77e20368e 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -125,25 +125,15 @@ static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom_offset)
- static bool opb_read(PnvLpcController *lpc, uint32_t addr, uint8_t *data,
-                      int sz)
- {
--    bool success;
--
--    /* XXX Handle access size limits and FW read caching here */
--    success = !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-+    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-                                 data, sz, false);
--
--    return success;
- }
- 
- static bool opb_write(PnvLpcController *lpc, uint32_t addr, uint8_t *data,
-                       int sz)
- {
--    bool success;
--
--    /* XXX Handle access size limits here */
--    success = !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-+    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-                                 data, sz, true);
--
--    return success;
- }
- 
- #define ECCB_CTL_READ           PPC_BIT(15)
-diff --git a/io/net-listener.c b/io/net-listener.c
-index 555e8acaa4..3317aa6e5f 100644
---- a/io/net-listener.c
-+++ b/io/net-listener.c
-@@ -25,11 +25,7 @@
- 
- QIONetListener *qio_net_listener_new(void)
- {
--    QIONetListener *ret;
--
--    ret = QIO_NET_LISTENER(object_new(TYPE_QIO_NET_LISTENER));
--
--    return ret;
-+    return QIO_NET_LISTENER(object_new(TYPE_QIO_NET_LISTENER));
- }
- 
- void qio_net_listener_set_name(QIONetListener *listener,
-diff --git a/target/i386/hax-darwin.c b/target/i386/hax-darwin.c
-index acdde476a0..a5426a6dac 100644
---- a/target/i386/hax-darwin.c
-+++ b/target/i386/hax-darwin.c
-@@ -257,10 +257,7 @@ int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
- 
- int hax_vcpu_run(struct hax_vcpu_state *vcpu)
- {
--    int ret;
--
--    ret = ioctl(vcpu->fd, HAX_VCPU_IOCTL_RUN, NULL);
--    return ret;
-+    return ioctl(vcpu->fd, HAX_VCPU_IOCTL_RUN, NULL);
- }
- 
- int hax_sync_fpu(CPUArchState *env, struct fx_layout *fl, int set)
-@@ -315,13 +312,12 @@ int hax_sync_vcpu_state(CPUArchState *env, struct vcpu_state_t *state, int set)
- 
- int hax_inject_interrupt(CPUArchState *env, int vector)
- {
--    int ret, fd;
-+    int fd;
- 
-     fd = hax_vcpu_get_fd(env);
-     if (fd <= 0) {
-         return -1;
-     }
- 
--    ret = ioctl(fd, HAX_VCPU_IOCTL_INTERRUPT, &vector);
--    return ret;
-+    return ioctl(fd, HAX_VCPU_IOCTL_INTERRUPT, &vector);
- }
-diff --git a/target/mips/dsp_helper.c b/target/mips/dsp_helper.c
-index f152fea34a..739b69dd45 100644
---- a/target/mips/dsp_helper.c
-+++ b/target/mips/dsp_helper.c
-@@ -3274,14 +3274,11 @@ target_ulong helper_dextr_l(target_ulong ac, target_ulong shift,
-                             CPUMIPSState *env)
- {
-     uint64_t temp[3];
--    target_ulong result;
- 
-     shift = shift & 0x3F;
- 
-     mipsdsp_rndrashift_acc(temp, ac, shift, env);
--    result = (temp[1] << 63) | (temp[0] >> 1);
--
--    return result;
-+    return (temp[1] << 63) | (temp[0] >> 1);
- }
- 
- target_ulong helper_dextr_r_l(target_ulong ac, target_ulong shift,
-@@ -3289,7 +3286,6 @@ target_ulong helper_dextr_r_l(target_ulong ac, target_ulong shift,
- {
-     uint64_t temp[3];
-     uint32_t temp128;
--    target_ulong result;
- 
-     shift = shift & 0x3F;
-     mipsdsp_rndrashift_acc(temp, ac, shift, env);
-@@ -3309,9 +3305,7 @@ target_ulong helper_dextr_r_l(target_ulong ac, target_ulong shift,
-         set_DSPControl_overflow_flag(1, 23, env);
-     }
- 
--    result = (temp[1] << 63) | (temp[0] >> 1);
--
--    return result;
-+    return (temp[1] << 63) | (temp[0] >> 1);
- }
- 
- target_ulong helper_dextr_rs_l(target_ulong ac, target_ulong shift,
-@@ -3319,7 +3313,6 @@ target_ulong helper_dextr_rs_l(target_ulong ac, target_ulong shift,
- {
-     uint64_t temp[3];
-     uint32_t temp128;
--    target_ulong result;
- 
-     shift = shift & 0x3F;
-     mipsdsp_rndrashift_acc(temp, ac, shift, env);
-@@ -3345,9 +3338,7 @@ target_ulong helper_dextr_rs_l(target_ulong ac, target_ulong shift,
-         }
-         set_DSPControl_overflow_flag(1, 23, env);
-     }
--    result = (temp[1] << 63) | (temp[0] >> 1);
--
--    return result;
-+    return (temp[1] << 63) | (temp[0] >> 1);
- }
- #endif
- 
-diff --git a/target/xtensa/core-dc232b/xtensa-modules.c b/target/xtensa/core-dc232b/xtensa-modules.c
-index d322c3f52a..164df3b1a4 100644
---- a/target/xtensa/core-dc232b/xtensa-modules.c
-+++ b/target/xtensa/core-dc232b/xtensa-modules.c
-@@ -1736,9 +1736,7 @@ Operand_arr_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_arr_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1750,9 +1748,7 @@ Operand_ars_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ars_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1764,9 +1760,7 @@ Operand_art_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_art_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1778,9 +1772,7 @@ Operand_ar0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1792,9 +1784,7 @@ Operand_ar4_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar4_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1806,9 +1796,7 @@ Operand_ar8_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar8_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1820,9 +1808,7 @@ Operand_ar12_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar12_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1834,9 +1820,7 @@ Operand_ars_entry_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ars_entry_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -2406,9 +2390,7 @@ Operand_mx_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mx_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2436,9 +2418,7 @@ Operand_mw_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mw_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2450,9 +2430,7 @@ Operand_mr0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2464,9 +2442,7 @@ Operand_mr1_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr1_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2478,9 +2454,7 @@ Operand_mr2_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr2_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2492,9 +2466,7 @@ Operand_mr3_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr3_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-diff --git a/target/xtensa/core-dc233c/xtensa-modules.c b/target/xtensa/core-dc233c/xtensa-modules.c
-index 7c20f82349..0f32f0804a 100644
---- a/target/xtensa/core-dc233c/xtensa-modules.c
-+++ b/target/xtensa/core-dc233c/xtensa-modules.c
-@@ -1817,9 +1817,7 @@ Operand_arr_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_arr_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1831,9 +1829,7 @@ Operand_ars_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ars_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1845,9 +1841,7 @@ Operand_art_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_art_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1859,9 +1853,7 @@ Operand_ar0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1873,9 +1865,7 @@ Operand_ar4_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar4_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1887,9 +1877,7 @@ Operand_ar8_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar8_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1901,9 +1889,7 @@ Operand_ar12_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar12_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -1915,9 +1901,7 @@ Operand_ars_entry_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ars_entry_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x1f) != 0;
--  return error;
-+  return (*valp & ~0x1f) != 0;
- }
- 
- static int
-@@ -2487,9 +2471,7 @@ Operand_mx_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mx_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2517,9 +2499,7 @@ Operand_mw_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mw_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2531,9 +2511,7 @@ Operand_mr0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2545,9 +2523,7 @@ Operand_mr1_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr1_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2559,9 +2535,7 @@ Operand_mr2_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr2_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-@@ -2573,9 +2547,7 @@ Operand_mr3_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_mr3_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3) != 0;
--  return error;
-+  return (*valp & ~0x3) != 0;
- }
- 
- static int
-diff --git a/target/xtensa/core-de212/xtensa-modules.c b/target/xtensa/core-de212/xtensa-modules.c
-index ef7674de3a..480c68d3c6 100644
---- a/target/xtensa/core-de212/xtensa-modules.c
-+++ b/target/xtensa/core-de212/xtensa-modules.c
-@@ -1798,9 +1798,7 @@ OperandSem_opnd_sem_AR_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1812,9 +1810,7 @@ OperandSem_opnd_sem_AR_0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1826,9 +1822,7 @@ OperandSem_opnd_sem_AR_1_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_1_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1840,9 +1834,7 @@ OperandSem_opnd_sem_AR_2_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_2_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1854,9 +1846,7 @@ OperandSem_opnd_sem_AR_3_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_3_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1868,9 +1858,7 @@ OperandSem_opnd_sem_AR_4_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_4_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -2464,9 +2452,7 @@ OperandSem_opnd_sem_MR_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_MR_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 4);
--  return error;
-+  return (*valp >= 4);
- }
- 
- static int
-@@ -2478,9 +2464,7 @@ OperandSem_opnd_sem_MR_1_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_MR_1_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 4);
--  return error;
-+  return (*valp >= 4);
- }
- 
- static int
-@@ -2492,9 +2476,7 @@ OperandSem_opnd_sem_MR_2_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_MR_2_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 4);
--  return error;
-+  return (*valp >= 4);
- }
- 
- static int
-@@ -2506,9 +2488,7 @@ OperandSem_opnd_sem_MR_3_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_MR_3_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 4);
--  return error;
-+  return (*valp >= 4);
- }
- 
- static int
-@@ -2520,9 +2500,7 @@ OperandSem_opnd_sem_MR_4_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_MR_4_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 4);
--  return error;
-+  return (*valp >= 4);
- }
- 
- static int
-@@ -2534,9 +2512,7 @@ OperandSem_opnd_sem_MR_5_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_MR_5_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 4);
--  return error;
-+  return (*valp >= 4);
- }
- 
- static int
-diff --git a/target/xtensa/core-fsf/xtensa-modules.c b/target/xtensa/core-fsf/xtensa-modules.c
-index f7de2dec15..c32683ff77 100644
---- a/target/xtensa/core-fsf/xtensa-modules.c
-+++ b/target/xtensa/core-fsf/xtensa-modules.c
-@@ -1379,9 +1379,7 @@ Operand_arr_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_arr_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1393,9 +1391,7 @@ Operand_ars_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ars_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1407,9 +1403,7 @@ Operand_art_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_art_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0xf) != 0;
--  return error;
-+  return (*valp & ~0xf) != 0;
- }
- 
- static int
-@@ -1421,9 +1415,7 @@ Operand_ar0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3f) != 0;
--  return error;
-+  return (*valp & ~0x3f) != 0;
- }
- 
- static int
-@@ -1435,9 +1427,7 @@ Operand_ar4_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar4_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3f) != 0;
--  return error;
-+  return (*valp & ~0x3f) != 0;
- }
- 
- static int
-@@ -1449,9 +1439,7 @@ Operand_ar8_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar8_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3f) != 0;
--  return error;
-+  return (*valp & ~0x3f) != 0;
- }
- 
- static int
-@@ -1463,9 +1451,7 @@ Operand_ar12_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ar12_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3f) != 0;
--  return error;
-+  return (*valp & ~0x3f) != 0;
- }
- 
- static int
-@@ -1477,9 +1463,7 @@ Operand_ars_entry_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- Operand_ars_entry_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp & ~0x3f) != 0;
--  return error;
-+  return (*valp & ~0x3f) != 0;
- }
- 
- static int
-diff --git a/target/xtensa/core-sample_controller/xtensa-modules.c b/target/xtensa/core-sample_controller/xtensa-modules.c
-index fba41b99ae..7e87d216bd 100644
---- a/target/xtensa/core-sample_controller/xtensa-modules.c
-+++ b/target/xtensa/core-sample_controller/xtensa-modules.c
-@@ -1570,9 +1570,7 @@ OperandSem_opnd_sem_AR_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1584,9 +1582,7 @@ OperandSem_opnd_sem_AR_0_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_0_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1598,9 +1594,7 @@ OperandSem_opnd_sem_AR_1_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_1_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1612,9 +1606,7 @@ OperandSem_opnd_sem_AR_2_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_2_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1626,9 +1618,7 @@ OperandSem_opnd_sem_AR_3_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_3_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-@@ -1640,9 +1630,7 @@ OperandSem_opnd_sem_AR_4_decode (uint32 *valp ATTRIBUTE_UNUSED)
- static int
- OperandSem_opnd_sem_AR_4_encode (uint32 *valp)
- {
--  int error;
--  error = (*valp >= 32);
--  return error;
-+  return (*valp >= 32);
- }
- 
- static int
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 4f6d03059f..f88cdbeecd 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -1272,11 +1272,8 @@ XtensaOpcodeOps *
- xtensa_find_opcode_ops(const XtensaOpcodeTranslators *t,
-                        const char *name)
- {
--    XtensaOpcodeOps *ops;
--
--    ops = bsearch(name, t->opcode, t->num_opcodes,
-+    return bsearch(name, t->opcode, t->num_opcodes,
-                   sizeof(XtensaOpcodeOps), compare_opcode_ops);
--    return ops;
- }
- 
- static void translate_abs(DisasContext *dc, const uint32_t arg[],
-diff --git a/tests/m48t59-test.c b/tests/m48t59-test.c
-index 26af7d6e8e..5b695971c7 100644
---- a/tests/m48t59-test.c
-+++ b/tests/m48t59-test.c
-@@ -256,8 +256,6 @@ static void base_setup(void)
- 
- int main(int argc, char **argv)
- {
--    int ret;
--
-     base_setup();
- 
-     g_test_init(&argc, &argv, NULL);
-@@ -267,7 +265,5 @@ int main(int argc, char **argv)
-         qtest_add_func("/rtc/bcd-check-time", bcd_check_time);
-     }
-     qtest_add_func("/rtc/fuzz-registers", fuzz_registers);
--    ret = g_test_run();
--
--    return ret;
-+    return g_test_run();
- }
-diff --git a/tests/test-thread-pool.c b/tests/test-thread-pool.c
-index 91b4ec5524..9cdccb3a47 100644
---- a/tests/test-thread-pool.c
-+++ b/tests/test-thread-pool.c
-@@ -224,8 +224,6 @@ static void test_cancel_async(void)
- 
- int main(int argc, char **argv)
- {
--    int ret;
--
-     qemu_init_main_loop(&error_abort);
-     ctx = qemu_get_current_aio_context();
-     pool = aio_get_thread_pool(ctx);
-@@ -238,7 +236,5 @@ int main(int argc, char **argv)
-     g_test_add_func("/thread-pool/cancel", test_cancel);
-     g_test_add_func("/thread-pool/cancel-async", test_cancel_async);
- 
--    ret = g_test_run();
--
--    return ret;
-+    return g_test_run();
- }
-diff --git a/util/uri.c b/util/uri.c
-index 93ecefdaaf..8624a7ac23 100644
---- a/util/uri.c
-+++ b/util/uri.c
-@@ -1065,10 +1065,7 @@ URI *uri_parse_raw(const char *str, int raw)
-  */
- URI *uri_new(void)
- {
--    URI *ret;
--
--    ret = g_new0(URI, 1);
--    return ret;
-+    return g_new0(URI, 1);
- }
- 
- /**
--- 
-2.14.3
+vring address description is a better model for how to document this
+message.
+
+> @@ -146,6 +155,7 @@ typedef struct VhostUserMsg {
+>          VhostUserLog log;
+>          struct vhost_iotlb_msg iotlb;
+>          VhostUserConfig config;
+> +        VhostUserVringArea area;
+>      };
+>  } QEMU_PACKED VhostUserMsg;
+>  
+> @@ -358,6 +368,17 @@ The fd is provided via VHOST_USER_SET_SLAVE_REQ_FD ancillary data.
+>  A slave may then send VHOST_USER_SLAVE_* messages to the master
+>  using this fd communication channel.
+>  
+> +VFIO based accelerators
+> +-----------------------
+> +
+> +The VFIO based accelerators feature is a protocol extension. It is supported
+> +when the protocol feature VHOST_USER_PROTOCOL_F_VFIO (bit 7) is set.
+> +
+> +The vhost-user backend will set the accelerator context via slave channel,
+> +and QEMU just needs to handle those messages passively.
+
+I didn't understand the above unfortunately.
+accelerator context and passively do not seem to be defined anywhere.
+What do these terms mean here?
+
+How is the backend supposed to use this?
+Could you describe this in a way that will make it possible
+for backend writers to use?
+
+
+> The accelerator
+> +context will be set for each queue independently. So the page-per-vq property
+> +should also be enabled.
+
+Backend author is unlikely to know what does page-per-vq property mean.
+
+Is this intended for users maybe? docs/interop is not the best place
+for user-facing documentation.
+
+I also wonder:
+
+	commit d9997d89a4a09a330a056929d06d4b7b0b7a8239
+	Author: Marcel Apfelbaum <marcel@redhat.com>
+	Date:   Wed Sep 7 18:02:25 2016 +0300
+
+	    virtio-pci: reduce modern_mem_bar size
+	    
+	    Currently each VQ Notification Virtio Capability is allocated
+	    on a different page. The idea is to enable split drivers within
+	    guests, however there are no known plans to do that.
+	    The allocation will result in a 8MB BAR, more than various
+	    guest firmwares pre-allocates for PCI Bridges hotplug process.
+    
+looks like enabling page per vq will break pci express hotplug.
+I suspect more work is needed to down-size the BAR to # of VQs
+actually supported.
+
+
+
+> +
+>  Protocol features
+>  -----------------
+>  
+> @@ -369,6 +390,7 @@ Protocol features
+>  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
+>  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
+>  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+> +#define VHOST_USER_PROTOCOL_F_VFIO           8
+>  
+>  Master message types
+>  --------------------
+> @@ -722,6 +744,41 @@ Slave message types
+>       respond with zero when operation is successfully completed, or non-zero
+>       otherwise.
+>  
+> + * VHOST_USER_SLAVE_VRING_VFIO_GROUP_MSG
+> +
+> +      Id: 3
+> +      Equivalent ioctl: N/A
+> +      Slave payload: u64
+> +      Master payload: N/A
+> +
+> +      Sets the VFIO group file descriptor which is passed as ancillary data
+> +      for a specified queue (queue index is carried in the u64 payload).
+> +      Slave sends this request to tell QEMU to add or delete a VFIO group.
+
+add or delete it where?
+
+> +      QEMU will delete the current group if any for the specified queue when
+> +      the message is sent without a file descriptor. A VFIO group will be
+> +      actually deleted when its reference count reaches zero.
+> +      This request should be sent only when VHOST_USER_PROTOCOL_F_VFIO protocol
+> +      feature has been successfully negotiated.
+
+I think this text should refer reader to Documentation/vfio.txt in Linux
+(you can add a link), and explain how to use it
+in terms consistent with that document.
+
+I also wonder how does this interact with the vIOMMU.
+
+
+To put it another way, I think what is really going on here
+is that slave has configured a VFIO device and is asking the
+master to enable that device to interrupt the guest
+directly (without using an eventfd)?
+
+So qemu offered support for the VFIO extension and slave is using it.
+What assumptions can slave make then?
+
+
+> +
+> + * VHOST_USER_SLAVE_VRING_NOTIFY_AREA_MSG
+> +
+> +      Id: 4
+> +      Equivalent ioctl: N/A
+> +      Slave payload: vring area description
+> +      Master payload: N/A
+> +
+> +      Sets the notify area for a specified queue (queue index is carried
+> +      in the u64 field of the vring area description). A file descriptor is
+> +      passed as ancillary data (typically it's a VFIO device fd). QEMU can
+> +      mmap the file descriptor based on the information carried in the vring
+> +      area description.
+
+Based on it how? What do all fields mean?
+
+> +      Slave sends this request to tell QEMU to add or delete a MemoryRegion
+> +      for a specified queue's notify MMIO region. QEMU will delete the current
+> +      MemoryRegion if any for the specified queue when the message is sent
+> +      without a file descriptor.
+> +      This request should be sent only when VHOST_USER_PROTOCOL_F_VFIO protocol
+> +      feature and VIRTIO_F_VERSION_1 feature have been successfully negotiated.
+> +
+
+This message is a bit easier to understand.
+So this allows backend to replace the notification eventfd
+with a memory area.
+
+
+but readers of this
+document do not know what MemoryRegion is.
+
+
+>  VHOST_USER_PROTOCOL_F_REPLY_ACK:
+>  -------------------------------
+>  The original vhost-user specification only demands replies for certain
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index b228994ffd..07fc63c6e8 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -42,6 +42,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
+>      VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
+>      VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+> +    VHOST_USER_PROTOCOL_F_VFIO = 8,
+>  
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+> @@ -84,6 +85,8 @@ typedef enum VhostUserSlaveRequest {
+>      VHOST_USER_SLAVE_NONE = 0,
+>      VHOST_USER_SLAVE_IOTLB_MSG = 1,
+>      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
+> +    VHOST_USER_SLAVE_VRING_VFIO_GROUP_MSG = 3,
+> +    VHOST_USER_SLAVE_VRING_NOTIFY_AREA_MSG = 4,
+>      VHOST_USER_SLAVE_MAX
+>  }  VhostUserSlaveRequest;
+>  
+> @@ -128,6 +131,12 @@ static VhostUserConfig c __attribute__ ((unused));
+>                                     + sizeof(c.size) \
+>                                     + sizeof(c.flags))
+>  
+> +typedef struct VhostUserVringArea {
+> +    uint64_t u64;
+> +    uint64_t size;
+> +    uint64_t offset;
+> +} VhostUserVringArea;
+> +
+>  typedef struct {
+>      VhostUserRequest request;
+>  
+> @@ -149,6 +158,7 @@ typedef union {
+>          struct vhost_iotlb_msg iotlb;
+>          VhostUserConfig config;
+>          VhostUserCryptoSession session;
+> +        VhostUserVringArea area;
+>  } VhostUserPayload;
+>  
+>  typedef struct VhostUserMsg {
+> @@ -459,9 +469,37 @@ static int vhost_user_set_vring_num(struct vhost_dev *dev,
+>      return vhost_set_vring(dev, VHOST_USER_SET_VRING_NUM, ring);
+>  }
+>  
+> +static void vhost_user_notify_region_remap(struct vhost_dev *dev, int queue_idx)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserVFIOState *vfio = &u->shared->vfio;
+> +    VhostUserNotifyCtx *notify = &vfio->notify[queue_idx];
+> +    VirtIODevice *vdev = dev->vdev;
+> +
+> +    if (notify->addr && !notify->mapped) {
+> +        virtio_device_notify_region_map(vdev, queue_idx, &notify->mr);
+> +        notify->mapped = true;
+> +    }
+> +}
+> +
+> +static void vhost_user_notify_region_unmap(struct vhost_dev *dev, int queue_idx)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserVFIOState *vfio = &u->shared->vfio;
+> +    VhostUserNotifyCtx *notify = &vfio->notify[queue_idx];
+> +    VirtIODevice *vdev = dev->vdev;
+> +
+> +    if (notify->addr && notify->mapped) {
+> +        virtio_device_notify_region_unmap(vdev, &notify->mr);
+> +        notify->mapped = false;
+> +    }
+> +}
+> +
+>  static int vhost_user_set_vring_base(struct vhost_dev *dev,
+>                                       struct vhost_vring_state *ring)
+>  {
+> +    vhost_user_notify_region_remap(dev, ring->index);
+> +
+>      return vhost_set_vring(dev, VHOST_USER_SET_VRING_BASE, ring);
+>  }
+>  
+> @@ -495,6 +533,8 @@ static int vhost_user_get_vring_base(struct vhost_dev *dev,
+>          .hdr.size = sizeof(msg.payload.state),
+>      };
+>  
+> +    vhost_user_notify_region_unmap(dev, ring->index);
+> +
+>      if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+>          return -1;
+>      }
+> @@ -668,6 +708,133 @@ static int vhost_user_slave_handle_config_change(struct vhost_dev *dev)
+>      return ret;
+>  }
+>  
+> +static int vhost_user_handle_vring_vfio_group(struct vhost_dev *dev,
+> +                                              uint64_t u64,
+
+That's not a good variable name.
+
+> +                                              int groupfd)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserVFIOState *vfio = &u->shared->vfio;
+> +    int queue_idx = u64 & VHOST_USER_VRING_IDX_MASK;
+> +    VirtIODevice *vdev = dev->vdev;
+> +    VFIOGroup *group;
+> +    int ret = 0;
+> +
+> +    qemu_mutex_lock(&vfio->lock);
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                            VHOST_USER_PROTOCOL_F_VFIO) ||
+> +        vdev == NULL || queue_idx >= virtio_get_num_queues(vdev)) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    if (vfio->group[queue_idx]) {
+> +        vfio_put_group(vfio->group[queue_idx]);
+> +        vfio->group[queue_idx] = NULL;
+> +    }
+> +
+> +    if (u64 & VHOST_USER_VRING_NOFD_MASK) {
+> +        goto out;
+> +    }
+> +
+> +    group = vfio_get_group_from_fd(groupfd, NULL, NULL);
+> +    if (group == NULL) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    if (group->fd != groupfd) {
+> +        close(groupfd);
+> +    }
+> +
+> +    vfio->group[queue_idx] = group;
+> +
+> +out:
+> +    kvm_irqchip_commit_routes(kvm_state);
+
+The fact we poke at kvm_eventfds_enabled is already kind of ugly.
+It would be better to just process eventfds in QEMU when we do not
+and make it transparent to the backend.
+
+I don't think vhost should touch more kvm state directly like that.
+
+
+
+> +    qemu_mutex_unlock(&vfio->lock);
+> +
+> +    if (ret != 0 && groupfd != -1) {
+> +        close(groupfd);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +#define NOTIFY_PAGE_SIZE 0x1000
+
+why is this correct for all systems?
+
+> +
+> +static int vhost_user_handle_vring_notify_area(struct vhost_dev *dev,
+> +                                               VhostUserVringArea *area,
+> +                                               int fd)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserVFIOState *vfio = &u->shared->vfio;
+> +    int queue_idx = area->u64 & VHOST_USER_VRING_IDX_MASK;
+> +    VirtIODevice *vdev = dev->vdev;
+> +    VhostUserNotifyCtx *notify;
+> +    void *addr = NULL;
+> +    int ret = 0;
+> +    char *name;
+> +
+> +    qemu_mutex_lock(&vfio->lock);
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                            VHOST_USER_PROTOCOL_F_VFIO) ||
+> +        vdev == NULL || queue_idx >= virtio_get_num_queues(vdev) ||
+> +        !virtio_device_page_per_vq_enabled(vdev)) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    notify = &vfio->notify[queue_idx];
+> +
+> +    if (notify->addr) {
+> +        virtio_device_notify_region_unmap(vdev, &notify->mr);
+> +        munmap(notify->addr, NOTIFY_PAGE_SIZE);
+> +        object_unparent(OBJECT(&notify->mr));
+> +        notify->addr = NULL;
+> +    }
+> +
+> +    if (area->u64 & VHOST_USER_VRING_NOFD_MASK) {
+> +        goto out;
+> +    }
+> +
+> +    if (area->size < NOTIFY_PAGE_SIZE) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+
+So that's the only use of size. Why have it at all then?
+
+> +
+> +    addr = mmap(NULL, NOTIFY_PAGE_SIZE, PROT_READ | PROT_WRITE,
+> +                MAP_SHARED, fd, area->offset);
+
+Can't we use memory_region_init_ram_from_fd?
+
+Also, must validate the message before doing things like that.
+
+
+> +    if (addr == MAP_FAILED) {
+> +        error_report("Can't map notify region.");
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    name = g_strdup_printf("vhost-user/vfio@%p mmaps[%d]", vfio, queue_idx);
+> +    memory_region_init_ram_device_ptr(&notify->mr, OBJECT(vdev), name,
+> +                                      NOTIFY_PAGE_SIZE, addr);
+
+This will register RAM for migration which probably isn't what you want.
+
+> +    g_free(name);
+> +
+> +    if (virtio_device_notify_region_map(vdev, queue_idx, &notify->mr)) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    notify->addr = addr;
+> +    notify->mapped = true;
+> +
+> +out:
+> +    if (ret < 0 && addr != NULL) {
+> +        munmap(addr, NOTIFY_PAGE_SIZE);
+
+Does this actually do the right thing?
+Don't we need to finalize the mr we created?
+
+
+> +    }
+> +    if (fd != -1) {
+> +        close(fd);
+> +    }
+
+Who will close it if there's no error?
+Looks like this leaks fds on success.
+
+> +    qemu_mutex_unlock(&vfio->lock);
+> +    return ret;
+> +}
+> +
+>  static void slave_read(void *opaque)
+>  {
+>      struct vhost_dev *dev = opaque;
+> @@ -734,6 +901,12 @@ static void slave_read(void *opaque)
+>      case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG :
+>          ret = vhost_user_slave_handle_config_change(dev);
+>          break;
+> +    case VHOST_USER_SLAVE_VRING_VFIO_GROUP_MSG:
+> +        ret = vhost_user_handle_vring_vfio_group(dev, payload.u64, fd);
+> +        break;
+> +    case VHOST_USER_SLAVE_VRING_NOTIFY_AREA_MSG:
+> +        ret = vhost_user_handle_vring_notify_area(dev, &payload.area, fd);
+> +        break;
+>      default:
+>          error_report("Received unexpected msg type.");
+>          if (fd != -1) {
+> @@ -844,6 +1017,10 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
+>      u->slave_fd = -1;
+>      dev->opaque = u;
+>  
+> +    if (dev->vq_index == 0) {
+> +        qemu_mutex_init(&u->shared->vfio.lock);
+> +    }
+> +
+>      err = vhost_user_get_features(dev, &features);
+>      if (err < 0) {
+>          return err;
+
+That seems inelegant.
+Now that we have a shared vhost user state, I'd expect a
+clean way to initialize it.
+
+> @@ -904,6 +1081,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
+>  static int vhost_user_cleanup(struct vhost_dev *dev)
+>  {
+>      struct vhost_user *u;
+> +    int i;
+>  
+>      assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
+>  
+> @@ -913,6 +1091,26 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
+>          close(u->slave_fd);
+>          u->slave_fd = -1;
+>      }
+> +
+> +    if (dev->vq_index == 0) {
+> +        VhostUserVFIOState *vfio = &u->shared->vfio;
+> +
+> +        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+> +            if (vfio->notify[i].addr) {
+> +                munmap(vfio->notify[i].addr, NOTIFY_PAGE_SIZE);
+> +                object_unparent(OBJECT(&vfio->notify[i].mr));
+> +                vfio->notify[i].addr = NULL;
+> +            }
+> +
+> +            if (vfio->group[i]) {
+> +                vfio_put_group(vfio->group[i]);
+> +                vfio->group[i] = NULL;
+> +            }
+> +        }
+> +
+> +        qemu_mutex_destroy(&u->shared->vfio.lock);
+> +    }
+> +
+>      g_free(u);
+>      dev->opaque = 0;
+>  
+
+Same here.
+
+> diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+> index 4f5a1477d1..de8c647962 100644
+> --- a/include/hw/virtio/vhost-user.h
+> +++ b/include/hw/virtio/vhost-user.h
+> @@ -9,9 +9,26 @@
+>  #define HW_VIRTIO_VHOST_USER_H
+>  
+>  #include "chardev/char-fe.h"
+> +#include "hw/virtio/virtio.h"
+> +#include "hw/vfio/vfio-common.h"
+> +
+> +typedef struct VhostUserNotifyCtx {
+> +    void *addr;
+> +    MemoryRegion mr;
+> +    bool mapped;
+> +} VhostUserNotifyCtx;
+> +
+> +typedef struct VhostUserVFIOState {
+> +    /* The VFIO group associated with each queue */
+> +    VFIOGroup *group[VIRTIO_QUEUE_MAX];
+> +    /* The notify context of each queue */
+> +    VhostUserNotifyCtx notify[VIRTIO_QUEUE_MAX];
+> +    QemuMutex lock;
+> +} VhostUserVFIOState;
+>  
+>  typedef struct VhostUser {
+>      CharBackend chr;
+> +    VhostUserVFIOState vfio;
+>  } VhostUser;
+>  
+>  #endif
+> -- 
+> 2.11.0
