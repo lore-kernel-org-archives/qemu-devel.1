@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1ez4mb-00079F-NF
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:17:51 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1ez4mb-00079H-P3
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:17:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1ez4mY-0000bZ-Il
+	(envelope-from <a.perevalov@samsung.com>) id 1ez4mY-0000bR-ID
 	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:17:49 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:44920)
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:60165)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1ez4mY-0000aF-3F
+	id 1ez4mY-0000ab-3f
 	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 14:17:46 -0400
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 22 Mar 2018 21:17:23 +0300
-Message-id: <1521742647-25550-3-git-send-email-a.perevalov@samsung.com>
+Date: Thu, 22 Mar 2018 21:17:24 +0300
+Message-id: <1521742647-25550-4-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1521742647-25550-1-git-send-email-a.perevalov@samsung.com>
 References: <1521742647-25550-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20180322181740eucas1p13028d8418e837695a91ded89385f8978@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v2 2/6] migration: add postcopy blocktime ctx
- into MigrationIncomingState
+	<CGME20180322181741eucas1p1d80d609a6d0aca10e459563b715b37d6@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v2 3/6] migration: calculate vCPU blocktime on
+ dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,148 +29,232 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, dgilbert@redhat.com
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, v.kuramshin@samsung.com, ash.billore@samsung.com, f4bug@amsat.org, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com
 
-This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID, in
-case this feature is provided by kernel.
+This patch provides blocktime calculation per vCPU,
+as a summary and as a overlapped value for all vCPUs.
 
-PostcopyBlocktimeContext is encapsulated inside postcopy-ram.c,
-due to it being a postcopy-only feature.
-Also it defines PostcopyBlocktimeContext's instance live time.
-Information from PostcopyBlocktimeContext instance will be provided
-much after postcopy migration end, instance of PostcopyBlocktimeContext
-will live till QEMU exit, but part of it (vcpu_addr,
-page_fault_vcpu_time) used only during calculation, will be released
-when postcopy ended or failed.
+This approach was suggested by Peter Xu, as an improvements of
+previous approch where QEMU kept tree with faulted page address and cpus bitmask
+in it. Now QEMU is keeping array with faulted page address as value and vCPU
+as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+list for blocktime per vCPU (could be traced with page_fault_addr)
 
-To enable postcopy blocktime calculation on destination, need to
-request proper compatibility (Patch for documentation will be at the
-tail of the patch set).
+Blocktime will not calculated if postcopy_blocktime field of
+MigrationIncomingState wasn't initialized.
 
-As an example following command enable that capability, assume QEMU was
-started with
--chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
-option to control it
-
-[root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
-{\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
-\"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
-true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
-
-Or just with HMP
-(qemu) migrate_set_capability postcopy-blocktime on
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.h    |  8 +++++++
- migration/postcopy-ram.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ migration/postcopy-ram.c | 151 ++++++++++++++++++++++++++++++++++++++++++++++-
+ migration/trace-events   |   5 +-
+ 2 files changed, 154 insertions(+), 2 deletions(-)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index 46a50bc..6d9aaeb 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -22,6 +22,8 @@
- #include "hw/qdev.h"
- #include "io/channel.h"
- 
-+struct PostcopyBlocktimeContext;
-+
- /* State for the incoming migration */
- struct MigrationIncomingState {
-     QEMUFile *from_src_file;
-@@ -65,6 +67,12 @@ struct MigrationIncomingState {
-     /* The coroutine we should enter (back) after failover */
-     Coroutine *migration_incoming_co;
-     QemuSemaphore colo_incoming_sem;
-+
-+    /*
-+     * PostcopyBlocktimeContext to keep information for postcopy
-+     * live migration, to calculate vCPU block time
-+     * */
-+    struct PostcopyBlocktimeContext *blocktime_ctx;
- };
- 
- MigrationIncomingState *migration_incoming_get_current(void);
 diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index efd7793..66f1df9 100644
+index 66f1df9..6b01884 100644
 --- a/migration/postcopy-ram.c
 +++ b/migration/postcopy-ram.c
-@@ -90,6 +90,54 @@ int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
- #include <sys/eventfd.h>
- #include <linux/userfaultfd.h>
+@@ -636,6 +636,148 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+     return 0;
+ }
  
-+typedef struct PostcopyBlocktimeContext {
-+    /* time when page fault initiated per vCPU */
-+    uint32_t *page_fault_vcpu_time;
-+    /* page address per vCPU */
-+    uintptr_t *vcpu_addr;
-+    uint32_t total_blocktime;
-+    /* blocktime per vCPU */
-+    uint32_t *vcpu_blocktime;
-+    /* point in time when last page fault was initiated */
-+    uint32_t last_begin;
-+    /* number of vCPU are suspended */
-+    int smp_cpus_down;
-+    uint64_t start_time;
-+
-+    /*
-+     * Handler for exit event, necessary for
-+     * releasing whole blocktime_ctx
-+     */
-+    Notifier exit_notifier;
-+} PostcopyBlocktimeContext;
-+
-+static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
++static int get_mem_fault_cpu_index(uint32_t pid)
 +{
-+    g_free(ctx->page_fault_vcpu_time);
-+    g_free(ctx->vcpu_addr);
-+    g_free(ctx->vcpu_blocktime);
-+    g_free(ctx);
-+}
++    CPUState *cpu_iter;
 +
-+static void migration_exit_cb(Notifier *n, void *data)
-+{
-+    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
-+                                                 exit_notifier);
-+    destroy_blocktime_context(ctx);
-+}
-+
-+static struct PostcopyBlocktimeContext *blocktime_context_new(void)
-+{
-+    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
-+    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
-+    ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
-+    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
-+
-+    ctx->exit_notifier.notify = migration_exit_cb;
-+    ctx->start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    qemu_add_exit_notifier(&ctx->exit_notifier);
-+    return ctx;
-+}
- 
- /**
-  * receive_ufd_features: check userfault fd features, to request only supported
-@@ -182,6 +230,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
-         }
-     }
- 
-+#ifdef UFFD_FEATURE_THREAD_ID
-+    if (migrate_postcopy_blocktime() && mis &&
-+        UFFD_FEATURE_THREAD_ID & supported_features) {
-+        /* kernel supports that feature */
-+        /* don't create blocktime_context if it exists */
-+        if (!mis->blocktime_ctx) {
-+            mis->blocktime_ctx = blocktime_context_new();
++    CPU_FOREACH(cpu_iter) {
++        if (cpu_iter->thread_id == pid) {
++            trace_get_mem_fault_cpu_index(cpu_iter->cpu_index, pid);
++            return cpu_iter->cpu_index;
 +        }
-+
-+        asked_features |= UFFD_FEATURE_THREAD_ID;
 +    }
-+#endif
++    trace_get_mem_fault_cpu_index(-1, pid);
++    return -1;
++}
 +
-     /*
-      * request features, even if asked_features is 0, due to
-      * kernel expects UFFD_API before UFFDIO_REGISTER, per
++static uint32_t get_low_time_offset(PostcopyBlocktimeContext *dc)
++{
++    int64_t start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
++                                    dc->start_time;
++    return start_time_offset < 1 ? 1 : start_time_offset & UINT32_MAX;
++}
++
++/*
++ * This function is being called when pagefault occurs. It
++ * tracks down vCPU blocking time.
++ *
++ * @addr: faulted host virtual address
++ * @ptid: faulted process thread id
++ * @rb: ramblock appropriate to addr
++ */
++static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
++                                          RAMBlock *rb)
++{
++    int cpu, already_received;
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
++    uint32_t low_time_offset;
++
++    if (!dc || ptid == 0) {
++        return;
++    }
++    cpu = get_mem_fault_cpu_index(ptid);
++    if (cpu < 0) {
++        return;
++    }
++
++    low_time_offset = get_low_time_offset(dc);
++    if (dc->vcpu_addr[cpu] == 0) {
++        atomic_inc(&dc->smp_cpus_down);
++    }
++
++    atomic_xchg(&dc->last_begin, low_time_offset);
++    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
++    atomic_xchg(&dc->vcpu_addr[cpu], addr);
++
++    /* check it here, not at the begining of the function,
++     * due to, check could accur early than bitmap_set in
++     * qemu_ufd_copy_ioctl */
++    already_received = ramblock_recv_bitmap_test(rb, (void *)addr);
++    if (already_received) {
++        atomic_xchg(&dc->vcpu_addr[cpu], 0);
++        atomic_xchg(&dc->page_fault_vcpu_time[cpu], 0);
++        atomic_dec(&dc->smp_cpus_down);
++    }
++    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
++                                        cpu, already_received);
++}
++
++/*
++ *  This function just provide calculated blocktime per cpu and trace it.
++ *  Total blocktime is calculated in mark_postcopy_blocktime_end.
++ *
++ *
++ * Assume we have 3 CPU
++ *
++ *      S1        E1           S1               E1
++ * -----***********------------xxx***************------------------------> CPU1
++ *
++ *             S2                E2
++ * ------------****************xxx---------------------------------------> CPU2
++ *
++ *                         S3            E3
++ * ------------------------****xxx********-------------------------------> CPU3
++ *
++ * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
++ * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
++ * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
++ *            it's a part of total blocktime.
++ * S1 - here is last_begin
++ * Legend of the picture is following:
++ *              * - means blocktime per vCPU
++ *              x - means overlapped blocktime (total blocktime)
++ *
++ * @addr: host virtual address
++ */
++static void mark_postcopy_blocktime_end(uintptr_t addr)
++{
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
++    int i, affected_cpu = 0;
++    bool vcpu_total_blocktime = false;
++    uint32_t read_vcpu_time, low_time_offset;
++
++    if (!dc) {
++        return;
++    }
++
++    low_time_offset = get_low_time_offset(dc);
++    /* lookup cpu, to clear it,
++     * that algorithm looks straighforward, but it's not
++     * optimal, more optimal algorithm is keeping tree or hash
++     * where key is address value is a list of  */
++    for (i = 0; i < smp_cpus; i++) {
++        uint32_t vcpu_blocktime = 0;
++
++        read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
++        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
++            read_vcpu_time == 0) {
++            continue;
++        }
++        atomic_xchg(&dc->vcpu_addr[i], 0);
++        vcpu_blocktime = low_time_offset - read_vcpu_time;
++        affected_cpu += 1;
++        /* we need to know is that mark_postcopy_end was due to
++         * faulted page, another possible case it's prefetched
++         * page and in that case we shouldn't be here */
++        if (!vcpu_total_blocktime &&
++            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
++            vcpu_total_blocktime = true;
++        }
++        /* continue cycle, due to one page could affect several vCPUs */
++        dc->vcpu_blocktime[i] += vcpu_blocktime;
++    }
++
++    atomic_sub(&dc->smp_cpus_down, affected_cpu);
++    if (vcpu_total_blocktime) {
++        dc->total_blocktime += low_time_offset - atomic_fetch_add(
++                &dc->last_begin, 0);
++    }
++    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
++                                      affected_cpu);
++}
++
+ /*
+  * Handle faults detected by the USERFAULT markings
+  */
+@@ -742,7 +884,12 @@ static void *postcopy_ram_fault_thread(void *opaque)
+             rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+             trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+                                                 qemu_ram_get_idstr(rb),
+-                                                rb_offset);
++                                                rb_offset,
++                                                msg.arg.pagefault.feat.ptid);
++            mark_postcopy_blocktime_begin(
++                    (uintptr_t)(msg.arg.pagefault.address),
++                                msg.arg.pagefault.feat.ptid, rb);
++
+             /*
+              * Send the request to the source - we want to request one
+              * of our host page sizes (which is >= TPS)
+@@ -889,6 +1036,8 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+     if (!ret) {
+         ramblock_recv_bitmap_set_range(rb, host_addr,
+                                        pagesize / qemu_target_page_size());
++        mark_postcopy_blocktime_end((uintptr_t)host_addr);
++
+     }
+     return ret;
+ }
+diff --git a/migration/trace-events b/migration/trace-events
+index a180d7b..368bc4b 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -115,6 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+ process_incoming_migration_co_postcopy_end_main(void) ""
+ migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+ migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
++mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
++mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+ 
+ # migration/rdma.c
+ qemu_rdma_accept_incoming_migration(void) ""
+@@ -193,7 +195,7 @@ postcopy_ram_fault_thread_exit(void) ""
+ postcopy_ram_fault_thread_fds_core(int baseufd, int quitfd) "ufd: %d quitfd: %d"
+ postcopy_ram_fault_thread_fds_extra(size_t index, const char *name, int fd) "%zd/%s: %d"
+ postcopy_ram_fault_thread_quit(void) ""
+-postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx"
++postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx pid=%u"
+ postcopy_ram_incoming_cleanup_closeuf(void) ""
+ postcopy_ram_incoming_cleanup_entry(void) ""
+ postcopy_ram_incoming_cleanup_exit(void) ""
+@@ -206,6 +208,7 @@ save_xbzrle_page_skipping(void) ""
+ save_xbzrle_page_overflow(void) ""
+ ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+ ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
++get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
+ 
+ # migration/exec.c
+ migration_exec_outgoing(const char *cmd) "cmd=%s"
 -- 
 2.7.4
