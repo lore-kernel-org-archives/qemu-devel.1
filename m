@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eysPW-0000NY-Vl
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:05:12 -0400
+	(envelope-from <no-reply@patchew.org>) id 1eysS7-0001Hx-EE
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eysPT-00058f-Qs
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:05:10 -0400
-Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:36381)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eysPT-00057X-L7
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:05:07 -0400
-Received: by mail-io0-x236.google.com with SMTP id o4so9358328iod.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Mar 2018 22:05:07 -0700 (PDT)
-References: <1521663109-32262-1-git-send-email-cota@braap.org>
-	<1521663109-32262-9-git-send-email-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <67b8c0f8-3fd9-ba7c-a666-d0715b5a3329@linaro.org>
-Date: Thu, 22 Mar 2018 13:05:00 +0800
+	(envelope-from <no-reply@patchew.org>) id 1eysS4-0006oG-8l
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 01:07:51 -0400
+Resent-Message-Id: <E1eysS4-0006oG-8l@eggs.gnu.org>
+In-Reply-To: <20180321211056.3339-1-yuval.shaia@oracle.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152169525471.222.10982135661238361362@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <1521663109-32262-9-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 08/14] hostfloat: support float32/64
- addition and subtraction
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 21 Mar 2018 22:07:35 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/3] hw/rdma: Fix 32-bit compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: yuval.shaia@oracle.com
+Cc: famz@redhat.com, marcel@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 03/22/2018 04:11 AM, Emilio G. Cota wrote:
-> +#define GEN_FPU_ADDSUB(add_name, sub_name, soft_t, host_t,              \
-> +                       host_abs_func, min_normal)                       \
-> +    static inline __attribute__((always_inline)) soft_t                 \
-> +    fpu_ ## soft_t ## _addsub(soft_t a, soft_t b, bool subtract,        \
-> +                              float_status *s)                          \
-> +    {                                                                   \
-> +        soft_t ## _input_flush2(&a, &b, s);                             \
-> +        if (likely((soft_t ## _is_normal(a) || soft_t ## _is_zero(a)) && \
-> +                   (soft_t ## _is_normal(b) || soft_t ## _is_zero(b)) && \
-> +                   s->float_exception_flags & float_flag_inexact &&     \
-> +                   s->float_rounding_mode == float_round_nearest_even)) { \
-> +            host_t ha = soft_t ## _to_ ## host_t(a);                    \
-> +            host_t hb = soft_t ## _to_ ## host_t(b);                    \
-> +            host_t hr;                                                  \
-> +            soft_t r;                                                   \
-> +                                                                        \
-> +            if (subtract) {                                             \
-> +                hb = -hb;                                               \
-> +            }                                                           \
-> +            hr = ha + hb;                                               \
-> +            r = host_t ## _to_ ## soft_t(hr);                           \
-> +            if (unlikely(soft_t ## _is_infinity(r))) {                  \
-> +                s->float_exception_flags |= float_flag_overflow;        \
-> +            } else if (unlikely(host_abs_func(hr) <= min_normal)) {     \
-> +                goto soft;                                              \
-> +            }                                                           \
-> +            return r;                                                   \
-> +        }                                                               \
-> +    soft:                                                               \
-
-Is there any especially good reason you want to not put this code into the
-normal softfloat function?  Does it really many any measurable difference at
-all to force this code to be inlined into a helper?
-
-
-r~
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzIxMjExMDU2LjMzMzktMS15dXZhbC5zaGFpYUBvcmFjbGUuY29tClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBody9yZG1hOiBGaXggMzItYml0IGNvbXBp
+bGF0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCjc5Njg0MDI1NDUgaHcvcmRtYTogRml4IDMyLWJpdCBjb21waWxhdGlvbgozOTI0
+ZTA2MzVkIGh3L3JkbWE6IFVzZSBjb3JyZWN0IHByaW50IGZvcm1hdCBpbiBDSEtfQVRUUiBtYWNy
+bwo5MjhlZGIwNTU0IGh3L3JkbWE6IENoYW5nZSBob3N0X3ZpcnQgdG8gdm9pZCAqCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IGh3L3JkbWE6IENoYW5nZSBob3N0X3Zp
+cnQgdG8gdm9pZCAqLi4uCkNoZWNraW5nIFBBVENIIDIvMzogaHcvcmRtYTogVXNlIGNvcnJlY3Qg
+cHJpbnQgZm9ybWF0IGluIENIS19BVFRSIG1hY3JvLi4uCkNoZWNraW5nIFBBVENIIDMvMzogaHcv
+cmRtYTogRml4IDMyLWJpdCBjb21waWxhdGlvbi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojNDA6IEZJTEU6IGh3L3JkbWEvcmRtYV9iYWNrZW5kLmM6MTgwOgorICAgICAgICAg
+ICAgcHJfZGJnKCJpYnZfY3JlYXRlX2FoIGZhaWxlZCBmb3IgZ2lkIDwweCUiIFBSSXg2NCAiLCAw
+eCUiIFBSSXg2NCAiPlxuIiwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNs
+b3NlIHBhcmVudGhlc2lzICcpJwojNzg6IEZJTEU6IGh3L3JkbWEvcmRtYV9iYWNrZW5kLmM6Njcz
+OgorICAgIENIS19BVFRSKGRldl9hdHRyLCBiYWNrZW5kX2Rldi0+ZGV2X2F0dHIsIG1heF9tcl9z
+aXplLCAiJSIgUFJJZDY0ICk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ0
+OiBGSUxFOiBody9yZG1hL3Ztdy9wdnJkbWFfbWFpbi5jOjM0NToKKyAgICAgICAgcHJfZXJyKCJF
+cnJvciB0cnlpbmcgdG8gc2V0IFJFRyB2YWx1ZSwgYWRkcj0weCUiIFBSSXg2NCAiLCB2YWw9MHgl
+IiBQUkl4NjQgIlxuIiwKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgMjQ4IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
