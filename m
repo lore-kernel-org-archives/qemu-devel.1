@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1ez7gC-00015a-SK
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:23:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1ez8CM-0003cL-Jt
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1ez7gB-0005zf-Vj
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:23:24 -0400
-From: Wei Huang <wei@redhat.com>
-Date: Thu, 22 Mar 2018 16:23:18 -0500
-Message-Id: <20180322212318.7182-1-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V2 1/1] mach-virt: Set VM's SMBIOS system
- version to mc->name
+	(envelope-from <bounces@canonical.com>) id 1ez8CI-0002oC-LM
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:56:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ez8CI-0002mz-Fi
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 17:56:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ez8CE-0004Pt-O4
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 21:56:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 755E22E8D3B
+	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 21:56:28 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Mar 2018 21:45:59 -0000
+From: Launchpad Bug Tracker <1749393@bugs.launchpad.net>
+Reply-To: Bug 1749393 <1749393@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151859702399.9461.6832978283203997178.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152175516030.1762.11925966608095141926.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1749393] Re: sbrk() not working under qemu-user
+ with a PIE-compiled binary?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,86 +38,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, drjones@redhat.com, berrange@redhat.com
 
-Instead of using "1.0" as the system version of SMBIOS, we should use
-mc->name for mach-virt machine type to be consistent other architectures.
-With this patch, "dmidecode -t 1" (e.g., "-M virt-2.12,accel=kvm") will
-show:
+Status changed to 'Confirmed' because the bug affects multiple users.
 
-    Handle 0x0100, DMI type 1, 27 bytes
-    System Information
-            Manufacturer: QEMU
-            Product Name: KVM Virtual Machine
-            Version: virt-2.12
-            Serial Number: Not Specified
-            ...
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Confirmed
 
-instead of:
+-- =
 
-    Handle 0x0100, DMI type 1, 27 bytes
-    System Information
-            Manufacturer: QEMU
-            Product Name: KVM Virtual Machine
-            Version: 1.0
-            Serial Number: Not Specified
-            ...
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1749393
 
-For backward compatibility, we allow older machine types to keep "1.0"
-as the default system version.
+Title:
+  sbrk() not working under qemu-user with a PIE-compiled binary?
 
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- hw/arm/virt.c         | 8 +++++++-
- include/hw/arm/virt.h | 1 +
- 2 files changed, 8 insertions(+), 1 deletion(-)
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2c07245047..94dcb125d3 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1132,6 +1132,8 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
- 
- static void virt_build_smbios(VirtMachineState *vms)
- {
-+    MachineClass *mc = MACHINE_GET_CLASS(vms);
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-     const char *product = "QEMU Virtual Machine";
-@@ -1145,7 +1147,8 @@ static void virt_build_smbios(VirtMachineState *vms)
-     }
- 
-     smbios_set_defaults("QEMU", product,
--                        "1.0", false, true, SMBIOS_ENTRY_POINT_30);
-+                        vmc->smbios_old_sys_ver ? "1.0" : mc->name, false,
-+                        true, SMBIOS_ENTRY_POINT_30);
- 
-     smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
-                       &smbios_anchor, &smbios_anchor_len);
-@@ -1646,8 +1649,11 @@ static void virt_2_11_instance_init(Object *obj)
- 
- static void virt_machine_2_11_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_2_12_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
-+    vmc->smbios_old_sys_ver = true;
- }
- DEFINE_VIRT_MACHINE(2, 11)
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 33b0ff3892..ba0c1a4faa 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -85,6 +85,7 @@ typedef struct {
-     bool no_its;
-     bool no_pmu;
-     bool claim_edge_triggered_timers;
-+    bool smbios_old_sys_ver;
- } VirtMachineClass;
- 
- typedef struct {
--- 
-2.14.3
+Bug description:
+  In Debian unstable, we recently switched bash to be a PIE-compiled
+  binary (for hardening). Unfortunately this resulted in bash being
+  broken when run under qemu-user (for all target architectures, host
+  being amd64 for me).
+
+  $ sudo chroot /srv/chroots/sid-i386/ qemu-i386-static /bin/bash
+  bash: xmalloc: .././shell.c:1709: cannot allocate 10 bytes (0 bytes alloc=
+ated)
+
+  bash has its own malloc implementation based on sbrk():
+  https://git.savannah.gnu.org/cgit/bash.git/tree/lib/malloc/malloc.c
+
+  When we disable this internal implementation and rely on glibc's
+  malloc, then everything is fine. But it might be that glibc has a
+  fallback when sbrk() is not working properly and it might hide the
+  underlying problem in qemu-user.
+
+  This issue has also been reported to the bash upstream author and he sugg=
+ested that the issue might be in qemu-user so I'm opening a ticket here. He=
+re's the discussion with the bash upstream author:
+  https://lists.gnu.org/archive/html/bug-bash/2018-02/threads.html#00080
+
+  You can find the problematic bash binary in that .deb file:
+  http://snapshot.debian.org/archive/debian/20180206T154716Z/pool/main/b/ba=
+sh/bash_4.4.18-1_i386.deb
+
+  The version of qemu I have been using is 2.11 (Debian package qemu-
+  user-static version 1:2.11+dfsg-1) but I have had reports that the
+  problem is reproducible with older versions (back to 2.8 at least).
+
+  Here are the related Debian bug reports:
+  https://bugs.debian.org/889869
+  https://bugs.debian.org/865599
+
+  It's worth noting that bash used to have this problem (when compiled as a=
+ PIE binary) even when run directly but then something got fixed in the ker=
+nel and now the problem only appears when run under qemu-user:
+  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1518483
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1749393/+subscriptions
