@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ezTxw-0000i8-BC
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:11:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1ezTyq-0001C0-RK
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:12:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ezTxs-0003M8-VZ
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:11:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43226)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ezTxs-0003Lk-Pc
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:11:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ezTxr-0001Kn-Ua
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 21:11:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E4F6A2E8191
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 21:11:07 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1ezTym-0003tX-4f
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:12:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36264 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezTyl-0003tD-WD
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:12:04 -0400
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<1520860275-101576-6-git-send-email-imammedo@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7ff0f691-b682-61e0-ebfe-f484c87fbc8d@redhat.com>
+Date: Fri, 23 Mar 2018 16:11:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Mar 2018 20:59:48 -0000
-From: philmd <1663287@bugs.launchpad.net>
-Reply-To: Bug 1663287 <1663287@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170209154937.3933.99004.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152183878935.22149.9888114464000751404.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1663287] Re: Illegal delay slot code causes abort
- on mips64
+In-Reply-To: <1520860275-101576-6-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/9] qapi: introduce new cmd option
+ "allowed-in-preconfig"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
-** Tags added: mips
+On 03/12/2018 08:11 AM, Igor Mammedov wrote:
+> New option will be used to allow commands, which are prepared/need
+> to run run in preconfig state. Other commands that should be able
 
--- =
+s/run run in/run, during/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1663287
+> to run in preconfig state, should be ammeded to not expect machine
 
-Title:
-  Illegal delay slot code causes abort on mips64
+s/ammeded/amended/
 
-Status in QEMU:
-  New
+> in initialized state or deal with it.
+> 
+> For compatibility reasons, commands, that don't use new flag
 
-Bug description:
-  During some randomised testing of an experimental MIPS implementation
-  I found an instruction sequence that also causes aborts on mainline
-  qemu's MIPS support.  The problem is triggered by an MSA branch
-  instruction appearing in a delay slot when emulating a processor
-  without MSA support.
+s/commands,/commands/
 
-  For example, with the current repository HEAD
-  (f073cd3a2bf1054135271b837c58a7da650dd84b) configured for
-  mips64-softmmu, if I run the attached binary using
+> 'allowed-in-preconfig' explicitly, are not permited to run in
 
-      mips64-softmmu/qemu-system-mips64 -bios ../abort2.bin -machine
-  mipssim -nographic
+s/explicitly,/explicitly/
+s/permited/permitted/
 
-  it will report
+> preconfig state but allowed in all other states like they used
+> to be.
+> 
+> Within this patch allow following commands in preconfig state:
+>     qmp_capabilities
+>     query-qmp-schema
+>     query-commands
+>     query-status
+>     cont
+> to allow qmp connection, basic introspection and moving to the next
+> state.
 
-      unknown branch 0x13000
-      Aborted (core dumped)
+Looks like a reasonable list.  Maybe also query-command-line-options 
+should be here?
 
-  The binary contains the following two instructions:
+> 
+> PS:
+> set-numa-node and query-hotpluggable-cpus will be enabled later in
+> a separate patch.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v4:
+>    * replaces complex "universal" approach
+>       "[PATCH v3 5/9] QAPI: allow to specify valid runstates  per command"
+>      with a simpler new command flag "allowed-in-preconfig".
+>      (Eric Blake <eblake@redhat.com>)
 
-      00200008 jr at
-      47081e61 bz.b       w8,0xffffffffbfc0798c
+Thanks; it looks a lot more maintainable now.  However, you need to 
+rebase, now that 'allow-oob' has already landed.
 
-  The jr sets up a jump, and hflags is set accordingly in
-  gen_compute_branch (in target/mips/translate.c).  When processing the
-  bz.b, check_insn generates an exception because the instruction isn't
-  support, but gen_msa_branch skips the usual delay slot check for the
-  same reason, and sets more bits in hflags, leading to an abort in
-  gen_branch because the hflags are now invalid.
+> +++ b/qapi/introspect.json
+> @@ -259,12 +259,16 @@
+>   #
+>   # @ret-type: the name of the command's result type.
+>   #
+> +# @allowed-in-preconfig: command could be executed  in preconfig runstate,
 
-  I suspect the best fix is to remove the instruction set condition from
-  the delay slot check in gen_msa_branch.
+s/could/can/
+double space before in
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1663287/+subscriptions
+> +#                        default: 'false' (Since 2.12)
+
+/me must resist the urge to call out softfreeze ;)
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
