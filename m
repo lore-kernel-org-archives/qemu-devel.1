@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ezRe5-0006vJ-5c
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:42:34 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ezRlK-00017K-JP
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:50:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ezRe0-0006l3-QH
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:42:33 -0400
-References: <1518116908-10852-1-git-send-email-mst@redhat.com>
-	<1518116908-10852-12-git-send-email-mst@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <41774c00-7462-f2b0-9314-3b3d7e0f9fb0@redhat.com>
-Date: Fri, 23 Mar 2018 19:42:07 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ezRlJ-0004Cl-IC
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:50:02 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1ezRlJ-0004CA-Ay
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:50:01 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1ezRlH-0007dP-Eh
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:49:59 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 18:49:48 +0000
+Message-Id: <20180323184958.14252-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1518116908-10852-12-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 11/26] pci-bridge/i82801b11: clear bridge
- registers on platform reset
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/10] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
 
-Michael, Peter,
+Ten arm-related bug fixes for 2.12...
 
-On 02/08/18 20:09, Michael S. Tsirkin wrote:
-> From: Laszlo Ersek <lersek@redhat.com>
-> 
-> The "i82801b11-bridge" device model is a descendant of "base-pci-bridge"
-> (TYPE_PCI_BRIDGE). However, unlike other similar devices, such as
-> 
-> - pci-bridge,
-> - pcie-pci-bridge,
-> - PCIE Root Port,
-> - xio3130 switch upstream and downstream ports,
-> - dec-21154-p2p-bridge,
-> - pbm-bridge,
-> - xilinx-pcie-root,
-> 
-> "i82801b11-bridge" does not clear the bridge specific registers at
-> platform reset.
-> 
-> This is a problem because devices on "i82801b11-bridge" continue to
-> respond to config space cycles after platform reset, when addressed with
-> the bus number that was previously programmed into the secondary bus
-> number register of "i82801b11-bridge". This error breaks OVMF's search for
-> extra (PXB) root buses, for example.
-> 
-> The device class reset method for "i82801b11-bridge" is currently NULL;
-> set it directly to pci_bridge_reset(), like the last three bridge models
-> in the above listing do.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: qemu-stable@nongnu.org
-> Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1541839
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/pci-bridge/i82801b11.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-> index cb522bf..ebf7f5f 100644
-> --- a/hw/pci-bridge/i82801b11.c
-> +++ b/hw/pci-bridge/i82801b11.c
-> @@ -98,6 +98,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
->      k->realize = i82801b11_bridge_realize;
->      k->config_write = pci_bridge_write_config;
->      dc->vmsd = &i82801b11_bridge_dev_vmstate;
-> +    dc->reset = pci_bridge_reset;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
->  
-> 
+thanks
+-- PMM
 
-this patch didn't get included in the 2.11.1 round-up:
+The following changes since commit 4c2c1015905fa1d616750dfe024b4c0b35875950:
 
-http://mid.mail-archive.com/20180206191515.25830-1-mdroth@linux.vnet.ibm.com
+  Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20180323' into staging (2018-03-23 10:20:54 +0000)
 
-(The patch was posted, CC stable, between Mike's round-up set and the
-actual 2.11.1 release.)
+are available in the Git repository at:
 
-Can we please make sure that the commit doesn't miss the 2.11.2 bus?
-2.12 is still a month out, and without this patch, rebooting an UEFI
-guest OS (with OVMF) hangs, on certain VM configs (see the commit message).
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180323
 
-(Apologies if there is a "queue" or "next" branch for stable releases --
-in that case I should have probably checked that branch before sending
-this email.)
+for you to fetch changes up to 548f514cf89dd9ab39c0cb4c063097bccf141fdd:
 
-The commit hash on the master branch is
-ed247f40db84c8bd4bb7d10948702cd47cc4d5ae; it's part of v2.12.0-rc0.
+  target/arm: Always set FAR to a known unknown value for debug exceptions (2018-03-23 18:26:46 +0000)
 
-Thanks!
-Laszlo
+----------------------------------------------------------------
+target-arm queue:
+ * arm/translate-a64: don't lose interrupts after unmasking via write to DAIF
+ * sdhci: fix incorrect use of Error *
+ * hw/intc/arm_gicv3: Fix secure-GIC NS ICC_PMR and ICC_RPR accesses
+ * hw/arm/bcm2836: Use the Cortex-A7 instead of Cortex-A15
+ * i.MX: Support serial RS-232 break properly
+ * mach-virt: Set VM's SMBIOS system version to mc->name
+ * target/arm: Honour MDCR_EL2.TDE when routing exceptions due to BKPT/BRK
+ * target/arm: Factor out code to calculate FSR for debug exceptions
+ * target/arm: Set FSR for BKPT, BRK when raising exception
+ * target/arm: Always set FAR to a known unknown value for debug exceptions
+
+----------------------------------------------------------------
+Paolo Bonzini (1):
+      sdhci: fix incorrect use of Error *
+
+Peter Maydell (6):
+      hw/intc/arm_gicv3: Fix secure-GIC NS ICC_PMR and ICC_RPR accesses
+      hw/arm/bcm2836: Use the Cortex-A7 instead of Cortex-A15
+      target/arm: Honour MDCR_EL2.TDE when routing exceptions due to BKPT/BRK
+      target/arm: Factor out code to calculate FSR for debug exceptions
+      target/arm: Set FSR for BKPT, BRK when raising exception
+      target/arm: Always set FAR to a known unknown value for debug exceptions
+
+Trent Piepho (1):
+      i.MX: Support serial RS-232 break properly
+
+Victor Kamensky (1):
+      arm/translate-a64: treat DISAS_UPDATE as variant of DISAS_EXIT
+
+Wei Huang (1):
+      mach-virt: Set VM's SMBIOS system version to mc->name
+
+ include/hw/arm/virt.h        |  1 +
+ include/hw/char/imx_serial.h |  1 +
+ target/arm/helper.h          |  1 +
+ target/arm/internals.h       | 25 +++++++++++++++++++++++++
+ hw/arm/bcm2836.c             |  2 +-
+ hw/arm/raspi.c               |  2 +-
+ hw/arm/virt.c                |  8 +++++++-
+ hw/char/imx_serial.c         |  5 ++++-
+ hw/intc/arm_gicv3_cpuif.c    |  6 +++---
+ hw/sd/sdhci.c                |  4 ++--
+ target/arm/helper.c          |  1 -
+ target/arm/op_helper.c       | 33 ++++++++++++++++++++++-----------
+ target/arm/translate-a64.c   | 21 ++++++++++++++++-----
+ target/arm/translate.c       | 19 ++++++++++++++-----
+ 14 files changed, 98 insertions(+), 31 deletions(-)
