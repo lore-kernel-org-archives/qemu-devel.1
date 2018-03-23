@@ -1,42 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ezM4G-0004BP-3Z
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:45:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ezM5w-000550-A0
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ezM4C-0008Ay-Ue
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:45:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ezM47-000878-L0
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:45:08 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2NCipIu044490
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 08:45:02 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gvy66et0n-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 08:45:01 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 23 Mar 2018 12:44:59 -0000
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-21-peterx@redhat.com>
-	<1bd08e1d-b6ff-6b39-e053-599bddd1a208@de.ibm.com>
-	<20180323122538.GN32362@xz-mi>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 23 Mar 2018 13:44:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180323122538.GN32362@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <332a9ef5-549a-d329-ec5e-d68609b1fbe1@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 20/23] monitor: enable IO thread for
- (qmp & !mux) typed
+	(envelope-from <dgilbert@redhat.com>) id 1ezM5t-0001WB-8J
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:46:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33002 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezM5t-0001Vr-47
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:46:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AEEA87D843
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 12:46:47 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 23 Mar 2018 12:46:37 +0000
+Message-Id: <20180323124637.11220-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] vhost: Allow abutting regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,27 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, Stefan Hajnoczi <shajnocz@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, alex.williamson@redhat.com
 
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+My rework of section adding combines overlapping or abutting regions,
+but checks they're actually the same underlying RAM block.
+Fix the case where two blocks abut but don't overlap; that new region
+should get added (but not combined), but my previous patch was disallowing it.
 
-On 03/23/2018 01:25 PM, Peter Xu wrote:
-> On Fri, Mar 23, 2018 at 01:10:51PM +0100, Christian Borntraeger wrote:
->> As Max Reitz said, this breaks several qemu iotests. I can reproduce that on s390
->> e.g. with ./check -qcow2 030 in the qemu-iotest.
->>
->> Why was this merged?
-> 
-> My fault.  Sorry.  I should have done iotests before submission.
-> 
-> Now I'm trying to fix those iotest issues.
-> 
-> I'm not extremely familiar with block, so the progress is a bit slow,
-> but I'll do it asap (though I'll possibly need some help from the
-> block team, since there are some not-easy ones for me).
+Fixes: c1ece84e7c9
 
-As this patch also seems to trigger something else for Eric, can we revert this
-patch for the time being and re-apply as soon as we have solutions for the issues?
+Reported-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/virtio/vhost.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-After all a hard hang in the iotest can break CI environments (as you run into timeouts).
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 250f886acb..fc9062a89f 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -595,10 +595,15 @@ static void vhost_region_add_section(struct vhost_dev *dev,
+                                         prev_sec->offset_within_address_space,
+                                         prev_sec->offset_within_region);
+             } else {
+-                error_report("%s: Overlapping but not coherent sections "
+-                             "at %"PRIx64,
+-                             __func__, mrs_gpa);
+-                return;
++                /* abutting regions are fine, but overlapping ones with
++                 * different blocks/offsets shouldn't happen
++                 */
++                if (mrs_gpa != prev_gpa_end + 1) {
++                    error_report("%s: Overlapping but not coherent sections "
++                                 "at %"PRIx64,
++                                 __func__, mrs_gpa);
++                    return;
++                }
+             }
+         }
+     }
+-- 
+2.14.3
