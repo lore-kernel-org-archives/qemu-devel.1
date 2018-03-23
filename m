@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezM5w-000550-A0
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:46:57 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1ezM6t-0005dS-TZ
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezM5t-0001WB-8J
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:46:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33002 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezM5t-0001Vr-47
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:46:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEEA87D843
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 12:46:47 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 23 Mar 2018 12:46:37 +0000
-Message-Id: <20180323124637.11220-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] vhost: Allow abutting regions
+	(envelope-from <eric.auger@redhat.com>) id 1ezM6t-0002mx-5Y
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:47:55 -0400
+References: <d29ae6aa-5758-277b-b754-4e6fe7666e6b@redhat.com>
+	<CAFEAcA9dHPLj6aF=JsS8dXaDWf_ONQ_A+SD1xXQO7DdsWK3yAw@mail.gmail.com>
+	<6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
+	<20180323121957.GM32362@xz-mi>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <a6dd2e45-41ac-ca1a-1725-ca372761b9af@redhat.com>
+Date: Fri, 23 Mar 2018 13:47:45 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180323121957.GM32362@xz-mi>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Regression on KVM qemu-system-aarch64 since
+ "monitor: enable IO thread for (qmp & !mux) typed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, alex.williamson@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, qemu list <qemu-devel@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Hi Peter,
 
-My rework of section adding combines overlapping or abutting regions,
-but checks they're actually the same underlying RAM block.
-Fix the case where two blocks abut but don't overlap; that new region
-should get added (but not combined), but my previous patch was disallowing it.
+On 23/03/18 13:19, Peter Xu wrote:
+> On Fri, Mar 23, 2018 at 01:01:43PM +0100, Auger Eric wrote:
+>> Hi,
+>>
+>> On 23/03/18 11:26, Peter Maydell wrote:
+>>> On 23 March 2018 at 10:24, Auger Eric <eric.auger@redhat.com> wrote:
+>>>> Hi,
+>>>>
+>>>> I observe a regression on KVM accelerated qemu-system-aarch64:
+>>>>
+>>>> Unexpected error in kvm_device_access() at
+>>>> /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
+>>>> 2018-03-23T09:59:59.629439Z qemu-system-aarch64: KVM_GET_DEVICE_ATTR
+>>>> failed: Group 6 attr 0x000000000000c664: Device or resource busy
+>>>> 2018-03-23 10:00:00.085+0000: shutting down, reason=crashed
+>>>
+>>> Can you get a backtrace for this? (I guess you'd need to fiddle
+>>> with the kvm_device_access() code to make it assert rather
+>>> than passing back the error).
+>>
+>> OK. I will try to do so. As I could have expected, I cannot reproduce on
+>> a standalone qemu command line. The problem observed above is seen with
+>> libvirt launch which may be doing some other QMP stuff concurrently?
+> 
+> Maybe not concurrently inside libvirt, but after the patches AFAIK the
+> QMP part can be concurrent with something else or break some timing.
+> 
+> Anyway, sorry for that!  I'll see what I can do to help.
 
-Fixes: c1ece84e7c9
+No worries
 
-Reported-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/virtio/vhost.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Thanks
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 250f886acb..fc9062a89f 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -595,10 +595,15 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-                                         prev_sec->offset_within_address_space,
-                                         prev_sec->offset_within_region);
-             } else {
--                error_report("%s: Overlapping but not coherent sections "
--                             "at %"PRIx64,
--                             __func__, mrs_gpa);
--                return;
-+                /* abutting regions are fine, but overlapping ones with
-+                 * different blocks/offsets shouldn't happen
-+                 */
-+                if (mrs_gpa != prev_gpa_end + 1) {
-+                    error_report("%s: Overlapping but not coherent sections "
-+                                 "at %"PRIx64,
-+                                 __func__, mrs_gpa);
-+                    return;
-+                }
-             }
-         }
-     }
--- 
-2.14.3
+Eric
+> 
