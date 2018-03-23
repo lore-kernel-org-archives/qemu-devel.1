@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1ezJdJ-0000Tm-Su
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:09:17 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1ezJgG-0001lG-G3
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:12:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1ezJdE-0003JV-8p
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:09:13 -0400
-Date: Fri, 23 Mar 2018 11:08:43 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180323100843.i7xrvfodcpi7rtr5@hawk.localdomain>
-References: <20180315133441.24149-1-peter.maydell@linaro.org>
-	<20180322142343.jvc6pxxvl5zhfjgy@hawk.localdomain>
-	<CAFEAcA8Vti8NnrQK4U4kLuk=nNMC5=KiKjc6wT7cLDnCHFj-8w@mail.gmail.com>
-	<48f559bd-9f54-bcdd-1f3c-f6fafccfc54e@amsat.org>
+	(envelope-from <rkagan@virtuozzo.com>) id 1ezJgD-0004sy-Oi
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:12:16 -0400
+Received: from mail-ve1eur01hn0206.outbound.protection.outlook.com
+	([104.47.1.206]:51646
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1ezJgD-0004qw-2v
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:12:13 -0400
+Date: Fri, 23 Mar 2018 13:11:53 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180323101152.GB28085@rkaganb.sw.ru>
+References: <20180322131358.15096-1-vkuznets@redhat.com>
+	<20180322131358.15096-3-vkuznets@redhat.com>
+	<20180322190146.GA1396@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <48f559bd-9f54-bcdd-1f3c-f6fafccfc54e@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12] hw/intc/arm_gicv3: Fix
- secure-GIC NS ICC_PMR and ICC_RPR accesses
+In-Reply-To: <20180322190146.GA1396@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] i386/kvm: expose Hyper-V frequency
+ MSRs with reenlightenment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Mar 22, 2018 at 05:42:02PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi Peter,
->=20
-> On 03/22/2018 03:29 PM, Peter Maydell wrote:
-> > On 22 March 2018 at 14:23, Andrew Jones <drjones@redhat.com> wrote:
-> >> On Thu, Mar 15, 2018 at 01:34:41PM +0000, Peter Maydell wrote:
-> >>> If the GIC has the security extension support enabled, then a
-> >>> non-secure access to ICC_PMR must take account of the non-secure
-> >>> view of interrupt priorities, where real priorities 0..0x7f
-> >>> are secure-only and not visible to the non-secure guest, and
-> >>> priorities 0x80..0xff are shown to the guest as if they were
-> >>> 0x00..0xff. We had the logic here wrong:
-> >>
-> >> 0x00..0x7f
-> >=20
-> > I think 0x00..0xff is correct.
->=20
-> I guess Andrew only suggested to correct the hex prefix in your comment=
-:
-> - ... where real priorities 0..0x7f
-> + ... where real priorities 0x00..0x7f
+On Thu, Mar 22, 2018 at 04:01:46PM -0300, Eduardo Habkost wrote:
+> On Thu, Mar 22, 2018 at 02:13:58PM +0100, Vitaly Kuznetsov wrote:
+> > We can also expose Hyper-V frequency MSRs when reenlightenment feature is
+> > enabled and TSC frequency is known, Hyper-V on KVM will provide stable TSC
+> > page clocksources to its guests.
+> > 
+> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > ---
+> > - Expose frequency MSRs only when either INVTSC or Reenlightenment is
+> >   provided [Paolo Bonzini]
+> > ---
+> >  target/i386/kvm.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index 75f4e1d69e..2c3c19d690 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -651,7 +651,8 @@ static int hyperv_handle_properties(CPUState *cs)
+> >          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
+> >          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
+> >  
+> > -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
+> > +        if (has_msr_hv_frequencies && env->tsc_khz &&
+> > +            (tsc_is_stable_and_known(env) || cpu->hyperv_reenlightenment)) {
+> 
+> Continuing the discussion we had in v3 about being possible to
+> crash when migrating to a host running an older kernel:
+> 
+> This patch doesn't fix the issue, because it is still implicitly
+> enabling hv-frequencies.
+> 
+> But I don't think this patch will make the situation any worse,
+> because we don't have any KVM versions that support
+> HV_X64_MSR_REENLIGHTENMENT_CONTROL but not
+> HV_X64_MSR_TSC_FREQUENCY.
+> 
+> This means that we can safely make "hv-reenlightenment=on"
+> automatically set "hv-frequencies=on", when we finally introduce
+> a hv-frequencies property.
 
-Actually I just hadn't thought that through properly. But thanks for
-giving me the benefit of the doubt :-)
+Do I get you right that there's no controversy about the need for
+hv-frequencies?
 
-> >=20
-> > the NS view covers the whole 0x00..0xff range, but more sparsely.
-> > (OK, technically you can't ever read 0xff, only 0xfe.)
->=20
+> Roman, do you agree?
 
-You can read 0xff, because 0xff will be written when either 0xfe or 0xff
-are written. Then, when reading, priority =3D=3D 0xff will fail the !=3D =
-0xff
-test (which is QEMU's implementation of the pseudo code where PRIMask()
-is hardcoded to 0xff). In that case it'll just return the priority value
-unchanged, which is 0xff.
+Well, this strictly depends on the answer to your next question, because
+hv-reenlightenment is most certainly 2.13 material.
+
+> The next question is: do we need to fix this and introduce a
+> hv-frequencies property in 2.12, or can this wait for 2.13?
+
+I'm tempted to stick hv-frequencies into 2.12 and retrospectively into
+2.11-stable, to minimize the exposure to the problem but to keep the
+effort and added complexity reasonable.  But I'm not sure this will be
+ok from the compatibility policy standpoint.  So I'd appreciate an
+advice on this.
+[Should I better just post a patch doing that and continue this
+discussion there?]
 
 Thanks,
-drew
+Roman.
