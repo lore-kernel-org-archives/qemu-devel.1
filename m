@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezTEF-0000bD-J1
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:24:00 -0400
+	(envelope-from <jsnow@redhat.com>) id 1ezTIG-0003eP-0T
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezTED-0003q3-T5
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:23:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52156 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezTED-0003pn-Oq
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:23:57 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 23 Mar 2018 20:23:44 +0000
-Message-Id: <20180323202344.70640-6-dgilbert@redhat.com>
-In-Reply-To: <20180323202344.70640-1-dgilbert@redhat.com>
-References: <20180323202344.70640-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] migration: Fix block migration flag case
+	(envelope-from <jsnow@redhat.com>) id 1ezTIF-0005Yu-2C
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:28:08 -0400
+References: <20180223152640.11459-1-pbonzini@redhat.com>
+	<cb07d198-c73a-a045-cb70-57433c45a5a0@redhat.com>
+	<933679da-c0b1-f1e3-5681-9709bd383143@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <2964a562-a689-4281-ecde-c9f695efc378@redhat.com>
+Date: Fri, 23 Mar 2018 16:28:00 -0400
+MIME-Version: 1.0
+In-Reply-To: <933679da-c0b1-f1e3-5681-9709bd383143@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 0/5] atapi: change
+ unlimited recursion to while loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, berrange@redhat.com, lidongchen@tencent.com, pl@kamp.de, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Fix the case where when a migration with a bad protocol is tried,
-we leave the block migration capability set.
 
-(This is a cut down version of my 'migration: Fix block failure cases'
-where it's other case was fixed by Peter's dd0ee30caeebbd )
+On 03/23/2018 04:17 PM, Paolo Bonzini wrote:
+> On 23/03/2018 21:08, John Snow wrote:
+>>
+>>
+>> On 02/23/2018 10:26 AM, Paolo Bonzini wrote:
+>>> Real hardware doesn't have an unlimited stack, so the unlimited
+>>> recursion in the ATAPI code smells a bit.  In fact, the call to
+>>> ide_transfer_start easily becomes a tail call with a small change
+>>> to the code (patch 4).  The remaining four patches move code around
+>>> so as to the turn the call back to ide_atapi_cmd_reply_end into
+>>> another tail call, and then convert the (double) tail recursion into
+>>> a while loop.
+>>>
+>>> I'm not sure how this can be tested, apart from adding a READ CD
+>>> test to ahci-test (which I don't really have time for now, hence
+>>> the RFC tag).  The existing AHCI tests still pass, so patches 1-3
+>>> aren't complete crap.
+>>>
+>>> Paolo
+>>>
+>>> Paolo Bonzini (5):
+>>>   ide: push call to end_transfer_func out of start_transfer callback
+>>>   ide: push end_transfer callback to ide_transfer_halt
+>>>   ide: make ide_transfer_stop idempotent
+>>>   atapi: call ide_set_irq before ide_transfer_start
+>>>   ide: introduce ide_transfer_start_norecurse
+>>>
+>>>  hw/ide/ahci.c             | 12 +++++++-----
+>>>  hw/ide/atapi.c            | 37 ++++++++++++++++++++-----------------
+>>>  hw/ide/core.c             | 37 +++++++++++++++++++++++--------------
+>>>  include/hw/ide/internal.h |  3 +++
+>>>  4 files changed, 53 insertions(+), 36 deletions(-)
+>>>
+>>
+>> LGTM; only comments wound up being naming.
+> 
+> The "PIO setup" FIS though should be sent at the *beginning* of data
+> transfer according to the spec.  And if that is fixed a bunch of things
+> are simpler (no end_transfer callback!).  I'll test and send next week.
+> 
+> Paolo
+> 
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20180316202114.32345-1-dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 1 +
- 1 file changed, 1 insertion(+)
+My naive understanding is that it gets sent at the beginning to inform
+the transfer -- but I'm not sure what the values of the frame should
+actually be since it specifies it should also set what the value of the
+registers ought to be after the transfer -- and I don't know how to
+interpret that.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index fc629e5965..52a5092add 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1428,6 +1428,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-                    "a valid migration protocol");
-         migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                           MIGRATION_STATUS_FAILED);
-+        block_cleanup_parameters(s);
-         return;
-     }
- 
--- 
-2.14.3
+Is that an "expected value" or does that mean that the device (like the
+SATA device) is expected to buffer up the transfer first, then send the
+PIO Setup FIS frame and thus it already knows if it succeeded or failed
+in buffering the data?
+
+It's not tremendously clear to me -- but as long as at the end of the
+transfer AHCI's mirror for the ATA registers match our core register
+values, then it's probably fine...?
