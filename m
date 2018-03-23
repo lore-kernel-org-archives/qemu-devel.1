@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ezImj-0001f0-Mg
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:14:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezJFE-0005D3-Jq
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ezImg-0001KA-Dw
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:14:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36738
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ezImg-0001JW-7j
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:14:50 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2N9AVQn137772
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 05:14:49 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gvx609km8-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 05:14:49 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 23 Mar 2018 09:14:47 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 23 Mar 2018 09:14:40 +0000
-In-Reply-To: <20180323091441.116971-1-borntraeger@de.ibm.com>
-References: <20180323091441.116971-1-borntraeger@de.ibm.com>
-Message-Id: <20180323091441.116971-2-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 1/2] s390x/pci: forbid multifunction pci device
+	(envelope-from <peter.maydell@linaro.org>) id 1ezJFA-0003VY-6W
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:44:20 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezJFA-0003VG-0U
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:44:16 -0400
+Received: by mail-ot0-x243.google.com with SMTP id t2-v6so12592527otj.4
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 02:44:15 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180322215833.7713-1-laurent@vivier.eu>
+References: <20180322215833.7713-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 09:43:54 +0000
+Message-ID: <CAFEAcA8MKD2LxgouprA9pRWD6F+c50LoWyLS1o-PVJPYRodt2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for 2.13 0/5] linux-user: move arch
+ specific parts to arch directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,50 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+On 22 March 2018 at 21:58, Laurent Vivier <laurent@vivier.eu> wrote:
+> Some files like signal.c are really hard to read
+> because all architectures are mixed in the same
+> file.
+>
+> This series moves from signal.c these parts to
+> the architecture dedicated directories in linux-user.
+> Moerover, this allows to compare easier functions
+> between architectures (it helps to debug problems).
+> Adding new functions for a new architecture will
+> be facilitated too.
+>
+> As we are doing that for signal.c, we can also
+> do that for main.c, for the cpu loop part
+> and the cpu loop prologue too.
 
-Currently we don't support pci multifunction. If a pci with
-multifucntion is plugged, the guest will spin forever. This patch fixes
-this.
+Yeah, this is something I've kind of had on my backlog
+of "it would be nice to do this" for years. Thanks
+for putting in the work!
 
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/s390-pci-bus.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> checkpatch.pl is not happy... but I only want to
+> move code from a file to another. I don't want
+> to change the content of the parts I move.
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 77a50cab36..10da87458e 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -816,6 +816,11 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-         PCIBridge *pb = PCI_BRIDGE(dev);
-         PCIDevice *pdev = PCI_DEVICE(dev);
- 
-+        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-+            error_setg(errp, "multifunction not supported in s390");
-+            return;
-+        }
-+
-         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
-         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
- 
-@@ -835,6 +840,11 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         pdev = PCI_DEVICE(dev);
- 
-+        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
-+            error_setg(errp, "multifunction not supported in s390");
-+            return;
-+        }
-+
-         if (!dev->id) {
-             /* In the case the PCI device does not define an id */
-             /* we generate one based on the PCI address         */
--- 
-2.14.3
+Yeah, that's reasonable. (Since the move will reduce
+the effectiveness of git blame anyway we might want
+to do a fix-coding-style pass afterwards, but we can
+do that as a separate patchset.)
+
+thanks
+-- PMM
