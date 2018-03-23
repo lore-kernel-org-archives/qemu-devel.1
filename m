@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ezNgg-0002Ar-1b
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:28:58 -0400
+	(envelope-from <lvivier@redhat.com>) id 1ezNjv-0003xD-H9
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ezNga-0001NE-9x
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:28:58 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:44629)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ezNga-0001N3-3w
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:28:52 -0400
-Received: by mail-oi0-x236.google.com with SMTP id j143-v6so1538453oih.11
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 07:28:52 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1ezNju-000363-H6
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:32:19 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Fri, 23 Mar 2018 15:31:57 +0100
+Message-Id: <20180323143202.28879-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ebf41b29-24e1-2f51-e382-22b34260cb34@redhat.com>
-References: <1521794165-31678-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-KEnE9NKGC-vTnMByFC_LDPt2Ae8G7GfOxakfgMGH90w@mail.gmail.com>
-	<6750673e-ffc3-578e-e867-332ac0790935@redhat.com>
-	<CAFEAcA_u3cKF1aSHbrjW0Hc403G5GkNNom_9mqkJfregfqMymw@mail.gmail.com>
-	<173b1d18-720a-4f61-29cf-4f812b78cb2e@redhat.com>
-	<CAFEAcA_HaC6yjX7wW0MscxfiEafFT2uhMiWeN644NTYADhdEnQ@mail.gmail.com>
-	<ebf41b29-24e1-2f51-e382-22b34260cb34@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Mar 2018 14:28:31 +0000
-Message-ID: <CAFEAcA8ga2WjKcj=3ercfgC+wATk_jc2tEpQ48-r-OhoMUpzPA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/riscv: Fix crashes with
- "-nodefaults"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/5] coccinelle: re-run scripts from
+ scripts/coccinelle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +21,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Alberto Garcia <berto@igalia.com>, qemu-ppc@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Max Reitz <mreitz@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>
 
-On 23 March 2018 at 14:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 23/03/2018 15:04, Peter Maydell wrote:
->>> However, if the machine is emulating a real-world board with a fixed SoC
->>> and fixed hardware in the SoC, it makes more sense to create a null backend.
->>
->> That's a lot of duplicate code to say "oh, this is NULL, create the
->> null backend" in lots of different boards :-(
->
-> Note it's a null "backend", not necessarily a null "character device".
-> Your proposal, namely ensuring that be->chr == NULL is handled properly
-> in qemu_chr_fe_init, would be just fine.
+I've re-run some scripts from the coccinelle directory,
+and they have found some problems.
 
-Hmm, the chardev layer code seems to have more ends than I expect.
-The "frontend" is the UART model, right, and I thought the
-"backend" was the TCP/UDP/serial port/stdio/etc end of things,
-but those seem to be Chardevs? If those aren't the backend,
-then what is?
+This series fixes them.
 
-What I'd like, anyway, is that every UART model can cope with being
-setup with a NULL 'chardev' property, and ideally that that doesn't
-require a lot of extra code per-UART, and doesn't require each UART
-to create a TYPE_CHARDEV_NULL.
+v2: only change PATCH 4/4
+  - keep comments
+  - fix indentation
+  I didn't remove changes in autogenerated files as it
+  seems they are generated only once.
 
-> The main point was that the choice of whether to create the device is up
-> to the board, and there isn't a single answer valid for all boards.
+Daniel P. Berrang=C3=A9 (1):
+  make: improve check for stale generated files in source dir
 
-I agree with that part, yes, assuming I have the terminology right now.
+Laurent Vivier (4):
+  error: Strip trailing '\n' from error string arguments (again again)
+  error: Remove NULL checks on error_propagate() calls
+  qdict: remove useless cast
+  Remove unnecessary variables for function return value
 
-thanks
--- PMM
+ Makefile                                           | 29 +++++++----
+ accel/tcg/translate-all.c                          |  5 +-
+ block/nvme.c                                       | 11 ++---
+ block/quorum.c                                     |  6 +--
+ hw/arm/exynos4210.c                                |  6 +--
+ hw/block/vhost-user-blk.c                          |  5 +-
+ hw/hppa/dino.c                                     |  5 +-
+ hw/misc/mos6522.c                                  |  8 +---
+ hw/net/ftgmac100.c                                 |  5 +-
+ hw/ppc/pnv_lpc.c                                   | 16 ++-----
+ io/channel-websock.c                               |  4 +-
+ io/net-listener.c                                  |  6 +--
+ monitor.c                                          |  2 +-
+ target/i386/hax-darwin.c                           | 10 ++--
+ target/i386/hvf/hvf.c                              | 24 +++++-----
+ target/mips/dsp_helper.c                           | 15 ++----
+ target/xtensa/core-dc232b/xtensa-modules.c         | 56 ++++++----------=
+------
+ target/xtensa/core-dc233c/xtensa-modules.c         | 56 ++++++----------=
+------
+ target/xtensa/core-de212/xtensa-modules.c          | 48 +++++-----------=
+---
+ target/xtensa/core-fsf/xtensa-modules.c            | 32 ++++---------
+ .../xtensa/core-sample_controller/xtensa-modules.c | 24 +++-------
+ target/xtensa/translate.c                          |  7 +--
+ tests/m48t59-test.c                                |  6 +--
+ tests/test-thread-pool.c                           |  6 +--
+ util/uri.c                                         |  5 +-
+ 25 files changed, 117 insertions(+), 280 deletions(-)
+
+--=20
+2.14.3
