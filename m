@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezQdV-0005Ye-Oi
+	(envelope-from <eblake@redhat.com>) id 1ezQdV-0005Yf-Oj
 	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezQdR-0002GQ-Je
+	(envelope-from <eblake@redhat.com>) id 1ezQdU-0002IC-PK
 	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35486 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43498 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezQdR-0002G9-Ep
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:49 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezQdU-0002Hw-JA
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:52 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 805F4813F699
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 17:37:47 +0000 (UTC)
-Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 48F288443B
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 17:37:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3723E722DE
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 17:37:52 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 23 Mar 2018 12:37:37 -0500
-Message-Id: <20180323173741.1445744-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/4] QAPI patches for 2018-03-23, for 2.12-rc1
+Date: Fri, 23 Mar 2018 12:37:38 -0500
+Message-Id: <20180323173741.1445744-2-eblake@redhat.com>
+In-Reply-To: <20180323173741.1445744-1-eblake@redhat.com>
+References: <20180323173741.1445744-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 1/4] Revert "tests: qmp-test: add oob test"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +30,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-The following changes since commit 4c2c1015905fa1d616750dfe024b4c0b358759=
-50:
+From: Peter Xu <peterx@redhat.com>
 
-  Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20180323' =
-into staging (2018-03-23 10:20:54 +0000)
+This reverts commit d003f7a8f9cafe50119975844fa01afc2baf41fb.
 
-are available in the Git repository at:
+Enabling OOB caused several iotests failures; due to the imminent
+2.12 release, the safest action is to disable OOB, but first we
+have to revert tests that rely on OOB.
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-23
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180323140821.28957-3-peterx@redhat.com>
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+[eblake: reorder commits, enhance commit message]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qmp-test.c | 65 --------------------------------------------------------
+ 1 file changed, 65 deletions(-)
 
-for you to fetch changes up to 39615354fc07af34e04ab5efb5b6d478b0d24e32:
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 07c0b87e27a..2e4b599a4c8 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -164,70 +164,6 @@ static void test_qmp_protocol(void)
+     qtest_quit(qts);
+ }
 
-  qapi: Force UTF8 encoding when parsing qapi files (2018-03-23 12:29:07 =
--0500)
+-/* Tests for Out-Of-Band support. */
+-static void test_qmp_oob(void)
+-{
+-    QDict *resp;
+-    int acks = 0;
+-    const char *cmd_id;
+-
+-    global_qtest = qtest_init_without_qmp_handshake(common_args);
+-
+-    /* Ignore the greeting message. */
+-    resp = qmp_receive();
+-    g_assert(qdict_get_qdict(resp, "QMP"));
+-    QDECREF(resp);
+-
+-    /* Try a fake capability, it should fail. */
+-    resp = qmp("{ 'execute': 'qmp_capabilities', "
+-               "  'arguments': { 'enable': [ 'cap-does-not-exist' ] } }");
+-    g_assert(qdict_haskey(resp, "error"));
+-    QDECREF(resp);
+-
+-    /* Now, enable OOB in current QMP session, it should succeed. */
+-    resp = qmp("{ 'execute': 'qmp_capabilities', "
+-               "  'arguments': { 'enable': [ 'oob' ] } }");
+-    g_assert(qdict_haskey(resp, "return"));
+-    QDECREF(resp);
+-
+-    /*
+-     * Try any command that does not support OOB but with OOB flag. We
+-     * should get failure.
+-     */
+-    resp = qmp("{ 'execute': 'query-cpus',"
+-               "  'control': { 'run-oob': true } }");
+-    g_assert(qdict_haskey(resp, "error"));
+-    QDECREF(resp);
+-
+-    /*
+-     * First send the "x-oob-test" command with lock=true and
+-     * oob=false, it should hang the dispatcher and main thread;
+-     * later, we send another lock=false with oob=true to continue
+-     * that thread processing.  Finally we should receive replies from
+-     * both commands.
+-     */
+-    qmp_async("{ 'execute': 'x-oob-test',"
+-              "  'arguments': { 'lock': true }, "
+-              "  'id': 'lock-cmd'}");
+-    qmp_async("{ 'execute': 'x-oob-test', "
+-              "  'arguments': { 'lock': false }, "
+-              "  'control': { 'run-oob': true }, "
+-              "  'id': 'unlock-cmd' }");
+-
+-    /* Ignore all events.  Wait for 2 acks */
+-    while (acks < 2) {
+-        resp = qmp_receive();
+-        cmd_id = qdict_get_str(resp, "id");
+-        if (!g_strcmp0(cmd_id, "lock-cmd") ||
+-            !g_strcmp0(cmd_id, "unlock-cmd")) {
+-            acks++;
+-        }
+-        QDECREF(resp);
+-    }
+-
+-    qtest_end();
+-}
+-
+ static int query_error_class(const char *cmd)
+ {
+     static struct {
+@@ -412,7 +348,6 @@ int main(int argc, char *argv[])
+     g_test_init(&argc, &argv, NULL);
 
-There may be another rc1 pull request on Monday, but let's get
-these in sooner rather than later to minimize the window where
-iotests are broken during bisects.
+     qtest_add_func("qmp/protocol", test_qmp_protocol);
+-    qtest_add_func("qmp/oob", test_qmp_oob);
+     qmp_schema_init(&schema);
+     add_query_tests(&schema);
 
-----------------------------------------------------------------
-qapi patches for 2018-03-12, 2.12-rc1
-
-- Peter Xu: 0/4 Turn OOB off for 2.12-rc1, revert OOB tests
-- Eric Blake: qapi: Force UTF8 encoding when parsing qapi files
-
-----------------------------------------------------------------
-Eric Blake (1):
-      qapi: Force UTF8 encoding when parsing qapi files
-
-Peter Xu (3):
-      Revert "tests: qmp-test: add oob test"
-      Revert "tests: qmp-test: verify command batching"
-      Revert "monitor: enable IO thread for (qmp & !mux) typed"
-
- monitor.c              |  5 +--
- tests/qmp-test.c       | 97 +-------------------------------------------=
-------
- tests/Makefile.include |  6 ++--
- 3 files changed, 5 insertions(+), 103 deletions(-)
-
---=20
+-- 
 2.14.3
