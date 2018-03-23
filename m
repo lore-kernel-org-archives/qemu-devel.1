@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ezS9p-0006mE-Ik
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:15:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1ezSFL-0000in-Ra
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ezS9o-0003WW-P3
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:15:21 -0400
-References: <20180323143202.28879-1-lvivier@redhat.com>
-	<20180323143202.28879-4-lvivier@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0a6bdc26-5380-e1e7-bf85-f124b4b3f9de@redhat.com>
-Date: Fri, 23 Mar 2018 20:14:46 +0100
+	(envelope-from <bounces@canonical.com>) id 1ezSFH-0007I7-Sk
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:21:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ezSFH-0007HZ-LR
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:20:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ezSFF-0002Tc-Fq
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 19:20:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4BCE62E8D48
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 19:20:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180323143202.28879-4-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 3/5] error: Remove NULL
- checks on error_propagate() calls
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 23 Mar 2018 19:07:38 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152183205860.18701.11652728657771730197.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Max Reitz <mreitz@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 23.03.2018 15:32, Laurent Vivier wrote:
-> Re-run Coccinelle patch
-> scripts/coccinelle/error_propagate_null.cocci
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  io/channel-websock.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/io/channel-websock.c b/io/channel-websock.c
-> index ec48a305f0..e6608b969d 100644
-> --- a/io/channel-websock.c
-> +++ b/io/channel-websock.c
-> @@ -586,9 +586,7 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
->          return TRUE;
->      }
->  
-> -    if (err) {
-> -        error_propagate(&wioc->io_err, err);
-> -    }
-> +    error_propagate(&wioc->io_err, err);
->  
->      trace_qio_channel_websock_handshake_reply(ioc);
->      qio_channel_add_watch(
+> Actually, you only need the parent to get the status from the child,
+which can be passed in other way than through common memory.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Certainly, it *can* be, but the glibc code we're trying to run in the
+guest here doesn't do it in some other way, it uses common memory.
+Having QEMU effectively pause the parent process until the child has
+done its execve is certainly possible along the lines you suggest. But
+that is only half the requirement -- the parent also has to be able to
+see in its memory space the updates to the status variable that the
+child has made.
+
+If you're willing to change the guest code the problem is easy (for
+instance you could just go back to the old glibc approach). But we need
+to run the code as it stands.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
+
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
