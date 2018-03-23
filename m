@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ezRlR-00019O-C5
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:50:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1ezRmi-0002DE-0T
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ezRlP-0004H9-04
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:50:08 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ezRlO-0004GT-PS
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:50:06 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ezRlN-0007hX-Mt
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:50:05 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Mar 2018 18:49:57 +0000
-Message-Id: <20180323184958.14252-10-peter.maydell@linaro.org>
-In-Reply-To: <20180323184958.14252-1-peter.maydell@linaro.org>
-References: <20180323184958.14252-1-peter.maydell@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1ezRme-00053U-T9
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:51:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ezRme-000539-La
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 14:51:24 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ezRmd-0006iC-Fa
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 18:51:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 72E1C2E8D36
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 18:51:23 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/10] target/arm: Set FSR for BKPT,
- BRK when raising exception
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 23 Mar 2018 18:37:01 -0000
+From: =?utf-8?q?=C3=89ric_Hoffman?= <1673976@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152183022183.26239.10208426979115058383.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +39,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Now that we have a helper function specifically for the BRK and
-BKPT instructions, we can set the exception.fsr there rather
-than in arm_cpu_do_interrupt_aarch32(). This allows us to
-use our new arm_debug_exception_fsr() helper.
+Hello
 
-In particular this fixes a bug where we were hardcoding the
-short-form IFSR value, which is wrong if the target exception
-level has LPAE enabled.
+Sorry for the delay...
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1756927
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180320134114.30418-4-peter.maydell@linaro.org
----
- target/arm/helper.c    | 1 -
- target/arm/op_helper.c | 2 ++
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Actually, you only need the parent to get the status from the child,
+which can be passed in other way than through common memory.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 09893e3f72..dcb8476d9e 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -7910,7 +7910,6 @@ static void arm_cpu_do_interrupt_aarch32(CPUState *cs)
-         offset = 0;
-         break;
-     case EXCP_BKPT:
--        env->exception.fsr = 2;
-         /* Fall through to prefetch abort.  */
-     case EXCP_PREFETCH_ABORT:
-         A32_BANKED_CURRENT_REG_SET(env, ifsr, env->exception.fsr);
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 75efff9edf..8e1e521193 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -488,6 +488,8 @@ void HELPER(exception_with_syndrome)(CPUARMState *env, uint32_t excp,
-  */
- void HELPER(exception_bkpt_insn)(CPUARMState *env, uint32_t syndrome)
- {
-+    /* FSR will only be used if the debug target EL is AArch32. */
-+    env->exception.fsr = arm_debug_exception_fsr(env);
-     raise_exception(env, EXCP_BKPT, syndrome, arm_debug_target_el(env));
- }
- 
--- 
-2.16.2
+The idea is to use pipefd to actually wait for the child to either
+terminate or successfully call execve.  As follow:
+
+
+When the TARGET_NR_clone syscall is trapped, you do:
+- Call do_fork(), as currently done
+- In do_fork(), at the beginning, if CLONE_VFORK flag is set, keep track of=
+ it (i.e. do not clear the flag, just clear the CLONE_VM, as currently done=
+, to do a normal fork, i.e. the child have it's own copy of the memory segm=
+ents).
+- Just before the call to fork(), create a pipefd.
+- The parent branch and then (if CLONE_VFORK is set) close the write end of=
+ the pipe (it's own copy), and start looping (could be indefinitely, but pr=
+eferably some sort of timeout logic could be set) on the read fd, waiting c=
+ontinuously for status updates from the child.
+- The child branch close the read-end of the pipe (it's own forked copy), s=
+et the write-end fd flag FD_CLOEXEC (with fnctl()), and put the write fd in=
+to it's QEMU state variables (parent vfork fd).
+- The child then move on.
+
+When the TARGET_NR_execve syscall is trapped (this is in child context), yo=
+u do:
+- Do everything as currently done, up to just before the safe_execve() call.
+- Just before the call to safe_execve(), check if the QEMU state variable (=
+parent vfork fd) is defined.  If so, tell the the parent (through the pipe)=
+, that we are good so far, and about to call execve().  Note that the paren=
+t just update the child status, but keep looping endlessly.
+- Call the execve().
+- If the above call return, an error occurred.  If this occur, check if the=
+ QEMU state variable (parent vfork fd) is defined.  If so, tell whatever er=
+ror status you got to the parent (through the pipe).  The parent update it'=
+s child status, but again, continue to loop endlessly.
+- Continue normally.
+
+That's pretty much the bulk of the work done!  What will happen:
+- Either the child will eventually call execve, which will succeed, at whic=
+h point the write end of the pipe will be closed (because we set the pipe t=
+o close on execve, with the FD_CLOEXEC flag).
+- The child could be playing on us, and try to re-call execve() multiple ti=
+mes (possibly with different arguments, executables path, etc.), but every =
+time, the parent will just receive status update through the pipe.  And eve=
+ntually, the above case will occur (success), and pipe will be closed.
+- The child call _exit(), which will close the pipe again.
+- The child get some horrible signal, get killed, or whatever else...  Pipe=
+ still get closed.
+
+The parent, on it's side, just update the status endlessly, UNTIL the
+other end of the pipe get closed.  At this point, the read() of the pipe
+will get a 'broken pipe' error.  This signal the parent to move on, and
+return whatever status the child last provided.
+
+Note that this status could initially be set to an error state (in case
+the child die or call _exit() before calling execve()).
+
+The only thing that could make the parent hang is if the child hang (and
+never call execve() or _exit() or die...).  But the beauty is that this
+is perfectly fine, because that is exactly the required behavior when
+CLONE_VFORK flag is set (parent wait for the child).
+
+
+This is a lot of description, but should be relatively easy and straightfor=
+ward to implement.  Could this work?
+
+There are a few examples similar to this on the Web, using pipefd, fork
+and execve, for different applications.  Here, we just pass the status.
+
+Regards,
+Eric
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
+
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
