@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ezHIO-0005RV-W9
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 03:39:29 -0400
+	(envelope-from <david@redhat.com>) id 1ezHL1-0006Qw-Oj
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 03:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ezHIL-0006Lu-UA
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 03:39:29 -0400
+	(envelope-from <david@redhat.com>) id 1ezHKy-0007Nb-N5
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 03:42:11 -0400
 References: <20180320130702.188689-1-borntraeger@de.ibm.com>
+	<c3d189be-29ae-9500-f1b1-c573c842a307@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <0fd5429f-9745-7897-2386-d2cf30325174@redhat.com>
-Date: Fri, 23 Mar 2018 08:39:16 +0100
+Message-ID: <44a34aee-6515-2682-0ef5-7fb874780d2a@redhat.com>
+Date: Fri, 23 Mar 2018 08:42:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180320130702.188689-1-borntraeger@de.ibm.com>
+In-Reply-To: <c3d189be-29ae-9500-f1b1-c573c842a307@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -25,37 +26,26 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Michael Mueller <mimu@linux.vnet.ibm.com>
 
-On 20.03.2018 14:07, Christian Borntraeger wrote:
-> Since commit 46a99c9f73c7 ("s390x/cpumodel: model PTFF subfunctions
-> for Multiple-epoch facility") -cpu help no longer shows the MSA8
-> feature group. Turns out that we forgot to add the new MEPOCH_PTFF
-> group enum.
+On 20.03.2018 14:17, Christian Borntraeger wrote:
+> David, Jason, Michael,
 > 
-> Fixes: 46a99c9f73c7 ("s390x/cpumodel: model PTFF subfunctions for Multiple-epoch facility")
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/cpu_features.h | 1 +
->  1 file changed, 1 insertion(+)
+> the cpumodel code is somewhat fragile as we have to add maintain things
+> in multiple places. I would like to have more robust code, e.g. by either
+> generating more or by having build bug_ons or something like that. 
+> Any idea is highly welcome.
 > 
-> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-> index e306aa7ab2..968b12fdfe 100644
-> --- a/target/s390x/cpu_features.h
-> +++ b/target/s390x/cpu_features.h
-> @@ -78,6 +78,7 @@ typedef enum {
->      S390_FEAT_GROUP_MSA_EXT_6,
->      S390_FEAT_GROUP_MSA_EXT_7,
->      S390_FEAT_GROUP_MSA_EXT_8,
-> +    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
->      S390_FEAT_GROUP_MAX,
->  } S390FeatGroup;
->  
-> 
+> Christian
 
-Indeed, thanks!
+Yes, error prone. I was also wondering if we should explicitly address
+array items when initializing - e.g. in target/s390x/cpu_features.c the
+"indexed by feature number for easy lookup" part. More LOC but less
+error prone.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+As Mimu also suggested, if we can generate something automatically, we
+should do that.
+
 
 -- 
 
