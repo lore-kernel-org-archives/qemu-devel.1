@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ezSnd-00058J-Ie
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:56:31 -0400
+	(envelope-from <palmer@sifive.com>) id 1ezSsw-00080D-G2
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:01:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ezSnZ-0004gS-51
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 15:56:29 -0400
-Date: Fri, 23 Mar 2018 16:56:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180323195621.GN3417@localhost.localdomain>
-References: <20180323125808.4479-1-rkagan@virtuozzo.com>
-	<20180323125808.4479-3-rkagan@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180323125808.4479-3-rkagan@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] i386/hyperv: error out if
- features requested but unsupported
+	(envelope-from <palmer@sifive.com>) id 1ezSss-00086R-IS
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:01:58 -0400
+Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:41012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1ezSss-00085T-DB
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 16:01:54 -0400
+Received: by mail-pl0-x22d.google.com with SMTP id b7-v6so8074798plr.8
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 13:01:54 -0700 (PDT)
+Date: Fri, 23 Mar 2018 13:01:52 -0700 (PDT)
+In-Reply-To: <xnbmfflpqr.fsf@greed.delorie.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-6b5e9ecc-0232-4af1-a4f8-c02e4441e2c4@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Fix riscv_isa_string memory
+ size bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-stable@nongnu.org
+To: dj@redhat.com
+Cc: rjones@redhat.com, Michael Clark <mjc@sifive.com>, f4bug@amsat.org, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Fri, Mar 23, 2018 at 03:58:08PM +0300, Roman Kagan wrote:
-> In order to guarantee compatibility on migration, QEMU should have
-> complete control over the features it announces to the guest via CPUID.
-> 
-> However, for a number of Hyper-V-related cpu properties, if the
-> corresponding feature is not supported by the underlying KVM, the
-> propery is silently ignored and the feature is not announced to the
-> guest.
-> 
-> Refuse to start with an error instead.
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+On Thu, 22 Mar 2018 15:17:16 PDT (-0700), dj@redhat.com wrote:
+> "Richard W.M. Jones" <rjones@redhat.com> writes:
+>> DJ, am I remembering correctly that you tried the test case on the
+>> HiFive evaluation board and it didn't demonstrate the bug?
+>
+> I tested it on the vc707 board, without seeing the bug.
 
-I wonder if we should make these just warnings on -stable, and
-make them fatal errors only on 2.12.  I wouldn't want to make
-existing running VMs not runnable on a stable update.
+FWIW, the cores in the bitstream for the vc707 are almost identical to the
+FU540-C000.
 
+> I can test other test cases if needed, I've got the board running Fedora
+> at the moment.
 
-> ---
->  target/i386/kvm.c | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index fb20ff18c2..c9c359241c 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -658,17 +658,34 @@ static int hyperv_handle_properties(CPUState *cs)
->          env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
->          env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
->      }
-> -    if (cpu->hyperv_crash && has_msr_hv_crash) {
-> +    if (cpu->hyperv_crash) {
-> +        if (!has_msr_hv_crash) {
-> +            fprintf(stderr,
-> +                    "Hyper-V crash MSRs are not supported by kernel\n");
-
-I would mention the corresponding "hv-..." -cpu option
-explicitly, for clarity.
-
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
->      }
->      env->features[FEAT_HYPERV_EDX] |= HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
-> -    if (cpu->hyperv_reset && has_msr_hv_reset) {
-> +    if (cpu->hyperv_reset) {
-> +       if (!has_msr_hv_reset) {
-> +            fprintf(stderr, "Hyper-V reset MSR is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EAX] |= HV_RESET_AVAILABLE;
->      }
-> -    if (cpu->hyperv_vpindex && has_msr_hv_vpindex) {
-> +    if (cpu->hyperv_vpindex) {
-> +        if (!has_msr_hv_vpindex) {
-> +            fprintf(stderr, "Hyper-V VP_INDEX is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EAX] |= HV_VP_INDEX_AVAILABLE;
->      }
-> -    if (cpu->hyperv_runtime && has_msr_hv_runtime) {
-> +    if (cpu->hyperv_runtime) {
-> +        if (!has_msr_hv_runtime) {
-> +            fprintf(stderr, "Hyper-V VP_INDEX is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EAX] |= HV_VP_RUNTIME_AVAILABLE;
->      }
->      if (cpu->hyperv_synic) {
-> -- 
-> 2.14.3
-> 
-
--- 
-Eduardo
+Thanks!
