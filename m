@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezQJc-000790-AM
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1ezQK2-0007Ol-0U
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezQJZ-0003cE-JQ
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34846 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1ezQJz-0003vH-9m
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34850 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezQJZ-0003bG-FS
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:17 -0400
-Date: Fri, 23 Mar 2018 17:17:03 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180323171703.GD3186@work-vm>
-References: <1521568357-114127-1-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezQJz-0003v7-4w
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:43 -0400
+References: <20180323140821.28957-1-peterx@redhat.com>
+	<17b3708c-3787-c08d-e960-c6df21114689@redhat.com>
+	<ff6a3e78-56dd-aa7b-da36-4d0a79634079@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <758e314f-10d3-d335-9f20-7ee7cf714320@redhat.com>
+Date: Fri, 23 Mar 2018 12:17:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1521568357-114127-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] linux-headers: unistd.h fixups
+In-Reply-To: <ff6a3e78-56dd-aa7b-da36-4d0a79634079@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] Turn OOB off for 2.12-rc1,
+ revert OOB tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> It turns out that we have unistd.h for some architectures but not
-> others.  We are thus unable to use e.g. usefaultfd on these systems.
+On 03/23/2018 10:53 AM, Eric Blake wrote:
+
+> Actually, we should revert things in reverse order of the original 
+> commits, so that we aren't introducing yet more temporary breakage.
 > 
-> Fix up update-linux-headers.sh to make sure we
-> get it for all architectures which have linux-headers/
-> (unfortunately this still does not mean "all linux systems").
+> Since you reverted:
 > 
-> Tested on x86 only.
+> $ git describe 3fd2457 d003f7a 91ad450 0213031 --match=v\*
+> v2.11.0-2595-g3fd2457d18e
+> v2.11.0-2598-gd003f7a8f9c
+> v2.11.0-2597-g91ad45061af
+> v2.11.0-2585-g02130314d8c
 > 
-> Pls consider merging this through the migration tree.
+> where the higher the middle number represents the further distance from 
+> 2.11 (aka newer patch), this series should be applied in the order:
+> 
+> 2/4 (revert the newest patch first)
+> 3/4
+> 1/4
+> 4/4
+
+Even that didn't work - 'make check' fails with either 1/4 or 4/4 
+applied in isolation, so I'm squashing them into a single patch.
+
+The failure was either:
+
+   GTESTER check-qtest-x86_64
+**
+ERROR:tests/qmp-test.c:96:test_qmp_protocol: assertion failed: (entry)
+GTester: last random seed: R02Sa02aeb0d46d3092524914cd9be2b57f7
+make: *** [/home/eblake/qemu/tests/Makefile.include:880: 
+check-qtest-x86_64] Error 1
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+or:
 
-and queued for migration;  I'll test build Power and aarch64 as well.
+   GTESTER check-qtest-x86_64
+**
+ERROR:tests/qmp-test.c:92:test_qmp_protocol: assertion failed: 
+(capabilities && qlist_empty(capabilities))
+GTester: last random seed: R02S621a9dbfcf7bed132c614953e93ecb37
+make: *** [/home/eblake/qemu/tests/Makefile.include:880: 
+check-qtest-x86_64] Error 1
 
-Dave
 
-> Michael S. Tsirkin (2):
->   update-linux-headers.sh: add unistd.h
->   linux-headers: add asm-generic/unistd.h
-> 
->  linux-headers/asm-arm/bitsperlong.h     |   1 +
->  linux-headers/asm-arm64/bitsperlong.h   |  24 +
->  linux-headers/asm-generic/bitsperlong.h |  16 +
->  linux-headers/asm-generic/unistd.h      | 944 ++++++++++++++++++++++++++++++++
->  linux-headers/asm-mips/bitsperlong.h    |   9 +
->  linux-headers/asm-mips/unistd.h         |  44 +-
->  linux-headers/asm-powerpc/bitsperlong.h |  13 +
->  linux-headers/asm-s390/bitsperlong.h    |  14 +
->  linux-headers/asm-x86/bitsperlong.h     |  14 +
->  scripts/update-linux-headers.sh         |  20 +-
->  10 files changed, 1086 insertions(+), 13 deletions(-)
->  create mode 100644 linux-headers/asm-arm/bitsperlong.h
->  create mode 100644 linux-headers/asm-arm64/bitsperlong.h
->  create mode 100644 linux-headers/asm-generic/bitsperlong.h
->  create mode 100644 linux-headers/asm-generic/unistd.h
->  create mode 100644 linux-headers/asm-mips/bitsperlong.h
->  create mode 100644 linux-headers/asm-powerpc/bitsperlong.h
->  create mode 100644 linux-headers/asm-s390/bitsperlong.h
->  create mode 100644 linux-headers/asm-x86/bitsperlong.h
-> 
-> -- 
-> MST
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
