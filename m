@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1ezJPZ-0001Rg-LD
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:55:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezJRi-0002aW-1d
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1ezJPW-0003Px-4p
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:55:01 -0400
-Received: from mga17.intel.com ([192.55.52.151]:51248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1ezJPV-0003N5-QL
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:54:58 -0400
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <22f7f184-c295-4e18-c186-3fd9fdcce213@linux.intel.com>
-Date: Fri, 23 Mar 2018 17:54:53 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1ezJRg-0004vL-HL
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:57:14 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34683)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezJRg-0004ud-CU
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 05:57:12 -0400
+Received: by mail-oi0-x242.google.com with SMTP id u141-v6so9844422oif.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 02:57:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [Consult] nfs-vsocks support
+In-Reply-To: <1521794165-31678-1-git-send-email-thuth@redhat.com>
+References: <1521794165-31678-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 09:56:51 +0000
+Message-ID: <CAFEAcA-KEnE9NKGC-vTnMByFC_LDPt2Ae8G7GfOxakfgMGH90w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/riscv: Fix crashes with
+ "-nodefaults"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: yang.zhong@intel.com, stefanha@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-Hello,
+On 23 March 2018 at 08:36, Thomas Huth <thuth@redhat.com> wrote:
+> Most of the RISC-V boards currently crash when they are started with
+> "-nodefaults", e.g.:
+>
+> $ gdb --args riscv32-softmmu/qemu-system-riscv32 -nodefaults -M sifive_e
+> [...]
+> (gdb) r
+> Program received signal SIGSEGV, Segmentation fault.
+> qemu_chr_fe_init ([...], s=s@entry=0x0, [...])
+>     at chardev/char-fe.c:210
+> 210         } else if (s->be) {
+> (gdb) bt
+>  0  0x00005555558695f8 in qemu_chr_fe_init ([...], s=s@entry=0x0, [...])
+>     at chardev/char-fe.c:210
+>  1  0x00005555556fb425 in sifive_uart_create ([...], chr=0x0, [...])
+>     at hw/riscv/sifive_uart.c:169
+>  2  0x00005555556f8cc4 in riscv_sifive_e_init (machine=[...])
+>     at hw/riscv/sifive_e.c:164
+>     [...]
+>
+> With "-nodefaults" there are no entries in serial_hds[], so qemu_chr_fe_init()
+> finally tries to dereference a NULL pointer. Let's fix this problem by
+> creating a "null" chardev in this case instead.
 
-I am currently trying to use nfs-vsocks on x86 for vitural machine 
-filesystem by some manuals on 
-https://www.spinics.net/lists/linux-nfs/msg64563.html
-and https://lwn.net/Articles/647516/
+Isn't it possible to fix this another level further down
+by having qemu_chr_fe_init() &c handle having a NULL chardev?
+That would be nicer than requiring every UART model to handle
+it, because inevitably people will forget about that corner case.
 
-It tells the quickstart steps with the following codes but I got some 
-problems as listed.
-  * Linux kernel: https://github.com/stefanha/linux.git vsock-nfs
-  * QEMU virtio-vsock device: https://github.com/stefanha/qemu.git vsock
-  * nfs-utils vsock: https://github.com/stefanha/nfs-utils.git vsock
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  For other boards / targets, see also:
+>  https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg05073.html
+>
+>  hw/riscv/riscv_htif.c  | 5 +++++
+>  hw/riscv/sifive_uart.c | 5 +++++
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+> index 3e17f30..d3d31ff 100644
+> --- a/hw/riscv/riscv_htif.c
+> +++ b/hw/riscv/riscv_htif.c
+> @@ -245,9 +245,14 @@ HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
+>      s->pending_read = 0;
+>      s->allow_tohost = 0;
+>      s->fromhost_inprogress = 0;
+> +
+> +    if (!chr) {
+> +        chr = qemu_chardev_new(NULL, TYPE_CHARDEV_NULL, NULL, &error_abort);
+> +    }
+>      qemu_chr_fe_init(&s->chr, chr, &error_abort);
+>      qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
+>          htif_be_change, s, NULL, true);
+> +
+>      if (base) {
+>          memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
+>                              TYPE_HTIF_UART, size);
 
-1. I would like to ask what is the current status of these codes? If 
-there're some updates? :)
-2. nfs-utils codes could not compile for me... I refered to the README 
-but failed for both ways. It seems no configure script and 
-autoheader/automake... So I don't know how to install this.
-3. For the 5th step (Start nfsd), I'd like to know the rpc.nfsd --vsock 
-is enabled by which codes? Is it the CONFIG_VHOST_VSOCK kernel module in 
-host? Because I installed the kernel with vsock-nfs repo with the 
-specified config options but failed to do rpc.nfsd --vsock.
+As an aside: this source file looks like it's a device, but
+it isn't a QOM device. That seems like it needs fixing, and it
+should probably be in hw/char or hw/misc.
 
+> diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
+> index b0c3798..2bde8bb 100644
+> --- a/hw/riscv/sifive_uart.c
+> +++ b/hw/riscv/sifive_uart.c
 
-Could you give me some help and thanks in advance!
+If this is a UART why isn't it in hw/char ? It should also
+be a proper QOM device, and moved to the right place in
+the source tree.
 
-BRs,
-Jing Liu
+> @@ -166,9 +166,14 @@ SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
+>  {
+>      SiFiveUARTState *s = g_malloc0(sizeof(SiFiveUARTState));
+>      s->irq = irq;
+> +
+> +    if (!chr) {
+> +        chr = qemu_chardev_new(NULL, TYPE_CHARDEV_NULL, NULL, &error_abort);
+> +    }
+>      qemu_chr_fe_init(&s->chr, chr, &error_abort);
+>      qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
+>          uart_be_change, s, NULL, true);
+> +
+>      memory_region_init_io(&s->mmio, NULL, &uart_ops, s,
+>                            TYPE_SIFIVE_UART, SIFIVE_UART_MAX);
+>      memory_region_add_subregion(address_space, base, &s->mmio);
+> --
+> 1.8.3.1
+
+thanks
+-- PMM
