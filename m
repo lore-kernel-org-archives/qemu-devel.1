@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ezVDV-0005bW-Pe
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:31:22 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ezVdU-0004iL-Nv
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ezVDR-0001Px-8E
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:31:21 -0400
-Resent-Message-Id: <E1ezVDR-0001Px-8E@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ezVDR-0001Ou-1X
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:31:17 -0400
-In-Reply-To: <20180323184958.14252-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152184154190.306.613073996903354674@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 23 Mar 2018 14:45:42 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/10] target-arm queue
+	(envelope-from <laurent@vivier.eu>) id 1ezVdR-0000WL-HN
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:12 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 23 Mar 2018 23:57:19 +0100
+Message-Id: <20180323225739.17329-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH for 2.13 v2 00/20] linux-user: move arch
+ specific parts to arch directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +18,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMzIzMTg0OTU4LjE0MjUyLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gdGFyZ2V0LWFybSBxdWV1ZQoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
-KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpl
-NDI1MGE2NTc1IHRhcmdldC9hcm06IEFsd2F5cyBzZXQgRkFSIHRvIGEga25vd24gdW5rbm93biB2
-YWx1ZSBmb3IgZGVidWcgZXhjZXB0aW9ucwo1ZjhhZDFlNWRjIHRhcmdldC9hcm06IFNldCBGU1Ig
-Zm9yIEJLUFQsIEJSSyB3aGVuIHJhaXNpbmcgZXhjZXB0aW9uCjFmODY5OGU3ODIgdGFyZ2V0L2Fy
-bTogRmFjdG9yIG91dCBjb2RlIHRvIGNhbGN1bGF0ZSBGU1IgZm9yIGRlYnVnIGV4Y2VwdGlvbnMK
-MDFjM2M3ODNhMiB0YXJnZXQvYXJtOiBIb25vdXIgTURDUl9FTDIuVERFIHdoZW4gcm91dGluZyBl
-eGNlcHRpb25zIGR1ZSB0byBCS1BUL0JSSwo2ZmRkOGVkNDdlIG1hY2gtdmlydDogU2V0IFZNJ3Mg
-U01CSU9TIHN5c3RlbSB2ZXJzaW9uIHRvIG1jLT5uYW1lCjRjMjc0MjFlM2QgaS5NWDogU3VwcG9y
-dCBzZXJpYWwgUlMtMjMyIGJyZWFrIHByb3Blcmx5CjU0MWJmOWFkMTAgaHcvYXJtL2JjbTI4MzY6
-IFVzZSB0aGUgQ29ydGV4LUE3IGluc3RlYWQgb2YgQ29ydGV4LUExNQo0YmE0ZDZlZGQ5IGh3L2lu
-dGMvYXJtX2dpY3YzOiBGaXggc2VjdXJlLUdJQyBOUyBJQ0NfUE1SIGFuZCBJQ0NfUlBSIGFjY2Vz
-c2VzCmM1ZDFiYzI4YzAgc2RoY2k6IGZpeCBpbmNvcnJlY3QgdXNlIG9mIEVycm9yICoKYzhjNDE5
-ZDEzYyBhcm0vdHJhbnNsYXRlLWE2NDogdHJlYXQgRElTQVNfVVBEQVRFIGFzIHZhcmlhbnQgb2Yg
-RElTQVNfRVhJVAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogYXJt
-L3RyYW5zbGF0ZS1hNjQ6IHRyZWF0IERJU0FTX1VQREFURSBhcyB2YXJpYW50IG9mIERJU0FTX0VY
-SVQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMDogc2RoY2k6IGZpeCBpbmNvcnJlY3QgdXNlIG9mIEVy
-cm9yICouLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogaHcvaW50Yy9hcm1fZ2ljdjM6IEZpeCBzZWN1
-cmUtR0lDIE5TIElDQ19QTVIgYW5kIElDQ19SUFIgYWNjZXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NC8xMDogaHcvYXJtL2JjbTI4MzY6IFVzZSB0aGUgQ29ydGV4LUE3IGluc3RlYWQgb2YgQ29ydGV4
-LUExNS4uLgpDaGVja2luZyBQQVRDSCA1LzEwOiBpLk1YOiBTdXBwb3J0IHNlcmlhbCBSUy0yMzIg
-YnJlYWsgcHJvcGVybHkuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPDwn
-IChjdHg6VnhWKQojNTY6IEZJTEU6IGluY2x1ZGUvaHcvY2hhci9pbXhfc2VyaWFsLmg6Mjk6Cisj
-ZGVmaW5lIFVSWERfRlJNRVJSICAgICAoMTw8MTIpICAgLyogQ2hhcmFjdGVyIGhhcyBmcmFtZSBl
-cnJvciAqLwogICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvMTA6IG1hY2gtdmlydDogU2V0IFZNJ3MgU01CSU9T
-IHN5c3RlbSB2ZXJzaW9uIHRvIG1jLT5uYW1lLi4uCkNoZWNraW5nIFBBVENIIDcvMTA6IHRhcmdl
-dC9hcm06IEhvbm91ciBNRENSX0VMMi5UREUgd2hlbiByb3V0aW5nIGV4Y2VwdGlvbnMgZHVlIHRv
-IEJLUFQvQlJLLi4uCkNoZWNraW5nIFBBVENIIDgvMTA6IHRhcmdldC9hcm06IEZhY3RvciBvdXQg
-Y29kZSB0byBjYWxjdWxhdGUgRlNSIGZvciBkZWJ1ZyBleGNlcHRpb25zLi4uCkNoZWNraW5nIFBB
-VENIIDkvMTA6IHRhcmdldC9hcm06IFNldCBGU1IgZm9yIEJLUFQsIEJSSyB3aGVuIHJhaXNpbmcg
-ZXhjZXB0aW9uLi4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiB0YXJnZXQvYXJtOiBBbHdheXMgc2V0
-IEZBUiB0byBhIGtub3duIHVua25vd24gdmFsdWUgZm9yIGRlYnVnIGV4Y2VwdGlvbnMuLi4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
-cy5vcmc=
+Some files like signal.c are really hard to read
+because all architectures are mixed in the same
+file.
+
+This series moves from signal.c these parts to
+the architecture dedicated directories in linux-user.
+Moreover, this allows to compare easier functions
+between architectures (it helps to debug problems).
+Adding new functions for a new architecture will
+be facilitated too.
+
+checkpatch.pl is not happy... but I only want to
+move code from a file to another. I don't want
+to change the content of the parts I move.
+
+v2:
+  - only move parts from signal.c
+  - link them instead of including them
+  - one patch by architecture
+  - add a first patch to prepare the change.
+
+The first patch adds signal-common.h to define
+what is needed by the signal.c of the architectures.
+It adds a "do-nothing" signal.c in each arch
+directory and the rule needed to build them
+in Makefile.objs.
+
+Then the process is simple...
+
+for each architecture:
+  - copy the arch specific code from signal.c
+    to <arch>/signal.c
+  - add includes (including signal-common.h)
+  - export setup_rt_frame() and setup_frame()
+    (remove static in <arch>/signal.c,
+     add the declaration in <arch>/target_signal.h)
+
+When the arch has 32bit and 64bit architectures,
+it's a little bit more complicated:
+  - ppc/ppc64: nothing special to do, all is in ppc/,
+    there is no ppc64 directory,
+  - arm/aarch64: one file for arm, one file for aarch64
+  - i386/x86_64, sparc/sparc64, mips/mips64:
+    update each target_signal.h,
+    include the 32bit signal.c file into the 64bit signal.c file
+    to avoid to duplicate code (and add a guard to not include
+    the 32bit target_signal.h)
+
+Laurent Vivier (20):
+  linux-user: create a dummy per arch signal.c
+  linux-user: move aarch64 signal.c parts to aarch64 directory
+  linux-user: move arm signal.c parts to arm directory
+  linux-user: move sh4 signal.c parts to sh4 directory
+  linux-user: move microblaze signal.c parts to microblaze directory
+  linux-user: move cris signal.c parts to cris directory
+  linux-user: move nios2 signal.c parts to nios2 directory
+  linux-user: move openrisc signal.c parts to openrisc directory
+  linux-user: move s390x signal.c parts to s390x directory
+  linux-user: move m68k signal.c parts to m68k directory
+  linux-user: move alpha signal.c parts to alpha directory
+  linux-user: move tilegx signal.c parts to tilegx directory
+  linux-user: move riscv signal.c parts to riscv directory
+  linux-user: move hppa signal.c parts to hppa directory
+  linux-user: move xtensa signal.c parts to xtensa directory
+  linux-user: move i386/x86_64 signal.c parts to i386 directory
+  linux-user: move sparc/sparc64 signal.c parts to sparc directory
+  linux-user: move mips/mips64 signal.c parts to mips directory
+  linux-user: move ppc/ppc64 signal.c parts to ppc directory
+  linux-user: define TARGET_ARCH_HAS_SETUP_FRAME
+
+ linux-user/Makefile.objs              |    2 +-
+ linux-user/aarch64/signal.c           |  579 +++
+ linux-user/aarch64/target_signal.h    |    6 +
+ linux-user/alpha/signal.c             |  280 ++
+ linux-user/alpha/target_signal.h      |    6 +
+ linux-user/arm/signal.c               |  772 ++++
+ linux-user/arm/target_signal.h        |    7 +-
+ linux-user/cris/signal.c              |  189 +
+ linux-user/cris/target_signal.h       |    7 +-
+ linux-user/hppa/signal.c              |  210 ++
+ linux-user/hppa/target_signal.h       |    3 +
+ linux-user/i386/signal.c              |  602 +++
+ linux-user/i386/target_signal.h       |    6 +
+ linux-user/m68k/signal.c              |  428 +++
+ linux-user/m68k/target_signal.h       |    7 +-
+ linux-user/microblaze/signal.c        |  248 ++
+ linux-user/microblaze/target_signal.h |    7 +-
+ linux-user/mips/signal.c              |  400 ++
+ linux-user/mips/target_signal.h       |   10 +-
+ linux-user/mips64/signal.c            |   20 +
+ linux-user/mips64/target_signal.h     |    4 +-
+ linux-user/nios2/signal.c             |  254 ++
+ linux-user/nios2/target_signal.h      |    4 +
+ linux-user/openrisc/signal.c          |  231 ++
+ linux-user/openrisc/target_signal.h   |    4 +-
+ linux-user/ppc/signal.c               |  689 ++++
+ linux-user/ppc/target_signal.h        |    9 +-
+ linux-user/riscv/signal.c             |  218 ++
+ linux-user/riscv/target_signal.h      |    3 +
+ linux-user/s390x/signal.c             |  327 ++
+ linux-user/s390x/target_signal.h      |    7 +-
+ linux-user/sh4/signal.c               |  350 ++
+ linux-user/sh4/target_signal.h        |    6 +
+ linux-user/signal-common.h            |   50 +
+ linux-user/signal.c                   | 6654 +--------------------------------
+ linux-user/sparc/signal.c             |  624 ++++
+ linux-user/sparc/target_signal.h      |    7 +-
+ linux-user/sparc64/signal.c           |   20 +
+ linux-user/sparc64/target_signal.h    |    7 +-
+ linux-user/tilegx/signal.c            |  186 +
+ linux-user/tilegx/target_signal.h     |    4 +-
+ linux-user/x86_64/signal.c            |   20 +
+ linux-user/x86_64/target_signal.h     |    3 +
+ linux-user/xtensa/signal.c            |  275 ++
+ linux-user/xtensa/target_signal.h     |    3 +
+ 45 files changed, 7155 insertions(+), 6593 deletions(-)
+ create mode 100644 linux-user/aarch64/signal.c
+ create mode 100644 linux-user/alpha/signal.c
+ create mode 100644 linux-user/arm/signal.c
+ create mode 100644 linux-user/cris/signal.c
+ create mode 100644 linux-user/hppa/signal.c
+ create mode 100644 linux-user/i386/signal.c
+ create mode 100644 linux-user/m68k/signal.c
+ create mode 100644 linux-user/microblaze/signal.c
+ create mode 100644 linux-user/mips/signal.c
+ create mode 100644 linux-user/mips64/signal.c
+ create mode 100644 linux-user/nios2/signal.c
+ create mode 100644 linux-user/openrisc/signal.c
+ create mode 100644 linux-user/ppc/signal.c
+ create mode 100644 linux-user/riscv/signal.c
+ create mode 100644 linux-user/s390x/signal.c
+ create mode 100644 linux-user/sh4/signal.c
+ create mode 100644 linux-user/signal-common.h
+ create mode 100644 linux-user/sparc/signal.c
+ create mode 100644 linux-user/sparc64/signal.c
+ create mode 100644 linux-user/tilegx/signal.c
+ create mode 100644 linux-user/x86_64/signal.c
+ create mode 100644 linux-user/xtensa/signal.c
+
+-- 
+2.14.3
