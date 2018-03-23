@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezPXB-0002OB-BL
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:27:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1ezPan-0003se-Hg
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezPX8-0005wZ-1R
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:27:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezPX7-0005wK-SA
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:27:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 09EDE40704A2
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 16:27:09 +0000 (UTC)
-Date: Fri, 23 Mar 2018 16:27:02 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180323162701.GA17165@work-vm>
-References: <20180312141714.7223-1-berrange@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1ezPak-0000AZ-9L
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:31:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60836)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ezPak-00009s-2i
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:30:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ezPah-0002BA-Ce
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 16:30:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A58662E8D5A
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 16:30:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180312141714.7223-1-berrange@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 REPOST] migration: convert socket
- server to QIONetListener
+Date: Fri, 23 Mar 2018 16:19:26 -0000
+From: LukeShu <lukeshu@lukeshu.com>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <152182196650.22615.16870934999456464714.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> Instead of creating a QIOChannelSocket directly for the migration
-> server socket, use a QIONetListener. This provides the ability
-> to listen on multiple sockets at the same time, so enables
-> full support for IPv4/IPv6 dual stack.
->=20
-> For example,   '$QEMU -incoming tcp::9000' now correctly listens
-> on both 0.0.0.0 and :: at the same time, instead of only on 0.0.0.0.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+I don't believe so.  The patchset applies cleanly on 2.11.0, and fixes
+the issue there.
 
-<squints really hard>
-Queued for 2.12
+-- =
 
-> ---
->  migration/socket.c | 48 ++++++++++++++++------------------------------=
---
->  1 file changed, 16 insertions(+), 32 deletions(-)
->=20
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 8a93fb1af5..122d8ccfbe 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -24,6 +24,7 @@
->  #include "migration.h"
->  #include "qemu-file.h"
->  #include "io/channel-socket.h"
-> +#include "io/net-listener.h"
->  #include "trace.h"
-> =20
-> =20
-> @@ -129,34 +130,20 @@ void unix_start_outgoing_migration(MigrationState=
- *s,
->  }
-> =20
-> =20
-> -static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-> -                                                 GIOCondition conditio=
-n,
-> -                                                 gpointer opaque)
-> +static void socket_accept_incoming_migration(QIONetListener *listener,
-> +                                             QIOChannelSocket *cioc,
-> +                                             gpointer opaque)
->  {
-> -    QIOChannelSocket *sioc;
-> -    Error *err =3D NULL;
-> -
-> -    sioc =3D qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
-> -                                     &err);
-> -    if (!sioc) {
-> -        error_report("could not accept migration connection (%s)",
-> -                     error_get_pretty(err));
-> -        goto out;
-> -    }
-> -
->      trace_migration_socket_incoming_accepted();
-> =20
-> -    qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming=
-");
-> -    migration_channel_process_incoming(QIO_CHANNEL(sioc));
-> -    object_unref(OBJECT(sioc));
-> +    qio_channel_set_name(QIO_CHANNEL(cioc), "migration-socket-incoming=
-");
-> +    migration_channel_process_incoming(QIO_CHANNEL(cioc));
-> =20
-> -out:
->      if (migration_has_all_channels()) {
->          /* Close listening socket as its no longer needed */
-> -        qio_channel_close(ioc, NULL);
-> -        return G_SOURCE_REMOVE;
-> -    } else {
-> -        return G_SOURCE_CONTINUE;
-> +        qio_net_listener_disconnect(listener);
-> +
-> +        object_unref(OBJECT(listener));
->      }
->  }
-> =20
-> @@ -164,21 +151,18 @@ out:
->  static void socket_start_incoming_migration(SocketAddress *saddr,
->                                              Error **errp)
->  {
-> -    QIOChannelSocket *listen_ioc =3D qio_channel_socket_new();
-> +    QIONetListener *listener =3D qio_net_listener_new();
-> =20
-> -    qio_channel_set_name(QIO_CHANNEL(listen_ioc),
-> -                         "migration-socket-listener");
-> +    qio_net_listener_set_name(listener, "migration-socket-listener");
-> =20
-> -    if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
-> -        object_unref(OBJECT(listen_ioc));
-> +    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
-> +        object_unref(OBJECT(listener));
->          return;
->      }
-> =20
-> -    qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
-> -                          G_IO_IN,
-> -                          socket_accept_incoming_migration,
-> -                          listen_ioc,
-> -                          (GDestroyNotify)object_unref);
-> +    qio_net_listener_set_client_func(listener,
-> +                                     socket_accept_incoming_migration,
-> +                                     NULL, NULL);
->  }
-> =20
->  void tcp_start_incoming_migration(const char *host_port, Error **errp)
-> --=20
-> 2.14.3
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
+
+Title:
+  static linux-user ARM emulation has several-second startup time
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+
+Bug description:
+  static linux-user emulation has several-second startup time
+
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
+
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
+
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
+
+  ----
+
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
+
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
+
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
+
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
+
+  ----
+
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
