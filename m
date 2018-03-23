@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezNNv-0007qm-Ix
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:09:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ezNRq-0002tL-0n
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:13:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezNNs-0005MY-DG
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:09:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40730 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1ezNRm-0006o9-TN
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:13:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57814 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ezNNs-0005MN-9H
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:09:32 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Fri, 23 Mar 2018 22:08:21 +0800
-Message-Id: <20180323140821.28957-5-peterx@redhat.com>
-In-Reply-To: <20180323140821.28957-1-peterx@redhat.com>
-References: <20180323140821.28957-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.12 4/4] tests: partly revert "qmp:
- introduce QMPCapability"
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ezNRm-0006nn-OF
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:13:34 -0400
+References: <1521794165-31678-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-KEnE9NKGC-vTnMByFC_LDPt2Ae8G7GfOxakfgMGH90w@mail.gmail.com>
+	<6750673e-ffc3-578e-e867-332ac0790935@redhat.com>
+	<CAFEAcA_u3cKF1aSHbrjW0Hc403G5GkNNom_9mqkJfregfqMymw@mail.gmail.com>
+	<173b1d18-720a-4f61-29cf-4f812b78cb2e@redhat.com>
+	<CAFEAcA_HaC6yjX7wW0MscxfiEafFT2uhMiWeN644NTYADhdEnQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ebf41b29-24e1-2f51-e382-22b34260cb34@redhat.com>
+Date: Fri, 23 Mar 2018 15:13:30 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_HaC6yjX7wW0MscxfiEafFT2uhMiWeN644NTYADhdEnQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/riscv: Fix crashes with
+ "-nodefaults"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com, Eric Auger <eric.auger@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Revert the tests in the patch 02130314d8 ("qmp: introduce
-QMPCapability", 2018-03-19) since we'll disable OOB for now.
+On 23/03/2018 15:04, Peter Maydell wrote:
+>> However, if the machine is emulating a real-world board with a fixed S=
+oC
+>> and fixed hardware in the SoC, it makes more sense to create a null ba=
+ckend.
+>
+> That's a lot of duplicate code to say "oh, this is NULL, create the
+> null backend" in lots of different boards :-(
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/qmp-test.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+Note it's a null "backend", not necessarily a null "character device".
+Your proposal, namely ensuring that be->chr =3D=3D NULL is handled proper=
+ly
+in qemu_chr_fe_init, would be just fine.
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index d1fa1cb217..558e83540c 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -80,8 +80,6 @@ static void test_qmp_protocol(void)
-     QDict *resp, *q, *ret;
-     QList *capabilities;
-     QTestState *qts;
--    const QListEntry *entry;
--    QString *qstr;
- 
-     qts = qtest_init_without_qmp_handshake(common_args);
- 
-@@ -91,13 +89,7 @@ static void test_qmp_protocol(void)
-     g_assert(q);
-     test_version(qdict_get(q, "version"));
-     capabilities = qdict_get_qlist(q, "capabilities");
--    g_assert(capabilities);
--    entry = qlist_first(capabilities);
--    g_assert(entry);
--    qstr = qobject_to(QString, entry->value);
--    g_assert(qstr);
--    g_assert_cmpstr(qstring_get_str(qstr), ==, "oob");
--    QDECREF(resp);
-+    g_assert(capabilities && qlist_empty(capabilities));
- 
-     /* Test valid command before handshake */
-     resp = qtest_qmp(qts, "{ 'execute': 'query-version' }");
--- 
-2.14.3
+The main point was that the choice of whether to create the device is up
+to the board, and there isn't a single answer valid for all boards.
+
+Paolo
