@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezQK2-0007Ol-0U
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ezQMW-0000kW-Is
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:20:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezQJz-0003vH-9m
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezQJz-0003v7-4w
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:17:43 -0400
-References: <20180323140821.28957-1-peterx@redhat.com>
-	<17b3708c-3787-c08d-e960-c6df21114689@redhat.com>
-	<ff6a3e78-56dd-aa7b-da36-4d0a79634079@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <758e314f-10d3-d335-9f20-7ee7cf714320@redhat.com>
-Date: Fri, 23 Mar 2018 12:17:23 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ezQMT-0006HZ-LF
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:20:20 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:38619)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ezQMT-0006H2-A6
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:20:17 -0400
+Received: by mail-qk0-x243.google.com with SMTP id 132so13666001qkd.5
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 10:20:17 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180323131715.29739-1-jcmvbkbc@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c7a7949f-1b75-edef-f91f-04ea9ee8ca39@amsat.org>
+Date: Fri, 23 Mar 2018 14:20:13 -0300
 MIME-Version: 1.0
-In-Reply-To: <ff6a3e78-56dd-aa7b-da36-4d0a79634079@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180323131715.29739-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] Turn OOB off for 2.12-rc1,
- revert OOB tests
+Subject: Re: [Qemu-devel] [PATCH] target/xtensa: fix timers test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>
 
-On 03/23/2018 10:53 AM, Eric Blake wrote:
+Hi Max,
 
-> Actually, we should revert things in reverse order of the original 
-> commits, so that we aren't introducing yet more temporary breakage.
+On 03/23/2018 10:17 AM, Max Filippov wrote:
+> Change frequency of the core used in tests so that clock cycle takes
+> exactly 64ns. Change icount power used in tests to 6, so that each
+> instruction takes exactly 1 clock cycle. With these changes the
+> assumptions of the xtensa timers test are correct and the test must
+> always pass.
 > 
-> Since you reverted:
+> Longer story:
+>   http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg04326.html
+
+Would be great to have it in this commit message.
+
 > 
-> $ git describe 3fd2457 d003f7a 91ad450 0213031 --match=v\*
-> v2.11.0-2595-g3fd2457d18e
-> v2.11.0-2598-gd003f7a8f9c
-> v2.11.0-2597-g91ad45061af
-> v2.11.0-2585-g02130314d8c
+> Cc: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+>  target/xtensa/core-dc232b.c | 2 +-
+>  tests/tcg/xtensa/Makefile   | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> where the higher the middle number represents the further distance from 
-> 2.11 (aka newer patch), this series should be applied in the order:
+> diff --git a/target/xtensa/core-dc232b.c b/target/xtensa/core-dc232b.c
+> index aa07018af4e7..8846336f5cfa 100644
+> --- a/target/xtensa/core-dc232b.c
+> +++ b/target/xtensa/core-dc232b.c
+> @@ -47,7 +47,7 @@ static XtensaConfig dc232b __attribute__((unused)) = {
+>          }
+>      },
+>      .isa_internal = &xtensa_modules,
+> -    .clock_freq_khz = 10000,
+> +    .clock_freq_khz = 15625,
+
+What about using self-explicit:
+
+       .clock_freq_khz = (NANOSECONDS_PER_SECOND / 64) / 1000;
+
+>      DEFAULT_SECTIONS
+>  };
+>  
+> diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
+> index 2882c431e4a9..091518c05583 100644
+> --- a/tests/tcg/xtensa/Makefile
+> +++ b/tests/tcg/xtensa/Makefile
+> @@ -5,7 +5,7 @@ CROSS=xtensa-$(CORE)-elf-
+>  
+>  ifndef XT
+>  SIM = ../../../xtensa-softmmu/qemu-system-xtensa
+> -SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting -icount 7 $(EXTFLAGS) -kernel
+> +SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting -icount 6 $(EXTFLAGS) -kernel
+>  SIMDEBUG = -s -S
+>  else
+>  SIM = xt-run
 > 
-> 2/4 (revert the newest patch first)
-> 3/4
-> 1/4
-> 4/4
 
-Even that didn't work - 'make check' fails with either 1/4 or 4/4 
-applied in isolation, so I'm squashing them into a single patch.
+Regards,
 
-The failure was either:
-
-   GTESTER check-qtest-x86_64
-**
-ERROR:tests/qmp-test.c:96:test_qmp_protocol: assertion failed: (entry)
-GTester: last random seed: R02Sa02aeb0d46d3092524914cd9be2b57f7
-make: *** [/home/eblake/qemu/tests/Makefile.include:880: 
-check-qtest-x86_64] Error 1
-
-
-or:
-
-   GTESTER check-qtest-x86_64
-**
-ERROR:tests/qmp-test.c:92:test_qmp_protocol: assertion failed: 
-(capabilities && qlist_empty(capabilities))
-GTester: last random seed: R02S621a9dbfcf7bed132c614953e93ecb37
-make: *** [/home/eblake/qemu/tests/Makefile.include:880: 
-check-qtest-x86_64] Error 1
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Phil.
