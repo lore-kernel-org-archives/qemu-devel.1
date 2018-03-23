@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezNU1-0004Ht-8q
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:15:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezNWL-0005my-Hb
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezNTy-0008Hb-3q
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:15:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51854 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ezNTx-0008HS-Vr
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:15:50 -0400
-Date: Fri, 23 Mar 2018 22:15:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180323141536.GR32362@xz-mi>
-References: <20180323140821.28957-1-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ezNWK-0002WI-Cn
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:18:17 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:39764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezNWK-0002Vk-7C
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 10:18:16 -0400
+Received: by mail-ot0-x243.google.com with SMTP id h8-v6so13390451oti.6
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 07:18:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180323140821.28957-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] Turn OOB off for 2.12-rc1,
- revert OOB tests
+In-Reply-To: <20180322215833.7713-4-laurent@vivier.eu>
+References: <20180322215833.7713-1-laurent@vivier.eu>
+	<20180322215833.7713-4-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 14:17:55 +0000
+Message-ID: <CAFEAcA8fTCNdZurrXY9vpNfJugqsfpGgTAhWKBEM34pMzW4+vg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for 2.13 3/5] linux-user: define
+ TARGET_ARCH_HAS_SETUP_FRAME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Fri, Mar 23, 2018 at 10:08:17PM +0800, Peter Xu wrote:
-> Temporarily disable OOB for 2.12 since it break (a lot of) things.
-> Luckily it's only a switch so not so hard. Meanwhile, revert all new
-> tests that checks against it.
-> 
-> Tests done: all target builds and "make check" passed, but only on
-> x86_64 host.  It can pass all "raw" iotests, but some "qcow2" iotests
-> are still failing.  I can even reproduce many of the qcow2 fails even
-> before the whole OOB series, so I suppose that's something already
-> exists so I'll ignore.
-> 
-> More tests are really welcomed.  Thanks,
+On 22 March 2018 at 21:58, Laurent Vivier <laurent@vivier.eu> wrote:
+> instead of calling setup_frame() conditionnaly to a list of knowm targets,
 
-CC Eric Blake too.
+"Instead". "conditionally". "known".
 
--- 
-Peter Xu
+> define TARGET_ARCH_HAS_SETUP_FRAME if the target provides the function
+> and call it only if the macro is defined
+
+Trailing ".".
+
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -886,18 +886,13 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+>          }
+>  #endif
+>          /* prepare the stack frame of the virtual CPU */
+> -#if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64) \
+> -        || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
+> -        || defined(TARGET_PPC64) || defined(TARGET_HPPA) \
+> -        || defined(TARGET_NIOS2) || defined(TARGET_X86_64) \
+> -        || defined(TARGET_RISCV) || defined(TARGET_XTENSA)
+> -        /* These targets do not have traditional signals.  */
+> -        setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+> -#else
+> +#if defined(TARGET_ARCH_HAS_SETUP_FRAME)
+>          if (sa->sa_flags & TARGET_SA_SIGINFO)
+>              setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+>          else
+>              setup_frame(sig, sa, &target_old_set, cpu_env);
+> +#else
+> +        setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+>  #endif
+>          if (sa->sa_flags & TARGET_SA_RESETHAND) {
+>              sa->_sa_handler = TARGET_SIG_DFL;
+
+You might like to add the {} to the if (sa->sa_flags...) while we're
+here.
+
+Either way,
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
