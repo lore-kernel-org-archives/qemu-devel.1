@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1ezDcm-0001L6-UY
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 23:44:18 -0400
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ezDkK-0004HS-Jt
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 23:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1ezDcj-0004OI-0S
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 23:44:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56536
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1ezDci-0004Nd-Ry
-	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 23:44:12 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2N3hjhv041251
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 23:44:11 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2gvheps8kb-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Mar 2018 23:44:11 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Fri, 23 Mar 2018 03:44:08 -0000
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Fri, 23 Mar 2018 04:43:56 +0100
-In-Reply-To: <20180323034356.72130-1-haoqf@linux.vnet.ibm.com>
-References: <20180323034356.72130-1-haoqf@linux.vnet.ibm.com>
-Message-Id: <20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] iotests: fix test case 185
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ezDkH-0000bS-CG
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 23:52:04 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:35001
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ezDkF-0000QX-SB
+	for qemu-devel@nongnu.org; Thu, 22 Mar 2018 23:52:01 -0400
+References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
+	<152142533512.7381.1938340023148732379.malone@soybean.canonical.com>
+	<CAK3tnvK-zMB1t7+jdxa0o+4f1c05=sbuDpRw0QWGot0CW-ZFUw@mail.gmail.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Message-ID: <83fccfcd-f3d5-95cf-5d2f-87c29ac6f9f0@cn.fujitsu.com>
+Date: Fri, 23 Mar 2018 11:51:43 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAK3tnvK-zMB1t7+jdxa0o+4f1c05=sbuDpRw0QWGot0CW-ZFUw@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Bug 1754542] Re: colo: vm crash with segmentation
+ fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,138 +30,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, stefanha@redhat.com, kwolf@redhat.com, famz@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: Zhang Chen <zhangckid@gmail.com>, Bug 1754542 <1754542@bugs.launchpad.net>, qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com, Lukas Straub <lukasstraub2@web.de>
 
-Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_shutdown()".
-It's because of the newly introduced function vm_shutdown calls bdrv_drain_all,
-which is called later by bdrv_close_all. bdrv_drain_all resumes the jobs
-that doubles the speed and offset is doubled.
-Some jobs' status are changed as well.
 
-The fix is to not resume the jobs that are already yielded and also change
-185.out accordingly.
 
-Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
-Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
----
- blockjob.c                 | 10 +++++++++-
- include/block/blockjob.h   |  5 +++++
- tests/qemu-iotests/185.out | 11 +++++++++--
- 3 files changed, 23 insertions(+), 3 deletions(-)
+On 03/21/2018 02:04 PM, Zhang Chen wrote:
+> Hi Suiheng,
+>
+> I made a new guest image and retest it, and got the same bug from latest branch.
+> I found that after the COLO checkpoint begin, the secondary guest always send
+> reset request to Qemu like someone still push the reset button in the guest.
+> And this bug occurred in COLO frame related codes. This part of codes wrote
+> by Li zhijian and Zhang hailiang and currently maintained by Zhang hailiang.
+> So, I add them to this thread.
+>
+> CC Zhijian and Hailiang:
+> Any idea or comments about this bug?
 
-diff --git a/blockjob.c b/blockjob.c
-index ef3ed69ff1..fa9838ac97 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -206,11 +206,16 @@ void block_job_txn_add_job(BlockJobTxn *txn, BlockJob *job)
- 
- static void block_job_pause(BlockJob *job)
- {
--    job->pause_count++;
-+    if (!job->yielded) {
-+        job->pause_count++;
-+    }
- }
- 
- static void block_job_resume(BlockJob *job)
- {
-+    if (job->yielded) {
-+        return;
-+    }
-     assert(job->pause_count > 0);
-     job->pause_count--;
-     if (job->pause_count) {
-@@ -371,6 +376,7 @@ static void block_job_sleep_timer_cb(void *opaque)
-     BlockJob *job = opaque;
- 
-     block_job_enter(job);
-+    job->yielded = false;
- }
- 
- void block_job_start(BlockJob *job)
-@@ -935,6 +941,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->cb            = cb;
-     job->opaque        = opaque;
-     job->busy          = false;
-+    job->yielded       = false;
-     job->paused        = true;
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-@@ -1034,6 +1041,7 @@ static void block_job_do_yield(BlockJob *job, uint64_t ns)
-         timer_mod(&job->sleep_timer, ns);
-     }
-     job->busy = false;
-+    job->yielded = true;
-     block_job_unlock();
-     qemu_coroutine_yield();
- 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index fc645dac68..f8f208bbcf 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -99,6 +99,11 @@ typedef struct BlockJob {
-     bool ready;
- 
-     /**
-+     * Set to true when the job is yielded.
-+     */
-+    bool yielded;
-+
-+    /**
-      * Set to true when the job has deferred work to the main loop.
-      */
-     bool deferred_to_main_loop;
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-index 57eaf8d699..798282e196 100644
---- a/tests/qemu-iotests/185.out
-+++ b/tests/qemu-iotests/185.out
-@@ -7,6 +7,7 @@ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
- 
- === Creating backing chain ===
- 
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
- Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- wrote 4194304/4194304 bytes at offset 0
-@@ -25,23 +26,28 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- === Start active commit job and exit qemu ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
- 
- === Start mirror job and exit qemu ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
- Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
- 
- === Start backup job and exit qemu ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
- Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- {"return": {}}
-@@ -51,6 +57,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
- === Start streaming job and exit qemu ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+One clue is the memory of SVM not is same with PVM.
+we can try to compare the memory after checkpoint, i had a draft patch to do this before.
+
+
+Thanks
+
+
+
+
+>
+> If you want to test COLO currently, you can try the old version of COLO:
+> https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10-legacy
+>
+>
+> Thanks
+> Zhang Chen
+>
+> On Mon, Mar 19, 2018 at 10:08 AM, 李穗恒 <1754542@bugs.launchpad.net <mailto:1754542@bugs.launchpad.net>> wrote:
+>
+>     Hi Zhang Chen，
+>     I follow the https://wiki.qemu.org/Features/COLO <https://wiki.qemu.org/Features/COLO>, And Vm no crash.
+>     But SVM rebooting constantly after print RESET, PVM normal startup.
+>
+>     Secondary:
+>     {"timestamp": {"seconds": 1521421788, "microseconds": 541058}, "event": "RESUME"}
+>     {"timestamp": {"seconds": 1521421808, "microseconds": 493484}, "event": "STOP"}
+>     {"timestamp": {"seconds": 1521421808, "microseconds": 686466}, "event": "RESUME"}
+>     {"timestamp": {"seconds": 1521421808, "microseconds": 696152}, "event": "RESET", "data": {"guest": true}}
+>     {"timestamp": {"seconds": 1521421808, "microseconds": 740653}, "event": "RESET", "data": {"guest": true}}
+>     {"timestamp": {"seconds": 1521421818, "microseconds": 742222}, "event": "STOP"}
+>     {"timestamp": {"seconds": 1521421818, "microseconds": 969883}, "event": "RESUME"}
+>     {"timestamp": {"seconds": 1521421818, "microseconds": 979986}, "event": "RESET", "data": {"guest": true}}
+>     {"timestamp": {"seconds": 1521421819, "microseconds": 22652}, "event": "RESET", "data": {"guest": true}}
+>
+>
+>     The command(I run two VM in sample machine):
+>
+>     Primary:
+>     sudo /home/lee/Documents/qemu/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -boot c -m 2048 -smp 2 -qmp stdio  -name primary -cpu qemu64,+kvmclock -device piix3-usb-uhci -device usb-tablet \
+>         -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown -device rtl8139,id=e0,netdev=hn0 \
+>         -chardev socket,id=mirror0,host=192.168.0.33,port=9003,server,nowait \
+>         -chardev socket,id=compare1,host=192.168.0.33,port=9004,server,wait \
+>         -chardev socket,id=compare0,host=192.168.0.33,port=9001,server,nowait \
+>         -chardev socket,id=compare0-0,host=192.168.0.33,port=9001 \
+>         -chardev socket,id=compare_out,host=192.168.0.33,port=9005,server,nowait \
+>         -chardev socket,id=compare_out0,host=192.168.0.33,port=9005 \
+>         -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0 \
+>         -object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out \
+>         -object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0 \
+>         -object iothread,id=iothread1 \
+>         -object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,iothread=iothread1 \
+>         -drive if=ide,id=colo-disk0,driver=quorum,read-pattern=fifo,vote-threshold=1,children.0.file.filename=/var/lib/libvirt/images/1.raw,children.0.driver=raw -S
+>
+>     Secondary:
+>     sudo /home/lee/Documents/qemu/x86_64-softmmu/qemu-system-x86_64 -boot c -m 2048 -smp 2 -qmp stdio  -name secondary -enable-kvm -cpu qemu64,+kvmclock \
+>         -device piix3-usb-uhci -device usb-tablet \
+>         -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown \
+>         -device rtl8139,netdev=hn0 \
+>         -chardev socket,id=red0,host=192.168.0.33,port=9003,reconnect=1 \
+>         -chardev socket,id=red1,host=192.168.0.33,port=9004,reconnect=1 \
+>         -object filter-redirector,id=f1,netdev=hn0,queue=tx,indev=red0 \
+>         -object filter-redirector,id=f2,netdev=hn0,queue=rx,outdev=red1 \
+>         -object filter-rewriter,id=rew0,netdev=hn0,queue=all \
+>         -drive if=none,id=colo-disk0,file.filename=/var/lib/libvirt/images/2.raw,driver=raw,node-name=node0 \
+>         -drive if=ide,id=active-disk0,driver=replication,mode=secondary,file.driver=qcow2,top-id=active-disk0,file.file.filename=/mnt/ramfs/active_disk.img,file.backing.driver=qcow2,file.backing.file.filename=/mnt/ramfs/hidden_disk.img,file.backing.backing=colo-disk0 \
+>         -incoming tcp:0:8888
+>
+>     Secondary:
+>       {'execute':'qmp_capabilities'}
+>       { 'execute': 'nbd-server-start',
+>         'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.33', 'port': '8889'} } }
+>       }
+>       {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writable': true } }
+>       {'execute': 'trace-event-set-state', 'arguments': {'name': 'colo*', 'enable': true} }
+>
+>
+>     Primary:
+>       {'execute':'qmp_capabilities'}
+>       { 'execute': 'human-monitor-command',
+>         'arguments': {'command-line': 'drive_add -n buddy driver=replication,mode=primary,file.driver=nbd,file.host=192.168.0.33,file.port=8889,file.export=colo-disk0,node-name=node0'}}
+>       { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'node': 'node0' } }
+>       { 'execute': 'migrate-set-capabilities',
+>             'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': true } ] } }
+>       { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.33:8888 <http://192.168.0.33:8888>' } }
+>
+>     Thanks
+>     Suiheng
+>
+>     --
+>     You received this bug notification because you are subscribed to the bug
+>     report.
+>     https://bugs.launchpad.net/bugs/1754542 <https://bugs.launchpad.net/bugs/1754542>
+>
+>     Title:
+>       colo:  vm crash with segmentation fault
+>
+>     Status in QEMU:
+>       New
+>
+>     Bug description:
+>       I use Arch Linux x86_64
+>       Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10 <https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10>)
+>       Following document 'COLO-FT.txt',
+>       I test colo feature on my hosts
+>
+>       I run this command
+>       Primary:
+>       sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp stdio -name primary \
+>       -device piix3-usb-uhci \
+>       -device usb-tablet -netdev tap,id=hn0,vhost=off \
+>       -device virtio-net-pci,id=net-pci0,netdev=hn0 \
+>       -drive if=virtio,id=primary-disk0,driver=quorum,read-pattern=fifo,vote-threshold=1,\
+>       children.0.file.filename=/var/lib/libvirt/images/1.raw,\
+>       children.0.driver=raw -S
+>
+>       Secondary:
+>       sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp stdio -name secondary \
+>       -device piix3-usb-uhci \
+>       -device usb-tablet -netdev tap,id=hn0,vhost=off \
+>       -device virtio-net-pci,id=net-pci0,netdev=hn0 \
+>       -drive if=none,id=secondary-disk0,file.filename=/var/lib/libvirt/images/2.raw,driver=raw,node-name=node0 \
+>       -drive if=virtio,id=active-disk0,driver=replication,mode=secondary,\
+>       file.driver=qcow2,top-id=active-disk0,\
+>       file.file.filename=/mnt/ramfs/active_disk.img,\
+>       file.backing.driver=qcow2,\
+>       file.backing.file.filename=/mnt/ramfs/hidden_disk.img,\
+>       file.backing.backing=secondary-disk0 \
+>       -incoming tcp:0:8888
+>
+>       Secondary:
+>       {'execute':'qmp_capabilities'}
+>       { 'execute': 'nbd-server-start',
+>         'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34', 'port': '8889'} } }
+>       }
+>       {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', 'writable': true } }
+>
+>       Primary:
+>       {'execute':'qmp_capabilities'}
+>       { 'execute': 'human-monitor-command',
+>         'arguments': {'command-line': 'drive_add -n buddy driver=replication,mode=primary,file.driver=nbd,file.host=192.168.0.34,file.port=8889,file.export=secondary-disk0,node-name=nbd_client0'}}
+>       { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', 'node': 'nbd_client0' } }
+>       { 'execute': 'migrate-set-capabilities',
+>             'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': true } ] } }
+>       { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888 <http://192.168.0.34:8888>' } }
+>       And two VM with cash
+>       Primary:
+>       {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "RESUME"}
+>       [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qm
+>
+>       Secondary:
+>       {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "RESUME"}
+>       [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qm
+>
+>     To manage notifications about this bug go to:
+>     https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions <https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions>
+>
+>
+
 -- 
-2.13.5
+Best regards.
+Li Zhijian (8528)
