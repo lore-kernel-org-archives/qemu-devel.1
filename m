@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ezcQs-0001tD-OV
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 02:13:40 -0400
+	(envelope-from <no-reply@patchew.org>) id 1ezeJX-0004Lt-Hm
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 04:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ezcQp-0003AO-Gt
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 02:13:38 -0400
-Received: from ozlabs.org ([103.22.144.67]:53309)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ezcQo-00034p-8t
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 02:13:35 -0400
-Date: Sat, 24 Mar 2018 16:30:38 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180324053038.GA7432@umbus.fritz.box>
-References: <alpine.LSU.2.21.1802231729040.10187@wotan.suse.de>
+	(envelope-from <no-reply@patchew.org>) id 1ezeJV-0000bn-4D
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 04:14:11 -0400
+Resent-Message-Id: <E1ezeJV-0000bn-4D@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21124)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ezeJU-0000bd-Tu
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 04:14:09 -0400
+In-Reply-To: <20180323143202.28879-1-lvivier@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152182237902.291.10506431455446754776@71c20359a636>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.21.1802231729040.10187@wotan.suse.de>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Fix size of ppc64 xer register (fwd)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 23 Mar 2018 09:26:21 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] coccinelle: re-run scripts from
+ scripts/coccinelle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,147 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Matz <matz@suse.de>
-Cc: qemu-devel@nongnu.org, Torsten Duwe <duwe@suse.de>
+To: lvivier@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, agraf@suse.de, jcmvbkbc@gmail.com, berto@igalia.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, yongbok.kim@mips.com, armbru@redhat.com, rth@twiddle.netfamz@redhat.com, ehabkost@redhat.com, dgilbert@redhat.com, qemu-arm@nongnu.org, david@gibson.dropbear.id.au, kwolf@redhat.com, crosthwaite.peter@gmail.com, i.mitsyanko@gmail.com, mreitz@redhat.com, qemu-ppc@nongnu.org, pbonzini@redhat.com, aurelien@aurel32.net
 
-
---fUYQa+Pmc3FrFX/N
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 23, 2018 at 05:29:56PM +0000, Michael Matz wrote:
-> The normal gdb definition of the XER registers is only 32 bit,
-> and that's what the current version of power64-core.xml also
-> says (seems copied from gdb's).  But qemu's idea of the XER register
-> is target_ulong (in CPUPPCState, ppc_gdb_register_len and
-> ppc_cpu_gdb_read_register)
->=20
-> That mismatch leads to the following message when attaching
-> with gdb:
->=20
->   Truncated register 32 in remote 'g' packet
->=20
-> (and following on that qemu stops responding).  The simple fix is
-> to say the truth in the .xml file.  But the better fix is to
-> actually make it 32bit on the wire, as old gdbs don't support
-> XML files for describing registers.  Also the XER state in qemu
-> doesn't seem to use the high 32 bits, so sending it off to gdb
-> doesn't seem worthwhile.
->=20
-> Signed-off-by: Michael Matz <matz@suse.de>
-
-Sorry I've taken so long to look at this.  I've now applied it to my
-ppc-for-2.13 branch (since it's not a regression, I don't think it's
-justified to include it during the 2.12 hard freeze).
-
-In future, please CC me directly on mails (as ppc maintainer) and also
-CC qemu-ppc@nongnu.org.  I might never have spotted this if Alex Graf
-hadn't forwarded a pointer to me.
-
-> ---
->  target/ppc/gdbstub.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
-> index 7a33813..b6f6693 100644
-> --- a/target/ppc/gdbstub.c
-> +++ b/target/ppc/gdbstub.c
-> @@ -37,10 +37,10 @@ static int ppc_gdb_register_len_apple(int n)
->      case 65+32: /* msr */
->      case 67+32: /* lr */
->      case 68+32: /* ctr */
-> -    case 69+32: /* xer */
->      case 70+32: /* fpscr */
->          return 8;
->      case 66+32: /* cr */
-> +    case 69+32: /* xer */
->          return 4;
->      default:
->          return 0;
-> @@ -61,6 +61,8 @@ static int ppc_gdb_register_len(int n)
->          return 8;
->      case 66:
->          /* cr */
-> +    case 69:
-> +        /* xer */
->          return 4;
->      case 64:
->          /* nip */
-> @@ -70,8 +72,6 @@ static int ppc_gdb_register_len(int n)
->          /* lr */
->      case 68:
->          /* ctr */
-> -    case 69:
-> -        /* xer */
->          return sizeof(target_ulong);
->      case 70:
->          /* fpscr */
-> @@ -152,7 +152,7 @@ int ppc_cpu_gdb_read_register(CPUState *cs, uint8_t *=
-mem_buf, int n)
->              gdb_get_regl(mem_buf, env->ctr);
->              break;
->          case 69:
-> -            gdb_get_regl(mem_buf, env->xer);
-> +            gdb_get_reg32(mem_buf, env->xer);
->              break;
->          case 70:
->              gdb_get_reg32(mem_buf, env->fpscr);
-> @@ -208,7 +208,7 @@ int ppc_cpu_gdb_read_register_apple(CPUState *cs, uin=
-t8_t *mem_buf, int n)
->              gdb_get_reg64(mem_buf, env->ctr);
->              break;
->          case 69 + 32:
-> -            gdb_get_reg64(mem_buf, env->xer);
-> +            gdb_get_reg32(mem_buf, env->xer);
->              break;
->          case 70 + 32:
->              gdb_get_reg64(mem_buf, env->fpscr);
-> @@ -259,7 +259,7 @@ int ppc_cpu_gdb_write_register(CPUState *cs, uint8_t =
-*mem_buf, int n)
->              env->ctr =3D ldtul_p(mem_buf);
->              break;
->          case 69:
-> -            env->xer =3D ldtul_p(mem_buf);
-> +            env->xer =3D ldl_p(mem_buf);
->              break;
->          case 70:
->              /* fpscr */
-> @@ -309,7 +309,7 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, ui=
-nt8_t *mem_buf, int n)
->              env->ctr =3D ldq_p(mem_buf);
->              break;
->          case 69 + 32:
-> -            env->xer =3D ldq_p(mem_buf);
-> +            env->xer =3D ldl_p(mem_buf);
->              break;
->          case 70 + 32:
->              /* fpscr */
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---fUYQa+Pmc3FrFX/N
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq14nsACgkQbDjKyiDZ
-s5IG3BAAvoQHXB6x8rqShzjABfLEJ8BX9neT4jGtG7a2BczuP1pC09fO128xrXFr
-5JrT1aaVmJ799qSNU3BJrJUN+RtHF1HRYauljHKydDJeXoYTgjME/vNfcubvWydJ
-/erIpidqBW4YxjzITNknUU3iQAzFw1dNGzb8gji4eczeQLM/dCFbMajtA31PR2Aa
-Dq1NcFK4pThnY4YesAe59iHBVOR2A8PaxysaSiFfkSAFIsvzbmhkN+BhM2HYa8dt
-UVYzVLrZtLIR1l4Ols6oCr7wpfZs53rkkPVFEcYtWNCRb5UuSYNZEmNrm0eoDsgA
-OQbny96TtxEDia8+OIBZgfuc8YHGPU3itPhgU7paVWUxuMcKYqW33aTLWbm3qt/N
-tjDn/piesF95mbnaP82jxnnURLZuLUEdSoLIZzz1me7OjHF6KTt2C6b7JNpvvmmf
-tg7MH3eQynRyVYIp5UHrLcxQwX0jHr0bGimCSZkNOLFMMNJ7K7BwtaMnmVvPYzq2
-Vo4Crtf97mDEPIYzX3jqbSkWqaYNaUNVmzvO76ogLizP9hiBOoj9U8MWsCU8jWAp
-MSfFuedBMhB9BrEHkbCGH1Bb7EYPGQNMqRnvXCSAlzkLX6jLd96bIdcHkvjqMJMs
-jOO+PicIEgRgUuCzGzP2x8XTperwhqcJcjIr7ILTldkuRmoWKfA=
-=JVpJ
------END PGP SIGNATURE-----
-
---fUYQa+Pmc3FrFX/N--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzIzMTQzMjAyLjI4ODc5LTEtbHZpdmllckByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC81XSBjb2NjaW5lbGxlOiByZS1ydW4gc2NyaXB0
+cyBmcm9tIHNjcmlwdHMvY29jY2luZWxsZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
+LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
+bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
+ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
+aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NGEwZTM0YjZjIFJlbW92ZSB1bm5lY2Vzc2Fy
+eSB2YXJpYWJsZXMgZm9yIGZ1bmN0aW9uIHJldHVybiB2YWx1ZQoxNzU5NDExOGRjIHFkaWN0OiBy
+ZW1vdmUgdXNlbGVzcyBjYXN0CjkyZTBlNjQ2YzIgZXJyb3I6IFJlbW92ZSBOVUxMIGNoZWNrcyBv
+biBlcnJvcl9wcm9wYWdhdGUoKSBjYWxscwpkMzRlZDIzMTczIGVycm9yOiBTdHJpcCB0cmFpbGlu
+ZyAnXG4nIGZyb20gZXJyb3Igc3RyaW5nIGFyZ3VtZW50cyAoYWdhaW4gYWdhaW4pCmExZDE1ODFh
+ZDUgbWFrZTogaW1wcm92ZSBjaGVjayBmb3Igc3RhbGUgZ2VuZXJhdGVkIGZpbGVzIGluIHNvdXJj
+ZSBkaXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogbWFrZTogaW1w
+cm92ZSBjaGVjayBmb3Igc3RhbGUgZ2VuZXJhdGVkIGZpbGVzIGluIHNvdXJjZSBkaXIuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMi81OiBlcnJvcjogU3RyaXAgdHJhaWxpbmcgJ1xuJyBmcm9tIGVycm9yIHN0
+cmluZyBhcmd1bWVudHMgKGFnYWluIGFnYWluKS4uLgpDaGVja2luZyBQQVRDSCAzLzU6IGVycm9y
+OiBSZW1vdmUgTlVMTCBjaGVja3Mgb24gZXJyb3JfcHJvcGFnYXRlKCkgY2FsbHMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNC81OiBxZGljdDogcmVtb3ZlIHVzZWxlc3MgY2FzdC4uLgpDaGVja2luZyBQQVRD
+SCA1LzU6IFJlbW92ZSB1bm5lY2Vzc2FyeSB2YXJpYWJsZXMgZm9yIGZ1bmN0aW9uIHJldHVybiB2
+YWx1ZS4uLgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUg
+bm90IHJlcXVpcmVkCiMyNTM6IEZJTEU6IHRhcmdldC9taXBzL2RzcF9oZWxwZXIuYzozMjgxOgor
+ICAgIHJldHVybiAodGVtcFsxXSA8PCA2MykgfCAodGVtcFswXSA+PiAxKTsKCkVSUk9SOiByZXR1
+cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzI3Mjog
+RklMRTogdGFyZ2V0L21pcHMvZHNwX2hlbHBlci5jOjMzMDg6CisgICAgcmV0dXJuICh0ZW1wWzFd
+IDw8IDYzKSB8ICh0ZW1wWzBdID4+IDEpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlv
+biwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMjkxOiBGSUxFOiB0YXJnZXQvbWlwcy9k
+c3BfaGVscGVyLmM6MzM0MToKKyAgICByZXR1cm4gKHRlbXBbMV0gPDwgNjMpIHwgKHRlbXBbMF0g
+Pj4gMSk7Cgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDgxNyBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
