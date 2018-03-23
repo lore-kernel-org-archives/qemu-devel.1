@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ezITO-0008Ex-7l
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:54:56 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1ezIUm-00010O-Po
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ezITK-0002x4-5w
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:54:54 -0400
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:49022)
+	(envelope-from <tiwei.bie@intel.com>) id 1ezIUi-0004Cr-Ob
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:56:20 -0400
+Received: from mga06.intel.com ([134.134.136.31]:34114)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ezITJ-0002tn-SZ
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:54:50 -0400
-Received: from player714.ha.ovh.net (unknown [10.109.122.225])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id C158EB6015
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 09:54:39 +0100 (CET)
-References: <20180315133402.13470-1-clg@kaod.org>
-	<20180315133402.13470-4-clg@kaod.org>
-	<20180323082447.GU3905@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2781e095-b669-e5d7-4a07-4624f23ec438@kaod.org>
-Date: Fri, 23 Mar 2018 09:54:34 +0100
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1ezIUi-0004A4-B3
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:56:16 -0400
+Date: Fri, 23 Mar 2018 16:54:37 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180323085437.cwbkymt62oce7bcf@debian>
+References: <20180319071537.28649-1-tiwei.bie@intel.com>
+	<20180322165441-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180323082447.GU3905@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] target/ppc: add hash MMU support on
- POWER9 for PowerNV only
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180322165441-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] Extend vhost-user to support VFIO
+ based accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,333 +28,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On 03/23/2018 09:24 AM, David Gibson wrote:
-> I'm not quite sure what the "for PowerNV only" in the subject is
-> supposed to be indicating.
+On Thu, Mar 22, 2018 at 04:55:39PM +0200, Michael S. Tsirkin wrote:
+> On Mon, Mar 19, 2018 at 03:15:31PM +0800, Tiwei Bie wrote:
+> > This patch set does some small extensions to vhost-user protocol
+> > to support VFIO based accelerators, and makes it possible to get
+> > the similar performance of VFIO based PCI passthru while keeping
+> > the virtio device emulation in QEMU.
+> 
+> I love your patches!
+> Yet there are some things to improve.
+> Posting comments separately as individual messages.
+> 
 
-That's the initial subject which didn't evolve with the code, which is=20
-now changing some sPAPR hcalls. And anyhow, hash MMU is supported on
-POWER9 TCG, so there is no reason for the 'only'. KVM is another matter.
+Thank you so much! :-)
 
-I will change the subject and split the patch in two parts, a first=20
-one for the changes in the HPTE bits definitions introduced by ISA v3.0=20
-which has some impact on the sPAPR platform. And a second patch to
-introduce ppc_hash64_hpt_reg() which adds support for hash MMU to
-the PowerNV platform.
+It may take me some time to address all your comments.
+They're really helpful! I'll try to address and reply
+to these comments in the next few days. Thanks again!
+I do appreciate it!
 
-Thanks,
+Best regards,
+Tiwei Bie
 
-C.
-
-=20
-> On Thu, Mar 15, 2018 at 01:34:01PM +0000, C=E9dric Le Goater wrote:
->> The HPTE bits definitions are slightly modified in ISA v3.0. Let's add
->> some helpers to hide the differences in the hash MMU code.
->>
->> On a POWER9 processor, the Partition Table is composed of a pair of
->> doublewords per partition. The first doubleword indicates whether the
->> partition uses HPT or Radix Trees translation and contains the address
->> of the host's translation table structure and size.
->>
->> The first doubleword of the PTCR holds the Hash Page Table base
->> address for the host when the hash MMU is in use. Also add an helper
->> to retrieve the HPT base address depending on the MMU revision.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>
->>  Changes since v2:
->>
->>  - reworked ppc_hash64_hpt_reg() to cover only powernv machines. pseri=
-es
->>    machines being handled with cpu->vhyp at the ppc_hash64_hpt_base()
->>    level.
->>
->>  Changes since v1:
->>
->>  - introduced ppc64_v3_get_patbe0()
->> =20
->>  hw/ppc/spapr_hcall.c       |  5 +++--
->>  target/ppc/mmu-book3s-v3.h |  5 +++++
->>  target/ppc/mmu-hash64.c    | 52 +++++++++++++++++++++++++++++++++++++=
-+--------
->>  target/ppc/mmu-hash64.h    | 34 ++++++++++++++++++++++++++++--
->>  4 files changed, 83 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index 3215c3b4aec3..b437f8825819 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -94,7 +94,7 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMa=
-chineState *spapr,
->>          return H_PARAMETER;
->>      }
->> =20
->> -    raddr =3D (ptel & HPTE64_R_RPN) & ~((1ULL << apshift) - 1);
->> +    raddr =3D (ptel & ppc_hash64_hpte_r_rpn(cpu)) & ~((1ULL << apshif=
-t) - 1);
->=20
-> h_enter() will never be used on PowerNV, for example, so why is it
-> being changed?
->=20
->>      if (is_ram_address(spapr, raddr)) {
->>          /* Regular RAM - should have WIMG=3D0010 */
->> @@ -586,7 +586,8 @@ static int rehash_hpte(PowerPCCPU *cpu,
->> =20
->>      base_pg_shift =3D ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte=
-1);
->>      assert(base_pg_shift); /* H_ENTER shouldn't allow a bad encoding =
-*/
->> -    avpn =3D HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << base_pg_shift) - 1=
-) >> 23);
->> +    avpn =3D ppc_hash64_hpte_v_avpn_val(cpu, pte0) &
->> +        ~(((1ULL << base_pg_shift) - 1) >> 23);
->> =20
->>      if (pte0 & HPTE64_V_SECONDARY) {
->>          pteg =3D ~pteg;
->> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
->> index fdf80987d7b2..a7ab580c3140 100644
->> --- a/target/ppc/mmu-book3s-v3.h
->> +++ b/target/ppc/mmu-book3s-v3.h
->> @@ -54,6 +54,11 @@ static inline bool ppc64_radix_guest(PowerPCCPU *cp=
-u)
->>  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->>                                int mmu_idx);
->> =20
->> +static inline hwaddr ppc64_v3_get_patbe0(PowerPCCPU *cpu)
->> +{
->> +    return ldq_phys(CPU(cpu)->as, cpu->env.spr[SPR_PTCR] & PTCR_PATB)=
-;
->> +}
->> +
->>  #endif /* TARGET_PPC64 */
->> =20
->>  #endif /* CONFIG_USER_ONLY */
->> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
->> index c9b72b742956..c425edd93ebe 100644
->> --- a/target/ppc/mmu-hash64.c
->> +++ b/target/ppc/mmu-hash64.c
->> @@ -289,6 +289,26 @@ target_ulong helper_load_slb_vsid(CPUPPCState *en=
-v, target_ulong rb)
->>      return rt;
->>  }
->> =20
->> +hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu)
->> +{
->> +    CPUPPCState *env =3D &cpu->env;
->> +
->> +    /* We should not reach this routine on sPAPR machines */
->> +    assert(!cpu->vhyp);
->> +
->> +    /* PowerNV machine */
->> +    if (msr_hv) {
->> +        if (env->mmu_model & POWERPC_MMU_V3) {
->> +            return ppc64_v3_get_patbe0(cpu);
->> +        } else {
->> +            return cpu->env.spr[SPR_SDR1];
->> +        }
->> +    } else {
->> +        error_report("PowerNV guest support Unimplemented");
->> +        exit(1);
->> +    }
->> +}
->> +
->>  /* Check No-Execute or Guarded Storage */
->>  static inline int ppc_hash64_pte_noexec_guard(PowerPCCPU *cpu,
->>                                                ppc_hash_pte64_t pte)
->> @@ -451,8 +471,9 @@ void ppc_hash64_unmap_hptes(PowerPCCPU *cpu, const=
- ppc_hash_pte64_t *hptes,
->>                          false, n * HASH_PTE_SIZE_64);
->>  }
->> =20
->> -static unsigned hpte_page_shift(const struct ppc_one_seg_page_size *s=
-ps,
->> -    uint64_t pte0, uint64_t pte1)
->> +static unsigned hpte_page_shift(PowerPCCPU *cpu,
->> +                                const struct ppc_one_seg_page_size *s=
-ps,
->> +                                uint64_t pte0, uint64_t pte1)
->>  {
->>      int i;
->> =20
->> @@ -478,7 +499,7 @@ static unsigned hpte_page_shift(const struct ppc_o=
-ne_seg_page_size *sps,
->>              continue;
->>          }
->> =20
->> -        mask =3D ((1ULL << ps->page_shift) - 1) & HPTE64_R_RPN;
->> +        mask =3D ((1ULL << ps->page_shift) - 1) & ppc_hash64_hpte_r_r=
-pn(cpu);
->> =20
->>          if ((pte1 & mask) =3D=3D ((uint64_t)ps->pte_enc << HPTE64_R_R=
-PN_SHIFT)) {
->>              return ps->page_shift;
->> @@ -488,6 +509,18 @@ static unsigned hpte_page_shift(const struct ppc_=
-one_seg_page_size *sps,
->>      return 0; /* Bad page size encoding */
->>  }
->> =20
->> +static bool ppc_hash64_hpte_v_compare(PowerPCCPU *cpu, target_ulong p=
-te0,
->> +                                      target_ulong ptem)
->> +{
->> +    CPUPPCState *env =3D &cpu->env;
->> +
->> +    if (env->mmu_model & POWERPC_MMU_V3) {
->> +        return HPTE64_V_COMPARE_3_0(pte0, ptem);
->> +    } else {
->> +        return HPTE64_V_COMPARE(pte0, ptem);
->> +    }
->> +}
->> +
->>  static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
->>                                       const struct ppc_one_seg_page_si=
-ze *sps,
->>                                       target_ulong ptem,
->> @@ -508,8 +541,8 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *c=
-pu, hwaddr hash,
->>          pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
->> =20
->>          /* This compares V, B, H (secondary) and the AVPN */
->> -        if (HPTE64_V_COMPARE(pte0, ptem)) {
->> -            *pshift =3D hpte_page_shift(sps, pte0, pte1);
->> +        if (ppc_hash64_hpte_v_compare(cpu, pte0, ptem)) {
->> +            *pshift =3D hpte_page_shift(cpu, sps, pte0, pte1);
->>              /*
->>               * If there is no match, ignore the PTE, it could simply
->>               * be for a different segment size encoding and the
->> @@ -569,7 +602,8 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *c=
-pu,
->>          epn =3D (eaddr & ~SEGMENT_MASK_256M) & epnmask;
->>          hash =3D vsid ^ (epn >> sps->page_shift);
->>      }
->> -    ptem =3D (slb->vsid & SLB_VSID_PTEM) | ((epn >> 16) & HPTE64_V_AV=
-PN);
->> +    ptem =3D (slb->vsid & SLB_VSID_PTEM) | ((epn >> 16) &
->> +                                          ppc_hash64_hpte_v_avpn(cpu)=
-);
->>      ptem |=3D HPTE64_V_VALID;
->> =20
->>      /* Page address translation */
->> @@ -624,7 +658,7 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCC=
-PU *cpu,
->>              break;
->>          }
->> =20
->> -        shift =3D hpte_page_shift(sps, pte0, pte1);
->> +        shift =3D hpte_page_shift(cpu, sps, pte0, pte1);
->>          if (shift) {
->>              return shift;
->>          }
->> @@ -860,7 +894,7 @@ skip_slb_search:
->> =20
->>      /* 7. Determine the real address from the PTE */
->> =20
->> -    raddr =3D deposit64(pte.pte1 & HPTE64_R_RPN, 0, apshift, eaddr);
->> +    raddr =3D deposit64(pte.pte1 & ppc_hash64_hpte_r_rpn(cpu), 0, aps=
-hift, eaddr);
->> =20
->>      tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MA=
-SK,
->>                   prot, mmu_idx, 1ULL << apshift);
->> @@ -910,7 +944,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *=
-cpu, target_ulong addr)
->>          return -1;
->>      }
->> =20
->> -    return deposit64(pte.pte1 & HPTE64_R_RPN, 0, apshift, addr)
->> +    return deposit64(pte.pte1 & ppc_hash64_hpte_r_rpn(cpu), 0, apshif=
-t, addr)
->>          & TARGET_PAGE_MASK;
->>  }
->> =20
->> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
->> index 0ade8d15d9e4..708f4f6d222a 100644
->> --- a/target/ppc/mmu-hash64.h
->> +++ b/target/ppc/mmu-hash64.h
->> @@ -69,8 +69,12 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->>  #define HPTE64_V_SSIZE_SHIFT    62
->>  #define HPTE64_V_AVPN_SHIFT     7
->>  #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
->> +#define HPTE64_V_AVPN_3_0       0x000fffffffffff80ULL
->>  #define HPTE64_V_AVPN_VAL(x)    (((x) & HPTE64_V_AVPN) >> HPTE64_V_AV=
-PN_SHIFT)
->> +#define HPTE64_V_AVPN_VAL_3_0(x)                        \
->> +    (((x) & HPTE64_V_AVPN_3_0) >> HPTE64_V_AVPN_SHIFT)
->>  #define HPTE64_V_COMPARE(x, y)  (!(((x) ^ (y)) & 0xffffffffffffff83UL=
-L))
->> +#define HPTE64_V_COMPARE_3_0(x, y)  (!(((x) ^ (y)) & 0x3fffffffffffff=
-83ULL))
->>  #define HPTE64_V_BOLTED         0x0000000000000010ULL
->>  #define HPTE64_V_LARGE          0x0000000000000004ULL
->>  #define HPTE64_V_SECONDARY      0x0000000000000002ULL
->> @@ -81,6 +85,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->>  #define HPTE64_R_KEY_HI         0x3000000000000000ULL
->>  #define HPTE64_R_RPN_SHIFT      12
->>  #define HPTE64_R_RPN            0x0ffffffffffff000ULL
->> +#define HPTE64_R_RPN_3_0        0x01fffffffffff000ULL
->>  #define HPTE64_R_FLAGS          0x00000000000003ffULL
->>  #define HPTE64_R_PP             0x0000000000000003ULL
->>  #define HPTE64_R_N              0x0000000000000004ULL
->> @@ -98,6 +103,31 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->>  #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
->>  #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
->> =20
->> +static inline target_ulong ppc_hash64_hpte_r_rpn(PowerPCCPU *cpu)
->> +{
->> +    CPUPPCState *env =3D &cpu->env;
->> +
->> +    return env->mmu_model & POWERPC_MMU_V3 ? HPTE64_R_RPN_3_0 : HPTE6=
-4_R_RPN;
->> +}
->> +
->> +static inline target_ulong ppc_hash64_hpte_v_avpn(PowerPCCPU *cpu)
->> +{
->> +    CPUPPCState *env =3D &cpu->env;
->> +
->> +    return env->mmu_model & POWERPC_MMU_V3 ? HPTE64_V_AVPN_3_0 : HPTE=
-64_V_AVPN;
->> +}
->> +
->> +static inline target_ulong ppc_hash64_hpte_v_avpn_val(PowerPCCPU *cpu=
-,
->> +                                                      target_ulong pt=
-e0)
->> +{
->> +    CPUPPCState *env =3D &cpu->env;
->> +
->> +    return env->mmu_model & POWERPC_MMU_V3 ?
->> +        HPTE64_V_AVPN_VAL_3_0(pte0) : HPTE64_V_AVPN_VAL(pte0);
->> +}
->> +
->> +hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu);
->> +
->>  static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
->>  {
->>      if (cpu->vhyp) {
->> @@ -105,7 +135,7 @@ static inline hwaddr ppc_hash64_hpt_base(PowerPCCP=
-U *cpu)
->>              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
->>          return vhc->hpt_base(cpu->vhyp);
->>      }
->> -    return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
->> +    return ppc_hash64_hpt_reg(cpu) & SDR_64_HTABORG;
->>  }
->> =20
->>  static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
->> @@ -115,7 +145,7 @@ static inline hwaddr ppc_hash64_hpt_mask(PowerPCCP=
-U *cpu)
->>              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
->>          return vhc->hpt_mask(cpu->vhyp);
->>      }
->> -    return (1ULL << ((cpu->env.spr[SPR_SDR1] & SDR_64_HTABSIZE) + 18 =
-- 7)) - 1;
->> +    return (1ULL << ((ppc_hash64_hpt_reg(cpu) & SDR_64_HTABSIZE) + 18=
- - 7)) - 1;
->>  }
->> =20
->>  struct ppc_hash_pte64 {
->=20
+> 
+> > How does accelerator accelerate vhost (data path)
+> > =================================================
+> > 
+> > Any virtio ring compatible devices potentially can be used as the
+> > vhost data path accelerators. We can setup the accelerator based
+> > on the informations (e.g. memory table, features, ring info, etc)
+> > available on the vhost backend. And accelerator will be able to use
+> > the virtio ring provided by the virtio driver in the VM directly.
+> > So the virtio driver in the VM can exchange e.g. network packets
+> > with the accelerator directly via the virtio ring. That is to say,
+> > we will be able to use the accelerator to accelerate the vhost
+> > data path. We call it vDPA: vhost Data Path Acceleration.
+> > 
+> > Notice: Although the accelerator can talk with the virtio driver
+> > in the VM via the virtio ring directly. The control path events
+> > (e.g. device start/stop) in the VM will still be trapped and handled
+> > by QEMU, and QEMU will deliver such events to the vhost backend
+> > via standard vhost protocol.
+> > 
+> > Below link is an example showing how to setup a such environment
+> > via nested VM. In this case, the virtio device in the outer VM is
+> > the accelerator. It will be used to accelerate the virtio device
+> > in the inner VM. In reality, we could use virtio ring compatible
+> > hardware device as the accelerators.
+> > 
+> > http://dpdk.org/ml/archives/dev/2017-December/085044.html
+> > 
+> > In above example, it doesn't require any changes to QEMU, but
+> > it has lower performance compared with the traditional VFIO
+> > based PCI passthru. And that's the problem this patch set wants
+> > to solve.
+> > 
+> > The performance issue of vDPA/vhost-user and solutions
+> > ======================================================
+> > 
+> > For vhost-user backend, the critical issue in vDPA is that the
+> > data path performance is relatively low and some host threads are
+> > needed for the data path, because some necessary mechanisms are
+> > missing to support:
+> > 
+> > 1) guest driver notifies the device directly;
+> > 2) device interrupts the guest directly;
+> > 
+> > So this patch set does some small extensions to the vhost-user
+> > protocol to make both of them possible. It leverages the same
+> > mechanisms (e.g. EPT and Posted-Interrupt on Intel platform) as
+> > the PCI passthru.
+> > 
+> > A new protocol feature bit is added to negotiate the accelerator
+> > feature support. Two new slave message types are added to control
+> > the notify region and queue interrupt passthru for each queue.
+> > >From the view of vhost-user protocol design, it's very flexible.
+> > The passthru can be enabled/disabled for each queue individually,
+> > and it's possible to accelerate each queue by different devices.
+> > More design and implementation details can be found from the last
+> > patch.
+> > 
+> > Difference between vDPA and PCI passthru
+> > ========================================
+> > 
+> > The key difference between PCI passthru and vDPA is that, in vDPA
+> > only the data path of the device (e.g. DMA ring, notify region and
+> > queue interrupt) is pass-throughed to the VM, the device control
+> > path (e.g. PCI configuration space and MMIO regions) is still
+> > defined and emulated by QEMU.
+> > 
+> > The benefits of keeping virtio device emulation in QEMU compared
+> > with virtio device PCI passthru include (but not limit to):
+> > 
+> > - consistent device interface for guest OS in the VM;
+> > - max flexibility on the hardware (i.e. the accelerators) design;
+> > - leveraging the existing virtio live-migration framework;
+> > 
+> > Why extend vhost-user for vDPA
+> > ==============================
+> > 
+> > We have already implemented various virtual switches (e.g. OVS-DPDK)
+> > based on vhost-user for VMs in the Cloud. They are purely software
+> > running on CPU cores. When we have accelerators for such NFVi applications,
+> > it's ideal if the applications could keep using the original interface
+> > (i.e. vhost-user netdev) with QEMU, and infrastructure is able to decide
+> > when and how to switch between CPU and accelerators within the interface.
+> > And the switching (i.e. switch between CPU and accelerators) can be done
+> > flexibly and quickly inside the applications.
+> > 
+> > More details about this can be found from the Cunming's discussions on
+> > the RFC patch set.
+> > 
+> > Update notes
+> > ============
+> > 
+> > IOMMU feature bit check is removed in this version, because:
+> > 
+> > The IOMMU feature is negotiable, when an accelerator is used and
+> > it doesn't support virtual IOMMU, its driver just won't provide
+> > this feature bit when vhost library querying its features. And if
+> > it supports the virtual IOMMU, its driver can provide this feature
+> > bit. It's not reasonable to add this limitation in this patch set.
+> > 
+> > The previous links:
+> > RFC: http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg04844.html
+> > v1:  http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg06028.html
+> > 
+> > v1 -> v2:
+> > - Add some explanations about why extend vhost-user in commit log (Paolo);
+> > - Bug fix in slave_read() according to Stefan's fix in DPDK;
+> > - Remove IOMMU feature check and related commit log;
+> > - Some minor refinements;
+> > - Rebase to the latest QEMU;
+> > 
+> > RFC -> v1:
+> > - Add some details about how vDPA works in cover letter (Alexey)
+> > - Add some details about the OVS offload use-case in cover letter (Jason)
+> > - Move PCI specific stuffs out of vhost-user (Jason)
+> > - Handle the virtual IOMMU case (Jason)
+> > - Move VFIO group management code into vfio/common.c (Alex)
+> > - Various refinements;
+> > (approximately sorted by comment posting time)
+> > 
+> > Tiwei Bie (6):
+> >   vhost-user: support receiving file descriptors in slave_read
+> >   vhost-user: introduce shared vhost-user state
+> >   virtio: support adding sub-regions for notify region
+> >   vfio: support getting VFIOGroup from groupfd
+> >   vfio: remove DPRINTF() definition from vfio-common.h
+> >   vhost-user: add VFIO based accelerators support
+> > 
+> >  Makefile.target                 |   4 +
+> >  docs/interop/vhost-user.txt     |  57 +++++++++
+> >  hw/scsi/vhost-user-scsi.c       |   6 +-
+> >  hw/vfio/common.c                |  97 +++++++++++++++-
+> >  hw/virtio/vhost-user.c          | 248 +++++++++++++++++++++++++++++++++++++++-
+> >  hw/virtio/virtio-pci.c          |  48 ++++++++
+> >  hw/virtio/virtio-pci.h          |   5 +
+> >  hw/virtio/virtio.c              |  39 +++++++
+> >  include/hw/vfio/vfio-common.h   |  11 +-
+> >  include/hw/virtio/vhost-user.h  |  34 ++++++
+> >  include/hw/virtio/virtio-scsi.h |   6 +-
+> >  include/hw/virtio/virtio.h      |   5 +
+> >  include/qemu/osdep.h            |   1 +
+> >  net/vhost-user.c                |  30 ++---
+> >  scripts/create_config           |   3 +
+> >  15 files changed, 561 insertions(+), 33 deletions(-)
+> >  create mode 100644 include/hw/virtio/vhost-user.h
+> > 
+> > -- 
+> > 2.11.0
