@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezMGS-0002Eb-QA
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:57:50 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1ezMH1-0002dh-31
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezMGR-0000mA-RM
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:57:48 -0400
-Date: Fri, 23 Mar 2018 20:57:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180323125722.GO32362@xz-mi>
-References: <d29ae6aa-5758-277b-b754-4e6fe7666e6b@redhat.com>
-	<CAFEAcA9dHPLj6aF=JsS8dXaDWf_ONQ_A+SD1xXQO7DdsWK3yAw@mail.gmail.com>
-	<6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
-	<CAFEAcA_rJ_=-dKauAmrJPGRJ6C09_9CQzRdXK53va4NB_xXKpg@mail.gmail.com>
-	<0d6f5f6d-bf28-ffc0-4d7c-b2c73912057e@redhat.com>
+	(envelope-from <rkagan@virtuozzo.com>) id 1ezMGz-00017Q-1F
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:58:23 -0400
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Fri, 23 Mar 2018 15:58:08 +0300
+Message-Id: <20180323125808.4479-3-rkagan@virtuozzo.com>
+In-Reply-To: <20180323125808.4479-1-rkagan@virtuozzo.com>
+References: <20180323125808.4479-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0d6f5f6d-bf28-ffc0-4d7c-b2c73912057e@redhat.com>
-Subject: Re: [Qemu-devel] Regression on KVM qemu-system-aarch64 since
- "monitor: enable IO thread for (qmp & !mux) typed"
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.12 2/2] i386/hyperv: error out if
+ features requested but unsupported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +22,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: qemu-stable@nongnu.org
 
-On Fri, Mar 23, 2018 at 01:36:36PM +0100, Auger Eric wrote:
-> Hi,
-> 
-> On 23/03/18 13:11, Peter Maydell wrote:
-> > On 23 March 2018 at 12:01, Auger Eric <eric.auger@redhat.com> wrote:
-> >> Hi,
-> >>
-> >> On 23/03/18 11:26, Peter Maydell wrote:
-> >>> On 23 March 2018 at 10:24, Auger Eric <eric.auger@redhat.com> wrote:
-> >>>> Hi,
-> >>>>
-> >>>> I observe a regression on KVM accelerated qemu-system-aarch64:
-> >>>>
-> >>>> Unexpected error in kvm_device_access() at
-> >>>> /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
-> >>>> 2018-03-23T09:59:59.629439Z qemu-system-aarch64: KVM_GET_DEVICE_ATTR
-> >>>> failed: Group 6 attr 0x000000000000c664: Device or resource busy
-> >>>> 2018-03-23 10:00:00.085+0000: shutting down, reason=crashed
-> >>>
-> >>> Can you get a backtrace for this? (I guess you'd need to fiddle
-> >>> with the kvm_device_access() code to make it assert rather
-> >>> than passing back the error).
-> >>
-> >> OK. I will try to do so. As I could have expected, I cannot reproduce on
-> >> a standalone qemu command line. The problem observed above is seen with
-> >> libvirt launch which may be doing some other QMP stuff concurrently?
-> > 
-> > Hmm, that could be a bit painful to debug. I dunno if libvirt
-> > has a "launch QEMU under gdb" option. If not, you could try
-> > something like:
-> >    if (condition we want to get a backtrace on) {
-> >        printf("hit condition, attach gdb to process %d\n", (int)getpid());
-> >        for (;;) { }
-> >    }
-> 
-> Thanks for the hint. Here is the stack I get.
-> 
-> #0  kvm_device_access (fd=31, group=6, attr=50788, val=0x5937c88, write=false, errp=0x16984a8 <error_abort>) at /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164
-> #1  0x00000000004f8ce4 in arm_gicv3_icc_reset (env=0xffffa1fc8330, ri=0x597f910) at /home/augere/UPSTREAM/qemu/hw/intc/arm_gicv3_kvm.c:632
-> #2  0x00000000006351ac in cp_reg_reset (key=0x597f730, value=0x597f910, opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:78
-> #3  0x0000ffffa47edce4 in g_hash_table_foreach () from /lib64/libglib-2.0.so.0
-> #4  0x0000000000635394 in arm_cpu_reset (s=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:130
-> #5  0x000000000090c888 in cpu_reset (cpu=0xffffa1fc0010) at qom/cpu.c:249
-> #6  0x00000000005793d8 in do_cpu_reset (opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/hw/arm/boot.c:665
-> #7  0x000000000073095c in qemu_devices_reset () at hw/core/reset.c:69
-> #8  0x00000000006976e0 in qemu_system_reset (reason=SHUTDOWN_CAUSE_NONE) at vl.c:1731
-> #9  0x000000000069fd60 in main (argc=69, argv=0xffffe877d1a8, envp=0xffffe877d3d8) at vl.c:4697
+In order to guarantee compatibility on migration, QEMU should have
+complete control over the features it announces to the guest via CPUID.
 
-I'm not sure, but I suspect libvirt has already sent something to QEMU
-before this point, which breaks the timing of the old QMP code (the
-old QMP won't do anything until main loop).
+However, for a number of Hyper-V-related cpu properties, if the
+corresponding feature is not supported by the underlying KVM, the
+propery is silently ignored and the feature is not announced to the
+guest.
 
-I'm thinking maybe I should postpone the monitors at least until main
-loop so that we can still keep that assumption.  But I'll see what do
-others think of it first.
+Refuse to start with an error instead.
 
-Thanks,
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+---
+ target/i386/kvm.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index fb20ff18c2..c9c359241c 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -658,17 +658,34 @@ static int hyperv_handle_properties(CPUState *cs)
+         env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+         env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+     }
+-    if (cpu->hyperv_crash && has_msr_hv_crash) {
++    if (cpu->hyperv_crash) {
++        if (!has_msr_hv_crash) {
++            fprintf(stderr,
++                    "Hyper-V crash MSRs are not supported by kernel\n");
++            return -ENOSYS;
++        }
+         env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
+     }
+     env->features[FEAT_HYPERV_EDX] |= HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
+-    if (cpu->hyperv_reset && has_msr_hv_reset) {
++    if (cpu->hyperv_reset) {
++       if (!has_msr_hv_reset) {
++            fprintf(stderr, "Hyper-V reset MSR is not supported by kernel\n");
++            return -ENOSYS;
++        }
+         env->features[FEAT_HYPERV_EAX] |= HV_RESET_AVAILABLE;
+     }
+-    if (cpu->hyperv_vpindex && has_msr_hv_vpindex) {
++    if (cpu->hyperv_vpindex) {
++        if (!has_msr_hv_vpindex) {
++            fprintf(stderr, "Hyper-V VP_INDEX is not supported by kernel\n");
++            return -ENOSYS;
++        }
+         env->features[FEAT_HYPERV_EAX] |= HV_VP_INDEX_AVAILABLE;
+     }
+-    if (cpu->hyperv_runtime && has_msr_hv_runtime) {
++    if (cpu->hyperv_runtime) {
++        if (!has_msr_hv_runtime) {
++            fprintf(stderr, "Hyper-V VP_INDEX is not supported by kernel\n");
++            return -ENOSYS;
++        }
+         env->features[FEAT_HYPERV_EAX] |= HV_VP_RUNTIME_AVAILABLE;
+     }
+     if (cpu->hyperv_synic) {
 -- 
-Peter Xu
+2.14.3
