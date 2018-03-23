@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezMus-0004Ub-Ml
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:39:35 -0400
+	(envelope-from <mst@redhat.com>) id 1ezN7k-00012J-Uk
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezMup-0004up-JP
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:39:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50962 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ezMup-0004ua-E9
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:39:31 -0400
-Date: Fri, 23 Mar 2018 21:39:06 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180323133415.GQ32362@xz-mi>
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-21-peterx@redhat.com>
-	<1bd08e1d-b6ff-6b39-e053-599bddd1a208@de.ibm.com>
-	<20180323122538.GN32362@xz-mi>
-	<332a9ef5-549a-d329-ec5e-d68609b1fbe1@de.ibm.com>
-	<20180323130117.GP32362@xz-mi>
-	<c6aee84a-1764-5a8c-bc85-96b6f4081d73@de.ibm.com>
+	(envelope-from <mst@redhat.com>) id 1ezN7j-0004fX-JZ
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:52:52 -0400
+Date: Fri, 23 Mar 2018 16:52:13 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180323162223-mutt-send-email-mst@kernel.org>
+References: <1521746188-496856-1-git-send-email-mst@redhat.com>
+	<20180323102227.GF16270@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <c6aee84a-1764-5a8c-bc85-96b6f4081d73@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 20/23] monitor: enable IO thread for
- (qmp & !mux) typed
+In-Reply-To: <20180323102227.GF16270@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] make: move generated headers to
+ qemu-build/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +25,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, marcandre.lureau@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, David Hildenbrand <david@redhat.com>, Jeff Cody <jcody@redhat.com>, Zhang Chen <zhangckid@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Anthony Perard <anthony.perard@citrix.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Wen Congyang <wencongyang2@huawei.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Hannes Reinecke <hare@suse.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On Fri, Mar 23, 2018 at 02:23:27PM +0100, Christian Borntraeger wrote:
-> 
-> 
-> On 03/23/2018 02:01 PM, Peter Xu wrote:
-> > On Fri, Mar 23, 2018 at 01:44:54PM +0100, Christian Borntraeger wrote:
-> >>
-> >>
-> >> On 03/23/2018 01:25 PM, Peter Xu wrote:
-> >>> On Fri, Mar 23, 2018 at 01:10:51PM +0100, Christian Borntraeger wrote:
-> >>>> As Max Reitz said, this breaks several qemu iotests. I can reproduce that on s390
-> >>>> e.g. with ./check -qcow2 030 in the qemu-iotest.
-> >>>>
-> >>>> Why was this merged?
-> >>>
-> >>> My fault.  Sorry.  I should have done iotests before submission.
-> >>>
-> >>> Now I'm trying to fix those iotest issues.
-> >>>
-> >>> I'm not extremely familiar with block, so the progress is a bit slow,
-> >>> but I'll do it asap (though I'll possibly need some help from the
-> >>> block team, since there are some not-easy ones for me).
-> >>
-> >> As this patch also seems to trigger something else for Eric, can we revert this
-> >> patch for the time being and re-apply as soon as we have solutions for the issues?
-> >>
-> >> After all a hard hang in the iotest can break CI environments (as you run into timeouts).
-> > 
-> > I'm fine with it if it helps.
-> > 
-> > Then I can work in background to solved existing problems, then we
-> > turn it on again in 2.13 when ready (but still it might break things -
-> > at least it can be during dev cycle rather than softfreeze).
-> 
-> Strangely enough, reverting 3fd2457d18edf5736f713dfe1
-> now causes make check errors... :-/
-> 
-> 
->   GTESTER check-qtest-s390x
->   GTESTER check-qtest-i386
-> **
-> ERROR:/home/cborntra/REPOS/qemu/tests/qmp-test.c:97:test_qmp_protocol: assertion failed: (entry)
-> GTester: last random seed: R02S1cbb7e297cc349b33ae39f10dd92764a
-> **
-> ERROR:/home/cborntra/REPOS/qemu/tests/qmp-test.c:190:test_qmp_oob: assertion failed: (qdict_haskey(resp, "return"))
-> GTester: last random seed: R02S7afc5ab63f6f29401d702dceb1f8030b
-> make: *** [/home/cborntra/REPOS/qemu/tests/Makefile.include:880: check-qtest-s390x] Error 1
-> make: *** Waiting for unfinished jobs....
-> ^Cmake: *** [/home/cborntra/REPOS/qemu/tests/Makefile.include:880: check-qtest-i386] Interrupt
-> 
-> 
-> Do we have patches depending on this change?
+On Fri, Mar 23, 2018 at 10:22:27AM +0000, Daniel P. Berrang=E9 wrote:
+> On Thu, Mar 22, 2018 at 09:27:55PM +0200, Michael S. Tsirkin wrote:
+> > Make sure all generated files go into qemu-build subdirectory.
+> > We can then include them like this:
+> >  #include "qemu-build/trace.h"
+> >=20
+> > This serves two purposes:
+> > - make it easy to detect which files are in the source
+> >   directory (a bit more work for writers, easier for readers)
+> > - reduce chances of conflicts with possible stale files in source
+> >   directory (which could be left over from e.g. old patches, etc)
+>=20
+> If people care about this, then they can just be doing a build
+> with  srcdir !=3D builddir config.
 
-It's the new OOB tests that's failing.  I'm preparing a patchset that
-reverts the enablement patch, along with those tests.
+Helps with the second point but I do not see how this will help address
+the first point.
 
-Now I'm testing that branch with more platforms and also all
-raw+qcow2 iotests.  After that's solid, I'll post that out soon if it
-goes smoothly.
+I see include "x.h" in source, it's natural to ask where it is.
 
-Hopefully that would fix all problems so far.
+I look for it in the c file directory. Not there.
 
-Thanks,
+I look for it in the include, it's not there. Where then?
 
--- 
-Peter Xu
+qemu source root on the include path. Not there.
+
+Oh tcg directory is in the include path for some reason. Not there.
+
+Some other tree coming from a submodule maybe?
+
+Oh *maybe* it will be generated by some script, I need to run
+build to find out.
+
+For the record, more remains to be done.
+Here's a list from and oot build of virtio, with some comments:
+
+cc -iquote /home/mst/qemu-oot/hw/virtio
+
+
+ -iquote hw/virtio=20
+
+<- same directory repeated twice.
+
+<- also this is here just for trace.h . Better to just change code to poi=
+nt at the right trace header -
+   will look into it.
+
+-iquote /home/mst/qemu/tcg
+
+<- why does everyone want tcg? better to just include with tcg/
+
+ -iquote /home/mst/qemu/tcg/i386
+
+<- and i386 specifically?
+
+ -I/home/mst/qemu/linux-headers
+
+<- ok this is so we can override with our own version of headers
+
+ -I/home/mst/qemu-oot/linux-headers
+
+<- why do we have these at all?
+   oh it's because we have asm-<arch> tricks like linux used to use years=
+ ago,
+   then we copy the correct asm headers:
+     ls linux-headers/asm/
+     bitsperlong.h  hyperv.h  kvm.h  kvm_para.h  unistd_32.h  unistd_64.h=
+  unistd.h  unistd_x32.h
+
+   a better strategy would be to have headers in arch/<arch>/asm like Lin=
+ux does now,
+   no code generation tricks.
+
+ -iquote .
+
+<- build directory. No headers there at all.
+
+ -iquote /home/mst/qemu=20
+
+<- turns out we still have headers in source root. Why not move them to i=
+nclude/ ?
+
+-iquote /home/mst/qemu/accel/tcg=20
+
+<- more tcg goodness for everyone?
+
+-iquote /home/mst/qemu/include=20
+
+<- ok that's expected. Why isn't this first on the list though?
+
+-I/usr/include/pixman-1
+
+<- should be limited to ui files I guess?
+
+  -I/usr/include/glib-2.0=20
+
+<- ok we need that
+
+-I/usr/lib64/glib-2.0/include=20
+
+<- but that one does not exist
+
+  -I/usr/include/p11-kit-1     -I/usr/include/libpng16  -I/usr/include/li=
+bdrm
+
+<- more GUI things?
+
+  -I/home/mst/qemu/capstone/include
+
+<- ok a bunch of disasm things.
+	ls capstone/include/
+	arm64.h  arm.h  capstone.h  mips.h  platform.h  ppc.h  sparc.h  systemz.=
+h  x86.h  xcore.h
+   can we add this just to disas.c?
+
+  -I../linux-headers
+
+<- all together now: same as qemu-oot but with a relative path now.
+
+ -iquote ..
+
+<- build directory - no headers there
+
+ -iquote /home/mst/qemu/target/arm
+
+<- this is a good idea why?
+
+ -iquote /home/mst/qemu/include
+
+<- deja vu
+
+Wow that was fun.
+
+>  If people are using srcdir =3D=3D builddir
+> then they likely *want* all the generated files in their srcdir.
+>=20
+> IMHO it would be valid for us to consider if we could just mandate
+> srcdir !=3D builddir, but if people object to such a proposal, then I
+> don't think we should arbitrarily move all generated source files
+> in this way, as that's effectively the same thing forced onto devs.
+>=20
+> Regards,
+> Daniel
+
+People don't really care.
+
+
+
+
+
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
