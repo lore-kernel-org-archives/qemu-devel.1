@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ezVdu-0005Ad-P3
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:43 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ezVdx-0005FS-U5
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ezVdo-0000sg-3y
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:38 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ezVdt-0000wu-H3
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:41 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 23 Mar 2018 23:57:29 +0100
-Message-Id: <20180323225739.17329-11-laurent@vivier.eu>
+Date: Fri, 23 Mar 2018 23:57:34 +0100
+Message-Id: <20180323225739.17329-16-laurent@vivier.eu>
 In-Reply-To: <20180323225739.17329-1-laurent@vivier.eu>
 References: <20180323225739.17329-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 10/20] linux-user: move m68k
- signal.c parts to m68k directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 15/20] linux-user: move xtensa
+ signal.c parts to xtensa directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,21 +24,285 @@ To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org
 
 No code change, only move code from signal.c to
-m68k/signal.c, except adding includes and
-exporting setup_frame() and setup_rt_frame().
+xtensa/signal.c, except adding includes and
+exporting setup_rt_frame().
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/m68k/signal.c        | 410 ++++++++++++++++++++++++++++++++++++++++
- linux-user/m68k/target_signal.h |   6 +-
- linux-user/signal.c             | 407 ---------------------------------------
- 3 files changed, 415 insertions(+), 408 deletions(-)
+ linux-user/signal.c               | 253 -------------------------------------
+ linux-user/xtensa/signal.c        | 257 ++++++++++++++++++++++++++++++++++++++
+ linux-user/xtensa/target_signal.h |   3 +
+ 3 files changed, 260 insertions(+), 253 deletions(-)
 
-diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
-index 02ca338b6c..fc72468a81 100644
---- a/linux-user/m68k/signal.c
-+++ b/linux-user/m68k/signal.c
-@@ -16,3 +16,413 @@
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index fc81ec87b6..f039157970 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -3032,259 +3032,6 @@ sigsegv:
+     return -TARGET_QEMU_ESIGRETURN;
+ }
+ 
+-#elif defined(TARGET_XTENSA)
+-
+-struct target_sigcontext {
+-    abi_ulong sc_pc;
+-    abi_ulong sc_ps;
+-    abi_ulong sc_lbeg;
+-    abi_ulong sc_lend;
+-    abi_ulong sc_lcount;
+-    abi_ulong sc_sar;
+-    abi_ulong sc_acclo;
+-    abi_ulong sc_acchi;
+-    abi_ulong sc_a[16];
+-    abi_ulong sc_xtregs;
+-};
+-
+-struct target_ucontext {
+-    abi_ulong tuc_flags;
+-    abi_ulong tuc_link;
+-    target_stack_t tuc_stack;
+-    struct target_sigcontext tuc_mcontext;
+-    target_sigset_t tuc_sigmask;
+-};
+-
+-struct target_rt_sigframe {
+-    target_siginfo_t info;
+-    struct target_ucontext uc;
+-    /* TODO: xtregs */
+-    uint8_t retcode[6];
+-    abi_ulong window[4];
+-};
+-
+-static abi_ulong get_sigframe(struct target_sigaction *sa,
+-                              CPUXtensaState *env,
+-                              unsigned long framesize)
+-{
+-    abi_ulong sp = env->regs[1];
+-
+-    /* This is the X/Open sanctioned signal stack switching.  */
+-    if ((sa->sa_flags & TARGET_SA_ONSTACK) != 0 && !sas_ss_flags(sp)) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-    return (sp - framesize) & -16;
+-}
+-
+-static int flush_window_regs(CPUXtensaState *env)
+-{
+-    const uint32_t nareg_mask = env->config->nareg - 1;
+-    uint32_t wb = env->sregs[WINDOW_BASE];
+-    uint32_t ws = (xtensa_replicate_windowstart(env) >> (wb + 1)) &
+-        ((1 << env->config->nareg / 4) - 1);
+-    uint32_t d = ctz32(ws) + 1;
+-    uint32_t sp;
+-    abi_long ret = 0;
+-
+-    wb += d;
+-    ws >>= d;
+-
+-    xtensa_sync_phys_from_window(env);
+-    sp = env->phys_regs[(wb * 4 + 1) & nareg_mask];
+-
+-    while (ws && ret == 0) {
+-        int d;
+-        int i;
+-        int idx;
+-
+-        if (ws & 0x1) {
+-            ws >>= 1;
+-            d = 1;
+-        } else if (ws & 0x2) {
+-            ws >>= 2;
+-            d = 2;
+-            for (i = 0; i < 4; ++i) {
+-                idx = (wb * 4 + 4 + i) & nareg_mask;
+-                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 12) * 4);
+-            }
+-        } else if (ws & 0x4) {
+-            ws >>= 3;
+-            d = 3;
+-            for (i = 0; i < 8; ++i) {
+-                idx = (wb * 4 + 4 + i) & nareg_mask;
+-                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 16) * 4);
+-            }
+-        } else {
+-            g_assert_not_reached();
+-        }
+-        sp = env->phys_regs[((wb + d) * 4 + 1) & nareg_mask];
+-        for (i = 0; i < 4; ++i) {
+-            idx = (wb * 4 + i) & nareg_mask;
+-            ret |= put_user_ual(env->phys_regs[idx], sp + (i - 4) * 4);
+-        }
+-        wb += d;
+-    }
+-    return ret == 0;
+-}
+-
+-static int setup_sigcontext(struct target_rt_sigframe *frame,
+-                            CPUXtensaState *env)
+-{
+-    struct target_sigcontext *sc = &frame->uc.tuc_mcontext;
+-    int i;
+-
+-    __put_user(env->pc, &sc->sc_pc);
+-    __put_user(env->sregs[PS], &sc->sc_ps);
+-    __put_user(env->sregs[LBEG], &sc->sc_lbeg);
+-    __put_user(env->sregs[LEND], &sc->sc_lend);
+-    __put_user(env->sregs[LCOUNT], &sc->sc_lcount);
+-    if (!flush_window_regs(env)) {
+-        return 0;
+-    }
+-    for (i = 0; i < 16; ++i) {
+-        __put_user(env->regs[i], sc->sc_a + i);
+-    }
+-    __put_user(0, &sc->sc_xtregs);
+-    /* TODO: xtregs */
+-    return 1;
+-}
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPUXtensaState *env)
+-{
+-    abi_ulong frame_addr;
+-    struct target_rt_sigframe *frame;
+-    uint32_t ra;
+-    int i;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_rt_frame(env, frame_addr);
+-
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto give_sigsegv;
+-    }
+-
+-    if (ka->sa_flags & SA_SIGINFO) {
+-        tswap_siginfo(&frame->info, info);
+-    }
+-
+-    __put_user(0, &frame->uc.tuc_flags);
+-    __put_user(0, &frame->uc.tuc_link);
+-    __put_user(target_sigaltstack_used.ss_sp,
+-               &frame->uc.tuc_stack.ss_sp);
+-    __put_user(sas_ss_flags(env->regs[1]),
+-               &frame->uc.tuc_stack.ss_flags);
+-    __put_user(target_sigaltstack_used.ss_size,
+-               &frame->uc.tuc_stack.ss_size);
+-    if (!setup_sigcontext(frame, env)) {
+-        unlock_user_struct(frame, frame_addr, 0);
+-        goto give_sigsegv;
+-    }
+-    for (i = 0; i < TARGET_NSIG_WORDS; ++i) {
+-        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
+-    }
+-
+-    if (ka->sa_flags & TARGET_SA_RESTORER) {
+-        ra = ka->sa_restorer;
+-    } else {
+-        ra = frame_addr + offsetof(struct target_rt_sigframe, retcode);
+-#ifdef TARGET_WORDS_BIGENDIAN
+-        /* Generate instruction:  MOVI a2, __NR_rt_sigreturn */
+-        __put_user(0x22, &frame->retcode[0]);
+-        __put_user(0x0a, &frame->retcode[1]);
+-        __put_user(TARGET_NR_rt_sigreturn, &frame->retcode[2]);
+-        /* Generate instruction:  SYSCALL */
+-        __put_user(0x00, &frame->retcode[3]);
+-        __put_user(0x05, &frame->retcode[4]);
+-        __put_user(0x00, &frame->retcode[5]);
+-#else
+-        /* Generate instruction:  MOVI a2, __NR_rt_sigreturn */
+-        __put_user(0x22, &frame->retcode[0]);
+-        __put_user(0xa0, &frame->retcode[1]);
+-        __put_user(TARGET_NR_rt_sigreturn, &frame->retcode[2]);
+-        /* Generate instruction:  SYSCALL */
+-        __put_user(0x00, &frame->retcode[3]);
+-        __put_user(0x50, &frame->retcode[4]);
+-        __put_user(0x00, &frame->retcode[5]);
+-#endif
+-    }
+-    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
+-    if (xtensa_option_enabled(env->config, XTENSA_OPTION_WINDOWED_REGISTER)) {
+-        env->sregs[PS] |= PS_WOE | (1 << PS_CALLINC_SHIFT);
+-    }
+-    memset(env->regs, 0, sizeof(env->regs));
+-    env->pc = ka->_sa_handler;
+-    env->regs[1] = frame_addr;
+-    env->sregs[WINDOW_BASE] = 0;
+-    env->sregs[WINDOW_START] = 1;
+-
+-    env->regs[4] = (ra & 0x3fffffff) | 0x40000000;
+-    env->regs[6] = sig;
+-    env->regs[7] = frame_addr + offsetof(struct target_rt_sigframe, info);
+-    env->regs[8] = frame_addr + offsetof(struct target_rt_sigframe, uc);
+-    unlock_user_struct(frame, frame_addr, 1);
+-    return;
+-
+-give_sigsegv:
+-    force_sigsegv(sig);
+-    return;
+-}
+-
+-static void restore_sigcontext(CPUXtensaState *env,
+-                               struct target_rt_sigframe *frame)
+-{
+-    struct target_sigcontext *sc = &frame->uc.tuc_mcontext;
+-    uint32_t ps;
+-    int i;
+-
+-    __get_user(env->pc, &sc->sc_pc);
+-    __get_user(ps, &sc->sc_ps);
+-    __get_user(env->sregs[LBEG], &sc->sc_lbeg);
+-    __get_user(env->sregs[LEND], &sc->sc_lend);
+-    __get_user(env->sregs[LCOUNT], &sc->sc_lcount);
+-
+-    env->sregs[WINDOW_BASE] = 0;
+-    env->sregs[WINDOW_START] = 1;
+-    env->sregs[PS] = deposit32(env->sregs[PS],
+-                               PS_CALLINC_SHIFT,
+-                               PS_CALLINC_LEN,
+-                               extract32(ps, PS_CALLINC_SHIFT,
+-                                         PS_CALLINC_LEN));
+-    for (i = 0; i < 16; ++i) {
+-        __get_user(env->regs[i], sc->sc_a + i);
+-    }
+-    /* TODO: xtregs */
+-}
+-
+-long do_rt_sigreturn(CPUXtensaState *env)
+-{
+-    abi_ulong frame_addr = env->regs[1];
+-    struct target_rt_sigframe *frame;
+-    sigset_t set;
+-
+-    trace_user_do_rt_sigreturn(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+-        goto badframe;
+-    }
+-    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
+-    set_sigmask(&set);
+-
+-    restore_sigcontext(env, frame);
+-
+-    if (do_sigaltstack(frame_addr +
+-                       offsetof(struct target_rt_sigframe, uc.tuc_stack),
+-                       0, get_sp_from_cpustate(env)) == -TARGET_EFAULT) {
+-        goto badframe;
+-    }
+-    unlock_user_struct(frame, frame_addr, 0);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-badframe:
+-    unlock_user_struct(frame, frame_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+ #endif
+ 
+ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
+index 02ca338b6c..e4e032e954 100644
+--- a/linux-user/xtensa/signal.c
++++ b/linux-user/xtensa/signal.c
+@@ -16,3 +16,260 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
@@ -49,401 +313,248 @@ index 02ca338b6c..fc72468a81 100644
 +#include "linux-user/trace.h"
 +
 +struct target_sigcontext {
-+    abi_ulong  sc_mask;
-+    abi_ulong  sc_usp;
-+    abi_ulong  sc_d0;
-+    abi_ulong  sc_d1;
-+    abi_ulong  sc_a0;
-+    abi_ulong  sc_a1;
-+    unsigned short sc_sr;
-+    abi_ulong  sc_pc;
++    abi_ulong sc_pc;
++    abi_ulong sc_ps;
++    abi_ulong sc_lbeg;
++    abi_ulong sc_lend;
++    abi_ulong sc_lcount;
++    abi_ulong sc_sar;
++    abi_ulong sc_acclo;
++    abi_ulong sc_acchi;
++    abi_ulong sc_a[16];
++    abi_ulong sc_xtregs;
 +};
-+
-+struct target_sigframe
-+{
-+    abi_ulong pretcode;
-+    int sig;
-+    int code;
-+    abi_ulong psc;
-+    char retcode[8];
-+    abi_ulong extramask[TARGET_NSIG_WORDS-1];
-+    struct target_sigcontext sc;
-+};
-+
-+typedef int target_greg_t;
-+#define TARGET_NGREG 18
-+typedef target_greg_t target_gregset_t[TARGET_NGREG];
-+
-+typedef struct target_fpregset {
-+    int f_fpcntl[3];
-+    int f_fpregs[8*3];
-+} target_fpregset_t;
-+
-+struct target_mcontext {
-+    int version;
-+    target_gregset_t gregs;
-+    target_fpregset_t fpregs;
-+};
-+
-+#define TARGET_MCONTEXT_VERSION 2
 +
 +struct target_ucontext {
 +    abi_ulong tuc_flags;
 +    abi_ulong tuc_link;
 +    target_stack_t tuc_stack;
-+    struct target_mcontext tuc_mcontext;
-+    abi_long tuc_filler[80];
++    struct target_sigcontext tuc_mcontext;
 +    target_sigset_t tuc_sigmask;
 +};
 +
-+struct target_rt_sigframe
-+{
-+    abi_ulong pretcode;
-+    int sig;
-+    abi_ulong pinfo;
-+    abi_ulong puc;
-+    char retcode[8];
-+    struct target_siginfo info;
++struct target_rt_sigframe {
++    target_siginfo_t info;
 +    struct target_ucontext uc;
++    /* TODO: xtregs */
++    uint8_t retcode[6];
++    abi_ulong window[4];
 +};
 +
-+static void setup_sigcontext(struct target_sigcontext *sc, CPUM68KState *env,
-+                             abi_ulong mask)
++static abi_ulong get_sigframe(struct target_sigaction *sa,
++                              CPUXtensaState *env,
++                              unsigned long framesize)
 +{
-+    uint32_t sr = (env->sr & 0xff00) | cpu_m68k_get_ccr(env);
-+    __put_user(mask, &sc->sc_mask);
-+    __put_user(env->aregs[7], &sc->sc_usp);
-+    __put_user(env->dregs[0], &sc->sc_d0);
-+    __put_user(env->dregs[1], &sc->sc_d1);
-+    __put_user(env->aregs[0], &sc->sc_a0);
-+    __put_user(env->aregs[1], &sc->sc_a1);
-+    __put_user(sr, &sc->sc_sr);
-+    __put_user(env->pc, &sc->sc_pc);
-+}
-+
-+static void
-+restore_sigcontext(CPUM68KState *env, struct target_sigcontext *sc)
-+{
-+    int temp;
-+
-+    __get_user(env->aregs[7], &sc->sc_usp);
-+    __get_user(env->dregs[0], &sc->sc_d0);
-+    __get_user(env->dregs[1], &sc->sc_d1);
-+    __get_user(env->aregs[0], &sc->sc_a0);
-+    __get_user(env->aregs[1], &sc->sc_a1);
-+    __get_user(env->pc, &sc->sc_pc);
-+    __get_user(temp, &sc->sc_sr);
-+    cpu_m68k_set_ccr(env, temp);
-+}
-+
-+/*
-+ * Determine which stack to use..
-+ */
-+static inline abi_ulong
-+get_sigframe(struct target_sigaction *ka, CPUM68KState *regs,
-+             size_t frame_size)
-+{
-+    unsigned long sp;
-+
-+    sp = regs->aregs[7];
++    abi_ulong sp = env->regs[1];
 +
 +    /* This is the X/Open sanctioned signal stack switching.  */
-+    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags (sp) == 0)) {
++    if ((sa->sa_flags & TARGET_SA_ONSTACK) != 0 && !sas_ss_flags(sp)) {
 +        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 +    }
-+
-+    return ((sp - frame_size) & -8UL);
++    return (sp - framesize) & -16;
 +}
 +
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUM68KState *env)
++static int flush_window_regs(CPUXtensaState *env)
 +{
-+    struct target_sigframe *frame;
-+    abi_ulong frame_addr;
-+    abi_ulong retcode_addr;
-+    abi_ulong sc_addr;
++    const uint32_t nareg_mask = env->config->nareg - 1;
++    uint32_t wb = env->sregs[WINDOW_BASE];
++    uint32_t ws = (xtensa_replicate_windowstart(env) >> (wb + 1)) &
++        ((1 << env->config->nareg / 4) - 1);
++    uint32_t d = ctz32(ws) + 1;
++    uint32_t sp;
++    abi_long ret = 0;
++
++    wb += d;
++    ws >>= d;
++
++    xtensa_sync_phys_from_window(env);
++    sp = env->phys_regs[(wb * 4 + 1) & nareg_mask];
++
++    while (ws && ret == 0) {
++        int d;
++        int i;
++        int idx;
++
++        if (ws & 0x1) {
++            ws >>= 1;
++            d = 1;
++        } else if (ws & 0x2) {
++            ws >>= 2;
++            d = 2;
++            for (i = 0; i < 4; ++i) {
++                idx = (wb * 4 + 4 + i) & nareg_mask;
++                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 12) * 4);
++            }
++        } else if (ws & 0x4) {
++            ws >>= 3;
++            d = 3;
++            for (i = 0; i < 8; ++i) {
++                idx = (wb * 4 + 4 + i) & nareg_mask;
++                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 16) * 4);
++            }
++        } else {
++            g_assert_not_reached();
++        }
++        sp = env->phys_regs[((wb + d) * 4 + 1) & nareg_mask];
++        for (i = 0; i < 4; ++i) {
++            idx = (wb * 4 + i) & nareg_mask;
++            ret |= put_user_ual(env->phys_regs[idx], sp + (i - 4) * 4);
++        }
++        wb += d;
++    }
++    return ret == 0;
++}
++
++static int setup_sigcontext(struct target_rt_sigframe *frame,
++                            CPUXtensaState *env)
++{
++    struct target_sigcontext *sc = &frame->uc.tuc_mcontext;
 +    int i;
 +
-+    frame_addr = get_sigframe(ka, env, sizeof *frame);
-+    trace_user_setup_frame(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
-+        goto give_sigsegv;
++    __put_user(env->pc, &sc->sc_pc);
++    __put_user(env->sregs[PS], &sc->sc_ps);
++    __put_user(env->sregs[LBEG], &sc->sc_lbeg);
++    __put_user(env->sregs[LEND], &sc->sc_lend);
++    __put_user(env->sregs[LCOUNT], &sc->sc_lcount);
++    if (!flush_window_regs(env)) {
++        return 0;
 +    }
-+
-+    __put_user(sig, &frame->sig);
-+
-+    sc_addr = frame_addr + offsetof(struct target_sigframe, sc);
-+    __put_user(sc_addr, &frame->psc);
-+
-+    setup_sigcontext(&frame->sc, env, set->sig[0]);
-+
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user(set->sig[i], &frame->extramask[i - 1]);
++    for (i = 0; i < 16; ++i) {
++        __put_user(env->regs[i], sc->sc_a + i);
 +    }
-+
-+    /* Set up to return from userspace.  */
-+
-+    retcode_addr = frame_addr + offsetof(struct target_sigframe, retcode);
-+    __put_user(retcode_addr, &frame->pretcode);
-+
-+    /* moveq #,d0; trap #0 */
-+
-+    __put_user(0x70004e40 + (TARGET_NR_sigreturn << 16),
-+               (uint32_t *)(frame->retcode));
-+
-+    /* Set up to return from userspace */
-+
-+    env->aregs[7] = frame_addr;
-+    env->pc = ka->_sa_handler;
-+
-+    unlock_user_struct(frame, frame_addr, 1);
-+    return;
-+
-+give_sigsegv:
-+    force_sigsegv(sig);
-+}
-+
-+static inline void target_rt_save_fpu_state(struct target_ucontext *uc,
-+                                           CPUM68KState *env)
-+{
-+    int i;
-+    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
-+
-+    __put_user(env->fpcr, &fpregs->f_fpcntl[0]);
-+    __put_user(env->fpsr, &fpregs->f_fpcntl[1]);
-+    /* fpiar is not emulated */
-+
-+    for (i = 0; i < 8; i++) {
-+        uint32_t high = env->fregs[i].d.high << 16;
-+        __put_user(high, &fpregs->f_fpregs[i * 3]);
-+        __put_user(env->fregs[i].d.low,
-+                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
-+    }
-+}
-+
-+static inline int target_rt_setup_ucontext(struct target_ucontext *uc,
-+                                           CPUM68KState *env)
-+{
-+    target_greg_t *gregs = uc->tuc_mcontext.gregs;
-+    uint32_t sr = (env->sr & 0xff00) | cpu_m68k_get_ccr(env);
-+
-+    __put_user(TARGET_MCONTEXT_VERSION, &uc->tuc_mcontext.version);
-+    __put_user(env->dregs[0], &gregs[0]);
-+    __put_user(env->dregs[1], &gregs[1]);
-+    __put_user(env->dregs[2], &gregs[2]);
-+    __put_user(env->dregs[3], &gregs[3]);
-+    __put_user(env->dregs[4], &gregs[4]);
-+    __put_user(env->dregs[5], &gregs[5]);
-+    __put_user(env->dregs[6], &gregs[6]);
-+    __put_user(env->dregs[7], &gregs[7]);
-+    __put_user(env->aregs[0], &gregs[8]);
-+    __put_user(env->aregs[1], &gregs[9]);
-+    __put_user(env->aregs[2], &gregs[10]);
-+    __put_user(env->aregs[3], &gregs[11]);
-+    __put_user(env->aregs[4], &gregs[12]);
-+    __put_user(env->aregs[5], &gregs[13]);
-+    __put_user(env->aregs[6], &gregs[14]);
-+    __put_user(env->aregs[7], &gregs[15]);
-+    __put_user(env->pc, &gregs[16]);
-+    __put_user(sr, &gregs[17]);
-+
-+    target_rt_save_fpu_state(uc, env);
-+
-+    return 0;
-+}
-+
-+static inline void target_rt_restore_fpu_state(CPUM68KState *env,
-+                                               struct target_ucontext *uc)
-+{
-+    int i;
-+    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
-+    uint32_t fpcr;
-+
-+    __get_user(fpcr, &fpregs->f_fpcntl[0]);
-+    cpu_m68k_set_fpcr(env, fpcr);
-+    __get_user(env->fpsr, &fpregs->f_fpcntl[1]);
-+    /* fpiar is not emulated */
-+
-+    for (i = 0; i < 8; i++) {
-+        uint32_t high;
-+        __get_user(high, &fpregs->f_fpregs[i * 3]);
-+        env->fregs[i].d.high = high >> 16;
-+        __get_user(env->fregs[i].d.low,
-+                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
-+    }
-+}
-+
-+static inline int target_rt_restore_ucontext(CPUM68KState *env,
-+                                             struct target_ucontext *uc)
-+{
-+    int temp;
-+    target_greg_t *gregs = uc->tuc_mcontext.gregs;
-+
-+    __get_user(temp, &uc->tuc_mcontext.version);
-+    if (temp != TARGET_MCONTEXT_VERSION)
-+        goto badframe;
-+
-+    /* restore passed registers */
-+    __get_user(env->dregs[0], &gregs[0]);
-+    __get_user(env->dregs[1], &gregs[1]);
-+    __get_user(env->dregs[2], &gregs[2]);
-+    __get_user(env->dregs[3], &gregs[3]);
-+    __get_user(env->dregs[4], &gregs[4]);
-+    __get_user(env->dregs[5], &gregs[5]);
-+    __get_user(env->dregs[6], &gregs[6]);
-+    __get_user(env->dregs[7], &gregs[7]);
-+    __get_user(env->aregs[0], &gregs[8]);
-+    __get_user(env->aregs[1], &gregs[9]);
-+    __get_user(env->aregs[2], &gregs[10]);
-+    __get_user(env->aregs[3], &gregs[11]);
-+    __get_user(env->aregs[4], &gregs[12]);
-+    __get_user(env->aregs[5], &gregs[13]);
-+    __get_user(env->aregs[6], &gregs[14]);
-+    __get_user(env->aregs[7], &gregs[15]);
-+    __get_user(env->pc, &gregs[16]);
-+    __get_user(temp, &gregs[17]);
-+    cpu_m68k_set_ccr(env, temp);
-+
-+    target_rt_restore_fpu_state(env, uc);
-+
-+    return 0;
-+
-+badframe:
++    __put_user(0, &sc->sc_xtregs);
++    /* TODO: xtregs */
 +    return 1;
 +}
 +
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUM68KState *env)
++                    target_sigset_t *set, CPUXtensaState *env)
 +{
-+    struct target_rt_sigframe *frame;
 +    abi_ulong frame_addr;
-+    abi_ulong retcode_addr;
-+    abi_ulong info_addr;
-+    abi_ulong uc_addr;
-+    int err = 0;
++    struct target_rt_sigframe *frame;
++    uint32_t ra;
 +    int i;
 +
-+    frame_addr = get_sigframe(ka, env, sizeof *frame);
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
 +    trace_user_setup_rt_frame(env, frame_addr);
++
 +    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
 +        goto give_sigsegv;
 +    }
 +
-+    __put_user(sig, &frame->sig);
-+
-+    info_addr = frame_addr + offsetof(struct target_rt_sigframe, info);
-+    __put_user(info_addr, &frame->pinfo);
-+
-+    uc_addr = frame_addr + offsetof(struct target_rt_sigframe, uc);
-+    __put_user(uc_addr, &frame->puc);
-+
-+    tswap_siginfo(&frame->info, info);
-+
-+    /* Create the ucontext */
++    if (ka->sa_flags & SA_SIGINFO) {
++        tswap_siginfo(&frame->info, info);
++    }
 +
 +    __put_user(0, &frame->uc.tuc_flags);
 +    __put_user(0, &frame->uc.tuc_link);
 +    __put_user(target_sigaltstack_used.ss_sp,
 +               &frame->uc.tuc_stack.ss_sp);
-+    __put_user(sas_ss_flags(env->aregs[7]),
-+            &frame->uc.tuc_stack.ss_flags);
++    __put_user(sas_ss_flags(env->regs[1]),
++               &frame->uc.tuc_stack.ss_flags);
 +    __put_user(target_sigaltstack_used.ss_size,
 +               &frame->uc.tuc_stack.ss_size);
-+    err |= target_rt_setup_ucontext(&frame->uc, env);
-+
-+    if (err)
++    if (!setup_sigcontext(frame, env)) {
++        unlock_user_struct(frame, frame_addr, 0);
 +        goto give_sigsegv;
-+
-+    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
++    }
++    for (i = 0; i < TARGET_NSIG_WORDS; ++i) {
 +        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
 +    }
 +
-+    /* Set up to return from userspace.  */
-+
-+    retcode_addr = frame_addr + offsetof(struct target_sigframe, retcode);
-+    __put_user(retcode_addr, &frame->pretcode);
-+
-+    /* moveq #,d0; notb d0; trap #0 */
-+
-+    __put_user(0x70004600 + ((TARGET_NR_rt_sigreturn ^ 0xff) << 16),
-+               (uint32_t *)(frame->retcode + 0));
-+    __put_user(0x4e40, (uint16_t *)(frame->retcode + 4));
-+
-+    if (err)
-+        goto give_sigsegv;
-+
-+    /* Set up to return from userspace */
-+
-+    env->aregs[7] = frame_addr;
++    if (ka->sa_flags & TARGET_SA_RESTORER) {
++        ra = ka->sa_restorer;
++    } else {
++        ra = frame_addr + offsetof(struct target_rt_sigframe, retcode);
++#ifdef TARGET_WORDS_BIGENDIAN
++        /* Generate instruction:  MOVI a2, __NR_rt_sigreturn */
++        __put_user(0x22, &frame->retcode[0]);
++        __put_user(0x0a, &frame->retcode[1]);
++        __put_user(TARGET_NR_rt_sigreturn, &frame->retcode[2]);
++        /* Generate instruction:  SYSCALL */
++        __put_user(0x00, &frame->retcode[3]);
++        __put_user(0x05, &frame->retcode[4]);
++        __put_user(0x00, &frame->retcode[5]);
++#else
++        /* Generate instruction:  MOVI a2, __NR_rt_sigreturn */
++        __put_user(0x22, &frame->retcode[0]);
++        __put_user(0xa0, &frame->retcode[1]);
++        __put_user(TARGET_NR_rt_sigreturn, &frame->retcode[2]);
++        /* Generate instruction:  SYSCALL */
++        __put_user(0x00, &frame->retcode[3]);
++        __put_user(0x50, &frame->retcode[4]);
++        __put_user(0x00, &frame->retcode[5]);
++#endif
++    }
++    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
++    if (xtensa_option_enabled(env->config, XTENSA_OPTION_WINDOWED_REGISTER)) {
++        env->sregs[PS] |= PS_WOE | (1 << PS_CALLINC_SHIFT);
++    }
++    memset(env->regs, 0, sizeof(env->regs));
 +    env->pc = ka->_sa_handler;
++    env->regs[1] = frame_addr;
++    env->sregs[WINDOW_BASE] = 0;
++    env->sregs[WINDOW_START] = 1;
 +
++    env->regs[4] = (ra & 0x3fffffff) | 0x40000000;
++    env->regs[6] = sig;
++    env->regs[7] = frame_addr + offsetof(struct target_rt_sigframe, info);
++    env->regs[8] = frame_addr + offsetof(struct target_rt_sigframe, uc);
 +    unlock_user_struct(frame, frame_addr, 1);
 +    return;
 +
 +give_sigsegv:
-+    unlock_user_struct(frame, frame_addr, 1);
 +    force_sigsegv(sig);
++    return;
 +}
 +
-+long do_sigreturn(CPUM68KState *env)
++static void restore_sigcontext(CPUXtensaState *env,
++                               struct target_rt_sigframe *frame)
 +{
-+    struct target_sigframe *frame;
-+    abi_ulong frame_addr = env->aregs[7] - 4;
-+    target_sigset_t target_set;
-+    sigset_t set;
++    struct target_sigcontext *sc = &frame->uc.tuc_mcontext;
++    uint32_t ps;
 +    int i;
 +
-+    trace_user_do_sigreturn(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
-+        goto badframe;
++    __get_user(env->pc, &sc->sc_pc);
++    __get_user(ps, &sc->sc_ps);
++    __get_user(env->sregs[LBEG], &sc->sc_lbeg);
++    __get_user(env->sregs[LEND], &sc->sc_lend);
++    __get_user(env->sregs[LCOUNT], &sc->sc_lcount);
 +
-+    /* set blocked signals */
-+
-+    __get_user(target_set.sig[0], &frame->sc.sc_mask);
-+
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
++    env->sregs[WINDOW_BASE] = 0;
++    env->sregs[WINDOW_START] = 1;
++    env->sregs[PS] = deposit32(env->sregs[PS],
++                               PS_CALLINC_SHIFT,
++                               PS_CALLINC_LEN,
++                               extract32(ps, PS_CALLINC_SHIFT,
++                                         PS_CALLINC_LEN));
++    for (i = 0; i < 16; ++i) {
++        __get_user(env->regs[i], sc->sc_a + i);
 +    }
-+
-+    target_to_host_sigset_internal(&set, &target_set);
-+    set_sigmask(&set);
-+
-+    /* restore registers */
-+
-+    restore_sigcontext(env, &frame->sc);
-+
-+    unlock_user_struct(frame, frame_addr, 0);
-+    return -TARGET_QEMU_ESIGRETURN;
-+
-+badframe:
-+    force_sig(TARGET_SIGSEGV);
-+    return -TARGET_QEMU_ESIGRETURN;
++    /* TODO: xtregs */
 +}
 +
-+long do_rt_sigreturn(CPUM68KState *env)
++long do_rt_sigreturn(CPUXtensaState *env)
 +{
++    abi_ulong frame_addr = env->regs[1];
 +    struct target_rt_sigframe *frame;
-+    abi_ulong frame_addr = env->aregs[7] - 4;
 +    sigset_t set;
 +
 +    trace_user_do_rt_sigreturn(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
 +        goto badframe;
-+
++    }
 +    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
 +    set_sigmask(&set);
 +
-+    /* restore registers */
-+
-+    if (target_rt_restore_ucontext(env, &frame->uc))
-+        goto badframe;
++    restore_sigcontext(env, frame);
 +
 +    if (do_sigaltstack(frame_addr +
 +                       offsetof(struct target_rt_sigframe, uc.tuc_stack),
-+                       0, get_sp_from_cpustate(env)) == -EFAULT)
++                       0, get_sp_from_cpustate(env)) == -TARGET_EFAULT) {
 +        goto badframe;
-+
++    }
 +    unlock_user_struct(frame, frame_addr, 0);
 +    return -TARGET_QEMU_ESIGRETURN;
 +
@@ -452,438 +563,17 @@ index 02ca338b6c..fc72468a81 100644
 +    force_sig(TARGET_SIGSEGV);
 +    return -TARGET_QEMU_ESIGRETURN;
 +}
-diff --git a/linux-user/m68k/target_signal.h b/linux-user/m68k/target_signal.h
-index 9d2d7343f8..29e0c01191 100644
---- a/linux-user/m68k/target_signal.h
-+++ b/linux-user/m68k/target_signal.h
-@@ -26,5 +26,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUM68KState *state)
-     return state->aregs[7];
+diff --git a/linux-user/xtensa/target_signal.h b/linux-user/xtensa/target_signal.h
+index c6962e70af..f6545903a4 100644
+--- a/linux-user/xtensa/target_signal.h
++++ b/linux-user/xtensa/target_signal.h
+@@ -25,4 +25,7 @@ static inline abi_ulong get_sp_from_cpustate(CPUXtensaState *state)
+     return state->regs[1];
  }
  
--
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUM68KState *env);
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUM68KState *env);
- #endif /* M68K_TARGET_SIGNAL_H */
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 377ff6621a..e211ef6ff0 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -3032,413 +3032,6 @@ sigsegv:
-     return -TARGET_QEMU_ESIGRETURN;
- }
- 
--#elif defined(TARGET_M68K)
--
--struct target_sigcontext {
--    abi_ulong  sc_mask;
--    abi_ulong  sc_usp;
--    abi_ulong  sc_d0;
--    abi_ulong  sc_d1;
--    abi_ulong  sc_a0;
--    abi_ulong  sc_a1;
--    unsigned short sc_sr;
--    abi_ulong  sc_pc;
--};
--
--struct target_sigframe
--{
--    abi_ulong pretcode;
--    int sig;
--    int code;
--    abi_ulong psc;
--    char retcode[8];
--    abi_ulong extramask[TARGET_NSIG_WORDS-1];
--    struct target_sigcontext sc;
--};
--
--typedef int target_greg_t;
--#define TARGET_NGREG 18
--typedef target_greg_t target_gregset_t[TARGET_NGREG];
--
--typedef struct target_fpregset {
--    int f_fpcntl[3];
--    int f_fpregs[8*3];
--} target_fpregset_t;
--
--struct target_mcontext {
--    int version;
--    target_gregset_t gregs;
--    target_fpregset_t fpregs;
--};
--
--#define TARGET_MCONTEXT_VERSION 2
--
--struct target_ucontext {
--    abi_ulong tuc_flags;
--    abi_ulong tuc_link;
--    target_stack_t tuc_stack;
--    struct target_mcontext tuc_mcontext;
--    abi_long tuc_filler[80];
--    target_sigset_t tuc_sigmask;
--};
--
--struct target_rt_sigframe
--{
--    abi_ulong pretcode;
--    int sig;
--    abi_ulong pinfo;
--    abi_ulong puc;
--    char retcode[8];
--    struct target_siginfo info;
--    struct target_ucontext uc;
--};
--
--static void setup_sigcontext(struct target_sigcontext *sc, CPUM68KState *env,
--                             abi_ulong mask)
--{
--    uint32_t sr = (env->sr & 0xff00) | cpu_m68k_get_ccr(env);
--    __put_user(mask, &sc->sc_mask);
--    __put_user(env->aregs[7], &sc->sc_usp);
--    __put_user(env->dregs[0], &sc->sc_d0);
--    __put_user(env->dregs[1], &sc->sc_d1);
--    __put_user(env->aregs[0], &sc->sc_a0);
--    __put_user(env->aregs[1], &sc->sc_a1);
--    __put_user(sr, &sc->sc_sr);
--    __put_user(env->pc, &sc->sc_pc);
--}
--
--static void
--restore_sigcontext(CPUM68KState *env, struct target_sigcontext *sc)
--{
--    int temp;
--
--    __get_user(env->aregs[7], &sc->sc_usp);
--    __get_user(env->dregs[0], &sc->sc_d0);
--    __get_user(env->dregs[1], &sc->sc_d1);
--    __get_user(env->aregs[0], &sc->sc_a0);
--    __get_user(env->aregs[1], &sc->sc_a1);
--    __get_user(env->pc, &sc->sc_pc);
--    __get_user(temp, &sc->sc_sr);
--    cpu_m68k_set_ccr(env, temp);
--}
--
--/*
-- * Determine which stack to use..
-- */
--static inline abi_ulong
--get_sigframe(struct target_sigaction *ka, CPUM68KState *regs,
--             size_t frame_size)
--{
--    unsigned long sp;
--
--    sp = regs->aregs[7];
--
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags (sp) == 0)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
--
--    return ((sp - frame_size) & -8UL);
--}
--
--static void setup_frame(int sig, struct target_sigaction *ka,
--                        target_sigset_t *set, CPUM68KState *env)
--{
--    struct target_sigframe *frame;
--    abi_ulong frame_addr;
--    abi_ulong retcode_addr;
--    abi_ulong sc_addr;
--    int i;
--
--    frame_addr = get_sigframe(ka, env, sizeof *frame);
--    trace_user_setup_frame(env, frame_addr);
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
--        goto give_sigsegv;
--    }
--
--    __put_user(sig, &frame->sig);
--
--    sc_addr = frame_addr + offsetof(struct target_sigframe, sc);
--    __put_user(sc_addr, &frame->psc);
--
--    setup_sigcontext(&frame->sc, env, set->sig[0]);
--
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __put_user(set->sig[i], &frame->extramask[i - 1]);
--    }
--
--    /* Set up to return from userspace.  */
--
--    retcode_addr = frame_addr + offsetof(struct target_sigframe, retcode);
--    __put_user(retcode_addr, &frame->pretcode);
--
--    /* moveq #,d0; trap #0 */
--
--    __put_user(0x70004e40 + (TARGET_NR_sigreturn << 16),
--               (uint32_t *)(frame->retcode));
--
--    /* Set up to return from userspace */
--
--    env->aregs[7] = frame_addr;
--    env->pc = ka->_sa_handler;
--
--    unlock_user_struct(frame, frame_addr, 1);
--    return;
--
--give_sigsegv:
--    force_sigsegv(sig);
--}
--
--static inline void target_rt_save_fpu_state(struct target_ucontext *uc,
--                                           CPUM68KState *env)
--{
--    int i;
--    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
--
--    __put_user(env->fpcr, &fpregs->f_fpcntl[0]);
--    __put_user(env->fpsr, &fpregs->f_fpcntl[1]);
--    /* fpiar is not emulated */
--
--    for (i = 0; i < 8; i++) {
--        uint32_t high = env->fregs[i].d.high << 16;
--        __put_user(high, &fpregs->f_fpregs[i * 3]);
--        __put_user(env->fregs[i].d.low,
--                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
--    }
--}
--
--static inline int target_rt_setup_ucontext(struct target_ucontext *uc,
--                                           CPUM68KState *env)
--{
--    target_greg_t *gregs = uc->tuc_mcontext.gregs;
--    uint32_t sr = (env->sr & 0xff00) | cpu_m68k_get_ccr(env);
--
--    __put_user(TARGET_MCONTEXT_VERSION, &uc->tuc_mcontext.version);
--    __put_user(env->dregs[0], &gregs[0]);
--    __put_user(env->dregs[1], &gregs[1]);
--    __put_user(env->dregs[2], &gregs[2]);
--    __put_user(env->dregs[3], &gregs[3]);
--    __put_user(env->dregs[4], &gregs[4]);
--    __put_user(env->dregs[5], &gregs[5]);
--    __put_user(env->dregs[6], &gregs[6]);
--    __put_user(env->dregs[7], &gregs[7]);
--    __put_user(env->aregs[0], &gregs[8]);
--    __put_user(env->aregs[1], &gregs[9]);
--    __put_user(env->aregs[2], &gregs[10]);
--    __put_user(env->aregs[3], &gregs[11]);
--    __put_user(env->aregs[4], &gregs[12]);
--    __put_user(env->aregs[5], &gregs[13]);
--    __put_user(env->aregs[6], &gregs[14]);
--    __put_user(env->aregs[7], &gregs[15]);
--    __put_user(env->pc, &gregs[16]);
--    __put_user(sr, &gregs[17]);
--
--    target_rt_save_fpu_state(uc, env);
--
--    return 0;
--}
--
--static inline void target_rt_restore_fpu_state(CPUM68KState *env,
--                                               struct target_ucontext *uc)
--{
--    int i;
--    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
--    uint32_t fpcr;
--
--    __get_user(fpcr, &fpregs->f_fpcntl[0]);
--    cpu_m68k_set_fpcr(env, fpcr);
--    __get_user(env->fpsr, &fpregs->f_fpcntl[1]);
--    /* fpiar is not emulated */
--
--    for (i = 0; i < 8; i++) {
--        uint32_t high;
--        __get_user(high, &fpregs->f_fpregs[i * 3]);
--        env->fregs[i].d.high = high >> 16;
--        __get_user(env->fregs[i].d.low,
--                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
--    }
--}
--
--static inline int target_rt_restore_ucontext(CPUM68KState *env,
--                                             struct target_ucontext *uc)
--{
--    int temp;
--    target_greg_t *gregs = uc->tuc_mcontext.gregs;
--    
--    __get_user(temp, &uc->tuc_mcontext.version);
--    if (temp != TARGET_MCONTEXT_VERSION)
--        goto badframe;
--
--    /* restore passed registers */
--    __get_user(env->dregs[0], &gregs[0]);
--    __get_user(env->dregs[1], &gregs[1]);
--    __get_user(env->dregs[2], &gregs[2]);
--    __get_user(env->dregs[3], &gregs[3]);
--    __get_user(env->dregs[4], &gregs[4]);
--    __get_user(env->dregs[5], &gregs[5]);
--    __get_user(env->dregs[6], &gregs[6]);
--    __get_user(env->dregs[7], &gregs[7]);
--    __get_user(env->aregs[0], &gregs[8]);
--    __get_user(env->aregs[1], &gregs[9]);
--    __get_user(env->aregs[2], &gregs[10]);
--    __get_user(env->aregs[3], &gregs[11]);
--    __get_user(env->aregs[4], &gregs[12]);
--    __get_user(env->aregs[5], &gregs[13]);
--    __get_user(env->aregs[6], &gregs[14]);
--    __get_user(env->aregs[7], &gregs[15]);
--    __get_user(env->pc, &gregs[16]);
--    __get_user(temp, &gregs[17]);
--    cpu_m68k_set_ccr(env, temp);
--
--    target_rt_restore_fpu_state(env, uc);
--
--    return 0;
--
--badframe:
--    return 1;
--}
--
--static void setup_rt_frame(int sig, struct target_sigaction *ka,
--                           target_siginfo_t *info,
--                           target_sigset_t *set, CPUM68KState *env)
--{
--    struct target_rt_sigframe *frame;
--    abi_ulong frame_addr;
--    abi_ulong retcode_addr;
--    abi_ulong info_addr;
--    abi_ulong uc_addr;
--    int err = 0;
--    int i;
--
--    frame_addr = get_sigframe(ka, env, sizeof *frame);
--    trace_user_setup_rt_frame(env, frame_addr);
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
--        goto give_sigsegv;
--    }
--
--    __put_user(sig, &frame->sig);
--
--    info_addr = frame_addr + offsetof(struct target_rt_sigframe, info);
--    __put_user(info_addr, &frame->pinfo);
--
--    uc_addr = frame_addr + offsetof(struct target_rt_sigframe, uc);
--    __put_user(uc_addr, &frame->puc);
--
--    tswap_siginfo(&frame->info, info);
--
--    /* Create the ucontext */
--
--    __put_user(0, &frame->uc.tuc_flags);
--    __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp,
--               &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->aregs[7]),
--            &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
--    err |= target_rt_setup_ucontext(&frame->uc, env);
--
--    if (err)
--        goto give_sigsegv;
--
--    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
--        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
--    }
--
--    /* Set up to return from userspace.  */
--
--    retcode_addr = frame_addr + offsetof(struct target_sigframe, retcode);
--    __put_user(retcode_addr, &frame->pretcode);
--
--    /* moveq #,d0; notb d0; trap #0 */
--
--    __put_user(0x70004600 + ((TARGET_NR_rt_sigreturn ^ 0xff) << 16),
--               (uint32_t *)(frame->retcode + 0));
--    __put_user(0x4e40, (uint16_t *)(frame->retcode + 4));
--
--    if (err)
--        goto give_sigsegv;
--
--    /* Set up to return from userspace */
--
--    env->aregs[7] = frame_addr;
--    env->pc = ka->_sa_handler;
--
--    unlock_user_struct(frame, frame_addr, 1);
--    return;
--
--give_sigsegv:
--    unlock_user_struct(frame, frame_addr, 1);
--    force_sigsegv(sig);
--}
--
--long do_sigreturn(CPUM68KState *env)
--{
--    struct target_sigframe *frame;
--    abi_ulong frame_addr = env->aregs[7] - 4;
--    target_sigset_t target_set;
--    sigset_t set;
--    int i;
--
--    trace_user_do_sigreturn(env, frame_addr);
--    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
--        goto badframe;
--
--    /* set blocked signals */
--
--    __get_user(target_set.sig[0], &frame->sc.sc_mask);
--
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
--    }
--
--    target_to_host_sigset_internal(&set, &target_set);
--    set_sigmask(&set);
--
--    /* restore registers */
--
--    restore_sigcontext(env, &frame->sc);
--
--    unlock_user_struct(frame, frame_addr, 0);
--    return -TARGET_QEMU_ESIGRETURN;
--
--badframe:
--    force_sig(TARGET_SIGSEGV);
--    return -TARGET_QEMU_ESIGRETURN;
--}
--
--long do_rt_sigreturn(CPUM68KState *env)
--{
--    struct target_rt_sigframe *frame;
--    abi_ulong frame_addr = env->aregs[7] - 4;
--    sigset_t set;
--
--    trace_user_do_rt_sigreturn(env, frame_addr);
--    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
--        goto badframe;
--
--    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
--    set_sigmask(&set);
--
--    /* restore registers */
--
--    if (target_rt_restore_ucontext(env, &frame->uc))
--        goto badframe;
--
--    if (do_sigaltstack(frame_addr +
--                       offsetof(struct target_rt_sigframe, uc.tuc_stack),
--                       0, get_sp_from_cpustate(env)) == -EFAULT)
--        goto badframe;
--
--    unlock_user_struct(frame, frame_addr, 0);
--    return -TARGET_QEMU_ESIGRETURN;
--
--badframe:
--    unlock_user_struct(frame, frame_addr, 0);
--    force_sig(TARGET_SIGSEGV);
--    return -TARGET_QEMU_ESIGRETURN;
--}
--
- #elif defined(TARGET_ALPHA)
- 
- struct target_sigcontext {
++                    target_sigset_t *set, CPUXtensaState *env);
+ #endif
 -- 
 2.14.3
