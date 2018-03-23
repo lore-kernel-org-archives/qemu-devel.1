@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ezUEu-0001mI-VX
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:28:45 -0400
+	(envelope-from <onursahin08@gmail.com>) id 1ezUTJ-000657-TH
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ezUEr-0007Jm-1M
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:28:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51938)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ezUEq-0007Ic-Qs
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:28:40 -0400
-Date: Fri, 23 Mar 2018 18:28:37 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180323212837.GH28161@localhost.localdomain>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<1520860275-101576-6-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520860275-101576-6-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 5/9] qapi: introduce new cmd option
- "allowed-in-preconfig"
+	(envelope-from <onursahin08@gmail.com>) id 1ezUTG-00066K-PT
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 17:43:37 -0400
+From: Onur Sahin <onursahin08@gmail.com>
+Date: Fri, 23 Mar 2018 17:43:06 -0400
+Message-Id: <1521841386-27498-1-git-send-email-onursahin08@gmail.com>
+In-Reply-To: <CAFEAcA9G3xVjmjys2R4-NXRHiZwLVLRO7ZQDZ0AhNMHHFhHV8A@mail.gmail.com>
+References: <CAFEAcA9G3xVjmjys2R4-NXRHiZwLVLRO7ZQDZ0AhNMHHFhHV8A@mail.gmail.com>
+Subject: [Qemu-devel] [PATCH v2] target-arm: Check undefined opcodes for SWP
+ in A32 decoder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +20,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, Onur Sahin <onursahin08@gmail.com>
 
-On Mon, Mar 12, 2018 at 02:11:11PM +0100, Igor Mammedov wrote:
-> New option will be used to allow commands, which are prepared/need
-> to run run in preconfig state. Other commands that should be able
-> to run in preconfig state, should be ammeded to not expect machine
-> in initialized state or deal with it.
-> 
-> For compatibility reasons, commands, that don't use new flag
-> 'allowed-in-preconfig' explicitly, are not permited to run in
-> preconfig state but allowed in all other states like they used
-> to be.
-> 
-> Within this patch allow following commands in preconfig state:
->    qmp_capabilities
->    query-qmp-schema
->    query-commands
->    query-status
->    cont
-> to allow qmp connection, basic introspection and moving to the next
-> state.
-> 
-> PS:
-> set-numa-node and query-hotpluggable-cpus will be enabled later in
-> a separate patch.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Thanks for the feedback Peter. Removing the redundant check on bit
+23 and adding checks for the "should be" bits as well (bits [11:8]).
 
-I didn't review the code yet, but:
+The following patch should make sure we are not treating
+architecturally Undefined instructions as a SWP, by verifying
+the opcodes as per section A8.8.229 of ARMv7-A specification.
 
-Shouldn't this be applied before patch 3/9, for bisectability?
-Otherwise it will be very easy to crash QEMU after applying patch
-3/9.
+Best,
+Onur
 
+Signed-off-by: Onur Sahin <onursahin08@gmail.com>
+---
+ target/arm/translate.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index ba6ab7d..1fb0b8f 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9227,11 +9227,14 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                             }
+                         }
+                         tcg_temp_free_i32(addr);
+-                    } else {
++                    } else if ((insn & 0x00300f00) == 0) {
++                        /* 0bcccc_0001_0x00_xxxx_xxxx_0000_1001_xxxx
++                        *  - SWP, SWPB
++                        */
++
+                         TCGv taddr;
+                         TCGMemOp opc = s->be_data;
+ 
+-                        /* SWP instruction */
+                         rm = (insn) & 0xf;
+ 
+                         if (insn & (1 << 22)) {
+@@ -9249,6 +9252,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                                                 get_mem_index(s), opc);
+                         tcg_temp_free(taddr);
+                         store_reg(s, rd, tmp);
++                    } else {
++                        goto illegal_op;
+                     }
+                 }
+             } else {
 -- 
-Eduardo
+1.8.3.1
