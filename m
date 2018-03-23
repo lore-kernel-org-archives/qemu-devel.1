@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezOnE-0001Dz-Qs
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:39:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1ezOpZ-0003iW-Ow
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezOnB-0006Rx-Lp
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:39:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53066 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1ezOpW-0000L6-K2
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:42:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43666 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezOnB-0006RY-Gq
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:39:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16E7F77068
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 15:39:45 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 23 Mar 2018 15:39:39 +0000
-Message-Id: <20180323153939.16684-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] vhost: Allow adjoining regions
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezOpW-0000Kw-FF
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:42:10 -0400
+References: <20180323140821.28957-1-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <17b3708c-3787-c08d-e960-c6df21114689@redhat.com>
+Date: Fri, 23 Mar 2018 10:42:00 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180323140821.28957-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] Turn OOB off for 2.12-rc1,
+ revert OOB tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, alex.williamson@redhat.com
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 03/23/2018 09:08 AM, Peter Xu wrote:
+> Temporarily disable OOB for 2.12 since it break (a lot of) things.
+> Luckily it's only a switch so not so hard. Meanwhile, revert all new
+> tests that checks against it.
+> 
+> Tests done: all target builds and "make check" passed, but only on
+> x86_64 host.  It can pass all "raw" iotests, but some "qcow2" iotests
+> are still failing.  I can even reproduce many of the qcow2 fails even
+> before the whole OOB series, so I suppose that's something already
+> exists so I'll ignore.
+> 
+> More tests are really welcomed.  Thanks,
+> 
+> Peter
 
-My rework of section adding combines overlapping or adjoining regions,
-but checks they're actually the same underlying RAM block.
-Fix the case where two blocks adjoin but don't overlap; that new region
-should get added (but not combined), but my previous patch was disallowing it.
+Acked-by: Eric Blake <eblake@redhat.com>
 
-Fixes: c1ece84e7c9
+if Peter Maydell wants to pick this up directly on mainline (the smaller 
+the window with broken tests, the easier it is to bisect other issues). 
+Otherwise, I'll queue it in my QAPI pull request for Monday.
 
-Reported-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/virtio/vhost.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 250f886acb..2a720cca3d 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -595,10 +595,15 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-                                         prev_sec->offset_within_address_space,
-                                         prev_sec->offset_within_region);
-             } else {
--                error_report("%s: Overlapping but not coherent sections "
--                             "at %"PRIx64,
--                             __func__, mrs_gpa);
--                return;
-+                /* adjoining regions are fine, but overlapping ones with
-+                 * different blocks/offsets shouldn't happen
-+                 */
-+                if (mrs_gpa != prev_gpa_end + 1) {
-+                    error_report("%s: Overlapping but not coherent sections "
-+                                 "at %"PRIx64,
-+                                 __func__, mrs_gpa);
-+                    return;
-+                }
-             }
-         }
-     }
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
