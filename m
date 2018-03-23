@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ezJgG-0001lG-G3
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:12:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezJoh-0005vQ-Fy
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1ezJgD-0004sy-Oi
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:12:16 -0400
-Received: from mail-ve1eur01hn0206.outbound.protection.outlook.com
-	([104.47.1.206]:51646
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1ezJgD-0004qw-2v
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:12:13 -0400
-Date: Fri, 23 Mar 2018 13:11:53 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180323101152.GB28085@rkaganb.sw.ru>
-References: <20180322131358.15096-1-vkuznets@redhat.com>
-	<20180322131358.15096-3-vkuznets@redhat.com>
-	<20180322190146.GA1396@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1ezJog-0000Ob-9L
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:20:59 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:44844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezJog-0000No-40
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 06:20:58 -0400
+Received: by mail-ot0-x242.google.com with SMTP id x6-v6so11227253otg.11
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 03:20:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180322190146.GA1396@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] i386/kvm: expose Hyper-V frequency
- MSRs with reenlightenment
+In-Reply-To: <1521584722-39133-1-git-send-email-mjc@sifive.com>
+References: <1521584722-39133-1-git-send-email-mjc@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 10:20:36 +0000
+Message-ID: <CAFEAcA-oqg8UJD=i9swm8AiF=tvJ7GY6+CyStJNiZyoqUYfMqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/25] RISC-V Post-merge spec conformance
+ and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Thu, Mar 22, 2018 at 04:01:46PM -0300, Eduardo Habkost wrote:
-> On Thu, Mar 22, 2018 at 02:13:58PM +0100, Vitaly Kuznetsov wrote:
-> > We can also expose Hyper-V frequency MSRs when reenlightenment feature is
-> > enabled and TSC frequency is known, Hyper-V on KVM will provide stable TSC
-> > page clocksources to its guests.
-> > 
-> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > ---
-> > - Expose frequency MSRs only when either INVTSC or Reenlightenment is
-> >   provided [Paolo Bonzini]
-> > ---
-> >  target/i386/kvm.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index 75f4e1d69e..2c3c19d690 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -651,7 +651,8 @@ static int hyperv_handle_properties(CPUState *cs)
-> >          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
-> >          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
-> >  
-> > -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-> > +        if (has_msr_hv_frequencies && env->tsc_khz &&
-> > +            (tsc_is_stable_and_known(env) || cpu->hyperv_reenlightenment)) {
-> 
-> Continuing the discussion we had in v3 about being possible to
-> crash when migrating to a host running an older kernel:
-> 
-> This patch doesn't fix the issue, because it is still implicitly
-> enabling hv-frequencies.
-> 
-> But I don't think this patch will make the situation any worse,
-> because we don't have any KVM versions that support
-> HV_X64_MSR_REENLIGHTENMENT_CONTROL but not
-> HV_X64_MSR_TSC_FREQUENCY.
-> 
-> This means that we can safely make "hv-reenlightenment=on"
-> automatically set "hv-frequencies=on", when we finally introduce
-> a hv-frequencies property.
+On 20 March 2018 at 22:25, Michael Clark <mjc@sifive.com> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> The following changes since commit f1a63fcfcd92c88be8942b5ae71aef9749a4f135:
+>
+>   Update version for v2.12.0-rc0 release (2018-03-20 19:04:22 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-fixes
+>
+> for you to fetch changes up to e1a247183ac0816284dfda61423f7030b6686679:
+>
+>   RISC-V: Remove erroneous comment from translate.c (2018-03-20 14:34:13 -0700)
 
-Do I get you right that there's no controversy about the need for
-hv-frequencies?
+I know this pull request needs a respin, but I gave it a test build
+run anyway to see if there were any issues thrown up by that (there
+weren't, which is great).
 
-> Roman, do you agree?
+I did notice that the tag name you quote here, "tags/riscv-qemu-2.12-fixes",
+doesn't seem to be a tag pushed to your git repo. I tested with
+"tags/riscv-qemu-2.12-fixes-v5" which I'm guessing is what you meant.
+You probably want to have a look into the workflow which generates
+these pullreq emails though to ensure it's creating them with the
+tag names that you intend, though.
 
-Well, this strictly depends on the answer to your next question, because
-hv-reenlightenment is most certainly 2.13 material.
-
-> The next question is: do we need to fix this and introduce a
-> hv-frequencies property in 2.12, or can this wait for 2.13?
-
-I'm tempted to stick hv-frequencies into 2.12 and retrospectively into
-2.11-stable, to minimize the exposure to the problem but to keep the
-effort and added complexity reasonable.  But I'm not sure this will be
-ok from the compatibility policy standpoint.  So I'd appreciate an
-advice on this.
-[Should I better just post a patch doing that and continue this
-discussion there?]
-
-Thanks,
-Roman.
+thanks
+-- PMM
