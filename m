@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ezI2T-0005Ka-Vt
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:27:07 -0400
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ezI9y-0000FK-2R
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ezI2O-0001z3-LO
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:27:05 -0400
-Date: Fri, 23 Mar 2018 19:24:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180323082447.GU3905@umbus.fritz.box>
-References: <20180315133402.13470-1-clg@kaod.org>
-	<20180315133402.13470-4-clg@kaod.org>
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ezI9u-0007Kz-7m
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:34:50 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:33259
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ezI9t-0007K3-3s
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 04:34:46 -0400
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
+	<152142533512.7381.1938340023148732379.malone@soybean.canonical.com>
+	<CAK3tnvK-zMB1t7+jdxa0o+4f1c05=sbuDpRw0QWGot0CW-ZFUw@mail.gmail.com>
+	<83fccfcd-f3d5-95cf-5d2f-87c29ac6f9f0@cn.fujitsu.com>
+Message-ID: <1bf88958-e3d1-d456-96f0-464cfcdb6212@cn.fujitsu.com>
+Date: Fri, 23 Mar 2018 16:34:36 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dXvu6+ixFx2ZffE8"
-Content-Disposition: inline
-In-Reply-To: <20180315133402.13470-4-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] target/ppc: add hash MMU support on
- POWER9 for PowerNV only
+In-Reply-To: <83fccfcd-f3d5-95cf-5d2f-87c29ac6f9f0@cn.fujitsu.com>
+Content-Type: multipart/mixed; boundary="------------C89AD310A4777CE142EFCBFB"
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Bug 1754542] Re: colo: vm crash with segmentation
+ fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,335 +30,307 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Zhang Chen <zhangckid@gmail.com>, Bug 1754542 <1754542@bugs.launchpad.net>, qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com, Lukas Straub <lukasstraub2@web.de>
+
+--------------C89AD310A4777CE142EFCBFB
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+
+Just noticed that's a little old, you may need to rebase it
 
 
---dXvu6+ixFx2ZffE8
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks
 
-I'm not quite sure what the "for PowerNV only" in the subject is
-supposed to be indicating.
 
-On Thu, Mar 15, 2018 at 01:34:01PM +0000, C=E9dric Le Goater wrote:
-> The HPTE bits definitions are slightly modified in ISA v3.0. Let's add
-> some helpers to hide the differences in the hash MMU code.
->=20
-> On a POWER9 processor, the Partition Table is composed of a pair of
-> doublewords per partition. The first doubleword indicates whether the
-> partition uses HPT or Radix Trees translation and contains the address
-> of the host's translation table structure and size.
->=20
-> The first doubleword of the PTCR holds the Hash Page Table base
-> address for the host when the hash MMU is in use. Also add an helper
-> to retrieve the HPT base address depending on the MMU revision.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->=20
->  Changes since v2:
->=20
->  - reworked ppc_hash64_hpt_reg() to cover only powernv machines. pseries
->    machines being handled with cpu->vhyp at the ppc_hash64_hpt_base()
->    level.
->=20
->  Changes since v1:
->=20
->  - introduced ppc64_v3_get_patbe0()
-> =20
->  hw/ppc/spapr_hcall.c       |  5 +++--
->  target/ppc/mmu-book3s-v3.h |  5 +++++
->  target/ppc/mmu-hash64.c    | 52 ++++++++++++++++++++++++++++++++++++++--=
-------
->  target/ppc/mmu-hash64.h    | 34 ++++++++++++++++++++++++++++--
->  4 files changed, 83 insertions(+), 13 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 3215c3b4aec3..b437f8825819 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -94,7 +94,7 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
->          return H_PARAMETER;
->      }
-> =20
-> -    raddr =3D (ptel & HPTE64_R_RPN) & ~((1ULL << apshift) - 1);
-> +    raddr =3D (ptel & ppc_hash64_hpte_r_rpn(cpu)) & ~((1ULL << apshift) =
-- 1);
+On 03/23/2018 11:51 AM, Li Zhijian wrote:
+>
+>
+> On 03/21/2018 02:04 PM, Zhang Chen wrote:
+>> Hi Suiheng,
+>>
+>> I made a new guest image and retest it, and got the same bug from latest branch.
+>> I found that after the COLO checkpoint begin, the secondary guest always send
+>> reset request to Qemu like someone still push the reset button in the guest.
+>> And this bug occurred in COLO frame related codes. This part of codes wrote
+>> by Li zhijian and Zhang hailiang and currently maintained by Zhang hailiang.
+>> So, I add them to this thread.
+>>
+>> CC Zhijian and Hailiang:
+>> Any idea or comments about this bug?
+>
+> One clue is the memory of SVM not is same with PVM.
+> we can try to compare the memory after checkpoint, i had a draft patch to do this before.
+>
+>
+> Thanks
+>
+>
+>
+>
+>>
+>> If you want to test COLO currently, you can try the old version of COLO:
+>> https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10-legacy
+>>
+>>
+>> Thanks
+>> Zhang Chen
+>>
+>> On Mon, Mar 19, 2018 at 10:08 AM, 李穗恒 <1754542@bugs.launchpad.net <mailto:1754542@bugs.launchpad.net>> wrote:
+>>
+>>     Hi Zhang Chen，
+>>     I follow the https://wiki.qemu.org/Features/COLO <https://wiki.qemu.org/Features/COLO>, And Vm no crash.
+>>     But SVM rebooting constantly after print RESET, PVM normal startup.
+>>
+>>     Secondary:
+>>     {"timestamp": {"seconds": 1521421788, "microseconds": 541058}, "event": "RESUME"}
+>>     {"timestamp": {"seconds": 1521421808, "microseconds": 493484}, "event": "STOP"}
+>>     {"timestamp": {"seconds": 1521421808, "microseconds": 686466}, "event": "RESUME"}
+>>     {"timestamp": {"seconds": 1521421808, "microseconds": 696152}, "event": "RESET", "data": {"guest": true}}
+>>     {"timestamp": {"seconds": 1521421808, "microseconds": 740653}, "event": "RESET", "data": {"guest": true}}
+>>     {"timestamp": {"seconds": 1521421818, "microseconds": 742222}, "event": "STOP"}
+>>     {"timestamp": {"seconds": 1521421818, "microseconds": 969883}, "event": "RESUME"}
+>>     {"timestamp": {"seconds": 1521421818, "microseconds": 979986}, "event": "RESET", "data": {"guest": true}}
+>>     {"timestamp": {"seconds": 1521421819, "microseconds": 22652}, "event": "RESET", "data": {"guest": true}}
+>>
+>>
+>>     The command(I run two VM in sample machine):
+>>
+>>     Primary:
+>>     sudo /home/lee/Documents/qemu/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -boot c -m 2048 -smp 2 -qmp stdio  -name primary -cpu qemu64,+kvmclock -device piix3-usb-uhci -device usb-tablet \
+>>         -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown -device rtl8139,id=e0,netdev=hn0 \
+>>         -chardev socket,id=mirror0,host=192.168.0.33,port=9003,server,nowait \
+>>         -chardev socket,id=compare1,host=192.168.0.33,port=9004,server,wait \
+>>         -chardev socket,id=compare0,host=192.168.0.33,port=9001,server,nowait \
+>>         -chardev socket,id=compare0-0,host=192.168.0.33,port=9001 \
+>>         -chardev socket,id=compare_out,host=192.168.0.33,port=9005,server,nowait \
+>>         -chardev socket,id=compare_out0,host=192.168.0.33,port=9005 \
+>>         -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0 \
+>>         -object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out \
+>>         -object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0 \
+>>         -object iothread,id=iothread1 \
+>>         -object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,iothread=iothread1 \
+>>         -drive if=ide,id=colo-disk0,driver=quorum,read-pattern=fifo,vote-threshold=1,children.0.file.filename=/var/lib/libvirt/images/1.raw,children.0.driver=raw -S
+>>
+>>     Secondary:
+>>     sudo /home/lee/Documents/qemu/x86_64-softmmu/qemu-system-x86_64 -boot c -m 2048 -smp 2 -qmp stdio  -name secondary -enable-kvm -cpu qemu64,+kvmclock \
+>>         -device piix3-usb-uhci -device usb-tablet \
+>>         -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown \
+>>         -device rtl8139,netdev=hn0 \
+>>         -chardev socket,id=red0,host=192.168.0.33,port=9003,reconnect=1 \
+>>         -chardev socket,id=red1,host=192.168.0.33,port=9004,reconnect=1 \
+>>         -object filter-redirector,id=f1,netdev=hn0,queue=tx,indev=red0 \
+>>         -object filter-redirector,id=f2,netdev=hn0,queue=rx,outdev=red1 \
+>>         -object filter-rewriter,id=rew0,netdev=hn0,queue=all \
+>>         -drive if=none,id=colo-disk0,file.filename=/var/lib/libvirt/images/2.raw,driver=raw,node-name=node0 \
+>>         -drive if=ide,id=active-disk0,driver=replication,mode=secondary,file.driver=qcow2,top-id=active-disk0,file.file.filename=/mnt/ramfs/active_disk.img,file.backing.driver=qcow2,file.backing.file.filename=/mnt/ramfs/hidden_disk.img,file.backing.backing=colo-disk0 \
+>>         -incoming tcp:0:8888
+>>
+>>     Secondary:
+>>       {'execute':'qmp_capabilities'}
+>>       { 'execute': 'nbd-server-start',
+>>         'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.33', 'port': '8889'} } }
+>>       }
+>>       {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk0', 'writable': true } }
+>>       {'execute': 'trace-event-set-state', 'arguments': {'name': 'colo*', 'enable': true} }
+>>
+>>
+>>     Primary:
+>>       {'execute':'qmp_capabilities'}
+>>       { 'execute': 'human-monitor-command',
+>>         'arguments': {'command-line': 'drive_add -n buddy driver=replication,mode=primary,file.driver=nbd,file.host=192.168.0.33,file.port=8889,file.export=colo-disk0,node-name=node0'}}
+>>       { 'execute':'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'node': 'node0' } }
+>>       { 'execute': 'migrate-set-capabilities',
+>>             'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': true } ] } }
+>>       { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.33:8888 <http://192.168.0.33:8888>' } }
+>>
+>>     Thanks
+>>     Suiheng
+>>
+>>     --
+>>     You received this bug notification because you are subscribed to the bug
+>>     report.
+>>     https://bugs.launchpad.net/bugs/1754542 <https://bugs.launchpad.net/bugs/1754542>
+>>
+>>     Title:
+>>       colo:  vm crash with segmentation fault
+>>
+>>     Status in QEMU:
+>>       New
+>>
+>>     Bug description:
+>>       I use Arch Linux x86_64
+>>       Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10 <https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10>)
+>>       Following document 'COLO-FT.txt',
+>>       I test colo feature on my hosts
+>>
+>>       I run this command
+>>       Primary:
+>>       sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp stdio -name primary \
+>>       -device piix3-usb-uhci \
+>>       -device usb-tablet -netdev tap,id=hn0,vhost=off \
+>>       -device virtio-net-pci,id=net-pci0,netdev=hn0 \
+>>       -drive if=virtio,id=primary-disk0,driver=quorum,read-pattern=fifo,vote-threshold=1,\
+>>       children.0.file.filename=/var/lib/libvirt/images/1.raw,\
+>>       children.0.driver=raw -S
+>>
+>>       Secondary:
+>>       sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp stdio -name secondary \
+>>       -device piix3-usb-uhci \
+>>       -device usb-tablet -netdev tap,id=hn0,vhost=off \
+>>       -device virtio-net-pci,id=net-pci0,netdev=hn0 \
+>>       -drive if=none,id=secondary-disk0,file.filename=/var/lib/libvirt/images/2.raw,driver=raw,node-name=node0 \
+>>       -drive if=virtio,id=active-disk0,driver=replication,mode=secondary,\
+>>       file.driver=qcow2,top-id=active-disk0,\
+>>       file.file.filename=/mnt/ramfs/active_disk.img,\
+>>       file.backing.driver=qcow2,\
+>>       file.backing.file.filename=/mnt/ramfs/hidden_disk.img,\
+>>       file.backing.backing=secondary-disk0 \
+>>       -incoming tcp:0:8888
+>>
+>>       Secondary:
+>>       {'execute':'qmp_capabilities'}
+>>       { 'execute': 'nbd-server-start',
+>>         'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34', 'port': '8889'} } }
+>>       }
+>>       {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', 'writable': true } }
+>>
+>>       Primary:
+>>       {'execute':'qmp_capabilities'}
+>>       { 'execute': 'human-monitor-command',
+>>         'arguments': {'command-line': 'drive_add -n buddy driver=replication,mode=primary,file.driver=nbd,file.host=192.168.0.34,file.port=8889,file.export=secondary-disk0,node-name=nbd_client0'}}
+>>       { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', 'node': 'nbd_client0' } }
+>>       { 'execute': 'migrate-set-capabilities',
+>>             'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': true } ] } }
+>>       { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888 <http://192.168.0.34:8888>' } }
+>>       And two VM with cash
+>>       Primary:
+>>       {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "RESUME"}
+>>       [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qm
+>>
+>>       Secondary:
+>>       {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "RESUME"}
+>>       [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -boot c -enable-kvm -m 2048 -smp 2 -qm
+>>
+>>     To manage notifications about this bug go to:
+>>     https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions <https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions>
+>>
+>>
+>
 
-h_enter() will never be used on PowerNV, for example, so why is it
-being changed?
+-- 
+Best regards.
+Li Zhijian (8528)
 
->      if (is_ram_address(spapr, raddr)) {
->          /* Regular RAM - should have WIMG=3D0010 */
-> @@ -586,7 +586,8 @@ static int rehash_hpte(PowerPCCPU *cpu,
-> =20
->      base_pg_shift =3D ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte1);
->      assert(base_pg_shift); /* H_ENTER shouldn't allow a bad encoding */
-> -    avpn =3D HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << base_pg_shift) - 1) >=
-> 23);
-> +    avpn =3D ppc_hash64_hpte_v_avpn_val(cpu, pte0) &
-> +        ~(((1ULL << base_pg_shift) - 1) >> 23);
-> =20
->      if (pte0 & HPTE64_V_SECONDARY) {
->          pteg =3D ~pteg;
-> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-> index fdf80987d7b2..a7ab580c3140 100644
-> --- a/target/ppc/mmu-book3s-v3.h
-> +++ b/target/ppc/mmu-book3s-v3.h
-> @@ -54,6 +54,11 @@ static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
->  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                                int mmu_idx);
-> =20
-> +static inline hwaddr ppc64_v3_get_patbe0(PowerPCCPU *cpu)
-> +{
-> +    return ldq_phys(CPU(cpu)->as, cpu->env.spr[SPR_PTCR] & PTCR_PATB);
-> +}
-> +
->  #endif /* TARGET_PPC64 */
-> =20
->  #endif /* CONFIG_USER_ONLY */
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index c9b72b742956..c425edd93ebe 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -289,6 +289,26 @@ target_ulong helper_load_slb_vsid(CPUPPCState *env, =
-target_ulong rb)
->      return rt;
->  }
-> =20
-> +hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +
-> +    /* We should not reach this routine on sPAPR machines */
-> +    assert(!cpu->vhyp);
-> +
-> +    /* PowerNV machine */
-> +    if (msr_hv) {
-> +        if (env->mmu_model & POWERPC_MMU_V3) {
-> +            return ppc64_v3_get_patbe0(cpu);
-> +        } else {
-> +            return cpu->env.spr[SPR_SDR1];
-> +        }
-> +    } else {
-> +        error_report("PowerNV guest support Unimplemented");
-> +        exit(1);
-> +    }
-> +}
-> +
->  /* Check No-Execute or Guarded Storage */
->  static inline int ppc_hash64_pte_noexec_guard(PowerPCCPU *cpu,
->                                                ppc_hash_pte64_t pte)
-> @@ -451,8 +471,9 @@ void ppc_hash64_unmap_hptes(PowerPCCPU *cpu, const pp=
-c_hash_pte64_t *hptes,
->                          false, n * HASH_PTE_SIZE_64);
->  }
-> =20
-> -static unsigned hpte_page_shift(const struct ppc_one_seg_page_size *sps,
-> -    uint64_t pte0, uint64_t pte1)
-> +static unsigned hpte_page_shift(PowerPCCPU *cpu,
-> +                                const struct ppc_one_seg_page_size *sps,
-> +                                uint64_t pte0, uint64_t pte1)
->  {
->      int i;
-> =20
-> @@ -478,7 +499,7 @@ static unsigned hpte_page_shift(const struct ppc_one_=
-seg_page_size *sps,
->              continue;
->          }
-> =20
-> -        mask =3D ((1ULL << ps->page_shift) - 1) & HPTE64_R_RPN;
-> +        mask =3D ((1ULL << ps->page_shift) - 1) & ppc_hash64_hpte_r_rpn(=
-cpu);
-> =20
->          if ((pte1 & mask) =3D=3D ((uint64_t)ps->pte_enc << HPTE64_R_RPN_=
-SHIFT)) {
->              return ps->page_shift;
-> @@ -488,6 +509,18 @@ static unsigned hpte_page_shift(const struct ppc_one=
-_seg_page_size *sps,
->      return 0; /* Bad page size encoding */
->  }
-> =20
-> +static bool ppc_hash64_hpte_v_compare(PowerPCCPU *cpu, target_ulong pte0,
-> +                                      target_ulong ptem)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +
-> +    if (env->mmu_model & POWERPC_MMU_V3) {
-> +        return HPTE64_V_COMPARE_3_0(pte0, ptem);
-> +    } else {
-> +        return HPTE64_V_COMPARE(pte0, ptem);
-> +    }
-> +}
-> +
->  static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
->                                       const struct ppc_one_seg_page_size =
-*sps,
->                                       target_ulong ptem,
-> @@ -508,8 +541,8 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu,=
- hwaddr hash,
->          pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
-> =20
->          /* This compares V, B, H (secondary) and the AVPN */
-> -        if (HPTE64_V_COMPARE(pte0, ptem)) {
-> -            *pshift =3D hpte_page_shift(sps, pte0, pte1);
-> +        if (ppc_hash64_hpte_v_compare(cpu, pte0, ptem)) {
-> +            *pshift =3D hpte_page_shift(cpu, sps, pte0, pte1);
->              /*
->               * If there is no match, ignore the PTE, it could simply
->               * be for a different segment size encoding and the
-> @@ -569,7 +602,8 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
->          epn =3D (eaddr & ~SEGMENT_MASK_256M) & epnmask;
->          hash =3D vsid ^ (epn >> sps->page_shift);
->      }
-> -    ptem =3D (slb->vsid & SLB_VSID_PTEM) | ((epn >> 16) & HPTE64_V_AVPN);
-> +    ptem =3D (slb->vsid & SLB_VSID_PTEM) | ((epn >> 16) &
-> +                                          ppc_hash64_hpte_v_avpn(cpu));
->      ptem |=3D HPTE64_V_VALID;
-> =20
->      /* Page address translation */
-> @@ -624,7 +658,7 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU =
-*cpu,
->              break;
->          }
-> =20
-> -        shift =3D hpte_page_shift(sps, pte0, pte1);
-> +        shift =3D hpte_page_shift(cpu, sps, pte0, pte1);
->          if (shift) {
->              return shift;
->          }
-> @@ -860,7 +894,7 @@ skip_slb_search:
-> =20
->      /* 7. Determine the real address from the PTE */
-> =20
-> -    raddr =3D deposit64(pte.pte1 & HPTE64_R_RPN, 0, apshift, eaddr);
-> +    raddr =3D deposit64(pte.pte1 & ppc_hash64_hpte_r_rpn(cpu), 0, apshif=
-t, eaddr);
-> =20
->      tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
->                   prot, mmu_idx, 1ULL << apshift);
-> @@ -910,7 +944,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
-, target_ulong addr)
->          return -1;
->      }
-> =20
-> -    return deposit64(pte.pte1 & HPTE64_R_RPN, 0, apshift, addr)
-> +    return deposit64(pte.pte1 & ppc_hash64_hpte_r_rpn(cpu), 0, apshift, =
-addr)
->          & TARGET_PAGE_MASK;
->  }
-> =20
-> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> index 0ade8d15d9e4..708f4f6d222a 100644
-> --- a/target/ppc/mmu-hash64.h
-> +++ b/target/ppc/mmu-hash64.h
-> @@ -69,8 +69,12 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->  #define HPTE64_V_SSIZE_SHIFT    62
->  #define HPTE64_V_AVPN_SHIFT     7
->  #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
-> +#define HPTE64_V_AVPN_3_0       0x000fffffffffff80ULL
->  #define HPTE64_V_AVPN_VAL(x)    (((x) & HPTE64_V_AVPN) >> HPTE64_V_AVPN_=
-SHIFT)
-> +#define HPTE64_V_AVPN_VAL_3_0(x)                        \
-> +    (((x) & HPTE64_V_AVPN_3_0) >> HPTE64_V_AVPN_SHIFT)
->  #define HPTE64_V_COMPARE(x, y)  (!(((x) ^ (y)) & 0xffffffffffffff83ULL))
-> +#define HPTE64_V_COMPARE_3_0(x, y)  (!(((x) ^ (y)) & 0x3fffffffffffff83U=
-LL))
->  #define HPTE64_V_BOLTED         0x0000000000000010ULL
->  #define HPTE64_V_LARGE          0x0000000000000004ULL
->  #define HPTE64_V_SECONDARY      0x0000000000000002ULL
-> @@ -81,6 +85,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->  #define HPTE64_R_KEY_HI         0x3000000000000000ULL
->  #define HPTE64_R_RPN_SHIFT      12
->  #define HPTE64_R_RPN            0x0ffffffffffff000ULL
-> +#define HPTE64_R_RPN_3_0        0x01fffffffffff000ULL
->  #define HPTE64_R_FLAGS          0x00000000000003ffULL
->  #define HPTE64_R_PP             0x0000000000000003ULL
->  #define HPTE64_R_N              0x0000000000000004ULL
-> @@ -98,6 +103,31 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->  #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
->  #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
-> =20
-> +static inline target_ulong ppc_hash64_hpte_r_rpn(PowerPCCPU *cpu)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +
-> +    return env->mmu_model & POWERPC_MMU_V3 ? HPTE64_R_RPN_3_0 : HPTE64_R=
-_RPN;
-> +}
-> +
-> +static inline target_ulong ppc_hash64_hpte_v_avpn(PowerPCCPU *cpu)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +
-> +    return env->mmu_model & POWERPC_MMU_V3 ? HPTE64_V_AVPN_3_0 : HPTE64_=
-V_AVPN;
-> +}
-> +
-> +static inline target_ulong ppc_hash64_hpte_v_avpn_val(PowerPCCPU *cpu,
-> +                                                      target_ulong pte0)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +
-> +    return env->mmu_model & POWERPC_MMU_V3 ?
-> +        HPTE64_V_AVPN_VAL_3_0(pte0) : HPTE64_V_AVPN_VAL(pte0);
-> +}
-> +
-> +hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu);
-> +
->  static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
->  {
->      if (cpu->vhyp) {
-> @@ -105,7 +135,7 @@ static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *=
-cpu)
->              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
->          return vhc->hpt_base(cpu->vhyp);
->      }
-> -    return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
-> +    return ppc_hash64_hpt_reg(cpu) & SDR_64_HTABORG;
->  }
-> =20
->  static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
-> @@ -115,7 +145,7 @@ static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *=
-cpu)
->              PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
->          return vhc->hpt_mask(cpu->vhyp);
->      }
-> -    return (1ULL << ((cpu->env.spr[SPR_SDR1] & SDR_64_HTABSIZE) + 18 - 7=
-)) - 1;
-> +    return (1ULL << ((ppc_hash64_hpt_reg(cpu) & SDR_64_HTABSIZE) + 18 - =
-7)) - 1;
->  }
-> =20
->  struct ppc_hash_pte64 {
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---dXvu6+ixFx2ZffE8
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+--------------C89AD310A4777CE142EFCBFB
+Content-Type: text/x-patch;
+	name="0001-check-block-host-md5sum-between-migration-source-and.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename*0="0001-check-block-host-md5sum-between-migration-source-and.pa";
+	filename*1="tch"
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq0ucsACgkQbDjKyiDZ
-s5IReQ//d2aQvOdpV0nibs0bWP+JtZKaiID7lOSyYgQ/Aio5IrmwL2FTQrDb1v/o
-dC/ot/mYKsrhwnoAAWc3YaJOWZt20ON7WDe/mhd17yXeIHUcbedOb89WaQ6ZGv+B
-fr5km7WqR0ubTytpWsRbefJKUwmLmgzVa4tDc5hcUy4QEDp5kIXbjd/MJsQ5Kdfn
-0u+7hbo7HWEUb53BgKPyWQudVViD4vuKPE8tahq5Zm8SLFbfnpvPLB5/795QeDKV
-G79otqZfN1M3lPrZ6YXZy9WnwEMGwj37PHMdHtUXWa07Qqx7v83HItuqKncu0m4D
-XmsUgfXw2z9UJqo5eprhTecRtTVrgPsXT3jDlDOwFB1vc56ySf2eeXuqZnMYrIEx
-GvionXzw8uJ9CT/87CgKh3ZZk2ZTKQkf0P+kQTSXisJIVpifJG6N2rtxgZ2jAB4U
-7C85jthgefyZNvT+L/vetLwjdIygvVNW9oP91bMOwKuMq3BL6C9nFVQ1LcOHSN/6
-y7SdTYth2v4EU5X9pwmDxQCOWtGcl26PTR4ZuAmXIgUi3QdMmZ2hBXROfLg/KeqR
-TbXvpVy4edX6mGBIWcV3GULCYi+rMwxsHcIiiZYcqyT9Kx0V9EJeXb7zvvvSpX0m
-way5zxAHw6q8ABY8pHLSZmgC5m9CDzwYHoyG8r0beuge5gKzLVs=
-=f2wm
------END PGP SIGNATURE-----
+>From ecb789cf7f383b112da3cce33eb9822a94b9497a Mon Sep 17 00:00:00 2001
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Date: Tue, 24 Mar 2015 21:53:26 -0400
+Subject: [PATCH] check pc.ram block md5sum between migration Source and
+ Destination
 
---dXvu6+ixFx2ZffE8--
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+---
+ savevm.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+ mode change 100644 => 100755 savevm.c
+
+diff --git a/savevm.c b/savevm.c
+old mode 100644
+new mode 100755
+index 3b0e222..3d431dc
+--- a/savevm.c
++++ b/savevm.c
+@@ -51,6 +51,26 @@
+ #define ARP_PTYPE_IP 0x0800
+ #define ARP_OP_REQUEST_REV 0x3
+ 
++#include "qemu/rcu_queue.h"
++#include <openssl/md5.h>
++
++static void check_host_md5(void)
++{
++    int i;
++    unsigned char md[MD5_DIGEST_LENGTH];
++    MD5_CTX ctx;
++    RAMBlock *block = QLIST_FIRST_RCU(&ram_list.blocks);/* Only check 'pc.ram' block */
++
++    MD5_Init(&ctx);
++    MD5_Update(&ctx, (void *)block->host, block->used_length);
++    MD5_Final(md, &ctx);
++    printf("md_host : ");
++    for(i = 0; i < MD5_DIGEST_LENGTH; i++) {
++        fprintf(stderr, "%02x", md[i]);
++    }
++    fprintf(stderr, "\n");
++}
++
+ static int announce_self_create(uint8_t *buf,
+                                 uint8_t *mac_addr)
+ {
+@@ -741,7 +761,13 @@ void qemu_savevm_state_complete(QEMUFile *f)
+         qemu_put_byte(f, QEMU_VM_SECTION_END);
+         qemu_put_be32(f, se->section_id);
+ 
++        printf("before saving %s complete\n", se->idstr);
++        check_host_md5();
++
+         ret = se->ops->save_live_complete(f, se->opaque);
++        printf("after saving %s complete\n", se->idstr);
++        check_host_md5();
++
+         trace_savevm_section_end(se->idstr, se->section_id, ret);
+         if (ret < 0) {
+             qemu_file_set_error(f, ret);
+@@ -1007,6 +1033,13 @@ int qemu_loadvm_state(QEMUFile *f)
+             QLIST_INSERT_HEAD(&loadvm_handlers, le, entry);
+ 
+             ret = vmstate_load(f, le->se, le->version_id);
++#if 0
++            if (section_type == QEMU_VM_SECTION_FULL) {
++                printf("QEMU_VM_SECTION_FULL, after loading %s\n", le->se->idstr);
++                check_host_md5();
++            }
++#endif
++
+             if (ret < 0) {
+                 error_report("error while loading state for instance 0x%x of"
+                              " device '%s'", instance_id, idstr);
+@@ -1030,6 +1063,11 @@ int qemu_loadvm_state(QEMUFile *f)
+             }
+ 
+             ret = vmstate_load(f, le->se, le->version_id);
++            if (section_type == QEMU_VM_SECTION_END) {
++                printf("QEMU_VM_SECTION_END, after loading %s\n", le->se->idstr);
++                check_host_md5();
++            }
++
+             if (ret < 0) {
+                 error_report("error while loading state section id %d(%s)",
+                              section_id, le->se->idstr);
+@@ -1061,7 +1099,11 @@ int qemu_loadvm_state(QEMUFile *f)
+         g_free(buf);
+     }
+ 
++    printf("after loading all vmstate\n");
++    check_host_md5();
+     cpu_synchronize_all_post_init();
++    printf("after cpu_synchronize_all_post_init\n");
++    check_host_md5();
+ 
+     ret = 0;
+ 
+-- 
+1.7.12.4
+
+
+--------------C89AD310A4777CE142EFCBFB--
