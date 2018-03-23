@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ezMZV-0001Cg-W8
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:17:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezMe3-0003Yu-97
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ezMZT-0006Pj-Hr
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:17:29 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:40258)
+	(envelope-from <peter.maydell@linaro.org>) id 1ezMe2-0001T7-ID
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:22:11 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35777)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ezMZT-0006PJ-AQ
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:17:27 -0400
-Received: by mail-lf0-x244.google.com with SMTP id e5-v6so18265445lfb.7
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 06:17:27 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 23 Mar 2018 06:17:15 -0700
-Message-Id: <20180323131715.29739-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] target/xtensa: fix timers test
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezMe2-0001St-C1
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:22:10 -0400
+Received: by mail-ot0-x243.google.com with SMTP id r30-v6so13193008otr.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 06:22:10 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180323130117.GP32362@xz-mi>
+References: <20180309090006.10018-1-peterx@redhat.com>
+	<20180309090006.10018-21-peterx@redhat.com>
+	<1bd08e1d-b6ff-6b39-e053-599bddd1a208@de.ibm.com>
+	<20180323122538.GN32362@xz-mi>
+	<332a9ef5-549a-d329-ec5e-d68609b1fbe1@de.ibm.com>
+	<20180323130117.GP32362@xz-mi>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 13:21:49 +0000
+Message-ID: <CAFEAcA86ruK6QhkUj_YnjGYkXEr0yonoT7iWj9v9JoYXwo7ddQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 20/23] monitor: enable IO thread for
+ (qmp & !mux) typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>
+To: Peter Xu <peterx@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Auger Eric <eric.auger@redhat.com>
 
-Change frequency of the core used in tests so that clock cycle takes
-exactly 64ns. Change icount power used in tests to 6, so that each
-instruction takes exactly 1 clock cycle. With these changes the
-assumptions of the xtensa timers test are correct and the test must
-always pass.
+On 23 March 2018 at 13:01, Peter Xu <peterx@redhat.com> wrote:
+> On Fri, Mar 23, 2018 at 01:44:54PM +0100, Christian Borntraeger wrote:
+>>
+>>
+>> On 03/23/2018 01:25 PM, Peter Xu wrote:
+>> > On Fri, Mar 23, 2018 at 01:10:51PM +0100, Christian Borntraeger wrote:
+>> >> As Max Reitz said, this breaks several qemu iotests. I can reproduce that on s390
+>> >> e.g. with ./check -qcow2 030 in the qemu-iotest.
+>> >>
+>> >> Why was this merged?
+>> >
+>> > My fault.  Sorry.  I should have done iotests before submission.
+>> >
+>> > Now I'm trying to fix those iotest issues.
+>> >
+>> > I'm not extremely familiar with block, so the progress is a bit slow,
+>> > but I'll do it asap (though I'll possibly need some help from the
+>> > block team, since there are some not-easy ones for me).
+>>
+>> As this patch also seems to trigger something else for Eric, can we revert this
+>> patch for the time being and re-apply as soon as we have solutions for the issues?
+>>
+>> After all a hard hang in the iotest can break CI environments (as you run into timeouts).
+>
+> I'm fine with it if it helps.
 
-Longer story:
-  http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg04326.html
+OK. I'm running a revert of commit 3fd2457d18edf5736f713dfe1ada9c87a9badab1
+through my buildtests and will push it to master assuming it passes.
 
-Cc: Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/core-dc232b.c | 2 +-
- tests/tcg/xtensa/Makefile   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/target/xtensa/core-dc232b.c b/target/xtensa/core-dc232b.c
-index aa07018af4e7..8846336f5cfa 100644
---- a/target/xtensa/core-dc232b.c
-+++ b/target/xtensa/core-dc232b.c
-@@ -47,7 +47,7 @@ static XtensaConfig dc232b __attribute__((unused)) = {
-         }
-     },
-     .isa_internal = &xtensa_modules,
--    .clock_freq_khz = 10000,
-+    .clock_freq_khz = 15625,
-     DEFAULT_SECTIONS
- };
- 
-diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
-index 2882c431e4a9..091518c05583 100644
---- a/tests/tcg/xtensa/Makefile
-+++ b/tests/tcg/xtensa/Makefile
-@@ -5,7 +5,7 @@ CROSS=xtensa-$(CORE)-elf-
- 
- ifndef XT
- SIM = ../../../xtensa-softmmu/qemu-system-xtensa
--SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting -icount 7 $(EXTFLAGS) -kernel
-+SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting -icount 6 $(EXTFLAGS) -kernel
- SIMDEBUG = -s -S
- else
- SIM = xt-run
--- 
-2.11.0
+thanks
+-- PMM
