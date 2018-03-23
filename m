@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezQdW-0005Yq-NS
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ezQeF-00067j-K0
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezQdV-0002JI-SV
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35488 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1ezQeB-0002i9-Ea
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:38:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43522 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezQdV-0002Iy-NG
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:37:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53960813F699
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 17:37:53 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 23 Mar 2018 12:37:40 -0500
-Message-Id: <20180323173741.1445744-4-eblake@redhat.com>
-In-Reply-To: <20180323173741.1445744-1-eblake@redhat.com>
-References: <20180323173741.1445744-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 3/4] Revert "monitor: enable IO thread for (qmp
- & !mux) typed"
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ezQeB-0002hs-8X
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 13:38:35 -0400
+Date: Fri, 23 Mar 2018 17:38:24 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180323173823.GD17165@work-vm>
+References: <1521579652-180248-1-git-send-email-mst@redhat.com>
+	<1521579652-180248-2-git-send-email-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1521579652-180248-2-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] update-linux-headers.sh: add
+ unistd.h and kvm on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, James Hogan <jhogan@kernel.org>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> Rework the update script slightly, add the unistd.h header and its
+> dependencies on all architectures.
+> 
+> This also removes the IA64 and MIPS from a KVM blacklist:
+> Linux dropped IA64, and there was never a reason to
+> exclude MIPS from kvm specifically - it was
+> excluded due to dependency of its unistd.h on sgidefs.h,
+> which we also import.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  scripts/update-linux-headers.sh | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+> 
+> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+> index d18e2f1..2a4dac8a 100755
+> --- a/scripts/update-linux-headers.sh
+> +++ b/scripts/update-linux-headers.sh
+> @@ -80,11 +80,6 @@ for arch in $ARCHLIST; do
+>          continue
+>      fi
+>  
+> -    # Blacklist architectures which have KVM headers but are actually dead
+> -    if [ "$arch" = "ia64" -o "$arch" = "mips" ]; then
+> -        continue
+> -    fi
+> -
+>      if [ "$arch" = x86 ]; then
+>          arch_var=SRCARCH
+>      else
+> @@ -95,9 +90,18 @@ for arch in $ARCHLIST; do
+>  
+>      rm -rf "$output/linux-headers/asm-$arch"
+>      mkdir -p "$output/linux-headers/asm-$arch"
+> -    for header in kvm.h kvm_para.h unistd.h; do
+> +    for header in unistd.h bitsperlong.h; do
+> +        cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+> +    done
+> +
+> +    for header in kvm.h kvm_para.h; do
+>          cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+>      done
+> +
+> +    if [ $arch = mips ]; then
+> +        cp "$tmpdir/include/asm/sgidefs.h" "$output/linux-headers/asm-mips/"
+> +    fi
+> +
+>      if [ $arch = powerpc ]; then
+>          cp "$tmpdir/include/asm/epapr_hcalls.h" "$output/linux-headers/asm-powerpc/"
+>      fi
+> @@ -120,6 +124,10 @@ EOF
+>          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+>          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+>      fi
+> +    if [ $arch = s390 ]; then
+> +        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-arm/"
+> +        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-arm/"
 
-This reverts commit 3fd2457d18edf5736f713dfe1ada9c87a9badab1.
+That doesn't look right - I'm guessing that should be copying into
+asm-s390 ?
 
-Enabling OOB caused several iotests failures; due to the imminent
-2.12 release, the safest action is to disable OOB for now.  If
-other patches fix the issues that iotests exposed, it may be turned
-back on in time for the release, otherwise it will be 2.13 material;
-either way, the framework changes not reverted now do not hurt if
-they remain as part of the 2.12 release.
+Dave
 
-Additionally, revert the tests in the patch 02130314d8 ("qmp: introduce
-QMPCapability", 2018-03-19), as both parts must be reverted at once
-to keep 'make check' passing.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180323140821.28957-2-peterx@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-[eblake: reorder/squash commits, enhance commit message]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- monitor.c        |  5 +----
- tests/qmp-test.c | 10 +---------
- 2 files changed, 2 insertions(+), 13 deletions(-)
-
-diff --git a/monitor.c b/monitor.c
-index 6ccd2fc0895..77f4c41cfa6 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -36,7 +36,6 @@
- #include "net/slirp.h"
- #include "chardev/char-fe.h"
- #include "chardev/char-io.h"
--#include "chardev/char-mux.h"
- #include "ui/qemu-spice.h"
- #include "sysemu/numa.h"
- #include "monitor/monitor.h"
-@@ -4537,10 +4536,8 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
- void monitor_init(Chardev *chr, int flags)
- {
-     Monitor *mon = g_malloc(sizeof(*mon));
--    /* Enable IOThread for QMPs that are not using MUX chardev backends. */
--    bool use_io_thr = (!CHARDEV_IS_MUX(chr)) && (flags & MONITOR_USE_CONTROL);
-
--    monitor_data_init(mon, false, use_io_thr);
-+    monitor_data_init(mon, false, false);
-
-     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
-     mon->flags = flags;
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index d1fa1cb2177..558e83540cc 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -80,8 +80,6 @@ static void test_qmp_protocol(void)
-     QDict *resp, *q, *ret;
-     QList *capabilities;
-     QTestState *qts;
--    const QListEntry *entry;
--    QString *qstr;
-
-     qts = qtest_init_without_qmp_handshake(common_args);
-
-@@ -91,13 +89,7 @@ static void test_qmp_protocol(void)
-     g_assert(q);
-     test_version(qdict_get(q, "version"));
-     capabilities = qdict_get_qlist(q, "capabilities");
--    g_assert(capabilities);
--    entry = qlist_first(capabilities);
--    g_assert(entry);
--    qstr = qobject_to(QString, entry->value);
--    g_assert(qstr);
--    g_assert_cmpstr(qstring_get_str(qstr), ==, "oob");
--    QDECREF(resp);
-+    g_assert(capabilities && qlist_empty(capabilities));
-
-     /* Test valid command before handshake */
-     resp = qtest_qmp(qts, "{ 'execute': 'query-version' }");
--- 
-2.14.3
+> +    fi
+>  done
+>  
+>  rm -rf "$output/linux-headers/linux"
+> @@ -130,7 +138,7 @@ for header in kvm.h kvm_para.h vfio.h vfio_ccw.h vhost.h \
+>  done
+>  rm -rf "$output/linux-headers/asm-generic"
+>  mkdir -p "$output/linux-headers/asm-generic"
+> -for header in kvm_para.h; do
+> +for header in kvm_para.h bitsperlong.h unistd.h; do
+>      cp "$tmpdir/include/asm-generic/$header" "$output/linux-headers/asm-generic"
+>  done
+>  if [ -L "$linux/source" ]; then
+> -- 
+> MST
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
