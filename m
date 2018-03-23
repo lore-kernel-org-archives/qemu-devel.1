@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ezVe4-0005O8-MC
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ezVe5-0005Op-AX
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ezVe1-00014Q-1m
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ezVe0-00014A-UA
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 18:58:49 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 23 Mar 2018 23:57:36 +0100
-Message-Id: <20180323225739.17329-18-laurent@vivier.eu>
+Date: Fri, 23 Mar 2018 23:57:38 +0100
+Message-Id: <20180323225739.17329-20-laurent@vivier.eu>
 In-Reply-To: <20180323225739.17329-1-laurent@vivier.eu>
 References: <20180323225739.17329-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 17/20] linux-user: move
- sparc/sparc64 signal.c parts to sparc directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 19/20] linux-user: move ppc/ppc64
+ signal.c parts to ppc directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,640 +24,21 @@ To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org
 
 No code change, only move code from signal.c to
-sparc/signal.c, except adding includes and
+ppc/signal.c, except adding includes and
 exporting setup_frame() and setup_rt_frame().
-
-sparc64/signal.c includes sparc/signal.c
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/signal.c                | 604 +-----------------------------------
- linux-user/sparc/signal.c          | 606 +++++++++++++++++++++++++++++++++++++
- linux-user/sparc/target_signal.h   |   6 +-
- linux-user/sparc64/signal.c        |   2 +
- linux-user/sparc64/target_signal.h |   6 +-
- 5 files changed, 619 insertions(+), 605 deletions(-)
+ linux-user/ppc/signal.c        | 671 +++++++++++++++++++++++++++++++++++++++++
+ linux-user/ppc/target_signal.h |   8 +-
+ linux-user/signal.c            | 670 ----------------------------------------
+ 3 files changed, 678 insertions(+), 671 deletions(-)
 
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 1891553823..2bcb32a7ce 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -803,609 +803,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
-     return ret;
- }
- 
--#if defined(TARGET_SPARC)
--
--#define __SUNOS_MAXWIN   31
--
--/* This is what SunOS does, so shall I. */
--struct target_sigcontext {
--    abi_ulong sigc_onstack;      /* state to restore */
--
--    abi_ulong sigc_mask;         /* sigmask to restore */
--    abi_ulong sigc_sp;           /* stack pointer */
--    abi_ulong sigc_pc;           /* program counter */
--    abi_ulong sigc_npc;          /* next program counter */
--    abi_ulong sigc_psr;          /* for condition codes etc */
--    abi_ulong sigc_g1;           /* User uses these two registers */
--    abi_ulong sigc_o0;           /* within the trampoline code. */
--
--    /* Now comes information regarding the users window set
--         * at the time of the signal.
--         */
--    abi_ulong sigc_oswins;       /* outstanding windows */
--
--    /* stack ptrs for each regwin buf */
--    char *sigc_spbuf[__SUNOS_MAXWIN];
--
--    /* Windows to restore after signal */
--    struct {
--        abi_ulong locals[8];
--        abi_ulong ins[8];
--    } sigc_wbuf[__SUNOS_MAXWIN];
--};
--/* A Sparc stack frame */
--struct sparc_stackf {
--    abi_ulong locals[8];
--    abi_ulong ins[8];
--    /* It's simpler to treat fp and callers_pc as elements of ins[]
--         * since we never need to access them ourselves.
--         */
--    char *structptr;
--    abi_ulong xargs[6];
--    abi_ulong xxargs[1];
--};
--
--typedef struct {
--    struct {
--        abi_ulong psr;
--        abi_ulong pc;
--        abi_ulong npc;
--        abi_ulong y;
--        abi_ulong u_regs[16]; /* globals and ins */
--    }               si_regs;
--    int             si_mask;
--} __siginfo_t;
--
--typedef struct {
--    abi_ulong  si_float_regs[32];
--    unsigned   long si_fsr;
--    unsigned   long si_fpqdepth;
--    struct {
--        unsigned long *insn_addr;
--        unsigned long insn;
--    } si_fpqueue [16];
--} qemu_siginfo_fpu_t;
--
--
--struct target_signal_frame {
--    struct sparc_stackf ss;
--    __siginfo_t         info;
--    abi_ulong           fpu_save;
--    abi_ulong           insns[2] __attribute__ ((aligned (8)));
--    abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
--    abi_ulong           extra_size; /* Should be 0 */
--    qemu_siginfo_fpu_t fpu_state;
--};
--struct target_rt_signal_frame {
--    struct sparc_stackf ss;
--    siginfo_t           info;
--    abi_ulong           regs[20];
--    sigset_t            mask;
--    abi_ulong           fpu_save;
--    unsigned int        insns[2];
--    stack_t             stack;
--    unsigned int        extra_size; /* Should be 0 */
--    qemu_siginfo_fpu_t  fpu_state;
--};
--
--#define UREG_O0        16
--#define UREG_O6        22
--#define UREG_I0        0
--#define UREG_I1        1
--#define UREG_I2        2
--#define UREG_I3        3
--#define UREG_I4        4
--#define UREG_I5        5
--#define UREG_I6        6
--#define UREG_I7        7
--#define UREG_L0	       8
--#define UREG_FP        UREG_I6
--#define UREG_SP        UREG_O6
--
--static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
--                                     CPUSPARCState *env,
--                                     unsigned long framesize)
--{
--    abi_ulong sp;
--
--    sp = env->regwptr[UREG_FP];
--
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if (sa->sa_flags & TARGET_SA_ONSTACK) {
--        if (!on_sig_stack(sp)
--                && !((target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size) & 7)) {
--            sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--        }
--    }
--    return sp - framesize;
--}
--
--static int
--setup___siginfo(__siginfo_t *si, CPUSPARCState *env, abi_ulong mask)
--{
--    int err = 0, i;
--
--    __put_user(env->psr, &si->si_regs.psr);
--    __put_user(env->pc, &si->si_regs.pc);
--    __put_user(env->npc, &si->si_regs.npc);
--    __put_user(env->y, &si->si_regs.y);
--    for (i=0; i < 8; i++) {
--        __put_user(env->gregs[i], &si->si_regs.u_regs[i]);
--    }
--    for (i=0; i < 8; i++) {
--        __put_user(env->regwptr[UREG_I0 + i], &si->si_regs.u_regs[i+8]);
--    }
--    __put_user(mask, &si->si_mask);
--    return err;
--}
--
--#if 0
--static int
--setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
--                 CPUSPARCState *env, unsigned long mask)
--{
--    int err = 0;
--
--    __put_user(mask, &sc->sigc_mask);
--    __put_user(env->regwptr[UREG_SP], &sc->sigc_sp);
--    __put_user(env->pc, &sc->sigc_pc);
--    __put_user(env->npc, &sc->sigc_npc);
--    __put_user(env->psr, &sc->sigc_psr);
--    __put_user(env->gregs[1], &sc->sigc_g1);
--    __put_user(env->regwptr[UREG_O0], &sc->sigc_o0);
--
--    return err;
--}
--#endif
--#define NF_ALIGNEDSZ  (((sizeof(struct target_signal_frame) + 7) & (~7)))
--
--static void setup_frame(int sig, struct target_sigaction *ka,
--                        target_sigset_t *set, CPUSPARCState *env)
--{
--    abi_ulong sf_addr;
--    struct target_signal_frame *sf;
--    int sigframe_size, err, i;
--
--    /* 1. Make sure everything is clean */
--    //synchronize_user_stack();
--
--    sigframe_size = NF_ALIGNEDSZ;
--    sf_addr = get_sigframe(ka, env, sigframe_size);
--    trace_user_setup_frame(env, sf_addr);
--
--    sf = lock_user(VERIFY_WRITE, sf_addr,
--                   sizeof(struct target_signal_frame), 0);
--    if (!sf) {
--        goto sigsegv;
--    }
--#if 0
--    if (invalid_frame_pointer(sf, sigframe_size))
--        goto sigill_and_return;
--#endif
--    /* 2. Save the current process state */
--    err = setup___siginfo(&sf->info, env, set->sig[0]);
--    __put_user(0, &sf->extra_size);
--
--    //save_fpu_state(regs, &sf->fpu_state);
--    //__put_user(&sf->fpu_state, &sf->fpu_save);
--
--    __put_user(set->sig[0], &sf->info.si_mask);
--    for (i = 0; i < TARGET_NSIG_WORDS - 1; i++) {
--        __put_user(set->sig[i + 1], &sf->extramask[i]);
--    }
--
--    for (i = 0; i < 8; i++) {
--        __put_user(env->regwptr[i + UREG_L0], &sf->ss.locals[i]);
--    }
--    for (i = 0; i < 8; i++) {
--        __put_user(env->regwptr[i + UREG_I0], &sf->ss.ins[i]);
--    }
--    if (err)
--        goto sigsegv;
--
--    /* 3. signal handler back-trampoline and parameters */
--    env->regwptr[UREG_FP] = sf_addr;
--    env->regwptr[UREG_I0] = sig;
--    env->regwptr[UREG_I1] = sf_addr +
--            offsetof(struct target_signal_frame, info);
--    env->regwptr[UREG_I2] = sf_addr +
--            offsetof(struct target_signal_frame, info);
--
--    /* 4. signal handler */
--    env->pc = ka->_sa_handler;
--    env->npc = (env->pc + 4);
--    /* 5. return to kernel instructions */
--    if (ka->sa_restorer) {
--        env->regwptr[UREG_I7] = ka->sa_restorer;
--    } else {
--        uint32_t val32;
--
--        env->regwptr[UREG_I7] = sf_addr +
--                offsetof(struct target_signal_frame, insns) - 2 * 4;
--
--        /* mov __NR_sigreturn, %g1 */
--        val32 = 0x821020d8;
--        __put_user(val32, &sf->insns[0]);
--
--        /* t 0x10 */
--        val32 = 0x91d02010;
--        __put_user(val32, &sf->insns[1]);
--        if (err)
--            goto sigsegv;
--
--        /* Flush instruction space. */
--        // flush_sig_insns(current->mm, (unsigned long) &(sf->insns[0]));
--        // tb_flush(env);
--    }
--    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
--    return;
--#if 0
--sigill_and_return:
--    force_sig(TARGET_SIGILL);
--#endif
--sigsegv:
--    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
--    force_sigsegv(sig);
--}
--
--static void setup_rt_frame(int sig, struct target_sigaction *ka,
--                           target_siginfo_t *info,
--                           target_sigset_t *set, CPUSPARCState *env)
--{
--    fprintf(stderr, "setup_rt_frame: not implemented\n");
--}
--
--long do_sigreturn(CPUSPARCState *env)
--{
--    abi_ulong sf_addr;
--    struct target_signal_frame *sf;
--    uint32_t up_psr, pc, npc;
--    target_sigset_t set;
--    sigset_t host_set;
--    int err=0, i;
--
--    sf_addr = env->regwptr[UREG_FP];
--    trace_user_do_sigreturn(env, sf_addr);
--    if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
--        goto segv_and_exit;
--    }
--
--    /* 1. Make sure we are not getting garbage from the user */
--
--    if (sf_addr & 3)
--        goto segv_and_exit;
--
--    __get_user(pc,  &sf->info.si_regs.pc);
--    __get_user(npc, &sf->info.si_regs.npc);
--
--    if ((pc | npc) & 3) {
--        goto segv_and_exit;
--    }
--
--    /* 2. Restore the state */
--    __get_user(up_psr, &sf->info.si_regs.psr);
--
--    /* User can only change condition codes and FPU enabling in %psr. */
--    env->psr = (up_psr & (PSR_ICC /* | PSR_EF */))
--            | (env->psr & ~(PSR_ICC /* | PSR_EF */));
--
--    env->pc = pc;
--    env->npc = npc;
--    __get_user(env->y, &sf->info.si_regs.y);
--    for (i=0; i < 8; i++) {
--        __get_user(env->gregs[i], &sf->info.si_regs.u_regs[i]);
--    }
--    for (i=0; i < 8; i++) {
--        __get_user(env->regwptr[i + UREG_I0], &sf->info.si_regs.u_regs[i+8]);
--    }
--
--    /* FIXME: implement FPU save/restore:
--         * __get_user(fpu_save, &sf->fpu_save);
--         * if (fpu_save)
--         *        err |= restore_fpu_state(env, fpu_save);
--         */
--
--    /* This is pretty much atomic, no amount locking would prevent
--         * the races which exist anyways.
--         */
--    __get_user(set.sig[0], &sf->info.si_mask);
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __get_user(set.sig[i], &sf->extramask[i - 1]);
--    }
--
--    target_to_host_sigset_internal(&host_set, &set);
--    set_sigmask(&host_set);
--
--    if (err) {
--        goto segv_and_exit;
--    }
--    unlock_user_struct(sf, sf_addr, 0);
--    return -TARGET_QEMU_ESIGRETURN;
--
--segv_and_exit:
--    unlock_user_struct(sf, sf_addr, 0);
--    force_sig(TARGET_SIGSEGV);
--    return -TARGET_QEMU_ESIGRETURN;
--}
--
--long do_rt_sigreturn(CPUSPARCState *env)
--{
--    trace_user_do_rt_sigreturn(env, 0);
--    fprintf(stderr, "do_rt_sigreturn: not implemented\n");
--    return -TARGET_ENOSYS;
--}
--
--#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
--#define SPARC_MC_TSTATE 0
--#define SPARC_MC_PC 1
--#define SPARC_MC_NPC 2
--#define SPARC_MC_Y 3
--#define SPARC_MC_G1 4
--#define SPARC_MC_G2 5
--#define SPARC_MC_G3 6
--#define SPARC_MC_G4 7
--#define SPARC_MC_G5 8
--#define SPARC_MC_G6 9
--#define SPARC_MC_G7 10
--#define SPARC_MC_O0 11
--#define SPARC_MC_O1 12
--#define SPARC_MC_O2 13
--#define SPARC_MC_O3 14
--#define SPARC_MC_O4 15
--#define SPARC_MC_O5 16
--#define SPARC_MC_O6 17
--#define SPARC_MC_O7 18
--#define SPARC_MC_NGREG 19
--
--typedef abi_ulong target_mc_greg_t;
--typedef target_mc_greg_t target_mc_gregset_t[SPARC_MC_NGREG];
--
--struct target_mc_fq {
--    abi_ulong *mcfq_addr;
--    uint32_t mcfq_insn;
--};
--
--struct target_mc_fpu {
--    union {
--        uint32_t sregs[32];
--        uint64_t dregs[32];
--        //uint128_t qregs[16];
--    } mcfpu_fregs;
--    abi_ulong mcfpu_fsr;
--    abi_ulong mcfpu_fprs;
--    abi_ulong mcfpu_gsr;
--    struct target_mc_fq *mcfpu_fq;
--    unsigned char mcfpu_qcnt;
--    unsigned char mcfpu_qentsz;
--    unsigned char mcfpu_enab;
--};
--typedef struct target_mc_fpu target_mc_fpu_t;
--
--typedef struct {
--    target_mc_gregset_t mc_gregs;
--    target_mc_greg_t mc_fp;
--    target_mc_greg_t mc_i7;
--    target_mc_fpu_t mc_fpregs;
--} target_mcontext_t;
--
--struct target_ucontext {
--    struct target_ucontext *tuc_link;
--    abi_ulong tuc_flags;
--    target_sigset_t tuc_sigmask;
--    target_mcontext_t tuc_mcontext;
--};
--
--/* A V9 register window */
--struct target_reg_window {
--    abi_ulong locals[8];
--    abi_ulong ins[8];
--};
--
--#define TARGET_STACK_BIAS 2047
--
--/* {set, get}context() needed for 64-bit SparcLinux userland. */
--void sparc64_set_context(CPUSPARCState *env)
--{
--    abi_ulong ucp_addr;
--    struct target_ucontext *ucp;
--    target_mc_gregset_t *grp;
--    abi_ulong pc, npc, tstate;
--    abi_ulong fp, i7, w_addr;
--    unsigned int i;
--
--    ucp_addr = env->regwptr[UREG_I0];
--    if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
--        goto do_sigsegv;
--    }
--    grp  = &ucp->tuc_mcontext.mc_gregs;
--    __get_user(pc, &((*grp)[SPARC_MC_PC]));
--    __get_user(npc, &((*grp)[SPARC_MC_NPC]));
--    if ((pc | npc) & 3) {
--        goto do_sigsegv;
--    }
--    if (env->regwptr[UREG_I1]) {
--        target_sigset_t target_set;
--        sigset_t set;
--
--        if (TARGET_NSIG_WORDS == 1) {
--            __get_user(target_set.sig[0], &ucp->tuc_sigmask.sig[0]);
--        } else {
--            abi_ulong *src, *dst;
--            src = ucp->tuc_sigmask.sig;
--            dst = target_set.sig;
--            for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
--                __get_user(*dst, src);
--            }
--        }
--        target_to_host_sigset_internal(&set, &target_set);
--        set_sigmask(&set);
--    }
--    env->pc = pc;
--    env->npc = npc;
--    __get_user(env->y, &((*grp)[SPARC_MC_Y]));
--    __get_user(tstate, &((*grp)[SPARC_MC_TSTATE]));
--    env->asi = (tstate >> 24) & 0xff;
--    cpu_put_ccr(env, tstate >> 32);
--    cpu_put_cwp64(env, tstate & 0x1f);
--    __get_user(env->gregs[1], (&(*grp)[SPARC_MC_G1]));
--    __get_user(env->gregs[2], (&(*grp)[SPARC_MC_G2]));
--    __get_user(env->gregs[3], (&(*grp)[SPARC_MC_G3]));
--    __get_user(env->gregs[4], (&(*grp)[SPARC_MC_G4]));
--    __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
--    __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
--    __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
--    __get_user(env->regwptr[UREG_I0], (&(*grp)[SPARC_MC_O0]));
--    __get_user(env->regwptr[UREG_I1], (&(*grp)[SPARC_MC_O1]));
--    __get_user(env->regwptr[UREG_I2], (&(*grp)[SPARC_MC_O2]));
--    __get_user(env->regwptr[UREG_I3], (&(*grp)[SPARC_MC_O3]));
--    __get_user(env->regwptr[UREG_I4], (&(*grp)[SPARC_MC_O4]));
--    __get_user(env->regwptr[UREG_I5], (&(*grp)[SPARC_MC_O5]));
--    __get_user(env->regwptr[UREG_I6], (&(*grp)[SPARC_MC_O6]));
--    __get_user(env->regwptr[UREG_I7], (&(*grp)[SPARC_MC_O7]));
--
--    __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
--    __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
--
--    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
--    if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    if (put_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    /* FIXME this does not match how the kernel handles the FPU in
--     * its sparc64_set_context implementation. In particular the FPU
--     * is only restored if fenab is non-zero in:
--     *   __get_user(fenab, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_enab));
--     */
--    __get_user(env->fprs, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fprs));
--    {
--        uint32_t *src = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
--        for (i = 0; i < 64; i++, src++) {
--            if (i & 1) {
--                __get_user(env->fpr[i/2].l.lower, src);
--            } else {
--                __get_user(env->fpr[i/2].l.upper, src);
--            }
--        }
--    }
--    __get_user(env->fsr,
--               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fsr));
--    __get_user(env->gsr,
--               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_gsr));
--    unlock_user_struct(ucp, ucp_addr, 0);
--    return;
--do_sigsegv:
--    unlock_user_struct(ucp, ucp_addr, 0);
--    force_sig(TARGET_SIGSEGV);
--}
--
--void sparc64_get_context(CPUSPARCState *env)
--{
--    abi_ulong ucp_addr;
--    struct target_ucontext *ucp;
--    target_mc_gregset_t *grp;
--    target_mcontext_t *mcp;
--    abi_ulong fp, i7, w_addr;
--    int err;
--    unsigned int i;
--    target_sigset_t target_set;
--    sigset_t set;
--
--    ucp_addr = env->regwptr[UREG_I0];
--    if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
--        goto do_sigsegv;
--    }
--    
--    mcp = &ucp->tuc_mcontext;
--    grp = &mcp->mc_gregs;
--
--    /* Skip over the trap instruction, first. */
--    env->pc = env->npc;
--    env->npc += 4;
--
--    /* If we're only reading the signal mask then do_sigprocmask()
--     * is guaranteed not to fail, which is important because we don't
--     * have any way to signal a failure or restart this operation since
--     * this is not a normal syscall.
--     */
--    err = do_sigprocmask(0, NULL, &set);
--    assert(err == 0);
--    host_to_target_sigset_internal(&target_set, &set);
--    if (TARGET_NSIG_WORDS == 1) {
--        __put_user(target_set.sig[0],
--                   (abi_ulong *)&ucp->tuc_sigmask);
--    } else {
--        abi_ulong *src, *dst;
--        src = target_set.sig;
--        dst = ucp->tuc_sigmask.sig;
--        for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
--            __put_user(*src, dst);
--        }
--        if (err)
--            goto do_sigsegv;
--    }
--
--    /* XXX: tstate must be saved properly */
--    //    __put_user(env->tstate, &((*grp)[SPARC_MC_TSTATE]));
--    __put_user(env->pc, &((*grp)[SPARC_MC_PC]));
--    __put_user(env->npc, &((*grp)[SPARC_MC_NPC]));
--    __put_user(env->y, &((*grp)[SPARC_MC_Y]));
--    __put_user(env->gregs[1], &((*grp)[SPARC_MC_G1]));
--    __put_user(env->gregs[2], &((*grp)[SPARC_MC_G2]));
--    __put_user(env->gregs[3], &((*grp)[SPARC_MC_G3]));
--    __put_user(env->gregs[4], &((*grp)[SPARC_MC_G4]));
--    __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
--    __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
--    __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
--    __put_user(env->regwptr[UREG_I0], &((*grp)[SPARC_MC_O0]));
--    __put_user(env->regwptr[UREG_I1], &((*grp)[SPARC_MC_O1]));
--    __put_user(env->regwptr[UREG_I2], &((*grp)[SPARC_MC_O2]));
--    __put_user(env->regwptr[UREG_I3], &((*grp)[SPARC_MC_O3]));
--    __put_user(env->regwptr[UREG_I4], &((*grp)[SPARC_MC_O4]));
--    __put_user(env->regwptr[UREG_I5], &((*grp)[SPARC_MC_O5]));
--    __put_user(env->regwptr[UREG_I6], &((*grp)[SPARC_MC_O6]));
--    __put_user(env->regwptr[UREG_I7], &((*grp)[SPARC_MC_O7]));
--
--    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
--    fp = i7 = 0;
--    if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    if (get_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    __put_user(fp, &(mcp->mc_fp));
--    __put_user(i7, &(mcp->mc_i7));
--
--    {
--        uint32_t *dst = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
--        for (i = 0; i < 64; i++, dst++) {
--            if (i & 1) {
--                __put_user(env->fpr[i/2].l.lower, dst);
--            } else {
--                __put_user(env->fpr[i/2].l.upper, dst);
--            }
--        }
--    }
--    __put_user(env->fsr, &(mcp->mc_fpregs.mcfpu_fsr));
--    __put_user(env->gsr, &(mcp->mc_fpregs.mcfpu_gsr));
--    __put_user(env->fprs, &(mcp->mc_fpregs.mcfpu_fprs));
--
--    if (err)
--        goto do_sigsegv;
--    unlock_user_struct(ucp, ucp_addr, 1);
--    return;
--do_sigsegv:
--    unlock_user_struct(ucp, ucp_addr, 1);
--    force_sig(TARGET_SIGSEGV);
--}
--#endif
--#elif defined(TARGET_MIPS) || defined(TARGET_MIPS64)
-+#if defined(TARGET_MIPS) || defined(TARGET_MIPS64)
- 
- # if defined(TARGET_ABI_MIPSO32)
- struct target_sigcontext {
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index 02ca338b6c..d3cff2ebb1 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -16,3 +16,609 @@
+diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+index 02ca338b6c..15148d54a9 100644
+--- a/linux-user/ppc/signal.c
++++ b/linux-user/ppc/signal.c
+@@ -16,3 +16,674 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
@@ -667,645 +48,1368 @@ index 02ca338b6c..d3cff2ebb1 100644
 +#include "signal-common.h"
 +#include "linux-user/trace.h"
 +
-+#define __SUNOS_MAXWIN   31
-+
-+/* This is what SunOS does, so shall I. */
-+struct target_sigcontext {
-+    abi_ulong sigc_onstack;      /* state to restore */
-+
-+    abi_ulong sigc_mask;         /* sigmask to restore */
-+    abi_ulong sigc_sp;           /* stack pointer */
-+    abi_ulong sigc_pc;           /* program counter */
-+    abi_ulong sigc_npc;          /* next program counter */
-+    abi_ulong sigc_psr;          /* for condition codes etc */
-+    abi_ulong sigc_g1;           /* User uses these two registers */
-+    abi_ulong sigc_o0;           /* within the trampoline code. */
-+
-+    /* Now comes information regarding the users window set
-+         * at the time of the signal.
-+         */
-+    abi_ulong sigc_oswins;       /* outstanding windows */
-+
-+    /* stack ptrs for each regwin buf */
-+    char *sigc_spbuf[__SUNOS_MAXWIN];
-+
-+    /* Windows to restore after signal */
-+    struct {
-+        abi_ulong locals[8];
-+        abi_ulong ins[8];
-+    } sigc_wbuf[__SUNOS_MAXWIN];
-+};
-+/* A Sparc stack frame */
-+struct sparc_stackf {
-+    abi_ulong locals[8];
-+    abi_ulong ins[8];
-+    /* It's simpler to treat fp and callers_pc as elements of ins[]
-+         * since we never need to access them ourselves.
-+         */
-+    char *structptr;
-+    abi_ulong xargs[6];
-+    abi_ulong xxargs[1];
-+};
-+
-+typedef struct {
-+    struct {
-+        abi_ulong psr;
-+        abi_ulong pc;
-+        abi_ulong npc;
-+        abi_ulong y;
-+        abi_ulong u_regs[16]; /* globals and ins */
-+    }               si_regs;
-+    int             si_mask;
-+} __siginfo_t;
-+
-+typedef struct {
-+    abi_ulong  si_float_regs[32];
-+    unsigned   long si_fsr;
-+    unsigned   long si_fpqdepth;
-+    struct {
-+        unsigned long *insn_addr;
-+        unsigned long insn;
-+    } si_fpqueue [16];
-+} qemu_siginfo_fpu_t;
-+
-+
-+struct target_signal_frame {
-+    struct sparc_stackf ss;
-+    __siginfo_t         info;
-+    abi_ulong           fpu_save;
-+    abi_ulong           insns[2] __attribute__ ((aligned (8)));
-+    abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
-+    abi_ulong           extra_size; /* Should be 0 */
-+    qemu_siginfo_fpu_t fpu_state;
-+};
-+struct target_rt_signal_frame {
-+    struct sparc_stackf ss;
-+    siginfo_t           info;
-+    abi_ulong           regs[20];
-+    sigset_t            mask;
-+    abi_ulong           fpu_save;
-+    unsigned int        insns[2];
-+    stack_t             stack;
-+    unsigned int        extra_size; /* Should be 0 */
-+    qemu_siginfo_fpu_t  fpu_state;
-+};
-+
-+#define UREG_O0        16
-+#define UREG_O6        22
-+#define UREG_I0        0
-+#define UREG_I1        1
-+#define UREG_I2        2
-+#define UREG_I3        3
-+#define UREG_I4        4
-+#define UREG_I5        5
-+#define UREG_I6        6
-+#define UREG_I7        7
-+#define UREG_L0	       8
-+#define UREG_FP        UREG_I6
-+#define UREG_SP        UREG_O6
-+
-+static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
-+                                     CPUSPARCState *env,
-+                                     unsigned long framesize)
-+{
-+    abi_ulong sp;
-+
-+    sp = env->regwptr[UREG_FP];
-+
-+    /* This is the X/Open sanctioned signal stack switching.  */
-+    if (sa->sa_flags & TARGET_SA_ONSTACK) {
-+        if (!on_sig_stack(sp)
-+                && !((target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size) & 7)) {
-+            sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+        }
-+    }
-+    return sp - framesize;
-+}
-+
-+static int
-+setup___siginfo(__siginfo_t *si, CPUSPARCState *env, abi_ulong mask)
-+{
-+    int err = 0, i;
-+
-+    __put_user(env->psr, &si->si_regs.psr);
-+    __put_user(env->pc, &si->si_regs.pc);
-+    __put_user(env->npc, &si->si_regs.npc);
-+    __put_user(env->y, &si->si_regs.y);
-+    for (i=0; i < 8; i++) {
-+        __put_user(env->gregs[i], &si->si_regs.u_regs[i]);
-+    }
-+    for (i=0; i < 8; i++) {
-+        __put_user(env->regwptr[UREG_I0 + i], &si->si_regs.u_regs[i+8]);
-+    }
-+    __put_user(mask, &si->si_mask);
-+    return err;
-+}
-+
-+#if 0
-+static int
-+setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
-+                 CPUSPARCState *env, unsigned long mask)
-+{
-+    int err = 0;
-+
-+    __put_user(mask, &sc->sigc_mask);
-+    __put_user(env->regwptr[UREG_SP], &sc->sigc_sp);
-+    __put_user(env->pc, &sc->sigc_pc);
-+    __put_user(env->npc, &sc->sigc_npc);
-+    __put_user(env->psr, &sc->sigc_psr);
-+    __put_user(env->gregs[1], &sc->sigc_g1);
-+    __put_user(env->regwptr[UREG_O0], &sc->sigc_o0);
-+
-+    return err;
-+}
++/* Size of dummy stack frame allocated when calling signal handler.
++   See arch/powerpc/include/asm/ptrace.h.  */
++#if defined(TARGET_PPC64)
++#define SIGNAL_FRAMESIZE 128
++#else
++#define SIGNAL_FRAMESIZE 64
 +#endif
-+#define NF_ALIGNEDSZ  (((sizeof(struct target_signal_frame) + 7) & (~7)))
 +
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUSPARCState *env)
-+{
-+    abi_ulong sf_addr;
-+    struct target_signal_frame *sf;
-+    int sigframe_size, err, i;
-+
-+    /* 1. Make sure everything is clean */
-+    //synchronize_user_stack();
-+
-+    sigframe_size = NF_ALIGNEDSZ;
-+    sf_addr = get_sigframe(ka, env, sigframe_size);
-+    trace_user_setup_frame(env, sf_addr);
-+
-+    sf = lock_user(VERIFY_WRITE, sf_addr,
-+                   sizeof(struct target_signal_frame), 0);
-+    if (!sf) {
-+        goto sigsegv;
-+    }
-+#if 0
-+    if (invalid_frame_pointer(sf, sigframe_size))
-+        goto sigill_and_return;
++/* See arch/powerpc/include/asm/ucontext.h.  Only used for 32-bit PPC;
++   on 64-bit PPC, sigcontext and mcontext are one and the same.  */
++struct target_mcontext {
++    target_ulong mc_gregs[48];
++    /* Includes fpscr.  */
++    uint64_t mc_fregs[33];
++#if defined(TARGET_PPC64)
++    /* Pointer to the vector regs */
++    target_ulong v_regs;
++#else
++    target_ulong mc_pad[2];
 +#endif
-+    /* 2. Save the current process state */
-+    err = setup___siginfo(&sf->info, env, set->sig[0]);
-+    __put_user(0, &sf->extra_size);
-+
-+    //save_fpu_state(regs, &sf->fpu_state);
-+    //__put_user(&sf->fpu_state, &sf->fpu_save);
-+
-+    __put_user(set->sig[0], &sf->info.si_mask);
-+    for (i = 0; i < TARGET_NSIG_WORDS - 1; i++) {
-+        __put_user(set->sig[i + 1], &sf->extramask[i]);
-+    }
-+
-+    for (i = 0; i < 8; i++) {
-+        __put_user(env->regwptr[i + UREG_L0], &sf->ss.locals[i]);
-+    }
-+    for (i = 0; i < 8; i++) {
-+        __put_user(env->regwptr[i + UREG_I0], &sf->ss.ins[i]);
-+    }
-+    if (err)
-+        goto sigsegv;
-+
-+    /* 3. signal handler back-trampoline and parameters */
-+    env->regwptr[UREG_FP] = sf_addr;
-+    env->regwptr[UREG_I0] = sig;
-+    env->regwptr[UREG_I1] = sf_addr +
-+            offsetof(struct target_signal_frame, info);
-+    env->regwptr[UREG_I2] = sf_addr +
-+            offsetof(struct target_signal_frame, info);
-+
-+    /* 4. signal handler */
-+    env->pc = ka->_sa_handler;
-+    env->npc = (env->pc + 4);
-+    /* 5. return to kernel instructions */
-+    if (ka->sa_restorer) {
-+        env->regwptr[UREG_I7] = ka->sa_restorer;
-+    } else {
-+        uint32_t val32;
-+
-+        env->regwptr[UREG_I7] = sf_addr +
-+                offsetof(struct target_signal_frame, insns) - 2 * 4;
-+
-+        /* mov __NR_sigreturn, %g1 */
-+        val32 = 0x821020d8;
-+        __put_user(val32, &sf->insns[0]);
-+
-+        /* t 0x10 */
-+        val32 = 0x91d02010;
-+        __put_user(val32, &sf->insns[1]);
-+        if (err)
-+            goto sigsegv;
-+
-+        /* Flush instruction space. */
-+        // flush_sig_insns(current->mm, (unsigned long) &(sf->insns[0]));
-+        // tb_flush(env);
-+    }
-+    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
-+    return;
-+#if 0
-+sigill_and_return:
-+    force_sig(TARGET_SIGILL);
-+#endif
-+sigsegv:
-+    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
-+    force_sigsegv(sig);
-+}
-+
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUSPARCState *env)
-+{
-+    fprintf(stderr, "setup_rt_frame: not implemented\n");
-+}
-+
-+long do_sigreturn(CPUSPARCState *env)
-+{
-+    abi_ulong sf_addr;
-+    struct target_signal_frame *sf;
-+    uint32_t up_psr, pc, npc;
-+    target_sigset_t set;
-+    sigset_t host_set;
-+    int err=0, i;
-+
-+    sf_addr = env->regwptr[UREG_FP];
-+    trace_user_do_sigreturn(env, sf_addr);
-+    if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
-+        goto segv_and_exit;
-+    }
-+
-+    /* 1. Make sure we are not getting garbage from the user */
-+
-+    if (sf_addr & 3)
-+        goto segv_and_exit;
-+
-+    __get_user(pc,  &sf->info.si_regs.pc);
-+    __get_user(npc, &sf->info.si_regs.npc);
-+
-+    if ((pc | npc) & 3) {
-+        goto segv_and_exit;
-+    }
-+
-+    /* 2. Restore the state */
-+    __get_user(up_psr, &sf->info.si_regs.psr);
-+
-+    /* User can only change condition codes and FPU enabling in %psr. */
-+    env->psr = (up_psr & (PSR_ICC /* | PSR_EF */))
-+            | (env->psr & ~(PSR_ICC /* | PSR_EF */));
-+
-+    env->pc = pc;
-+    env->npc = npc;
-+    __get_user(env->y, &sf->info.si_regs.y);
-+    for (i=0; i < 8; i++) {
-+        __get_user(env->gregs[i], &sf->info.si_regs.u_regs[i]);
-+    }
-+    for (i=0; i < 8; i++) {
-+        __get_user(env->regwptr[i + UREG_I0], &sf->info.si_regs.u_regs[i+8]);
-+    }
-+
-+    /* FIXME: implement FPU save/restore:
-+         * __get_user(fpu_save, &sf->fpu_save);
-+         * if (fpu_save)
-+         *        err |= restore_fpu_state(env, fpu_save);
-+         */
-+
-+    /* This is pretty much atomic, no amount locking would prevent
-+         * the races which exist anyways.
-+         */
-+    __get_user(set.sig[0], &sf->info.si_mask);
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __get_user(set.sig[i], &sf->extramask[i - 1]);
-+    }
-+
-+    target_to_host_sigset_internal(&host_set, &set);
-+    set_sigmask(&host_set);
-+
-+    if (err) {
-+        goto segv_and_exit;
-+    }
-+    unlock_user_struct(sf, sf_addr, 0);
-+    return -TARGET_QEMU_ESIGRETURN;
-+
-+segv_and_exit:
-+    unlock_user_struct(sf, sf_addr, 0);
-+    force_sig(TARGET_SIGSEGV);
-+    return -TARGET_QEMU_ESIGRETURN;
-+}
-+
-+long do_rt_sigreturn(CPUSPARCState *env)
-+{
-+    trace_user_do_rt_sigreturn(env, 0);
-+    fprintf(stderr, "do_rt_sigreturn: not implemented\n");
-+    return -TARGET_ENOSYS;
-+}
-+
-+#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-+#define SPARC_MC_TSTATE 0
-+#define SPARC_MC_PC 1
-+#define SPARC_MC_NPC 2
-+#define SPARC_MC_Y 3
-+#define SPARC_MC_G1 4
-+#define SPARC_MC_G2 5
-+#define SPARC_MC_G3 6
-+#define SPARC_MC_G4 7
-+#define SPARC_MC_G5 8
-+#define SPARC_MC_G6 9
-+#define SPARC_MC_G7 10
-+#define SPARC_MC_O0 11
-+#define SPARC_MC_O1 12
-+#define SPARC_MC_O2 13
-+#define SPARC_MC_O3 14
-+#define SPARC_MC_O4 15
-+#define SPARC_MC_O5 16
-+#define SPARC_MC_O6 17
-+#define SPARC_MC_O7 18
-+#define SPARC_MC_NGREG 19
-+
-+typedef abi_ulong target_mc_greg_t;
-+typedef target_mc_greg_t target_mc_gregset_t[SPARC_MC_NGREG];
-+
-+struct target_mc_fq {
-+    abi_ulong *mcfq_addr;
-+    uint32_t mcfq_insn;
-+};
-+
-+struct target_mc_fpu {
++    /* We need to handle Altivec and SPE at the same time, which no
++       kernel needs to do.  Fortunately, the kernel defines this bit to
++       be Altivec-register-large all the time, rather than trying to
++       twiddle it based on the specific platform.  */
 +    union {
-+        uint32_t sregs[32];
-+        uint64_t dregs[32];
-+        //uint128_t qregs[16];
-+    } mcfpu_fregs;
-+    abi_ulong mcfpu_fsr;
-+    abi_ulong mcfpu_fprs;
-+    abi_ulong mcfpu_gsr;
-+    struct target_mc_fq *mcfpu_fq;
-+    unsigned char mcfpu_qcnt;
-+    unsigned char mcfpu_qentsz;
-+    unsigned char mcfpu_enab;
++        /* SPE vector registers.  One extra for SPEFSCR.  */
++        uint32_t spe[33];
++        /* Altivec vector registers.  The packing of VSCR and VRSAVE
++           varies depending on whether we're PPC64 or not: PPC64 splits
++           them apart; PPC32 stuffs them together.
++           We also need to account for the VSX registers on PPC64
++        */
++#if defined(TARGET_PPC64)
++#define QEMU_NVRREG (34 + 16)
++        /* On ppc64, this mcontext structure is naturally *unaligned*,
++         * or rather it is aligned on a 8 bytes boundary but not on
++         * a 16 bytes one. This pad fixes it up. This is also why the
++         * vector regs are referenced by the v_regs pointer above so
++         * any amount of padding can be added here
++         */
++        target_ulong pad;
++#else
++        /* On ppc32, we are already aligned to 16 bytes */
++#define QEMU_NVRREG 33
++#endif
++        /* We cannot use ppc_avr_t here as we do *not* want the implied
++         * 16-bytes alignment that would result from it. This would have
++         * the effect of making the whole struct target_mcontext aligned
++         * which breaks the layout of struct target_ucontext on ppc64.
++         */
++        uint64_t altivec[QEMU_NVRREG][2];
++#undef QEMU_NVRREG
++    } mc_vregs;
 +};
-+typedef struct target_mc_fpu target_mc_fpu_t;
 +
-+typedef struct {
-+    target_mc_gregset_t mc_gregs;
-+    target_mc_greg_t mc_fp;
-+    target_mc_greg_t mc_i7;
-+    target_mc_fpu_t mc_fpregs;
-+} target_mcontext_t;
++/* See arch/powerpc/include/asm/sigcontext.h.  */
++struct target_sigcontext {
++    target_ulong _unused[4];
++    int32_t signal;
++#if defined(TARGET_PPC64)
++    int32_t pad0;
++#endif
++    target_ulong handler;
++    target_ulong oldmask;
++    target_ulong regs;      /* struct pt_regs __user * */
++#if defined(TARGET_PPC64)
++    struct target_mcontext mcontext;
++#endif
++};
++
++/* Indices for target_mcontext.mc_gregs, below.
++   See arch/powerpc/include/asm/ptrace.h for details.  */
++enum {
++    TARGET_PT_R0 = 0,
++    TARGET_PT_R1 = 1,
++    TARGET_PT_R2 = 2,
++    TARGET_PT_R3 = 3,
++    TARGET_PT_R4 = 4,
++    TARGET_PT_R5 = 5,
++    TARGET_PT_R6 = 6,
++    TARGET_PT_R7 = 7,
++    TARGET_PT_R8 = 8,
++    TARGET_PT_R9 = 9,
++    TARGET_PT_R10 = 10,
++    TARGET_PT_R11 = 11,
++    TARGET_PT_R12 = 12,
++    TARGET_PT_R13 = 13,
++    TARGET_PT_R14 = 14,
++    TARGET_PT_R15 = 15,
++    TARGET_PT_R16 = 16,
++    TARGET_PT_R17 = 17,
++    TARGET_PT_R18 = 18,
++    TARGET_PT_R19 = 19,
++    TARGET_PT_R20 = 20,
++    TARGET_PT_R21 = 21,
++    TARGET_PT_R22 = 22,
++    TARGET_PT_R23 = 23,
++    TARGET_PT_R24 = 24,
++    TARGET_PT_R25 = 25,
++    TARGET_PT_R26 = 26,
++    TARGET_PT_R27 = 27,
++    TARGET_PT_R28 = 28,
++    TARGET_PT_R29 = 29,
++    TARGET_PT_R30 = 30,
++    TARGET_PT_R31 = 31,
++    TARGET_PT_NIP = 32,
++    TARGET_PT_MSR = 33,
++    TARGET_PT_ORIG_R3 = 34,
++    TARGET_PT_CTR = 35,
++    TARGET_PT_LNK = 36,
++    TARGET_PT_XER = 37,
++    TARGET_PT_CCR = 38,
++    /* Yes, there are two registers with #39.  One is 64-bit only.  */
++    TARGET_PT_MQ = 39,
++    TARGET_PT_SOFTE = 39,
++    TARGET_PT_TRAP = 40,
++    TARGET_PT_DAR = 41,
++    TARGET_PT_DSISR = 42,
++    TARGET_PT_RESULT = 43,
++    TARGET_PT_REGS_COUNT = 44
++};
++
 +
 +struct target_ucontext {
-+    struct target_ucontext *tuc_link;
-+    abi_ulong tuc_flags;
++    target_ulong tuc_flags;
++    target_ulong tuc_link;    /* ucontext_t __user * */
++    struct target_sigaltstack tuc_stack;
++#if !defined(TARGET_PPC64)
++    int32_t tuc_pad[7];
++    target_ulong tuc_regs;    /* struct mcontext __user *
++                                points to uc_mcontext field */
++#endif
 +    target_sigset_t tuc_sigmask;
-+    target_mcontext_t tuc_mcontext;
++#if defined(TARGET_PPC64)
++    target_sigset_t unused[15]; /* Allow for uc_sigmask growth */
++    struct target_sigcontext tuc_sigcontext;
++#else
++    int32_t tuc_maskext[30];
++    int32_t tuc_pad2[3];
++    struct target_mcontext tuc_mcontext;
++#endif
 +};
 +
-+/* A V9 register window */
-+struct target_reg_window {
-+    abi_ulong locals[8];
-+    abi_ulong ins[8];
++/* See arch/powerpc/kernel/signal_32.c.  */
++struct target_sigframe {
++    struct target_sigcontext sctx;
++    struct target_mcontext mctx;
++    int32_t abigap[56];
 +};
 +
-+#define TARGET_STACK_BIAS 2047
++#if defined(TARGET_PPC64)
 +
-+/* {set, get}context() needed for 64-bit SparcLinux userland. */
-+void sparc64_set_context(CPUSPARCState *env)
++#define TARGET_TRAMP_SIZE 6
++
++struct target_rt_sigframe {
++    /* sys_rt_sigreturn requires the ucontext be the first field */
++    struct target_ucontext uc;
++    target_ulong  _unused[2];
++    uint32_t trampoline[TARGET_TRAMP_SIZE];
++    target_ulong pinfo; /* struct siginfo __user * */
++    target_ulong puc; /* void __user * */
++    struct target_siginfo info;
++    /* 64 bit ABI allows for 288 bytes below sp before decrementing it. */
++    char abigap[288];
++} __attribute__((aligned(16)));
++
++#else
++
++struct target_rt_sigframe {
++    struct target_siginfo info;
++    struct target_ucontext uc;
++    int32_t abigap[56];
++};
++
++#endif
++
++#if defined(TARGET_PPC64)
++
++struct target_func_ptr {
++    target_ulong entry;
++    target_ulong toc;
++};
++
++#endif
++
++/* We use the mc_pad field for the signal return trampoline.  */
++#define tramp mc_pad
++
++/* See arch/powerpc/kernel/signal.c.  */
++static target_ulong get_sigframe(struct target_sigaction *ka,
++                                 CPUPPCState *env,
++                                 int frame_size)
 +{
-+    abi_ulong ucp_addr;
-+    struct target_ucontext *ucp;
-+    target_mc_gregset_t *grp;
-+    abi_ulong pc, npc, tstate;
-+    abi_ulong fp, i7, w_addr;
-+    unsigned int i;
++    target_ulong oldsp;
 +
-+    ucp_addr = env->regwptr[UREG_I0];
-+    if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
-+        goto do_sigsegv;
-+    }
-+    grp  = &ucp->tuc_mcontext.mc_gregs;
-+    __get_user(pc, &((*grp)[SPARC_MC_PC]));
-+    __get_user(npc, &((*grp)[SPARC_MC_NPC]));
-+    if ((pc | npc) & 3) {
-+        goto do_sigsegv;
-+    }
-+    if (env->regwptr[UREG_I1]) {
-+        target_sigset_t target_set;
-+        sigset_t set;
++    oldsp = env->gpr[1];
 +
-+        if (TARGET_NSIG_WORDS == 1) {
-+            __get_user(target_set.sig[0], &ucp->tuc_sigmask.sig[0]);
-+        } else {
-+            abi_ulong *src, *dst;
-+            src = ucp->tuc_sigmask.sig;
-+            dst = target_set.sig;
-+            for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
-+                __get_user(*dst, src);
-+            }
-+        }
-+        target_to_host_sigset_internal(&set, &target_set);
-+        set_sigmask(&set);
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) &&
++            (sas_ss_flags(oldsp) == 0)) {
++        oldsp = (target_sigaltstack_used.ss_sp
++                 + target_sigaltstack_used.ss_size);
 +    }
-+    env->pc = pc;
-+    env->npc = npc;
-+    __get_user(env->y, &((*grp)[SPARC_MC_Y]));
-+    __get_user(tstate, &((*grp)[SPARC_MC_TSTATE]));
-+    env->asi = (tstate >> 24) & 0xff;
-+    cpu_put_ccr(env, tstate >> 32);
-+    cpu_put_cwp64(env, tstate & 0x1f);
-+    __get_user(env->gregs[1], (&(*grp)[SPARC_MC_G1]));
-+    __get_user(env->gregs[2], (&(*grp)[SPARC_MC_G2]));
-+    __get_user(env->gregs[3], (&(*grp)[SPARC_MC_G3]));
-+    __get_user(env->gregs[4], (&(*grp)[SPARC_MC_G4]));
-+    __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
-+    __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
-+    __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
-+    __get_user(env->regwptr[UREG_I0], (&(*grp)[SPARC_MC_O0]));
-+    __get_user(env->regwptr[UREG_I1], (&(*grp)[SPARC_MC_O1]));
-+    __get_user(env->regwptr[UREG_I2], (&(*grp)[SPARC_MC_O2]));
-+    __get_user(env->regwptr[UREG_I3], (&(*grp)[SPARC_MC_O3]));
-+    __get_user(env->regwptr[UREG_I4], (&(*grp)[SPARC_MC_O4]));
-+    __get_user(env->regwptr[UREG_I5], (&(*grp)[SPARC_MC_O5]));
-+    __get_user(env->regwptr[UREG_I6], (&(*grp)[SPARC_MC_O6]));
-+    __get_user(env->regwptr[UREG_I7], (&(*grp)[SPARC_MC_O7]));
 +
-+    __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
-+    __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
-+
-+    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
-+    if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
-+                 abi_ulong) != 0) {
-+        goto do_sigsegv;
-+    }
-+    if (put_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
-+                 abi_ulong) != 0) {
-+        goto do_sigsegv;
-+    }
-+    /* FIXME this does not match how the kernel handles the FPU in
-+     * its sparc64_set_context implementation. In particular the FPU
-+     * is only restored if fenab is non-zero in:
-+     *   __get_user(fenab, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_enab));
-+     */
-+    __get_user(env->fprs, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fprs));
-+    {
-+        uint32_t *src = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
-+        for (i = 0; i < 64; i++, src++) {
-+            if (i & 1) {
-+                __get_user(env->fpr[i/2].l.lower, src);
-+            } else {
-+                __get_user(env->fpr[i/2].l.upper, src);
-+            }
-+        }
-+    }
-+    __get_user(env->fsr,
-+               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fsr));
-+    __get_user(env->gsr,
-+               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_gsr));
-+    unlock_user_struct(ucp, ucp_addr, 0);
-+    return;
-+do_sigsegv:
-+    unlock_user_struct(ucp, ucp_addr, 0);
-+    force_sig(TARGET_SIGSEGV);
++    return (oldsp - frame_size) & ~0xFUL;
 +}
 +
-+void sparc64_get_context(CPUSPARCState *env)
++#if ((defined(TARGET_WORDS_BIGENDIAN) && defined(HOST_WORDS_BIGENDIAN)) || \
++     (!defined(HOST_WORDS_BIGENDIAN) && !defined(TARGET_WORDS_BIGENDIAN)))
++#define PPC_VEC_HI      0
++#define PPC_VEC_LO      1
++#else
++#define PPC_VEC_HI      1
++#define PPC_VEC_LO      0
++#endif
++
++
++static void save_user_regs(CPUPPCState *env, struct target_mcontext *frame)
 +{
-+    abi_ulong ucp_addr;
-+    struct target_ucontext *ucp;
-+    target_mc_gregset_t *grp;
-+    target_mcontext_t *mcp;
-+    abi_ulong fp, i7, w_addr;
-+    int err;
-+    unsigned int i;
-+    target_sigset_t target_set;
-+    sigset_t set;
++    target_ulong msr = env->msr;
++    int i;
++    target_ulong ccr = 0;
 +
-+    ucp_addr = env->regwptr[UREG_I0];
-+    if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
-+        goto do_sigsegv;
++    /* In general, the kernel attempts to be intelligent about what it
++       needs to save for Altivec/FP/SPE registers.  We don't care that
++       much, so we just go ahead and save everything.  */
++
++    /* Save general registers.  */
++    for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
++        __put_user(env->gpr[i], &frame->mc_gregs[i]);
 +    }
-+    
-+    mcp = &ucp->tuc_mcontext;
-+    grp = &mcp->mc_gregs;
++    __put_user(env->nip, &frame->mc_gregs[TARGET_PT_NIP]);
++    __put_user(env->ctr, &frame->mc_gregs[TARGET_PT_CTR]);
++    __put_user(env->lr, &frame->mc_gregs[TARGET_PT_LNK]);
++    __put_user(env->xer, &frame->mc_gregs[TARGET_PT_XER]);
 +
-+    /* Skip over the trap instruction, first. */
-+    env->pc = env->npc;
-+    env->npc += 4;
++    for (i = 0; i < ARRAY_SIZE(env->crf); i++) {
++        ccr |= env->crf[i] << (32 - ((i + 1) * 4));
++    }
++    __put_user(ccr, &frame->mc_gregs[TARGET_PT_CCR]);
 +
-+    /* If we're only reading the signal mask then do_sigprocmask()
-+     * is guaranteed not to fail, which is important because we don't
-+     * have any way to signal a failure or restart this operation since
-+     * this is not a normal syscall.
-+     */
-+    err = do_sigprocmask(0, NULL, &set);
-+    assert(err == 0);
-+    host_to_target_sigset_internal(&target_set, &set);
-+    if (TARGET_NSIG_WORDS == 1) {
-+        __put_user(target_set.sig[0],
-+                   (abi_ulong *)&ucp->tuc_sigmask);
-+    } else {
-+        abi_ulong *src, *dst;
-+        src = target_set.sig;
-+        dst = ucp->tuc_sigmask.sig;
-+        for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
-+            __put_user(*src, dst);
++    /* Save Altivec registers if necessary.  */
++    if (env->insns_flags & PPC_ALTIVEC) {
++        uint32_t *vrsave;
++        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
++            ppc_avr_t *avr = &env->avr[i];
++            ppc_avr_t *vreg = (ppc_avr_t *)&frame->mc_vregs.altivec[i];
++
++            __put_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
++            __put_user(avr->u64[PPC_VEC_LO], &vreg->u64[1]);
 +        }
-+        if (err)
-+            goto do_sigsegv;
++        /* Set MSR_VR in the saved MSR value to indicate that
++           frame->mc_vregs contains valid data.  */
++        msr |= MSR_VR;
++#if defined(TARGET_PPC64)
++        vrsave = (uint32_t *)&frame->mc_vregs.altivec[33];
++        /* 64-bit needs to put a pointer to the vectors in the frame */
++        __put_user(h2g(frame->mc_vregs.altivec), &frame->v_regs);
++#else
++        vrsave = (uint32_t *)&frame->mc_vregs.altivec[32];
++#endif
++        __put_user((uint32_t)env->spr[SPR_VRSAVE], vrsave);
 +    }
 +
-+    /* XXX: tstate must be saved properly */
-+    //    __put_user(env->tstate, &((*grp)[SPARC_MC_TSTATE]));
-+    __put_user(env->pc, &((*grp)[SPARC_MC_PC]));
-+    __put_user(env->npc, &((*grp)[SPARC_MC_NPC]));
-+    __put_user(env->y, &((*grp)[SPARC_MC_Y]));
-+    __put_user(env->gregs[1], &((*grp)[SPARC_MC_G1]));
-+    __put_user(env->gregs[2], &((*grp)[SPARC_MC_G2]));
-+    __put_user(env->gregs[3], &((*grp)[SPARC_MC_G3]));
-+    __put_user(env->gregs[4], &((*grp)[SPARC_MC_G4]));
-+    __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
-+    __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
-+    __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
-+    __put_user(env->regwptr[UREG_I0], &((*grp)[SPARC_MC_O0]));
-+    __put_user(env->regwptr[UREG_I1], &((*grp)[SPARC_MC_O1]));
-+    __put_user(env->regwptr[UREG_I2], &((*grp)[SPARC_MC_O2]));
-+    __put_user(env->regwptr[UREG_I3], &((*grp)[SPARC_MC_O3]));
-+    __put_user(env->regwptr[UREG_I4], &((*grp)[SPARC_MC_O4]));
-+    __put_user(env->regwptr[UREG_I5], &((*grp)[SPARC_MC_O5]));
-+    __put_user(env->regwptr[UREG_I6], &((*grp)[SPARC_MC_O6]));
-+    __put_user(env->regwptr[UREG_I7], &((*grp)[SPARC_MC_O7]));
-+
-+    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
-+    fp = i7 = 0;
-+    if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
-+                 abi_ulong) != 0) {
-+        goto do_sigsegv;
-+    }
-+    if (get_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
-+                 abi_ulong) != 0) {
-+        goto do_sigsegv;
-+    }
-+    __put_user(fp, &(mcp->mc_fp));
-+    __put_user(i7, &(mcp->mc_i7));
-+
-+    {
-+        uint32_t *dst = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
-+        for (i = 0; i < 64; i++, dst++) {
-+            if (i & 1) {
-+                __put_user(env->fpr[i/2].l.lower, dst);
-+            } else {
-+                __put_user(env->fpr[i/2].l.upper, dst);
-+            }
++    /* Save VSX second halves */
++    if (env->insns_flags2 & PPC2_VSX) {
++        uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
++        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
++            __put_user(env->vsr[i], &vsregs[i]);
 +        }
 +    }
-+    __put_user(env->fsr, &(mcp->mc_fpregs.mcfpu_fsr));
-+    __put_user(env->gsr, &(mcp->mc_fpregs.mcfpu_gsr));
-+    __put_user(env->fprs, &(mcp->mc_fpregs.mcfpu_fprs));
++
++    /* Save floating point registers.  */
++    if (env->insns_flags & PPC_FLOAT) {
++        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
++            __put_user(env->fpr[i], &frame->mc_fregs[i]);
++        }
++        __put_user((uint64_t) env->fpscr, &frame->mc_fregs[32]);
++    }
++
++    /* Save SPE registers.  The kernel only saves the high half.  */
++    if (env->insns_flags & PPC_SPE) {
++#if defined(TARGET_PPC64)
++        for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
++            __put_user(env->gpr[i] >> 32, &frame->mc_vregs.spe[i]);
++        }
++#else
++        for (i = 0; i < ARRAY_SIZE(env->gprh); i++) {
++            __put_user(env->gprh[i], &frame->mc_vregs.spe[i]);
++        }
++#endif
++        /* Set MSR_SPE in the saved MSR value to indicate that
++           frame->mc_vregs contains valid data.  */
++        msr |= MSR_SPE;
++        __put_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
++    }
++
++    /* Store MSR.  */
++    __put_user(msr, &frame->mc_gregs[TARGET_PT_MSR]);
++}
++
++static void encode_trampoline(int sigret, uint32_t *tramp)
++{
++    /* Set up the sigreturn trampoline: li r0,sigret; sc.  */
++    if (sigret) {
++        __put_user(0x38000000 | sigret, &tramp[0]);
++        __put_user(0x44000002, &tramp[1]);
++    }
++}
++
++static void restore_user_regs(CPUPPCState *env,
++                              struct target_mcontext *frame, int sig)
++{
++    target_ulong save_r2 = 0;
++    target_ulong msr;
++    target_ulong ccr;
++
++    int i;
++
++    if (!sig) {
++        save_r2 = env->gpr[2];
++    }
++
++    /* Restore general registers.  */
++    for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
++        __get_user(env->gpr[i], &frame->mc_gregs[i]);
++    }
++    __get_user(env->nip, &frame->mc_gregs[TARGET_PT_NIP]);
++    __get_user(env->ctr, &frame->mc_gregs[TARGET_PT_CTR]);
++    __get_user(env->lr, &frame->mc_gregs[TARGET_PT_LNK]);
++    __get_user(env->xer, &frame->mc_gregs[TARGET_PT_XER]);
++    __get_user(ccr, &frame->mc_gregs[TARGET_PT_CCR]);
++
++    for (i = 0; i < ARRAY_SIZE(env->crf); i++) {
++        env->crf[i] = (ccr >> (32 - ((i + 1) * 4))) & 0xf;
++    }
++
++    if (!sig) {
++        env->gpr[2] = save_r2;
++    }
++    /* Restore MSR.  */
++    __get_user(msr, &frame->mc_gregs[TARGET_PT_MSR]);
++
++    /* If doing signal return, restore the previous little-endian mode.  */
++    if (sig)
++        env->msr = (env->msr & ~(1ull << MSR_LE)) | (msr & (1ull << MSR_LE));
++
++    /* Restore Altivec registers if necessary.  */
++    if (env->insns_flags & PPC_ALTIVEC) {
++        ppc_avr_t *v_regs;
++        uint32_t *vrsave;
++#if defined(TARGET_PPC64)
++        uint64_t v_addr;
++        /* 64-bit needs to recover the pointer to the vectors from the frame */
++        __get_user(v_addr, &frame->v_regs);
++        v_regs = g2h(v_addr);
++#else
++        v_regs = (ppc_avr_t *)frame->mc_vregs.altivec;
++#endif
++        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
++            ppc_avr_t *avr = &env->avr[i];
++            ppc_avr_t *vreg = &v_regs[i];
++
++            __get_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
++            __get_user(avr->u64[PPC_VEC_LO], &vreg->u64[1]);
++        }
++        /* Set MSR_VEC in the saved MSR value to indicate that
++           frame->mc_vregs contains valid data.  */
++#if defined(TARGET_PPC64)
++        vrsave = (uint32_t *)&v_regs[33];
++#else
++        vrsave = (uint32_t *)&v_regs[32];
++#endif
++        __get_user(env->spr[SPR_VRSAVE], vrsave);
++    }
++
++    /* Restore VSX second halves */
++    if (env->insns_flags2 & PPC2_VSX) {
++        uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
++        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
++            __get_user(env->vsr[i], &vsregs[i]);
++        }
++    }
++
++    /* Restore floating point registers.  */
++    if (env->insns_flags & PPC_FLOAT) {
++        uint64_t fpscr;
++        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
++            __get_user(env->fpr[i], &frame->mc_fregs[i]);
++        }
++        __get_user(fpscr, &frame->mc_fregs[32]);
++        env->fpscr = (uint32_t) fpscr;
++    }
++
++    /* Save SPE registers.  The kernel only saves the high half.  */
++    if (env->insns_flags & PPC_SPE) {
++#if defined(TARGET_PPC64)
++        for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
++            uint32_t hi;
++
++            __get_user(hi, &frame->mc_vregs.spe[i]);
++            env->gpr[i] = ((uint64_t)hi << 32) | ((uint32_t) env->gpr[i]);
++        }
++#else
++        for (i = 0; i < ARRAY_SIZE(env->gprh); i++) {
++            __get_user(env->gprh[i], &frame->mc_vregs.spe[i]);
++        }
++#endif
++        __get_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
++    }
++}
++
++#if !defined(TARGET_PPC64)
++void setup_frame(int sig, struct target_sigaction *ka,
++                 target_sigset_t *set, CPUPPCState *env)
++{
++    struct target_sigframe *frame;
++    struct target_sigcontext *sc;
++    target_ulong frame_addr, newsp;
++    int err = 0;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_frame(env, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1))
++        goto sigsegv;
++    sc = &frame->sctx;
++
++    __put_user(ka->_sa_handler, &sc->handler);
++    __put_user(set->sig[0], &sc->oldmask);
++    __put_user(set->sig[1], &sc->_unused[3]);
++    __put_user(h2g(&frame->mctx), &sc->regs);
++    __put_user(sig, &sc->signal);
++
++    /* Save user regs.  */
++    save_user_regs(env, &frame->mctx);
++
++    /* Construct the trampoline code on the stack. */
++    encode_trampoline(TARGET_NR_sigreturn, (uint32_t *)&frame->mctx.tramp);
++
++    /* The kernel checks for the presence of a VDSO here.  We don't
++       emulate a vdso, so use a sigreturn system call.  */
++    env->lr = (target_ulong) h2g(frame->mctx.tramp);
++
++    /* Turn off all fp exceptions.  */
++    env->fpscr = 0;
++
++    /* Create a stack frame for the caller of the handler.  */
++    newsp = frame_addr - SIGNAL_FRAMESIZE;
++    err |= put_user(env->gpr[1], newsp, target_ulong);
 +
 +    if (err)
-+        goto do_sigsegv;
-+    unlock_user_struct(ucp, ucp_addr, 1);
++        goto sigsegv;
++
++    /* Set up registers for signal handler.  */
++    env->gpr[1] = newsp;
++    env->gpr[3] = sig;
++    env->gpr[4] = frame_addr + offsetof(struct target_sigframe, sctx);
++
++    env->nip = (target_ulong) ka->_sa_handler;
++
++    /* Signal handlers are entered in big-endian mode.  */
++    env->msr &= ~(1ull << MSR_LE);
++
++    unlock_user_struct(frame, frame_addr, 1);
 +    return;
-+do_sigsegv:
-+    unlock_user_struct(ucp, ucp_addr, 1);
-+    force_sig(TARGET_SIGSEGV);
++
++sigsegv:
++    unlock_user_struct(frame, frame_addr, 1);
++    force_sigsegv(sig);
 +}
++#endif /* !defined(TARGET_PPC64) */
++
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUPPCState *env)
++{
++    struct target_rt_sigframe *rt_sf;
++    uint32_t *trampptr = 0;
++    struct target_mcontext *mctx = 0;
++    target_ulong rt_sf_addr, newsp = 0;
++    int i, err = 0;
++#if defined(TARGET_PPC64)
++    struct target_sigcontext *sc = 0;
++    struct image_info *image = ((TaskState *)thread_cpu->opaque)->info;
 +#endif
-diff --git a/linux-user/sparc/target_signal.h b/linux-user/sparc/target_signal.h
-index e445e2b463..ea2c68c900 100644
---- a/linux-user/sparc/target_signal.h
-+++ b/linux-user/sparc/target_signal.h
-@@ -33,5 +33,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
-     return state->regwptr[UREG_FP];
++
++    rt_sf_addr = get_sigframe(ka, env, sizeof(*rt_sf));
++    if (!lock_user_struct(VERIFY_WRITE, rt_sf, rt_sf_addr, 1))
++        goto sigsegv;
++
++    tswap_siginfo(&rt_sf->info, info);
++
++    __put_user(0, &rt_sf->uc.tuc_flags);
++    __put_user(0, &rt_sf->uc.tuc_link);
++    __put_user((target_ulong)target_sigaltstack_used.ss_sp,
++               &rt_sf->uc.tuc_stack.ss_sp);
++    __put_user(sas_ss_flags(env->gpr[1]),
++               &rt_sf->uc.tuc_stack.ss_flags);
++    __put_user(target_sigaltstack_used.ss_size,
++               &rt_sf->uc.tuc_stack.ss_size);
++#if !defined(TARGET_PPC64)
++    __put_user(h2g (&rt_sf->uc.tuc_mcontext),
++               &rt_sf->uc.tuc_regs);
++#endif
++    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &rt_sf->uc.tuc_sigmask.sig[i]);
++    }
++
++#if defined(TARGET_PPC64)
++    mctx = &rt_sf->uc.tuc_sigcontext.mcontext;
++    trampptr = &rt_sf->trampoline[0];
++
++    sc = &rt_sf->uc.tuc_sigcontext;
++    __put_user(h2g(mctx), &sc->regs);
++    __put_user(sig, &sc->signal);
++#else
++    mctx = &rt_sf->uc.tuc_mcontext;
++    trampptr = (uint32_t *)&rt_sf->uc.tuc_mcontext.tramp;
++#endif
++
++    save_user_regs(env, mctx);
++    encode_trampoline(TARGET_NR_rt_sigreturn, trampptr);
++
++    /* The kernel checks for the presence of a VDSO here.  We don't
++       emulate a vdso, so use a sigreturn system call.  */
++    env->lr = (target_ulong) h2g(trampptr);
++
++    /* Turn off all fp exceptions.  */
++    env->fpscr = 0;
++
++    /* Create a stack frame for the caller of the handler.  */
++    newsp = rt_sf_addr - (SIGNAL_FRAMESIZE + 16);
++    err |= put_user(env->gpr[1], newsp, target_ulong);
++
++    if (err)
++        goto sigsegv;
++
++    /* Set up registers for signal handler.  */
++    env->gpr[1] = newsp;
++    env->gpr[3] = (target_ulong) sig;
++    env->gpr[4] = (target_ulong) h2g(&rt_sf->info);
++    env->gpr[5] = (target_ulong) h2g(&rt_sf->uc);
++    env->gpr[6] = (target_ulong) h2g(rt_sf);
++
++#if defined(TARGET_PPC64)
++    if (get_ppc64_abi(image) < 2) {
++        /* ELFv1 PPC64 function pointers are pointers to OPD entries. */
++        struct target_func_ptr *handler =
++            (struct target_func_ptr *)g2h(ka->_sa_handler);
++        env->nip = tswapl(handler->entry);
++        env->gpr[2] = tswapl(handler->toc);
++    } else {
++        /* ELFv2 PPC64 function pointers are entry points, but R12
++         * must also be set */
++        env->nip = tswapl((target_ulong) ka->_sa_handler);
++        env->gpr[12] = env->nip;
++    }
++#else
++    env->nip = (target_ulong) ka->_sa_handler;
++#endif
++
++    /* Signal handlers are entered in big-endian mode.  */
++    env->msr &= ~(1ull << MSR_LE);
++
++    unlock_user_struct(rt_sf, rt_sf_addr, 1);
++    return;
++
++sigsegv:
++    unlock_user_struct(rt_sf, rt_sf_addr, 1);
++    force_sigsegv(sig);
++
++}
++
++#if !defined(TARGET_PPC64)
++long do_sigreturn(CPUPPCState *env)
++{
++    struct target_sigcontext *sc = NULL;
++    struct target_mcontext *sr = NULL;
++    target_ulong sr_addr = 0, sc_addr;
++    sigset_t blocked;
++    target_sigset_t set;
++
++    sc_addr = env->gpr[1] + SIGNAL_FRAMESIZE;
++    if (!lock_user_struct(VERIFY_READ, sc, sc_addr, 1))
++        goto sigsegv;
++
++#if defined(TARGET_PPC64)
++    set.sig[0] = sc->oldmask + ((uint64_t)(sc->_unused[3]) << 32);
++#else
++    __get_user(set.sig[0], &sc->oldmask);
++    __get_user(set.sig[1], &sc->_unused[3]);
++#endif
++    target_to_host_sigset_internal(&blocked, &set);
++    set_sigmask(&blocked);
++
++    __get_user(sr_addr, &sc->regs);
++    if (!lock_user_struct(VERIFY_READ, sr, sr_addr, 1))
++        goto sigsegv;
++    restore_user_regs(env, sr, 1);
++
++    unlock_user_struct(sr, sr_addr, 1);
++    unlock_user_struct(sc, sc_addr, 1);
++    return -TARGET_QEMU_ESIGRETURN;
++
++sigsegv:
++    unlock_user_struct(sr, sr_addr, 1);
++    unlock_user_struct(sc, sc_addr, 1);
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
++#endif /* !defined(TARGET_PPC64) */
++
++/* See arch/powerpc/kernel/signal_32.c.  */
++static int do_setcontext(struct target_ucontext *ucp, CPUPPCState *env, int sig)
++{
++    struct target_mcontext *mcp;
++    target_ulong mcp_addr;
++    sigset_t blocked;
++    target_sigset_t set;
++
++    if (copy_from_user(&set, h2g(ucp) + offsetof(struct target_ucontext, tuc_sigmask),
++                       sizeof (set)))
++        return 1;
++
++#if defined(TARGET_PPC64)
++    mcp_addr = h2g(ucp) +
++        offsetof(struct target_ucontext, tuc_sigcontext.mcontext);
++#else
++    __get_user(mcp_addr, &ucp->tuc_regs);
++#endif
++
++    if (!lock_user_struct(VERIFY_READ, mcp, mcp_addr, 1))
++        return 1;
++
++    target_to_host_sigset_internal(&blocked, &set);
++    set_sigmask(&blocked);
++    restore_user_regs(env, mcp, sig);
++
++    unlock_user_struct(mcp, mcp_addr, 1);
++    return 0;
++}
++
++long do_rt_sigreturn(CPUPPCState *env)
++{
++    struct target_rt_sigframe *rt_sf = NULL;
++    target_ulong rt_sf_addr;
++
++    rt_sf_addr = env->gpr[1] + SIGNAL_FRAMESIZE + 16;
++    if (!lock_user_struct(VERIFY_READ, rt_sf, rt_sf_addr, 1))
++        goto sigsegv;
++
++    if (do_setcontext(&rt_sf->uc, env, 1))
++        goto sigsegv;
++
++    do_sigaltstack(rt_sf_addr
++                   + offsetof(struct target_rt_sigframe, uc.tuc_stack),
++                   0, env->gpr[1]);
++
++    unlock_user_struct(rt_sf, rt_sf_addr, 1);
++    return -TARGET_QEMU_ESIGRETURN;
++
++sigsegv:
++    unlock_user_struct(rt_sf, rt_sf_addr, 1);
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
+diff --git a/linux-user/ppc/target_signal.h b/linux-user/ppc/target_signal.h
+index 865c52f3e8..5e293e3b03 100644
+--- a/linux-user/ppc/target_signal.h
++++ b/linux-user/ppc/target_signal.h
+@@ -26,5 +26,11 @@ static inline abi_ulong get_sp_from_cpustate(CPUPPCState *state)
+     return state->gpr[1];
  }
  
 -
++#if !defined(TARGET_PPC64)
 +void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUSPARCState *env);
++                 target_sigset_t *set, CPUPPCState *env);
++#endif
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUSPARCState *env);
- #endif /* SPARC_TARGET_SIGNAL_H */
-diff --git a/linux-user/sparc64/signal.c b/linux-user/sparc64/signal.c
-index 02ca338b6c..c263eb0f08 100644
---- a/linux-user/sparc64/signal.c
-+++ b/linux-user/sparc64/signal.c
-@@ -16,3 +16,5 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-+#define SPARC_TARGET_SIGNAL_H /* to only include sparc64/target_signal.h */
-+#include "../sparc/signal.c"
-diff --git a/linux-user/sparc64/target_signal.h b/linux-user/sparc64/target_signal.h
-index 4449457baf..7f10db9ede 100644
---- a/linux-user/sparc64/target_signal.h
-+++ b/linux-user/sparc64/target_signal.h
-@@ -33,5 +33,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
-     return state->regwptr[UREG_FP];
++                    target_sigset_t *set, CPUPPCState *env);
+ #endif /* PPC_TARGET_SIGNAL_H */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 92d7347b14..7f435c4606 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -803,676 +803,6 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+     return ret;
  }
  
+-#if defined(TARGET_PPC)
 -
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUSPARCState *env);
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUSPARCState *env);
- #endif /* SPARC64_TARGET_SIGNAL_H */
+-/* Size of dummy stack frame allocated when calling signal handler.
+-   See arch/powerpc/include/asm/ptrace.h.  */
+-#if defined(TARGET_PPC64)
+-#define SIGNAL_FRAMESIZE 128
+-#else
+-#define SIGNAL_FRAMESIZE 64
+-#endif
+-
+-/* See arch/powerpc/include/asm/ucontext.h.  Only used for 32-bit PPC;
+-   on 64-bit PPC, sigcontext and mcontext are one and the same.  */
+-struct target_mcontext {
+-    target_ulong mc_gregs[48];
+-    /* Includes fpscr.  */
+-    uint64_t mc_fregs[33];
+-#if defined(TARGET_PPC64)
+-    /* Pointer to the vector regs */
+-    target_ulong v_regs;
+-#else
+-    target_ulong mc_pad[2];
+-#endif
+-    /* We need to handle Altivec and SPE at the same time, which no
+-       kernel needs to do.  Fortunately, the kernel defines this bit to
+-       be Altivec-register-large all the time, rather than trying to
+-       twiddle it based on the specific platform.  */
+-    union {
+-        /* SPE vector registers.  One extra for SPEFSCR.  */
+-        uint32_t spe[33];
+-        /* Altivec vector registers.  The packing of VSCR and VRSAVE
+-           varies depending on whether we're PPC64 or not: PPC64 splits
+-           them apart; PPC32 stuffs them together.
+-           We also need to account for the VSX registers on PPC64
+-        */
+-#if defined(TARGET_PPC64)
+-#define QEMU_NVRREG (34 + 16)
+-        /* On ppc64, this mcontext structure is naturally *unaligned*,
+-         * or rather it is aligned on a 8 bytes boundary but not on
+-         * a 16 bytes one. This pad fixes it up. This is also why the
+-         * vector regs are referenced by the v_regs pointer above so
+-         * any amount of padding can be added here
+-         */
+-        target_ulong pad;
+-#else
+-        /* On ppc32, we are already aligned to 16 bytes */
+-#define QEMU_NVRREG 33
+-#endif
+-        /* We cannot use ppc_avr_t here as we do *not* want the implied
+-         * 16-bytes alignment that would result from it. This would have
+-         * the effect of making the whole struct target_mcontext aligned
+-         * which breaks the layout of struct target_ucontext on ppc64.
+-         */
+-        uint64_t altivec[QEMU_NVRREG][2];
+-#undef QEMU_NVRREG
+-    } mc_vregs;
+-};
+-
+-/* See arch/powerpc/include/asm/sigcontext.h.  */
+-struct target_sigcontext {
+-    target_ulong _unused[4];
+-    int32_t signal;
+-#if defined(TARGET_PPC64)
+-    int32_t pad0;
+-#endif
+-    target_ulong handler;
+-    target_ulong oldmask;
+-    target_ulong regs;      /* struct pt_regs __user * */
+-#if defined(TARGET_PPC64)
+-    struct target_mcontext mcontext;
+-#endif
+-};
+-
+-/* Indices for target_mcontext.mc_gregs, below.
+-   See arch/powerpc/include/asm/ptrace.h for details.  */
+-enum {
+-    TARGET_PT_R0 = 0,
+-    TARGET_PT_R1 = 1,
+-    TARGET_PT_R2 = 2,
+-    TARGET_PT_R3 = 3,
+-    TARGET_PT_R4 = 4,
+-    TARGET_PT_R5 = 5,
+-    TARGET_PT_R6 = 6,
+-    TARGET_PT_R7 = 7,
+-    TARGET_PT_R8 = 8,
+-    TARGET_PT_R9 = 9,
+-    TARGET_PT_R10 = 10,
+-    TARGET_PT_R11 = 11,
+-    TARGET_PT_R12 = 12,
+-    TARGET_PT_R13 = 13,
+-    TARGET_PT_R14 = 14,
+-    TARGET_PT_R15 = 15,
+-    TARGET_PT_R16 = 16,
+-    TARGET_PT_R17 = 17,
+-    TARGET_PT_R18 = 18,
+-    TARGET_PT_R19 = 19,
+-    TARGET_PT_R20 = 20,
+-    TARGET_PT_R21 = 21,
+-    TARGET_PT_R22 = 22,
+-    TARGET_PT_R23 = 23,
+-    TARGET_PT_R24 = 24,
+-    TARGET_PT_R25 = 25,
+-    TARGET_PT_R26 = 26,
+-    TARGET_PT_R27 = 27,
+-    TARGET_PT_R28 = 28,
+-    TARGET_PT_R29 = 29,
+-    TARGET_PT_R30 = 30,
+-    TARGET_PT_R31 = 31,
+-    TARGET_PT_NIP = 32,
+-    TARGET_PT_MSR = 33,
+-    TARGET_PT_ORIG_R3 = 34,
+-    TARGET_PT_CTR = 35,
+-    TARGET_PT_LNK = 36,
+-    TARGET_PT_XER = 37,
+-    TARGET_PT_CCR = 38,
+-    /* Yes, there are two registers with #39.  One is 64-bit only.  */
+-    TARGET_PT_MQ = 39,
+-    TARGET_PT_SOFTE = 39,
+-    TARGET_PT_TRAP = 40,
+-    TARGET_PT_DAR = 41,
+-    TARGET_PT_DSISR = 42,
+-    TARGET_PT_RESULT = 43,
+-    TARGET_PT_REGS_COUNT = 44
+-};
+-
+-
+-struct target_ucontext {
+-    target_ulong tuc_flags;
+-    target_ulong tuc_link;    /* ucontext_t __user * */
+-    struct target_sigaltstack tuc_stack;
+-#if !defined(TARGET_PPC64)
+-    int32_t tuc_pad[7];
+-    target_ulong tuc_regs;    /* struct mcontext __user *
+-                                points to uc_mcontext field */
+-#endif
+-    target_sigset_t tuc_sigmask;
+-#if defined(TARGET_PPC64)
+-    target_sigset_t unused[15]; /* Allow for uc_sigmask growth */
+-    struct target_sigcontext tuc_sigcontext;
+-#else
+-    int32_t tuc_maskext[30];
+-    int32_t tuc_pad2[3];
+-    struct target_mcontext tuc_mcontext;
+-#endif
+-};
+-
+-/* See arch/powerpc/kernel/signal_32.c.  */
+-struct target_sigframe {
+-    struct target_sigcontext sctx;
+-    struct target_mcontext mctx;
+-    int32_t abigap[56];
+-};
+-
+-#if defined(TARGET_PPC64)
+-
+-#define TARGET_TRAMP_SIZE 6
+-
+-struct target_rt_sigframe {
+-    /* sys_rt_sigreturn requires the ucontext be the first field */
+-    struct target_ucontext uc;
+-    target_ulong  _unused[2];
+-    uint32_t trampoline[TARGET_TRAMP_SIZE];
+-    target_ulong pinfo; /* struct siginfo __user * */
+-    target_ulong puc; /* void __user * */
+-    struct target_siginfo info;
+-    /* 64 bit ABI allows for 288 bytes below sp before decrementing it. */
+-    char abigap[288];
+-} __attribute__((aligned(16)));
+-
+-#else
+-
+-struct target_rt_sigframe {
+-    struct target_siginfo info;
+-    struct target_ucontext uc;
+-    int32_t abigap[56];
+-};
+-
+-#endif
+-
+-#if defined(TARGET_PPC64)
+-
+-struct target_func_ptr {
+-    target_ulong entry;
+-    target_ulong toc;
+-};
+-
+-#endif
+-
+-/* We use the mc_pad field for the signal return trampoline.  */
+-#define tramp mc_pad
+-
+-/* See arch/powerpc/kernel/signal.c.  */
+-static target_ulong get_sigframe(struct target_sigaction *ka,
+-                                 CPUPPCState *env,
+-                                 int frame_size)
+-{
+-    target_ulong oldsp;
+-
+-    oldsp = env->gpr[1];
+-
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) &&
+-            (sas_ss_flags(oldsp) == 0)) {
+-        oldsp = (target_sigaltstack_used.ss_sp
+-                 + target_sigaltstack_used.ss_size);
+-    }
+-
+-    return (oldsp - frame_size) & ~0xFUL;
+-}
+-
+-#if ((defined(TARGET_WORDS_BIGENDIAN) && defined(HOST_WORDS_BIGENDIAN)) || \
+-     (!defined(HOST_WORDS_BIGENDIAN) && !defined(TARGET_WORDS_BIGENDIAN)))
+-#define PPC_VEC_HI      0
+-#define PPC_VEC_LO      1
+-#else
+-#define PPC_VEC_HI      1
+-#define PPC_VEC_LO      0
+-#endif
+-
+-
+-static void save_user_regs(CPUPPCState *env, struct target_mcontext *frame)
+-{
+-    target_ulong msr = env->msr;
+-    int i;
+-    target_ulong ccr = 0;
+-
+-    /* In general, the kernel attempts to be intelligent about what it
+-       needs to save for Altivec/FP/SPE registers.  We don't care that
+-       much, so we just go ahead and save everything.  */
+-
+-    /* Save general registers.  */
+-    for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
+-        __put_user(env->gpr[i], &frame->mc_gregs[i]);
+-    }
+-    __put_user(env->nip, &frame->mc_gregs[TARGET_PT_NIP]);
+-    __put_user(env->ctr, &frame->mc_gregs[TARGET_PT_CTR]);
+-    __put_user(env->lr, &frame->mc_gregs[TARGET_PT_LNK]);
+-    __put_user(env->xer, &frame->mc_gregs[TARGET_PT_XER]);
+-
+-    for (i = 0; i < ARRAY_SIZE(env->crf); i++) {
+-        ccr |= env->crf[i] << (32 - ((i + 1) * 4));
+-    }
+-    __put_user(ccr, &frame->mc_gregs[TARGET_PT_CCR]);
+-
+-    /* Save Altivec registers if necessary.  */
+-    if (env->insns_flags & PPC_ALTIVEC) {
+-        uint32_t *vrsave;
+-        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
+-            ppc_avr_t *avr = &env->avr[i];
+-            ppc_avr_t *vreg = (ppc_avr_t *)&frame->mc_vregs.altivec[i];
+-
+-            __put_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
+-            __put_user(avr->u64[PPC_VEC_LO], &vreg->u64[1]);
+-        }
+-        /* Set MSR_VR in the saved MSR value to indicate that
+-           frame->mc_vregs contains valid data.  */
+-        msr |= MSR_VR;
+-#if defined(TARGET_PPC64)
+-        vrsave = (uint32_t *)&frame->mc_vregs.altivec[33];
+-        /* 64-bit needs to put a pointer to the vectors in the frame */
+-        __put_user(h2g(frame->mc_vregs.altivec), &frame->v_regs);
+-#else
+-        vrsave = (uint32_t *)&frame->mc_vregs.altivec[32];
+-#endif
+-        __put_user((uint32_t)env->spr[SPR_VRSAVE], vrsave);
+-    }
+-
+-    /* Save VSX second halves */
+-    if (env->insns_flags2 & PPC2_VSX) {
+-        uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
+-        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
+-            __put_user(env->vsr[i], &vsregs[i]);
+-        }
+-    }
+-
+-    /* Save floating point registers.  */
+-    if (env->insns_flags & PPC_FLOAT) {
+-        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
+-            __put_user(env->fpr[i], &frame->mc_fregs[i]);
+-        }
+-        __put_user((uint64_t) env->fpscr, &frame->mc_fregs[32]);
+-    }
+-
+-    /* Save SPE registers.  The kernel only saves the high half.  */
+-    if (env->insns_flags & PPC_SPE) {
+-#if defined(TARGET_PPC64)
+-        for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
+-            __put_user(env->gpr[i] >> 32, &frame->mc_vregs.spe[i]);
+-        }
+-#else
+-        for (i = 0; i < ARRAY_SIZE(env->gprh); i++) {
+-            __put_user(env->gprh[i], &frame->mc_vregs.spe[i]);
+-        }
+-#endif
+-        /* Set MSR_SPE in the saved MSR value to indicate that
+-           frame->mc_vregs contains valid data.  */
+-        msr |= MSR_SPE;
+-        __put_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
+-    }
+-
+-    /* Store MSR.  */
+-    __put_user(msr, &frame->mc_gregs[TARGET_PT_MSR]);
+-}
+-
+-static void encode_trampoline(int sigret, uint32_t *tramp)
+-{
+-    /* Set up the sigreturn trampoline: li r0,sigret; sc.  */
+-    if (sigret) {
+-        __put_user(0x38000000 | sigret, &tramp[0]);
+-        __put_user(0x44000002, &tramp[1]);
+-    }
+-}
+-
+-static void restore_user_regs(CPUPPCState *env,
+-                              struct target_mcontext *frame, int sig)
+-{
+-    target_ulong save_r2 = 0;
+-    target_ulong msr;
+-    target_ulong ccr;
+-
+-    int i;
+-
+-    if (!sig) {
+-        save_r2 = env->gpr[2];
+-    }
+-
+-    /* Restore general registers.  */
+-    for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
+-        __get_user(env->gpr[i], &frame->mc_gregs[i]);
+-    }
+-    __get_user(env->nip, &frame->mc_gregs[TARGET_PT_NIP]);
+-    __get_user(env->ctr, &frame->mc_gregs[TARGET_PT_CTR]);
+-    __get_user(env->lr, &frame->mc_gregs[TARGET_PT_LNK]);
+-    __get_user(env->xer, &frame->mc_gregs[TARGET_PT_XER]);
+-    __get_user(ccr, &frame->mc_gregs[TARGET_PT_CCR]);
+-
+-    for (i = 0; i < ARRAY_SIZE(env->crf); i++) {
+-        env->crf[i] = (ccr >> (32 - ((i + 1) * 4))) & 0xf;
+-    }
+-
+-    if (!sig) {
+-        env->gpr[2] = save_r2;
+-    }
+-    /* Restore MSR.  */
+-    __get_user(msr, &frame->mc_gregs[TARGET_PT_MSR]);
+-
+-    /* If doing signal return, restore the previous little-endian mode.  */
+-    if (sig)
+-        env->msr = (env->msr & ~(1ull << MSR_LE)) | (msr & (1ull << MSR_LE));
+-
+-    /* Restore Altivec registers if necessary.  */
+-    if (env->insns_flags & PPC_ALTIVEC) {
+-        ppc_avr_t *v_regs;
+-        uint32_t *vrsave;
+-#if defined(TARGET_PPC64)
+-        uint64_t v_addr;
+-        /* 64-bit needs to recover the pointer to the vectors from the frame */
+-        __get_user(v_addr, &frame->v_regs);
+-        v_regs = g2h(v_addr);
+-#else
+-        v_regs = (ppc_avr_t *)frame->mc_vregs.altivec;
+-#endif
+-        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
+-            ppc_avr_t *avr = &env->avr[i];
+-            ppc_avr_t *vreg = &v_regs[i];
+-
+-            __get_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
+-            __get_user(avr->u64[PPC_VEC_LO], &vreg->u64[1]);
+-        }
+-        /* Set MSR_VEC in the saved MSR value to indicate that
+-           frame->mc_vregs contains valid data.  */
+-#if defined(TARGET_PPC64)
+-        vrsave = (uint32_t *)&v_regs[33];
+-#else
+-        vrsave = (uint32_t *)&v_regs[32];
+-#endif
+-        __get_user(env->spr[SPR_VRSAVE], vrsave);
+-    }
+-
+-    /* Restore VSX second halves */
+-    if (env->insns_flags2 & PPC2_VSX) {
+-        uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
+-        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
+-            __get_user(env->vsr[i], &vsregs[i]);
+-        }
+-    }
+-
+-    /* Restore floating point registers.  */
+-    if (env->insns_flags & PPC_FLOAT) {
+-        uint64_t fpscr;
+-        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
+-            __get_user(env->fpr[i], &frame->mc_fregs[i]);
+-        }
+-        __get_user(fpscr, &frame->mc_fregs[32]);
+-        env->fpscr = (uint32_t) fpscr;
+-    }
+-
+-    /* Save SPE registers.  The kernel only saves the high half.  */
+-    if (env->insns_flags & PPC_SPE) {
+-#if defined(TARGET_PPC64)
+-        for (i = 0; i < ARRAY_SIZE(env->gpr); i++) {
+-            uint32_t hi;
+-
+-            __get_user(hi, &frame->mc_vregs.spe[i]);
+-            env->gpr[i] = ((uint64_t)hi << 32) | ((uint32_t) env->gpr[i]);
+-        }
+-#else
+-        for (i = 0; i < ARRAY_SIZE(env->gprh); i++) {
+-            __get_user(env->gprh[i], &frame->mc_vregs.spe[i]);
+-        }
+-#endif
+-        __get_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
+-    }
+-}
+-
+-#if !defined(TARGET_PPC64)
+-static void setup_frame(int sig, struct target_sigaction *ka,
+-                        target_sigset_t *set, CPUPPCState *env)
+-{
+-    struct target_sigframe *frame;
+-    struct target_sigcontext *sc;
+-    target_ulong frame_addr, newsp;
+-    int err = 0;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_frame(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1))
+-        goto sigsegv;
+-    sc = &frame->sctx;
+-
+-    __put_user(ka->_sa_handler, &sc->handler);
+-    __put_user(set->sig[0], &sc->oldmask);
+-    __put_user(set->sig[1], &sc->_unused[3]);
+-    __put_user(h2g(&frame->mctx), &sc->regs);
+-    __put_user(sig, &sc->signal);
+-
+-    /* Save user regs.  */
+-    save_user_regs(env, &frame->mctx);
+-
+-    /* Construct the trampoline code on the stack. */
+-    encode_trampoline(TARGET_NR_sigreturn, (uint32_t *)&frame->mctx.tramp);
+-
+-    /* The kernel checks for the presence of a VDSO here.  We don't
+-       emulate a vdso, so use a sigreturn system call.  */
+-    env->lr = (target_ulong) h2g(frame->mctx.tramp);
+-
+-    /* Turn off all fp exceptions.  */
+-    env->fpscr = 0;
+-
+-    /* Create a stack frame for the caller of the handler.  */
+-    newsp = frame_addr - SIGNAL_FRAMESIZE;
+-    err |= put_user(env->gpr[1], newsp, target_ulong);
+-
+-    if (err)
+-        goto sigsegv;
+-
+-    /* Set up registers for signal handler.  */
+-    env->gpr[1] = newsp;
+-    env->gpr[3] = sig;
+-    env->gpr[4] = frame_addr + offsetof(struct target_sigframe, sctx);
+-
+-    env->nip = (target_ulong) ka->_sa_handler;
+-
+-    /* Signal handlers are entered in big-endian mode.  */
+-    env->msr &= ~(1ull << MSR_LE);
+-
+-    unlock_user_struct(frame, frame_addr, 1);
+-    return;
+-
+-sigsegv:
+-    unlock_user_struct(frame, frame_addr, 1);
+-    force_sigsegv(sig);
+-}
+-#endif /* !defined(TARGET_PPC64) */
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPUPPCState *env)
+-{
+-    struct target_rt_sigframe *rt_sf;
+-    uint32_t *trampptr = 0;
+-    struct target_mcontext *mctx = 0;
+-    target_ulong rt_sf_addr, newsp = 0;
+-    int i, err = 0;
+-#if defined(TARGET_PPC64)
+-    struct target_sigcontext *sc = 0;
+-    struct image_info *image = ((TaskState *)thread_cpu->opaque)->info;
+-#endif
+-
+-    rt_sf_addr = get_sigframe(ka, env, sizeof(*rt_sf));
+-    if (!lock_user_struct(VERIFY_WRITE, rt_sf, rt_sf_addr, 1))
+-        goto sigsegv;
+-
+-    tswap_siginfo(&rt_sf->info, info);
+-
+-    __put_user(0, &rt_sf->uc.tuc_flags);
+-    __put_user(0, &rt_sf->uc.tuc_link);
+-    __put_user((target_ulong)target_sigaltstack_used.ss_sp,
+-               &rt_sf->uc.tuc_stack.ss_sp);
+-    __put_user(sas_ss_flags(env->gpr[1]),
+-               &rt_sf->uc.tuc_stack.ss_flags);
+-    __put_user(target_sigaltstack_used.ss_size,
+-               &rt_sf->uc.tuc_stack.ss_size);
+-#if !defined(TARGET_PPC64)
+-    __put_user(h2g (&rt_sf->uc.tuc_mcontext),
+-               &rt_sf->uc.tuc_regs);
+-#endif
+-    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __put_user(set->sig[i], &rt_sf->uc.tuc_sigmask.sig[i]);
+-    }
+-
+-#if defined(TARGET_PPC64)
+-    mctx = &rt_sf->uc.tuc_sigcontext.mcontext;
+-    trampptr = &rt_sf->trampoline[0];
+-
+-    sc = &rt_sf->uc.tuc_sigcontext;
+-    __put_user(h2g(mctx), &sc->regs);
+-    __put_user(sig, &sc->signal);
+-#else
+-    mctx = &rt_sf->uc.tuc_mcontext;
+-    trampptr = (uint32_t *)&rt_sf->uc.tuc_mcontext.tramp;
+-#endif
+-
+-    save_user_regs(env, mctx);
+-    encode_trampoline(TARGET_NR_rt_sigreturn, trampptr);
+-
+-    /* The kernel checks for the presence of a VDSO here.  We don't
+-       emulate a vdso, so use a sigreturn system call.  */
+-    env->lr = (target_ulong) h2g(trampptr);
+-
+-    /* Turn off all fp exceptions.  */
+-    env->fpscr = 0;
+-
+-    /* Create a stack frame for the caller of the handler.  */
+-    newsp = rt_sf_addr - (SIGNAL_FRAMESIZE + 16);
+-    err |= put_user(env->gpr[1], newsp, target_ulong);
+-
+-    if (err)
+-        goto sigsegv;
+-
+-    /* Set up registers for signal handler.  */
+-    env->gpr[1] = newsp;
+-    env->gpr[3] = (target_ulong) sig;
+-    env->gpr[4] = (target_ulong) h2g(&rt_sf->info);
+-    env->gpr[5] = (target_ulong) h2g(&rt_sf->uc);
+-    env->gpr[6] = (target_ulong) h2g(rt_sf);
+-
+-#if defined(TARGET_PPC64)
+-    if (get_ppc64_abi(image) < 2) {
+-        /* ELFv1 PPC64 function pointers are pointers to OPD entries. */
+-        struct target_func_ptr *handler =
+-            (struct target_func_ptr *)g2h(ka->_sa_handler);
+-        env->nip = tswapl(handler->entry);
+-        env->gpr[2] = tswapl(handler->toc);
+-    } else {
+-        /* ELFv2 PPC64 function pointers are entry points, but R12
+-         * must also be set */
+-        env->nip = tswapl((target_ulong) ka->_sa_handler);
+-        env->gpr[12] = env->nip;
+-    }
+-#else
+-    env->nip = (target_ulong) ka->_sa_handler;
+-#endif
+-
+-    /* Signal handlers are entered in big-endian mode.  */
+-    env->msr &= ~(1ull << MSR_LE);
+-
+-    unlock_user_struct(rt_sf, rt_sf_addr, 1);
+-    return;
+-
+-sigsegv:
+-    unlock_user_struct(rt_sf, rt_sf_addr, 1);
+-    force_sigsegv(sig);
+-
+-}
+-
+-#if !defined(TARGET_PPC64)
+-long do_sigreturn(CPUPPCState *env)
+-{
+-    struct target_sigcontext *sc = NULL;
+-    struct target_mcontext *sr = NULL;
+-    target_ulong sr_addr = 0, sc_addr;
+-    sigset_t blocked;
+-    target_sigset_t set;
+-
+-    sc_addr = env->gpr[1] + SIGNAL_FRAMESIZE;
+-    if (!lock_user_struct(VERIFY_READ, sc, sc_addr, 1))
+-        goto sigsegv;
+-
+-#if defined(TARGET_PPC64)
+-    set.sig[0] = sc->oldmask + ((uint64_t)(sc->_unused[3]) << 32);
+-#else
+-    __get_user(set.sig[0], &sc->oldmask);
+-    __get_user(set.sig[1], &sc->_unused[3]);
+-#endif
+-    target_to_host_sigset_internal(&blocked, &set);
+-    set_sigmask(&blocked);
+-
+-    __get_user(sr_addr, &sc->regs);
+-    if (!lock_user_struct(VERIFY_READ, sr, sr_addr, 1))
+-        goto sigsegv;
+-    restore_user_regs(env, sr, 1);
+-
+-    unlock_user_struct(sr, sr_addr, 1);
+-    unlock_user_struct(sc, sc_addr, 1);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-sigsegv:
+-    unlock_user_struct(sr, sr_addr, 1);
+-    unlock_user_struct(sc, sc_addr, 1);
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+-#endif /* !defined(TARGET_PPC64) */
+-
+-/* See arch/powerpc/kernel/signal_32.c.  */
+-static int do_setcontext(struct target_ucontext *ucp, CPUPPCState *env, int sig)
+-{
+-    struct target_mcontext *mcp;
+-    target_ulong mcp_addr;
+-    sigset_t blocked;
+-    target_sigset_t set;
+-
+-    if (copy_from_user(&set, h2g(ucp) + offsetof(struct target_ucontext, tuc_sigmask),
+-                       sizeof (set)))
+-        return 1;
+-
+-#if defined(TARGET_PPC64)
+-    mcp_addr = h2g(ucp) +
+-        offsetof(struct target_ucontext, tuc_sigcontext.mcontext);
+-#else
+-    __get_user(mcp_addr, &ucp->tuc_regs);
+-#endif
+-
+-    if (!lock_user_struct(VERIFY_READ, mcp, mcp_addr, 1))
+-        return 1;
+-
+-    target_to_host_sigset_internal(&blocked, &set);
+-    set_sigmask(&blocked);
+-    restore_user_regs(env, mcp, sig);
+-
+-    unlock_user_struct(mcp, mcp_addr, 1);
+-    return 0;
+-}
+-
+-long do_rt_sigreturn(CPUPPCState *env)
+-{
+-    struct target_rt_sigframe *rt_sf = NULL;
+-    target_ulong rt_sf_addr;
+-
+-    rt_sf_addr = env->gpr[1] + SIGNAL_FRAMESIZE + 16;
+-    if (!lock_user_struct(VERIFY_READ, rt_sf, rt_sf_addr, 1))
+-        goto sigsegv;
+-
+-    if (do_setcontext(&rt_sf->uc, env, 1))
+-        goto sigsegv;
+-
+-    do_sigaltstack(rt_sf_addr
+-                   + offsetof(struct target_rt_sigframe, uc.tuc_stack),
+-                   0, env->gpr[1]);
+-
+-    unlock_user_struct(rt_sf, rt_sf_addr, 1);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-sigsegv:
+-    unlock_user_struct(rt_sf, rt_sf_addr, 1);
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+-
+-#endif
+-
+ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+                                   struct emulated_sigtable *k)
+ {
 -- 
 2.14.3
