@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezPpF-0002Za-Q9
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:45:58 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ezPv9-0005X1-BO
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ezPpE-00059l-TM
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:45:57 -0400
-Date: Fri, 23 Mar 2018 16:45:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180323164545.GC17165@work-vm>
-References: <1520507908-16743-1-git-send-email-pl@kamp.de>
-	<1520507908-16743-5-git-send-email-pl@kamp.de>
+	(envelope-from <laurent@vivier.eu>) id 1ezPv5-0001s6-95
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:52:03 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:45269)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ezPv4-0001p6-Vp
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 12:51:59 -0400
+References: <20180322215833.7713-1-laurent@vivier.eu>
+	<20180322215833.7713-2-laurent@vivier.eu>
+	<CAFEAcA-xXP2sBWFknM4gKsVNSqGu7=JnF0xD8gGbSerWnznOiQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <408d4186-805c-47b1-7718-9cfc1455aa35@vivier.eu>
+Date: Fri, 23 Mar 2018 17:51:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520507908-16743-5-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH 4/5] migration/block: limit the number of
- parallel I/O requests
+In-Reply-To: <CAFEAcA-xXP2sBWFknM4gKsVNSqGu7=JnF0xD8gGbSerWnznOiQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.13 1/5] linux-user: cleanup signal.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, jjherne@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-* Peter Lieven (pl@kamp.de) wrote:
-> the current implementation submits up to 512 I/O requests in parallel
-> which is much to high especially for a background task.
-> This patch adds a maximum limit of 16 I/O requests that can
-> be submitted in parallel to avoid monopolizing the I/O device.
+Le 23/03/2018 à 15:22, Peter Maydell a écrit :
+> On 22 March 2018 at 21:58, Laurent Vivier <laurent@vivier.eu> wrote:
+>> move all target specific parts to
+>> signal.inc.c in arch directory
+>>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>  linux-user/aarch64/signal.inc.c    |  556 +++
+>>  linux-user/alpha/signal.inc.c      |  258 ++
+>>  linux-user/arm/signal.inc.c        |  749 +++++
+>>  linux-user/cris/signal.inc.c       |  166 +
+>>  linux-user/hppa/signal.inc.c       |  188 ++
+>>  linux-user/i386/signal.inc.c       |  579 ++++
+>>  linux-user/m68k/signal.inc.c       |  406 +++
+>>  linux-user/microblaze/signal.inc.c |  226 ++
+>>  linux-user/mips/signal.inc.c       |  378 +++
+>>  linux-user/mips64/signal.inc.c     |    1 +
+>>  linux-user/nios2/signal.inc.c      |  232 ++
+>>  linux-user/openrisc/signal.inc.c   |  209 ++
+>>  linux-user/ppc/signal.inc.c        |  667 ++++
+>>  linux-user/riscv/signal.inc.c      |  196 ++
+>>  linux-user/s390x/signal.inc.c      |  305 ++
+>>  linux-user/sh4/signal.inc.c        |  327 ++
+>>  linux-user/signal.c                | 6487 +-----------------------------------
+>>  linux-user/sparc/signal.inc.c      |  601 ++++
+>>  linux-user/sparc64/signal.inc.c    |    1 +
+>>  linux-user/tilegx/signal.inc.c     |  163 +
+>>  linux-user/x86_64/signal.inc.c     |    1 +
+>>  linux-user/xtensa/signal.inc.c     |  253 ++
+>>  22 files changed, 6463 insertions(+), 6486 deletions(-)
 > 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+> I think anything with a diffstat like this is basically
+> unreviewable, at least for me :-(
+> 
+>> diff --git a/linux-user/aarch64/signal.inc.c b/linux-user/aarch64/signal.inc.c
+>> new file mode 100644
+>> index 0000000000..28fa0f2f22
+>> --- /dev/null
+>> +++ b/linux-user/aarch64/signal.inc.c
+> 
+> I was hoping we could have these be standalone .c files,
+> rather than just #included from linux-user/signal.c.
+> I appreciate this requires a bit more teasing out of what
+> needs to become non-static in the common code signal.c
+> to be callable from the per-target code, though.
+> 
 
-Queued (including 5/5)
-> ---
->  migration/block.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/migration/block.c b/migration/block.c
-> index 41b95d1..ce939e2 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -37,6 +37,7 @@
->  #define MAX_IS_ALLOCATED_SEARCH (65536 * BDRV_SECTOR_SIZE)
->  
->  #define MAX_IO_BUFFERS 512
-> +#define MAX_PARALLEL_IO 16
->  
->  //#define DEBUG_BLK_MIGRATION
->  
-> @@ -775,6 +776,7 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
->      while ((block_mig_state.submitted +
->              block_mig_state.read_done) * BLOCK_SIZE <
->             qemu_file_get_rate_limit(f) &&
-> +           block_mig_state.submitted < MAX_PARALLEL_IO &&
->             (block_mig_state.submitted + block_mig_state.read_done) <
->             MAX_IO_BUFFERS) {
->          blk_mig_unlock();
-> -- 
-> 2.7.4
-> 
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thank you for your review.
+
+I tried the easy way first... but I'm going to try to do standalone c files.
+
+Thanks,
+Laurent
