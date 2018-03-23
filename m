@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ezP0F-0008Ca-R1
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:53:16 -0400
+	(envelope-from <marcel@redhat.com>) id 1ezP0G-0008Cg-ET
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ezP0B-0007bV-Ef
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:53:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39822 helo=mx1.redhat.com)
+	(envelope-from <marcel@redhat.com>) id 1ezP0D-0007cn-G6
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:53:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54814 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ezP0B-0007bA-3c
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:53:11 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ezP0D-0007cY-Af
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 11:53:13 -0400
 From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Fri, 23 Mar 2018 18:52:58 +0300
-Message-Id: <20180323155306.83812-1-marcel@redhat.com>
-Subject: [Qemu-devel]  [PATCH PULL 0/8] RDMA queue
+Date: Fri, 23 Mar 2018 18:52:59 +0300
+Message-Id: <20180323155306.83812-2-marcel@redhat.com>
+In-Reply-To: <20180323155306.83812-1-marcel@redhat.com>
+References: <20180323155306.83812-1-marcel@redhat.com>
+Subject: [Qemu-devel]  [PATCH PULL 1/8] hw/rdma: Add Query QP operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +26,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, yuval.shaia@oracle.com, mst@redhat.com, marcel@redhat.com, f4bug@amsat.org, eblake@redhat.com, berrange@redhat.com, stefanha@redhat.com
 
-The following changes since commit 4c2c1015905fa1d616750dfe024b4c0b35875950:
+From: Yuval Shaia <yuval.shaia@oracle.com>
 
-  Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20180323' into staging (2018-03-23 10:20:54 +0000)
+This operation is needed by rdma devices - implement it.
 
-are available in the git repository at:
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ hw/rdma/rdma_backend.c | 12 ++++++++++++
+ hw/rdma/rdma_backend.h |  2 ++
+ hw/rdma/rdma_rm.c      | 18 ++++++++++++++++++
+ hw/rdma/rdma_rm.h      |  3 +++
+ 4 files changed, 35 insertions(+)
 
-  https://github.com/marcel-apf/qemu tags/rdma-pull-request
-
-for you to fetch changes up to 6f559013c86d16255991ca23e47bd161407b95c8:
-
-  hw/rdma: Fix 32-bit compilation (2018-03-23 18:38:55 +0300)
-
-----------------------------------------------------------------
-* fix PVRDMA compilation errors and warnings
-* implement query_qp for the PVRDMA device
-* fix make - switch from -I to -iquote
-
-----------------------------------------------------------------
-Marcel Apfelbaum (1):
-      hw/rdma: fix clang compilation errors
-
-Michael S. Tsirkin (2):
-      rdma: fix up include directives
-      make: switch from -I to -iquote
-
-Yuval Shaia (5):
-      hw/rdma: Add Query QP operation
-      hw/rdma: Add support for Query QP verb to pvrdma device
-      hw/rdma: Change host_virt to void *
-      hw/rdma: Use correct print format in CHK_ATTR macro
-      hw/rdma: Fix 32-bit compilation
-
- Makefile.target               |  4 ++--
- configure                     | 16 ++++++-------
- hw/rdma/rdma_backend.c        | 51 +++++++++++++++++++++++++----------------
- hw/rdma/rdma_backend.h        |  6 +++--
- hw/rdma/rdma_backend_defs.h   |  2 +-
- hw/rdma/rdma_rm.c             | 38 +++++++++++++++++++++++--------
- hw/rdma/rdma_rm.h             |  5 +++-
- hw/rdma/rdma_rm_defs.h        |  2 +-
- hw/rdma/rdma_utils.c          |  6 ++---
- hw/rdma/rdma_utils.h          |  6 ++---
- hw/rdma/vmw/pvrdma.h          |  8 +++----
- hw/rdma/vmw/pvrdma_cmd.c      | 45 +++++++++++++++++++++++++++---------
- hw/rdma/vmw/pvrdma_dev_ring.c | 14 ++++++------
- hw/rdma/vmw/pvrdma_dev_ring.h |  4 ++--
- hw/rdma/vmw/pvrdma_main.c     | 53 ++++++++++++++++++++++---------------------
- hw/rdma/vmw/pvrdma_qp_ops.c   | 10 ++++----
- rules.mak                     |  2 +-
- 17 files changed, 166 insertions(+), 106 deletions(-)
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index e306fba534..0beed77c27 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -646,6 +646,18 @@ int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
+     return 0;
+ }
+ 
++int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
++                          int attr_mask, struct ibv_qp_init_attr *init_attr)
++{
++    if (!qp->ibqp) {
++        pr_dbg("QP1\n");
++        attr->qp_state = IBV_QPS_RTS;
++        return 0;
++    }
++
++    return ibv_query_qp(qp->ibqp, attr, attr_mask, init_attr);
++}
++
+ void rdma_backend_destroy_qp(RdmaBackendQP *qp)
+ {
+     if (qp->ibqp) {
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+index 68f2b05ca7..36218d1990 100644
+--- a/hw/rdma/rdma_backend.h
++++ b/hw/rdma/rdma_backend.h
+@@ -83,6 +83,8 @@ int rdma_backend_qp_state_rtr(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
+                               bool use_qkey);
+ int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
+                               uint32_t sq_psn, uint32_t qkey, bool use_qkey);
++int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
++                          int attr_mask, struct ibv_qp_init_attr *init_attr);
+ void rdma_backend_destroy_qp(RdmaBackendQP *qp);
+ 
+ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index b5fc45ddab..43f73adecf 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -453,6 +453,24 @@ int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+     return 0;
+ }
+ 
++int rdma_rm_query_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                     uint32_t qp_handle, struct ibv_qp_attr *attr,
++                     int attr_mask, struct ibv_qp_init_attr *init_attr)
++{
++    RdmaRmQP *qp;
++
++    pr_dbg("qpn=%d\n", qp_handle);
++
++    qp = rdma_rm_get_qp(dev_res, qp_handle);
++    if (!qp) {
++        return -EINVAL;
++    }
++
++    pr_dbg("qp_type=%d\n", qp->qp_type);
++
++    return rdma_backend_query_qp(&qp->backend_qp, attr, attr_mask, init_attr);
++}
++
+ void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
+ {
+     RdmaRmQP *qp;
+diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
+index be95c1b0f4..0528c1972b 100644
+--- a/hw/rdma/rdma_rm.h
++++ b/hw/rdma/rdma_rm.h
+@@ -59,6 +59,9 @@ int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+                       union ibv_gid *dgid, uint32_t dqpn,
+                       enum ibv_qp_state qp_state, uint32_t qkey,
+                       uint32_t rq_psn, uint32_t sq_psn);
++int rdma_rm_query_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
++                     uint32_t qp_handle, struct ibv_qp_attr *attr,
++                     int attr_mask, struct ibv_qp_init_attr *init_attr);
+ void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle);
+ 
+ int rdma_rm_alloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t *cqe_ctx_id,
 -- 
 2.13.5
