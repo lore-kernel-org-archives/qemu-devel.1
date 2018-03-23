@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1ezKUs-0006ba-Rv
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 07:04:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezKYC-0007Y4-PW
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 07:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1ezKUp-0005vs-Mk
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 07:04:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48066 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1ezKUp-0005u1-HN
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 07:04:31 -0400
-Date: Fri, 23 Mar 2018 12:04:10 +0100
-From: Eduardo Otubo <otubo@redhat.com>
-Message-ID: <20180323110410.GB11563@vader>
-References: <20171124134644.490-1-otubo@redhat.com>
-	<1d5665fa-f425-25b5-041e-5f226192296c@redhat.com>
-	<20171127084035.GA2718@vader>
-	<a04427bc-3f63-9eda-dfcb-2702c4e7efcd@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ezKYB-0002Ct-PD
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 07:08:00 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezKYB-0002BW-JY
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 07:07:59 -0400
+Received: by mail-ot0-x244.google.com with SMTP id i28-v6so12795247otf.8
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 04:07:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a04427bc-3f63-9eda-dfcb-2702c4e7efcd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCHv3] dma/i82374: avoid double creation of
- i82374 device
+In-Reply-To: <20180320013657.25038-1-tpiepho@impinj.com>
+References: <20180320013657.25038-1-tpiepho@impinj.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 11:07:38 +0000
+Message-ID: <CAFEAcA_nHaMqGBdEW+yV7O1oA1ovrWGgB5zOE1OXey2AnCS=dQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] i.MX: Support serial RS-232 break properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: ehabkost@redhat.com, armbru@redhat.com, mjt@tls.msk.ru, agraf@suse.de, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Trent Piepho <tpiepho@impinj.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>
 
-On 16/03/2018 - 11:46:57, Thomas Huth wrote:
-> On 27.11.2017 09:40, Eduardo Otubo wrote:
-> > On Fri, Nov 24, 2017 at 06:44:59PM +0100, Thomas Huth wrote:
-> >>  Hi Eduardo,
-> >>
-> >> On 24.11.2017 14:46, Eduardo Otubo wrote:
-> >>> v3:
-> >>>  * Removed all unecessary local_err
-> >>>  * Change return of isa_bus_dma() and DMA_init() from void to int8_t,
-> >>>    returning -EBUSY on error and 0 on success
-> >>>  * Added qdev_cleanup_nofail() in case isa_bus_dma() returns error. The
-> >>>    cleanup looks safe, but please review if I didn't miss any detail
-> >>>
-> >>> v2:
-> >>>  * Removed user_creatable=false and replaced by error handling using
-> >>>    Error **errp and error_propagate();
-> >>
-> >> Version changelog should go below the "---" separator, otherwise it will
-> >> be included in the git changelog as well, which is kind of ugly.
-> >>
-> >>> QEMU fails when used with the following command line:
-> >>>
-> >>>     ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
-> >>>     qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
-> >>>     Aborted (core dumped)
-> >>>
-> >>> The 40p machine type already created the device i82374. If specified in the
-> >>> command line, it will try to create it again, hence generating the error. The
-> >>> function isa_bus_dma() isn't supposed to be called twice for the same bus. One
-> >>> way to avoid this problem is to set user_creatable=false.
-> >>
-> >> You don't do that user_creatable=false here anymore, so please remove it
-> >> from the description.
-> >>
-> >>> A possible fix in a near future would be making
-> >>> isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
-> >>> as well.
-> >>
-> >> You should rephrase that sentence as well.
-> >>
-> > 
-> > Well, I think one mistake lead to another here. I've always put the changelog
-> > before the --- and that's why the old commit message. For example:
-> > 2f668be77501c0232a84aafb6a066c9915987f0e. But I guess on that context it made
-> > sense to use the changelog since the commit message was too simplistic. I'm
-> > gonna fix this on the v3 then, among other thigs that I need to fix. Thanks for
-> > the heads up :)
-> 
->  Hi,
-> 
-> did you ever send a v4? The problem seems still to persist...
-> 
+On 20 March 2018 at 01:36, Trent Piepho <tpiepho@impinj.com> wrote:
+> Linux does not detect a break from this IMX serial driver as a magic
+> sysrq.  Nor does it note a break in the port error counts.
+>
+> The former is because the Linux driver uses the BRCD bit in the USR2
+> register to trigger the RS-232 break handler in the kernel, which is
+> where sysrq hooks in.  The emulated UART was not setting this status
+> bit.
+>
+> The latter is because the Linux driver expects, in addition to the BRK
+> bit, that the ERR bit is set when a break is read in the FIFO.  A break
+> should also count as a frame error, so add that bit too.
+>
+> Cc: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Signed-off-by: Trent Piepho <tpiepho@impinj.com>
 
-I didn't, I guess I put this on the bottom of my priority list and never got to
-it.
+Yep, the data sheet is nice and clear here about the requirements.
 
-I'll send a new version right away.
-Thanks for the reminder.
+Applied to target-arm.next, thanks.
 
--- 
-Eduardo Otubo
+-- PMM
