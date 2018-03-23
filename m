@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezMK3-0005Bx-Mr
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:01:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezMVH-0007rX-Ah
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ezMJy-0003bU-0E
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:01:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47476 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ezMJx-0003b2-Ss
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:01:25 -0400
-Date: Fri, 23 Mar 2018 21:01:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180323130117.GP32362@xz-mi>
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-21-peterx@redhat.com>
-	<1bd08e1d-b6ff-6b39-e053-599bddd1a208@de.ibm.com>
-	<20180323122538.GN32362@xz-mi>
-	<332a9ef5-549a-d329-ec5e-d68609b1fbe1@de.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ezMVG-0003S9-Gm
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:13:07 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezMVG-0003Rf-9L
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 09:13:06 -0400
+Received: by mail-ot0-x241.google.com with SMTP id m7-v6so13176396otd.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 06:13:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <332a9ef5-549a-d329-ec5e-d68609b1fbe1@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 20/23] monitor: enable IO thread for
- (qmp & !mux) typed
+In-Reply-To: <6750673e-ffc3-578e-e867-332ac0790935@redhat.com>
+References: <1521794165-31678-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-KEnE9NKGC-vTnMByFC_LDPt2Ae8G7GfOxakfgMGH90w@mail.gmail.com>
+	<6750673e-ffc3-578e-e867-332ac0790935@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 13:12:44 +0000
+Message-ID: <CAFEAcA_u3cKF1aSHbrjW0Hc403G5GkNNom_9mqkJfregfqMymw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/riscv: Fix crashes with
+ "-nodefaults"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, Stefan Hajnoczi <shajnocz@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Mar 23, 2018 at 01:44:54PM +0100, Christian Borntraeger wrote:
-> 
-> 
-> On 03/23/2018 01:25 PM, Peter Xu wrote:
-> > On Fri, Mar 23, 2018 at 01:10:51PM +0100, Christian Borntraeger wrote:
-> >> As Max Reitz said, this breaks several qemu iotests. I can reproduce that on s390
-> >> e.g. with ./check -qcow2 030 in the qemu-iotest.
-> >>
-> >> Why was this merged?
-> > 
-> > My fault.  Sorry.  I should have done iotests before submission.
-> > 
-> > Now I'm trying to fix those iotest issues.
-> > 
-> > I'm not extremely familiar with block, so the progress is a bit slow,
-> > but I'll do it asap (though I'll possibly need some help from the
-> > block team, since there are some not-easy ones for me).
-> 
-> As this patch also seems to trigger something else for Eric, can we revert this
-> patch for the time being and re-apply as soon as we have solutions for the issues?
-> 
-> After all a hard hang in the iotest can break CI environments (as you run into timeouts).
+On 23 March 2018 at 12:31, Thomas Huth <thuth@redhat.com> wrote:
+> On 23.03.2018 10:56, Peter Maydell wrote:
+>> On 23 March 2018 at 08:36, Thomas Huth <thuth@redhat.com> wrote:
+>>> Most of the RISC-V boards currently crash when they are started with
+>>> "-nodefaults", e.g.:
+>>>
+>>> $ gdb --args riscv32-softmmu/qemu-system-riscv32 -nodefaults -M sifive_=
+e
+>>> [...]
+>>> (gdb) r
+>>> Program received signal SIGSEGV, Segmentation fault.
+>>> qemu_chr_fe_init ([...], s=3Ds@entry=3D0x0, [...])
+>>>     at chardev/char-fe.c:210
+>>> 210         } else if (s->be) {
+>>> (gdb) bt
+>>>  0  0x00005555558695f8 in qemu_chr_fe_init ([...], s=3Ds@entry=3D0x0, [=
+...])
+>>>     at chardev/char-fe.c:210
+>>>  1  0x00005555556fb425 in sifive_uart_create ([...], chr=3D0x0, [...])
+>>>     at hw/riscv/sifive_uart.c:169
+>>>  2  0x00005555556f8cc4 in riscv_sifive_e_init (machine=3D[...])
+>>>     at hw/riscv/sifive_e.c:164
+>>>     [...]
+>>>
+>>> With "-nodefaults" there are no entries in serial_hds[], so qemu_chr_fe=
+_init()
+>>> finally tries to dereference a NULL pointer. Let's fix this problem by
+>>> creating a "null" chardev in this case instead.
+>>
+>> Isn't it possible to fix this another level further down
+>> by having qemu_chr_fe_init() &c handle having a NULL chardev?
+>
+> Not sure, ... I don't think that we should create a "null" device in
+> chardev/char-fe.c - that would sound like a layer violation to me.
 
-I'm fine with it if it helps.
+It already does treat a NULL Chardev* as being "do nothing"
+most of the time: eg qemu_chr_fe_write(), qemu_chr_fe_read_all(),
+qemu_chr_fe_ioctl(), qemu_chr_fe_set_handlers() &c all have
+"if be->chr is NULL, do nothing" checks.
 
-Then I can work in background to solved existing problems, then we
-turn it on again in 2.13 when ready (but still it might break things -
-at least it can be during dev cycle rather than softfreeze).
+> So all we could do there is to set an error in "errp" or to simply
+> "ignore" the NULL pointer (so that b->chr simply gets set to NULL here).
 
--- 
-Peter Xu
+I think that the latter seems to be what the design intends:
+a backend with a NULL chardev pointer is "backend with no
+chardev attached at the moment". At least some of our UART devices
+handle that as "just dump output into nothingness", which
+seems logical to me.
+
+Cc'ing Marc-Andr=C3=A9 and Paolo as the chardev maintainers --
+do you have a plan for what the intended design here is?
+
+thanks
+-- PMM
