@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ezLXF-0003w3-SC
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:11:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ezLXn-0004GD-DP
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ezLXA-0008Rr-E8
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:11:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ezLXA-0008R1-5J
-	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:11:00 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2NC9VOL045678
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 08:10:58 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gw04jb83n-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 08:10:58 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 23 Mar 2018 12:10:56 -0000
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-21-peterx@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 23 Mar 2018 13:10:51 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ezLXm-0000a4-D4
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:11:39 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ezLXm-0000ZZ-80
+	for qemu-devel@nongnu.org; Fri, 23 Mar 2018 08:11:38 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id 71-v6so10103357oie.12
+	for <qemu-devel@nongnu.org>; Fri, 23 Mar 2018 05:11:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180309090006.10018-21-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <1bd08e1d-b6ff-6b39-e053-599bddd1a208@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 20/23] monitor: enable IO thread for
- (qmp & !mux) typed
+In-Reply-To: <6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
+References: <d29ae6aa-5758-277b-b754-4e6fe7666e6b@redhat.com>
+	<CAFEAcA9dHPLj6aF=JsS8dXaDWf_ONQ_A+SD1xXQO7DdsWK3yAw@mail.gmail.com>
+	<6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Mar 2018 12:11:17 +0000
+Message-ID: <CAFEAcA_rJ_=-dKauAmrJPGRJ6C09_9CQzRdXK53va4NB_xXKpg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Regression on KVM qemu-system-aarch64 since
+ "monitor: enable IO thread for (qmp & !mux) typed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,48 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Xu <peterx@redhat.com>, Eric Blake <eblake@redhat.com>
 
-As Max Reitz said, this breaks several qemu iotests. I can reproduce that on s390
-e.g. with ./check -qcow2 030 in the qemu-iotest.
+On 23 March 2018 at 12:01, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi,
+>
+> On 23/03/18 11:26, Peter Maydell wrote:
+>> On 23 March 2018 at 10:24, Auger Eric <eric.auger@redhat.com> wrote:
+>>> Hi,
+>>>
+>>> I observe a regression on KVM accelerated qemu-system-aarch64:
+>>>
+>>> Unexpected error in kvm_device_access() at
+>>> /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
+>>> 2018-03-23T09:59:59.629439Z qemu-system-aarch64: KVM_GET_DEVICE_ATTR
+>>> failed: Group 6 attr 0x000000000000c664: Device or resource busy
+>>> 2018-03-23 10:00:00.085+0000: shutting down, reason=crashed
+>>
+>> Can you get a backtrace for this? (I guess you'd need to fiddle
+>> with the kvm_device_access() code to make it assert rather
+>> than passing back the error).
+>
+> OK. I will try to do so. As I could have expected, I cannot reproduce on
+> a standalone qemu command line. The problem observed above is seen with
+> libvirt launch which may be doing some other QMP stuff concurrently?
 
-Why was this merged?
+Hmm, that could be a bit painful to debug. I dunno if libvirt
+has a "launch QEMU under gdb" option. If not, you could try
+something like:
+   if (condition we want to get a backtrace on) {
+       printf("hit condition, attach gdb to process %d\n", (int)getpid());
+       for (;;) { }
+   }
 
+and then QEMU will sit in a loop waiting for you to do a
+  gdb path/to/qemu <pid>
 
-On 03/09/2018 10:00 AM, Peter Xu wrote:
-> Start to use dedicate IO thread for QMP monitors that are not using
-> MUXed chardev.
-> 
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index c6de5f123e..9e8ee2ed14 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -36,6 +36,7 @@
->  #include "net/slirp.h"
->  #include "chardev/char-fe.h"
->  #include "chardev/char-io.h"
-> +#include "chardev/char-mux.h"
->  #include "ui/qemu-spice.h"
->  #include "sysemu/numa.h"
->  #include "monitor/monitor.h"
-> @@ -4533,8 +4534,10 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
->  void monitor_init(Chardev *chr, int flags)
->  {
->      Monitor *mon = g_malloc(sizeof(*mon));
-> +    /* Enable IOThread for QMPs that are not using MUX chardev backends. */
-> +    bool use_io_thr = (!CHARDEV_IS_MUX(chr)) && (flags & MONITOR_USE_CONTROL);
-> 
-> -    monitor_data_init(mon, false, false);
-> +    monitor_data_init(mon, false, use_io_thr);
-> 
->      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
->      mon->flags = flags;
-> 
+thanks
+-- PMM
