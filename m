@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42534)
+Received: from eggs.gnu.org ([208.118.235.92]:42648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezoo0-0007lh-6c
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:27:26 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezooE-0007th-1Q
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezomw-0005lc-70
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:20 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37590)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezonA-0005wW-2O
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:34 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33684)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1ezomw-0005lR-0d
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:14 -0400
-Received: by mail-pg0-x244.google.com with SMTP id n11so5794125pgp.4
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:13 -0700 (PDT)
+	id 1ezon9-0005w7-Sg
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:27 -0400
+Received: by mail-pl0-x242.google.com with SMTP id c11-v6so9442715plo.0
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:27 -0700 (PDT)
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sat, 24 Mar 2018 12:24:46 -0700
-Message-Id: <20180324192455.12254-6-mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:55 -0700
+Message-Id: <20180324192455.12254-15-mdavidsaver@gmail.com>
 In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
 References: <20180324192455.12254-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 05/14] timer: ds1338 change write handling
+Subject: [Qemu-devel] [PATCH 14/14] tests: drop ds1338-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +29,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-instead of a read-modify-write, do direct translation
-of device registers to struct tm members.
-
-This new ds1338_update() is the reverse of
-the existing capture_current_time().
-
-Simplifies later handling of CENTURY bit in
-similar Dallas RTC chips.
+redundant to ds-rtc-*-test.c
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 ---
- hw/timer/ds1338.c | 86 ++++++++++++++++++++++++++-----------------------------
- 1 file changed, 40 insertions(+), 46 deletions(-)
+ tests/Makefile.include |  2 --
+ tests/ds1338-test.c    | 75 --------------------------------------------------
+ 2 files changed, 77 deletions(-)
+ delete mode 100644 tests/ds1338-test.c
 
-diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
-index 9bcda26e51..071c031563 100644
---- a/hw/timer/ds1338.c
-+++ b/hw/timer/ds1338.c
-@@ -159,6 +159,42 @@ static int ds1338_recv(I2CSlave *i2c)
-     return res;
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index d256095c88..04a99ea6fb 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -371,7 +371,6 @@ check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
+ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
  
-+/* call after guest writes to current time registers
-+ * to re-compute our offset from host time.
-+ */
-+static void ds1338_update(DS1338State *s)
-+{
-+
-+    struct tm now;
-+    memset(&now, 0, sizeof(now));
-+
-+    /* TODO: Implement CH (stop) bit?  */
-+    now.tm_sec = from_bcd(s->nvram[R_SEC] & 0x7f);
-+    now.tm_min = from_bcd(s->nvram[R_MIN] & 0x7f);
-+    if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
-+        /* 12 hour (1-12) */
-+        /* read and wrap 1-12 -> 0-11 */
-+        now.tm_hour = from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR12)) % 12u;
-+        if (ARRAY_FIELD_EX32(s->nvram, HOUR, AMPM)) {
-+            now.tm_hour += 12;
-+        }
-+
-+    } else {
-+        now.tm_hour = from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR24));
-+    }
-+    {
-+        /* The day field is supposed to contain a value in
-+               the range 1-7. Otherwise behavior is undefined.
-+             */
-+        int user_wday = (s->nvram[R_WDAY] & 7) - 1;
-+        s->wday_offset = (user_wday - now.tm_wday + 7) % 7;
-+    }
-+    now.tm_mday = from_bcd(s->nvram[R_DATE] & 0x3f);
-+    now.tm_mon = from_bcd(s->nvram[R_MONTH] & 0x1f) - 1;
-+    now.tm_year = from_bcd(s->nvram[R_YEAR]) + 100;
-+    s->offset = qemu_timedate_diff(&now);
-+}
-+
- static int ds1338_send(I2CSlave *i2c, uint8_t data)
- {
-     DS1338State *s = DS1338(i2c);
-@@ -168,52 +204,7 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
-         s->addr_byte = false;
-         return 0;
-     }
--    if (s->ptr < 7) {
--        /* Time register. */
--        struct tm now;
--        qemu_get_timedate(&now, s->offset);
--        switch(s->ptr) {
--        case R_SEC:
--            /* TODO: Implement CH (stop) bit.  */
--            now.tm_sec = from_bcd(data & 0x7f);
--            break;
--        case R_MIN:
--            now.tm_min = from_bcd(data & 0x7f);
--            break;
--        case R_HOUR:
--            if (FIELD_EX32(data, HOUR, SET12)) {
--                /* 12 hour (1-12) */
--                /* read and wrap 1-12 -> 0-11 */
--                now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR12)) % 12u;
--                if (FIELD_EX32(data, HOUR, AMPM)) {
--                    now.tm_hour += 12;
--                }
+ check-qtest-arm-y = tests/tmp105-test$(EXESUF)
+-check-qtest-arm-y += tests/ds1338-test$(EXESUF)
+ check-qtest-arm-y += tests/ds-rtc-current-test$(EXESUF)
+ check-qtest-arm-y += tests/ds-rtc-set-test$(EXESUF)
+ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
+@@ -772,7 +771,6 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+ 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+ tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+-tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
+ tests/ds-rtc-current-test$(EXESUF): tests/ds-rtc-current-test.o $(libqos-imx-obj-y)
+ tests/ds-rtc-set-test$(EXESUF): tests/ds-rtc-set-test.o $(libqos-imx-obj-y)
+ tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
+deleted file mode 100644
+index 742dad9113..0000000000
+--- a/tests/ds1338-test.c
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/*
+- * QTest testcase for the DS1338 RTC
+- *
+- * Copyright (c) 2013 Jean-Christophe Dubois
+- *
+- *  This program is free software; you can redistribute it and/or modify it
+- *  under the terms of the GNU General Public License as published by the
+- *  Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful, but WITHOUT
+- *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+- *  for more details.
+- *
+- *  You should have received a copy of the GNU General Public License along
+- *  with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
 -
--            } else {
--                now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR24));
--            }
--            break;
--        case R_WDAY:
--            {
--                /* The day field is supposed to contain a value in
--                   the range 1-7. Otherwise behavior is undefined.
--                 */
--                int user_wday = (data & 7) - 1;
--                s->wday_offset = (user_wday - now.tm_wday + 7) % 7;
--            }
--            break;
--        case R_DATE:
--            now.tm_mday = from_bcd(data & 0x3f);
--            break;
--        case R_MONTH:
--            now.tm_mon = from_bcd(data & 0x1f) - 1;
--            break;
--        case R_YEAR:
--            now.tm_year = from_bcd(data) + 100;
--            break;
--        }
--        s->offset = qemu_timedate_diff(&now);
--    } else if (s->ptr == R_CTRL) {
-+    if (s->ptr == R_CTRL) {
-         /* Control register. */
- 
-         /* Ensure bits 2, 3 and 6 will read back as zero. */
-@@ -225,6 +216,9 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
- 
-     }
-     s->nvram[s->ptr] = data;
-+    if (s->ptr <= R_YEAR) {
-+        ds1338_update(s);
-+    }
-     inc_regptr(s);
-     return 0;
- }
+-#include "qemu/osdep.h"
+-#include "libqtest.h"
+-#include "libqos/i2c.h"
+-
+-#define IMX25_I2C_0_BASE 0x43F80000
+-
+-#define DS1338_ADDR 0x68
+-
+-static I2CAdapter *i2c;
+-static uint8_t addr;
+-
+-static inline uint8_t bcd2bin(uint8_t x)
+-{
+-    return ((x) & 0x0f) + ((x) >> 4) * 10;
+-}
+-
+-static void send_and_receive(void)
+-{
+-    uint8_t cmd[1];
+-    uint8_t resp[7];
+-    time_t now = time(NULL);
+-    struct tm *tm_ptr = gmtime(&now);
+-
+-    /* reset the index in the RTC memory */
+-    cmd[0] = 0;
+-    i2c_send(i2c, addr, cmd, 1);
+-
+-    /* retrieve the date */
+-    i2c_recv(i2c, addr, resp, 7);
+-
+-    /* check retrieved time againt local time */
+-    g_assert_cmpuint(bcd2bin(resp[4]), == , tm_ptr->tm_mday);
+-    g_assert_cmpuint(bcd2bin(resp[5]), == , 1 + tm_ptr->tm_mon);
+-    g_assert_cmpuint(2000 + bcd2bin(resp[6]), == , 1900 + tm_ptr->tm_year);
+-}
+-
+-int main(int argc, char **argv)
+-{
+-    QTestState *s = NULL;
+-    int ret;
+-
+-    g_test_init(&argc, &argv, NULL);
+-
+-    s = qtest_start("-display none -machine imx25-pdk");
+-    i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
+-    addr = DS1338_ADDR;
+-
+-    qtest_add_func("/ds1338/tx-rx", send_and_receive);
+-
+-    ret = g_test_run();
+-
+-    qtest_quit(s);
+-    g_free(i2c);
+-
+-    return ret;
+-}
 -- 
 2.11.0
