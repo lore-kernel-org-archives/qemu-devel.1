@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42560)
+Received: from eggs.gnu.org ([208.118.235.92]:42626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezoo4-0007o3-QU
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:30:48 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezooB-0007s8-A4
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezon0-0005o8-Qk
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:24 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:35527)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezon7-0005ua-AS
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:31 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:39685)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1ezon0-0005n9-Ky
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:18 -0400
-Received: by mail-pl0-x242.google.com with SMTP id p9-v6so9440708pls.2
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:18 -0700 (PDT)
+	id 1ezon7-0005sr-0d
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:25 -0400
+Received: by mail-pg0-x242.google.com with SMTP id a19so5796060pgw.6
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:24 -0700 (PDT)
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sat, 24 Mar 2018 12:24:49 -0700
-Message-Id: <20180324192455.12254-9-mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:53 -0700
+Message-Id: <20180324192455.12254-13-mdavidsaver@gmail.com>
 In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
 References: <20180324192455.12254-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 08/14] tests: ds-rtc test wday offset
+Subject: [Qemu-devel] [PATCH 12/14] timer: ds-rtc handle CENTURY bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,103 +31,101 @@ Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 ---
- tests/ds-rtc-common.h       | 10 +++++++---
- tests/ds-rtc-current-test.c |  9 ++++++++-
- tests/ds-rtc-set-test.c     |  6 ++++--
- 3 files changed, 19 insertions(+), 6 deletions(-)
+ hw/timer/ds-rtc.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/tests/ds-rtc-common.h b/tests/ds-rtc-common.h
-index c8e6c2bc5b..633131c55f 100644
---- a/tests/ds-rtc-common.h
-+++ b/tests/ds-rtc-common.h
-@@ -20,7 +20,7 @@ static uint8_t addr;
- static bool use_century;
+diff --git a/hw/timer/ds-rtc.c b/hw/timer/ds-rtc.c
+index 2df1bce3f8..5a4df1b115 100644
+--- a/hw/timer/ds-rtc.c
++++ b/hw/timer/ds-rtc.c
+@@ -70,6 +70,7 @@ typedef struct DSRTCState {
+ typedef struct DSRTCClass {
+     I2CSlaveClass parent_obj;
  
- /* input buffer must have at least 7 elements */
--static inline time_t rtc_parse(const uint8_t *buf)
-+static inline time_t rtc_parse(const uint8_t *buf, unsigned *wday)
- {
-     struct tm parts;
- 
-@@ -48,10 +48,14 @@ static inline time_t rtc_parse(const uint8_t *buf)
-         parts.tm_year += 100u;
++    bool has_century;
+     /* actual address space size must be <= NVRAM_SIZE */
+     unsigned addr_size;
+     unsigned ctrl_offset;
+@@ -91,7 +92,7 @@ static const VMStateDescription vmstate_dsrtc = {
      }
+ };
  
-+    if (wday) {
-+        *wday = parts.tm_wday;
-+    }
+-static void capture_current_time(DSRTCState *s)
++static void capture_current_time(DSRTCState *s, DSRTCClass *k)
+ {
+     /* Capture the current time into the secondary registers
+      * which will be actually read by the data transfer operation.
+@@ -123,25 +124,28 @@ static void capture_current_time(DSRTCState *s)
+     }
+     s->nvram[R_DATE] = to_bcd(now.tm_mday);
+     s->nvram[R_MONTH] = to_bcd(now.tm_mon + 1);
+-    s->nvram[R_YEAR] = to_bcd(now.tm_year - 100);
++    s->nvram[R_YEAR] = to_bcd(now.tm_year % 100u);
 +
-     return mktimegm(&parts);
++    ARRAY_FIELD_DP32(s->nvram, MONTH, CENTURY,
++                     k->has_century && now.tm_year >= 100)
  }
  
--static time_t rtc_gettime(void)
-+static time_t rtc_gettime(unsigned *wday)
+-static void inc_regptr(DSRTCState *s)
++static void inc_regptr(DSRTCState *s, DSRTCClass *k)
  {
-     uint8_t buf[7];
- 
-@@ -61,7 +65,7 @@ static time_t rtc_gettime(void)
-     /* read back current time registers */
-     i2c_recv(i2c, addr, buf, 7);
- 
--    return rtc_parse(buf);
-+    return rtc_parse(buf, wday);
- }
- 
- #endif /* DSRTCCOMMON_H */
-diff --git a/tests/ds-rtc-current-test.c b/tests/ds-rtc-current-test.c
-index 6acbbed9a6..7dc3202261 100644
---- a/tests/ds-rtc-current-test.c
-+++ b/tests/ds-rtc-current-test.c
-@@ -20,17 +20,24 @@
- static
- void test_rtc_current(void)
- {
-+    struct tm tm_actual;
-     time_t expected, actual;
-     /* relax test to limit false positives when host may be overloaded.
-      * Allow larger delta when running "-m quick"
+-    DSRTCClass *k = DSRTC_GET_CLASS(s);
+     /* The register pointer wraps around after k->addr_size-1; wraparound
+      * causes the current time/date to be retransferred into
+      * the secondary registers.
       */
-     time_t max_delta = g_test_slow() ? 1 : 30;
- 
-+    unsigned wday_expect;
-+
-     actual = time(NULL);
-     /* new second may start here */
--    expected = rtc_gettime();
-+    expected = rtc_gettime(&wday_expect);
-+
-+    gmtime_r(&actual, &tm_actual);
-+
-     g_assert_cmpuint(expected, <=, actual + max_delta);
-     g_assert_cmpuint(expected, >=, actual);
-+    g_assert_cmpuint(wday_expect, ==, tm_actual.tm_wday);
+     s->ptr = (s->ptr + 1) % k->addr_size;
+     if (!s->ptr) {
+-        capture_current_time(s);
++        capture_current_time(s, k);
+     }
  }
  
- int main(int argc, char *argv[])
-diff --git a/tests/ds-rtc-set-test.c b/tests/ds-rtc-set-test.c
-index c48406ee2c..12aeb2580a 100644
---- a/tests/ds-rtc-set-test.c
-+++ b/tests/ds-rtc-set-test.c
-@@ -124,16 +124,18 @@ void test_rtc_set(const void *raw)
+ static int dsrtc_event(I2CSlave *i2c, enum i2c_event event)
+ {
+     DSRTCState *s = DSRTC(i2c);
++    DSRTCClass *k = DSRTC_GET_CLASS(s);
  
-     const uint8_t *testtime = raw;
-     time_t expected, actual;
-+    unsigned wday_expect, wday_actual;
+     switch (event) {
+     case I2C_START_RECV:
+@@ -150,7 +154,7 @@ static int dsrtc_event(I2CSlave *i2c, enum i2c_event event)
+          * START_SEND, because the guest can't get at that data
+          * without going through a START_RECV which would overwrite it.
+          */
+-        capture_current_time(s);
++        capture_current_time(s, k);
+         break;
+     case I2C_START_SEND:
+         s->addr_byte = true;
+@@ -165,10 +169,11 @@ static int dsrtc_event(I2CSlave *i2c, enum i2c_event event)
+ static int dsrtc_recv(I2CSlave *i2c)
+ {
+     DSRTCState *s = DSRTC(i2c);
++    DSRTCClass *k = DSRTC_GET_CLASS(s);
+     uint8_t res;
  
-     /* skip address pointer and parse remainder */
--    expected = rtc_parse(&testtime[1]);
-+    expected = rtc_parse(&testtime[1], &wday_expect);
- 
-     i2c_send(i2c, addr, testtime, 8);
-     /* host may start new second here */
--    actual = rtc_gettime();
-+    actual = rtc_gettime(&wday_actual);
- 
-     g_assert_cmpuint(expected, <=, actual);
-     g_assert_cmpuint(expected + max_delta, >=, actual);
-+    g_assert_cmpuint(wday_expect, ==, wday_actual);
+     res  = s->nvram[s->ptr];
+-    inc_regptr(s);
++    inc_regptr(s, k);
+     return res;
  }
  
- int main(int argc, char *argv[])
+@@ -230,7 +235,7 @@ static int dsrtc_send(I2CSlave *i2c, uint8_t data)
+     if (s->ptr <= R_YEAR) {
+         dsrtc_update(s);
+     }
+-    inc_regptr(s);
++    inc_regptr(s, k);
+     return 0;
+ }
+ 
+@@ -278,6 +283,7 @@ static void ds1338_class_init(ObjectClass *klass, void *data)
+ {
+     DSRTCClass *k = DSRTC_CLASS(klass);
+ 
++    k->has_century = false;
+     k->addr_size = 0x40;
+     k->ctrl_offset = R_DS1338_CTRL;
+     k->ctrl_write = ds1338_control_write;
 -- 
 2.11.0
