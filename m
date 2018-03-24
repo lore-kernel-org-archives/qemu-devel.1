@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:45738)
+Received: from eggs.gnu.org ([208.118.235.92]:43246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezow1-0004jW-3w
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:35:43 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezoxd-0000Bv-Bd
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezops-0007Jt-Pn
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:29:22 -0400
-References: <6f10cd53d361a395aa0e85a9311ec4e9a8fc11e5.1521868451.git.mprivozn@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <73a91502-7cda-c3c3-b439-78d7bae0f2e2@redhat.com>
-Date: Sat, 24 Mar 2018 06:46:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <6f10cd53d361a395aa0e85a9311ec4e9a8fc11e5.1521868451.git.mprivozn@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] qemu-pr-helper: Actually allow
- users to specify pidfile
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezomu-0005lC-KO
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:28:50 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1ezomu-0005ku-E2
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:12 -0400
+Received: by mail-pf0-x243.google.com with SMTP id f15so243982pfn.0
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:12 -0700 (PDT)
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:45 -0700
+Message-Id: <20180324192455.12254-5-mdavidsaver@gmail.com>
+In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
+References: <20180324192455.12254-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 04/14] timer: ds1338 clarify HOUR handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On 03/24/2018 12:14 AM, Michal Privoznik wrote:
-> Due to wrong specification of arguments to getopt_long() any
-> attempt to set pidfile resulted in:
-> 
-> 1) the default to be leaked
-> 2) the @pidfile variable to be set to NULL (because optarg is
-> NULL without this patch).
+Simplify and comment the translation between
+registers and struct tm.
 
-Broken since the introduction in commit b855f8d, in 2.11 (documentation 
-has always mentioned the argument, code has never supported it).
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ hw/timer/ds1338.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
-> 
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-
-CC: qemu-stable@nongnu.org
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
+index 72a4692d60..9bcda26e51 100644
+--- a/hw/timer/ds1338.c
++++ b/hw/timer/ds1338.c
+@@ -88,23 +88,23 @@ static void capture_current_time(DS1338State *s)
+      * which will be actually read by the data transfer operation.
+      */
+     struct tm now;
++    bool mode12 = ARRAY_FIELD_EX32(s->nvram, HOUR, SET12);
+     qemu_get_timedate(&now, s->offset);
++
+     s->nvram[R_SEC] = to_bcd(now.tm_sec);
+     s->nvram[R_MIN] = to_bcd(now.tm_min);
+-    if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
+-        int tmp = now.tm_hour;
+-        if (tmp % 12 == 0) {
+-            tmp += 12;
+-        }
+-        s->nvram[R_HOUR] = 0;
++    s->nvram[R_HOUR] = 0;
++    if (mode12) {
++        /* map 0-23 to 1-12 am/pm */
+         ARRAY_FIELD_DP32(s->nvram, HOUR, SET12, 1);
+-        if (tmp <= 12) {
+-            ARRAY_FIELD_DP32(s->nvram, HOUR, AMPM, 0);
+-            ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR12, to_bcd(tmp));
+-        } else {
+-            ARRAY_FIELD_DP32(s->nvram, HOUR, AMPM, 1);
+-            ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR12, to_bcd(tmp - 12));
++        ARRAY_FIELD_DP32(s->nvram, HOUR, AMPM, now.tm_hour >= 12u);
++        now.tm_hour %= 12u; /* wrap 0-23 to 0-11 */
++        if (now.tm_hour == 0u) {
++            /* midnight/noon stored as 12 */
++            now.tm_hour = 12u;
+         }
++        ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR12, to_bcd(now.tm_hour));
++
+     } else {
+         ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR24, to_bcd(now.tm_hour));
+     }
+@@ -182,14 +182,13 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+             break;
+         case R_HOUR:
+             if (FIELD_EX32(data, HOUR, SET12)) {
+-                int tmp = from_bcd(FIELD_EX32(data, HOUR, HOUR12));
++                /* 12 hour (1-12) */
++                /* read and wrap 1-12 -> 0-11 */
++                now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR12)) % 12u;
+                 if (FIELD_EX32(data, HOUR, AMPM)) {
+-                    tmp += 12;
++                    now.tm_hour += 12;
+                 }
+-                if (tmp % 12 == 0) {
+-                    tmp -= 12;
+-                }
+-                now.tm_hour = tmp;
++
+             } else {
+                 now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR24));
+             }
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.11.0
