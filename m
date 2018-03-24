@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35238)
+Received: from eggs.gnu.org ([208.118.235.92]:58252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezq6A-0000zO-Fz
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:50:16 -0400
+	(envelope-from <mjc@sifive.com>) id 1ezq9k-0002qh-Vu
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezq56-0008HX-F4
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:49:10 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:43022)
+	(envelope-from <mjc@sifive.com>) id 1ezq8h-0006Jj-0t
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:52:53 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33375)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1ezon8-0005uz-GL
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:26 -0400
-Received: by mail-pl0-x242.google.com with SMTP id f23-v6so9436658plr.10
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:26 -0700 (PDT)
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sat, 24 Mar 2018 12:24:54 -0700
-Message-Id: <20180324192455.12254-14-mdavidsaver@gmail.com>
-In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
-References: <20180324192455.12254-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 13/14] timer: ds-rtc model ds1375
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ezpdH-0006q8-O0
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:19:19 -0400
+Received: by mail-ot0-x244.google.com with SMTP id 23-v6so6283704otj.0
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 13:19:19 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAHNT7Nu=OHy8kV-T2JkzQ1+4XX=iKwYrWh4P9hFmne_f6ueCow@mail.gmail.com>
+References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
+	<1521915220-65389-2-git-send-email-mjc@sifive.com>
+	<CAHNT7Nu=OHy8kV-T2JkzQ1+4XX=iKwYrWh4P9hFmne_f6ueCow@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 24 Mar 2018 13:19:18 -0700
+Message-ID: <CAHNT7NvNO8KUE-KZhWW8NScnEnxnK1QjT-kGSsbXXjad3iqBUw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 06/26] RISC-V: Mark ROM read-only after
+ copying in code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +30,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: RISC-V Patches <patches@groups.riscv.org>, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-differences from ds1338
+On Sat, Mar 24, 2018 at 12:45 PM, Michael Clark <mjc@sifive.com> wrote:
 
-* Has alarms (not modeled)
-* different control register (not modeled)
-* smaller address space (0x20 vs. 0x40)
+>
+>
+> On Sat, Mar 24, 2018 at 11:13 AM, Michael Clark <mjc@sifive.com> wrote:
+>
+>> The sifive_u machine already marks its ROM readonly. This fixes
+>> the remaining boards.
+>>
+>> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+>> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+>> Signed-off-by: Michael Clark <mjc@sifive.com>
+>> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>> ---
+>>  hw/riscv/sifive_u.c      |  9 +++++----
+>>  hw/riscv/spike.c         | 18 ++++++++++--------
+>>  hw/riscv/virt.c          |  7 ++++---
+>>  include/hw/riscv/spike.h |  8 --------
+>>  4 files changed, 19 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+>> index 6116c38..25df16c 100644
+>> --- a/hw/riscv/sifive_u.c
+>> +++ b/hw/riscv/sifive_u.c
+>> @@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState
+>> *machine)
+>>      SiFiveUState *s = g_new0(SiFiveUState, 1);
+>>      MemoryRegion *sys_memory = get_system_memory();
+>>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>>
+>>      /* Initialize SOC */
+>>      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+>> @@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState
+>> *machine)
+>>      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>>
+>>      /* boot rom */
+>> -    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
+>> +    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
+>>                             memmap[SIFIVE_U_MROM].base, &error_fatal);
+>> -    memory_region_set_readonly(boot_rom, true);
+>> -    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
+>> +    memory_region_set_readonly(mask_rom, true);
+>> +    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
+>>
+>>      if (machine->kernel_filename) {
+>>          load_kernel(machine->kernel_filename);
+>> @@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState
+>> *machine)
+>>      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>>      cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
+>>          sizeof(reset_vec), s->fdt, s->fdt_size);
+>> +    memory_region_set_readonly(mask_rom, true);
+>>
+>>      /* MMIO */
+>>      s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+>> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+>> index 7710333..74edf33 100644
+>> --- a/hw/riscv/spike.c
+>> +++ b/hw/riscv/spike.c
+>> @@ -173,7 +173,7 @@ static void spike_v1_10_0_board_init(MachineState
+>> *machine)
+>>      SpikeState *s = g_new0(SpikeState, 1);
+>>      MemoryRegion *system_memory = get_system_memory();
+>>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>>
+>>      /* Initialize SOC */
+>>      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+>> @@ -196,9 +196,9 @@ static void spike_v1_10_0_board_init(MachineState
+>> *machine)
+>>      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>>
+>>      /* boot rom */
+>> -    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
+>> +    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
+>>                             s->fdt_size + 0x2000, &error_fatal);
+>> -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+>> +    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+>>
+>>      if (machine->kernel_filename) {
+>>          load_kernel(machine->kernel_filename);
+>> @@ -228,9 +228,10 @@ static void spike_v1_10_0_board_init(MachineState
+>> *machine)
+>>      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>>      cpu_physical_memory_write(memmap[SPIKE_MROM].base +
+>> sizeof(reset_vec),
+>>          s->fdt, s->fdt_size);
+>> +    memory_region_set_readonly(mask_rom, true);
+>>
+>>      /* initialize HTIF using symbols found in load_kernel */
+>> -    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env,
+>> serial_hds[0]);
+>> +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env,
+>> serial_hds[0]);
+>>
+>>      /* Core Local Interruptor (timer and IPI) */
+>>      sifive_clint_create(memmap[SPIKE_CLINT].base,
+>> memmap[SPIKE_CLINT].size,
+>> @@ -244,7 +245,7 @@ static void spike_v1_09_1_board_init(MachineState
+>> *machine)
+>>      SpikeState *s = g_new0(SpikeState, 1);
+>>      MemoryRegion *system_memory = get_system_memory();
+>>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>>
+>>      /* Initialize SOC */
+>>      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+>> @@ -264,9 +265,9 @@ static void spike_v1_09_1_board_init(MachineState
+>> *machine)
+>>          main_mem);
+>>
+>>      /* boot rom */
+>> -    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
+>> +    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
+>>                             0x40000, &error_fatal);
+>> -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+>> +    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+>>
+>>      if (machine->kernel_filename) {
+>>          load_kernel(machine->kernel_filename);
+>> @@ -325,9 +326,10 @@ static void spike_v1_09_1_board_init(MachineState
+>> *machine)
+>>      /* copy in the config string */
+>>      cpu_physical_memory_write(memmap[SPIKE_MROM].base +
+>> sizeof(reset_vec),
+>>          config_string, config_string_len);
+>> +    memory_region_set_readonly(mask_rom, true);
+>>
+>>      /* initialize HTIF using symbols found in load_kernel */
+>> -    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env,
+>> serial_hds[0]);
+>> +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env,
+>> serial_hds[0]);
+>>
+>>      /* Core Local Interruptor (timer and IPI) */
+>>      sifive_clint_create(memmap[SPIKE_CLINT].base,
+>> memmap[SPIKE_CLINT].size,
+>> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+>> index f8c19b4..f1e3641 100644
+>> --- a/hw/riscv/virt.c
+>> +++ b/hw/riscv/virt.c
+>> @@ -270,7 +270,7 @@ static void riscv_virt_board_init(MachineState
+>> *machine)
+>>      RISCVVirtState *s = g_new0(RISCVVirtState, 1);
+>>      MemoryRegion *system_memory = get_system_memory();
+>>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>>      char *plic_hart_config;
+>>      size_t plic_hart_config_len;
+>>      int i;
+>> @@ -296,9 +296,9 @@ static void riscv_virt_board_init(MachineState
+>> *machine)
+>>      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>>
+>>      /* boot rom */
+>> -    memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
+>> +    memory_region_init_ram(mask_rom, NULL, "riscv_virt_board.mrom",
+>>                             s->fdt_size + 0x2000, &error_fatal);
+>> -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+>> +    memory_region_add_subregion(system_memory, 0x0, mask_rom);
+>>
+>>      if (machine->kernel_filename) {
+>>          uint64_t kernel_entry = load_kernel(machine->kernel_filename);
+>> @@ -339,6 +339,7 @@ static void riscv_virt_board_init(MachineState
+>> *machine)
+>>      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>>      cpu_physical_memory_write(memmap[VIRT_MROM].base +
+>> sizeof(reset_vec),
+>>          s->fdt, s->fdt_size);
+>> +    memory_region_set_readonly(mask_rom, true);
+>>
+>>      /* create PLIC hart topology configuration string */
+>>      plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) *
+>> smp_cpus;
+>> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+>> index d85a64e..179b6cf 100644
+>> --- a/include/hw/riscv/spike.h
+>> +++ b/include/hw/riscv/spike.h
+>> @@ -22,20 +22,12 @@
+>>  #define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9_1"
+>>  #define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
+>>
+>> -#define SPIKE(obj) \
+>> -    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
+>> -
+>>  typedef struct {
+>> -    /*< private >*/
+>> -    SysBusDevice parent_obj;
+>> -
+>> -    /*< public >*/
+>>
+>
+> These should not be removed in patch 6, however they are added back in the
+> subsequent patch 7. The net result is okay, however if we want to be
+> pedantic, we could remove this hunk from patch 6 and alter patch 7 to not
+> add these fields back.
+>
 
-Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
----
- hw/timer/ds-rtc.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+Fixed in the riscv.org qemu-2.12-fixes branch:
 
-diff --git a/hw/timer/ds-rtc.c b/hw/timer/ds-rtc.c
-index 5a4df1b115..e5da36cae8 100644
---- a/hw/timer/ds-rtc.c
-+++ b/hw/timer/ds-rtc.c
-@@ -1,8 +1,9 @@
- /*
-- * MAXIM DSRTC I2C RTC+NVRAM
-+ * MAXIM/Dallas DS1338 and DS1375 I2C RTC+NVRAM
-  *
-+ * Copyright (c) 2018 Michael Davidsaver
-  * Copyright (c) 2009 CodeSourcery.
-- * Written by Paul Brook
-+ * Written by Paul Brook, Michael Davidsaver
-  *
-  * This code is licensed under the GNU GPL v2.
-  *
-@@ -41,6 +42,7 @@
- #define R_YEAR  (0x6)
- 
- #define R_DS1338_CTRL (0x7)
-+#define R_DS1375_CTRL (0xe)
- 
- /* use 12 hour mode when set */
- FIELD(HOUR, SET12, 6, 1)
-@@ -296,10 +298,34 @@ static const TypeInfo ds1338_info = {
-     .class_init    = ds1338_class_init,
- };
- 
-+static void ds1375_control_write(DSRTCState *s, uint8_t data)
-+{
-+    /* just store it, we don't model any features */
-+    s->nvram[R_DS1375_CTRL] = data;
-+}
-+
-+static void ds1375_class_init(ObjectClass *klass, void *data)
-+{
-+    DSRTCClass *k = DSRTC_CLASS(klass);
-+
-+    k->has_century = true;
-+    k->addr_size = 0x20;
-+    k->ctrl_offset = R_DS1375_CTRL;
-+    k->ctrl_write = ds1375_control_write;
-+}
-+
-+static const TypeInfo ds1375_info = {
-+    .name          = "ds1375",
-+    .parent        = TYPE_DSRTC,
-+    .class_size    = sizeof(DSRTCClass),
-+    .class_init    = ds1375_class_init,
-+};
-+
- static void dsrtc_register_types(void)
- {
-     type_register_static(&dsrtc_info);
-     type_register_static(&ds1338_info);
-+    type_register_static(&ds1375_info);
- }
- 
- type_init(dsrtc_register_types)
--- 
-2.11.0
+- https://github.com/riscv/riscv-qemu/commits/qemu-2.12-fixes
+
+This essentially removes a hunk from patch 6 and instead merges it into
+patch 7. The net result is the same however the patches are now cleaner.
+
+     RISCVHartArrayState soc;
+>>      void *fdt;
+>>      int fdt_size;
+>>  } SpikeState;
+>>
+>> -
+>>  enum {
+>>      SPIKE_MROM,
+>>      SPIKE_CLINT,
+>> --
+>> 2.7.0
+>>
+>>
+>
