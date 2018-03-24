@@ -1,35 +1,37 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezl5C-0004q7-Ez
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:32:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ezlDc-0008O1-8a
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ezl44-0005zc-OP
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:27:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48992 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ezhY1-0008TH-GI
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 07:41:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19A438424C
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 11:41:17 +0000 (UTC)
-References: <20180323103239.32414-1-marcandre.lureau@redhat.com>
-	<20180323153537.GS32362@xz-mi>
-	<CAMxuvax=SPeOui3mGcmK8HAo7EqDbpUSZ8Fq3mVHCrLztmBCLA@mail.gmail.com>
-	<15aaea55-9ebd-8a16-c25e-c9bc709fcabc@redhat.com>
-	<20180324014150.GU32362@xz-mi>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <51f5f5e5-61c3-e5c6-e925-4f2e9fdc4403@redhat.com>
-Date: Sat, 24 Mar 2018 06:41:04 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ezlCY-0002R5-5k
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:36:32 -0400
+Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:39592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ezlCX-0002QU-W5
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:35:26 -0400
+Received: by mail-qk0-x231.google.com with SMTP id j73so15963110qke.6
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 08:35:25 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180216134516.6269-1-peter.maydell@linaro.org>
+	<20180216134516.6269-2-peter.maydell@linaro.org>
+	<20180216172841.2ec69b8a@redhat.com>
+	<98a92185-d5e0-48fd-79a7-1c77260c9aca@amsat.org>
+	<2d4874be-fec4-39bb-9df5-bb53f17d1d74@redhat.com>
+	<20180220142319.2c959f83@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fadf8f9f-acd1-6a47-086d-01590400104e@amsat.org>
+Date: Sat, 24 Mar 2018 12:35:22 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180324014150.GU32362@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180220142319.2c959f83@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] monitor: fix expected qmp_capabilities
- error description regression
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/sysbus.h: New sysbus_init_child()
+ helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,44 +40,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
 
-On 03/23/2018 08:41 PM, Peter Xu wrote:
+Hi,
 
->> There have been quite a few patch ideas across multiple threads related to
->> OOB fallout.  Hopefully I can keep straight which patches are intended for
->> 2.12 (anything that fixes a bug, like this one, is a good candidate,
+On 02/20/2018 10:23 AM, Igor Mammedov wrote:
+> On Tue, 20 Feb 2018 13:13:49 +0100
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> I'll mark patches with "for-2.12" if there are.
+>> On 16/02/2018 18:40, Philippe Mathieu-Daudé wrote:
+>>> we can keep object_initialize() when no parent,
+>>> and add object_initialize_child(, const char *childname, Object *parent)
+>>> 'parent' last because all previous args are child-related.
+>>>   
+>>>>  
+>>>>> +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());  
+>>>> and then assuming we don't create sysbus devices, nor should be able to,
+>>>> which are not attached to sysbus_get_default() this one can go sysbus' instance_init()  
+>>> good idea.
+>>>   
+> [...]
 > 
->> and it
->> would be nice if we can undo the temporary reversion of exposing OOB if we
->> can solve all the issues that iotests exposed).
+>> I'm not sure about moving qdev_set_parent_bus to instance_init().  It
+>> would be a bit different from other buses and possibly confusing.
+> That's what this series sort of does, i.e. creating a type/class
+> specific helper(s). Which becomes confusing as number of helpers
+> increases (frankly it's just 2 different approaches to code i.e.
+> functional vs OOM).
 > 
-> IMHO it'll still be risky considering what has already reported.
+> It could be better to keep single QOM API and let SYSBUS base class
+> instance_init() to do all implicit initialization that must be done
+> for inherited classes.
+
+What is the consensus on this series once 2.12 gets released?
+
+> Yes, it will be different from other devices with buses but
+> users won't really care (there is no other buss to assign to),
+> for them it will look like a typical bus-less device and it
+> would be less error-prone to code.
 > 
-> Here's my plan, hopefully to make everyone happy - we keep OOB turned
-> off for 2.12 and even later.  In 2.13, I'll post some new patches to
-> add a new monitor parameter to allow user to enable OOB explicitly,
-> otherwise we never enable it.  After all, for now the only real user
-> should be postcopy. Then we don't need to struggle around all these
-> mess.  What do you think?
+>  
+>> Potentially there could be a "hierarchy" of *_initialize_child
+>> functions, adding or removing arguments as needed for the specific kind
+>> of bus:
+>>
+>> 	/* adds qdev_set_parent_bus */
+>> 	device_initialize_child(Object *parent, const char *childname,
+>> 				BusState *bus, void *data, size_t size,
+>> 				const char *typename);
+>> 	/* uses sysbus_get_default() */
+>> 	sysbus_initialize_child(Object *parent, const char *childname,
+>> 				void *data, size_t size,
+>> 				const char *typename);
+> 
+> 
+>> 	/* initializes "addr" property too */
+>> 	pci_initialize_child(Object *parent, const char *childname,
+>> 			     BusState *bus, int addr,
+>> 			     void *data, size_t size,
+>> 			     const char *typename);
+> PCI could also incorporate PCI specific bus setting/
+> verification logic inside of base class.
+> 
+> It could allow us to drop bus assigning magic in qdev_device_add(),
+> bringing it closer to simple QOM object handling, with specifics
+> abstracted by respective TYPE implementations.
+> Maybe we would be able to unify -device with -object in the end.
 
-If you're going to add a CLI parameter that must be specified for OOB to 
-even be advertised, then it is MUCH less invasive to existing clients 
-(it does mean that opting in to OOB now requires the command line 
-argument AND the capability request during qmp_capabilities) - as such, 
-enabling the opt-in during 2.12 is less controversial, and I see no 
-reason to defer it to 2.13, especially if you want to maximize testing 
-of the new feature to shake out the bugs it encounters.
+Thanks,
 
-If you want to be cautious, name the command-line parameter --x-oob for 
-now, we can rename it later to drop the x- prefix, or remove the 
-parameter altogether if we decide by opting in via merely 
-qmp_capabilities is sufficient.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Phil.
