@@ -1,14 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1ezbVJ-00051o-JG
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 01:14:10 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1ezbWC-0005Wu-6o
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 01:15:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1ezbVG-0005UG-Ac
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 01:14:09 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1ezbWB-00067L-FI
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 01:15:04 -0400
 From: Michal Privoznik <mprivozn@redhat.com>
-Date: Sat, 24 Mar 2018 06:13:41 +0100
-Message-Id: <4e8dcc24123a09587ecc427f2e80727ba41a7866.1521868380.git.mprivozn@redhat.com>
-Subject: [Qemu-devel] [PATCH] ccid-card: include libcacard.h only
+Date: Sat, 24 Mar 2018 06:14:49 +0100
+Message-Id: <6f10cd53d361a395aa0e85a9311ec4e9a8fc11e5.1521868451.git.mprivozn@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-pr-helper: Actually allow users to
+ specify pidfile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,49 +19,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, kraxel@redhat.com
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-block@nongnu.org
 
-When trying to build with latest libcacard-2.5.1, I hit the
-following error:
+Due to wrong specification of arguments to getopt_long() any
+attempt to set pidfile resulted in:
 
-In file included from hw/usb/ccid-card-passthru.c:12:0:
-/usr/include/cacard/vscard_common.h:26:2: error: #warning "Only <libcacard.h> can be included directly" [-Werror=cpp]
- #warning "Only <libcacard.h> can be included directly"
+1) the default to be leaked
+2) the @pidfile variable to be set to NULL (because optarg is
+NULL without this patch).
 
 Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
 ---
- hw/usb/ccid-card-emulated.c | 5 +----
- hw/usb/ccid-card-passthru.c | 2 +-
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ scsi/qemu-pr-helper.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
-index ea42e4681d..7b538ae6da 100644
---- a/hw/usb/ccid-card-emulated.c
-+++ b/hw/usb/ccid-card-emulated.c
-@@ -27,10 +27,7 @@
-  */
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 3facbba170..21e1b8ea60 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -903,12 +903,12 @@ static int drop_privileges(void)
  
- #include "qemu/osdep.h"
--#include <eventt.h>
--#include <vevent.h>
--#include <vreader.h>
--#include <vcard_emul.h>
-+#include <cacard/libcacard.h>
- 
- #include "qemu/thread.h"
- #include "qemu/main-loop.h"
-diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-index b7dd3602dc..982d575edd 100644
---- a/hw/usb/ccid-card-passthru.c
-+++ b/hw/usb/ccid-card-passthru.c
-@@ -9,7 +9,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include <cacard/vscard_common.h>
-+#include <cacard/libcacard.h>
- #include "chardev/char-fe.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
+ int main(int argc, char **argv)
+ {
+-    const char *sopt = "hVk:fdT:u:g:vq";
++    const char *sopt = "hVk:f:dT:u:g:vq";
+     struct option lopt[] = {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+         { "socket", required_argument, NULL, 'k' },
+-        { "pidfile", no_argument, NULL, 'f' },
++        { "pidfile", required_argument, NULL, 'f' },
+         { "daemon", no_argument, NULL, 'd' },
+         { "trace", required_argument, NULL, 'T' },
+         { "user", required_argument, NULL, 'u' },
+@@ -952,7 +952,8 @@ int main(int argc, char **argv)
+             }
+             break;
+         case 'f':
+-            pidfile = optarg;
++            g_free(pidfile);
++            pidfile = g_strdup(optarg);
+             break;
+ #ifdef CONFIG_LIBCAP
+         case 'u': {
 -- 
 2.16.1
