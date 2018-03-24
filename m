@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44426)
+Received: from eggs.gnu.org ([208.118.235.92]:42488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ezodG-0003Tl-EO
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:19:25 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezont-0007hz-3W
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ezoUv-0004aw-ER
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:07:43 -0400
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:35737)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezomp-0005im-3W
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:13 -0400
+Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:47006)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ezoUv-0004ar-5r
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:06:37 -0400
-Received: by mail-oi0-x22a.google.com with SMTP id x20-v6so12729328oie.2
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:06:37 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAHNT7Nvug7ZyDbyGMae6zLj_AhBi=ZU-e29bzc4aPaAshqEScQ@mail.gmail.com>
-References: <1521665220-3869-1-git-send-email-mjc@sifive.com>
-	<CAHNT7Nvug7ZyDbyGMae6zLj_AhBi=ZU-e29bzc4aPaAshqEScQ@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Sat, 24 Mar 2018 12:06:36 -0700
-Message-ID: <CAHNT7NtsXkbzoTe55xH3c2dj0PwzpocpWueLb7f=Z9e59xv6hQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/24] RISC-V: Post-merge spec conformance
- and cleanup v5
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1ezomo-0005iU-Tg
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:07 -0400
+Received: by mail-pg0-x229.google.com with SMTP id t12so4022640pgp.13
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:06 -0700 (PDT)
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:41 -0700
+Message-Id: <20180324192455.12254-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 00/14] Generalize Dallas/Maxim I2C RTC devices
+ v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,186 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: RISC-V Patches <patches@groups.riscv.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On Sat, Mar 24, 2018 at 11:54 AM, Michael Clark <mjc@sifive.com> wrote:
+This series generalizes the ds1338 model to also support the ds1375.
+As previously, only the time of day registers are modeled.  This
+series is largely a do-over wrt. my previous series.  This time I
+started with incremental changes from the existing ds1338 model, and only
+add support for the ds1375 (which I care about).
 
-> Hi Peter,
->
-> I did actually have the full `riscv-qemu-2.12-fixes-v5` tag in the second
-> PR. See below.
->
-> It was the v4 pull request prior to this where I made the mistake of not
-> including the series version in the tag. I had since dropped the
-> riscv_isa_string and rcu_read_lock patches so deleted the unversioned tag.
-> I'll make sure I always have the series version in the tag in future PRs.
-> I'm starting to get the hang of this...
->
-> I haven't yet made a riscv-qemu-2.12-fixes-v6 tag. The first 24 commits
-> are the same as v5, however, there is the addition of two new bug fixes (25
-> and 26). I will wait until I get some feedback and can tag and make a PR on
-> Monday or Tuesday next week assuming we don't have to make changes to any
-> of the other commits in the series... It seems we still have time to get
-> bug fixes in before the final release, and this series has been tested
-> quite extensively by folk working on the Fedora port... as I believe they
-> have been using the riscv-all branch in the riscv.org repo which includes
-> qemu-2.12-fixes (the branch) which will be tagged as riscv-qemu-2.12-fixes-v6
-> when I make the next PR, and patch 26 is basically the Fedora patch with a
-> comment, checkpatch warnings fixed, and a conditional to only enable the
-> behaviour if mttcg is enabled (as uniprocessor mstatus.FS apepars to be
-> okay).
->
+I've added a more thorough test of the time of day function, covering
+reading and setting in both 12 and 24 hour mode.  This corrects two
+(practically inconsequential) bugs with the handling of 12 hour mode,
+and day of the week.
 
-I've just pushed a `riscv-qemu-2.12-fixes-v6` tag to the riscv.org repo,
-however I think we should wait for some review. Hopefully v7 just adds
-'Reviewed-by' to the patches that haven't been reviewed yet... as I don't
-mind if we follow the process. I'll try to rally some reviewers. I'll also
-try and reserve some time to review other patches, however admittedly I'm
-best qualified to do this for target/riscv and hw/riscv as those are the
-areas I am familar with. The mstatus.FS fix i've added Signed-off-by. I
-think this workaround is preferrable to a corrupt floating point register
-file, unless I can get a more comprehensive fix for the QEMU 2.12 release.
-I've checked with Palmer, and he thinks the workaround is okay, and
-preferrable to the current state. I think the new commit 26 in the series
-is one of the more important bug fixes.
+In an attempt to address concerns about false positive test failures
+in CI builds, instead of comparing the parts of 'struct tm' seperately
+I've changed the logic of the tests to compare the difference between
+the expected and actual time in seconds.  The threshold is 30 seconds
+when run with 'gtester -m quick', and 1 second otherwise.
 
+Comparision of day of the week is still exact, so there is a chance of
+a false positive if the test is running across midnight UTC.
 
-> Thanks,
-> Michael
->
-> On Wed, Mar 21, 2018 at 1:46 PM, Michael Clark <mjc@sifive.com> wrote:
->
->> -----BEGIN PGP SIGNED MESSAGE-----
->> Hash: SHA1
->>
->> The following changes since commit f1a63fcfcd92c88be8942b5ae71aef
->> 9749a4f135:
->>
->>   Update version for v2.12.0-rc0 release (2018-03-20 19:04:22 +0000)
->>
->> are available in the git repository at:
->>
->>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-fixes-v5
->>
->> for you to fetch changes up to 6ad43207f802c91a04e49d86d658b6696faddae0:
->>
->>   RISC-V: Remove erroneous comment from translate.c (2018-03-21 11:28:43
->> -0700)
->>
->> - ----------------------------------------------------------------
->> Post-merge spec conformance and cleanup
->>
->> This is a series of spec conformance bug fixes and code cleanups
->> that we would like to get in before the QEMU 2.12 release.
->>
->> The focus of this series is specification conformance bug fixes.
->>
->> This series also addresses post-merge feedback such as updating
->> the cpu initialization model to conform with other architectures
->> as requested by Igor Mammedov.
->>
->> The riscv_isa_string patch has been dropped as it was merged
->> independently. The patch to hold rcu_read_lock when accessing
->> physical memory has been dropped as requested by Paolo Bonzini.
->>
->> * Implements WARL behavior for CSRs that don't support writes
->> * Improves specification conformance of the page table walker
->>   * Change access checks from ternary operator to if statements
->>   * Checks for misaligned PPNs
->>   * Disallow M-mode or S-mode from fetching from User pages
->>   * Adds reserved PTE flag check: W or W|X
->>   * Set READ flag for PTE X flag if mstatus.mxr is in effect
->>   * Improves page walker comments and general readability
->> * Several trivial code cleanups to hw/riscv
->>   * Replacing hard coded constants with reference to enums
->>     or the machine memory maps.
->>   * Remove unnecessary class initialization boilerplate
->> * Adds bounds checks when writing device-tree to ROM
->> * Updates the cpu model to use a more modern interface
->> * Adds hexidecimal instruction bytes to disassembly output
->> * Sets mtval/stval to zero on exceptions without addresses
->>
->> v5
->>
->> * dropped fix for memory allocation bug in riscv_isa_string
->> * dropped Hold rcu_read_lock when accessing memory
->>
->> v4
->>
->> * added fix for memory allocation bug in riscv_isa_string
->> * trivial fix to remove erroneous comment from translate.c
->>
->> v3
->>
->> * refactor rcu_read_lock in PTE update to use single unlock
->> * mstatus.mxr is in effect regardless of privilege mode
->> * remove unnecessary class init from riscv_hart
->> * set mtval/stval to zero on exceptions without addresses
->>
->> v2
->>
->> * remove unused class boilerplate retains qom parent_obj
->> * convert cpu definition towards future model
->> * honor mstatus.mxr flag in page table walker
->>
->> v1
->>
->> * initial post merge cleanup patch series
->>
->> - ----------------------------------------------------------------
->> Michael Clark (24):
->>       RISC-V: Make virt create_fdt interface consistent
->>       RISC-V: Replace hardcoded constants with enum values
->>       RISC-V: Make virt board description match spike
->>       RISC-V: Use ROM base address and size from memmap
->>       RISC-V: Remove identity_translate from load_elf
->>       RISC-V: Mark ROM read-only after copying in code
->>       RISC-V: Remove unused class definitions
->>       RISC-V: Make sure rom has space for fdt
->>       RISC-V: Include intruction hex in disassembly
->>       RISC-V: Improve page table walker spec compliance
->>       RISC-V: Update E order and I extension order
->>       RISC-V: Make some header guards more specific
->>       RISC-V: Make virt header comment title consistent
->>       RISC-V: Use memory_region_is_ram in pte update
->>       RISC-V: Remove EM_RISCV ELF_MACHINE indirection
->>       RISC-V: Hardwire satp to 0 for no-mmu case
->>       RISC-V: Remove braces from satp case statement
->>       RISC-V: riscv-qemu port supports sv39 and sv48
->>       RISC-V: vectored traps are optional
->>       RISC-V: No traps on writes to misa,minstret,mcycle
->>       RISC-V: Remove support for adhoc X_COP interrupt
->>       RISC-V: Convert cpu definition towards future model
->>       RISC-V: Clear mtval/stval on exceptions without info
->>       RISC-V: Remove erroneous comment from translate.c
->>
->>  disas/riscv.c                   |  39 +++++++------
->>  hw/riscv/riscv_hart.c           |   6 --
->>  hw/riscv/sifive_clint.c         |   9 +--
->>  hw/riscv/sifive_e.c             |  34 +----------
->>  hw/riscv/sifive_u.c             |  65 +++++++--------------
->>  hw/riscv/spike.c                |  65 ++++++++-------------
->>  hw/riscv/virt.c                 |  77 +++++++++----------------
->>  include/hw/riscv/sifive_clint.h |   4 ++
->>  include/hw/riscv/sifive_e.h     |   5 --
->>  include/hw/riscv/sifive_u.h     |   9 ++-
->>  include/hw/riscv/spike.h        |  15 ++---
->>  include/hw/riscv/virt.h         |  17 +++---
->>  target/riscv/cpu.c              | 125 ++++++++++++++++++++++--------
->> ----------
->>  target/riscv/cpu.h              |   6 +-
->>  target/riscv/cpu_bits.h         |   3 -
->>  target/riscv/helper.c           |  69 ++++++++++++++++------
->>  target/riscv/op_helper.c        |  52 ++++++++---------
->>  target/riscv/translate.c        |   1 -
->>  18 files changed, 267 insertions(+), 334 deletions(-)
->> -----BEGIN PGP SIGNATURE-----
->>
->> iF0EARECAB0WIQR8mZMOsXzYugc9Xvpr8dezV+8+TwUCWrLDxgAKCRBr8dezV+8+
->> T5dLAJoCKgHyfglospIPAnxcM5v+BZW4egCfYmQkpDUoDbeXzwqs06eNGYyRi9s=
->> =vzEq
->> -----END PGP SIGNATURE-----
->>
->
->
+Michael Davidsaver (14):
+  tests: more thorough tests of ds1338
+  timer: ds1338 use registerfields.h
+  timer: ds1338 persist 12-hour mode selection
+  timer: ds1338 clarify HOUR handling
+  timer: ds1338 change write handling
+  tests: ds-rtc test 12 hour mode
+  timer: ds1338 fix wday_offset handling
+  tests: ds-rtc test wday offset
+  timer: rename ds1338 -> dsrtc
+  timer: rename file ds1338.c -> ds-rtc.c
+  timer: generalize ds1338
+  timer: ds-rtc handle CENTURY bit
+  timer: ds-rtc model ds1375
+  tests: drop ds1338-test
+
+ default-configs/arm-softmmu.mak |   2 +-
+ hw/timer/Makefile.objs          |   2 +-
+ hw/timer/ds-rtc.c               | 331 ++++++++++++++++++++++++++++++++++++++++
+ hw/timer/ds1338.c               | 239 -----------------------------
+ tests/Makefile.include          |   6 +-
+ tests/ds-rtc-common.h           |  71 +++++++++
+ tests/ds-rtc-current-test.c     |  66 ++++++++
+ tests/ds-rtc-set-test.c         | 171 +++++++++++++++++++++
+ tests/ds1338-test.c             |  75 ---------
+ 9 files changed, 645 insertions(+), 318 deletions(-)
+ create mode 100644 hw/timer/ds-rtc.c
+ delete mode 100644 hw/timer/ds1338.c
+ create mode 100644 tests/ds-rtc-common.h
+ create mode 100644 tests/ds-rtc-current-test.c
+ create mode 100644 tests/ds-rtc-set-test.c
+ delete mode 100644 tests/ds1338-test.c
+
+-- 
+2.11.0
