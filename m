@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
+Received: from eggs.gnu.org ([208.118.235.92]:54741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezp4a-0003jo-31
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:44:34 -0400
+	(envelope-from <rjones@redhat.com>) id 1ezpDe-0006Ft-Um
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezp0a-0006RW-Km
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:43:28 -0400
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:35812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1ezp0a-0006Qf-EK
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:39:20 -0400
-Received: by mail-pf0-x236.google.com with SMTP id u86so218855pfd.2
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:39:20 -0700 (PDT)
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-References: <20180219040342.12686-1-mdavidsaver@gmail.com>
-	<20180219040342.12686-3-mdavidsaver@gmail.com>
-	<bd080194-a170-52a0-59fd-31678e838d34@redhat.com>
-	<6b259b00-e185-5ca9-f101-e69a5c8dcbb6@gmail.com>
-Message-ID: <364d195d-b948-52f4-8c65-2ea535061fe9@gmail.com>
-Date: Sat, 24 Mar 2018 12:39:16 -0700
+	(envelope-from <rjones@redhat.com>) id 1ezp7e-0001se-0v
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:47:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1ezp7d-0001rk-QN
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:46:37 -0400
+Date: Sat, 24 Mar 2018 19:46:34 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180324194634.GW2787@redhat.com>
+References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
+	<1521915220-65389-15-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <6b259b00-e185-5ca9-f101-e69a5c8dcbb6@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] tests: more thorough test of ds1338
+Content-Disposition: inline
+In-Reply-To: <1521915220-65389-15-git-send-email-mjc@sifive.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 26/26] RISC-V: Workaround for critical
+ mstatus.FS MTTCG bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Antoine Mathys <barsamin@gmail.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peter Maydell <peter.maydell@linaro.org>
 
-> On 02/20/2018 09:44 AM, Michael Davidsaver wrote:
->> On 02/18/2018 11:39 PM, Thomas Huth wrote:
-...
->> That magic (together with patch 1/5) is IMHO a little bit ugly. I've hit
->> the same problem with the m48t59 test recently, and I solved it by
->> moving the qtest_start() and qtest_end() calls from the main() function
->> into the single tests instead, so that each test starts with a clean state:
->>
->> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=9c29830c90d82f27f
->>
->> Could you maybe try whether that approach works for your test cases
->> here, too? Then you could do this without the "0xff" hack here...
-> 
-> Your right, this looks clearer.  I'll try this approach.
+On Sat, Mar 24, 2018 at 11:13:40AM -0700, Michael Clark wrote:
+> This change is a workaround for a bug where mstatus.FS
+> is not correctly reporting dirty when MTTCG and SMP are
+> enabled which results in the floating point register file
+> not being saved during context switches. This a critical
+> bug for RISC-V in QEMU as it results in floating point
+> register file corruption when running SMP Linux in the
+> RISC-V 'virt' machine.
+>=20
+> This workaround will return dirty if mstatus.FS is
+> switched from off to initial or clean. We have checked
+> the specification and it is legal for an implementation
+> to return either off, or dirty, if set to initial or clean.
+>=20
+> This workaround will result in unnecessary floating point
+> save restore. When mstatus.FS is off, floating point
+> instruction trap to indicate the process is using the FPU.
+> The OS can then save floating-point state of the previous
+> process using the FPU and set mstatus.FS to initial or
+> clean. With this workaround, mstatus.FS will always return
+> dirty if set to a non-zero value, indicating floating point
+> save restore is necessary, versus misreporting mstatus.FS
+> resulting in floating point register file corruption.
+>=20
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Richard W.M. Jones <rjones@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
 
-I ultimately decided not to go with this approach as test failures
-didn't call qtest_quit(), and the process under test is left running
-after gtester exits.
+I tested this by running qemu from git with and without this patch,
+both times compiling and running the =E2=80=9Csched.c=E2=80=9D test progr=
+am:
 
-Instead I split the current time test off into a second executable.
-This avoids all of the magic.
+http://oirase.annexia.org/tmp/sched.c
 
+In my tests it fixes the problem, and therefore:
 
-FYI.  I also looked at using g_test_add(), keeping the QTestState* in a
-Fixture struct, and using setup and teardown functions to call
-qtest_start()/qtest_quit().  This works, but seemed to me like too much
-effort in this case.
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+
+Rich.
+
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
