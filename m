@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ezlDc-0008O1-8a
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:37:38 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ezlhY-0004Y7-2B
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 12:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ezlCY-0002R5-5k
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:36:32 -0400
-Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:39592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ezlCX-0002QU-W5
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 11:35:26 -0400
-Received: by mail-qk0-x231.google.com with SMTP id j73so15963110qke.6
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 08:35:25 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180216134516.6269-1-peter.maydell@linaro.org>
-	<20180216134516.6269-2-peter.maydell@linaro.org>
-	<20180216172841.2ec69b8a@redhat.com>
-	<98a92185-d5e0-48fd-79a7-1c77260c9aca@amsat.org>
-	<2d4874be-fec4-39bb-9df5-bb53f17d1d74@redhat.com>
-	<20180220142319.2c959f83@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fadf8f9f-acd1-6a47-086d-01590400104e@amsat.org>
-Date: Sat, 24 Mar 2018 12:35:22 -0300
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ezlgU-0004Ns-1h
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 12:07:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180220142319.2c959f83@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/sysbus.h: New sysbus_init_child()
- helper function
+In-Reply-To: <82d1bda3-36a9-e5b9-1aa0-8319750c57f7@redhat.com>
+References: <4e8dcc24123a09587ecc427f2e80727ba41a7866.1521868380.git.mprivozn@redhat.com>
+	<CAJ+F1CJgXUY888Bo-SQ2yiDWeKk0NKe06bdzkZFL7A-6B4FusQ@mail.gmail.com>
+	<82d1bda3-36a9-e5b9-1aa0-8319750c57f7@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 24 Mar 2018 14:38:55 +0100
+Message-ID: <CAJ+F1CL4gBhh_qGc0ZV7bE__UvZaeLwFEyV--dHth6iX2HK1vg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ccid-card: include libcacard.h only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,74 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi,
+Hi
 
-On 02/20/2018 10:23 AM, Igor Mammedov wrote:
-> On Tue, 20 Feb 2018 13:13:49 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> On 16/02/2018 18:40, Philippe Mathieu-Daudé wrote:
->>> we can keep object_initialize() when no parent,
->>> and add object_initialize_child(, const char *childname, Object *parent)
->>> 'parent' last because all previous args are child-related.
->>>   
->>>>  
->>>>> +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());  
->>>> and then assuming we don't create sysbus devices, nor should be able to,
->>>> which are not attached to sysbus_get_default() this one can go sysbus' instance_init()  
->>> good idea.
->>>   
-> [...]
-> 
->> I'm not sure about moving qdev_set_parent_bus to instance_init().  It
->> would be a bit different from other buses and possibly confusing.
-> That's what this series sort of does, i.e. creating a type/class
-> specific helper(s). Which becomes confusing as number of helpers
-> increases (frankly it's just 2 different approaches to code i.e.
-> functional vs OOM).
-> 
-> It could be better to keep single QOM API and let SYSBUS base class
-> instance_init() to do all implicit initialization that must be done
-> for inherited classes.
-
-What is the consensus on this series once 2.12 gets released?
-
-> Yes, it will be different from other devices with buses but
-> users won't really care (there is no other buss to assign to),
-> for them it will look like a typical bus-less device and it
-> would be less error-prone to code.
-> 
->  
->> Potentially there could be a "hierarchy" of *_initialize_child
->> functions, adding or removing arguments as needed for the specific kind
->> of bus:
+On Sat, Mar 24, 2018 at 1:40 PM, Michal Privoznik <mprivozn@redhat.com> wro=
+te:
+> On 03/24/2018 12:01 PM, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi
 >>
->> 	/* adds qdev_set_parent_bus */
->> 	device_initialize_child(Object *parent, const char *childname,
->> 				BusState *bus, void *data, size_t size,
->> 				const char *typename);
->> 	/* uses sysbus_get_default() */
->> 	sysbus_initialize_child(Object *parent, const char *childname,
->> 				void *data, size_t size,
->> 				const char *typename);
-> 
-> 
->> 	/* initializes "addr" property too */
->> 	pci_initialize_child(Object *parent, const char *childname,
->> 			     BusState *bus, int addr,
->> 			     void *data, size_t size,
->> 			     const char *typename);
-> PCI could also incorporate PCI specific bus setting/
-> verification logic inside of base class.
-> 
-> It could allow us to drop bus assigning magic in qdev_device_add(),
-> bringing it closer to simple QOM object handling, with specifics
-> abstracted by respective TYPE implementations.
-> Maybe we would be able to unify -device with -object in the end.
+>> On Sat, Mar 24, 2018 at 6:13 AM, Michal Privoznik <mprivozn@redhat.com> =
+wrote:
+>>> When trying to build with latest libcacard-2.5.1, I hit the
+>>> following error:
+>>>
+>>> In file included from hw/usb/ccid-card-passthru.c:12:0:
+>>> /usr/include/cacard/vscard_common.h:26:2: error: #warning "Only <libcac=
+ard.h> can be included directly" [-Werror=3Dcpp]
+>>>  #warning "Only <libcacard.h> can be included directly"
+>>>
+>>
+>> The warning was promptly removed in 2.5.2:
+>> https://cgit.freedesktop.org/spice/libcacard/commit/?id=3D998db1e88eb821=
+9264476c022d1446f3cb4330e8
+>
+> Cool. But We can still include just top level header file instead of
+> individual files, can't we?
 
-Thanks,
+Yes, if we bump libcacard version dependency. 2.5.1 (that added
+top-level libcacard.h) is from 2015-11-24.
 
-Phil.
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
