@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54742)
+Received: from eggs.gnu.org ([208.118.235.92]:43423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ezpEl-0006Fv-Pr
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:55:05 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezpiu-0001aX-JH
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ezp6j-0001O7-MH
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:46:47 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:38874)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezphq-0003Kf-J6
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 16:25:08 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ezp6j-0001Nw-EZ
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:45:41 -0400
-Received: by mail-oi0-x233.google.com with SMTP id c3-v6so13017661oib.5
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:45:41 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1521915220-65389-2-git-send-email-mjc@sifive.com>
-References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
-	<1521915220-65389-2-git-send-email-mjc@sifive.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Sat, 24 Mar 2018 12:45:40 -0700
-Message-ID: <CAHNT7Nu=OHy8kV-T2JkzQ1+4XX=iKwYrWh4P9hFmne_f6ueCow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 06/26] RISC-V: Mark ROM read-only after
- copying in code
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1ezomq-0005j6-7m
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:08 -0400
+Received: by mail-pf0-x242.google.com with SMTP id u86so211550pfd.2
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:08 -0700 (PDT)
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:42 -0700
+Message-Id: <20180324192455.12254-2-mdavidsaver@gmail.com>
+In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
+References: <20180324192455.12254-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 01/14] tests: more thorough tests of ds1338
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,215 +26,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: RISC-V Patches <patches@groups.riscv.org>, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On Sat, Mar 24, 2018 at 11:13 AM, Michael Clark <mjc@sifive.com> wrote:
+Test current time and set+get round trip.
+Separate current time test from set/get
+tests to avoid test order issues.
 
-> The sifive_u machine already marks its ROM readonly. This fixes
-> the remaining boards.
->
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> ---
->  hw/riscv/sifive_u.c      |  9 +++++----
->  hw/riscv/spike.c         | 18 ++++++++++--------
->  hw/riscv/virt.c          |  7 ++++---
->  include/hw/riscv/spike.h |  8 --------
->  4 files changed, 19 insertions(+), 23 deletions(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 6116c38..25df16c 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState *machine)
->      SiFiveUState *s = g_new0(SiFiveUState, 1);
->      MemoryRegion *sys_memory = get_system_memory();
->      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
->
->      /* Initialize SOC */
->      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-> @@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState
-> *machine)
->      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
->
->      /* boot rom */
-> -    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
-> +    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
->                             memmap[SIFIVE_U_MROM].base, &error_fatal);
-> -    memory_region_set_readonly(boot_rom, true);
-> -    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
-> +    memory_region_set_readonly(mask_rom, true);
-> +    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
->
->      if (machine->kernel_filename) {
->          load_kernel(machine->kernel_filename);
-> @@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState *machine)
->      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
->      cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
->          sizeof(reset_vec), s->fdt, s->fdt_size);
-> +    memory_region_set_readonly(mask_rom, true);
->
->      /* MMIO */
->      s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 7710333..74edf33 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -173,7 +173,7 @@ static void spike_v1_10_0_board_init(MachineState
-> *machine)
->      SpikeState *s = g_new0(SpikeState, 1);
->      MemoryRegion *system_memory = get_system_memory();
->      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
->
->      /* Initialize SOC */
->      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-> @@ -196,9 +196,9 @@ static void spike_v1_10_0_board_init(MachineState
-> *machine)
->      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
->
->      /* boot rom */
-> -    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
-> +    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
->                             s->fdt_size + 0x2000, &error_fatal);
-> -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-> +    memory_region_add_subregion(system_memory, 0x0, mask_rom);
->
->      if (machine->kernel_filename) {
->          load_kernel(machine->kernel_filename);
-> @@ -228,9 +228,10 @@ static void spike_v1_10_0_board_init(MachineState
-> *machine)
->      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
->      cpu_physical_memory_write(memmap[SPIKE_MROM].base +
-> sizeof(reset_vec),
->          s->fdt, s->fdt_size);
-> +    memory_region_set_readonly(mask_rom, true);
->
->      /* initialize HTIF using symbols found in load_kernel */
-> -    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env,
-> serial_hds[0]);
-> +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env,
-> serial_hds[0]);
->
->      /* Core Local Interruptor (timer and IPI) */
->      sifive_clint_create(memmap[SPIKE_CLINT].base,
-> memmap[SPIKE_CLINT].size,
-> @@ -244,7 +245,7 @@ static void spike_v1_09_1_board_init(MachineState
-> *machine)
->      SpikeState *s = g_new0(SpikeState, 1);
->      MemoryRegion *system_memory = get_system_memory();
->      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
->
->      /* Initialize SOC */
->      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-> @@ -264,9 +265,9 @@ static void spike_v1_09_1_board_init(MachineState
-> *machine)
->          main_mem);
->
->      /* boot rom */
-> -    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
-> +    memory_region_init_ram(mask_rom, NULL, "riscv.spike.mrom",
->                             0x40000, &error_fatal);
-> -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-> +    memory_region_add_subregion(system_memory, 0x0, mask_rom);
->
->      if (machine->kernel_filename) {
->          load_kernel(machine->kernel_filename);
-> @@ -325,9 +326,10 @@ static void spike_v1_09_1_board_init(MachineState
-> *machine)
->      /* copy in the config string */
->      cpu_physical_memory_write(memmap[SPIKE_MROM].base +
-> sizeof(reset_vec),
->          config_string, config_string_len);
-> +    memory_region_set_readonly(mask_rom, true);
->
->      /* initialize HTIF using symbols found in load_kernel */
-> -    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env,
-> serial_hds[0]);
-> +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env,
-> serial_hds[0]);
->
->      /* Core Local Interruptor (timer and IPI) */
->      sifive_clint_create(memmap[SPIKE_CLINT].base,
-> memmap[SPIKE_CLINT].size,
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index f8c19b4..f1e3641 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -270,7 +270,7 @@ static void riscv_virt_board_init(MachineState
-> *machine)
->      RISCVVirtState *s = g_new0(RISCVVirtState, 1);
->      MemoryRegion *system_memory = get_system_memory();
->      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
->      char *plic_hart_config;
->      size_t plic_hart_config_len;
->      int i;
-> @@ -296,9 +296,9 @@ static void riscv_virt_board_init(MachineState
-> *machine)
->      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
->
->      /* boot rom */
-> -    memory_region_init_ram(boot_rom, NULL, "riscv_virt_board.bootrom",
-> +    memory_region_init_ram(mask_rom, NULL, "riscv_virt_board.mrom",
->                             s->fdt_size + 0x2000, &error_fatal);
-> -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-> +    memory_region_add_subregion(system_memory, 0x0, mask_rom);
->
->      if (machine->kernel_filename) {
->          uint64_t kernel_entry = load_kernel(machine->kernel_filename);
-> @@ -339,6 +339,7 @@ static void riscv_virt_board_init(MachineState
-> *machine)
->      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
->      cpu_physical_memory_write(memmap[VIRT_MROM].base + sizeof(reset_vec),
->          s->fdt, s->fdt_size);
-> +    memory_region_set_readonly(mask_rom, true);
->
->      /* create PLIC hart topology configuration string */
->      plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
-> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-> index d85a64e..179b6cf 100644
-> --- a/include/hw/riscv/spike.h
-> +++ b/include/hw/riscv/spike.h
-> @@ -22,20 +22,12 @@
->  #define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9_1"
->  #define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
->
-> -#define SPIKE(obj) \
-> -    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
-> -
->  typedef struct {
-> -    /*< private >*/
-> -    SysBusDevice parent_obj;
-> -
-> -    /*< public >*/
->
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ tests/Makefile.include      |   4 ++
+ tests/ds-rtc-common.h       |  67 +++++++++++++++++++++++++
+ tests/ds-rtc-current-test.c |  59 ++++++++++++++++++++++
+ tests/ds-rtc-set-test.c     | 117 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 247 insertions(+)
+ create mode 100644 tests/ds-rtc-common.h
+ create mode 100644 tests/ds-rtc-current-test.c
+ create mode 100644 tests/ds-rtc-set-test.c
 
-These should not be removed in patch 6, however they are added back in the
-subsequent patch 7. The net result is okay, however if we want to be
-pedantic, we could remove this hunk from patch 6 and alter patch 7 to not
-add these fields back.
-
-
->      RISCVHartArrayState soc;
->      void *fdt;
->      int fdt_size;
->  } SpikeState;
->
-> -
->  enum {
->      SPIKE_MROM,
->      SPIKE_CLINT,
-> --
-> 2.7.0
->
->
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index eb218a9539..d256095c88 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -372,6 +372,8 @@ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
+ 
+ check-qtest-arm-y = tests/tmp105-test$(EXESUF)
+ check-qtest-arm-y += tests/ds1338-test$(EXESUF)
++check-qtest-arm-y += tests/ds-rtc-current-test$(EXESUF)
++check-qtest-arm-y += tests/ds-rtc-set-test$(EXESUF)
+ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
+ gcov-files-arm-y += hw/misc/tmp105.c
+ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
+@@ -771,6 +773,8 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+ tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+ tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
++tests/ds-rtc-current-test$(EXESUF): tests/ds-rtc-current-test.o $(libqos-imx-obj-y)
++tests/ds-rtc-set-test$(EXESUF): tests/ds-rtc-set-test.o $(libqos-imx-obj-y)
+ tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+ tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
+ tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
+diff --git a/tests/ds-rtc-common.h b/tests/ds-rtc-common.h
+new file mode 100644
+index 0000000000..c8e6c2bc5b
+--- /dev/null
++++ b/tests/ds-rtc-common.h
+@@ -0,0 +1,67 @@
++/* Common code for testing of Dallas/Maxim I2C bus RTC devices
++ *
++ * Copyright (c) 2018 Michael Davidsaver
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the LICENSE file in the top-level directory.
++ */
++#ifndef DSRTCCOMMON_H
++#define DSRTCCOMMON_H
++
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include "libqos/i2c.h"
++
++#define IMX25_I2C_0_BASE 0x43F80000
++#define DS1338_ADDR 0x68
++
++static I2CAdapter *i2c;
++static uint8_t addr;
++static bool use_century;
++
++/* input buffer must have at least 7 elements */
++static inline time_t rtc_parse(const uint8_t *buf)
++{
++    struct tm parts;
++
++    parts.tm_sec = from_bcd(buf[0]);
++    parts.tm_min = from_bcd(buf[1]);
++    if (buf[2] & 0x40) {
++        /* 12 hour */
++        /* HOUR register is 1-12. */
++        parts.tm_hour = from_bcd(buf[2] & 0x1f);
++        g_assert_cmpuint(parts.tm_hour, >=, 1);
++        g_assert_cmpuint(parts.tm_hour, <=, 12);
++        parts.tm_hour %= 12u; /* wrap 12 -> 0 */
++        if (buf[2] & 0x20) {
++            parts.tm_hour += 12u;
++        }
++    } else {
++        /* 24 hour */
++        parts.tm_hour = from_bcd(buf[2] & 0x3f);
++    }
++    parts.tm_wday = from_bcd(buf[3]);
++    parts.tm_mday = from_bcd(buf[4]);
++    parts.tm_mon =  from_bcd((buf[5] & 0x1f) - 1u);
++    parts.tm_year = from_bcd(buf[6]);
++    if (!use_century || (buf[5] & 0x80)) {
++        parts.tm_year += 100u;
++    }
++
++    return mktimegm(&parts);
++}
++
++static time_t rtc_gettime(void)
++{
++    uint8_t buf[7];
++
++    /* zero address pointer */
++    buf[0] = 0;
++    i2c_send(i2c, addr, buf, 1);
++    /* read back current time registers */
++    i2c_recv(i2c, addr, buf, 7);
++
++    return rtc_parse(buf);
++}
++
++#endif /* DSRTCCOMMON_H */
+diff --git a/tests/ds-rtc-current-test.c b/tests/ds-rtc-current-test.c
+new file mode 100644
+index 0000000000..6acbbed9a6
+--- /dev/null
++++ b/tests/ds-rtc-current-test.c
+@@ -0,0 +1,59 @@
++/* Testing of Dallas/Maxim I2C bus RTC devices
++ *
++ * Copyright (c) 2018 Michael Davidsaver
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the LICENSE file in the top-level directory.
++ */
++#include <stdio.h>
++
++#include "qemu/osdep.h"
++#include "qemu/bcd.h"
++#include "qemu/cutils.h"
++#include "libqtest.h"
++#include "libqos/libqos.h"
++#include "libqos/i2c.h"
++
++#include "ds-rtc-common.h"
++
++/* read back and compare with current system time */
++static
++void test_rtc_current(void)
++{
++    time_t expected, actual;
++    /* relax test to limit false positives when host may be overloaded.
++     * Allow larger delta when running "-m quick"
++     */
++    time_t max_delta = g_test_slow() ? 1 : 30;
++
++    actual = time(NULL);
++    /* new second may start here */
++    expected = rtc_gettime();
++    g_assert_cmpuint(expected, <=, actual + max_delta);
++    g_assert_cmpuint(expected, >=, actual);
++}
++
++int main(int argc, char *argv[])
++{
++    int ret;
++    const char *arch = qtest_get_arch();
++    QTestState *s = NULL;
++
++    g_test_init(&argc, &argv, NULL);
++
++    if (strcmp(arch, "arm") == 0) {
++        s = qtest_start("-machine imx25-pdk");
++        i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
++        addr = DS1338_ADDR;
++        use_century = false;
++
++    }
++
++    qtest_add_func("/ds-rtc-i2c/current", test_rtc_current);
++
++    ret = g_test_run();
++
++    qtest_end();
++
++    return ret;
++}
+diff --git a/tests/ds-rtc-set-test.c b/tests/ds-rtc-set-test.c
+new file mode 100644
+index 0000000000..35e1a36281
+--- /dev/null
++++ b/tests/ds-rtc-set-test.c
+@@ -0,0 +1,117 @@
++/* Testing of Dallas/Maxim I2C bus RTC devices
++ *
++ * Copyright (c) 2018 Michael Davidsaver
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the LICENSE file in the top-level directory.
++ */
++#include <stdio.h>
++
++#include "qemu/osdep.h"
++#include "qemu/bcd.h"
++#include "qemu/cutils.h"
++#include "qemu/timer.h"
++#include "libqtest.h"
++#include "libqos/libqos.h"
++#include "libqos/i2c.h"
++
++#include "ds-rtc-common.h"
++
++static uint8_t test_time_24_12am[8] = {
++    0, /* address */
++    /* Wed, 22 Nov 2017 00:30:53 +0000 */
++    0x53,
++    0x30,
++    0x00, /* 12 AM in 24 hour mode */
++    0x03, /* monday is our day 1 */
++    0x22,
++    0x11 | 0x80,
++    0x17,
++};
++
++static uint8_t test_time_24_6am[8] = {
++    0, /* address */
++    /* Wed, 22 Nov 2017 06:30:53 +0000 */
++    0x53,
++    0x30,
++    0x06, /* 6 AM in 24 hour mode */
++    0x03, /* monday is our day 1 */
++    0x22,
++    0x11 | 0x80,
++    0x17,
++};
++
++static uint8_t test_time_24_12pm[8] = {
++    0, /* address */
++    /* Wed, 22 Nov 2017 12:30:53 +0000 */
++    0x53,
++    0x30,
++    0x12, /* 12 PM in 24 hour mode */
++    0x03, /* monday is our day 1 */
++    0x22,
++    0x11 | 0x80,
++    0x17,
++};
++
++static uint8_t test_time_24_6pm[8] = {
++    0, /* address */
++    /* Wed, 22 Nov 2017 18:30:53 +0000 */
++    0x53,
++    0x30,
++    0x18, /* 6 PM in 24 hour mode */
++    0x03, /* monday is our day 1 */
++    0x22,
++    0x11 | 0x80,
++    0x17,
++};
++
++/* write in and read back known time */
++static
++void test_rtc_set(const void *raw)
++{
++    /* relax test to limit false positives when host may be overloaded.
++     * Allow larger delta when running "-m quick"
++     */
++    time_t max_delta = g_test_slow() ? 1 : 30;
++
++    const uint8_t *testtime = raw;
++    time_t expected, actual;
++
++    /* skip address pointer and parse remainder */
++    expected = rtc_parse(&testtime[1]);
++
++    i2c_send(i2c, addr, testtime, 8);
++    /* host may start new second here */
++    actual = rtc_gettime();
++
++    g_assert_cmpuint(expected, <=, actual);
++    g_assert_cmpuint(expected + max_delta, >=, actual);
++}
++
++int main(int argc, char *argv[])
++{
++    int ret;
++    const char *arch = qtest_get_arch();
++    QTestState *s = NULL;
++
++    g_test_init(&argc, &argv, NULL);
++
++    if (strcmp(arch, "arm") == 0) {
++        s = qtest_start("-display none -machine imx25-pdk");
++        i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
++        addr = DS1338_ADDR;
++        use_century = false;
++
++    }
++
++    qtest_add_data_func("/ds-rtc-i2c/set24_12am", test_time_24_12am, test_rtc_set);
++    qtest_add_data_func("/ds-rtc-i2c/set24_6am", test_time_24_6am, test_rtc_set);
++    qtest_add_data_func("/ds-rtc-i2c/set24_12pm", test_time_24_12pm, test_rtc_set);
++    qtest_add_data_func("/ds-rtc-i2c/set24_6pm", test_time_24_6pm, test_rtc_set);
++
++    ret = g_test_run();
++
++    qtest_end();
++
++    return ret;
++}
+-- 
+2.11.0
