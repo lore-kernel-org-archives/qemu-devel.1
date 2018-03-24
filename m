@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43224)
+Received: from eggs.gnu.org ([208.118.235.92]:38950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ezrLq-0000YV-7y
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 18:10:32 -0400
+	(envelope-from <mjc@sifive.com>) id 1ezsc7-0002R6-N3
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 19:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ezrKm-0001WC-4L
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 18:09:26 -0400
-Resent-Message-Id: <E1ezrKm-0001WC-4L@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21097)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ezrKl-0001P2-Sm
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 18:08:20 -0400
-In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152192928550.363.5497859547477813786@71c20359a636>
+	(envelope-from <mjc@sifive.com>) id 1ezrlK-0004fq-Qn
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 18:36:52 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:37649)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ezrlK-0004fE-L7
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 18:35:46 -0400
+Received: by mail-oi0-x236.google.com with SMTP id f186-v6so13205147oig.4
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 15:35:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 24 Mar 2018 15:08:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/14] Generalize Dallas/Maxim I2C RTC
- devices v2
+In-Reply-To: <CAFEAcA8ByeRz-=3juyLZMeW8zK2Sa=u547ZCrEqgXqBibygQ=w@mail.gmail.com>
+References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
+	<1521915220-65389-3-git-send-email-mjc@sifive.com>
+	<CAFEAcA8ByeRz-=3juyLZMeW8zK2Sa=u547ZCrEqgXqBibygQ=w@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 24 Mar 2018 15:35:45 -0700
+Message-ID: <CAHNT7NthMA8zva9MQjztboOdo1HbSFzNcevdefAKs_x_fvpE_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 08/26] RISC-V: Make sure rom has space
+ for fdt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdavidsaver@gmail.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, barsamin@gmail.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLWJ1aWxkQG1pbi1nbGliIGJ1aWxkIHRlc3Qu
-IFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cu
-IElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNl
-IGl0CmxvY2FsbHkuCgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODAzMjQxOTI0NTUuMTIy
-NTQtMS1tZGF2aWRzYXZlckBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAw
-MC8xNF0gR2VuZXJhbGl6ZSBEYWxsYXMvTWF4aW0gSTJDIFJUQyBkZXZpY2VzIHYyCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0
-ZSAtLWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhw
-b3J0IFNIT1dfRU5WPTEKZXhwb3J0IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtYnVpbGRAbWlu
-LWdsaWIKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpj
-ZDVkNDQxNDJmIHRlc3RzOiBkcm9wIGRzMTMzOC10ZXN0CmM1NjhkMDM2MjkgdGltZXI6IGRzLXJ0
-YyBtb2RlbCBkczEzNzUKMzYwZTc2ZTk1OCB0aW1lcjogZHMtcnRjIGhhbmRsZSBDRU5UVVJZIGJp
-dAo4ZTYwMGFkNjc5IHRpbWVyOiBnZW5lcmFsaXplIGRzMTMzOAo0M2YxZGI1MDAyIHRpbWVyOiBy
-ZW5hbWUgZmlsZSBkczEzMzguYyAtPiBkcy1ydGMuYwo1ZWM1MDViZTJlIHRpbWVyOiByZW5hbWUg
-ZHMxMzM4IC0+IGRzcnRjCjYyOGVkOTI0NjggdGVzdHM6IGRzLXJ0YyB0ZXN0IHdkYXkgb2Zmc2V0
-CjI1ODJiYWY4MTAgdGltZXI6IGRzMTMzOCBmaXggd2RheV9vZmZzZXQgaGFuZGxpbmcKNzkzYjg5
-Njg3YiB0ZXN0czogZHMtcnRjIHRlc3QgMTIgaG91ciBtb2RlCjNmOWIyZWIwN2IgdGltZXI6IGRz
-MTMzOCBjaGFuZ2Ugd3JpdGUgaGFuZGxpbmcKNDVjNGRmNjg5NSB0aW1lcjogZHMxMzM4IGNsYXJp
-ZnkgSE9VUiBoYW5kbGluZwpiYjVkNmNkNTM0IHRpbWVyOiBkczEzMzggcGVyc2lzdCAxMi1ob3Vy
-IG1vZGUgc2VsZWN0aW9uCjgyOTFhNmIyMmQgdGltZXI6IGRzMTMzOCB1c2UgcmVnaXN0ZXJmaWVs
-ZHMuaApjNzg1MTc1MzU4IHRlc3RzOiBtb3JlIHRob3JvdWdoIHRlc3RzIG9mIGRzMTMzOAoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KU3VibW9kdWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0
-Lm9yZy9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLThwd3ZwM3N0L3NyYy9kdGMnLi4uClN1Ym1vZHVsZSBw
-YXRoICdkdGMnOiBjaGVja2VkIG91dCAnZTU0Mzg4MDE1YWYxZmI0YmYwNGQwYmNhOTljYWJhMTA3
-NGQ5Y2M0MicKICBCVUlMRCAgIG1pbi1nbGliCm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAn
-L3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLThwd3ZwM3N0L3NyYycKICBHRU4gICAgIC92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC04cHd2cDNzdC9zcmMvZG9ja2VyLXNyYy4yMDE4LTAzLTI0
-LTE4LjA3LjE2Ljc3MjMvcWVtdS50YXIKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtOHB3dnAzc3Qvc3JjL2RvY2tlci1zcmMuMjAxOC0wMy0yNC0xOC4wNy4xNi43NzIz
-L3FlbXUudGFyLnZyb290Jy4uLgpkb25lLgpZb3VyIGJyYW5jaCBpcyB1cC10by1kYXRlIHdpdGgg
-J29yaWdpbi90ZXN0Jy4KU3VibW9kdWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9y
-Zy9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnL3Zhci90
-bXAvcGF0Y2hldy10ZXN0ZXItdG1wLThwd3ZwM3N0L3NyYy9kb2NrZXItc3JjLjIwMTgtMDMtMjQt
-MTguMDcuMTYuNzcyMy9xZW11LnRhci52cm9vdC9kdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMn
-OiBjaGVja2VkIG91dCAnZTU0Mzg4MDE1YWYxZmI0YmYwNGQwYmNhOTljYWJhMTA3NGQ5Y2M0MicK
-U3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChnaXQ6Ly9naXQucWVtdS5vcmcva2V5Y29kZW1h
-cGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9uaW5nIGlu
-dG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC04cHd2cDNzdC9zcmMvZG9ja2VyLXNyYy4y
-MDE4LTAzLTI0LTE4LjA3LjE2Ljc3MjMvcWVtdS50YXIudnJvb3QvdWkva2V5Y29kZW1hcGRiJy4u
-LgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZl
-MmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMyY2UnCnRhcjogL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLThwd3ZwM3N0L3NyYy9kb2NrZXItc3JjLjIwMTgtMDMtMjQtMTguMDcuMTYuNzcy
-My9xZW11LnRhcjogV3JvdGUgb25seSA0MDk2IG9mIDEwMjQwIGJ5dGVzCnRhcjogRXJyb3IgaXMg
-bm90IHJlY292ZXJhYmxlOiBleGl0aW5nIG5vdwpmYWlsZWQgdG8gY3JlYXRlIHRhciBmaWxlCiAg
-Q09QWSAgICBSVU5ORVIKICAgIFJVTiB0ZXN0LWJ1aWxkIGluIHFlbXU6bWluLWdsaWIgCnRhcjog
-VW5leHBlY3RlZCBFT0YgaW4gYXJjaGl2ZQp0YXI6IFVuZXhwZWN0ZWQgRU9GIGluIGFyY2hpdmUK
-dGFyOiBFcnJvciBpcyBub3QgcmVjb3ZlcmFibGU6IGV4aXRpbmcgbm93Ci92YXIvdG1wL3FlbXUv
-cnVuOiBsaW5lIDMyOiBwcmVwX2ZhaWw6IGNvbW1hbmQgbm90IGZvdW5kCkVudmlyb25tZW50IHZh
-cmlhYmxlczoKSE9TVE5BTUU9MmFkODkxZjJiMTdmCk1BS0VGTEFHUz0gLWo4Cko9OApDQ0FDSEVf
-RElSPS92YXIvdG1wL2NjYWNoZQpFWFRSQV9DT05GSUdVUkVfT1BUUz0KVj0KU0hPV19FTlY9MQpQ
-QVRIPS91c3IvbGliL2NjYWNoZTovdXNyL2xpYjY0L2NjYWNoZTovdXNyL2xvY2FsL3NiaW46L3Vz
-ci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4KUFdEPS8KVEFSR0VUX0xJ
-U1Q9ClNITFZMPTEKSE9NRT0vcm9vdApURVNUX0RJUj0vdG1wL3FlbXUtdGVzdApGRUFUVVJFUz0g
-ZHRjCkRFQlVHPQpfPS91c3IvYmluL2VudgoKQ29uZmlndXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdl
-cnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1tdSAtLXByZWZp
-eD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsCgpFUlJPUjogRFRDIChsaWJmZHQpIHZlcnNpb24gPj0g
-MS40LjIgbm90IHByZXNlbnQuCiAgICAgICBQbGVhc2UgaW5zdGFsbCB0aGUgRFRDIChsaWJmZHQp
-IGRldmVsIHBhY2thZ2UKClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxl
-ICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDQwNywgaW4gPG1vZHVsZT4KICAgIHN5
-cy5leGl0KG1haW4oKSkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDQw
-NCwgaW4gbWFpbgogICAgcmV0dXJuIGFyZ3MuY21kb2JqLnJ1bihhcmdzLCBhcmd2KQogIEZpbGUg
-Ii4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMjYxLCBpbiBydW4KICAgIHJldHVybiBE
-b2NrZXIoKS5ydW4oYXJndiwgYXJncy5rZWVwLCBxdWlldD1hcmdzLnF1aWV0KQogIEZpbGUgIi4v
-dGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMjI5LCBpbiBydW4KICAgIHF1aWV0PXF1aWV0
-KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMTQ3LCBpbiBfZG9fY2hl
-Y2sKICAgIHJldHVybiBzdWJwcm9jZXNzLmNoZWNrX2NhbGwoc2VsZi5fY29tbWFuZCArIGNtZCwg
-Kiprd2FyZ3MpCiAgRmlsZSAiL3Vzci9saWI2NC9weXRob24yLjcvc3VicHJvY2Vzcy5weSIsIGxp
-bmUgMTg2LCBpbiBjaGVja19jYWxsCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
-ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydkb2NrZXIn
-LCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1jMjE5YjRkODJmYWYx
-MWU4Yjk5ODUyNTQwMDY5YzgzMCcsICctdScsICcwJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2Nv
-bXA9dW5jb25maW5lZCcsICctLXJtJywgJy0tbmV0PW5vbmUnLCAnLWUnLCAnVEFSR0VUX0xJU1Q9
-JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTgn
-LCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0v
-dmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL3Jvb3QvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTov
-dmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtOHB3
-dnAzc3Qvc3JjL2RvY2tlci1zcmMuMjAxOC0wMy0yNC0xOC4wNy4xNi43NzIzOi92YXIvdG1wL3Fl
-bXU6eixybycsICdxZW11Om1pbi1nbGliJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtYnVp
-bGQnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMQptYWtlWzFdOiAqKiogW3Rlc3Rz
-L2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjEyOTogZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFd
-OiBMZWF2aW5nIGRpcmVjdG9yeSAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLThwd3ZwM3N0
-L3NyYycKbWFrZTogKioqIFt0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNjM6IGRvY2tl
-ci1ydW4tdGVzdC1idWlsZEBtaW4tZ2xpYl0gRXJyb3IgMgoKcmVhbAkwbTU0LjM1NXMKdXNlcgkw
-bTguOTk1cwpzeXMJMG02Ljg4NnMKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Sat, Mar 24, 2018 at 2:25 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On 24 March 2018 at 18:13, Michael Clark <mjc@sifive.com> wrote:
+> > Remove a potential buffer overflow (not seen in practice).
+> > Perhaps cpu_physical_memory_write already has bound checks.
+>
+> cpu_physical_memory_write() writes to the guest address
+> space, so it won't overflow. If you ask it to write
+> off the end of a ROM then it will correctly write into
+> an unassigned part of the guest memory space (which does
+> nothing) or into whatever device or other ram is there.
+> You probably don't want to do that, but it is not a buffer
+> overflow.
+>
+
+I assumed that was the case but it is still probably good discipline to
+have the bounds check.
+
+We have also expanded the ROM regions to account for the default FDT size
+which was larger than the previous ROM region sizes. I discovered this
+while debugging another issue, where I had a debug statement to print the
+fdt_size and noticed it was larger than the ROM region reserved for it.
+
+It's belts and braces change. I'd prefer we at least make sure our ROM
+regions are large enough for the default FDT size. It could be overflowed
+on the virt board eventually if we enable many CPUs and add more devices.
+The error message is a nice to have, as we'll know if the FDT size is too
+large rather than have a subtle failure due to the boot loader parsing
+truncated device tree.
+
+This problem is not seen in practice... yet... but I still think it is
+worth fixing.
