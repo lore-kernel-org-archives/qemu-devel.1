@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ezqmL-0000UT-9Q
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:36:45 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezr6C-0001b3-Ow
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ezqeD-0006vf-80
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:25:27 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:38769)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezr0C-0005Hr-Fe
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:48:10 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:40226)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ezqeD-0006uz-38
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:24:21 -0400
-Received: by mail-ot0-x241.google.com with SMTP id 95-v6so16879327ote.5
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 14:24:20 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1521915220-65389-2-git-send-email-mjc@sifive.com>
-References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
-	<1521915220-65389-2-git-send-email-mjc@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 24 Mar 2018 21:23:59 +0000
-Message-ID: <CAFEAcA9zMy1hp1dWoyQPsyzC9VWpdxz3KKWTu4fsVCvAk6CSrA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 06/26] RISC-V: Mark ROM read-only after
- copying in code
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1ezon5-0005qq-FI
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:23 -0400
+Received: by mail-pf0-x241.google.com with SMTP id v66so3513525pfv.7
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:23 -0700 (PDT)
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:52 -0700
+Message-Id: <20180324192455.12254-12-mdavidsaver@gmail.com>
+In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
+References: <20180324192455.12254-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 11/14] timer: generalize ds1338
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +26,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On 24 March 2018 at 18:13, Michael Clark <mjc@sifive.com> wrote:
-> The sifive_u machine already marks its ROM readonly. This fixes
-> the remaining boards.
->
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> ---
->  hw/riscv/sifive_u.c      |  9 +++++----
->  hw/riscv/spike.c         | 18 ++++++++++--------
->  hw/riscv/virt.c          |  7 ++++---
->  include/hw/riscv/spike.h |  8 --------
->  4 files changed, 19 insertions(+), 23 deletions(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 6116c38..25df16c 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState *machine)
->      SiFiveUState *s = g_new0(SiFiveUState, 1);
->      MemoryRegion *sys_memory = get_system_memory();
->      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
->
->      /* Initialize SOC */
->      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-> @@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState *machine)
->      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
->
->      /* boot rom */
-> -    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
-> +    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
->                             memmap[SIFIVE_U_MROM].base, &error_fatal);
-> -    memory_region_set_readonly(boot_rom, true);
-> -    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
-> +    memory_region_set_readonly(mask_rom, true);
-> +    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
+Add class level handling for address space size
+and control register.
 
-memory_region_init_ram + memory_region_set_readonly is
-equivalent to memory_region_init_rom.
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ hw/timer/ds-rtc.c | 63 ++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 46 insertions(+), 17 deletions(-)
 
->      if (machine->kernel_filename) {
->          load_kernel(machine->kernel_filename);
-> @@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState *machine)
->      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
->      cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
->          sizeof(reset_vec), s->fdt, s->fdt_size);
-> +    memory_region_set_readonly(mask_rom, true);
-
-Rather than doing this, you should use
-rom_add_blob_fixed(). That works even on ROMs which
-means you can just create them as read-only from the
-start rather than waiting til you've written to them
-and then marking them read-only. It also means that
-you get the contents correctly reset on reset, even
-if the user has been messing with their contents
-via the debugger or something.
-
-hw/arm/boot.c has code which (among a lot of other
-things) loads initial kernels and dtb images into
-guest memory. You can also find ppc code doing
-similar things.
-
-thanks
--- PMM
+diff --git a/hw/timer/ds-rtc.c b/hw/timer/ds-rtc.c
+index 28f788dd8e..2df1bce3f8 100644
+--- a/hw/timer/ds-rtc.c
++++ b/hw/timer/ds-rtc.c
+@@ -21,10 +21,10 @@
+  */
+ #define NVRAM_SIZE 64
+ 
+-#define CTRL_OSF   0x20
+-
+-#define TYPE_DSRTC "ds1338"
++#define TYPE_DSRTC "dsrtc"
+ #define DSRTC(obj) OBJECT_CHECK(DSRTCState, (obj), TYPE_DSRTC)
++#define DSRTC_CLASS(klass) OBJECT_CLASS_CHECK(DSRTCClass, (klass), TYPE_DSRTC)
++#define DSRTC_GET_CLASS(obj) OBJECT_GET_CLASS(DSRTCClass, (obj), TYPE_DSRTC)
+ 
+ /* values stored in BCD */
+ /* 00-59 */
+@@ -40,7 +40,7 @@
+ /* 0-99 */
+ #define R_YEAR  (0x6)
+ 
+-#define R_CTRL  (0x7)
++#define R_DS1338_CTRL (0x7)
+ 
+ /* use 12 hour mode when set */
+ FIELD(HOUR, SET12, 6, 1)
+@@ -67,6 +67,15 @@ typedef struct DSRTCState {
+     bool addr_byte;
+ } DSRTCState;
+ 
++typedef struct DSRTCClass {
++    I2CSlaveClass parent_obj;
++
++    /* actual address space size must be <= NVRAM_SIZE */
++    unsigned addr_size;
++    unsigned ctrl_offset;
++    void (*ctrl_write)(DSRTCState *s, uint8_t);
++} DSRTCClass;
++
+ static const VMStateDescription vmstate_dsrtc = {
+     .name = "ds1338",
+     .version_id = 2,
+@@ -119,11 +128,12 @@ static void capture_current_time(DSRTCState *s)
+ 
+ static void inc_regptr(DSRTCState *s)
+ {
+-    /* The register pointer wraps around after 0x3F; wraparound
++    DSRTCClass *k = DSRTC_GET_CLASS(s);
++    /* The register pointer wraps around after k->addr_size-1; wraparound
+      * causes the current time/date to be retransferred into
+      * the secondary registers.
+      */
+-    s->ptr = (s->ptr + 1) & (NVRAM_SIZE - 1);
++    s->ptr = (s->ptr + 1) % k->addr_size;
+     if (!s->ptr) {
+         capture_current_time(s);
+     }
+@@ -206,22 +216,15 @@ static void dsrtc_update(DSRTCState *s)
+ static int dsrtc_send(I2CSlave *i2c, uint8_t data)
+ {
+     DSRTCState *s = DSRTC(i2c);
++    DSRTCClass *k = DSRTC_GET_CLASS(s);
+ 
+     if (s->addr_byte) {
+-        s->ptr = data & (NVRAM_SIZE - 1);
++        s->ptr = data % k->addr_size;
+         s->addr_byte = false;
+         return 0;
+     }
+-    if (s->ptr == R_CTRL) {
+-        /* Control register. */
+-
+-        /* Ensure bits 2, 3 and 6 will read back as zero. */
+-        data &= 0xB3;
+-
+-        /* Attempting to write the OSF flag to logic 1 leaves the
+-           value unchanged. */
+-        data = (data & ~CTRL_OSF) | (data & s->nvram[s->ptr] & CTRL_OSF);
+-
++    if (s->ptr == k->ctrl_offset) {
++        (k->ctrl_write)(s, data);
+     }
+     s->nvram[s->ptr] = data;
+     if (s->ptr <= R_YEAR) {
+@@ -256,15 +259,41 @@ static void dsrtc_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo dsrtc_info = {
++    .abstract      = true,
+     .name          = TYPE_DSRTC,
+     .parent        = TYPE_I2C_SLAVE,
+     .instance_size = sizeof(DSRTCState),
+     .class_init    = dsrtc_class_init,
+ };
+ 
++static void ds1338_control_write(DSRTCState *s, uint8_t data)
++{
++    /* Control register. */
++
++    /* allow guest to set no-op controls for clock out pin */
++    s->nvram[R_DS1338_CTRL] = data & 0x93;
++}
++
++static void ds1338_class_init(ObjectClass *klass, void *data)
++{
++    DSRTCClass *k = DSRTC_CLASS(klass);
++
++    k->addr_size = 0x40;
++    k->ctrl_offset = R_DS1338_CTRL;
++    k->ctrl_write = ds1338_control_write;
++}
++
++static const TypeInfo ds1338_info = {
++    .name          = "ds1338",
++    .parent        = TYPE_DSRTC,
++    .class_size    = sizeof(DSRTCClass),
++    .class_init    = ds1338_class_init,
++};
++
+ static void dsrtc_register_types(void)
+ {
+     type_register_static(&dsrtc_info);
++    type_register_static(&ds1338_info);
+ }
+ 
+ type_init(dsrtc_register_types)
+-- 
+2.11.0
