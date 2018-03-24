@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51476)
+Received: from eggs.gnu.org ([208.118.235.92]:34570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ezfRZ-0005xK-Qz
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 05:26:34 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eziQF-0001K9-Ax
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 08:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ezfRV-0003UO-4m
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 05:26:33 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:39546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ezfRU-0003UB-Ux
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 05:26:29 -0400
-Received: by mail-pl0-x242.google.com with SMTP id k22-v6so8894177pls.6
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 02:26:28 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 24 Mar 2018 17:26:14 +0800
-Message-Id: <20180324092614.6176-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.12] target/hppa: Include priv level in
- user-only iaoq
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ezgvL-00075g-G3
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 07:04:18 -0400
+MIME-Version: 1.0
+In-Reply-To: <4e8dcc24123a09587ecc427f2e80727ba41a7866.1521868380.git.mprivozn@redhat.com>
+References: <4e8dcc24123a09587ecc427f2e80727ba41a7866.1521868380.git.mprivozn@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 24 Mar 2018 12:01:20 +0100
+Message-ID: <CAJ+F1CJgXUY888Bo-SQ2yiDWeKk0NKe06bdzkZFL7A-6B4FusQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ccid-card: include libcacard.h only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +22,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: law@redhat.com, deller@gmx.de, dave.anglin@bell.net
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-A recent glibc change relies on the fact that the priv level in the iaoq
-must be 3, and computes an address based on that.  QEMU had been ignoring
-the priv level for user-only, which produced an incorrect address.
+Hi
 
-Reported-by: John David Anglin <dave.anglin@bell.net>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
+On Sat, Mar 24, 2018 at 6:13 AM, Michal Privoznik <mprivozn@redhat.com> wro=
+te:
+> When trying to build with latest libcacard-2.5.1, I hit the
+> following error:
+>
+> In file included from hw/usb/ccid-card-passthru.c:12:0:
+> /usr/include/cacard/vscard_common.h:26:2: error: #warning "Only <libcacar=
+d.h> can be included directly" [-Werror=3Dcpp]
+>  #warning "Only <libcacard.h> can be included directly"
+>
 
-I have not set up everything in order to test this vs current glibc,
-but since I'm forcing the value upon starting translation, I expect
-it to work.  It does at least work with my current sysroot.
+The warning was promptly removed in 2.5.2:
+https://cgit.freedesktop.org/spice/libcacard/commit/?id=3D998db1e88eb821926=
+4476c022d1446f3cb4330e8
+
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+> ---
+>  hw/usb/ccid-card-emulated.c | 5 +----
+>  hw/usb/ccid-card-passthru.c | 2 +-
+>  2 files changed, 2 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+> index ea42e4681d..7b538ae6da 100644
+> --- a/hw/usb/ccid-card-emulated.c
+> +++ b/hw/usb/ccid-card-emulated.c
+> @@ -27,10 +27,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include <eventt.h>
+> -#include <vevent.h>
+> -#include <vreader.h>
+> -#include <vcard_emul.h>
+> +#include <cacard/libcacard.h>
+>
+>  #include "qemu/thread.h"
+>  #include "qemu/main-loop.h"
+> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+> index b7dd3602dc..982d575edd 100644
+> --- a/hw/usb/ccid-card-passthru.c
+> +++ b/hw/usb/ccid-card-passthru.c
+> @@ -9,7 +9,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include <cacard/vscard_common.h>
+> +#include <cacard/libcacard.h>
+>  #include "chardev/char-fe.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/sockets.h"
+> --
+> 2.16.1
+>
+>
 
 
-r~
----
- target/hppa/cpu.h       |  4 ++--
- target/hppa/translate.c | 12 ++++--------
- 2 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 19dd12a93e..861bbb1f16 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -305,8 +305,8 @@ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
-        incomplete virtual address.  This also means that we must separate
-        out current cpu priviledge from the low bits of IAOQ_F.  */
- #ifdef CONFIG_USER_ONLY
--    *pc = env->iaoq_f;
--    *cs_base = env->iaoq_b;
-+    *pc = env->iaoq_f & -4;
-+    *cs_base = env->iaoq_b & -4;
- #else
-     /* ??? E, T, H, L, B, P bits need to be here, when implemented.  */
-     flags |= env->psw & (PSW_W | PSW_C | PSW_D);
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 6499b392f9..c532889b1f 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -1909,9 +1909,6 @@ static DisasJumpType do_ibranch(DisasContext *ctx, TCGv_reg dest,
-  */
- static TCGv_reg do_ibranch_priv(DisasContext *ctx, TCGv_reg offset)
- {
--#ifdef CONFIG_USER_ONLY
--    return offset;
--#else
-     TCGv_reg dest;
-     switch (ctx->privilege) {
-     case 0:
-@@ -1931,7 +1928,6 @@ static TCGv_reg do_ibranch_priv(DisasContext *ctx, TCGv_reg offset)
-         break;
-     }
-     return dest;
--#endif
- }
- 
- #ifdef CONFIG_USER_ONLY
-@@ -1967,7 +1963,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
-         goto do_sigill;
-     }
- 
--    switch (ctx->iaoq_f) {
-+    switch (ctx->iaoq_f & -4) {
-     case 0x00: /* Null pointer call */
-         gen_excp_1(EXCP_IMP);
-         return DISAS_NORETURN;
-@@ -1978,7 +1974,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
- 
-     case 0xe0: /* SET_THREAD_POINTER */
-         tcg_gen_st_reg(cpu_gr[26], cpu_env, offsetof(CPUHPPAState, cr[27]));
--        tcg_gen_mov_reg(cpu_iaoq_f, cpu_gr[31]);
-+        tcg_gen_ori_reg(cpu_iaoq_f, cpu_gr[31], 3);
-         tcg_gen_addi_reg(cpu_iaoq_b, cpu_iaoq_f, 4);
-         return DISAS_IAQ_N_UPDATED;
- 
-@@ -4697,8 +4693,8 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
- #ifdef CONFIG_USER_ONLY
-     ctx->privilege = MMU_USER_IDX;
-     ctx->mmu_idx = MMU_USER_IDX;
--    ctx->iaoq_f = ctx->base.pc_first;
--    ctx->iaoq_b = ctx->base.tb->cs_base;
-+    ctx->iaoq_f = ctx->base.pc_first | MMU_USER_IDX;
-+    ctx->iaoq_b = ctx->base.tb->cs_base | MMU_USER_IDX;
- #else
-     ctx->privilege = (ctx->tb_flags >> TB_FLAG_PRIV_SHIFT) & 3;
-     ctx->mmu_idx = (ctx->tb_flags & PSW_D ? ctx->privilege : MMU_PHYS_IDX);
--- 
-2.14.3
+--=20
+Marc-Andr=C3=A9 Lureau
