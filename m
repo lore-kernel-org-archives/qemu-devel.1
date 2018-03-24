@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42488)
+Received: from eggs.gnu.org ([208.118.235.92]:42534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezont-0007hz-3W
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:27:19 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezoo0-0007lh-6c
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1ezomp-0005im-3W
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:13 -0400
-Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:47006)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezomw-0005lc-70
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:26:20 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37590)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1ezomo-0005iU-Tg
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:07 -0400
-Received: by mail-pg0-x229.google.com with SMTP id t12so4022640pgp.13
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:06 -0700 (PDT)
+	id 1ezomw-0005lR-0d
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:14 -0400
+Received: by mail-pg0-x244.google.com with SMTP id n11so5794125pgp.4
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:13 -0700 (PDT)
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sat, 24 Mar 2018 12:24:41 -0700
-Message-Id: <20180324192455.12254-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 00/14] Generalize Dallas/Maxim I2C RTC devices
- v2
+Date: Sat, 24 Mar 2018 12:24:46 -0700
+Message-Id: <20180324192455.12254-6-mdavidsaver@gmail.com>
+In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
+References: <20180324192455.12254-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 05/14] timer: ds1338 change write handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +29,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-This series generalizes the ds1338 model to also support the ds1375.
-As previously, only the time of day registers are modeled.  This
-series is largely a do-over wrt. my previous series.  This time I
-started with incremental changes from the existing ds1338 model, and only
-add support for the ds1375 (which I care about).
+instead of a read-modify-write, do direct translation
+of device registers to struct tm members.
 
-I've added a more thorough test of the time of day function, covering
-reading and setting in both 12 and 24 hour mode.  This corrects two
-(practically inconsequential) bugs with the handling of 12 hour mode,
-and day of the week.
+This new ds1338_update() is the reverse of
+the existing capture_current_time().
 
-In an attempt to address concerns about false positive test failures
-in CI builds, instead of comparing the parts of 'struct tm' seperately
-I've changed the logic of the tests to compare the difference between
-the expected and actual time in seconds.  The threshold is 30 seconds
-when run with 'gtester -m quick', and 1 second otherwise.
+Simplifies later handling of CENTURY bit in
+similar Dallas RTC chips.
 
-Comparision of day of the week is still exact, so there is a chance of
-a false positive if the test is running across midnight UTC.
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ hw/timer/ds1338.c | 86 ++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 40 insertions(+), 46 deletions(-)
 
-Michael Davidsaver (14):
-  tests: more thorough tests of ds1338
-  timer: ds1338 use registerfields.h
-  timer: ds1338 persist 12-hour mode selection
-  timer: ds1338 clarify HOUR handling
-  timer: ds1338 change write handling
-  tests: ds-rtc test 12 hour mode
-  timer: ds1338 fix wday_offset handling
-  tests: ds-rtc test wday offset
-  timer: rename ds1338 -> dsrtc
-  timer: rename file ds1338.c -> ds-rtc.c
-  timer: generalize ds1338
-  timer: ds-rtc handle CENTURY bit
-  timer: ds-rtc model ds1375
-  tests: drop ds1338-test
-
- default-configs/arm-softmmu.mak |   2 +-
- hw/timer/Makefile.objs          |   2 +-
- hw/timer/ds-rtc.c               | 331 ++++++++++++++++++++++++++++++++++++++++
- hw/timer/ds1338.c               | 239 -----------------------------
- tests/Makefile.include          |   6 +-
- tests/ds-rtc-common.h           |  71 +++++++++
- tests/ds-rtc-current-test.c     |  66 ++++++++
- tests/ds-rtc-set-test.c         | 171 +++++++++++++++++++++
- tests/ds1338-test.c             |  75 ---------
- 9 files changed, 645 insertions(+), 318 deletions(-)
- create mode 100644 hw/timer/ds-rtc.c
- delete mode 100644 hw/timer/ds1338.c
- create mode 100644 tests/ds-rtc-common.h
- create mode 100644 tests/ds-rtc-current-test.c
- create mode 100644 tests/ds-rtc-set-test.c
- delete mode 100644 tests/ds1338-test.c
-
+diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
+index 9bcda26e51..071c031563 100644
+--- a/hw/timer/ds1338.c
++++ b/hw/timer/ds1338.c
+@@ -159,6 +159,42 @@ static int ds1338_recv(I2CSlave *i2c)
+     return res;
+ }
+ 
++/* call after guest writes to current time registers
++ * to re-compute our offset from host time.
++ */
++static void ds1338_update(DS1338State *s)
++{
++
++    struct tm now;
++    memset(&now, 0, sizeof(now));
++
++    /* TODO: Implement CH (stop) bit?  */
++    now.tm_sec = from_bcd(s->nvram[R_SEC] & 0x7f);
++    now.tm_min = from_bcd(s->nvram[R_MIN] & 0x7f);
++    if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
++        /* 12 hour (1-12) */
++        /* read and wrap 1-12 -> 0-11 */
++        now.tm_hour = from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR12)) % 12u;
++        if (ARRAY_FIELD_EX32(s->nvram, HOUR, AMPM)) {
++            now.tm_hour += 12;
++        }
++
++    } else {
++        now.tm_hour = from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR24));
++    }
++    {
++        /* The day field is supposed to contain a value in
++               the range 1-7. Otherwise behavior is undefined.
++             */
++        int user_wday = (s->nvram[R_WDAY] & 7) - 1;
++        s->wday_offset = (user_wday - now.tm_wday + 7) % 7;
++    }
++    now.tm_mday = from_bcd(s->nvram[R_DATE] & 0x3f);
++    now.tm_mon = from_bcd(s->nvram[R_MONTH] & 0x1f) - 1;
++    now.tm_year = from_bcd(s->nvram[R_YEAR]) + 100;
++    s->offset = qemu_timedate_diff(&now);
++}
++
+ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+ {
+     DS1338State *s = DS1338(i2c);
+@@ -168,52 +204,7 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+         s->addr_byte = false;
+         return 0;
+     }
+-    if (s->ptr < 7) {
+-        /* Time register. */
+-        struct tm now;
+-        qemu_get_timedate(&now, s->offset);
+-        switch(s->ptr) {
+-        case R_SEC:
+-            /* TODO: Implement CH (stop) bit.  */
+-            now.tm_sec = from_bcd(data & 0x7f);
+-            break;
+-        case R_MIN:
+-            now.tm_min = from_bcd(data & 0x7f);
+-            break;
+-        case R_HOUR:
+-            if (FIELD_EX32(data, HOUR, SET12)) {
+-                /* 12 hour (1-12) */
+-                /* read and wrap 1-12 -> 0-11 */
+-                now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR12)) % 12u;
+-                if (FIELD_EX32(data, HOUR, AMPM)) {
+-                    now.tm_hour += 12;
+-                }
+-
+-            } else {
+-                now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR24));
+-            }
+-            break;
+-        case R_WDAY:
+-            {
+-                /* The day field is supposed to contain a value in
+-                   the range 1-7. Otherwise behavior is undefined.
+-                 */
+-                int user_wday = (data & 7) - 1;
+-                s->wday_offset = (user_wday - now.tm_wday + 7) % 7;
+-            }
+-            break;
+-        case R_DATE:
+-            now.tm_mday = from_bcd(data & 0x3f);
+-            break;
+-        case R_MONTH:
+-            now.tm_mon = from_bcd(data & 0x1f) - 1;
+-            break;
+-        case R_YEAR:
+-            now.tm_year = from_bcd(data) + 100;
+-            break;
+-        }
+-        s->offset = qemu_timedate_diff(&now);
+-    } else if (s->ptr == R_CTRL) {
++    if (s->ptr == R_CTRL) {
+         /* Control register. */
+ 
+         /* Ensure bits 2, 3 and 6 will read back as zero. */
+@@ -225,6 +216,9 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+ 
+     }
+     s->nvram[s->ptr] = data;
++    if (s->ptr <= R_YEAR) {
++        ds1338_update(s);
++    }
+     inc_regptr(s);
+     return 0;
+ }
 -- 
 2.11.0
