@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44183)
+Received: from eggs.gnu.org ([208.118.235.92]:42355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ezqQX-0006xI-Tt
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:11:19 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezqXO-0004ku-FP
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ezqPR-0002aW-7k
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:10:11 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39342)
+	(envelope-from <mdavidsaver@gmail.com>) id 1ezqRU-0003zh-EG
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 17:12:18 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:38759)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ezngY-0003lc-78
-	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 14:14:34 -0400
-Received: by mail-pf0-x242.google.com with SMTP id u5so5951892pfh.6
-	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 11:14:34 -0700 (PDT)
-From: Michael Clark <mjc@sifive.com>
-Date: Sat, 24 Mar 2018 11:13:35 -0700
-Message-Id: <1521915220-65389-10-git-send-email-mjc@sifive.com>
-In-Reply-To: <1521915220-65389-1-git-send-email-mjc@sifive.com>
-References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v6 20/26] RISC-V: No traps on writes to misa,
- minstret, mcycle
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1ezomt-0005kV-1a
+	for qemu-devel@nongnu.org; Sat, 24 Mar 2018 15:25:11 -0400
+Received: by mail-pg0-x243.google.com with SMTP id a15so5799807pgn.5
+	for <qemu-devel@nongnu.org>; Sat, 24 Mar 2018 12:25:10 -0700 (PDT)
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Sat, 24 Mar 2018 12:24:44 -0700
+Message-Id: <20180324192455.12254-4-mdavidsaver@gmail.com>
+In-Reply-To: <20180324192455.12254-1-mdavidsaver@gmail.com>
+References: <20180324192455.12254-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 03/14] timer: ds1338 persist 12-hour mode
+ selection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-These fields are marked WARL in the specification so illegal
-writes are silently dropped.
+Need to save HOUR[HOUR12] bit to keep
+track of guest selection of 12-hour mode.
+Write through current time registers to
+achieve this.  Will be overwritten
+by the next read/latch.
 
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 ---
- target/riscv/op_helper.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ hw/timer/ds1338.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index 36b9e8e..ba3639d 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -200,17 +200,19 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-         break;
+diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
+index b5630e214a..72a4692d60 100644
+--- a/hw/timer/ds1338.c
++++ b/hw/timer/ds1338.c
+@@ -224,10 +224,8 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+            value unchanged. */
+         data = (data & ~CTRL_OSF) | (data & s->nvram[s->ptr] & CTRL_OSF);
+ 
+-        s->nvram[s->ptr] = data;
+-    } else {
+-        s->nvram[s->ptr] = data;
      }
-     case CSR_MINSTRET:
--        qemu_log_mask(LOG_UNIMP, "CSR_MINSTRET: write not implemented");
--        goto do_illegal;
-+        /* minstret is WARL so unsupported writes are ignored */
-+        break;
-     case CSR_MCYCLE:
--        qemu_log_mask(LOG_UNIMP, "CSR_MCYCLE: write not implemented");
--        goto do_illegal;
-+        /* mcycle is WARL so unsupported writes are ignored */
-+        break;
-+#if defined(TARGET_RISCV32)
-     case CSR_MINSTRETH:
--        qemu_log_mask(LOG_UNIMP, "CSR_MINSTRETH: write not implemented");
--        goto do_illegal;
-+        /* minstreth is WARL so unsupported writes are ignored */
-+        break;
-     case CSR_MCYCLEH:
--        qemu_log_mask(LOG_UNIMP, "CSR_MCYCLEH: write not implemented");
--        goto do_illegal;
-+        /* mcycleh is WARL so unsupported writes are ignored */
-+        break;
-+#endif
-     case CSR_MUCOUNTEREN:
-         env->mucounteren = val_to_write;
-         break;
-@@ -300,10 +302,9 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-     case CSR_MBADADDR:
-         env->mbadaddr = val_to_write;
-         break;
--    case CSR_MISA: {
--        qemu_log_mask(LOG_UNIMP, "CSR_MISA: misa writes not supported");
--        goto do_illegal;
--    }
-+    case CSR_MISA:
-+        /* misa is WARL so unsupported writes are ignored */
-+        break;
-     case CSR_PMPCFG0:
-     case CSR_PMPCFG1:
-     case CSR_PMPCFG2:
-@@ -328,7 +329,6 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
-     case CSR_PMPADDR15:
-        pmpaddr_csr_write(env, csrno - CSR_PMPADDR0, val_to_write);
-        break;
--    do_illegal:
- #endif
-     default:
-         do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    s->nvram[s->ptr] = data;
+     inc_regptr(s);
+     return 0;
+ }
 -- 
-2.7.0
+2.11.0
