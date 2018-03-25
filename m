@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ezxIO-00080t-FM
-	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 00:30:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f053n-0008JC-8w
+	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 08:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ezxIM-0002SC-JM
-	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 00:30:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55762)
+	(envelope-from <peter.maydell@linaro.org>) id 1f053m-0006TK-1H
+	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 08:47:43 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ezxIM-0002Rn-De
-	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 00:30:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ezxIL-0002hr-Ii
-	for <qemu-devel@nongnu.org>; Sun, 25 Mar 2018 04:30:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 86F7D2E8D36
-	for <qemu-devel@nongnu.org>; Sun, 25 Mar 2018 04:30:13 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f053l-0006TC-Ra
+	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 08:47:41 -0400
+Received: by mail-oi0-x241.google.com with SMTP id e8-v6so165094oii.4
+	for <qemu-devel@nongnu.org>; Sun, 25 Mar 2018 05:47:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 25 Mar 2018 04:17:35 -0000
-From: Launchpad Bug Tracker <1176366@bugs.launchpad.net>
-Reply-To: Bug 1176366 <1176366@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130504161319.14721.75130.malonedeb@gac.canonical.com>
-Message-Id: <152195145525.15147.7599335525190353368.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1176366] Re: TCPIP not working on qemu 1.4.50
- (master)
+In-Reply-To: <CAHNT7NuPLa7GWD_WRUYDm+ZUAh9GYir2wxJr9hw=JNGXrdBkXw@mail.gmail.com>
+References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
+	<1521915220-65389-2-git-send-email-mjc@sifive.com>
+	<CAFEAcA9zMy1hp1dWoyQPsyzC9VWpdxz3KKWTu4fsVCvAk6CSrA@mail.gmail.com>
+	<CAHNT7NuPLa7GWD_WRUYDm+ZUAh9GYir2wxJr9hw=JNGXrdBkXw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 25 Mar 2018 13:47:20 +0100
+Message-ID: <CAFEAcA87phZ=TvT_p0YO0b4q3F6c1UCiQUe-opoiuo3KadMQ9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 06/26] RISC-V: Mark ROM read-only after
+ copying in code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 25 March 2018 at 00:23, Michael Clark <mjc@sifive.com> wrote:
+>
+>
+> On Sat, Mar 24, 2018 at 2:23 PM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>>
+>> On 24 March 2018 at 18:13, Michael Clark <mjc@sifive.com> wrote:
+>> > The sifive_u machine already marks its ROM readonly. This fixes
+>> > the remaining boards.
+>> >
+>> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+>> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+>> > Signed-off-by: Michael Clark <mjc@sifive.com>
+>> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>> > ---
+>> >  hw/riscv/sifive_u.c      |  9 +++++----
+>> >  hw/riscv/spike.c         | 18 ++++++++++--------
+>> >  hw/riscv/virt.c          |  7 ++++---
+>> >  include/hw/riscv/spike.h |  8 --------
+>> >  4 files changed, 19 insertions(+), 23 deletions(-)
+>> >
+>> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+>> > index 6116c38..25df16c 100644
+>> > --- a/hw/riscv/sifive_u.c
+>> > +++ b/hw/riscv/sifive_u.c
+>> > @@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState
+>> > *machine)
+>> >      SiFiveUState *s = g_new0(SiFiveUState, 1);
+>> >      MemoryRegion *sys_memory = get_system_memory();
+>> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> > -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>> >
+>> >      /* Initialize SOC */
+>> >      object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+>> > @@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState
+>> > *machine)
+>> >      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>> >
+>> >      /* boot rom */
+>> > -    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
+>> > +    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
+>> >                             memmap[SIFIVE_U_MROM].base, &error_fatal);
+>> > -    memory_region_set_readonly(boot_rom, true);
+>> > -    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
+>> > +    memory_region_set_readonly(mask_rom, true);
+>> > +    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
+>>
+>> memory_region_init_ram + memory_region_set_readonly is
+>> equivalent to memory_region_init_rom.
+>>
+>> >      if (machine->kernel_filename) {
+>> >          load_kernel(machine->kernel_filename);
+>> > @@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState
+>> > *machine)
+>> >      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>> >      cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
+>> >          sizeof(reset_vec), s->fdt, s->fdt_size);
+>> > +    memory_region_set_readonly(mask_rom, true);
+>>
+>> Rather than doing this, you should use
+>> rom_add_blob_fixed(). That works even on ROMs which
+>> means you can just create them as read-only from the
+>> start rather than waiting til you've written to them
+>> and then marking them read-only. It also means that
+>> you get the contents correctly reset on reset, even
+>> if the user has been messing with their contents
+>> via the debugger or something.
+>>
+>> hw/arm/boot.c has code which (among a lot of other
+>> things) loads initial kernels and dtb images into
+>> guest memory. You can also find ppc code doing
+>> similar things.
+>
+>
+> I don't mind to make this change, however it is a case of good vs perfect.
+> Currently we have some machines with writable ROM sections, this change
+> fixes it and has been tested.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Yes, I would put this on your set of things to
+address for 2.13.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1176366
-
-Title:
-  TCPIP not working on qemu 1.4.50 (master)
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  whenever I try, in the guest OS, in this case it's NT 3.1, to enable
-  TCP/IP, it crashes the whole emulator. With either the ne2000 isa,
-  ne2000 pci or PCnet, still crashes
-
-  below is attached a screenshot.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1176366/+subscriptions
+thanks
+-- PMM
