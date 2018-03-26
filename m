@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0PNf-0003gn-Oi
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:29:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0POm-0004TP-SZ
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0PNe-0007dM-UL
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:29:35 -0400
-Date: Mon, 26 Mar 2018 12:29:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180326102919.GB5267@localhost.localdomain>
-References: <20180323034356.72130-1-haoqf@linux.vnet.ibm.com>
-	<20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1f0POl-00009M-UU
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:30:44 -0400
+References: <20180323164254.26487-2-pbonzini@redhat.com>
+	<39eabba4-ce6d-8b5b-f3a8-78dde910ec2e@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e60b1a9e-e5e4-e6ad-ac3c-2b3276c54ffc@redhat.com>
+Date: Mon, 26 Mar 2018 12:30:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] iotests: fix test case 185
+In-Reply-To: <39eabba4-ce6d-8b5b-f3a8-78dde910ec2e@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block: simplify code around releasing
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, stefanha@redhat.com, famz@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-Am 23.03.2018 um 04:43 hat QingFeng Hao geschrieben:
-> Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_shutdown()".
-> It's because of the newly introduced function vm_shutdown calls bdrv_drain_all,
-> which is called later by bdrv_close_all. bdrv_drain_all resumes the jobs
-> that doubles the speed and offset is doubled.
-> Some jobs' status are changed as well.
-> 
-> The fix is to not resume the jobs that are already yielded and also change
-> 185.out accordingly.
-> 
-> Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+On 26/03/2018 12:24, Vladimir Sementsov-Ogievskiy wrote:
+> 23.03.2018 19:42, Paolo Bonzini wrote:
+>> QLIST_REMOVE does not require walking the list, and once the "bitmap"
+>> argument is removed from bdrv_do_release_matching_dirty_bitmap_locked
+>> the code simplifies a lot and it is worth inlining everything in the
+>> callers of bdrv_do_release_matching_dirty_bitmap.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>> =C2=A0 block/dirty-bitmap.c | 81
+>> +++++++++++++++++++---------------------------------
+>> =C2=A0 1 file changed, 30 insertions(+), 51 deletions(-)
+>>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 13bb5066a4..c0fb49bf7b 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -250,48 +250,15 @@ void
+>> bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+>> =C2=A0 }
+>> =C2=A0 =C2=A0 /* Called within bdrv_dirty_bitmap_lock..unlock */
+>=20
+> Worth adding "Called with BQL taken" to the comment?
 
-Stefan already commented on the fix itself, but I want to add two more
-points:
+Yes, good idea.
 
-Please change your subject line. "iotests: fix test case 185" means that
-you are fixing the test case, not qemu code that makes the test case
-fail. The subject line should describe the actual change. In all
-likelihood it will start with "blockjob:" rather than "iotests:".
+>> +static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
 
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index fc645dac68..f8f208bbcf 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -99,6 +99,11 @@ typedef struct BlockJob {
->      bool ready;
->  
->      /**
-> +     * Set to true when the job is yielded.
-> +     */
-> +    bool yielded;
+> worth adding "Called with BQL taken." to the comment?
+> bdrv_release_named_dirty_bitmaps functions has it.
+>=20
+>> =C2=A0 void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs=
+)
 
-This is the same as !busy, so we don't need a new field for this.
+This is pre-existing, but it's also a good idea.
 
-Kevin
+Paolo
+
+>> -=C2=A0=C2=A0=C2=A0 bdrv_do_release_matching_dirty_bitmap(bs, NULL,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0
+>> bdrv_dirty_bitmap_get_persistance);
+>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bm, *next;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmaps_lock(bs);
+>> +=C2=A0=C2=A0=C2=A0 QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, n=
+ext) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_get_=
+persistance(bm)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bd=
+rv_release_dirty_bitmap_locked(bm);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmaps_unlock(bs);
+>> =C2=A0 }
+>> =C2=A0 =C2=A0 /**
+>=20
+> anyway,
+>=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
