@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f0RR4-0002fW-0d
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 08:41:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f0RRB-0002ij-CX
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 08:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f0RQz-0005mS-Hl
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 08:41:14 -0400
-Resent-Message-Id: <E1f0RQz-0005mS-Hl@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21011)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f0RQz-0005kK-82
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 08:41:09 -0400
-In-Reply-To: <1522047629-27658-1-git-send-email-jasowang@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152206805137.480.6469734146978649851@71c20359a636>
+	(envelope-from <imammedo@redhat.com>) id 1f0RR5-0005qb-Io
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 08:41:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60078 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f0RR5-0005p8-BY
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 08:41:15 -0400
+Date: Mon, 26 Mar 2018 14:41:02 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180326144102.00c5f3a0@redhat.com>
+In-Reply-To: <fadf8f9f-acd1-6a47-086d-01590400104e@amsat.org>
+References: <20180216134516.6269-1-peter.maydell@linaro.org>
+	<20180216134516.6269-2-peter.maydell@linaro.org>
+	<20180216172841.2ec69b8a@redhat.com>
+	<98a92185-d5e0-48fd-79a7-1c77260c9aca@amsat.org>
+	<2d4874be-fec4-39bb-9df5-bb53f17d1d74@redhat.com>
+	<20180220142319.2c959f83@redhat.com>
+	<fadf8f9f-acd1-6a47-086d-01590400104e@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 26 Mar 2018 05:40:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/2] Net patches
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/sysbus.h: New sysbus_init_child()
+ helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLXF1aWNrQGNlbnRvczYgYnVpbGQgdGVzdC4g
-UGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4g
-SWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2Ug
-aXQKbG9jYWxseS4KClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNTIyMDQ3NjI5LTI3NjU4LTEt
-Z2l0LXNlbmQtZW1haWwtamFzb3dhbmdAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
-W1BVTEwgMC8yXSBOZXQgcGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0YwojIExldCBkb2NrZXIg
-dGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9XX0VOVj0xCmV4cG9ydCBKPTgK
-dGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczYKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1NTUwZTVjNjBmIG5ldC92ZGU6IHByaW50IGVy
-cm9yIG9uIHZkZV9vcGVuKCkgZmFpbHVyZQpiY2RkZmE0MzBlIHZpcnRpb19uZXQ6IGZsdXNoIHVu
-Y29tcGxldGVkIFRYIG9uIHJlc2V0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpTdWJtb2R1bGUgJ2R0
-YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzV3XzIw
-bGwvc3JjL2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICdlNTQzODgw
-MTVhZjFmYjRiZjA0ZDBiY2E5OWNhYmExMDc0ZDljYzQyJwogIEJVSUxEICAgY2VudG9zNgptYWtl
-WzFdOiBFbnRlcmluZyBkaXJlY3RvcnkgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1fNXdf
-MjBsbC9zcmMnCiAgR0VOICAgICAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzV3XzIwbGwv
-c3JjL2RvY2tlci1zcmMuMjAxOC0wMy0yNi0wOC40MC4yNy4yMjA5MC9xZW11LnRhcgpDbG9uaW5n
-IGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1fNXdfMjBsbC9zcmMvZG9ja2VyLXNy
-Yy4yMDE4LTAzLTI2LTA4LjQwLjI3LjIyMDkwL3FlbXUudGFyLnZyb290Jy4uLgpkb25lLgpDaGVj
-a2luZyBvdXQgZmlsZXM6ICA1MCUgKDMwNTcvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAg
-NTElICgzMDkwLzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUyJSAoMzE1MC82MDU3KSAg
-IApDaGVja2luZyBvdXQgZmlsZXM6ICA1MyUgKDMyMTEvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZp
-bGVzOiAgNTQlICgzMjcxLzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU1JSAoMzMzMi82
-MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NiUgKDMzOTIvNjA1NykgICAKQ2hlY2tpbmcg
-b3V0IGZpbGVzOiAgNTclICgzNDUzLzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU4JSAo
-MzUxNC82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1OSUgKDM1NzQvNjA1NykgICAKQ2hl
-Y2tpbmcgb3V0IGZpbGVzOiAgNjAlICgzNjM1LzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczog
-IDYxJSAoMzY5NS82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MiUgKDM3NTYvNjA1Nykg
-ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjMlICgzODE2LzYwNTcpICAgCkNoZWNraW5nIG91dCBm
-aWxlczogIDY0JSAoMzg3Ny82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2NSUgKDM5Mzgv
-NjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjYlICgzOTk4LzYwNTcpICAgCkNoZWNraW5n
-IG91dCBmaWxlczogIDY3JSAoNDA1OS82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2OCUg
-KDQxMTkvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjklICg0MTgwLzYwNTcpICAgCkNo
-ZWNraW5nIG91dCBmaWxlczogIDcwJSAoNDI0MC82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
-ICA3MSUgKDQzMDEvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzIlICg0MzYyLzYwNTcp
-ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDczJSAoNDQyMi82MDU3KSAgIApDaGVja2luZyBvdXQg
-ZmlsZXM6ICA3NCUgKDQ0ODMvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzUlICg0NTQz
-LzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc2JSAoNDYwNC82MDU3KSAgIApDaGVja2lu
-ZyBvdXQgZmlsZXM6ICA3NyUgKDQ2NjQvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzgl
-ICg0NzI1LzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc5JSAoNDc4Ni82MDU3KSAgIApD
-aGVja2luZyBvdXQgZmlsZXM6ICA4MCUgKDQ4NDYvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
-OiAgODElICg0OTA3LzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgyJSAoNDk2Ny82MDU3
-KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MyUgKDUwMjgvNjA1NykgICAKQ2hlY2tpbmcgb3V0
-IGZpbGVzOiAgODQlICg1MDg4LzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg1JSAoNTE0
-OS82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NiUgKDUyMTAvNjA1NykgICAKQ2hlY2tp
-bmcgb3V0IGZpbGVzOiAgODclICg1MjcwLzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg4
-JSAoNTMzMS82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4OSUgKDUzOTEvNjA1NykgICAK
-Q2hlY2tpbmcgb3V0IGZpbGVzOiAgOTAlICg1NDUyLzYwNTcpICAgCkNoZWNraW5nIG91dCBmaWxl
-czogIDkxJSAoNTUxMi82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MiUgKDU1NzMvNjA1
-NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTMlICg1NjM0LzYwNTcpICAgCkNoZWNraW5nIG91
-dCBmaWxlczogIDk0JSAoNTY5NC82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5NSUgKDU3
-NTUvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTYlICg1ODE1LzYwNTcpICAgCkNoZWNr
-aW5nIG91dCBmaWxlczogIDk3JSAoNTg3Ni82MDU3KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5
-OCUgKDU5MzYvNjA1NykgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTklICg1OTk3LzYwNTcpICAg
-CkNoZWNraW5nIG91dCBmaWxlczogMTAwJSAoNjA1Ny82MDU3KSAgIApDaGVja2luZyBvdXQgZmls
-ZXM6IDEwMCUgKDYwNTcvNjA1NyksIGRvbmUuCllvdXIgYnJhbmNoIGlzIHVwLXRvLWRhdGUgd2l0
-aCAnb3JpZ2luL3Rlc3QnLgpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qu
-b3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzV3XzIwbGwvc3JjL2RvY2tlci1zcmMuMjAxOC0wMy0y
-Ni0wOC40MC4yNy4yMjA5MC9xZW11LnRhci52cm9vdC9kdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdk
-dGMnOiBjaGVja2VkIG91dCAnZTU0Mzg4MDE1YWYxZmI0YmYwNGQwYmNhOTljYWJhMTA3NGQ5Y2M0
-MicKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChnaXQ6Ly9naXQucWVtdS5vcmcva2V5Y29k
-ZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9uaW5n
-IGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1fNXdfMjBsbC9zcmMvZG9ja2VyLXNy
-Yy4yMDE4LTAzLTI2LTA4LjQwLjI3LjIyMDkwL3FlbXUudGFyLnZyb290L3VpL2tleWNvZGVtYXBk
-YicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0ICc2YjNk
-NzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwogIENPUFkgICAgUlVOTkVSCiAg
-ICBSVU4gdGVzdC1xdWljayBpbiBxZW11OmNlbnRvczYgClBhY2thZ2VzIGluc3RhbGxlZDoKU0RM
-LWRldmVsLTEuMi4xNC03LmVsNl83LjEueDg2XzY0CmJpc29uLTIuNC4xLTUuZWw2Lng4Nl82NApi
-emlwMi1kZXZlbC0xLjAuNS03LmVsNl8wLng4Nl82NApjY2FjaGUtMy4xLjYtMi5lbDYueDg2XzY0
-CmNzbmFwcHktZGV2ZWwtMC02LjIwMTUwNzI5Z2l0ZDdiYzY4My5lbDYueDg2XzY0CmZsZXgtMi41
-LjM1LTkuZWw2Lng4Nl82NApnY2MtNC40LjctMTguZWw2Lng4Nl82NApnZXR0ZXh0LTAuMTctMTgu
-ZWw2Lng4Nl82NApnaXQtMS43LjEtOS5lbDZfOS54ODZfNjQKZ2xpYjItZGV2ZWwtMi4yOC44LTku
-ZWw2Lng4Nl82NApsaWJlcG94eS1kZXZlbC0xLjItMy5lbDYueDg2XzY0CmxpYmZkdC1kZXZlbC0x
-LjQuMC0xLmVsNi54ODZfNjQKbGlicmRtYWNtLWRldmVsLTEuMC4yMS0wLmVsNi54ODZfNjQKbHpv
-LWRldmVsLTIuMDMtMy4xLmVsNl81LjEueDg2XzY0Cm1ha2UtMy44MS0yMy5lbDYueDg2XzY0Cm1l
-c2EtbGliRUdMLWRldmVsLTExLjAuNy00LmVsNi54ODZfNjQKbWVzYS1saWJnYm0tZGV2ZWwtMTEu
-MC43LTQuZWw2Lng4Nl82NApwYWNrYWdlIGcrKyBpcyBub3QgaW5zdGFsbGVkCnBpeG1hbi1kZXZl
-bC0wLjMyLjgtMS5lbDYueDg2XzY0CnNwaWNlLWdsaWItZGV2ZWwtMC4yNi04LmVsNi54ODZfNjQK
-c3BpY2Utc2VydmVyLWRldmVsLTAuMTIuNC0xNi5lbDYueDg2XzY0CnRhci0xLjIzLTE1LmVsNl84
-Lng4Nl82NAp2dGUtZGV2ZWwtMC4yNS4xLTkuZWw2Lng4Nl82NAp4ZW4tZGV2ZWwtNC42LjYtMi5l
-bDYueDg2XzY0CnpsaWItZGV2ZWwtMS4yLjMtMjkuZWw2Lng4Nl82NAoKRW52aXJvbm1lbnQgdmFy
-aWFibGVzOgpQQUNLQUdFUz1iaXNvbiAgICAgYnppcDItZGV2ZWwgICAgIGNjYWNoZSAgICAgY3Nu
-YXBweS1kZXZlbCAgICAgZmxleCAgICAgZysrICAgICBnY2MgICAgIGdldHRleHQgICAgIGdpdCAg
-ICAgZ2xpYjItZGV2ZWwgICAgIGxpYmVwb3h5LWRldmVsICAgICBsaWJmZHQtZGV2ZWwgICAgIGxp
-YnJkbWFjbS1kZXZlbCAgICAgbHpvLWRldmVsICAgICBtYWtlICAgICBtZXNhLWxpYkVHTC1kZXZl
-bCAgICAgbWVzYS1saWJnYm0tZGV2ZWwgICAgIHBpeG1hbi1kZXZlbCAgICAgU0RMLWRldmVsICAg
-ICBzcGljZS1nbGliLWRldmVsICAgICBzcGljZS1zZXJ2ZXItZGV2ZWwgICAgIHRhciAgICAgdnRl
-LWRldmVsICAgICB4ZW4tZGV2ZWwgICAgIHpsaWItZGV2ZWwKSE9TVE5BTUU9ZGNmZmI5MzY1N2I1
-Ck1BS0VGTEFHUz0gLWo4Cko9OApDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZQpFWFRSQV9DT05G
-SUdVUkVfT1BUUz0KVj0KU0hPV19FTlY9MQpQQVRIPS91c3IvbGliL2NjYWNoZTovdXNyL2xpYjY0
-L2NjYWNoZTovdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmlu
-Oi9zYmluOi9iaW4KUFdEPS8KVEFSR0VUX0xJU1Q9ClNITFZMPTEKSE9NRT0vcm9vdApURVNUX0RJ
-Uj0vdG1wL3FlbXUtdGVzdApGRUFUVVJFUz0gZHRjCkRFQlVHPQpfPS91c3IvYmluL2VudgoKQ29u
-ZmlndXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0
-bW11LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsClRyYWNl
-YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
-ZXIucHkiLCBsaW5lIDQwNywgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKICBGaWxl
-ICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDQwNCwgaW4gbWFpbgogICAgcmV0dXJu
-IGFyZ3MuY21kb2JqLnJ1bihhcmdzLCBhcmd2KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tl
-ci5weSIsIGxpbmUgMjYxLCBpbiBydW4KICAgIHJldHVybiBEb2NrZXIoKS5ydW4oYXJndiwgYXJn
-cy5rZWVwLCBxdWlldD1hcmdzLnF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5w
-eSIsIGxpbmUgMjI5LCBpbiBydW4KICAgIHF1aWV0PXF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9j
-a2VyL2RvY2tlci5weSIsIGxpbmUgMTQ3LCBpbiBfZG9fY2hlY2sKICAgIHJldHVybiBzdWJwcm9j
-ZXNzLmNoZWNrX2NhbGwoc2VsZi5fY29tbWFuZCArIGNtZCwgKiprd2FyZ3MpCiAgRmlsZSAiL3Vz
-ci9saWI2NC9weXRob24yLjcvc3VicHJvY2Vzcy5weSIsIGxpbmUgMTg2LCBpbiBjaGVja19jYWxs
-CiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNh
-bGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAn
-Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1lMmY5Njg0ZTMwZjIxMWU4OTZmNjUyNTQwMDY5YzgzMCcs
-ICctdScsICcwJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJt
-JywgJy0tbmV0PW5vbmUnLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJ
-R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTgnLCAnLWUnLCAnREVCVUc9JywgJy1l
-JywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYn
-LCAnL3Jvb3QvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICct
-dicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzV3XzIwbGwvc3JjL2RvY2tlci1zcmMu
-MjAxOC0wMy0yNi0wOC40MC4yNy4yMjA5MDovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50
-b3M2JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXpl
-cm8gZXhpdCBzdGF0dXMgMTM3Cm1ha2VbMV06ICoqKiBbdGVzdHMvZG9ja2VyL01ha2VmaWxlLmlu
-Y2x1ZGU6MTI5OiBkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5
-ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzV3XzIwbGwvc3JjJwptYWtlOiAqKiogW3Rl
-c3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjE2MzogZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNl
-bnRvczZdIEVycm9yIDIKCnJlYWwJMG0yNS4wMTBzCnVzZXIJMG0zLjg2M3MKc3lzCTBtMy41MzFz
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDIKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+On Sat, 24 Mar 2018 12:35:22 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+
+> Hi,
+>=20
+> On 02/20/2018 10:23 AM, Igor Mammedov wrote:
+> > On Tue, 20 Feb 2018 13:13:49 +0100
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >  =20
+> >> On 16/02/2018 18:40, Philippe Mathieu-Daud=C3=A9 wrote: =20
+> >>> we can keep object_initialize() when no parent,
+> >>> and add object_initialize_child(, const char *childname, Object *pare=
+nt)
+> >>> 'parent' last because all previous args are child-related.
+> >>>    =20
+> >>>>   =20
+> >>>>> +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());   =20
+> >>>> and then assuming we don't create sysbus devices, nor should be able=
+ to,
+> >>>> which are not attached to sysbus_get_default() this one can go sysbu=
+s' instance_init()   =20
+> >>> good idea.
+> >>>    =20
+> > [...]
+> >  =20
+> >> I'm not sure about moving qdev_set_parent_bus to instance_init().  It
+> >> would be a bit different from other buses and possibly confusing. =20
+> > That's what this series sort of does, i.e. creating a type/class
+> > specific helper(s). Which becomes confusing as number of helpers
+> > increases (frankly it's just 2 different approaches to code i.e.
+> > functional vs OOM).
+> >=20
+> > It could be better to keep single QOM API and let SYSBUS base class
+> > instance_init() to do all implicit initialization that must be done
+> > for inherited classes. =20
+>=20
+> What is the consensus on this series once 2.12 gets released?
+At least we should add and make current code use it
+  object_initialize_child()
+It should save quite a bit of code in ARM target
+
+As for
+  qdev_set_parent_bus(DEVICE, sysbus_get_default())
+it is a separate issue, but I'd still go with
+TYPE_SYS_BUS_DEVICE setting bus in its instance_init so that
+inherited types nor their users would have to deal with it.
+
+> > Yes, it will be different from other devices with buses but
+> > users won't really care (there is no other buss to assign to),
+> > for them it will look like a typical bus-less device and it
+> > would be less error-prone to code.
+> >=20
+> >   =20
+> >> Potentially there could be a "hierarchy" of *_initialize_child
+> >> functions, adding or removing arguments as needed for the specific kind
+> >> of bus:
+> >>
+> >> 	/* adds qdev_set_parent_bus */
+> >> 	device_initialize_child(Object *parent, const char *childname,
+> >> 				BusState *bus, void *data, size_t size,
+> >> 				const char *typename);
+> >> 	/* uses sysbus_get_default() */
+> >> 	sysbus_initialize_child(Object *parent, const char *childname,
+> >> 				void *data, size_t size,
+> >> 				const char *typename); =20
+> >=20
+> >  =20
+> >> 	/* initializes "addr" property too */
+> >> 	pci_initialize_child(Object *parent, const char *childname,
+> >> 			     BusState *bus, int addr,
+> >> 			     void *data, size_t size,
+> >> 			     const char *typename); =20
+> > PCI could also incorporate PCI specific bus setting/
+> > verification logic inside of base class.
+> >=20
+> > It could allow us to drop bus assigning magic in qdev_device_add(),
+> > bringing it closer to simple QOM object handling, with specifics
+> > abstracted by respective TYPE implementations.
+> > Maybe we would be able to unify -device with -object in the end. =20
+>=20
+> Thanks,
+>=20
+> Phil.
