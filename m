@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f0Zus-0000NA-MN
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 17:44:35 -0400
+	(envelope-from <mjc@sifive.com>) id 1f0ZyG-0001bw-Ku
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 17:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f0Zur-0001LG-PU
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 17:44:34 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:37783)
+	(envelope-from <mjc@sifive.com>) id 1f0ZyE-0003XF-6H
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 17:48:04 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:46362)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f0Zur-0001Kb-Hk
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 17:44:33 -0400
-Received: by mail-lf0-x242.google.com with SMTP id m16-v6so26584617lfc.4
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 14:44:33 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 26 Mar 2018 14:44:09 -0700
-Message-Id: <20180326214409.15326-1-jcmvbkbc@gmail.com>
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f0ZyD-0003Ww-V2
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 17:48:02 -0400
+Received: by mail-ot0-x241.google.com with SMTP id v64-v6so1193036otb.13
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 14:48:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/4] target/xtensa fixes for 2.12
+In-Reply-To: <20180326191603.10217-18-laurent@vivier.eu>
+References: <20180326191603.10217-1-laurent@vivier.eu>
+	<20180326191603.10217-18-laurent@vivier.eu>
+From: Michael Clark <mjc@sifive.com>
+Date: Mon, 26 Mar 2018 14:48:00 -0700
+Message-ID: <CAHNT7NsaxqBxDxEL2BZZG=_N92oCvJQBJb3JpMLG5Pex6yrtKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for 2.13 17/19] linux-user: move riscv cpu
+ loop to riscv directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +29,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org
 
-Hi Peter,
+On Mon, Mar 26, 2018 at 12:16 PM, Laurent Vivier <laurent@vivier.eu> wrote:
 
-please pull the following fixes for target/xtensa for 2.12:
+> No code change, only move code from main.c to
+> riscv/cpu_loop.c.
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>
 
-The following changes since commit 7b93d78a04aa242d377ae213b79db6c319c71847:
+Reviewed-by: Michael Clark <mjc@sifive.com>
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-03-26 15:17:25 +0100)
 
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20180326-xtensa
-
-for you to fetch changes up to d0ce7e9cfc8eda113f872b608fe4a3dd7662997e:
-
-  target/xtensa: fix timers test (2018-03-26 14:17:04 -0700)
-
-----------------------------------------------------------------
-target/xtensa fixes for 2.12:
-
-- add .inc. to non-top level source file names under target/xtensa;
-- fix #include <xtensa-isa.h> in the import_core.sh script;
-- remove stray linux-user/xtensa/syscall.h;
-- fix timers test.
-
-----------------------------------------------------------------
-Max Filippov (4):
-      target/xtensa: add .inc. to non-top level source file names
-      target/xtensa/import_core.sh: fix #include <xtensa-isa.h>
-      linux-user/xtensa: remove stray syscall.h
-      target/xtensa: fix timers test
-
- linux-user/xtensa/syscall.h                                      | 0
- target/xtensa/core-dc232b.c                                      | 6 +++---
- target/xtensa/core-dc232b/{gdb-config.c => gdb-config.inc.c}     | 0
- .../core-dc232b/{xtensa-modules.c => xtensa-modules.inc.c}       | 0
- target/xtensa/core-dc233c.c                                      | 4 ++--
- target/xtensa/core-dc233c/{gdb-config.c => gdb-config.inc.c}     | 0
- .../core-dc233c/{xtensa-modules.c => xtensa-modules.inc.c}       | 0
- target/xtensa/core-de212.c                                       | 4 ++--
- target/xtensa/core-de212/{gdb-config.c => gdb-config.inc.c}      | 0
- .../xtensa/core-de212/{xtensa-modules.c => xtensa-modules.inc.c} | 0
- target/xtensa/core-fsf.c                                         | 2 +-
- .../xtensa/core-fsf/{xtensa-modules.c => xtensa-modules.inc.c}   | 0
- target/xtensa/core-sample_controller.c                           | 4 ++--
- .../core-sample_controller/{gdb-config.c => gdb-config.inc.c}    | 0
- .../{xtensa-modules.c => xtensa-modules.inc.c}                   | 0
- target/xtensa/import_core.sh                                     | 9 +++++----
- tests/tcg/xtensa/Makefile                                        | 2 +-
- 17 files changed, 16 insertions(+), 15 deletions(-)
- delete mode 100644 linux-user/xtensa/syscall.h
- rename target/xtensa/core-dc232b/{gdb-config.c => gdb-config.inc.c} (100%)
- rename target/xtensa/core-dc232b/{xtensa-modules.c => xtensa-modules.inc.c} (100%)
- rename target/xtensa/core-dc233c/{gdb-config.c => gdb-config.inc.c} (100%)
- rename target/xtensa/core-dc233c/{xtensa-modules.c => xtensa-modules.inc.c} (100%)
- rename target/xtensa/core-de212/{gdb-config.c => gdb-config.inc.c} (100%)
- rename target/xtensa/core-de212/{xtensa-modules.c => xtensa-modules.inc.c} (100%)
- rename target/xtensa/core-fsf/{xtensa-modules.c => xtensa-modules.inc.c} (100%)
- rename target/xtensa/core-sample_controller/{gdb-config.c => gdb-config.inc.c} (100%)
- rename target/xtensa/core-sample_controller/{xtensa-modules.c => xtensa-modules.inc.c} (100%)
-
--- 
-Thanks.
--- Max
+> ---
+>  linux-user/main.c           | 101 +-----------------------------
+> --------------
+>  linux-user/riscv/cpu_loop.c |  92 ++++++++++++++++++++++++++++++
+> ++++++++++
+>  2 files changed, 93 insertions(+), 100 deletions(-)
+>
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 3b3613cb89..78ff99bd00 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -149,100 +149,6 @@ void fork_end(int child)
+>      }
+>  }
+>
+> -#ifdef TARGET_RISCV
+> -
+> -void cpu_loop(CPURISCVState *env)
+> -{
+> -    CPUState *cs = CPU(riscv_env_get_cpu(env));
+> -    int trapnr, signum, sigcode;
+> -    target_ulong sigaddr;
+> -    target_ulong ret;
+> -
+> -    for (;;) {
+> -        cpu_exec_start(cs);
+> -        trapnr = cpu_exec(cs);
+> -        cpu_exec_end(cs);
+> -        process_queued_cpu_work(cs);
+> -
+> -        signum = 0;
+> -        sigcode = 0;
+> -        sigaddr = 0;
+> -
+> -        switch (trapnr) {
+> -        case EXCP_INTERRUPT:
+> -            /* just indicate that signals should be handled asap */
+> -            break;
+> -        case EXCP_ATOMIC:
+> -            cpu_exec_step_atomic(cs);
+> -            break;
+> -        case RISCV_EXCP_U_ECALL:
+> -            env->pc += 4;
+> -            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
+> -                /* riscv_flush_icache_syscall is a no-op in QEMU as
+> -                   self-modifying code is automatically detected */
+> -                ret = 0;
+> -            } else {
+> -                ret = do_syscall(env,
+> -                                 env->gpr[xA7],
+> -                                 env->gpr[xA0],
+> -                                 env->gpr[xA1],
+> -                                 env->gpr[xA2],
+> -                                 env->gpr[xA3],
+> -                                 env->gpr[xA4],
+> -                                 env->gpr[xA5],
+> -                                 0, 0);
+> -            }
+> -            if (ret == -TARGET_ERESTARTSYS) {
+> -                env->pc -= 4;
+> -            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+> -                env->gpr[xA0] = ret;
+> -            }
+> -            if (cs->singlestep_enabled) {
+> -                goto gdbstep;
+> -            }
+> -            break;
+> -        case RISCV_EXCP_ILLEGAL_INST:
+> -            signum = TARGET_SIGILL;
+> -            sigcode = TARGET_ILL_ILLOPC;
+> -            break;
+> -        case RISCV_EXCP_BREAKPOINT:
+> -            signum = TARGET_SIGTRAP;
+> -            sigcode = TARGET_TRAP_BRKPT;
+> -            sigaddr = env->pc;
+> -            break;
+> -        case RISCV_EXCP_INST_PAGE_FAULT:
+> -        case RISCV_EXCP_LOAD_PAGE_FAULT:
+> -        case RISCV_EXCP_STORE_PAGE_FAULT:
+> -            signum = TARGET_SIGSEGV;
+> -            sigcode = TARGET_SEGV_MAPERR;
+> -            break;
+> -        case EXCP_DEBUG:
+> -        gdbstep:
+> -            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
+> -            sigcode = TARGET_TRAP_BRKPT;
+> -            break;
+> -        default:
+> -            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x -
+> aborting\n",
+> -                     trapnr);
+> -            exit(EXIT_FAILURE);
+> -        }
+> -
+> -        if (signum) {
+> -            target_siginfo_t info = {
+> -                .si_signo = signum,
+> -                .si_errno = 0,
+> -                .si_code = sigcode,
+> -                ._sifields._sigfault._addr = sigaddr
+> -            };
+> -            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
+> -        }
+> -
+> -        process_pending_signals(env);
+> -    }
+> -}
+> -
+> -#endif /* TARGET_RISCV */
+> -
+>  #ifdef TARGET_HPPA
+>
+>  static abi_ulong hppa_lws(CPUHPPAState *env)
+> @@ -1319,12 +1225,7 @@ int main(int argc, char **argv, char **envp)
+>
+>      target_cpu_copy_regs(env, regs);
+>
+> -#if defined(TARGET_RISCV)
+> -    {
+> -        env->pc = regs->sepc;
+> -        env->gpr[xSP] = regs->sp;
+> -    }
+> -#elif defined(TARGET_HPPA)
+> +#if defined(TARGET_HPPA)
+>      {
+>          int i;
+>          for (i = 1; i < 32; i++) {
+> diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+> index b7700a5561..f137d39d7e 100644
+> --- a/linux-user/riscv/cpu_loop.c
+> +++ b/linux-user/riscv/cpu_loop.c
+> @@ -21,6 +21,98 @@
+>  #include "qemu.h"
+>  #include "cpu_loop-common.h"
+>
+> +void cpu_loop(CPURISCVState *env)
+> +{
+> +    CPUState *cs = CPU(riscv_env_get_cpu(env));
+> +    int trapnr, signum, sigcode;
+> +    target_ulong sigaddr;
+> +    target_ulong ret;
+> +
+> +    for (;;) {
+> +        cpu_exec_start(cs);
+> +        trapnr = cpu_exec(cs);
+> +        cpu_exec_end(cs);
+> +        process_queued_cpu_work(cs);
+> +
+> +        signum = 0;
+> +        sigcode = 0;
+> +        sigaddr = 0;
+> +
+> +        switch (trapnr) {
+> +        case EXCP_INTERRUPT:
+> +            /* just indicate that signals should be handled asap */
+> +            break;
+> +        case EXCP_ATOMIC:
+> +            cpu_exec_step_atomic(cs);
+> +            break;
+> +        case RISCV_EXCP_U_ECALL:
+> +            env->pc += 4;
+> +            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
+> +                /* riscv_flush_icache_syscall is a no-op in QEMU as
+> +                   self-modifying code is automatically detected */
+> +                ret = 0;
+> +            } else {
+> +                ret = do_syscall(env,
+> +                                 env->gpr[xA7],
+> +                                 env->gpr[xA0],
+> +                                 env->gpr[xA1],
+> +                                 env->gpr[xA2],
+> +                                 env->gpr[xA3],
+> +                                 env->gpr[xA4],
+> +                                 env->gpr[xA5],
+> +                                 0, 0);
+> +            }
+> +            if (ret == -TARGET_ERESTARTSYS) {
+> +                env->pc -= 4;
+> +            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+> +                env->gpr[xA0] = ret;
+> +            }
+> +            if (cs->singlestep_enabled) {
+> +                goto gdbstep;
+> +            }
+> +            break;
+> +        case RISCV_EXCP_ILLEGAL_INST:
+> +            signum = TARGET_SIGILL;
+> +            sigcode = TARGET_ILL_ILLOPC;
+> +            break;
+> +        case RISCV_EXCP_BREAKPOINT:
+> +            signum = TARGET_SIGTRAP;
+> +            sigcode = TARGET_TRAP_BRKPT;
+> +            sigaddr = env->pc;
+> +            break;
+> +        case RISCV_EXCP_INST_PAGE_FAULT:
+> +        case RISCV_EXCP_LOAD_PAGE_FAULT:
+> +        case RISCV_EXCP_STORE_PAGE_FAULT:
+> +            signum = TARGET_SIGSEGV;
+> +            sigcode = TARGET_SEGV_MAPERR;
+> +            break;
+> +        case EXCP_DEBUG:
+> +        gdbstep:
+> +            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
+> +            sigcode = TARGET_TRAP_BRKPT;
+> +            break;
+> +        default:
+> +            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x -
+> aborting\n",
+> +                     trapnr);
+> +            exit(EXIT_FAILURE);
+> +        }
+> +
+> +        if (signum) {
+> +            target_siginfo_t info = {
+> +                .si_signo = signum,
+> +                .si_errno = 0,
+> +                .si_code = sigcode,
+> +                ._sifields._sigfault._addr = sigaddr
+> +            };
+> +            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
+> +        }
+> +
+> +        process_pending_signals(env);
+> +    }
+> +}
+> +
+>  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+>  {
+> +    env->pc = regs->sepc;
+> +    env->gpr[xSP] = regs->sp;
+>  }
+> --
+> 2.14.3
+>
+>
+>
