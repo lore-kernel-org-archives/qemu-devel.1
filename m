@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0LMa-0004jG-1p
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 02:12:12 -0400
+	(envelope-from <peterx@redhat.com>) id 1f0Lml-0002Bl-6I
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 02:39:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0LMW-00052m-2G
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 02:12:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59870 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f0Lmh-0006ge-HE
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 02:39:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38644 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0LMV-00052X-V0
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 02:12:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0Lmh-0006gZ-CW
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 02:39:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E60A6401DE65
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 06:12:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E8AF2722C0
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 06:39:10 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 26 Mar 2018 14:11:57 +0800
-Message-Id: <20180326061157.24865-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
+Date: Mon, 26 Mar 2018 14:38:54 +0800
+Message-Id: <20180326063901.27425-2-peterx@redhat.com>
+In-Reply-To: <20180326063901.27425-1-peterx@redhat.com>
+References: <20180326063901.27425-1-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-2.12 1/8] qmp: fix qmp_capabilities error
+ regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +34,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-If there are more than one events, wait_until_completed() might return
-the 2nd event even if the 1st event is JOB_COMPLETED, since the for loop
-will continue to run even if completed is set to True.
+When someone sents a command before QMP handshake, error was like this:
 
-It never happened before, but it can be triggered when OOB is enabled
-due to the RESUME startup message. Fix that up by removing the boolean
-and make sure we return the correct event.
+ {"execute": "query-cpus"}
+ {"error": {"class": "CommandNotFound", "desc":
+            "Expecting capabilities negotiation with 'qmp_capabilities'"}=
+}
 
+While after cf869d5317 it becomes:
+
+ {"execute": "query-cpus"}
+ {"error": {"class": "CommandNotFound", "desc":
+            "The command query-cpus has not been found"}}
+
+Fix it back to the nicer one.
+
+Fixes: cf869d5317 ("qmp: support out-of-band (oob) execution", 2018-03-19=
+)
+Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+ monitor.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index b5d7945af8..11704e6583 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -470,18 +470,14 @@ class QMPTestCase(unittest.TestCase):
- 
-     def wait_until_completed(self, drive='drive0', check_offset=True):
-         '''Wait for a block job to finish, returning the event'''
--        completed = False
--        while not completed:
--            for event in self.vm.get_qmp_events(wait=True):
--                if event['event'] == 'BLOCK_JOB_COMPLETED':
--                    self.assert_qmp(event, 'data/device', drive)
--                    self.assert_qmp_absent(event, 'data/error')
--                    if check_offset:
--                        self.assert_qmp(event, 'data/offset', event['data']['len'])
--                    completed = True
+diff --git a/monitor.c b/monitor.c
+index 77f4c41cfa..849fa23bf9 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1203,8 +1203,14 @@ static bool qmp_cmd_oob_check(Monitor *mon, QDict =
+*req, Error **errp)
+=20
+     cmd =3D qmp_find_command(mon->qmp.commands, command);
+     if (!cmd) {
+-        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+-                  "The command %s has not been found", command);
++        if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
++            error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
++                      "Expecting capabilities negotiation "
++                      "with 'qmp_capabilities'");
++        } else {
++            error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
++                      "The command %s has not been found", command);
++        }
+         return false;
+     }
+=20
+@@ -4027,7 +4033,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *re=
+q_obj)
+ {
+     Monitor *mon, *old_mon;
+     QObject *req, *rsp =3D NULL, *id;
+-    QDict *qdict =3D NULL;
+     bool need_resume;
+=20
+     req =3D req_obj->req;
+@@ -4050,18 +4055,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *r=
+eq_obj)
+=20
+     cur_mon =3D old_mon;
+=20
+-    if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
+-        qdict =3D qdict_get_qdict(qobject_to(QDict, rsp), "error");
+-        if (qdict
+-            && !g_strcmp0(qdict_get_try_str(qdict, "class"),
+-                    QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOUND))) =
+{
+-            /* Provide a more useful error message */
+-            qdict_del(qdict, "desc");
+-            qdict_put_str(qdict, "desc", "Expecting capabilities negotia=
+tion"
+-                          " with 'qmp_capabilities'");
+-        }
+-    }
 -
--        self.assert_no_active_block_jobs()
--        return event
-+        for event in self.vm.get_qmp_events(wait=True):
-+            if event['event'] == 'BLOCK_JOB_COMPLETED':
-+                self.assert_qmp(event, 'data/device', drive)
-+                self.assert_qmp_absent(event, 'data/error')
-+                if check_offset:
-+                    self.assert_qmp(event, 'data/offset', event['data']['len'])
-+                self.assert_no_active_block_jobs()
-+                return event
- 
-     def wait_ready(self, drive='drive0'):
-         '''Wait until a block job BLOCK_JOB_READY event'''
--- 
+     /* Respond if necessary */
+     monitor_qmp_respond(mon, rsp, NULL, id);
+=20
+--=20
 2.14.3
