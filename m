@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0MiT-0003k7-4v
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:38:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1f0NAb-0001YR-FE
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0MiQ-00016r-0e
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:38:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39504 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f0NAW-0008RO-Da
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:07:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34698 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0MiP-00016d-Rw
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:38:49 -0400
-References: <1521193892-15552-1-git-send-email-thuth@redhat.com>
-	<1ef42117-6b16-b22f-29fe-f4910361aa2a@redhat.com>
-	<d40e6299-9c4f-26f3-41e0-21116da4d8f4@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a78b536c-ceba-1a2e-e74e-7e487689a267@redhat.com>
-Date: Mon, 26 Mar 2018 09:38:32 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0NAW-0008Qr-7r
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:07:52 -0400
+Date: Mon, 26 Mar 2018 16:07:38 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180326080738.GA17789@xz-mi>
+References: <20180309090006.10018-1-peterx@redhat.com>
+	<20180309090006.10018-15-peterx@redhat.com>
+	<CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <d40e6299-9c4f-26f3-41e0-21116da4d8f4@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] Fix crashes with CAN bus and
- ISA DMA devices
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Pavel Pisa <pisa@cmp.felk.cvut.cz>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 23/03/2018 19:20, John Snow wrote:
-> 
-> 
-> On 03/16/2018 06:15 AM, Paolo Bonzini wrote:
->> On 16/03/2018 10:51, Thomas Huth wrote:
->>> The new CAN bus devices and some older ISA devices that use DMA can be
->>> used to crash QEMU. These patches introduce some proper checks so that
->>> the users get a proper error message instead.
->>>
->>> Alexey Kardashevskiy (1):
->>>   fdc: Exit if ISA controller does not support DMA
->>>
->>> Thomas Huth (3):
->>>   hw/net/can: Fix segfaults when using the devices without bus
->>>   hw/audio: Fix crashes when devices are used on ISA bus without DMA
->>>   scripts/device-crash-test: Remove fixed isapc-with-iommu entry
->>>
->>>  hw/audio/cs4231a.c        | 8 +++++++-
->>>  hw/audio/gus.c            | 7 ++++++-
->>>  hw/audio/sb16.c           | 9 +++++++--
->>>  hw/block/fdc.c            | 5 ++++-
->>>  hw/net/can/can_sja1000.c  | 4 ++++
->>>  scripts/device-crash-test | 8 --------
->>>  6 files changed, 28 insertions(+), 13 deletions(-)
->>>
->>
->> Queued, thanks.
->>
->> Paolo
->>
-> 
-> Did you not actually send a PR for this?
+On Fri, Mar 23, 2018 at 05:18:53PM +0100, Marc-Andr=C3=A9 Lureau wrote:
 
-No, today. :)
+[...]
 
-Paolo
+> > +/*
+> > + * Dispatch one single QMP request. The function will free the req_o=
+bj
+> > + * and objects inside it before return.
+> > + */
+> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+> >  {
+> > -    QObject *req, *rsp =3D NULL, *id =3D NULL;
+> > +    Monitor *mon, *old_mon;
+> > +    QObject *req, *rsp =3D NULL, *id;
+> >      QDict *qdict =3D NULL;
+> > -    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP, parser)=
+;
+> > -    Monitor *old_mon, *mon =3D container_of(mon_qmp, Monitor, qmp);
+> > -
+> > -    Error *err =3D NULL;
+> > +    bool need_resume;
+> >
+> > -    req =3D json_parser_parse_err(tokens, NULL, &err);
+> > -    if (!req && !err) {
+> > -        /* json_parser_parse_err() sucks: can fail without setting @=
+err */
+> > -        error_setg(&err, QERR_JSON_PARSING);
+> > -    }
+> > -    if (err) {
+> > -        goto err_out;
+> > -    }
+> > +    req =3D req_obj->req;
+> > +    mon =3D req_obj->mon;
+> > +    id =3D req_obj->id;
+> > +    need_resume =3D req_obj->need_resume;
+> >
+> > -    qdict =3D qobject_to_qdict(req);
+> > -    if (qdict) {
+> > -        id =3D qdict_get(qdict, "id");
+> > -        qobject_incref(id);
+> > -        qdict_del(qdict, "id");
+> > -    } /* else will fail qmp_dispatch() */
+> > +    g_free(req_obj);
+> >
+> >      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
+> >          QString *req_json =3D qobject_to_json(req);
+> > @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMessageParse=
+r *parser, GQueue *tokens)
+> >      old_mon =3D cur_mon;
+> >      cur_mon =3D mon;
+>=20
+> There is another issue with this series, since cur_mon is global (and
+> not protected), an oob command may change the cur_mon while another
+> command is running in the main thread with unexpected consequences. I
+> don't have a clear idea what is the best way to solve it. Making the
+> variable per-thread, or going all the way to get rid of cur_mon (my
+> preference, but much harder)
+
+IMHO it is fine too.
+
+Note that this cur_mon operation is in monitor_qmp_dispatch_one() now,
+which is still running in main thread.  So AFAICT all the cur_mon
+references are in main thread, and monitor IOThread does not modify
+that variable at all.  Then we should probably be safe.
+
+I would be far more than glad to see cur_mon go away one day.
+
+Thanks,
+
+--=20
+Peter Xu
