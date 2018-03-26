@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ylk-0002PV-9F
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:31:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0Yws-00066P-Sm
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ylj-0007SS-Fk
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:31:04 -0400
-References: <20180228131315.30194-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1e7d7cbe-0e38-39ee-2ba0-8223e3c64095@redhat.com>
-Date: Mon, 26 Mar 2018 22:30:54 +0200
+	(envelope-from <eblake@redhat.com>) id 1f0Ywp-00057L-Nu
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:42:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58098 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0Ywp-00056q-IP
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:42:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 33B794040073
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 20:42:28 +0000 (UTC)
+References: <20180326063901.27425-1-peterx@redhat.com>
+	<20180326063901.27425-8-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0c71c9a6-7e56-3a22-21e8-af4338237b1a@redhat.com>
+Date: Mon, 26 Mar 2018 15:42:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180228131315.30194-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="t8DIFkr2tL1ca5TDrvOTUHEjak6cOgeMk"
-Subject: Re: [Qemu-devel] [PATCH 0/2] block/file-posix: Fix fully
- preallocated truncate
+In-Reply-To: <20180326063901.27425-8-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 7/8] tests: introduce
+ qtest_init_with_qmp_format()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +35,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, qemu-stable@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---t8DIFkr2tL1ca5TDrvOTUHEjak6cOgeMk
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, qemu-stable@nongnu.org
-Message-ID: <1e7d7cbe-0e38-39ee-2ba0-8223e3c64095@redhat.com>
-Subject: Re: [PATCH 0/2] block/file-posix: Fix fully preallocated truncate
-References: <20180228131315.30194-1-mreitz@redhat.com>
-In-Reply-To: <20180228131315.30194-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 03/26/2018 01:39 AM, Peter Xu wrote:
+> It is abstracted from qtest_init_without_qmp_handshake(). It works just
+> like qtest_init_without_qmp_handshake() but further it would allow the
+> caller to specify the QMP parameter.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   tests/libqtest.c | 14 +++++++++++---
+>   tests/libqtest.h | 14 ++++++++++++++
+>   2 files changed, 25 insertions(+), 3 deletions(-)
+> 
 
-On 2018-02-28 14:13, Max Reitz wrote:
-> Fully preallocated truncation has a 50 % chance of working on images
-> files over file-posix.  It works if $SIZE % 4G < 2G, and it fails
-> otherwise.  To make things even more interesting, often you would not
-> even notice because qemu reported success even though it did nothing
-> (because after the successful lseek(), errno was still 0, so when the
-> file-posix driver tried to return a negative error code, it actually
-> reported success).
->=20
-> This issue is fixed by patch 1 in this series.  Thanks to Daniel for
-> reporting!
->=20
->=20
-> Max Reitz (2):
->   block/file-posix: Fix fully preallocated truncate
->   iotests: Test preallocated truncate of 2G image
->=20
->  block/file-posix.c         |  5 +++--
->  tests/qemu-iotests/106     | 24 ++++++++++++++++++++++++
->  tests/qemu-iotests/106.out | 10 ++++++++++
->  3 files changed, 37 insertions(+), 2 deletions(-)
+[Reviewing in reverse order; you may want to look at 
+scripts/git.orderfile for how to present your patches in a more logical 
+manner with .h changes first.]
 
-Applied to my block tree...  (*cough* *cough* -- I'm the worst when it
-comes to keeping track of my own patches.)
+ > diff --git a/tests/libqtest.h b/tests/libqtest.h
+ > index 811169453a..1f3605ce73 100644
+ > --- a/tests/libqtest.h
+ > +++ b/tests/libqtest.h
+ > @@ -62,6 +62,20 @@ QTestState *qtest_init(const char *extra_args);
+ >    */
+ >   QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
+ >
+ > +/**
+ > + * qtest_init_with_qmp_format:
+ > + * @extra_args: other arguments to pass to QEMU.
 
-Max
+Not your fault, but I'm already not a fan of 'extra_args'; it would be 
+better to make these functions take an array of arguments, or even use 
+varargs, instead of relying on shell word splitting.  Our testsuite is a 
+gaping security hole if executed in a directory where a shell 
+metacharacter causes the shell word splitting to do something different 
+than planned.
 
+ > + * @qmp_format: format of QMP parameters, should contain one "%s"
+ > + *              field so that the socket path will be filled later.
+ > + *
+ > + * Note that this function will work just like
+ > + * qtest_init_without_qmp_handshake(), so no QMP handshake will be done.
+ > + *
+ > + * Returns: #QTestState instance.
+ > + */
+ > +QTestState *qtest_init_with_qmp_format(const char *extra_args,
+ > +                                       const char *qmp_format);
 
---t8DIFkr2tL1ca5TDrvOTUHEjak6cOgeMk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Ouch - you didn't use any attribute to mark the format string so that 
+the compiler can enforce that it is treated as a printf-style argument. 
+I wonder if it would have been better to just have a 'bool use_oob' 
+parameter rather than playing ugly games with passing printf-style 
+format arguments around.
 
------BEGIN PGP SIGNATURE-----
+ > +
+ >   /**
+ >    * qtest_quit:
+ >    * @s: #QTestState instance to operate on.
+ >
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlq5WH4ACgkQ9AfbAGHV
-z0Df/Qf/QrmFf9ZfDq5xEl11OjMLscdbs/kQnD2OtGcK04ton44Vm/16YUILRTcL
-XwUqy4sCtdHiuQQ4eX1U2sZe90bJ9gwQrcjfc/zAR0W5enU8Y5tUn9zvXCO+pxT6
-rLl9nh8BXc+eUOMMno0RfOGWuxR50nh0Xtmm2d/KIw4oGd77VFQQ/vA5WartHAZM
-vxQUUVRDAYkOylZDYzZPbRIFzNERbCDXlrWYMLM/8U4W7nQ4mk3zOsuQ81563jnN
-rDC4fpxl4Z1Ov1enatnnBsqN9mWMAAgNKrzoSZsmY6zdBxOUC4gusW8bn2D0yfGs
-Dxy9jPNtmjcUs9HyCC97+IPt6cFUcA==
-=lpd6
------END PGP SIGNATURE-----
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 200b2b9e92..d2af1b17f0 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -166,19 +166,22 @@ static const char *qtest_qemu_binary(void)
+>       return qemu_bin;
+>   }
+>   
+> -QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+> +QTestState *qtest_init_with_qmp_format(const char *extra_args,
+> +                                       const char *qmp_format)
+>   {
+>       QTestState *s;
+>       int sock, qmpsock, i;
+>       gchar *socket_path;
+>       gchar *qmp_socket_path;
+>       gchar *command;
+> +    gchar *qmp_params;
+>       const char *qemu_binary = qtest_qemu_binary();
+>   
+>       s = g_new(QTestState, 1);
+>   
+>       socket_path = g_strdup_printf("/tmp/qtest-%d.sock", getpid());
+>       qmp_socket_path = g_strdup_printf("/tmp/qtest-%d.qmp", getpid());
+> +    qmp_params = g_strdup_printf(qmp_format, qmp_socket_path);
 
---t8DIFkr2tL1ca5TDrvOTUHEjak6cOgeMk--
+And in addition to my earlier comment about not using a compiler 
+attribute, you aren't even bothering to assert that the caller didn't 
+pass in a garbage string, which can really lead to weird breakages.
+
+>   
+>       /* It's possible that if an earlier test run crashed it might
+>        * have left a stale unix socket lying around. Delete any
+> @@ -199,12 +202,12 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+>           command = g_strdup_printf("exec %s "
+>                                     "-qtest unix:%s,nowait "
+>                                     "-qtest-log %s "
+> -                                  "-qmp unix:%s,nowait "
+> +                                  "%s "
+>                                     "-machine accel=qtest "
+>                                     "-display none "
+>                                     "%s", qemu_binary, socket_path,
+>                                     getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
+> -                                  qmp_socket_path,
+> +                                  qmp_params,
+
+Again, if you used the idea of a 'bool use_oob',  this would look more like:
+
+"-qmp unix:%s,nowait%s ",
+...
+qmp_socket_path, use_oob ? "x-oob=on" : "",
+
+which is a lot more limited in scope to prevent auditing nightmares, 
+while no less powerful for what you are actually using this new function 
+for.
+
+>                                     extra_args ?: "");
+>           execlp("/bin/sh", "sh", "-c", command, NULL);
+>           exit(1);
+> @@ -237,6 +240,11 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+>       return s;
+>   }
+>   
+> +QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+> +{
+> +    return qtest_init_with_qmp_format(extra_args, "-qmp unix:%s,nowait");
+> +}
+
+There are so few callers of qtest_init_without_qmp_handshake() that I'd 
+just add the parameter to the existing function and update its two 
+callers, instead of adding yet another forwarding wrapper.  Especially 
+if it is just adding a 'bool use_oob' parameter.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
