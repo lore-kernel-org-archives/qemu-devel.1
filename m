@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0O7J-0000oZ-9A
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:08:38 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f0O9C-0001cS-Py
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:10:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0O7F-00036S-VV
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:08:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53822 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0O7F-00035g-Pj
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:08:33 -0400
-Date: Mon, 26 Mar 2018 17:08:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180326090822.GC17789@xz-mi>
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-15-peterx@redhat.com>
-	<CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
-	<20180326080738.GA17789@xz-mi>
-	<CAJ+F1C+t9kvCq-h1JogM+cm=vP8jx=ZvZVma1niHD_X3GkwiyQ@mail.gmail.com>
+	(envelope-from <mlureau@redhat.com>) id 1f0O99-0007Ra-JB
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:10:34 -0400
+Received: from mail-io0-f195.google.com ([209.85.223.195]:45128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f0O99-0007QV-D3
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:10:31 -0400
+Received: by mail-io0-f195.google.com with SMTP id 141so22339930iou.12
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 02:10:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1C+t9kvCq-h1JogM+cm=vP8jx=ZvZVma1niHD_X3GkwiyQ@mail.gmail.com>
+In-Reply-To: <20180326063901.27425-4-peterx@redhat.com>
+References: <20180326063901.27425-1-peterx@redhat.com>
+	<20180326063901.27425-4-peterx@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 26 Mar 2018 11:10:30 +0200
+Message-ID: <CAMxuvawX2yzMpMYNsB6b-8NP6iXm-ugjE5TUgj5KkgiEEUApFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
- dispatcher
+Subject: Re: [Qemu-devel] [PATCH for-2.12 3/8] monitor: new parameter "x-oob"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,152 +29,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Mon, Mar 26, 2018 at 10:33:27AM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Mar 26, 2018 at 10:07 AM, Peter Xu <peterx@redhat.com> wrote:
-> > On Fri, Mar 23, 2018 at 05:18:53PM +0100, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> >
-> > [...]
-> >
-> >> > +/*
-> >> > + * Dispatch one single QMP request. The function will free the re=
-q_obj
-> >> > + * and objects inside it before return.
-> >> > + */
-> >> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
-> >> >  {
-> >> > -    QObject *req, *rsp =3D NULL, *id =3D NULL;
-> >> > +    Monitor *mon, *old_mon;
-> >> > +    QObject *req, *rsp =3D NULL, *id;
-> >> >      QDict *qdict =3D NULL;
-> >> > -    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP, pars=
-er);
-> >> > -    Monitor *old_mon, *mon =3D container_of(mon_qmp, Monitor, qmp=
-);
-> >> > -
-> >> > -    Error *err =3D NULL;
-> >> > +    bool need_resume;
-> >> >
-> >> > -    req =3D json_parser_parse_err(tokens, NULL, &err);
-> >> > -    if (!req && !err) {
-> >> > -        /* json_parser_parse_err() sucks: can fail without settin=
-g @err */
-> >> > -        error_setg(&err, QERR_JSON_PARSING);
-> >> > -    }
-> >> > -    if (err) {
-> >> > -        goto err_out;
-> >> > -    }
-> >> > +    req =3D req_obj->req;
-> >> > +    mon =3D req_obj->mon;
-> >> > +    id =3D req_obj->id;
-> >> > +    need_resume =3D req_obj->need_resume;
-> >> >
-> >> > -    qdict =3D qobject_to_qdict(req);
-> >> > -    if (qdict) {
-> >> > -        id =3D qdict_get(qdict, "id");
-> >> > -        qobject_incref(id);
-> >> > -        qdict_del(qdict, "id");
-> >> > -    } /* else will fail qmp_dispatch() */
-> >> > +    g_free(req_obj);
-> >> >
-> >> >      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND))=
- {
-> >> >          QString *req_json =3D qobject_to_json(req);
-> >> > @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMessagePa=
-rser *parser, GQueue *tokens)
-> >> >      old_mon =3D cur_mon;
-> >> >      cur_mon =3D mon;
-> >>
-> >> There is another issue with this series, since cur_mon is global (an=
-d
-> >> not protected), an oob command may change the cur_mon while another
-> >> command is running in the main thread with unexpected consequences. =
-I
-> >> don't have a clear idea what is the best way to solve it. Making the
-> >> variable per-thread, or going all the way to get rid of cur_mon (my
-> >> preference, but much harder)
-> >
-> > IMHO it is fine too.
-> >
-> > Note that this cur_mon operation is in monitor_qmp_dispatch_one() now=
-,
-> > which is still running in main thread.  So AFAICT all the cur_mon
-> > references are in main thread, and monitor IOThread does not modify
-> > that variable at all.  Then we should probably be safe.
->=20
-> But monitor_qmp_dispatch_one() is called from iothread if the command
-> is oob, so cur_mon may be updated while another command is running in
-> main thread, or am I wrong?
+Hi
 
-You are right. I missed that, sorry...
+On Mon, Mar 26, 2018 at 8:38 AM, Peter Xu <peterx@redhat.com> wrote:
+> Add new parameter to optionally enable Out-Of-Band for a QMP server.
+>
+> An example command line:
+>
+>   ./qemu-system-x86_64 -chardev stdio,id=3Dchar0 \
+>                        -mon chardev=3Dchar0,mode=3Dcontrol,x-oob=3Don
+>
+> By default, Out-Of-Band is off.
+>
+> It is not allowed if either MUX or non-QMP is detected, since
+> Out-Of-Band is currently only for QMP, and non-MUX chardev backends.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  include/monitor/monitor.h |  1 +
+>  monitor.c                 | 22 ++++++++++++++++++++--
+>  vl.c                      |  5 +++++
+>  3 files changed, 26 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+> index 0cb0538a31..d6ab70cae2 100644
+> --- a/include/monitor/monitor.h
+> +++ b/include/monitor/monitor.h
+> @@ -13,6 +13,7 @@ extern Monitor *cur_mon;
+>  #define MONITOR_USE_READLINE  0x02
+>  #define MONITOR_USE_CONTROL   0x04
+>  #define MONITOR_USE_PRETTY    0x08
+> +#define MONITOR_USE_OOB       0x10
+>
+>  bool monitor_cur_is_qmp(void);
+>
+> diff --git a/monitor.c b/monitor.c
+> index eba98df9da..d77ccc8785 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -36,6 +36,7 @@
+>  #include "net/slirp.h"
+>  #include "chardev/char-fe.h"
+>  #include "chardev/char-io.h"
+> +#include "chardev/char-mux.h"
+>  #include "ui/qemu-spice.h"
+>  #include "sysemu/numa.h"
+>  #include "monitor/monitor.h"
+> @@ -4568,12 +4569,26 @@ static void monitor_qmp_setup_handlers_bh(void *o=
+paque)
+>  void monitor_init(Chardev *chr, int flags)
+>  {
+>      Monitor *mon =3D g_malloc(sizeof(*mon));
+> +    bool use_readline =3D flags & MONITOR_USE_READLINE;
+> +    bool use_oob =3D flags & MONITOR_USE_OOB;
+> +
+> +    if (use_oob) {
+> +        if (CHARDEV_IS_MUX(chr)) {
+> +            error_report("Monitor Out-Of-Band is not supported with "
+> +                         "MUX typed chardev backend");
+> +            exit(1);
+> +        }
+> +        if (use_readline) {
+> +            error_report("Monitor Out-Of-band is only supported by QMP")=
+;
+> +            exit(1);
+> +        }
+> +    }
 
-Would this be a simple workaround (but hopefully efficient) solution?
+I would rather see the error reporting / exit in vl.c:mon_init_func()
+function, to have a single place for exit()
 
-diff --git a/monitor.c b/monitor.c
-index 77f4c41cfa..99641c0c6d 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4023,7 +4023,7 @@ typedef struct QMPRequest QMPRequest;
-  * Dispatch one single QMP request. The function will free the req_obj
-  * and objects inside it before return.
-  */
--static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
-+static void monitor_qmp_dispatch_one(QMPRequest *req_obj, bool hack_curm=
-on)
- {
-     Monitor *mon, *old_mon;
-     QObject *req, *rsp =3D NULL, *id;
-@@ -4043,12 +4043,16 @@ static void monitor_qmp_dispatch_one(QMPRequest *=
-req_obj)
-         QDECREF(req_json);
-     }
+>
+> -    monitor_data_init(mon, false, false);
+> +    monitor_data_init(mon, false, use_oob);
+>
+>      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+>      mon->flags =3D flags;
+> -    if (flags & MONITOR_USE_READLINE) {
+> +    if (use_readline) {
+>          mon->rs =3D readline_init(monitor_readline_printf,
+>                                  monitor_readline_flush,
+>                                  mon,
+> @@ -4669,6 +4684,9 @@ QemuOptsList qemu_mon_opts =3D {
+>          },{
+>              .name =3D "pretty",
+>              .type =3D QEMU_OPT_BOOL,
+> +        },{
+> +            .name =3D "x-oob",
+> +            .type =3D QEMU_OPT_BOOL,
+>          },
+>          { /* end of list */ }
+>      },
+> diff --git a/vl.c b/vl.c
+> index c81cc86607..5fd01bd5f6 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2404,6 +2404,11 @@ static int mon_init_func(void *opaque, QemuOpts *o=
+pts, Error **errp)
+>      if (qemu_opt_get_bool(opts, "pretty", 0))
+>          flags |=3D MONITOR_USE_PRETTY;
+>
+> +    /* OOB is off by default */
+> +    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
+> +        flags |=3D MONITOR_USE_OOB;
+> +    }
+> +
+>      chardev =3D qemu_opt_get(opts, "chardev");
+>      chr =3D qemu_chr_find(chardev);
+>      if (chr =3D=3D NULL) {
+> --
+> 2.14.3
+>
 
--    old_mon =3D cur_mon;
--    cur_mon =3D mon;
-+    if (hack_curmon) {
-+        old_mon =3D cur_mon;
-+        cur_mon =3D mon;
-+    }
-
-     rsp =3D qmp_dispatch(mon->qmp.commands, req);
-
--    cur_mon =3D old_mon;
-+    if (hack_curmon) {
-+        cur_mon =3D old_mon;
-+    }
-
-     if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
-         qdict =3D qdict_get_qdict(qobject_to(QDict, rsp), "error");
-@@ -4116,7 +4120,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
-
-     if (req_obj) {
-         trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
-: "");
--        monitor_qmp_dispatch_one(req_obj);
-+        monitor_qmp_dispatch_one(req_obj, true);
-         /* Reschedule instead of looping so the main loop stays responsi=
-ve */
-         qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
-     }
-@@ -4175,7 +4179,7 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
-         /* Out-Of-Band (OOB) requests are executed directly in parser. *=
-/
-         trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj->i=
-d)
-                                           ?: "");
--        monitor_qmp_dispatch_one(req_obj);
-+        monitor_qmp_dispatch_one(req_obj, false);
-         return;
-     }
-
-Then we forbit touching that evil cur_mon in OOB-capable command
-handlers.  Thanks,
-
---=20
-Peter Xu
+Other than that, it looks fine.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
