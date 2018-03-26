@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f0fQ1-0000Oj-1Q
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:37:06 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f0fVw-0002RT-Bv
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f0fPx-0003FN-Tj
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:37:05 -0400
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:36191)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f0fVt-0006h9-7k
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:43:12 -0400
+Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:40255)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f0fPx-0003F5-MW
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:37:01 -0400
-Received: by mail-pf0-x22e.google.com with SMTP id g14so1849586pfh.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 20:37:01 -0700 (PDT)
-References: <1521926678-76539-1-git-send-email-mjc@sifive.com>
-	<CAHNT7NtnuZ7_dNHFUJ_4KL=11sWV2u5E51bUJK1XH7ekm=sbXw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2979bb1d-0f56-9b2e-66f0-94c157510fa6@linaro.org>
-Date: Tue, 27 Mar 2018 11:36:36 +0800
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1f0fVs-0006gg-UZ
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:43:09 -0400
+Received: by mail-pg0-x22f.google.com with SMTP id g8so8095107pgv.7
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 20:43:08 -0700 (PDT)
+References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
+	<20180313075739.11194-2-xiaoguangrong@tencent.com>
+	<20180315102501.GA3062@work-vm>
+	<423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
+	<20180321081923.GB20571@xz-mi>
+	<b957b756-4996-7e79-406d-9587000839c1@gmail.com>
+	<20180326090213.GB17789@xz-mi>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <73e25db4-997f-0fbf-0c73-6589283c4005@gmail.com>
+Date: Mon, 26 Mar 2018 23:43:33 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NtnuZ7_dNHFUJ_4KL=11sWV2u5E51bUJK1XH7ekm=sbXw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180326090213.GB17789@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] RISC-V: RISC-V TCG backend work in
- progress
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
+ migration thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +37,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: RISC-V Patches <patches@groups.riscv.org>
-
-On 03/27/2018 08:26 AM, Michael Clark wrote:
-> IN:
-> 0x0000000000011138:  800002b7          lui             t0,-2147483648
-> 0x000000000001113c:  ffff8337          lui             t1,-32768
-> 0x0000000000011140:  0262a433          mulhsu          s0,t0,t1
-> 0x0000000000011144:  800004b7          lui             s1,-2147483648
-> 0x0000000000011148:  00700193          addi            gp,zero,7
-> 0x000000000001114c:  f49412e3          bne             s0,s1,-188
-
-At last something interesting.
-
--2147483648 * 18446744073709518848 (0xffff_ffff_ffff_8000)
-= -39614081257132098428027797504
-= -7FFF_FFFF_FFFF_C000_0000_0000
-=  ffff_ffff_8000_0000 0000_0400_0000_0000
+To: Peter Xu <peterx@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, liang.z.li@intel.com, kvm@vger.kernel.org, quintela@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
 
 
-> OP after optimization and liveness analysis:
->  ld_i32 tmp0,env,$0xffffffffffffffec              dead: 1
->  movi_i32 tmp1,$0x0
->  brcond_i32 tmp0,tmp1,lt,$L0                      dead: 0 1
+
+On 03/26/2018 05:02 PM, Peter Xu wrote:
+> On Thu, Mar 22, 2018 at 07:38:07PM +0800, Xiao Guangrong wrote:
+>>
+>>
+>> On 03/21/2018 04:19 PM, Peter Xu wrote:
+>>> On Fri, Mar 16, 2018 at 04:05:14PM +0800, Xiao Guangrong wrote:
+>>>>
+>>>> Hi David,
+>>>>
+>>>> Thanks for your review.
+>>>>
+>>>> On 03/15/2018 06:25 PM, Dr. David Alan Gilbert wrote:
+>>>>
+>>>>>>     migration/ram.c | 32 ++++++++++++++++----------------
+>>>>>
+>>>>> Hi,
+>>>>>      Do you have some performance numbers to show this helps?  Were those
+>>>>> taken on a normal system or were they taken with one of the compression
+>>>>> accelerators (which I think the compression migration was designed for)?
+>>>>
+>>>> Yes, i have tested it on my desktop, i7-4790 + 16G, by locally live migrate
+>>>> the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to 350.
+>>>>
+>>>> During the migration, a workload which has 8 threads repeatedly written total
+>>>> 6G memory in the VM. Before this patchset, its bandwidth is ~25 mbps, after
+>>>> applying, the bandwidth is ~50 mbps.
+>>>
+>>> Hi, Guangrong,
+>>>
+>>> Not really review comments, but I got some questions. :)
+>>
+>> Your comments are always valuable to me! :)
+>>
+>>>
+>>> IIUC this patch will only change the behavior when last_sent_block
+>>> changed.  I see that the performance is doubled after the change,
+>>> which is really promising.  However I don't fully understand why it
+>>> brings such a big difference considering that IMHO current code is
+>>> sending dirty pages per-RAMBlock.  I mean, IMHO last_sent_block should
+>>> not change frequently?  Or am I wrong?
+>>
+>> It's depends on the configuration, each memory-region which is ram or
+>> file backend has a RAMBlock.
+>>
+>> Actually, more benefits comes from the fact that the performance & throughput
+>> of the multithreads has been improved as the threads is fed by the
+>> migration thread and the result is consumed by the migration
+>> thread.
 > 
->  ---- 0000000000011138
->  movi_i64 t0  ,$0xffffffff80000000                sync: 0  dead: 0
+> I'm not sure whether I got your points - I think you mean that the
+> compression threads and the migration thread can form a better
+> pipeline if the migration thread does not do any compression at all.
 > 
->  ---- 000000000001113c
->  movi_i64 t1  ,$0xffffffffffff8000                sync: 0  dead: 0
+> I think I agree with that.
 > 
->  ---- 0000000000011140
->  movi_i64 tmp2,$0x80000000
->  mov_i64 s0  ,tmp2                                sync: 0  dead: 0 1
+> However it does not really explain to me on why a very rare event
+> (sending the first page of a RAMBlock, considering bitmap sync is
+> rare) can greatly affect the performance (it shows a doubled boost).
 > 
->  ---- 0000000000011144
->  movi_i64 s1  ,$0xffffffff80000000                sync: 0  dead: 0
 
-So, yes, your test is correct, because here we load that high-part.  But
-crucially, the multiply has produced a result *without* the sign-extension, so
-the test fails.
+I understand it is trick indeed, but it is not very hard to explain.
+Multi-threads (using 8 CPUs in our test) keep idle for a long time
+for the origin code, however, after our patch, as the normal is
+posted out async-ly that it's extremely fast as you said (the network
+is almost idle for current implementation) so it has a long time that
+the CPUs can be used effectively to generate more compressed data than
+before.
 
-It would have been handy to see the opcodes emitted before optimization, so
-that we can verify what the riscv front-end did.  However, it's not that hard
-to regenerate.
+> Btw, about the numbers: IMHO the numbers might not be really "true
+> numbers".  Or say, even the bandwidth is doubled, IMHO it does not
+> mean the performance is doubled. Becasue the data has changed.
+> 
+> Previously there were only compressed pages, and now for each cycle of
+> RAMBlock looping we'll send a normal page (then we'll get more thing
+> to send).  So IMHO we don't really know whether we sent more pages
+> with this patch, we can only know we sent more bytes (e.g., an extreme
+> case is that the extra 25Mbps/s are all caused by those normal pages,
+> and we can be sending exactly the same number of pages like before, or
+> even worse?).
+> 
 
-Annoyingly, the tcg optimizer hasn't been taught to fold things the same way
-when the backend supports mulu2, so we *don't* fold the test away for an x86_64
-host.
+Current implementation uses CPU very ineffectively (it's our next work
+to be posted out) that the network is almost idle so posting more data
+out is a better choice，further more, migration thread plays a role for
+parallel, it'd better to make it fast.
 
- mulu2_i64 tmp4,tmp5,t0  ,t1                      dead: 0 2 3
- movi_i64 tmp4,$0xffffffffffff8000
- sub_i64 tmp2,tmp5,tmp4                           dead: 1 2
- mov_i64 s0  ,tmp2                                sync: 0  dead: 0 1
+>>
+>>>
+>>> Another follow-up question would be: have you measured how long time
+>>> needed to compress a 4k page, and how many time to send it?  I think
+>>> "sending the page" is not really meaningful considering that we just
+>>> put a page into the buffer (which should be extremely fast since we
+>>> don't really flush it every time), however I would be curious on how
+>>> slow would compressing a page be.
+>>
+>> I haven't benchmark the performance of zlib, i think it is CPU intensive
+>> workload, particularly, there no compression-accelerator (e.g, QAT) on
+>> our production. BTW, we were using lzo instead of zlib which worked
+>> better for some workload.
+> 
+> Never mind. Good to know about that.
+> 
+>>
+>> Putting a page into buffer should depend on the network, i,e, if the
+>> network is congested it should take long time. :)
+> 
+> Again, considering that I don't know much on compression (especially I
+> hardly used that) mine are only questions, which should not block your
+> patches to be either queued/merged/reposted when proper. :)
 
-And thus no doubt the test succeeds for that case.
-So lemme try again with an aarch64 host.
+Yes, i see. The discussion can potentially raise a better solution.
 
- movi_i64 tmp2,$0x80000000
- mov_i64 s0  ,tmp2                                sync: 0  dead: 0 1
-
-Yay, reproduction.  The input to the optimization is
-
- mov_i64 tmp2,t0
- mov_i64 tmp3,t1
- mul_i64 tmp6,tmp2,tmp3
- muluh_i64 tmp5,tmp2,tmp3
- mov_i64 tmp4,tmp6
- movi_i64 tmp6,$0x3f
- sar_i64 tmp4,tmp2,tmp6
- and_i64 tmp4,tmp4,tmp3
- sub_i64 tmp2,tmp5,tmp4
- mov_i64 s0  ,tmp2
-
-Now, dead-code and forward propagate constants by hand,
-
- movi_i64 tmp2,$0xffffffff80000000
- movi_i64 tmp3,$0xffffffffffff8000
- muluh_i64 tmp5,tmp2,tmp3
- sub_i64 tmp2,tmp5,$0xffffffffffff8000
- mov_i64 s0  ,tmp2
-
-Now, for the unsigned multiplication we get
-
-18446744071562067968 * 18446744073709518848
-= 340282366881323777743332701689153060864
-= FFFF_FFFF_7FFF_8000 0000_4000_0000_0000
-
-....
-
-Oops, I see the bug right away now.
-
-Value returned is $3 = 18446744071562035200
-(gdb) n
-410	    if (!(def->flags & TCG_OPF_64BIT)) {
-411	        res = (int32_t)res;
-
-Failure to mark muluh_i64 and mulsh_i64 as 64-bit ops, so we've discarded the
-high 32 bits of the result.
-
-I'm surprised that we haven't seen this as a problem before.  Perhaps luck in
-non-optimization; we need a test case this small (but no smaller, like RISU) to
-be able to produce a bad result.
-
-So.  Two line patch to follow.
-
-
-r~
+Thanks for your comment, Peter!
