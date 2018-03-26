@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0PYh-0007ct-JH
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:41:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0PfP-00016R-4S
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0PYg-0005AB-GQ
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:40:59 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 26 Mar 2018 12:40:37 +0200
-Message-Id: <20180326104037.6894-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] block: simplify code around releasing
- bitmaps
+	(envelope-from <kwolf@redhat.com>) id 1f0PfL-0000il-TI
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:47:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56878 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1f0PfL-0000i7-PR
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:47:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0385477067
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 10:47:48 +0000 (UTC)
+Date: Mon, 26 Mar 2018 12:47:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180326104739.GC5267@localhost.localdomain>
+References: <20180326061157.24865-1-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180326061157.24865-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,153 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-QLIST_REMOVE does not require walking the list, and once the "bitmap"
-argument is removed from bdrv_do_release_matching_dirty_bitmap_locked
-the code simplifies a lot and it is worth inlining everything in the
-callers of bdrv_do_release_matching_dirty_bitmap.
+Am 26.03.2018 um 08:11 hat Peter Xu geschrieben:
+> If there are more than one events, wait_until_completed() might return
+> the 2nd event even if the 1st event is JOB_COMPLETED, since the for loop
+> will continue to run even if completed is set to True.
+> 
+> It never happened before, but it can be triggered when OOB is enabled
+> due to the RESUME startup message. Fix that up by removing the boolean
+> and make sure we return the correct event.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 20 ++++++++------------
+>  1 file changed, 8 insertions(+), 12 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index b5d7945af8..11704e6583 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -470,18 +470,14 @@ class QMPTestCase(unittest.TestCase):
+>  
+>      def wait_until_completed(self, drive='drive0', check_offset=True):
+>          '''Wait for a block job to finish, returning the event'''
+> -        completed = False
+> -        while not completed:
+> -            for event in self.vm.get_qmp_events(wait=True):
+> -                if event['event'] == 'BLOCK_JOB_COMPLETED':
+> -                    self.assert_qmp(event, 'data/device', drive)
+> -                    self.assert_qmp_absent(event, 'data/error')
+> -                    if check_offset:
+> -                        self.assert_qmp(event, 'data/offset', event['data']['len'])
+> -                    completed = True
+> -
+> -        self.assert_no_active_block_jobs()
+> -        return event
+> +        for event in self.vm.get_qmp_events(wait=True):
+> +            if event['event'] == 'BLOCK_JOB_COMPLETED':
+> +                self.assert_qmp(event, 'data/device', drive)
+> +                self.assert_qmp_absent(event, 'data/error')
+> +                if check_offset:
+> +                    self.assert_qmp(event, 'data/offset', event['data']['len'])
+> +                self.assert_no_active_block_jobs()
+> +                return event
+>  
+>      def wait_ready(self, drive='drive0'):
+>          '''Wait until a block job BLOCK_JOB_READY event'''
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
+If an event is pending, but it's not the expected event, won't we return
+None now instead of waiting for the BLOCK_JOB_COMPLETED event?
 
-Notes:
-    v1->v2: improve locking comments [Vladimir]
+Wouldn't it be much easier to just add a 'break'?
 
- block/dirty-bitmap.c | 84 ++++++++++++++++++++--------------------------------
- 1 file changed, 32 insertions(+), 52 deletions(-)
-
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index ea82c06f07..a7eaa1051d 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -249,49 +249,16 @@ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
-     qemu_mutex_unlock(bitmap->mutex);
- }
- 
--/* Called within bdrv_dirty_bitmap_lock..unlock */
--static void bdrv_do_release_matching_dirty_bitmap_locked(
--    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
--    bool (*cond)(BdrvDirtyBitmap *bitmap))
-+/* Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.  */
-+static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
- {
--    BdrvDirtyBitmap *bm, *next;
--
--    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
--        if ((!bitmap || bm == bitmap) && (!cond || cond(bm))) {
--            assert(!bm->active_iterators);
--            assert(!bdrv_dirty_bitmap_frozen(bm));
--            assert(!bm->meta);
--            QLIST_REMOVE(bm, list);
--            hbitmap_free(bm->bitmap);
--            g_free(bm->name);
--            g_free(bm);
--
--            if (bitmap) {
--                return;
--            }
--        }
--    }
--
--    if (bitmap) {
--        abort();
--    }
--}
--
--/* Called with BQL taken.  */
--static void bdrv_do_release_matching_dirty_bitmap(
--    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
--    bool (*cond)(BdrvDirtyBitmap *bitmap))
--{
--    bdrv_dirty_bitmaps_lock(bs);
--    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, cond);
--    bdrv_dirty_bitmaps_unlock(bs);
--}
--
--/* Called within bdrv_dirty_bitmap_lock..unlock */
--static void bdrv_release_dirty_bitmap_locked(BlockDriverState *bs,
--                                             BdrvDirtyBitmap *bitmap)
--{
--    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, NULL);
-+    assert(!bitmap->active_iterators);
-+    assert(!bdrv_dirty_bitmap_frozen(bitmap));
-+    assert(!bitmap->meta);
-+    QLIST_REMOVE(bitmap, list);
-+    hbitmap_free(bitmap->bitmap);
-+    g_free(bitmap->name);
-+    g_free(bitmap);
- }
- 
- /**
-@@ -344,7 +311,7 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-         error_setg(errp, "Merging of parent and successor bitmap failed");
-         return NULL;
-     }
--    bdrv_release_dirty_bitmap_locked(bs, successor);
-+    bdrv_release_dirty_bitmap_locked(successor);
-     parent->successor = NULL;
- 
-     return parent;
-@@ -382,15 +349,12 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
-     bdrv_dirty_bitmaps_unlock(bs);
- }
- 
--static bool bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
--{
--    return !!bdrv_dirty_bitmap_name(bitmap);
--}
--
- /* Called with BQL taken.  */
- void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
- {
--    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, NULL);
-+    bdrv_dirty_bitmaps_lock(bs);
-+    bdrv_release_dirty_bitmap_locked(bitmap);
-+    bdrv_dirty_bitmaps_unlock(bs);
- }
- 
- /**
-@@ -401,7 +365,15 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
-  */
- void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
- {
--    bdrv_do_release_matching_dirty_bitmap(bs, NULL, bdrv_dirty_bitmap_has_name);
-+    BdrvDirtyBitmap *bm, *next;
-+
-+    bdrv_dirty_bitmaps_lock(bs);
-+    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
-+        if (bdrv_dirty_bitmap_name(bm)) {
-+            bdrv_release_dirty_bitmap_locked(bm);
-+        }
-+    }
-+    bdrv_dirty_bitmaps_unlock(bs);
- }
- 
- /**
-@@ -409,11 +381,19 @@ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
-  * bdrv_inactivate_recurse()).
-  * There must not be any frozen bitmaps attached.
-  * This function does not remove persistent bitmaps from the storage.
-+ * Called with BQL taken.
-  */
- void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs)
- {
--    bdrv_do_release_matching_dirty_bitmap(bs, NULL,
--                                          bdrv_dirty_bitmap_get_persistance);
-+    BdrvDirtyBitmap *bm, *next;
-+
-+    bdrv_dirty_bitmaps_lock(bs);
-+    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
-+        if (bdrv_dirty_bitmap_get_persistance(bm)) {
-+            bdrv_release_dirty_bitmap_locked(bm);
-+        }
-+    }
-+    bdrv_dirty_bitmaps_unlock(bs);
- }
- 
- /**
--- 
-2.16.2
+Kevin
