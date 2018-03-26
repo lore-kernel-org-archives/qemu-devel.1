@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f0NZM-0000H4-6F
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:33:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1f0NaO-00012p-BR
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f0NZL-0006EB-7F
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:33:32 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35256)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1f0NZK-0006DR-Vx
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:33:31 -0400
-Received: by mail-wr0-x233.google.com with SMTP id 80so16890616wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 01:33:29 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1f0NaK-0006Z9-52
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:34:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35466 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f0NaK-0006Yu-0r
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:34:32 -0400
+References: <152192928550.363.5497859547477813786@71c20359a636>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cca001a1-5fca-10d2-54d4-4cf07b69d8a9@redhat.com>
+Date: Mon, 26 Mar 2018 10:34:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180326080738.GA17789@xz-mi>
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-15-peterx@redhat.com>
-	<CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
-	<20180326080738.GA17789@xz-mi>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 26 Mar 2018 10:33:27 +0200
-Message-ID: <CAJ+F1C+t9kvCq-h1JogM+cm=vP8jx=ZvZVma1niHD_X3GkwiyQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <152192928550.363.5497859547477813786@71c20359a636>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
- dispatcher
+Subject: [Qemu-devel] Patchew failure ? (was: Re: [PATCH 00/14] Generalize
+ Dallas/Maxim I2C RTC devices v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, mdavidsaver@gmail.com
 
-Hi
+On 24.03.2018 23:08, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed docker-build@min-glib build test. Please find the te=
+sting commands and
+> their output below. If you have Docker installed, you can probably repr=
+oduce it
+> locally.
+>=20
+> Type: series
+> Message-id: 20180324192455.12254-1-mdavidsaver@gmail.com
+> Subject: [Qemu-devel] [PATCH 00/14] Generalize Dallas/Maxim I2C RTC dev=
+ices v2
+[...]
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for pat=
+h 'dtc'
+> Cloning into '/var/tmp/patchew-tester-tmp-8pwvp3st/src/dtc'...
+> Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9=
+cc42'
+>   BUILD   min-glib
+> make[1]: Entering directory '/var/tmp/patchew-tester-tmp-8pwvp3st/src'
+>   GEN     /var/tmp/patchew-tester-tmp-8pwvp3st/src/docker-src.2018-03-2=
+4-18.07.16.7723/qemu.tar
+> Cloning into '/var/tmp/patchew-tester-tmp-8pwvp3st/src/docker-src.2018-=
+03-24-18.07.16.7723/qemu.tar.vroot'...
+> done.
+> Your branch is up-to-date with 'origin/test'.
+> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for pat=
+h 'dtc'
+> Cloning into '/var/tmp/patchew-tester-tmp-8pwvp3st/src/docker-src.2018-=
+03-24-18.07.16.7723/qemu.tar.vroot/dtc'...
+> Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9=
+cc42'
+> Submodule 'ui/keycodemapdb' (git://git.qemu.org/keycodemapdb.git) regis=
+tered for path 'ui/keycodemapdb'
+> Cloning into '/var/tmp/patchew-tester-tmp-8pwvp3st/src/docker-src.2018-=
+03-24-18.07.16.7723/qemu.tar.vroot/ui/keycodemapdb'...
+> Submodule path 'ui/keycodemapdb': checked out '6b3d716e2b6472eb7189d322=
+0552280ef3d832ce'
+> tar: /var/tmp/patchew-tester-tmp-8pwvp3st/src/docker-src.2018-03-24-18.=
+07.16.7723/qemu.tar: Wrote only 4096 of 10240 bytes
+> tar: Error is not recoverable: exiting now
+> failed to create tar file
+>   COPY    RUNNER
+>     RUN test-build in qemu:min-glib=20
+> tar: Unexpected EOF in archive
+> tar: Unexpected EOF in archive
+> tar: Error is not recoverable: exiting now
+> /var/tmp/qemu/run: line 32: prep_fail: command not found
+> Environment variables:
+> HOSTNAME=3D2ad891f2b17f
+> MAKEFLAGS=3D -j8
+> J=3D8
+> CCACHE_DIR=3D/var/tmp/ccache
+> EXTRA_CONFIGURE_OPTS=3D
+> V=3D
+> SHOW_ENV=3D1
+> PATH=3D/usr/lib/ccache:/usr/lib64/ccache:/usr/local/sbin:/usr/local/bin=
+:/usr/sbin:/usr/bin:/sbin:/bin
+> PWD=3D/
+> TARGET_LIST=3D
+> SHLVL=3D1
+> HOME=3D/root
+> TEST_DIR=3D/tmp/qemu-test
+> FEATURES=3D dtc
+> DEBUG=3D
+> _=3D/usr/bin/env
+>=20
+> Configure options:
+> --enable-werror --target-list=3Dx86_64-softmmu,aarch64-softmmu --prefix=
+=3D/tmp/qemu-test/install
+>=20
+> ERROR: DTC (libfdt) version >=3D 1.4.2 not present.
+>        Please install the DTC (libfdt) devel package
 
-On Mon, Mar 26, 2018 at 10:07 AM, Peter Xu <peterx@redhat.com> wrote:
-> On Fri, Mar 23, 2018 at 05:18:53PM +0100, Marc-Andr=C3=A9 Lureau wrote:
->
-> [...]
->
->> > +/*
->> > + * Dispatch one single QMP request. The function will free the req_ob=
-j
->> > + * and objects inside it before return.
->> > + */
->> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
->> >  {
->> > -    QObject *req, *rsp =3D NULL, *id =3D NULL;
->> > +    Monitor *mon, *old_mon;
->> > +    QObject *req, *rsp =3D NULL, *id;
->> >      QDict *qdict =3D NULL;
->> > -    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP, parser);
->> > -    Monitor *old_mon, *mon =3D container_of(mon_qmp, Monitor, qmp);
->> > -
->> > -    Error *err =3D NULL;
->> > +    bool need_resume;
->> >
->> > -    req =3D json_parser_parse_err(tokens, NULL, &err);
->> > -    if (!req && !err) {
->> > -        /* json_parser_parse_err() sucks: can fail without setting @e=
-rr */
->> > -        error_setg(&err, QERR_JSON_PARSING);
->> > -    }
->> > -    if (err) {
->> > -        goto err_out;
->> > -    }
->> > +    req =3D req_obj->req;
->> > +    mon =3D req_obj->mon;
->> > +    id =3D req_obj->id;
->> > +    need_resume =3D req_obj->need_resume;
->> >
->> > -    qdict =3D qobject_to_qdict(req);
->> > -    if (qdict) {
->> > -        id =3D qdict_get(qdict, "id");
->> > -        qobject_incref(id);
->> > -        qdict_del(qdict, "id");
->> > -    } /* else will fail qmp_dispatch() */
->> > +    g_free(req_obj);
->> >
->> >      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
->> >          QString *req_json =3D qobject_to_json(req);
->> > @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMessageParser=
- *parser, GQueue *tokens)
->> >      old_mon =3D cur_mon;
->> >      cur_mon =3D mon;
->>
->> There is another issue with this series, since cur_mon is global (and
->> not protected), an oob command may change the cur_mon while another
->> command is running in the main thread with unexpected consequences. I
->> don't have a clear idea what is the best way to solve it. Making the
->> variable per-thread, or going all the way to get rid of cur_mon (my
->> preference, but much harder)
->
-> IMHO it is fine too.
->
-> Note that this cur_mon operation is in monitor_qmp_dispatch_one() now,
-> which is still running in main thread.  So AFAICT all the cur_mon
-> references are in main thread, and monitor IOThread does not modify
-> that variable at all.  Then we should probably be safe.
+ Hi Fam,
 
-But monitor_qmp_dispatch_one() is called from iothread if the command
-is oob, so cur_mon may be updated while another command is running in
-main thread, or am I wrong?
+sounds like there is currently something broken with patchew? Could you
+please have a look why it fails to use libfdt?
 
->
-> I would be far more than glad to see cur_mon go away one day.
->
-> Thanks,
->
-> --
-> Peter Xu
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thomas
