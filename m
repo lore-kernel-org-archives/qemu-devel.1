@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f0aVG-0004Zh-D9
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 18:22:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0acc-00077u-Gk
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 18:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f0aVE-0001Ud-Oa
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 18:22:10 -0400
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:36393)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f0aVE-0001UG-Hz
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 18:22:08 -0400
-Received: by mail-ot0-x22c.google.com with SMTP id n40-v6so5504418otd.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 15:22:08 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1f0acX-0006UG-R5
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 18:29:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44590 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0acX-0006Tl-MT
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 18:29:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E70C8D682
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 22:29:38 +0000 (UTC)
+References: <20180326063901.27425-1-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1c13d18f-b029-f2ce-c0e3-636c391aad97@redhat.com>
+Date: Mon, 26 Mar 2018 17:29:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA87phZ=TvT_p0YO0b4q3F6c1UCiQUe-opoiuo3KadMQ9w@mail.gmail.com>
-References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
-	<1521915220-65389-2-git-send-email-mjc@sifive.com>
-	<CAFEAcA9zMy1hp1dWoyQPsyzC9VWpdxz3KKWTu4fsVCvAk6CSrA@mail.gmail.com>
-	<CAHNT7NuPLa7GWD_WRUYDm+ZUAh9GYir2wxJr9hw=JNGXrdBkXw@mail.gmail.com>
-	<CAFEAcA87phZ=TvT_p0YO0b4q3F6c1UCiQUe-opoiuo3KadMQ9w@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Mon, 26 Mar 2018 15:22:07 -0700
-Message-ID: <CAHNT7NtTeNvFUSSydxN4cw5kXp9=DuOWgUT62JmoCE1_EVpUJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 06/26] RISC-V: Mark ROM read-only after
- copying in code
+In-Reply-To: <20180326063901.27425-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/8] Monitor: some oob related
+ patches (fixes, new param, tests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Sun, Mar 25, 2018 at 5:47 AM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+On 03/26/2018 01:38 AM, Peter Xu wrote:
+> I suppose these are all good even for 2.12, so marked in subject.
+> Tested with "make check" for all targets on x86_64, and iotest -raw.
+> 
+> Patch 1 fixes one OOB error message regression reported by Marc-Andre.
+> 
+> Patch 2 fixes one potential OOB problem when more than one clients are
+> there, reported by Marc-Andre (too).
+> 
+> Patch 3 introduce "-mon x-oob=on" parameter to allow user to
+> explicitly enable Out-Of-Band for a specific monitor.
+> 
+> Patch 4-6 are qapi-schema fixes and tests for Out-Of-Band.
+> 
+> Patch 7-8 add back the OOB test on the new parameter (with more
+> enhancements).
+> 
+> Please review, thanks.
+> 
+> Peter Xu (8):
+>    qmp: fix qmp_capabilities error regression
+>    qmp: cleanup qmp queues properly
+>    monitor: new parameter "x-oob"
+>    qapi: restrict allow-oob value to be "true"
+>    tests: let qapi-schema tests detect oob
+>    tests: add oob-test for qapi-schema
+>    tests: introduce qtest_init_with_qmp_format()
+>    tests: qmp-test: add test for new "x-oob"
 
-> On 25 March 2018 at 00:23, Michael Clark <mjc@sifive.com> wrote:
-> >
-> >
-> > On Sat, Mar 24, 2018 at 2:23 PM, Peter Maydell <peter.maydell@linaro.org
-> >
-> > wrote:
-> >>
-> >> On 24 March 2018 at 18:13, Michael Clark <mjc@sifive.com> wrote:
-> >> > The sifive_u machine already marks its ROM readonly. This fixes
-> >> > the remaining boards.
-> >> >
-> >> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> >> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> >> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> >> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> >> > ---
-> >> >  hw/riscv/sifive_u.c      |  9 +++++----
-> >> >  hw/riscv/spike.c         | 18 ++++++++++--------
-> >> >  hw/riscv/virt.c          |  7 ++++---
-> >> >  include/hw/riscv/spike.h |  8 --------
-> >> >  4 files changed, 19 insertions(+), 23 deletions(-)
-> >> >
-> >> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> >> > index 6116c38..25df16c 100644
-> >> > --- a/hw/riscv/sifive_u.c
-> >> > +++ b/hw/riscv/sifive_u.c
-> >> > @@ -223,7 +223,7 @@ static void riscv_sifive_u_init(MachineState
-> >> > *machine)
-> >> >      SiFiveUState *s = g_new0(SiFiveUState, 1);
-> >> >      MemoryRegion *sys_memory = get_system_memory();
-> >> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> >> > -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-> >> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-> >> >
-> >> >      /* Initialize SOC */
-> >> >      object_initialize(&s->soc, sizeof(s->soc),
-> TYPE_RISCV_HART_ARRAY);
-> >> > @@ -246,10 +246,10 @@ static void riscv_sifive_u_init(MachineState
-> >> > *machine)
-> >> >      create_fdt(s, memmap, machine->ram_size,
-> machine->kernel_cmdline);
-> >> >
-> >> >      /* boot rom */
-> >> > -    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
-> >> > +    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.u.mrom",
-> >> >                             memmap[SIFIVE_U_MROM].base, &error_fatal);
-> >> > -    memory_region_set_readonly(boot_rom, true);
-> >> > -    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
-> >> > +    memory_region_set_readonly(mask_rom, true);
-> >> > +    memory_region_add_subregion(sys_memory, 0x0, mask_rom);
-> >>
-> >> memory_region_init_ram + memory_region_set_readonly is
-> >> equivalent to memory_region_init_rom.
-> >>
-> >> >      if (machine->kernel_filename) {
-> >> >          load_kernel(machine->kernel_filename);
-> >> > @@ -279,6 +279,7 @@ static void riscv_sifive_u_init(MachineState
-> >> > *machine)
-> >> >      qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-> >> >      cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
-> >> >          sizeof(reset_vec), s->fdt, s->fdt_size);
-> >> > +    memory_region_set_readonly(mask_rom, true);
-> >>
-> >> Rather than doing this, you should use
-> >> rom_add_blob_fixed(). That works even on ROMs which
-> >> means you can just create them as read-only from the
-> >> start rather than waiting til you've written to them
-> >> and then marking them read-only. It also means that
-> >> you get the contents correctly reset on reset, even
-> >> if the user has been messing with their contents
-> >> via the debugger or something.
-> >>
-> >> hw/arm/boot.c has code which (among a lot of other
-> >> things) loads initial kernels and dtb images into
-> >> guest memory. You can also find ppc code doing
-> >> similar things.
-> >
-> >
-> > I don't mind to make this change, however it is a case of good vs
-> perfect.
-> > Currently we have some machines with writable ROM sections, this change
-> > fixes it and has been tested.
->
-> Yes, I would put this on your set of things to
-> address for 2.13.
->
+Queuing 1, 4-6 without further changes.  I'll repost a v2 of 2, 3, my 
+rewrite of 7, and 8.
 
-Okay. It's on my list...
-
-I will be replying to the other thread with a list of the oustanding
-patches, whether they are bug fixes vs cleanups, and whether they are
-reviewed.
-
-The mstatus.FS fix is relatively critical and Igor's cpu init actually
-fixes a bug with -cpu list. In any case I'll send a list shortly...
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
