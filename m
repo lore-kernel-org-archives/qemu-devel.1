@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tkl-0005BO-D6
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:44 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tkm-0005EM-JJ
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tki-0002l1-Fe
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47472 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tkg-0002kF-Sx
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57190 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1f0Tki-0002kk-Ac
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:40 -0400
+	id 1f0Tkg-0002jx-Ob
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:38 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 26 Mar 2018 17:08:47 +0200
-Message-Id: <20180326150916.9602-10-marcandre.lureau@redhat.com>
+Date: Mon, 26 Mar 2018 17:08:46 +0200
+Message-Id: <20180326150916.9602-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20180326150916.9602-1-marcandre.lureau@redhat.com>
 References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 09/38] json: remove useless return value
- from lexer/parser
+Subject: [Qemu-devel] [PATCH v3 08/38] json-lexer: make it safe to call
+ multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,139 +31,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The lexer always returns 0 when char feeding. Furthermore, none of the
-caller care about the return value.
+We can easily avoid the burden of checking if the lexer was
+initialized prior to calling destroy by the caller, let's do it.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/json-lexer.h    |  4 ++--
- include/qapi/qmp/json-streamer.h |  4 ++--
- qobject/json-lexer.c             | 23 ++++++++---------------
- qobject/json-streamer.c          |  8 ++++----
- 4 files changed, 16 insertions(+), 23 deletions(-)
+ qobject/json-lexer.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.=
-h
-index afee7828cd..66ccf0357c 100644
---- a/include/qapi/qmp/json-lexer.h
-+++ b/include/qapi/qmp/json-lexer.h
-@@ -47,9 +47,9 @@ struct JSONLexer
-=20
- void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func);
-=20
--int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
-+void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
-=20
--int json_lexer_flush(JSONLexer *lexer);
-+void json_lexer_flush(JSONLexer *lexer);
-=20
- void json_lexer_destroy(JSONLexer *lexer);
-=20
-diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-str=
-eamer.h
-index 00d8a23af8..cb808cf27d 100644
---- a/include/qapi/qmp/json-streamer.h
-+++ b/include/qapi/qmp/json-streamer.h
-@@ -36,10 +36,10 @@ typedef struct JSONMessageParser
- void json_message_parser_init(JSONMessageParser *parser,
-                               void (*func)(JSONMessageParser *, GQueue *=
-));
-=20
--int json_message_parser_feed(JSONMessageParser *parser,
-+void json_message_parser_feed(JSONMessageParser *parser,
-                              const char *buffer, size_t size);
-=20
--int json_message_parser_flush(JSONMessageParser *parser);
-+void json_message_parser_flush(JSONMessageParser *parser);
-=20
- void json_message_parser_destroy(JSONMessageParser *parser);
-=20
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 0eaba43a2c..89ccb180cc 100644
+index 980ba159d6..0eaba43a2c 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -290,7 +290,7 @@ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitt=
-er func)
-     lexer->x =3D lexer->y =3D 0;
- }
-=20
--static int json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-+static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
- {
-     int char_consumed, new_state;
-=20
-@@ -344,7 +344,7 @@ static int json_lexer_feed_char(JSONLexer *lexer, cha=
-r ch, bool flush)
-             g_string_truncate(lexer->token, 0);
-             new_state =3D IN_START;
-             lexer->state =3D new_state;
--            return 0;
-+            return;
-         default:
-             break;
-         }
-@@ -359,29 +359,22 @@ static int json_lexer_feed_char(JSONLexer *lexer, c=
-har ch, bool flush)
-         g_string_truncate(lexer->token, 0);
-         lexer->state =3D IN_START;
-     }
--
--    return 0;
- }
-=20
--int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
-+void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
- {
-     size_t i;
-=20
-     for (i =3D 0; i < size; i++) {
--        int err;
--
--        err =3D json_lexer_feed_char(lexer, buffer[i], false);
--        if (err < 0) {
--            return err;
--        }
-+        json_lexer_feed_char(lexer, buffer[i], false);
-     }
--
--    return 0;
- }
-=20
--int json_lexer_flush(JSONLexer *lexer)
-+void json_lexer_flush(JSONLexer *lexer)
- {
--    return lexer->state =3D=3D IN_START ? 0 : json_lexer_feed_char(lexer=
-, 0, true);
-+    if (lexer->state !=3D IN_START) {
-+        json_lexer_feed_char(lexer, 0, true);
-+    }
- }
+@@ -386,5 +386,8 @@ int json_lexer_flush(JSONLexer *lexer)
 =20
  void json_lexer_destroy(JSONLexer *lexer)
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index c51c2021f9..78dfff2aa0 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -118,15 +118,15 @@ void json_message_parser_init(JSONMessageParser *pa=
-rser,
-     json_lexer_init(&parser->lexer, json_message_process_token);
- }
-=20
--int json_message_parser_feed(JSONMessageParser *parser,
-+void json_message_parser_feed(JSONMessageParser *parser,
-                              const char *buffer, size_t size)
  {
--    return json_lexer_feed(&parser->lexer, buffer, size);
-+    json_lexer_feed(&parser->lexer, buffer, size);
+-    g_string_free(lexer->token, true);
++    if (lexer->token) {
++        g_string_free(lexer->token, true);
++        lexer->token =3D NULL;
++    }
  }
-=20
--int json_message_parser_flush(JSONMessageParser *parser)
-+void json_message_parser_flush(JSONMessageParser *parser)
- {
--    return json_lexer_flush(&parser->lexer);
-+    json_lexer_flush(&parser->lexer);
- }
-=20
- void json_message_parser_destroy(JSONMessageParser *parser)
 --=20
 2.17.0.rc1.1.g4c4f2b46a3
