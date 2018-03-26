@@ -1,29 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0O1M-0005qz-PE
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:02:32 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f0O2S-0006Wg-7e
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0O1E-0003DL-Pe
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:02:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41652 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0O1E-0003D2-JL
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:02:20 -0400
-Date: Mon, 26 Mar 2018 17:02:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180326090213.GB17789@xz-mi>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
-	<20180315102501.GA3062@work-vm>
-	<423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
-	<20180321081923.GB20571@xz-mi>
-	<b957b756-4996-7e79-406d-9587000839c1@gmail.com>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f0O2N-0003b4-A1
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:03:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49496
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1f0O2N-0003a9-4m
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 05:03:31 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2Q8wt2B016109
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 05:03:29 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gxw25tk9r-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 05:03:29 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Mon, 26 Mar 2018 10:03:27 +0100
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Mon, 26 Mar 2018 11:03:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b957b756-4996-7e79-406d-9587000839c1@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+In-Reply-To: <4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +45,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, liang.z.li@intel.com, kvm@vger.kernel.org, quintela@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+To: David Hildenbrand <david@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-On Thu, Mar 22, 2018 at 07:38:07PM +0800, Xiao Guangrong wrote:
-> 
-> 
-> On 03/21/2018 04:19 PM, Peter Xu wrote:
-> > On Fri, Mar 16, 2018 at 04:05:14PM +0800, Xiao Guangrong wrote:
-> > > 
-> > > Hi David,
-> > > 
-> > > Thanks for your review.
-> > > 
-> > > On 03/15/2018 06:25 PM, Dr. David Alan Gilbert wrote:
-> > > 
-> > > > >    migration/ram.c | 32 ++++++++++++++++----------------
-> > > > 
-> > > > Hi,
-> > > >     Do you have some performance numbers to show this helps?  Were those
-> > > > taken on a normal system or were they taken with one of the compression
-> > > > accelerators (which I think the compression migration was designed for)?
-> > > 
-> > > Yes, i have tested it on my desktop, i7-4790 + 16G, by locally live migrate
-> > > the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to 350.
-> > > 
-> > > During the migration, a workload which has 8 threads repeatedly written total
-> > > 6G memory in the VM. Before this patchset, its bandwidth is ~25 mbps, after
-> > > applying, the bandwidth is ~50 mbps.
-> > 
-> > Hi, Guangrong,
-> > 
-> > Not really review comments, but I got some questions. :)
-> 
-> Your comments are always valuable to me! :)
-> 
-> > 
-> > IIUC this patch will only change the behavior when last_sent_block
-> > changed.  I see that the performance is doubled after the change,
-> > which is really promising.  However I don't fully understand why it
-> > brings such a big difference considering that IMHO current code is
-> > sending dirty pages per-RAMBlock.  I mean, IMHO last_sent_block should
-> > not change frequently?  Or am I wrong?
-> 
-> It's depends on the configuration, each memory-region which is ram or
-> file backend has a RAMBlock.
-> 
-> Actually, more benefits comes from the fact that the performance & throughput
-> of the multithreads has been improved as the threads is fed by the
-> migration thread and the result is consumed by the migration
-> thread.
+On 26/03/2018 10:32, David Hildenbrand wrote:
+> On 16.03.2018 00:24, Tony Krowiak wrote:
+>> If the CPU model indicates that AP facility is installed on
+>> the guest (i.e., -cpu xxxx,ap=3Don), then the expectation is that
+>> the AP bus running in the guest will initialize; however, if the
+>> AP instructions are not being interpreted by the firmware, then
+>> they will be intercepted and routed back to QEMU for handling.
+>> If a handler is not defined to process the intercepted instruciton,
+>> t
+...snip...
+>
+>> +int ap_device_handle_nqap(S390CPU *cpu)
+>> +{
+>> +    CPUS390XState *env =3D &cpu->env;
+>> +
+>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>> +        env->regs[1] =3D 0x10000;
+>> +
+>> +        return 0;
+>> +    }
+>> +
+>> +    return -EOPNOTSUPP;
+>> +}
+>> +
+>> +int ap_device_handle_dqap(S390CPU *cpu)
+>> +{
+>> +    CPUS390XState *env =3D &cpu->env;
+>> +
+>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>> +        env->regs[1] =3D 0x10000;
+>> +
+>> +        return 0;
+>> +    }
+>> +
+>> +    return -EOPNOTSUPP;
+>> +}
+>> +
+>> +int ap_device_handle_pqap(S390CPU *cpu)
+>> +{
+>> +    CPUS390XState *env =3D &cpu->env;
+>> +    int fc =3D 4 & (env->regs[0] >> 24);
+>> +
+>> +    /*
+>> +     * The Query Configuration Information (QCI) function (fc =3D=3D =
+4) does not
+>> +     * set a response code in reg 1, so check for that along with the
+>> +     * AP feature.
+>> +     */
+>> +    if ((fc !=3D 4) && s390_has_feat(S390_FEAT_AP)) {
+>> +        env->regs[1] =3D 0x10000;
+>> +
+>> +        return 0;
+>> +    }
+> This would imply an operation exception in case fc=3D=3D4, which sounds=
+ very
+> wrong.
 
-I'm not sure whether I got your points - I think you mean that the
-compression threads and the migration thread can form a better
-pipeline if the migration thread does not do any compression at all.
+It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must be=20
+tested
+to know what to answer.
+If the feature is there, QCI must be answered correctly.
 
-I think I agree with that.
+there are also some error situations to handle in all three functions.
 
-However it does not really explain to me on why a very rare event
-(sending the first page of a RAMBlock, considering bitmap sync is
-rare) can greatly affect the performance (it shows a doubled boost).
 
-Btw, about the numbers: IMHO the numbers might not be really "true
-numbers".  Or say, even the bandwidth is doubled, IMHO it does not
-mean the performance is doubled. Becasue the data has changed.
+>
+> Hard to review without access to documentation. (hard to understand why
+> such stuff is to be kept confidential for decades)
+>
+>> +
+>> +    return -EOPNOTSUPP;
+>> +}
+>> +
+>>   static Property vfio_ap_properties[] =3D {
+>>       DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
+>>       DEFINE_PROP_END_OF_LIST(),
+>> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device=
+.h
+>> index 693df90..d45ae38 100644
+>> --- a/include/hw/s390x/ap-device.h
+>> +++ b/include/hw/s390x/ap-device.h
+>> @@ -11,6 +11,8 @@
+>>   #ifndef HW_S390X_AP_DEVICE_H
+>>   #define HW_S390X_AP_DEVICE_H
+>>  =20
+>
 
-Previously there were only compressed pages, and now for each cycle of
-RAMBlock looping we'll send a normal page (then we'll get more thing
-to send).  So IMHO we don't really know whether we sent more pages
-with this patch, we can only know we sent more bytes (e.g., an extreme
-case is that the extra 25Mbps/s are all caused by those normal pages,
-and we can be sending exactly the same number of pages like before, or
-even worse?).
-
-> 
-> > 
-> > Another follow-up question would be: have you measured how long time
-> > needed to compress a 4k page, and how many time to send it?  I think
-> > "sending the page" is not really meaningful considering that we just
-> > put a page into the buffer (which should be extremely fast since we
-> > don't really flush it every time), however I would be curious on how
-> > slow would compressing a page be.
-> 
-> I haven't benchmark the performance of zlib, i think it is CPU intensive
-> workload, particularly, there no compression-accelerator (e.g, QAT) on
-> our production. BTW, we were using lzo instead of zlib which worked
-> better for some workload.
-
-Never mind. Good to know about that.
-
-> 
-> Putting a page into buffer should depend on the network, i,e, if the
-> network is congested it should take long time. :)
-
-Again, considering that I don't know much on compression (especially I
-hardly used that) mine are only questions, which should not block your
-patches to be either queued/merged/reposted when proper. :)
-
-Thanks,
-
--- 
-Peter Xu
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
