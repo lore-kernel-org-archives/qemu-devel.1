@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34460)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0TvR-0007Fn-MQ
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:20:47 -0400
+	id 1f0U9B-00038E-0g
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0TvO-00019d-F7
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:20:45 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:39338)
+	id 1f0U96-00009W-4L
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:34:57 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:38217)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0TvO-00018o-8a
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:20:42 -0400
-Received: by mail-qk0-x243.google.com with SMTP id j73so20459442qke.6
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 08:20:42 -0700 (PDT)
+	id 1f0U95-000097-W1
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:34:52 -0400
+Received: by mail-qk0-x243.google.com with SMTP id 132so20543106qkd.5
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 08:34:51 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180326111857.26146-1-otubo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9264d86f-e432-485b-c01b-4e8164af1561@amsat.org>
-Date: Mon, 26 Mar 2018 12:20:36 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 26 Mar 2018 12:34:36 -0300
+Message-Id: <20180326153441.32641-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180326111857.26146-1-otubo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/5] dma/i82374: avoid double creation of
  i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,266 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, ehabkost@redhat.com, mjt@tls.msk.ru, armbru@redhat.com, agraf@suse.de, pbonzini@redhat.com
+To: Eduardo Otubo <otubo@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Nageswara Sastry <nasastry@in.ibm.com>
 
-Hi Eduardo,
+Hi,
 
-On 03/26/2018 08:18 AM, Eduardo Otubo wrote:
-> QEMU fails when used with the following command line:
-> 
->     ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
->     qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
->     Aborted (core dumped)
-> 
-> The 40p machine type already creates the device i82374. If specified in the
-> command line, it will try to create it again, hence generating the error. The
-> function isa_bus_dma() isn't supposed to be called twice for the same bus. This
-> patch fixes this issue by calling involved functions with Error **error_fatal
-> and propagating back the error so QEMU can fail nicely without Abort and core
-> dump.
+This series intend to fix: https://bugs.launchpad.net/qemu/+bug/1721224
 
-I came with a simpler patch (imho), keeping your comment.
+Patch #1 is the fix for 2.12, following patches are just refactors for 2.13.
 
-> 
-> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
-> ---
-> v4:
->  * Change return value from int8_t to int
->  * Changed function calling for other architectures.
-> 
-> v3:
->  * Removed all unecessary local_err                                                                                                                                                                                  
->  * Change return of isa_bus_dma() and DMA_init() from void to int8_t,                                                                                                                                                
->    returning -EBUSY on error and 0 on success                                                                                                                                                                        
->  * Added qdev_cleanup_nofail() in case isa_bus_dma() returns error. The                                                                                                                                              
->    cleanup looks safe, but please review if I didn't miss any detail                                                                                                                                                 
->                                                                                                                                                                                                                      
-> v2:                                                                                                                                                                                                                  
->  * Removed user_creatable=false and replaced by error handling using                                                                                                                                                 
->    Error **errp and error_propagate();          
-> 
->  hw/core/qdev.c          | 16 ++++++++++++++++
->  hw/dma/i82374.c         |  3 ++-
->  hw/dma/i8257.c          | 35 +++++++++++++++++++----------------
->  hw/i386/pc.c            |  2 +-
->  hw/isa/isa-bus.c        |  8 ++++++--
->  hw/mips/mips_fulong2e.c |  2 +-
->  hw/mips/mips_jazz.c     |  2 +-
->  hw/mips/mips_malta.c    |  2 +-
->  include/hw/dma/i8257.h  |  2 +-
->  include/hw/isa/isa.h    |  2 +-
->  include/hw/qdev-core.h  |  1 +
->  11 files changed, 50 insertions(+), 25 deletions(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index f6f92473b8..e14164526f 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -345,6 +345,22 @@ void qdev_init_nofail(DeviceState *dev)
->      object_unref(OBJECT(dev));
->  }
->  
-> +void qdev_cleanup_nofail(DeviceState *dev)
-> +{
-> +    Error *err = NULL;
-> +
-> +    assert(dev->realized);
-> +
-> +    object_ref(OBJECT(dev));
-> +    object_property_set_bool(OBJECT(dev), false, "realized", &err);
-> +    if (err) {
-> +        error_reportf_err(err, "Clean up of device %s failed: ",
-> +                          object_get_typename(OBJECT(dev)));
-> +        exit(1);
-> +    }
-> +    object_unref(OBJECT(dev));
-> +}
-> +
->  void qdev_machine_creation_done(void)
->  {
->      /*
-> diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
-> index 83c87d92e0..718cd632fd 100644
-> --- a/hw/dma/i82374.c
-> +++ b/hw/dma/i82374.c
-> @@ -25,6 +25,7 @@
->  #include "qemu/osdep.h"
->  #include "hw/isa/isa.h"
->  #include "hw/dma/i8257.h"
-> +#include "qapi/error.h"
->  
->  #define TYPE_I82374 "i82374"
->  #define I82374(obj) OBJECT_CHECK(I82374State, (obj), TYPE_I82374)
-> @@ -124,7 +125,7 @@ static void i82374_realize(DeviceState *dev, Error **errp)
->      portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
->                      s->iobase);
->  
-> -    i8257_dma_init(isa_bus_from_device(ISA_DEVICE(dev)), true);
-> +    i8257_dma_init(isa_bus_from_device(ISA_DEVICE(dev)), true, errp);
->      memset(s->commands, 0, sizeof(s->commands));
->  }
->  
-> diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
-> index 52675e97c9..84978f9459 100644
-> --- a/hw/dma/i8257.c
-> +++ b/hw/dma/i8257.c
-> @@ -622,26 +622,29 @@ static void i8257_register_types(void)
->  
->  type_init(i8257_register_types)
->  
-> -void i8257_dma_init(ISABus *bus, bool high_page_enable)
-> +void i8257_dma_init(ISABus *bus, bool high_page_enable, Error **error_fatal)
->  {
->      ISADevice *isa1, *isa2;
-> -    DeviceState *d;
-> +    DeviceState *d1, *d2;
->  
->      isa1 = isa_create(bus, TYPE_I8257);
-> -    d = DEVICE(isa1);
-> -    qdev_prop_set_int32(d, "base", 0x00);
-> -    qdev_prop_set_int32(d, "page-base", 0x80);
-> -    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x480 : -1);
-> -    qdev_prop_set_int32(d, "dshift", 0);
-> -    qdev_init_nofail(d);
-> +    d1 = DEVICE(isa1);
-> +    qdev_prop_set_int32(d1, "base", 0x00);
-> +    qdev_prop_set_int32(d1, "page-base", 0x80);
-> +    qdev_prop_set_int32(d1, "pageh-base", high_page_enable ? 0x480 : -1);
-> +    qdev_prop_set_int32(d1, "dshift", 0);
-> +    qdev_init_nofail(d1);
->  
->      isa2 = isa_create(bus, TYPE_I8257);
-> -    d = DEVICE(isa2);
-> -    qdev_prop_set_int32(d, "base", 0xc0);
-> -    qdev_prop_set_int32(d, "page-base", 0x88);
-> -    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x488 : -1);
-> -    qdev_prop_set_int32(d, "dshift", 1);
-> -    qdev_init_nofail(d);
-> -
-> -    isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2));
-> +    d2 = DEVICE(isa2);
-> +    qdev_prop_set_int32(d2, "base", 0xc0);
-> +    qdev_prop_set_int32(d2, "page-base", 0x88);
-> +    qdev_prop_set_int32(d2, "pageh-base", high_page_enable ? 0x488 : -1);
-> +    qdev_prop_set_int32(d2, "dshift", 1);
-> +    qdev_init_nofail(d2);
-> +
-> +    if (isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2), error_fatal) < 0) {
-> +        qdev_cleanup_nofail(d1);
-> +        qdev_cleanup_nofail(d2);
-> +    }
->  }
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index d36bac8c89..31777a7ed5 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1624,7 +1624,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
->          pcspk_init(isa_bus, pit);
->      }
->  
-> -    i8257_dma_init(isa_bus, 0);
-> +    i8257_dma_init(isa_bus, 0, &error_fatal);
->  
->      /* Super I/O */
->      pc_superio_init(isa_bus, create_fdctrl, no_vmport);
-> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-> index 63fa77effc..f0f9a1f8e0 100644
-> --- a/hw/isa/isa-bus.c
-> +++ b/hw/isa/isa-bus.c
-> @@ -104,12 +104,16 @@ void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq)
->      qdev_connect_gpio_out(DEVICE(isadev), gpioirq, irq);
->  }
->  
-> -void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16)
-> +int isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error **error_fatal)
->  {
->      assert(bus && dma8 && dma16);
-> -    assert(!bus->dma[0] && !bus->dma[1]);
-> +    if (bus->dma[0] || bus->dma[1]) {
-> +        error_setg(error_fatal, "DMA already initialized on ISA bus");
-> +        return -EBUSY;
-> +    }
->      bus->dma[0] = dma8;
->      bus->dma[1] = dma16;
-> +    return 0;
->  }
->  
->  IsaDma *isa_get_dma(ISABus *bus, int nchan)
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index 02fb2fdcc4..e98d994f3a 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -243,7 +243,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
->      isa_bus_irqs(isa_bus, i8259);
->      /* init other devices */
->      i8254_pit_init(isa_bus, 0x40, 0, NULL);
-> -    i8257_dma_init(isa_bus, 0);
-> +    i8257_dma_init(isa_bus, 0, &error_fatal);
->      /* Super I/O */
->      isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
->  
-> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-> index 7223085547..a1c071e311 100644
-> --- a/hw/mips/mips_jazz.c
-> +++ b/hw/mips/mips_jazz.c
-> @@ -222,7 +222,7 @@ static void mips_jazz_init(MachineState *machine,
->      /* ISA devices */
->      i8259 = i8259_init(isa_bus, env->irq[4]);
->      isa_bus_irqs(isa_bus, i8259);
-> -    i8257_dma_init(isa_bus, 0);
-> +    i8257_dma_init(isa_bus, 0, &error_fatal);
->      pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
->      pcspk_init(isa_bus, pit);
->  
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index f6513a4fd5..7bb9b6071d 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1198,7 +1198,7 @@ void mips_malta_init(MachineState *machine)
->      smbus = piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
->                            isa_get_irq(NULL, 9), NULL, 0, NULL);
->      pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
-> -    i8257_dma_init(isa_bus, 0);
-> +    i8257_dma_init(isa_bus, 0, &error_fatal);
->      mc146818_rtc_init(isa_bus, 2000, NULL);
->  
->      /* generate SPD EEPROM data */
-> diff --git a/include/hw/dma/i8257.h b/include/hw/dma/i8257.h
-> index 2cab50bb6c..d3f89393fe 100644
-> --- a/include/hw/dma/i8257.h
-> +++ b/include/hw/dma/i8257.h
-> @@ -44,6 +44,6 @@ typedef struct I8257State {
->      PortioList portio_pageh;
->  } I8257State;
->  
-> -void i8257_dma_init(ISABus *bus, bool high_page_enable);
-> +void i8257_dma_init(ISABus *bus, bool high_page_enable, Error **error_fatal);
->  
->  #endif
-> diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-> index b9dbab24b4..eb89654d24 100644
-> --- a/include/hw/isa/isa.h
-> +++ b/include/hw/isa/isa.h
-> @@ -103,7 +103,7 @@ void isa_bus_irqs(ISABus *bus, qemu_irq *irqs);
->  qemu_irq isa_get_irq(ISADevice *dev, int isairq);
->  void isa_init_irq(ISADevice *dev, qemu_irq *p, int isairq);
->  void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq);
-> -void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16);
-> +int isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error ** error_fatal);
->  IsaDma *isa_get_dma(ISABus *bus, int nchan);
->  MemoryRegion *isa_address_space(ISADevice *dev);
->  MemoryRegion *isa_address_space_io(ISADevice *dev);
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 9453588160..238ad2f6f3 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -283,6 +283,7 @@ typedef struct GlobalProperty {
->  DeviceState *qdev_create(BusState *bus, const char *name);
->  DeviceState *qdev_try_create(BusState *bus, const char *name);
->  void qdev_init_nofail(DeviceState *dev);
-> +void qdev_cleanup_nofail(DeviceState *dev);
->  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
->                                   int required_for_version);
->  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
-> 
+The 8257 only has 4 DMA channels. To have 8 channels, the IBM PC/AT
+implementation uses 2x 8257, the second cascaded onto the first.
+The i8257_dma_init() name is misleading since this function creates two
+8257 to register a total of 8 channels on the ISA bus.
+
+The refactor is to enforce that 2 controllers are used (cascaded) - no
+logical change.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (5):
+  hw/dma/i82374: Avoid double creation of the 82374 controller
+  hw/dma/i8257: Define I8257_CHANNEL_COUNT
+  hw/dma/i8257: Split i8257_dma_init() by master/slave
+  hw/dma/i8257: Rename i8257_dma_init() -> i8257_dma_init_cascaded()
+  hw/dma/i8257: Rename i8257_dma_init(false) -> i8257_dma_init_pc_at()
+
+ include/hw/dma/i8257.h  | 23 +++++++++++++++++++++--
+ hw/dma/i82374.c         |  9 ++++++++-
+ hw/dma/i8257.c          | 38 ++++++++++++++++++++++++++++----------
+ hw/i386/pc.c            |  2 +-
+ hw/mips/mips_fulong2e.c |  2 +-
+ hw/mips/mips_jazz.c     |  2 +-
+ hw/mips/mips_malta.c    |  2 +-
+ 7 files changed, 61 insertions(+), 17 deletions(-)
+
+-- 
+2.16.3
