@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0TEW-00038Z-Un
+	(envelope-from <kwolf@redhat.com>) id 1f0TEb-0003BR-5k
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0TEW-0004Ec-4I
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0TEX-0004Fw-I7
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:29 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 26 Mar 2018 16:35:53 +0200
-Message-Id: <20180326143600.7724-13-kwolf@redhat.com>
+Date: Mon, 26 Mar 2018 16:35:57 +0200
+Message-Id: <20180326143600.7724-17-kwolf@redhat.com>
 In-Reply-To: <20180326143600.7724-1-kwolf@redhat.com>
 References: <20180326143600.7724-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/19] luks: Turn another invalid assertion into
- check
+Subject: [Qemu-devel] [PULL 16/19] vhdx: Require power-of-two block size on
+ create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Commit e39e959e fixed an invalid assertion in the .bdrv_length
-implementation, but left a similar assertion in place for
-.bdrv_truncate. Instead of crashing when the user requests a too large
-image size, fail gracefully.
-
-A file size of exactly INT64_MAX caused failure before, but is actually
-legal.
+Images with a non-power-of-two block size are invalid and cannot be
+opened. Reject such block sizes when creating an image.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- block/crypto.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block/vhdx.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index e0b8856f74..bc6c7e3795 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -357,7 +357,11 @@ static int block_crypto_truncate(BlockDriverState *b=
-s, int64_t offset,
-     BlockCrypto *crypto =3D bs->opaque;
-     uint64_t payload_offset =3D
-         qcrypto_block_get_payload_offset(crypto->block);
--    assert(payload_offset < (INT64_MAX - offset));
-+
-+    if (payload_offset > INT64_MAX - offset) {
-+        error_setg(errp, "The requested file size is too large");
-+        return -EFBIG;
+diff --git a/block/vhdx.c b/block/vhdx.c
+index d2c54b7891..6a5e48eb69 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1877,6 +1877,10 @@ static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
+         error_setg_errno(errp, EINVAL, "Block size must be a multiple of 1 MB");
+         return -EINVAL;
+     }
++    if (!is_power_of_2(block_size)) {
++        error_setg(errp, "Block size must be a power of two");
++        return -EINVAL;
 +    }
-=20
-     offset +=3D payload_offset;
-=20
---=20
+     if (block_size > VHDX_BLOCK_SIZE_MAX) {
+         error_setg_errno(errp, EINVAL, "Block size must not exceed %d",
+                          VHDX_BLOCK_SIZE_MAX);
+-- 
 2.13.6
