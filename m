@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0TEb-0003BN-3R
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0TEn-0003NS-Bb
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0TEW-0004ES-2N
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0TEj-0004Ny-4b
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:41 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 26 Mar 2018 16:35:56 +0200
-Message-Id: <20180326143600.7724-16-kwolf@redhat.com>
+Date: Mon, 26 Mar 2018 16:36:00 +0200
+Message-Id: <20180326143600.7724-20-kwolf@redhat.com>
 In-Reply-To: <20180326143600.7724-1-kwolf@redhat.com>
 References: <20180326143600.7724-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/19] qemu-iotests: Test parallels image
- creation with QMP
+Subject: [Qemu-devel] [PULL 19/19] qemu-iotests: Test vhdx image creation
+ with QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +25,22 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/212     | 326 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/212.out | 111 +++++++++++++++
+ tests/qemu-iotests/213     | 349 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/213.out | 121 ++++++++++++++++
  tests/qemu-iotests/group   |   1 +
- 3 files changed, 438 insertions(+)
- create mode 100755 tests/qemu-iotests/212
- create mode 100644 tests/qemu-iotests/212.out
+ 3 files changed, 471 insertions(+)
+ create mode 100755 tests/qemu-iotests/213
+ create mode 100644 tests/qemu-iotests/213.out
 
-diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
+diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
 new file mode 100755
-index 0000000000..e5a1ba77ce
+index 0000000000..3a00a0f6d6
 --- /dev/null
-+++ b/tests/qemu-iotests/212
-@@ -0,0 +1,326 @@
++++ b/tests/qemu-iotests/213
+@@ -0,0 +1,349 @@
 +#!/bin/bash
 +#
-+# Test parallels and file image creation
++# Test vhdx and file image creation
 +#
 +# Copyright (C) 2018 Red Hat, Inc.
 +#
@@ -71,7 +71,7 @@ index 0000000000..e5a1ba77ce
 +. ./common.rc
 +. ./common.filter
 +
-+_supported_fmt parallels
++_supported_fmt vhdx
 +_supported_proto file
 +_supported_os Linux
 +
@@ -147,7 +147,10 @@ index 0000000000..e5a1ba77ce
 +          "filename": "$TEST_IMG"
 +      },
 +      "size": $size,
-+      "cluster-size": 1048576
++      "log-size": 1048576,
++      "block-size": 8388608,
++      "subformat": "dynamic",
++      "block-state-zero": true
 +  }
 +}
 +{ "execute": "quit" }
@@ -179,7 +182,10 @@ index 0000000000..e5a1ba77ce
 +          "filename": "$TEST_IMG"
 +      },
 +      "size": $size,
-+      "cluster-size": 65536
++      "log-size": 8388608,
++      "block-size": 268435456,
++      "subformat": "fixed",
++      "block-state-zero": false
 +  }
 +}
 +{ "execute": "quit" }
@@ -231,7 +237,7 @@ index 0000000000..e5a1ba77ce
 +  "arguments": {
 +      "driver": "$IMGFMT",
 +      "file": "node0",
-+      "size": 4503599627369984
++      "size": 70368744177664
 +  }
 +}
 +{ "execute": "quit" }
@@ -247,22 +253,14 @@ index 0000000000..e5a1ba77ce
 +# with QAPI's implementation of the 'size' type and affects other commands as
 +# well. Once this is fixed, we may want to add a test case here.
 +
-+# 1. Misaligned image size
-+# 2. 2^64 - 512
-+# 3. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
-+# 4. 2^63 - 512 (generally valid, but with the image header the file will
++# 1. 2^64 - 512
++# 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
++# 3. 2^63 - 512 (generally valid, but with the image header the file will
 +#                exceed 63 bits)
-+# 5. 2^52 (512 bytes more than maximum image size)
++# 4. 2^46 + 1 (one byte more than maximum image size)
 +
 +run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
 +{ "execute": "qmp_capabilities" }
-+{ "execute": "x-blockdev-create",
-+  "arguments": {
-+      "driver": "$IMGFMT",
-+      "file": "node0",
-+      "size": 1234
-+  }
-+}
 +{ "execute": "x-blockdev-create",
 +  "arguments": {
 +      "driver": "$IMGFMT",
@@ -288,14 +286,14 @@ index 0000000000..e5a1ba77ce
 +  "arguments": {
 +      "driver": "$IMGFMT",
 +      "file": "node0",
-+      "size": 4503599627370497
++      "size": 70368744177665
 +  }
 +}
 +{ "execute": "quit" }
 +EOF
 +
 +echo
-+echo "=== Invalid cluster size ==="
++echo "=== Invalid block size ==="
 +echo
 +
 +run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
@@ -305,7 +303,7 @@ index 0000000000..e5a1ba77ce
 +      "driver": "$IMGFMT",
 +      "file": "node0",
 +      "size": 67108864,
-+      "cluster-size": 1234
++      "block-size": 1234567
 +  }
 +}
 +{ "execute": "x-blockdev-create",
@@ -313,7 +311,7 @@ index 0000000000..e5a1ba77ce
 +      "driver": "$IMGFMT",
 +      "file": "node0",
 +      "size": 67108864,
-+      "cluster-size": 128
++      "block-size": 128
 +  }
 +}
 +{ "execute": "x-blockdev-create",
@@ -321,7 +319,7 @@ index 0000000000..e5a1ba77ce
 +      "driver": "$IMGFMT",
 +      "file": "node0",
 +      "size": 67108864,
-+      "cluster-size": 4294967296
++      "block-size": 3145728
 +  }
 +}
 +{ "execute": "x-blockdev-create",
@@ -329,7 +327,7 @@ index 0000000000..e5a1ba77ce
 +      "driver": "$IMGFMT",
 +      "file": "node0",
 +      "size": 67108864,
-+      "cluster-size": 9223372036854775808
++      "block-size": 536870912
 +  }
 +}
 +{ "execute": "x-blockdev-create",
@@ -337,7 +335,24 @@ index 0000000000..e5a1ba77ce
 +      "driver": "$IMGFMT",
 +      "file": "node0",
 +      "size": 67108864,
-+      "cluster-size": 18446744073709551104
++      "block-size": 0
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "=== Invalid log size ==="
++echo
++
++run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "log-size": 1234567
 +  }
 +}
 +{ "execute": "x-blockdev-create",
@@ -345,15 +360,23 @@ index 0000000000..e5a1ba77ce
 +      "driver": "$IMGFMT",
 +      "file": "node0",
 +      "size": 67108864,
-+      "cluster-size": 0
++      "log-size": 128
 +  }
 +}
 +{ "execute": "x-blockdev-create",
 +  "arguments": {
 +      "driver": "$IMGFMT",
 +      "file": "node0",
-+      "size": 281474976710656,
-+      "cluster-size": 512
++      "size": 67108864,
++      "log-size": 4294967296
++  }
++}
++{ "execute": "x-blockdev-create",
++  "arguments": {
++      "driver": "$IMGFMT",
++      "file": "node0",
++      "size": 67108864,
++      "log-size": 0
 +  }
 +}
 +{ "execute": "quit" }
@@ -364,13 +387,13 @@ index 0000000000..e5a1ba77ce
 +echo "*** done"
 +rm -f $seq.full
 +status=0
-diff --git a/tests/qemu-iotests/212.out b/tests/qemu-iotests/212.out
+diff --git a/tests/qemu-iotests/213.out b/tests/qemu-iotests/213.out
 new file mode 100644
-index 0000000000..587de6fad0
+index 0000000000..8e8fc29cbc
 --- /dev/null
-+++ b/tests/qemu-iotests/212.out
-@@ -0,0 +1,111 @@
-+QA output created by 212
++++ b/tests/qemu-iotests/213.out
+@@ -0,0 +1,121 @@
++QA output created by 213
 +
 +=== Successful image creation (defaults) ===
 +
@@ -449,46 +472,56 @@ index 0000000000..587de6fad0
 +
 +image: TEST_DIR/t.IMGFMT
 +file format: IMGFMT
-+virtual size: 4096T (4503599627369984 bytes)
++virtual size: 64T (70368744177664 bytes)
 +
 +=== Invalid sizes ===
 +
 +Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
 +QMP_VERSION
 +{"return": {}}
-+{"error": {"class": "GenericError", "desc": "Image size must be a multiple of 512 bytes"}}
-+{"error": {"class": "GenericError", "desc": "Image size is too large for this cluster size"}}
-+{"error": {"class": "GenericError", "desc": "Image size is too large for this cluster size"}}
-+{"error": {"class": "GenericError", "desc": "Image size is too large for this cluster size"}}
-+{"error": {"class": "GenericError", "desc": "Image size is too large for this cluster size"}}
++{"error": {"class": "GenericError", "desc": "Image size too large; max of 64TB"}}
++{"error": {"class": "GenericError", "desc": "Image size too large; max of 64TB"}}
++{"error": {"class": "GenericError", "desc": "Image size too large; max of 64TB"}}
++{"error": {"class": "GenericError", "desc": "Image size too large; max of 64TB"}}
 +{"return": {}}
 +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 +
 +
-+=== Invalid cluster size ===
++=== Invalid block size ===
 +
 +Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
 +QMP_VERSION
 +{"return": {}}
-+{"error": {"class": "GenericError", "desc": "Cluster size must be a multiple of 512 bytes"}}
-+{"error": {"class": "GenericError", "desc": "Cluster size must be a multiple of 512 bytes"}}
-+{"error": {"class": "GenericError", "desc": "Cluster size is too large"}}
-+{"error": {"class": "GenericError", "desc": "Cluster size is too large"}}
-+{"error": {"class": "GenericError", "desc": "Cluster size is too large"}}
-+{"error": {"class": "GenericError", "desc": "Image size is too large for this cluster size"}}
-+{"error": {"class": "GenericError", "desc": "Image size is too large for this cluster size"}}
++{"error": {"class": "GenericError", "desc": "Block size must be a multiple of 1 MB"}}
++{"error": {"class": "GenericError", "desc": "Block size must be a multiple of 1 MB"}}
++{"error": {"class": "GenericError", "desc": "Block size must be a power of two"}}
++{"error": {"class": "GenericError", "desc": "Block size must not exceed 268435456"}}
++{"error": {"class": "GenericError", "desc": "Block size must be a multiple of 1 MB"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++
++=== Invalid log size ===
++
++Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
++QMP_VERSION
++{"return": {}}
++{"error": {"class": "GenericError", "desc": "Log size must be a multiple of 1 MB"}}
++{"error": {"class": "GenericError", "desc": "Log size must be a multiple of 1 MB"}}
++{"error": {"class": "GenericError", "desc": "Log size must be smaller than 4 GB"}}
++{"error": {"class": "GenericError", "desc": "Log size must be a multiple of 1 MB"}}
 +{"return": {}}
 +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 +
 +*** done
 diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 0d11d40aec..f706346f86 100644
+index f706346f86..52a80f3f9e 100644
 --- a/tests/qemu-iotests/group
 +++ b/tests/qemu-iotests/group
-@@ -210,3 +210,4 @@
- 209 rw auto quick
+@@ -211,3 +211,4 @@
  210 rw auto
  211 rw auto quick
-+212 rw auto quick
+ 212 rw auto quick
++213 rw auto quick
 -- 
 2.13.6
