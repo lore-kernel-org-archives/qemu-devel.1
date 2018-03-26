@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f0HkK-0003hU-Sb
-	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 22:20:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1f0IgB-0000Mo-32
+	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 23:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f0HkJ-0003J2-Ep
-	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 22:20:28 -0400
-Date: Mon, 26 Mar 2018 13:20:12 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180326022012.GB2104@umbus.fritz.box>
-References: <20180326001421.0E0937456D7@zero.eik.bme.hu>
+	(envelope-from <peterx@redhat.com>) id 1f0Ig7-0008Ne-Np
+	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 23:20:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55430 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0Ig7-0008Jg-Jm
+	for qemu-devel@nongnu.org; Sun, 25 Mar 2018 23:20:11 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 03E63401DECF
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 03:20:07 +0000 (UTC)
+Date: Mon, 26 Mar 2018 11:19:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180326031958.GV32362@xz-mi>
+References: <20180323103239.32414-1-marcandre.lureau@redhat.com>
+	<20180323153537.GS32362@xz-mi>
+	<CAMxuvax=SPeOui3mGcmK8HAo7EqDbpUSZ8Fq3mVHCrLztmBCLA@mail.gmail.com>
+	<15aaea55-9ebd-8a16-c25e-c9bc709fcabc@redhat.com>
+	<20180324014150.GU32362@xz-mi>
+	<51f5f5e5-61c3-e5c6-e925-4f2e9fdc4403@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5I6of5zJg18YgZEa"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180326001421.0E0937456D7@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fix reserved bit mask of dstst
- instruction
+In-Reply-To: <51f5f5e5-61c3-e5c6-e925-4f2e9fdc4403@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: fix expected qmp_capabilities
+ error description regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +38,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
+On Sat, Mar 24, 2018 at 06:41:04AM -0500, Eric Blake wrote:
+> On 03/23/2018 08:41 PM, Peter Xu wrote:
+> 
+> > > There have been quite a few patch ideas across multiple threads related to
+> > > OOB fallout.  Hopefully I can keep straight which patches are intended for
+> > > 2.12 (anything that fixes a bug, like this one, is a good candidate,
+> > 
+> > I'll mark patches with "for-2.12" if there are.
+> > 
+> > > and it
+> > > would be nice if we can undo the temporary reversion of exposing OOB if we
+> > > can solve all the issues that iotests exposed).
+> > 
+> > IMHO it'll still be risky considering what has already reported.
+> > 
+> > Here's my plan, hopefully to make everyone happy - we keep OOB turned
+> > off for 2.12 and even later.  In 2.13, I'll post some new patches to
+> > add a new monitor parameter to allow user to enable OOB explicitly,
+> > otherwise we never enable it.  After all, for now the only real user
+> > should be postcopy. Then we don't need to struggle around all these
+> > mess.  What do you think?
+> 
+> If you're going to add a CLI parameter that must be specified for OOB to
+> even be advertised, then it is MUCH less invasive to existing clients (it
+> does mean that opting in to OOB now requires the command line argument AND
+> the capability request during qmp_capabilities) - as such, enabling the
+> opt-in during 2.12 is less controversial, and I see no reason to defer it to
+> 2.13, especially if you want to maximize testing of the new feature to shake
+> out the bugs it encounters.
+> 
+> If you want to be cautious, name the command-line parameter --x-oob for now,
+> we can rename it later to drop the x- prefix, or remove the parameter
+> altogether if we decide by opting in via merely qmp_capabilities is
+> sufficient.
 
---5I6of5zJg18YgZEa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hmm, it seems I don't even need to wait. :-)
 
-On Mon, Mar 26, 2018 at 01:54:28AM +0200, BALATON Zoltan wrote:
-> According to the Vector/SIMD extension documentation bit 6 that is
-> currently masked is valid (listed as transient bit) but bits 7 and 8
-> should be reserved instead. Fix the mask to match this.
+I'll prepare something soon (together with some existing known fixes).
 
-What document can I find information on dstst in?  The ISA documents I
-have handy are either too early (the instruction didn't exist yet) or
-too late (the instruction was considered obsolete and no details are
-given).
+Thanks!
 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  target/ppc/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 3457d29..b0d79a3 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6561,7 +6561,7 @@ GEN_HANDLER(dcbtst, 0x1F, 0x16, 0x07, 0x00000001, P=
-PC_CACHE),
->  GEN_HANDLER_E(dcbtls, 0x1F, 0x06, 0x05, 0x02000001, PPC_BOOKE, PPC2_BOOK=
-E206),
->  GEN_HANDLER(dcbz, 0x1F, 0x16, 0x1F, 0x03C00001, PPC_CACHE_DCBZ),
->  GEN_HANDLER(dst, 0x1F, 0x16, 0x0A, 0x01800001, PPC_ALTIVEC),
-> -GEN_HANDLER(dstst, 0x1F, 0x16, 0x0B, 0x02000001, PPC_ALTIVEC),
-> +GEN_HANDLER(dstst, 0x1F, 0x16, 0x0B, 0x01800001, PPC_ALTIVEC),
->  GEN_HANDLER(dss, 0x1F, 0x16, 0x19, 0x019FF801, PPC_ALTIVEC),
->  GEN_HANDLER(icbi, 0x1F, 0x16, 0x1E, 0x03E00001, PPC_CACHE_ICBI),
->  GEN_HANDLER(dcba, 0x1F, 0x16, 0x17, 0x03E00001, PPC_CACHE_DCBA),
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---5I6of5zJg18YgZEa
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq4WNwACgkQbDjKyiDZ
-s5I6Iw/7B45oIg8vNEFLIZWlH38NOSx4gmmkXej5XiLHfRt3w+ZPejGtXMN3aYHL
-nbXRAL7E9+RBSy/o83FgL9qbQhJSG9E36LdLQOCGJcvaMhDrIIAKI18IGFKs+2PI
-nNDDHzJcgpkuBxfxBpEyrAUBJO0w7SVWYo7siwFSwV4qsSjbbQ4hmdF74RuyJl5q
-Hy6/GWnQNd5y0O3DGXcNNyeb3O6bN9GxHdWbJ6H5rVrurhS5zXBCamLvmjiVQSb9
-xbyNZcb09aucElEe9rugW6Pvyc4pvW/ONYJpT/X1EMMJyL13eTi30DU6C1i9Td8p
-9LsyAHNeV48zmEM9aF8GEp/Qw8hVZEV1yFlOoRlg7od1ETWjGGGYUPv0dOFlwwMr
-kBvv008vh0m1hV7j/zjXY9ORes8y7dlk/8gwSJGuMxas4/Wm1kAS6mBp8ByhaPxF
-WmaAg2MY56+5d0fWHG0aJn8BFMaBO84olBKnWF5J/DtBjtaOvHn+Vx5kEQrEF+wZ
-pUlIY/c11Up+Zm74Re7+3Fsg55ir+tYBOgswZMugXfe84QJVB8BASq/oEsOSP+5J
-+KVpfqv8swtUqQ8OrHe5+VYUDNGqIVTqUb2ldbc7xBKtK8ZtKQnjZ9sBtWmRFTqO
-KaW+DXKJvFTrUKHTYW+QDajI3P7uzOTnlMS0CqKmLOt6wojdN5E=
-=qwb3
------END PGP SIGNATURE-----
-
---5I6of5zJg18YgZEa--
+-- 
+Peter Xu
