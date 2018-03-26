@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f0MWv-0000xX-RF
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:26:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0MiT-0003k7-4v
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f0MWr-0003rc-SZ
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:26:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50052 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1f0MiQ-00016r-0e
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:38:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39504 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f0MWr-0003np-Ma
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:26:53 -0400
-Date: Mon, 26 Mar 2018 15:26:39 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180326072639.GB31422@lemon.usersys.redhat.com>
-References: <20180322073822.25795-1-famz@redhat.com>
-	<097f05b7-c628-c529-1c64-a84dc6483f7c@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0MiP-00016d-Rw
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 03:38:49 -0400
+References: <1521193892-15552-1-git-send-email-thuth@redhat.com>
+	<1ef42117-6b16-b22f-29fe-f4910361aa2a@redhat.com>
+	<d40e6299-9c4f-26f3-41e0-21116da4d8f4@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a78b536c-ceba-1a2e-e74e-7e487689a267@redhat.com>
+Date: Mon, 26 Mar 2018 09:38:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <097f05b7-c628-c529-1c64-a84dc6483f7c@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scsi-disk: Don't enlarge min_io_size to
- max_io_size
+In-Reply-To: <d40e6299-9c4f-26f3-41e0-21116da4d8f4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] Fix crashes with CAN bus and
+ ISA DMA devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, dgibson@redhat.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-On Thu, 03/22 09:19, Daniel Henrique Barboza wrote:
-> Hi,
->=20
-> On 03/22/2018 04:38 AM, Fam Zheng wrote:
-> > Some backends report big max_io_sectors. Making min_io_size the same
-> > value in this case will make it impossible for guest to align memory,
-> > therefore the disk may not be usable at all.
-> >=20
-> > Change the default behavior (when min_io_size and opt_io_size are not
-> > specified in the command line), do not assume max_io_sectors is a goo=
-d
-> > value for opt_io_size and min_io_size, use 512 instead.
-> >=20
-> > Reported-by: David Gibson <dgibson@redhat.com>
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >   hw/scsi/scsi-disk.c | 6 ++----
-> >   1 file changed, 2 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> > index 5b7a48f5a5..76e3c9eaa4 100644
-> > --- a/hw/scsi/scsi-disk.c
-> > +++ b/hw/scsi/scsi-disk.c
-> > @@ -714,10 +714,8 @@ static int scsi_disk_emulate_inquiry(SCSIRequest=
- *req, uint8_t *outbuf)
-> >=20
-> >                   /* min_io_size and opt_io_size can't be greater tha=
-n
-> >                    * max_io_sectors */
-> > -                min_io_size =3D
-> > -                    MIN_NON_ZERO(min_io_size, max_io_sectors);
-> > -                opt_io_size =3D
-> > -                    MIN_NON_ZERO(opt_io_size, max_io_sectors);
-> > +                min_io_size =3D MIN(min_io_size ? : 512, max_io_sect=
-ors);
-> > +                opt_io_size =3D MIN(opt_io_size ? : 512, max_io_sect=
-ors);
-> >               }
->=20
-> This code you're changing was added in d082d16a5c ("consider
-> bl->max_transfer ..").
-> I've borrowed this logic from scsi-generic.c, scsi_read_complete:
->=20
-> =A0=A0=A0 if (s->type =3D=3D TYPE_DISK &&
-> =A0=A0=A0=A0=A0=A0=A0 r->req.cmd.buf[0] =3D=3D INQUIRY &&
-> =A0=A0=A0=A0=A0=A0=A0 r->req.cmd.buf[2] =3D=3D 0xb0) {
-> =A0=A0=A0=A0=A0=A0=A0 uint32_t max_transfer =3D
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 blk_get_max_transfer(s->conf.blk) / s=
-->blocksize;
->=20
-> =A0=A0=A0=A0=A0=A0=A0 assert(max_transfer);
-> =A0=A0=A0=A0=A0=A0=A0 stl_be_p(&r->buf[8], max_transfer);
-> =A0=A0=A0=A0=A0=A0=A0 /* Also take care of the opt xfer len. */
-> =A0=A0=A0=A0=A0=A0=A0 stl_be_p(&r->buf[12],
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 MIN_NON_ZERO(max_trans=
-fer, ldl_be_p(&r->buf[12])));
-> =A0=A0=A0 }
->=20
->=20
-> Unless I've misunderstood the bug, you will want to change this code to=
-o.
-> Otherwise
-> you'll fix it with emulated disks but it might appear when using SCSI
-> passthrough.
+On 23/03/2018 19:20, John Snow wrote:
+> 
+> 
+> On 03/16/2018 06:15 AM, Paolo Bonzini wrote:
+>> On 16/03/2018 10:51, Thomas Huth wrote:
+>>> The new CAN bus devices and some older ISA devices that use DMA can be
+>>> used to crash QEMU. These patches introduce some proper checks so that
+>>> the users get a proper error message instead.
+>>>
+>>> Alexey Kardashevskiy (1):
+>>>   fdc: Exit if ISA controller does not support DMA
+>>>
+>>> Thomas Huth (3):
+>>>   hw/net/can: Fix segfaults when using the devices without bus
+>>>   hw/audio: Fix crashes when devices are used on ISA bus without DMA
+>>>   scripts/device-crash-test: Remove fixed isapc-with-iommu entry
+>>>
+>>>  hw/audio/cs4231a.c        | 8 +++++++-
+>>>  hw/audio/gus.c            | 7 ++++++-
+>>>  hw/audio/sb16.c           | 9 +++++++--
+>>>  hw/block/fdc.c            | 5 ++++-
+>>>  hw/net/can/can_sja1000.c  | 4 ++++
+>>>  scripts/device-crash-test | 8 --------
+>>>  6 files changed, 28 insertions(+), 13 deletions(-)
+>>>
+>>
+>> Queued, thanks.
+>>
+>> Paolo
+>>
+> 
+> Did you not actually send a PR for this?
 
-I am assuming (because I don't have a reproducer myself) what matters is
-min_io_size here.
+No, today. :)
 
-David, could you help test if you see the same problem with "-device
-scsi-block"? If we I'll patch scsi-generic.c in v2 too.
-
-Fam
+Paolo
