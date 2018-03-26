@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ybs-0003xB-I6
+	(envelope-from <mreitz@redhat.com>) id 1f0Ybs-0003x7-Fs
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ybr-0000HM-Gs
+	(envelope-from <mreitz@redhat.com>) id 1f0Ybr-0000HS-Iq
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:52 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 26 Mar 2018 22:20:35 +0200
-Message-Id: <20180326202039.21070-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 0/4] Block patches for 2.12.0-rc1
+Date: Mon, 26 Mar 2018 22:20:36 +0200
+Message-Id: <20180326202039.21070-2-mreitz@redhat.com>
+In-Reply-To: <20180326202039.21070-1-mreitz@redhat.com>
+References: <20180326202039.21070-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 1/4] qcow2-bitmap: add
+ qcow2_reopen_bitmaps_rw_hint()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-The following changes since commit 7b93d78a04aa242d377ae213b79db6c319c71847:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-03-26 15:17:25 +0100)
+Add version of qcow2_reopen_bitmaps_rw, which do the same work but
+also return a hint about was header updated or not. This will be
+used in the following fix for bitmaps reloading after migration.
 
-are available in the Git repository at:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180320170521.32152-2-vsementsov@virtuozzo.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.h        |  2 ++
+ block/qcow2-bitmap.c | 15 ++++++++++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-  git://github.com/XanClic/qemu.git tags/pull-block-2018-03-26
-
-for you to fetch changes up to a77672ea3d95094a0cb4f974de84fb7353c67cc0:
-
-  vmdk: return ERROR when cluster sector is larger than vmdk limitation (2018-03-26 21:17:24 +0200)
-
-----------------------------------------------------------------
-A fix for dirty bitmap migration through shared storage, and a VMDK
-patch keeping us from creating too large extents.
-
-----------------------------------------------------------------
-Vladimir Sementsov-Ogievskiy (3):
-  qcow2-bitmap: add qcow2_reopen_bitmaps_rw_hint()
-  qcow2: fix bitmaps loading when bitmaps already exist
-  iotests: enable shared migration cases in 169
-
-yuchenlin (1):
-  vmdk: return ERROR when cluster sector is larger than vmdk limitation
-
- block/qcow2.h              |  2 ++
- block/qcow2-bitmap.c       | 15 ++++++++++++++-
- block/qcow2.c              | 17 ++++++++++++++++-
- block/vmdk.c               |  6 ++++++
- tests/qemu-iotests/169     |  8 +++-----
- tests/qemu-iotests/169.out |  4 ++--
- 6 files changed, 43 insertions(+), 9 deletions(-)
-
+diff --git a/block/qcow2.h b/block/qcow2.h
+index ccb92a9696..d301f77cea 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -671,6 +671,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
++                                 Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 3010adb909..6e93ec43e1 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1004,7 +1004,8 @@ fail:
+     return false;
+ }
+ 
+-int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
++int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
++                                 Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     Qcow2BitmapList *bm_list;
+@@ -1012,6 +1013,10 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+     GSList *ro_dirty_bitmaps = NULL;
+     int ret = 0;
+ 
++    if (header_updated != NULL) {
++        *header_updated = false;
++    }
++
+     if (s->nb_bitmaps == 0) {
+         /* No bitmaps - nothing to do */
+         return 0;
+@@ -1055,6 +1060,9 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+             error_setg_errno(errp, -ret, "Can't update bitmap directory");
+             goto out;
+         }
++        if (header_updated != NULL) {
++            *header_updated = true;
++        }
+         g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
+     }
+ 
+@@ -1065,6 +1073,11 @@ out:
+     return ret;
+ }
+ 
++int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
++{
++    return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
++}
++
+ /* store_bitmap_data()
+  * Store bitmap to image, filling bitmap table accordingly.
+  */
 -- 
 2.14.3
