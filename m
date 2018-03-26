@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tkm-0005EZ-O4
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:46 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tke-0002io-Ih
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tkl-0005BO-D6
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48724 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tki-0002l1-Fe
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47472 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1f0Tke-0002fP-EP
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:36 -0400
+	id 1f0Tki-0002kk-Ac
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:09:40 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 26 Mar 2018 17:08:38 +0200
-Message-Id: <20180326150916.9602-1-marcandre.lureau@redhat.com>
+Date: Mon, 26 Mar 2018 17:08:47 +0200
+Message-Id: <20180326150916.9602-10-marcandre.lureau@redhat.com>
+In-Reply-To: <20180326150916.9602-1-marcandre.lureau@redhat.com>
+References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/38] RFC: monitor: add asynchronous
- command type
+Subject: [Qemu-devel] [PATCH v3 09/38] json: remove useless return value
+ from lexer/parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +31,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+The lexer always returns 0 when char feeding. Furthermore, none of the
+caller care about the return value.
 
-One of initial design goals of QMP was to have "asynchronous command
-completion" (http://wiki.qemu.org/Features/QAPI). Unfortunately, that
-goal was not fully achieved, and some broken bits left were removed
-progressively until commit 65207c59d that removed async command
-support.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qapi/qmp/json-lexer.h    |  4 ++--
+ include/qapi/qmp/json-streamer.h |  4 ++--
+ qobject/json-lexer.c             | 23 ++++++++---------------
+ qobject/json-streamer.c          |  8 ++++----
+ 4 files changed, 16 insertions(+), 23 deletions(-)
 
-Yet there are clear benefits allowing the command handler to re-enter
-the main loop if the command cannot be handled synchronously, or if it
-is long-lasting. This is currently not possible and make some bugs
-such as rhbz#1230527 difficult to solve.  Furthermore, many QMP
-commands do IO and could be considered 'slow' and blocking the main
-loop today. The unwritten solution so far is to use a pair of
-command+event. But this approach has a number of issues, in particular
-to fix existing commands, and inadequacy since the event is
-broadcasted and may thus have command 'id' conflict, beside being
-rather inefficient and incorrect.
-
-The following series implements an async command solution instead. By
-introducing a session context and a command return handler, it can:
-- defer the return, allowing the mainloop to reenter
-- return only to the caller (no broadcasted event)
-- optionnally allow cancellation when the client is gone
-- track on-going qapi command(s) per client/session
-
-Existing qemu commands can be gradually replaced by async:true
-variants when needed, and by carefully reviewing the concurrency
-aspects. The async:true commands marshaller helpers are splitted in
-half, the calling and return functions. The command is called with a
-QmpReturn context, that can return immediately or later, using the
-generated return helper, which allows for step-by-step conversion.
-
-The screendump command is converted to an async:true version to solve
-rhbz#1230527. The command shows basic cancellation (this could be
-extended if needed). It could be further improved to do asynchronous
-IO write as well.
-
-v3:
-- complete rework, dropping the asynchronous commands visibility from
-  the protocol side entirely (until there is a real need for it)
-- rebased, with a few preliminary cleanup patches
-- teach asynchronous commands to HMP
-
-v2:
-- documentation fixes and improvements
-- fix calling async commands sync without id
-- fix bad hmp monitor assert
-- add a few extra asserts
-- add async with no-id failure and screendump test
-
-Marc-Andr=C3=A9 Lureau (38):
-  HACK: add back OOB
-  qmp-shell: learn to send commands with quoted arguments
-  Revert "qmp: isolate responses into io thread"
-  monitor: no need to save need_resume
-  monitor: further simplify previous patch
-  monitor: no need to remove desc before replacing it
-  json-parser: always set an error if return NULL
-  json-lexer: make it safe to call multiple times
-  json: remove useless return value from lexer/parser
-  tests: add a few qemu-qmp tests
-  tests: change /0.15/* tests to /qmp/*
-  tests: add a qmp success-response test
-  qga: process_event() simplification
-  monitor: simplify monitor_qmp_respond()
-  qmp: pass and return a QDict to qmp_dispatch()
-  qmp: move 'id' copy to qmp_dispatch()
-  qmp: constify qmp_is_oob()
-  qmp: add QmpSession
-  QmpSession: add a return_cb
-  QmpSession: add json parser and use it in qga
-  QmpSession: add a dispatch callback
-  monitor: use QmpSession parsing and common dispatch code
-  QmpSession: introduce QmpReturn
-  qmp: remove qmp_build_error_object()
-  qmp: remove need for qobject_from_jsonf()
-  qmp: fold do_qmp_dispatch() in qmp_dispatch()
-  QmpSession: keep a queue of pending commands
-  QmpSession: return orderly
-  qmp: introduce asynchronous command type
-  scripts: learn 'async' qapi commands
-  qmp: add qmp_return_is_cancelled()
-  monitor: add qmp_return_get_monitor()
-  console: graphic_hw_update return true if async
-  console: add graphic_hw_update_done()
-  console: make screendump asynchronous
-  monitor: start making qmp_human_monitor_command() asynchronous
-  monitor: teach HMP about asynchronous commands
-  hmp: call the asynchronous QMP screendump to fix outdated/glitches
-
- qapi/misc.json                          |   3 +-
- qapi/ui.json                            |   3 +-
- scripts/qapi/commands.py                | 149 +++++++--
- scripts/qapi/common.py                  |  12 +-
- scripts/qapi/doc.py                     |   2 +-
- scripts/qapi/introspect.py              |   2 +-
- hmp.h                                   |   3 +-
- hw/display/qxl.h                        |   2 +-
- include/monitor/monitor.h               |   3 +
- include/qapi/qmp/dispatch.h             |  85 ++++-
- include/qapi/qmp/json-lexer.h           |   4 +-
- include/qapi/qmp/json-streamer.h        |   4 +-
- include/ui/console.h                    |   7 +-
- hmp.c                                   |   6 +-
- hw/display/qxl-render.c                 |  14 +-
- hw/display/qxl.c                        |   8 +-
- migration/postcopy-ram.c                |   1 +
- monitor.c                               | 393 +++++++++---------------
- qapi/qmp-dispatch.c                     | 234 +++++++++++---
- qapi/qmp-registry.c                     |  27 +-
- qga/main.c                              |  73 +----
- qobject/json-lexer.c                    |  28 +-
- qobject/json-parser.c                   |   7 +-
- qobject/json-streamer.c                 |   8 +-
- tests/qmp-test.c                        | 146 ++++++++-
- tests/test-qmp-cmds.c                   | 206 +++++++++++--
- ui/console.c                            | 106 ++++++-
- hmp-commands.hx                         |   3 +-
- scripts/qmp/qmp-shell                   |   3 +-
- tests/Makefile.include                  |   6 +-
- tests/qapi-schema/qapi-schema-test.json |   7 +
- tests/qapi-schema/qapi-schema-test.out  |  10 +
- tests/qapi-schema/test-qapi.py          |   7 +-
- 33 files changed, 1078 insertions(+), 494 deletions(-)
- mode change 100644 =3D> 100755 scripts/qapi/doc.py
-
+diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.=
+h
+index afee7828cd..66ccf0357c 100644
+--- a/include/qapi/qmp/json-lexer.h
++++ b/include/qapi/qmp/json-lexer.h
+@@ -47,9 +47,9 @@ struct JSONLexer
+=20
+ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func);
+=20
+-int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
++void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
+=20
+-int json_lexer_flush(JSONLexer *lexer);
++void json_lexer_flush(JSONLexer *lexer);
+=20
+ void json_lexer_destroy(JSONLexer *lexer);
+=20
+diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-str=
+eamer.h
+index 00d8a23af8..cb808cf27d 100644
+--- a/include/qapi/qmp/json-streamer.h
++++ b/include/qapi/qmp/json-streamer.h
+@@ -36,10 +36,10 @@ typedef struct JSONMessageParser
+ void json_message_parser_init(JSONMessageParser *parser,
+                               void (*func)(JSONMessageParser *, GQueue *=
+));
+=20
+-int json_message_parser_feed(JSONMessageParser *parser,
++void json_message_parser_feed(JSONMessageParser *parser,
+                              const char *buffer, size_t size);
+=20
+-int json_message_parser_flush(JSONMessageParser *parser);
++void json_message_parser_flush(JSONMessageParser *parser);
+=20
+ void json_message_parser_destroy(JSONMessageParser *parser);
+=20
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 0eaba43a2c..89ccb180cc 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -290,7 +290,7 @@ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitt=
+er func)
+     lexer->x =3D lexer->y =3D 0;
+ }
+=20
+-static int json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
++static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+ {
+     int char_consumed, new_state;
+=20
+@@ -344,7 +344,7 @@ static int json_lexer_feed_char(JSONLexer *lexer, cha=
+r ch, bool flush)
+             g_string_truncate(lexer->token, 0);
+             new_state =3D IN_START;
+             lexer->state =3D new_state;
+-            return 0;
++            return;
+         default:
+             break;
+         }
+@@ -359,29 +359,22 @@ static int json_lexer_feed_char(JSONLexer *lexer, c=
+har ch, bool flush)
+         g_string_truncate(lexer->token, 0);
+         lexer->state =3D IN_START;
+     }
+-
+-    return 0;
+ }
+=20
+-int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
++void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
+ {
+     size_t i;
+=20
+     for (i =3D 0; i < size; i++) {
+-        int err;
+-
+-        err =3D json_lexer_feed_char(lexer, buffer[i], false);
+-        if (err < 0) {
+-            return err;
+-        }
++        json_lexer_feed_char(lexer, buffer[i], false);
+     }
+-
+-    return 0;
+ }
+=20
+-int json_lexer_flush(JSONLexer *lexer)
++void json_lexer_flush(JSONLexer *lexer)
+ {
+-    return lexer->state =3D=3D IN_START ? 0 : json_lexer_feed_char(lexer=
+, 0, true);
++    if (lexer->state !=3D IN_START) {
++        json_lexer_feed_char(lexer, 0, true);
++    }
+ }
+=20
+ void json_lexer_destroy(JSONLexer *lexer)
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index c51c2021f9..78dfff2aa0 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -118,15 +118,15 @@ void json_message_parser_init(JSONMessageParser *pa=
+rser,
+     json_lexer_init(&parser->lexer, json_message_process_token);
+ }
+=20
+-int json_message_parser_feed(JSONMessageParser *parser,
++void json_message_parser_feed(JSONMessageParser *parser,
+                              const char *buffer, size_t size)
+ {
+-    return json_lexer_feed(&parser->lexer, buffer, size);
++    json_lexer_feed(&parser->lexer, buffer, size);
+ }
+=20
+-int json_message_parser_flush(JSONMessageParser *parser)
++void json_message_parser_flush(JSONMessageParser *parser)
+ {
+-    return json_lexer_flush(&parser->lexer);
++    json_lexer_flush(&parser->lexer);
+ }
+=20
+ void json_message_parser_destroy(JSONMessageParser *parser)
 --=20
 2.17.0.rc1.1.g4c4f2b46a3
