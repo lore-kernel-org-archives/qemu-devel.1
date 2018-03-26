@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0QXu-0007K7-35
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:44:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0QYj-0007qI-O1
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0QXq-0002Aw-W5
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:44:14 -0400
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35861)
+	(envelope-from <pbonzini@redhat.com>) id 1f0QYg-0003D7-MW
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:45:05 -0400
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:45265)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0QXq-0002AN-QA
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:44:10 -0400
-Received: by mail-wm0-f68.google.com with SMTP id x82so14830148wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 04:44:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0QYg-0003CF-GA
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:45:02 -0400
+Received: by mail-wr0-f194.google.com with SMTP id u11so6273315wri.12
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 04:45:02 -0700 (PDT)
 References: <20180326112056.8420-1-vsementsov@virtuozzo.com>
-	<20180326112056.8420-6-vsementsov@virtuozzo.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa6a8e20-de93-a021-0129-9a6483b85453@redhat.com>
-Date: Mon, 26 Mar 2018 13:44:06 +0200
+Message-ID: <30d6538c-3f5b-c51f-2f53-fb6d4e03ef00@redhat.com>
+Date: Mon, 26 Mar 2018 13:44:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180326112056.8420-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20180326112056.8420-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/7] blockdev: refactor
- block-dirty-bitmap-clear transaction
+Subject: Re: [Qemu-devel] [PATCH 0/7] Dirty bitmaps fixing and refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +33,28 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.o
 Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 
 On 26/03/2018 13:20, Vladimir Sementsov-Ogievskiy wrote:
-> bdrv_clear_dirty_bitmap do not fail, so we can call it in transaction
-> commit, avoiding any rollback.
+> Nothing critical here.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  blockdev.c | 16 +---------------
->  1 file changed, 1 insertion(+), 15 deletions(-)
+> 01 - these functions are unused for now, but the will be used in
+>      the qmp bitmaps api.
 > 
-> diff --git a/blockdev.c b/blockdev.c
-> index c31bf3d98d..88eae60c1c 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2050,7 +2050,6 @@ typedef struct BlockDirtyBitmapState {
->      BlkActionState common;
->      BdrvDirtyBitmap *bitmap;
->      BlockDriverState *bs;
-> -    HBitmap *backup;
->      bool prepared;
->  } BlockDirtyBitmapState;
->  
-> @@ -2129,18 +2128,6 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
->          error_setg(errp, "Cannot clear a readonly bitmap");
->          return;
->      }
-> -
-> -    bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
-> -}
-> -
-> -static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-> -{
-> -    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-> -                                             common, common);
-> -
-> -    if (state->backup) {
-> -        bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
-> -    }
+> Vladimir Sementsov-Ogievskiy (7):
+>   block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_bitmap
+>   dirty-bitmaps: fix comment about dirty_bitmap_mutex
+>   dirty-bitmap: remove missed bdrv_dirty_bitmap_get_autoload header
+>   dirty-bitmap: separate unused meta-bitmap related functions
+>   blockdev: refactor block-dirty-bitmap-clear transaction
+>   block/dirty-bitmap: bdrv_clear_dirty_bitmap: drop unused parameter
+>   blockdev: unify block-dirty-bitmap-clear command and transaction
+>     action
+> 
+>  include/block/block_int.h    | 14 +++++----
+>  include/block/dirty-bitmap.h | 15 ++++++----
+>  block/dirty-bitmap.c         | 23 +++++++++------
+>  blockdev.c                   | 69 ++++++++++++++------------------------------
+>  4 files changed, 54 insertions(+), 67 deletions(-)
+> 
 
-Isn't bdrv_undo_clear_dirty_bitmap new unused?
-
-Thanks,
+Looks good apart from some dead code still being there.
 
 Paolo
-
->  }
->  
->  static void block_dirty_bitmap_clear_commit(BlkActionState *common)
-> @@ -2148,7 +2135,7 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
->      BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
->                                               common, common);
->  
-> -    hbitmap_free(state->backup);
-> +    bdrv_clear_dirty_bitmap(state->bitmap, NULL);
->  }
->  
->  static void abort_prepare(BlkActionState *common, Error **errp)
-> @@ -2210,7 +2197,6 @@ static const BlkActionOps actions[] = {
->          .instance_size = sizeof(BlockDirtyBitmapState),
->          .prepare = block_dirty_bitmap_clear_prepare,
->          .commit = block_dirty_bitmap_clear_commit,
-> -        .abort = block_dirty_bitmap_clear_abort,
->      }
->  };
->  
-> 
