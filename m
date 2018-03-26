@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f0NeL-0003LA-Ps
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:38:42 -0400
+	(envelope-from <lvivier@redhat.com>) id 1f0NeV-0003Sb-R3
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:38:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f0NeI-0000M0-NU
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:38:41 -0400
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3d85cfec-e3d8-8506-f65f-2cbed50980bd@redhat.com>
-Date: Mon, 26 Mar 2018 10:38:22 +0200
+	(envelope-from <lvivier@redhat.com>) id 1f0NeS-0000R5-Pz
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:38:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36404 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1f0NeS-0000Qc-Lp
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 04:38:48 -0400
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<1520860275-101576-3-git-send-email-imammedo@redhat.com>
+	<20180323204218.GC28161@localhost.localdomain>
+	<ebc23db4-34f8-5774-2486-6773af015d30@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <a4855529-fc57-8313-0caa-aa635d24b626@redhat.com>
+Date: Mon, 26 Mar 2018 10:38:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <1521156300-19296-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+In-Reply-To: <ebc23db4-34f8-5774-2486-6773af015d30@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/7] s390x/kvm: interface to interpret
- AP instructions
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/9] numa: split out NumaOptions parsing
+ into parse_NumaOptions()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On 16.03.2018 00:24, Tony Krowiak wrote:
-> The VFIO AP device exploits interpretive execution of AP
-> instructions (APIE). APIE is enabled by setting a device attribute
-> via the KVM_SET_DEVICE_ATTR ioctl.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-> ---
->  target/s390x/kvm.c       |   16 ++++++++++++++++
->  target/s390x/kvm_s390x.h |    2 ++
->  2 files changed, 18 insertions(+), 0 deletions(-)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 33e5ec3..2812e28 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -277,6 +277,22 @@ static void kvm_s390_init_dea_kw(void)
->      }
->  }
->  
-> +int kvm_s390_set_interpret_ap(uint8_t enable)
-> +{
-> +    struct kvm_device_attr attribute = {
-> +        .group = KVM_S390_VM_CRYPTO,
-> +        .attr  = KVM_S390_VM_CRYPTO_INTERPRET_AP,
-> +        .addr = 1,
-> +    };
-> +
-> +    if (!kvm_vm_check_attr(kvm_state, KVM_S390_VM_CRYPTO,
-> +                           KVM_S390_VM_CRYPTO_INTERPRET_AP)) {
-> +        return -EOPNOTSUPP;
-> +    }
-> +
-> +    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attribute);
-> +}
-> +
->  void kvm_s390_crypto_reset(void)
->  {
->      if (s390_has_feat(S390_FEAT_MSA_EXT_3)) {
-> diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
-> index 34ee7e7..0d6c6e7 100644
-> --- a/target/s390x/kvm_s390x.h
-> +++ b/target/s390x/kvm_s390x.h
-> @@ -40,4 +40,6 @@ void kvm_s390_crypto_reset(void);
->  void kvm_s390_restart_interrupt(S390CPU *cpu);
->  void kvm_s390_stop_interrupt(S390CPU *cpu);
->  
-> +int kvm_s390_set_interpret_ap(uint8_t enable);
-> +
->  #endif /* KVM_S390X_H */
-> 
+On 23/03/2018 21:49, Eric Blake wrote:
+> On 03/23/2018 03:42 PM, Eduardo Habkost wrote:
+>> On Mon, Mar 12, 2018 at 02:11:08PM +0100, Igor Mammedov wrote:
+>>> it will allow to reuse parse_NumaOptions() for parsing
+>>> configuration commands received via QMP interface
+>>>
+>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>=20
+>>> =C2=A0 end:
+>>> +=C2=A0=C2=A0=C2=A0 if (err) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, err=
+);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>
+>> "if (err)" is not necessary here.=C2=A0 See
+>> scripts/coccinelle/error_propagate_null.cocci.
+>>
+>=20
+>>> +=C2=A0=C2=A0=C2=A0 parse_NumaOptions(ms, object, &err);
+>>> +
+>>> +end:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qapi_free_NumaOptions(object);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (err) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report_e=
+rr(err);
+>>
+>> We can fix this one too while at it.
+>=20
+> Hmm - this is the same script mentioned here:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06293.html
+>=20
+> Except that patch didn't pick up this file.=C2=A0 Why is Coccinelle not
+> seeing this?
+>=20
 
-Wonder if a capability - like we use e.g. for SIGP user space
-interpretation - would be a better fit.
-
-We can provide the AP feature to the guest in case:
-- KVM_S390_VM_CPU_FEAT_AP ("interpretation support") is available
-- KVM_S390_VM_CRYPTO_INTERPRET_AP ("interception support") is available
-
-I am missing the second check in your code. (for now you only rely on
-KVM_S390_VM_CPU_FEAT_AP)
-
-I think you have to change the order of the patches so they work also
-properly when bisectin.
-
--- 
+The script only catch error_propagate(), not error_report_err(). And
+error_report_err() doesn't check if err is NULL.
 
 Thanks,
-
-David / dhildenb
+Laurent
