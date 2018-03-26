@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f0QBT-00045Y-Mo
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:21:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1f0QUl-000618-Ol
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f0QBR-0007Nn-4c
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:21:03 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 26 Mar 2018 14:20:55 +0300
-Message-Id: <20180326112056.8420-7-vsementsov@virtuozzo.com>
-In-Reply-To: <20180326112056.8420-1-vsementsov@virtuozzo.com>
-References: <20180326112056.8420-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 6/7] block/dirty-bitmap:
- bdrv_clear_dirty_bitmap: drop unused parameter
+	(envelope-from <bounces@canonical.com>) id 1f0QUi-0000Cr-HV
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:40:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55188)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f0QUi-0000CK-B1
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:40:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f0QUh-0005j4-Ao
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 11:40:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 50C172E8D38
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 11:40:55 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Mar 2018 11:33:11 -0000
+From: Eduardo Otubo <1721224@bugs.launchpad.net>
+Reply-To: Bug 1721224 <1721224@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150711240619.28742.14769362567837002713.malonedeb@gac.canonical.com>
+Message-Id: <152206399123.18662.1321073317865405933.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1721224] Re: qemu crashes with Assertion
+ `!bus->dma[0] && !bus->dma[1]' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,82 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
-Drop parameter "HBitmap **out" which is unused now, all callers set
-it to NULL.
+v4 patch posted:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg06565.html
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/block_int.h |  2 +-
- block/dirty-bitmap.c      | 14 +++++---------
- blockdev.c                |  4 ++--
- 3 files changed, 8 insertions(+), 12 deletions(-)
+-- =
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index e5af7820ff..b2ef0f472d 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1078,7 +1078,7 @@ bool blk_dev_is_medium_locked(BlockBackend *blk);
- 
- void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
- 
--void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
-+void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in);
- 
- void bdrv_inc_in_flight(BlockDriverState *bs);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 1812e17549..139102f24e 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -591,19 +591,15 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-     bdrv_dirty_bitmap_unlock(bitmap);
- }
- 
--void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
-+void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap)
- {
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
-+
-     bdrv_dirty_bitmap_lock(bitmap);
--    if (!out) {
--        hbitmap_reset_all(bitmap->bitmap);
--    } else {
--        HBitmap *backup = bitmap->bitmap;
--        bitmap->bitmap = hbitmap_alloc(bitmap->size,
--                                       hbitmap_granularity(backup));
--        *out = backup;
--    }
-+
-+    hbitmap_reset_all(bitmap->bitmap);
-+
-     bdrv_dirty_bitmap_unlock(bitmap);
- }
- 
-diff --git a/blockdev.c b/blockdev.c
-index 88eae60c1c..54e1ba8f44 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2135,7 +2135,7 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
-     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-                                              common, common);
- 
--    bdrv_clear_dirty_bitmap(state->bitmap, NULL);
-+    bdrv_clear_dirty_bitmap(state->bitmap);
- }
- 
- static void abort_prepare(BlkActionState *common, Error **errp)
-@@ -2906,7 +2906,7 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-         return;
-     }
- 
--    bdrv_clear_dirty_bitmap(bitmap, NULL);
-+    bdrv_clear_dirty_bitmap(bitmap);
- }
- 
- BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
--- 
-2.11.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1721224
+
+Title:
+  qemu crashes with Assertion `!bus->dma[0] && !bus->dma[1]' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Re-production steps:
+  git clone today's qemu git tree (4th Oct 2017)
+  ./configure --target-list=3Dppc64-softmmu && make -j 8
+
+  Run the device-crash-test from scripts folder, seeing the following
+  error
+
+  INFO: running test case: machine=3Dprep binary=3Dppc64-softmmu/qemu-syste=
+m-ppc64 device=3Di82374 accel=3Dtcg
+  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
+v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
+n,mode=3Dcontrol -display none -vga none -S -machine prep,accel=3Dtcg -devi=
+ce i82374
+  CRITICAL: failed: machine=3Dprep binary=3Dppc64-softmmu/qemu-system-ppc64=
+ device=3Di82374 accel=3Dtcg
+  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine prep,accel=
+=3Dtcg -device i82374
+  CRITICAL: log: qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Asse=
+rtion `!bus->dma[0] && !bus->dma[1]' failed.
+  CRITICAL: exit code: -6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1721224/+subscriptions
