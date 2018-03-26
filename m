@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f0PIW-0001xJ-Br
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:24:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0PNf-0003gn-Oi
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f0PIV-0004rd-4K
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:24:16 -0400
-References: <20180323164254.26487-2-pbonzini@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <39eabba4-ce6d-8b5b-f3a8-78dde910ec2e@virtuozzo.com>
-Date: Mon, 26 Mar 2018 13:24:04 +0300
+	(envelope-from <kwolf@redhat.com>) id 1f0PNe-0007dM-UL
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:29:35 -0400
+Date: Mon, 26 Mar 2018 12:29:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180326102919.GB5267@localhost.localdomain>
+References: <20180323034356.72130-1-haoqf@linux.vnet.ibm.com>
+	<20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180323164254.26487-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] block: simplify code around releasing
- bitmaps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] iotests: fix test case 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,156 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, stefanha@redhat.com, famz@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com
 
-23.03.2018 19:42, Paolo Bonzini wrote:
-> QLIST_REMOVE does not require walking the list, and once the "bitmap"
-> argument is removed from bdrv_do_release_matching_dirty_bitmap_locked
-> the code simplifies a lot and it is worth inlining everything in the
-> callers of bdrv_do_release_matching_dirty_bitmap.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   block/dirty-bitmap.c | 81 +++++++++++++++++++---------------------------------
->   1 file changed, 30 insertions(+), 51 deletions(-)
->
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 13bb5066a4..c0fb49bf7b 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -250,48 +250,15 @@ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
->   }
->   
->   /* Called within bdrv_dirty_bitmap_lock..unlock */
+Am 23.03.2018 um 04:43 hat QingFeng Hao geschrieben:
+> Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_shutdown()".
+> It's because of the newly introduced function vm_shutdown calls bdrv_drain_all,
+> which is called later by bdrv_close_all. bdrv_drain_all resumes the jobs
+> that doubles the speed and offset is doubled.
+> Some jobs' status are changed as well.
+> 
+> The fix is to not resume the jobs that are already yielded and also change
+> 185.out accordingly.
+> 
+> Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
 
-Worth adding "Called with BQL taken" to the comment?
+Stefan already commented on the fix itself, but I want to add two more
+points:
 
-> -static void bdrv_do_release_matching_dirty_bitmap_locked(
-> -    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-> -    bool (*cond)(BdrvDirtyBitmap *bitmap))
-> +static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
->   {
-> -    BdrvDirtyBitmap *bm, *next;
-> -
-> -    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
-> -        if ((!bitmap || bm == bitmap) && (!cond || cond(bm))) {
-> -            assert(!bm->active_iterators);
-> -            assert(!bdrv_dirty_bitmap_frozen(bm));
-> -            assert(!bm->meta);
-> -            QLIST_REMOVE(bm, list);
-> -            hbitmap_free(bm->bitmap);
-> -            g_free(bm->name);
-> -            g_free(bm);
-> -
-> -            if (bitmap) {
-> -                return;
-> -            }
-> -        }
-> -    }
-> -
-> -    if (bitmap) {
-> -        abort();
-> -    }
-> -}
-> -
-> -/* Called with BQL taken.  */
-> -static void bdrv_do_release_matching_dirty_bitmap(
-> -    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-> -    bool (*cond)(BdrvDirtyBitmap *bitmap))
-> -{
-> -    bdrv_dirty_bitmaps_lock(bs);
-> -    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, cond);
-> -    bdrv_dirty_bitmaps_unlock(bs);
-> -}
-> -
-> -/* Called within bdrv_dirty_bitmap_lock..unlock */
-> -static void bdrv_release_dirty_bitmap_locked(BlockDriverState *bs,
-> -                                             BdrvDirtyBitmap *bitmap)
-> -{
-> -    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, NULL);
-> +    assert(!bitmap->active_iterators);
-> +    assert(!bdrv_dirty_bitmap_frozen(bitmap));
-> +    assert(!bitmap->meta);
-> +    QLIST_REMOVE(bitmap, list);
-> +    hbitmap_free(bitmap->bitmap);
-> +    g_free(bitmap->name);
-> +    g_free(bitmap);
->   }
->   
->   /**
-> @@ -344,7 +311,7 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->           error_setg(errp, "Merging of parent and successor bitmap failed");
->           return NULL;
->       }
-> -    bdrv_release_dirty_bitmap_locked(bs, successor);
-> +    bdrv_release_dirty_bitmap_locked(successor);
->       parent->successor = NULL;
->   
->       return parent;
-> @@ -382,15 +349,12 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
->       bdrv_dirty_bitmaps_unlock(bs);
->   }
->   
-> -static bool bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
-> -{
-> -    return !!bdrv_dirty_bitmap_name(bitmap);
-> -}
-> -
->   /* Called with BQL taken.  */
->   void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
->   {
-> -    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, NULL);
-> +    bdrv_dirty_bitmaps_lock(bs);
-> +    bdrv_release_dirty_bitmap_locked(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bs);
->   }
->   
->   /**
-> @@ -401,7 +365,15 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
->    */
->   void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
->   {
-> -    bdrv_do_release_matching_dirty_bitmap(bs, NULL, bdrv_dirty_bitmap_has_name);
-> +    BdrvDirtyBitmap *bm, *next;
-> +
-> +    bdrv_dirty_bitmaps_lock(bs);
-> +    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
-> +        if (bdrv_dirty_bitmap_name(bm)) {
-> +            bdrv_release_dirty_bitmap_locked(bm);
-> +        }
-> +    }
-> +    bdrv_dirty_bitmaps_unlock(bs);
->   }
->   
->   /**
-> @@ -412,8 +384,15 @@ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
->    */
+Please change your subject line. "iotests: fix test case 185" means that
+you are fixing the test case, not qemu code that makes the test case
+fail. The subject line should describe the actual change. In all
+likelihood it will start with "blockjob:" rather than "iotests:".
 
-worth adding "Called with BQL taken." to the comment? 
-bdrv_release_named_dirty_bitmaps functions has it.
+> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+> index fc645dac68..f8f208bbcf 100644
+> --- a/include/block/blockjob.h
+> +++ b/include/block/blockjob.h
+> @@ -99,6 +99,11 @@ typedef struct BlockJob {
+>      bool ready;
+>  
+>      /**
+> +     * Set to true when the job is yielded.
+> +     */
+> +    bool yielded;
 
->   void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs)
->   {
-> -    bdrv_do_release_matching_dirty_bitmap(bs, NULL,
-> -                                          bdrv_dirty_bitmap_get_persistance);
-> +    BdrvDirtyBitmap *bm, *next;
-> +
-> +    bdrv_dirty_bitmaps_lock(bs);
-> +    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
-> +        if (bdrv_dirty_bitmap_get_persistance(bm)) {
-> +            bdrv_release_dirty_bitmap_locked(bm);
-> +        }
-> +    }
-> +    bdrv_dirty_bitmaps_unlock(bs);
->   }
->   
->   /**
+This is the same as !busy, so we don't need a new field for this.
 
-anyway,
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
--- 
-Best regards,
-Vladimir
+Kevin
