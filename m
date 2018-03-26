@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0X2G-0005V6-IO
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:40:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0X47-0006UR-F8
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0X2F-0000Lh-NA
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:40:00 -0400
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4013d078-5496-1b7f-dab3-c70ad75ac061@redhat.com>
-Date: Mon, 26 Mar 2018 20:39:44 +0200
+	(envelope-from <eblake@redhat.com>) id 1f0X44-0002BB-82
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:41:55 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 26 Mar 2018 13:41:47 -0500
+Message-Id: <20180326184147.1565719-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="J5lHQqrR8geqBpwoMRwZ9zBIzrMFMToTV"
-Subject: [Qemu-devel] nbd BLOCK_STATUS with -m32
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-2.12] maint: Add .mailmap entries for
+ patches claiming list authorship
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,71 +21,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J5lHQqrR8geqBpwoMRwZ9zBIzrMFMToTV
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <4013d078-5496-1b7f-dab3-c70ad75ac061@redhat.com>
-Subject: nbd BLOCK_STATUS with -m32
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The list did not author any patches, but it does rewrite the
+'From:' header of messages sent from any domain with restrictive
+SPF policies that would otherwise prevent the message from reaching
+all list recipients.  If a maintainer is not careful to undo the
+list header rewrite, and the author did not include a manual
+'From:' line in the body to fix the munged header, then 'git am'
+happily attributes the patch to the list.  Add some mailmap
+entries to correct the few that have escaped our attention; while
+we also work on improving the tooling to catch the problem in
+the future before a merge is even made.
 
-Hi,
+Also improve the comments occurring in the file, including line
+length improvements.
 
-iotests 209 and 123 fail under 32-bit (or at least with -m32), both with
-gcc and mingw.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-Diff for 209:
+Probably worth inclusion in 2.12-rc1, since it makes statistics
+about the release easier to follow.
 
-@@ -1,2 +1,2 @@
--[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data": true=
-},
--{ "start": 524288, "length": 524288, "depth": 0, "zero": true, "data":
-false}]
-+qemu-img: Protocol error: invalid payload for NBD_REPLY_TYPE_BLOCK_STATU=
-S
-+qemu-img: Could not read file metadata: Invalid argument
+ .mailmap | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-
-Diff for 123:
-
-@@ -3,6 +3,10 @@
- Formatting 'TEST_DIR/source.IMGFMT', fmt=3DIMGFMT size=3D1048576
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-img: Protocol error: invalid payload for NBD_REPLY_TYPE_BLOCK_STATU=
-S
-+qemu-img: error getting block status at offset 0: Invalid argument
-+qemu-img: error while writing sector 0: Input/output error
-+Pattern verification failed at offset 0, 1048576 bytes
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-
-
-Max
-
-
---J5lHQqrR8geqBpwoMRwZ9zBIzrMFMToTV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlq5PnASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AnskH/3PS8CsnVyFpYqiDEuXh7wnuGS1Ii3Wr
-hEjFy5CPn6r4areY11jpQsI91RsswJ8inRTmlWq63/k4Qb/VBv3UWTWp/oPbno2F
-kv9IC+SUHwXUIyaUbVPP/to7js1abFW+ogDUCZJqtMeF9RfEi313yMRB603GxOML
-AsBvPVunrVKV5h0S1ErV+MfbM1S8dOyUj7GQw2cd1Wf+oDaJPZrLaP49xGOV9P7K
-vrKn67Dr4bhfzNkQGWLQ7km0KOqrZW1HV72ENG5CME+ERu8iJ5JT+AQiJ5I13xdd
-d4JyHLrzTN0eKE53Udrvg7hTT3B3gHzoo0PIQvHAWkOUzrwgNafED20=
-=3QBR
------END PGP SIGNATURE-----
-
---J5lHQqrR8geqBpwoMRwZ9zBIzrMFMToTV--
+diff --git a/.mailmap b/.mailmap
+index cf689b9ec99..b02c357e9a1 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -1,6 +1,7 @@
+-# This mailmap just translates the weird addresses from the original imp=
+ort into git
+-# into proper addresses so that they are counted properly in git shortlo=
+g output.
+-#
++# This mailmap fixes up author names/addresses.
++
++# The first section translates weird addresses from the original git imp=
+ort
++# into proper addresses so that they are counted properly by git shortlo=
+g.
+ Andrzej Zaborowski <balrogg@gmail.com> balrog <balrog@c046a42c-6fe2-441c=
+-8c8c-71466251a162>
+ Anthony Liguori <anthony@codemonkey.ws> aliguori <aliguori@c046a42c-6fe2=
+-441c-8c8c-71466251a162>
+ Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm=
+.com>
+@@ -15,10 +16,19 @@ Paul Burton <paul.burton@mips.com> <paul.burton@imgte=
+c.com>
+ Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-714662=
+51a162>
+ malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
++
+ # There is also a:
+ #    (no author) <(no author)@c046a42c-6fe2-441c-8c8c-71466251a162>
+ # for the cvs2svn initialization commit e63c3dc74bf.
+-#
++
++# Next, translate a few commits where mailman rewrote the From: line due
++# to strict SPF, although we prefer to avoid adding more entries like th=
+at.
++Ed Swierk <eswierk@skyportsystems.com> Ed Swierk via Qemu-devel <qemu-de=
+vel@nongnu.org>
++Ian McKellar <ianloic@google.com> Ian McKellar via Qemu-devel <qemu-deve=
+l@nongnu.org>
++Julia Suvorova <jusual@mail.ru> Julia Suvorova via Qemu-devel <qemu-deve=
+l@nongnu.org>
++Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-dev=
+el <qemu-devel@nongnu.org>
++
++
+ # Also list preferred name forms where people have changed their
+ # git author config
+ Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+--=20
+2.14.3
