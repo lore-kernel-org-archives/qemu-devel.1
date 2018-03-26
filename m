@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0TlZ-00065Y-Jg
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:10:36 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tlc-00068Z-Ps
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0TlY-0003GI-J5
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:10:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57280 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0Tla-0003Hm-98
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:10:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52772 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1f0TlY-0003Fs-2w
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:10:32 -0400
+	id 1f0TlZ-0003HU-W1
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:10:34 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 26 Mar 2018 17:09:04 +0200
-Message-Id: <20180326150916.9602-27-marcandre.lureau@redhat.com>
+Date: Mon, 26 Mar 2018 17:09:05 +0200
+Message-Id: <20180326150916.9602-28-marcandre.lureau@redhat.com>
 In-Reply-To: <20180326150916.9602-1-marcandre.lureau@redhat.com>
 References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 26/38] qmp: fold do_qmp_dispatch() in
- qmp_dispatch()
+Subject: [Qemu-devel] [PATCH v3 27/38] QmpSession: keep a queue of pending
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +31,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-qmp_dispatch() is now a simple wrapper for do_qmp_dispatch(). In order
-to prepare for following asynchronous function, merge the two
-functions, which result in less code.
+The following commit will introduce asynchronous commands. Let's keep
+the client aware of the pending commands, so we can do interesting
+things like order the replies, or cancel pending operations when the
+client is gone.
+
+The queue needs a lock, since QmpSession may be used from multiple
+threads.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qapi/qmp-dispatch.c | 62 ++++++++++++++++++---------------------------
- 1 file changed, 25 insertions(+), 37 deletions(-)
+ include/qapi/qmp/dispatch.h |  4 ++++
+ qapi/qmp-dispatch.c         | 32 ++++++++++++++++++++++++++++++--
+ 2 files changed, 34 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 92079c0621..4a73cf88b3 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -114,47 +114,50 @@ QDict *qmp_dispatch_check_obj(const QObject *reques=
-t, Error **errp)
-     return dict;
- }
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index c5ac3bd41e..94a272a5fb 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -15,6 +15,7 @@
+ #define QAPI_QMP_DISPATCH_H
 =20
--static QObject *do_qmp_dispatch(QmpCommandList *cmds, QDict *dict,
--                                Error **errp)
-+void qmp_dispatch(QmpSession *session, QDict *req)
- {
--    Error *local_err =3D NULL;
-     const char *command;
--    QDict *args;
-+    QDict *args =3D NULL;
-     QmpCommand *cmd;
--    QObject *ret =3D NULL;
-+    Error *err =3D NULL;
+ #include "qemu/queue.h"
++#include "qemu/thread.h"
+ #include "qapi/qmp/json-streamer.h"
 =20
--    command =3D qdict_get_str(dict, "execute");
--    cmd =3D qmp_find_command(cmds, command);
-+    command =3D qdict_get_str(req, "execute");
-+    cmd =3D qmp_find_command(session->cmds, command);
-     if (cmd =3D=3D NULL) {
--        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-+        error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "The command %s has not been found", command);
--        return NULL;
-+        goto end;
-     }
-     if (!cmd->enabled) {
--        error_setg(errp, "The command %s has been disabled for this inst=
-ance",
-+        error_setg(&err, "The command %s has been disabled for this inst=
-ance",
-                    command);
--        return NULL;
-+        goto end;
-     }
+ typedef struct QmpReturn QmpReturn;
+@@ -48,11 +49,14 @@ struct QmpSession {
+     QmpDispatch *dispatch_cb;
+     QmpDispatchReturn *return_cb;
+     QmpCommandList *cmds;
++    QemuMutex pending_lock;
++    QTAILQ_HEAD(, QmpReturn) pending;
+ };
 =20
--    if (!qdict_haskey(dict, "arguments")) {
-+    if (!qdict_haskey(req, "arguments")) {
-         args =3D qdict_new();
-     } else {
--        args =3D qdict_get_qdict(dict, "arguments");
-+        args =3D qdict_get_qdict(req, "arguments");
-         QINCREF(args);
-     }
-=20
--    cmd->fn(args, &ret, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--    } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
--        g_assert(!ret);
--    } else if (!ret) {
--        ret =3D QOBJECT(qdict_new());
-+    {
-+        QObject *ret =3D NULL;
-+        cmd->fn(args, &ret, &err);
-+        if (err || cmd->options & QCO_NO_SUCCESS_RESP) {
-+            assert(!ret);
-+            goto end;
-+        } else if (!ret) {
-+            ret =3D QOBJECT(qdict_new());
-+        }
-+        qmp_return(qmp_return_new(session, req), ret);
-     }
-=20
-+end:
-+    if (err) {
-+        qmp_return_error(qmp_return_new(session, req), err);
-+    }
-     QDECREF(args);
--
--    return ret;
- }
+ struct QmpReturn {
+     QmpSession *session;
+     QDict *rsp;
++    QTAILQ_ENTRY(QmpReturn) entry;
+ };
 =20
  /*
-@@ -230,18 +233,3 @@ void qmp_session_destroy(QmpSession *session)
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 4a73cf88b3..2c162642cb 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -31,11 +31,24 @@ QmpReturn *qmp_return_new(QmpSession *session, const =
+QDict *req)
+         qdict_put_obj(qret->rsp, "id", id);
+     }
+=20
++    qemu_mutex_lock(&session->pending_lock);
++    QTAILQ_INSERT_TAIL(&session->pending, qret, entry);
++    qemu_mutex_unlock(&session->pending_lock);
++
+     return qret;
+ }
+=20
+ void qmp_return_free(QmpReturn *qret)
+ {
++    QmpSession *session =3D qret->session;
++
++    if (session) {
++        qemu_mutex_lock(&session->pending_lock);
++    }
++    QTAILQ_REMOVE(&session->pending, qret, entry);
++    if (session) {
++        qemu_mutex_unlock(&session->pending_lock);
++    }
+     QDECREF(qret->rsp);
+     g_free(qret);
+ }
+@@ -43,7 +56,9 @@ void qmp_return_free(QmpReturn *qret)
+ void qmp_return(QmpReturn *qret, QObject *rsp)
+ {
+     qdict_put_obj(qret->rsp, "return", rsp ?: QOBJECT(qdict_new()));
+-    qret->session->return_cb(qret->session, qret->rsp);
++    if (qret->session) {
++        qret->session->return_cb(qret->session, qret->rsp);
++    }
+     qmp_return_free(qret);
+ }
+=20
+@@ -55,7 +70,9 @@ void qmp_return_error(QmpReturn *qret, Error *err)
+     qdict_put_str(qdict, "desc", error_get_pretty(err));
+     qdict_put_obj(qret->rsp, "error", QOBJECT(qdict));
+     error_free(err);
+-    qret->session->return_cb(qret->session, qret->rsp);
++    if (qret->session) {
++        qret->session->return_cb(qret->session, qret->rsp);
++    }
+     qmp_return_free(qret);
+ }
+=20
+@@ -220,16 +237,27 @@ void qmp_session_init(QmpSession *session,
+     session->cmds =3D cmds;
+     session->dispatch_cb =3D dispatch_cb;
+     session->return_cb =3D return_cb;
++    qemu_mutex_init(&session->pending_lock);
++    QTAILQ_INIT(&session->pending);
+ }
+=20
+ void qmp_session_destroy(QmpSession *session)
+ {
++    QmpReturn *ret, *next;
++
+     if (!session->return_cb) {
+         return;
+     }
+=20
++    qemu_mutex_lock(&session->pending_lock);
++    QTAILQ_FOREACH_SAFE(ret, &session->pending, entry, next) {
++        ret->session =3D NULL;
++        QTAILQ_REMOVE(&session->pending, ret, entry);
++    }
++    qemu_mutex_unlock(&session->pending_lock);
+     session->cmds =3D NULL;
+     session->dispatch_cb =3D NULL;
      session->return_cb =3D NULL;
      json_message_parser_destroy(&session->parser);
++    qemu_mutex_destroy(&session->pending_lock);
  }
--
--void qmp_dispatch(QmpSession *session, QDict *req)
--{
--    QmpReturn *qret =3D qmp_return_new(session, req);
--    Error *err =3D NULL;
--    QObject *ret;
--
--    ret =3D do_qmp_dispatch(session->cmds, req, &err);
--    if (err) {
--        assert(!ret);
--        qmp_return_error(qret, err);
--    } else if (ret) {
--        qmp_return(qret, ret);
--    }
--}
 --=20
 2.17.0.rc1.1.g4c4f2b46a3
