@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0TEV-00035l-5S
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0TER-00032U-5g
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f0TEU-0004Bq-9I
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f0TEN-0003yb-Kb
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 10:36:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 26 Mar 2018 16:35:52 +0200
-Message-Id: <20180326143600.7724-12-kwolf@redhat.com>
+Date: Mon, 26 Mar 2018 16:35:49 +0200
+Message-Id: <20180326143600.7724-9-kwolf@redhat.com>
 In-Reply-To: <20180326143600.7724-1-kwolf@redhat.com>
 References: <20180326143600.7724-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/19] qemu-iotests: Enable 025 for luks
+Subject: [Qemu-devel] [PULL 08/19] vdi: Change 'static' create option to
+ 'preallocation' in QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +23,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-We want to test resizing even for luks. The only change that is needed
-is to explicitly zero out new space for luks because it's undefined.
+What static=on really does is what we call metadata preallocation for
+other block drivers. While we can still change the QMP interface, make
+it more consistent by using 'preallocation' for VDI, too.
+
+This doesn't implement any new functionality, so the only supported
+preallocation modes are 'off' and 'metadata' for now.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tests/qemu-iotests/025 | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ qapi/block-core.json |  7 +++----
+ block/vdi.c          | 24 ++++++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-index f5e672e6b3..70dd5f10aa 100755
---- a/tests/qemu-iotests/025
-+++ b/tests/qemu-iotests/025
-@@ -38,7 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.filter
- . ./common.pattern
-=20
--_supported_fmt raw qcow2 qed
-+_supported_fmt raw qcow2 qed luks
- _supported_proto file sheepdog rbd nfs
- _supported_os Linux
-=20
-@@ -62,6 +62,13 @@ length
- EOF
- _check_test_img
-=20
-+# bdrv_truncate() doesn't zero the new space, so we need to do that expl=
-icitly.
-+# We still want to test automatic zeroing for other formats even though
-+# bdrv_truncate() doesn't guarantee it.
-+if [ "$IMGFMT" =3D=3D "luks" ]; then
-+    $QEMU_IO -c "write -z $small_size $((big_size - small_size))" "$TEST=
-_IMG" > /dev/null
-+fi
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1088ab0c78..c50517bff3 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3943,16 +3943,15 @@
+ #
+ # @file             Node to create the image format on
+ # @size             Size of the virtual disk in bytes
+-# @static           Whether to create a statically (true) or
+-#                   dynamically (false) allocated image
+-#                   (default: false, i.e. dynamic)
++# @preallocation    Preallocation mode for the new image (allowed values: off,
++#                   metadata; default: off)
+ #
+ # Since: 2.12
+ ##
+ { 'struct': 'BlockdevCreateOptionsVdi',
+   'data': { 'file':             'BlockdevRef',
+             'size':             'size',
+-            '*static':          'bool' } }
++            '*preallocation':   'PreallocMode' } }
+ 
+ ##
+ # @BlockdevVhdxSubformat:
+diff --git a/block/vdi.c b/block/vdi.c
+index d939b034c4..73c059e69d 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -728,7 +728,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+     int ret = 0;
+     uint64_t bytes = 0;
+     uint32_t blocks;
+-    uint32_t image_type = VDI_TYPE_DYNAMIC;
++    uint32_t image_type;
+     VdiHeader header;
+     size_t i;
+     size_t bmap_size;
+@@ -744,9 +744,22 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+ 
+     /* Validate options and set default values */
+     bytes = vdi_opts->size;
+-    if (vdi_opts->q_static) {
 +
- echo
- echo "=3D=3D=3D Verifying image size after reopen"
- $QEMU_IO -c "length" "$TEST_IMG"
---=20
++    if (!vdi_opts->has_preallocation) {
++        vdi_opts->preallocation = PREALLOC_MODE_OFF;
++    }
++    switch (vdi_opts->preallocation) {
++    case PREALLOC_MODE_OFF:
++        image_type = VDI_TYPE_DYNAMIC;
++        break;
++    case PREALLOC_MODE_METADATA:
+         image_type = VDI_TYPE_STATIC;
++        break;
++    default:
++        error_setg(errp, "Preallocation mode not supported for vdi");
++        return -EINVAL;
+     }
++
+ #ifndef CONFIG_VDI_STATIC_IMAGE
+     if (image_type == VDI_TYPE_STATIC) {
+         ret = -ENOTSUP;
+@@ -874,6 +887,7 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+     BlockdevCreateOptions *create_options = NULL;
+     BlockDriverState *bs_file = NULL;
+     uint64_t block_size = DEFAULT_CLUSTER_SIZE;
++    bool is_static = false;
+     Visitor *v;
+     Error *local_err = NULL;
+     int ret;
+@@ -895,6 +909,9 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+         goto done;
+     }
+ #endif
++    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_STATIC, false)) {
++        is_static = true;
++    }
+ 
+     qdict = qemu_opts_to_qdict_filtered(opts, NULL, &vdi_create_opts, true);
+ 
+@@ -913,6 +930,9 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+ 
+     qdict_put_str(qdict, "driver", "vdi");
+     qdict_put_str(qdict, "file", bs_file->node_name);
++    if (is_static) {
++        qdict_put_str(qdict, "preallocation", "metadata");
++    }
+ 
+     /* Get the QAPI object */
+     v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
+-- 
 2.13.6
