@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ybu-0003zl-Lq
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f0Ybx-00041a-Uh
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ybt-0000Ie-Qx
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f0Ybs-0000Ho-1U
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:57 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 26 Mar 2018 22:20:39 +0200
-Message-Id: <20180326202039.21070-5-mreitz@redhat.com>
+Date: Mon, 26 Mar 2018 22:20:38 +0200
+Message-Id: <20180326202039.21070-4-mreitz@redhat.com>
 In-Reply-To: <20180326202039.21070-1-mreitz@redhat.com>
 References: <20180326202039.21070-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] vmdk: return ERROR when cluster sector is
- larger than vmdk limitation
+Subject: [Qemu-devel] [PULL 3/4] iotests: enable shared migration cases in
+ 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: yuchenlin <yuchenlin@synology.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-VMDK has a hard limitation of extent size, which is due to the size of grain
-table entry is 32 bits. It means it can only point to a grain located at
-offset = 2^32. To avoid writing the user data beyond limitation and record a useless offset
-in grain table. We should return ERROR here.
+Shared migration for dirty bitmaps is fixed by previous patches,
+so we can enable the test.
 
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
-Message-id: 20180322133337.28024-1-yuchenlin@synology.com
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20180320170521.32152-5-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/vmdk.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tests/qemu-iotests/169     | 8 +++-----
+ tests/qemu-iotests/169.out | 4 ++--
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index f94c49a9c0..84f8bbe480 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -47,6 +47,8 @@
- #define VMDK4_FLAG_MARKER (1 << 17)
- #define VMDK4_GD_AT_END 0xffffffffffffffffULL
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index 3a8db91f6f..153b10b6e7 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -140,16 +140,14 @@ def inject_test_case(klass, name, method, *args, **kwargs):
+     mc = operator.methodcaller(method, *args, **kwargs)
+     setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
  
-+#define VMDK_EXTENT_MAX_SECTORS (1ULL << 32)
-+
- #define VMDK_GTE_ZEROED 0x1
+-for cmb in list(itertools.product((True, False), repeat=3)):
++for cmb in list(itertools.product((True, False), repeat=4)):
+     name = ('_' if cmb[0] else '_not_') + 'persistent_'
+     name += ('_' if cmb[1] else '_not_') + 'migbitmap_'
+     name += '_online' if cmb[2] else '_offline'
+-
+-    # TODO fix shared-storage bitmap migration and enable cases for it
+-    args = list(cmb) + [False]
++    name += '_shared' if cmb[3] else '_nonshared'
  
- /* VMDK internal error codes */
-@@ -1250,6 +1252,10 @@ static int get_cluster_offset(BlockDriverState *bs,
-             return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
-         }
+     inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration',
+-                     *args)
++                     *list(cmb))
  
-+        if (extent->next_cluster_sector >= VMDK_EXTENT_MAX_SECTORS) {
-+            return VMDK_ERROR;
-+        }
-+
-         cluster_sector = extent->next_cluster_sector;
-         extent->next_cluster_sector += extent->cluster_sectors;
  
+ if __name__ == '__main__':
+diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
+index 594c16f49f..b6f257674e 100644
+--- a/tests/qemu-iotests/169.out
++++ b/tests/qemu-iotests/169.out
+@@ -1,5 +1,5 @@
+-........
++................
+ ----------------------------------------------------------------------
+-Ran 8 tests
++Ran 16 tests
+ 
+ OK
 -- 
 2.14.3
