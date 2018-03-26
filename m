@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f0QUl-000618-Ol
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:41:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0QXu-0007K7-35
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f0QUi-0000Cr-HV
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:40:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55188)
+	(envelope-from <pbonzini@redhat.com>) id 1f0QXq-0002Aw-W5
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:44:14 -0400
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35861)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f0QUi-0000CK-B1
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:40:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f0QUh-0005j4-Ao
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 11:40:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 50C172E8D38
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 11:40:55 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0QXq-0002AN-QA
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 07:44:10 -0400
+Received: by mail-wm0-f68.google.com with SMTP id x82so14830148wmg.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 04:44:10 -0700 (PDT)
+References: <20180326112056.8420-1-vsementsov@virtuozzo.com>
+	<20180326112056.8420-6-vsementsov@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aa6a8e20-de93-a021-0129-9a6483b85453@redhat.com>
+Date: Mon, 26 Mar 2018 13:44:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Mar 2018 11:33:11 -0000
-From: Eduardo Otubo <1721224@bugs.launchpad.net>
-Reply-To: Bug 1721224 <1721224@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711240619.28742.14769362567837002713.malonedeb@gac.canonical.com>
-Message-Id: <152206399123.18662.1321073317865405933.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721224] Re: qemu crashes with Assertion
- `!bus->dma[0] && !bus->dma[1]' failed
+In-Reply-To: <20180326112056.8420-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/7] blockdev: refactor
+ block-dirty-bitmap-clear transaction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 
-v4 patch posted:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg06565.html
+On 26/03/2018 13:20, Vladimir Sementsov-Ogievskiy wrote:
+> bdrv_clear_dirty_bitmap do not fail, so we can call it in transaction
+> commit, avoiding any rollback.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  blockdev.c | 16 +---------------
+>  1 file changed, 1 insertion(+), 15 deletions(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index c31bf3d98d..88eae60c1c 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2050,7 +2050,6 @@ typedef struct BlockDirtyBitmapState {
+>      BlkActionState common;
+>      BdrvDirtyBitmap *bitmap;
+>      BlockDriverState *bs;
+> -    HBitmap *backup;
+>      bool prepared;
+>  } BlockDirtyBitmapState;
+>  
+> @@ -2129,18 +2128,6 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
+>          error_setg(errp, "Cannot clear a readonly bitmap");
+>          return;
+>      }
+> -
+> -    bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
+> -}
+> -
+> -static void block_dirty_bitmap_clear_abort(BlkActionState *common)
+> -{
+> -    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+> -                                             common, common);
+> -
+> -    if (state->backup) {
+> -        bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
+> -    }
 
--- =
+Isn't bdrv_undo_clear_dirty_bitmap new unused?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721224
+Thanks,
 
-Title:
-  qemu crashes with Assertion `!bus->dma[0] && !bus->dma[1]' failed
+Paolo
 
-Status in QEMU:
-  New
-
-Bug description:
-  Re-production steps:
-  git clone today's qemu git tree (4th Oct 2017)
-  ./configure --target-list=3Dppc64-softmmu && make -j 8
-
-  Run the device-crash-test from scripts folder, seeing the following
-  error
-
-  INFO: running test case: machine=3Dprep binary=3Dppc64-softmmu/qemu-syste=
-m-ppc64 device=3Di82374 accel=3Dtcg
-  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
-v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
-n,mode=3Dcontrol -display none -vga none -S -machine prep,accel=3Dtcg -devi=
-ce i82374
-  CRITICAL: failed: machine=3Dprep binary=3Dppc64-softmmu/qemu-system-ppc64=
- device=3Di82374 accel=3Dtcg
-  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine prep,accel=
-=3Dtcg -device i82374
-  CRITICAL: log: qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Asse=
-rtion `!bus->dma[0] && !bus->dma[1]' failed.
-  CRITICAL: exit code: -6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721224/+subscriptions
+>  }
+>  
+>  static void block_dirty_bitmap_clear_commit(BlkActionState *common)
+> @@ -2148,7 +2135,7 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
+>      BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+>                                               common, common);
+>  
+> -    hbitmap_free(state->backup);
+> +    bdrv_clear_dirty_bitmap(state->bitmap, NULL);
+>  }
+>  
+>  static void abort_prepare(BlkActionState *common, Error **errp)
+> @@ -2210,7 +2197,6 @@ static const BlkActionOps actions[] = {
+>          .instance_size = sizeof(BlockDirtyBitmapState),
+>          .prepare = block_dirty_bitmap_clear_prepare,
+>          .commit = block_dirty_bitmap_clear_commit,
+> -        .abort = block_dirty_bitmap_clear_abort,
+>      }
+>  };
+>  
+> 
