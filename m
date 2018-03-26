@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0WhK-0003Jq-47
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:18:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f0Wpw-0006l9-Uz
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0WhF-0008Fe-Qo
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:18:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58438 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1f0Wpt-0003qU-0O
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:27:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0WhF-0008FL-LN
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:18:17 -0400
-References: <1522047629-27658-1-git-send-email-jasowang@redhat.com>
-	<CAFEAcA8-2uHpdPYHbKj3fTyPd4DEXHm2CF-xVGcg5nJfzF8RDQ@mail.gmail.com>
-	<9b924dcf-d5bb-d1d9-a570-5fffd6a8db92@redhat.com>
-	<CAFEAcA8qXbuR+o0h3P5HyGgqLxhn6s9W-jpZp2Cnm-YgSOeNBg@mail.gmail.com>
-	<ffb62c2e-58a8-2ed4-f6e4-36921140370c@redhat.com>
-	<CAFEAcA-SuZ-aEY5aFpqdrjfGeNH+FoLz5vCxf4crJJdiO6w1jw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8e877bbc-a0d9-8d6b-54c0-1831d340e1e9@redhat.com>
-Date: Mon, 26 Mar 2018 13:18:16 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f0Wps-0003nX-RR
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 14:27:12 -0400
+Date: Mon, 26 Mar 2018 15:26:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180326182658.GP3417@localhost.localdomain>
+References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
+	<20180326150916.9602-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-SuZ-aEY5aFpqdrjfGeNH+FoLz5vCxf4crJJdiO6w1jw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/2] Net patches
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180326150916.9602-3-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 02/38] qmp-shell: learn to send commands
+ with quoted arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 03/26/2018 11:59 AM, Peter Maydell wrote:
-> On 26 March 2018 at 17:54, Eric Blake <eblake@redhat.com> wrote:
->> Hmm, on re-reading that, I wonder if shortlog will do the right thing when a
->> .mailmap entry exists.  I'm trying to make sure we don't have to go
->> lower-level with use of 'git log --format=%ae' (vs. --format=%aE and/or log
->> --use-mailmap).
->>
->> /me goes and experiments with:
->>
+On Mon, Mar 26, 2018 at 05:08:40PM +0200, Marc-Andr=E9 Lureau wrote:
+> Use shlex to split the CLI command, respecting quoted arguments, and
+> also comments. This allows to call for ex:
+>=20
+> (QEMU) human-monitor-command command-line=3D"screendump /dev/null"
+> {"execute": "human-monitor-command", "arguments": {"command-line": "scr=
+eendump /dev/null"}}
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
->> +Julia Suvorova <<jusual@mail.ru> Julia Suvorova via Qemu-devel
->> <qemu-devel@nongnu.org>
+Wonderful.
 
-> 
-> Your mailmap change above seems to have a stray extra '<' in it --
-> was that added by the mailing list server, or is it in the original?
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-D'oh, extra < in my playground.  Thankfully, removing it, and trying 
-again, finds the same results: 'git shortlog 
---author=qemu-devel@nongnu.org' finds all Author: entries that were 
-originally spelled with the list address, even if a .mailmap entry would 
-rewrite it during 'git log --use-mailmap'.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--=20
+Eduardo
