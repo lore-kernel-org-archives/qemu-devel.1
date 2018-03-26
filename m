@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0POm-0004TP-SZ
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:30:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0PYh-0007ct-JH
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f0POl-00009M-UU
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:30:44 -0400
-References: <20180323164254.26487-2-pbonzini@redhat.com>
-	<39eabba4-ce6d-8b5b-f3a8-78dde910ec2e@virtuozzo.com>
+	(envelope-from <pbonzini@redhat.com>) id 1f0PYg-0005AB-GQ
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 06:40:59 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e60b1a9e-e5e4-e6ad-ac3c-2b3276c54ffc@redhat.com>
-Date: Mon, 26 Mar 2018 12:30:33 +0200
-MIME-Version: 1.0
-In-Reply-To: <39eabba4-ce6d-8b5b-f3a8-78dde910ec2e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block: simplify code around releasing
+Date: Mon, 26 Mar 2018 12:40:37 +0200
+Message-Id: <20180326104037.6894-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] block: simplify code around releasing
  bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,69 +18,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 26/03/2018 12:24, Vladimir Sementsov-Ogievskiy wrote:
-> 23.03.2018 19:42, Paolo Bonzini wrote:
->> QLIST_REMOVE does not require walking the list, and once the "bitmap"
->> argument is removed from bdrv_do_release_matching_dirty_bitmap_locked
->> the code simplifies a lot and it is worth inlining everything in the
->> callers of bdrv_do_release_matching_dirty_bitmap.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> =C2=A0 block/dirty-bitmap.c | 81
->> +++++++++++++++++++---------------------------------
->> =C2=A0 1 file changed, 30 insertions(+), 51 deletions(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 13bb5066a4..c0fb49bf7b 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -250,48 +250,15 @@ void
->> bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
->> =C2=A0 }
->> =C2=A0 =C2=A0 /* Called within bdrv_dirty_bitmap_lock..unlock */
->=20
-> Worth adding "Called with BQL taken" to the comment?
+QLIST_REMOVE does not require walking the list, and once the "bitmap"
+argument is removed from bdrv_do_release_matching_dirty_bitmap_locked
+the code simplifies a lot and it is worth inlining everything in the
+callers of bdrv_do_release_matching_dirty_bitmap.
 
-Yes, good idea.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
 
->> +static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+Notes:
+    v1->v2: improve locking comments [Vladimir]
 
-> worth adding "Called with BQL taken." to the comment?
-> bdrv_release_named_dirty_bitmaps functions has it.
->=20
->> =C2=A0 void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs=
-)
+ block/dirty-bitmap.c | 84 ++++++++++++++++++++--------------------------------
+ 1 file changed, 32 insertions(+), 52 deletions(-)
 
-This is pre-existing, but it's also a good idea.
-
-Paolo
-
->> -=C2=A0=C2=A0=C2=A0 bdrv_do_release_matching_dirty_bitmap(bs, NULL,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0
->> bdrv_dirty_bitmap_get_persistance);
->> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bm, *next;
->> +
->> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmaps_lock(bs);
->> +=C2=A0=C2=A0=C2=A0 QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, n=
-ext) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_get_=
-persistance(bm)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bd=
-rv_release_dirty_bitmap_locked(bm);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmaps_unlock(bs);
->> =C2=A0 }
->> =C2=A0 =C2=A0 /**
->=20
-> anyway,
->=20
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index ea82c06f07..a7eaa1051d 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -249,49 +249,16 @@ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+     qemu_mutex_unlock(bitmap->mutex);
+ }
+ 
+-/* Called within bdrv_dirty_bitmap_lock..unlock */
+-static void bdrv_do_release_matching_dirty_bitmap_locked(
+-    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
+-    bool (*cond)(BdrvDirtyBitmap *bitmap))
++/* Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.  */
++static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+ {
+-    BdrvDirtyBitmap *bm, *next;
+-
+-    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
+-        if ((!bitmap || bm == bitmap) && (!cond || cond(bm))) {
+-            assert(!bm->active_iterators);
+-            assert(!bdrv_dirty_bitmap_frozen(bm));
+-            assert(!bm->meta);
+-            QLIST_REMOVE(bm, list);
+-            hbitmap_free(bm->bitmap);
+-            g_free(bm->name);
+-            g_free(bm);
+-
+-            if (bitmap) {
+-                return;
+-            }
+-        }
+-    }
+-
+-    if (bitmap) {
+-        abort();
+-    }
+-}
+-
+-/* Called with BQL taken.  */
+-static void bdrv_do_release_matching_dirty_bitmap(
+-    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
+-    bool (*cond)(BdrvDirtyBitmap *bitmap))
+-{
+-    bdrv_dirty_bitmaps_lock(bs);
+-    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, cond);
+-    bdrv_dirty_bitmaps_unlock(bs);
+-}
+-
+-/* Called within bdrv_dirty_bitmap_lock..unlock */
+-static void bdrv_release_dirty_bitmap_locked(BlockDriverState *bs,
+-                                             BdrvDirtyBitmap *bitmap)
+-{
+-    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, NULL);
++    assert(!bitmap->active_iterators);
++    assert(!bdrv_dirty_bitmap_frozen(bitmap));
++    assert(!bitmap->meta);
++    QLIST_REMOVE(bitmap, list);
++    hbitmap_free(bitmap->bitmap);
++    g_free(bitmap->name);
++    g_free(bitmap);
+ }
+ 
+ /**
+@@ -344,7 +311,7 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+         error_setg(errp, "Merging of parent and successor bitmap failed");
+         return NULL;
+     }
+-    bdrv_release_dirty_bitmap_locked(bs, successor);
++    bdrv_release_dirty_bitmap_locked(successor);
+     parent->successor = NULL;
+ 
+     return parent;
+@@ -382,15 +349,12 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
+     bdrv_dirty_bitmaps_unlock(bs);
+ }
+ 
+-static bool bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
+-{
+-    return !!bdrv_dirty_bitmap_name(bitmap);
+-}
+-
+ /* Called with BQL taken.  */
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, NULL);
++    bdrv_dirty_bitmaps_lock(bs);
++    bdrv_release_dirty_bitmap_locked(bitmap);
++    bdrv_dirty_bitmaps_unlock(bs);
+ }
+ 
+ /**
+@@ -401,7 +365,15 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+  */
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, NULL, bdrv_dirty_bitmap_has_name);
++    BdrvDirtyBitmap *bm, *next;
++
++    bdrv_dirty_bitmaps_lock(bs);
++    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
++        if (bdrv_dirty_bitmap_name(bm)) {
++            bdrv_release_dirty_bitmap_locked(bm);
++        }
++    }
++    bdrv_dirty_bitmaps_unlock(bs);
+ }
+ 
+ /**
+@@ -409,11 +381,19 @@ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+  * bdrv_inactivate_recurse()).
+  * There must not be any frozen bitmaps attached.
+  * This function does not remove persistent bitmaps from the storage.
++ * Called with BQL taken.
+  */
+ void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, NULL,
+-                                          bdrv_dirty_bitmap_get_persistance);
++    BdrvDirtyBitmap *bm, *next;
++
++    bdrv_dirty_bitmaps_lock(bs);
++    QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
++        if (bdrv_dirty_bitmap_get_persistance(bm)) {
++            bdrv_release_dirty_bitmap_locked(bm);
++        }
++    }
++    bdrv_dirty_bitmaps_unlock(bs);
+ }
+ 
+ /**
+-- 
+2.16.2
