@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ybs-0003x7-Fs
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f0Ybu-0003zl-Lq
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f0Ybr-0000HS-Iq
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f0Ybt-0000Ie-Qx
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 16:20:54 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 26 Mar 2018 22:20:36 +0200
-Message-Id: <20180326202039.21070-2-mreitz@redhat.com>
+Date: Mon, 26 Mar 2018 22:20:39 +0200
+Message-Id: <20180326202039.21070-5-mreitz@redhat.com>
 In-Reply-To: <20180326202039.21070-1-mreitz@redhat.com>
 References: <20180326202039.21070-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] qcow2-bitmap: add
- qcow2_reopen_bitmaps_rw_hint()
+Subject: [Qemu-devel] [PULL 4/4] vmdk: return ERROR when cluster sector is
+ larger than vmdk limitation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: yuchenlin <yuchenlin@synology.com>
 
-Add version of qcow2_reopen_bitmaps_rw, which do the same work but
-also return a hint about was header updated or not. This will be
-used in the following fix for bitmaps reloading after migration.
+VMDK has a hard limitation of extent size, which is due to the size of grain
+table entry is 32 bits. It means it can only point to a grain located at
+offset = 2^32. To avoid writing the user data beyond limitation and record a useless offset
+in grain table. We should return ERROR here.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180320170521.32152-2-vsementsov@virtuozzo.com
+Signed-off-by: yuchenlin <yuchenlin@synology.com>
+Message-id: 20180322133337.28024-1-yuchenlin@synology.com
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h        |  2 ++
- block/qcow2-bitmap.c | 15 ++++++++++++++-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ block/vmdk.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index ccb92a9696..d301f77cea 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -671,6 +671,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-+                                 Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 3010adb909..6e93ec43e1 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1004,7 +1004,8 @@ fail:
-     return false;
- }
+diff --git a/block/vmdk.c b/block/vmdk.c
+index f94c49a9c0..84f8bbe480 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -47,6 +47,8 @@
+ #define VMDK4_FLAG_MARKER (1 << 17)
+ #define VMDK4_GD_AT_END 0xffffffffffffffffULL
  
--int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-+int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-+                                 Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2BitmapList *bm_list;
-@@ -1012,6 +1013,10 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-     GSList *ro_dirty_bitmaps = NULL;
-     int ret = 0;
- 
-+    if (header_updated != NULL) {
-+        *header_updated = false;
-+    }
++#define VMDK_EXTENT_MAX_SECTORS (1ULL << 32)
 +
-     if (s->nb_bitmaps == 0) {
-         /* No bitmaps - nothing to do */
-         return 0;
-@@ -1055,6 +1060,9 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-             error_setg_errno(errp, -ret, "Can't update bitmap directory");
-             goto out;
+ #define VMDK_GTE_ZEROED 0x1
+ 
+ /* VMDK internal error codes */
+@@ -1250,6 +1252,10 @@ static int get_cluster_offset(BlockDriverState *bs,
+             return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
          }
-+        if (header_updated != NULL) {
-+            *header_updated = true;
+ 
++        if (extent->next_cluster_sector >= VMDK_EXTENT_MAX_SECTORS) {
++            return VMDK_ERROR;
 +        }
-         g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-     }
- 
-@@ -1065,6 +1073,11 @@ out:
-     return ret;
- }
- 
-+int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-+{
-+    return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
-+}
 +
- /* store_bitmap_data()
-  * Store bitmap to image, filling bitmap table accordingly.
-  */
+         cluster_sector = extent->next_cluster_sector;
+         extent->next_cluster_sector += extent->cluster_sectors;
+ 
 -- 
 2.14.3
