@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34644)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0U9N-0003KC-Pq
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:35:15 -0400
+	id 1f0U9T-0003RI-Pq
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0U9I-0000K1-U4
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:35:09 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:44639)
+	id 1f0U9S-0000T3-Jl
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:35:15 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:39605)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0U9I-0000Jh-PG
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:35:04 -0400
-Received: by mail-qk0-x242.google.com with SMTP id o5so2139170qki.11
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 08:35:04 -0700 (PDT)
+	id 1f0U9S-0000Sh-Fy
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 11:35:14 -0400
+Received: by mail-qt0-x242.google.com with SMTP id v11so19969719qtj.6
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 08:35:14 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 26 Mar 2018 12:34:39 -0300
-Message-Id: <20180326153441.32641-4-f4bug@amsat.org>
+Date: Mon, 26 Mar 2018 12:34:41 -0300
+Message-Id: <20180326153441.32641-6-f4bug@amsat.org>
 In-Reply-To: <20180326153441.32641-1-f4bug@amsat.org>
 References: <20180326153441.32641-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-2.13 3/5] hw/dma/i8257: Split
- i8257_dma_init() by master/slave
+Subject: [Qemu-devel] [PATCH for-2.13 5/5] hw/dma/i8257: Rename
+ i8257_dma_init(false) -> i8257_dma_init_pc_at()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +35,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Otubo <otubo@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Nageswara Sastry <nasastry@in.ibm.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Nageswara Sastry <nasastry@in.ibm.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-This emphasises than two controller are created (in master/slave configuration).
+Reflect that the PC/AT implementation is used.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/dma/i8257.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ include/hw/dma/i8257.h  | 17 +++++++++++++++--
+ hw/i386/pc.c            |  2 +-
+ hw/mips/mips_fulong2e.c |  2 +-
+ hw/mips/mips_jazz.c     |  2 +-
+ hw/mips/mips_malta.c    |  2 +-
+ 5 files changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
-index df030f934c..72f8893b9e 100644
---- a/hw/dma/i8257.c
-+++ b/hw/dma/i8257.c
-@@ -622,26 +622,44 @@ static void i8257_register_types(void)
+diff --git a/include/hw/dma/i8257.h b/include/hw/dma/i8257.h
+index 986319e4e3..15db8b4d29 100644
+--- a/include/hw/dma/i8257.h
++++ b/include/hw/dma/i8257.h
+@@ -47,9 +47,22 @@ typedef struct I8257State {
+ } I8257State;
  
- type_init(i8257_register_types)
- 
--void i8257_dma_init(ISABus *bus, bool high_page_enable)
-+static ISADevice *i8257_dma_init_master(ISABus *bus, bool high_page_enable)
+ void i8257_dma_init_cascaded(ISABus *bus, bool high_page_enable);
+-static inline void i8257_dma_init(ISABus *bus, bool high_page_enable)
++
++/**
++ * i8257_dma_init_pc_at: Install 8 DMA channels on the ISA bus.
++ *
++ * This is the PC/AT DMA implementation:
++ *
++ * Two i8257 controllers are created.
++ * The primary controller register channels [0..3] on the bus,
++ * the secondary controller (slave) is cascaded on the primary (master),
++ * registering channels [4..7].
++ *
++ * @bus: the #ISABus against which these are created.
++ */
++static inline void i8257_dma_init_pc_at(ISABus *bus)
  {
--    ISADevice *isa1, *isa2;
-+    ISADevice *isa;
-     DeviceState *d;
- 
--    isa1 = isa_create(bus, TYPE_I8257);
--    d = DEVICE(isa1);
-+    isa = isa_create(bus, TYPE_I8257);
-+    d = DEVICE(isa);
-     qdev_prop_set_int32(d, "base", 0x00);
-     qdev_prop_set_int32(d, "page-base", 0x80);
-     qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x480 : -1);
-     qdev_prop_set_int32(d, "dshift", 0);
-     qdev_init_nofail(d);
- 
--    isa2 = isa_create(bus, TYPE_I8257);
--    d = DEVICE(isa2);
-+    return isa;
-+}
-+
-+static ISADevice *i8257_dma_init_slave(ISABus *bus, bool high_page_enable)
-+{
-+    ISADevice *isa;
-+    DeviceState *d;
-+
-+    isa = isa_create(bus, TYPE_I8257);
-+    d = DEVICE(isa);
-     qdev_prop_set_int32(d, "base", 0xc0);
-     qdev_prop_set_int32(d, "page-base", 0x88);
-     qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x488 : -1);
-     qdev_prop_set_int32(d, "dshift", 1);
-     qdev_init_nofail(d);
- 
--    isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2));
-+    return isa;
-+}
-+
-+void i8257_dma_init(ISABus *bus, bool high_page_enable)
-+{
-+    ISADevice *master, *slave;
-+
-+    master = i8257_dma_init_master(bus, high_page_enable);
-+    slave = i8257_dma_init_slave(bus, high_page_enable);
-+
-+    isa_bus_dma(bus, ISADMA(master), ISADMA(slave));
+-    i8257_dma_init_cascaded(bus, high_page_enable);
++    i8257_dma_init_cascaded(bus, false);
  }
+ 
+ #endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d36bac8c89..baba079d7f 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1624,7 +1624,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+         pcspk_init(isa_bus, pit);
+     }
+ 
+-    i8257_dma_init(isa_bus, 0);
++    i8257_dma_init_pc_at(isa_bus);
+ 
+     /* Super I/O */
+     pc_superio_init(isa_bus, create_fdctrl, no_vmport);
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 02fb2fdcc4..8168e6cf16 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -243,7 +243,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
+     isa_bus_irqs(isa_bus, i8259);
+     /* init other devices */
+     i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    i8257_dma_init(isa_bus, 0);
++    i8257_dma_init_pc_at(isa_bus);
+     /* Super I/O */
+     isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
+ 
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index 7223085547..2577e8383d 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -222,7 +222,7 @@ static void mips_jazz_init(MachineState *machine,
+     /* ISA devices */
+     i8259 = i8259_init(isa_bus, env->irq[4]);
+     isa_bus_irqs(isa_bus, i8259);
+-    i8257_dma_init(isa_bus, 0);
++    i8257_dma_init_pc_at(isa_bus);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+     pcspk_init(isa_bus, pit);
+ 
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index f6513a4fd5..9d0409bc36 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1198,7 +1198,7 @@ void mips_malta_init(MachineState *machine)
+     smbus = piix4_pm_init(pci_bus, piix4_devfn + 3, 0x1100,
+                           isa_get_irq(NULL, 9), NULL, 0, NULL);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    i8257_dma_init(isa_bus, 0);
++    i8257_dma_init_pc_at(isa_bus);
+     mc146818_rtc_init(isa_bus, 2000, NULL);
+ 
+     /* generate SPD EEPROM data */
 -- 
 2.16.3
