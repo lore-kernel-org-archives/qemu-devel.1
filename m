@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f0hQq-00019T-Ps
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:46:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1f0iE5-0007Yd-VT
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 02:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f0hQm-0003cs-R4
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:46:04 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:37561)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f0hQm-0003c4-Ll
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:46:00 -0400
-Date: Tue, 27 Mar 2018 01:45:59 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180327054559.GA1666@flamenco>
-References: <20180327034757.3432-1-richard.henderson@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1f0iE1-0005Lt-Bq
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 02:36:58 -0400
+References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
+	<20180327043741.7705-3-david@gibson.dropbear.id.au>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0e24234b-60b6-5374-1024-dff3e39cb717@redhat.com>
+Date: Tue, 27 Mar 2018 08:36:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180327034757.3432-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] tcg: Mark muluh_i64 and mulsh_i64
- as 64-bit ops
+In-Reply-To: <20180327043741.7705-3-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC for-2.13 02/12] target/ppc:
+ Simplify cpu valid check in ppc_cpu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@groups.riscv.org, mjc@sifive.com
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, groug@kaod.org
+Cc: qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com
 
-On Tue, Mar 27, 2018 at 11:47:57 +0800, Richard Henderson wrote:
-> Failure to do so results in the tcg optimizer sign-extending
-> any constant fold from 32-bits.  This turns out to be visible
-> in the RISC-V testsuite using a host that emits these opcodes
-> (e.g. any non-x86_64).
->
-> Reported-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 27.03.2018 06:37, David Gibson wrote:
+> The #if isn't necessary, because there's a suitable one inside
+> ppc_cpu_is_valid().  We've already filtered for suitable cpu models in the
+> functions that search and register them.  So by the time we get to realize
+> having an invalid one indicates a code error, not a user error, so an
+> assert() is more appropriate than error_setg().
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  target/ppc/translate_init.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
+> 
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 56b80a204a..2ae718242a 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -9749,14 +9749,7 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+>          }
+>      }
+>  
+> -#if defined(TARGET_PPCEMB)
+> -    if (!ppc_cpu_is_valid(pcc)) {
+> -        error_setg(errp, "CPU does not possess a BookE or 4xx MMU. "
+> -                   "Please use qemu-system-ppc or qemu-system-ppc64 instead "
+> -                   "or choose another CPU model.");
+> -        goto unrealize;
+> -    }
+> -#endif
+> +    assert(ppc_cpu_is_valid(pcc));
+>  
+>      create_ppc_opcodes(cpu, &local_err);
+>      if (local_err != NULL) {
+> 
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-
-		E.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
