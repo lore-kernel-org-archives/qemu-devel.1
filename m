@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0eaC-0008HX-Su
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 22:43:33 -0400
+	(envelope-from <famz@redhat.com>) id 1f0esB-0006HY-Jk
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:02:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0eaA-00022d-BL
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 22:43:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52524 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0eaA-00022R-64
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 22:43:30 -0400
-Date: Tue, 27 Mar 2018 10:43:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180327024315.GH17789@xz-mi>
-References: <20180327013620.1644387-1-eblake@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1f0esB-0003TQ-2b
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:02:07 -0400
+Date: Tue, 27 Mar 2018 11:01:47 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180327030147.GH31422@lemon.usersys.redhat.com>
+References: <20180322161226.29796-1-lvivier@redhat.com>
+	<20180322161226.29796-4-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180327013620.1644387-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Monitor: OOB related patches
+In-Reply-To: <20180322161226.29796-4-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] qdict: remove useless cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +23,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, borntraeger@de.ibm.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Mar 26, 2018 at 08:36:16PM -0500, Eric Blake wrote:
-> This is patches 2, 3, 7, and 8 (with 7 rewritten) from Peter Xu's
-> series.  I've pushed them to git://repo.or.cz/qemu/ericb.git qapi-next
-> (on top of the other pending qapi patches at branch qapi); hopefully
-> this will be part of my pull request tomorrow for -rc1.
+On Thu, 03/22 17:12, Laurent Vivier wrote:
+> Re-run Coccinelle script scripts/coccinelle/qobject.cocci
 > 
-> Eric Blake (1):
->   tests: Add parameter to qtest_init_without_qmp_handshake
-> 
-> Peter Xu (3):
->   qmp: cleanup qmp queues properly
->   monitor: new parameter "x-oob"
->   tests: qmp-test: add test for new "x-oob"
-> 
->  tests/libqtest.h          |  7 +++-
->  include/monitor/monitor.h |  1 +
->  vl.c                      |  5 +++
->  tests/libqtest.c          | 10 +++--
->  monitor.c                 | 94 ++++++++++++++++++++++++++++++++++++-----------
->  tests/qmp-test.c          | 84 +++++++++++++++++++++++++++++++++++++++++-
->  6 files changed, 173 insertions(+), 28 deletions(-)
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-All of them look good to me.
-
-Thanks Eric!
-
--- 
-Peter Xu
+Acked-by: Fam Zheng <famz@redhat.com>
