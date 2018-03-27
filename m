@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0p8A-0003cl-Lr
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:59:19 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1f0pAL-00054J-EN
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0p86-0006TW-OZ
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:59:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57846 helo=mx1.redhat.com)
+	(envelope-from <tiwei.bie@intel.com>) id 1f0pAF-0007YE-Ek
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:01:33 -0400
+Received: from mga14.intel.com ([192.55.52.115]:52835)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0p86-0006TE-J8
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:59:14 -0400
-References: <20180327123800.28851-1-sathnaga@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <686b98e4-cf4e-00c9-e4fd-a3efd9f52994@redhat.com>
-Date: Tue, 27 Mar 2018 08:59:04 -0500
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f0pAF-0007XX-5M
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:01:27 -0400
+Date: Tue, 27 Mar 2018 21:59:49 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180327135949.owjzqtbrnlfmj6yd@debian>
+References: <20180319071537.28649-1-tiwei.bie@intel.com>
+	<20180319071537.28649-7-tiwei.bie@intel.com>
+	<20180322171740-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180327123800.28851-1-sathnaga@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hmp.c: Revert hmp_info_cpus
- output format
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180322171740-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] vhost-user: add VFIO based
+ accelerators support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sathnaga@linux.vnet.ibm.com, qemu-devel@nongnu.org
-Cc: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On 03/27/2018 07:38 AM, sathnaga@linux.vnet.ibm.com wrote:
-> From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+On Thu, Mar 22, 2018 at 06:19:44PM +0200, Michael S. Tsirkin wrote:
+> On Mon, Mar 19, 2018 at 03:15:37PM +0800, Tiwei Bie wrote:
+[...]
+> > 
+> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> > index cb3a7595aa..264a58a800 100644
+> > --- a/docs/interop/vhost-user.txt
+> > +++ b/docs/interop/vhost-user.txt
+[...]
 > 
-> This commit 137b5cb6ab565cb3781d5337591e155932b4230e
-> refactors info cpus output and changes output format from
-> 'thread_id' to 'thread-id', this would break parsing
-> of output in above layers like libvirt, test framework etc.
+> > The accelerator
+> > +context will be set for each queue independently. So the page-per-vq property
+> > +should also be enabled.
 > 
-> This patch just reverts back output format to 'thread_id'.
+> Backend author is unlikely to know what does page-per-vq property mean.
 > 
-> CC: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> ---
->   hmp.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Is this intended for users maybe? docs/interop is not the best place
+> for user-facing documentation.
+> 
+> I also wonder:
+> 
+> 	commit d9997d89a4a09a330a056929d06d4b7b0b7a8239
+> 	Author: Marcel Apfelbaum <marcel@redhat.com>
+> 	Date:   Wed Sep 7 18:02:25 2016 +0300
+> 
+> 	    virtio-pci: reduce modern_mem_bar size
+> 	    
+> 	    Currently each VQ Notification Virtio Capability is allocated
+> 	    on a different page. The idea is to enable split drivers within
+> 	    guests, however there are no known plans to do that.
+> 	    The allocation will result in a 8MB BAR, more than various
+> 	    guest firmwares pre-allocates for PCI Bridges hotplug process.
+>     
+> looks like enabling page per vq will break pci express hotplug.
+> I suspect more work is needed to down-size the BAR to # of VQs
+> actually supported.
+> 
 
-I'm not opposed to this patch (because it is a trivial way to keep older 
-stuff working), but agree with Daniel that HMP output can change at any 
-time, so other stuff relying on HMP should be fixed.  Libvirt is not 
-affected, so if we DO take this into 2.12, we should update the commit 
-message to drop mention of libvirt being impacted, maybe along the lines of:
+I agree. Maybe we can fix the potential pci express hotplug
+issue caused by enabling page-per-vq in another patch set.
 
-Commit 137b5cb6 refactored 'info cpus' output, changing 'thread_id' to 
-'thread-id'.  While HMP is not a stable interface, it is trivial to keep 
-the spelling consistent for test frameworks that have not yet updated to 
-using QMP.
-
-With the improved commit message,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Best regards,
+Tiwei Bie
