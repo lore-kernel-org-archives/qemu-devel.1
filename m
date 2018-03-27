@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f0jnp-0003HO-CG
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:17:58 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1f0jtw-0005OT-8K
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f0jnk-0004Cz-D7
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:17:57 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:35914)
+	(envelope-from <linzhecheng@huawei.com>) id 1f0jtr-0007ng-GF
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:24:16 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2094 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f0jnk-0004C8-2t
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:17:52 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.120.215])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0C997125ED9
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 10:17:49 +0200 (CEST)
-Date: Tue, 27 Mar 2018 10:17:39 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180327101739.4268aed9@bahia.lan>
-In-Reply-To: <20180327043741.7705-5-david@gibson.dropbear.id.au>
-References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-	<20180327043741.7705-5-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1f0jtr-0007ls-4k
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:24:11 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 27 Mar 2018 16:23:34 +0800
+Message-ID: <20180327082334.22948-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.13 04/12] target/ppc: Avoid taking
- "env" parameter to mmu-hash64 functions
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] virtio-serial: fix heap-over-flow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,199 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org
+To: qemu-devel@nongnu.org
+Cc: amit.shah@redhat.com, mst@redhat.com, pbonzini@redhat.com, wangxinxin.wang@huawei.com, xuding42@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-On Tue, 27 Mar 2018 15:37:33 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Check device having the feature of VIRTIO_CONSOLE_F_EMERG_WRITE before
+get config->emerg_wr. It is neccessary because sizeof(virtio_console_config)
+is 8 byte if VirtIOSerial doesn't have the feature of
+VIRTIO_CONSOLE_F_EMERG_WRITE(see virtio_serial_device_realize),
+read/write emerg_wr will lead to heap-over-flow.
 
-> In most cases we prefer to pass a PowerPCCPU rather than the (embedded)
-> CPUPPCState.
-> 
-> For ppc_hash64_update_{rmls,vrma}() change to take "cpu" instead of "env".
-> For ppc_hash64_set_{dsi,isi}() remove the redundant "env" parameter.
-> 
-> In theory this makes more work for the functions, but since "cs", "cpu"
-> and "env" are related by at most constant offsets, the compiler should be
-> able to optimize out the difference at effectively zero cost.
-> 
-> helper_*() functions are left alone - since they're more closely tied to
-> the TCG generated code, passing "env" is still the standard there.
-> 
-> While we're there, fix an incorrect indentation.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  target/ppc/mmu-hash64.c     | 35 +++++++++++++++++++----------------
->  target/ppc/mmu-hash64.h     |  4 ++--
->  target/ppc/translate_init.c |  4 ++--
->  3 files changed, 23 insertions(+), 20 deletions(-)
-> 
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index c9b72b7429..a87fa7c83f 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -633,9 +633,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
->      return 0;
->  }
->  
-> -static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
-> -                               uint64_t error_code)
-> +static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
->  {
-> +    CPUPPCState *env = &POWERPC_CPU(cs)->env;
->      bool vpm;
->  
->      if (msr_ir) {
-> @@ -659,9 +659,9 @@ static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
->      env->error_code = error_code;
->  }
->  
-> -static void ppc_hash64_set_dsi(CPUState *cs, CPUPPCState *env, uint64_t dar,
-> -                               uint64_t dsisr)
-> +static void ppc_hash64_set_dsi(CPUState *cs, uint64_t dar, uint64_t dsisr)
->  {
-> +    CPUPPCState *env = &POWERPC_CPU(cs)->env;
->      bool vpm;
->  
->      if (msr_dr) {
-> @@ -741,13 +741,13 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
->              } else {
->                  /* The access failed, generate the approriate interrupt */
->                  if (rwx == 2) {
-> -                    ppc_hash64_set_isi(cs, env, SRR1_PROTFAULT);
-> +                    ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
->                  } else {
->                      int dsisr = DSISR_PROTFAULT;
->                      if (rwx == 1) {
->                          dsisr |= DSISR_ISSTORE;
->                      }
-> -                    ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-> +                    ppc_hash64_set_dsi(cs, eaddr, dsisr);
->                  }
->                  return 1;
->              }
-> @@ -783,7 +783,7 @@ skip_slb_search:
->  
->      /* 3. Check for segment level no-execute violation */
->      if ((rwx == 2) && (slb->vsid & SLB_VSID_N)) {
-> -        ppc_hash64_set_isi(cs, env, SRR1_NOEXEC_GUARD);
-> +        ppc_hash64_set_isi(cs, SRR1_NOEXEC_GUARD);
->          return 1;
->      }
->  
-> @@ -791,13 +791,13 @@ skip_slb_search:
->      ptex = ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
->      if (ptex == -1) {
->          if (rwx == 2) {
-> -            ppc_hash64_set_isi(cs, env, SRR1_NOPTE);
-> +            ppc_hash64_set_isi(cs, SRR1_NOPTE);
->          } else {
->              int dsisr = DSISR_NOPTE;
->              if (rwx == 1) {
->                  dsisr |= DSISR_ISSTORE;
->              }
-> -            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-> +            ppc_hash64_set_dsi(cs, eaddr, dsisr);
->          }
->          return 1;
->      }
-> @@ -824,7 +824,7 @@ skip_slb_search:
->              if (PAGE_EXEC & ~amr_prot) {
->                  srr1 |= SRR1_IAMR; /* Access violates virt pg class key prot */
->              }
-> -            ppc_hash64_set_isi(cs, env, srr1);
-> +            ppc_hash64_set_isi(cs, srr1);
->          } else {
->              int dsisr = 0;
->              if (need_prot[rwx] & ~pp_prot) {
-> @@ -836,7 +836,7 @@ skip_slb_search:
->              if (need_prot[rwx] & ~amr_prot) {
->                  dsisr |= DSISR_AMR;
->              }
-> -            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-> +            ppc_hash64_set_dsi(cs, eaddr, dsisr);
->          }
->          return 1;
->      }
-> @@ -942,8 +942,9 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
->      cpu->env.tlb_need_flush = TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_FLUSH;
->  }
->  
-> -void ppc_hash64_update_rmls(CPUPPCState *env)
-> +void ppc_hash64_update_rmls(PowerPCCPU *cpu)
->  {
-> +    CPUPPCState *env = &cpu->env;
->      uint64_t lpcr = env->spr[SPR_LPCR];
->  
->      /*
-> @@ -976,8 +977,9 @@ void ppc_hash64_update_rmls(CPUPPCState *env)
->      }
->  }
->  
-> -void ppc_hash64_update_vrma(CPUPPCState *env)
-> +void ppc_hash64_update_vrma(PowerPCCPU *cpu)
->  {
-> +    CPUPPCState *env = &cpu->env;
->      const struct ppc_one_seg_page_size *sps = NULL;
->      target_ulong esid, vsid, lpcr;
->      ppc_slb_t *slb = &env->vrma_slb;
-> @@ -1002,7 +1004,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
->      vsid |= (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
->      esid = SLB_ESID_V;
->  
-> -   for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-> +    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
->          const struct ppc_one_seg_page_size *sps1 = &env->sps.sps[i];
->  
->          if (!sps1->page_shift) {
-> @@ -1028,6 +1030,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
->  
->  void helper_store_lpcr(CPUPPCState *env, target_ulong val)
->  {
-> +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
->      uint64_t lpcr = 0;
->  
->      /* Filter out bits */
-> @@ -1089,6 +1092,6 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
->          ;
->      }
->      env->spr[SPR_LPCR] = lpcr;
-> -    ppc_hash64_update_rmls(env);
-> -    ppc_hash64_update_vrma(env);
-> +    ppc_hash64_update_rmls(cpu);
-> +    ppc_hash64_update_vrma(cpu);
->  }
-> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> index d297b97d37..95a8c330d6 100644
-> --- a/target/ppc/mmu-hash64.h
-> +++ b/target/ppc/mmu-hash64.h
-> @@ -17,8 +17,8 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
->                                 target_ulong pte0, target_ulong pte1);
->  unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
->                                            uint64_t pte0, uint64_t pte1);
-> -void ppc_hash64_update_vrma(CPUPPCState *env);
-> -void ppc_hash64_update_rmls(CPUPPCState *env);
-> +void ppc_hash64_update_vrma(PowerPCCPU *cpu);
-> +void ppc_hash64_update_rmls(PowerPCCPU *cpu);
->  #endif
->  
->  /*
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 2ae718242a..29bd6f3654 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8975,8 +8975,8 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
->      env->spr[SPR_AMOR] = amor->default_value = 0xffffffffffffffffull;
->  
->      /* Update some env bits based on new LPCR value */
-> -    ppc_hash64_update_rmls(env);
-> -    ppc_hash64_update_vrma(env);
-> +    ppc_hash64_update_rmls(cpu);
-> +    ppc_hash64_update_vrma(cpu);
->  
->      /* Tell KVM that we're in PAPR mode */
->      if (kvm_enabled()) {
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index 9470bd7be7..3695172f37 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -580,11 +580,12 @@ static void set_config(VirtIODevice *vdev, const uint8_t *config_data)
+     VirtIOSerial *vser = VIRTIO_SERIAL(vdev);
+     struct virtio_console_config *config =
+         (struct virtio_console_config *)config_data;
+-    uint8_t emerg_wr_lo = le32_to_cpu(config->emerg_wr);
+     VirtIOSerialPort *port = find_first_connected_console(vser);
+     VirtIOSerialPortClass *vsc;
++    uint8_t emerg_wr_lo;
+ 
+-    if (!config->emerg_wr) {
++    if (!virtio_has_feature(vser->host_features,
++        VIRTIO_CONSOLE_F_EMERG_WRITE) || !config->emerg_wr) {
+         return;
+     }
+     /* Make sure we don't misdetect an emergency write when the guest
+@@ -594,6 +595,7 @@ static void set_config(VirtIODevice *vdev, const uint8_t *config_data)
+         return;
+     }
+     vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
++    emerg_wr_lo = le32_to_cpu(config->emerg_wr);
+     (void)vsc->have_data(port, &emerg_wr_lo, 1);
+ }
+ 
+-- 
+2.12.2.windows.2
