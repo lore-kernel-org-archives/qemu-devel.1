@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f0rgH-0001j9-5N
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:42:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f0rlY-000424-JH
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f0rgG-0003Um-95
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:42:41 -0400
-References: <20180327153011.29569-1-marcandre.lureau@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <93eeb364-6521-784f-b02b-c3c7e960461b@redhat.com>
-Date: Tue, 27 Mar 2018 12:42:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f0rlV-00064a-Sb
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:48:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37712 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f0rlV-00064I-Nw
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:48:05 -0400
+Date: Tue, 27 Mar 2018 17:47:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180327164753.GF2837@work-vm>
+References: <20180327113452.19613-1-dgilbert@redhat.com>
+	<20180327113452.19613-4-dgilbert@redhat.com>
+	<0bfadead-a3c2-9bce-3e53-8ca3a258a57a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180327153011.29569-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockjob: use qapi enum
- helpers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0bfadead-a3c2-9bce-3e53-8ca3a258a57a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] e1000: Old machine types,
+ turn new subsection off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, jtc@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, eswierk@skyportsystems.com, jasowang@redhat.com, peterx@redhat.com, quintela@redhat.com
+
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 27/03/2018 13:34, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Turn the newly added subsection off for old machine types
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  include/hw/compat.h | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/include/hw/compat.h b/include/hw/compat.h
+> > index bc9e3a6627..13242b831a 100644
+> > --- a/include/hw/compat.h
+> > +++ b/include/hw/compat.h
+> > @@ -14,6 +14,10 @@
+> >          .driver   = "vhost-user-blk-pci",\
+> >          .property = "vectors",\
+> >          .value    = "2",\
+> > +    },{\
+> > +        .driver   = "e1000",\
+> > +        .property = "migrate_tso_props",\
+> > +        .value    = "off",\
+> >      },
+> >  
+> >  #define HW_COMPAT_2_10 \
+> > 
+> 
+> Unfortunately it's not that easy, because on old machine types
+> tx.tso_props was stored in tx.props.
+
+OK, this pretty much sounds like the answer to the question I asked on
+the cover letter.
+
+> So if the subsection is absent you
+> have to migrate either tx.tso_props or tx.props, depending on s->tx.cptse.
+
+Do you mean when sending you have to decide which set to send in the
+non-subsection data?  And with cptse true that means use tso_props?
+
+> Likewise if you migrate from older versions: if s->tx.props.tse &&
+> s->tx.cptse, you have to copy s->tx.props to s->tx.tso_props and clear
+> s->tx.props.
 
 
+I don't see any equivalent code in the existing non-subsection postload to
+do this; so I'm guessing there are some cases of 2.11->2.12 that will
+break at the moment?
 
-On 03/27/2018 11:30 AM, Marc-Andr=C3=A9 Lureau wrote:
-> QAPI generator provide #define helpers for looking up enum string.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  blockjob.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
->=20
-> diff --git a/blockjob.c b/blockjob.c
-> index ef3ed69ff1..11c9ce124d 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -75,10 +75,8 @@ static void block_job_state_transition(BlockJob *job=
-, BlockJobStatus s1)
->      assert(s1 >=3D 0 && s1 <=3D BLOCK_JOB_STATUS__MAX);
->      trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1=
-] ?
->                                       "allowed" : "disallowed",
-> -                                     qapi_enum_lookup(&BlockJobStatus_=
-lookup,
-> -                                                      s0),
-> -                                     qapi_enum_lookup(&BlockJobStatus_=
-lookup,
-> -                                                      s1));
-> +                                     BlockJobStatus_str(s0),
-> +                                     BlockJobStatus_str(s1));
->      assert(BlockJobSTT[s0][s1]);
->      job->status =3D s1;
->  }
-> @@ -86,17 +84,15 @@ static void block_job_state_transition(BlockJob *jo=
-b, BlockJobStatus s1)
->  static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error =
-**errp)
->  {
->      assert(bv >=3D 0 && bv <=3D BLOCK_JOB_VERB__MAX);
-> -    trace_block_job_apply_verb(job, qapi_enum_lookup(&BlockJobStatus_l=
-ookup,
-> -                                                     job->status),
-> -                               qapi_enum_lookup(&BlockJobVerb_lookup, =
-bv),
-> +    trace_block_job_apply_verb(job, BlockJobStatus_str(job->status),
-> +                               BlockJobVerb_str(bv),
->                                 BlockJobVerbTable[bv][job->status] ?
->                                 "allowed" : "prohibited");
->      if (BlockJobVerbTable[bv][job->status]) {
->          return 0;
->      }
->      error_setg(errp, "Job '%s' in state '%s' cannot accept command ver=
-b '%s'",
-> -               job->id, qapi_enum_lookup(&BlockJobStatus_lookup, job->=
-status),
-> -               qapi_enum_lookup(&BlockJobVerb_lookup, bv));
-> +               job->id, BlockJobStatus_str(job->status), BlockJobVerb_=
-str(bv));
->      return -EPERM;
->  }
-> =20
->=20
+> My understanding is that s->tx.tso_props.tse will be 1 if
+> and only if the source sent s->tx.tso_props.
 
-Oh, whoops. I knew you added functions, but I didn't realize we got
-per-enum functions. Thanks.
+I don't see anything in the current code that migrates tso_props.tse -
+where does it come from?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+> This seems most easily done with a new field (e.g. vmstate_fixed_props)
+> that is written in pre_save and set in post_load.
 
-and forwarded to Jeff Cody.
+It might need a VMSTATE_WITH_TMP to be able to do the saving part;
+when saving we can't change the current state when migrating
+to an old destination in case the migration fails and we just continue.
 
---js
+How would I test this lot?
+
+Dave
+
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
