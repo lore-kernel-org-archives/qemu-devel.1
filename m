@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f0uUt-0008Tp-Oy
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:43:11 -0400
+	(envelope-from <mjc@sifive.com>) id 1f0uh2-0004M0-0p
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f0uUp-0006qX-5g
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:43:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43728 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f0uUp-0006px-0J
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:43:03 -0400
-Date: Tue, 27 Mar 2018 22:42:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180327224058-mutt-send-email-mst@kernel.org>
-References: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] i386/kvm: add support for
- KVM_CAP_X86_DISABLE_EXITS
+	(envelope-from <mjc@sifive.com>) id 1f0ugy-0005Aq-3Z
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:55:40 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:38945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f0ugx-0005AN-Ti
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:55:36 -0400
+Received: by mail-pl0-x243.google.com with SMTP id s24-v6so64847plq.6
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 12:55:35 -0700 (PDT)
+From: Michael Clark <mjc@sifive.com>
+Date: Tue, 27 Mar 2018 12:54:47 -0700
+Message-Id: <1522180487-22899-2-git-send-email-mjc@sifive.com>
+In-Reply-To: <1522180487-22899-1-git-send-email-mjc@sifive.com>
+References: <1522180487-22899-1-git-send-email-mjc@sifive.com>
+Subject: [Qemu-devel] [PATCH v1 1/1] RISC-V: Workaround for critical
+ mstatus.FS MTTCG bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Mar 16, 2018 at 07:36:42AM -0700, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
->=20
-> This patch adds support for KVM_CAP_X86_DISABLE_EXITS. Provides userspa=
-ce with=20
-> per-VM capability(KVM_CAP_X86_DISABLE_EXITS) to not intercept MWAIT/HLT=
-/PAUSE=20
-> in order that to improve latency in some workloads.
->=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  linux-headers/linux/kvm.h |  6 +++++-
->  target/i386/kvm.c         | 12 ++++++++++++
->  2 files changed, 17 insertions(+), 1 deletion(-)
->=20
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index a167be8..857df15 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -925,7 +925,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_S390_GS 140
->  #define KVM_CAP_S390_AIS 141
->  #define KVM_CAP_SPAPR_TCE_VFIO 142
-> -#define KVM_CAP_X86_GUEST_MWAIT 143
-> +#define KVM_CAP_X86_DISABLE_EXITS 143
->  #define KVM_CAP_ARM_USER_IRQ 144
->  #define KVM_CAP_S390_CMMA_MIGRATION 145
->  #define KVM_CAP_PPC_FWNMI 146
-> @@ -1508,6 +1508,10 @@ struct kvm_assigned_msix_entry {
->  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
->  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
-> =20
-> +#define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
-> +#define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
-> +#define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
-> +
->  /* Available with KVM_CAP_ARM_USER_IRQ */
-> =20
->  /* Bits for run->s.regs.device_irq_level */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index d23fff1..95ed9eb 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -999,6 +999,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->      }
-> =20
-> +    if (env->features[FEAT_KVM_HINTS] & KVM_HINTS_DEDICATED) {
-> +        int disable_exits =3D kvm_check_extension(cs->kvm_state, KVM_C=
-AP_X86_DISABLE_EXITS);
-> +        if (disable_exits) {
-> +            disable_exits &=3D (KVM_X86_DISABLE_EXITS_MWAIT |
-> +                              KVM_X86_DISABLE_EXITS_HLT |
-> +                              KVM_X86_DISABLE_EXITS_PAUSE);
-> +        }
-> +        if (kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS=
-, 0, disable_exits)) {
-> +            error_report("kvm: DISABLE EXITS not supported");
-> +        }
-> +    }
-> +
->      qemu_add_vm_change_state_handler(cpu_update_state, env);
-> =20
->      c =3D cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+This change is a workaround for a bug where mstatus.FS
+is not correctly reporting dirty when MTTCG and SMP are
+enabled which results in the floating point register file
+not being saved during context switches. This a critical
+bug for RISC-V in QEMU as it results in floating point
+register file corruption when running SMP Linux in the
+RISC-V 'virt' machine.
 
-Why not a bit per capability?
-I can see how someone might want to disable mwait exists
-but not the rest of them.
+This workaround will return dirty if mstatus.FS is
+switched from off to initial or clean. We have checked
+the specification and it is legal for an implementation
+to return either off, or dirty, if set to initial or clean.
 
-> --=20
-> 2.7.4
+This workaround will result in unnecessary floating point
+save restore. When mstatus.FS is off, floating point
+instruction trap to indicate the process is using the FPU.
+The OS can then save floating-point state of the previous
+process using the FPU and set mstatus.FS to initial or
+clean. With this workaround, mstatus.FS will always return
+dirty if set to a non-zero value, indicating floating point
+save restore is necessary, versus misreporting mstatus.FS
+resulting in floating point register file corruption.
+
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+---
+ target/riscv/op_helper.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index e34715d..7281b98 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -144,8 +144,23 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
+         }
+ 
+         mstatus = (mstatus & ~mask) | (val_to_write & mask);
+-        int dirty = (mstatus & MSTATUS_FS) == MSTATUS_FS;
+-        dirty |= (mstatus & MSTATUS_XS) == MSTATUS_XS;
++
++        /* Note: this is a workaround for an issue where mstatus.FS
++           does not report dirty when SMP and MTTCG is enabled. This
++           workaround is technically compliant with the RISC-V Privileged
++           specification as it is legal to return only off, or dirty,
++           however this may cause unnecessary saves of floating point state.
++           Without this workaround, floating point state is not saved and
++           restored correctly when SMP and MTTCG is enabled, */
++        if (qemu_tcg_mttcg_enabled()) {
++            /* FP is always dirty or off */
++            if (mstatus & MSTATUS_FS) {
++                mstatus |= MSTATUS_FS;
++            }
++        }
++
++        int dirty = ((mstatus & MSTATUS_FS) == MSTATUS_FS) |
++                    ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+         mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+         env->mstatus = mstatus;
+         break;
+-- 
+2.7.0
