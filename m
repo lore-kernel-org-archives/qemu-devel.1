@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f0u1n-0007tY-Nk
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:13:05 -0400
+	(envelope-from <mst@redhat.com>) id 1f0uUt-0008Tp-Oy
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f0u1i-0000XE-1f
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:13:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43074 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1f0uUp-0006qX-5g
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:43:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43728 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f0u1h-0000WT-Sn
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:12:57 -0400
-Date: Tue, 27 Mar 2018 20:12:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180327191243.GK2837@work-vm>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
-	<20180315102501.GA3062@work-vm>
-	<423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
-	<20180321081923.GB20571@xz-mi>
-	<b957b756-4996-7e79-406d-9587000839c1@gmail.com>
-	<20180326090213.GB17789@xz-mi>
-	<73e25db4-997f-0fbf-0c73-6589283c4005@gmail.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f0uUp-0006px-0J
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 15:43:03 -0400
+Date: Tue, 27 Mar 2018 22:42:56 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180327224058-mutt-send-email-mst@kernel.org>
+References: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <73e25db4-997f-0fbf-0c73-6589283c4005@gmail.com>
+In-Reply-To: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+Subject: Re: [Qemu-devel] [PATCH] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,159 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, liang.z.li@intel.com, kvm@vger.kernel.org, quintela@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+To: Wanpeng Li <kernellwp@gmail.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-* Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
+On Fri, Mar 16, 2018 at 07:36:42AM -0700, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
 >=20
+> This patch adds support for KVM_CAP_X86_DISABLE_EXITS. Provides userspa=
+ce with=20
+> per-VM capability(KVM_CAP_X86_DISABLE_EXITS) to not intercept MWAIT/HLT=
+/PAUSE=20
+> in order that to improve latency in some workloads.
 >=20
-> On 03/26/2018 05:02 PM, Peter Xu wrote:
-> > On Thu, Mar 22, 2018 at 07:38:07PM +0800, Xiao Guangrong wrote:
-> > >=20
-> > >=20
-> > > On 03/21/2018 04:19 PM, Peter Xu wrote:
-> > > > On Fri, Mar 16, 2018 at 04:05:14PM +0800, Xiao Guangrong wrote:
-> > > > >=20
-> > > > > Hi David,
-> > > > >=20
-> > > > > Thanks for your review.
-> > > > >=20
-> > > > > On 03/15/2018 06:25 PM, Dr. David Alan Gilbert wrote:
-> > > > >=20
-> > > > > > >     migration/ram.c | 32 ++++++++++++++++----------------
-> > > > > >=20
-> > > > > > Hi,
-> > > > > >      Do you have some performance numbers to show this helps?=
-  Were those
-> > > > > > taken on a normal system or were they taken with one of the c=
-ompression
-> > > > > > accelerators (which I think the compression migration was des=
-igned for)?
-> > > > >=20
-> > > > > Yes, i have tested it on my desktop, i7-4790 + 16G, by locally =
-live migrate
-> > > > > the VM which has 8 vCPUs + 6G memory and the max-bandwidth is l=
-imited to 350.
-> > > > >=20
-> > > > > During the migration, a workload which has 8 threads repeatedly=
- written total
-> > > > > 6G memory in the VM. Before this patchset, its bandwidth is ~25=
- mbps, after
-> > > > > applying, the bandwidth is ~50 mbps.
-> > > >=20
-> > > > Hi, Guangrong,
-> > > >=20
-> > > > Not really review comments, but I got some questions. :)
-> > >=20
-> > > Your comments are always valuable to me! :)
-> > >=20
-> > > >=20
-> > > > IIUC this patch will only change the behavior when last_sent_bloc=
-k
-> > > > changed.  I see that the performance is doubled after the change,
-> > > > which is really promising.  However I don't fully understand why =
-it
-> > > > brings such a big difference considering that IMHO current code i=
-s
-> > > > sending dirty pages per-RAMBlock.  I mean, IMHO last_sent_block s=
-hould
-> > > > not change frequently?  Or am I wrong?
-> > >=20
-> > > It's depends on the configuration, each memory-region which is ram =
-or
-> > > file backend has a RAMBlock.
-> > >=20
-> > > Actually, more benefits comes from the fact that the performance & =
-throughput
-> > > of the multithreads has been improved as the threads is fed by the
-> > > migration thread and the result is consumed by the migration
-> > > thread.
-> >=20
-> > I'm not sure whether I got your points - I think you mean that the
-> > compression threads and the migration thread can form a better
-> > pipeline if the migration thread does not do any compression at all.
-> >=20
-> > I think I agree with that.
-> >=20
-> > However it does not really explain to me on why a very rare event
-> > (sending the first page of a RAMBlock, considering bitmap sync is
-> > rare) can greatly affect the performance (it shows a doubled boost).
-> >=20
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  linux-headers/linux/kvm.h |  6 +++++-
+>  target/i386/kvm.c         | 12 ++++++++++++
+>  2 files changed, 17 insertions(+), 1 deletion(-)
 >=20
-> I understand it is trick indeed, but it is not very hard to explain.
-> Multi-threads (using 8 CPUs in our test) keep idle for a long time
-> for the origin code, however, after our patch, as the normal is
-> posted out async-ly that it's extremely fast as you said (the network
-> is almost idle for current implementation) so it has a long time that
-> the CPUs can be used effectively to generate more compressed data than
-> before.
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index a167be8..857df15 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -925,7 +925,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_GS 140
+>  #define KVM_CAP_S390_AIS 141
+>  #define KVM_CAP_SPAPR_TCE_VFIO 142
+> -#define KVM_CAP_X86_GUEST_MWAIT 143
+> +#define KVM_CAP_X86_DISABLE_EXITS 143
+>  #define KVM_CAP_ARM_USER_IRQ 144
+>  #define KVM_CAP_S390_CMMA_MIGRATION 145
+>  #define KVM_CAP_PPC_FWNMI 146
+> @@ -1508,6 +1508,10 @@ struct kvm_assigned_msix_entry {
+>  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+>  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+> =20
+> +#define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+> +#define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+> +#define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> +
+>  /* Available with KVM_CAP_ARM_USER_IRQ */
+> =20
+>  /* Bits for run->s.regs.device_irq_level */
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index d23fff1..95ed9eb 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -999,6 +999,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+> =20
+> +    if (env->features[FEAT_KVM_HINTS] & KVM_HINTS_DEDICATED) {
+> +        int disable_exits =3D kvm_check_extension(cs->kvm_state, KVM_C=
+AP_X86_DISABLE_EXITS);
+> +        if (disable_exits) {
+> +            disable_exits &=3D (KVM_X86_DISABLE_EXITS_MWAIT |
+> +                              KVM_X86_DISABLE_EXITS_HLT |
+> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> +        }
+> +        if (kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS=
+, 0, disable_exits)) {
+> +            error_report("kvm: DISABLE EXITS not supported");
+> +        }
+> +    }
+> +
+>      qemu_add_vm_change_state_handler(cpu_update_state, env);
+> =20
+>      c =3D cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
 
-One thing to try, to explain Peter's worry, would be, for testing, to
-add a counter to see how often this case triggers, and perhaps add
-some debug to see when;  Peter's right that flipping between the
-RAMBlocks seems odd, unless you're either doing lots of iterations or
-have lots of separate RAMBlocks for some reason.
+Why not a bit per capability?
+I can see how someone might want to disable mwait exists
+but not the rest of them.
 
-Dave
-
-> > Btw, about the numbers: IMHO the numbers might not be really "true
-> > numbers".  Or say, even the bandwidth is doubled, IMHO it does not
-> > mean the performance is doubled. Becasue the data has changed.
-> >=20
-> > Previously there were only compressed pages, and now for each cycle o=
-f
-> > RAMBlock looping we'll send a normal page (then we'll get more thing
-> > to send).  So IMHO we don't really know whether we sent more pages
-> > with this patch, we can only know we sent more bytes (e.g., an extrem=
-e
-> > case is that the extra 25Mbps/s are all caused by those normal pages,
-> > and we can be sending exactly the same number of pages like before, o=
-r
-> > even worse?).
-> >=20
->=20
-> Current implementation uses CPU very ineffectively (it's our next work
-> to be posted out) that the network is almost idle so posting more data
-> out is a better choice=EF=BC=8Cfurther more, migration thread plays a r=
-ole for
-> parallel, it'd better to make it fast.
->=20
-> > >=20
-> > > >=20
-> > > > Another follow-up question would be: have you measured how long t=
-ime
-> > > > needed to compress a 4k page, and how many time to send it?  I th=
-ink
-> > > > "sending the page" is not really meaningful considering that we j=
-ust
-> > > > put a page into the buffer (which should be extremely fast since =
-we
-> > > > don't really flush it every time), however I would be curious on =
-how
-> > > > slow would compressing a page be.
-> > >=20
-> > > I haven't benchmark the performance of zlib, i think it is CPU inte=
-nsive
-> > > workload, particularly, there no compression-accelerator (e.g, QAT)=
- on
-> > > our production. BTW, we were using lzo instead of zlib which worked
-> > > better for some workload.
-> >=20
-> > Never mind. Good to know about that.
-> >=20
-> > >=20
-> > > Putting a page into buffer should depend on the network, i,e, if th=
-e
-> > > network is congested it should take long time. :)
-> >=20
-> > Again, considering that I don't know much on compression (especially =
-I
-> > hardly used that) mine are only questions, which should not block you=
-r
-> > patches to be either queued/merged/reposted when proper. :)
->=20
-> Yes, i see. The discussion can potentially raise a better solution.
->=20
-> Thanks for your comment, Peter!
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --=20
+> 2.7.4
