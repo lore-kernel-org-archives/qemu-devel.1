@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f0hFI-0007P5-70
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:10 -0400
+	(envelope-from <cota@braap.org>) id 1f0hFI-0007P6-7b
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f0hFD-0005Lw-F5
+	(envelope-from <cota@braap.org>) id 1f0hFE-0005OA-H7
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:08 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:36039)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:34275)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f0hFD-0005LK-AK
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:03 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f0hFE-0005NC-DC
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:04 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 27 Mar 2018 01:33:53 -0400
-Message-Id: <1522128840-498-8-git-send-email-cota@braap.org>
+Date: Tue, 27 Mar 2018 01:33:58 -0400
+Message-Id: <1522128840-498-13-git-send-email-cota@braap.org>
 In-Reply-To: <1522128840-498-1-git-send-email-cota@braap.org>
 References: <1522128840-498-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 07/14] fpu: introduce hardfloat
+Subject: [Qemu-devel] [PATCH v2 12/14] hardfloat: support float32/64 square
+ root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,138 +27,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The appended paves the way for leveraging the host FPU for a subset
-of guest FP operations. For most guest workloads (e.g. FP flags
-aren't ever cleared, inexact occurs often and rounding is set to the
-default [to nearest]) this will yield sizable performance speedups.
+Performance results for fp-bench run under aarch64-linux-user
+on an Intel(R) Core(TM) i7-4790K CPU @ 4.00GHz host:
 
-The approach followed here avoids checking the FP exception flags register.
-See the added comment for details.
+- before:
+sqrt-single: 26.61 MFlops
+sqrt-double: 17.14 MFlops
 
-This assumes that QEMU is running on an IEEE754-compliant FPU and
-that the rounding is set to the default (to nearest). The
-implementation-dependent specifics of the FPU should not matter; things
-like tininess detection and snan representation are still dealt with in
-soft-fp. However, this approach will break on most hosts if we compile
-QEMU with flags such as -ffast-math. We control the flags so this should
-be easy to enforce though.
+- after:
+sqrt-single: 95.06 MFlops
+sqrt-double: 89.05 MFlops
 
-This patch just adds some boilerplate code; subsequent patches add
-operations, one per commit to ease bisection.
+Note that here we have a single implementation for both f32/f64.
+I tried the same trick we used before, but the results aren't
+as good:
+
+- w/ each using float32/64_is_normal or fpclassify etc.:
+sqrt-single: 95.50 MFlops
+sqrt-double: 84.55 MFlops
+
+- w/ both using fpclassify etc.:
+sqrt-single: 91.04 MFlops
+sqrt-double: 85.55 MFlops
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 91 insertions(+)
+ fpu/softfloat.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 6803279..ffe16b2 100644
+index 2dedb13..ba7289b 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -82,6 +82,8 @@ this code that are retained.
- /* softfloat (and in particular the code in softfloat-specialize.h) is
-  * target-dependent and needs the TARGET_* macros.
-  */
-+#include <math.h>
-+
- #include "qemu/osdep.h"
- #include "qemu/bitops.h"
- #include "fpu/softfloat.h"
-@@ -105,6 +107,95 @@ this code that are retained.
- *----------------------------------------------------------------------------*/
- #include "softfloat-specialize.h"
+@@ -2436,20 +2436,42 @@ float16 __attribute__((flatten)) float16_sqrt(float16 a, float_status *status)
+     return float16_round_pack_canonical(pr, status);
+ }
  
-+/*
-+ * Hardfloat
-+ *
-+ * Fast emulation of guest FP instructions is challenging for two reasons.
-+ * First, FP instruction semantics are similar but not identical, particularly
-+ * when handling NaNs. Second, emulating at reasonable speed the guest FP
-+ * exception flags is not trivial: reading the host's flags register with a
-+ * feclearexcept & fetestexcept pair is slow [slightly slower than soft-fp],
-+ * and trapping on every FP exception is not fast nor pleasant to work with.
-+ *
-+ * We address these challenges by leverage the host FPU for a subset of the
-+ * operations. To do this we follow the main idea presented in this paper:
-+ *
-+ * Guo, Yu-Chuan, et al. "Translating the ARM Neon and VFP instructions in a
-+ * binary translator." Software: Practice and Experience 46.12 (2016):1591-1615.
-+ *
-+ * The idea is thus to leverage the host FPU to (1) compute FP operations
-+ * and (2) identify whether FP exceptions occurred while avoiding
-+ * expensive exception flag register accesses.
-+ *
-+ * An important optimization shown in the paper is that given that exception
-+ * flags are rarely cleared by the guest, we can avoid recomputing some flags.
-+ * This is particularly useful for the inexact flag, which is very frequently
-+ * raised in floating-point workloads.
-+ *
-+ * We optimize the code further by deferring to soft-fp whenever FP exception
-+ * detection might get hairy. Two examples: (1) when at least one operand is
-+ * denormal/inf/NaN; (2) when operands are not guaranteed to lead to a 0 result
-+ * and the result is < the minimum normal.
-+ */
-+#define GEN_TYPE_CONV(name, to_t, from_t)       \
-+    static inline to_t name(from_t a)           \
-+    {                                           \
-+        to_t r = *(to_t *)&a;                   \
-+        return r;                               \
+-float32 __attribute__((flatten)) float32_sqrt(float32 a, float_status *status)
++static float32 __attribute__((flatten, noinline))
++soft_float32_sqrt(float32 a, float_status *status)
+ {
+     FloatParts pa = float32_unpack_canonical(a, status);
+     FloatParts pr = sqrt_float(pa, status, &float32_params);
+     return float32_round_pack_canonical(pr, status);
+ }
+ 
+-float64 __attribute__((flatten)) float64_sqrt(float64 a, float_status *status)
++static float64 __attribute__((flatten, noinline))
++soft_float64_sqrt(float64 a, float_status *status)
+ {
+     FloatParts pa = float64_unpack_canonical(a, status);
+     FloatParts pr = sqrt_float(pa, status, &float64_params);
+     return float64_round_pack_canonical(pr, status);
+ }
+ 
++#define GEN_FPU_SQRT(name, soft_t, host_t, host_sqrt_func)              \
++    soft_t name(soft_t a, float_status *s)                              \
++    {                                                                   \
++        soft_t ## _input_flush1(&a, s);                                 \
++        if (likely((soft_t ## _is_normal(a) || soft_t ## _is_zero(a)) && \
++                   !soft_t ## _is_neg(a) &&                             \
++                   s->float_exception_flags & float_flag_inexact &&     \
++                   s->float_rounding_mode == float_round_nearest_even)) { \
++            host_t ha = soft_t ## _to_ ## host_t(a);                    \
++            host_t hr = host_sqrt_func(ha);                             \
++                                                                        \
++            return host_t ## _to_ ## soft_t(hr);                        \
++        }                                                               \
++        return soft_ ## soft_t ## _sqrt(a, s);                          \
 +    }
 +
-+GEN_TYPE_CONV(float32_to_float, float, float32)
-+GEN_TYPE_CONV(float64_to_double, double, float64)
-+GEN_TYPE_CONV(float_to_float32, float32, float)
-+GEN_TYPE_CONV(double_to_float64, float64, double)
-+#undef GEN_TYPE_CONV
++GEN_FPU_SQRT(float32_sqrt, float32, float, sqrtf)
++GEN_FPU_SQRT(float64_sqrt, float64, double, sqrt)
++#undef GEN_FPU_SQRT
 +
-+#define GEN_INPUT_FLUSH(soft_t)                                         \
-+    static inline __attribute__((always_inline)) void                   \
-+    soft_t ## _input_flush__nocheck(soft_t *a, float_status *s)         \
-+    {                                                                   \
-+        if (unlikely(soft_t ## _is_denormal(*a))) {                     \
-+            *a = soft_t ## _set_sign(soft_t ## _zero,                   \
-+                                     soft_t ## _is_neg(*a));            \
-+            s->float_exception_flags |= float_flag_input_denormal;      \
-+        }                                                               \
-+    }                                                                   \
-+                                                                        \
-+    static inline __attribute__((always_inline)) void                   \
-+    soft_t ## _input_flush1(soft_t *a, float_status *s)                 \
-+    {                                                                   \
-+        if (likely(!s->flush_inputs_to_zero)) {                         \
-+            return;                                                     \
-+        }                                                               \
-+        soft_t ## _input_flush__nocheck(a, s);                          \
-+    }                                                                   \
-+                                                                        \
-+    static inline __attribute__((always_inline)) void                   \
-+    soft_t ## _input_flush2(soft_t *a, soft_t *b, float_status *s)      \
-+    {                                                                   \
-+        if (likely(!s->flush_inputs_to_zero)) {                         \
-+            return;                                                     \
-+        }                                                               \
-+        soft_t ## _input_flush__nocheck(a, s);                          \
-+        soft_t ## _input_flush__nocheck(b, s);                          \
-+    }                                                                   \
-+                                                                        \
-+    static inline __attribute__((always_inline)) void                   \
-+    soft_t ## _input_flush3(soft_t *a, soft_t *b, soft_t *c,            \
-+                            float_status *s)                            \
-+    {                                                                   \
-+        if (likely(!s->flush_inputs_to_zero)) {                         \
-+            return;                                                     \
-+        }                                                               \
-+        soft_t ## _input_flush__nocheck(a, s);                          \
-+        soft_t ## _input_flush__nocheck(b, s);                          \
-+        soft_t ## _input_flush__nocheck(c, s);                          \
-+    }
-+
-+GEN_INPUT_FLUSH(float32)
-+GEN_INPUT_FLUSH(float64)
-+#undef GEN_INPUT_FLUSH
-+
+ 
  /*----------------------------------------------------------------------------
- | Returns the fraction bits of the half-precision floating-point value `a'.
- *----------------------------------------------------------------------------*/
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
 -- 
 2.7.4
