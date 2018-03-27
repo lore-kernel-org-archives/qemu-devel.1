@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1f0kwk-0007LD-DN
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:31:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f0kzf-0000tO-Bx
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:34:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1f0kwg-0007Qj-Ao
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:31:14 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:39692
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1f0kwg-0007Pu-4e
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:31:10 -0400
-References: <1521538773-30802-1-git-send-email-frederic.konrad@adacore.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <c586efc7-029d-b98b-727c-fc439239270b@adacore.com>
-Date: Tue, 27 Mar 2018 11:31:05 +0200
+	(envelope-from <cohuck@redhat.com>) id 1f0kzc-0000Vs-3Y
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:34:15 -0400
+Date: Tue, 27 Mar 2018 11:33:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180327113359.0efc75f9.cohuck@redhat.com>
+In-Reply-To: <606ca3cc-f96e-2d39-df97-b5ec80d2e7a9@vivier.eu>
+References: <20180323225739.17329-1-laurent@vivier.eu>
+	<20180323225739.17329-10-laurent@vivier.eu>
+	<20180327104706.5363eda9.cohuck@redhat.com>
+	<606ca3cc-f96e-2d39-df97-b5ec80d2e7a9@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <1521538773-30802-1-git-send-email-frederic.konrad@adacore.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12] gdbstub: send a termination
- packet instead of crashing gdb
+Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 09/20] linux-user: move s390x
+ signal.c parts to s390x directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org, stefanha@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org
 
-Peter, can this be cherry-picked in 2.12-rc1?
+On Tue, 27 Mar 2018 11:13:37 +0200
+Laurent Vivier <laurent@vivier.eu> wrote:
 
-Thanks,
-Fred
+> Le 27/03/2018 =C3=A0 10:47, Cornelia Huck a =C3=A9crit=C2=A0:
+> > On Fri, 23 Mar 2018 23:57:28 +0100
+> > Laurent Vivier <laurent@vivier.eu> wrote:
+> >  =20
+> >> No code change, only move code from signal.c to
+> >> s390x/signal.c, except adding includes and
+> >> exporting setup_frame() and setup_rt_frame().
+> >>
+> >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> >> ---
+> >>  linux-user/s390x/signal.c        | 309 ++++++++++++++++++++++++++++++=
++++++++++
+> >>  linux-user/s390x/target_signal.h |   6 +-
+> >>  linux-user/signal.c              | 306 ------------------------------=
+--------
+> >>  3 files changed, 314 insertions(+), 307 deletions(-) =20
+> >=20
+> > I'm not too emotionally involved with linux-user, but =20
+>=20
+> I use git-publish and it automatically copies people in the MAINTAINERS
+> file (in your case because of "K: ^Subject:.*(?i)s390x?").
 
-On 03/20/2018 10:39 AM, KONRAD Frederic wrote:
-> Since the commit:
-> commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
-> Author: Stefan Hajnoczi <stefanha@redhat.com>
-> Date:   Wed Mar 7 14:42:05 2018 +0000
+I already guessed so - but I'm fine with looking at this as well, if I
+have some spare cycles :)
+
 >=20
->      vl: introduce vm_shutdown()
+> > Acked-by: Cornelia Huck <cohuck@redhat.com>
+> >  =20
 >=20
-> GDB crashes when qemu exits (at least on sparc-softmmu):
-> Remote communication error.  Target disconnected.: Connection reset by =
-peer.
-> Quitting: putpkt: write failed: Broken pipe.
+> Thank you!
 >=20
-> So send a packet to exit GDB before we exit QEMU:
-> [Inferior 1 (Thread 0) exited normally]
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> ---
->=20
-> Notes:
->      V1 -> V2:
->        * fix typos
->        * mark the patch for-2.12
->=20
->   gdbstub.c              | 7 +++++++
->   include/exec/gdbstub.h | 2 ++
->   vl.c                   | 2 ++
->   3 files changed, 11 insertions(+)
->=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index f1d5148..a76b2fa 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2052,6 +2052,13 @@ int gdbserver_start(const char *device)
->       return 0;
->   }
->  =20
-> +void gdbserver_cleanup(void)
-> +{
-> +    if (gdbserver_state) {
-> +        put_packet(gdbserver_state, "W00");
-> +    }
-> +}
-> +
->   static void register_types(void)
->   {
->       type_register_static(&char_gdb_type_info);
-> diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-> index 9aa7756..2e8a4b8 100644
-> --- a/include/exec/gdbstub.h
-> +++ b/include/exec/gdbstub.h
-> @@ -103,6 +103,8 @@ int gdbserver_start(int);
->   int gdbserver_start(const char *port);
->   #endif
->  =20
-> +void gdbserver_cleanup(void);
-> +
->   /**
->    * gdb_has_xml:
->    * This is an ugly hack to cope with both new and old gdb.
-> diff --git a/vl.c b/vl.c
-> index 19340a3..cd8d5cb 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4725,6 +4725,8 @@ int main(int argc, char **argv, char **envp)
->  =20
->       main_loop();
->  =20
-> +    gdbserver_cleanup();
-> +
->       /* No more vcpu or device emulation activity beyond this point */
->       vm_shutdown();
->  =20
->=20
+> Laurent
