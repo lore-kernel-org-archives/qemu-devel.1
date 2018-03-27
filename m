@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f0gfO-0007Q5-F3
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:57:03 -0400
+	(envelope-from <cota@braap.org>) id 1f0hFI-0007P3-5q
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f0gfK-0002wf-KL
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:57:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41538 helo=mx1.redhat.com)
+	(envelope-from <cota@braap.org>) id 1f0hFD-0005Lo-DI
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:08 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:54151)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1f0gfK-0002uf-G1
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:56:58 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue, 27 Mar 2018 00:56:44 -0400
-Message-Id: <20180327045646.21112-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 0/2] Ide patches
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f0hFD-0005Kz-9R
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:03 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Tue, 27 Mar 2018 01:33:52 -0400
+Message-Id: <1522128840-498-7-git-send-email-cota@braap.org>
+In-Reply-To: <1522128840-498-1-git-send-email-cota@braap.org>
+References: <1522128840-498-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 06/14] target/tricore: use
+ float32_is_denormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +25,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, jsnow@redhat.com
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-The following changes since commit 7b93d78a04aa242d377ae213b79db6c319c71847:
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ target/tricore/fpu_helper.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-03-26 15:17:25 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/jnsnow/qemu.git tags/ide-pull-request
-
-for you to fetch changes up to eb69953ecb1cbe7b4c4093a97a4dab3daa315d4e:
-
-  macio: fix NULL pointer dereference when issuing IDE trim (2018-03-27 00:38:00 -0400)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Anton Nefedov (1):
-  ide: fix invalid TRIM range abortion for macio
-
-Mark Cave-Ayland (1):
-  macio: fix NULL pointer dereference when issuing IDE trim
-
- hw/ide/core.c  | 17 +++++++++--------
- hw/ide/macio.c |  2 +-
- 2 files changed, 10 insertions(+), 9 deletions(-)
-
+diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
+index df16290..31df462 100644
+--- a/target/tricore/fpu_helper.c
++++ b/target/tricore/fpu_helper.c
+@@ -44,11 +44,6 @@ static inline uint8_t f_get_excp_flags(CPUTriCoreState *env)
+               | float_flag_inexact);
+ }
+ 
+-static inline bool f_is_denormal(float32 arg)
+-{
+-    return float32_is_zero_or_denormal(arg) && !float32_is_zero(arg);
+-}
+-
+ static inline float32 f_maddsub_nan_result(float32 arg1, float32 arg2,
+                                            float32 arg3, float32 result,
+                                            uint32_t muladd_negate_c)
+@@ -260,8 +255,8 @@ uint32_t helper_fcmp(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
+     set_flush_inputs_to_zero(0, &env->fp_status);
+ 
+     result = 1 << (float32_compare_quiet(arg1, arg2, &env->fp_status) + 1);
+-    result |= f_is_denormal(arg1) << 4;
+-    result |= f_is_denormal(arg2) << 5;
++    result |= float32_is_denormal(arg1) << 4;
++    result |= float32_is_denormal(arg2) << 5;
+ 
+     flags = f_get_excp_flags(env);
+     if (flags) {
 -- 
-2.14.3
+2.7.4
