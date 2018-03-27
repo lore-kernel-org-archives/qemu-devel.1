@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0qcX-0006Vq-S1
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:34:47 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0r8f-00050r-Us
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0qcX-0001zz-6C
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:34:45 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f0r8f-0004k3-0b
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:07:57 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 27 Mar 2018 17:30:11 +0200
-Message-Id: <20180327153011.29569-1-marcandre.lureau@redhat.com>
+Date: Tue, 27 Mar 2018 18:07:36 +0200
+Message-Id: <20180327160736.24309-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] blockjob: use qapi enum helpers
+Subject: [Qemu-devel] [PATCH] blockjob: leak fix,
+ remove from txn when failing early
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +24,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-QAPI generator provide #define helpers for looking up enum string.
+This fixes leaks found by ASAN such as:
+  GTESTER tests/test-blockjob
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D31442=3D=3DERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 24 byte(s) in 1 object(s) allocated from:
+    #0 0x7f88483cba38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
+8)
+    #1 0x7f8845e1bd77 in g_malloc0 ../glib/gmem.c:129
+    #2 0x7f8845e1c04b in g_malloc0_n ../glib/gmem.c:360
+    #3 0x5584d2732498 in block_job_txn_new /home/elmarco/src/qemu/blockjo=
+b.c:172
+    #4 0x5584d2739b28 in block_job_create /home/elmarco/src/qemu/blockjob=
+.c:973
+    #5 0x5584d270ae31 in mk_job /home/elmarco/src/qemu/tests/test-blockjo=
+b.c:34
+    #6 0x5584d270b1c1 in do_test_id /home/elmarco/src/qemu/tests/test-blo=
+ckjob.c:57
+    #7 0x5584d270b65c in test_job_ids /home/elmarco/src/qemu/tests/test-b=
+lockjob.c:118
+    #8 0x7f8845e40b69 in test_case_run ../glib/gtestutils.c:2255
+    #9 0x7f8845e40f29 in g_test_run_suite_internal ../glib/gtestutils.c:2=
+339
+    #10 0x7f8845e40fd2 in g_test_run_suite_internal ../glib/gtestutils.c:=
+2351
+    #11 0x7f8845e411e9 in g_test_run_suite ../glib/gtestutils.c:2426
+    #12 0x7f8845e3fe72 in g_test_run ../glib/gtestutils.c:1692
+    #13 0x5584d270d6e2 in main /home/elmarco/src/qemu/tests/test-blockjob=
+.c:377
+    #14 0x7f8843641f29 in __libc_start_main (/lib64/libc.so.6+0x20f29)
+
+Add an assert to make sure that the job doesn't have associated txn befor=
+e free().
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- blockjob.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ blockjob.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/blockjob.c b/blockjob.c
-index ef3ed69ff1..11c9ce124d 100644
+index 11c9ce124d..bb75386515 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -75,10 +75,8 @@ static void block_job_state_transition(BlockJob *job, =
-BlockJobStatus s1)
-     assert(s1 >=3D 0 && s1 <=3D BLOCK_JOB_STATUS__MAX);
-     trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] =
-?
-                                      "allowed" : "disallowed",
--                                     qapi_enum_lookup(&BlockJobStatus_lo=
-okup,
--                                                      s0),
--                                     qapi_enum_lookup(&BlockJobStatus_lo=
-okup,
--                                                      s1));
-+                                     BlockJobStatus_str(s0),
-+                                     BlockJobStatus_str(s1));
-     assert(BlockJobSTT[s0][s1]);
-     job->status =3D s1;
- }
-@@ -86,17 +84,15 @@ static void block_job_state_transition(BlockJob *job,=
- BlockJobStatus s1)
- static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error **=
-errp)
+@@ -228,6 +228,7 @@ void block_job_unref(BlockJob *job)
  {
-     assert(bv >=3D 0 && bv <=3D BLOCK_JOB_VERB__MAX);
--    trace_block_job_apply_verb(job, qapi_enum_lookup(&BlockJobStatus_loo=
-kup,
--                                                     job->status),
--                               qapi_enum_lookup(&BlockJobVerb_lookup, bv=
-),
-+    trace_block_job_apply_verb(job, BlockJobStatus_str(job->status),
-+                               BlockJobVerb_str(bv),
-                                BlockJobVerbTable[bv][job->status] ?
-                                "allowed" : "prohibited");
-     if (BlockJobVerbTable[bv][job->status]) {
-         return 0;
-     }
-     error_setg(errp, "Job '%s' in state '%s' cannot accept command verb =
-'%s'",
--               job->id, qapi_enum_lookup(&BlockJobStatus_lookup, job->st=
-atus),
--               qapi_enum_lookup(&BlockJobVerb_lookup, bv));
-+               job->id, BlockJobStatus_str(job->status), BlockJobVerb_st=
-r(bv));
-     return -EPERM;
+     if (--job->refcnt =3D=3D 0) {
+         assert(job->status =3D=3D BLOCK_JOB_STATUS_NULL);
++        assert(!job->txn);
+         BlockDriverState *bs =3D blk_bs(job->blk);
+         QLIST_REMOVE(job, job_list);
+         bs->job =3D NULL;
+@@ -479,6 +480,7 @@ static int block_job_finalize_single(BlockJob *job)
+=20
+     QLIST_REMOVE(job, txn_list);
+     block_job_txn_unref(job->txn);
++    job->txn =3D NULL;
+     block_job_conclude(job);
+     return 0;
+ }
+@@ -994,6 +996,9 @@ void block_job_pause_all(void)
+ void block_job_early_fail(BlockJob *job)
+ {
+     assert(job->status =3D=3D BLOCK_JOB_STATUS_CREATED);
++    QLIST_REMOVE(job, txn_list);
++    block_job_txn_unref(job->txn);
++    job->txn =3D NULL;
+     block_job_decommission(job);
  }
 =20
 --=20
