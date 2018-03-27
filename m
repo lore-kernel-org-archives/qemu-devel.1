@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f0vlU-0000dj-R1
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:04:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0vmi-0001Ky-Uq
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f0vlT-0003ey-Ty
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:04:20 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44861)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f0vlT-0003eo-P0
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:04:19 -0400
-Received: by mail-ot0-x241.google.com with SMTP id x6-v6so318158otg.11
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 14:04:19 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <c586efc7-029d-b98b-727c-fc439239270b@adacore.com>
-References: <1521538773-30802-1-git-send-email-frederic.konrad@adacore.com>
-	<c586efc7-029d-b98b-727c-fc439239270b@adacore.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Mar 2018 22:03:58 +0100
-Message-ID: <CAFEAcA8dAuV3KuQS9Eh=75-oijFEfnDAQk++WX8cZwJXOSE3Kw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12] gdbstub: send a termination
- packet instead of crashing gdb
+	(envelope-from <eblake@redhat.com>) id 1f0vmi-00051I-2b
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:05:36 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 27 Mar 2018 16:05:17 -0500
+Message-Id: <20180327210517.1804242-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12] nbd: Fix 32-bit compilation on
+ BLOCK_STATUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +18,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 27 March 2018 at 10:31, KONRAD Frederic <frederic.konrad@adacore.com> wr=
-ote:
-> Peter, can this be cherry-picked in 2.12-rc1?
->
-> Thanks,
-> Fred
->
->
-> On 03/20/2018 10:39 AM, KONRAD Frederic wrote:
->>
->> Since the commit:
->> commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268
->> Author: Stefan Hajnoczi <stefanha@redhat.com>
->> Date:   Wed Mar 7 14:42:05 2018 +0000
->>
->>      vl: introduce vm_shutdown()
->>
->> GDB crashes when qemu exits (at least on sparc-softmmu):
->> Remote communication error.  Target disconnected.: Connection reset by
->> peer.
->> Quitting: putpkt: write failed: Broken pipe.
->>
->> So send a packet to exit GDB before we exit QEMU:
->> [Inferior 1 (Thread 0) exited normally]
->>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->> ---
+iotests 123 and 209 fail on 32-bit platforms.  The culprit:
+sizeof(extent) is wrong; we want sizeof(*extent).  But since
+the struct is 8 bytes, it happened to work on 64-bit platforms
+where the pointer is also 8 bytes (nasty).
 
-Applied to master, thanks.
+Fixes: 78a33ab58
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/nbd-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
--- PMM
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index e64e346d690..e7caf49fbb4 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -239,7 +239,7 @@ static int nbd_parse_blockstatus_payload(NBDClientSession *client,
+ {
+     uint32_t context_id;
+
+-    if (chunk->length != sizeof(context_id) + sizeof(extent)) {
++    if (chunk->length != sizeof(context_id) + sizeof(*extent)) {
+         error_setg(errp, "Protocol error: invalid payload for "
+                          "NBD_REPLY_TYPE_BLOCK_STATUS");
+         return -EINVAL;
+-- 
+2.14.3
