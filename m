@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f0mrb-00054k-0i
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:34:04 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f0msb-0005Z9-B0
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f0mrW-0006gq-Je
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:34:03 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:50268)
+	(envelope-from <alex.bennee@linaro.org>) id 1f0msW-0007FU-Nf
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:35:05 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44822)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f0mrW-0006fk-9I
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:33:58 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id l201so2776269wmg.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 04:33:58 -0700 (PDT)
+	id 1f0msW-0007Ep-Gz
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:35:00 -0400
+Received: by mail-wr0-x241.google.com with SMTP id u46so22052347wrc.11
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 04:35:00 -0700 (PDT)
 References: <1521663109-32262-1-git-send-email-cota@braap.org>
-	<1521663109-32262-5-git-send-email-cota@braap.org>
+	<1521663109-32262-6-git-send-email-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1521663109-32262-5-git-send-email-cota@braap.org>
-Date: Tue, 27 Mar 2018 12:33:55 +0100
-Message-ID: <87vadh92ho.fsf@linaro.org>
+In-reply-to: <1521663109-32262-6-git-send-email-cota@braap.org>
+Date: Tue, 27 Mar 2018 12:34:57 +0100
+Message-ID: <87tvt192fy.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 04/14] fp-test: add muladd variants
+Subject: Re: [Qemu-devel] [PATCH v1 05/14] softfloat: add float32_is_normal
+ and float64_is_normal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,142 +37,45 @@ Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell 
 
 Emilio G. Cota <cota@braap.org> writes:
 
-> These are a few muladd-related operations that the original IBM syntax
-> does not specify; model files for these are in muladd.fptest.
+> This paves the way for upcoming work.
 >
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  tests/fp-test/fp-test.c     | 24 +++++++++++++++++++++
->  tests/fp-test/muladd.fptest | 51 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 75 insertions(+)
->  create mode 100644 tests/fp-test/muladd.fptest
+>  include/fpu/softfloat.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >
-> diff --git a/tests/fp-test/fp-test.c b/tests/fp-test/fp-test.c
-> index 27637c4..2200d40 100644
-> --- a/tests/fp-test/fp-test.c
-> +++ b/tests/fp-test/fp-test.c
-> @@ -53,6 +53,9 @@ enum op {
->      OP_SUB,
->      OP_MUL,
->      OP_MULADD,
-> +    OP_MULADD_NEG_ADDEND,
-> +    OP_MULADD_NEG_PRODUCT,
-> +    OP_MULADD_NEG_RESULT,
->      OP_DIV,
->      OP_SQRT,
->      OP_MINNUM,
-> @@ -69,6 +72,9 @@ static const struct op_desc ops[] =3D {
->      [OP_SUB] =3D       { "-", 2 },
->      [OP_MUL] =3D       { "*", 2 },
->      [OP_MULADD] =3D    { "*+", 3 },
-> +    [OP_MULADD_NEG_ADDEND] =3D  { "*+nc", 3 },
-> +    [OP_MULADD_NEG_PRODUCT] =3D { "*+np", 3 },
-> +    [OP_MULADD_NEG_RESULT] =3D  { "*+nr", 3 },
->      [OP_DIV] =3D       { "/", 2 },
->      [OP_SQRT] =3D      { "V", 1 },
->      [OP_MINNUM] =3D    { "<C", 2 },
-> @@ -463,6 +469,15 @@ static enum error soft_tester(struct test_op *t)
->          case OP_MULADD:
->              res =3D float32_muladd(a, b, c, 0, s);
->              break;
-> +        case OP_MULADD_NEG_ADDEND:
-> +            res =3D float32_muladd(a, b, c, float_muladd_negate_c, s);
-> +            break;
-> +        case OP_MULADD_NEG_PRODUCT:
-> +            res =3D float32_muladd(a, b, c, float_muladd_negate_product,=
- s);
-> +            break;
-> +        case OP_MULADD_NEG_RESULT:
-> +            res =3D float32_muladd(a, b, c, float_muladd_negate_result, =
-s);
-> +            break;
->          case OP_DIV:
->              res =3D float32_div(a, b, s);
->              break;
-> @@ -522,6 +537,15 @@ static enum error soft_tester(struct test_op *t)
->          case OP_MULADD:
->              res64 =3D float64_muladd(a, b, c, 0, s);
->              break;
-> +        case OP_MULADD_NEG_ADDEND:
-> +            res64 =3D float64_muladd(a, b, c, float_muladd_negate_c, s);
-> +            break;
-> +        case OP_MULADD_NEG_PRODUCT:
-> +            res64 =3D float64_muladd(a, b, c, float_muladd_negate_produc=
-t, s);
-> +            break;
-> +        case OP_MULADD_NEG_RESULT:
-> +            res64 =3D float64_muladd(a, b, c, float_muladd_negate_result=
-, s);
-> +            break;
->          case OP_DIV:
->              res64 =3D float64_div(a, b, s);
->              break;
-
-Are there any intrinsics we could use for the hard variant which would
-be useful if we want to run under translation?
-
-> diff --git a/tests/fp-test/muladd.fptest b/tests/fp-test/muladd.fptest
-> new file mode 100644
-> index 0000000..6cd48ff
-> --- /dev/null
-> +++ b/tests/fp-test/muladd.fptest
-> @@ -0,0 +1,51 @@
-> +# nc =3D=3D negate addend
-> +b32*+nc =3D0 -Inf -Inf +Inf -> Q i
-> +b32*+nc =3D0 -1.7FFFFFP127 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -1.6C9AE7P113 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -1.000000P-126 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -0.7FFFFFP-126 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -0.1B977AP-126 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -0.000001P-126 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -1.000000P0 -Inf +Inf -> Q i
-> +b32*+nc =3D0 -Zero -Inf +Inf -> Q i
-> +b32*+nc =3D0 +Zero -Inf +Inf -> Q i
-> +b32*+nc =3D0 -Zero -1.000000P-126 +1.7FFFFFP127 -> -1.7FFFFFP127
-> +b32*+nc =3D0 +Zero -1.000000P-126 +1.7FFFFFP127 -> -1.7FFFFFP127
-> +b32*+nc =3D0 -1.000000P-126 -1.7FFFFFP127 -1.4B9156P109 -> +1.4B9156P109=
- x
-> +b32*+nc =3D0 -0.7FFFFFP-126 -1.7FFFFFP127 -1.51BA59P-113 -> +1.7FFFFDP1 x
-> +b32*+nc =3D0 -0.3D6B57P-126 -1.7FFFFFP127 -1.265398P-67 -> +1.75AD5BP0 x
-> +b32*+nc =3D0 -0.000001P-126 -1.7FFFFFP127 -1.677330P-113 -> +1.7FFFFFP-2=
-2 x
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index 36626a5..7b9d31c 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -402,6 +402,11 @@ static inline int float32_is_zero(float32 a)
+>      return (float32_val(a) & 0x7fffffff) =3D=3D 0;
+>  }
+>
+> +static inline bool float32_is_normal(float32 a)
+> +{
+> +    return ((float32_val(a) + 0x00800000) & 0x7fffffff) >=3D 0x01000000;
+> +}
 > +
-> +# np =3D=3D negate product
-> +b32*+np =3D0 +Inf -Inf -Inf -> Q i
-> +b32*+np =3D0 +1.7FFFFFP127 -Inf -Inf -> Q i
-> +b32*+np =3D0 +1.6C9AE7P113 -Inf -Inf -> Q i
-> +b32*+np =3D0 +1.000000P-126 -Inf -Inf -> Q i
-> +b32*+np =3D0 +0.7FFFFFP-126 -Inf -Inf -> Q i
-> +b32*+np =3D0 +0.1B977AP-126 -Inf -Inf -> Q i
-> +b32*+np =3D0 +0.000001P-126 -Inf -Inf -> Q i
-> +b32*+np =3D0 +1.000000P0 -Inf -Inf -> Q i
-> +b32*+np =3D0 +Zero -Inf -Inf -> Q i
-> +b32*+np =3D0 +Zero -Inf -Inf -> Q i
-> +b32*+np =3D0 -Zero -1.000000P-126 -1.7FFFFFP127 -> -1.7FFFFFP127
-> +b32*+np =3D0 +Zero -1.000000P-126 -1.7FFFFFP127 -> -1.7FFFFFP127
-> +b32*+np =3D0 -1.3A6A89P-18 +1.24E7AEP9 -0.7FFFFFP-126 -> +1.7029E9P-9 x
+>  static inline int float32_is_any_nan(float32 a)
+>  {
+>      return ((float32_val(a) & ~(1 << 31)) > 0x7f800000UL);
+> @@ -531,6 +536,11 @@ static inline int float64_is_zero(float64 a)
+>      return (float64_val(a) & 0x7fffffffffffffffLL) =3D=3D 0;
+>  }
+>
+> +static inline bool float64_is_normal(float64 a)
+> +{
+> +    return ((float64_val(a) + (1ULL << 52)) & -1ULL >> 1) >=3D 1ULL << 5=
+3;
+> +}
 > +
-> +# nr =3D=3D negate result
-> +b32*+nr =3D0 -Inf -Inf -Inf -> Q i
-> +b32*+nr =3D0 -1.7FFFFFP127 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -1.6C9AE7P113 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -1.000000P-126 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -0.7FFFFFP-126 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -0.1B977AP-126 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -0.000001P-126 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -1.000000P0 -Inf -Inf -> Q i
-> +b32*+nr =3D0 -Zero -Inf -Inf -> Q i
-> +b32*+nr =3D0 -Zero -Inf -Inf -> Q i
-> +b32*+nr =3D0 +Zero -1.000000P-126 -1.7FFFFFP127 -> +1.7FFFFFP127
-> +b32*+nr =3D0 -Zero -1.000000P-126 -1.7FFFFFP127 -> +1.7FFFFFP127
-> +b32*+nr =3D0 -1.000000P-126 -1.7FFFFFP127 -1.4B9156P109 -> +1.4B9156P109=
- x
-> +b32*+nr =3D0 -0.7FFFFFP-126 -1.7FFFFFP127 -1.51BA59P-113 -> -1.7FFFFDP1 x
-> +b32*+nr =3D0 -0.3D6B57P-126 -1.7FFFFFP127 -1.265398P-67 -> -1.75AD5BP0 x
-> +b32*+nr =3D0 -0.000001P-126 -1.7FFFFFP127 -1.677330P-113 -> -1.7FFFFFP-2=
-2 x
-> +b32*+nr =3D0 +1.72E53AP-33 -1.7FFFFFP127 -1.5AA684P-2 -> +1.72E539P95 x
+>  static inline int float64_is_any_nan(float64 a)
+>  {
+>      return ((float64_val(a) & ~(1ULL << 63)) > 0x7ff0000000000000ULL);
 
 
 --
