@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f0pnA-0007xJ-LF
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f0puE-0005Pa-2J
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f0pn8-0000zW-E2
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59906 helo=mx1.redhat.com)
+	(envelope-from <cohuck@redhat.com>) id 1f0puA-0003tN-0y
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:48:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60232 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f0pn8-0000zK-AJ
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:38 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 27 Mar 2018 15:41:24 +0100
-Message-Id: <20180327144124.32533-5-stefanha@redhat.com>
-In-Reply-To: <20180327144124.32533-1-stefanha@redhat.com>
-References: <20180327144124.32533-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] MAINTAINERS: add include/block/aio-wait.h
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1f0pu9-0003tH-SK
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:48:53 -0400
+Date: Tue, 27 Mar 2018 16:48:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180327164840.78a7d905.cohuck@redhat.com>
+In-Reply-To: <20180323173823.GD17165@work-vm>
+References: <1521579652-180248-1-git-send-email-mst@redhat.com>
+	<1521579652-180248-2-git-send-email-mst@redhat.com>
+	<20180323173823.GD17165@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] update-linux-headers.sh: add
+ unistd.h and kvm on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, James Hogan <jhogan@kernel.org>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-The include/block/aio-wait.h header file was added by commit
-7719f3c968c59e1bcda7e177679dc765b59e578f ("block: extract
-AIO_WAIT_WHILE() from BlockDriverState") without updating MAINTAINERS.
+On Fri, 23 Mar 2018 17:38:24 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180312132204.23683-1-stefanha@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6fa36c7a2d..24b70169bc 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1351,6 +1351,7 @@ F: util/aio-*.c
- F: block/io.c
- F: migration/block*
- F: include/block/aio.h
-+F: include/block/aio-wait.h
- F: scripts/qemugdb/aio.py
- T: git git://github.com/stefanha/qemu.git block
- 
--- 
-2.14.3
+> > @@ -120,6 +124,10 @@ EOF
+> >          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+> >          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+> >      fi
+> > +    if [ $arch = s390 ]; then
+> > +        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-arm/"
+> > +        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-arm/"  
+> 
+> That doesn't look right - I'm guessing that should be copying into
+> asm-s390 ?
+
+I think we rather need "$arch = arm" or so here (s390 only has
+unistd.h, which is already handled).
