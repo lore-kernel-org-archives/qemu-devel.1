@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0pcR-0007Xk-JE
+	(envelope-from <eblake@redhat.com>) id 1f0pcO-0007Um-RX
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0pcO-000507-Na
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38158 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0pcO-0004zt-Dv
+	(envelope-from <eblake@redhat.com>) id 1f0pcK-0004yE-Oq
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49334 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0pcK-0004xx-GP
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:28 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 151FD818B11B
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 14:30:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1D7CD4072CC5
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 14:30:28 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 27 Mar 2018 09:30:13 -0500
-Message-Id: <20180327143014.1767669-14-eblake@redhat.com>
+Date: Tue, 27 Mar 2018 09:30:06 -0500
+Message-Id: <20180327143014.1767669-7-eblake@redhat.com>
 In-Reply-To: <20180327143014.1767669-1-eblake@redhat.com>
 References: <20180327143014.1767669-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/14] tests: qmp-test: add test for new "x-oob"
+Subject: [Qemu-devel] [PULL 06/14] qmp: fix qmp_capabilities error regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +33,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-Test the new OOB capability. It's mostly the reverted OOB test
-(see commit 4fd78ad7), but differs in that:
+When someone sends a command before QMP handshake, the error used to be
+like this:
 
-- It uses the new qtest_init_without_qmp_handshake() parameter to
-  create the monitor with "x-oob"
-- Squashed the capability tests on greeting message
-- Don't use qtest_global any more, instead use self-maintained
-  QTestState, which is the trend
+ {"execute": "query-cpus"}
+ {"error": {"class": "CommandNotFound", "desc":
+            "Expecting capabilities negotiation with 'qmp_capabilities'"}=
+}
 
+While after cf869d5317 it becomes:
+
+ {"execute": "query-cpus"}
+ {"error": {"class": "CommandNotFound", "desc":
+            "The command query-cpus has not been found"}}
+
+Fix it back to the nicer one.
+
+Fixes: cf869d5317 ("qmp: support out-of-band (oob) execution", 2018-03-19=
+)
+Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180326063901.27425-9-peterx@redhat.com>
+Message-Id: <20180326063901.27425-2-peterx@redhat.com>
+Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: rebase to qtest_init changes]
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+[eblake: commit message grammar tweaks]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qmp-test.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 82 insertions(+)
+ monitor.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 2134d95db97..772058fc4c4 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -135,6 +135,87 @@ static void test_qmp_protocol(void)
-     qtest_quit(qts);
- }
+diff --git a/monitor.c b/monitor.c
+index de709fc2e5d..3b1ef34711b 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1203,8 +1203,14 @@ static bool qmp_cmd_oob_check(Monitor *mon, QDict =
+*req, Error **errp)
 
-+/* Tests for Out-Of-Band support. */
-+static void test_qmp_oob(void)
-+{
-+    QTestState *qts;
-+    QDict *resp, *q;
-+    int acks =3D 0;
-+    const QListEntry *entry;
-+    QList *capabilities;
-+    QString *qstr;
-+    const char *cmd_id;
-+
-+    qts =3D qtest_init_without_qmp_handshake(true, common_args);
-+
-+    /* Check the greeting message. */
-+    resp =3D qtest_qmp_receive(qts);
-+    q =3D qdict_get_qdict(resp, "QMP");
-+    g_assert(q);
-+    capabilities =3D qdict_get_qlist(q, "capabilities");
-+    g_assert(capabilities && !qlist_empty(capabilities));
-+    entry =3D qlist_first(capabilities);
-+    g_assert(entry);
-+    qstr =3D qobject_to(QString, entry->value);
-+    g_assert(qstr);
-+    g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "oob");
-+    QDECREF(resp);
-+
-+    /* Try a fake capability, it should fail. */
-+    resp =3D qtest_qmp(qts,
-+                     "{ 'execute': 'qmp_capabilities', "
-+                     "  'arguments': { 'enable': [ 'cap-does-not-exist' =
-] } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+    QDECREF(resp);
-+
-+    /* Now, enable OOB in current QMP session, it should succeed. */
-+    resp =3D qtest_qmp(qts,
-+                     "{ 'execute': 'qmp_capabilities', "
-+                     "  'arguments': { 'enable': [ 'oob' ] } }");
-+    g_assert(qdict_haskey(resp, "return"));
-+    QDECREF(resp);
-+
-+    /*
-+     * Try any command that does not support OOB but with OOB flag. We
-+     * should get failure.
-+     */
-+    resp =3D qtest_qmp(qts,
-+                     "{ 'execute': 'query-cpus',"
-+                     "  'control': { 'run-oob': true } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+    QDECREF(resp);
-+
-+    /*
-+     * First send the "x-oob-test" command with lock=3Dtrue and
-+     * oob=3Dfalse, it should hang the dispatcher and main thread;
-+     * later, we send another lock=3Dfalse with oob=3Dtrue to continue
-+     * that thread processing.  Finally we should receive replies from
-+     * both commands.
-+     */
-+    qtest_async_qmp(qts,
-+                    "{ 'execute': 'x-oob-test',"
-+                    "  'arguments': { 'lock': true }, "
-+                    "  'id': 'lock-cmd'}");
-+    qtest_async_qmp(qts,
-+                    "{ 'execute': 'x-oob-test', "
-+                    "  'arguments': { 'lock': false }, "
-+                    "  'control': { 'run-oob': true }, "
-+                    "  'id': 'unlock-cmd' }");
-+
-+    /* Ignore all events.  Wait for 2 acks */
-+    while (acks < 2) {
-+        resp =3D qtest_qmp_receive(qts);
-+        cmd_id =3D qdict_get_str(resp, "id");
-+        if (!g_strcmp0(cmd_id, "lock-cmd") ||
-+            !g_strcmp0(cmd_id, "unlock-cmd")) {
-+            acks++;
+     cmd =3D qmp_find_command(mon->qmp.commands, command);
+     if (!cmd) {
+-        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+-                  "The command %s has not been found", command);
++        if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
++            error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
++                      "Expecting capabilities negotiation "
++                      "with 'qmp_capabilities'");
++        } else {
++            error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
++                      "The command %s has not been found", command);
 +        }
-+        QDECREF(resp);
-+    }
-+
-+    qtest_quit(qts);
-+}
-+
- static int query_error_class(const char *cmd)
- {
-     static struct {
-@@ -319,6 +400,7 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
+         return false;
+     }
 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-+    qtest_add_func("qmp/oob", test_qmp_oob);
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
+@@ -4027,7 +4033,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *re=
+q_obj)
+ {
+     Monitor *mon, *old_mon;
+     QObject *req, *rsp =3D NULL, *id;
+-    QDict *qdict =3D NULL;
+     bool need_resume;
+
+     req =3D req_obj->req;
+@@ -4050,18 +4055,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *r=
+eq_obj)
+
+     cur_mon =3D old_mon;
+
+-    if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
+-        qdict =3D qdict_get_qdict(qobject_to(QDict, rsp), "error");
+-        if (qdict
+-            && !g_strcmp0(qdict_get_try_str(qdict, "class"),
+-                    QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOUND))) =
+{
+-            /* Provide a more useful error message */
+-            qdict_del(qdict, "desc");
+-            qdict_put_str(qdict, "desc", "Expecting capabilities negotia=
+tion"
+-                          " with 'qmp_capabilities'");
+-        }
+-    }
+-
+     /* Respond if necessary */
+     monitor_qmp_respond(mon, rsp, NULL, id);
 
 --=20
 2.14.3
