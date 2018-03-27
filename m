@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40844)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <saipava@xhdsaipava40.localdomain>)
-	id 1f0kRK-0002te-Mb
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:58:47 -0400
+	id 1f0lJq-0002Vt-OR
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <saipava@xhdsaipava40.localdomain>)
-	id 1f0kRF-0001rt-Of
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:58:46 -0400
-Received: from mail-by2nam03on0088.outbound.protection.outlook.com
-	([104.47.42.88]:51520
+	id 1f0lJm-0002hI-PS
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:55:06 -0400
+Received: from mail-by2nam03on0087.outbound.protection.outlook.com
+	([104.47.42.87]:25348
 	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <saipava@xhdsaipava40.localdomain>)
-	id 1f0kRF-0001rD-En
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:58:41 -0400
+	id 1f0lJm-0002gb-Fp
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:55:02 -0400
 From: <saipavanboddu@gmail.com>
-Date: Tue, 27 Mar 2018 12:51:13 +0530
-Message-ID: <1522135274-15396-2-git-send-email-saipavanboddu@gmail.com>
-In-Reply-To: <1522135274-15396-1-git-send-email-saipavanboddu@gmail.com>
-References: <1522135274-15396-1-git-send-email-saipavanboddu@gmail.com>
+Date: Tue, 27 Mar 2018 12:51:12 +0530
+Message-ID: <1522135274-15396-1-git-send-email-saipavanboddu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [qemu-devel][PATCH v1 2/2] xilinx_spi: use
- qdev_init_gpio_out for gpio init
+Subject: [Qemu-devel] [qemu-devel][PATCH v1 1/2] ssi.c: Check if slave
+ already attached to a parent bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "Peter A. G. Crosthwaite" <peter.crosthwaite@petalogix.com>
+To: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 Cc: qemu-devel@nongnu.org
 
 From: Sai Pavan Boddu <saipava@xilinx.com>
 
-useful to connect gpio with qdev_connect_gpio_out
+Skip auto-connect if already connected to a bus
 
 Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/ssi/xilinx_spi.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ hw/ssi/ssi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
-index 83585bc..dcd1a2f 100644
---- a/hw/ssi/xilinx_spi.c
-+++ b/hw/ssi/xilinx_spi.c
-@@ -323,7 +323,6 @@ static int xilinx_spi_init(SysBusDevice *sbd)
- {
-     DeviceState *dev = DEVICE(sbd);
-     XilinxSPI *s = XILINX_SPI(dev);
--    int i;
+diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
+index 7eaaf56..6953c92 100644
+--- a/hw/ssi/ssi.c
++++ b/hw/ssi/ssi.c
+@@ -152,7 +152,7 @@ static int ssi_auto_connect_slave(Object *child, void *opaque)
+     SSISlave *dev = (SSISlave *)object_dynamic_cast(child, TYPE_SSI_SLAVE);
+     qemu_irq cs_line;
  
-     DB_PRINT("\n");
+-    if (!dev) {
++    if (!dev || qdev_get_parent_bus(DEVICE(dev))) {
+         return 0;
+     }
  
-@@ -332,9 +331,7 @@ static int xilinx_spi_init(SysBusDevice *sbd)
-     sysbus_init_irq(sbd, &s->irq);
-     s->cs_lines = g_new0(qemu_irq, s->num_cs);
-     ssi_auto_connect_slaves(dev, s->cs_lines, s->spi);
--    for (i = 0; i < s->num_cs; ++i) {
--        sysbus_init_irq(sbd, &s->cs_lines[i]);
--    }
-+    qdev_init_gpio_out(dev, s->cs_lines, s->num_cs);
- 
-     memory_region_init_io(&s->mmio, OBJECT(s), &spi_ops, s,
-                           "xilinx-spi", R_MAX * 4);
 -- 
 2.7.4
