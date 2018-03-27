@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0qPc-00079R-LQ
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:21:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0qRO-0007tz-OT
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0qPZ-0004Tz-Uv
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:21:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54164 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1f0qRM-00050t-1z
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:23:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33498 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0qPZ-0004Tr-Pc
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:21:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41EE284256
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 15:21:21 +0000 (UTC)
-Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 084F32026990
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 15:21:20 +0000 (UTC)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0qRL-00050n-Uf
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:23:12 -0400
+References: <20180327143014.1767669-1-eblake@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 27 Mar 2018 10:21:00 -0500
-Message-Id: <20180327152114.1776925-1-eblake@redhat.com>
+Message-ID: <9e3507d0-46aa-4b92-80aa-468dd45d399e@redhat.com>
+Date: Tue, 27 Mar 2018 10:23:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/14] QAPI changes for 2018-03-27, 2.12-rc1
+In-Reply-To: <20180327143014.1767669-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/14] QAPI changes for 2018-03-27, 2.12-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-The following changes since commit bdc408e91b14cedfc29be8ff703408936e5757=
-21:
+On 03/27/2018 09:30 AM, Eric Blake wrote:
+> The following changes since commit f58d9620aa4a514b1227074ff56eefd1334a6225:
+> 
+>    Merge remote-tracking branch 'remotes/rth/tags/pull-dt-20180326' into staging (2018-03-27 10:27:34 +0100)
+> 
+> are available in the Git repository at:
+> 
+>    git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-27
+> 
+> for you to fetch changes up to 701a2432fea0a9a1741abf7a887fae26f5410970:
+> 
+>    hmp.c: Revert hmp_info_cpus output format change (2018-03-27 09:21:52 -0500)
 
-  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-03-=
-26' into staging (2018-03-27 14:11:30 +0100)
+v2 pull request sent to fix some last minute Reviewed-by tag corrections
 
-are available in the Git repository at:
-
-  git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-27-v2
-
-for you to fetch changes up to 0dfddbb537fcb0fbd045e1c890bc0e95f2ea5177:
-
-  hmp.c: Revert hmp_info_cpus output format change (2018-03-27 10:17:48 -=
-0500)
-
-v2: fix some R-b tags in 6/14, 14/14 (no code changes, so no patches re-s=
-ent)
-
-----------------------------------------------------------------
-qapi patches for 2018-03-27, 2.12-rc1
-
-- Marc-Andr=C3=A9 Lureau: qmp-test: fix response leak
-- Eric Blake: tests: Silence false positive warning on generated test nam=
-e
-- Laurent Vivier: 0/4 (partial) coccinelle: re-run scripts from scripst/c=
-occinelle
-- Peter Xu: 0/8 Monitor: some oob related patches (fixes, new param, test=
-s)
-- Satheesh Rajendran: hmp.c: Revert hmp_info_cpus output format change
-
-----------------------------------------------------------------
-Eric Blake (2):
-      tests: Silence false positive warning on generated test name
-      tests: Add parameter to qtest_init_without_qmp_handshake
-
-Laurent Vivier (3):
-      error: Strip trailing '\n' from error string arguments (again again=
-)
-      error: Remove NULL checks on error_propagate() calls
-      qdict: remove useless cast
-
-Marc-Andr=C3=A9 Lureau (1):
-      qmp-test: fix response leak
-
-Peter Xu (7):
-      qmp: fix qmp_capabilities error regression
-      qapi: restrict allow-oob value to be "true"
-      tests: let qapi-schema tests detect oob
-      tests: add oob-test for qapi-schema
-      qmp: cleanup qmp queues properly
-      monitor: new parameter "x-oob"
-      tests: qmp-test: add test for new "x-oob"
-
-Satheesh Rajendran (1):
-      hmp.c: Revert hmp_info_cpus output format change
-
- scripts/qapi/common.py                  |   2 +-
- tests/libqtest.h                        |   7 +-
- include/monitor/monitor.h               |   1 +
- vl.c                                    |   5 ++
- tests/libqtest.c                        |  10 +--
- block/nvme.c                            |  11 ++-
- hmp.c                                   |   2 +-
- io/channel-websock.c                    |   4 +-
- monitor.c                               | 118 ++++++++++++++++++++++----=
-------
- target/i386/hvf/hvf.c                   |  24 +++----
- tests/qmp-test.c                        |  85 ++++++++++++++++++++++-
- tests/test-qmp-cmds.c                   |   4 ++
- tests/test-visitor-serialization.c      |   2 +-
- tests/Makefile.include                  |   1 +
- tests/qapi-schema/doc-good.out          |   4 +-
- tests/qapi-schema/ident-with-escape.out |   2 +-
- tests/qapi-schema/indented-expr.out     |   4 +-
- tests/qapi-schema/oob-test.err          |   1 +
- tests/qapi-schema/oob-test.exit         |   1 +
- tests/qapi-schema/oob-test.json         |   2 +
- tests/qapi-schema/oob-test.out          |   0
- tests/qapi-schema/qapi-schema-test.json |   3 +
- tests/qapi-schema/qapi-schema-test.out  |  20 +++---
- tests/qapi-schema/test-qapi.py          |   4 +-
- 24 files changed, 233 insertions(+), 84 deletions(-)
- create mode 100644 tests/qapi-schema/oob-test.err
- create mode 100644 tests/qapi-schema/oob-test.exit
- create mode 100644 tests/qapi-schema/oob-test.json
- create mode 100644 tests/qapi-schema/oob-test.out
-
---=20
-2.14.3
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
