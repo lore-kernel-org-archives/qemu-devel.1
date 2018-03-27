@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f11Nf-0001ut-8C
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:04:08 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f11gi-00076H-3i
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:23:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f11Nc-000473-5K
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:04:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60170 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f11Nb-00046v-Vq
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:04:04 -0400
-Date: Wed, 28 Mar 2018 11:03:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180328030351.GU17789@xz-mi>
-References: <201803280843566488166@zte.com.cn>
-	<be4636a8-1450-388e-e225-f96c66fe9741@gmail.com>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f11gd-0002ja-OI
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:23:48 -0400
+Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:42256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1f11gd-0002jM-FD
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:23:43 -0400
+Received: by mail-pl0-x232.google.com with SMTP id g20-v6so759123plo.9
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 20:23:43 -0700 (PDT)
+References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
+	<20180313075739.11194-2-xiaoguangrong@tencent.com>
+	<286AC319A985734F985F78AFA26841F73948919A@shsmsx102.ccr.corp.intel.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <92c7e013-9496-519b-94ff-b1215c6b452d@gmail.com>
+Date: Tue, 27 Mar 2018 23:24:12 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <be4636a8-1450-388e-e225-f96c66fe9741@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] migration: support to
- detectcompression and decompression errors
+In-Reply-To: <286AC319A985734F985F78AFA26841F73948919A@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
+ migration thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +33,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: jiang.biao2@zte.com.cn, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: "Wang, Wei W" <wei.w.wang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Xiao Guangrong <xiaoguangrong@tencent.com>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Mar 27, 2018 at 10:35:29PM +0800, Xiao Guangrong wrote:
+
+
+On 03/28/2018 11:01 AM, Wang, Wei W wrote:
+> On Tuesday, March 13, 2018 3:58 PM, Xiao Guangrong wrote:
+>>
+>> As compression is a heavy work, do not do it in migration thread, instead, we
+>> post it out as a normal page
+>>
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 > 
 > 
-> On 03/28/2018 08:43 AM, jiang.biao2@zte.com.cn wrote:
-> > > On 03/27/2018 07:17 PM, Peter Xu wrote:
-> > > > On Tue, Mar 27, 2018 at 03:42:32AM +0800, Xiao Guangrong wrote:
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > > It'll be understandable to me if the problem is that the compress()
-> > > > > > API does not allow the input buffer to be changed during the whole
-> > > > > > period of the call.  If that is a must, this patch for sure helps.
-> > > > > 
-> > > > > Yes, that is exactly what i want to say. :)
-> > > > 
-> > > > So I think now I know what this patch is for. :) And yeah, it makes
-> > > > sense.
-> > > > 
-> > > > Though another question would be: if the buffer is updated during
-> > > > compress() and compress() returned error, would that pollute the whole
-> > > > z_stream or it only fails the compress() call?
-> > > > 
-> > > 
-> > > I guess deflateReset() can recover everything, i.e, keep z_stream as
-> > > it is init'ed by deflate_init().
-> > > 
-> > > > (Same question applies to decompress().)
-> > > > 
-> > > > If it's only a compress() error and it won't pollute z_stream (or say,
-> > > > it can be recovered after a deflateReset() and then we can continue to
-> > > > call deflate() without problem), then we'll actually have two
-> > > > alternatives to solve this "buffer update" issue:
-> > > > 
-> > > > 1. Use the approach of current patch: we copy the page every time, so
-> > > >      deflate() never fails because update never happens.  But it's slow
-> > > >      since we copy the pages every time.
-> > > > 
-> > > > 2. Use the old approach, and when compress() fail, we just ignore that
-> > > >      page (since now we know that error _must_ be caused by page update,
-> > > >      then we are 100% sure that we'll send that page again so it'll be
-> > > >      perfectly fine).
-> > > > 
-> > > 
-> > > No, we can't make the assumption that "error _must_ be caused by page update".
-> > > No document/ABI about compress/decompress promised it. :)
-
-Indeed, I found no good documents about below errors that jiang.biao
-pointed out.
-
-> > So, as I metioned before, can we just distingush the decompress/compress errors
-> > from errors caused by page update by the return code of inflate/deflate?
-> > According to the zlib manual, there seems to be several error codes for different
-> > cases,
-> > #define Z_ERRNO        (-1)
-> > #define Z_STREAM_ERROR (-2)
-> > #define Z_DATA_ERROR   (-3)
-> > #define Z_MEM_ERROR    (-4)
-> > #define Z_BUF_ERROR    (-5)
-> > #define Z_VERSION_ERROR (-6)
-> > Did you check the return code when silent failure(not caused by page update)
-> > happened before? :)
+> Hi Guangrong,
 > 
-> I am afraid there is no such error code and i guess zlib is not designed to
-> compress the data which is being modified.
+> Dave asked me to help review your patch, so I will just drop my 2 cents wherever possible, and hope that could be inspiring for your work.
 
-So I agree with you, maybe the only right way to do now is copy the
-page, until we know better about zlib and find something useful.
+Thank you both for the nice help on the work. :)
 
-Thanks!
+> 
+> 
+>> ---
+>>   migration/ram.c | 32 ++++++++++++++++----------------
+>>   1 file changed, 16 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/migration/ram.c b/migration/ram.c index
+>> 7266351fd0..615693f180 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -1132,7 +1132,7 @@ static int ram_save_compressed_page(RAMState
+>> *rs, PageSearchStatus *pss,
+>>       int pages = -1;
+>>       uint64_t bytes_xmit = 0;
+>>       uint8_t *p;
+>> -    int ret, blen;
+>> +    int ret;
+>>       RAMBlock *block = pss->block;
+>>       ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
+>>
+>> @@ -1162,23 +1162,23 @@ static int
+>> ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+>>           if (block != rs->last_sent_block) {
+>>               flush_compressed_data(rs);
+>>               pages = save_zero_page(rs, block, offset);
+>> -            if (pages == -1) {
+>> -                /* Make sure the first page is sent out before other pages */
+>> -                bytes_xmit = save_page_header(rs, rs->f, block, offset |
+>> -                                              RAM_SAVE_FLAG_COMPRESS_PAGE);
+>> -                blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
+>> -                                                 migrate_compress_level());
+>> -                if (blen > 0) {
+>> -                    ram_counters.transferred += bytes_xmit + blen;
+>> -                    ram_counters.normal++;
+>> -                    pages = 1;
+>> -                } else {
+>> -                    qemu_file_set_error(rs->f, blen);
+>> -                    error_report("compressed data failed!");
+>> -                }
+>> -            }
+>>               if (pages > 0) {
+>>                   ram_release_pages(block->idstr, offset, pages);
+>> +            } else {
+>> +                /*
+>> +                 * Make sure the first page is sent out before other pages.
+>> +                 *
+>> +                 * we post it as normal page as compression will take much
+>> +                 * CPU resource.
+>> +                 */
+>> +                ram_counters.transferred += save_page_header(rs, rs->f, block,
+>> +                                                offset | RAM_SAVE_FLAG_PAGE);
+>> +                qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
+>> +                                      migrate_release_ram() &
+>> +                                      migration_in_postcopy());
+>> +                ram_counters.transferred += TARGET_PAGE_SIZE;
+>> +                ram_counters.normal++;
+>> +                pages = 1;
+>>               }
+>>           } else {
+>>               pages = save_zero_page(rs, block, offset);
+>> --
+> 
+> I agree that this patch is an improvement for the current implementation. So just pile up mine here:
+> Reviewed-by: Wei Wang <wei.w.wang@intel.com>
 
--- 
-Peter Xu
+Thanks.
+
+> 
+> 
+> If you are interested in something more aggressive, I can share an alternative approach, which I think would be better. Please see below.
+> 
+> Actually, we can use the multi-threaded compression for the first page as well, which will not block the migration thread progress. The advantage is that we can enjoy the compression benefit for the first page and meanwhile not blocking the migration thread - the page is given to a compression thread and compressed asynchronously to the migration thread execution.
+> 
+
+Yes, it is a good point.
+
+> The main barrier to achieving the above that is that we need to make sure the first page of each block is sent first in the multi-threaded environment. We can twist the current implementation to achieve that, which is not hard:
+> 
+> For example, we can add a new flag to RAMBlock - bool first_page_added. In each thread of compression, they need
+> 1) check if this is the first page of the block.
+> 2) If it is the first page, set block->first_page_added after sending the page;
+> 3) If it is not the first the page, wait to send the page only when block->first_page_added is set.
+
+
+So there is another barrier introduced which hurts the parallel...
+
+Hmm, we need more deliberate consideration on this point, let me think it over after this work.
+
+Thank you.
