@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0jKH-00039J-9D
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 03:47:26 -0400
+	(envelope-from <groug@kaod.org>) id 1f0jnp-0003HO-CG
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0jKD-0001dT-Dv
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 03:47:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52404 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1f0jnk-0004Cz-D7
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:17:57 -0400
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:35914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0jKD-0001dB-9A
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 03:47:21 -0400
-Date: Tue, 27 Mar 2018 15:47:08 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180327074708.GL17789@xz-mi>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-5-xiaoguangrong@tencent.com>
-	<20180315113759.GD3062@work-vm>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f0jnk-0004C8-2t
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:17:52 -0400
+Received: from player168.ha.ovh.net (unknown [10.109.120.215])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0C997125ED9
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 10:17:49 +0200 (CEST)
+Date: Tue, 27 Mar 2018 10:17:39 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180327101739.4268aed9@bahia.lan>
+In-Reply-To: <20180327043741.7705-5-david@gibson.dropbear.id.au>
+References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
+	<20180327043741.7705-5-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180315113759.GD3062@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 4/8] migration: introduce
- control_save_page()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC for-2.13 04/12] target/ppc: Avoid taking
+ "env" parameter to mmu-hash64 functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +31,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: guangrong.xiao@gmail.com, quintela@redhat.com, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org
 
-On Thu, Mar 15, 2018 at 11:37:59AM +0000, Dr. David Alan Gilbert wrote:
-> * guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
-> > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > 
-> > Abstract the common function control_save_page() to cleanup the code,
-> > no logic is changed
-> > 
-> > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Tue, 27 Mar 2018 15:37:33 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> In most cases we prefer to pass a PowerPCCPU rather than the (embedded)
+> CPUPPCState.
 > 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> For ppc_hash64_update_{rmls,vrma}() change to take "cpu" instead of "env".
+> For ppc_hash64_set_{dsi,isi}() remove the redundant "env" parameter.
 > 
-> It would be good to find a better name for control_save_page, but I
-> can't think of one!).
+> In theory this makes more work for the functions, but since "cs", "cpu"
+> and "env" are related by at most constant offsets, the compiler should be
+> able to optimize out the difference at effectively zero cost.
+> 
+> helper_*() functions are left alone - since they're more closely tied to
+> the TCG generated code, passing "env" is still the standard there.
+> 
+> While we're there, fix an incorrect indentation.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Yeah.  I would prefer it's at least still prefixed with ram_*, however
-I don't really hope we spend too much time on namings (always :).
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Maybe we can just squash the changes into current
-ram_control_save_page() directly.  But that's optional, current patch
-is good to me already, so:
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
--- 
-Peter Xu
+>  target/ppc/mmu-hash64.c     | 35 +++++++++++++++++++----------------
+>  target/ppc/mmu-hash64.h     |  4 ++--
+>  target/ppc/translate_init.c |  4 ++--
+>  3 files changed, 23 insertions(+), 20 deletions(-)
+> 
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index c9b72b7429..a87fa7c83f 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -633,9 +633,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
+>      return 0;
+>  }
+>  
+> -static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
+> -                               uint64_t error_code)
+> +static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
+>  {
+> +    CPUPPCState *env = &POWERPC_CPU(cs)->env;
+>      bool vpm;
+>  
+>      if (msr_ir) {
+> @@ -659,9 +659,9 @@ static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
+>      env->error_code = error_code;
+>  }
+>  
+> -static void ppc_hash64_set_dsi(CPUState *cs, CPUPPCState *env, uint64_t dar,
+> -                               uint64_t dsisr)
+> +static void ppc_hash64_set_dsi(CPUState *cs, uint64_t dar, uint64_t dsisr)
+>  {
+> +    CPUPPCState *env = &POWERPC_CPU(cs)->env;
+>      bool vpm;
+>  
+>      if (msr_dr) {
+> @@ -741,13 +741,13 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
+>              } else {
+>                  /* The access failed, generate the approriate interrupt */
+>                  if (rwx == 2) {
+> -                    ppc_hash64_set_isi(cs, env, SRR1_PROTFAULT);
+> +                    ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
+>                  } else {
+>                      int dsisr = DSISR_PROTFAULT;
+>                      if (rwx == 1) {
+>                          dsisr |= DSISR_ISSTORE;
+>                      }
+> -                    ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
+> +                    ppc_hash64_set_dsi(cs, eaddr, dsisr);
+>                  }
+>                  return 1;
+>              }
+> @@ -783,7 +783,7 @@ skip_slb_search:
+>  
+>      /* 3. Check for segment level no-execute violation */
+>      if ((rwx == 2) && (slb->vsid & SLB_VSID_N)) {
+> -        ppc_hash64_set_isi(cs, env, SRR1_NOEXEC_GUARD);
+> +        ppc_hash64_set_isi(cs, SRR1_NOEXEC_GUARD);
+>          return 1;
+>      }
+>  
+> @@ -791,13 +791,13 @@ skip_slb_search:
+>      ptex = ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
+>      if (ptex == -1) {
+>          if (rwx == 2) {
+> -            ppc_hash64_set_isi(cs, env, SRR1_NOPTE);
+> +            ppc_hash64_set_isi(cs, SRR1_NOPTE);
+>          } else {
+>              int dsisr = DSISR_NOPTE;
+>              if (rwx == 1) {
+>                  dsisr |= DSISR_ISSTORE;
+>              }
+> -            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
+> +            ppc_hash64_set_dsi(cs, eaddr, dsisr);
+>          }
+>          return 1;
+>      }
+> @@ -824,7 +824,7 @@ skip_slb_search:
+>              if (PAGE_EXEC & ~amr_prot) {
+>                  srr1 |= SRR1_IAMR; /* Access violates virt pg class key prot */
+>              }
+> -            ppc_hash64_set_isi(cs, env, srr1);
+> +            ppc_hash64_set_isi(cs, srr1);
+>          } else {
+>              int dsisr = 0;
+>              if (need_prot[rwx] & ~pp_prot) {
+> @@ -836,7 +836,7 @@ skip_slb_search:
+>              if (need_prot[rwx] & ~amr_prot) {
+>                  dsisr |= DSISR_AMR;
+>              }
+> -            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
+> +            ppc_hash64_set_dsi(cs, eaddr, dsisr);
+>          }
+>          return 1;
+>      }
+> @@ -942,8 +942,9 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
+>      cpu->env.tlb_need_flush = TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_FLUSH;
+>  }
+>  
+> -void ppc_hash64_update_rmls(CPUPPCState *env)
+> +void ppc_hash64_update_rmls(PowerPCCPU *cpu)
+>  {
+> +    CPUPPCState *env = &cpu->env;
+>      uint64_t lpcr = env->spr[SPR_LPCR];
+>  
+>      /*
+> @@ -976,8 +977,9 @@ void ppc_hash64_update_rmls(CPUPPCState *env)
+>      }
+>  }
+>  
+> -void ppc_hash64_update_vrma(CPUPPCState *env)
+> +void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>  {
+> +    CPUPPCState *env = &cpu->env;
+>      const struct ppc_one_seg_page_size *sps = NULL;
+>      target_ulong esid, vsid, lpcr;
+>      ppc_slb_t *slb = &env->vrma_slb;
+> @@ -1002,7 +1004,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
+>      vsid |= (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
+>      esid = SLB_ESID_V;
+>  
+> -   for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
+> +    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
+>          const struct ppc_one_seg_page_size *sps1 = &env->sps.sps[i];
+>  
+>          if (!sps1->page_shift) {
+> @@ -1028,6 +1030,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
+>  
+>  void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+>  {
+> +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
+>      uint64_t lpcr = 0;
+>  
+>      /* Filter out bits */
+> @@ -1089,6 +1092,6 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+>          ;
+>      }
+>      env->spr[SPR_LPCR] = lpcr;
+> -    ppc_hash64_update_rmls(env);
+> -    ppc_hash64_update_vrma(env);
+> +    ppc_hash64_update_rmls(cpu);
+> +    ppc_hash64_update_vrma(cpu);
+>  }
+> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> index d297b97d37..95a8c330d6 100644
+> --- a/target/ppc/mmu-hash64.h
+> +++ b/target/ppc/mmu-hash64.h
+> @@ -17,8 +17,8 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
+>                                 target_ulong pte0, target_ulong pte1);
+>  unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
+>                                            uint64_t pte0, uint64_t pte1);
+> -void ppc_hash64_update_vrma(CPUPPCState *env);
+> -void ppc_hash64_update_rmls(CPUPPCState *env);
+> +void ppc_hash64_update_vrma(PowerPCCPU *cpu);
+> +void ppc_hash64_update_rmls(PowerPCCPU *cpu);
+>  #endif
+>  
+>  /*
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 2ae718242a..29bd6f3654 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8975,8 +8975,8 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+>      env->spr[SPR_AMOR] = amor->default_value = 0xffffffffffffffffull;
+>  
+>      /* Update some env bits based on new LPCR value */
+> -    ppc_hash64_update_rmls(env);
+> -    ppc_hash64_update_vrma(env);
+> +    ppc_hash64_update_rmls(cpu);
+> +    ppc_hash64_update_vrma(cpu);
+>  
+>      /* Tell KVM that we're in PAPR mode */
+>      if (kvm_enabled()) {
