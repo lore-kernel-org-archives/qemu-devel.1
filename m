@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f0fMz-0007sH-Dj
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:33:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f0fQ1-0000Oj-1Q
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f0fMw-0001c1-AN
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:33:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1f0fMw-0001ba-1U
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:33:54 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2R3XjBW019806
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 23:33:53 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2gycbabjne-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 23:33:52 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Mon, 26 Mar 2018 23:33:51 -0400
-References: <20180323034356.72130-1-haoqf@linux.vnet.ibm.com>
-	<20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
-	<20180326102919.GB5267@localhost.localdomain>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Tue, 27 Mar 2018 11:33:33 +0800
+	(envelope-from <richard.henderson@linaro.org>) id 1f0fPx-0003FN-Tj
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:37:05 -0400
+Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:36191)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f0fPx-0003F5-MW
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:37:01 -0400
+Received: by mail-pf0-x22e.google.com with SMTP id g14so1849586pfh.3
+	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 20:37:01 -0700 (PDT)
+References: <1521926678-76539-1-git-send-email-mjc@sifive.com>
+	<CAHNT7NtnuZ7_dNHFUJ_4KL=11sWV2u5E51bUJK1XH7ekm=sbXw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2979bb1d-0f56-9b2e-66f0-94c157510fa6@linaro.org>
+Date: Tue, 27 Mar 2018 11:36:36 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180326102919.GB5267@localhost.localdomain>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <94a4e9f3-e4af-4060-b2b5-bb0be25f46b6@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] iotests: fix test case 185
+In-Reply-To: <CAHNT7NtnuZ7_dNHFUJ_4KL=11sWV2u5E51bUJK1XH7ekm=sbXw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] RISC-V: RISC-V TCG backend work in
+ progress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,58 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, stefanha@redhat.com
+To: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: RISC-V Patches <patches@groups.riscv.org>
+
+On 03/27/2018 08:26 AM, Michael Clark wrote:
+> IN:
+> 0x0000000000011138:  800002b7          lui             t0,-2147483648
+> 0x000000000001113c:  ffff8337          lui             t1,-32768
+> 0x0000000000011140:  0262a433          mulhsu          s0,t0,t1
+> 0x0000000000011144:  800004b7          lui             s1,-2147483648
+> 0x0000000000011148:  00700193          addi            gp,zero,7
+> 0x000000000001114c:  f49412e3          bne             s0,s1,-188
+
+At last something interesting.
+
+-2147483648 * 18446744073709518848 (0xffff_ffff_ffff_8000)
+= -39614081257132098428027797504
+= -7FFF_FFFF_FFFF_C000_0000_0000
+=  ffff_ffff_8000_0000 0000_0400_0000_0000
 
 
+> OP after optimization and liveness analysis:
+>  ld_i32 tmp0,env,$0xffffffffffffffec              dead: 1
+>  movi_i32 tmp1,$0x0
+>  brcond_i32 tmp0,tmp1,lt,$L0                      dead: 0 1
+> 
+>  ---- 0000000000011138
+>  movi_i64 t0  ,$0xffffffff80000000                sync: 0  dead: 0
+> 
+>  ---- 000000000001113c
+>  movi_i64 t1  ,$0xffffffffffff8000                sync: 0  dead: 0
+> 
+>  ---- 0000000000011140
+>  movi_i64 tmp2,$0x80000000
+>  mov_i64 s0  ,tmp2                                sync: 0  dead: 0 1
+> 
+>  ---- 0000000000011144
+>  movi_i64 s1  ,$0xffffffff80000000                sync: 0  dead: 0
 
-=D4=DA 2018/3/26 18:29, Kevin Wolf =D0=B4=B5=C0:
-> Am 23.03.2018 um 04:43 hat QingFeng Hao geschrieben:
->> Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_sh=
-utdown()".
->> It's because of the newly introduced function vm_shutdown calls bdrv_d=
-rain_all,
->> which is called later by bdrv_close_all. bdrv_drain_all resumes the jo=
-bs
->> that doubles the speed and offset is doubled.
->> Some jobs' status are changed as well.
->>
->> The fix is to not resume the jobs that are already yielded and also ch=
-ange
->> 185.out accordingly.
->>
->> Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
->> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
->=20
-> Stefan already commented on the fix itself, but I want to add two more
-> points:
->=20
-> Please change your subject line. "iotests: fix test case 185" means tha=
-t
-> you are fixing the test case, not qemu code that makes the test case
-> fail. The subject line should describe the actual change. In all
-> likelihood it will start with "blockjob:" rather than "iotests:".
-Sure! thanks for pointing that.
->=20
->> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
->> index fc645dac68..f8f208bbcf 100644
->> --- a/include/block/blockjob.h
->> +++ b/include/block/blockjob.h
->> @@ -99,6 +99,11 @@ typedef struct BlockJob {
->>       bool ready;
->>  =20
->>       /**
->> +     * Set to true when the job is yielded.
->> +     */
->> +    bool yielded;
->=20
-> This is the same as !busy, so we don't need a new field for this.
->=20
-Mostly yes, but the trick is that busy is set to be true in=20
-block_job_do_yield.
-> Kevin
->=20
+So, yes, your test is correct, because here we load that high-part.  But
+crucially, the multiply has produced a result *without* the sign-extension, so
+the test fails.
 
---=20
-Regards
-QingFeng Hao
+It would have been handy to see the opcodes emitted before optimization, so
+that we can verify what the riscv front-end did.  However, it's not that hard
+to regenerate.
+
+Annoyingly, the tcg optimizer hasn't been taught to fold things the same way
+when the backend supports mulu2, so we *don't* fold the test away for an x86_64
+host.
+
+ mulu2_i64 tmp4,tmp5,t0  ,t1                      dead: 0 2 3
+ movi_i64 tmp4,$0xffffffffffff8000
+ sub_i64 tmp2,tmp5,tmp4                           dead: 1 2
+ mov_i64 s0  ,tmp2                                sync: 0  dead: 0 1
+
+And thus no doubt the test succeeds for that case.
+So lemme try again with an aarch64 host.
+
+ movi_i64 tmp2,$0x80000000
+ mov_i64 s0  ,tmp2                                sync: 0  dead: 0 1
+
+Yay, reproduction.  The input to the optimization is
+
+ mov_i64 tmp2,t0
+ mov_i64 tmp3,t1
+ mul_i64 tmp6,tmp2,tmp3
+ muluh_i64 tmp5,tmp2,tmp3
+ mov_i64 tmp4,tmp6
+ movi_i64 tmp6,$0x3f
+ sar_i64 tmp4,tmp2,tmp6
+ and_i64 tmp4,tmp4,tmp3
+ sub_i64 tmp2,tmp5,tmp4
+ mov_i64 s0  ,tmp2
+
+Now, dead-code and forward propagate constants by hand,
+
+ movi_i64 tmp2,$0xffffffff80000000
+ movi_i64 tmp3,$0xffffffffffff8000
+ muluh_i64 tmp5,tmp2,tmp3
+ sub_i64 tmp2,tmp5,$0xffffffffffff8000
+ mov_i64 s0  ,tmp2
+
+Now, for the unsigned multiplication we get
+
+18446744071562067968 * 18446744073709518848
+= 340282366881323777743332701689153060864
+= FFFF_FFFF_7FFF_8000 0000_4000_0000_0000
+
+....
+
+Oops, I see the bug right away now.
+
+Value returned is $3 = 18446744071562035200
+(gdb) n
+410	    if (!(def->flags & TCG_OPF_64BIT)) {
+411	        res = (int32_t)res;
+
+Failure to mark muluh_i64 and mulsh_i64 as 64-bit ops, so we've discarded the
+high 32 bits of the result.
+
+I'm surprised that we haven't seen this as a problem before.  Perhaps luck in
+non-optimization; we need a test case this small (but no smaller, like RISU) to
+be able to produce a bad result.
+
+So.  Two line patch to follow.
+
+
+r~
