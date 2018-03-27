@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f0uyi-0004dq-VR
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 16:13:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0v2l-00067v-T0
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 16:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f0uyi-0005q0-3q
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 16:13:56 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:35641)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f0uyh-0005ph-TZ
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 16:13:56 -0400
-Received: by mail-oi0-x231.google.com with SMTP id z8-v6so157941oix.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 13:13:55 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1f0v2i-00085s-Oz
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 16:18:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38734 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0v2i-00085a-Jl
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 16:18:04 -0400
+References: <20180327113452.19613-1-dgilbert@redhat.com>
+	<20180327113452.19613-4-dgilbert@redhat.com>
+	<0bfadead-a3c2-9bce-3e53-8ca3a258a57a@redhat.com>
+	<20180327164753.GF2837@work-vm>
+	<8c238385-5cab-2c7d-6550-d6d0866570eb@redhat.com>
+	<20180327180115.GH2837@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <66a2b6b9-0231-bd32-10cd-81117fd06725@redhat.com>
+Date: Tue, 27 Mar 2018 22:17:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180327152114.1776925-1-eblake@redhat.com>
-References: <20180327152114.1776925-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Mar 2018 21:13:34 +0100
-Message-ID: <CAFEAcA-4XX9ZLFgWC6ApRvXguXBFg4NdKPv4zq_Jzmkf=2kf2g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/14] QAPI changes for 2018-03-27,
- 2.12-rc1
+In-Reply-To: <20180327180115.GH2837@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] e1000: Old machine types,
+ turn new subsection off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, eswierk@skyportsystems.com, jasowang@redhat.com, peterx@redhat.com, quintela@redhat.com
 
-On 27 March 2018 at 16:21, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit bdc408e91b14cedfc29be8ff703408936e5757=
-21:
->
->   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-03-=
-26' into staging (2018-03-27 14:11:30 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-27-v2
->
-> for you to fetch changes up to 0dfddbb537fcb0fbd045e1c890bc0e95f2ea5177:
->
->   hmp.c: Revert hmp_info_cpus output format change (2018-03-27 10:17:48 -=
-0500)
->
-> v2: fix some R-b tags in 6/14, 14/14 (no code changes, so no patches re-s=
-ent)
->
-> ----------------------------------------------------------------
-> qapi patches for 2018-03-27, 2.12-rc1
->
-> - Marc-Andr=C3=A9 Lureau: qmp-test: fix response leak
-> - Eric Blake: tests: Silence false positive warning on generated test nam=
-e
-> - Laurent Vivier: 0/4 (partial) coccinelle: re-run scripts from scripst/c=
-occinelle
-> - Peter Xu: 0/8 Monitor: some oob related patches (fixes, new param, test=
-s)
-> - Satheesh Rajendran: hmp.c: Revert hmp_info_cpus output format change
->
-> ----------------------------------------------------------------
+On 27/03/2018 20:01, Dr. David Alan Gilbert wrote:
+>> New->old migration will place tx_legacy_vmstate_props in tx.props on the
+>> destination; new->new will realize the subsection was transmitted and
+>> ignore the tx_legacy_vmstate_props; old->new will not find data from the
+>> subsection and copy the tx_legacy_vmstate_props into one of tx.props and
+>> tx.tso_props.
+> Yeh, adding a legacy_props field should do it; although we never need
+> to transmit more than 2 copies.  
+> 
+> I'll look at this more tomorrow; I am a bit worried about testing it
+> though.
 
-Applied, thanks.
+Yes, I'm also afraid that we can't really do much better than careful
+code review.
 
--- PMM
+Paolo
