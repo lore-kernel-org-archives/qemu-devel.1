@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f0saZ-0006iq-TF
+	(envelope-from <bounces@canonical.com>) id 1f0saZ-0006ir-TE
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 13:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f0saW-0004Ws-Pe
+	(envelope-from <bounces@canonical.com>) id 1f0saY-0004Yc-FX
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 13:40:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45976)
+Received: from indium.canonical.com ([91.189.90.7]:46028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f0saW-0004Wc-IP
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 13:40:48 -0400
+	id 1f0saY-0004XD-5S
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 13:40:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f0saV-0003EV-Mt
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 17:40:47 +0000
+	id 1f0saX-0003Fx-9a
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 17:40:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A64D72E80C9
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 17:40:47 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 466A62E80C9
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 17:40:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Mar 2018 17:33:05 -0000
-From: "mike@papersolve.com" <mike@papersolve.com>
-Reply-To: Bug 1759338 <1759338@bugs.launchpad.net>
+Date: Tue, 27 Mar 2018 17:30:57 -0000
+From: Adam Williamson <awilliam@redhat.com>
+Reply-To: Bug 1759337 <1759337@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <152217198529.30594.10454069952660679046.malonedeb@gac.canonical.com>
+Message-Id: <152217185720.30131.11816005457402548159.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1759338] [NEW] qemu-system-sparc w/ SS-20 ROM
- does not add processors
+Subject: [Qemu-devel] [Bug 1759337] [NEW] 'Failed to get "write" lock' error
+ when trying to run a VM with disk image file on an SMB share
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,56 +40,31 @@ To: qemu-devel@nongnu.org
 
 Public bug reported:
 
-When booting a SPARCstation-20 with the original ROM, qemu does not set
-the number of processors in a way that this ROM can understand it, and
-the ROM always reports only 1 processor installed:
+This has been reported and discussed downstream:
 
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1484130
 
- ~/qemu =EE=82=B0 /usr/local/bin/qemu-system-sparc -bios ./ss20_v2.25_rom -=
-M SS-20 -cpu "TI SuperSparc 60" -smp 2 -nographic
+but doesn't seem to be getting a lot of traction there.
 
-Power-ON Reset
+Basically, with qemu since at least 2.10, you cannot use a disk image on
+an SMB share that's mounted with protocol version 3 (I think possibly 2
+or higher). This is made much more serious because kernel 4.13 upstream
+made version 3 the *default* for SMB mounts, because version 1 is
+insecure and should not be used.
 
+So basically, anyone with a recent qemu and kernel cannot use disk
+images stored on an SMB share. This is a major inconvenience for me
+because, well, an SMB share is exactly where I store my VM disk images,
+usually: I have a big NAS drive where I keep them all, only now I can't
+because of this bug, and I'm manually swapping them in and out of the
+very limited space I have on my system drive (SSD).
 
-           SMCC SPARCstation 10/20 UP/MP POST version VRV3.45 (09/11/95)
+The error you get is:
 
-
-CPU_#0       TI, TMS390Z50(3.x)       0Mb External cache
-
-CPU_#1       ******* NOT installed *******
-CPU_#2       ******* NOT installed *******
-CPU_#3       ******* NOT installed *******
-
-    <<< CPU_00000000 on MBus Slot_00000000 >>> IS RUNNING (MID =3D
-00000008)
-
-
-...
-
-Cpu #0 TI,TMS390Z50 =
-
-Cpu #1 Nothing there =
-
-Cpu #2 Nothing there =
-
-Cpu #3 Nothing there =
-
-
-...
-
-SPARCstation 20 (1 X 390Z50), No Keyboard
-ROM Rev. 2.25, 128 MB memory installed, Serial #1193046.
-Ethernet address 52:54:0:12:34:56, Host ID: 72123456.
-
-
-(It is necessary use SS-20 since it is the only sun4m model that
-supports 512MB RAM, and I can't get Solaris to install on the SS-20
-using OpenBIOS.)
-
-When booting with OpenBIOS I can't seem to boot any version of Solaris
-though I had heard this did work.  Solaris 8 and 9 do work nicely with
-this ROM, but I am opening this to see if it is possible to fix this to
-allow the original OBP ROM to see multiple processors.
+qemu-system-x86_64: -drive file=3D/share/data/isos/vms/desktop_test_1.qcow2=
+,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0: Failed to get "write" lo=
+ck
+Is another process using the image?
 
 ** Affects: qemu
      Importance: Undecided
@@ -99,73 +74,41 @@ allow the original OBP ROM to see multiple processors.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1759338
+https://bugs.launchpad.net/bugs/1759337
 
 Title:
-  qemu-system-sparc w/ SS-20 ROM does not add processors
+  'Failed to get "write" lock' error when trying to run a VM with disk
+  image file on an SMB share
 
 Status in QEMU:
   New
 
 Bug description:
-  When booting a SPARCstation-20 with the original ROM, qemu does not
-  set the number of processors in a way that this ROM can understand it,
-  and the ROM always reports only 1 processor installed:
+  This has been reported and discussed downstream:
 
-  =
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1484130
 
-   ~/qemu =EE=82=B0 /usr/local/bin/qemu-system-sparc -bios ./ss20_v2.25_rom=
- -M SS-20 -cpu "TI SuperSparc 60" -smp 2 -nographic
+  but doesn't seem to be getting a lot of traction there.
 
-  Power-ON Reset
+  Basically, with qemu since at least 2.10, you cannot use a disk image
+  on an SMB share that's mounted with protocol version 3 (I think
+  possibly 2 or higher). This is made much more serious because kernel
+  4.13 upstream made version 3 the *default* for SMB mounts, because
+  version 1 is insecure and should not be used.
 
+  So basically, anyone with a recent qemu and kernel cannot use disk
+  images stored on an SMB share. This is a major inconvenience for me
+  because, well, an SMB share is exactly where I store my VM disk
+  images, usually: I have a big NAS drive where I keep them all, only
+  now I can't because of this bug, and I'm manually swapping them in and
+  out of the very limited space I have on my system drive (SSD).
 
-  =
+  The error you get is:
 
-             SMCC SPARCstation 10/20 UP/MP POST version VRV3.45 (09/11/95)
-
-  =
-
-  CPU_#0       TI, TMS390Z50(3.x)       0Mb External cache
-
-  CPU_#1       ******* NOT installed *******
-  CPU_#2       ******* NOT installed *******
-  CPU_#3       ******* NOT installed *******
-
-      <<< CPU_00000000 on MBus Slot_00000000 >>> IS RUNNING (MID =3D
-  00000008)
-
-  =
-
-  ...
-
-  Cpu #0 TI,TMS390Z50 =
-
-  Cpu #1 Nothing there =
-
-  Cpu #2 Nothing there =
-
-  Cpu #3 Nothing there =
-
-
-  ...
-
-  SPARCstation 20 (1 X 390Z50), No Keyboard
-  ROM Rev. 2.25, 128 MB memory installed, Serial #1193046.
-  Ethernet address 52:54:0:12:34:56, Host ID: 72123456.
-
-
-  =
-
-  (It is necessary use SS-20 since it is the only sun4m model that supports=
- 512MB RAM, and I can't get Solaris to install on the SS-20 using OpenBIOS.=
-) =
-
-
-  When booting with OpenBIOS I can't seem to boot any version of Solaris
-  though I had heard this did work.  Solaris 8 and 9 do work nicely with
-  this ROM, but I am opening this to see if it is possible to fix this
-  to allow the original OBP ROM to see multiple processors.
+  qemu-system-x86_64: -drive file=3D/share/data/isos/vms/desktop_test_1.qco=
+w2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0: Failed to get "write" =
+lock
+  Is another process using the image?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1759338/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1759337/+subscriptions
