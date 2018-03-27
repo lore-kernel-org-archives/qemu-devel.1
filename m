@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f0kAk-0002eV-8e
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:41:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f0kEL-00047T-6t
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f0kAf-0001Aj-49
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:41:38 -0400
-Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:44173)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f0kAe-00016d-SP
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:41:33 -0400
-Received: from player762.ha.ovh.net (unknown [10.109.105.151])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 25C4BD767E
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 10:41:23 +0200 (CEST)
-References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-	<20180327043741.7705-4-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e275a984-23ff-03de-d29a-cda2a2b0f4e0@kaod.org>
-Date: Tue, 27 Mar 2018 10:41:01 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1f0kEH-0002uP-Tp
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:45:21 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:50356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f0kEH-0002tl-IN
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:45:17 -0400
+Received: by mail-wm0-x241.google.com with SMTP id l201so1874149wmg.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 01:45:17 -0700 (PDT)
+References: <1521663109-32262-1-git-send-email-cota@braap.org>
+	<1521663109-32262-2-git-send-email-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1521663109-32262-2-git-send-email-cota@braap.org>
+Date: Tue, 27 Mar 2018 09:45:14 +0100
+Message-ID: <871sg5aov9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180327043741.7705-4-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for-2.13 03/12] target/ppc: Pass cpu instead
- of env to ppc_create_page_sizes_prop()
+Subject: Re: [Qemu-devel] [PATCH v1 01/14] tests: add fp-bench,
+ a collection of simple floating-point microbenchmarks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +31,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, groug@kaod.org
-Cc: agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 03/27/2018 06:37 AM, David Gibson wrote:
-> As a rule we prefer to pass PowerPCCPU instead of CPUPPCState, and this
-> change will make some things simpler later on.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Emilio G. Cota <cota@braap.org> writes:
 
+> This will allow us to measure the performance impact of FP
+> emulation optimizations.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  hw/ppc/fdt.c         | 5 +++--
->  hw/ppc/pnv.c         | 4 ++--
->  hw/ppc/spapr.c       | 4 ++--
->  include/hw/ppc/fdt.h | 2 +-
->  4 files changed, 8 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/ppc/fdt.c b/hw/ppc/fdt.c
-> index 2ffc5866e4..2721603ffa 100644
-> --- a/hw/ppc/fdt.c
-> +++ b/hw/ppc/fdt.c
-> @@ -13,9 +13,10 @@
->  #include "hw/ppc/fdt.h"
-> =20
->  #if defined(TARGET_PPC64)
-> -size_t ppc_create_page_sizes_prop(CPUPPCState *env, uint32_t *prop,
-> -                                     size_t maxsize)
-> +size_t ppc_create_page_sizes_prop(PowerPCCPU *cpu, uint32_t *prop,
-> +                                  size_t maxsize)
->  {
-> +    CPUPPCState *env =3D &cpu->env;
->      size_t maxcells =3D maxsize / sizeof(uint32_t);
->      int i, j, count;
->      uint32_t *p =3D prop;
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 98ee3c607a..5a79b24828 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -209,8 +209,8 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc,=
- void *fdt)
->          _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
->      }
-> =20
-> -    page_sizes_prop_size =3D ppc_create_page_sizes_prop(env, page_size=
-s_prop,
-> -                                                  sizeof(page_sizes_pr=
-op));
-> +    page_sizes_prop_size =3D ppc_create_page_sizes_prop(cpu, page_size=
-s_prop,
-> +                                                      sizeof(page_size=
-s_prop));
->      if (page_sizes_prop_size) {
->          _FDT((fdt_setprop(fdt, offset, "ibm,segment-page-sizes",
->                             page_sizes_prop, page_sizes_prop_size)));
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 2c0be8c898..a35bffd524 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -581,8 +581,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, voi=
-d *fdt, int offset,
->          _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
->      }
-> =20
-> -    page_sizes_prop_size =3D ppc_create_page_sizes_prop(env, page_size=
-s_prop,
-> -                                                  sizeof(page_sizes_pr=
-op));
-> +    page_sizes_prop_size =3D ppc_create_page_sizes_prop(cpu, page_size=
-s_prop,
-> +                                                      sizeof(page_size=
-s_prop));
->      if (page_sizes_prop_size) {
->          _FDT((fdt_setprop(fdt, offset, "ibm,segment-page-sizes",
->                            page_sizes_prop, page_sizes_prop_size)));
-> diff --git a/include/hw/ppc/fdt.h b/include/hw/ppc/fdt.h
-> index bd5b0a8c3d..a8cd85069f 100644
-> --- a/include/hw/ppc/fdt.h
-> +++ b/include/hw/ppc/fdt.h
-> @@ -23,7 +23,7 @@
->          }                                                          \
->      } while (0)
-> =20
-> -size_t ppc_create_page_sizes_prop(CPUPPCState *env, uint32_t *prop,
-> +size_t ppc_create_page_sizes_prop(PowerPCCPU *cpu, uint32_t *prop,
->                                    size_t maxsize);
-> =20
->  #endif /* PPC_FDT_H */
->=20
+>  tests/fp-bench.c       | 290 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  tests/.gitignore       |   1 +
+>  tests/Makefile.include |   3 +-
+>  3 files changed, 293 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/fp-bench.c
+>
+> diff --git a/tests/fp-bench.c b/tests/fp-bench.c
+> new file mode 100644
+> index 0000000..a782093
+> --- /dev/null
+> +++ b/tests/fp-bench.c
+> @@ -0,0 +1,290 @@
+> +/*
+> + * fp-bench.c - A collection of simple floating point microbenchmarks.
+> + *
+> + * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
+> + *
+> + * License: GNU GPL, version 2 or later.
+> + *   See the COPYING file in the top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/atomic.h"
+> +
+> +#include <math.h>
+> +
+> +#include <sys/time.h>
+> +#include <stdint.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +#include <stdio.h>
+> +#include <time.h>
+> +
+> +/* amortize the computation of random inputs */
+> +#define OPS_PER_ITER     (1000ULL)
+> +
+> +#define SEED_A 0xdeadfacedeadface
+> +#define SEED_B 0xbadc0feebadc0fee
+> +#define SEED_C 0xbeefdeadbeefdead
+> +
+> +enum op {
+> +    OP_ADD,
+> +    OP_SUB,
+> +    OP_MUL,
+> +    OP_DIV,
+> +    OP_FMA,
+> +    OP_SQRT,
+> +};
+> +
+> +static const char * const op_names[] =3D {
+> +    [OP_ADD] =3D "add",
+> +    [OP_SUB] =3D "sub",
+> +    [OP_MUL] =3D "mul",
+> +    [OP_DIV] =3D "div",
+> +    [OP_FMA] =3D "fma",
+> +    [OP_SQRT] =3D "sqrt",
+> +};
+> +
+> +static uint64_t n_ops =3D 10000000;
+> +static enum op op;
+> +static const char *precision =3D "float";
+> +
+> +static const char commands_string[] =3D
+> +    " -n =3D number of floating point operations\n"
+> +    " -o =3D floating point operation (add, sub, mul, div, fma, sqrt). D=
+efault: add\n"
+> +    " -p =3D precision (float|single, double). Default: float";
+> +
+> +static void usage_complete(int argc, char *argv[])
+> +{
+> +    fprintf(stderr, "Usage: %s [options]\n", argv[0]);
+> +    fprintf(stderr, "options:\n%s\n", commands_string);
+> +    exit(-1);
+> +}
+> +
+> +static void set_op(const char *name)
+> +{
+> +    int i;
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(op_names); i++) {
+> +        if (strcmp(name, op_names[i]) =3D=3D 0) {
+> +            op =3D i;
+> +            return;
+> +        }
+> +    }
+> +    fprintf(stderr, "Unsupported op '%s'\n", name);
+> +    exit(EXIT_FAILURE);
+> +}
+> +
+> +static inline int64_t get_clock_realtime(void)
+> +{
+> +    struct timeval tv;
+> +
+> +    gettimeofday(&tv, NULL);
+> +    return tv.tv_sec * 1000000000LL + (tv.tv_usec * 1000);
+> +}
+> +
+> +/*
+> + * From: https://en.wikipedia.org/wiki/Xorshift
+> + * This is faster than rand_r(), and gives us a wider range (RAND_MAX is=
+ only
+> + * guaranteed to be >=3D INT_MAX).
+> + */
+> +static uint64_t xorshift64star(uint64_t x)
+> +{
+> +    x ^=3D x >> 12; /* a */
+> +    x ^=3D x << 25; /* b */
+> +    x ^=3D x >> 27; /* c */
+> +    return x * UINT64_C(2685821657736338717);
+> +}
+> +
+> +static inline bool u32_is_normal(uint32_t x)
+> +{
+> +    return ((x + 0x00800000) & 0x7fffffff) >=3D 0x01000000;
+> +}
+> +
+> +static inline bool u64_is_normal(uint64_t x)
+> +{
+> +    return ((x + (1ULL << 52)) & -1ULL >> 1) >=3D 1ULL << 53;
+> +}
+> +
+> +static inline float get_random_float(uint64_t *x)
+> +{
+> +    uint64_t r =3D *x;
+> +    uint32_t r32;
+> +
+> +    do {
+> +        r =3D xorshift64star(r);
+> +    } while (!u32_is_normal(r));
+> +    *x =3D r;
+> +    r32 =3D r;
+> +    return *(float *)&r32;
+> +}
+> +
+> +static inline double get_random_double(uint64_t *x)
+> +{
+> +    uint64_t r =3D *x;
+> +
+> +    do {
+> +        r =3D xorshift64star(r);
+> +    } while (!u64_is_normal(r));
+> +    *x =3D r;
+> +    return *(double *)&r;
+> +}
+> +
+> +/*
+> + * Disable optimizations (e.g. "a OP b" outside of the inner loop) with
+> + * volatile.
+> + */
+> +#define GEN_BENCH_1OPF(NAME, FUNC, PRECISION)                           \
+> +    static void NAME(volatile PRECISION *res)                           \
+> +    {                                                                   \
+> +        uint64_t ra =3D SEED_A;                                         =
+  \
+> +        uint64_t i, j;                                                  \
+> +                                                                        \
+> +        for (i =3D 0; i < n_ops; i +=3D OPS_PER_ITER) {                 =
+    \
+> +            volatile PRECISION a =3D glue(get_random_, PRECISION)(&ra); =
+  \
+> +                                                                        \
+> +            for (j =3D 0; j < OPS_PER_ITER; j++) {                      =
+  \
+> +                *res =3D FUNC(a);                                       =
+  \
+> +            }                                                           \
+> +        }                                                               \
+> +    }
+> +
+
+Have you had a chance to look at if this will vectorise? I have a
+similar benchmark which I compile with multiple options to test normal,
+NEON/AdvSIMD and SVE enabled loops.
+
+> +GEN_BENCH_1OPF(bench_float_sqrt, sqrtf, float)
+> +GEN_BENCH_1OPF(bench_double_sqrt, sqrt, double)
+> +#undef GEN_BENCH_1OPF
+> +
+> +#define GEN_BENCH_2OP(NAME, OP, PRECISION)                              \
+> +    static void NAME(volatile PRECISION *res)                           \
+> +    {                                                                   \
+> +        uint64_t ra =3D SEED_A;                                         =
+  \
+> +        uint64_t rb =3D SEED_B;                                         =
+  \
+> +        uint64_t i, j;                                                  \
+> +                                                                        \
+> +        for (i =3D 0; i < n_ops; i +=3D OPS_PER_ITER) {                 =
+    \
+> +            volatile PRECISION a =3D glue(get_random_, PRECISION)(&ra); =
+  \
+> +            volatile PRECISION b =3D glue(get_random_, PRECISION)(&rb); =
+  \
+> +                                                                        \
+> +            for (j =3D 0; j < OPS_PER_ITER; j++) {                      =
+  \
+> +                *res =3D a OP b;                                        =
+  \
+> +            }                                                           \
+> +        }                                                               \
+> +    }
+> +
+> +GEN_BENCH_2OP(bench_float_add, +, float)
+> +GEN_BENCH_2OP(bench_float_sub, -, float)
+> +GEN_BENCH_2OP(bench_float_mul, *, float)
+> +GEN_BENCH_2OP(bench_float_div, /, float)
+> +
+> +GEN_BENCH_2OP(bench_double_add, +, double)
+> +GEN_BENCH_2OP(bench_double_sub, -, double)
+> +GEN_BENCH_2OP(bench_double_mul, *, double)
+> +GEN_BENCH_2OP(bench_double_div, /, double)
+> +
+> +#define GEN_BENCH_3OPF(NAME, FUNC, PRECISION)                           \
+> +    static void NAME(volatile PRECISION *res)                           \
+> +    {                                                                   \
+> +        uint64_t ra =3D SEED_A;                                         =
+  \
+> +        uint64_t rb =3D SEED_B;                                         =
+  \
+> +        uint64_t rc =3D SEED_C;                                         =
+  \
+> +        uint64_t i, j;                                                  \
+> +                                                                        \
+> +        for (i =3D 0; i < n_ops; i +=3D OPS_PER_ITER) {                 =
+    \
+> +            volatile PRECISION a =3D glue(get_random_, PRECISION)(&ra); =
+  \
+> +            volatile PRECISION b =3D glue(get_random_, PRECISION)(&rb); =
+  \
+> +            volatile PRECISION c =3D glue(get_random_, PRECISION)(&rc); =
+  \
+> +                                                                        \
+> +            for (j =3D 0; j < OPS_PER_ITER; j++) {                      =
+  \
+> +                *res =3D FUNC(a, b, c);                                 =
+  \
+> +            }                                                           \
+> +        }                                                               \
+> +    }
+> +
+> +GEN_BENCH_3OPF(bench_float_fma, fmaf, float)
+> +GEN_BENCH_3OPF(bench_double_fma, fma, double)
+> +#undef GEN_BENCH_3OPF
+> +
+> +static void parse_args(int argc, char *argv[])
+> +{
+> +    int c;
+> +
+> +    for (;;) {
+> +        c =3D getopt(argc, argv, "n:ho:p:");
+> +        if (c < 0) {
+> +            break;
+> +        }
+> +        switch (c) {
+> +        case 'h':
+> +            usage_complete(argc, argv);
+> +            exit(0);
+> +        case 'n':
+> +            n_ops =3D atoll(optarg);
+> +            if (n_ops < OPS_PER_ITER) {
+> +                n_ops =3D OPS_PER_ITER;
+> +            }
+> +            n_ops -=3D n_ops % OPS_PER_ITER;
+> +            break;
+> +        case 'o':
+> +            set_op(optarg);
+> +            break;
+> +        case 'p':
+> +            precision =3D optarg;
+> +            if (strcmp(precision, "float") &&
+> +                strcmp(precision, "single") &&
+> +                strcmp(precision, "double")) {
+> +                fprintf(stderr, "Unsupported precision '%s'\n", precisio=
+n);
+> +                exit(EXIT_FAILURE);
+
+Supporting half-precision if the compiler does would also be useful here.
+
+> +            }
+> +            break;
+> +        }
+> +    }
+> +}
+> +
+> +#define CALL_BENCH(OP, PRECISION, RESP)                 \
+> +    do {                                                \
+> +        switch (OP) {                                   \
+> +        case OP_ADD:                                    \
+> +            glue(glue(bench_, PRECISION), _add)(RESP);  \
+> +            break;                                      \
+> +        case OP_SUB:                                    \
+> +            glue(glue(bench_, PRECISION), _sub)(RESP);  \
+> +            break;                                      \
+> +        case OP_MUL:                                    \
+> +            glue(glue(bench_, PRECISION), _mul)(RESP);  \
+> +            break;                                      \
+> +        case OP_DIV:                                    \
+> +            glue(glue(bench_, PRECISION), _div)(RESP);  \
+> +            break;                                      \
+> +        case OP_FMA:                                    \
+> +            glue(glue(bench_, PRECISION), _fma)(RESP);  \
+> +            break;                                      \
+> +        case OP_SQRT:                                   \
+> +            glue(glue(bench_, PRECISION), _sqrt)(RESP); \
+> +            break;                                      \
+> +        default:                                        \
+> +            g_assert_not_reached();                     \
+> +        }                                               \
+> +    } while (0)
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +    int64_t t0, t1;
+> +    double resd;
+> +
+> +    parse_args(argc, argv);
+> +    if (!strcmp(precision, "float") || !strcmp(precision, "single")) {
+> +        float res;
+> +        t0 =3D get_clock_realtime();
+> +        CALL_BENCH(op, float, &res);
+> +        t1 =3D get_clock_realtime();
+> +        resd =3D res;
+> +    } else if (!strcmp(precision, "double")) {
+> +        t0 =3D get_clock_realtime();
+> +        CALL_BENCH(op, double, &resd);
+> +        t1 =3D get_clock_realtime();
+> +    } else {
+> +        g_assert_not_reached();
+> +    }
+> +    printf("%.2f MFlops\n", (double)n_ops / (t1 - t0) * 1e3);
+> +    if (resd) {
+> +        return 0;
+> +    }
+> +    return 0;
+> +}
+> diff --git a/tests/.gitignore b/tests/.gitignore
+> index 18e58b2..df69175 100644
+> --- a/tests/.gitignore
+> +++ b/tests/.gitignore
+> @@ -12,6 +12,7 @@ check-qobject
+>  check-qstring
+>  check-qom-interface
+>  check-qom-proplist
+> +fp-bench
+>  qht-bench
+>  rcutorture
+>  test-aio
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index ef9b88c..f6121ee 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -587,7 +587,7 @@ test-obj-y =3D tests/check-qnum.o tests/check-qstring=
+.o tests/check-qdict.o \
+>  	tests/rcutorture.o tests/test-rcu-list.o \
+>  	tests/test-qdist.o tests/test-shift128.o \
+>  	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
+> -	tests/atomic_add-bench.o
+> +	tests/atomic_add-bench.o tests/fp-bench.o
+
+Not sure why but "make check" didn't build this. I had to explicitly
+"make tests/fp-bench". I guess along with atomic_add_bench though these
+are explicitly guest facing tests so maybe we should move them once
+tests/tcg is working again. I'll have another run at that this week.
+
+>
+>  $(test-obj-y): QEMU_INCLUDES +=3D -Itests
+>  QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+> @@ -639,6 +639,7 @@ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tes=
+ts/qht-bench$(EXESUF) $(tes
+>  tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
+>  tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-=
+obj-y)
+>  tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-ob=
+j-y)
+> +tests/fp-bench$(EXESUF): tests/fp-bench.o $(test-util-obj-y)
+>
+>  tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+>  	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+
+Anyway for this version:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
