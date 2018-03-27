@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0r8f-00050r-Us
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:07:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f0r8j-00053Y-1t
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f0r8f-0004k3-0b
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:07:57 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 27 Mar 2018 18:07:36 +0200
-Message-Id: <20180327160736.24309-1-marcandre.lureau@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1f0r8g-0004lh-9y
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:08:01 -0400
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:43356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f0r8g-0004jt-4F
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 12:07:58 -0400
+Received: by mail-wr0-f195.google.com with SMTP id p53so15437588wrc.10
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 09:07:57 -0700 (PDT)
+References: <20180327113452.19613-1-dgilbert@redhat.com>
+	<20180327113452.19613-4-dgilbert@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0bfadead-a3c2-9bce-3e53-8ca3a258a57a@redhat.com>
+Date: Tue, 27 Mar 2018 18:07:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] blockjob: leak fix,
- remove from txn when failing early
+In-Reply-To: <20180327113452.19613-4-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] e1000: Old machine types,
+ turn new subsection off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,79 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, eswierk@skyportsystems.com, jasowang@redhat.com
+Cc: peterx@redhat.com, quintela@redhat.com
 
-This fixes leaks found by ASAN such as:
-  GTESTER tests/test-blockjob
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3D31442=3D=3DERROR: LeakSanitizer: detected memory leaks
+On 27/03/2018 13:34, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Turn the newly added subsection off for old machine types
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/hw/compat.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index bc9e3a6627..13242b831a 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -14,6 +14,10 @@
+>          .driver   = "vhost-user-blk-pci",\
+>          .property = "vectors",\
+>          .value    = "2",\
+> +    },{\
+> +        .driver   = "e1000",\
+> +        .property = "migrate_tso_props",\
+> +        .value    = "off",\
+>      },
+>  
+>  #define HW_COMPAT_2_10 \
+> 
 
-Direct leak of 24 byte(s) in 1 object(s) allocated from:
-    #0 0x7f88483cba38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
-8)
-    #1 0x7f8845e1bd77 in g_malloc0 ../glib/gmem.c:129
-    #2 0x7f8845e1c04b in g_malloc0_n ../glib/gmem.c:360
-    #3 0x5584d2732498 in block_job_txn_new /home/elmarco/src/qemu/blockjo=
-b.c:172
-    #4 0x5584d2739b28 in block_job_create /home/elmarco/src/qemu/blockjob=
-.c:973
-    #5 0x5584d270ae31 in mk_job /home/elmarco/src/qemu/tests/test-blockjo=
-b.c:34
-    #6 0x5584d270b1c1 in do_test_id /home/elmarco/src/qemu/tests/test-blo=
-ckjob.c:57
-    #7 0x5584d270b65c in test_job_ids /home/elmarco/src/qemu/tests/test-b=
-lockjob.c:118
-    #8 0x7f8845e40b69 in test_case_run ../glib/gtestutils.c:2255
-    #9 0x7f8845e40f29 in g_test_run_suite_internal ../glib/gtestutils.c:2=
-339
-    #10 0x7f8845e40fd2 in g_test_run_suite_internal ../glib/gtestutils.c:=
-2351
-    #11 0x7f8845e411e9 in g_test_run_suite ../glib/gtestutils.c:2426
-    #12 0x7f8845e3fe72 in g_test_run ../glib/gtestutils.c:1692
-    #13 0x5584d270d6e2 in main /home/elmarco/src/qemu/tests/test-blockjob=
-.c:377
-    #14 0x7f8843641f29 in __libc_start_main (/lib64/libc.so.6+0x20f29)
+Unfortunately it's not that easy, because on old machine types
+tx.tso_props was stored in tx.props.  So if the subsection is absent you
+have to migrate either tx.tso_props or tx.props, depending on s->tx.cptse.
 
-Add an assert to make sure that the job doesn't have associated txn befor=
-e free().
+Likewise if you migrate from older versions: if s->tx.props.tse &&
+s->tx.cptse, you have to copy s->tx.props to s->tx.tso_props and clear
+s->tx.props.  My understanding is that s->tx.tso_props.tse will be 1 if
+and only if the source sent s->tx.tso_props.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- blockjob.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This seems most easily done with a new field (e.g. vmstate_fixed_props)
+that is written in pre_save and set in post_load.
 
-diff --git a/blockjob.c b/blockjob.c
-index 11c9ce124d..bb75386515 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -228,6 +228,7 @@ void block_job_unref(BlockJob *job)
- {
-     if (--job->refcnt =3D=3D 0) {
-         assert(job->status =3D=3D BLOCK_JOB_STATUS_NULL);
-+        assert(!job->txn);
-         BlockDriverState *bs =3D blk_bs(job->blk);
-         QLIST_REMOVE(job, job_list);
-         bs->job =3D NULL;
-@@ -479,6 +480,7 @@ static int block_job_finalize_single(BlockJob *job)
-=20
-     QLIST_REMOVE(job, txn_list);
-     block_job_txn_unref(job->txn);
-+    job->txn =3D NULL;
-     block_job_conclude(job);
-     return 0;
- }
-@@ -994,6 +996,9 @@ void block_job_pause_all(void)
- void block_job_early_fail(BlockJob *job)
- {
-     assert(job->status =3D=3D BLOCK_JOB_STATUS_CREATED);
-+    QLIST_REMOVE(job, txn_list);
-+    block_job_txn_unref(job->txn);
-+    job->txn =3D NULL;
-     block_job_decommission(job);
- }
-=20
---=20
-2.17.0.rc1.1.g4c4f2b46a3
+Paolo
