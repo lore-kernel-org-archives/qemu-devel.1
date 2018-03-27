@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f0oL8-0004fl-OD
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:08:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f0oN5-0005gE-6g
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:10:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f0oL3-0007lY-PL
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:08:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57242 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f0oL3-0007kf-JY
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:08:33 -0400
-Date: Tue, 27 Mar 2018 15:08:27 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180327150827.532e8486@redhat.com>
-In-Reply-To: <20180323204218.GC28161@localhost.localdomain>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<1520860275-101576-3-git-send-email-imammedo@redhat.com>
-	<20180323204218.GC28161@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1f0oN4-0000nj-5S
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:10:39 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40627)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f0oN3-0000ms-Vj
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:10:38 -0400
+Received: by mail-ot0-x243.google.com with SMTP id w12-v6so2456881otj.7
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 06:10:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] numa: split out NumaOptions parsing
- into parse_NumaOptions()
+In-Reply-To: <20180326165030.875-1-richard.henderson@linaro.org>
+References: <20180326165030.875-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Mar 2018 14:10:16 +0100
+Message-ID: <CAFEAcA-ifqhtoBQzTLNLMN-5-Xz=d45xc2SL9oYH-if_xZvCgg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-2.12 0/1] target/hppa: Fix for glibc 2.27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 23 Mar 2018 17:42:18 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 26 March 2018 at 17:50, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The following changes since commit 2ffd221d07a671f72354a063d3080f244ec80b20:
+>
+>   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2018-03-26 11:02:50 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-hppa-20180327
+>
+> for you to fetch changes up to ebd0e151149a6280ea9f4cd9638aea517bb3238b:
+>
+>   target/hppa: Include priv level in user-only iaoq (2018-03-26 22:56:57 +0800)
+>
+> ----------------------------------------------------------------
+> Fix glibc 2.27 for hppa-linux-user
+>
+> ----------------------------------------------------------------
+> Richard Henderson (1):
+>       target/hppa: Include priv level in user-only iaoq
+>
+>  target/hppa/cpu.h       |  4 ++--
+>  target/hppa/translate.c | 12 ++++--------
+>  2 files changed, 6 insertions(+), 10 deletions(-)
 
-> On Mon, Mar 12, 2018 at 02:11:08PM +0100, Igor Mammedov wrote:
-> > it will allow to reuse parse_NumaOptions() for parsing
-> > configuration commands received via QMP interface
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/sysemu/numa.h |  1 +
-> >  numa.c                | 48 +++++++++++++++++++++++++++++-------------------
-> >  2 files changed, 30 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> > index 21713b7..7a0ae75 100644
-> > --- a/include/sysemu/numa.h
-> > +++ b/include/sysemu/numa.h
-> > @@ -22,6 +22,7 @@ struct NumaNodeMem {
-> >  };
-> >  
-> >  extern NodeInfo numa_info[MAX_NODES];
-> > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
-> >  void parse_numa_opts(MachineState *ms);
-> >  void numa_complete_configuration(MachineState *ms);
-> >  void query_numa_node_mem(NumaNodeMem node_mem[]);
-> > diff --git a/numa.c b/numa.c
-> > index 126c649..2b1d292 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -169,28 +169,11 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
-> >      have_numa_distance = true;
-> >  }
-> >  
-> > -static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> > +static
-> > +void parse_NumaOptions(MachineState *ms, NumaOptions *object, Error **errp)  
-> 
-> I wonder if we should rename the parse_numa_{node,distance}()
-> functions to configure_numa_{node,distance}(), and this one
-> configure_numa().  These functions don't parse anything, anymore.
-I'd preffer to do it in another patch on top of this series
-(added it my TODO list)
+Applied, thanks.
 
-
-> >  {
-> > -    NumaOptions *object = NULL;
-> > -    MachineState *ms = opaque;
-> >      Error *err = NULL;
-> >  
-> > -    {
-> > -        Visitor *v = opts_visitor_new(opts);
-> > -        visit_type_NumaOptions(v, NULL, &object, &err);
-> > -        visit_free(v);
-> > -    }
-> > -
-> > -    if (err) {
-> > -        goto end;
-> > -    }
-> > -
-> > -    /* Fix up legacy suffix-less format */
-> > -    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
-> > -        const char *mem_str = qemu_opt_get(opts, "mem");
-> > -        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
-> > -    }
-> > -
-> >      switch (object->type) {
-> >      case NUMA_OPTIONS_TYPE_NODE:
-> >          parse_numa_node(ms, &object->u.node, &err);
-> > @@ -224,6 +207,33 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> >      }
-> >  
-> >  end:
-> > +    if (err) {
-> > +        error_propagate(errp, err);
-> > +    }  
-> 
-> "if (err)" is not necessary here.  See
-> scripts/coccinelle/error_propagate_null.cocci.
-fixed
- 
-> > +}
-> > +
-> > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> > +{
-> > +    NumaOptions *object = NULL;
-> > +    MachineState *ms = MACHINE(opaque);
-> > +    Error *err = NULL;
-> > +    Visitor *v = opts_visitor_new(opts);
-> > +
-> > +    visit_type_NumaOptions(v, NULL, &object, &err);
-> > +    visit_free(v);
-> > +    if (err) {
-> > +        goto end;
-> > +    }
-> > +
-> > +    /* Fix up legacy suffix-less format */
-> > +    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
-> > +        const char *mem_str = qemu_opt_get(opts, "mem");
-> > +        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
-> > +    }
-> > +
-> > +    parse_NumaOptions(ms, object, &err);
-> > +
-> > +end:
-> >      qapi_free_NumaOptions(object);
-> >      if (err) {
-> >          error_report_err(err);  
-> 
-> We can fix this one too while at it.
-error_report_err() doesn't check for NULL value,
-'if(err)' is needed here
- 
-> The rest of the patch looks good.
-> 
+-- PMM
