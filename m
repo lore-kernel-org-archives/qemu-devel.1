@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f0fVw-0002RT-Bv
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:43:13 -0400
+	(envelope-from <dgibson@redhat.com>) id 1f0fXL-0003QJ-GK
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f0fVt-0006h9-7k
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:43:12 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:40255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1f0fVs-0006gg-UZ
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:43:09 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id g8so8095107pgv.7
-	for <qemu-devel@nongnu.org>; Mon, 26 Mar 2018 20:43:08 -0700 (PDT)
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
-	<20180315102501.GA3062@work-vm>
-	<423c901d-16b6-67fb-262b-3021e30871ec@gmail.com>
-	<20180321081923.GB20571@xz-mi>
-	<b957b756-4996-7e79-406d-9587000839c1@gmail.com>
-	<20180326090213.GB17789@xz-mi>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <73e25db4-997f-0fbf-0c73-6589283c4005@gmail.com>
-Date: Mon, 26 Mar 2018 23:43:33 +0800
+	(envelope-from <dgibson@redhat.com>) id 1f0fXI-0007vF-Dx
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:44:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45978 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@redhat.com>) id 1f0fXI-0007s2-7c
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 23:44:36 -0400
+Date: Tue, 27 Mar 2018 14:44:16 +1100
+From: David Gibson <dgibson@redhat.com>
+Message-ID: <20180327144416.2ed36b8e@umbus.fritz.box>
+In-Reply-To: <20180326072639.GB31422@lemon.usersys.redhat.com>
+References: <20180322073822.25795-1-famz@redhat.com>
+	<097f05b7-c628-c529-1c64-a84dc6483f7c@linux.vnet.ibm.com>
+	<20180326072639.GB31422@lemon.usersys.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180326090213.GB17789@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/3oQY+0i=UWyvfpUt6ZwlLue";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] scsi-disk: Don't enlarge min_io_size to
+ max_io_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,121 +30,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, liang.z.li@intel.com, kvm@vger.kernel.org, quintela@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+--Sig_/3oQY+0i=UWyvfpUt6ZwlLue
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, 26 Mar 2018 15:26:39 +0800
+Fam Zheng <famz@redhat.com> wrote:
 
-On 03/26/2018 05:02 PM, Peter Xu wrote:
-> On Thu, Mar 22, 2018 at 07:38:07PM +0800, Xiao Guangrong wrote:
->>
->>
->> On 03/21/2018 04:19 PM, Peter Xu wrote:
->>> On Fri, Mar 16, 2018 at 04:05:14PM +0800, Xiao Guangrong wrote:
->>>>
->>>> Hi David,
->>>>
->>>> Thanks for your review.
->>>>
->>>> On 03/15/2018 06:25 PM, Dr. David Alan Gilbert wrote:
->>>>
->>>>>>     migration/ram.c | 32 ++++++++++++++++----------------
->>>>>
->>>>> Hi,
->>>>>      Do you have some performance numbers to show this helps?  Were those
->>>>> taken on a normal system or were they taken with one of the compression
->>>>> accelerators (which I think the compression migration was designed for)?
->>>>
->>>> Yes, i have tested it on my desktop, i7-4790 + 16G, by locally live migrate
->>>> the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to 350.
->>>>
->>>> During the migration, a workload which has 8 threads repeatedly written total
->>>> 6G memory in the VM. Before this patchset, its bandwidth is ~25 mbps, after
->>>> applying, the bandwidth is ~50 mbps.
->>>
->>> Hi, Guangrong,
->>>
->>> Not really review comments, but I got some questions. :)
->>
->> Your comments are always valuable to me! :)
->>
->>>
->>> IIUC this patch will only change the behavior when last_sent_block
->>> changed.  I see that the performance is doubled after the change,
->>> which is really promising.  However I don't fully understand why it
->>> brings such a big difference considering that IMHO current code is
->>> sending dirty pages per-RAMBlock.  I mean, IMHO last_sent_block should
->>> not change frequently?  Or am I wrong?
->>
->> It's depends on the configuration, each memory-region which is ram or
->> file backend has a RAMBlock.
->>
->> Actually, more benefits comes from the fact that the performance & throughput
->> of the multithreads has been improved as the threads is fed by the
->> migration thread and the result is consumed by the migration
->> thread.
-> 
-> I'm not sure whether I got your points - I think you mean that the
-> compression threads and the migration thread can form a better
-> pipeline if the migration thread does not do any compression at all.
-> 
-> I think I agree with that.
-> 
-> However it does not really explain to me on why a very rare event
-> (sending the first page of a RAMBlock, considering bitmap sync is
-> rare) can greatly affect the performance (it shows a doubled boost).
-> 
+> On Thu, 03/22 09:19, Daniel Henrique Barboza wrote:
+> > Hi,
+> >=20
+> > On 03/22/2018 04:38 AM, Fam Zheng wrote: =20
+> > > Some backends report big max_io_sectors. Making min_io_size the same
+> > > value in this case will make it impossible for guest to align memory,
+> > > therefore the disk may not be usable at all.
+> > >=20
+> > > Change the default behavior (when min_io_size and opt_io_size are not
+> > > specified in the command line), do not assume max_io_sectors is a good
+> > > value for opt_io_size and min_io_size, use 512 instead.
+> > >=20
+> > > Reported-by: David Gibson <dgibson@redhat.com>
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > ---
+> > >   hw/scsi/scsi-disk.c | 6 ++----
+> > >   1 file changed, 2 insertions(+), 4 deletions(-)
+> > >=20
+> > > diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> > > index 5b7a48f5a5..76e3c9eaa4 100644
+> > > --- a/hw/scsi/scsi-disk.c
+> > > +++ b/hw/scsi/scsi-disk.c
+> > > @@ -714,10 +714,8 @@ static int scsi_disk_emulate_inquiry(SCSIRequest=
+ *req, uint8_t *outbuf)
+> > >=20
+> > >                   /* min_io_size and opt_io_size can't be greater than
+> > >                    * max_io_sectors */
+> > > -                min_io_size =3D
+> > > -                    MIN_NON_ZERO(min_io_size, max_io_sectors);
+> > > -                opt_io_size =3D
+> > > -                    MIN_NON_ZERO(opt_io_size, max_io_sectors);
+> > > +                min_io_size =3D MIN(min_io_size ? : 512, max_io_sect=
+ors);
+> > > +                opt_io_size =3D MIN(opt_io_size ? : 512, max_io_sect=
+ors);
+> > >               } =20
+> >=20
+> > This code you're changing was added in d082d16a5c ("consider
+> > bl->max_transfer ..").
+> > I've borrowed this logic from scsi-generic.c, scsi_read_complete:
+> >=20
+> > =C2=A0=C2=A0=C2=A0 if (s->type =3D=3D TYPE_DISK &&
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r->req.cmd.buf[0] =3D=3D INQ=
+UIRY &&
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r->req.cmd.buf[2] =3D=3D 0xb=
+0) {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t max_transfer =3D
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_=
+get_max_transfer(s->conf.blk) / s->blocksize;
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(max_transfer);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stl_be_p(&r->buf[8], max_tra=
+nsfer);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Also take care of the opt=
+ xfer len. */
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stl_be_p(&r->buf[12],
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12]=
+)));
+> > =C2=A0=C2=A0=C2=A0 }
+> >=20
+> >=20
+> > Unless I've misunderstood the bug, you will want to change this code to=
+o.
+> > Otherwise
+> > you'll fix it with emulated disks but it might appear when using SCSI
+> > passthrough. =20
+>=20
+> I am assuming (because I don't have a reproducer myself)
 
-I understand it is trick indeed, but it is not very hard to explain.
-Multi-threads (using 8 CPUs in our test) keep idle for a long time
-for the origin code, however, after our patch, as the normal is
-posted out async-ly that it's extremely fast as you said (the network
-is almost idle for current implementation) so it has a long time that
-the CPUs can be used effectively to generate more compressed data than
-before.
+Sorry, I should have given you specific reproduce instructions.  You
+don't need a POWER host - I've verified that the bug trips under TCG.
 
-> Btw, about the numbers: IMHO the numbers might not be really "true
-> numbers".  Or say, even the bandwidth is doubled, IMHO it does not
-> mean the performance is doubled. Becasue the data has changed.
-> 
-> Previously there were only compressed pages, and now for each cycle of
-> RAMBlock looping we'll send a normal page (then we'll get more thing
-> to send).  So IMHO we don't really know whether we sent more pages
-> with this patch, we can only know we sent more bytes (e.g., an extreme
-> case is that the extra 25Mbps/s are all caused by those normal pages,
-> and we can be sending exactly the same number of pages like before, or
-> even worse?).
-> 
+  1. Grab a RHEL ppc64le install image (other installers could well
+     also hit it, but I haven't tried them)
+  2. Build current qemu master, including the ppc64-softmmu target
+  3. Create a fresh new guest disk image
+        qemu-img create -f qcow2 disk.qcow2 20G
+  4. Attempt to install the new guest:
+        $QEMU -nodefaults -nographic -machine pseries \
+              -cpu POWER8 -smp 1 -m 1G \
+              -chardev stdio,id=3Dconmon,mux=3Don,signal=3Doff \
+              -device spapr-vty,chardev=3Dconmon \
+              -mon conmon \
+              -device virtio-scsi-pci,id=3Dscsi \
+              -drive file=3Ddisk.qcow2,if=3Dnone,format=3Dqcow2,id=3Dhd \
+              -device scsi-disk,drive=3Dhd,bus=3Dscsi.0 \
+              -drive file=3DRHEL-7.4-20170711.0-Server-ppc64le-dvd1.iso,for=
+mat=3Draw,media=3Dcdrom,if=3Dnone,id=3Dcd \
+              -device scsi-cd,drive=3Dcd,bus=3Dscsi.0
 
-Current implementation uses CPU very ineffectively (it's our next work
-to be posted out) that the network is almost idle so posting more data
-out is a better choice，further more, migration thread plays a role for
-parallel, it'd better to make it fast.
+That's using the RHEL7.4 GA image, a recent 7.5 snapshot also works as may =
+others.
 
->>
->>>
->>> Another follow-up question would be: have you measured how long time
->>> needed to compress a 4k page, and how many time to send it?  I think
->>> "sending the page" is not really meaningful considering that we just
->>> put a page into the buffer (which should be extremely fast since we
->>> don't really flush it every time), however I would be curious on how
->>> slow would compressing a page be.
->>
->> I haven't benchmark the performance of zlib, i think it is CPU intensive
->> workload, particularly, there no compression-accelerator (e.g, QAT) on
->> our production. BTW, we were using lzo instead of zlib which worked
->> better for some workload.
-> 
-> Never mind. Good to know about that.
-> 
->>
->> Putting a page into buffer should depend on the network, i,e, if the
->> network is congested it should take long time. :)
-> 
-> Again, considering that I don't know much on compression (especially I
-> hardly used that) mine are only questions, which should not block your
-> patches to be either queued/merged/reposted when proper. :)
+> what matters is
+> min_io_size here.
+>=20
+> David, could you help test if you see the same problem with "-device
+> scsi-block"? If we I'll patch scsi-generic.c in v2 too.
 
-Yes, i see. The discussion can potentially raise a better solution.
+I'm not sure exactly what you want me to check here?  You mean putting
+the guest disk on a scsi-block instead of scsi-disk?  That's a bit more
+fiddly, since I have to find a block device to back it instead of an
+image.
 
-Thanks for your comment, Peter!
+--=20
+David Gibson <dgibson@redhat.com>
+Principal Software Engineer, Virtualization, Red Hat
+
+--Sig_/3oQY+0i=UWyvfpUt6ZwlLue
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq5vhAACgkQbDjKyiDZ
+s5L3yw//fzHcjypta0pOAbbcKjm1kZ3aiFgYDYFDAhXs6ITzFQDJHCRlCErE4oL0
+bCNUmGLdHZ6BNKJYJDaQGxCadFIzaZQB+xRAWdK5gO2sCNJK3lHp0/Y4EGlAACEg
+065EzJ+q2MGI7aWXPPjyNNjaPmcpc/teafbeZoIYru/8o57bc/I5Hkye+hxOY6Tw
+9qOnghAF8paed75e9O2yL7OlktLLY/vzL1O4TNCTSv0EEuJvwPc/+VDCDYEwLgm7
+/RLeLovs9XSXoq49xM4Ru161A5NHluvwy57nLeGuMjIliLfgocWm3XbggaQxf/vf
+ype1ftxakGibu6ip/bGsgB5srYn3gZy8u29EgHszVNJL+nyb+msc44Awxk+OsKiM
+YkuDmfVNR3mxrr4ZbTrxgFtGNC2U9hGEPE1CzhWoJjkAiIdJQMJgCdi0d5cQHNFm
+papHyWx7gJ+CU64dVIuEED30PPfOMvfOGhdmrH9fJqog28xxbbv76nAiuvFfNWmL
+WPJU1hD7wLZVeWEuF/8NYqLmfp00M1GsCsPxv/h23lmJM5zT0U4wpJIVFb4xi5Yw
+QwF1Oo0I6T8nfR2lIPlVNQT/8ey95uyYniXIey5aZ4uTxebTtx53OZWxWVYo6k/L
+eg/cNtzO+VPs9zpB9q71guEIhjYzwdtNVEfWoBG7arc0pTjW6kc=
+=IEk+
+-----END PGP SIGNATURE-----
+
+--Sig_/3oQY+0i=UWyvfpUt6ZwlLue--
