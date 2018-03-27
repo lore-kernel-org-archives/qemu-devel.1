@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f176C-0000kr-JT
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f176C-0000kp-JI
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f176B-0004w1-MA
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f1768-0004ui-5S
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:28 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35875)
+Received: from mail-pl0-x22f.google.com ([2607:f8b0:400e:c01::22f]:35819)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1f176B-0004vb-AK
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:27 -0400
-Received: by mail-pg0-x244.google.com with SMTP id 201so714525pgg.3
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 02:10:27 -0700 (PDT)
+	id 1f1767-0004uO-TH
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:24 -0400
+Received: by mail-pl0-x22f.google.com with SMTP id p9-v6so1211024pls.2
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 02:10:23 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue, 27 Mar 2018 17:10:34 +0800
-Message-Id: <20180327091043.30220-2-xiaoguangrong@tencent.com>
-In-Reply-To: <20180327091043.30220-1-xiaoguangrong@tencent.com>
-References: <20180327091043.30220-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 01/10] migration: stop compressing page in
- migration thread
+Date: Tue, 27 Mar 2018 17:10:33 +0800
+Message-Id: <20180327091043.30220-1-xiaoguangrong@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/10] migration: improve and cleanup
+ compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +33,98 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-As compression is a heavy work, do not do it in migration thread,
-instead, we post it out as a normal page
+Changelog in v2:
+Thanks to the review from Dave, Peter, Wei and Jiang Biao, the changes
+in this version are:
+1) include the performance number in the cover letter
+2）add some comments to explain how to use z_stream->opaque in the
+   patchset
+3) allocate a internal buffer for per thread to store the data to
+   be compressed
+4) add a new patch that moves some code to ram_save_host_page() so
+   that 'goto' can be omitted gracefully
+5) split the optimization of compression and decompress into two
+   separated patches
+6) refine and correct code styles
 
-Reviewed-by: Wei Wang <wei.w.wang@intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
----
- migration/ram.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 0e90efa092..409c847a76 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1137,7 +1137,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-     int pages = -1;
-     uint64_t bytes_xmit = 0;
-     uint8_t *p;
--    int ret, blen;
-+    int ret;
-     RAMBlock *block = pss->block;
-     ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
- 
-@@ -1167,23 +1167,23 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-         if (block != rs->last_sent_block) {
-             flush_compressed_data(rs);
-             pages = save_zero_page(rs, block, offset);
--            if (pages == -1) {
--                /* Make sure the first page is sent out before other pages */
--                bytes_xmit = save_page_header(rs, rs->f, block, offset |
--                                              RAM_SAVE_FLAG_COMPRESS_PAGE);
--                blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
--                                                 migrate_compress_level());
--                if (blen > 0) {
--                    ram_counters.transferred += bytes_xmit + blen;
--                    ram_counters.normal++;
--                    pages = 1;
--                } else {
--                    qemu_file_set_error(rs->f, blen);
--                    error_report("compressed data failed!");
--                }
--            }
-             if (pages > 0) {
-                 ram_release_pages(block->idstr, offset, pages);
-+            } else {
-+                /*
-+                 * Make sure the first page is sent out before other pages.
-+                 *
-+                 * we post it as normal page as compression will take much
-+                 * CPU resource.
-+                 */
-+                ram_counters.transferred += save_page_header(rs, rs->f, block,
-+                                                offset | RAM_SAVE_FLAG_PAGE);
-+                qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
-+                                      migrate_release_ram() &
-+                                      migration_in_postcopy());
-+                ram_counters.transferred += TARGET_PAGE_SIZE;
-+                ram_counters.normal++;
-+                pages = 1;
-             }
-         } else {
-             pages = save_zero_page(rs, block, offset);
+This is the first part of our work to improve compression to make it
+be more useful in the production.
+
+The first patch resolves the problem that the migration thread spends
+too much CPU resource to compression memory if it jumps to a new block
+that causes the network is used very deficient.
+
+The second patch fixes the performance issue that too many VM-exits
+happen during live migration if compression is being used, it is caused
+by huge memory returned to kernel frequently as the memory is allocated
+and freed for every signal call to compress2()
+
+The remaining patches clean the code up dramatically
+
+Performance numbers:
+We have tested it on my desktop, i7-4790 + 16G, by locally live migrate
+the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to
+350. During the migration, a workload which has 8 threads repeatedly
+written total 6G memory in the VM.
+
+Before this patchset, its bandwidth is ~25 mbps, after applying, the
+bandwidth is ~50 mbp.
+
+We also collected the perf data for patch 2 and 3 on our production,
+before the patchset:
++  57.88%  kqemu  [kernel.kallsyms]        [k] queued_spin_lock_slowpath
++  10.55%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
++   4.83%  kqemu  [kernel.kallsyms]        [k] flush_tlb_func_common
+
+-   1.16%  kqemu  [kernel.kallsyms]        [k] lock_acquire                                       ▒
+   - lock_acquire                                                                                 ▒
+      - 15.68% _raw_spin_lock                                                                     ▒
+         + 29.42% __schedule                                                                      ▒
+         + 29.14% perf_event_context_sched_out                                                    ▒
+         + 23.60% tdp_page_fault                                                                  ▒
+         + 10.54% do_anonymous_page                                                               ▒
+         + 2.07% kvm_mmu_notifier_invalidate_range_start                                          ▒
+         + 1.83% zap_pte_range                                                                    ▒
+         + 1.44% kvm_mmu_notifier_invalidate_range_end
+
+
+apply our work:
++  51.92%  kqemu  [kernel.kallsyms]        [k] queued_spin_lock_slowpath
++  14.82%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
++   1.47%  kqemu  [kernel.kallsyms]        [k] mark_lock.clone.0
++   1.46%  kqemu  [kernel.kallsyms]        [k] native_sched_clock
++   1.31%  kqemu  [kernel.kallsyms]        [k] lock_acquire
++   1.24%  kqemu  libc-2.12.so             [.] __memset_sse2
+
+-  14.82%  kqemu  [kernel.kallsyms]        [k] __lock_acquire                                     ▒
+   - __lock_acquire                                                                               ▒
+      - 99.75% lock_acquire                                                                       ▒
+         - 18.38% _raw_spin_lock                                                                  ▒
+            + 39.62% tdp_page_fault                                                               ▒
+            + 31.32% __schedule                                                                   ▒
+            + 27.53% perf_event_context_sched_out                                                 ▒
+            + 0.58% hrtimer_interrupt
+
+
+We can see the TLB flush and mmu-lock contention have gone.
+
+Xiao Guangrong (10):
+  migration: stop compressing page in migration thread
+  migration: stop compression to allocate and free memory frequently
+  migration: stop decompression to allocate and free memory frequently
+  migration: detect compression and decompression errors
+  migration: introduce control_save_page()
+  migration: move some code ram_save_host_page
+  migration: move calling control_save_page to the common place
+  migration: move calling save_zero_page to the common place
+  migration: introduce save_normal_page()
+  migration: remove ram_save_compressed_page()
+
+ migration/qemu-file.c |  43 ++++-
+ migration/qemu-file.h |   6 +-
+ migration/ram.c       | 479 ++++++++++++++++++++++++++++++--------------------
+ 3 files changed, 322 insertions(+), 206 deletions(-)
+
 -- 
 2.14.3
