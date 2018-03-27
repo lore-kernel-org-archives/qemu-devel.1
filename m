@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f0kgJ-0008Tk-VS
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:14:20 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1f0koy-0002hu-QC
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f0kgE-0002aD-Op
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:14:15 -0400
-References: <20180323225739.17329-1-laurent@vivier.eu>
-	<20180323225739.17329-10-laurent@vivier.eu>
-	<20180327104706.5363eda9.cohuck@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <606ca3cc-f96e-2d39-df97-b5ec80d2e7a9@vivier.eu>
-Date: Tue, 27 Mar 2018 11:13:37 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1f0kou-0000KC-Nd
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:23:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59936
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1f0kou-0000JZ-Hr
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:23:08 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2R9IqUk006491
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 05:23:07 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2gyk2h0jdb-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 05:23:07 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 27 Mar 2018 10:23:05 +0100
+References: <20180327013620.1644387-1-eblake@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 27 Mar 2018 11:23:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180327104706.5363eda9.cohuck@redhat.com>
+In-Reply-To: <20180327013620.1644387-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 09/20] linux-user: move s390x
- signal.c parts to s390x directory
+Content-Transfer-Encoding: 7bit
+Message-Id: <b677f5b5-d81d-ce47-7f2b-9add4aef6edb@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Monitor: OOB related patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +42,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: peterx@redhat.com, marcandre.lureau@redhat.com
 
-Le 27/03/2018 à 10:47, Cornelia Huck a écrit :
-> On Fri, 23 Mar 2018 23:57:28 +0100
-> Laurent Vivier <laurent@vivier.eu> wrote:
+
+
+On 03/27/2018 03:36 AM, Eric Blake wrote:
+> This is patches 2, 3, 7, and 8 (with 7 rewritten) from Peter Xu's
+> series.  I've pushed them to git://repo.or.cz/qemu/ericb.git qapi-next
+
+that branch seems to work fine. (no make check or iotest regression on s390)
+
+
+
+
+
+> (on top of the other pending qapi patches at branch qapi); hopefully
+> this will be part of my pull request tomorrow for -rc1.
 > 
->> No code change, only move code from signal.c to
->> s390x/signal.c, except adding includes and
->> exporting setup_frame() and setup_rt_frame().
->>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>  linux-user/s390x/signal.c        | 309 +++++++++++++++++++++++++++++++++++++++
->>  linux-user/s390x/target_signal.h |   6 +-
->>  linux-user/signal.c              | 306 --------------------------------------
->>  3 files changed, 314 insertions(+), 307 deletions(-)
+> Eric Blake (1):
+>   tests: Add parameter to qtest_init_without_qmp_handshake
 > 
-> I'm not too emotionally involved with linux-user, but
-
-I use git-publish and it automatically copies people in the MAINTAINERS
-file (in your case because of "K: ^Subject:.*(?i)s390x?").
-
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> Peter Xu (3):
+>   qmp: cleanup qmp queues properly
+>   monitor: new parameter "x-oob"
+>   tests: qmp-test: add test for new "x-oob"
 > 
-
-Thank you!
-
-Laurent
+>  tests/libqtest.h          |  7 +++-
+>  include/monitor/monitor.h |  1 +
+>  vl.c                      |  5 +++
+>  tests/libqtest.c          | 10 +++--
+>  monitor.c                 | 94 ++++++++++++++++++++++++++++++++++++-----------
+>  tests/qmp-test.c          | 84 +++++++++++++++++++++++++++++++++++++++++-
+>  6 files changed, 173 insertions(+), 28 deletions(-)
+> 
