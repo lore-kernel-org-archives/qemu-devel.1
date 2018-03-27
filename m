@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0dZO-0005pD-Bj
+	(envelope-from <eblake@redhat.com>) id 1f0dZO-0005pF-Bv
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0dZL-0007jo-6v
+	(envelope-from <eblake@redhat.com>) id 1f0dZL-0007k5-Sh
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58796 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58802 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0dZL-0007je-1X
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0dZL-0007jx-Np
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:35 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 26 Mar 2018 20:36:18 -0500
-Message-Id: <20180327013620.1644387-3-eblake@redhat.com>
+Date: Mon, 26 Mar 2018 20:36:19 -0500
+Message-Id: <20180327013620.1644387-4-eblake@redhat.com>
 In-Reply-To: <20180327013620.1644387-1-eblake@redhat.com>
 References: <20180327013620.1644387-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/4] monitor: new parameter "x-oob"
+Subject: [Qemu-devel] [PATCH v2 3/4] tests: Add parameter to
+ qtest_init_without_qmp_handshake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +25,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, marcandre.lureau@redhat.com, borntraeger@de.ibm.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@redhat.com, borntraeger@de.ibm.com, Markus Armbruster <armbru@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+Allow callers to choose whether to allow OOB support during a test;
+for now, all existing callers pass false, but the next patch will
+add a new caller.  Also, rewrite the monitor setup to be generic
+(using the -qmp shorthand is insufficient for honoring the parameter).
 
-Add new parameter to optionally enable Out-Of-Band for a QMP server.
+Based on an idea by Peter Xu, in <20180326063901.27425-8-peterx@redhat.com>
 
-An example command line:
-
-  ./qemu-system-x86_64 -chardev stdio,id=3Dchar0 \
-                       -mon chardev=3Dchar0,mode=3Dcontrol,x-oob=3Don
-
-By default, Out-Of-Band is off.
-
-It is not allowed if either MUX or non-QMP is detected, since
-Out-Of-Band is currently only for QMP, and non-MUX chardev backends.
-
-Note that the client STILL has to request 'oob' during qmp_capabilities;
-in part because the x-oob command line option may disappear in the
-future if we decide the capabilities negotiation is sufficient.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180326063901.27425-4-peterx@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[eblake: enhance commit message]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/monitor/monitor.h |  1 +
- vl.c                      |  5 +++++
- monitor.c                 | 22 ++++++++++++++++++++--
- 3 files changed, 26 insertions(+), 2 deletions(-)
+ tests/libqtest.h |  7 +++++--
+ tests/libqtest.c | 10 ++++++----
+ tests/qmp-test.c |  2 +-
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index 0cb0538a315..d6ab70cae23 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -13,6 +13,7 @@ extern Monitor *cur_mon;
- #define MONITOR_USE_READLINE  0x02
- #define MONITOR_USE_CONTROL   0x04
- #define MONITOR_USE_PRETTY    0x08
-+#define MONITOR_USE_OOB       0x10
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 811169453ab..cbe8df44730 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -56,11 +56,14 @@ QTestState *qtest_init(const char *extra_args);
 
- bool monitor_cur_is_qmp(void);
+ /**
+  * qtest_init_without_qmp_handshake:
+- * @extra_args: other arguments to pass to QEMU.
++ * @use_oob: true to have the server advertise OOB support
++ * @extra_args: other arguments to pass to QEMU.  CAUTION: these
++ * arguments are subject to word splitting and shell evaluation.
+  *
+  * Returns: #QTestState instance.
+  */
+-QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
++QTestState *qtest_init_without_qmp_handshake(bool use_oob,
++                                             const char *extra_args);
 
-diff --git a/vl.c b/vl.c
-index c81cc866079..5fd01bd5f69 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2404,6 +2404,11 @@ static int mon_init_func(void *opaque, QemuOpts *o=
-pts, Error **errp)
-     if (qemu_opt_get_bool(opts, "pretty", 0))
-         flags |=3D MONITOR_USE_PRETTY;
+ /**
+  * qtest_quit:
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 200b2b9e92a..6f33a37667c 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -166,7 +166,8 @@ static const char *qtest_qemu_binary(void)
+     return qemu_bin;
+ }
 
-+    /* OOB is off by default */
-+    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
-+        flags |=3D MONITOR_USE_OOB;
-+    }
-+
-     chardev =3D qemu_opt_get(opts, "chardev");
-     chr =3D qemu_chr_find(chardev);
-     if (chr =3D=3D NULL) {
-diff --git a/monitor.c b/monitor.c
-index 8fa18936419..e11724eec24 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -36,6 +36,7 @@
- #include "net/slirp.h"
- #include "chardev/char-fe.h"
- #include "chardev/char-io.h"
-+#include "chardev/char-mux.h"
- #include "ui/qemu-spice.h"
- #include "sysemu/numa.h"
- #include "monitor/monitor.h"
-@@ -4563,12 +4564,26 @@ static void monitor_qmp_setup_handlers_bh(void *o=
-paque)
- void monitor_init(Chardev *chr, int flags)
+-QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
++QTestState *qtest_init_without_qmp_handshake(bool use_oob,
++                                             const char *extra_args)
  {
-     Monitor *mon =3D g_malloc(sizeof(*mon));
-+    bool use_readline =3D flags & MONITOR_USE_READLINE;
-+    bool use_oob =3D flags & MONITOR_USE_OOB;
+     QTestState *s;
+     int sock, qmpsock, i;
+@@ -199,12 +200,13 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+         command = g_strdup_printf("exec %s "
+                                   "-qtest unix:%s,nowait "
+                                   "-qtest-log %s "
+-                                  "-qmp unix:%s,nowait "
++                                  "-chardev socket,path=%s,nowait,id=char0 "
++                                  "-mon chardev=char0,mode=control%s "
+                                   "-machine accel=qtest "
+                                   "-display none "
+                                   "%s", qemu_binary, socket_path,
+                                   getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
+-                                  qmp_socket_path,
++                                  qmp_socket_path, use_oob ? ",x-oob=on" : "",
+                                   extra_args ?: "");
+         execlp("/bin/sh", "sh", "-c", command, NULL);
+         exit(1);
+@@ -239,7 +241,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
 
--    monitor_data_init(mon, false, false);
-+    if (use_oob) {
-+        if (CHARDEV_IS_MUX(chr)) {
-+            error_report("Monitor Out-Of-Band is not supported with "
-+                         "MUX typed chardev backend");
-+            exit(1);
-+        }
-+        if (use_readline) {
-+            error_report("Monitor Out-Of-band is only supported by QMP")=
-;
-+            exit(1);
-+        }
-+    }
-+
-+    monitor_data_init(mon, false, use_oob);
+ QTestState *qtest_init(const char *extra_args)
+ {
+-    QTestState *s = qtest_init_without_qmp_handshake(extra_args);
++    QTestState *s = qtest_init_without_qmp_handshake(false, extra_args);
 
-     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
-     mon->flags =3D flags;
--    if (flags & MONITOR_USE_READLINE) {
-+    if (use_readline) {
-         mon->rs =3D readline_init(monitor_readline_printf,
-                                 monitor_readline_flush,
-                                 mon,
-@@ -4664,6 +4679,9 @@ QemuOptsList qemu_mon_opts =3D {
-         },{
-             .name =3D "pretty",
-             .type =3D QEMU_OPT_BOOL,
-+        },{
-+            .name =3D "x-oob",
-+            .type =3D QEMU_OPT_BOOL,
-         },
-         { /* end of list */ }
-     },
---=20
+     /* Read the QMP greeting and then do the handshake */
+     qtest_qmp_discard_response(s, "");
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 8de99a4727e..2134d95db97 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -81,7 +81,7 @@ static void test_qmp_protocol(void)
+     QList *capabilities;
+     QTestState *qts;
+
+-    qts = qtest_init_without_qmp_handshake(common_args);
++    qts = qtest_init_without_qmp_handshake(false, common_args);
+
+     /* Test greeting */
+     resp = qtest_qmp_receive(qts);
+-- 
 2.14.3
