@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f0nRw-00050b-DH
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 08:11:37 -0400
+	(envelope-from <saipava@xhdsaipava40.localdomain>)
+	id 1f0kRK-0002te-Mb
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:58:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f0nRt-0002Ui-8k
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 08:11:36 -0400
-Date: Tue, 27 Mar 2018 13:11:12 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180327121112.GB4909@stefanha-x1.localdomain>
-References: <20180322152834.12656-1-stefanha@redhat.com>
+	(envelope-from <saipava@xhdsaipava40.localdomain>)
+	id 1f0kRF-0001rt-Of
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:58:46 -0400
+Received: from mail-by2nam03on0088.outbound.protection.outlook.com
+	([104.47.42.88]:51520
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <saipava@xhdsaipava40.localdomain>)
+	id 1f0kRF-0001rD-En
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 04:58:41 -0400
+From: <saipavanboddu@gmail.com>
+Date: Tue, 27 Mar 2018 12:51:13 +0530
+Message-ID: <1522135274-15396-2-git-send-email-saipavanboddu@gmail.com>
+In-Reply-To: <1522135274-15396-1-git-send-email-saipavanboddu@gmail.com>
+References: <1522135274-15396-1-git-send-email-saipavanboddu@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="UHN/qo2QbUvPLonB"
-Content-Disposition: inline
-In-Reply-To: <20180322152834.12656-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] coroutine: avoid co_queue_wakeup
- recursion
+Content-Type: text/plain
+Subject: [Qemu-devel] [qemu-devel][PATCH v1 2/2] xilinx_spi: use
+ qdev_init_gpio_out for gpio init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "Peter A. G. Crosthwaite" <peter.crosthwaite@petalogix.com>
+Cc: qemu-devel@nongnu.org
 
+From: Sai Pavan Boddu <saipava@xilinx.com>
 
---UHN/qo2QbUvPLonB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+useful to connect gpio with qdev_connect_gpio_out
 
-On Thu, Mar 22, 2018 at 03:28:31PM +0000, Stefan Hajnoczi wrote:
-> co_queue_wakeup is currently implemented in a recursive fashion.  Patholo=
-gical
-> patterns of aio_co_enter() between coroutines can cause stack exhaustion.
->=20
-> This patch series implements co_queue_wakeup iteratively and avoids stack
-> exhaustion.
->=20
-> This issue was originally reported with qemu-img convert but I don't have=
- a
-> good reproducer.  See Patch 3 for a test-aio test case instead.
->=20
-> Stefan Hajnoczi (3):
->   queue: add QSIMPLEQ_PREPEND()
->   coroutine: avoid co_queue_wakeup recursion
->   coroutine: add test-aio coroutine queue chaining test case
->=20
->  include/qemu/coroutine_int.h |   1 -
->  include/qemu/queue.h         |   8 ++++
->  block/io.c                   |   3 +-
->  tests/test-aio.c             |  65 ++++++++++++++++++++-----
->  util/qemu-coroutine-lock.c   |  34 -------------
->  util/qemu-coroutine.c        | 110 +++++++++++++++++++++++--------------=
-------
->  6 files changed, 120 insertions(+), 101 deletions(-)
->=20
-> --=20
-> 2.14.3
->=20
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/ssi/xilinx_spi.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---UHN/qo2QbUvPLonB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaujTgAAoJEJykq7OBq3PISYoH+QGadGqZc3XcITvjforlYQAu
-LXGRoJSJ6Y81rjoDfT9DWCSlvumA1f7j077w5vI8+7sNmGOra0VLrBV9PY2W7M0u
-pI/jNz7BZTTnFH7ZzbnC+weZE0pOP7tJt3/ayRwNt5lthq3lXNsU4OzC+D9goDcO
-bHID6muxoWCJ8eH6ZZdY2V4YsUdJtPblvzUXjnTu4nb0p3pr7yx3xC/wFW25bd8L
-+qc3VxdWg5XFJzRYVBMxz4LfV4w2WzFRWYwLu9216MKigX9BS5wA4qwri1R7Rc1s
-cs/AJmqHu7KGt214o5PFnkjkPvbINE7KRKJOzIj7xziGL+GNiOoC+M1RCoIUZW4=
-=P8YF
------END PGP SIGNATURE-----
-
---UHN/qo2QbUvPLonB--
+diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
+index 83585bc..dcd1a2f 100644
+--- a/hw/ssi/xilinx_spi.c
++++ b/hw/ssi/xilinx_spi.c
+@@ -323,7 +323,6 @@ static int xilinx_spi_init(SysBusDevice *sbd)
+ {
+     DeviceState *dev = DEVICE(sbd);
+     XilinxSPI *s = XILINX_SPI(dev);
+-    int i;
+ 
+     DB_PRINT("\n");
+ 
+@@ -332,9 +331,7 @@ static int xilinx_spi_init(SysBusDevice *sbd)
+     sysbus_init_irq(sbd, &s->irq);
+     s->cs_lines = g_new0(qemu_irq, s->num_cs);
+     ssi_auto_connect_slaves(dev, s->cs_lines, s->spi);
+-    for (i = 0; i < s->num_cs; ++i) {
+-        sysbus_init_irq(sbd, &s->cs_lines[i]);
+-    }
++    qdev_init_gpio_out(dev, s->cs_lines, s->num_cs);
+ 
+     memory_region_init_io(&s->mmio, OBJECT(s), &spi_ops, s,
+                           "xilinx-spi", R_MAX * 4);
+-- 
+2.7.4
