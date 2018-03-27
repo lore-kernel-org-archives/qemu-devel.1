@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f176C-0000kp-JI
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:29 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f176K-0000rF-LJ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f1768-0004ui-5S
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:28 -0400
-Received: from mail-pl0-x22f.google.com ([2607:f8b0:400e:c01::22f]:35819)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f176H-0004yP-Vj
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:36 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45875)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1f1767-0004uO-TH
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:24 -0400
-Received: by mail-pl0-x22f.google.com with SMTP id p9-v6so1211024pls.2
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 02:10:23 -0700 (PDT)
+	id 1f176H-0004yA-Md
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:33 -0400
+Received: by mail-pf0-x243.google.com with SMTP id l27so730936pfk.12
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 02:10:33 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue, 27 Mar 2018 17:10:33 +0800
-Message-Id: <20180327091043.30220-1-xiaoguangrong@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 00/10] migration: improve and cleanup
- compression
+Date: Tue, 27 Mar 2018 17:10:36 +0800
+Message-Id: <20180327091043.30220-4-xiaoguangrong@tencent.com>
+In-Reply-To: <20180327091043.30220-1-xiaoguangrong@tencent.com>
+References: <20180327091043.30220-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH v2 03/10] migration: stop decompression to
+ allocate and free memory frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,98 +32,195 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Changelog in v2:
-Thanks to the review from Dave, Peter, Wei and Jiang Biao, the changes
-in this version are:
-1) include the performance number in the cover letter
-2）add some comments to explain how to use z_stream->opaque in the
-   patchset
-3) allocate a internal buffer for per thread to store the data to
-   be compressed
-4) add a new patch that moves some code to ram_save_host_page() so
-   that 'goto' can be omitted gracefully
-5) split the optimization of compression and decompress into two
-   separated patches
-6) refine and correct code styles
+Current code uses uncompress() to decompress memory which manages
+memory internally, that causes huge memory is allocated and freed
+very frequently, more worse, frequently returning memory to kernel
+will flush TLBs
 
+So, we maintain the memory by ourselves and reuse it for each
+decompression
 
-This is the first part of our work to improve compression to make it
-be more useful in the production.
+Reviewed-by: Jiang Biao <jiang.biao2@zte.com.cn>
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+---
+ migration/ram.c | 110 ++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 80 insertions(+), 30 deletions(-)
 
-The first patch resolves the problem that the migration thread spends
-too much CPU resource to compression memory if it jumps to a new block
-that causes the network is used very deficient.
-
-The second patch fixes the performance issue that too many VM-exits
-happen during live migration if compression is being used, it is caused
-by huge memory returned to kernel frequently as the memory is allocated
-and freed for every signal call to compress2()
-
-The remaining patches clean the code up dramatically
-
-Performance numbers:
-We have tested it on my desktop, i7-4790 + 16G, by locally live migrate
-the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limited to
-350. During the migration, a workload which has 8 threads repeatedly
-written total 6G memory in the VM.
-
-Before this patchset, its bandwidth is ~25 mbps, after applying, the
-bandwidth is ~50 mbp.
-
-We also collected the perf data for patch 2 and 3 on our production,
-before the patchset:
-+  57.88%  kqemu  [kernel.kallsyms]        [k] queued_spin_lock_slowpath
-+  10.55%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
-+   4.83%  kqemu  [kernel.kallsyms]        [k] flush_tlb_func_common
-
--   1.16%  kqemu  [kernel.kallsyms]        [k] lock_acquire                                       ▒
-   - lock_acquire                                                                                 ▒
-      - 15.68% _raw_spin_lock                                                                     ▒
-         + 29.42% __schedule                                                                      ▒
-         + 29.14% perf_event_context_sched_out                                                    ▒
-         + 23.60% tdp_page_fault                                                                  ▒
-         + 10.54% do_anonymous_page                                                               ▒
-         + 2.07% kvm_mmu_notifier_invalidate_range_start                                          ▒
-         + 1.83% zap_pte_range                                                                    ▒
-         + 1.44% kvm_mmu_notifier_invalidate_range_end
-
-
-apply our work:
-+  51.92%  kqemu  [kernel.kallsyms]        [k] queued_spin_lock_slowpath
-+  14.82%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
-+   1.47%  kqemu  [kernel.kallsyms]        [k] mark_lock.clone.0
-+   1.46%  kqemu  [kernel.kallsyms]        [k] native_sched_clock
-+   1.31%  kqemu  [kernel.kallsyms]        [k] lock_acquire
-+   1.24%  kqemu  libc-2.12.so             [.] __memset_sse2
-
--  14.82%  kqemu  [kernel.kallsyms]        [k] __lock_acquire                                     ▒
-   - __lock_acquire                                                                               ▒
-      - 99.75% lock_acquire                                                                       ▒
-         - 18.38% _raw_spin_lock                                                                  ▒
-            + 39.62% tdp_page_fault                                                               ▒
-            + 31.32% __schedule                                                                   ▒
-            + 27.53% perf_event_context_sched_out                                                 ▒
-            + 0.58% hrtimer_interrupt
-
-
-We can see the TLB flush and mmu-lock contention have gone.
-
-Xiao Guangrong (10):
-  migration: stop compressing page in migration thread
-  migration: stop compression to allocate and free memory frequently
-  migration: stop decompression to allocate and free memory frequently
-  migration: detect compression and decompression errors
-  migration: introduce control_save_page()
-  migration: move some code ram_save_host_page
-  migration: move calling control_save_page to the common place
-  migration: move calling save_zero_page to the common place
-  migration: introduce save_normal_page()
-  migration: remove ram_save_compressed_page()
-
- migration/qemu-file.c |  43 ++++-
- migration/qemu-file.h |   6 +-
- migration/ram.c       | 479 ++++++++++++++++++++++++++++++--------------------
- 3 files changed, 322 insertions(+), 206 deletions(-)
-
+diff --git a/migration/ram.c b/migration/ram.c
+index e043a192e1..6b699650ca 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -281,6 +281,7 @@ struct DecompressParam {
+     void *des;
+     uint8_t *compbuf;
+     int len;
++    z_stream stream;
+ };
+ typedef struct DecompressParam DecompressParam;
+ 
+@@ -2526,6 +2527,31 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
+     }
+ }
+ 
++/* return the size after decompression, or negative value on error */
++static int
++qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
++                     const uint8_t *source, size_t source_len)
++{
++    int err;
++
++    err = inflateReset(stream);
++    if (err != Z_OK) {
++        return -1;
++    }
++
++    stream->avail_in = source_len;
++    stream->next_in = (uint8_t *)source;
++    stream->avail_out = dest_len;
++    stream->next_out = dest;
++
++    err = inflate(stream, Z_NO_FLUSH);
++    if (err != Z_STREAM_END) {
++        return -1;
++    }
++
++    return stream->total_out;
++}
++
+ static void *do_data_decompress(void *opaque)
+ {
+     DecompressParam *param = opaque;
+@@ -2542,13 +2568,13 @@ static void *do_data_decompress(void *opaque)
+             qemu_mutex_unlock(&param->mutex);
+ 
+             pagesize = TARGET_PAGE_SIZE;
+-            /* uncompress() will return failed in some case, especially
+-             * when the page is dirted when doing the compression, it's
+-             * not a problem because the dirty page will be retransferred
++            /* qemu_uncompress_data() will return failed in some case,
++             * especially when the page is dirtied when doing the compression,
++             * it's not a problem because the dirty page will be retransferred
+              * and uncompress() won't break the data in other pages.
+              */
+-            uncompress((Bytef *)des, &pagesize,
+-                       (const Bytef *)param->compbuf, len);
++            qemu_uncompress_data(&param->stream, des, pagesize, param->compbuf,
++                                 len);
+ 
+             qemu_mutex_lock(&decomp_done_lock);
+             param->done = true;
+@@ -2583,30 +2609,6 @@ static void wait_for_decompress_done(void)
+     qemu_mutex_unlock(&decomp_done_lock);
+ }
+ 
+-static void compress_threads_load_setup(void)
+-{
+-    int i, thread_count;
+-
+-    if (!migrate_use_compression()) {
+-        return;
+-    }
+-    thread_count = migrate_decompress_threads();
+-    decompress_threads = g_new0(QemuThread, thread_count);
+-    decomp_param = g_new0(DecompressParam, thread_count);
+-    qemu_mutex_init(&decomp_done_lock);
+-    qemu_cond_init(&decomp_done_cond);
+-    for (i = 0; i < thread_count; i++) {
+-        qemu_mutex_init(&decomp_param[i].mutex);
+-        qemu_cond_init(&decomp_param[i].cond);
+-        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
+-        decomp_param[i].done = true;
+-        decomp_param[i].quit = false;
+-        qemu_thread_create(decompress_threads + i, "decompress",
+-                           do_data_decompress, decomp_param + i,
+-                           QEMU_THREAD_JOINABLE);
+-    }
+-}
+-
+ static void compress_threads_load_cleanup(void)
+ {
+     int i, thread_count;
+@@ -2616,16 +2618,27 @@ static void compress_threads_load_cleanup(void)
+     }
+     thread_count = migrate_decompress_threads();
+     for (i = 0; i < thread_count; i++) {
++        /* see the comments in compress_threads_save_cleanup() */
++        if (!decomp_param[i].stream.opaque) {
++            break;
++        }
++
+         qemu_mutex_lock(&decomp_param[i].mutex);
+         decomp_param[i].quit = true;
+         qemu_cond_signal(&decomp_param[i].cond);
+         qemu_mutex_unlock(&decomp_param[i].mutex);
+     }
+     for (i = 0; i < thread_count; i++) {
++        if (!decomp_param[i].stream.opaque) {
++            break;
++        }
++
+         qemu_thread_join(decompress_threads + i);
+         qemu_mutex_destroy(&decomp_param[i].mutex);
+         qemu_cond_destroy(&decomp_param[i].cond);
+         g_free(decomp_param[i].compbuf);
++        inflateEnd(&decomp_param[i].stream);
++        decomp_param[i].stream.opaque = NULL;
+     }
+     g_free(decompress_threads);
+     g_free(decomp_param);
+@@ -2633,6 +2646,40 @@ static void compress_threads_load_cleanup(void)
+     decomp_param = NULL;
+ }
+ 
++static int compress_threads_load_setup(void)
++{
++    int i, thread_count;
++
++    if (!migrate_use_compression()) {
++        return 0;
++    }
++
++    thread_count = migrate_decompress_threads();
++    decompress_threads = g_new0(QemuThread, thread_count);
++    decomp_param = g_new0(DecompressParam, thread_count);
++    qemu_mutex_init(&decomp_done_lock);
++    qemu_cond_init(&decomp_done_cond);
++    for (i = 0; i < thread_count; i++) {
++        if (inflateInit(&decomp_param[i].stream) != Z_OK) {
++            goto exit;
++        }
++        decomp_param[i].stream.opaque = &decomp_param[i];
++
++        qemu_mutex_init(&decomp_param[i].mutex);
++        qemu_cond_init(&decomp_param[i].cond);
++        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
++        decomp_param[i].done = true;
++        decomp_param[i].quit = false;
++        qemu_thread_create(decompress_threads + i, "decompress",
++                           do_data_decompress, decomp_param + i,
++                           QEMU_THREAD_JOINABLE);
++    }
++    return 0;
++exit:
++    compress_threads_load_cleanup();
++    return -1;
++}
++
+ static void decompress_data_with_multi_threads(QEMUFile *f,
+                                                void *host, int len)
+ {
+@@ -2672,8 +2719,11 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+  */
+ static int ram_load_setup(QEMUFile *f, void *opaque)
+ {
++    if (compress_threads_load_setup()) {
++        return -1;
++    }
++
+     xbzrle_load_setup();
+-    compress_threads_load_setup();
+     ramblock_recv_map_init();
+     return 0;
+ }
 -- 
 2.14.3
