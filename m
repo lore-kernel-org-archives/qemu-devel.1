@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f0gN3-0001qi-BG
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:38:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f0gN5-0001ti-Uj
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f0gN0-0002m8-29
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:38:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f0gN4-0002oQ-Mi
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 00:38:07 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 27 Mar 2018 15:37:33 +1100
-Message-Id: <20180327043741.7705-5-david@gibson.dropbear.id.au>
+Date: Tue, 27 Mar 2018 15:37:34 +1100
+Message-Id: <20180327043741.7705-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180327043741.7705-1-david@gibson.dropbear.id.au>
 References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC for-2.13 04/12] target/ppc: Avoid taking "env"
- parameter to mmu-hash64 functions
+Subject: [Qemu-devel] [RFC for-2.13 05/12] target/ppc: Remove fallback 64k
+ pagesize information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,192 +23,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, groug@kaod.org
 Cc: agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-In most cases we prefer to pass a PowerPCCPU rather than the (embedded)
-CPUPPCState.
+CPU definitions for cpus with the 64-bit hash MMU can include a table of
+available pagesizes.  If this isn't supplied ppc_cpu_instance_init() will
+fill it in a fallback table based on the POWERPC_MMU_64K bit in mmu_model.
 
-For ppc_hash64_update_{rmls,vrma}() change to take "cpu" instead of "env".
-For ppc_hash64_set_{dsi,isi}() remove the redundant "env" parameter.
+However, it turns out all the cpus which support 64K pages already include
+an explicit table of page sizes, so there's no point to the fallback table
+including 64k pages.
 
-In theory this makes more work for the functions, but since "cs", "cpu"
-and "env" are related by at most constant offsets, the compiler should be
-able to optimize out the difference at effectively zero cost.
-
-helper_*() functions are left alone - since they're more closely tied to
-the TCG generated code, passing "env" is still the standard there.
-
-While we're there, fix an incorrect indentation.
+That removes the only place which tests POWERPC_MMU_64K, so we can remove
+it.  Which in turn allows some logic to be removed from
+kvm_fixup_page_sizes().
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/mmu-hash64.c     | 35 +++++++++++++++++++----------------
- target/ppc/mmu-hash64.h     |  4 ++--
- target/ppc/translate_init.c |  4 ++--
- 3 files changed, 23 insertions(+), 20 deletions(-)
+ target/ppc/cpu-qom.h        |  4 ----
+ target/ppc/kvm.c            |  7 -------
+ target/ppc/translate_init.c | 20 ++------------------
+ 3 files changed, 2 insertions(+), 29 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index c9b72b7429..a87fa7c83f 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -633,9 +633,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
-     return 0;
- }
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index deaa46a14b..9bbb05cf62 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -70,7 +70,6 @@ enum powerpc_mmu_t {
+ #define POWERPC_MMU_64       0x00010000
+ #define POWERPC_MMU_1TSEG    0x00020000
+ #define POWERPC_MMU_AMR      0x00040000
+-#define POWERPC_MMU_64K      0x00080000
+ #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
+     /* 64 bits PowerPC MMU                                     */
+     POWERPC_MMU_64B        = POWERPC_MMU_64 | 0x00000001,
+@@ -78,15 +77,12 @@ enum powerpc_mmu_t {
+     POWERPC_MMU_2_03       = POWERPC_MMU_64 | 0x00000002,
+     /* Architecture 2.06 variant                               */
+     POWERPC_MMU_2_06       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+-                             | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | 0x00000003,
+     /* Architecture 2.07 variant                               */
+     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+-                             | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | 0x00000004,
+     /* Architecture 3.00 variant                               */
+     POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+-                             | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | POWERPC_MMU_V3
+                              | 0x00000005,
+ };
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 79a436a384..6160356a4a 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -425,7 +425,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     static bool has_smmu_info;
+     CPUPPCState *env = &cpu->env;
+     int iq, ik, jq, jk;
+-    bool has_64k_pages = false;
  
--static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
--                               uint64_t error_code)
-+static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
- {
-+    CPUPPCState *env = &POWERPC_CPU(cs)->env;
-     bool vpm;
- 
-     if (msr_ir) {
-@@ -659,9 +659,9 @@ static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
-     env->error_code = error_code;
- }
- 
--static void ppc_hash64_set_dsi(CPUState *cs, CPUPPCState *env, uint64_t dar,
--                               uint64_t dsisr)
-+static void ppc_hash64_set_dsi(CPUState *cs, uint64_t dar, uint64_t dsisr)
- {
-+    CPUPPCState *env = &POWERPC_CPU(cs)->env;
-     bool vpm;
- 
-     if (msr_dr) {
-@@ -741,13 +741,13 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-             } else {
-                 /* The access failed, generate the approriate interrupt */
-                 if (rwx == 2) {
--                    ppc_hash64_set_isi(cs, env, SRR1_PROTFAULT);
-+                    ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-                     int dsisr = DSISR_PROTFAULT;
-                     if (rwx == 1) {
-                         dsisr |= DSISR_ISSTORE;
-                     }
--                    ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-+                    ppc_hash64_set_dsi(cs, eaddr, dsisr);
-                 }
-                 return 1;
+     /* We only handle page sizes for 64-bit server guests for now */
+     if (!(env->mmu_model & POWERPC_MMU_64)) {
+@@ -471,9 +470,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+                                      ksps->enc[jk].page_shift)) {
+                 continue;
              }
-@@ -783,7 +783,7 @@ skip_slb_search:
- 
-     /* 3. Check for segment level no-execute violation */
-     if ((rwx == 2) && (slb->vsid & SLB_VSID_N)) {
--        ppc_hash64_set_isi(cs, env, SRR1_NOEXEC_GUARD);
-+        ppc_hash64_set_isi(cs, SRR1_NOEXEC_GUARD);
-         return 1;
+-            if (ksps->enc[jk].page_shift == 16) {
+-                has_64k_pages = true;
+-            }
+             qsps->enc[jq].page_shift = ksps->enc[jk].page_shift;
+             qsps->enc[jq].pte_enc = ksps->enc[jk].pte_enc;
+             if (++jq >= PPC_PAGE_SIZES_MAX_SZ) {
+@@ -488,9 +484,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+         env->mmu_model &= ~POWERPC_MMU_1TSEG;
      }
- 
-@@ -791,13 +791,13 @@ skip_slb_search:
-     ptex = ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
-     if (ptex == -1) {
-         if (rwx == 2) {
--            ppc_hash64_set_isi(cs, env, SRR1_NOPTE);
-+            ppc_hash64_set_isi(cs, SRR1_NOPTE);
-         } else {
-             int dsisr = DSISR_NOPTE;
-             if (rwx == 1) {
-                 dsisr |= DSISR_ISSTORE;
-             }
--            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-+            ppc_hash64_set_dsi(cs, eaddr, dsisr);
-         }
-         return 1;
-     }
-@@ -824,7 +824,7 @@ skip_slb_search:
-             if (PAGE_EXEC & ~amr_prot) {
-                 srr1 |= SRR1_IAMR; /* Access violates virt pg class key prot */
-             }
--            ppc_hash64_set_isi(cs, env, srr1);
-+            ppc_hash64_set_isi(cs, srr1);
-         } else {
-             int dsisr = 0;
-             if (need_prot[rwx] & ~pp_prot) {
-@@ -836,7 +836,7 @@ skip_slb_search:
-             if (need_prot[rwx] & ~amr_prot) {
-                 dsisr |= DSISR_AMR;
-             }
--            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-+            ppc_hash64_set_dsi(cs, eaddr, dsisr);
-         }
-         return 1;
-     }
-@@ -942,8 +942,9 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
-     cpu->env.tlb_need_flush = TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_FLUSH;
+-    if (!has_64k_pages) {
+-        env->mmu_model &= ~POWERPC_MMU_64K;
+-    }
  }
  
--void ppc_hash64_update_rmls(CPUPPCState *env)
-+void ppc_hash64_update_rmls(PowerPCCPU *cpu)
- {
-+    CPUPPCState *env = &cpu->env;
-     uint64_t lpcr = env->spr[SPR_LPCR];
- 
-     /*
-@@ -976,8 +977,9 @@ void ppc_hash64_update_rmls(CPUPPCState *env)
-     }
- }
- 
--void ppc_hash64_update_vrma(CPUPPCState *env)
-+void ppc_hash64_update_vrma(PowerPCCPU *cpu)
- {
-+    CPUPPCState *env = &cpu->env;
-     const struct ppc_one_seg_page_size *sps = NULL;
-     target_ulong esid, vsid, lpcr;
-     ppc_slb_t *slb = &env->vrma_slb;
-@@ -1002,7 +1004,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
-     vsid |= (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
-     esid = SLB_ESID_V;
- 
--   for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-+    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-         const struct ppc_one_seg_page_size *sps1 = &env->sps.sps[i];
- 
-         if (!sps1->page_shift) {
-@@ -1028,6 +1030,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
- 
- void helper_store_lpcr(CPUPPCState *env, target_ulong val)
- {
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     uint64_t lpcr = 0;
- 
-     /* Filter out bits */
-@@ -1089,6 +1092,6 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
-         ;
-     }
-     env->spr[SPR_LPCR] = lpcr;
--    ppc_hash64_update_rmls(env);
--    ppc_hash64_update_vrma(env);
-+    ppc_hash64_update_rmls(cpu);
-+    ppc_hash64_update_vrma(cpu);
- }
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index d297b97d37..95a8c330d6 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -17,8 +17,8 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
-                                target_ulong pte0, target_ulong pte1);
- unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
-                                           uint64_t pte0, uint64_t pte1);
--void ppc_hash64_update_vrma(CPUPPCState *env);
--void ppc_hash64_update_rmls(CPUPPCState *env);
-+void ppc_hash64_update_vrma(PowerPCCPU *cpu);
-+void ppc_hash64_update_rmls(PowerPCCPU *cpu);
- #endif
- 
- /*
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
 diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 2ae718242a..29bd6f3654 100644
+index 29bd6f3654..99be6fcd68 100644
 --- a/target/ppc/translate_init.c
 +++ b/target/ppc/translate_init.c
-@@ -8975,8 +8975,8 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
-     env->spr[SPR_AMOR] = amor->default_value = 0xffffffffffffffffull;
- 
-     /* Update some env bits based on new LPCR value */
--    ppc_hash64_update_rmls(env);
--    ppc_hash64_update_vrma(env);
-+    ppc_hash64_update_rmls(cpu);
-+    ppc_hash64_update_vrma(cpu);
- 
-     /* Tell KVM that we're in PAPR mode */
-     if (kvm_enabled()) {
+@@ -10469,7 +10469,7 @@ static void ppc_cpu_instance_init(Object *obj)
+         env->sps = *pcc->sps;
+     } else if (env->mmu_model & POWERPC_MMU_64) {
+         /* Use default sets of page sizes. We don't support MPSS */
+-        static const struct ppc_segment_page_sizes defsps_4k = {
++        static const struct ppc_segment_page_sizes defsps = {
+             .sps = {
+                 { .page_shift = 12, /* 4K */
+                   .slb_enc = 0,
+@@ -10481,23 +10481,7 @@ static void ppc_cpu_instance_init(Object *obj)
+                 },
+             },
+         };
+-        static const struct ppc_segment_page_sizes defsps_64k = {
+-            .sps = {
+-                { .page_shift = 12, /* 4K */
+-                  .slb_enc = 0,
+-                  .enc = { { .page_shift = 12, .pte_enc = 0 } }
+-                },
+-                { .page_shift = 16, /* 64K */
+-                  .slb_enc = 0x110,
+-                  .enc = { { .page_shift = 16, .pte_enc = 1 } }
+-                },
+-                { .page_shift = 24, /* 16M */
+-                  .slb_enc = 0x100,
+-                  .enc = { { .page_shift = 24, .pte_enc = 0 } }
+-                },
+-            },
+-        };
+-        env->sps = (env->mmu_model & POWERPC_MMU_64K) ? defsps_64k : defsps_4k;
++        env->sps = defsps;
+     }
+ #endif /* defined(TARGET_PPC64) */
+ }
 -- 
 2.14.3
