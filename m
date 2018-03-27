@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f0ljs-0005ye-VM
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:22:02 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f0m2e-0003Oo-3Z
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f0ljp-00012F-7O
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:22:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57710 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f0ljp-00011C-3C
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:21:57 -0400
-Date: Tue, 27 Mar 2018 11:21:48 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180327102148.GI4005@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1521915220-65389-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA_4MnAhSyRc2nhaWtrDvLEGP_eEDXu+tzdmOHY_Sp2oqQ@mail.gmail.com>
-	<CAHNT7Nt3XZi1aXBe79SrPjOW_4DEBbRweyTRZzhmHRgH5rqJPA@mail.gmail.com>
-	<CAHNT7NsWALp1eehZ7YNX3eGFemh94YCNKBwxjqUOjEAheBV5iA@mail.gmail.com>
-	<CAHNT7NuzZY8MgAtDjokbN8MMtHV=oFnrSnXj2xAzDF_uXd=4jg@mail.gmail.com>
+	(envelope-from <mlureau@redhat.com>) id 1f0m2a-0007nG-5m
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:41:24 -0400
+Received: from mail-it0-f67.google.com ([209.85.214.67]:38610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f0m2a-0007ly-1G
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:41:20 -0400
+Received: by mail-it0-f67.google.com with SMTP id 19-v6so14662321itw.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 03:41:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHNT7NuzZY8MgAtDjokbN8MMtHV=oFnrSnXj2xAzDF_uXd=4jg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [patches] Re: [PATCH v6 00/26] RISC-V: Fixes and
- cleanups for QEMU 2.12
+In-Reply-To: <20180327013620.1644387-4-eblake@redhat.com>
+References: <20180327013620.1644387-1-eblake@redhat.com>
+	<20180327013620.1644387-4-eblake@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 27 Mar 2018 12:41:18 +0200
+Message-ID: <CAMxuvaw6btZaYUAdWCjFvcG=aWv=beYgTyKCORG2uCrm34n4wg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] tests: Add parameter to
+ qtest_init_without_qmp_handshake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, borntraeger@de.ibm.com, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Mar 26, 2018 at 04:45:34PM -0700, Michael Clark wrote:
-> I've made a tag for the series including the fixes from my own review
-> during the weekend (one logic fix and 2 comment of commit log typos, and a
-> patch hunk in the wrong commit):
-> 
-> - https://github.com/riscv/riscv-qemu/releases/tag/riscv-qemu-2.12-fixes-v7
-> 
-> That said, if you want important or critical fixes only, then i'd suggest
-> these at least these 3:
-> 
-> I R [PATCH v6 22/26] RISC-V: Convert cpu definition towards future model
-> I - [PATCH v6 25/26] RISC-V: Fix incorrect disassembly for addiw
-> X - [PATCH v6 26/26] RISC-V: Workaround for critical mstatus.FS MTTCG bug
-> 
-> The other patches are the 23 patches which were accidentially included in
-> the initial pull on March 8, now with Signed-off-by, less the one that
-> Paolo asked me to drop.
-> 
-> Most of the bugs are relatively innocuous except for the mstatus.FS fix.
-> Linux boots on upstream QEMU but has FPU register file corruption when SMP
-> is enabled.
+On Tue, Mar 27, 2018 at 3:36 AM, Eric Blake <eblake@redhat.com> wrote:
+> Allow callers to choose whether to allow OOB support during a test;
+> for now, all existing callers pass false, but the next patch will
+> add a new caller.  Also, rewrite the monitor setup to be generic
+> (using the -qmp shorthand is insufficient for honoring the parameter).
+>
+> Based on an idea by Peter Xu, in <20180326063901.27425-8-peterx@redhat.co=
+m>
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Even innocuous bug fixes are still welcome before rc2 is released.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> I need advice as to which fixes you want to have included in QEMU 2.12. I'm
-> not sure if the reviewed set is the right set as it excludes 25/26 and more
-> importantly 26/26.
 
-We've got rc1 now, but you can still send pull requests for pretty much
-any kind of bug fix to get into the rc2 release, assuming the patches have
-a Reviewed-by, and are not excessively complicated or likely to cause
-regressions.
-
-After rc2 is out you want to only be sending important bug fixes, that
-users cannot wait for.
-
-After rc3 is out, ideally we won't find any more important bugs that
-need fixing. A bug would have to be really severe to justify including
-at that stage.
-
-Based on your description, patches 22/25/26 definitely still welcome
-in a pull request before rc2 or rc3. The more innocuous patches can
-also still be sent if you can do send a pull request for them pretty
-much straightaway before rc2. You'll obviously need to chase reviews
-for the few that miss them still.
-
-We're slightly unlucky in this release that the time between rc1 and
-rc2 falls over Easter weekend and Peter is on holiday, so has pretty
-limited time for dealing with pull requests. So you want to do what
-you can to minimize the work that Peter has to do, and minimize risk
-that a patch will fail build or automated testing, as that risks
-having the PR rejected. This is why it is worth sending patches in
-smaller groups. If you sent 20 patches at once and the last one
-fails, all 20 patches get rejected. If you send two batches of 10
-you would at least get some of them off your plate, even if they
-are innocuous fixes.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>  tests/libqtest.h |  7 +++++--
+>  tests/libqtest.c | 10 ++++++----
+>  tests/qmp-test.c |  2 +-
+>  3 files changed, 12 insertions(+), 7 deletions(-)
+>
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 811169453ab..cbe8df44730 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -56,11 +56,14 @@ QTestState *qtest_init(const char *extra_args);
+>
+>  /**
+>   * qtest_init_without_qmp_handshake:
+> - * @extra_args: other arguments to pass to QEMU.
+> + * @use_oob: true to have the server advertise OOB support
+> + * @extra_args: other arguments to pass to QEMU.  CAUTION: these
+> + * arguments are subject to word splitting and shell evaluation.
+>   *
+>   * Returns: #QTestState instance.
+>   */
+> -QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
+> +QTestState *qtest_init_without_qmp_handshake(bool use_oob,
+> +                                             const char *extra_args);
+>
+>  /**
+>   * qtest_quit:
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 200b2b9e92a..6f33a37667c 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -166,7 +166,8 @@ static const char *qtest_qemu_binary(void)
+>      return qemu_bin;
+>  }
+>
+> -QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+> +QTestState *qtest_init_without_qmp_handshake(bool use_oob,
+> +                                             const char *extra_args)
+>  {
+>      QTestState *s;
+>      int sock, qmpsock, i;
+> @@ -199,12 +200,13 @@ QTestState *qtest_init_without_qmp_handshake(const =
+char *extra_args)
+>          command =3D g_strdup_printf("exec %s "
+>                                    "-qtest unix:%s,nowait "
+>                                    "-qtest-log %s "
+> -                                  "-qmp unix:%s,nowait "
+> +                                  "-chardev socket,path=3D%s,nowait,id=
+=3Dchar0 "
+> +                                  "-mon chardev=3Dchar0,mode=3Dcontrol%s=
+ "
+>                                    "-machine accel=3Dqtest "
+>                                    "-display none "
+>                                    "%s", qemu_binary, socket_path,
+>                                    getenv("QTEST_LOG") ? "/dev/fd/2" : "/=
+dev/null",
+> -                                  qmp_socket_path,
+> +                                  qmp_socket_path, use_oob ? ",x-oob=3Do=
+n" : "",
+>                                    extra_args ?: "");
+>          execlp("/bin/sh", "sh", "-c", command, NULL);
+>          exit(1);
+> @@ -239,7 +241,7 @@ QTestState *qtest_init_without_qmp_handshake(const ch=
+ar *extra_args)
+>
+>  QTestState *qtest_init(const char *extra_args)
+>  {
+> -    QTestState *s =3D qtest_init_without_qmp_handshake(extra_args);
+> +    QTestState *s =3D qtest_init_without_qmp_handshake(false, extra_args=
+);
+>
+>      /* Read the QMP greeting and then do the handshake */
+>      qtest_qmp_discard_response(s, "");
+> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+> index 8de99a4727e..2134d95db97 100644
+> --- a/tests/qmp-test.c
+> +++ b/tests/qmp-test.c
+> @@ -81,7 +81,7 @@ static void test_qmp_protocol(void)
+>      QList *capabilities;
+>      QTestState *qts;
+>
+> -    qts =3D qtest_init_without_qmp_handshake(common_args);
+> +    qts =3D qtest_init_without_qmp_handshake(false, common_args);
+>
+>      /* Test greeting */
+>      resp =3D qtest_qmp_receive(qts);
+> --
+> 2.14.3
+>
