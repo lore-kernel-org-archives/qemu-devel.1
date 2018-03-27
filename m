@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f0kzf-0000tO-Bx
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:34:16 -0400
+	(envelope-from <prvs=61706adb2=anthony.perard@citrix.com>)
+	id 1f0l7t-0004Su-6a
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f0kzc-0000Vs-3Y
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:34:15 -0400
-Date: Tue, 27 Mar 2018 11:33:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180327113359.0efc75f9.cohuck@redhat.com>
-In-Reply-To: <606ca3cc-f96e-2d39-df97-b5ec80d2e7a9@vivier.eu>
-References: <20180323225739.17329-1-laurent@vivier.eu>
-	<20180323225739.17329-10-laurent@vivier.eu>
-	<20180327104706.5363eda9.cohuck@redhat.com>
-	<606ca3cc-f96e-2d39-df97-b5ec80d2e7a9@vivier.eu>
+	(envelope-from <prvs=61706adb2=anthony.perard@citrix.com>)
+	id 1f0l7q-0004OJ-54
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:42:45 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:36382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=61706adb2=anthony.perard@citrix.com>)
+	id 1f0l7p-0004NB-V2
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:42:42 -0400
+Date: Tue, 27 Mar 2018 10:42:05 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180327094204.GC2208@perard>
+References: <1520982894-4180-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 09/20] linux-user: move s390x
- signal.c parts to s390x directory
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1520982894-4180-1-git-send-email-igor.druzhinin@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v2] xen-pvdevice: Introduce a simplistic
+ xen-pvdevice save state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, sstabellini@kernel.org, paul.durrant@citrix.com, pbonzini@redhat.com, mst@redhat.com
 
-On Tue, 27 Mar 2018 11:13:37 +0200
-Laurent Vivier <laurent@vivier.eu> wrote:
+On Tue, Mar 13, 2018 at 11:14:54PM +0000, Igor Druzhinin wrote:
+> This should help to avoid problems with accessing the device after
+> migration/resume without PV drivers by migrating its PCI configuration
+> space state. Without an explicitly defined state record it resets
+> every time a VM migrates which confuses the OS and makes every
+> access to xen-pvdevice MMIO region to fail. PV tools enable some
+> logic to save and restore PCI configuration state from within the VM
+> every time it migrates which basically hides the issue.
+> 
+> Older systems will acquire the new record when migrated which should
+> not change their state for worse.
+> 
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+> Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+> ---
+> v2: add more concrete info
+> ---
+>  hw/i386/xen/xen_pvdevice.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 
-> Le 27/03/2018 =C3=A0 10:47, Cornelia Huck a =C3=A9crit=C2=A0:
-> > On Fri, 23 Mar 2018 23:57:28 +0100
-> > Laurent Vivier <laurent@vivier.eu> wrote:
-> >  =20
-> >> No code change, only move code from signal.c to
-> >> s390x/signal.c, except adding includes and
-> >> exporting setup_frame() and setup_rt_frame().
-> >>
-> >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> >> ---
-> >>  linux-user/s390x/signal.c        | 309 ++++++++++++++++++++++++++++++=
-+++++++++
-> >>  linux-user/s390x/target_signal.h |   6 +-
-> >>  linux-user/signal.c              | 306 ------------------------------=
---------
-> >>  3 files changed, 314 insertions(+), 307 deletions(-) =20
-> >=20
-> > I'm not too emotionally involved with linux-user, but =20
->=20
-> I use git-publish and it automatically copies people in the MAINTAINERS
-> file (in your case because of "K: ^Subject:.*(?i)s390x?").
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-I already guessed so - but I'm fine with looking at this as well, if I
-have some spare cycles :)
+Thanks,
 
->=20
-> > Acked-by: Cornelia Huck <cohuck@redhat.com>
-> >  =20
->=20
-> Thank you!
->=20
-> Laurent
+-- 
+Anthony PERARD
