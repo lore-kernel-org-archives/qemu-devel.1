@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f0wBn-0002Nv-DY
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:31:32 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1f0wBo-0002PD-Py
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f0wBj-0003xB-UU
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:31:31 -0400
-Received: from mail-bn3nam01on0052.outbound.protection.outlook.com
-	([104.47.33.52]:30064
+	(envelope-from <Babu.Moger@amd.com>) id 1f0wBl-0003zC-KX
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:31:32 -0400
+Received: from mail-bn3nam01on0077.outbound.protection.outlook.com
+	([104.47.33.77]:43743
 	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f0wBj-0003wo-PD
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:31:27 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f0wBl-0003yL-Fe
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 17:31:29 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Tue, 27 Mar 2018 17:31:08 -0400
-Message-Id: <1522186271-27743-7-git-send-email-babu.moger@amd.com>
+Date: Tue, 27 Mar 2018 17:31:10 -0400
+Message-Id: <1522186271-27743-9-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
 References: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 6/9] i386: Populate AMD Processor Cache
- Information for cpuid 0x8000001D
+Subject: [Qemu-devel] [PATCH v5 8/9] i386: Enable TOPOEXT feature on AMD
+ EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,172 +31,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, babu.moger@amd.com
 
-Add information for cpuid 0x8000001D leaf. Populate cache topology information
-for different cache types(Data Cache, Instruction Cache, L2 and L3) supported
-by 0x8000001D leaf. Please refer Processor Programming Reference (PPR) for AMD
-Family 17h Model for more details.
+Enable TOPOEXT feature on EPYC CPU. This is required to support
+hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- target/i386/cpu.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/kvm.c | 29 ++++++++++++++++--
- 2 files changed, 117 insertions(+), 3 deletions(-)
+ target/i386/cpu.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 738927d..f69f551 100644
+index 6f3ad44..f8e7325 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -307,6 +307,14 @@ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
-                           a == ASSOC_FULL ? 0xF : \
-                           0 /* invalid value */)
- 
-+/* Definitions used on CPUID Leaf 0x8000001D */
-+/* Number of logical cores in a complex */
-+#define CORES_IN_CMPLX  4
-+/* Number of logical processors sharing cache */
-+#define NUM_SHARING_CACHE(threads)   (threads ? \
-+                         (((CORES_IN_CMPLX - 1) * 2) + 1)  : \
-+                         (CORES_IN_CMPLX - 1))
-+
- /*
-  * Encode cache info for CPUID[0x80000006].ECX and CPUID[0x80000006].EDX
-  * @l3 can be NULL.
-@@ -336,6 +344,40 @@ static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
-     }
- }
- 
-+/* Encode cache info for CPUID[8000001D] */
-+static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, int nr_threads,
-+                                uint32_t *eax, uint32_t *ebx,
-+                                uint32_t *ecx, uint32_t *edx)
-+{
-+    assert(cache->size == cache->line_size * cache->associativity *
-+                          cache->partitions * cache->sets);
-+
-+    *eax = CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
-+               (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
-+
-+    if (CACHE_TYPE(cache->type) == UNIFIED_CACHE) {
-+        *eax |= (NUM_SHARING_CACHE(nr_threads - 1) << 14);
-+    } else {
-+        *eax |= ((nr_threads - 1) << 14);
-+    }
-+
-+    assert(cache->line_size > 0);
-+    assert(cache->partitions > 0);
-+    assert(cache->associativity > 0);
-+    /* We don't implement fully-associative caches */
-+    assert(cache->associativity < cache->sets);
-+    *ebx = (cache->line_size - 1) |
-+           ((cache->partitions - 1) << 12) |
-+           ((cache->associativity - 1) << 22);
-+
-+    assert(cache->sets > 0);
-+    *ecx = cache->sets - 1;
-+
-+    *edx = (cache->no_invd_sharing ? CACHE_NO_INVD_SHARING : 0) |
-+           (cache->inclusive ? CACHE_INCLUSIVE : 0) |
-+           (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
-+}
-+
- /* Definitions of the hardcoded cache entries we expose: */
- 
- /* L1 data cache: */
-@@ -4010,6 +4052,55 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *edx = 0;
+@@ -2330,7 +2330,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .features[FEAT_8000_0001_ECX] =
+             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_TOPOEXT,
+         .features[FEAT_7_0_EBX] =
+             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+             CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+@@ -2422,7 +2423,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .features[FEAT_8000_0001_ECX] =
+             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_TOPOEXT,
+         .features[FEAT_8000_0008_EBX] =
+             CPUID_8000_0008_EBX_IBPB,
+         .features[FEAT_7_0_EBX] =
+@@ -4575,6 +4577,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
          }
-         break;
-+    case 0x8000001D:
-+        *eax = 0;
-+        switch (count) {
-+        case 0: /* L1 dcache info */
-+            if (env->cache_info.valid && !cpu->legacy_cache) {
-+                encode_cache_cpuid8000001d(&env->cache_info.l1d_cache,
-+                                           cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            } else {
-+                encode_cache_cpuid8000001d(&l1d_cache_amd, cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            }
-+            break;
-+        case 1: /* L1 icache info */
-+            if (env->cache_info.valid && !cpu->legacy_cache) {
-+                encode_cache_cpuid8000001d(&env->cache_info.l1i_cache,
-+                                           cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            } else {
-+                encode_cache_cpuid8000001d(&l1i_cache_amd,
-+                                           cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            }
-+            break;
-+        case 2: /* L2 cache info */
-+            if (env->cache_info.valid && !cpu->legacy_cache) {
-+                encode_cache_cpuid8000001d(&env->cache_info.l2_cache,
-+                                           cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            } else {
-+                encode_cache_cpuid8000001d(&l2_cache_amd, cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            }
-+            break;
-+        case 3: /* L3 cache info */
-+            if (env->cache_info.valid && !cpu->legacy_cache) {
-+                encode_cache_cpuid8000001d(&env->cache_info.l3_cache,
-+                                           cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            } else {
-+                encode_cache_cpuid8000001d(&l3_cache, cs->nr_threads,
-+                                           eax, ebx, ecx, edx);
-+            }
-+            break;
-+        default: /* end of info */
-+            *eax = *ebx = *ecx = *edx = 0;
-+            break;
-+        }
-+        break;
-     case 0xC0000000:
-         *eax = env->cpuid_xlevel2;
-         *ebx = 0;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index d23fff1..d170d2a 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -937,9 +937,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-         c = &cpuid_data.entries[cpuid_i++];
  
--        c->function = i;
--        c->flags = 0;
--        cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+        switch (i) {
-+        case 0x8000001d:
-+            /* Query for all AMD cache information leaves */
-+            for (j = 0; ; j++) {
-+                c->function = i;
-+                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-+                c->index = j;
-+                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
++        /* TOPOEXT feature requires 0x8000001E */
++        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
++        }
 +
-+                if (c->eax == 0) {
-+                    break;
-+                }
-+                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-+                    fprintf(stderr, "cpuid_data is full, no space for "
-+                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-+                    abort();
-+                }
-+                c = &cpuid_data.entries[cpuid_i++];
-+            }
-+            break;
-+        default:
-+            c->function = i;
-+            c->flags = 0;
-+            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+            break;
-+        }
-     }
- 
-     /* Call Centaur's CPUID instructions they are supported. */
+         /* SEV requires CPUID[0x8000001F] */
+         if (sev_enabled()) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
 -- 
 1.8.3.1
