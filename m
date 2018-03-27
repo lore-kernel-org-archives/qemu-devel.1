@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57227)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0wz8-0001JP-Qu
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 18:22:32 -0400
+	id 1f0wzs-0001fb-9J
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 18:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f0wz7-0002H0-07
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 18:22:30 -0400
+	id 1f0wzq-0002TR-JB
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 18:23:16 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180326191603.10217-1-laurent@vivier.eu>
-	<20180326191603.10217-15-laurent@vivier.eu>
+	<20180326191603.10217-19-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5316803a-a356-1f31-bab2-3bc467f40b31@amsat.org>
-Date: Tue, 27 Mar 2018 19:22:18 -0300
+Message-ID: <8cb8e8f9-2ed6-2d22-c27c-8fd477e75979@amsat.org>
+Date: Tue, 27 Mar 2018 19:23:03 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180326191603.10217-15-laurent@vivier.eu>
+In-Reply-To: <20180326191603.10217-19-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.13 14/19] linux-user: move alpha cpu
- loop to alpha directory
+Subject: Re: [Qemu-devel] [PATCH for 2.13 18/19] linux-user: move hppa cpu
+ loop to hppa directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,449 +32,425 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On 03/26/2018 04:15 PM, Laurent Vivier wrote:
+On 03/26/2018 04:16 PM, Laurent Vivier wrote:
 > No code change, only move code from main.c to
-> alpha/cpu_loop.c.
+> hppa/cpu_loop.c.
 > 
 > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  linux-user/alpha/cpu_loop.c | 199 ++++++++++++++++++++++++++++++++++++++++++
->  linux-user/main.c           | 204 --------------------------------------------
->  2 files changed, 199 insertions(+), 204 deletions(-)
+>  linux-user/hppa/cpu_loop.c | 185 ++++++++++++++++++++++++++++++++++++++++++
+>  linux-user/main.c          | 194 +--------------------------------------------
+>  2 files changed, 186 insertions(+), 193 deletions(-)
 > 
-> diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
-> index b7700a5561..b87fcaea87 100644
-> --- a/linux-user/alpha/cpu_loop.c
-> +++ b/linux-user/alpha/cpu_loop.c
-> @@ -21,6 +21,205 @@
+> diff --git a/linux-user/hppa/cpu_loop.c b/linux-user/hppa/cpu_loop.c
+> index b7700a5561..0301c766c6 100644
+> --- a/linux-user/hppa/cpu_loop.c
+> +++ b/linux-user/hppa/cpu_loop.c
+> @@ -21,6 +21,191 @@
 >  #include "qemu.h"
 >  #include "cpu_loop-common.h"
 >  
-> +void cpu_loop(CPUAlphaState *env)
+> +static abi_ulong hppa_lws(CPUHPPAState *env)
 > +{
-> +    CPUState *cs = CPU(alpha_env_get_cpu(env));
-> +    int trapnr;
+> +    uint32_t which = env->gr[20];
+> +    abi_ulong addr = env->gr[26];
+> +    abi_ulong old = env->gr[25];
+> +    abi_ulong new = env->gr[24];
+> +    abi_ulong size, ret;
+> +
+> +    switch (which) {
+> +    default:
+> +        return -TARGET_ENOSYS;
+> +
+> +    case 0: /* elf32 atomic 32bit cmpxchg */
+> +        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
+> +            return -TARGET_EFAULT;
+> +        }
+> +        old = tswap32(old);
+> +        new = tswap32(new);
+> +        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
+> +        ret = tswap32(ret);
+> +        break;
+> +
+> +    case 2: /* elf32 atomic "new" cmpxchg */
+> +        size = env->gr[23];
+> +        if (size >= 4) {
+> +            return -TARGET_ENOSYS;
+> +        }
+> +        if (((addr | old | new) & ((1 << size) - 1))
+> +            || !access_ok(VERIFY_WRITE, addr, 1 << size)
+> +            || !access_ok(VERIFY_READ, old, 1 << size)
+> +            || !access_ok(VERIFY_READ, new, 1 << size)) {
+> +            return -TARGET_EFAULT;
+> +        }
+> +        /* Note that below we use host-endian loads so that the cmpxchg
+> +           can be host-endian as well.  */
+> +        switch (size) {
+> +        case 0:
+> +            old = *(uint8_t *)g2h(old);
+> +            new = *(uint8_t *)g2h(new);
+> +            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
+> +            ret = ret != old;
+> +            break;
+> +        case 1:
+> +            old = *(uint16_t *)g2h(old);
+> +            new = *(uint16_t *)g2h(new);
+> +            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
+> +            ret = ret != old;
+> +            break;
+> +        case 2:
+> +            old = *(uint32_t *)g2h(old);
+> +            new = *(uint32_t *)g2h(new);
+> +            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
+> +            ret = ret != old;
+> +            break;
+> +        case 3:
+> +            {
+> +                uint64_t o64, n64, r64;
+> +                o64 = *(uint64_t *)g2h(old);
+> +                n64 = *(uint64_t *)g2h(new);
+> +#ifdef CONFIG_ATOMIC64
+> +                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
+> +                ret = r64 != o64;
+> +#else
+> +                start_exclusive();
+> +                r64 = *(uint64_t *)g2h(addr);
+> +                ret = 1;
+> +                if (r64 == o64) {
+> +                    *(uint64_t *)g2h(addr) = n64;
+> +                    ret = 0;
+> +                }
+> +                end_exclusive();
+> +#endif
+> +            }
+> +            break;
+> +        }
+> +        break;
+> +    }
+> +
+> +    env->gr[28] = ret;
+> +    return 0;
+> +}
+> +
+> +void cpu_loop(CPUHPPAState *env)
+> +{
+> +    CPUState *cs = CPU(hppa_env_get_cpu(env));
 > +    target_siginfo_t info;
-> +    abi_long sysret;
+> +    abi_ulong ret;
+> +    int trapnr;
 > +
 > +    while (1) {
-> +        bool arch_interrupt = true;
-> +
 > +        cpu_exec_start(cs);
 > +        trapnr = cpu_exec(cs);
 > +        cpu_exec_end(cs);
 > +        process_queued_cpu_work(cs);
 > +
 > +        switch (trapnr) {
-> +        case EXCP_RESET:
-> +            fprintf(stderr, "Reset requested. Exit\n");
-> +            exit(EXIT_FAILURE);
+> +        case EXCP_SYSCALL:
+> +            ret = do_syscall(env, env->gr[20],
+> +                             env->gr[26], env->gr[25],
+> +                             env->gr[24], env->gr[23],
+> +                             env->gr[22], env->gr[21], 0, 0);
+> +            switch (ret) {
+> +            default:
+> +                env->gr[28] = ret;
+> +                /* We arrived here by faking the gateway page.  Return.  */
+> +                env->iaoq_f = env->gr[31];
+> +                env->iaoq_b = env->gr[31] + 4;
+> +                break;
+> +            case -TARGET_ERESTARTSYS:
+> +            case -TARGET_QEMU_ESIGRETURN:
+> +                break;
+> +            }
 > +            break;
-> +        case EXCP_MCHK:
-> +            fprintf(stderr, "Machine check exception. Exit\n");
-> +            exit(EXIT_FAILURE);
+> +        case EXCP_SYSCALL_LWS:
+> +            env->gr[21] = hppa_lws(env);
+> +            /* We arrived here by faking the gateway page.  Return.  */
+> +            env->iaoq_f = env->gr[31];
+> +            env->iaoq_b = env->gr[31] + 4;
 > +            break;
-> +        case EXCP_SMP_INTERRUPT:
-> +        case EXCP_CLK_INTERRUPT:
-> +        case EXCP_DEV_INTERRUPT:
-> +            fprintf(stderr, "External interrupt. Exit\n");
-> +            exit(EXIT_FAILURE);
-> +            break;
-> +        case EXCP_MMFAULT:
+> +        case EXCP_ITLB_MISS:
+> +        case EXCP_DTLB_MISS:
+> +        case EXCP_NA_ITLB_MISS:
+> +        case EXCP_NA_DTLB_MISS:
+> +        case EXCP_IMP:
+> +        case EXCP_DMP:
+> +        case EXCP_DMB:
+> +        case EXCP_PAGE_REF:
+> +        case EXCP_DMAR:
+> +        case EXCP_DMPI:
 > +            info.si_signo = TARGET_SIGSEGV;
 > +            info.si_errno = 0;
-> +            info.si_code = (page_get_flags(env->trap_arg0) & PAGE_VALID
-> +                            ? TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR);
-> +            info._sifields._sigfault._addr = env->trap_arg0;
+> +            info.si_code = TARGET_SEGV_ACCERR;
+> +            info._sifields._sigfault._addr = env->cr[CR_IOR];
 > +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > +            break;
 > +        case EXCP_UNALIGN:
 > +            info.si_signo = TARGET_SIGBUS;
 > +            info.si_errno = 0;
-> +            info.si_code = TARGET_BUS_ADRALN;
-> +            info._sifields._sigfault._addr = env->trap_arg0;
+> +            info.si_code = 0;
+> +            info._sifields._sigfault._addr = env->cr[CR_IOR];
 > +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > +            break;
-> +        case EXCP_OPCDEC:
-> +        do_sigill:
+> +        case EXCP_ILL:
+> +        case EXCP_PRIV_OPR:
+> +        case EXCP_PRIV_REG:
 > +            info.si_signo = TARGET_SIGILL;
 > +            info.si_errno = 0;
-> +            info.si_code = TARGET_ILL_ILLOPC;
-> +            info._sifields._sigfault._addr = env->pc;
+> +            info.si_code = TARGET_ILL_ILLOPN;
+> +            info._sifields._sigfault._addr = env->iaoq_f;
 > +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > +            break;
-> +        case EXCP_ARITH:
+> +        case EXCP_OVERFLOW:
+> +        case EXCP_COND:
+> +        case EXCP_ASSIST:
 > +            info.si_signo = TARGET_SIGFPE;
 > +            info.si_errno = 0;
-> +            info.si_code = TARGET_FPE_FLTINV;
-> +            info._sifields._sigfault._addr = env->pc;
+> +            info.si_code = 0;
+> +            info._sifields._sigfault._addr = env->iaoq_f;
 > +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > +            break;
-> +        case EXCP_FEN:
-> +            /* No-op.  Linux simply re-enables the FPU.  */
-> +            break;
-> +        case EXCP_CALL_PAL:
-> +            switch (env->error_code) {
-> +            case 0x80:
-> +                /* BPT */
-> +                info.si_signo = TARGET_SIGTRAP;
-> +                info.si_errno = 0;
-> +                info.si_code = TARGET_TRAP_BRKPT;
-> +                info._sifields._sigfault._addr = env->pc;
-> +                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +                break;
-> +            case 0x81:
-> +                /* BUGCHK */
-> +                info.si_signo = TARGET_SIGTRAP;
-> +                info.si_errno = 0;
-> +                info.si_code = 0;
-> +                info._sifields._sigfault._addr = env->pc;
-> +                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +                break;
-> +            case 0x83:
-> +                /* CALLSYS */
-> +                trapnr = env->ir[IR_V0];
-> +                sysret = do_syscall(env, trapnr,
-> +                                    env->ir[IR_A0], env->ir[IR_A1],
-> +                                    env->ir[IR_A2], env->ir[IR_A3],
-> +                                    env->ir[IR_A4], env->ir[IR_A5],
-> +                                    0, 0);
-> +                if (sysret == -TARGET_ERESTARTSYS) {
-> +                    env->pc -= 4;
-> +                    break;
-> +                }
-> +                if (sysret == -TARGET_QEMU_ESIGRETURN) {
-> +                    break;
-> +                }
-> +                /* Syscall writes 0 to V0 to bypass error check, similar
-> +                   to how this is handled internal to Linux kernel.
-> +                   (Ab)use trapnr temporarily as boolean indicating error.  */
-> +                trapnr = (env->ir[IR_V0] != 0 && sysret < 0);
-> +                env->ir[IR_V0] = (trapnr ? -sysret : sysret);
-> +                env->ir[IR_A3] = trapnr;
-> +                break;
-> +            case 0x86:
-> +                /* IMB */
-> +                /* ??? We can probably elide the code using page_unprotect
-> +                   that is checking for self-modifying code.  Instead we
-> +                   could simply call tb_flush here.  Until we work out the
-> +                   changes required to turn off the extra write protection,
-> +                   this can be a no-op.  */
-> +                break;
-> +            case 0x9E:
-> +                /* RDUNIQUE */
-> +                /* Handled in the translator for usermode.  */
-> +                abort();
-> +            case 0x9F:
-> +                /* WRUNIQUE */
-> +                /* Handled in the translator for usermode.  */
-> +                abort();
-> +            case 0xAA:
-> +                /* GENTRAP */
-> +                info.si_signo = TARGET_SIGFPE;
-> +                switch (env->ir[IR_A0]) {
-> +                case TARGET_GEN_INTOVF:
-> +                    info.si_code = TARGET_FPE_INTOVF;
-> +                    break;
-> +                case TARGET_GEN_INTDIV:
-> +                    info.si_code = TARGET_FPE_INTDIV;
-> +                    break;
-> +                case TARGET_GEN_FLTOVF:
-> +                    info.si_code = TARGET_FPE_FLTOVF;
-> +                    break;
-> +                case TARGET_GEN_FLTUND:
-> +                    info.si_code = TARGET_FPE_FLTUND;
-> +                    break;
-> +                case TARGET_GEN_FLTINV:
-> +                    info.si_code = TARGET_FPE_FLTINV;
-> +                    break;
-> +                case TARGET_GEN_FLTINE:
-> +                    info.si_code = TARGET_FPE_FLTRES;
-> +                    break;
-> +                case TARGET_GEN_ROPRAND:
-> +                    info.si_code = 0;
-> +                    break;
-> +                default:
-> +                    info.si_signo = TARGET_SIGTRAP;
-> +                    info.si_code = 0;
-> +                    break;
-> +                }
-> +                info.si_errno = 0;
-> +                info._sifields._sigfault._addr = env->pc;
-> +                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +                break;
-> +            default:
-> +                goto do_sigill;
-> +            }
-> +            break;
 > +        case EXCP_DEBUG:
-> +            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
-> +            if (info.si_signo) {
+> +            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
+> +            if (trapnr) {
+> +                info.si_signo = trapnr;
 > +                info.si_errno = 0;
 > +                info.si_code = TARGET_TRAP_BRKPT;
-> +                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +            } else {
-> +                arch_interrupt = false;
+> +                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
 > +            }
 > +            break;
 > +        case EXCP_INTERRUPT:
-> +            /* Just indicate that signals should be handled asap.  */
-> +            break;
-> +        case EXCP_ATOMIC:
-> +            cpu_exec_step_atomic(cs);
-> +            arch_interrupt = false;
+> +            /* just indicate that signals should be handled asap */
 > +            break;
 > +        default:
-> +            printf ("Unhandled trap: 0x%x\n", trapnr);
-> +            cpu_dump_state(cs, stderr, fprintf, 0);
-> +            exit(EXIT_FAILURE);
+> +            g_assert_not_reached();
 > +        }
-> +        process_pending_signals (env);
-> +
-> +        /* Most of the traps imply a transition through PALcode, which
-> +           implies an REI instruction has been executed.  Which means
-> +           that RX and LOCK_ADDR should be cleared.  But there are a
-> +           few exceptions for traps internal to QEMU.  */
-> +        if (arch_interrupt) {
-> +            env->flags &= ~ENV_FLAG_RX_FLAG;
-> +            env->lock_addr = -1;
-> +        }
+> +        process_pending_signals(env);
 > +    }
 > +}
 > +
 >  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 >  {
 > +    int i;
-> +
-> +    for(i = 0; i < 28; i++) {
-> +        env->ir[i] = ((abi_ulong *)regs)[i];
+> +    for (i = 1; i < 32; i++) {
+> +        env->gr[i] = regs->gr[i];
 > +    }
-> +    env->ir[IR_SP] = regs->usp;
-> +    env->pc = regs->pc;
+> +    env->iaoq_f = regs->iaoq[0];
+> +    env->iaoq_b = regs->iaoq[1];
 >  }
 > diff --git a/linux-user/main.c b/linux-user/main.c
-> index 2a9afb6659..a3c68dad36 100644
+> index 78ff99bd00..8a0a5f9f39 100644
 > --- a/linux-user/main.c
 > +++ b/linux-user/main.c
-> @@ -149,200 +149,6 @@ void fork_end(int child)
+> @@ -149,189 +149,6 @@ void fork_end(int child)
 >      }
 >  }
 >  
-> -#ifdef TARGET_ALPHA
-> -void cpu_loop(CPUAlphaState *env)
+> -#ifdef TARGET_HPPA
+> -
+> -static abi_ulong hppa_lws(CPUHPPAState *env)
 > -{
-> -    CPUState *cs = CPU(alpha_env_get_cpu(env));
-> -    int trapnr;
+> -    uint32_t which = env->gr[20];
+> -    abi_ulong addr = env->gr[26];
+> -    abi_ulong old = env->gr[25];
+> -    abi_ulong new = env->gr[24];
+> -    abi_ulong size, ret;
+> -
+> -    switch (which) {
+> -    default:
+> -        return -TARGET_ENOSYS;
+> -
+> -    case 0: /* elf32 atomic 32bit cmpxchg */
+> -        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
+> -            return -TARGET_EFAULT;
+> -        }
+> -        old = tswap32(old);
+> -        new = tswap32(new);
+> -        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
+> -        ret = tswap32(ret);
+> -        break;
+> -
+> -    case 2: /* elf32 atomic "new" cmpxchg */
+> -        size = env->gr[23];
+> -        if (size >= 4) {
+> -            return -TARGET_ENOSYS;
+> -        }
+> -        if (((addr | old | new) & ((1 << size) - 1))
+> -            || !access_ok(VERIFY_WRITE, addr, 1 << size)
+> -            || !access_ok(VERIFY_READ, old, 1 << size)
+> -            || !access_ok(VERIFY_READ, new, 1 << size)) {
+> -            return -TARGET_EFAULT;
+> -        }
+> -        /* Note that below we use host-endian loads so that the cmpxchg
+> -           can be host-endian as well.  */
+> -        switch (size) {
+> -        case 0:
+> -            old = *(uint8_t *)g2h(old);
+> -            new = *(uint8_t *)g2h(new);
+> -            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
+> -            ret = ret != old;
+> -            break;
+> -        case 1:
+> -            old = *(uint16_t *)g2h(old);
+> -            new = *(uint16_t *)g2h(new);
+> -            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
+> -            ret = ret != old;
+> -            break;
+> -        case 2:
+> -            old = *(uint32_t *)g2h(old);
+> -            new = *(uint32_t *)g2h(new);
+> -            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
+> -            ret = ret != old;
+> -            break;
+> -        case 3:
+> -            {
+> -                uint64_t o64, n64, r64;
+> -                o64 = *(uint64_t *)g2h(old);
+> -                n64 = *(uint64_t *)g2h(new);
+> -#ifdef CONFIG_ATOMIC64
+> -                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
+> -                ret = r64 != o64;
+> -#else
+> -                start_exclusive();
+> -                r64 = *(uint64_t *)g2h(addr);
+> -                ret = 1;
+> -                if (r64 == o64) {
+> -                    *(uint64_t *)g2h(addr) = n64;
+> -                    ret = 0;
+> -                }
+> -                end_exclusive();
+> -#endif
+> -            }
+> -            break;
+> -        }
+> -        break;
+> -    }
+> -
+> -    env->gr[28] = ret;
+> -    return 0;
+> -}
+> -
+> -void cpu_loop(CPUHPPAState *env)
+> -{
+> -    CPUState *cs = CPU(hppa_env_get_cpu(env));
 > -    target_siginfo_t info;
-> -    abi_long sysret;
+> -    abi_ulong ret;
+> -    int trapnr;
 > -
 > -    while (1) {
-> -        bool arch_interrupt = true;
-> -
 > -        cpu_exec_start(cs);
 > -        trapnr = cpu_exec(cs);
 > -        cpu_exec_end(cs);
 > -        process_queued_cpu_work(cs);
 > -
 > -        switch (trapnr) {
-> -        case EXCP_RESET:
-> -            fprintf(stderr, "Reset requested. Exit\n");
-> -            exit(EXIT_FAILURE);
+> -        case EXCP_SYSCALL:
+> -            ret = do_syscall(env, env->gr[20],
+> -                             env->gr[26], env->gr[25],
+> -                             env->gr[24], env->gr[23],
+> -                             env->gr[22], env->gr[21], 0, 0);
+> -            switch (ret) {
+> -            default:
+> -                env->gr[28] = ret;
+> -                /* We arrived here by faking the gateway page.  Return.  */
+> -                env->iaoq_f = env->gr[31];
+> -                env->iaoq_b = env->gr[31] + 4;
+> -                break;
+> -            case -TARGET_ERESTARTSYS:
+> -            case -TARGET_QEMU_ESIGRETURN:
+> -                break;
+> -            }
 > -            break;
-> -        case EXCP_MCHK:
-> -            fprintf(stderr, "Machine check exception. Exit\n");
-> -            exit(EXIT_FAILURE);
+> -        case EXCP_SYSCALL_LWS:
+> -            env->gr[21] = hppa_lws(env);
+> -            /* We arrived here by faking the gateway page.  Return.  */
+> -            env->iaoq_f = env->gr[31];
+> -            env->iaoq_b = env->gr[31] + 4;
 > -            break;
-> -        case EXCP_SMP_INTERRUPT:
-> -        case EXCP_CLK_INTERRUPT:
-> -        case EXCP_DEV_INTERRUPT:
-> -            fprintf(stderr, "External interrupt. Exit\n");
-> -            exit(EXIT_FAILURE);
-> -            break;
-> -        case EXCP_MMFAULT:
+> -        case EXCP_ITLB_MISS:
+> -        case EXCP_DTLB_MISS:
+> -        case EXCP_NA_ITLB_MISS:
+> -        case EXCP_NA_DTLB_MISS:
+> -        case EXCP_IMP:
+> -        case EXCP_DMP:
+> -        case EXCP_DMB:
+> -        case EXCP_PAGE_REF:
+> -        case EXCP_DMAR:
+> -        case EXCP_DMPI:
 > -            info.si_signo = TARGET_SIGSEGV;
 > -            info.si_errno = 0;
-> -            info.si_code = (page_get_flags(env->trap_arg0) & PAGE_VALID
-> -                            ? TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR);
-> -            info._sifields._sigfault._addr = env->trap_arg0;
+> -            info.si_code = TARGET_SEGV_ACCERR;
+> -            info._sifields._sigfault._addr = env->cr[CR_IOR];
 > -            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > -            break;
 > -        case EXCP_UNALIGN:
 > -            info.si_signo = TARGET_SIGBUS;
 > -            info.si_errno = 0;
-> -            info.si_code = TARGET_BUS_ADRALN;
-> -            info._sifields._sigfault._addr = env->trap_arg0;
+> -            info.si_code = 0;
+> -            info._sifields._sigfault._addr = env->cr[CR_IOR];
 > -            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > -            break;
-> -        case EXCP_OPCDEC:
-> -        do_sigill:
+> -        case EXCP_ILL:
+> -        case EXCP_PRIV_OPR:
+> -        case EXCP_PRIV_REG:
 > -            info.si_signo = TARGET_SIGILL;
 > -            info.si_errno = 0;
-> -            info.si_code = TARGET_ILL_ILLOPC;
-> -            info._sifields._sigfault._addr = env->pc;
+> -            info.si_code = TARGET_ILL_ILLOPN;
+> -            info._sifields._sigfault._addr = env->iaoq_f;
 > -            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > -            break;
-> -        case EXCP_ARITH:
+> -        case EXCP_OVERFLOW:
+> -        case EXCP_COND:
+> -        case EXCP_ASSIST:
 > -            info.si_signo = TARGET_SIGFPE;
 > -            info.si_errno = 0;
-> -            info.si_code = TARGET_FPE_FLTINV;
-> -            info._sifields._sigfault._addr = env->pc;
+> -            info.si_code = 0;
+> -            info._sifields._sigfault._addr = env->iaoq_f;
 > -            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > -            break;
-> -        case EXCP_FEN:
-> -            /* No-op.  Linux simply re-enables the FPU.  */
-> -            break;
-> -        case EXCP_CALL_PAL:
-> -            switch (env->error_code) {
-> -            case 0x80:
-> -                /* BPT */
-> -                info.si_signo = TARGET_SIGTRAP;
-> -                info.si_errno = 0;
-> -                info.si_code = TARGET_TRAP_BRKPT;
-> -                info._sifields._sigfault._addr = env->pc;
-> -                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> -                break;
-> -            case 0x81:
-> -                /* BUGCHK */
-> -                info.si_signo = TARGET_SIGTRAP;
-> -                info.si_errno = 0;
-> -                info.si_code = 0;
-> -                info._sifields._sigfault._addr = env->pc;
-> -                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> -                break;
-> -            case 0x83:
-> -                /* CALLSYS */
-> -                trapnr = env->ir[IR_V0];
-> -                sysret = do_syscall(env, trapnr,
-> -                                    env->ir[IR_A0], env->ir[IR_A1],
-> -                                    env->ir[IR_A2], env->ir[IR_A3],
-> -                                    env->ir[IR_A4], env->ir[IR_A5],
-> -                                    0, 0);
-> -                if (sysret == -TARGET_ERESTARTSYS) {
-> -                    env->pc -= 4;
-> -                    break;
-> -                }
-> -                if (sysret == -TARGET_QEMU_ESIGRETURN) {
-> -                    break;
-> -                }
-> -                /* Syscall writes 0 to V0 to bypass error check, similar
-> -                   to how this is handled internal to Linux kernel.
-> -                   (Ab)use trapnr temporarily as boolean indicating error.  */
-> -                trapnr = (env->ir[IR_V0] != 0 && sysret < 0);
-> -                env->ir[IR_V0] = (trapnr ? -sysret : sysret);
-> -                env->ir[IR_A3] = trapnr;
-> -                break;
-> -            case 0x86:
-> -                /* IMB */
-> -                /* ??? We can probably elide the code using page_unprotect
-> -                   that is checking for self-modifying code.  Instead we
-> -                   could simply call tb_flush here.  Until we work out the
-> -                   changes required to turn off the extra write protection,
-> -                   this can be a no-op.  */
-> -                break;
-> -            case 0x9E:
-> -                /* RDUNIQUE */
-> -                /* Handled in the translator for usermode.  */
-> -                abort();
-> -            case 0x9F:
-> -                /* WRUNIQUE */
-> -                /* Handled in the translator for usermode.  */
-> -                abort();
-> -            case 0xAA:
-> -                /* GENTRAP */
-> -                info.si_signo = TARGET_SIGFPE;
-> -                switch (env->ir[IR_A0]) {
-> -                case TARGET_GEN_INTOVF:
-> -                    info.si_code = TARGET_FPE_INTOVF;
-> -                    break;
-> -                case TARGET_GEN_INTDIV:
-> -                    info.si_code = TARGET_FPE_INTDIV;
-> -                    break;
-> -                case TARGET_GEN_FLTOVF:
-> -                    info.si_code = TARGET_FPE_FLTOVF;
-> -                    break;
-> -                case TARGET_GEN_FLTUND:
-> -                    info.si_code = TARGET_FPE_FLTUND;
-> -                    break;
-> -                case TARGET_GEN_FLTINV:
-> -                    info.si_code = TARGET_FPE_FLTINV;
-> -                    break;
-> -                case TARGET_GEN_FLTINE:
-> -                    info.si_code = TARGET_FPE_FLTRES;
-> -                    break;
-> -                case TARGET_GEN_ROPRAND:
-> -                    info.si_code = 0;
-> -                    break;
-> -                default:
-> -                    info.si_signo = TARGET_SIGTRAP;
-> -                    info.si_code = 0;
-> -                    break;
-> -                }
-> -                info.si_errno = 0;
-> -                info._sifields._sigfault._addr = env->pc;
-> -                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> -                break;
-> -            default:
-> -                goto do_sigill;
-> -            }
-> -            break;
 > -        case EXCP_DEBUG:
-> -            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
-> -            if (info.si_signo) {
+> -            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
+> -            if (trapnr) {
+> -                info.si_signo = trapnr;
 > -                info.si_errno = 0;
 > -                info.si_code = TARGET_TRAP_BRKPT;
-> -                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> -            } else {
-> -                arch_interrupt = false;
+> -                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
 > -            }
 > -            break;
 > -        case EXCP_INTERRUPT:
-> -            /* Just indicate that signals should be handled asap.  */
-> -            break;
-> -        case EXCP_ATOMIC:
-> -            cpu_exec_step_atomic(cs);
-> -            arch_interrupt = false;
+> -            /* just indicate that signals should be handled asap */
 > -            break;
 > -        default:
-> -            printf ("Unhandled trap: 0x%x\n", trapnr);
-> -            cpu_dump_state(cs, stderr, fprintf, 0);
-> -            exit(EXIT_FAILURE);
+> -            g_assert_not_reached();
 > -        }
-> -        process_pending_signals (env);
-> -
-> -        /* Most of the traps imply a transition through PALcode, which
-> -           implies an REI instruction has been executed.  Which means
-> -           that RX and LOCK_ADDR should be cleared.  But there are a
-> -           few exceptions for traps internal to QEMU.  */
-> -        if (arch_interrupt) {
-> -            env->flags &= ~ENV_FLAG_RX_FLAG;
-> -            env->lock_addr = -1;
-> -        }
+> -        process_pending_signals(env);
 > -    }
 > -}
-> -#endif /* TARGET_ALPHA */
 > -
->  #ifdef TARGET_S390X
+> -#endif /* TARGET_HPPA */
+> -
+>  #ifdef TARGET_XTENSA
 >  
->  /* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-> @@ -1911,16 +1717,6 @@ int main(int argc, char **argv, char **envp)
->          env->pc = regs->sepc;
->          env->gpr[xSP] = regs->sp;
->      }
-> -#elif defined(TARGET_ALPHA)
+>  static void xtensa_rfw(CPUXtensaState *env)
+> @@ -1225,16 +1042,7 @@ int main(int argc, char **argv, char **envp)
+>  
+>      target_cpu_copy_regs(env, regs);
+>  
+> -#if defined(TARGET_HPPA)
 > -    {
 > -        int i;
-> -
-> -        for(i = 0; i < 28; i++) {
-> -            env->ir[i] = ((abi_ulong *)regs)[i];
+> -        for (i = 1; i < 32; i++) {
+> -            env->gr[i] = regs->gr[i];
 > -        }
-> -        env->ir[IR_SP] = regs->usp;
-> -        env->pc = regs->pc;
+> -        env->iaoq_f = regs->iaoq[0];
+> -        env->iaoq_b = regs->iaoq[1];
 > -    }
->  #elif defined(TARGET_S390X)
+> -#elif defined(TARGET_XTENSA)
+> +#if defined(TARGET_XTENSA)
 >      {
->              int i;
+>          int i;
+>          for (i = 0; i < 16; ++i) {
 > 
