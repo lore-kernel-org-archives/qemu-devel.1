@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <saipava@xhdsaipava40.localdomain>)
-	id 1f0lJq-0002Vt-OR
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:55:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1f0npK-0006fE-Vm
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 08:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <saipava@xhdsaipava40.localdomain>)
-	id 1f0lJm-0002hI-PS
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:55:06 -0400
-Received: from mail-by2nam03on0087.outbound.protection.outlook.com
-	([104.47.42.87]:25348
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <saipava@xhdsaipava40.localdomain>)
-	id 1f0lJm-0002gb-Fp
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 05:55:02 -0400
-From: <saipavanboddu@gmail.com>
-Date: Tue, 27 Mar 2018 12:51:12 +0530
-Message-ID: <1522135274-15396-1-git-send-email-saipavanboddu@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1f0npF-0007VK-GL
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 08:35:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54132 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0npF-0007Tj-Cc
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 08:35:41 -0400
+Date: Tue, 27 Mar 2018 20:35:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180327123527.GO17789@xz-mi>
+References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
+	<20180313075739.11194-6-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [qemu-devel][PATCH v1 1/2] ssi.c: Check if slave
- already attached to a parent bus
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180313075739.11194-6-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 5/8] migration: move calling
+ control_save_page to the common place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Cc: qemu-devel@nongnu.org
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-From: Sai Pavan Boddu <saipava@xilinx.com>
+On Tue, Mar 13, 2018 at 03:57:36PM +0800, guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> The function is called by both ram_save_page and ram_save_target_page,
+> so move it to the common caller to cleanup the code
+> 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Skip auto-connect if already connected to a bus
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- hw/ssi/ssi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
-index 7eaaf56..6953c92 100644
---- a/hw/ssi/ssi.c
-+++ b/hw/ssi/ssi.c
-@@ -152,7 +152,7 @@ static int ssi_auto_connect_slave(Object *child, void *opaque)
-     SSISlave *dev = (SSISlave *)object_dynamic_cast(child, TYPE_SSI_SLAVE);
-     qemu_irq cs_line;
- 
--    if (!dev) {
-+    if (!dev || qdev_get_parent_bus(DEVICE(dev))) {
-         return 0;
-     }
- 
 -- 
-2.7.4
+Peter Xu
