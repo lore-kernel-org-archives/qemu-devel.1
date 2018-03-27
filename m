@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f0p7p-0003Gm-Lm
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:58:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0p8A-0003cl-Lr
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f0p7l-0006Jn-NS
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:58:57 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:54577)
+	(envelope-from <eblake@redhat.com>) id 1f0p86-0006TW-OZ
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:59:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57846 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f0p7l-0006JP-E7
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:58:53 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.108.1])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id BEF75125E4D
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 15:58:51 +0200 (CEST)
-Date: Tue, 27 Mar 2018 15:58:40 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180327155840.0a6c5645@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20180327043741.7705-7-david@gibson.dropbear.id.au>
-References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-	<20180327043741.7705-7-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0p86-0006TE-J8
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:59:14 -0400
+References: <20180327123800.28851-1-sathnaga@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <686b98e4-cf4e-00c9-e4fd-a3efd9f52994@redhat.com>
+Date: Tue, 27 Mar 2018 08:59:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180327123800.28851-1-sathnaga@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.13 06/12] target/ppc: Move page size
- setup to helper function
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hmp.c: Revert hmp_info_cpus
+ output format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org
+To: sathnaga@linux.vnet.ibm.com, qemu-devel@nongnu.org
+Cc: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-On Tue, 27 Mar 2018 15:37:35 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Initialization of the env->sps structure at the end of instance_init is
-> specific to the 64-bit hash MMU, so move the code into a helper function
-> in mmu-hash64.c.
+On 03/27/2018 07:38 AM, sathnaga@linux.vnet.ibm.com wrote:
+> From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 > 
-> We also create a corresponding function to be called at finalize time -
-> it's empty for now, but we'll need it shortly.
+> This commit 137b5cb6ab565cb3781d5337591e155932b4230e
+> refactors info cpus output and changes output format from
+> 'thread_id' to 'thread-id', this would break parsing
+> of output in above layers like libvirt, test framework etc.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> This patch just reverts back output format to 'thread_id'.
+> 
+> CC: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 > ---
+>   hmp.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+I'm not opposed to this patch (because it is a trivial way to keep older 
+stuff working), but agree with Daniel that HMP output can change at any 
+time, so other stuff relying on HMP should be fixed.  Libvirt is not 
+affected, so if we DO take this into 2.12, we should update the commit 
+message to drop mention of libvirt being impacted, maybe along the lines of:
 
->  target/ppc/mmu-hash64.c     | 29 +++++++++++++++++++++++++++++
->  target/ppc/mmu-hash64.h     | 11 +++++++++++
->  target/ppc/translate_init.c | 29 +++++++++--------------------
->  3 files changed, 49 insertions(+), 20 deletions(-)
-> 
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index a87fa7c83f..4cb7d1cf07 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -1095,3 +1095,32 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
->      ppc_hash64_update_rmls(cpu);
->      ppc_hash64_update_vrma(cpu);
->  }
-> +
-> +void ppc_hash64_init(PowerPCCPU *cpu)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> +
-> +    if (pcc->sps) {
-> +        env->sps = *pcc->sps;
-> +    } else if (env->mmu_model & POWERPC_MMU_64) {
-> +        /* Use default sets of page sizes. We don't support MPSS */
-> +        static const struct ppc_segment_page_sizes defsps = {
-> +            .sps = {
-> +                { .page_shift = 12, /* 4K */
-> +                  .slb_enc = 0,
-> +                  .enc = { { .page_shift = 12, .pte_enc = 0 } }
-> +                },
-> +                { .page_shift = 24, /* 16M */
-> +                  .slb_enc = 0x100,
-> +                  .enc = { { .page_shift = 24, .pte_enc = 0 } }
-> +                },
-> +            },
-> +        };
-> +        env->sps = defsps;
-> +    }
-> +}
-> +
-> +void ppc_hash64_finalize(PowerPCCPU *cpu)
-> +{
-> +}
-> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> index 95a8c330d6..074ded4c27 100644
-> --- a/target/ppc/mmu-hash64.h
-> +++ b/target/ppc/mmu-hash64.h
-> @@ -19,6 +19,8 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
->                                            uint64_t pte0, uint64_t pte1);
->  void ppc_hash64_update_vrma(PowerPCCPU *cpu);
->  void ppc_hash64_update_rmls(PowerPCCPU *cpu);
-> +void ppc_hash64_init(PowerPCCPU *cpu);
-> +void ppc_hash64_finalize(PowerPCCPU *cpu);
->  #endif
->  
->  /*
-> @@ -136,4 +138,13 @@ static inline uint64_t ppc_hash64_hpte1(PowerPCCPU *cpu,
->  
->  #endif /* CONFIG_USER_ONLY */
->  
-> +#if defined(CONFIG_USER_ONLY) || !defined(TARGET_PPC64)
-> +static inline void ppc_hash64_init(PowerPCCPU *cpu)
-> +{
-> +}
-> +static inline void ppc_hash64_finalize(PowerPCCPU *cpu)
-> +{
-> +}
-> +#endif
-> +
->  #endif /* MMU_HASH64_H */
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 99be6fcd68..aa63a5dcb3 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -10464,26 +10464,14 @@ static void ppc_cpu_instance_init(Object *obj)
->      env->has_hv_mode = !!(env->msr_mask & MSR_HVB);
->  #endif
->  
-> -#if defined(TARGET_PPC64)
-> -    if (pcc->sps) {
-> -        env->sps = *pcc->sps;
-> -    } else if (env->mmu_model & POWERPC_MMU_64) {
-> -        /* Use default sets of page sizes. We don't support MPSS */
-> -        static const struct ppc_segment_page_sizes defsps = {
-> -            .sps = {
-> -                { .page_shift = 12, /* 4K */
-> -                  .slb_enc = 0,
-> -                  .enc = { { .page_shift = 12, .pte_enc = 0 } }
-> -                },
-> -                { .page_shift = 24, /* 16M */
-> -                  .slb_enc = 0x100,
-> -                  .enc = { { .page_shift = 24, .pte_enc = 0 } }
-> -                },
-> -            },
-> -        };
-> -        env->sps = defsps;
-> -    }
-> -#endif /* defined(TARGET_PPC64) */
-> +    ppc_hash64_init(cpu);
-> +}
-> +
-> +static void ppc_cpu_instance_finalize(Object *obj)
-> +{
-> +    PowerPCCPU *cpu = POWERPC_CPU(obj);
-> +
-> +    ppc_hash64_finalize(cpu);
->  }
->  
->  static bool ppc_pvr_match_default(PowerPCCPUClass *pcc, uint32_t pvr)
-> @@ -10601,6 +10589,7 @@ static const TypeInfo ppc_cpu_type_info = {
->      .parent = TYPE_CPU,
->      .instance_size = sizeof(PowerPCCPU),
->      .instance_init = ppc_cpu_instance_init,
-> +    .instance_finalize = ppc_cpu_instance_finalize,
->      .abstract = true,
->      .class_size = sizeof(PowerPCCPUClass),
->      .class_init = ppc_cpu_class_init,
+Commit 137b5cb6 refactored 'info cpus' output, changing 'thread_id' to 
+'thread-id'.  While HMP is not a stable interface, it is trivial to keep 
+the spelling consistent for test frameworks that have not yet updated to 
+using QMP.
+
+With the improved commit message,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
