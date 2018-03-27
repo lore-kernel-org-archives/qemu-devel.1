@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f0hFI-0007PD-8X
+	(envelope-from <cota@braap.org>) id 1f0hFI-0007PF-8Q
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f0hFE-0005ON-NA
+	(envelope-from <cota@braap.org>) id 1f0hFD-0005MF-MH
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:08 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:48435)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:47417)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f0hFE-0005Nd-J6
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:04 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f0hFD-0005KK-HH
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 01:34:03 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 27 Mar 2018 01:33:59 -0400
-Message-Id: <1522128840-498-14-git-send-email-cota@braap.org>
+Date: Tue, 27 Mar 2018 01:33:50 -0400
+Message-Id: <1522128840-498-5-git-send-email-cota@braap.org>
 In-Reply-To: <1522128840-498-1-git-send-email-cota@braap.org>
 References: <1522128840-498-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 13/14] hardfloat: support float32/64
- comparison
+Subject: [Qemu-devel] [PATCH v2 04/14] fp-test: add muladd variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +26,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Performance results for fp-bench run under aarch64-linux-user
-on an Intel(R) Core(TM) i7-4790K CPU @ 4.00GHz host:
-
-- before:
-cmp-single: 34.23 MFlops
-cmp-double: 32.53 MFlops
-
-- after:
-cmp-single: 43.51 MFlops
-cmp-double: 41.23 MFlops
-
-Using float32/64_is_any_nan vs. isnan yields only up to a 2% perf
-difference, so I'm keeping for now a single implementation.
-
-This low sensitivity is most likely due to the soft-fp
-int64_to_float32/64 functions -- they take ~50% of execution time.
-They should be converted to hardfloat once there are test cases
-in fp-test for them.
+These are a few muladd-related operations that the original IBM syntax
+does not specify; model files for these are in muladd.fptest.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 69 +++++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 55 insertions(+), 14 deletions(-)
+ tests/fp-test/fp-test.c     | 24 +++++++++++++++++++++
+ tests/fp-test/muladd.fptest | 51 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+ create mode 100644 tests/fp-test/muladd.fptest
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index ba7289b..2b86d73 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -2300,28 +2300,69 @@ static int compare_floats(FloatParts a, FloatParts b, bool is_quiet,
-     }
- }
- 
--#define COMPARE(sz)                                                     \
--int float ## sz ## _compare(float ## sz a, float ## sz b,               \
--                            float_status *s)                            \
--{                                                                       \
--    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
--    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
--    return compare_floats(pa, pb, false, s);                            \
--}                                                                       \
--int float ## sz ## _compare_quiet(float ## sz a, float ## sz b,         \
--                                  float_status *s)                      \
-+#define COMPARE(attr, sz)                                               \
-+static int attr                                                         \
-+soft_float ## sz ## _compare(float ## sz a, float ## sz b,              \
-+                             bool is_quiet, float_status *s)            \
- {                                                                       \
-     FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-     FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
--    return compare_floats(pa, pb, true, s);                             \
-+    return compare_floats(pa, pb, is_quiet, s);                         \
- }
- 
--COMPARE(16)
--COMPARE(32)
--COMPARE(64)
-+COMPARE(, 16)
-+COMPARE(__attribute__((noinline)), 32)
-+COMPARE(__attribute__((noinline)), 64)
- 
- #undef COMPARE
- 
-+int __attribute__((flatten))
-+float16_compare(float16 a, float16 b, float_status *s)
-+{
-+    return soft_float16_compare(a, b, false, s);
-+}
+diff --git a/tests/fp-test/fp-test.c b/tests/fp-test/fp-test.c
+index 27637c4..2200d40 100644
+--- a/tests/fp-test/fp-test.c
++++ b/tests/fp-test/fp-test.c
+@@ -53,6 +53,9 @@ enum op {
+     OP_SUB,
+     OP_MUL,
+     OP_MULADD,
++    OP_MULADD_NEG_ADDEND,
++    OP_MULADD_NEG_PRODUCT,
++    OP_MULADD_NEG_RESULT,
+     OP_DIV,
+     OP_SQRT,
+     OP_MINNUM,
+@@ -69,6 +72,9 @@ static const struct op_desc ops[] = {
+     [OP_SUB] =       { "-", 2 },
+     [OP_MUL] =       { "*", 2 },
+     [OP_MULADD] =    { "*+", 3 },
++    [OP_MULADD_NEG_ADDEND] =  { "*+nc", 3 },
++    [OP_MULADD_NEG_PRODUCT] = { "*+np", 3 },
++    [OP_MULADD_NEG_RESULT] =  { "*+nr", 3 },
+     [OP_DIV] =       { "/", 2 },
+     [OP_SQRT] =      { "V", 1 },
+     [OP_MINNUM] =    { "<C", 2 },
+@@ -463,6 +469,15 @@ static enum error soft_tester(struct test_op *t)
+         case OP_MULADD:
+             res = float32_muladd(a, b, c, 0, s);
+             break;
++        case OP_MULADD_NEG_ADDEND:
++            res = float32_muladd(a, b, c, float_muladd_negate_c, s);
++            break;
++        case OP_MULADD_NEG_PRODUCT:
++            res = float32_muladd(a, b, c, float_muladd_negate_product, s);
++            break;
++        case OP_MULADD_NEG_RESULT:
++            res = float32_muladd(a, b, c, float_muladd_negate_result, s);
++            break;
+         case OP_DIV:
+             res = float32_div(a, b, s);
+             break;
+@@ -522,6 +537,15 @@ static enum error soft_tester(struct test_op *t)
+         case OP_MULADD:
+             res64 = float64_muladd(a, b, c, 0, s);
+             break;
++        case OP_MULADD_NEG_ADDEND:
++            res64 = float64_muladd(a, b, c, float_muladd_negate_c, s);
++            break;
++        case OP_MULADD_NEG_PRODUCT:
++            res64 = float64_muladd(a, b, c, float_muladd_negate_product, s);
++            break;
++        case OP_MULADD_NEG_RESULT:
++            res64 = float64_muladd(a, b, c, float_muladd_negate_result, s);
++            break;
+         case OP_DIV:
+             res64 = float64_div(a, b, s);
+             break;
+diff --git a/tests/fp-test/muladd.fptest b/tests/fp-test/muladd.fptest
+new file mode 100644
+index 0000000..6cd48ff
+--- /dev/null
++++ b/tests/fp-test/muladd.fptest
+@@ -0,0 +1,51 @@
++# nc == negate addend
++b32*+nc =0 -Inf -Inf +Inf -> Q i
++b32*+nc =0 -1.7FFFFFP127 -Inf +Inf -> Q i
++b32*+nc =0 -1.6C9AE7P113 -Inf +Inf -> Q i
++b32*+nc =0 -1.000000P-126 -Inf +Inf -> Q i
++b32*+nc =0 -0.7FFFFFP-126 -Inf +Inf -> Q i
++b32*+nc =0 -0.1B977AP-126 -Inf +Inf -> Q i
++b32*+nc =0 -0.000001P-126 -Inf +Inf -> Q i
++b32*+nc =0 -1.000000P0 -Inf +Inf -> Q i
++b32*+nc =0 -Zero -Inf +Inf -> Q i
++b32*+nc =0 +Zero -Inf +Inf -> Q i
++b32*+nc =0 -Zero -1.000000P-126 +1.7FFFFFP127 -> -1.7FFFFFP127
++b32*+nc =0 +Zero -1.000000P-126 +1.7FFFFFP127 -> -1.7FFFFFP127
++b32*+nc =0 -1.000000P-126 -1.7FFFFFP127 -1.4B9156P109 -> +1.4B9156P109 x
++b32*+nc =0 -0.7FFFFFP-126 -1.7FFFFFP127 -1.51BA59P-113 -> +1.7FFFFDP1 x
++b32*+nc =0 -0.3D6B57P-126 -1.7FFFFFP127 -1.265398P-67 -> +1.75AD5BP0 x
++b32*+nc =0 -0.000001P-126 -1.7FFFFFP127 -1.677330P-113 -> +1.7FFFFFP-22 x
 +
-+int __attribute__((flatten))
-+float16_compare_quiet(float16 a, float16 b, float_status *s)
-+{
-+    return soft_float16_compare(a, b, true, s);
-+}
++# np == negate product
++b32*+np =0 +Inf -Inf -Inf -> Q i
++b32*+np =0 +1.7FFFFFP127 -Inf -Inf -> Q i
++b32*+np =0 +1.6C9AE7P113 -Inf -Inf -> Q i
++b32*+np =0 +1.000000P-126 -Inf -Inf -> Q i
++b32*+np =0 +0.7FFFFFP-126 -Inf -Inf -> Q i
++b32*+np =0 +0.1B977AP-126 -Inf -Inf -> Q i
++b32*+np =0 +0.000001P-126 -Inf -Inf -> Q i
++b32*+np =0 +1.000000P0 -Inf -Inf -> Q i
++b32*+np =0 +Zero -Inf -Inf -> Q i
++b32*+np =0 +Zero -Inf -Inf -> Q i
++b32*+np =0 -Zero -1.000000P-126 -1.7FFFFFP127 -> -1.7FFFFFP127
++b32*+np =0 +Zero -1.000000P-126 -1.7FFFFFP127 -> -1.7FFFFFP127
++b32*+np =0 -1.3A6A89P-18 +1.24E7AEP9 -0.7FFFFFP-126 -> +1.7029E9P-9 x
 +
-+#define GEN_FPU_COMPARE(name, soft_t, host_t)                           \
-+    static inline __attribute__((always_inline)) int                    \
-+    fpu_ ## name(soft_t a, soft_t b, bool is_quiet, float_status *s)    \
-+    {                                                                   \
-+        host_t ha, hb;                                                  \
-+                                                                        \
-+        soft_t ## _input_flush2(&a, &b, s);                             \
-+        ha = soft_t ## _to_ ## host_t(a);                               \
-+        hb = soft_t ## _to_ ## host_t(b);                               \
-+        if (unlikely(isnan(ha) || isnan(hb))) {                         \
-+            return soft_ ## name(a, b, is_quiet, s);                    \
-+        }                                                               \
-+        if (isgreater(ha, hb)) {                                        \
-+            return float_relation_greater;                              \
-+        }                                                               \
-+        if (isless(ha, hb)) {                                           \
-+            return float_relation_less;                                 \
-+        }                                                               \
-+        return float_relation_equal;                                    \
-+    }                                                                   \
-+                                                                        \
-+    int name(soft_t a, soft_t b, float_status *s)                       \
-+    {                                                                   \
-+        return fpu_ ## name(a, b, false, s);                            \
-+    }                                                                   \
-+                                                                        \
-+    int name ## _quiet(soft_t a, soft_t b, float_status *s)             \
-+    {                                                                   \
-+        return fpu_ ## name(a, b, true, s);                             \
-+    }
-+
-+GEN_FPU_COMPARE(float32_compare, float32, float)
-+GEN_FPU_COMPARE(float64_compare, float64, double)
-+#undef GEN_FPU_COMPARE
-+
- /* Multiply A by 2 raised to the power N.  */
- static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
- {
++# nr == negate result
++b32*+nr =0 -Inf -Inf -Inf -> Q i
++b32*+nr =0 -1.7FFFFFP127 -Inf -Inf -> Q i
++b32*+nr =0 -1.6C9AE7P113 -Inf -Inf -> Q i
++b32*+nr =0 -1.000000P-126 -Inf -Inf -> Q i
++b32*+nr =0 -0.7FFFFFP-126 -Inf -Inf -> Q i
++b32*+nr =0 -0.1B977AP-126 -Inf -Inf -> Q i
++b32*+nr =0 -0.000001P-126 -Inf -Inf -> Q i
++b32*+nr =0 -1.000000P0 -Inf -Inf -> Q i
++b32*+nr =0 -Zero -Inf -Inf -> Q i
++b32*+nr =0 -Zero -Inf -Inf -> Q i
++b32*+nr =0 +Zero -1.000000P-126 -1.7FFFFFP127 -> +1.7FFFFFP127
++b32*+nr =0 -Zero -1.000000P-126 -1.7FFFFFP127 -> +1.7FFFFFP127
++b32*+nr =0 -1.000000P-126 -1.7FFFFFP127 -1.4B9156P109 -> +1.4B9156P109 x
++b32*+nr =0 -0.7FFFFFP-126 -1.7FFFFFP127 -1.51BA59P-113 -> -1.7FFFFDP1 x
++b32*+nr =0 -0.3D6B57P-126 -1.7FFFFFP127 -1.265398P-67 -> -1.75AD5BP0 x
++b32*+nr =0 -0.000001P-126 -1.7FFFFFP127 -1.677330P-113 -> -1.7FFFFFP-22 x
++b32*+nr =0 +1.72E53AP-33 -1.7FFFFFP127 -1.5AA684P-2 -> +1.72E539P95 x
 -- 
 2.7.4
