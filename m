@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f10nQ-00077W-Lz
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:26:41 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f10vX-0001Fs-FG
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f10nP-00052v-PP
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:26:40 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36035)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f10vU-0008Th-BY
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:35:03 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:42884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f10nP-00052l-JY
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:26:39 -0400
-Received: by mail-pf0-x243.google.com with SMTP id g14so412316pfh.3
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 19:26:39 -0700 (PDT)
-References: <1522180487-22899-1-git-send-email-mjc@sifive.com>
-	<1522180487-22899-2-git-send-email-mjc@sifive.com>
-	<0b20ff75-00d7-80db-ed2a-8b644a57b415@amsat.org>
-	<CAHNT7Nt40C8Bh3VJHjv8f+obSbU6Ki8ThXH2L7o4zoSM2LnK5A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2bb7c25b-237b-4225-319c-90f14f3c560d@linaro.org>
-Date: Wed, 28 Mar 2018 10:26:30 +0800
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1f10vU-0008T3-3k
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:35:00 -0400
+Received: by mail-pg0-x231.google.com with SMTP id f10so398719pgs.9
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 19:34:59 -0700 (PDT)
+References: <201803280843566488166@zte.com.cn>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <be4636a8-1450-388e-e225-f96c66fe9741@gmail.com>
+Date: Tue, 27 Mar 2018 22:35:29 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7Nt40C8Bh3VJHjv8f+obSbU6Ki8ThXH2L7o4zoSM2LnK5A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <201803280843566488166@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] RISC-V: Workaround for critical
- mstatus.FS MTTCG bug
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/8] migration: support to
+ detectcompression and decompression errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, RISC-V Patches <patches@groups.riscv.org>
-
-On 03/28/2018 08:15 AM, Michael Clark wrote:
-> On looking at this again, I think we may need to remove
-> the qemu_tcg_mttcg_enabled conditional and always return dirty if the state is
-> initial or clean, but not off.
-
-Yes.
-
-> While testing on uniprocessor worked okay, it's likely because we were lucky
-> and there was no task migration or multiple FPU tasks working.
-
-Also yes.
-
->     > +        if (qemu_tcg_mttcg_enabled()) {
->     > +            /* FP is always dirty or off */
->     > +            if (mstatus & MSTATUS_FS) {
->     > +                mstatus |= MSTATUS_FS;
->     > +            }
->     > +        }
-
-I've just posted an alternate patch set to track MSTATUS_FS more exactly, but
-if that's thought to be too much this late in the cycle, then I'll sign off on
-this patch without the mttcg test.
+To: jiang.biao2@zte.com.cn
+Cc: peterx@redhat.com, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
 
-r~
+
+On 03/28/2018 08:43 AM, jiang.biao2@zte.com.cn wrote:
+>> On 03/27/2018 07:17 PM, Peter Xu wrote:
+>>> On Tue, Mar 27, 2018 at 03:42:32AM +0800, Xiao Guangrong wrote:
+>>>
+>>> [...]
+>>>
+>>>>> It'll be understandable to me if the problem is that the compress()
+>>>>> API does not allow the input buffer to be changed during the whole
+>>>>> period of the call.  If that is a must, this patch for sure helps.
+>>>>
+>>>> Yes, that is exactly what i want to say. :)
+>>>
+>>> So I think now I know what this patch is for. :) And yeah, it makes
+>>> sense.
+>>>
+>>> Though another question would be: if the buffer is updated during
+>>> compress() and compress() returned error, would that pollute the whole
+>>> z_stream or it only fails the compress() call?
+>>>
+>>
+>> I guess deflateReset() can recover everything, i.e, keep z_stream as
+>> it is init'ed by deflate_init().
+>>
+>>> (Same question applies to decompress().)
+>>>
+>>> If it's only a compress() error and it won't pollute z_stream (or say,
+>>> it can be recovered after a deflateReset() and then we can continue to
+>>> call deflate() without problem), then we'll actually have two
+>>> alternatives to solve this "buffer update" issue:
+>>>
+>>> 1. Use the approach of current patch: we copy the page every time, so
+>>>      deflate() never fails because update never happens.  But it's slow
+>>>      since we copy the pages every time.
+>>>
+>>> 2. Use the old approach, and when compress() fail, we just ignore that
+>>>      page (since now we know that error _must_ be caused by page update,
+>>>      then we are 100% sure that we'll send that page again so it'll be
+>>>      perfectly fine).
+>>>
+>>
+>> No, we can't make the assumption that "error _must_ be caused by page update".
+>> No document/ABI about compress/decompress promised it. :)
+> So, as I metioned before, can we just distingush the decompress/compress errors
+> from errors caused by page update by the return code of inflate/deflate?
+> According to the zlib manual, there seems to be several error codes for different
+> cases,
+> #define Z_ERRNO        (-1)
+> #define Z_STREAM_ERROR (-2)
+> #define Z_DATA_ERROR   (-3)
+> #define Z_MEM_ERROR    (-4)
+> #define Z_BUF_ERROR    (-5)
+> #define Z_VERSION_ERROR (-6)
+> Did you check the return code when silent failure(not caused by page update)
+> happened before? :)
+
+I am afraid there is no such error code and i guess zlib is not designed to
+compress the data which is being modified.
