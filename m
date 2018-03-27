@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f0pn4-0007qb-77
+	(envelope-from <stefanha@redhat.com>) id 1f0pn7-0007uf-Tt
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f0pn2-0000wg-N9
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33518 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1f0pn6-0000ys-Ln
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33524 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f0pn2-0000wa-Hj
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:32 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f0pn6-0000yk-Gz
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:41:36 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 27 Mar 2018 15:41:22 +0100
-Message-Id: <20180327144124.32533-3-stefanha@redhat.com>
+Date: Tue, 27 Mar 2018 15:41:23 +0100
+Message-Id: <20180327144124.32533-4-stefanha@redhat.com>
 In-Reply-To: <20180327144124.32533-1-stefanha@redhat.com>
 References: <20180327144124.32533-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] coroutine: avoid co_queue_wakeup recursion
+Subject: [Qemu-devel] [PULL 3/4] coroutine: add test-aio coroutine queue
+ chaining test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,226 +27,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-qemu_aio_coroutine_enter() is (indirectly) called recursively when
-processing co_queue_wakeup.  This can lead to stack exhaustion.
+Check that two coroutines can queue each other repeatedly without
+hitting stack exhaustion.
 
-This patch rewrites co_queue_wakeup in an iterative fashion (instead of
-recursive) with bounded memory usage to prevent stack exhaustion.
-
-qemu_co_queue_run_restart() is inlined into qemu_aio_coroutine_enter()
-and the qemu_coroutine_enter() call is turned into a loop to avoid
-recursion.
-
-There is one change that is worth mentioning:  Previously, when
-coroutine A queued coroutine B, qemu_co_queue_run_restart() entered
-coroutine B from coroutine A.  If A was terminating then it would still
-stay alive until B yielded.  After this patch B is entered by A's parent
-so that a A can be deleted immediately if it is terminating.
-
-It is safe to make this change since B could never interact with A if it
-was terminating anyway.
+Switch to qemu_init_main_loop() in main() because coroutines use
+qemu_get_aio_context() - they don't know about test-aio's ctx variable.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20180322152834.12656-3-stefanha@redhat.com
+Message-id: 20180322152834.12656-4-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/qemu/coroutine_int.h |   1 -
- block/io.c                   |   3 +-
- util/qemu-coroutine-lock.c   |  34 -------------
- util/qemu-coroutine.c        | 110 +++++++++++++++++++++++--------------------
- 4 files changed, 60 insertions(+), 88 deletions(-)
+ tests/test-aio.c | 65 ++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 52 insertions(+), 13 deletions(-)
 
-diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-index 59e8406398..bd6b0468e1 100644
---- a/include/qemu/coroutine_int.h
-+++ b/include/qemu/coroutine_int.h
-@@ -68,6 +68,5 @@ Coroutine *qemu_coroutine_new(void);
- void qemu_coroutine_delete(Coroutine *co);
- CoroutineAction qemu_coroutine_switch(Coroutine *from, Coroutine *to,
-                                       CoroutineAction action);
--void coroutine_fn qemu_co_queue_run_restart(Coroutine *co);
+diff --git a/tests/test-aio.c b/tests/test-aio.c
+index 54e20d6ab1..86fb73b3d5 100644
+--- a/tests/test-aio.c
++++ b/tests/test-aio.c
+@@ -16,6 +16,8 @@
+ #include "qemu/timer.h"
+ #include "qemu/sockets.h"
+ #include "qemu/error-report.h"
++#include "qemu/coroutine.h"
++#include "qemu/main-loop.h"
  
- #endif
-diff --git a/block/io.c b/block/io.c
-index 2b09c656d0..bd9a19a9c4 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -249,8 +249,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
-     BdrvCoDrainData data;
+ static AioContext *ctx;
  
-     /* Calling bdrv_drain() from a BH ensures the current coroutine yields and
--     * other coroutines run if they were queued from
--     * qemu_co_queue_run_restart(). */
-+     * other coroutines run if they were queued by aio_co_enter(). */
- 
-     assert(qemu_in_coroutine());
-     data = (BdrvCoDrainData) {
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 5a80c10690..27438a1858 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -68,40 +68,6 @@ void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock)
-     }
+@@ -827,24 +829,59 @@ static void test_source_timer_schedule(void)
+     timer_del(&data.timer);
  }
  
--/**
-- * qemu_co_queue_run_restart:
-- *
-- * Enter each coroutine that was previously marked for restart by
-- * qemu_co_queue_next() or qemu_co_queue_restart_all().  This function is
-- * invoked by the core coroutine code when the current coroutine yields or
-- * terminates.
-- */
--void qemu_co_queue_run_restart(Coroutine *co)
--{
--    Coroutine *next;
--    QSIMPLEQ_HEAD(, Coroutine) tmp_queue_wakeup =
--        QSIMPLEQ_HEAD_INITIALIZER(tmp_queue_wakeup);
--
--    trace_qemu_co_queue_run_restart(co);
--
--    /* Because "co" has yielded, any coroutine that we wakeup can resume it.
--     * If this happens and "co" terminates, co->co_queue_wakeup becomes
--     * invalid memory.  Therefore, use a temporary queue and do not touch
--     * the "co" coroutine as soon as you enter another one.
--     *
--     * In its turn resumed "co" can populate "co_queue_wakeup" queue with
--     * new coroutines to be woken up.  The caller, who has resumed "co",
--     * will be responsible for traversing the same queue, which may cause
--     * a different wakeup order but not any missing wakeups.
--     */
--    QSIMPLEQ_CONCAT(&tmp_queue_wakeup, &co->co_queue_wakeup);
--
--    while ((next = QSIMPLEQ_FIRST(&tmp_queue_wakeup))) {
--        QSIMPLEQ_REMOVE_HEAD(&tmp_queue_wakeup, co_queue_next);
--        qemu_coroutine_enter(next);
--    }
--}
--
- static bool qemu_co_queue_do_restart(CoQueue *queue, bool single)
- {
-     Coroutine *next;
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index 9eff7fd450..1ba4191b84 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -104,57 +104,65 @@ static void coroutine_delete(Coroutine *co)
++/*
++ * Check that aio_co_enter() can chain many times
++ *
++ * Two coroutines should be able to invoke each other via aio_co_enter() many
++ * times without hitting a limit like stack exhaustion.  In other words, the
++ * calls should be chained instead of nested.
++ */
++
++typedef struct {
++    Coroutine *other;
++    unsigned i;
++    unsigned max;
++} ChainData;
++
++static void coroutine_fn chain(void *opaque)
++{
++    ChainData *data = opaque;
++
++    for (data->i = 0; data->i < data->max; data->i++) {
++        /* Queue up the other coroutine... */
++        aio_co_enter(ctx, data->other);
++
++        /* ...and give control to it */
++        qemu_coroutine_yield();
++    }
++}
++
++static void test_queue_chaining(void)
++{
++    /* This number of iterations hit stack exhaustion in the past: */
++    ChainData data_a = { .max = 25000 };
++    ChainData data_b = { .max = 25000 };
++
++    data_b.other = qemu_coroutine_create(chain, &data_a);
++    data_a.other = qemu_coroutine_create(chain, &data_b);
++
++    qemu_coroutine_enter(data_b.other);
++
++    g_assert_cmpint(data_a.i, ==, data_a.max);
++    g_assert_cmpint(data_b.i, ==, data_b.max - 1);
++
++    /* Allow the second coroutine to terminate */
++    qemu_coroutine_enter(data_a.other);
++
++    g_assert_cmpint(data_b.i, ==, data_b.max);
++}
  
- void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
- {
--    Coroutine *self = qemu_coroutine_self();
--    CoroutineAction ret;
--
--    /* Cannot rely on the read barrier for co in aio_co_wake(), as there are
--     * callers outside of aio_co_wake() */
--    const char *scheduled = atomic_mb_read(&co->scheduled);
--
--    trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
--
--    /* if the Coroutine has already been scheduled, entering it again will
--     * cause us to enter it twice, potentially even after the coroutine has
--     * been deleted */
--    if (scheduled) {
--        fprintf(stderr,
--                "%s: Co-routine was already scheduled in '%s'\n",
--                __func__, scheduled);
--        abort();
--    }
--
--    if (co->caller) {
--        fprintf(stderr, "Co-routine re-entered recursively\n");
--        abort();
--    }
--
--    co->caller = self;
--    co->ctx = ctx;
--
--    /* Store co->ctx before anything that stores co.  Matches
--     * barrier in aio_co_wake and qemu_co_mutex_wake.
--     */
--    smp_wmb();
--
--    ret = qemu_coroutine_switch(self, co, COROUTINE_ENTER);
--
--    qemu_co_queue_run_restart(co);
--
--    /* Beware, if ret == COROUTINE_YIELD and qemu_co_queue_run_restart()
--     * has started any other coroutine, "co" might have been reentered
--     * and even freed by now!  So be careful and do not touch it.
--     */
--
--    switch (ret) {
--    case COROUTINE_YIELD:
--        return;
--    case COROUTINE_TERMINATE:
--        assert(!co->locks_held);
--        trace_qemu_coroutine_terminate(co);
--        coroutine_delete(co);
--        return;
--    default:
--        abort();
-+    QSIMPLEQ_HEAD(, Coroutine) pending = QSIMPLEQ_HEAD_INITIALIZER(pending);
-+    Coroutine *from = qemu_coroutine_self();
-+
-+    QSIMPLEQ_INSERT_TAIL(&pending, co, co_queue_next);
-+
-+    /* Run co and any queued coroutines */
-+    while (!QSIMPLEQ_EMPTY(&pending)) {
-+        Coroutine *to = QSIMPLEQ_FIRST(&pending);
-+        CoroutineAction ret;
-+
-+        /* Cannot rely on the read barrier for to in aio_co_wake(), as there are
-+         * callers outside of aio_co_wake() */
-+        const char *scheduled = atomic_mb_read(&to->scheduled);
-+
-+        QSIMPLEQ_REMOVE_HEAD(&pending, co_queue_next);
-+
-+        trace_qemu_aio_coroutine_enter(ctx, from, to, to->entry_arg);
-+
-+        /* if the Coroutine has already been scheduled, entering it again will
-+         * cause us to enter it twice, potentially even after the coroutine has
-+         * been deleted */
-+        if (scheduled) {
-+            fprintf(stderr,
-+                    "%s: Co-routine was already scheduled in '%s'\n",
-+                    __func__, scheduled);
-+            abort();
-+        }
-+
-+        if (to->caller) {
-+            fprintf(stderr, "Co-routine re-entered recursively\n");
-+            abort();
-+        }
-+
-+        to->caller = from;
-+        to->ctx = ctx;
-+
-+        /* Store to->ctx before anything that stores to.  Matches
-+         * barrier in aio_co_wake and qemu_co_mutex_wake.
-+         */
-+        smp_wmb();
-+
-+        ret = qemu_coroutine_switch(from, to, COROUTINE_ENTER);
-+
-+        /* Queued coroutines are run depth-first; previously pending coroutines
-+         * run after those queued more recently.
-+         */
-+        QSIMPLEQ_PREPEND(&pending, &to->co_queue_wakeup);
-+
-+        switch (ret) {
-+        case COROUTINE_YIELD:
-+            break;
-+        case COROUTINE_TERMINATE:
-+            assert(!to->locks_held);
-+            trace_qemu_coroutine_terminate(to);
-+            coroutine_delete(to);
-+            break;
-+        default:
-+            abort();
-+        }
-     }
- }
+ /* End of tests.  */
  
+ int main(int argc, char **argv)
+ {
+-    Error *local_error = NULL;
+-    GSource *src;
+-
+-    init_clocks(NULL);
+-
+-    ctx = aio_context_new(&local_error);
+-    if (!ctx) {
+-        error_reportf_err(local_error, "Failed to create AIO Context: ");
+-        exit(1);
+-    }
+-    src = aio_get_g_source(ctx);
+-    g_source_attach(src, NULL);
+-    g_source_unref(src);
++    qemu_init_main_loop(&error_fatal);
++    ctx = qemu_get_aio_context();
+ 
+     while (g_main_context_iteration(NULL, false));
+ 
+@@ -864,6 +901,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/aio/external-client",         test_aio_external_client);
+     g_test_add_func("/aio/timer/schedule",          test_timer_schedule);
+ 
++    g_test_add_func("/aio/coroutine/queue-chaining", test_queue_chaining);
++
+     g_test_add_func("/aio-gsource/flush",                   test_source_flush);
+     g_test_add_func("/aio-gsource/bh/schedule",             test_source_bh_schedule);
+     g_test_add_func("/aio-gsource/bh/schedule10",           test_source_bh_schedule10);
 -- 
 2.14.3
