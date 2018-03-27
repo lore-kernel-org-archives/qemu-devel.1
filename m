@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1f0oy4-0008Lc-5I
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:48:56 -0400
+	(envelope-from <groug@kaod.org>) id 1f0p4E-0001Kp-K6
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:55:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1f0oxz-0000Ty-6W
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:48:52 -0400
-Received: from mga02.intel.com ([134.134.136.20]:44799)
+	(envelope-from <groug@kaod.org>) id 1f0p49-0003dY-Ff
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:55:14 -0400
+Received: from 19.mo6.mail-out.ovh.net ([188.165.56.177]:40153)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f0oxy-0000SM-RV
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:48:47 -0400
-Date: Tue, 27 Mar 2018 21:47:05 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180327134705.3zqzangejm2yy3ph@debian>
-References: <20180319071537.28649-1-tiwei.bie@intel.com>
-	<20180319071537.28649-4-tiwei.bie@intel.com>
-	<20180322164345-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f0p49-0003cq-60
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 09:55:09 -0400
+Received: from player699.ha.ovh.net (unknown [10.109.122.96])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id DFD6B14D87D
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 15:55:06 +0200 (CEST)
+Date: Tue, 27 Mar 2018 15:54:55 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180327155455.674960b4@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20180327043741.7705-6-david@gibson.dropbear.id.au>
+References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
+	<20180327043741.7705-6-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180322164345-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] virtio: support adding sub-regions
- for notify region
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC for-2.13 05/12] target/ppc: Remove fallback
+ 64k pagesize information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +31,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org
 
-On Thu, Mar 22, 2018 at 04:57:23PM +0200, Michael S. Tsirkin wrote:
-> On Mon, Mar 19, 2018 at 03:15:34PM +0800, Tiwei Bie wrote:
-[...]
-> > +
-> > +bool virtio_pci_page_per_vq_enabled(VirtIODevice *vdev)
-> > +{
-> > +    VirtIOPCIProxy *proxy = virtio_device_to_virtio_pci_proxy(vdev);
-> > +
-> > +    if (proxy == NULL) {
-> > +        return false;
-> > +    }
-> > +
-> > +    return !!(proxy->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ);
-> > +}
-> > +
-> 
-> VIRTIO_PCI_FLAG_PAGE_PER_VQ is not something external users
-> should care about. Need to find some other way to express the
-> specific requirements.
-> 
-> In particular do you want to use a host page per VQ?
-> 
-> This isn't what VIRTIO_PCI_FLAG_PAGE_PER_VQ does - it uses a 4K offset
-> which does not match a memory page size on all platforms.
+On Tue, 27 Mar 2018 15:37:34 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Yeah, right. I'll think about how to deal with this.
-
+> CPU definitions for cpus with the 64-bit hash MMU can include a table of
+> available pagesizes.  If this isn't supplied ppc_cpu_instance_init() will
+> fill it in a fallback table based on the POWERPC_MMU_64K bit in mmu_model.
 > 
-> 
-> > +int virtio_pci_notify_region_map(VirtIODevice *vdev, int queue_idx,
-> > +                                 MemoryRegion *mr)
-> > +{
-> > +    VirtIOPCIProxy *proxy = virtio_device_to_virtio_pci_proxy(vdev);
-> > +    int offset;
-> > +
-> > +    if (proxy == NULL || !virtio_pci_modern(proxy)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    offset = virtio_pci_queue_mem_mult(proxy) * queue_idx;
-> > +    memory_region_add_subregion(&proxy->notify.mr, offset, mr);
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +void virtio_pci_notify_region_unmap(VirtIODevice *vdev, MemoryRegion *mr)
-> > +{
-> > +    VirtIOPCIProxy *proxy = virtio_device_to_virtio_pci_proxy(vdev);
-> > +
-> > +    if (proxy != NULL) {
-> > +        memory_region_del_subregion(&proxy->notify.mr, mr);
-> > +    }
-> > +}
-> > +
-> >  static void virtio_pci_pre_plugged(DeviceState *d, Error **errp)
-> >  {
-> >      VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-> > diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> > index 813082b0d7..8061133741 100644
-> > --- a/hw/virtio/virtio-pci.h
-> > +++ b/hw/virtio/virtio-pci.h
-> > @@ -213,6 +213,11 @@ static inline void virtio_pci_disable_modern(VirtIOPCIProxy *proxy)
-> >      proxy->disable_modern = true;
-> >  }
-> >  
-> > +bool virtio_pci_page_per_vq_enabled(VirtIODevice *vdev);
-> > +int virtio_pci_notify_region_map(VirtIODevice *vdev, int queue_idx,
-> > +                                 MemoryRegion *mr);
-> > +void virtio_pci_notify_region_unmap(VirtIODevice *vdev, MemoryRegion *mr);
-> > +
-> >  /*
-> >   * virtio-scsi-pci: This extends VirtioPCIProxy.
-> >   */
-> 
-> These are not great APIs unfortunately. Need to come up with generic names.
-> E.g. do we register and de-register host notifiers maybe?
+> However, it turns out all the cpus which support 64K pages already include
+> an explicit table of page sizes, so there's no point to the fallback table
+> including 64k pages.
 > 
 
-I like the name "host notifier". I'll try to use it. Thanks a lot!
+I was thinking that 64k pages came with POWER5+. At least, this is mentioned
+in several places:
 
-> 
-> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > index 006d3d1148..90ee72984c 100644
-> > --- a/hw/virtio/virtio.c
-> > +++ b/hw/virtio/virtio.c
-> > @@ -22,6 +22,7 @@
-> >  #include "qemu/atomic.h"
-> >  #include "hw/virtio/virtio-bus.h"
-> >  #include "hw/virtio/virtio-access.h"
-> > +#include "hw/virtio/virtio-pci.h"
-> >  #include "sysemu/dma.h"
-> >  
-> >  /*
-> > @@ -2681,6 +2682,44 @@ void virtio_device_release_ioeventfd(VirtIODevice *vdev)
-> >      virtio_bus_release_ioeventfd(vbus);
-> >  }
-> >  
-> > +bool virtio_device_parent_is_pci_device(VirtIODevice *vdev)
-> > +{
-> > +    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-> > +    const char *typename = object_get_typename(OBJECT(qbus->parent));
-> > +
-> > +    return strstr(typename, "pci") != NULL;
-> > +}
-> > +
-> > +bool virtio_device_page_per_vq_enabled(VirtIODevice *vdev)
-> > +{
-> > +#ifdef CONFIG_VIRTIO_PCI
-> > +    if (virtio_device_parent_is_pci_device(vdev)) {
-> > +        return virtio_pci_page_per_vq_enabled(vdev);
-> > +    }
-> > +#endif
-> > +    return false;
-> > +}
-> > +
-> 
-> A better way to do this is to pass a callback to the bus where each bus can
-> implement its own.
-> 
+https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.performance/supported_page_sizes_processor_type.htm
 
-It's pretty neat! It helped me get rid of all the
-changes to the build scripts. Thanks a lot!
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a4a0f2524acc2c602cadd8e743be19d86f3a746b
 
-Best regards,
-Tiwei Bie
+And we do support POWER5+ with TCG and KVM PR. Shouldn't we include an explicit
+table of pages sizes there as well ?
+
+> That removes the only place which tests POWERPC_MMU_64K, so we can remove
+> it.  Which in turn allows some logic to be removed from
+> kvm_fixup_page_sizes().
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  target/ppc/cpu-qom.h        |  4 ----
+>  target/ppc/kvm.c            |  7 -------
+>  target/ppc/translate_init.c | 20 ++------------------
+>  3 files changed, 2 insertions(+), 29 deletions(-)
+> 
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index deaa46a14b..9bbb05cf62 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -70,7 +70,6 @@ enum powerpc_mmu_t {
+>  #define POWERPC_MMU_64       0x00010000
+>  #define POWERPC_MMU_1TSEG    0x00020000
+>  #define POWERPC_MMU_AMR      0x00040000
+> -#define POWERPC_MMU_64K      0x00080000
+>  #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
+>      /* 64 bits PowerPC MMU                                     */
+>      POWERPC_MMU_64B        = POWERPC_MMU_64 | 0x00000001,
+> @@ -78,15 +77,12 @@ enum powerpc_mmu_t {
+>      POWERPC_MMU_2_03       = POWERPC_MMU_64 | 0x00000002,
+>      /* Architecture 2.06 variant                               */
+>      POWERPC_MMU_2_06       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+> -                             | POWERPC_MMU_64K
+>                               | POWERPC_MMU_AMR | 0x00000003,
+>      /* Architecture 2.07 variant                               */
+>      POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+> -                             | POWERPC_MMU_64K
+>                               | POWERPC_MMU_AMR | 0x00000004,
+>      /* Architecture 3.00 variant                               */
+>      POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+> -                             | POWERPC_MMU_64K
+>                               | POWERPC_MMU_AMR | POWERPC_MMU_V3
+>                               | 0x00000005,
+>  };
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 79a436a384..6160356a4a 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -425,7 +425,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>      static bool has_smmu_info;
+>      CPUPPCState *env = &cpu->env;
+>      int iq, ik, jq, jk;
+> -    bool has_64k_pages = false;
+>  
+>      /* We only handle page sizes for 64-bit server guests for now */
+>      if (!(env->mmu_model & POWERPC_MMU_64)) {
+> @@ -471,9 +470,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>                                       ksps->enc[jk].page_shift)) {
+>                  continue;
+>              }
+> -            if (ksps->enc[jk].page_shift == 16) {
+> -                has_64k_pages = true;
+> -            }
+>              qsps->enc[jq].page_shift = ksps->enc[jk].page_shift;
+>              qsps->enc[jq].pte_enc = ksps->enc[jk].pte_enc;
+>              if (++jq >= PPC_PAGE_SIZES_MAX_SZ) {
+> @@ -488,9 +484,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>      if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+>          env->mmu_model &= ~POWERPC_MMU_1TSEG;
+>      }
+> -    if (!has_64k_pages) {
+> -        env->mmu_model &= ~POWERPC_MMU_64K;
+> -    }
+>  }
+>  
+>  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 29bd6f3654..99be6fcd68 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10469,7 +10469,7 @@ static void ppc_cpu_instance_init(Object *obj)
+>          env->sps = *pcc->sps;
+>      } else if (env->mmu_model & POWERPC_MMU_64) {
+>          /* Use default sets of page sizes. We don't support MPSS */
+> -        static const struct ppc_segment_page_sizes defsps_4k = {
+> +        static const struct ppc_segment_page_sizes defsps = {
+>              .sps = {
+>                  { .page_shift = 12, /* 4K */
+>                    .slb_enc = 0,
+> @@ -10481,23 +10481,7 @@ static void ppc_cpu_instance_init(Object *obj)
+>                  },
+>              },
+>          };
+> -        static const struct ppc_segment_page_sizes defsps_64k = {
+> -            .sps = {
+> -                { .page_shift = 12, /* 4K */
+> -                  .slb_enc = 0,
+> -                  .enc = { { .page_shift = 12, .pte_enc = 0 } }
+> -                },
+> -                { .page_shift = 16, /* 64K */
+> -                  .slb_enc = 0x110,
+> -                  .enc = { { .page_shift = 16, .pte_enc = 1 } }
+> -                },
+> -                { .page_shift = 24, /* 16M */
+> -                  .slb_enc = 0x100,
+> -                  .enc = { { .page_shift = 24, .pte_enc = 0 } }
+> -                },
+> -            },
+> -        };
+> -        env->sps = (env->mmu_model & POWERPC_MMU_64K) ? defsps_64k : defsps_4k;
+> +        env->sps = defsps;
+>      }
+>  #endif /* defined(TARGET_PPC64) */
+>  }
