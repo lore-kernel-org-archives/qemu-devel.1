@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0qLM-0004yK-5V
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:17:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1f0qPc-00079R-LQ
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:21:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0qLI-0001tM-8Q
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:17:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34790 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1f0qPZ-0004Tz-Uv
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:21:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54164 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0qLI-0001su-3j
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:16:56 -0400
-References: <20180327143014.1767669-1-eblake@redhat.com>
-	<20180327143014.1767669-7-eblake@redhat.com>
-	<CAJ+F1CJvvhd-pL5S9JChsBjEHqaB=_-HdYRzd+NiH3RK28B0yw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0qPZ-0004Tr-Pc
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 11:21:21 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41EE284256
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 15:21:21 +0000 (UTC)
+Received: from red.redhat.com (ovpn-121-135.rdu2.redhat.com [10.10.121.135])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 084F32026990
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 15:21:20 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b635c80e-4093-0cdb-2166-6a37dbd6ee18@redhat.com>
-Date: Tue, 27 Mar 2018 10:16:48 -0500
+Date: Tue, 27 Mar 2018 10:21:00 -0500
+Message-Id: <20180327152114.1776925-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJvvhd-pL5S9JChsBjEHqaB=_-HdYRzd+NiH3RK28B0yw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 06/14] qmp: fix qmp_capabilities error
- regression
+Subject: [Qemu-devel] [PULL v2 00/14] QAPI changes for 2018-03-27, 2.12-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +33,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 03/27/2018 10:01 AM, Marc-Andr=C3=A9 Lureau wrote:
-> On Tue, Mar 27, 2018 at 4:30 PM, Eric Blake <eblake@redhat.com> wrote:
->> From: Peter Xu <peterx@redhat.com>
->>
->> When someone sends a command before QMP handshake, the error used to b=
+The following changes since commit bdc408e91b14cedfc29be8ff703408936e5757=
+21:
+
+  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-03-=
+26' into staging (2018-03-27 14:11:30 +0100)
+
+are available in the Git repository at:
+
+  git://repo.or.cz/qemu/ericb.git tags/pull-qapi-2018-03-27-v2
+
+for you to fetch changes up to 0dfddbb537fcb0fbd045e1c890bc0e95f2ea5177:
+
+  hmp.c: Revert hmp_info_cpus output format change (2018-03-27 10:17:48 -=
+0500)
+
+v2: fix some R-b tags in 6/14, 14/14 (no code changes, so no patches re-s=
+ent)
+
+----------------------------------------------------------------
+qapi patches for 2018-03-27, 2.12-rc1
+
+- Marc-Andr=C3=A9 Lureau: qmp-test: fix response leak
+- Eric Blake: tests: Silence false positive warning on generated test nam=
 e
->> like this:
->>
->>   {"execute": "query-cpus"}
->>   {"error": {"class": "CommandNotFound", "desc":
->>              "Expecting capabilities negotiation with 'qmp_capabilitie=
-s'"}}
->>
->> While after cf869d5317 it becomes:
->>
->>   {"execute": "query-cpus"}
->>   {"error": {"class": "CommandNotFound", "desc":
->>              "The command query-cpus has not been found"}}
->>
->> Fix it back to the nicer one.
->>
->> Fixes: cf869d5317 ("qmp: support out-of-band (oob) execution", 2018-03=
--19)
->> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> Signed-off-by: Peter Xu <peterx@redhat.com>
->> Message-Id: <20180326063901.27425-2-peterx@redhat.com>
->> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Reviewed-by (not x2 Reported-by ;)
->=20
+- Laurent Vivier: 0/4 (partial) coccinelle: re-run scripts from scripst/c=
+occinelle
+- Peter Xu: 0/8 Monitor: some oob related patches (fixes, new param, test=
+s)
+- Satheesh Rajendran: hmp.c: Revert hmp_info_cpus output format change
 
-Shoot.  Want me to send a v2 pull request?
+----------------------------------------------------------------
+Eric Blake (2):
+      tests: Silence false positive warning on generated test name
+      tests: Add parameter to qtest_init_without_qmp_handshake
+
+Laurent Vivier (3):
+      error: Strip trailing '\n' from error string arguments (again again=
+)
+      error: Remove NULL checks on error_propagate() calls
+      qdict: remove useless cast
+
+Marc-Andr=C3=A9 Lureau (1):
+      qmp-test: fix response leak
+
+Peter Xu (7):
+      qmp: fix qmp_capabilities error regression
+      qapi: restrict allow-oob value to be "true"
+      tests: let qapi-schema tests detect oob
+      tests: add oob-test for qapi-schema
+      qmp: cleanup qmp queues properly
+      monitor: new parameter "x-oob"
+      tests: qmp-test: add test for new "x-oob"
+
+Satheesh Rajendran (1):
+      hmp.c: Revert hmp_info_cpus output format change
+
+ scripts/qapi/common.py                  |   2 +-
+ tests/libqtest.h                        |   7 +-
+ include/monitor/monitor.h               |   1 +
+ vl.c                                    |   5 ++
+ tests/libqtest.c                        |  10 +--
+ block/nvme.c                            |  11 ++-
+ hmp.c                                   |   2 +-
+ io/channel-websock.c                    |   4 +-
+ monitor.c                               | 118 ++++++++++++++++++++++----=
+------
+ target/i386/hvf/hvf.c                   |  24 +++----
+ tests/qmp-test.c                        |  85 ++++++++++++++++++++++-
+ tests/test-qmp-cmds.c                   |   4 ++
+ tests/test-visitor-serialization.c      |   2 +-
+ tests/Makefile.include                  |   1 +
+ tests/qapi-schema/doc-good.out          |   4 +-
+ tests/qapi-schema/ident-with-escape.out |   2 +-
+ tests/qapi-schema/indented-expr.out     |   4 +-
+ tests/qapi-schema/oob-test.err          |   1 +
+ tests/qapi-schema/oob-test.exit         |   1 +
+ tests/qapi-schema/oob-test.json         |   2 +
+ tests/qapi-schema/oob-test.out          |   0
+ tests/qapi-schema/qapi-schema-test.json |   3 +
+ tests/qapi-schema/qapi-schema-test.out  |  20 +++---
+ tests/qapi-schema/test-qapi.py          |   4 +-
+ 24 files changed, 233 insertions(+), 84 deletions(-)
+ create mode 100644 tests/qapi-schema/oob-test.err
+ create mode 100644 tests/qapi-schema/oob-test.exit
+ create mode 100644 tests/qapi-schema/oob-test.json
+ create mode 100644 tests/qapi-schema/oob-test.out
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
