@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0dZO-0005pG-Cg
+	(envelope-from <eblake@redhat.com>) id 1f0dZO-0005pD-Bj
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0dZM-0007kM-J7
+	(envelope-from <eblake@redhat.com>) id 1f0dZL-0007jo-6v
 	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58806 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58796 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0dZM-0007kG-De
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:36 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0dZL-0007je-1X
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:35 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 26 Mar 2018 20:36:20 -0500
-Message-Id: <20180327013620.1644387-5-eblake@redhat.com>
+Date: Mon, 26 Mar 2018 20:36:18 -0500
+Message-Id: <20180327013620.1644387-3-eblake@redhat.com>
 In-Reply-To: <20180327013620.1644387-1-eblake@redhat.com>
 References: <20180327013620.1644387-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] tests: qmp-test: add test for new
- "x-oob"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/4] monitor: new parameter "x-oob"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,127 +27,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, marcandre.lureau@redhat.com, borntraeger@de.ibm.com, Markus Armbruster <armbru@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@redhat.com, borntraeger@de.ibm.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-Test the new OOB capability. It's mostly the reverted OOB test
-(see commit 4fd78ad7), but differs in that:
+Add new parameter to optionally enable Out-Of-Band for a QMP server.
 
-- It uses the new qtest_init_without_qmp_handshake() parameter to
-  create the monitor with "x-oob"
-- Squashed the capability tests on greeting message
-- Don't use qtest_global any more, instead use self-maintained
-  QTestState, which is the trend
+An example command line:
+
+  ./qemu-system-x86_64 -chardev stdio,id=3Dchar0 \
+                       -mon chardev=3Dchar0,mode=3Dcontrol,x-oob=3Don
+
+By default, Out-Of-Band is off.
+
+It is not allowed if either MUX or non-QMP is detected, since
+Out-Of-Band is currently only for QMP, and non-MUX chardev backends.
+
+Note that the client STILL has to request 'oob' during qmp_capabilities;
+in part because the x-oob command line option may disappear in the
+future if we decide the capabilities negotiation is sufficient.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180326063901.27425-9-peterx@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: rebase to qtest_init changes]
+Message-Id: <20180326063901.27425-4-peterx@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+[eblake: enhance commit message]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qmp-test.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+ include/monitor/monitor.h |  1 +
+ vl.c                      |  5 +++++
+ monitor.c                 | 22 ++++++++++++++++++++--
+ 3 files changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 2134d95db97..772058fc4c4 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -135,6 +135,87 @@ static void test_qmp_protocol(void)
-     qtest_quit(qts);
- }
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 0cb0538a315..d6ab70cae23 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -13,6 +13,7 @@ extern Monitor *cur_mon;
+ #define MONITOR_USE_READLINE  0x02
+ #define MONITOR_USE_CONTROL   0x04
+ #define MONITOR_USE_PRETTY    0x08
++#define MONITOR_USE_OOB       0x10
 
-+/* Tests for Out-Of-Band support. */
-+static void test_qmp_oob(void)
-+{
-+    QTestState *qts;
-+    QDict *resp, *q;
-+    int acks = 0;
-+    const QListEntry *entry;
-+    QList *capabilities;
-+    QString *qstr;
-+    const char *cmd_id;
-+
-+    qts = qtest_init_without_qmp_handshake(true, common_args);
-+
-+    /* Check the greeting message. */
-+    resp = qtest_qmp_receive(qts);
-+    q = qdict_get_qdict(resp, "QMP");
-+    g_assert(q);
-+    capabilities = qdict_get_qlist(q, "capabilities");
-+    g_assert(capabilities && !qlist_empty(capabilities));
-+    entry = qlist_first(capabilities);
-+    g_assert(entry);
-+    qstr = qobject_to(QString, entry->value);
-+    g_assert(qstr);
-+    g_assert_cmpstr(qstring_get_str(qstr), ==, "oob");
-+    QDECREF(resp);
-+
-+    /* Try a fake capability, it should fail. */
-+    resp = qtest_qmp(qts,
-+                     "{ 'execute': 'qmp_capabilities', "
-+                     "  'arguments': { 'enable': [ 'cap-does-not-exist' ] } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+    QDECREF(resp);
-+
-+    /* Now, enable OOB in current QMP session, it should succeed. */
-+    resp = qtest_qmp(qts,
-+                     "{ 'execute': 'qmp_capabilities', "
-+                     "  'arguments': { 'enable': [ 'oob' ] } }");
-+    g_assert(qdict_haskey(resp, "return"));
-+    QDECREF(resp);
-+
-+    /*
-+     * Try any command that does not support OOB but with OOB flag. We
-+     * should get failure.
-+     */
-+    resp = qtest_qmp(qts,
-+                     "{ 'execute': 'query-cpus',"
-+                     "  'control': { 'run-oob': true } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+    QDECREF(resp);
-+
-+    /*
-+     * First send the "x-oob-test" command with lock=true and
-+     * oob=false, it should hang the dispatcher and main thread;
-+     * later, we send another lock=false with oob=true to continue
-+     * that thread processing.  Finally we should receive replies from
-+     * both commands.
-+     */
-+    qtest_async_qmp(qts,
-+                    "{ 'execute': 'x-oob-test',"
-+                    "  'arguments': { 'lock': true }, "
-+                    "  'id': 'lock-cmd'}");
-+    qtest_async_qmp(qts,
-+                    "{ 'execute': 'x-oob-test', "
-+                    "  'arguments': { 'lock': false }, "
-+                    "  'control': { 'run-oob': true }, "
-+                    "  'id': 'unlock-cmd' }");
-+
-+    /* Ignore all events.  Wait for 2 acks */
-+    while (acks < 2) {
-+        resp = qtest_qmp_receive(qts);
-+        cmd_id = qdict_get_str(resp, "id");
-+        if (!g_strcmp0(cmd_id, "lock-cmd") ||
-+            !g_strcmp0(cmd_id, "unlock-cmd")) {
-+            acks++;
-+        }
-+        QDECREF(resp);
+ bool monitor_cur_is_qmp(void);
+
+diff --git a/vl.c b/vl.c
+index c81cc866079..5fd01bd5f69 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2404,6 +2404,11 @@ static int mon_init_func(void *opaque, QemuOpts *o=
+pts, Error **errp)
+     if (qemu_opt_get_bool(opts, "pretty", 0))
+         flags |=3D MONITOR_USE_PRETTY;
+
++    /* OOB is off by default */
++    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
++        flags |=3D MONITOR_USE_OOB;
 +    }
 +
-+    qtest_quit(qts);
-+}
-+
- static int query_error_class(const char *cmd)
+     chardev =3D qemu_opt_get(opts, "chardev");
+     chr =3D qemu_chr_find(chardev);
+     if (chr =3D=3D NULL) {
+diff --git a/monitor.c b/monitor.c
+index 8fa18936419..e11724eec24 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -36,6 +36,7 @@
+ #include "net/slirp.h"
+ #include "chardev/char-fe.h"
+ #include "chardev/char-io.h"
++#include "chardev/char-mux.h"
+ #include "ui/qemu-spice.h"
+ #include "sysemu/numa.h"
+ #include "monitor/monitor.h"
+@@ -4563,12 +4564,26 @@ static void monitor_qmp_setup_handlers_bh(void *o=
+paque)
+ void monitor_init(Chardev *chr, int flags)
  {
-     static struct {
-@@ -319,6 +400,7 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
+     Monitor *mon =3D g_malloc(sizeof(*mon));
++    bool use_readline =3D flags & MONITOR_USE_READLINE;
++    bool use_oob =3D flags & MONITOR_USE_OOB;
 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-+    qtest_add_func("qmp/oob", test_qmp_oob);
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
+-    monitor_data_init(mon, false, false);
++    if (use_oob) {
++        if (CHARDEV_IS_MUX(chr)) {
++            error_report("Monitor Out-Of-Band is not supported with "
++                         "MUX typed chardev backend");
++            exit(1);
++        }
++        if (use_readline) {
++            error_report("Monitor Out-Of-band is only supported by QMP")=
+;
++            exit(1);
++        }
++    }
++
++    monitor_data_init(mon, false, use_oob);
 
--- 
+     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+     mon->flags =3D flags;
+-    if (flags & MONITOR_USE_READLINE) {
++    if (use_readline) {
+         mon->rs =3D readline_init(monitor_readline_printf,
+                                 monitor_readline_flush,
+                                 mon,
+@@ -4664,6 +4679,9 @@ QemuOptsList qemu_mon_opts =3D {
+         },{
+             .name =3D "pretty",
+             .type =3D QEMU_OPT_BOOL,
++        },{
++            .name =3D "x-oob",
++            .type =3D QEMU_OPT_BOOL,
+         },
+         { /* end of list */ }
+     },
+--=20
 2.14.3
