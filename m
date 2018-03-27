@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0pcP-0007V8-80
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:34 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0pcO-0004zp-20
+	(envelope-from <eblake@redhat.com>) id 1f0pcO-0007Ue-KQ
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59408 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1f0pcN-0004z0-4N
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60628 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0pcN-0004zF-TZ
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0pcM-0004ys-PG
 	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 10:30:31 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8BCDAEB6F4
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 14:30:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 60BD4401DEA6
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 14:30:30 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 27 Mar 2018 09:30:12 -0500
-Message-Id: <20180327143014.1767669-13-eblake@redhat.com>
+Date: Tue, 27 Mar 2018 09:30:10 -0500
+Message-Id: <20180327143014.1767669-11-eblake@redhat.com>
 In-Reply-To: <20180327143014.1767669-1-eblake@redhat.com>
 References: <20180327143014.1767669-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/14] tests: Add parameter to
- qtest_init_without_qmp_handshake
+Subject: [Qemu-devel] [PULL 10/14] qmp: cleanup qmp queues properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,106 +33,161 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Allow callers to choose whether to allow OOB support during a test;
-for now, all existing callers pass false, but the next patch will
-add a new caller.  Also, rewrite the monitor setup to be generic
-(using the -qmp shorthand is insufficient for honoring the parameter).
+From: Peter Xu <peterx@redhat.com>
 
-Based on an idea by Peter Xu, in <20180326063901.27425-8-peterx@redhat.co=
-m>
+Marc-Andr=C3=A9 Lureau reported that we can have this happen:
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180327013620.1644387-4-eblake@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Peter Xu <peterx@redhat.com>
+1. client1 connects, send command C1
+2. client1 disconnects before getting response for C1
+3. client2 connects, who might receive response of C1
+
+However client2 should not receive remaining responses for client1.
+
+Basically, we should clean up the request/response queue elements when:
+
+- after a session is closed
+- before destroying the queues
+
+Some helpers are introduced to achieve that.  We need to make sure we're
+with the lock when operating on those queues.  This also needed the
+declaration of QMPRequest moved earlier.
+
+Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180326063901.27425-3-peterx@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+[eblake: drop pointless qmp_response_free(), drop queue flush on connect
+since a clean queue on disconnect is sufficient]
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h |  7 +++++--
- tests/libqtest.c | 10 ++++++----
- tests/qmp-test.c |  2 +-
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ monitor.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++-----------=
+------
+ 1 file changed, 52 insertions(+), 19 deletions(-)
 
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 811169453ab..cbe8df44730 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -56,11 +56,14 @@ QTestState *qtest_init(const char *extra_args);
+diff --git a/monitor.c b/monitor.c
+index 3b1ef34711b..32d6114ac3a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -234,6 +234,22 @@ static struct {
+     QEMUBH *qmp_respond_bh;
+ } mon_global;
 
- /**
-  * qtest_init_without_qmp_handshake:
-- * @extra_args: other arguments to pass to QEMU.
-+ * @use_oob: true to have the server advertise OOB support
-+ * @extra_args: other arguments to pass to QEMU.  CAUTION: these
-+ * arguments are subject to word splitting and shell evaluation.
-  *
-  * Returns: #QTestState instance.
-  */
--QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
-+QTestState *qtest_init_without_qmp_handshake(bool use_oob,
-+                                             const char *extra_args);
++struct QMPRequest {
++    /* Owner of the request */
++    Monitor *mon;
++    /* "id" field of the request */
++    QObject *id;
++    /* Request object to be handled */
++    QObject *req;
++    /*
++     * Whether we need to resume the monitor afterward.  This flag is
++     * used to emulate the old QMP server behavior that the current
++     * command must be completed before execution of the next one.
++     */
++    bool need_resume;
++};
++typedef struct QMPRequest QMPRequest;
++
+ /* QMP checker flags */
+ #define QMP_ACCEPT_UNKNOWNS 1
 
- /**
-  * qtest_quit:
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 200b2b9e92a..6f33a37667c 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -166,7 +166,8 @@ static const char *qtest_qemu_binary(void)
-     return qemu_bin;
+@@ -310,6 +326,38 @@ int monitor_read_password(Monitor *mon, ReadLineFunc=
+ *readline_func,
+     }
  }
 
--QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
-+QTestState *qtest_init_without_qmp_handshake(bool use_oob,
-+                                             const char *extra_args)
- {
-     QTestState *s;
-     int sock, qmpsock, i;
-@@ -199,12 +200,13 @@ QTestState *qtest_init_without_qmp_handshake(const =
-char *extra_args)
-         command =3D g_strdup_printf("exec %s "
-                                   "-qtest unix:%s,nowait "
-                                   "-qtest-log %s "
--                                  "-qmp unix:%s,nowait "
-+                                  "-chardev socket,path=3D%s,nowait,id=3D=
-char0 "
-+                                  "-mon chardev=3Dchar0,mode=3Dcontrol%s=
- "
-                                   "-machine accel=3Dqtest "
-                                   "-display none "
-                                   "%s", qemu_binary, socket_path,
-                                   getenv("QTEST_LOG") ? "/dev/fd/2" : "/=
-dev/null",
--                                  qmp_socket_path,
-+                                  qmp_socket_path, use_oob ? ",x-oob=3Do=
-n" : "",
-                                   extra_args ?: "");
-         execlp("/bin/sh", "sh", "-c", command, NULL);
-         exit(1);
-@@ -239,7 +241,7 @@ QTestState *qtest_init_without_qmp_handshake(const ch=
-ar *extra_args)
++static void qmp_request_free(QMPRequest *req)
++{
++    qobject_decref(req->id);
++    qobject_decref(req->req);
++    g_free(req);
++}
++
++/* Must with the mon->qmp.qmp_queue_lock held */
++static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
++{
++    while (!g_queue_is_empty(mon->qmp.qmp_requests)) {
++        qmp_request_free(g_queue_pop_head(mon->qmp.qmp_requests));
++    }
++}
++
++/* Must with the mon->qmp.qmp_queue_lock held */
++static void monitor_qmp_cleanup_resp_queue_locked(Monitor *mon)
++{
++    while (!g_queue_is_empty(mon->qmp.qmp_responses)) {
++        qobject_decref(g_queue_pop_head(mon->qmp.qmp_responses));
++    }
++}
++
++static void monitor_qmp_cleanup_queues(Monitor *mon)
++{
++    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
++    monitor_qmp_cleanup_req_queue_locked(mon);
++    monitor_qmp_cleanup_resp_queue_locked(mon);
++    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
++}
++
++
+ static void monitor_flush_locked(Monitor *mon);
 
- QTestState *qtest_init(const char *extra_args)
- {
--    QTestState *s =3D qtest_init_without_qmp_handshake(extra_args);
-+    QTestState *s =3D qtest_init_without_qmp_handshake(false, extra_args=
-);
+ static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
+@@ -701,6 +749,8 @@ static void monitor_data_destroy(Monitor *mon)
+     QDECREF(mon->outbuf);
+     qemu_mutex_destroy(&mon->out_lock);
+     qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
++    monitor_qmp_cleanup_req_queue_locked(mon);
++    monitor_qmp_cleanup_resp_queue_locked(mon);
+     g_queue_free(mon->qmp.qmp_requests);
+     g_queue_free(mon->qmp.qmp_responses);
+ }
+@@ -4009,22 +4059,6 @@ static void monitor_qmp_respond(Monitor *mon, QObj=
+ect *rsp,
+     qobject_decref(rsp);
+ }
 
-     /* Read the QMP greeting and then do the handshake */
-     qtest_qmp_discard_response(s, "");
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 8de99a4727e..2134d95db97 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -81,7 +81,7 @@ static void test_qmp_protocol(void)
-     QList *capabilities;
-     QTestState *qts;
-
--    qts =3D qtest_init_without_qmp_handshake(common_args);
-+    qts =3D qtest_init_without_qmp_handshake(false, common_args);
-
-     /* Test greeting */
-     resp =3D qtest_qmp_receive(qts);
+-struct QMPRequest {
+-    /* Owner of the request */
+-    Monitor *mon;
+-    /* "id" field of the request */
+-    QObject *id;
+-    /* Request object to be handled */
+-    QObject *req;
+-    /*
+-     * Whether we need to resume the monitor afterward.  This flag is
+-     * used to emulate the old QMP server behavior that the current
+-     * command must be completed before execution of the next one.
+-     */
+-    bool need_resume;
+-};
+-typedef struct QMPRequest QMPRequest;
+-
+ /*
+  * Dispatch one single QMP request. The function will free the req_obj
+  * and objects inside it before return.
+@@ -4191,9 +4225,7 @@ static void handle_qmp_command(JSONMessageParser *p=
+arser, GQueue *tokens)
+             qapi_event_send_command_dropped(id,
+                                             COMMAND_DROP_REASON_QUEUE_FU=
+LL,
+                                             &error_abort);
+-            qobject_decref(id);
+-            qobject_decref(req);
+-            g_free(req_obj);
++            qmp_request_free(req_obj);
+             return;
+         }
+     }
+@@ -4335,6 +4367,7 @@ static void monitor_qmp_event(void *opaque, int eve=
+nt)
+         mon_refcount++;
+         break;
+     case CHR_EVENT_CLOSED:
++        monitor_qmp_cleanup_queues(mon);
+         json_message_parser_destroy(&mon->qmp.parser);
+         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+         mon_refcount--;
 --=20
 2.14.3
