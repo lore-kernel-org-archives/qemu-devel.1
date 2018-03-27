@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0dZO-0005pE-Bt
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:39 -0400
+	(envelope-from <peterx@redhat.com>) id 1f0eFU-0000dL-8C
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 22:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f0dZK-0007ja-DA
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36446 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f0eFQ-00040I-57
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 22:22:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43404 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f0dZK-0007jL-7q
-	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 21:38:34 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 26 Mar 2018 20:36:17 -0500
-Message-Id: <20180327013620.1644387-2-eblake@redhat.com>
-In-Reply-To: <20180327013620.1644387-1-eblake@redhat.com>
-References: <20180327013620.1644387-1-eblake@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0eFQ-000406-0W
+	for qemu-devel@nongnu.org; Mon, 26 Mar 2018 22:22:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 672678151D49
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 02:22:01 +0000 (UTC)
+Date: Tue, 27 Mar 2018 10:21:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180327022155.GE17789@xz-mi>
+References: <20180326061157.24865-1-peterx@redhat.com>
+	<20180326104739.GC5267@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/4] qmp: cleanup qmp queues properly
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180326104739.GC5267@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,169 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, marcandre.lureau@redhat.com, borntraeger@de.ibm.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+On Mon, Mar 26, 2018 at 12:47:39PM +0200, Kevin Wolf wrote:
+> Am 26.03.2018 um 08:11 hat Peter Xu geschrieben:
+> > If there are more than one events, wait_until_completed() might return
+> > the 2nd event even if the 1st event is JOB_COMPLETED, since the for loop
+> > will continue to run even if completed is set to True.
+> > 
+> > It never happened before, but it can be triggered when OOB is enabled
+> > due to the RESUME startup message. Fix that up by removing the boolean
+> > and make sure we return the correct event.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  tests/qemu-iotests/iotests.py | 20 ++++++++------------
+> >  1 file changed, 8 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> > index b5d7945af8..11704e6583 100644
+> > --- a/tests/qemu-iotests/iotests.py
+> > +++ b/tests/qemu-iotests/iotests.py
+> > @@ -470,18 +470,14 @@ class QMPTestCase(unittest.TestCase):
+> >  
+> >      def wait_until_completed(self, drive='drive0', check_offset=True):
+> >          '''Wait for a block job to finish, returning the event'''
+> > -        completed = False
+> > -        while not completed:
+> > -            for event in self.vm.get_qmp_events(wait=True):
+> > -                if event['event'] == 'BLOCK_JOB_COMPLETED':
+> > -                    self.assert_qmp(event, 'data/device', drive)
+> > -                    self.assert_qmp_absent(event, 'data/error')
+> > -                    if check_offset:
+> > -                        self.assert_qmp(event, 'data/offset', event['data']['len'])
+> > -                    completed = True
+> > -
+> > -        self.assert_no_active_block_jobs()
+> > -        return event
+> > +        for event in self.vm.get_qmp_events(wait=True):
+> > +            if event['event'] == 'BLOCK_JOB_COMPLETED':
+> > +                self.assert_qmp(event, 'data/device', drive)
+> > +                self.assert_qmp_absent(event, 'data/error')
+> > +                if check_offset:
+> > +                    self.assert_qmp(event, 'data/offset', event['data']['len'])
+> > +                self.assert_no_active_block_jobs()
+> > +                return event
+> >  
+> >      def wait_ready(self, drive='drive0'):
+> >          '''Wait until a block job BLOCK_JOB_READY event'''
+> 
+> If an event is pending, but it's not the expected event, won't we return
+> None now instead of waiting for the BLOCK_JOB_COMPLETED event?
 
-Marc-Andr=C3=A9 Lureau reported that we can have this happen:
+If so, we'll return none.  The patch fixes the other case when there
+are two events: one JOB_COMPLETED plus another (e.g., RESUME) event.
+When that happens, logically we should return one JOB_COMPLETED event,
+but the old code will return the other event (e.g., RESUME).
 
-1. client1 connects, send command C1
-2. client1 disconnects before getting response for C1
-3. client2 connects, who might receive response of C1
+> 
+> Wouldn't it be much easier to just add a 'break'?
 
-However client2 should not receive remaining responses for client1.
+Yes, it's the same.  But IMHO those logics (e.g., the completed
+variable) are not really needed at all.  This one is simpler.
 
-Basically, we should clean up the request/response queue elements when:
+Or do you want me to post the oneliner that you prefer?
 
-- before a session established
-- after a session is closed
-- before destroying the queues
+Thanks,
 
-Some helpers are introduced to achieve that.  We need to make sure we're
-with the lock when operating on those queues.
-
-Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180326063901.27425-3-peterx@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[eblake: drop pointless qmp_response_free()]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- monitor.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++-----------=
-------
- 1 file changed, 53 insertions(+), 19 deletions(-)
-
-diff --git a/monitor.c b/monitor.c
-index 3b1ef34711b..8fa18936419 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -234,6 +234,22 @@ static struct {
-     QEMUBH *qmp_respond_bh;
- } mon_global;
-
-+struct QMPRequest {
-+    /* Owner of the request */
-+    Monitor *mon;
-+    /* "id" field of the request */
-+    QObject *id;
-+    /* Request object to be handled */
-+    QObject *req;
-+    /*
-+     * Whether we need to resume the monitor afterward.  This flag is
-+     * used to emulate the old QMP server behavior that the current
-+     * command must be completed before execution of the next one.
-+     */
-+    bool need_resume;
-+};
-+typedef struct QMPRequest QMPRequest;
-+
- /* QMP checker flags */
- #define QMP_ACCEPT_UNKNOWNS 1
-
-@@ -310,6 +326,38 @@ int monitor_read_password(Monitor *mon, ReadLineFunc=
- *readline_func,
-     }
- }
-
-+static void qmp_request_free(QMPRequest *req)
-+{
-+    qobject_decref(req->id);
-+    qobject_decref(req->req);
-+    g_free(req);
-+}
-+
-+/* Must with the mon->qmp.qmp_queue_lock held */
-+static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
-+{
-+    while (!g_queue_is_empty(mon->qmp.qmp_requests)) {
-+        qmp_request_free(g_queue_pop_head(mon->qmp.qmp_requests));
-+    }
-+}
-+
-+/* Must with the mon->qmp.qmp_queue_lock held */
-+static void monitor_qmp_cleanup_resp_queue_locked(Monitor *mon)
-+{
-+    while (!g_queue_is_empty(mon->qmp.qmp_responses)) {
-+        qobject_decref(g_queue_pop_head(mon->qmp.qmp_responses));
-+    }
-+}
-+
-+static void monitor_qmp_cleanup_queues(Monitor *mon)
-+{
-+    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-+    monitor_qmp_cleanup_req_queue_locked(mon);
-+    monitor_qmp_cleanup_resp_queue_locked(mon);
-+    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+}
-+
-+
- static void monitor_flush_locked(Monitor *mon);
-
- static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
-@@ -701,6 +749,8 @@ static void monitor_data_destroy(Monitor *mon)
-     QDECREF(mon->outbuf);
-     qemu_mutex_destroy(&mon->out_lock);
-     qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
-+    monitor_qmp_cleanup_req_queue_locked(mon);
-+    monitor_qmp_cleanup_resp_queue_locked(mon);
-     g_queue_free(mon->qmp.qmp_requests);
-     g_queue_free(mon->qmp.qmp_responses);
- }
-@@ -4009,22 +4059,6 @@ static void monitor_qmp_respond(Monitor *mon, QObj=
-ect *rsp,
-     qobject_decref(rsp);
- }
-
--struct QMPRequest {
--    /* Owner of the request */
--    Monitor *mon;
--    /* "id" field of the request */
--    QObject *id;
--    /* Request object to be handled */
--    QObject *req;
--    /*
--     * Whether we need to resume the monitor afterward.  This flag is
--     * used to emulate the old QMP server behavior that the current
--     * command must be completed before execution of the next one.
--     */
--    bool need_resume;
--};
--typedef struct QMPRequest QMPRequest;
--
- /*
-  * Dispatch one single QMP request. The function will free the req_obj
-  * and objects inside it before return.
-@@ -4191,9 +4225,7 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
-             qapi_event_send_command_dropped(id,
-                                             COMMAND_DROP_REASON_QUEUE_FU=
-LL,
-                                             &error_abort);
--            qobject_decref(id);
--            qobject_decref(req);
--            g_free(req_obj);
-+            qmp_request_free(req_obj);
-             return;
-         }
-     }
-@@ -4327,6 +4359,7 @@ static void monitor_qmp_event(void *opaque, int eve=
-nt)
-
-     switch (event) {
-     case CHR_EVENT_OPENED:
-+        monitor_qmp_cleanup_queues(mon);
-         mon->qmp.commands =3D &qmp_cap_negotiation_commands;
-         monitor_qmp_caps_reset(mon);
-         data =3D get_qmp_greeting(mon);
-@@ -4335,6 +4368,7 @@ static void monitor_qmp_event(void *opaque, int eve=
-nt)
-         mon_refcount++;
-         break;
-     case CHR_EVENT_CLOSED:
-+        monitor_qmp_cleanup_queues(mon);
-         json_message_parser_destroy(&mon->qmp.parser);
-         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-         mon_refcount--;
---=20
-2.14.3
+-- 
+Peter Xu
