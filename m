@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0mbd-0008OI-96
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:17:34 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f0mrb-00054k-0i
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:34:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f0mbY-0004GU-Ft
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:17:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54442 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f0mbY-0004EH-9F
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:17:28 -0400
-Date: Tue, 27 Mar 2018 19:17:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180327111717.GN17789@xz-mi>
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-4-xiaoguangrong@tencent.com>
-	<20180321100043.GA30634@xz-mi>
-	<48da6d2b-f5f4-a077-f282-ed52392c17f9@gmail.com>
-	<20180327072204.GJ17789@xz-mi>
-	<51b59c4c-b153-e711-d78a-8611780b2874@gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1f0mrW-0006gq-Je
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:34:03 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:50268)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f0mrW-0006fk-9I
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 07:33:58 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id l201so2776269wmg.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 04:33:58 -0700 (PDT)
+References: <1521663109-32262-1-git-send-email-cota@braap.org>
+	<1521663109-32262-5-git-send-email-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1521663109-32262-5-git-send-email-cota@braap.org>
+Date: Tue, 27 Mar 2018 12:33:55 +0100
+Message-ID: <87vadh92ho.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <51b59c4c-b153-e711-d78a-8611780b2874@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] migration: support to detect
- compression and decompression errors
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 04/14] fp-test: add muladd variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +30,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On Tue, Mar 27, 2018 at 03:42:32AM +0800, Xiao Guangrong wrote:
 
-[...]
+Emilio G. Cota <cota@braap.org> writes:
 
-> > It'll be understandable to me if the problem is that the compress()
-> > API does not allow the input buffer to be changed during the whole
-> > period of the call.  If that is a must, this patch for sure helps.
-> 
-> Yes, that is exactly what i want to say. :)
+> These are a few muladd-related operations that the original IBM syntax
+> does not specify; model files for these are in muladd.fptest.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  tests/fp-test/fp-test.c     | 24 +++++++++++++++++++++
+>  tests/fp-test/muladd.fptest | 51 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 75 insertions(+)
+>  create mode 100644 tests/fp-test/muladd.fptest
+>
+> diff --git a/tests/fp-test/fp-test.c b/tests/fp-test/fp-test.c
+> index 27637c4..2200d40 100644
+> --- a/tests/fp-test/fp-test.c
+> +++ b/tests/fp-test/fp-test.c
+> @@ -53,6 +53,9 @@ enum op {
+>      OP_SUB,
+>      OP_MUL,
+>      OP_MULADD,
+> +    OP_MULADD_NEG_ADDEND,
+> +    OP_MULADD_NEG_PRODUCT,
+> +    OP_MULADD_NEG_RESULT,
+>      OP_DIV,
+>      OP_SQRT,
+>      OP_MINNUM,
+> @@ -69,6 +72,9 @@ static const struct op_desc ops[] =3D {
+>      [OP_SUB] =3D       { "-", 2 },
+>      [OP_MUL] =3D       { "*", 2 },
+>      [OP_MULADD] =3D    { "*+", 3 },
+> +    [OP_MULADD_NEG_ADDEND] =3D  { "*+nc", 3 },
+> +    [OP_MULADD_NEG_PRODUCT] =3D { "*+np", 3 },
+> +    [OP_MULADD_NEG_RESULT] =3D  { "*+nr", 3 },
+>      [OP_DIV] =3D       { "/", 2 },
+>      [OP_SQRT] =3D      { "V", 1 },
+>      [OP_MINNUM] =3D    { "<C", 2 },
+> @@ -463,6 +469,15 @@ static enum error soft_tester(struct test_op *t)
+>          case OP_MULADD:
+>              res =3D float32_muladd(a, b, c, 0, s);
+>              break;
+> +        case OP_MULADD_NEG_ADDEND:
+> +            res =3D float32_muladd(a, b, c, float_muladd_negate_c, s);
+> +            break;
+> +        case OP_MULADD_NEG_PRODUCT:
+> +            res =3D float32_muladd(a, b, c, float_muladd_negate_product,=
+ s);
+> +            break;
+> +        case OP_MULADD_NEG_RESULT:
+> +            res =3D float32_muladd(a, b, c, float_muladd_negate_result, =
+s);
+> +            break;
+>          case OP_DIV:
+>              res =3D float32_div(a, b, s);
+>              break;
+> @@ -522,6 +537,15 @@ static enum error soft_tester(struct test_op *t)
+>          case OP_MULADD:
+>              res64 =3D float64_muladd(a, b, c, 0, s);
+>              break;
+> +        case OP_MULADD_NEG_ADDEND:
+> +            res64 =3D float64_muladd(a, b, c, float_muladd_negate_c, s);
+> +            break;
+> +        case OP_MULADD_NEG_PRODUCT:
+> +            res64 =3D float64_muladd(a, b, c, float_muladd_negate_produc=
+t, s);
+> +            break;
+> +        case OP_MULADD_NEG_RESULT:
+> +            res64 =3D float64_muladd(a, b, c, float_muladd_negate_result=
+, s);
+> +            break;
+>          case OP_DIV:
+>              res64 =3D float64_div(a, b, s);
+>              break;
 
-So I think now I know what this patch is for. :) And yeah, it makes
-sense.
+Are there any intrinsics we could use for the hard variant which would
+be useful if we want to run under translation?
 
-Though another question would be: if the buffer is updated during
-compress() and compress() returned error, would that pollute the whole
-z_stream or it only fails the compress() call?
+> diff --git a/tests/fp-test/muladd.fptest b/tests/fp-test/muladd.fptest
+> new file mode 100644
+> index 0000000..6cd48ff
+> --- /dev/null
+> +++ b/tests/fp-test/muladd.fptest
+> @@ -0,0 +1,51 @@
+> +# nc =3D=3D negate addend
+> +b32*+nc =3D0 -Inf -Inf +Inf -> Q i
+> +b32*+nc =3D0 -1.7FFFFFP127 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -1.6C9AE7P113 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -1.000000P-126 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -0.7FFFFFP-126 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -0.1B977AP-126 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -0.000001P-126 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -1.000000P0 -Inf +Inf -> Q i
+> +b32*+nc =3D0 -Zero -Inf +Inf -> Q i
+> +b32*+nc =3D0 +Zero -Inf +Inf -> Q i
+> +b32*+nc =3D0 -Zero -1.000000P-126 +1.7FFFFFP127 -> -1.7FFFFFP127
+> +b32*+nc =3D0 +Zero -1.000000P-126 +1.7FFFFFP127 -> -1.7FFFFFP127
+> +b32*+nc =3D0 -1.000000P-126 -1.7FFFFFP127 -1.4B9156P109 -> +1.4B9156P109=
+ x
+> +b32*+nc =3D0 -0.7FFFFFP-126 -1.7FFFFFP127 -1.51BA59P-113 -> +1.7FFFFDP1 x
+> +b32*+nc =3D0 -0.3D6B57P-126 -1.7FFFFFP127 -1.265398P-67 -> +1.75AD5BP0 x
+> +b32*+nc =3D0 -0.000001P-126 -1.7FFFFFP127 -1.677330P-113 -> +1.7FFFFFP-2=
+2 x
+> +
+> +# np =3D=3D negate product
+> +b32*+np =3D0 +Inf -Inf -Inf -> Q i
+> +b32*+np =3D0 +1.7FFFFFP127 -Inf -Inf -> Q i
+> +b32*+np =3D0 +1.6C9AE7P113 -Inf -Inf -> Q i
+> +b32*+np =3D0 +1.000000P-126 -Inf -Inf -> Q i
+> +b32*+np =3D0 +0.7FFFFFP-126 -Inf -Inf -> Q i
+> +b32*+np =3D0 +0.1B977AP-126 -Inf -Inf -> Q i
+> +b32*+np =3D0 +0.000001P-126 -Inf -Inf -> Q i
+> +b32*+np =3D0 +1.000000P0 -Inf -Inf -> Q i
+> +b32*+np =3D0 +Zero -Inf -Inf -> Q i
+> +b32*+np =3D0 +Zero -Inf -Inf -> Q i
+> +b32*+np =3D0 -Zero -1.000000P-126 -1.7FFFFFP127 -> -1.7FFFFFP127
+> +b32*+np =3D0 +Zero -1.000000P-126 -1.7FFFFFP127 -> -1.7FFFFFP127
+> +b32*+np =3D0 -1.3A6A89P-18 +1.24E7AEP9 -0.7FFFFFP-126 -> +1.7029E9P-9 x
+> +
+> +# nr =3D=3D negate result
+> +b32*+nr =3D0 -Inf -Inf -Inf -> Q i
+> +b32*+nr =3D0 -1.7FFFFFP127 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -1.6C9AE7P113 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -1.000000P-126 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -0.7FFFFFP-126 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -0.1B977AP-126 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -0.000001P-126 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -1.000000P0 -Inf -Inf -> Q i
+> +b32*+nr =3D0 -Zero -Inf -Inf -> Q i
+> +b32*+nr =3D0 -Zero -Inf -Inf -> Q i
+> +b32*+nr =3D0 +Zero -1.000000P-126 -1.7FFFFFP127 -> +1.7FFFFFP127
+> +b32*+nr =3D0 -Zero -1.000000P-126 -1.7FFFFFP127 -> +1.7FFFFFP127
+> +b32*+nr =3D0 -1.000000P-126 -1.7FFFFFP127 -1.4B9156P109 -> +1.4B9156P109=
+ x
+> +b32*+nr =3D0 -0.7FFFFFP-126 -1.7FFFFFP127 -1.51BA59P-113 -> -1.7FFFFDP1 x
+> +b32*+nr =3D0 -0.3D6B57P-126 -1.7FFFFFP127 -1.265398P-67 -> -1.75AD5BP0 x
+> +b32*+nr =3D0 -0.000001P-126 -1.7FFFFFP127 -1.677330P-113 -> -1.7FFFFFP-2=
+2 x
+> +b32*+nr =3D0 +1.72E53AP-33 -1.7FFFFFP127 -1.5AA684P-2 -> +1.72E539P95 x
 
-(Same question applies to decompress().)
 
-If it's only a compress() error and it won't pollute z_stream (or say,
-it can be recovered after a deflateReset() and then we can continue to
-call deflate() without problem), then we'll actually have two
-alternatives to solve this "buffer update" issue:
-
-1. Use the approach of current patch: we copy the page every time, so
-   deflate() never fails because update never happens.  But it's slow
-   since we copy the pages every time.
-
-2. Use the old approach, and when compress() fail, we just ignore that
-   page (since now we know that error _must_ be caused by page update,
-   then we are 100% sure that we'll send that page again so it'll be
-   perfectly fine).
-
-If you see, IMHO method 2 has its advantage, since actually it
-"detects" the page update operation by getting a failure in
-compress(), then we don't really need to send that page at all (since
-we'll send it later again, for sure).  Then, we not only saved the
-memcpy() CPU time for every single page, meanwhile we might save some
-bandwidth since we won't bother to send the page when we know the page
-is modified.
-
-But all these depend on the assumption that:
-
-1. compress() will fail only because of buffer update, and
-
-2. compress() failures won't pollute the whole z_stream.
-
-Same thing would apply to decompress() side - we drop the corrupted
-page (when decompress() returned errors) since we know another one
-will come soon.
-
-It's a bit tricky, but I'm still curious about it, since actually
-that's mostly the old code before this patch except that we don't
-really drop corrputed pages but we still use them (which won't hurt
-too IMHO).
-
-Thanks,
-
--- 
-Peter Xu
+--
+Alex Benn=C3=A9e
