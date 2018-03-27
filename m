@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f14ZE-0007W2-04
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:28:17 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f14oO-0003Dy-FZ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f14ZA-0004IG-TF
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:28:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34822 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f14ZA-0004Hx-Ob
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:28:12 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F02E4040853
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 06:28:08 +0000 (UTC)
-References: <1520857250-12935-1-git-send-email-thuth@redhat.com>
-	<e7c0d2c8-6451-a598-f140-29916c99e514@redhat.com>
-	<9d059301-fa9f-6303-5806-a2e6f7917ca5@redhat.com>
-	<7a3f63c9-7778-31f0-518a-5872c41c09c3@redhat.com>
-	<06bda6b5-f496-50d8-de4b-6f417d037908@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <586a6bdd-d0ea-6d4f-4967-6fe3ee1d4c1d@redhat.com>
-Date: Wed, 28 Mar 2018 14:27:59 +0800
+	(envelope-from <guangrong.xiao@gmail.com>) id 1f14oK-0002oj-75
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:43:56 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:37538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1f14oK-0002ob-2E
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:43:52 -0400
+Received: by mail-io0-x243.google.com with SMTP id y128so2200994iod.4
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 23:43:51 -0700 (PDT)
+References: <20180328030351.GU17789@xz-mi> <201803281208196040484@zte.com.cn>
+	<20180328042003.GB29554@xz-mi>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <acb5360c-75ac-2ae3-0e66-ff2adcbfb244@gmail.com>
+Date: Wed, 28 Mar 2018 02:44:21 +0800
 MIME-Version: 1.0
-In-Reply-To: <06bda6b5-f496-50d8-de4b-6f417d037908@redhat.com>
+In-Reply-To: <20180328042003.GB29554@xz-mi>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-doc: Rework the network options
- chapter to make "-net" less prominent
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/8] migration: support todetectcompression
+ and decompression errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,54 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Xu <peterx@redhat.com>, jiang.biao2@zte.com.cn
+Cc: kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
 
 
-On 2018=E5=B9=B403=E6=9C=8828=E6=97=A5 14:03, Thomas Huth wrote:
-> On 28.03.2018 04:59, Jason Wang wrote:
->>
->> On 2018=E5=B9=B403=E6=9C=8827=E6=97=A5 21:16, Thomas Huth wrote:
->>>>>  =C2=A0=C2=A0 # launch vde switch
->>>>>  =C2=A0=C2=A0 vde_switch -F -sock /tmp/myswitch
->>>>>  =C2=A0=C2=A0 # launch QEMU instance
->>>>> -qemu-system-i386 linux.img -net nic -net vde,sock=3D/tmp/myswitch
->>>>> +qemu-system-i386 linux.img -nic vde,sock=3D/tmp/myswitch
->>>> I think we should use -netdev here?
->>> I've had that in the original version of this patch, but Paolo sugges=
-ted
->>> to use -nic instead since this is more "user-friendly":
+On 03/28/2018 12:20 PM, Peter Xu wrote:
+> On Wed, Mar 28, 2018 at 12:08:19PM +0800, jiang.biao2@zte.com.cn wrote:
 >>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg05258.html
+>>> On Tue, Mar 27, 2018 at 10:35:29PM +0800, Xiao Guangrong wrote:
 >>>
->>> I personally don't mind whether we use "-netdev" or "-nic" in the
->>> examples, as long as we finally get rid of "-net" there...
->> Right.
->>
->>> Please let me
->>> know which way you prefer, so I can respin the patch again if necessa=
-ry.
+>>>>>> No, we can't make the assumption that "error _must_ be caused by page update".
+>>>>>> No document/ABI about compress/decompress promised it. :)
 >>>
->>>  =C2=A0 Thomas
->>>
->> But I think we should be consistent: in your patch some "-net" was
->> replaced by "-nic", but others were replaced by "-netdev".
-> These are *examples*, and I think it's good to give the users examples
-> for both ways of specifying a network connection. I'd really like to
-> avoid that people think that -nic is the only way of specifying such a
-> device, since you might not be able to configure all properties of the
-> NIC this way. On the other hand, -device + -netdev is really way more t=
-o
-> type, so we should also not only show this kind of examples. Thus a
-> mixture between both ways sounds like the right solution to me. But if
-> you disagree, let me know, then I can rework the patch again to either
-> only use -nic or only use -netdev in the examples.
->
->   Thomas
+>>> Indeed, I found no good documents about below errors that jiang.biao
+>>> pointed out.
+>> Hi, Peter
+>> The description about the errors comes from here,
+>> http://www.zlib.net/manual.html
+>> And about the error codes returned by inflate(), they are described as，
+>> ** inflate() returns
+>> Z_OK if some progress has been made (more input processed or more output produced),
+>> Z_STREAM_END if the end of the compressed data has been reached and all uncompressed output has been produced,
+>> Z_NEED_DICT if a preset dictionary is needed at this point,
+>> Z_DATA_ERROR if the input data was corrupted (input stream not conforming to the zlib format or incorrect check value, in which case strm->msg points to a string with a more specific error),
+>> Z_STREAM_ERROR if the stream structure was inconsistent (for example next_in or next_out was Z_NULL, or the state was inadvertently written over by the application),
+>> Z_MEM_ERROR if there was not enough memory,
+>> Z_BUF_ERROR if no progress was possible or if there was not enough room in the output buffer when Z_FINISH is used. ...
+>> **
+> 
+> Ah yes.  My bad to be so uncareful. :)
+> 
+>> According to the above description, the error caused by page update looks
+>> more like tend to return Z_DATA_ERROR, but I do not have env to verify that. :)
 
-Ok. I get your point.
+No, still lack info to confirm the case of compressing the data being
+updated is the only one to return Z_DATA_ERROR. And nothing provided
+that no other error condition causes data corrupted will be squeezed
+into this error code.
 
-I will apply v3 as is.
+>> As I understand it, the real compress/decompress error cases other than that
+>> caused by page update should be rare, maybe the error code is enough to
+>> distinguish those if we can verify the the error codes returned by page update
+>> and other silent failures by test. If so, we can cut the cost of memcpy.
 
-Thanks
+Please note, compare with other operations, e.g, compression, detect zero page,
+etc., memcpy() is not a hot function at all.
+
+>> If not, I agree with Guangrong's idea too. I never read the zlib code and all my
+>> information comes from the manual, so if anything inaccurate, pls ignore my
+>> option. :)
+> 
+> So I suppose all of us know that alternative now, we just need a solid
+> way to confirm the uncertainty.  I'll leave this to Guangrong.
+
+Yes, i still prefer to memcpy() to make it safe enough to protect our production
+unless we get enough certainty to figure out the error conditions.
+
+Thanks!
