@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f0ldY-0003CE-FP
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:15:34 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f0ldk-0003I1-O0
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f0ldU-0005ZV-Ic
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:15:28 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52805)
+	(envelope-from <alex.bennee@linaro.org>) id 1f0ldg-0005gQ-8h
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:15:40 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34872)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f0ldU-0005Z3-7I
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:15:24 -0400
-Received: by mail-wm0-x242.google.com with SMTP id l9so20648387wmh.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 03:15:24 -0700 (PDT)
+	id 1f0ldg-0005fo-3A
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 06:15:36 -0400
+Received: by mail-wm0-x243.google.com with SMTP id r82so20750583wme.0
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 03:15:36 -0700 (PDT)
 References: <1521663109-32262-1-git-send-email-cota@braap.org>
 	<1521663109-32262-4-git-send-email-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 In-reply-to: <1521663109-32262-4-git-send-email-cota@braap.org>
-Date: Tue, 27 Mar 2018 11:15:21 +0100
-Message-ID: <87y3id964m.fsf@linaro.org>
+Date: Tue, 27 Mar 2018 11:15:33 +0100
+Message-ID: <87woxx964a.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -49,10 +49,7 @@ Emilio G. Cota <cota@braap.org> writes:
 >
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-Oops. I guess it didn't show up in any of the testing, which is likely
-given how poorly RISU exercises the boundary conditions.
-
-I'll grab this patch as I'm fixing up some other bugs in ARM handling.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
 >  fpu/softfloat.c | 17 +++++++++--------
