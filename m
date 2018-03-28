@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1DSd-0006IN-Ur
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:58:04 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1f1DSv-0006Wj-7d
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1DSa-0002ZO-Tn
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:58:04 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:56197)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f1DSa-0002Yt-Me
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:58:00 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id b127so5043144wmf.5
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 08:58:00 -0700 (PDT)
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-14-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1519709965-29833-14-git-send-email-cota@braap.org>
-Date: Wed, 28 Mar 2018 16:57:58 +0100
-Message-ID: <878tac8a61.fsf@linaro.org>
+	(envelope-from <maxime.coquelin@redhat.com>) id 1f1DSs-0002ia-5V
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:58:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52840 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1f1DSs-0002iP-1A
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:58:18 -0400
+References: <20180328155657.6434-1-maxime.coquelin@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <8acc5b99-8c57-67b7-0557-3e6ffa2ef728@redhat.com>
+Date: Wed, 28 Mar 2018 17:58:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/16] translate-all: protect TB jumps with
- a per-destination-TB lock
+In-Reply-To: <20180328155657.6434-1-maxime.coquelin@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] vhost-user: Back SET/GET_CONFIG with a
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: mst@redhat.com, changpeng.liu@intel.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
 
-Emilio G. Cota <cota@braap.org> writes:
 
-> This applies to both user-mode and !user-mode emulation.
->
-<snip>
-> @@ -2124,7 +2148,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t reta=
-ddr)
->      /* Adjust the execution state of the next TB.  */
->      cpu->cflags_next_tb =3D curr_cflags() | CF_LAST_IO | n;
->
-> -    if (tb->cflags & CF_NOCACHE) {
-> +    if (tb_cflags(tb) & CF_NOCACHE) {
->          if (tb->orig_tb) {
->              /* Invalidate original TB if this TB was generated in
->               * cpu_exec_nocache() */
+On 03/28/2018 05:56 PM, Maxime Coquelin wrote:
+> Hi,
+> 
+> While reviewing DPDK series adding support to VHOST_USER_SET_CONFIG
+> and VHOST_USER_GET_CONFIG request, I found that it was not backed
+> with a dedicated protocol feature.
+> 
+> This series addresses this by adding a new protocol feature bit,
+> and by only negotiating it if the device supports it, as suggested
+> by Michael. Indeed, if the feature is supported by other type of
+> devices in the future, it would confuse the backends as it couldn't
+> know whether the device really support it or not.
+> 
+> To know whether the vhost device support config feature, the trick
+> is to check whether it implemented the config_ops. That's the
+> reason why the first patch moves setting the config ops in
+> vhost-user-blk befoire calling vhost_user_init().
+> 
+> The series targets v2.12 release, else we may have to disable these
+> requests in this release.
+> 
+> *NOTE*: The series has only been tested as I don't have the
 
-Heads up, this fails to apply on master, most likely due to
-87f963be66a32453e001d1052b000f1653605caa
+s/tested/build tested/
 
---
-Alex Benn=C3=A9e
+> environment to try it. Changpeng, can you please test it?
+> 
+> Thanks,
+> Maxime
+> 
+> Maxime Coquelin (2):
+>    vhost-user-blk: set config ops before vhost-user init
+>    vhost-user: back SET/GET_CONFIG requests with a protocol feature
+> 
+>   docs/interop/vhost-user.txt | 21 ++++++++++++---------
+>   hw/block/vhost-user-blk.c   |  4 ++--
+>   hw/virtio/vhost-user.c      | 17 +++++++++++++++++
+>   3 files changed, 31 insertions(+), 11 deletions(-)
+> 
