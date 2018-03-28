@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f17Kx-0003B0-6S
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:25:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1f17LG-0003OA-1a
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f17Kt-0003vX-2N
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:25:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f17Ks-0003uA-SQ
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:25:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f17Kr-0004O0-NP
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 09:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ACC1D2E8007
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 09:25:37 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1f17LB-000418-Uc
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:26:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40260 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f17LB-00040y-P7
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:25:57 -0400
+Date: Wed, 28 Mar 2018 17:25:44 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180328092544.GE29554@xz-mi>
+References: <20180327091043.30220-1-xiaoguangrong@tencent.com>
+	<20180327091043.30220-3-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Mar 2018 09:12:40 -0000
-From: Zixuan Wang <1759522@bugs.launchpad.net>
-Reply-To: Bug 1759522 <1759522@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152222836105.21062.2375148895134658603.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1759522] [NEW] windows qemu-img create vpc/vhdx
- error
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180327091043.30220-3-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] migration: stop compression to
+ allocate and free memory frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,162 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Public bug reported:
+On Tue, Mar 27, 2018 at 05:10:35PM +0800, guangrong.xiao@gmail.com wrote:
 
-On windows, using qemu-img (version 2.11.90) to create vpc/vhdx virtual
-disk tends to fail. Here's the way to reproduce:
+[...]
 
-1. Install qemu-w64-setup-20180321.exe
+> @@ -357,10 +358,20 @@ static void compress_threads_save_cleanup(void)
+>      terminate_compression_threads();
+>      thread_count = migrate_compress_threads();
+>      for (i = 0; i < thread_count; i++) {
+> +        /*
+> +         * stream.opaque can be used to store private data, we use it
+> +         * as a indicator which shows if the thread is properly init'd
+> +         * or not
+> +         */
+> +        if (!comp_param[i].stream.opaque) {
+> +            break;
+> +        }
 
-2. Use `qemu-img create -f vhdx -o subformat=3Dfixed disk.vhdx 512M` to cre=
-ate a vhdx:
-   Formatting 'disk.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576 b=
-lock_size=3D0 subformat=3Dfixed
+How about using comp_param[i].file?  The opaque seems to be hiding
+deeper, and...
 
-3. Execute `qemu-img info disk.vhdx` gives the result, (note the `disk size=
-` is incorrect):
-   image: disk.vhdx
-   file format: vhdx
-   virtual size: 512M (536870912 bytes)
-   disk size: 1.4M
-   cluster_size: 8388608
+>          qemu_thread_join(compress_threads + i);
+>          qemu_fclose(comp_param[i].file);
+>          qemu_mutex_destroy(&comp_param[i].mutex);
+>          qemu_cond_destroy(&comp_param[i].cond);
+> +        deflateEnd(&comp_param[i].stream);
+> +        comp_param[i].stream.opaque = NULL;
+>      }
+>      qemu_mutex_destroy(&comp_done_lock);
+>      qemu_cond_destroy(&comp_done_cond);
+> @@ -370,12 +381,12 @@ static void compress_threads_save_cleanup(void)
+>      comp_param = NULL;
+>  }
+>  
+> -static void compress_threads_save_setup(void)
+> +static int compress_threads_save_setup(void)
+>  {
+>      int i, thread_count;
+>  
+>      if (!migrate_use_compression()) {
+> -        return;
+> +        return 0;
+>      }
+>      thread_count = migrate_compress_threads();
+>      compress_threads = g_new0(QemuThread, thread_count);
+> @@ -383,6 +394,12 @@ static void compress_threads_save_setup(void)
+>      qemu_cond_init(&comp_done_cond);
+>      qemu_mutex_init(&comp_done_lock);
+>      for (i = 0; i < thread_count; i++) {
+> +        if (deflateInit(&comp_param[i].stream,
+> +                           migrate_compress_level()) != Z_OK) {
 
-4. On Windows 10 (V1709), double click disk.vhdx gives an error:
-   Make sure the file is in an NTFS volume and isn't in a compressed folder=
- or volume.
+(indent issue)
 
-   Using Disk Management -> Action -> Attach VHD gives an error:
-   The requested operation could not be completed due to a virtual disk sys=
-tem limitation. Virtual hard disk files must be uncompressed and uneccrypte=
-d and must not be sparse.
+> +            goto exit;
+> +        }
+> +        comp_param[i].stream.opaque = &comp_param[i];
 
-Comparison with Windows 10 created VHDX:
+...here from document:
 
-1. Using Disk Management -> Action -> Create VHD:
-   File name: win.vhdx
-   Virtual hard disk size: 512MB
-   Virtual hard disk format: VHDX
-   Virtual hard disk type: Fixed size
+        ZEXTERN int ZEXPORT deflateInit OF((z_streamp strm, int level));
 
-2. Detach VHDX
+        Initializes the internal stream state for compression. The
+        fields zalloc, zfree and opaque must be initialized before by
+        the caller. If zalloc and zfree are set to Z_NULL, deflateInit
+        updates them to use default allocation functions.
 
-3. Execute `qemu-img info win.vhdx` gives the result:
-   image: win.vhdx
-   file format: vhdx
-   virtual size: 512M (536870912 bytes)
-   disk size: 516M
-   cluster_size: 33554432
+So shall we init opaque first?  Otherwise looks good to me.
 
-Comparison with qemu-img under Ubuntu:
+> +
+>          /* comp_param[i].file is just used as a dummy buffer to save data,
+>           * set its ops to empty.
+>           */
 
-1. Version: qemu-img version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
-Copyright (c) 2004-2008 Fabrice Bellard
+Thanks,
 
-2. qemu-img create -f vhdx -o subformat=3Dfixed lin.vhdx 512M
-   Formatting 'lin.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576 bl=
-ock_size=3D0 subformat=3Dfixed
-
-3. qemu-img info lin.vhdx
-   image: lin.vhdx
-   file format: vhdx
-   virtual size: 512M (536870912 bytes)
-   disk size: 520M
-   cluster_size: 8388608
-
-4. Load lin.vhdx under Windows 10 is ok
-
-The same thing happens on `vpc` format with or without `oformat=3Dfixed`,
-it seems that windows version of qemu-img has some incorrect operation?
-My guess is that windows version of qemu-img doesn't handle the
-description field of vpc/vhdx, which leads to an incorrect `disk size`
-field.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1759522
-
-Title:
-  windows qemu-img create vpc/vhdx error
-
-Status in QEMU:
-  New
-
-Bug description:
-  On windows, using qemu-img (version 2.11.90) to create vpc/vhdx
-  virtual disk tends to fail. Here's the way to reproduce:
-
-  1. Install qemu-w64-setup-20180321.exe
-
-  2. Use `qemu-img create -f vhdx -o subformat=3Dfixed disk.vhdx 512M` to c=
-reate a vhdx:
-     Formatting 'disk.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576=
- block_size=3D0 subformat=3Dfixed
-
-  3. Execute `qemu-img info disk.vhdx` gives the result, (note the `disk si=
-ze` is incorrect):
-     image: disk.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 1.4M
-     cluster_size: 8388608
-
-  4. On Windows 10 (V1709), double click disk.vhdx gives an error:
-     Make sure the file is in an NTFS volume and isn't in a compressed fold=
-er or volume.
-
-     Using Disk Management -> Action -> Attach VHD gives an error:
-     The requested operation could not be completed due to a virtual disk s=
-ystem limitation. Virtual hard disk files must be uncompressed and uneccryp=
-ted and must not be sparse.
-
-  Comparison with Windows 10 created VHDX:
-
-  1. Using Disk Management -> Action -> Create VHD:
-     File name: win.vhdx
-     Virtual hard disk size: 512MB
-     Virtual hard disk format: VHDX
-     Virtual hard disk type: Fixed size
-
-  2. Detach VHDX
-
-  3. Execute `qemu-img info win.vhdx` gives the result:
-     image: win.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 516M
-     cluster_size: 33554432
-
-  Comparison with qemu-img under Ubuntu:
-
-  1. Version: qemu-img version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
-  Copyright (c) 2004-2008 Fabrice Bellard
-
-  2. qemu-img create -f vhdx -o subformat=3Dfixed lin.vhdx 512M
-     Formatting 'lin.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576 =
-block_size=3D0 subformat=3Dfixed
-
-  3. qemu-img info lin.vhdx
-     image: lin.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 520M
-     cluster_size: 8388608
-
-  4. Load lin.vhdx under Windows 10 is ok
-
-  The same thing happens on `vpc` format with or without
-  `oformat=3Dfixed`, it seems that windows version of qemu-img has some
-  incorrect operation? My guess is that windows version of qemu-img
-  doesn't handle the description field of vpc/vhdx, which leads to an
-  incorrect `disk size` field.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1759522/+subscriptions
+-- 
+Peter Xu
