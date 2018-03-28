@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f18BS-0005gY-1g
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 06:19:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1f18W2-0003Nw-Dz
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 06:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f18BO-0000Ej-Ma
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 06:19:57 -0400
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:45854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f18BO-0000DE-GX
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 06:19:54 -0400
-Received: from player688.ha.ovh.net (unknown [10.109.122.88])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id A2B5BB65CD
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 12:19:45 +0200 (CEST)
-References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-	<20180327043741.7705-12-david@gibson.dropbear.id.au>
-	<f3c7bb1c-f4b9-3ffe-aeeb-bcedba620283@kaod.org>
-	<05dd7870-11ba-7be8-ce45-6c9aba653226@kaod.org>
-	<20180328084720.GI3510@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1e220d03-11cf-2c8d-d3ba-b816741fa4e3@kaod.org>
-Date: Wed, 28 Mar 2018 12:19:37 +0200
+	(envelope-from <bounces@canonical.com>) id 1f18Vx-0000jT-Gc
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 06:41:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f18Vx-0000jC-9a
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 06:41:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f18Vw-0006n9-8e
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 10:41:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 407122E8023
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 10:41:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180328084720.GI3510@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for-2.13 11/12] target/ppc: Remove
- unnecessary POWERPC_MMU_V3 flag from mmu_model
+Date: Wed, 28 Mar 2018 10:27:05 -0000
+From: Zixuan Wang <1759522@bugs.launchpad.net>
+Reply-To: Bug 1759522 <1759522@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152222836105.21062.2375148895134658603.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152223282617.23658.9288958840899262856.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1759522] Re: windows qemu-img create vpc/vhdx
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +37,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, groug@kaod.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-On 03/28/2018 10:47 AM, David Gibson wrote:
-> On Wed, Mar 28, 2018 at 09:49:25AM +0200, C=E9dric Le Goater wrote:
->> On 03/28/2018 09:43 AM, C=E9dric Le Goater wrote:
->>> On 03/27/2018 06:37 AM, David Gibson wrote:
->>>> The only place we test this flag is in conjunction with
->>>> ppc64_use_proc_tbl().  That checks for the LPCR_UPRT bit, which we a=
-lready
->>>> ensure can't be set except on a machine with a v3 MMU (i.e. POWER9).
->>>
->>> hmm, ok, but what will I use for the PowerNV hash MMU support then ?=20
->>
->> That will be POWERPC_MMU_3_00.
->=20
-> You could check for that explicitly, or you could just check for
-> presence of non-NULL hash64_opts.  The idea is that will always be the
-> case for cpus capable of using the hash MMU.
+** Tags added: qemu-img
 
-ok. I will rebase when your patchset is merged.
-=20
-> I'm also considering adding a similar radix_opts with radix specific
-> details. =20
+-- =
 
-yes. It looks a bit unbalanced now.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1759522
 
-> POWER9 would have both, since it can support either mode.
->=20
->> I didn't realize mmu_model was so=20
->> crowded ..
->=20
-> It's not so that it's short of space.  It's more that the mix of enum
-> like pieces and bitflag like pieces like bits makes it confusing to
-> know whether it should be tested with simple equality or with &.  And
-> if testing with equality which bits should be masked for a sensible
-> comparison.
->=20
-> Additionally, I'd like to get options that are strictly related to the
-> hash mmu out of the general structures.
+Title:
+  windows qemu-img create vpc/vhdx error
 
-which are ? vrma_slb, rmls ?
+Status in QEMU:
+  New
 
-C.=20
+Bug description:
+  On windows, using qemu-img (version 2.11.90) to create vpc/vhdx
+  virtual disk tends to fail. Here's the way to reproduce:
+
+  1. Install qemu-w64-setup-20180321.exe
+
+  2. Use `qemu-img create -f vhdx -o subformat=3Dfixed disk.vhdx 512M` to c=
+reate a vhdx:
+     Formatting 'disk.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576=
+ block_size=3D0 subformat=3Dfixed
+
+  3. Execute `qemu-img info disk.vhdx` gives the result, (note the `disk si=
+ze` is incorrect):
+     image: disk.vhdx
+     file format: vhdx
+     virtual size: 512M (536870912 bytes)
+     disk size: 1.4M
+     cluster_size: 8388608
+
+  4. On Windows 10 (V1709), double click disk.vhdx gives an error:
+     Make sure the file is in an NTFS volume and isn't in a compressed fold=
+er or volume.
+
+     Using Disk Management -> Action -> Attach VHD gives an error:
+     The requested operation could not be completed due to a virtual disk s=
+ystem limitation. Virtual hard disk files must be uncompressed and uneccryp=
+ted and must not be sparse.
+
+  Comparison with Windows 10 created VHDX:
+
+  1. Using Disk Management -> Action -> Create VHD:
+     File name: win.vhdx
+     Virtual hard disk size: 512MB
+     Virtual hard disk format: VHDX
+     Virtual hard disk type: Fixed size
+
+  2. Detach VHDX
+
+  3. Execute `qemu-img info win.vhdx` gives the result:
+     image: win.vhdx
+     file format: vhdx
+     virtual size: 512M (536870912 bytes)
+     disk size: 516M
+     cluster_size: 33554432
+
+  Comparison with qemu-img under Ubuntu:
+
+  1. Version: qemu-img version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
+  Copyright (c) 2004-2008 Fabrice Bellard
+
+  2. qemu-img create -f vhdx -o subformat=3Dfixed lin.vhdx 512M
+     Formatting 'lin.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576 =
+block_size=3D0 subformat=3Dfixed
+
+  3. qemu-img info lin.vhdx
+     image: lin.vhdx
+     file format: vhdx
+     virtual size: 512M (536870912 bytes)
+     disk size: 520M
+     cluster_size: 8388608
+
+  4. Load lin.vhdx under Windows 10 is ok
+
+  The same thing happens on `vpc` format with or without
+  `oformat=3Dfixed`, it seems that windows version of qemu-img has some
+  incorrect operation? My guess is that windows version of qemu-img
+  doesn't handle the description field of vpc/vhdx, which leads to an
+  incorrect `disk size` field.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1759522/+subscriptions
