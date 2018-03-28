@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f11gi-00076H-3i
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:23:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f12B2-0005pG-Th
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:55:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1f11gd-0002ja-OI
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:23:48 -0400
-Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:42256)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1f11gd-0002jM-FD
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:23:43 -0400
-Received: by mail-pl0-x232.google.com with SMTP id g20-v6so759123plo.9
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 20:23:43 -0700 (PDT)
-References: <20180313075739.11194-1-xiaoguangrong@tencent.com>
-	<20180313075739.11194-2-xiaoguangrong@tencent.com>
-	<286AC319A985734F985F78AFA26841F73948919A@shsmsx102.ccr.corp.intel.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <92c7e013-9496-519b-94ff-b1215c6b452d@gmail.com>
-Date: Tue, 27 Mar 2018 23:24:12 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1f12B1-00029a-SJ
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:55:08 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:36325)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1f12B1-00025D-5k
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 23:55:07 -0400
+Date: Wed, 28 Mar 2018 13:37:13 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180328023713.GH3510@umbus.fritz.box>
+References: <20180327164141.19075-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <286AC319A985734F985F78AFA26841F73948919A@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: stop compressing page in
- migration thread
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4C6bbPZ6c/S1npyF"
+Content-Disposition: inline
+In-Reply-To: <20180327164141.19075-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] scsi-disk: Don't enlarge min_io_size to
+ max_io_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,112 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Xiao Guangrong <xiaoguangrong@tencent.com>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, danielhb@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, dgibson@redhat.com
 
 
+--4C6bbPZ6c/S1npyF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 03/28/2018 11:01 AM, Wang, Wei W wrote:
-> On Tuesday, March 13, 2018 3:58 PM, Xiao Guangrong wrote:
->>
->> As compression is a heavy work, do not do it in migration thread, instead, we
->> post it out as a normal page
->>
->> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> 
-> Hi Guangrong,
-> 
-> Dave asked me to help review your patch, so I will just drop my 2 cents wherever possible, and hope that could be inspiring for your work.
+On Wed, Mar 28, 2018 at 12:41:41AM +0800, Fam Zheng wrote:
+> Some backends report big max_io_sectors. Making min_io_size the same
+> value in this case will make it impossible for guest to align memory,
+> therefore the disk may not be usable at all.
+>=20
+> Do not enlarge them when they are zero.
+>=20
+> Reported-by: David Gibson <dgibson@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-Thank you both for the nice help on the work. :)
+Tested-by: David Gibson <david@gibson.dropbear.id.au>
 
-> 
-> 
->> ---
->>   migration/ram.c | 32 ++++++++++++++++----------------
->>   1 file changed, 16 insertions(+), 16 deletions(-)
->>
->> diff --git a/migration/ram.c b/migration/ram.c index
->> 7266351fd0..615693f180 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -1132,7 +1132,7 @@ static int ram_save_compressed_page(RAMState
->> *rs, PageSearchStatus *pss,
->>       int pages = -1;
->>       uint64_t bytes_xmit = 0;
->>       uint8_t *p;
->> -    int ret, blen;
->> +    int ret;
->>       RAMBlock *block = pss->block;
->>       ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
->>
->> @@ -1162,23 +1162,23 @@ static int
->> ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
->>           if (block != rs->last_sent_block) {
->>               flush_compressed_data(rs);
->>               pages = save_zero_page(rs, block, offset);
->> -            if (pages == -1) {
->> -                /* Make sure the first page is sent out before other pages */
->> -                bytes_xmit = save_page_header(rs, rs->f, block, offset |
->> -                                              RAM_SAVE_FLAG_COMPRESS_PAGE);
->> -                blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
->> -                                                 migrate_compress_level());
->> -                if (blen > 0) {
->> -                    ram_counters.transferred += bytes_xmit + blen;
->> -                    ram_counters.normal++;
->> -                    pages = 1;
->> -                } else {
->> -                    qemu_file_set_error(rs->f, blen);
->> -                    error_report("compressed data failed!");
->> -                }
->> -            }
->>               if (pages > 0) {
->>                   ram_release_pages(block->idstr, offset, pages);
->> +            } else {
->> +                /*
->> +                 * Make sure the first page is sent out before other pages.
->> +                 *
->> +                 * we post it as normal page as compression will take much
->> +                 * CPU resource.
->> +                 */
->> +                ram_counters.transferred += save_page_header(rs, rs->f, block,
->> +                                                offset | RAM_SAVE_FLAG_PAGE);
->> +                qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
->> +                                      migrate_release_ram() &
->> +                                      migration_in_postcopy());
->> +                ram_counters.transferred += TARGET_PAGE_SIZE;
->> +                ram_counters.normal++;
->> +                pages = 1;
->>               }
->>           } else {
->>               pages = save_zero_page(rs, block, offset);
->> --
-> 
-> I agree that this patch is an improvement for the current implementation. So just pile up mine here:
-> Reviewed-by: Wei Wang <wei.w.wang@intel.com>
+With this patch applied, I was able to successfully install a ppc64le
+guest again.
 
-Thanks.
+>=20
+> ---
+>=20
+> v2: Leave the values alone if zero. [Paolo]
+>     At least we can consult block layer for a slightly more sensible
+>     opt_io_size, but that's for another patch.
+> ---
+>  hw/scsi/scsi-disk.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index f5ab767ab5..f8ed8cf2b4 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -714,10 +714,12 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *r=
+eq, uint8_t *outbuf)
+> =20
+>                  /* min_io_size and opt_io_size can't be greater than
+>                   * max_io_sectors */
+> -                min_io_size =3D
+> -                    MIN_NON_ZERO(min_io_size, max_io_sectors);
+> -                opt_io_size =3D
+> -                    MIN_NON_ZERO(opt_io_size, max_io_sectors);
+> +                if (min_io_size) {
+> +                    min_io_size =3D MIN(min_io_size, max_io_sectors);
+> +                }
+> +                if (opt_io_size) {
+> +                    opt_io_size =3D MIN(opt_io_size, max_io_sectors);
+> +                }
+>              }
+>              /* required VPD size with unmap support */
+>              buflen =3D 0x40;
 
-> 
-> 
-> If you are interested in something more aggressive, I can share an alternative approach, which I think would be better. Please see below.
-> 
-> Actually, we can use the multi-threaded compression for the first page as well, which will not block the migration thread progress. The advantage is that we can enjoy the compression benefit for the first page and meanwhile not blocking the migration thread - the page is given to a compression thread and compressed asynchronously to the migration thread execution.
-> 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Yes, it is a good point.
+--4C6bbPZ6c/S1npyF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> The main barrier to achieving the above that is that we need to make sure the first page of each block is sent first in the multi-threaded environment. We can twist the current implementation to achieve that, which is not hard:
-> 
-> For example, we can add a new flag to RAMBlock - bool first_page_added. In each thread of compression, they need
-> 1) check if this is the first page of the block.
-> 2) If it is the first page, set block->first_page_added after sending the page;
-> 3) If it is not the first the page, wait to send the page only when block->first_page_added is set.
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq6/9gACgkQbDjKyiDZ
+s5LlvRAAsf/ehvM59Il4yswp+8J+v0n0zIb3zrUrJyDTW+2c8+LXPR0XUrHGuv57
+cN8lS2jrtg+RmJFBJzvGoQzXstbrSG+O+E1YoSze64TB1ork8c6ANfcXo9Ohj20x
+XMRqOqNjst7udzHcblZss5BpBr2p78ZK9xsDd3rjZwVsbYoAC6DngARmi988UJZl
+FkHRCSMP+QXN4Bg1ACjtSD9zcWha3pBw4GZnyv01gvvwiHnkc26Vr5WBoqL2ZRjp
+WlDtgAYl1g8oE6bXCbI2J/dM1d5JRg4Vd11nAx4ADtI8lSHugCnqEBK5SBUB+jNJ
+3iRH5op1MN5poKwcAXtzsPbaRhRniS+UynJovDoam5VTTZH/FZ/755xhdP+0aGbw
+lR1Kf84iKcarIjj8CaVm+UJnICIY+/qiyBBIh1v8UamPKI+BjG+Uuw2sj3wm5zy+
+0rGJ6AHNya8hs8Nb6RRwVfEY3axPKdmxx9xpak9Xxgq+wMvNA7bvnqerOLlJIka6
+MIsF4Y5NrQop4YhCBDxNn33aRZCRXQ+ZuCJjVVwfT3CU7wwOBsEtkDXTxSiLu76e
+Q7UeyZffELij+Z6yG3TsEDXUoQenNvLf6dmOFJ4jfAgim8umsGjzT15LRtxbg/o5
+iyWbpqTM66+6mUDB95f43QncPpUKA5aLwis2yocdgZmQr8FzSL0=
+=dnm5
+-----END PGP SIGNATURE-----
 
-So there is another barrier introduced which hurts the parallel...
-
-Hmm, we need more deliberate consideration on this point, let me think it over after this work.
-
-Thank you.
+--4C6bbPZ6c/S1npyF--
