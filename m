@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1E0i-0004bX-ER
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:33:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f1E46-0005vD-4c
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1E0e-0005Z5-4c
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:33:16 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:40138)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f1E0d-0005YP-Ph
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:33:12 -0400
-Received: by mail-wr0-x243.google.com with SMTP id z8so2833731wrh.7
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 09:33:11 -0700 (PDT)
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-3-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1519709965-29833-3-git-send-email-cota@braap.org>
-Date: Wed, 28 Mar 2018 17:33:09 +0100
-Message-ID: <87605g88je.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/16] qht: return existing entry when
- qht_insert fails
+	(envelope-from <dgilbert@redhat.com>) id 1f1E42-0007ls-W4
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53864 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1E42-0007lW-RH
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:42 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 28 Mar 2018 17:36:26 +0100
+Message-Id: <20180328163630.48576-3-dgilbert@redhat.com>
+In-Reply-To: <20180328163630.48576-1-dgilbert@redhat.com>
+References: <20180328163630.48576-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/6] e1000: Dupe offload data on reading old
+ stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,159 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org, eswierk@skyportsystems.com, jasowang@redhat.com, pbonzini@redhat.com
+Cc: quintela@redhat.com, peterx@redhat.com
 
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Emilio G. Cota <cota@braap.org> writes:
+Old QEMUs only had one set of offload data;  when we only receive
+one lot, dupe the received data - that should give us about the
+same bug level as the old version.
 
-> The meaning of "existing" is now changed to "matches in hash and
-> ht->cmp result". This is saner than just checking the pointer value.
->
-> Note that we now return NULL on insertion success, or the existing
-> pointer on failure. We can do this because NULL pointers are not
-> allowed to be inserted in QHT.
->
-> Suggested-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/qemu/qht.h |  7 ++++---
->  tests/qht-bench.c  |  4 ++--
->  tests/test-qht.c   |  5 ++++-
->  util/qht.c         | 17 +++++++++--------
->  4 files changed, 19 insertions(+), 14 deletions(-)
->
-> diff --git a/include/qemu/qht.h b/include/qemu/qht.h
-> index dd512bf..c320cb6 100644
-> --- a/include/qemu/qht.h
-> +++ b/include/qemu/qht.h
-> @@ -77,10 +77,11 @@ void qht_destroy(struct qht *ht);
->   * In case of successful operation, smp_wmb() is implied before the poin=
-ter is
->   * inserted into the hash table.
->   *
-> - * Returns true on success.
-> - * Returns false if the @p-@hash pair already exists in the hash table.
-> + * On success, returns NULL.
-> + * On failure, returns the pointer from an entry that is equivalent (i.e.
-> + * ht->cmp matches and the hash is the same) to @p-@h.
->   */
-> -bool qht_insert(struct qht *ht, void *p, uint32_t hash);
-> +void *qht_insert(struct qht *ht, void *p, uint32_t hash);
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/net/e1000.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Hmm this seems needlessly counter intuitive. I realise the potential
-efficiency in overloading success/fail but wouldn't a:
-
-  bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing);
-
-be conceptually nicer?
-
->
->  /**
->   * qht_lookup_custom - Look up a pointer using a custom comparison funct=
-ion.
-> diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-> index c94ac25..2f88400 100644
-> --- a/tests/qht-bench.c
-> +++ b/tests/qht-bench.c
-> @@ -163,7 +163,7 @@ static void do_rw(struct thread_info *info)
->              bool written =3D false;
->
->              if (qht_lookup(&ht, p, hash) =3D=3D NULL) {
-> -                written =3D qht_insert(&ht, p, hash);
-> +                written =3D !qht_insert(&ht, p, hash);
->              }
->              if (written) {
->                  stats->in++;
-> @@ -322,7 +322,7 @@ static void htable_init(void)
->              r =3D xorshift64star(r);
->              p =3D &keys[r & (init_range - 1)];
->              hash =3D h(*p);
-> -            if (qht_insert(&ht, p, hash)) {
-> +            if (qht_insert(&ht, p, hash) =3D=3D NULL) {
->                  break;
->              }
->              retries++;
-> diff --git a/tests/test-qht.c b/tests/test-qht.c
-> index f8f2886..7164ae4 100644
-> --- a/tests/test-qht.c
-> +++ b/tests/test-qht.c
-> @@ -27,11 +27,14 @@ static void insert(int a, int b)
->
->      for (i =3D a; i < b; i++) {
->          uint32_t hash;
-> +        void *existing;
->
->          arr[i] =3D i;
->          hash =3D i;
->
-> -        qht_insert(&ht, &arr[i], hash);
-> +        g_assert_true(!qht_insert(&ht, &arr[i], hash));
-> +        existing =3D qht_insert(&ht, &arr[i], hash);
-> +        g_assert_true(existing =3D=3D &arr[i]);
->      }
->  }
->
-> diff --git a/util/qht.c b/util/qht.c
-> index dcb3ee1..f9f49a9 100644
-> --- a/util/qht.c
-> +++ b/util/qht.c
-> @@ -511,9 +511,9 @@ void *qht_lookup(struct qht *ht, const void *userp, u=
-int32_t hash)
->  }
->
->  /* call with head->lock held */
-> -static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
-> -                               struct qht_bucket *head, void *p, uint32_=
-t hash,
-> -                               bool *needs_resize)
-> +static void *qht_insert__locked(struct qht *ht, struct qht_map *map,
-> +                                struct qht_bucket *head, void *p, uint32=
-_t hash,
-> +                                bool *needs_resize)
->  {
->      struct qht_bucket *b =3D head;
->      struct qht_bucket *prev =3D NULL;
-> @@ -523,8 +523,9 @@ static bool qht_insert__locked(struct qht *ht, struct=
- qht_map *map,
->      do {
->          for (i =3D 0; i < QHT_BUCKET_ENTRIES; i++) {
->              if (b->pointers[i]) {
-> -                if (unlikely(b->pointers[i] =3D=3D p)) {
-> -                    return false;
-> +                if (unlikely(b->hashes[i] =3D=3D hash &&
-> +                             ht->cmp(b->pointers[i], p))) {
-> +                    return b->pointers[i];
->                  }
->              } else {
->                  goto found;
-> @@ -553,7 +554,7 @@ static bool qht_insert__locked(struct qht *ht, struct=
- qht_map *map,
->      atomic_set(&b->hashes[i], hash);
->      atomic_set(&b->pointers[i], p);
->      seqlock_write_end(&head->sequence);
-> -    return true;
-> +    return NULL;
->  }
->
->  static __attribute__((noinline)) void qht_grow_maybe(struct qht *ht)
-> @@ -577,12 +578,12 @@ static __attribute__((noinline)) void qht_grow_mayb=
-e(struct qht *ht)
->      qemu_mutex_unlock(&ht->lock);
->  }
->
-> -bool qht_insert(struct qht *ht, void *p, uint32_t hash)
-> +void *qht_insert(struct qht *ht, void *p, uint32_t hash)
->  {
->      struct qht_bucket *b;
->      struct qht_map *map;
->      bool needs_resize =3D false;
-> -    bool ret;
-> +    void *ret;
->
->      /* NULL pointers are not supported */
->      qht_debug_assert(p);
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 24e9a4ab40..d399ce3e4f 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -127,6 +127,7 @@ typedef struct E1000State_st {
+ #define E1000_FLAG_MIT (1 << E1000_FLAG_MIT_BIT)
+ #define E1000_FLAG_MAC (1 << E1000_FLAG_MAC_BIT)
+     uint32_t compat_flags;
++    bool received_tx_tso;
+ } E1000State;
+ 
+ #define chkflag(x)     (s->compat_flags & E1000_FLAG_##x)
+@@ -1390,6 +1391,20 @@ static int e1000_post_load(void *opaque, int version_id)
+                   qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 500);
+     }
+ 
++    if (!s->received_tx_tso) {
++        /* We received only one set of offload data (tx.props)
++         * and haven't got tx.tso_props.  The best we can do
++         * is dupe the data.
++         */
++        s->tx.tso_props = s->tx.props;
++    }
++    return 0;
++}
++
++static int e1000_tx_tso_post_load(void *opaque, int version_id)
++{
++    E1000State *s = opaque;
++    s->received_tx_tso = true;
+     return 0;
+ }
+ 
+@@ -1437,6 +1452,7 @@ static const VMStateDescription vmstate_e1000_tx_tso_state = {
+     .name = "e1000/tx_tso_state",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .post_load = e1000_tx_tso_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
+         VMSTATE_UINT8(tx.tso_props.ipcso, E1000State),
+-- 
+2.14.3
