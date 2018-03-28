@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f16tx-0004rl-5b
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:57:50 -0400
+	(envelope-from <groug@kaod.org>) id 1f1764-0000iG-Ao
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f16tv-0005Uf-NA
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:57:49 -0400
-Date: Wed, 28 Mar 2018 19:54:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180328085447.GJ3510@umbus.fritz.box>
+	(envelope-from <groug@kaod.org>) id 1f175z-0004rE-AD
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:20 -0400
+Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:38866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f175y-0004qK-Tn
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 05:10:15 -0400
+Received: from player726.ha.ovh.net (unknown [10.109.122.111])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 57FF0ACA0A
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 11:10:13 +0200 (CEST)
+Date: Wed, 28 Mar 2018 11:10:04 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180328111004.7bfd41db@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20180327043741.7705-12-david@gibson.dropbear.id.au>
 References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-	<20180327043741.7705-6-david@gibson.dropbear.id.au>
-	<20180327155455.674960b4@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20180328003204.GD3510@umbus.fritz.box>
-	<20180328100112.4f0f5ad6@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20180327043741.7705-12-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9Q2l3mYpK16UQ/iv"
-Content-Disposition: inline
-In-Reply-To: <20180328100112.4f0f5ad6@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [RFC for-2.13 05/12] target/ppc: Remove fallback
- 64k pagesize information
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC for-2.13 11/12] target/ppc: Remove
+ unnecessary POWERPC_MMU_V3 flag from mmu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,238 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org
 
+On Tue, 27 Mar 2018 15:37:40 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---9Q2l3mYpK16UQ/iv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> The only place we test this flag is in conjunction with
+> ppc64_use_proc_tbl().  That checks for the LPCR_UPRT bit, which we already
+> ensure can't be set except on a machine with a v3 MMU (i.e. POWER9).
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-On Wed, Mar 28, 2018 at 10:01:38AM +0200, Greg Kurz wrote:
-> On Wed, 28 Mar 2018 11:32:04 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, Mar 27, 2018 at 03:54:55PM +0200, Greg Kurz wrote:
-> > > On Tue, 27 Mar 2018 15:37:34 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > CPU definitions for cpus with the 64-bit hash MMU can include a tab=
-le of
-> > > > available pagesizes.  If this isn't supplied ppc_cpu_instance_init(=
-) will
-> > > > fill it in a fallback table based on the POWERPC_MMU_64K bit in mmu=
-_model.
-> > > >=20
-> > > > However, it turns out all the cpus which support 64K pages already =
-include
-> > > > an explicit table of page sizes, so there's no point to the fallbac=
-k table
-> > > > including 64k pages.
-> > > >  =20
-> > >=20
-> > > I was thinking that 64k pages came with POWER5+. At least, this is me=
-ntioned
-> > > in several places:
-> > >=20
-> > > https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.pe=
-rformance/supported_page_sizes_processor_type.htm
-> > >=20
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
-mmit/?id=3Da4a0f2524acc2c602cadd8e743be19d86f3a746b =20
-> >=20
-> > Ok, I didn't know that.  However, that was already wrong - we weren't
-> > setting the MMU_64K bit for POWER5+.
-> >=20
->=20
-> Yes, I just happened to realize that while reviewing this patch. Hence the
-> remark :)
->=20
-> > > And we do support POWER5+ with TCG and KVM PR. =20
-> >=20
-> > Well, theoretically.  I doubt it's been tested in years, and I
-> > strongly suspect it won't actually work.
-> >=20
->=20
-> For the records, I could successfully boot a rhel67 guest on a POWER8 host
-> with:
->=20
->     -machine accel=3Dkvm,kvm-type=3DPR,vsmt=3D1 -cpu power5+
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Yeah, under KVM (at least HV) I'm pretty sure it will effectively act
-like the host CPU, even if you try to specify something else.
-
-> but it fails with TCG. The guest kernel oopses at some point because
-> of an illegal instruction and panics later on.
-
-Right I'm pretty sure any guest distro that's even remotely modern
-will be compiler to use instructions that weren't available on
-power5+.
-
-> > > Shouldn't we include an explicit
-> > > table of pages sizes there as well ? =20
-> >=20
-> > Yeah, but I think it makes more sense to fix that later.  Or, more
-> > likely, not, since no-one actually cares about POWER5.
-> >=20
->=20
-> You're probably right.
->=20
-> Anyway, this patch is the way to go, so:
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> > >  =20
-> > > > That removes the only place which tests POWERPC_MMU_64K, so we can =
-remove
-> > > > it.  Which in turn allows some logic to be removed from
-> > > > kvm_fixup_page_sizes().
-> > > >=20
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > ---
-> > > >  target/ppc/cpu-qom.h        |  4 ----
-> > > >  target/ppc/kvm.c            |  7 -------
-> > > >  target/ppc/translate_init.c | 20 ++------------------
-> > > >  3 files changed, 2 insertions(+), 29 deletions(-)
-> > > >=20
-> > > > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> > > > index deaa46a14b..9bbb05cf62 100644
-> > > > --- a/target/ppc/cpu-qom.h
-> > > > +++ b/target/ppc/cpu-qom.h
-> > > > @@ -70,7 +70,6 @@ enum powerpc_mmu_t {
-> > > >  #define POWERPC_MMU_64       0x00010000
-> > > >  #define POWERPC_MMU_1TSEG    0x00020000
-> > > >  #define POWERPC_MMU_AMR      0x00040000
-> > > > -#define POWERPC_MMU_64K      0x00080000
-> > > >  #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
-> > > >      /* 64 bits PowerPC MMU                                     */
-> > > >      POWERPC_MMU_64B        =3D POWERPC_MMU_64 | 0x00000001,
-> > > > @@ -78,15 +77,12 @@ enum powerpc_mmu_t {
-> > > >      POWERPC_MMU_2_03       =3D POWERPC_MMU_64 | 0x00000002,
-> > > >      /* Architecture 2.06 variant                               */
-> > > >      POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> > > > -                             | POWERPC_MMU_64K
-> > > >                               | POWERPC_MMU_AMR | 0x00000003,
-> > > >      /* Architecture 2.07 variant                               */
-> > > >      POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> > > > -                             | POWERPC_MMU_64K
-> > > >                               | POWERPC_MMU_AMR | 0x00000004,
-> > > >      /* Architecture 3.00 variant                               */
-> > > >      POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> > > > -                             | POWERPC_MMU_64K
-> > > >                               | POWERPC_MMU_AMR | POWERPC_MMU_V3
-> > > >                               | 0x00000005,
-> > > >  };
-> > > > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > > > index 79a436a384..6160356a4a 100644
-> > > > --- a/target/ppc/kvm.c
-> > > > +++ b/target/ppc/kvm.c
-> > > > @@ -425,7 +425,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cp=
-u)
-> > > >      static bool has_smmu_info;
-> > > >      CPUPPCState *env =3D &cpu->env;
-> > > >      int iq, ik, jq, jk;
-> > > > -    bool has_64k_pages =3D false;
-> > > > =20
-> > > >      /* We only handle page sizes for 64-bit server guests for now =
-*/
-> > > >      if (!(env->mmu_model & POWERPC_MMU_64)) {
-> > > > @@ -471,9 +470,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cp=
-u)
-> > > >                                       ksps->enc[jk].page_shift)) {
-> > > >                  continue;
-> > > >              }
-> > > > -            if (ksps->enc[jk].page_shift =3D=3D 16) {
-> > > > -                has_64k_pages =3D true;
-> > > > -            }
-> > > >              qsps->enc[jq].page_shift =3D ksps->enc[jk].page_shift;
-> > > >              qsps->enc[jq].pte_enc =3D ksps->enc[jk].pte_enc;
-> > > >              if (++jq >=3D PPC_PAGE_SIZES_MAX_SZ) {
-> > > > @@ -488,9 +484,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cp=
-u)
-> > > >      if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
-> > > >          env->mmu_model &=3D ~POWERPC_MMU_1TSEG;
-> > > >      }
-> > > > -    if (!has_64k_pages) {
-> > > > -        env->mmu_model &=3D ~POWERPC_MMU_64K;
-> > > > -    }
-> > > >  }
-> > > > =20
-> > > >  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-> > > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_ini=
-t.c
-> > > > index 29bd6f3654..99be6fcd68 100644
-> > > > --- a/target/ppc/translate_init.c
-> > > > +++ b/target/ppc/translate_init.c
-> > > > @@ -10469,7 +10469,7 @@ static void ppc_cpu_instance_init(Object *o=
-bj)
-> > > >          env->sps =3D *pcc->sps;
-> > > >      } else if (env->mmu_model & POWERPC_MMU_64) {
-> > > >          /* Use default sets of page sizes. We don't support MPSS */
-> > > > -        static const struct ppc_segment_page_sizes defsps_4k =3D {
-> > > > +        static const struct ppc_segment_page_sizes defsps =3D {
-> > > >              .sps =3D {
-> > > >                  { .page_shift =3D 12, /* 4K */
-> > > >                    .slb_enc =3D 0,
-> > > > @@ -10481,23 +10481,7 @@ static void ppc_cpu_instance_init(Object *=
-obj)
-> > > >                  },
-> > > >              },
-> > > >          };
-> > > > -        static const struct ppc_segment_page_sizes defsps_64k =3D {
-> > > > -            .sps =3D {
-> > > > -                { .page_shift =3D 12, /* 4K */
-> > > > -                  .slb_enc =3D 0,
-> > > > -                  .enc =3D { { .page_shift =3D 12, .pte_enc =3D 0 =
-} }
-> > > > -                },
-> > > > -                { .page_shift =3D 16, /* 64K */
-> > > > -                  .slb_enc =3D 0x110,
-> > > > -                  .enc =3D { { .page_shift =3D 16, .pte_enc =3D 1 =
-} }
-> > > > -                },
-> > > > -                { .page_shift =3D 24, /* 16M */
-> > > > -                  .slb_enc =3D 0x100,
-> > > > -                  .enc =3D { { .page_shift =3D 24, .pte_enc =3D 0 =
-} }
-> > > > -                },
-> > > > -            },
-> > > > -        };
-> > > > -        env->sps =3D (env->mmu_model & POWERPC_MMU_64K) ? defsps_6=
-4k : defsps_4k;
-> > > > +        env->sps =3D defsps;
-> > > >      }
-> > > >  #endif /* defined(TARGET_PPC64) */
-> > > >  } =20
-> > >  =20
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9Q2l3mYpK16UQ/iv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq7WFcACgkQbDjKyiDZ
-s5LSORAAyTrMj1XF7dM8lJpepm8p35DjlB3xFABEHveVtStKWaCPubClQ7nBrJrm
-zvuTth6rnwFGyEREo4Z62CD4swGQmMrAjdowjw+4XQ3swMqysoJYbBzxxhFUFNOt
-FQmAKAPEnxWokNA0Wm7XyLyS5JfrgFuvE6vCipAKHYaNagG6RjblOJ1QGdot7mO3
-lk/LUxbSRCuafN5dTz4oLQnuKdG1P1XdJZo4wuoOel77a9OPhgN7DEZ9plZmNM0d
-zr1lsrjS4b/yhg00nNpjgV8C8ili+1+KX7DGwaGbqxoCqATpo86vpcBcATqMttE1
-Oac6YTZ+nxGdYm4fw1BAKN/188LheX4G+v3JB9Ru10Nhae+fTzmXu2Tf13crmik+
-QOgtb/sG2sPvbFgqsvW4Lx3ONWLIE3uSG/06+Sj98UTfTKI/6NpjbLdPyH7lTCVg
-hOkXH00kERVsZU/kl7+JXTs5/wkk/1qh27e9EZ9GqS+PjP3/6YImzdhsMRs2nl9S
-UTDXuXn7oX4OXm0ibb3jmyTpJ2RxBZkNi/vQClWh3KopgmiaJGhHCGalwISKNOp1
-bVGAOT5V4vf3qrf3vw0cjUAfcmxj8Q69GgUIAi622YZ7M1PETfLaRwpKdOcuAcdQ
-zoItUfq8qnFt9E3Xwye6y07oYi2EeUJdJWDWSTlrdY0+oGpzqtQ=
-=fmQq
------END PGP SIGNATURE-----
-
---9Q2l3mYpK16UQ/iv--
+>  target/ppc/cpu-qom.h    | 4 +---
+>  target/ppc/mmu-hash64.c | 2 +-
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index 2bd58b2a84..ef96d42cf2 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -68,7 +68,6 @@ enum powerpc_mmu_t {
+>      /* PowerPC 601 MMU model (specific BATs format)            */
+>      POWERPC_MMU_601        = 0x0000000A,
+>  #define POWERPC_MMU_64       0x00010000
+> -#define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
+>      /* 64 bits PowerPC MMU                                     */
+>      POWERPC_MMU_64B        = POWERPC_MMU_64 | 0x00000001,
+>      /* Architecture 2.03 and later (has LPCR) */
+> @@ -78,8 +77,7 @@ enum powerpc_mmu_t {
+>      /* Architecture 2.07 variant                               */
+>      POWERPC_MMU_2_07       = POWERPC_MMU_64 | 0x00000004,
+>      /* Architecture 3.00 variant                               */
+> -    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_V3
+> -                             | 0x00000005,
+> +    POWERPC_MMU_3_00       = POWERPC_MMU_64 | 0x00000005,
+>  };
+>  #define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
+>  #define POWERPC_MMU_VER_64B POWERPC_MMU_VER(POWERPC_MMU_64B)
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 3b00bdee91..d964f2f5b0 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -761,7 +761,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
+>      slb = slb_lookup(cpu, eaddr);
+>      if (!slb) {
+>          /* No entry found, check if in-memory segment tables are in use */
+> -        if ((env->mmu_model & POWERPC_MMU_V3) && ppc64_use_proc_tbl(cpu)) {
+> +        if (ppc64_use_proc_tbl(cpu)) {
+>              /* TODO - Unsupported */
+>              error_report("Segment Table Support Unimplemented");
+>              exit(1);
