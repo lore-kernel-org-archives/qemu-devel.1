@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f1E46-0005vC-45
+	(envelope-from <dgilbert@redhat.com>) id 1f1E47-0005vI-0h
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f1E43-0007m3-1H
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59090 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1f1E46-0007n9-11
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56928 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1E42-0007lU-SF
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:42 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1E45-0007mz-Su
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:45 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Mar 2018 17:36:25 +0100
-Message-Id: <20180328163630.48576-2-dgilbert@redhat.com>
+Date: Wed, 28 Mar 2018 17:36:27 +0100
+Message-Id: <20180328163630.48576-4-dgilbert@redhat.com>
 In-Reply-To: <20180328163630.48576-1-dgilbert@redhat.com>
 References: <20180328163630.48576-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] e1000: Convert v3 fields to subsection
+Subject: [Qemu-devel] [PATCH v2 3/6] e1000: wire new subsection to property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +28,60 @@ Cc: quintela@redhat.com, peterx@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-A bunch of new TSO fields were introduced by d62644b4 and this bumped
-the VMState version; however it's easier for those trying to keep
-backwards migration compatibility if these fields are added in a
-subsection instead.
-
-Move the new fields to a subsection.
-
-Since this was added after 2.11, this change will only affect
-compatbility with 2.12-rc0.
+Wire the new subsection from the previous commit to a property
+so we can turn it off easily.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/net/e1000.c | 34 ++++++++++++++++++++++------------
- 1 file changed, 22 insertions(+), 12 deletions(-)
+ hw/net/e1000.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index c7f1695f57..24e9a4ab40 100644
+index d399ce3e4f..bb8ee2acb0 100644
 --- a/hw/net/e1000.c
 +++ b/hw/net/e1000.c
-@@ -1433,9 +1433,29 @@ static const VMStateDescription vmstate_e1000_full_mac_state = {
-     }
+@@ -123,9 +123,11 @@ typedef struct E1000State_st {
+ #define E1000_FLAG_AUTONEG_BIT 0
+ #define E1000_FLAG_MIT_BIT 1
+ #define E1000_FLAG_MAC_BIT 2
++#define E1000_FLAG_TSO_BIT 3
+ #define E1000_FLAG_AUTONEG (1 << E1000_FLAG_AUTONEG_BIT)
+ #define E1000_FLAG_MIT (1 << E1000_FLAG_MIT_BIT)
+ #define E1000_FLAG_MAC (1 << E1000_FLAG_MAC_BIT)
++#define E1000_FLAG_TSO (1 << E1000_FLAG_TSO_BIT)
+     uint32_t compat_flags;
+     bool received_tx_tso;
+ } E1000State;
+@@ -1422,6 +1424,13 @@ static bool e1000_full_mac_needed(void *opaque)
+     return chkflag(MAC);
+ }
+ 
++static bool e1000_tso_state_needed(void *opaque)
++{
++    E1000State *s = opaque;
++
++    return chkflag(TSO);
++}
++
+ static const VMStateDescription vmstate_e1000_mit_state = {
+     .name = "e1000/mit_state",
+     .version_id = 1,
+@@ -1452,6 +1461,7 @@ static const VMStateDescription vmstate_e1000_tx_tso_state = {
+     .name = "e1000/tx_tso_state",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .needed = e1000_tso_state_needed,
+     .post_load = e1000_tx_tso_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
+@@ -1677,6 +1687,8 @@ static Property e1000_properties[] = {
+                     compat_flags, E1000_FLAG_MIT_BIT, true),
+     DEFINE_PROP_BIT("extra_mac_registers", E1000State,
+                     compat_flags, E1000_FLAG_MAC_BIT, true),
++    DEFINE_PROP_BIT("migrate_tso_props", E1000State,
++                    compat_flags, E1000_FLAG_TSO_BIT, true),
+     DEFINE_PROP_END_OF_LIST(),
  };
  
-+static const VMStateDescription vmstate_e1000_tx_tso_state = {
-+    .name = "e1000/tx_tso_state",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
-+        VMSTATE_UINT8(tx.tso_props.ipcso, E1000State),
-+        VMSTATE_UINT16(tx.tso_props.ipcse, E1000State),
-+        VMSTATE_UINT8(tx.tso_props.tucss, E1000State),
-+        VMSTATE_UINT8(tx.tso_props.tucso, E1000State),
-+        VMSTATE_UINT16(tx.tso_props.tucse, E1000State),
-+        VMSTATE_UINT32(tx.tso_props.paylen, E1000State),
-+        VMSTATE_UINT8(tx.tso_props.hdr_len, E1000State),
-+        VMSTATE_UINT16(tx.tso_props.mss, E1000State),
-+        VMSTATE_INT8(tx.tso_props.ip, E1000State),
-+        VMSTATE_INT8(tx.tso_props.tcp, E1000State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_e1000 = {
-     .name = "e1000",
--    .version_id = 3,
-+    .version_id = 2,
-     .minimum_version_id = 1,
-     .pre_save = e1000_pre_save,
-     .post_load = e1000_post_load,
-@@ -1508,22 +1528,12 @@ static const VMStateDescription vmstate_e1000 = {
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, RA, 32),
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, MTA, 128),
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, VFTA, 128),
--        VMSTATE_UINT8_V(tx.tso_props.ipcss, E1000State, 3),
--        VMSTATE_UINT8_V(tx.tso_props.ipcso, E1000State, 3),
--        VMSTATE_UINT16_V(tx.tso_props.ipcse, E1000State, 3),
--        VMSTATE_UINT8_V(tx.tso_props.tucss, E1000State, 3),
--        VMSTATE_UINT8_V(tx.tso_props.tucso, E1000State, 3),
--        VMSTATE_UINT16_V(tx.tso_props.tucse, E1000State, 3),
--        VMSTATE_UINT32_V(tx.tso_props.paylen, E1000State, 3),
--        VMSTATE_UINT8_V(tx.tso_props.hdr_len, E1000State, 3),
--        VMSTATE_UINT16_V(tx.tso_props.mss, E1000State, 3),
--        VMSTATE_INT8_V(tx.tso_props.ip, E1000State, 3),
--        VMSTATE_INT8_V(tx.tso_props.tcp, E1000State, 3),
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_e1000_mit_state,
-         &vmstate_e1000_full_mac_state,
-+        &vmstate_e1000_tx_tso_state,
-         NULL
-     }
- };
 -- 
 2.14.3
