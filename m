@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f102b-0008FS-W3
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 21:38:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1f10RC-0007dE-2f
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:03:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f102Y-0001AD-SJ
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 21:38:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57094 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f102Y-0001A1-Ni
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 21:38:14 -0400
-Date: Wed, 28 Mar 2018 09:38:04 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180328013804.GM31422@lemon.usersys.redhat.com>
-References: <20180327211451.14647-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <peterx@redhat.com>) id 1f10RB-00087Z-40
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 22:03:42 -0400
+Date: Wed, 28 Mar 2018 10:03:22 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180328020322.GT17789@xz-mi>
+References: <d29ae6aa-5758-277b-b754-4e6fe7666e6b@redhat.com>
+	<CAFEAcA9dHPLj6aF=JsS8dXaDWf_ONQ_A+SD1xXQO7DdsWK3yAw@mail.gmail.com>
+	<6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
+	<CAFEAcA_rJ_=-dKauAmrJPGRJ6C09_9CQzRdXK53va4NB_xXKpg@mail.gmail.com>
+	<0d6f5f6d-bf28-ffc0-4d7c-b2c73912057e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180327211451.14647-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] hw/scsi: support SCSI-2 passthrough
- without PI
+In-Reply-To: <0d6f5f6d-bf28-ffc0-4d7c-b2c73912057e@redhat.com>
+Subject: Re: [Qemu-devel] Regression on KVM qemu-system-aarch64 since
+ "monitor: enable IO thread for (qmp & !mux) typed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Blake <eblake@redhat.com>
 
-On Tue, 03/27 18:14, Daniel Henrique Barboza wrote:
-> QEMU SCSI code makes assumptions about how the PROTECT and BYTCHK
-> works in the protocol, denying support for PI (Protection
-> Information) in case the guest OS requests it. However, in SCSI versions 2
-> and older, there is no PI concept in the protocol.
+On Fri, Mar 23, 2018 at 01:36:36PM +0100, Auger Eric wrote:
+> Hi,
 > 
-> This means that when dealing with such devices:
+> On 23/03/18 13:11, Peter Maydell wrote:
+> > On 23 March 2018 at 12:01, Auger Eric <eric.auger@redhat.com> wrote:
+> >> Hi,
+> >>
+> >> On 23/03/18 11:26, Peter Maydell wrote:
+> >>> On 23 March 2018 at 10:24, Auger Eric <eric.auger@redhat.com> wrote:
+> >>>> Hi,
+> >>>>
+> >>>> I observe a regression on KVM accelerated qemu-system-aarch64:
+> >>>>
+> >>>> Unexpected error in kvm_device_access() at
+> >>>> /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
+> >>>> 2018-03-23T09:59:59.629439Z qemu-system-aarch64: KVM_GET_DEVICE_ATTR
+> >>>> failed: Group 6 attr 0x000000000000c664: Device or resource busy
+> >>>> 2018-03-23 10:00:00.085+0000: shutting down, reason=crashed
+> >>>
+> >>> Can you get a backtrace for this? (I guess you'd need to fiddle
+> >>> with the kvm_device_access() code to make it assert rather
+> >>> than passing back the error).
+> >>
+> >> OK. I will try to do so. As I could have expected, I cannot reproduce on
+> >> a standalone qemu command line. The problem observed above is seen with
+> >> libvirt launch which may be doing some other QMP stuff concurrently?
+> > 
+> > Hmm, that could be a bit painful to debug. I dunno if libvirt
+> > has a "launch QEMU under gdb" option. If not, you could try
+> > something like:
+> >    if (condition we want to get a backtrace on) {
+> >        printf("hit condition, attach gdb to process %d\n", (int)getpid());
+> >        for (;;) { }
+> >    }
 > 
-> - there is no PROTECT bit in byte 5 of the standard INQUIRY response. The
-> whole byte is marked as "Reserved";
+> Thanks for the hint. Here is the stack I get.
 > 
-> - there is no RDPROTECT in byte 2 of READ. We have 'Logical Unit Number'
-> in this field instead;
-> 
-> - there is no VRPROTECT in byte 2 of VERIFY. We have 'Logical Unit Number'
-> in this field instead. This also means that the BYTCHK bit in this case
-> is not related to PI.
-> 
-> Since QEMU does not consider these changes, a SCSI passthrough using
-> a SCSI-2 device will not work. It will mistake these fields with
-> PI information and return Illegal Request SCSI SENSE thinking
-> that the driver is asking for PI support.
-> 
-> This patch fixes it by adding a new attribute called 'scsi_version'
-> that is read from the standard INQUIRY response of passthrough
-> devices. This allows for a version verification before applying
-> conditions related to PI that doesn't apply for older versions.
-> 
-> Reported-by: Dac Nguyen <dacng@us.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> ---
-> 
-> Changes in v3:
-> - moved the scsi_version initialization from realize functions to
-> reset functions, allowing the scsi_version to be redefined again after
-> each reboot.
+> #0  kvm_device_access (fd=31, group=6, attr=50788, val=0x5937c88, write=false, errp=0x16984a8 <error_abort>) at /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164
+> #1  0x00000000004f8ce4 in arm_gicv3_icc_reset (env=0xffffa1fc8330, ri=0x597f910) at /home/augere/UPSTREAM/qemu/hw/intc/arm_gicv3_kvm.c:632
+> #2  0x00000000006351ac in cp_reg_reset (key=0x597f730, value=0x597f910, opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:78
+> #3  0x0000ffffa47edce4 in g_hash_table_foreach () from /lib64/libglib-2.0.so.0
+> #4  0x0000000000635394 in arm_cpu_reset (s=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:130
+> #5  0x000000000090c888 in cpu_reset (cpu=0xffffa1fc0010) at qom/cpu.c:249
+> #6  0x00000000005793d8 in do_cpu_reset (opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/hw/arm/boot.c:665
+> #7  0x000000000073095c in qemu_devices_reset () at hw/core/reset.c:69
+> #8  0x00000000006976e0 in qemu_system_reset (reason=SHUTDOWN_CAUSE_NONE) at vl.c:1731
+> #9  0x000000000069fd60 in main (argc=69, argv=0xffffe877d1a8, envp=0xffffe877d3d8) at vl.c:4697
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+I think current master should work fine with ARM KVM now since OOB is
+now off by default. But does ARM use postcopy, and will ARM need the
+coming network failure recovery feature?
+
+If so, maybe we'll still need to have a look on this single problem
+(this is the only non-testcase issue I know now with Out-Of-Band).
+
+Thanks,
+
+-- 
+Peter Xu
