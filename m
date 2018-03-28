@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f1Fl9-0001KB-K6
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:25:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f1FrE-0002gi-EF
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f1Fl8-0008FJ-H9
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:25:19 -0400
-Date: Wed, 28 Mar 2018 14:25:10 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180328182510.GB30186@localhost.localdomain>
-References: <20180327153011.29569-1-marcandre.lureau@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1f1Fr9-0003Kn-RI
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:31:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1Fr9-0003JJ-Hq
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:31:31 -0400
+Date: Wed, 28 Mar 2018 15:31:23 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180328183123.GI5046@localhost.localdomain>
+References: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
+	<20180327224058-mutt-send-email-mst@kernel.org>
+	<20180327213646.GE5046@localhost.localdomain>
+	<20180328030327-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180327153011.29569-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] blockjob: use qapi enum helpers
+In-Reply-To: <20180328030327-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-On Tue, Mar 27, 2018 at 05:30:11PM +0200, Marc-Andr=E9 Lureau wrote:
-> QAPI generator provide #define helpers for looking up enum string.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  blockjob.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
->=20
-> diff --git a/blockjob.c b/blockjob.c
-> index ef3ed69ff1..11c9ce124d 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -75,10 +75,8 @@ static void block_job_state_transition(BlockJob *job=
-, BlockJobStatus s1)
->      assert(s1 >=3D 0 && s1 <=3D BLOCK_JOB_STATUS__MAX);
->      trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1=
-] ?
->                                       "allowed" : "disallowed",
-> -                                     qapi_enum_lookup(&BlockJobStatus_=
-lookup,
-> -                                                      s0),
-> -                                     qapi_enum_lookup(&BlockJobStatus_=
-lookup,
-> -                                                      s1));
-> +                                     BlockJobStatus_str(s0),
-> +                                     BlockJobStatus_str(s1));
->      assert(BlockJobSTT[s0][s1]);
->      job->status =3D s1;
->  }
-> @@ -86,17 +84,15 @@ static void block_job_state_transition(BlockJob *jo=
-b, BlockJobStatus s1)
->  static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error =
-**errp)
->  {
->      assert(bv >=3D 0 && bv <=3D BLOCK_JOB_VERB__MAX);
-> -    trace_block_job_apply_verb(job, qapi_enum_lookup(&BlockJobStatus_l=
-ookup,
-> -                                                     job->status),
-> -                               qapi_enum_lookup(&BlockJobVerb_lookup, =
-bv),
-> +    trace_block_job_apply_verb(job, BlockJobStatus_str(job->status),
-> +                               BlockJobVerb_str(bv),
->                                 BlockJobVerbTable[bv][job->status] ?
->                                 "allowed" : "prohibited");
->      if (BlockJobVerbTable[bv][job->status]) {
->          return 0;
->      }
->      error_setg(errp, "Job '%s' in state '%s' cannot accept command ver=
-b '%s'",
-> -               job->id, qapi_enum_lookup(&BlockJobStatus_lookup, job->=
-status),
-> -               qapi_enum_lookup(&BlockJobVerb_lookup, bv));
-> +               job->id, BlockJobStatus_str(job->status), BlockJobVerb_=
-str(bv));
->      return -EPERM;
->  }
-> =20
-> --=20
-> 2.17.0.rc1.1.g4c4f2b46a3
->=20
+On Wed, Mar 28, 2018 at 03:06:23AM +0300, Michael S. Tsirkin wrote:
+> On Tue, Mar 27, 2018 at 06:36:46PM -0300, Eduardo Habkost wrote:
+> > On Tue, Mar 27, 2018 at 10:42:56PM +0300, Michael S. Tsirkin wrote:
+> > > On Fri, Mar 16, 2018 at 07:36:42AM -0700, Wanpeng Li wrote:
+> > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > > 
+> > > > This patch adds support for KVM_CAP_X86_DISABLE_EXITS. Provides userspace with 
+> > > > per-VM capability(KVM_CAP_X86_DISABLE_EXITS) to not intercept MWAIT/HLT/PAUSE 
+> > > > in order that to improve latency in some workloads.
+> > > > 
+> > [...]
+> > > > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > > > index d23fff1..95ed9eb 100644
+> > > > --- a/target/i386/kvm.c
+> > > > +++ b/target/i386/kvm.c
+> > > > @@ -999,6 +999,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> > > >          }
+> > > >      }
+> > > >  
+> > > > +    if (env->features[FEAT_KVM_HINTS] & KVM_HINTS_DEDICATED) {
+> > > > +        int disable_exits = kvm_check_extension(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS);
+> > > > +        if (disable_exits) {
+> > > > +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> > > > +                              KVM_X86_DISABLE_EXITS_HLT |
+> > > > +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> > > > +        }
+> > > > +        if (kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS, 0, disable_exits)) {
+> > > > +            error_report("kvm: DISABLE EXITS not supported");
+> > > > +        }
+> > > > +    }
+> > > > +
+> > > >      qemu_add_vm_change_state_handler(cpu_update_state, env);
+> > > >  
+> > > >      c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+> > > 
+> > > Why not a bit per capability?
+> > > I can see how someone might want to disable mwait exists
+> > > but not the rest of them.
+> > 
+> > kvm-hint-dedicated=on should be used only if the physical CPU is
+> > dedicated to the VCPU task.  Are there any advantages of getting
+> > vmexits for HLT and PAUSE if no other task is going to use the
+> > CPU?
+> 
+> No but there are advantages to using mwait even without a dedicated host
+> CPU (VCPUs can wake up each other without exiting to hypervisor).
 
-Thanks,
+Are there any downsides?  What needs to be taken into account
+when deciding if mwait exits can be safely disabled?
 
-Looks like a bug fix to me.
 
-Applied to my block branch:
+> 
+> Which is my point - there should be a separate flag to disable mwait
+> exiting only.
 
-git://github.com/codyprime/qemu-kvm-jtc block
+Adding new command-line option is possible, but not necessary for
+the dedicated-CPU use case.  This means this patch is already
+useful without adding new flags.
 
--Jeff
+-- 
+Eduardo
