@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f1E49-0005wh-Gq
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:51 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f1E7J-0000cf-02
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:40:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f1E48-0007oM-LT
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56936 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1E48-0007oA-H4
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:48 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Mar 2018 17:36:29 +0100
-Message-Id: <20180328163630.48576-6-dgilbert@redhat.com>
-In-Reply-To: <20180328163630.48576-1-dgilbert@redhat.com>
-References: <20180328163630.48576-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] e1000: Choose which set of props to
- migrate
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f1E7I-0000hr-2D
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:40:05 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34637)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f1E7H-0000h1-QA
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:40:03 -0400
+Received: by mail-lf0-x241.google.com with SMTP id c78-v6so4443978lfh.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 09:40:03 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Wed, 28 Mar 2018 09:39:43 -0700
+Message-Id: <20180328163943.23783-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: fix flush_window_regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +23,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, eswierk@skyportsystems.com, jasowang@redhat.com, pbonzini@redhat.com
-Cc: quintela@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+flush_window_regs uses wrong stack frame to save overflow registers in
+call8 and call12 frames, which results in wrong register values in
+callers of a function that received a signal.
+Reimplement flush_window_regs closely following window overflow
+sequence.
 
-When we're using the subsection we migrate both
-the 'props' and 'tso_props' data; when we're not using
-the subsection (to migrate to 2.11 or old machine types) we've
-got to choose what to migrate in the main structure.
-
-If we're using the subsection migrate 'props' in the main structure.
-If we're not using the subsection then migrate the last one
-that changed, which gives behaviour similar to the old behaviour.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- hw/net/e1000.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ linux-user/signal.c | 55 +++++++++++++++++++++++------------------------------
+ 1 file changed, 24 insertions(+), 31 deletions(-)
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 4e606d4b2a..13a9494a8d 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -130,6 +130,7 @@ typedef struct E1000State_st {
- #define E1000_FLAG_TSO (1 << E1000_FLAG_TSO_BIT)
-     uint32_t compat_flags;
-     bool received_tx_tso;
-+    bool use_tso_for_migration;
-     e1000x_txd_props mig_props;
- } E1000State;
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 2ea3e0321f4d..33d5ced30c98 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -7094,52 +7094,45 @@ static abi_ulong get_sigframe(struct target_sigaction *sa,
  
-@@ -622,9 +623,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
-     if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
-         if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
-             e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
-+            s->use_tso_for_migration = 1;
-             tp->tso_frames = 0;
+ static int flush_window_regs(CPUXtensaState *env)
+ {
+-    const uint32_t nareg_mask = env->config->nareg - 1;
+     uint32_t wb = env->sregs[WINDOW_BASE];
+-    uint32_t ws = (xtensa_replicate_windowstart(env) >> (wb + 1)) &
+-        ((1 << env->config->nareg / 4) - 1);
+-    uint32_t d = ctz32(ws) + 1;
+-    uint32_t sp;
+-    abi_long ret = 0;
+-
+-    wb += d;
+-    ws >>= d;
++    uint32_t ws = xtensa_replicate_windowstart(env) >> (wb + 1);
++    unsigned d = ctz32(ws) + 1;
++    unsigned i;
++    int ret = 0;
+ 
+-    xtensa_sync_phys_from_window(env);
+-    sp = env->phys_regs[(wb * 4 + 1) & nareg_mask];
++    for (i = d; i < env->config->nareg / 4; i += d) {
++        uint32_t ssp, osp;
++        unsigned j;
+ 
+-    while (ws && ret == 0) {
+-        int d;
+-        int i;
+-        int idx;
++        ws >>= d;
++        xtensa_rotate_window(env, d);
+ 
+         if (ws & 0x1) {
+-            ws >>= 1;
++            ssp = env->regs[5];
+             d = 1;
+         } else if (ws & 0x2) {
+-            ws >>= 2;
++            ssp = env->regs[9];
++            ret |= get_user_ual(osp, env->regs[1] - 12);
++            osp -= 32;
+             d = 2;
+-            for (i = 0; i < 4; ++i) {
+-                idx = (wb * 4 + 4 + i) & nareg_mask;
+-                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 12) * 4);
+-            }
+         } else if (ws & 0x4) {
+-            ws >>= 3;
++            ssp = env->regs[13];
++            ret |= get_user_ual(osp, env->regs[1] - 12);
++            osp -= 48;
+             d = 3;
+-            for (i = 0; i < 8; ++i) {
+-                idx = (wb * 4 + 4 + i) & nareg_mask;
+-                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 16) * 4);
+-            }
          } else {
-             e1000x_read_tx_ctx_descr(xp, &tp->props);
-+            s->use_tso_for_migration = 0;
+             g_assert_not_reached();
          }
-         return;
-     } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
-@@ -1366,7 +1369,20 @@ static int e1000_pre_save(void *opaque)
-         s->phy_reg[PHY_STATUS] |= MII_SR_AUTONEG_COMPLETE;
+-        sp = env->phys_regs[((wb + d) * 4 + 1) & nareg_mask];
+-        for (i = 0; i < 4; ++i) {
+-            idx = (wb * 4 + i) & nareg_mask;
+-            ret |= put_user_ual(env->phys_regs[idx], sp + (i - 4) * 4);
++
++        for (j = 0; j < 4; ++j) {
++            ret |= put_user_ual(env->regs[j], ssp - 16 + j * 4);
++        }
++        for (j = 4; j < d * 4; ++j) {
++            ret |= put_user_ual(env->regs[j], osp - 16 + j * 4);
+         }
+-        wb += d;
      }
- 
--    s->mig_props = s->tx.props;
-+    /* Decide which set of props to migrate in the main structure */
-+    if (chkflag(TSO) || !s->use_tso_for_migration) {
-+        /* Either we're migrating with the extra subsection, in which
-+         * case the mig_props is always 'props' OR
-+         * we've not got the subsection, but 'props' was the last
-+         * updated.
-+         */
-+        s->mig_props = s->tx.props;
-+    } else {
-+        /* We're not using the subsection, and 'tso_props' was
-+         * the last updated.
-+         */
-+        s->mig_props = s->tx.tso_props;
-+    }
-     return 0;
++    xtensa_rotate_window(env, d);
++    g_assert(env->sregs[WINDOW_BASE] == wb);
+     return ret == 0;
  }
  
 -- 
-2.14.3
+2.11.0
