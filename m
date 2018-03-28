@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f144c-00005Q-Jp
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:56:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1f14B5-0001ka-FH
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f144X-0006b5-Us
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:56:38 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:43254)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f144X-0006al-Ok
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:56:33 -0400
-Received: by mail-ot0-x242.google.com with SMTP id m22-v6so1396678otf.10
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 22:56:33 -0700 (PDT)
-References: <20180323225739.17329-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3dc14f68-5275-6ab6-20dd-4e6dd74a02a4@linaro.org>
-Date: Wed, 28 Mar 2018 13:56:19 +0800
+	(envelope-from <thuth@redhat.com>) id 1f14B2-0001Bj-CH
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:03:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34040 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f14B2-0001AX-8Y
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:03:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5768C4023141
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 06:03:12 +0000 (UTC)
+References: <1520857250-12935-1-git-send-email-thuth@redhat.com>
+	<e7c0d2c8-6451-a598-f140-29916c99e514@redhat.com>
+	<9d059301-fa9f-6303-5806-a2e6f7917ca5@redhat.com>
+	<7a3f63c9-7778-31f0-518a-5872c41c09c3@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <06bda6b5-f496-50d8-de4b-6f417d037908@redhat.com>
+Date: Wed, 28 Mar 2018 08:03:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180323225739.17329-1-laurent@vivier.eu>
+In-Reply-To: <7a3f63c9-7778-31f0-518a-5872c41c09c3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 00/20] linux-user: move arch
- specific parts to arch directories
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-On 03/24/2018 06:57 AM, Laurent Vivier wrote:
-> Some files like signal.c are really hard to read
-> because all architectures are mixed in the same
-> file.
-> 
-> This series moves from signal.c these parts to
-> the architecture dedicated directories in linux-user.
-> Moreover, this allows to compare easier functions
-> between architectures (it helps to debug problems).
-> Adding new functions for a new architecture will
-> be facilitated too.
-> 
-> checkpatch.pl is not happy... but I only want to
-> move code from a file to another. I don't want
-> to change the content of the parts I move.
-> 
-> v2:
->   - only move parts from signal.c
->   - link them instead of including them
->   - one patch by architecture
->   - add a first patch to prepare the change.
-> 
-> The first patch adds signal-common.h to define
-> what is needed by the signal.c of the architectures.
-> It adds a "do-nothing" signal.c in each arch
-> directory and the rule needed to build them
-> in Makefile.objs.
-> 
-> Then the process is simple...
-> 
-> for each architecture:
->   - copy the arch specific code from signal.c
->     to <arch>/signal.c
->   - add includes (including signal-common.h)
->   - export setup_rt_frame() and setup_frame()
->     (remove static in <arch>/signal.c,
->      add the declaration in <arch>/target_signal.h)
-> 
-> When the arch has 32bit and 64bit architectures,
-> it's a little bit more complicated:
->   - ppc/ppc64: nothing special to do, all is in ppc/,
->     there is no ppc64 directory,
->   - arm/aarch64: one file for arm, one file for aarch64
->   - i386/x86_64, sparc/sparc64, mips/mips64:
->     update each target_signal.h,
->     include the 32bit signal.c file into the 64bit signal.c file
->     to avoid to duplicate code (and add a guard to not include
->     the 32bit target_signal.h)
+On 28.03.2018 04:59, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B403=E6=9C=8827=E6=97=A5 21:16, Thomas Huth wrote:
+>>>> =C2=A0=C2=A0 # launch vde switch
+>>>> =C2=A0=C2=A0 vde_switch -F -sock /tmp/myswitch
+>>>> =C2=A0=C2=A0 # launch QEMU instance
+>>>> -qemu-system-i386 linux.img -net nic -net vde,sock=3D/tmp/myswitch
+>>>> +qemu-system-i386 linux.img -nic vde,sock=3D/tmp/myswitch
+>>> I think we should use -netdev here?
+>> I've had that in the original version of this patch, but Paolo suggest=
+ed
+>> to use -nic instead since this is more "user-friendly":
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg05258.html
+>>
+>> I personally don't mind whether we use "-netdev" or "-nic" in the
+>> examples, as long as we finally get rid of "-net" there...
+>=20
+> Right.
+>=20
+>> Please let me
+>> know which way you prefer, so I can respin the patch again if necessar=
+y.
+>>
+>> =C2=A0 Thomas
+>>
+>=20
+> But I think we should be consistent: in your patch some "-net" was
+> replaced by "-nic", but others were replaced by "-netdev".
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+These are *examples*, and I think it's good to give the users examples
+for both ways of specifying a network connection. I'd really like to
+avoid that people think that -nic is the only way of specifying such a
+device, since you might not be able to configure all properties of the
+NIC this way. On the other hand, -device + -netdev is really way more to
+type, so we should also not only show this kind of examples. Thus a
+mixture between both ways sounds like the right solution to me. But if
+you disagree, let me know, then I can rework the patch again to either
+only use -nic or only use -netdev in the examples.
 
-
-r~
+ Thomas
