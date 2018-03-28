@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1f12O6-0002uK-Rw
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 00:08:40 -0400
+	(envelope-from <peterx@redhat.com>) id 1f12ZV-0006Nt-N0
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 00:20:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1f12O2-000754-0w
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 00:08:38 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:48778 helo=mxct.zte.com.cn)
+	(envelope-from <peterx@redhat.com>) id 1f12ZR-0003b4-GW
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 00:20:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47936 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jiang.biao2@zte.com.cn>)
-	id 1f12O1-00074P-KW
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 00:08:33 -0400
-Date: Wed, 28 Mar 2018 12:08:19 +0800 (CST)
-Message-ID: <201803281208196040484@zte.com.cn>
-In-Reply-To: <20180328030351.GU17789@xz-mi>
-References: 201803280843566488166@zte.com.cn,20180328030351.GU17789@xz-mi
-Mime-Version: 1.0
-From: <jiang.biao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_3/8=5D_migration=3A_support_tode?=
- =?utf-8?q?tectcompression_and_decompression_errors?=
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f12ZR-0003an-CJ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 00:20:21 -0400
+Date: Wed, 28 Mar 2018 12:20:03 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180328042003.GB29554@xz-mi>
+References: <20180328030351.GU17789@xz-mi> <201803281208196040484@zte.com.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <201803281208196040484@zte.com.cn>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/8] migration: support todetectcompression
+ and decompression errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
+To: jiang.biao2@zte.com.cn
 Cc: guangrong.xiao@gmail.com, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-PiAKPiBPbiBUdWUsIE1hciAyNywgMjAxOCBhdCAxMDozNToyOVBNICswODAwLCBYaWFvIEd1YW5n
-cm9uZyB3cm90ZToKPgo+PiA+ID4gTm8sIHdlIGNhbid0IG1ha2UgdGhlIGFzc3VtcHRpb24gdGhh
-dCAiZXJyb3IgX211c3RfIGJlIGNhdXNlZCBieSBwYWdlIHVwZGF0ZSIuCj4+ID4gPiBObyBkb2N1
-bWVudC9BQkkgYWJvdXQgY29tcHJlc3MvZGVjb21wcmVzcyBwcm9taXNlZCBpdC4gOikKPgo+IElu
-ZGVlZCwgSSBmb3VuZCBubyBnb29kIGRvY3VtZW50cyBhYm91dCBiZWxvdyBlcnJvcnMgdGhhdCBq
-aWFuZy5iaWFvCj4gcG9pbnRlZCBvdXQuCkhpLCBQZXRlcgpUaGUgZGVzY3JpcHRpb24gYWJvdXQg
-dGhlIGVycm9ycyBjb21lcyBmcm9tIGhlcmUsCmh0dHA6Ly93d3cuemxpYi5uZXQvbWFudWFsLmh0
-bWwKQW5kIGFib3V0IHRoZSBlcnJvciBjb2RlcyByZXR1cm5lZCBieSBpbmZsYXRlKCksIHRoZXkg
-YXJlIGRlc2NyaWJlZCBhc++8jAoqKiBpbmZsYXRlKCkgcmV0dXJucyAKWl9PSyBpZiBzb21lIHBy
-b2dyZXNzIGhhcyBiZWVuIG1hZGUgKG1vcmUgaW5wdXQgcHJvY2Vzc2VkIG9yIG1vcmUgb3V0cHV0
-IHByb2R1Y2VkKSwKWl9TVFJFQU1fRU5EIGlmIHRoZSBlbmQgb2YgdGhlIGNvbXByZXNzZWQgZGF0
-YSBoYXMgYmVlbiByZWFjaGVkIGFuZCBhbGwgdW5jb21wcmVzc2VkIG91dHB1dCBoYXMgYmVlbiBw
-cm9kdWNlZCwgClpfTkVFRF9ESUNUIGlmIGEgcHJlc2V0IGRpY3Rpb25hcnkgaXMgbmVlZGVkIGF0
-IHRoaXMgcG9pbnQsIApaX0RBVEFfRVJST1IgaWYgdGhlIGlucHV0IGRhdGEgd2FzIGNvcnJ1cHRl
-ZCAoaW5wdXQgc3RyZWFtIG5vdCBjb25mb3JtaW5nIHRvIHRoZSB6bGliIGZvcm1hdCBvciBpbmNv
-cnJlY3QgY2hlY2sgdmFsdWUsIGluIHdoaWNoIGNhc2Ugc3RybS0+bXNnIHBvaW50cyB0byBhIHN0
-cmluZyB3aXRoIGEgbW9yZSBzcGVjaWZpYyBlcnJvciksIApaX1NUUkVBTV9FUlJPUiBpZiB0aGUg
-c3RyZWFtIHN0cnVjdHVyZSB3YXMgaW5jb25zaXN0ZW50IChmb3IgZXhhbXBsZSBuZXh0X2luIG9y
-IG5leHRfb3V0IHdhcyBaX05VTEwsIG9yIHRoZSBzdGF0ZSB3YXMgaW5hZHZlcnRlbnRseSB3cml0
-dGVuIG92ZXIgYnkgdGhlIGFwcGxpY2F0aW9uKSwgClpfTUVNX0VSUk9SIGlmIHRoZXJlIHdhcyBu
-b3QgZW5vdWdoIG1lbW9yeSwgClpfQlVGX0VSUk9SIGlmIG5vIHByb2dyZXNzIHdhcyBwb3NzaWJs
-ZSBvciBpZiB0aGVyZSB3YXMgbm90IGVub3VnaCByb29tIGluIHRoZSBvdXRwdXQgYnVmZmVyIHdo
-ZW4gWl9GSU5JU0ggaXMgdXNlZC4gLi4uIAoqKgpBY2NvcmRpbmcgdG8gdGhlIGFib3ZlIGRlc2Ny
-aXB0aW9uLCB0aGUgZXJyb3IgY2F1c2VkIGJ5IHBhZ2UgdXBkYXRlIGxvb2tzIAptb3JlIGxpa2Ug
-dGVuZCB0byByZXR1cm4gWl9EQVRBX0VSUk9SLCBidXQgSSBkbyBub3QgaGF2ZSBlbnYgdG8gdmVy
-aWZ5IHRoYXQuIDopCkFzIEkgdW5kZXJzdGFuZCBpdCwgdGhlIHJlYWwgY29tcHJlc3MvZGVjb21w
-cmVzcyBlcnJvciBjYXNlcyBvdGhlciB0aGFuIHRoYXQgCmNhdXNlZCBieSBwYWdlIHVwZGF0ZSBz
-aG91bGQgYmUgcmFyZSwgbWF5YmUgdGhlIGVycm9yIGNvZGUgaXMgZW5vdWdoIHRvCmRpc3Rpbmd1
-aXNoIHRob3NlIGlmIHdlIGNhbiB2ZXJpZnkgdGhlIHRoZSBlcnJvciBjb2RlcyByZXR1cm5lZCBi
-eSBwYWdlIHVwZGF0ZQphbmQgb3RoZXIgc2lsZW50IGZhaWx1cmVzIGJ5IHRlc3QuIElmIHNvLCB3
-ZSBjYW4gY3V0IHRoZSBjb3N0IG9mIG1lbWNweS4gIApJZiBub3QsIEkgYWdyZWUgd2l0aCBHdWFu
-Z3JvbmcncyBpZGVhIHRvby4gSSBuZXZlciByZWFkIHRoZSB6bGliIGNvZGUgYW5kIGFsbCBteQpp
-bmZvcm1hdGlvbiBjb21lcyBmcm9tIHRoZSBtYW51YWwsIHNvIGlmIGFueXRoaW5nIGluYWNjdXJh
-dGUsIHBscyBpZ25vcmUgbXkKb3B0aW9uLiA6KQoKUmVnYXJkcywKSmlhbmc=
+On Wed, Mar 28, 2018 at 12:08:19PM +0800, jiang.biao2@zte.com.cn wrote:
+> >=20
+> > On Tue, Mar 27, 2018 at 10:35:29PM +0800, Xiao Guangrong wrote:
+> >
+> >> > > No, we can't make the assumption that "error _must_ be caused by=
+ page update".
+> >> > > No document/ABI about compress/decompress promised it. :)
+> >
+> > Indeed, I found no good documents about below errors that jiang.biao
+> > pointed out.
+> Hi, Peter
+> The description about the errors comes from here,
+> http://www.zlib.net/manual.html
+> And about the error codes returned by inflate(), they are described as=EF=
+=BC=8C
+> ** inflate() returns=20
+> Z_OK if some progress has been made (more input processed or more outpu=
+t produced),
+> Z_STREAM_END if the end of the compressed data has been reached and all=
+ uncompressed output has been produced,=20
+> Z_NEED_DICT if a preset dictionary is needed at this point,=20
+> Z_DATA_ERROR if the input data was corrupted (input stream not conformi=
+ng to the zlib format or incorrect check value, in which case strm->msg p=
+oints to a string with a more specific error),=20
+> Z_STREAM_ERROR if the stream structure was inconsistent (for example ne=
+xt_in or next_out was Z_NULL, or the state was inadvertently written over=
+ by the application),=20
+> Z_MEM_ERROR if there was not enough memory,=20
+> Z_BUF_ERROR if no progress was possible or if there was not enough room=
+ in the output buffer when Z_FINISH is used. ...=20
+> **
+
+Ah yes.  My bad to be so uncareful. :)
+
+> According to the above description, the error caused by page update loo=
+ks=20
+> more like tend to return Z_DATA_ERROR, but I do not have env to verify =
+that. :)
+> As I understand it, the real compress/decompress error cases other than=
+ that=20
+> caused by page update should be rare, maybe the error code is enough to
+> distinguish those if we can verify the the error codes returned by page=
+ update
+> and other silent failures by test. If so, we can cut the cost of memcpy=
+. =20
+> If not, I agree with Guangrong's idea too. I never read the zlib code a=
+nd all my
+> information comes from the manual, so if anything inaccurate, pls ignor=
+e my
+> option. :)
+
+So I suppose all of us know that alternative now, we just need a solid
+way to confirm the uncertainty.  I'll leave this to Guangrong.
+
+Thanks,
+
+--=20
+Peter Xu
