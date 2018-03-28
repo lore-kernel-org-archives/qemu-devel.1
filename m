@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1f1D7M-0005d5-7f
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:36:07 -0400
+	(envelope-from <cota@braap.org>) id 1f1D7w-000681-Gs
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1f1D7I-0000Jr-VH
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:36:04 -0400
-References: <1522157418-8954-1-git-send-email-den@openvz.org>
-	<95ac7934-4f03-821f-2ee6-6dc30467ce36@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <e8811b06-0ab6-aa0d-3c34-1d1ecbfca029@openvz.org>
-Date: Wed, 28 Mar 2018 18:35:53 +0300
+	(envelope-from <cota@braap.org>) id 1f1D7t-0000YZ-95
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:36:40 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:59673)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f1D7t-0000Y3-33
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:36:37 -0400
+Date: Wed, 28 Mar 2018 11:36:33 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180328153633.GA18182@flamenco>
+References: <1521663109-32262-1-git-send-email-cota@braap.org>
+	<1521663109-32262-3-git-send-email-cota@braap.org>
+	<87zi2t968i.fsf@linaro.org> <20180327180018.GC2693@flamenco>
+	<87lgec8r4t.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <95ac7934-4f03-821f-2ee6-6dc30467ce36@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for 2.12 1/1] block: allow recursive
- calling of bdrv_set_aio_context
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87lgec8r4t.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v1 02/14] tests: add fp-test,
+ a floating point test suite
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 03/28/2018 06:31 PM, Max Reitz wrote:
-> On 2018-03-27 15:30, Denis V. Lunev wrote:
->> We have received the following assert on QEMU 2.9:
->>
->> (gdb) bt
->> 0  0x00007f6f67d281f7 in __GI_raise ()
->> 1  0x00007f6f67d298e8 in __GI_abort ()
->> 2  0x00007f6f67d21266 in __assert_fail_base ()
->> 3  0x00007f6f67d21312 in __GI___assert_fail ()
->> 4  0x000055a8faf76f9f in bdrv_detach_aio_context ()
->> 5  0x000055a8faf76f68 in bdrv_detach_aio_context ()
->> 6  0x000055a8faf770c6 in bdrv_set_aio_context ()
->> 7  0x000055a8fafb780d in blk_set_aio_context ()
->> 8  0x000055a8faf7af08 in block_job_attached_aio_context ()
->> 9  0x000055a8faf77043 in bdrv_attach_aio_context ()
->> 10 0x000055a8faf770d9 in bdrv_set_aio_context ()
->> 11 0x000055a8fafb780d in blk_set_aio_context ()
->> 12 0x000055a8fad580e7 in virtio_blk_data_plane_stop ()
->> 13 0x000055a8faf11da5 in virtio_bus_stop_ioeventfd ()
->> 14 0x000055a8fad85604 in virtio_vmstate_change ()
->> 15 0x000055a8fae1ba52 in vm_state_notify ()
->> 16 0x000055a8fad273e5 in do_vm_stop ()
->> 17 vm_stop ()
->> 18 0x000055a8face8f28 in main_loop_should_exit ()
->> 19 main_loop ()
->> 20 main ()
->> (gdb)
->>
->> It does not look, that the code is fundumentally different in 2.12.
->>
->> block_job_attached_aio_context() calls backup_attached_aio_context(),
->> which in turn calls bdrv_detach_aio_context() again. This results in
->> assert(!bs->walking_aio_notifiers).
->>
->> The code in mirror is basically the same. The patch replaces boolean
->> condition with incremental counter, which should solve the problem.
->>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Kevin Wolf <kwolf@redhat.com>
->> CC: Max Reitz <mreitz@redhat.com>
->> ---
->>  include/block/block_int.h |  2 +-
->>  block.c                   | 12 ++++++------
->>  2 files changed, 7 insertions(+), 7 deletions(-)
-> Changing this to a counter looks OK to me, but dealing with a recursive
-> bdrv_set_aio_context() might be a bit more complicated than that.  It
-> calls for trouble if one of the aio_notifiers assigns a different
-> AioContext than was just assigned, if nothing else then because we have
-> to make sure not to call any other notifier with the old "new" context.
->
-> In this case, that shouldn't be an issue because we will simply assign
-> the new context again, so it's actually a no-op.  Maybe we could allow
-> that case alone, but even then we have to verify it.
->
-> Another thing I'm wondering is how this prevents infinite recursion.
-> Won't we just call the notifier again which will try to again set its
-> BlockBackend's AioContext?
-good catch to think about. AIO context here was different that one one top.
-I'll come back after more evaluation.
+On Wed, Mar 28, 2018 at 10:51:30 +0100, Alex Bennée wrote:
+> Emilio G. Cota <cota@braap.org> writes:
+> >> So this is a unit test of our code rather than a test program running
+> >> under QEMU?
+> >
+> > Having the -t host/soft flags allows you flexibility in what to test.
+> >
+> > With "host" mode, you're generating a binary that knows nothing
+> > about QEMU, i.e. all its FP operations are native. You can use this
+> > to (1) figure out whether your host diverts from the model [hopefully
+> > it doesn't in anything substantial], and (2) test whether QEMU mimics
+> > the corresponding host by running the binary under *-linux-user.
+> 
+> OK - there is no reason why we can't cross compile the single source
+> file for multiple tests/tcg/targets. I'll look at that when I have
+> another run at the cross compile stuff.
 
-> What is the full case anyway?  The AioContext of the source changes,
-> which results in the call of backup's notifier, which will then change
-> the AioContext of the target.  So source and target would need to be in
-> the same chain if setting target's context conflicts with a context
-> change on source.
-Unfortunately I do not know :( This has been happened on the customer
-site. The only thing we have is coredump, which gives above mentioned
-trace.
+In fact I tried this first. I generated one executable per target,
+compiling softfloat.o with the corresponding -DTARGET_FOO.
 
-Den
+Then I realised this isn't good enough. The problem is that this
+only buys you the target-specific part of softfloat, which boils
+down to sNaN representation and little else. You still have to
+pass your own float_status (with rounding etc.), and decide whether
+to act or to ignore whatever flags softfloat sets after an op.
 
-> Max
->
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 29cafa4..a290711 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -613,7 +613,7 @@ struct BlockDriverState {
->>       * BDS may register themselves in this list to be notified of changes
->>       * regarding this BDS's context */
->>      QLIST_HEAD(, BdrvAioNotifier) aio_notifiers;
->> -    bool walking_aio_notifiers; /* to make removal during iteration safe */
->> +    int walking_aio_notifiers; /* to make removal during iteration safe */
->>  
->>      char filename[PATH_MAX];
->>      char backing_file[PATH_MAX]; /* if non zero, the image is a diff of
->> diff --git a/block.c b/block.c
->> index a8da4f2..82cc07b 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -4739,8 +4739,7 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
->>          return;
->>      }
->>  
->> -    assert(!bs->walking_aio_notifiers);
->> -    bs->walking_aio_notifiers = true;
->> +    bs->walking_aio_notifiers++;
->>      QLIST_FOREACH_SAFE(baf, &bs->aio_notifiers, list, baf_tmp) {
->>          if (baf->deleted) {
->>              bdrv_do_remove_aio_context_notifier(baf);
->> @@ -4751,7 +4750,8 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
->>      /* Never mind iterating again to check for ->deleted.  bdrv_close() will
->>       * remove remaining aio notifiers if we aren't called again.
->>       */
->> -    bs->walking_aio_notifiers = false;
->> +    bs->walking_aio_notifiers--;
->> +    assert(bs->walking_aio_notifiers >= 0);
->>  
->>      if (bs->drv->bdrv_detach_aio_context) {
->>          bs->drv->bdrv_detach_aio_context(bs);
->> @@ -4782,8 +4782,7 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
->>          bs->drv->bdrv_attach_aio_context(bs, new_context);
->>      }
->>  
->> -    assert(!bs->walking_aio_notifiers);
->> -    bs->walking_aio_notifiers = true;
->> +    bs->walking_aio_notifiers++;
->>      QLIST_FOREACH_SAFE(ban, &bs->aio_notifiers, list, ban_tmp) {
->>          if (ban->deleted) {
->>              bdrv_do_remove_aio_context_notifier(ban);
->> @@ -4791,7 +4790,8 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
->>              ban->attached_aio_context(new_context, ban->opaque);
->>          }
->>      }
->> -    bs->walking_aio_notifiers = false;
->> +    bs->walking_aio_notifiers--;
->> +    assert(bs->walking_aio_notifiers >= 0);
->>  }
->>  
->>  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
->>
->
+In short, having this without having the actual target code doesn't
+buy you much.
+
+I think a better alternative is to:
+1- Compile fp-test using host mode on actual hardware. Let's call
+   this executable fp-test-host-$arch.
+2- Compare fp-test results of running on actual hardware against
+   running fp-test-host-$arch on linux-user-$arch.
+
+This will give us complete coverage of both softfloat and
+the target code that calls softfloat (and raises exceptions etc.).
+
+> >> If so we really should be building this automatically in make check.
+> >
+> > Yes, passing -soft mode would certainly be valuable and trivial
+> > to integrate since there is nothing built that is target-dependent.
+> 
+> So the two bugs I'm currently fixing are guest dependent so can't be
+> caught by soft mode:
+> 
+>   - ARM FP16 alternative format behaviour
+>   - round_to_int_and_pack refactor broke TriCore ftoi insns (1759264)
+
+Yes, passing soft mode is a necessary condition for correctness but
+it isn't sufficient--arch-specific bugs can also happen! And those
+bugs might be in softfloat and/or in target/$arch/*.
+
+For that we'll need something like what I sketched above.
+
+> I assume your bug was?
+> 
+>   - fix {min,max}nummag for same-abs-value inputs (from your series)
+
+Yep.
+
+Thanks,
+
+		E.
