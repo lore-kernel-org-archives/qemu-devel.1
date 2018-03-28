@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f14sI-0005DZ-7m
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:47:59 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1f14uP-0007RY-VZ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f14sH-0004jx-9i
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:47:58 -0400
-References: <1522160122-10744-1-git-send-email-eric.auger@redhat.com>
-	<1522160122-10744-9-git-send-email-eric.auger@redhat.com>
-	<5ABB13BC.8060809@huawei.com>
+	(envelope-from <eric.auger@redhat.com>) id 1f14uO-00062Z-V4
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 02:50:10 -0400
+References: <d29ae6aa-5758-277b-b754-4e6fe7666e6b@redhat.com>
+	<CAFEAcA9dHPLj6aF=JsS8dXaDWf_ONQ_A+SD1xXQO7DdsWK3yAw@mail.gmail.com>
+	<6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
+	<CAFEAcA_rJ_=-dKauAmrJPGRJ6C09_9CQzRdXK53va4NB_xXKpg@mail.gmail.com>
+	<0d6f5f6d-bf28-ffc0-4d7c-b2c73912057e@redhat.com>
+	<20180328020322.GT17789@xz-mi>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <578156db-afbd-a4d7-3899-ec96e2cfd8fb@redhat.com>
-Date: Wed, 28 Mar 2018 08:47:36 +0200
+Message-ID: <99129f71-aeb2-6d8e-ce7e-8bd81d39c87f@redhat.com>
+Date: Wed, 28 Mar 2018 08:49:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <5ABB13BC.8060809@huawei.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20180328020322.GT17789@xz-mi>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 8/8] hw/arm/virt: Allow up to 512 vcpus along
- with KVM VGICv3
+Subject: Re: [Qemu-devel] Regression on KVM qemu-system-aarch64 since
+ "monitor: enable IO thread for (qmp & !mux) typed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: wei@redhat.com, marc.zyngier@arm.com, drjones@redhat.com, cdall@kernel.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Blake <eblake@redhat.com>
 
-Hi Shannon,
+Hi Peter,
 
-On 28/03/18 06:02, Shannon Zhao wrote:
-> 
-> 
-> On 2018/3/27 22:15, Eric Auger wrote:
->> With KVM acceleration and if KVM VGICV3 supports to set multiple
->> redistributor regions, we now allow up to 512 vcpus.
+On 28/03/18 04:03, Peter Xu wrote:
+> On Fri, Mar 23, 2018 at 01:36:36PM +0100, Auger Eric wrote:
+>> Hi,
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/virt.c         | 17 ++++++++++++++++-
->>  include/hw/arm/virt.h |  1 +
->>  2 files changed, 17 insertions(+), 1 deletion(-)
+>> On 23/03/18 13:11, Peter Maydell wrote:
+>>> On 23 March 2018 at 12:01, Auger Eric <eric.auger@redhat.com> wrote:
+>>>> Hi,
+>>>>
+>>>> On 23/03/18 11:26, Peter Maydell wrote:
+>>>>> On 23 March 2018 at 10:24, Auger Eric <eric.auger@redhat.com> wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> I observe a regression on KVM accelerated qemu-system-aarch64:
+>>>>>>
+>>>>>> Unexpected error in kvm_device_access() at
+>>>>>> /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
+>>>>>> 2018-03-23T09:59:59.629439Z qemu-system-aarch64: KVM_GET_DEVICE_ATTR
+>>>>>> failed: Group 6 attr 0x000000000000c664: Device or resource busy
+>>>>>> 2018-03-23 10:00:00.085+0000: shutting down, reason=crashed
+>>>>>
+>>>>> Can you get a backtrace for this? (I guess you'd need to fiddle
+>>>>> with the kvm_device_access() code to make it assert rather
+>>>>> than passing back the error).
+>>>>
+>>>> OK. I will try to do so. As I could have expected, I cannot reproduce on
+>>>> a standalone qemu command line. The problem observed above is seen with
+>>>> libvirt launch which may be doing some other QMP stuff concurrently?
+>>>
+>>> Hmm, that could be a bit painful to debug. I dunno if libvirt
+>>> has a "launch QEMU under gdb" option. If not, you could try
+>>> something like:
+>>>    if (condition we want to get a backtrace on) {
+>>>        printf("hit condition, attach gdb to process %d\n", (int)getpid());
+>>>        for (;;) { }
+>>>    }
 >>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 8258f6f..cdb1a75 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -149,8 +149,10 @@ static const MemMapEntry a15memmap[] = {
->>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
->>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
->>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
->> +    /* Allows 512 - 123 additional vcpus (each 2x64kB) */
->> +    [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x30A0000LL },
-> One concern that this will limit the guest ram size to RAMLIMIT_BYTES.
-> If we want to support larger ram size in the future, this may be a problem.
-There is comment before  #define RAMLIMIT_GB 255
-saying that RAM extension should rather happen at 2TB base.
-"../.. We don't want to fill all the way up to 512GB with RAM because
- * we might want it for non-RAM purposes later"
+>> Thanks for the hint. Here is the stack I get.
+>>
+>> #0  kvm_device_access (fd=31, group=6, attr=50788, val=0x5937c88, write=false, errp=0x16984a8 <error_abort>) at /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164
+>> #1  0x00000000004f8ce4 in arm_gicv3_icc_reset (env=0xffffa1fc8330, ri=0x597f910) at /home/augere/UPSTREAM/qemu/hw/intc/arm_gicv3_kvm.c:632
+>> #2  0x00000000006351ac in cp_reg_reset (key=0x597f730, value=0x597f910, opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:78
+>> #3  0x0000ffffa47edce4 in g_hash_table_foreach () from /lib64/libglib-2.0.so.0
+>> #4  0x0000000000635394 in arm_cpu_reset (s=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:130
+>> #5  0x000000000090c888 in cpu_reset (cpu=0xffffa1fc0010) at qom/cpu.c:249
+>> #6  0x00000000005793d8 in do_cpu_reset (opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/hw/arm/boot.c:665
+>> #7  0x000000000073095c in qemu_devices_reset () at hw/core/reset.c:69
+>> #8  0x00000000006976e0 in qemu_system_reset (reason=SHUTDOWN_CAUSE_NONE) at vl.c:1731
+>> #9  0x000000000069fd60 in main (argc=69, argv=0xffffe877d1a8, envp=0xffffe877d3d8) at vl.c:4697
+> 
+> I think current master should work fine with ARM KVM now since OOB is
+> now off by default.
 
-This REDIST2 region could also be allocated at the top of the [256GB -
-512GB] region.
+Yes it works for me with the reverts.
 
-I will start working on extending the RAM as suggested by this comment.
+ But does ARM use postcopy, and will ARM need the
+> coming network failure recovery feature?
+
+I assume it does
+> 
+> If so, maybe we'll still need to have a look on this single problem
+> (this is the only non-testcase issue I know now with Out-Of-Band).
+
+OK. I need to have a look at your series to better understand what it does.
 
 Thanks
 
 Eric
-
 > 
->>      /* Second PCIe window, 512GB wide at the 512GB boundary */
->> -    [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
->> +    [VIRT_PCIE_MMIO_HIGH] =     { 0x8000000000ULL, 0x8000000000ULL },
->>  };
->>  
->>  static const int a15irqmap[] = {
->> @@ -553,6 +555,11 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->>          agcc->register_redist_region((GICv3State *)gicdev,
->>                                   vms->memmap[VIRT_GIC_REDIST].base,
->>                                   vms->memmap[VIRT_GIC_REDIST].size >> 17);
->> +        if (vms->smp_cpus > 123) {
->> +            agcc->register_redist_region((GICv3State *)gicdev,
->> +                     vms->memmap[VIRT_GIC_REDIST2].base,
->> +                                 vms->memmap[VIRT_GIC_REDIST2].size >> 17);
->> +        }
->>      } else {
->>          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
->>      }
->> @@ -1284,6 +1291,14 @@ static void machvirt_init(MachineState *machine)
->>       */
->>      if (vms->gic_version == 3) {
->>          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
->> +        if (kvm_max_vcpus(kvm_state) > 255) {
->> +            /*
->> +             * VGICv3 KVM device capability to set multiple redistributor
->> +             * was introduced at the same time KVM_MAX_VCPUS was bumped
->> +             * from 255 to 512
->> +             */
->> +            virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / 0x20000;
->> +        }
->>      } else {
->>          virt_max_cpus = GIC_NCPU;
->>      }
->> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->> index d168291..801a4ad 100644
->> --- a/include/hw/arm/virt.h
->> +++ b/include/hw/arm/virt.h
->> @@ -60,6 +60,7 @@ enum {
->>      VIRT_GIC_V2M,
->>      VIRT_GIC_ITS,
->>      VIRT_GIC_REDIST,
->> +    VIRT_GIC_REDIST2,
->>      VIRT_UART,
->>      VIRT_MMIO,
->>      VIRT_RTC,
->>
+> Thanks,
 > 
