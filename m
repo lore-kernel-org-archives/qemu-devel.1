@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f1E46-0005vB-3b
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f1E46-0005vC-45
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f1E42-0007lv-Vy
+	(envelope-from <dgilbert@redhat.com>) id 1f1E43-0007m3-1H
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59091 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59090 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1E42-0007lV-RC
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1E42-0007lU-SF
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 12:36:42 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 28 Mar 2018 17:36:24 +0100
-Message-Id: <20180328163630.48576-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] e1000 migration changes for 2.12
+Date: Wed, 28 Mar 2018 17:36:25 +0100
+Message-Id: <20180328163630.48576-2-dgilbert@redhat.com>
+In-Reply-To: <20180328163630.48576-1-dgilbert@redhat.com>
+References: <20180328163630.48576-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/6] e1000: Convert v3 fields to subsection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +28,79 @@ Cc: quintela@redhat.com, peterx@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi,
-  This set of patches change the e1000 migration code to make
-it easier to keep with compatibility with older versions in backwards
-migration.
+A bunch of new TSO fields were introduced by d62644b4 and this bumped
+the VMState version; however it's easier for those trying to keep
+backwards migration compatibility if these fields are added in a
+subsection instead.
 
-I think the first 3 patches are fairly uncontrovercial and I would like
-them for 2.12; it would be nice to have the lot since changing them
-after we've shipped is much more difficult.
+Move the new fields to a subsection.
 
-v2
-  Ed and Paolo answered my question that I asked in the cover letter;
-and I think I've followed the advice - although my testing has been
-very light.  The new patches do two things:
-   a) When we receive a stream without the subsection we duplicate the
-received pops state into both props and tso_props.
-   b) When we send without the subsection we decide which set to send
-in the main part of the state based on which state was last changed.
+Since this was added after 2.11, this change will only affect
+compatbility with 2.12-rc0.
 
-Dave
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/net/e1000.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-Dr. David Alan Gilbert (6):
-  e1000: Convert v3 fields to subsection
-  e1000: Dupe offload data on reading old stream
-  e1000: wire new subsection to property
-  e1000: Migrate props via a temporary structure
-  e1000: Choose which set of props to migrate
-  e1000: Old machine types, turn new subsection off
-
- hw/net/e1000.c      | 103 ++++++++++++++++++++++++++++++++++++++++------------
- include/hw/compat.h |   4 ++
- 2 files changed, 84 insertions(+), 23 deletions(-)
-
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index c7f1695f57..24e9a4ab40 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -1433,9 +1433,29 @@ static const VMStateDescription vmstate_e1000_full_mac_state = {
+     }
+ };
+ 
++static const VMStateDescription vmstate_e1000_tx_tso_state = {
++    .name = "e1000/tx_tso_state",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.ipcso, E1000State),
++        VMSTATE_UINT16(tx.tso_props.ipcse, E1000State),
++        VMSTATE_UINT8(tx.tso_props.tucss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.tucso, E1000State),
++        VMSTATE_UINT16(tx.tso_props.tucse, E1000State),
++        VMSTATE_UINT32(tx.tso_props.paylen, E1000State),
++        VMSTATE_UINT8(tx.tso_props.hdr_len, E1000State),
++        VMSTATE_UINT16(tx.tso_props.mss, E1000State),
++        VMSTATE_INT8(tx.tso_props.ip, E1000State),
++        VMSTATE_INT8(tx.tso_props.tcp, E1000State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_e1000 = {
+     .name = "e1000",
+-    .version_id = 3,
++    .version_id = 2,
+     .minimum_version_id = 1,
+     .pre_save = e1000_pre_save,
+     .post_load = e1000_post_load,
+@@ -1508,22 +1528,12 @@ static const VMStateDescription vmstate_e1000 = {
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, RA, 32),
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, MTA, 128),
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, VFTA, 128),
+-        VMSTATE_UINT8_V(tx.tso_props.ipcss, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.ipcso, E1000State, 3),
+-        VMSTATE_UINT16_V(tx.tso_props.ipcse, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.tucss, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.tucso, E1000State, 3),
+-        VMSTATE_UINT16_V(tx.tso_props.tucse, E1000State, 3),
+-        VMSTATE_UINT32_V(tx.tso_props.paylen, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.hdr_len, E1000State, 3),
+-        VMSTATE_UINT16_V(tx.tso_props.mss, E1000State, 3),
+-        VMSTATE_INT8_V(tx.tso_props.ip, E1000State, 3),
+-        VMSTATE_INT8_V(tx.tso_props.tcp, E1000State, 3),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_e1000_mit_state,
+         &vmstate_e1000_full_mac_state,
++        &vmstate_e1000_tx_tso_state,
+         NULL
+     }
+ };
 -- 
 2.14.3
