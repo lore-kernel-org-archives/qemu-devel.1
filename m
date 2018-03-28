@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f13QL-00077G-R9
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:15:02 -0400
+	(envelope-from <mjc@sifive.com>) id 1f13iX-0003Rp-Kz
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f13QI-0007e3-M8
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:15:01 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42443)
+	(envelope-from <mjc@sifive.com>) id 1f13iW-0005bA-SM
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:33:49 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f13QI-0007du-Ed
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:14:58 -0400
-Received: by mail-ot0-x242.google.com with SMTP id v23-v6so1334183oth.9
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 22:14:58 -0700 (PDT)
-References: <1522197746-26020-1-git-send-email-mjc@sifive.com>
-	<1522197746-26020-2-git-send-email-mjc@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e2a518fd-34ef-537a-b8b4-efbd8e61ca6a@linaro.org>
-Date: Wed, 28 Mar 2018 13:14:45 +0800
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f13iW-0005b3-IZ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 01:33:48 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id 71-v6so1090061oie.12
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 22:33:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1522197746-26020-2-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] RISC-V: Workaround for critical
- mstatus.FS MTTCG bug
+In-Reply-To: <11555693-5ceb-883f-70b7-b6fb62b00528@linaro.org>
+References: <1521926678-76539-1-git-send-email-mjc@sifive.com>
+	<3cc72690-683f-a264-033c-25a2947f40fe@linaro.org>
+	<CAHNT7Ntgkq+j1LfO9rGQPyS+qG0YHtXAtd4ZiGc6q3j8HJJ7yQ@mail.gmail.com>
+	<11555693-5ceb-883f-70b7-b6fb62b00528@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Tue, 27 Mar 2018 22:33:47 -0700
+Message-ID: <CAHNT7NvwBftXQy_GkjurYqqqhEgNJ3kTJ1rLeKhGh5WbM2nOeQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1] RISC-V: RISC-V TCG backend work in
+ progress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: patches@groups.riscv.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>
 
-On 03/28/2018 08:42 AM, Michael Clark wrote:
-> This change is a workaround for a bug where mstatus.FS
-> is not correctly reporting dirty after operations that
-> modify floating point registers. This a critical bug
-> or RISC-V in QEMU as it results in floating point
-> register file corruption when running SMP Linux due to
-> task migration and possibly uniprocessor Linux if
-> more than one process is using the FPU.
-> 
-> This workaround will return dirty if mstatus.FS is
-> switched from off to initial or clean. According to
-> the specification it is legal for an implementation
-> to return only off, or dirty.
-> 
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Tested-by: Richard W.M. Jones <rjones@redhat.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->  target/riscv/op_helper.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
+On Tue, Mar 27, 2018 at 5:35 PM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-In case the more extensive fix waits until 2.13,
+> On 03/28/2018 01:43 AM, Michael Clark wrote:
+> >     > +    if ((ct & TCG_CT_CONST_N12) && val >= -2047 && val <= 2047) {
+> >
+> >     +2048?
+>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Yes of course, you're right. It's safe. I just hadn't thought about it
+carefully enough.
 
 
-r~
+> > We use this constraint for a negatable immediate and the constraint is
+> only
+> > applied to sub. We have no subi, so we implement subi as addi rd, rs1,
+> -imm
+> >
+> >     case INDEX_op_sub_i32:
+> >         if (c2) {
+> >             tcg_out_opc_imm(s, is32bit ? OPC_ADDI : OPC_ADDIW, a0, a1,
+> -a2);
+> >         } else {
+> >             tcg_out_opc_reg(s, is32bit ? OPC_SUB : OPC_SUBW, a0, a1, a2);
+> >         }
+> >         break;
+>
+> That's my point.  The "positive" range for addition is -2048...2047, so the
+> "negative" range for subtraction should be -2047...2048.
+>
+
+Got it. Thanks.
