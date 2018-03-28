@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f1C0K-0004Xk-MA
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:24:50 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f1C3e-0005Xm-Hj
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f1C0H-000338-FL
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:24:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51770 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f1C0H-00032q-Ad
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:24:41 -0400
-Date: Wed, 28 Mar 2018 17:24:33 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180328172057-mutt-send-email-mst@kernel.org>
-References: <1516308132-10272-1-git-send-email-mst@redhat.com>
-	<1516308132-10272-3-git-send-email-mst@redhat.com>
-	<d7c049af-8da0-a8a1-a4b1-5484c682fd10@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1f1C3a-0004Yg-JQ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:28:10 -0400
+Received: from mail-io0-f181.google.com ([209.85.223.181]:41252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f1C3a-0004YS-EQ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:28:06 -0400
+Received: by mail-io0-f181.google.com with SMTP id m83so3766354ioi.8
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 07:28:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <d7c049af-8da0-a8a1-a4b1-5484c682fd10@redhat.com>
+In-Reply-To: <8172e5c57529e2275e5d8f1cbe06bd9bc88a8dd4.1522245129.git.jcody@redhat.com>
+References: <cover.1522245129.git.jcody@redhat.com>
+	<8172e5c57529e2275e5d8f1cbe06bd9bc88a8dd4.1522245129.git.jcody@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 28 Mar 2018 16:28:05 +0200
+Message-ID: <CAMxuvawv2Q13Ge=Pim3Uy9JG65rQaCU2CCHZav6jsPirUdqmAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v4 02/29] vhost-user: add new vhost user
- messages to support virtio config space
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] blockjob: leak fix,
+ remove from txn when failing early
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, Changpeng Liu <changpeng.liu@intel.com>, Peter Maydell <peter.maydell@linaro.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, jsnow@redhat.com, mreitz@redhat.com, "Wolf, Kevin" <kwolf@redhat.com>
 
-On Wed, Mar 28, 2018 at 12:03:36PM +0200, Maxime Coquelin wrote:
-> Hi,
->=20
-> On 01/18/2018 09:44 PM, Michael S. Tsirkin wrote:
-> > From: Changpeng Liu <changpeng.liu@intel.com>
-> >=20
-> > Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
-> > used for live migration of vhost user devices, also vhost user device=
-s
-> > can benefit from the messages to get/set virtio config space from/to =
-the
-> > I/O target. For the purpose to support virtio config space change,
-> > VHOST_USER_SLAVE_CONFIG_CHANGE_MSG message is added as the event noti=
-fier
-> > in case virtio config space change in the slave I/O target.
-> >=20
-> > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> > Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >   docs/interop/vhost-user.txt       |  55 ++++++++++++++++++
-> >   include/hw/virtio/vhost-backend.h |  12 ++++
-> >   include/hw/virtio/vhost.h         |  15 +++++
-> >   hw/virtio/vhost-user.c            | 118 +++++++++++++++++++++++++++=
-+++++++++++
-> >   hw/virtio/vhost.c                 |  32 +++++++++++
-> >   5 files changed, 232 insertions(+)
-> >=20
->=20
-> As discussed with Changpeng on DPDK ML, we need a vhost-user protocol
-> feature bit to back these new requests, else QEMU cannot whether the
-> user backend implement these.
->=20
-> With current and older DPDK version, if an unknown request is received,
-> the socket connection is closed.
->=20
-> Do we still have time before QEMU v2.12 is out?
->=20
-> Thanks,
-> Maxime
+On Wed, Mar 28, 2018 at 4:09 PM, Jeff Cody <jcody@redhat.com> wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> This fixes leaks found by ASAN such as:
+>   GTESTER tests/test-blockjob
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D31442=3D=3DERROR: LeakSanitizer: detected memory leaks
+>
+> Direct leak of 24 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f88483cba38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
+8)
+>     #1 0x7f8845e1bd77 in g_malloc0 ../glib/gmem.c:129
+>     #2 0x7f8845e1c04b in g_malloc0_n ../glib/gmem.c:360
+>     #3 0x5584d2732498 in block_job_txn_new /home/elmarco/src/qemu/blockjo=
+b.c:172
+>     #4 0x5584d2739b28 in block_job_create /home/elmarco/src/qemu/blockjob=
+.c:973
+>     #5 0x5584d270ae31 in mk_job /home/elmarco/src/qemu/tests/test-blockjo=
+b.c:34
+>     #6 0x5584d270b1c1 in do_test_id /home/elmarco/src/qemu/tests/test-blo=
+ckjob.c:57
+>     #7 0x5584d270b65c in test_job_ids /home/elmarco/src/qemu/tests/test-b=
+lockjob.c:118
+>     #8 0x7f8845e40b69 in test_case_run ../glib/gtestutils.c:2255
+>     #9 0x7f8845e40f29 in g_test_run_suite_internal ../glib/gtestutils.c:2=
+339
+>     #10 0x7f8845e40fd2 in g_test_run_suite_internal ../glib/gtestutils.c:=
+2351
+>     #11 0x7f8845e411e9 in g_test_run_suite ../glib/gtestutils.c:2426
+>     #12 0x7f8845e3fe72 in g_test_run ../glib/gtestutils.c:1692
+>     #13 0x5584d270d6e2 in main /home/elmarco/src/qemu/tests/test-blockjob=
+.c:377
+>     #14 0x7f8843641f29 in __libc_start_main (/lib64/libc.so.6+0x20f29)
+>
+> Add an assert to make sure that the job doesn't have associated txn befor=
+e free().
+>
+> [Jeff Cody: N.B., used updated patch provided by John Snow]
 
-We certainly do, and I agree it's a concern as we get maintain
-protocol extensions forever.
+Looks good to me, so :)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-It's my bad that I forgot to check that there's a feature bit, but I
-think we should act before the release.
+thanks
 
-There is probably time enough to add it - but if no one
-can spare then time it would be better to disable the new messages in
-QEMU for now than ship 2.12 without a feature bit.
-
-I wonder what's Changpeng Liu's take on this.
-
---=20
-MST
+>
+> ---
+>  blockjob.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>
+> diff --git a/blockjob.c b/blockjob.c
+> index ef3ed69ff1..c510a9fde5 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -204,6 +204,15 @@ void block_job_txn_add_job(BlockJobTxn *txn, BlockJo=
+b *job)
+>      block_job_txn_ref(txn);
+>  }
+>
+> +static void block_job_txn_del_job(BlockJob *job)
+> +{
+> +    if (job->txn) {
+> +        QLIST_REMOVE(job, txn_list);
+> +        block_job_txn_unref(job->txn);
+> +        job->txn =3D NULL;
+> +    }
+> +}
+> +
+>  static void block_job_pause(BlockJob *job)
+>  {
+>      job->pause_count++;
+> @@ -232,6 +241,7 @@ void block_job_unref(BlockJob *job)
+>  {
+>      if (--job->refcnt =3D=3D 0) {
+>          assert(job->status =3D=3D BLOCK_JOB_STATUS_NULL);
+> +        assert(!job->txn);
+>          BlockDriverState *bs =3D blk_bs(job->blk);
+>          QLIST_REMOVE(job, job_list);
+>          bs->job =3D NULL;
+> @@ -392,6 +402,7 @@ static void block_job_decommission(BlockJob *job)
+>      job->busy =3D false;
+>      job->paused =3D false;
+>      job->deferred_to_main_loop =3D true;
+> +    block_job_txn_del_job(job);
+>      block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
+>      block_job_unref(job);
+>  }
+> @@ -481,8 +492,7 @@ static int block_job_finalize_single(BlockJob *job)
+>          }
+>      }
+>
+> -    QLIST_REMOVE(job, txn_list);
+> -    block_job_txn_unref(job->txn);
+> +    block_job_txn_del_job(job);
+>      block_job_conclude(job);
+>      return 0;
+>  }
+> --
+> 2.13.6
+>
