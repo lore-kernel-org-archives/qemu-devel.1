@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f1CSy-0002Uq-21
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:54:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1f1CTh-00039a-0F
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:55:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f1CSv-0000pi-98
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:54:20 -0400
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-	<fce080fd-1970-b856-82e0-42c62306da6c@redhat.com>
-	<4add3400-b4d4-4812-72f2-0f184b2f4fd6@virtuozzo.com>
-	<b1fe16fd-05fe-73c6-f2f5-31b23459a131@virtuozzo.com>
-	<2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <48dbaef0-0a9f-de65-9c7d-584021fc4759@redhat.com>
-Date: Wed, 28 Mar 2018 16:53:57 +0200
+	(envelope-from <bounces@canonical.com>) id 1f1CTd-00013Y-2C
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:55:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41540)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f1CTc-00013C-Rp
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:55:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f1CTb-0007pp-CH
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 14:54:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 52BEE2E80CC
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 14:54:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Nec8V7MWZ8cwJCgLO7xjHZtQ0ePrA7Stq"
-Subject: Re: [Qemu-devel] [PATCH v4 for 2.12 0/3] fix bitmaps migration
- through shared storage
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Mar 2018 14:41:46 -0000
+From: "mike@papersolve.com" <mike@papersolve.com>
+Reply-To: Bug 1588591 <1588591@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160603031333.20018.31663.malonedeb@wampee.canonical.com>
+Message-Id: <152224810688.30058.11985765980313957104.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1588591] Re: Qemu 2.6 Solaris 8 Sparc telnet
+ terminate itself
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,273 +37,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Nec8V7MWZ8cwJCgLO7xjHZtQ0ePrA7Stq
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <48dbaef0-0a9f-de65-9c7d-584021fc4759@redhat.com>
-Subject: Re: [PATCH v4 for 2.12 0/3] fix bitmaps migration through shared
- storage
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
- <fce080fd-1970-b856-82e0-42c62306da6c@redhat.com>
- <4add3400-b4d4-4812-72f2-0f184b2f4fd6@virtuozzo.com>
- <b1fe16fd-05fe-73c6-f2f5-31b23459a131@virtuozzo.com>
- <2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
-In-Reply-To: <2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Although I have occasionally seen this message with later versions of
+QEMU running Solaris 8/SPARC it has never affected any operations for me
+or terminated a telnet or QEMU process, so I think if it is still there
+it's not having any affect.  So I think this can be closed.
 
-On 2018-03-27 12:11, Vladimir Sementsov-Ogievskiy wrote:
-> 27.03.2018 12:53, Vladimir Sementsov-Ogievskiy wrote:
->> 27.03.2018 12:28, Vladimir Sementsov-Ogievskiy wrote:
->>> 26.03.2018 21:06, Max Reitz wrote:
->>>> On 2018-03-20 18:05, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Hi all.
->>>>>
->>>>> This fixes bitmaps migration through shared storage. Look at 02 for=
+-- =
 
->>>>> details.
->>>>>
->>>>> The bug introduced in 2.10 with the whole qcow2 bitmaps feature, so=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1588591
 
->>>>> qemu-stable in CC. However I doubt that someone really suffered
->>>>> from this.
->>>>>
->>>>> Do we need dirty bitmaps at all in inactive case? - that was a
->>>>> question in v2.
->>>>> And, keeping in mind that we are going to use inactive mode not
->>>>> only for
->>>>> incoming migration, I'm not sure that answer is NO (but, it may be
->>>>> "NO" for
->>>>> 2.10, 2.11), so let's fix it in proposed here manner at least for
->>>>> 2.12.
->>>> For some reason, I can't get 169 to work now at all[1]. What's more,=
+Title:
+  Qemu 2.6 Solaris 8 Sparc telnet terminate itself
 
->>>> whenever I run it, two (on current master, maybe more after this
->>>> series)
->>>> "cat $TEST_DIR/mig_file" processes stay around.=C2=A0 That doesn't s=
-eem
->>>> right.
->>>>
->>>> However, this series doesn't seem to make it worse[2]...=C2=A0 So I'=
-m
->>>> keeping
->>>> it.=C2=A0 I suppose it's just some issue with the test.
->>>>
->>>> Max
->>>>
->>>>
->>>> [1] Sometimes there are migration even timeouts, sometimes just VM
->>>> launch timeouts (specifically when VM B is supposed to be re-launche=
-d
->>>> just after it has been shut down), and sometimes I get a dirty bitma=
-p
->>>> hash mismatch.
->>>>
->>>>
->>>> [2] The whole timeline was:
->>>>
->>>> - Apply this series, everything seems alright
->>>>
->>>> (a couple of hours later)
->>>> - Test some other things, stumble over 169 once or so
->>>>
->>>> - Focus on 169, fails a bit more often
->>>>
->>>> (today)
->>>> - Can't get it to work at all
->>>>
->>>> - Can't get it to work in any version, neither before nor after this=
+Status in QEMU:
+  New
 
->>>> patch
->>>>
->>>> - Lose my sanity
->>>>
->>>> - Write this email
->>>>
->>>> O:-)
->>>>
->>>
->>> hmm.. checked on current master (7b93d78a04aa24), tried a lot of
->>> times in a loop, works for me. How can I help?
->>>
->>
->> O, loop finally finished, with:
->>
->> 169 6s ... [failed, exit status 1] - output mismatch (see 169.out.bad)=
+Bug description:
+  With Qemu 2.6, Solaris 8 can be installed and run. However, it
+  sometimes terminate itself with I/O thread spun for 1000 iterations.
 
->> --- /work/src/qemu/master/tests/qemu-iotests/169.out=C2=A0=C2=A0=C2=A0=
- 2018-03-16
->> 21:01:19.536765587 +0300
->> +++ /work/src/qemu/master/tests/qemu-iotests/169.out.bad 2018-03-27
->> 12:33:03.804800350 +0300
->> @@ -1,5 +1,20 @@
->> -........
->> +......E.
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +ERROR: test__persistent__not_migbitmap__offline
->> (__main__.TestDirtyBitmapMigration)
->> +methodcaller(name, ...) --> methodcaller object
->> +---------------------------------------------------------------------=
--
->> +Traceback (most recent call last):
->> +=C2=A0 File "169", line 129, in do_test_migration
->> +=C2=A0=C2=A0=C2=A0 self.vm_b.event_wait("RESUME", timeout=3D10.0)
->> +=C2=A0 File
->> "/work/src/qemu/master/tests/qemu-iotests/../../scripts/qemu.py", line=
+  qemu-system-sparc -nographic -monitor null -serial mon:telnet:0.0.0.0:300=
+0,server -hda ./Sparc8.disk -m 256 -boot c -net nic,macaddr=3D52:54:0:12:34=
+:56 -net tap,ifname=3Dtap0,script=3Dno,downscript=3DnoQEMU waiting for conn=
+ection on: disconnected:telnet:0.0.0.0:3000,server
+  main-loop: WARNING: I/O thread spun for 1000 iterations
 
->> 349, in event_wait
->> +=C2=A0=C2=A0=C2=A0 event =3D self._qmp.pull_event(wait=3Dtimeout)
->> +=C2=A0 File
->> "/work/src/qemu/master/tests/qemu-iotests/../../scripts/qmp/qmp.py",
->> line 216, in pull_event
->> +=C2=A0=C2=A0=C2=A0 self.__get_events(wait)
->> +=C2=A0 File
->> "/work/src/qemu/master/tests/qemu-iotests/../../scripts/qmp/qmp.py",
->> line 124, in __get_events
->> +=C2=A0=C2=A0=C2=A0 raise QMPTimeoutError("Timeout waiting for event")=
-
->> +QMPTimeoutError: Timeout waiting for event
->> +
->> =C2=A0----------------------------------------------------------------=
-------
->> =C2=A0Ran 8 tests
->>
->> -OK
->> +FAILED (errors=3D1)
->> Failures: 169
->> Failed 1 of 1 tests
->>
->>
->> and I have a lot of opened pipes, like:
->>
->> root=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 18685=C2=A0 0.0=C2=A0 0.0 107=
-924=C2=A0=C2=A0 352 pts/0=C2=A0=C2=A0=C2=A0 S=C2=A0=C2=A0=C2=A0 12:19=C2=A0=
-=C2=A0 0:00 cat
->> /work/src/qemu/master/tests/qemu-iotests/scratch/mig_file
->>
->> ...
->>
->> restart testing loop, it continues to pass 169 again and again...
->>
->=20
-> .... and,
->=20
-> --- /work/src/qemu/master/tests/qemu-iotests/169.out=C2=A0=C2=A0=C2=A0 =
-2018-03-16
-> 21:01:19.536765587 +0300
-> +++ /work/src/qemu/master/tests/qemu-iotests/169.out.bad 2018-03-27
-> 12:58:44.804894014 +0300
-> @@ -1,5 +1,20 @@
-> -........
-> +F.......
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +FAIL: test__not_persistent__migbitmap__offline
-> (__main__.TestDirtyBitmapMigration)
-> +methodcaller(name, ...) --> methodcaller object
-> +----------------------------------------------------------------------=
-
-> +Traceback (most recent call last):
-> +=C2=A0 File "169", line 136, in do_test_migration
-> +=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persistent e=
-lse False)
-> +=C2=A0 File "169", line 77, in check_bitmap
-> +=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
-> +=C2=A0 File "/work/src/qemu/master/tests/qemu-iotests/iotests.py", lin=
-e 422,
-> in assert_qmp
-> +=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
-> +=C2=A0 File "/work/src/qemu/master/tests/qemu-iotests/iotests.py", lin=
-e 381,
-> in dictpath
-> +=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s"' =
-% (path, str(d)))
-> +AssertionError: failed path traversal for "error/desc" in "{u'return':=
-
-> {u'sha256':
-> u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}}"
-> +
-> =C2=A0-----------------------------------------------------------------=
------
-> =C2=A0Ran 8 tests
->=20
-> -OK
-> +FAILED (failures=3D1)
-> Failures: 169
-> Failed 1 of 1 tests
->=20
->=20
-> isn't it because a lot of cat processes? will check, update loop to
-> i=3D0; while check -qcow2 169; do ((i++)); echo $i OK; killall -9 cat; =
-done
-
-Hmm...  I know I tried to kill all of the cats, but for some reason that
-didn't really help yesterday.  Seems to help now, for 2.12.0-rc0 at
-least (that is, before this series).
-
-After the whole series, I still get a lot of failures in 169
-(mismatching bitmap hash, mostly).
-
-And interestingly, if I add an abort():
-
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 486f3e83b7..9204c1c0ac 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1481,6 +1481,7 @@ static int coroutine_fn
-qcow2_do_open(BlockDriverState *bs, QDict *options,     }
-
-     if (bdrv_dirty_bitmap_next(bs, NULL)) {
-+        abort();
-         /* It's some kind of reopen with already existing dirty
-bitmaps. There
-          * are no known cases where we need loading bitmaps in such
-situation,
-          * so it's safer don't load them.
-
-Then this fires for a couple of test cases of 169 even without the third
-patch of this series.
-
-I guess bdrv_dirty_bitmap_next() reacts to some bitmaps that migration
-adds or something?  Then this would be the wrong condition, because I
-guess we still want to load the bitmaps that are in the qcow2 file.
-
-I'm not sure whether bdrv_has_readonly_bitmaps() is the correct
-condition then, either, though.  Maybe let's take a step back: We want
-to load all the bitmaps from the file exactly once, and that is when it
-is opened the first time.  Or that's what I would have thought...  Is
-that even correct?
-
-Why do we load the bitmaps when the device is inactive anyway?
-Shouldn't we load them only once the device is activated?
-
-Max
-
-
---Nec8V7MWZ8cwJCgLO7xjHZtQ0ePrA7Stq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlq7rIUACgkQ9AfbAGHV
-z0C8bwf+LXhR/6RW6wZKOUhaIURpPEQkq3fXVu8mVfW1szpEI8HvCtaIS+QeDFUb
-5mEVGUoZhcsd7nuqXTVEk+9CUdlBGFnKEg60Iv8pl3hGf9vNj3FxK0PwjOKzr/Lk
-nPIA39ENjBX4PIH7+BwqkNYVZ9zdR8P8pWMw7ni+qQsEmFhxDvWGzcCYY8GsPaK4
-6kh72RHuGPIArvzn+oH8A4/4y/MLhpTVSIlYl6gNzIgbChNcSg4Yf4g0m76HmLaq
-gg/FlP98Q1BI43n6UzbDw1MmF3o3V/KQx/NPDKBMa3zMEDjGS2fxf7jD2wDdKU5x
-QpCfTaDKgpVjPQ6Pn5CJtsozOi8WZA==
-=Tmm3
------END PGP SIGNATURE-----
-
---Nec8V7MWZ8cwJCgLO7xjHZtQ0ePrA7Stq--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1588591/+subscriptions
