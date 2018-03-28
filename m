@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f1JVU-0005as-Uy
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:25:26 -0400
+	(envelope-from <eswierk@gmail.com>) id 1f1JrU-0007Dz-Ti
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f1JVQ-0003fR-07
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:25:24 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:36821)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f1JVP-0003dc-GI
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:25:19 -0400
-Date: Wed, 28 Mar 2018 18:25:17 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180328222517.GA31554@flamenco>
-References: <1522128840-498-1-git-send-email-cota@braap.org>
-	<1522128840-498-10-git-send-email-cota@braap.org>
-	<87in9g8h6h.fsf@linaro.org>
+	(envelope-from <eswierk@gmail.com>) id 1f1JrT-00064F-QN
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:48:08 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36411)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@gmail.com>) id 1f1JrT-000643-Lc
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:48:07 -0400
+Received: by mail-ot0-x242.google.com with SMTP id n40-v6so4454497otd.3
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 15:48:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87in9g8h6h.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 09/14] hardfloat: support float32/64
- multiplication
+In-Reply-To: <20180328163630.48576-6-dgilbert@redhat.com>
+References: <20180328163630.48576-1-dgilbert@redhat.com>
+	<20180328163630.48576-6-dgilbert@redhat.com>
+From: Ed Swierk <eswierk@gmail.com>
+Date: Wed, 28 Mar 2018 15:47:26 -0700
+Message-ID: <CAMCNy=BQoqHOopwsN_CHFqH4sBTcuJc9NDxy-BDf3XMke3x-_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] e1000: Choose which set of props to
+ migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, quintela@redhat.com, peterx@redhat.com
 
-On Wed, Mar 28, 2018 at 14:26:30 +0100, Alex Bennée wrote:
-> Emilio G. Cota <cota@braap.org> writes:
-> OK I've had a bit more of a play and I think we can drop the macro abuse
-> and have common wrappers for the host_fpu. We don't want to intermingle
-> with the soft float slow path to stop the compiler adding overhead. We
-> also need a wrapper for each float size and op count due to differences
-> in the classify functions. However the boiler plate is pretty common and
-> where there are differences the compiler is smart enough to fix it.
-> 
-> See branch:
-> https://github.com/stsquad/qemu/tree/hostfloat/common-fpu-wrapper
-> 
-> I keep the numbers for add/sub and doubled the speed of float32_mul on
-> my box, without any macros ;-)
+On Wed, Mar 28, 2018 at 9:36 AM, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> When we're using the subsection we migrate both
+> the 'props' and 'tso_props' data; when we're not using
+> the subsection (to migrate to 2.11 or old machine types) we've
+> got to choose what to migrate in the main structure.
+>
+> If we're using the subsection migrate 'props' in the main structure.
+> If we're not using the subsection then migrate the last one
+> that changed, which gives behaviour similar to the old behaviour.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-I really like the idea of letting the compiler unfold everything.
-In fact I just did that to re-implement fp-bench (now with support
-for -t host/soft, yay).
+Acked-by: Ed Swierk <eswierk@gmail.com>
 
-> Full patch inline:
-> 
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index d0f1f65c12..89217b5e67 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -879,56 +879,72 @@ soft_float64_sub(float64 a, float64 b, float_status *status)
->      return float64_round_pack_canonical(pr, status);
->  }
-(snip)
-> +static float fpu_mul32(float a, float b, bool *nocheck) {
-> +
-> +    if (float32_is_zero(a) || float32_is_zero(b)) {
-> +        bool signbit = float32_is_neg(a) ^ float32_is_neg(b);
-> +        *nocheck = true;
-> +        return float32_set_sign((0), signbit);
-> +    } else {
-> +        float ha = float32_to_float(a);
-> +        float hb = float32_to_float(b);
-> +        float hr = ha * hb;
-> +        return hr;
+> ---
+>  hw/net/e1000.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+> index 4e606d4b2a..13a9494a8d 100644
+> --- a/hw/net/e1000.c
+> +++ b/hw/net/e1000.c
+> @@ -130,6 +130,7 @@ typedef struct E1000State_st {
+>  #define E1000_FLAG_TSO (1 << E1000_FLAG_TSO_BIT)
+>      uint32_t compat_flags;
+>      bool received_tx_tso;
+> +    bool use_tso_for_migration;
+>      e1000x_txd_props mig_props;
+>  } E1000State;
+>
+> @@ -622,9 +623,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+>      if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
+>          if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
+>              e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
+> +            s->use_tso_for_migration = 1;
+>              tp->tso_frames = 0;
+>          } else {
+>              e1000x_read_tx_ctx_descr(xp, &tp->props);
+> +            s->use_tso_for_migration = 0;
+>          }
+>          return;
+>      } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
+> @@ -1366,7 +1369,20 @@ static int e1000_pre_save(void *opaque)
+>          s->phy_reg[PHY_STATUS] |= MII_SR_AUTONEG_COMPLETE;
 >      }
-> +}
-
-This function is wrong :-(
-
-Note that a and b are floats, not float32's. So if any of
-them is 0.X then they get silently converted to 0, which goes via the
-fast(er) path above. This explains the speedup.
-
-Note that you could have caught this with:
-
-  $ ./fp-test -t soft ibm/* -w whitelist.txt -e x
-
-Compiling with -Wconversion would also point these out, but the output
-is way too noisy to be useful.
-
-
-That said, I'll take inspiration from your approach for v3--hopefully
-without (many) macros this time round.
-
-Thanks!
-
-		Emilio
+>
+> -    s->mig_props = s->tx.props;
+> +    /* Decide which set of props to migrate in the main structure */
+> +    if (chkflag(TSO) || !s->use_tso_for_migration) {
+> +        /* Either we're migrating with the extra subsection, in which
+> +         * case the mig_props is always 'props' OR
+> +         * we've not got the subsection, but 'props' was the last
+> +         * updated.
+> +         */
+> +        s->mig_props = s->tx.props;
+> +    } else {
+> +        /* We're not using the subsection, and 'tso_props' was
+> +         * the last updated.
+> +         */
+> +        s->mig_props = s->tx.tso_props;
+> +    }
+>      return 0;
+>  }
+>
+> --
+> 2.14.3
+>
