@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1BuC-0001Jj-Rn
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:18:28 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f1BvN-0002AB-Uh
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1Bu9-0000dH-Kq
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:18:24 -0400
-Date: Wed, 28 Mar 2018 11:18:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180328141818.GG5046@localhost.localdomain>
-References: <20180323125808.4479-1-rkagan@virtuozzo.com>
-	<20180323125808.4479-3-rkagan@virtuozzo.com>
-	<20180323195621.GN3417@localhost.localdomain>
-	<20180326150615.GD2401@rkaganb.sw.ru>
+	(envelope-from <mlureau@redhat.com>) id 1f1BvK-000137-PH
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:19:37 -0400
+Received: from mail-io0-f196.google.com ([209.85.223.196]:33519)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f1BvK-00012u-JE
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:19:34 -0400
+Received: by mail-io0-f196.google.com with SMTP id l3so3760620iog.0
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 07:19:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180326150615.GD2401@rkaganb.sw.ru>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] i386/hyperv: error out if
- features requested but unsupported
+In-Reply-To: <6fca462f-7aca-f743-6f43-8475b6501014@redhat.com>
+References: <20180328130723.20831-1-marcandre.lureau@redhat.com>
+	<20180328130723.20831-3-marcandre.lureau@redhat.com>
+	<a74de730-cf65-056c-dfa1-2fcc9361b9a1@redhat.com>
+	<CAMxuvayFZiYwf99mbMVFVwFZR2Bnqfv4rYS1O2SpDT1mhFtAEg@mail.gmail.com>
+	<ac132600-ac94-c9b7-b280-f2ff2ebebf74@redhat.com>
+	<6fca462f-7aca-f743-6f43-8475b6501014@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 28 Mar 2018 16:19:33 +0200
+Message-ID: <CAMxuvazJp57yr6f5B=v3GYYyRkrWY9x9zKAUK_TtZHx2hcY2Ow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qobject: introduce QObjectCommon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-stable@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Armbruster, Markus" <armbru@redhat.com>
 
-On Mon, Mar 26, 2018 at 06:06:16PM +0300, Roman Kagan wrote:
-> On Fri, Mar 23, 2018 at 04:56:21PM -0300, Eduardo Habkost wrote:
-> > On Fri, Mar 23, 2018 at 03:58:08PM +0300, Roman Kagan wrote:
-> > > In order to guarantee compatibility on migration, QEMU should have
-> > > complete control over the features it announces to the guest via CPUID.
-> > > 
-> > > However, for a number of Hyper-V-related cpu properties, if the
-> > > corresponding feature is not supported by the underlying KVM, the
-> > > propery is silently ignored and the feature is not announced to the
-> > > guest.
-> > > 
-> > > Refuse to start with an error instead.
-> > > 
-> > > Cc: qemu-stable@nongnu.org
-> > > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> > 
-> > I wonder if we should make these just warnings on -stable, and
-> > make them fatal errors only on 2.12.  I wouldn't want to make
-> > existing running VMs not runnable on a stable update.
-> 
-> OK let's follow your approach and consider who would suffer more:
-> 
-> a) users who started a VM on a newer kernel and then migrated to an
->    older one, and got a guest crash on an unsupported MSR (I'm not even
->    sure they'd be able to see the warnings)
-> 
-> b) users who had a VM configuration with features which didn't actually
->    work (but that wasn't apparently a problem for them), and suddenly
->    couldn't start their VM after QEMU upgrade (the problem is not only
->    cold-restarting per se, but also live migration to the upgraded
->    version: dunno if the management layer would allow to adjust the VM
->    config to migrate successfully).
-> 
-> I don't have a strong opinion on this, will follow whatever direction
-> you advise.
+Hi
 
-(a) is an existing bug (and rare, it seems: I didn't see it being
-reported anywhere).  (b) would be a regression in a -stable
-update.  I'd prefer to be conservative on -stable.
+On Wed, Mar 28, 2018 at 4:11 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 28/03/2018 15:55, Eric Blake wrote:
+>> On 03/28/2018 08:48 AM, Marc-Andr=C3=A9 Lureau wrote:
+>>
+>>>>> +#define QOBJECT(x) \
+>>>>> +   container_of(&(x)->base, QObject, base)
+>>>>
+>>>>
+>>>> If I understand correctly, this still causes clang complaints when
+>>>> called as
+>>>> QOBJECT(NULL).  As long as we are touching this, should we improve thi=
+s
+>>>> macro to be friendly to NULL conversion?
+>>>
+>>> I don't see much need for allowing NULL (literally) to be passed to
+>>> QOBJECT(). If it's a null pointer, as long as it has the right type,
+>>> it should be fine, shouldn't it?
+>>
+>> Not with clang ubsan (okay, the failure is at runtime, not compile time)=
+:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg05143.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg05148.html
+>>
+>> Even when the offset is 0, the mere fact that you are computing an
+>> offset relative to a NULL pointer is undefined behavior.
+>
+> Are there cases where we are passing NULL to qobject_{inc,dec}ref?  They
+> currently have an "if" in they're body, but my opinion is they ought to
+> crash and burn...
 
-> 
-> 
-> > >  target/i386/kvm.c | 25 +++++++++++++++++++++----
-> > >  1 file changed, 21 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > > index fb20ff18c2..c9c359241c 100644
-> > > --- a/target/i386/kvm.c
-> > > +++ b/target/i386/kvm.c
-> > > @@ -658,17 +658,34 @@ static int hyperv_handle_properties(CPUState *cs)
-> > >          env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
-> > >          env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
-> > >      }
-> > > -    if (cpu->hyperv_crash && has_msr_hv_crash) {
-> > > +    if (cpu->hyperv_crash) {
-> > > +        if (!has_msr_hv_crash) {
-> > > +            fprintf(stderr,
-> > > +                    "Hyper-V crash MSRs are not supported by kernel\n");
-> > 
-> > I would mention the corresponding "hv-..." -cpu option
-> > explicitly, for clarity.
-> 
-> This sounds like a good idea, but I wonder if it should better be done
-> uniformly for all hv_* options, together with transitioning to
-> error_report(), and whether we want to do this at this point in the
-> release cycle.
+I find it convenient that unref() accepts NULL, just like free().
 
-I don't think it will be a problem if we mention the property
-names in the new messages, but not try to reword the existing
-ones.
+However, I agree than ref() should crash if given a NULL pointer.
 
--- 
-Eduardo
+While at it, I'd also prefer ref() to return a pointer to the same object..=
+.
