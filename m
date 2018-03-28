@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1f1I0E-0000GN-Q8
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:49:04 -0400
+	(envelope-from <mjc@sifive.com>) id 1f1I1K-0000tD-0c
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1f1I0A-0003ex-8v
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:49:02 -0400
-Received: from mail-cys01nam02on0129.outbound.protection.outlook.com
-	([104.47.37.129]:58640
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1f1I09-0003eO-V1
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:48:58 -0400
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Wed, 28 Mar 2018 20:48:54 +0000
-Message-ID: <DM5PR21MB0170C0B7995A9AC36D2F7C5BB6A30@DM5PR21MB0170.namprd21.prod.outlook.com>
-References: <20180326170658.606-1-juterry@microsoft.com>
-	<20180328175050.GH5046@localhost.localdomain>
-In-Reply-To: <20180328175050.GH5046@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mjc@sifive.com>) id 1f1I1I-0004Jo-5B
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:50:10 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:39251)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f1I1H-0004Hf-T9
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:50:08 -0400
+Received: by mail-ot0-x242.google.com with SMTP id h8-v6so4156280oti.6
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 13:50:07 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] WHPX fixes an issue with CPUID 1 not
- returning CPUID_EXT_HYPERVISOR
+In-Reply-To: <20180328022233.13400-3-richard.henderson@linaro.org>
+References: <20180328022233.13400-1-richard.henderson@linaro.org>
+	<20180328022233.13400-3-richard.henderson@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 28 Mar 2018 13:50:06 -0700
+Message-ID: <CAHNT7Nt6=__SC=5B6QgvuR9-kreLB-ufYMTSdiEnoiKBzN=Kfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/riscv: Mark MSTATUS_FS dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,191 +28,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>
 
-Hey Eduardo
+On Tue, Mar 27, 2018 at 7:22 PM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-Responses inline. Thanks!
+> Writes to the FP register file mark the register file as dirty.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
 
-> -----Original Message-----
-> From: Eduardo Habkost <ehabkost@redhat.com>
-> Sent: Wednesday, March 28, 2018 10:51 AM
-> To: Justin Terry (VM) <juterry@microsoft.com>
-> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; rth@twiddle.net
-> Subject: Re: [PATCH] WHPX fixes an issue with CPUID 1 not returning
-> CPUID_EXT_HYPERVISOR
->=20
-> On Mon, Mar 26, 2018 at 10:06:58AM -0700, Justin Terry (VM) wrote:
-> > Implements the CPUID trap for CPUID 1 to include the
-> > CPUID_EXT_HYPERVISOR flag in the ECX results. This was preventing some
-> > older linux kernels from booting when trying to access MSR's that dont
-> > make sense when virtualized.
-> >
-> > Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-> > ---
-> >  target/i386/whpx-all.c | 79
-> > +++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 78 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c index
-> > bf33d320bf..58435178a4 100644
-> > --- a/target/i386/whpx-all.c
-> > +++ b/target/i386/whpx-all.c
-> > @@ -911,12 +911,62 @@ static int whpx_vcpu_run(CPUState *cpu)
-> >              ret =3D 1;
-> >              break;
-> >
-> > +        case WHvRunVpExitReasonX64Cpuid: {
-> > +            WHV_REGISTER_VALUE reg_values[5] =3D {0};
-> > +            WHV_REGISTER_NAME reg_names[5];
-> > +            UINT32 reg_count =3D 5;
-> > +            UINT64 rip, rax, rcx, rdx, rbx;
-> > +
-> > +            rip =3D vcpu->exit_ctx.VpContext.Rip +
-> > +                  vcpu->exit_ctx.VpContext.InstructionLength;
-> > +            switch (vcpu->exit_ctx.CpuidAccess.Rax) {
-> > +            case 1:
-> > +                rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
-> > +                /* Advertise that we are running on a hypervisor */
-> > +                rcx =3D
-> > +                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx |
-> > +                    CPUID_EXT_HYPERVISOR;
-> > +
-> > +                rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
-> > +                rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
-> > +                break;
-> > +            default:
-> > +                rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
-> > +                rcx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRcx;
-> > +                rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
-> > +                rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
->=20
-> Interesting, so the WHPX API already tries to provide default values for =
-the
-> CPUID leaves.  Would it make sense to try and use the values returned by
-> cpu_x86_cpuid() in the future?
->=20
-> Is there a way to get the default CPUID results from the WHPX API without
-> calling WHvRunVirtualProcessor(), so QEMU can be aware of what exactly
-> the guest is seeing on CPUID?
+Reviewed-by: Michael Clark <mjc@sifive.com>
+Tested-by: Michael Clark <mjc@sifive.com>
 
-The platform now has two ways to interact with CPUID.
 
-1. (As the code is doing now). At partition creation time you can register =
-for specific CPUID exits and then respond to the CPUID with your custom ans=
-wer or with the Hypervisor defaults that were forwarded to you. Unfortunate=
-ly, QEMU has no way to know the Hypervisor default ahead of time but QEMU c=
-an make at least make a runtime decision about how to respond.
-2. At partition creation time the platform allows QEMU to inject (set) the =
-default responses for specific CPUID exits. This can now be done by setting=
- the  `WHV_X64_CPUID_RESULT` in the `CpuidResultList` of `WHV_PARTITION_PRO=
-PERTY` to the exit values QEMU wants. So effectively you can know the answe=
-rs ahead of time for any that you set but the answers are not dynamic.
-
-The only issues/questions I have there are:
-
-If we use [1] (like the code is now) I don't see any way to keep the exits =
-in cpu_x86_cpuid() matched up with the registered exits to WHPX. This means=
- that WHPX would not be called in these cases and would instead get the Hyp=
-ervisor default rather than the answer from cpu_x86_cpuid().
-
-If we use [2] to inject the answers at creation time WHPX needs access to t=
-he CPUX86State at accel init which also doesn't seem to be possible in QEMU=
- today. WHPX could basically just call cpu_x86_cpuid() for each CPUID QEMU =
-cares about and plumb the answer before start. This has the best performanc=
-e as we avoid the additional exits but has an issue in that the results mus=
-t be known ahead of time.
-
-And, we could obviously use a hybrid of the two for cases we know. Do you h=
-ave any ideas that I could try out here on how you would like to see this w=
-ork?
-
-Thanks,
-Justin
-
->=20
->=20
-> > +            }
-> > +
-> > +            reg_names[0] =3D WHvX64RegisterRip;
-> > +            reg_names[1] =3D WHvX64RegisterRax;
-> > +            reg_names[2] =3D WHvX64RegisterRcx;
-> > +            reg_names[3] =3D WHvX64RegisterRdx;
-> > +            reg_names[4] =3D WHvX64RegisterRbx;
-> > +
-> > +            reg_values[0].Reg64 =3D rip;
-> > +            reg_values[1].Reg64 =3D rax;
-> > +            reg_values[2].Reg64 =3D rcx;
-> > +            reg_values[3].Reg64 =3D rdx;
-> > +            reg_values[4].Reg64 =3D rbx;
-> > +
-> > +            hr =3D WHvSetVirtualProcessorRegisters(whpx->partition,
-> > +                                                 cpu->cpu_index,
-> > +                                                 reg_names,
-> > +                                                 reg_count,
-> > +                                                 reg_values);
-> > +
-> > +            if (FAILED(hr)) {
-> > +                error_report("WHPX: Failed to set CpuidAccess state re=
-gisters,"
-> > +                             " hr=3D%08lx", hr);
-> > +            }
-> > +            ret =3D 0;
-> > +            break;
-> > +        }
-> >          case WHvRunVpExitReasonNone:
-> >          case WHvRunVpExitReasonUnrecoverableException:
-> >          case WHvRunVpExitReasonInvalidVpRegisterValue:
-> >          case WHvRunVpExitReasonUnsupportedFeature:
-> >          case WHvRunVpExitReasonX64MsrAccess:
-> > -        case WHvRunVpExitReasonX64Cpuid:
-> >          case WHvRunVpExitReasonException:
-> >          default:
-> >              error_report("WHPX: Unexpected VP exit code %d", @@
-> > -1272,6 +1322,33 @@ static int whpx_accel_init(MachineState *ms)
-> >          goto error;
-> >      }
-> >
-> > +    memset(&prop, 0, sizeof(WHV_PARTITION_PROPERTY));
-> > +    prop.ExtendedVmExits.X64CpuidExit =3D 1;
-> > +    hr =3D WHvSetPartitionProperty(whpx->partition,
-> > +                                 WHvPartitionPropertyCodeExtendedVmExi=
-ts,
-> > +                                 &prop,
-> > +                                 sizeof(WHV_PARTITION_PROPERTY));
-> > +
-> > +    if (FAILED(hr)) {
-> > +        error_report("WHPX: Failed to enable partition extended
-> X64CpuidExit"
-> > +                     " hr=3D%08lx", hr);
-> > +        ret =3D -EINVAL;
-> > +        goto error;
-> > +    }
-> > +
-> > +    UINT32 cpuidExitList[] =3D {1};
-> > +    hr =3D WHvSetPartitionProperty(whpx->partition,
-> > +                                 WHvPartitionPropertyCodeCpuidExitList=
-,
-> > +                                 cpuidExitList,
-> > +                                 RTL_NUMBER_OF(cpuidExitList) *
-> > + sizeof(UINT32));
-> > +
-> > +    if (FAILED(hr)) {
-> > +        error_report("WHPX: Failed to set partition CpuidExitList hr=
-=3D%08lx",
-> > +                     hr);
-> > +        ret =3D -EINVAL;
-> > +        goto error;
-> > +    }
-> > +
-> >      hr =3D WHvSetupPartition(whpx->partition);
-> >      if (FAILED(hr)) {
-> >          error_report("WHPX: Failed to setup partition, hr=3D%08lx",
-> > hr);
-> > --
-> > 2.11.0
-> >
->=20
+> ---
+>  target/riscv/op_helper.c | 25 +++++++++++++++++--------
+>  target/riscv/translate.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 56 insertions(+), 9 deletions(-)
+>
+> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> index e34715df4e..74eeef0be8 100644
+> --- a/target/riscv/op_helper.c
+> +++ b/target/riscv/op_helper.c
+> @@ -72,11 +72,20 @@ void helper_raise_exception(CPURISCVState *env,
+> uint32_t exception)
+>      do_raise_exception_err(env, exception, 0);
+>  }
+>
+> -static void validate_mstatus_fs(CPURISCVState *env, uintptr_t ra)
+> +static void validate_mstatus_fs(CPURISCVState *env, uintptr_t ra, bool
+> write)
+>  {
+>  #ifndef CONFIG_USER_ONLY
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    switch (get_field(env->mstatus, MSTATUS_FS)) {
+> +    case 0: /* disabled */
+>          do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, ra);
+> +        g_assert_not_reached();
+> +    case 1: /* initial */
+> +    case 2: /* clean */
+> +        if (write) {
+> +            /* Mark fp status as dirty.  */
+> +            env->mstatus = MSTATUS_FS;
+> +        }
+> +        break;
+>      }
+>  #endif
+>  }
+> @@ -96,15 +105,15 @@ void csr_write_helper(CPURISCVState *env,
+> target_ulong val_to_write,
+>
+>      switch (csrno) {
+>      case CSR_FFLAGS:
+> -        validate_mstatus_fs(env, GETPC());
+> +        validate_mstatus_fs(env, GETPC(), true);
+>          cpu_riscv_set_fflags(env, val_to_write & (FSR_AEXC >>
+> FSR_AEXC_SHIFT));
+>          break;
+>      case CSR_FRM:
+> -        validate_mstatus_fs(env, GETPC());
+> +        validate_mstatus_fs(env, GETPC(), true);
+>          env->frm = val_to_write & (FSR_RD >> FSR_RD_SHIFT);
+>          break;
+>      case CSR_FCSR:
+> -        validate_mstatus_fs(env, GETPC());
+> +        validate_mstatus_fs(env, GETPC(), true);
+>          env->frm = (val_to_write & FSR_RD) >> FSR_RD_SHIFT;
+>          cpu_riscv_set_fflags(env, (val_to_write & FSR_AEXC) >>
+> FSR_AEXC_SHIFT);
+>          break;
+> @@ -379,13 +388,13 @@ target_ulong csr_read_helper(CPURISCVState *env,
+> target_ulong csrno)
+>
+>      switch (csrno) {
+>      case CSR_FFLAGS:
+> -        validate_mstatus_fs(env, GETPC());
+> +        validate_mstatus_fs(env, GETPC(), false);
+>          return cpu_riscv_get_fflags(env);
+>      case CSR_FRM:
+> -        validate_mstatus_fs(env, GETPC());
+> +        validate_mstatus_fs(env, GETPC(), false);
+>          return env->frm;
+>      case CSR_FCSR:
+> -        validate_mstatus_fs(env, GETPC());
+> +        validate_mstatus_fs(env, GETPC(), false);
+>          return (cpu_riscv_get_fflags(env) << FSR_AEXC_SHIFT)
+>                  | (env->frm << FSR_RD_SHIFT);
+>      /* rdtime/rdtimeh is trapped and emulated by bbl in system mode */
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index a30724aa90..08fc42a679 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -660,6 +660,31 @@ static void gen_store(DisasContext *ctx, uint32_t
+> opc, int rs1, int rs2,
+>      tcg_temp_free(dat);
+>  }
+>
+> +#ifndef CONFIG_USER_ONLY
+> +/* The states of mstatus_fs are:
+> + * 0 = disabled, 1 = initial, 2 = clean, 3 = dirty
+> + * We will have already diagnosed disabled state,
+> + * and need to turn initial/clean into dirty.
+> + */
+> +static void mark_fs_dirty(DisasContext *ctx)
+> +{
+> +    TCGv tmp;
+> +    if (ctx->mstatus_fs == MSTATUS_FS) {
+> +        return;
+> +    }
+> +    /* Remember the state change for the rest of the TB.  */
+> +    ctx->mstatus_fs = MSTATUS_FS;
+> +
+> +    tmp = tcg_temp_new();
+> +    tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
+> +    tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS);
+> +    tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
+> +    tcg_temp_free(tmp);
+> +}
+> +#else
+> +static inline void mark_fs_dirty(DisasContext *ctx) { }
+> +#endif
+> +
+>  static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
+>          int rs1, target_long imm)
+>  {
+> @@ -688,6 +713,8 @@ static void gen_fp_load(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          break;
+>      }
+>      tcg_temp_free(t0);
+> +
+> +    mark_fs_dirty(ctx);
+>  }
+>
+>  static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+> @@ -985,6 +1012,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>                           int rs1, int rs2, int rm)
+>  {
+>      TCGv t0 = NULL;
+> +    bool fp_output = true;
+>
+>      if (ctx->mstatus_fs == 0) {
+>          goto do_illegal;
+> @@ -1047,6 +1075,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_W_S:
+> @@ -1076,6 +1105,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_S_W:
+> @@ -1126,6 +1156,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FMV_S_X:
+> @@ -1218,6 +1249,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_W_D:
+> @@ -1247,6 +1279,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_D_W:
+> @@ -1294,6 +1327,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t
+> opc, int rd,
+>          default:
+>              goto do_illegal;
+>          }
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FMV_D_X:
+> @@ -1310,7 +1344,11 @@ static void gen_fp_arith(DisasContext *ctx,
+> uint32_t opc, int rd,
+>              tcg_temp_free(t0);
+>          }
+>          gen_exception_illegal(ctx);
+> -        break;
+> +        return;
+> +    }
+> +
+> +    if (fp_output) {
+> +        mark_fs_dirty(ctx);
+>      }
+>  }
+>
 > --
-> Eduardo
+> 2.14.3
+>
+>
