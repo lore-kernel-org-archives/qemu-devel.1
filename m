@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1f19Cr-0000oL-IW
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 07:25:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f19ZP-0007Wd-TM
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 07:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1f19Cn-0007y4-Gu
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 07:25:29 -0400
-Received: from mga04.intel.com ([192.55.52.120]:8692)
+	(envelope-from <imammedo@redhat.com>) id 1f19ZM-0000RZ-Or
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 07:48:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45026 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1f19Cn-0007xv-4I
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 07:25:25 -0400
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-References: <22f7f184-c295-4e18-c186-3fd9fdcce213@linux.intel.com>
-	<20180323160252.GA27131@stefanha-x1.localdomain>
-	<1e0e5f9b-18b4-7f0f-dbd1-696ef1f7039c@linux.intel.com>
-Message-ID: <e638d7a3-5c38-7a10-cef9-d1791e5b8fc7@linux.intel.com>
-Date: Wed, 28 Mar 2018 19:25:21 +0800
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f19ZM-0000Qx-KU
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 07:48:44 -0400
+Date: Wed, 28 Mar 2018 13:48:35 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180328134835.04f95535@redhat.com>
+In-Reply-To: <20180327170541.295fc29a@redhat.com>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<1520860275-101576-4-git-send-email-imammedo@redhat.com>
+	<20180323212508.GF28161@localhost.localdomain>
+	<20180327170541.295fc29a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1e0e5f9b-18b4-7f0f-dbd1-696ef1f7039c@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Consult] nfs-vsocks support
+Subject: Re: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: yang.zhong@intel.com, qemu-devel <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
+On Tue, 27 Mar 2018 17:05:41 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-
-On 3/26/2018 6:12 PM, Liu, Jing2 wrote:
-> Hi Stefan,
+> On Fri, 23 Mar 2018 18:25:08 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> Thank you very much for the response! It truly gave me much help.
-> 
-> On 3/24/2018 12:02 AM, Stefan Hajnoczi wrote:
+> > On Mon, Mar 12, 2018 at 02:11:09PM +0100, Igor Mammedov wrote:  
+> [...]
 [...]
->>> Could you give me some help and thanks in advance!
->>
->> Here is a script that launches nfsd and runs a guest:
->> https://github.com/stefanha/linux/commit/38cbc15661a6dd44b69c4f318091f2047d707035#diff-05f3fe8941076453942a8c059b409009 
->>
-
-Using the script, I met some problems making the
-initramfs.gz. It confused me a lot... I don't have busybox under
-/usr/bin or /usr/sbin. Where to get it?
-
-(host)$./go.sh nfs_tcp
-
-File /usr/sbin/busybox could not be opened for reading
-  line 55
-File /lib64/libtirpc.so.3 could not be opened for reading
-  line 306
-File nc-vsock could not be opened for reading
-  line 321
-File ../netperf-2.7.0/src/netserver could not be opened for reading
-  line 325
-
-It results in guest kernel_panic when gdb launches the guest:
-
-[    0.425738] Failed to execute /init (error -2)
-[    0.426074] Kernel panic - not syncing: No working init found.  Try 
-passing .
-[    0.427077] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.13.0+ #3
-[    0.427507] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
-BIOS rel-4
-[    0.428354] Call Trace:
-[    0.428538]  dump_stack+0x63/0x89
-[    0.428774]  ? rest_init+0x60/0xc0
-[    0.429017]  panic+0xeb/0x245
-[    0.429225]  ? putname+0x53/0x60
-[    0.429455]  ? rest_init+0xc0/0xc0
-[    0.429722]  kernel_init+0xf1/0x104
-[    0.430017]  ret_from_fork+0x25/0x30
-
-Looking forward to the kind reply.
-BTW, for the following questions that I sent two days ago, I have some
-ideas in mind and it could be ignored now.
-
-Jing
-
-> I have updated both host and guest kernel with vsock-nfsd repo and 
-> installed nfs-utils in both host and guest successfully.
-> 
-> There're two different manuals in 
-> https://www.spinics.net/lists/linux-nfs/msg64563.html(Quickstart 3~7) 
-> and nfs-utils (README step 3 DAEMON STARTUP ORDER).
-> Which one should be the best usage?
-> 
-> For the first quickstart manual step 7-Mount the export from the guest, 
-> two questions as follows.
-> 1. why hypervisor's CID is 2? I didn't notice when it is specified?
-> 2. Though I did step 3~7 successfully, I can't see the synchronistical 
-> changing on host folder /export/ and guest /mnt? So how to test the 
-> communcation between host and guest on the folder?
-> 
-> Thanks again!
-> 
-> Jing
+> > > @@ -1886,6 +1895,13 @@ static bool main_loop_should_exit(void)
+> > >      RunState r;
+> > >      ShutdownCause request;
+> > >  
+> > > +    if (preconfig_exit_requested) {
+> > > +        if (runstate_check(RUN_STATE_PRECONFIG)) {    
+> > 
+> > Is it possible to have preconfig_exit_request set outside of
+> > RUN_STATE_PRECONFIG?  When and why?  
+> preconfig_exit_requested is initialized with TRUE and
+> in combo with '-inmigrate' we need this runstate check.
+> it's the same as it was with
+>  { RUN_STATE_PRELAUNCH, RUN_STATE_INMIGRATE },
+> which I probably should remove (I need to check it though)
 [...]
->>
->> Stefan
->>
-> 
+
+> > > @@ -4594,6 +4623,10 @@ int main(int argc, char **argv, char **envp)
+> > >      }
+> > >      parse_numa_opts(current_machine);
+> > >  
+> > > +    /* do monitor/qmp handling at preconfig state if requested */
+> > > +    main_loop();    
+> > 
+> > Wouldn't it be simpler to do "if (!preconfig) { main_loop(); }"
+> > instead of entering main_loop() just to exit immediately?  
+> The thought didn't cross my mind, it might work and more readable
+> as one doesn't have to jump into main_loop() to find out that
+> it would exit immediately.
+> I'll try to it on respin.
+Well doing as suggested end ups more messy:
+
+    @@static bool main_loop_should_exit(void)
+    ...
+    if (preconfig_exit_requested) {
+        runstate_set(RUN_STATE_PRELAUNCH);                                        
+        return true;
+    }
+   
+    @@main
+    /* do monitor/qmp handling at preconfig state if requested */
+    if (!preconfig_exit_requested) {
+        main_loop();
+    } else if (runstate_check(RUN_STATE_PRECONFIG)) {
+        runstate_set(RUN_STATE_PRELAUNCH);
+    }
+    preconfig_exit_requested = false;
+    ...
+
+I'd prefer original v4 approach, where only main_loop_should_exit()
+has to deal with state transitions and book-keeping.
+
+[...]
