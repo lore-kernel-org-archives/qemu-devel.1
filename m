@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1GCa-0008H3-9y
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:53:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f1GDW-0000KZ-3P
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1GCV-0003nO-E9
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:53:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59198)
+	(envelope-from <ehabkost@redhat.com>) id 1f1GDR-00043K-70
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:54:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1GCV-0003nE-4W
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:53:35 -0400
-Date: Wed, 28 Mar 2018 15:53:31 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1GDQ-000435-U5
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:54:33 -0400
+Date: Wed, 28 Mar 2018 15:54:28 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180328185331.GN5046@localhost.localdomain>
-References: <20180328153024.23039-1-rkagan@virtuozzo.com>
-	<20180328153024.23039-3-rkagan@virtuozzo.com>
+Message-ID: <20180328185428.GO5046@localhost.localdomain>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<1520860275-101576-3-git-send-email-imammedo@redhat.com>
+	<20180323204218.GC28161@localhost.localdomain>
+	<20180327150827.532e8486@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180328153024.23039-3-rkagan@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2 2/2] i386/hyperv: error out if
- features requested but unsupported
+In-Reply-To: <20180327150827.532e8486@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/9] numa: split out NumaOptions parsing
+ into parse_NumaOptions()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Wed, Mar 28, 2018 at 06:30:24PM +0300, Roman Kagan wrote:
-> In order to guarantee compatibility on migration, QEMU should have
-> complete control over the features it announces to the guest via CPUID.
+On Tue, Mar 27, 2018 at 03:08:27PM +0200, Igor Mammedov wrote:
+> On Fri, 23 Mar 2018 17:42:18 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> However, for a number of Hyper-V-related cpu properties, if the
-> corresponding feature is not supported by the underlying KVM, the
-> propery is silently ignored and the feature is not announced to the
-> guest.
+> > On Mon, Mar 12, 2018 at 02:11:08PM +0100, Igor Mammedov wrote:
+> > > it will allow to reuse parse_NumaOptions() for parsing
+> > > configuration commands received via QMP interface
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  include/sysemu/numa.h |  1 +
+> > >  numa.c                | 48 +++++++++++++++++++++++++++++-------------------
+> > >  2 files changed, 30 insertions(+), 19 deletions(-)
+> > > 
+> > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > > index 21713b7..7a0ae75 100644
+> > > --- a/include/sysemu/numa.h
+> > > +++ b/include/sysemu/numa.h
+> > > @@ -22,6 +22,7 @@ struct NumaNodeMem {
+> > >  };
+> > >  
+> > >  extern NodeInfo numa_info[MAX_NODES];
+> > > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
+> > >  void parse_numa_opts(MachineState *ms);
+> > >  void numa_complete_configuration(MachineState *ms);
+> > >  void query_numa_node_mem(NumaNodeMem node_mem[]);
+> > > diff --git a/numa.c b/numa.c
+> > > index 126c649..2b1d292 100644
+> > > --- a/numa.c
+> > > +++ b/numa.c
+> > > @@ -169,28 +169,11 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
+> > >      have_numa_distance = true;
+> > >  }
+> > >  
+> > > -static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+> > > +static
+> > > +void parse_NumaOptions(MachineState *ms, NumaOptions *object, Error **errp)  
+> > 
+> > I wonder if we should rename the parse_numa_{node,distance}()
+> > functions to configure_numa_{node,distance}(), and this one
+> > configure_numa().  These functions don't parse anything, anymore.
+> I'd preffer to do it in another patch on top of this series
+> (added it my TODO list)
+
+I agree with renaming parse_numa*() later, but the new function
+you are creating can have a more reasonable name as it doesn't
+parse anything.
+
+
 > 
-> Refuse to start with an error instead.
 > 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> > >  {
+> > > -    NumaOptions *object = NULL;
+> > > -    MachineState *ms = opaque;
+> > >      Error *err = NULL;
+> > >  
+> > > -    {
+> > > -        Visitor *v = opts_visitor_new(opts);
+> > > -        visit_type_NumaOptions(v, NULL, &object, &err);
+> > > -        visit_free(v);
+> > > -    }
+> > > -
+> > > -    if (err) {
+> > > -        goto end;
+> > > -    }
+> > > -
+> > > -    /* Fix up legacy suffix-less format */
+> > > -    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
+> > > -        const char *mem_str = qemu_opt_get(opts, "mem");
+> > > -        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
+> > > -    }
+> > > -
+> > >      switch (object->type) {
+> > >      case NUMA_OPTIONS_TYPE_NODE:
+> > >          parse_numa_node(ms, &object->u.node, &err);
+> > > @@ -224,6 +207,33 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+> > >      }
+> > >  
+> > >  end:
+> > > +    if (err) {
+> > > +        error_propagate(errp, err);
+> > > +    }  
+> > 
+> > "if (err)" is not necessary here.  See
+> > scripts/coccinelle/error_propagate_null.cocci.
+> fixed
 
-Something I didn't consider before:
+Thanks!
 
-Will this block migration before it even starts, or will crash
-the VM only after all migration data was sent to the destination?
+>  
+> > > +}
+> > > +
+> > > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+> > > +{
+> > > +    NumaOptions *object = NULL;
+> > > +    MachineState *ms = MACHINE(opaque);
+> > > +    Error *err = NULL;
+> > > +    Visitor *v = opts_visitor_new(opts);
+> > > +
+> > > +    visit_type_NumaOptions(v, NULL, &object, &err);
+> > > +    visit_free(v);
+> > > +    if (err) {
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    /* Fix up legacy suffix-less format */
+> > > +    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
+> > > +        const char *mem_str = qemu_opt_get(opts, "mem");
+> > > +        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
+> > > +    }
+> > > +
+> > > +    parse_NumaOptions(ms, object, &err);
+> > > +
+> > > +end:
+> > >      qapi_free_NumaOptions(object);
+> > >      if (err) {
+> > >          error_report_err(err);  
+> > 
+> > We can fix this one too while at it.
+> error_report_err() doesn't check for NULL value,
+> 'if(err)' is needed here
 
-I didn't test it, but kvm_arch_init_vcpu() seems to be too late
-to block an invalid/unsupport configuration.
-
-Maybe we can simply call hyperv_handle_properties() earlier,
-inside x86_cpu_realizefn()?
-
-(I know it's very late for this kind of intrusive change in
-v2.12, but I still think it's a good idea to fix this as soon as
-possible.)
-
-
-> ---
-> v1 -> v2:
->  - indicate what flag requested the feature that can't be enabled in the
->    error message
->  - fix a typo in the error message for VP_RUNTIME
-> 
->  target/i386/kvm.c | 32 ++++++++++++++++++++++++++++----
->  1 file changed, 28 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index b35623ae24..113926aff2 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -659,17 +659,41 @@ static int hyperv_handle_properties(CPUState *cs)
->          env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
->          env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
->      }
-> -    if (cpu->hyperv_crash && has_msr_hv_crash) {
-> +    if (cpu->hyperv_crash) {
-> +        if (!has_msr_hv_crash) {
-> +            fprintf(stderr, "Hyper-V crash MSRs "
-> +                    "(requested by 'hv-crash' cpu flag) "
-> +                    "are not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
->      }
->      env->features[FEAT_HYPERV_EDX] |= HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
-> -    if (cpu->hyperv_reset && has_msr_hv_reset) {
-> +    if (cpu->hyperv_reset) {
-> +        if (!has_msr_hv_reset) {
-> +            fprintf(stderr, "Hyper-V reset MSR "
-> +                    "(requested by 'hv-reset' cpu flag) "
-> +                    "is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EAX] |= HV_RESET_AVAILABLE;
->      }
-> -    if (cpu->hyperv_vpindex && has_msr_hv_vpindex) {
-> +    if (cpu->hyperv_vpindex) {
-> +        if (!has_msr_hv_vpindex) {
-> +            fprintf(stderr, "Hyper-V VP_INDEX MSR "
-> +                    "(requested by 'hv-vpindex' cpu flag) "
-> +                    "is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EAX] |= HV_VP_INDEX_AVAILABLE;
->      }
-> -    if (cpu->hyperv_runtime && has_msr_hv_runtime) {
-> +    if (cpu->hyperv_runtime) {
-> +        if (!has_msr_hv_runtime) {
-> +            fprintf(stderr, "Hyper-V VP_RUNTIME MSR "
-> +                    "(requested by 'hv-runtime' cpu flag) "
-> +                    "is not supported by kernel\n");
-> +            return -ENOSYS;
-> +        }
->          env->features[FEAT_HYPERV_EAX] |= HV_VP_RUNTIME_AVAILABLE;
->      }
->      if (cpu->hyperv_synic) {
-> -- 
-> 2.14.3
-> 
+Sorry, my mistake.
 
 -- 
 Eduardo
