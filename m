@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f1651-0002x9-9b
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:05:17 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1f167W-0003q4-T1
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f164v-0005dO-72
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:05:11 -0400
-References: <d29ae6aa-5758-277b-b754-4e6fe7666e6b@redhat.com>
-	<CAFEAcA9dHPLj6aF=JsS8dXaDWf_ONQ_A+SD1xXQO7DdsWK3yAw@mail.gmail.com>
-	<6b4fbb94-2c28-27c2-17e4-b3ce593eb04d@redhat.com>
-	<CAFEAcA_rJ_=-dKauAmrJPGRJ6C09_9CQzRdXK53va4NB_xXKpg@mail.gmail.com>
-	<0d6f5f6d-bf28-ffc0-4d7c-b2c73912057e@redhat.com>
-	<20180328020322.GT17789@xz-mi>
-	<99129f71-aeb2-6d8e-ce7e-8bd81d39c87f@redhat.com>
-	<20180328072155.GC29554@xz-mi>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <f7b2ce1b-5ba6-be3e-e38f-53549efada01@redhat.com>
-Date: Wed, 28 Mar 2018 10:04:47 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180328072155.GC29554@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Regression on KVM qemu-system-aarch64 since
- "monitor: enable IO thread for (qmp & !mux) typed"
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1f167T-0006Er-Li
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:07:46 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:50032 helo=mxct.zte.com.cn)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jiang.biao2@zte.com.cn>)
+	id 1f167S-0006Dm-4J
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:07:43 -0400
+Date: Wed, 28 Mar 2018 16:07:33 +0800 (CST)
+Message-ID: <201803281607336840751@zte.com.cn>
+In-Reply-To: <acb5360c-75ac-2ae3-0e66-ff2adcbfb244@gmail.com>
+References: 20180328030351.GU17789@xz-mi, 201803281208196040484@zte.com.cn,
+	acb5360c-75ac-2ae3-0e66-ff2adcbfb244@gmail.com
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_3/8=5D_migration=3A_support_tode?=
+ =?utf-8?q?tectcompressionand_decompression_errors?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Blake <eblake@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: peterx@redhat.com, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Hi Peter,
-
-On 28/03/18 09:21, Peter Xu wrote:
-> On Wed, Mar 28, 2018 at 08:49:59AM +0200, Auger Eric wrote:
->> Hi Peter,
->>
->> On 28/03/18 04:03, Peter Xu wrote:
->>> On Fri, Mar 23, 2018 at 01:36:36PM +0100, Auger Eric wrote:
->>>> Hi,
->>>>
->>>> On 23/03/18 13:11, Peter Maydell wrote:
->>>>> On 23 March 2018 at 12:01, Auger Eric <eric.auger@redhat.com> wrote:
->>>>>> Hi,
->>>>>>
->>>>>> On 23/03/18 11:26, Peter Maydell wrote:
->>>>>>> On 23 March 2018 at 10:24, Auger Eric <eric.auger@redhat.com> wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> I observe a regression on KVM accelerated qemu-system-aarch64:
->>>>>>>>
->>>>>>>> Unexpected error in kvm_device_access() at
->>>>>>>> /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
->>>>>>>> 2018-03-23T09:59:59.629439Z qemu-system-aarch64: KVM_GET_DEVICE_ATTR
->>>>>>>> failed: Group 6 attr 0x000000000000c664: Device or resource busy
->>>>>>>> 2018-03-23 10:00:00.085+0000: shutting down, reason=crashed
->>>>>>>
->>>>>>> Can you get a backtrace for this? (I guess you'd need to fiddle
->>>>>>> with the kvm_device_access() code to make it assert rather
->>>>>>> than passing back the error).
->>>>>>
->>>>>> OK. I will try to do so. As I could have expected, I cannot reproduce on
->>>>>> a standalone qemu command line. The problem observed above is seen with
->>>>>> libvirt launch which may be doing some other QMP stuff concurrently?
->>>>>
->>>>> Hmm, that could be a bit painful to debug. I dunno if libvirt
->>>>> has a "launch QEMU under gdb" option. If not, you could try
->>>>> something like:
->>>>>    if (condition we want to get a backtrace on) {
->>>>>        printf("hit condition, attach gdb to process %d\n", (int)getpid());
->>>>>        for (;;) { }
->>>>>    }
->>>>
->>>> Thanks for the hint. Here is the stack I get.
->>>>
->>>> #0  kvm_device_access (fd=31, group=6, attr=50788, val=0x5937c88, write=false, errp=0x16984a8 <error_abort>) at /home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164
->>>> #1  0x00000000004f8ce4 in arm_gicv3_icc_reset (env=0xffffa1fc8330, ri=0x597f910) at /home/augere/UPSTREAM/qemu/hw/intc/arm_gicv3_kvm.c:632
->>>> #2  0x00000000006351ac in cp_reg_reset (key=0x597f730, value=0x597f910, opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:78
->>>> #3  0x0000ffffa47edce4 in g_hash_table_foreach () from /lib64/libglib-2.0.so.0
->>>> #4  0x0000000000635394 in arm_cpu_reset (s=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/target/arm/cpu.c:130
->>>> #5  0x000000000090c888 in cpu_reset (cpu=0xffffa1fc0010) at qom/cpu.c:249
->>>> #6  0x00000000005793d8 in do_cpu_reset (opaque=0xffffa1fc0010) at /home/augere/UPSTREAM/qemu/hw/arm/boot.c:665
->>>> #7  0x000000000073095c in qemu_devices_reset () at hw/core/reset.c:69
->>>> #8  0x00000000006976e0 in qemu_system_reset (reason=SHUTDOWN_CAUSE_NONE) at vl.c:1731
->>>> #9  0x000000000069fd60 in main (argc=69, argv=0xffffe877d1a8, envp=0xffffe877d3d8) at vl.c:4697
->>>
->>> I think current master should work fine with ARM KVM now since OOB is
->>> now off by default.
->>
->> Yes it works for me with the reverts.
->>
->>  But does ARM use postcopy, and will ARM need the
->>> coming network failure recovery feature?
->>
->> I assume it does
->>>
->>> If so, maybe we'll still need to have a look on this single problem
->>> (this is the only non-testcase issue I know now with Out-Of-Band).
->>
->> OK. I need to have a look at your series to better understand what it does.
-> 
-> It introduced a dedicated iothread to run IO part of the monitor code
-> (e.g., parsing of QMP input, and reply of the responses).  So now the
-> parsing could start earlier, before the main loop (that's what I
-> suspect the problem before), and meanwhile QMP IOs can happen in
-> parallel now with main thread, which it never can before (since all
-> QMP logic will be in main thread).
-> 
-> I would be curious about what commands have been sent by libvirt to
-> QEMU-arm when reach this point.  Please feel free to let me know if I
-> can help in any form.  For example, if there is an ARM server that I
-> can login and run both libvirt and QEMU, I'd be glad to play with it
-> too.
-Yes, I will send you the data and will my utmost to help in the debugging.
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> 
+PiBPbiAwMy8yOC8yMDE4IDEyOjIwIFBNLCBQZXRlciBYdSB3cm90ZToKPj4gT24gV2VkLCBNYXIg
+MjgsIDIwMTggYXQgMTI6MDg6MTlQTSArMDgwMCwgamlhbmcuYmlhbzJAenRlLmNvbS5jbiB3cm90
+ZToKPj4+Pgo+Pj4+IE9uIFR1ZSwgTWFyIDI3LCAyMDE4IGF0IDEwOjM1OjI5UE0gKzA4MDAsIFhp
+YW8gR3Vhbmdyb25nIHdyb3RlOgo+Pj4+Cj4+Pj4+Pj4gTm8sIHdlIGNhbid0IG1ha2UgdGhlIGFz
+c3VtcHRpb24gdGhhdCAiZXJyb3IgX211c3RfIGJlIGNhdXNlZCBieSBwYWdlIHVwZGF0ZSIuCj4+
+Pj4+Pj4gTm8gZG9jdW1lbnQvQUJJIGFib3V0IGNvbXByZXNzL2RlY29tcHJlc3MgcHJvbWlzZWQg
+aXQuIDopCj4+Pj4KPj4+PiBJbmRlZWQsIEkgZm91bmQgbm8gZ29vZCBkb2N1bWVudHMgYWJvdXQg
+YmVsb3cgZXJyb3JzIHRoYXQgamlhbmcuYmlhbwo+Pj4+IHBvaW50ZWQgb3V0Lgo+Pj4gSGksIFBl
+dGVyCj4+PiBUaGUgZGVzY3JpcHRpb24gYWJvdXQgdGhlIGVycm9ycyBjb21lcyBmcm9tIGhlcmUs
+Cj4+PiBodHRwOi8vd3d3LnpsaWIubmV0L21hbnVhbC5odG1sCj4+PiBBbmQgYWJvdXQgdGhlIGVy
+cm9yIGNvZGVzIHJldHVybmVkIGJ5IGluZmxhdGUoKSwgdGhleSBhcmUgZGVzY3JpYmVkIGFz77yM
+Cj4+PiAqKiBpbmZsYXRlKCkgcmV0dXJucwo+Pj4gWl9PSyBpZiBzb21lIHByb2dyZXNzIGhhcyBi
+ZWVuIG1hZGUgKG1vcmUgaW5wdXQgcHJvY2Vzc2VkIG9yIG1vcmUgb3V0cHV0IHByb2R1Y2VkKSwK
+Pj4+IFpfU1RSRUFNX0VORCBpZiB0aGUgZW5kIG9mIHRoZSBjb21wcmVzc2VkIGRhdGEgaGFzIGJl
+ZW4gcmVhY2hlZCBhbmQgYWxsIHVuY29tcHJlc3NlZCBvdXRwdXQgaGFzIGJlZW4gcHJvZHVjZWQs
+Cj4+PiBaX05FRURfRElDVCBpZiBhIHByZXNldCBkaWN0aW9uYXJ5IGlzIG5lZWRlZCBhdCB0aGlz
+IHBvaW50LAo+Pj4gWl9EQVRBX0VSUk9SIGlmIHRoZSBpbnB1dCBkYXRhIHdhcyBjb3JydXB0ZWQg
+KGlucHV0IHN0cmVhbSBub3QgY29uZm9ybWluZyB0byB0aGUgemxpYiBmb3JtYXQgb3IgaW5jb3Jy
+ZWN0IGNoZWNrIHZhbHVlLCBpbiB3aGljaCBjYXNlIHN0cm0tPm1zZyBwb2ludHMgdG8gYSBzdHJp
+bmcgd2l0aCBhID5tb3JlIHNwZWNpZmljIGVycm9yKSwKPj4+IFpfU1RSRUFNX0VSUk9SIGlmIHRo
+ZSBzdHJlYW0gc3RydWN0dXJlIHdhcyBpbmNvbnNpc3RlbnQgKGZvciBleGFtcGxlIG5leHRfaW4g
+b3IgbmV4dF9vdXQgd2FzIFpfTlVMTCwgb3IgdGhlIHN0YXRlIHdhcyBpbmFkdmVydGVudGx5IHdy
+aXR0ZW4gb3ZlciBieSB0aGUgYXBwbGljYXRpb24pLAo+Pj4gWl9NRU1fRVJST1IgaWYgdGhlcmUg
+d2FzIG5vdCBlbm91Z2ggbWVtb3J5LAo+Pj4gWl9CVUZfRVJST1IgaWYgbm8gcHJvZ3Jlc3Mgd2Fz
+IHBvc3NpYmxlIG9yIGlmIHRoZXJlIHdhcyBub3QgZW5vdWdoIHJvb20gaW4gdGhlIG91dHB1dCBi
+dWZmZXIgd2hlbiBaX0ZJTklTSCBpcyB1c2VkLiAuLi4KPj4+ICoqCj4+Cj4+IEFoIHllcy4gIE15
+IGJhZCB0byBiZSBzbyB1bmNhcmVmdWwuIDopCj4+Cj4+PiBBY2NvcmRpbmcgdG8gdGhlIGFib3Zl
+IGRlc2NyaXB0aW9uLCB0aGUgZXJyb3IgY2F1c2VkIGJ5IHBhZ2UgdXBkYXRlIGxvb2tzCj4+PiBt
+b3JlIGxpa2UgdGVuZCB0byByZXR1cm4gWl9EQVRBX0VSUk9SLCBidXQgSSBkbyBub3QgaGF2ZSBl
+bnYgdG8gdmVyaWZ5IHRoYXQuIDopCj4KPiBObywgc3RpbGwgbGFjayBpbmZvIHRvIGNvbmZpcm0g
+dGhlIGNhc2Ugb2YgY29tcHJlc3NpbmcgdGhlIGRhdGEgYmVpbmcKPiB1cGRhdGVkIGlzIHRoZSBv
+bmx5IG9uZSB0byByZXR1cm4gWl9EQVRBX0VSUk9SLiBBbmQgbm90aGluZyBwcm92aWRlZAo+IHRo
+YXQgbm8gb3RoZXIgZXJyb3IgY29uZGl0aW9uIGNhdXNlcyBkYXRhIGNvcnJ1cHRlZCB3aWxsIGJl
+IHNxdWVlemVkCj4gaW50byB0aGlzIGVycm9yIGNvZGUuCj4KPj4+IEFzIEkgdW5kZXJzdGFuZCBp
+dCwgdGhlIHJlYWwgY29tcHJlc3MvZGVjb21wcmVzcyBlcnJvciBjYXNlcyBvdGhlciB0aGFuIHRo
+YXQKPj4+IGNhdXNlZCBieSBwYWdlIHVwZGF0ZSBzaG91bGQgYmUgcmFyZSwgbWF5YmUgdGhlIGVy
+cm9yIGNvZGUgaXMgZW5vdWdoIHRvCj4+PiBkaXN0aW5ndWlzaCB0aG9zZSBpZiB3ZSBjYW4gdmVy
+aWZ5IHRoZSB0aGUgZXJyb3IgY29kZXMgcmV0dXJuZWQgYnkgcGFnZSB1cGRhdGUKPj4+IGFuZCBv
+dGhlciBzaWxlbnQgZmFpbHVyZXMgYnkgdGVzdC4gSWYgc28sIHdlIGNhbiBjdXQgdGhlIGNvc3Qg
+b2YgbWVtY3B5Lgo+Cj4gUGxlYXNlIG5vdGUsIGNvbXBhcmUgd2l0aCBvdGhlciBvcGVyYXRpb25z
+LCBlLmcsIGNvbXByZXNzaW9uLCBkZXRlY3QgemVybyBwYWdlLAo+IGV0Yy4sIG1lbWNweSgpIGlz
+IG5vdCBhIGhvdCBmdW5jdGlvbiBhdCBhbGwuCgpKdXN0IG91dCBvZiBjdXJpb3VzaXR5LCB3aGF0
+J3MgbGV2ZWwgb2YgbWVtb3J5IG51bSBuZWVkIHRvIGJlIGNvcGllZCBmb3IgCm5vcm1hbCBjYXNl
+cz8gS0JzLCBNQnM/IAoKPj4+IElmIG5vdCwgSSBhZ3JlZSB3aXRoIEd1YW5ncm9uZydzIGlkZWEg
+dG9vLiBJIG5ldmVyIHJlYWQgdGhlIHpsaWIgY29kZSBhbmQgYWxsIG15Cj4+PiBpbmZvcm1hdGlv
+biBjb21lcyBmcm9tIHRoZSBtYW51YWwsIHNvIGlmIGFueXRoaW5nIGluYWNjdXJhdGUsIHBscyBp
+Z25vcmUgbXkKPj4+IG9wdGlvbi4gOikKPj4KPj4gU28gSSBzdXBwb3NlIGFsbCBvZiB1cyBrbm93
+IHRoYXQgYWx0ZXJuYXRpdmUgbm93LCB3ZSBqdXN0IG5lZWQgYSBzb2xpZAo+PiB3YXkgdG8gY29u
+ZmlybSB0aGUgdW5jZXJ0YWludHkuICBJJ2xsIGxlYXZlIHRoaXMgdG8gR3Vhbmdyb25nLgo+Cj4g
+WWVzLCBpIHN0aWxsIHByZWZlciB0byBtZW1jcHkoKSB0byBtYWtlIGl0IHNhZmUgZW5vdWdoIHRv
+IHByb3RlY3Qgb3VyIHByb2R1Y3Rpb24KPiB1bmxlc3Mgd2UgZ2V0IGVub3VnaCBjZXJ0YWludHkg
+dG8gZmlndXJlIG91dCB0aGUgZXJyb3IgY29uZGl0aW9ucy4KCkluZGVlZCwgbm8gZ2FyYW50ZWUg
+Zm9yIHRoYXQgY3VycmVudGx5LCBzbyBmb3Igc2FmZSwgd2UgbmVlZCBtZW1jcHkoKS4gCk5ldmVy
+IG1pbmQsIHBscyBqdXN0IGlnbm9yZSBteSBvcGluaW9uLiA6KSAgClRoYW5rcyEKClJlZ2FyZHMs
+CkppYW5n
