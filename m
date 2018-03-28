@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f1CJx-0006jP-KL
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:45:06 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f1CR9-0001GM-MQ
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f1CJt-0005TE-Um
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:45:01 -0400
-Date: Wed, 28 Mar 2018 15:44:40 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180328144440.GU28913@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1f1CR5-0008VY-NK
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:52:27 -0400
 References: <20180323225739.17329-1-laurent@vivier.eu>
 	<87a7us8dov.fsf@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <0eda03dd-309c-9662-347c-d1c02686df34@vivier.eu>
+Date: Wed, 28 Mar 2018 16:52:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 In-Reply-To: <87a7us8dov.fsf@linaro.org>
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 00/20] linux-user: move arch
  specific parts to arch directories
 List-Id: <qemu-devel.nongnu.org>
@@ -26,41 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org
 
-On Wed, Mar 28, 2018 at 03:41:52PM +0100, Alex Benn=C3=A9e wrote:
->=20
+Le 28/03/2018 à 16:41, Alex Bennée a écrit :
+> 
 > Laurent Vivier <laurent@vivier.eu> writes:
->=20
-> > Some files like signal.c are really hard to read
-> > because all architectures are mixed in the same
-> > file.
-> >
-> > This series moves from signal.c these parts to
-> > the architecture dedicated directories in linux-user.
-> > Moreover, this allows to compare easier functions
-> > between architectures (it helps to debug problems).
-> > Adding new functions for a new architecture will
-> > be facilitated too.
-> >
-> > checkpatch.pl is not happy... but I only want to
-> > move code from a file to another. I don't want
-> > to change the content of the parts I move.
->=20
+> 
+>> Some files like signal.c are really hard to read
+>> because all architectures are mixed in the same
+>> file.
+>>
+>> This series moves from signal.c these parts to
+>> the architecture dedicated directories in linux-user.
+>> Moreover, this allows to compare easier functions
+>> between architectures (it helps to debug problems).
+>> Adding new functions for a new architecture will
+>> be facilitated too.
+>>
+>> checkpatch.pl is not happy... but I only want to
+>> move code from a file to another. I don't want
+>> to change the content of the parts I move.
+> 
 > I think de-tabifying is worth it as it's a whitespace fix. Sure you can
 > leave everything else.
+> 
+> Anyway for the rest of the series it looks good to me (although I only
+> tested ARM).
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-I'm all for doing cleanups of existing code to satisfy checkpatch
-too. Just make sure any cleanups are done as completely separate
-patches, not fixed with other functional changes.
+Thank you,
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+For testing, I have "debootstrap"ed the following architectures:
+
+stretch: s390x ppc64le mipsel mips64el mips arm aarch64
+jessie:  ppc
+lenny:   hppa
+sid:     m68k ppc64 sh4
+
+I've tried sparc32plus, sparc64 and alpha but they are already broken
+without this patch series.
+
+For the other architectures, I rely only on the results of "make check".
+(microblaze, cris, nios2, openrisc, tilegx, riscv, xtensa).
+
+If someone has pointers to debian repo for these archs, please share.
+
+Thanks,
+Laurent
