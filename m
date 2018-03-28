@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@gmail.com>) id 1f1JrU-0007Dz-Ti
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:48:09 -0400
+	(envelope-from <prvs=0625704796=stefanb@linux.vnet.ibm.com>)
+	id 1f1Kvh-0008Kq-Ba
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 19:56:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@gmail.com>) id 1f1JrT-00064F-QN
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:48:08 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36411)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@gmail.com>) id 1f1JrT-000643-Lc
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 18:48:07 -0400
-Received: by mail-ot0-x242.google.com with SMTP id n40-v6so4454497otd.3
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 15:48:07 -0700 (PDT)
+	(envelope-from <prvs=0625704796=stefanb@linux.vnet.ibm.com>)
+	id 1f1Kvd-0002h4-Fd
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 19:56:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53852
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=0625704796=stefanb@linux.vnet.ibm.com>)
+	id 1f1Kvd-0002ga-AE
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 19:56:29 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w2SNsbDf022491
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 19:56:27 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2h0hwc6sng-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 19:56:27 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 28 Mar 2018 19:56:26 -0400
+References: <1519934373-3629-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1519934373-3629-3-git-send-email-stefanb@linux.vnet.ibm.com>
+	<CAMxuvaxDVJxH0BwdtdqgvCUpOzaFf_0NsjvjQnceVjeO5dDhbQ@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 28 Mar 2018 19:56:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180328163630.48576-6-dgilbert@redhat.com>
-References: <20180328163630.48576-1-dgilbert@redhat.com>
-	<20180328163630.48576-6-dgilbert@redhat.com>
-From: Ed Swierk <eswierk@gmail.com>
-Date: Wed, 28 Mar 2018 15:47:26 -0700
-Message-ID: <CAMCNy=BQoqHOopwsN_CHFqH4sBTcuJc9NDxy-BDf3XMke3x-_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] e1000: Choose which set of props to
- migrate
+In-Reply-To: <CAMxuvaxDVJxH0BwdtdqgvCUpOzaFf_0NsjvjQnceVjeO5dDhbQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <944288fa-05f1-7ed1-b35d-f7010d28d4c9@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] tpm: extend TPM TIS with state
+ migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +47,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, quintela@redhat.com, peterx@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Wed, Mar 28, 2018 at 9:36 AM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 03/28/2018 11:41 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
 >
-> When we're using the subsection we migrate both
-> the 'props' and 'tso_props' data; when we're not using
-> the subsection (to migrate to 2.11 or old machine types) we've
-> got to choose what to migrate in the main structure.
+> On Thu, Mar 1, 2018 at 8:59 PM, Stefan Berger
+> <stefanb@linux.vnet.ibm.com> wrote:
+>> +
+>> +static const VMStateDescription vmstate_locty =3D {
+>> +    .name =3D "loc",
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 0,
+>> +    .minimum_version_id_old =3D 0,
+> I don't understand the problem there is leaving all the version fields
+> to 0, just like CRB.
 >
-> If we're using the subsection migrate 'props' in the main structure.
-> If we're not using the subsection then migrate the last one
-> that changed, which gives behaviour similar to the old behaviour.
+>> +    .fields      =3D (VMStateField[]) {
+>> +        VMSTATE_UINT32(state, TPMLocality),
+>> +        VMSTATE_UINT32(inte, TPMLocality),
+>> +        VMSTATE_UINT32(ints, TPMLocality),
+>> +        VMSTATE_UINT8(access, TPMLocality),
+>> +        VMSTATE_UINT32(sts, TPMLocality),
+>> +        VMSTATE_UINT32(iface_id, TPMLocality),
+>> +        VMSTATE_END_OF_LIST(),
+>> +    }
+>> +};
+>> +
+>>   static const VMStateDescription vmstate_tpm_tis =3D {
+>>       .name =3D "tpm",
+>> -    .unmigratable =3D 1,
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 0,
+>> +    .minimum_version_id_old =3D 0,
+> same
 >
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> If you remove the version fields: Reviewed-by: Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com>
 
-Acked-by: Ed Swierk <eswierk@gmail.com>
+This is the error I got when setting .version_id =3D 0 (on both) and doin=
+g=20
+a localhost migration
 
-> ---
->  hw/net/e1000.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
+qemu-system-x86_64: Missing section footer for tpm-tis
+qemu-system-x86_64: load of migration failed: Invalid argument
+
+It must have something to do with the nesting invoked by=20
+VMSTATE_STRUCT_ARRAY(loc,...) below.
+
+
+
 >
-> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-> index 4e606d4b2a..13a9494a8d 100644
-> --- a/hw/net/e1000.c
-> +++ b/hw/net/e1000.c
-> @@ -130,6 +130,7 @@ typedef struct E1000State_st {
->  #define E1000_FLAG_TSO (1 << E1000_FLAG_TSO_BIT)
->      uint32_t compat_flags;
->      bool received_tx_tso;
-> +    bool use_tso_for_migration;
->      e1000x_txd_props mig_props;
->  } E1000State;
 >
-> @@ -622,9 +623,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
->      if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
->          if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
->              e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
-> +            s->use_tso_for_migration = 1;
->              tp->tso_frames = 0;
->          } else {
->              e1000x_read_tx_ctx_descr(xp, &tp->props);
-> +            s->use_tso_for_migration = 0;
->          }
->          return;
->      } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
-> @@ -1366,7 +1369,20 @@ static int e1000_pre_save(void *opaque)
->          s->phy_reg[PHY_STATUS] |= MII_SR_AUTONEG_COMPLETE;
->      }
 >
-> -    s->mig_props = s->tx.props;
-> +    /* Decide which set of props to migrate in the main structure */
-> +    if (chkflag(TSO) || !s->use_tso_for_migration) {
-> +        /* Either we're migrating with the extra subsection, in which
-> +         * case the mig_props is always 'props' OR
-> +         * we've not got the subsection, but 'props' was the last
-> +         * updated.
-> +         */
-> +        s->mig_props = s->tx.props;
-> +    } else {
-> +        /* We're not using the subsection, and 'tso_props' was
-> +         * the last updated.
-> +         */
-> +        s->mig_props = s->tx.tso_props;
-> +    }
->      return 0;
->  }
->
-> --
-> 2.14.3
->
+>> +    .pre_save  =3D tpm_tis_pre_save,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_BUFFER(buffer, TPMState),
+>> +        VMSTATE_UINT16(rw_offset, TPMState),
+>> +        VMSTATE_UINT8(active_locty, TPMState),
+>> +        VMSTATE_UINT8(aborting_locty, TPMState),
+>> +        VMSTATE_UINT8(next_locty, TPMState),
+>> +
+>> +        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 1=
+,
+>> +                             vmstate_locty, TPMLocality),
+>> +
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>>   };
+>>
+>>   static Property tpm_tis_properties[] =3D {
+>> --
+>> 2.5.5
+>>
