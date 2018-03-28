@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1GDW-0000KZ-3P
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:54:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f1GEO-0000vL-FF
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:55:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1GDR-00043K-70
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:54:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52848)
+	(envelope-from <ehabkost@redhat.com>) id 1f1GEJ-0004PC-Cu
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:55:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1GDQ-000435-U5
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:54:33 -0400
-Date: Wed, 28 Mar 2018 15:54:28 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1GEJ-0004Ok-2L
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 14:55:27 -0400
+Date: Wed, 28 Mar 2018 15:55:24 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180328185428.GO5046@localhost.localdomain>
+Message-ID: <20180328185524.GP5046@localhost.localdomain>
 References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<1520860275-101576-3-git-send-email-imammedo@redhat.com>
-	<20180323204218.GC28161@localhost.localdomain>
-	<20180327150827.532e8486@redhat.com>
+	<1520860275-101576-5-git-send-email-imammedo@redhat.com>
+	<20180323212732.GG28161@localhost.localdomain>
+	<20180328131653.0a936cef@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180327150827.532e8486@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] numa: split out NumaOptions parsing
- into parse_NumaOptions()
+In-Reply-To: <20180328131653.0a936cef@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 4/9] hmp: disable monitor in preconfig
+ state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,129 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Tue, Mar 27, 2018 at 03:08:27PM +0200, Igor Mammedov wrote:
-> On Fri, 23 Mar 2018 17:42:18 -0300
+On Wed, Mar 28, 2018 at 01:16:53PM +0200, Igor Mammedov wrote:
+> On Fri, 23 Mar 2018 18:27:32 -0300
 > Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> > On Mon, Mar 12, 2018 at 02:11:08PM +0100, Igor Mammedov wrote:
-> > > it will allow to reuse parse_NumaOptions() for parsing
-> > > configuration commands received via QMP interface
+> > On Mon, Mar 12, 2018 at 02:11:10PM +0100, Igor Mammedov wrote:
+> > > Ban it for now, if someone would need it to work early,
+> > > one would have to implement checks if HMP command is valid
+> > > at preconfig state.
 > > > 
 > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > > > ---
-> > >  include/sysemu/numa.h |  1 +
-> > >  numa.c                | 48 +++++++++++++++++++++++++++++-------------------
-> > >  2 files changed, 30 insertions(+), 19 deletions(-)
+> > > v4:
+> > >   * v3 was only printing error but not preventing command execution,
+> > >     Fix it by returning after printing error message.
+> > >     ("Dr. David Alan Gilbert" <dgilbert@redhat.com>)
+> > > ---
+> > >  monitor.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
 > > > 
-> > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> > > index 21713b7..7a0ae75 100644
-> > > --- a/include/sysemu/numa.h
-> > > +++ b/include/sysemu/numa.h
-> > > @@ -22,6 +22,7 @@ struct NumaNodeMem {
-> > >  };
+> > > diff --git a/monitor.c b/monitor.c
+> > > index a4417f2..ea0ca57 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -3104,6 +3104,11 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
 > > >  
-> > >  extern NodeInfo numa_info[MAX_NODES];
-> > > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
-> > >  void parse_numa_opts(MachineState *ms);
-> > >  void numa_complete_configuration(MachineState *ms);
-> > >  void query_numa_node_mem(NumaNodeMem node_mem[]);
-> > > diff --git a/numa.c b/numa.c
-> > > index 126c649..2b1d292 100644
-> > > --- a/numa.c
-> > > +++ b/numa.c
-> > > @@ -169,28 +169,11 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
-> > >      have_numa_distance = true;
-> > >  }
+> > >      trace_handle_hmp_command(mon, cmdline);
 > > >  
-> > > -static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> > > +static
-> > > +void parse_NumaOptions(MachineState *ms, NumaOptions *object, Error **errp)  
+> > > +    if (runstate_check(RUN_STATE_PRECONFIG)) {
+> > > +        monitor_printf(mon, "HMP not available in preconfig state\n");
+> > > +        return;  
 > > 
-> > I wonder if we should rename the parse_numa_{node,distance}()
-> > functions to configure_numa_{node,distance}(), and this one
-> > configure_numa().  These functions don't parse anything, anymore.
-> I'd preffer to do it in another patch on top of this series
-> (added it my TODO list)
-
-I agree with renaming parse_numa*() later, but the new function
-you are creating can have a more reasonable name as it doesn't
-parse anything.
-
-
+> > Not even the "cont" command?  It would be useful for testing
+> > -preconfig.
+> As someone already said on the list it's very easy to test with
+> QMP nowdays, just use qmp-shell for that.
+> So if someone isn't willing to learn to use QMP, one can write
+> HMP part with proper white-listing.
 > 
+> I can extend error message like this:
 > 
-> > >  {
-> > > -    NumaOptions *object = NULL;
-> > > -    MachineState *ms = opaque;
-> > >      Error *err = NULL;
-> > >  
-> > > -    {
-> > > -        Visitor *v = opts_visitor_new(opts);
-> > > -        visit_type_NumaOptions(v, NULL, &object, &err);
-> > > -        visit_free(v);
-> > > -    }
-> > > -
-> > > -    if (err) {
-> > > -        goto end;
-> > > -    }
-> > > -
-> > > -    /* Fix up legacy suffix-less format */
-> > > -    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
-> > > -        const char *mem_str = qemu_opt_get(opts, "mem");
-> > > -        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
-> > > -    }
-> > > -
-> > >      switch (object->type) {
-> > >      case NUMA_OPTIONS_TYPE_NODE:
-> > >          parse_numa_node(ms, &object->u.node, &err);
-> > > @@ -224,6 +207,33 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> > >      }
-> > >  
-> > >  end:
-> > > +    if (err) {
-> > > +        error_propagate(errp, err);
-> > > +    }  
-> > 
-> > "if (err)" is not necessary here.  See
-> > scripts/coccinelle/error_propagate_null.cocci.
-> fixed
+> "HMP not available in preconfig state, use QMP instead\n"
 
-Thanks!
-
->  
-> > > +}
-> > > +
-> > > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> > > +{
-> > > +    NumaOptions *object = NULL;
-> > > +    MachineState *ms = MACHINE(opaque);
-> > > +    Error *err = NULL;
-> > > +    Visitor *v = opts_visitor_new(opts);
-> > > +
-> > > +    visit_type_NumaOptions(v, NULL, &object, &err);
-> > > +    visit_free(v);
-> > > +    if (err) {
-> > > +        goto end;
-> > > +    }
-> > > +
-> > > +    /* Fix up legacy suffix-less format */
-> > > +    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
-> > > +        const char *mem_str = qemu_opt_get(opts, "mem");
-> > > +        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
-> > > +    }
-> > > +
-> > > +    parse_NumaOptions(ms, object, &err);
-> > > +
-> > > +end:
-> > >      qapi_free_NumaOptions(object);
-> > >      if (err) {
-> > >          error_report_err(err);  
-> > 
-> > We can fix this one too while at it.
-> error_report_err() doesn't check for NULL value,
-> 'if(err)' is needed here
-
-Sorry, my mistake.
+Sounds good enough to me.
 
 -- 
 Eduardo
