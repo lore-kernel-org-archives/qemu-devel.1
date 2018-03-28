@@ -1,15 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f1BIr-0005ic-GI
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:39:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1f1BOe-0002mU-TM
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f1BIo-0003TJ-9d
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:39:49 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed, 28 Mar 2018 16:38:45 +0300
-Message-Id: <20180328133845.20632-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] scripts/dump-qcow2.pl: Script to dump qcow2
- metadata
+	(envelope-from <eblake@redhat.com>) id 1f1BOb-0006F0-Qf
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:45:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54702 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f1BOb-0006EX-Lv
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:45:45 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA58BF6404
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 13:45:41 +0000 (UTC)
+References: <20180328130723.20831-1-marcandre.lureau@redhat.com>
+	<20180328130723.20831-3-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a74de730-cf65-056c-dfa1-2fcc9361b9a1@redhat.com>
+Date: Wed, 28 Mar 2018 08:45:36 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180328130723.20831-3-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qobject: introduce QObjectCommon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,455 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com
 
-This script takes a qcow2 image and dumps its metadata: header,
-snapshot table and some extensions (although not all qcow2 features
-are supported yet).
+On 03/28/2018 08:07 AM, Marc-Andr=C3=A9 Lureau wrote:
+> By moving the common fields to a QObjectCommon, QObject can be a type
+> which also has a 'base' QObjectCommon field. This allows to write a
+> generic QOBJECT() macro that will work with any QObject type,
+> including QObject itself. The container_of() macro ensures that the
+> object to cast has a QObjectCommon base field, give me some type
+> safety guarantees. However, for it to work properly, all QObject types
+> must have 'base' at offset 0 (which is ensured by static checking from
+> previous patch)
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
 
-It can also display a list of all host clusters and the guest -> host
-address mappings, so it's useful to debug allocations.
+> +++ b/include/qapi/qmp/qbool.h
+> @@ -17,7 +17,7 @@
+>   #include "qapi/qmp/qobject.h"
+>  =20
+>   struct QBool {
+> -    QObject base;
+> +    struct QObjectCommon base;
 
-The image is assumed not to be corrupted, and this script does not do
-consistency checks (yet).
+Why no 'typedef struct QObjectCommon QObjectCommon' in scope to make=20
+this simpler?
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- scripts/dump-qcow2.pl | 425 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 425 insertions(+)
- create mode 100755 scripts/dump-qcow2.pl
+> -/* Get the 'base' part of an object */
+> -#define QOBJECT(obj) (&(obj)->base)
+> +struct QObject {
+> +    struct QObjectCommon base;
+> +};
+> +
+> +#define QOBJECT(x) \
+> +   container_of(&(x)->base, QObject, base)
 
-diff --git a/scripts/dump-qcow2.pl b/scripts/dump-qcow2.pl
-new file mode 100755
-index 0000000000..7eb9a0feda
---- /dev/null
-+++ b/scripts/dump-qcow2.pl
-@@ -0,0 +1,425 @@
-+#!/usr/bin/env perl
-+# Copyright (C) 2018 Igalia, S.L.
-+#
-+# Authors:
-+#  Alberto Garcia <berto@igalia.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+use strict;
-+use warnings;
-+use Fcntl qw(SEEK_SET SEEK_CUR);
-+use POSIX qw(ceil);
-+use Getopt::Long;
-+
-+sub showUsage {
-+    print "Usage: dump-qcow2.pl [options] <qcow2-file>\n";
-+    print "\nOptions:\n";
-+    print "\t--host           Show host cluster types\n";
-+    print "\t--guest          Show guest cluster mappings\n";
-+    print "\t--snapshot=<id>  Use this snapshot's L1 table for the mappings\n";
-+    exit 0;
-+}
-+
-+# Command-line parameters
-+my $printHost;
-+my $printGuest;
-+my $snapshot = '';
-+GetOptions('guest' => \$printGuest,
-+           'host' => \$printHost,
-+           'snapshot=s' => \$snapshot) or showUsage();
-+
-+# Open the qcow2 image
-+@ARGV == 1 or showUsage();
-+my $file = $ARGV[0];
-+-e $file or die "File '$file' not found\n";
-+open(FILE, $file) or die "Cannot open '$file'\n";
-+
-+# Some global variables
-+my $refcount_order = 4;
-+my $file_size = -s $file;
-+my $header_size = 72;
-+my $incompat_bits;
-+my $compat_bits;
-+my $autoclear_bits;
-+my @l2_tables;
-+my @clusters = ( "QCOW2 Header" ); # Contents of host clusters
-+my @crypt_methods = qw(no AES LUKS);
-+
-+# Read all common header fields
-+die "Not a qcow2 file\n" if (read_uint32() != 0x514649fb);
-+my $qcow2_version   = read_uint32();
-+my $backing_offset  = read_uint64();
-+my $backing_size    = read_uint32();
-+my $cluster_bits    = read_uint32();
-+my $virtual_size    = read_uint64();
-+my $crypt_method    = read_uint32();
-+my $l1_size         = read_uint32();
-+my $l1_offset       = read_uint64();
-+my $refcount_offset = read_uint64();
-+my $refcount_size   = read_uint32();
-+my $n_snapshots     = read_uint32();
-+my $snapshot_offset = read_uint64();
-+
-+if ($qcow2_version != 2 && $qcow2_version != 3) {
-+    die "Unknown QCOW2 version: $qcow2_version\n";
-+}
-+
-+# Read v3-specific fields
-+if ($qcow2_version == 3) {
-+    $incompat_bits  = read_uint64();
-+    $compat_bits    = read_uint64();
-+    $autoclear_bits = read_uint64();
-+    $refcount_order = read_uint32();
-+    $header_size    = read_uint32();
-+}
-+
-+# Values calculated from the header fields
-+my $cluster_size     = 1 << $cluster_bits;
-+my $refcount_bits    = 1 << $refcount_order;
-+my $n_clusters       = ceil($file_size / $cluster_size);
-+my $l1_size_clusters = ceil($l1_size * 8 / $cluster_size);
-+my $l1_size_expected = ceil($virtual_size * 8 / $cluster_size / $cluster_size);
-+
-+foreach my $i (0..$l1_size_clusters - 1) {
-+    $clusters[ncluster($l1_offset) + $i] = "L1 table $i [active]";
-+}
-+foreach my $i (0..$refcount_size-1) {
-+    $clusters[ncluster($refcount_offset) + $i] = "Refcount table $i";
-+}
-+if ($snapshot_offset > 0) {
-+    $clusters[ncluster($snapshot_offset)] = "Snapshot table";
-+}
-+
-+# Print a summary of the header
-+print "QCOW2 version $qcow2_version\n";
-+print "Header size: $header_size bytes\n";
-+print "File size: ".prettyBytes($file_size)."\n";
-+print "Virtual size: ".prettyBytes($virtual_size)."\n";
-+print "Cluster size: ".prettyBytes($cluster_size)." ($n_clusters clusters)\n";
-+if ($backing_offset != 0) {
-+    sysseek(FILE, $backing_offset, SEEK_SET);
-+    my $backing_name = read_str($backing_size);
-+    printf("Backing file offset: 0x%u (%u bytes): %s\n",
-+           $backing_offset, $backing_size, $backing_name);
-+}
-+print "Number of snapshots: $n_snapshots\n";
-+printf("Refcount table: %u cluster(s) (%u entries) ".
-+       "at 0x%x (#%u)\n", $refcount_size,
-+       $refcount_size * $cluster_size / 8,
-+       $refcount_offset, ncluster($refcount_offset));
-+printf("Refcount entry size: %u bits (%u entries per block)\n",
-+       $refcount_bits, $cluster_size * 8 / $refcount_bits);
-+printf("L1 table: %u entries at 0x%x (#%u)\n",
-+       $l1_size, $l1_offset, ncluster($l1_offset));
-+if ($l1_size != $l1_size_expected) {
-+    printf("Expected L1 entries based on the virtual size: %u\n",
-+           $l1_size_expected);
-+}
-+printf("Encrypted: %s\n", $crypt_methods[$crypt_method] || "unknown method");
-+
-+# Header extensions and additional sections
-+if ($qcow2_version == 3) {
-+    print "Incompatible bits:";
-+    print " none" if ($incompat_bits == 0);
-+    print " dirty" if ($incompat_bits & 1);
-+    print " corrupted" if ($incompat_bits & 2);
-+    print " unknown" if ($incompat_bits >> 2);
-+    print "\n";
-+
-+    print "Compatible bits:";
-+    print " none" if ($compat_bits == 0);
-+    print " lazy_refcounts" if ($compat_bits & 1);
-+    print " unknown" if ($compat_bits >> 1);
-+    print "\n";
-+
-+    print "Autoclear bits:";
-+    print " none" if ($autoclear_bits == 0);
-+    print " bitmaps_extension" if ($autoclear_bits & 1);
-+    print " unknown" if ($autoclear_bits >> 1);
-+    print "\n";
-+
-+    my ($i, $hdr_type, $hdr_len) = (0);
-+    sysseek(FILE, $header_size, SEEK_SET);
-+    do {
-+        $hdr_type = read_uint32();
-+        $hdr_len = (read_uint32() + 7) & ~7; # Round to the next multiple of 8
-+        if ($hdr_type == 0) {
-+            # No more extensions
-+        } elsif ($hdr_type == 0xE2792ACA) {
-+            print "Header extension $i: backing file format name\n";
-+        } elsif ($hdr_type == 0x6803f857) {
-+            print "Header extension $i: feature table name\n";
-+            for (my $ft_num = 0; $hdr_len >= 48; $hdr_len -= 48) {
-+                my @ft_types = ("incompatible", "compatible", "autoclear");
-+                my $ft_type = read_uint8();
-+                my $ft_bit = read_uint8();
-+                my $ft_name = read_str(46);
-+                printf("    Feature %d: %s (%s, bit %d)\n",
-+                       $ft_num++, $ft_name, $ft_types[$ft_type], $ft_bit);
-+            }
-+        } elsif ($hdr_type == 0x23852875) {
-+            print "Header extension $i: bitmaps extension\n";
-+        } elsif ($hdr_type == 0x0537be77) {
-+            print "Header extension $i: full disk encryption\n";
-+            my $fde_offset = read_uint64();
-+            my $fde_length = read_uint64();
-+            $hdr_len -= 16;
-+            my $fde_cluster = ncluster($fde_offset);
-+            my $fde_nclusters = ceil($fde_length / $cluster_size);
-+            foreach my $i (0..$fde_nclusters-1) {
-+                $clusters[$fde_cluster + $i] = "Full disk encryption header $i";
-+            }
-+            printf("    Offset 0x%x (#%u), length %u bytes (%u clusters)\n",
-+                   $fde_offset, $fde_cluster, $fde_length, $fde_nclusters);
-+        } else {
-+            printf("Header extension $i: unknown (0x%x)\n", $hdr_type);
-+        }
-+        sysseek(FILE, $hdr_len, SEEK_CUR);
-+        $i++;
-+    } while ($hdr_type != 0);
-+}
-+
-+if ($incompat_bits >> 2) {
-+    die "Incompatible bits found, aborting\n";
-+}
-+
-+# Read the snapshot table
-+my %snap_l1_offsets = read_snapshot_table();
-+if ($snapshot ne '' && !defined($snap_l1_offsets{$snapshot})) {
-+    die "Snapshot $snapshot not found\n";
-+}
-+
-+read_refcount_table();
-+
-+# Read and parse the active L1/L2 tables
-+my @l1_table = read_l1_table($l1_offset);
-+read_l2_tables("active", \@l1_table, $snapshot eq "");
-+
-+# Read all L1/L2 tables from all snapshots
-+foreach my $id (keys(%snap_l1_offsets)) {
-+    my $off = $snap_l1_offsets{$id};
-+    @l1_table = read_l1_table($off);
-+    read_l2_tables("snapshot $id", \@l1_table, $snapshot eq $id);
-+}
-+
-+close(FILE);
-+
-+printHostClusters() if $printHost;
-+printGuestClusters() if $printGuest;
-+
-+exit 0;
-+
-+# Subroutines
-+
-+sub read_l1_table {
-+    my $offset = shift;
-+    my @table;
-+    sysseek(FILE, $offset, SEEK_SET);
-+    foreach my $i (0..$l1_size-1) {
-+        $table[$i] = read_uint64();
-+    }
-+    return @table;
-+}
-+
-+sub read_l2_tables {
-+    my $name = shift;
-+    my $l1_table = shift;
-+    my $selected_l1_table = shift;
-+    foreach my $i (0..$#{$l1_table}) {
-+        my $l2_offset = ${$l1_table}[$i] & ((1<<56) - (1<<9));
-+        if ($l2_offset != 0) {
-+            my $l2_table =
-+                read_one_l2_table($i, $l2_offset, $selected_l1_table);
-+            if ($selected_l1_table) {
-+                $l2_tables[$i] = $l2_table;
-+            }
-+            $clusters[ncluster($l2_offset)] = "L2 table $i [$name]";
-+        }
-+    }
-+}
-+
-+sub read_one_l2_table {
-+    my $table_num = shift;
-+    my $l2_offset = shift;
-+    my $selected_l1_table = shift;
-+    my $num_l2_entries = $cluster_size / 8;
-+    my @l2_table;
-+    sysseek(FILE, $l2_offset, SEEK_SET);
-+    foreach my $j (0..$num_l2_entries-1) {
-+        my $entry = read_uint64();
-+        my $compressed = ($entry >> 62) & 1;
-+        if ($compressed) {
-+            my $csize_shift = 62 - ($cluster_bits - 8);
-+            my $csize_mask = (1 << ($cluster_bits - 8)) - 1;
-+            my $csize = (($entry >> $csize_shift) & $csize_mask) + 1;
-+            my $coffset = $entry & ((1 << $csize_shift) - 1);
-+            my $cluster1 = ncluster($coffset);
-+            my $cluster2 = ncluster($coffset + ($csize * 512) - 1);
-+            foreach my $k ($cluster1..$cluster2) {
-+                if (!$clusters[$k]) {
-+                    $clusters[$k] = "Compressed cluster";
-+                }
-+            }
-+            if ($cluster1 == $cluster2) {
-+                $l2_table[$j] =
-+                    sprintf("0x%x (#%u) (compressed, %d sectors)",
-+                            $coffset, $cluster1, $csize);
-+            } else {
-+                $l2_table[$j] =
-+                    sprintf("0x%x (#%u - #%u) (compressed, %d sectors)",
-+                            $coffset, $cluster1, $cluster2, $csize);
-+            }
-+        } else {
-+            my $guest_off = ($table_num << ($cluster_bits * 2 - 3)) +
-+                            ($j << $cluster_bits);
-+            my $host_off = $entry & ((1<<56) - (1<<9));
-+            my $host_cluster = ncluster($host_off);
-+            my $all_zeros = $entry & 1;
-+            if ($all_zeros) {
-+                if ($host_off != 0) {
-+                    $l2_table[$j] = sprintf("0x%x (#%u) (all zeros)",
-+                                            $host_off, ncluster($host_off));
-+                    if ($selected_l1_table) {
-+                        $clusters[$host_cluster] =
-+                            sprintf("All zeros [guest 0x%x (#%u)]",
-+                                    $guest_off, ncluster($guest_off));
-+                    } elsif (!$clusters[$host_cluster]) {
-+                        $clusters[$host_cluster] = "All zeros";
-+                    }
-+                } else {
-+                    $l2_table[$j] = "All zeros";
-+                }
-+            } else {
-+                if ($host_off != 0) {
-+                    $l2_table[$j] = sprintf("0x%x (#%u)",
-+                                            $host_off, ncluster($host_off));
-+                    if ($selected_l1_table) {
-+                        $clusters[$host_cluster] =
-+                            sprintf("Data cluster [guest 0x%x (#%u)]",
-+                                    $guest_off, ncluster($guest_off));
-+                    } elsif (!$clusters[$host_cluster]) {
-+                        $clusters[$host_cluster] = "Data cluster";
-+                    }
-+                }
-+            }
-+        }
-+    }
-+    return \@l2_table;
-+}
-+
-+sub read_refcount_table {
-+    my $n_entries = $refcount_size * $cluster_size / 8;
-+    sysseek(FILE, $refcount_offset, SEEK_SET);
-+    foreach my $i (0..$n_entries-1) {
-+        my $entry = read_uint64() & ~511;
-+        if ($entry != 0) {
-+            $clusters[ncluster($entry)] = "Refcount block $i";
-+        }
-+    }
-+}
-+
-+sub read_snapshot_table {
-+    my %l1_offsets;
-+    sysseek(FILE, $snapshot_offset, SEEK_SET);
-+    for (my $i = 0; $i < $n_snapshots; $i++) {
-+        my $snap_l1_offset = read_uint64();
-+        my $snap_l1_size = read_uint32();
-+        my $snap_l1_size_clusters = ceil($snap_l1_size * 8 / $cluster_size);
-+        my $snap_id_len = read_uint16();
-+        my $snap_name_len = read_uint16();
-+        sysseek(FILE, 20, SEEK_CUR);
-+        my $snap_extra_len = read_uint32();
-+        sysseek(FILE, $snap_extra_len, SEEK_CUR);
-+        my $snap_id = read_str($snap_id_len);
-+        my $snap_name = read_str($snap_name_len);
-+
-+        my $snap_var_len = $snap_id_len + $snap_name_len + $snap_extra_len;
-+        if ($snap_var_len & 7) {
-+            sysseek(FILE, 8 - ($snap_var_len & 7), SEEK_CUR);
-+        }
-+
-+        $l1_offsets{$snap_id} = $snap_l1_offset;
-+
-+        foreach my $i (0..$snap_l1_size_clusters - 1) {
-+            $clusters[ncluster($snap_l1_offset) + $i] =
-+                "L1 table $i [snapshot $snap_id]";
-+        }
-+        print "\nSnapshot #$snap_id ($snap_name)\n";
-+        printf("L1 table: %u entries at 0x%x (#%u)\n",
-+               $snap_l1_size, $snap_l1_offset, ncluster($snap_l1_offset));
-+    }
-+    return %l1_offsets;
-+}
-+
-+sub read_uint8 {
-+    my $data;
-+    sysread(FILE, $data, 1);
-+    return unpack('C', $data);
-+}
-+
-+sub read_uint16 {
-+    my $data;
-+    sysread(FILE, $data, 2);
-+    return unpack('S>', $data);
-+}
-+
-+sub read_uint32 {
-+    my $data;
-+    sysread(FILE, $data, 4);
-+    return unpack('L>', $data);
-+}
-+
-+sub read_uint64 {
-+    my $data;
-+    sysread(FILE, $data, 8);
-+    return unpack('Q>', $data);
-+}
-+
-+sub read_str {
-+    my $maxlen = shift;
-+    my $data;
-+    sysread(FILE, $data, $maxlen);
-+    if (index($data,chr(0)) != -1) {
-+        return substr($data, 0, index($data,chr(0))); # Strip trailing NULLs
-+    } else {
-+        return $data;
-+    }
-+}
-+
-+sub prettyBytes {
-+    my $size = $_[0];
-+    foreach ('B','KiB','MiB','GiB','TiB','PiB','EiB') {
-+        return sprintf("%.2f ",$size)."$_" if $size < 1024;
-+        $size /= 1024;
-+    }
-+}
-+
-+sub printHostClusters {
-+    print "\nHost clusters\n";
-+    foreach my $i (0..$n_clusters-1) {
-+        if ($clusters[$i]) {
-+            printf "0x%x (#%u): $clusters[$i]\n", $i * $cluster_size, $i;
-+        }
-+    }
-+}
-+
-+sub printGuestClusters {
-+    print "\nGuest address -> Host address\n";
-+    for (my $i = 0; $i < $virtual_size; $i += $cluster_size) {
-+        my $l1_index = $i >> ($cluster_bits * 2 - 3);
-+        my $l2_index = ncluster($i) & ((1 << ($cluster_bits - 3)) - 1);
-+        my $l2_table = $l2_tables[$l1_index];
-+        my $mapping = ${$l2_table}[$l2_index];
-+        if ($mapping) {
-+            printf("0x%x (#%u): %s\n", $i, ncluster($i), $mapping);
-+        }
-+    }
-+}
-+
-+# Return cluster number from its absolute offset
-+sub ncluster {
-+    my $offset = shift;
-+    return $offset >> $cluster_bits;
-+}
--- 
-2.11.0
+If I understand correctly, this still causes clang complaints when=20
+called as QOBJECT(NULL).  As long as we are touching this, should we=20
+improve this macro to be friendly to NULL conversion?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
