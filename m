@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f0yki-0004PC-W0
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 20:15:47 -0400
+	(envelope-from <eswierk@gmail.com>) id 1f0z0N-0000H2-EJ
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 20:31:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f0ykg-0004rA-UH
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 20:15:44 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:44139)
+	(envelope-from <eswierk@gmail.com>) id 1f0z0M-0003zf-CN
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 20:31:55 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:35470)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f0ykg-0004pb-Ko
-	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 20:15:42 -0400
-Received: by mail-ot0-x244.google.com with SMTP id x6-v6so759438otg.11
-	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 17:15:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <eswierk@gmail.com>) id 1f0z0M-0003zV-6a
+	for qemu-devel@nongnu.org; Tue, 27 Mar 2018 20:31:54 -0400
+Received: by mail-oi0-x233.google.com with SMTP id z8-v6so660155oix.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Mar 2018 17:31:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0b20ff75-00d7-80db-ed2a-8b644a57b415@amsat.org>
-References: <1522180487-22899-1-git-send-email-mjc@sifive.com>
-	<1522180487-22899-2-git-send-email-mjc@sifive.com>
-	<0b20ff75-00d7-80db-ed2a-8b644a57b415@amsat.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Tue, 27 Mar 2018 17:15:41 -0700
-Message-ID: <CAHNT7Nt40C8Bh3VJHjv8f+obSbU6Ki8ThXH2L7o4zoSM2LnK5A@mail.gmail.com>
+In-Reply-To: <8c238385-5cab-2c7d-6550-d6d0866570eb@redhat.com>
+References: <20180327113452.19613-1-dgilbert@redhat.com>
+	<20180327113452.19613-4-dgilbert@redhat.com>
+	<0bfadead-a3c2-9bce-3e53-8ca3a258a57a@redhat.com>
+	<20180327164753.GF2837@work-vm>
+	<8c238385-5cab-2c7d-6550-d6d0866570eb@redhat.com>
+From: Ed Swierk <eswierk@gmail.com>
+Date: Tue, 27 Mar 2018 17:31:12 -0700
+Message-ID: <CAMCNy=BXw18H6sjAgEETDgo4XN_PpD0qAtrvEarm56JJFN3PYA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] RISC-V: Workaround for critical
- mstatus.FS MTTCG bug
+Subject: Re: [Qemu-devel] [PATCH 3/3] e1000: Old machine types,
+ turn new subsection off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,147 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, RISC-V Patches <patches@groups.riscv.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, peterx@redhat.com, quintela@redhat.com
 
-On Tue, Mar 27, 2018 at 3:17 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
-
-> Cc'ing Alex and Richard.
+On Tue, Mar 27, 2018 at 10:28 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 27/03/2018 18:47, Dr. David Alan Gilbert wrote:
+>>> So if the subsection is absent you
+>>> have to migrate either tx.tso_props or tx.props, depending on s->tx.cptse.
+>> Do you mean when sending you have to decide which set to send in the
+>> non-subsection data?  And with cptse true that means use tso_props?
 >
-> On 03/27/2018 04:54 PM, Michael Clark wrote:
-> > This change is a workaround for a bug where mstatus.FS
-> > is not correctly reporting dirty when MTTCG and SMP are
-> > enabled which results in the floating point register file
-> > not being saved during context switches. This a critical
-> > bug for RISC-V in QEMU as it results in floating point
-> > register file corruption when running SMP Linux in the
-> > RISC-V 'virt' machine.
-> >
-> > This workaround will return dirty if mstatus.FS is
-> > switched from off to initial or clean. We have checked
-> > the specification and it is legal for an implementation
-> > to return either off, or dirty, if set to initial or clean.
-> >
-> > This workaround will result in unnecessary floating point
-> > save restore. When mstatus.FS is off, floating point
-> > instruction trap to indicate the process is using the FPU.
-> > The OS can then save floating-point state of the previous
-> > process using the FPU and set mstatus.FS to initial or
-> > clean. With this workaround, mstatus.FS will always return
-> > dirty if set to a non-zero value, indicating floating point
-> > save restore is necessary, versus misreporting mstatus.FS
-> > resulting in floating point register file corruption.
-> >
-> > Cc: Palmer Dabbelt <palmer@sifive.com>
-> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Tested-by: Richard W.M. Jones <rjones@redhat.com>
-> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > ---
-> >  target/riscv/op_helper.c | 19 +++++++++++++++++--
-> >  1 file changed, 17 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> > index e34715d..7281b98 100644
-> > --- a/target/riscv/op_helper.c
-> > +++ b/target/riscv/op_helper.c
-> > @@ -144,8 +144,23 @@ void csr_write_helper(CPURISCVState *env,
-> target_ulong val_to_write,
-> >          }
-> >
-> >          mstatus =3D (mstatus & ~mask) | (val_to_write & mask);
-> > -        int dirty =3D (mstatus & MSTATUS_FS) =3D=3D MSTATUS_FS;
-> > -        dirty |=3D (mstatus & MSTATUS_XS) =3D=3D MSTATUS_XS;
-> > +
-> > +        /* Note: this is a workaround for an issue where mstatus.FS
-> > +           does not report dirty when SMP and MTTCG is enabled. This
-> > +           workaround is technically compliant with the RISC-V
-> Privileged
-> > +           specification as it is legal to return only off, or dirty,
-> > +           however this may cause unnecessary saves of floating point
-> state.
-> > +           Without this workaround, floating point state is not saved
-> and
-> > +           restored correctly when SMP and MTTCG is enabled, */
+> Yes.
 >
-
-On looking at this again, I think we may need to remove the
-qemu_tcg_mttcg_enabled conditional and always return dirty if the state is
-initial or clean, but not off.
-
-While testing on uniprocessor worked okay, it's likely because we were
-lucky and there was no task migration or multiple FPU tasks working. This
-would mean we would revert to Richard W.M. Jones initial patch.
-
-> +        if (qemu_tcg_mttcg_enabled()) {
-> > +            /* FP is always dirty or off */
-> > +            if (mstatus & MSTATUS_FS) {
-> > +                mstatus |=3D MSTATUS_FS;
-> > +            }
-> > +        }
-> > +
-> > +        int dirty =3D ((mstatus & MSTATUS_FS) =3D=3D MSTATUS_FS) |
-> > +                    ((mstatus & MSTATUS_XS) =3D=3D MSTATUS_XS);
-> >          mstatus =3D set_field(mstatus, MSTATUS_SD, dirty);
-> >          env->mstatus =3D mstatus;
-> >          break;
-> >
+>>> Likewise if you migrate from older versions: if s->tx.props.tse &&
+>>> s->tx.cptse, you have to copy s->tx.props to s->tx.tso_props and clear
+>>> s->tx.props.
+>>
+>> I don't see any equivalent code in the existing non-subsection postload to
+>> do this; so I'm guessing there are some cases of 2.11->2.12 that will
+>> break at the moment?
 >
+> Yes, I think so.
+>
+>>> My understanding is that s->tx.tso_props.tse will be 1 if
+>>> and only if the source sent s->tx.tso_props.
+>> I don't see anything in the current code that migrates tso_props.tse -
+>> where does it come from?
+>
+> Ouch... The tse field is more or less dead in current code AFAICS, but
+> it was used in the previous version.  What's the best way then to find
+> if the subsection was transmitted?  Do we have anything like a post_load
+> callback in the subsection itself?
 
-The text from the specification that allows us to always return dirty if
-set to initial or clean, is below i.e. Dirty implies state has
-"potentially" been modified, so that gives us wriggle room.
+The TSE flag in the cmd_and_length field of the context descriptor is
+useful only as an indication of which context is being updated: TSO
+(tso_props) or non-TSO (props). There is no reason to store it or
+migrate it, and all prior uses of the stored field were based on an
+incorrect understanding of its meaning. Now props.tse is always 0, and
+tso_props.tse is always 1 after the first TSO context is processed.
 
-"
-When an extension's status is set to Off , any instruction that attempts to
-read or write the corresponding
-state will cause an exception. When the status is Initial, the
-corresponding state should
-have an initial constant value. When the status is Clean, the corresponding
-state is potentially
-di fferent from the initial value, but matches the last value stored on a
-context swap. When the
-status is Dirty, the corresponding state has potentially been modif ed
-since the last context save.
-"
+> To find out which "props" to transmit to older QEMU, you can add a
+> tp->use_tso_for_migration = tp->cptse just before "if (!(txd_lower &
+> E1000_TXD_CMD_EOP))" in process_tx_desc...
 
-I think the problem is Linux is setting the state to clean after saving
-fpu register state [1], but we have no code in the QEMU FPU operations to
-set the state to dirty, if is clean or initial, only code to cause an
-exception if the floating point extension state is set to off e.g.
+tp->cptse only indicates whether the current tx data descriptor should
+be segmented using parameters from the last TSO context descriptor.
+It's perfectly legal for the guest to set up a TSO context and then
+use it for some but not all subsequent data descriptors. tp->cptse
+doesn't help in deciding what to migrate.
 
-static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
-        int rs2, target_long imm)
-{
-    TCGv t0;
+Whether to migrate props or tso_props back to 2.11 should be instead
+based on which was updated last by a context descriptor. Something
+like
 
-    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-        gen_exception_illegal(ctx);
-        return;
+if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
+    if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
+        e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
+        tp->use_tso_for_migration = 1;
+        tp->tso_frames = 0;
+    } else {
+        e1000x_read_tx_ctx_descr(xp, &tp->props);
+        tp->use_tso_for_migration = 0;
     }
+    return;
 
-    t0 =3D tcg_temp_new();
-    gen_get_gpr(t0, rs1);
-    tcg_gen_addi_tl(t0, t0, imm);
-
-    switch (opc) {
-    case OPC_RISC_FSW:
-        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
-        break;
-    case OPC_RISC_FSD:
-        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
-        break;
-    default:
-        gen_exception_illegal(ctx);
-        break;
-    }
-
-    tcg_temp_free(t0);
-}
-
-[1]
-https://github.com/torvalds/linux/blob/master/arch/riscv/include/asm/switch=
-_to.h
+--Ed
