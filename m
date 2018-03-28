@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1f1BR9-00047I-Ui
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:48:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f1BY6-0007Ib-4R
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1f1BR5-0007z8-A0
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:48:23 -0400
-Received: from mail-it0-f68.google.com ([209.85.214.68]:51193)
+	(envelope-from <alex.bennee@linaro.org>) id 1f1BY1-0003qL-P5
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:55:34 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f1BR5-0007yN-5w
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:48:19 -0400
-Received: by mail-it0-f68.google.com with SMTP id r19-v6so3874287itc.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 06:48:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f1BY1-0003pt-Aw
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 09:55:29 -0400
+Received: by mail-wr0-x244.google.com with SMTP id l49so2356174wrl.4
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 06:55:29 -0700 (PDT)
+References: <20180323225739.17329-1-laurent@vivier.eu>
+	<20180323225739.17329-2-laurent@vivier.eu>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180323225739.17329-2-laurent@vivier.eu>
+Date: Wed, 28 Mar 2018 14:55:25 +0100
+Message-ID: <87fu4k8fua.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a74de730-cf65-056c-dfa1-2fcc9361b9a1@redhat.com>
-References: <20180328130723.20831-1-marcandre.lureau@redhat.com>
-	<20180328130723.20831-3-marcandre.lureau@redhat.com>
-	<a74de730-cf65-056c-dfa1-2fcc9361b9a1@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 28 Mar 2018 15:48:17 +0200
-Message-ID: <CAMxuvayFZiYwf99mbMVFVwFZR2Bnqfv4rYS1O2SpDT1mhFtAEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qobject: introduce QObjectCommon
+Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 01/20] linux-user: create a
+ dummy per arch signal.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +31,768 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange,
-	Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, "Bonzini,
-	Paolo" <pbonzini@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org
 
-Hi
 
-On Wed, Mar 28, 2018 at 3:45 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 03/28/2018 08:07 AM, Marc-Andr=C3=A9 Lureau wrote:
->>
->> By moving the common fields to a QObjectCommon, QObject can be a type
->> which also has a 'base' QObjectCommon field. This allows to write a
->> generic QOBJECT() macro that will work with any QObject type,
->> including QObject itself. The container_of() macro ensures that the
->> object to cast has a QObjectCommon base field, give me some type
->> safety guarantees. However, for it to work properly, all QObject types
->> must have 'base' at offset 0 (which is ensured by static checking from
->> previous patch)
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->
->
->> +++ b/include/qapi/qmp/qbool.h
->> @@ -17,7 +17,7 @@
->>   #include "qapi/qmp/qobject.h"
->>     struct QBool {
->> -    QObject base;
->> +    struct QObjectCommon base;
->
->
-> Why no 'typedef struct QObjectCommon QObjectCommon' in scope to make this
-> simpler?
+Laurent Vivier <laurent@vivier.eu> writes:
 
-We could (not having the typedef enforces the feeling that
-QObjectCommon is internal in my mind, but ymmv)
+> Create a signal-common.h for future use by
+> these new files and use it in the existing
+> signal.c
 
->> -/* Get the 'base' part of an object */
->> -#define QOBJECT(obj) (&(obj)->base)
->> +struct QObject {
->> +    struct QObjectCommon base;
->> +};
->> +
->> +#define QOBJECT(x) \
->> +   container_of(&(x)->base, QObject, base)
+nit: overly keen line wrapping?
+
+anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 >
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  linux-user/Makefile.objs       |  2 +-
+>  linux-user/aarch64/signal.c    | 18 +++++++++++++++
+>  linux-user/alpha/signal.c      | 18 +++++++++++++++
+>  linux-user/arm/signal.c        | 18 +++++++++++++++
+>  linux-user/cris/signal.c       | 18 +++++++++++++++
+>  linux-user/hppa/signal.c       | 18 +++++++++++++++
+>  linux-user/i386/signal.c       | 18 +++++++++++++++
+>  linux-user/m68k/signal.c       | 18 +++++++++++++++
+>  linux-user/microblaze/signal.c | 18 +++++++++++++++
+>  linux-user/mips/signal.c       | 18 +++++++++++++++
+>  linux-user/mips64/signal.c     | 18 +++++++++++++++
+>  linux-user/nios2/signal.c      | 18 +++++++++++++++
+>  linux-user/openrisc/signal.c   | 18 +++++++++++++++
+>  linux-user/ppc/signal.c        | 18 +++++++++++++++
+>  linux-user/riscv/signal.c      | 18 +++++++++++++++
+>  linux-user/s390x/signal.c      | 18 +++++++++++++++
+>  linux-user/sh4/signal.c        | 18 +++++++++++++++
+>  linux-user/signal-common.h     | 50 ++++++++++++++++++++++++++++++++++++=
+++++++
+>  linux-user/signal.c            | 41 ++++++++++------------------------
+>  linux-user/sparc/signal.c      | 18 +++++++++++++++
+>  linux-user/sparc64/signal.c    | 18 +++++++++++++++
+>  linux-user/tilegx/signal.c     | 18 +++++++++++++++
+>  linux-user/x86_64/signal.c     | 18 +++++++++++++++
+>  linux-user/xtensa/signal.c     | 18 +++++++++++++++
+>  24 files changed, 440 insertions(+), 31 deletions(-)
+>  create mode 100644 linux-user/aarch64/signal.c
+>  create mode 100644 linux-user/alpha/signal.c
+>  create mode 100644 linux-user/arm/signal.c
+>  create mode 100644 linux-user/cris/signal.c
+>  create mode 100644 linux-user/hppa/signal.c
+>  create mode 100644 linux-user/i386/signal.c
+>  create mode 100644 linux-user/m68k/signal.c
+>  create mode 100644 linux-user/microblaze/signal.c
+>  create mode 100644 linux-user/mips/signal.c
+>  create mode 100644 linux-user/mips64/signal.c
+>  create mode 100644 linux-user/nios2/signal.c
+>  create mode 100644 linux-user/openrisc/signal.c
+>  create mode 100644 linux-user/ppc/signal.c
+>  create mode 100644 linux-user/riscv/signal.c
+>  create mode 100644 linux-user/s390x/signal.c
+>  create mode 100644 linux-user/sh4/signal.c
+>  create mode 100644 linux-user/signal-common.h
+>  create mode 100644 linux-user/sparc/signal.c
+>  create mode 100644 linux-user/sparc64/signal.c
+>  create mode 100644 linux-user/tilegx/signal.c
+>  create mode 100644 linux-user/x86_64/signal.c
+>  create mode 100644 linux-user/xtensa/signal.c
 >
-> If I understand correctly, this still causes clang complaints when called=
- as
-> QOBJECT(NULL).  As long as we are touching this, should we improve this
-> macro to be friendly to NULL conversion?
+> diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+> index 8c93058100..811a7f5ce5 100644
+> --- a/linux-user/Makefile.objs
+> +++ b/linux-user/Makefile.objs
+> @@ -1,6 +1,6 @@
+>  obj-y =3D main.o syscall.o strace.o mmap.o signal.o \
+>  	elfload.o linuxload.o uaccess.o uname.o \
+> -	safe-syscall.o
+> +	safe-syscall.o $(TARGET_ABI_DIR)/signal.o
+>
+>  obj-$(TARGET_HAS_BFLT) +=3D flatload.o
+>  obj-$(TARGET_I386) +=3D vm86.o
+> diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/aarch64/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/alpha/signal.c b/linux-user/alpha/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/alpha/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/arm/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/cris/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/hppa/signal.c b/linux-user/hppa/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/hppa/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/i386/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/m68k/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signa=
+l.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/microblaze/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/mips/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/mips64/signal.c b/linux-user/mips64/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/mips64/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/nios2/signal.c b/linux-user/nios2/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/nios2/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/openrisc/signal.c b/linux-user/openrisc/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/openrisc/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/ppc/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/riscv/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/s390x/signal.c b/linux-user/s390x/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/s390x/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/sh4/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/signal-common.h b/linux-user/signal-common.h
+> new file mode 100644
+> index 0000000000..838b6e9198
+> --- /dev/null
+> +++ b/linux-user/signal-common.h
+> @@ -0,0 +1,50 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef SIGNAL_COMMON_H
+> +#define SIGNAL_COMMON_H
+> +extern struct target_sigaltstack target_sigaltstack_used;
+> +
+> +static inline int on_sig_stack(unsigned long sp)
+> +{
+> +    return (sp - target_sigaltstack_used.ss_sp
+> +            < target_sigaltstack_used.ss_size);
+> +}
+> +
+> +static inline int sas_ss_flags(unsigned long sp)
+> +{
+> +    return (target_sigaltstack_used.ss_size =3D=3D 0 ? SS_DISABLE
+> +            : on_sig_stack(sp) ? SS_ONSTACK : 0);
+> +}
+> +
+> +static inline void target_sigemptyset(target_sigset_t *set)
+> +{
+> +    memset(set, 0, sizeof(*set));
+> +}
+> +
+> +void host_to_target_sigset_internal(target_sigset_t *d,
+> +                                    const sigset_t *s);
+> +void target_to_host_sigset_internal(sigset_t *d,
+> +                                    const target_sigset_t *s);
+> +void tswap_siginfo(target_siginfo_t *tinfo,
+> +                   const target_siginfo_t *info);
+> +void set_sigmask(const sigset_t *set);
+> +void force_sig(int sig);
+> +void force_sigsegv(int oldsig);
+> +#endif
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 2ea3e0321f..435cadbe96 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -25,8 +25,9 @@
+>  #include "qemu-common.h"
+>  #include "target_signal.h"
+>  #include "trace.h"
+> +#include "signal-common.h"
+>
+> -static struct target_sigaltstack target_sigaltstack_used =3D {
+> +struct target_sigaltstack target_sigaltstack_used =3D {
+>      .ss_sp =3D 0,
+>      .ss_size =3D 0,
+>      .ss_flags =3D TARGET_SS_DISABLE,
+> @@ -82,18 +83,6 @@ static uint8_t host_to_target_signal_table[_NSIG] =3D {
+>  };
+>  static uint8_t target_to_host_signal_table[_NSIG];
+>
+> -static inline int on_sig_stack(unsigned long sp)
+> -{
+> -    return (sp - target_sigaltstack_used.ss_sp
+> -            < target_sigaltstack_used.ss_size);
+> -}
+> -
+> -static inline int sas_ss_flags(unsigned long sp)
+> -{
+> -    return (target_sigaltstack_used.ss_size =3D=3D 0 ? SS_DISABLE
+> -            : on_sig_stack(sp) ? SS_ONSTACK : 0);
+> -}
+> -
+>  int host_to_target_signal(int sig)
+>  {
+>      if (sig < 0 || sig >=3D _NSIG)
+> @@ -108,11 +97,6 @@ int target_to_host_signal(int sig)
+>      return target_to_host_signal_table[sig];
+>  }
+>
+> -static inline void target_sigemptyset(target_sigset_t *set)
+> -{
+> -    memset(set, 0, sizeof(*set));
+> -}
+> -
+>  static inline void target_sigaddset(target_sigset_t *set, int signum)
+>  {
+>      signum--;
+> @@ -127,8 +111,8 @@ static inline int target_sigismember(const target_sig=
+set_t *set, int signum)
+>      return ((set->sig[signum / TARGET_NSIG_BPW] & mask) !=3D 0);
+>  }
+>
+> -static void host_to_target_sigset_internal(target_sigset_t *d,
+> -                                           const sigset_t *s)
+> +void host_to_target_sigset_internal(target_sigset_t *d,
+> +                                    const sigset_t *s)
+>  {
+>      int i;
+>      target_sigemptyset(d);
+> @@ -149,8 +133,8 @@ void host_to_target_sigset(target_sigset_t *d, const =
+sigset_t *s)
+>          d->sig[i] =3D tswapal(d1.sig[i]);
+>  }
+>
+> -static void target_to_host_sigset_internal(sigset_t *d,
+> -                                           const target_sigset_t *s)
+> +void target_to_host_sigset_internal(sigset_t *d,
+> +                                    const target_sigset_t *s)
+>  {
+>      int i;
+>      sigemptyset(d);
+> @@ -257,7 +241,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigs=
+et_t *oldset)
+>  /* Just set the guest's signal mask to the specified value; the
+>   * caller is assumed to have called block_signals() already.
+>   */
+> -static void set_sigmask(const sigset_t *set)
+> +void set_sigmask(const sigset_t *set)
+>  {
+>      TaskState *ts =3D (TaskState *)thread_cpu->opaque;
+>
+> @@ -344,8 +328,8 @@ static inline void host_to_target_siginfo_noswap(targ=
+et_siginfo_t *tinfo,
+>      tinfo->si_code =3D deposit32(si_code, 16, 16, si_type);
+>  }
+>
+> -static void tswap_siginfo(target_siginfo_t *tinfo,
+> -                          const target_siginfo_t *info)
+> +void tswap_siginfo(target_siginfo_t *tinfo,
+> +                   const target_siginfo_t *info)
+>  {
+>      int si_type =3D extract32(info->si_code, 16, 16);
+>      int si_code =3D sextract32(info->si_code, 0, 16);
+> @@ -515,7 +499,7 @@ void signal_init(void)
+>   * also forces the signal to "not blocked, not ignored", but for QEMU
+>   * that work is done in process_pending_signals().
+>   */
+> -static void force_sig(int sig)
+> +void force_sig(int sig)
+>  {
+>      CPUState *cpu =3D thread_cpu;
+>      CPUArchState *env =3D cpu->env_ptr;
+> @@ -534,7 +518,7 @@ static void force_sig(int sig)
+>   * at the point of failure.
+>   */
+>  #if !defined(TARGET_RISCV)
+> -static void force_sigsegv(int oldsig)
+> +void force_sigsegv(int oldsig)
+>  {
+>      if (oldsig =3D=3D SIGSEGV) {
+>          /* Make sure we don't try to deliver the signal again; this will
+> @@ -7301,9 +7285,6 @@ badframe:
+>      force_sig(TARGET_SIGSEGV);
+>      return -TARGET_QEMU_ESIGRETURN;
+>  }
+> -
+> -#else
+> -#error Target needs to add support for signal handling
+>  #endif
+>
+>  static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+> diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/sparc/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/sparc64/signal.c b/linux-user/sparc64/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/sparc64/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/tilegx/signal.c b/linux-user/tilegx/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/tilegx/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/x86_64/signal.c b/linux-user/x86_64/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/x86_64/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
+> new file mode 100644
+> index 0000000000..02ca338b6c
+> --- /dev/null
+> +++ b/linux-user/xtensa/signal.c
+> @@ -0,0 +1,18 @@
+> +/*
+> + *  Emulation of Linux signals
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
 
-I don't see much need for allowing NULL (literally) to be passed to
-QOBJECT(). If it's a null pointer, as long as it has the right type,
-it should be fine, shouldn't it?
 
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+--
+Alex Benn=C3=A9e
