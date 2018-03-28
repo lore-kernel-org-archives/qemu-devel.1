@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f1EwH-000051-5o
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f1EwH-000050-5a
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 13:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f1EwE-0003x5-Gx
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f1EwE-0003x2-H8
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 13:32:45 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45856)
+Received: from relay.sw.ru ([185.231.240.75]:45872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1f1EwE-0003wI-8A
+	id 1f1EwE-0003wL-88
 	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 13:32:42 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 28 Mar 2018 20:32:38 +0300
-Message-Id: <20180328173238.507470-5-vsementsov@virtuozzo.com>
+Date: Wed, 28 Mar 2018 20:32:37 +0300
+Message-Id: <20180328173238.507470-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20180328173238.507470-1-vsementsov@virtuozzo.com>
 References: <20180328173238.507470-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/4] scripts/qemugdb: backtraces for coroutines
- in coredump
+Subject: [Qemu-devel] [PATCH 3/4] scripts/qemugdb: add coredump.py for
+ coredump patching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +28,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-We can't get coroutine backtrace through obvious way
- - set regs
- - bt
- - restore regs
-when debugging a coredump.
-So, let's go hard way: clone current coredump file, patch regs
-in it and execute a subprocess gdb to get backtrace from this
-patched coredump.
+The main function is write_regs_to_coredump, which opens coredump
+file, searches for 'CORE' sign. The first one should correspond
+to PRSTATUS note for first thread. Patch register values in
+elf_prstatus structure, going after header with 'CORE' sign.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- scripts/qemugdb/coroutine.py | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ scripts/qemugdb/coredump.py | 51 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 scripts/qemugdb/coredump.py
 
-diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
-index 7070a592f3..2a05851e24 100644
---- a/scripts/qemugdb/coroutine.py
-+++ b/scripts/qemugdb/coroutine.py
-@@ -15,9 +15,32 @@
- 
- import gdb
- import re
-+import tempfile
-+import subprocess
-+import os
-+import coredump
- 
- VOID_PTR = gdb.lookup_type('void').pointer()
- 
-+def bt_regs_static(regs):
-+    files = gdb.execute('info files', False, True).split('\n')
-+    executable = re.match('^Symbols from "(.*)".$', files[0]).group(1)
-+    dump = re.search("`(.*)'", files[2]).group(1)
+diff --git a/scripts/qemugdb/coredump.py b/scripts/qemugdb/coredump.py
+new file mode 100644
+index 0000000000..8915461886
+--- /dev/null
++++ b/scripts/qemugdb/coredump.py
+@@ -0,0 +1,51 @@
++# Coredump patching
++#
++# Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
++#
++# Authors:
++#  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    with tempfile.NamedTemporaryFile(dir='/tmp', delete=False) as f:
-+        temp = f.name
++import struct
++import shutil
 +
-+    coredump.clone_coredump(dump, temp, regs)
++def write_regs_to_coredump(fname, set_regs):
++    # asm/ptrace.h
++    pt_regs = ['r15', 'r14', 'r13', 'r12', 'rbp', 'rbx', 'r11', 'r10',
++               'r9', 'r8', 'rax', 'rcx', 'rdx', 'rsi', 'rdi', 'orig_rax',
++               'rip', 'cs', 'eflags', 'rsp', 'ss']
 +
-+    cmd = ['gdb', '-batch', '-ex', "python print '----split----'",
-+           '-ex', 'bt', executable, temp]
-+    out = subprocess.check_output(cmd)
-+    out = out.split('----split----')[1]
++    with open(fname, 'r+b') as f:
++        print 'patching core file "%s"' % fname
 +
-+    os.remove(temp)
++        while f.read(4) != 'CORE':
++            pass
 +
-+    print out
++        print 'found "CORE" at 0x%x' % f.tell()
++        f.seek(4, 1) # go to elf_prstatus
++        f.seek(112, 1) # offsetof(struct elf_prstatus, pr_reg)
 +
- def get_fs_base():
-     '''Fetch %fs base value using arch_prctl(ARCH_GET_FS).  This is
-        pthread_self().'''
-@@ -122,8 +145,7 @@ class CoroutineCommand(gdb.Command):
-         try:
-             bt_regs(regs)
-         except gdb.error:
--            print "Coroutine backtrace can't be obtained without " \
--                  "a process to debug."
-+            bt_regs_static(regs)
- 
- class CoroutineSPFunction(gdb.Function):
-     def __init__(self):
++        print 'assume pt_regs at 0x%x' % f.tell()
++        for reg in pt_regs:
++            if reg in set_regs:
++                print 'write %s at 0x%x' % (reg, f.tell())
++                f.write(struct.pack('q', set_regs[reg]))
++            else:
++                f.seek(8, 1)
++
++def clone_coredump(source, target, set_regs):
++    shutil.copyfile(source, target)
++    write_regs_to_coredump(target, set_regs)
 -- 
 2.11.1
