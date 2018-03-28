@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=0625704796=stefanb@linux.vnet.ibm.com>)
-	id 1f1IAV-0003V9-NM
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:59:41 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1f1IEP-0006aD-Bw
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 17:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=0625704796=stefanb@linux.vnet.ibm.com>)
-	id 1f1IAR-0000Hc-BG
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:59:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=0625704796=stefanb@linux.vnet.ibm.com>)
-	id 1f1IAR-0000HD-2J
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 16:59:35 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2SKx8MQ011127
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 16:59:33 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h0gf955nn-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 16:59:33 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 28 Mar 2018 14:59:32 -0600
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 28 Mar 2018 16:59:21 -0400
-In-Reply-To: <1522270761-29646-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1522270761-29646-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Message-Id: <1522270761-29646-5-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 4/4] tests: Tests more flags of the CRB
- interface
+	(envelope-from <eric.auger@redhat.com>) id 1f1IEM-0001XQ-6P
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 17:03:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39526 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1f1IEM-0001X9-1A
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 17:03:38 -0400
+References: <20180322081837.21460-1-aik@ozlabs.ru>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <6975e05c-da7a-5a96-4fb5-1234694136d0@redhat.com>
+Date: Wed, 28 Mar 2018 23:03:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180322081837.21460-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] vfio: Print address space address
+ when cannot map MMIO for DMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,121 +28,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>
 
-Test and modify more flags of the CRB interface.
+Hi Alexey, Alex,
+On 22/03/18 09:18, Alexey Kardashevskiy wrote:
+> The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions") added
+> an error message if a passed memory section address or size is not aligned
+> to the minimal IOMMU page size. However although it checks
+> offset_within_address_space for the alignment, offset_within_region is
+> printed instead which makes it harder to find out what device caused
+> the message so this replaces offset_within_region with
+> offset_within_address_space.
+> 
+> While we are here, this replaces '..' with 'size=' (as the second number
+> is a size, not an end offset) and adds a memory region name.
+> 
+> Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+The patch indeed fixes the reported format issues.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- tests/tpm-crb-test.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 72 insertions(+), 2 deletions(-)
+However I have some other concerns with the info that is reported to the
+end-user. See below.
 
-diff --git a/tests/tpm-crb-test.c b/tests/tpm-crb-test.c
-index e1513cb..d8f9569 100644
---- a/tests/tpm-crb-test.c
-+++ b/tests/tpm-crb-test.c
-@@ -28,6 +28,10 @@ static void tpm_crb_test(const void *data)
-     uint64_t caddr = readq(TPM_CRB_ADDR_BASE + A_CRB_CTRL_CMD_LADDR);
-     uint32_t rsize = readl(TPM_CRB_ADDR_BASE + A_CRB_CTRL_RSP_SIZE);
-     uint64_t raddr = readq(TPM_CRB_ADDR_BASE + A_CRB_CTRL_RSP_ADDR);
-+    uint8_t locstate = readb(TPM_CRB_ADDR_BASE + A_CRB_LOC_STATE);
-+    uint32_t locctrl = readl(TPM_CRB_ADDR_BASE + A_CRB_LOC_CTRL);
-+    uint32_t locsts = readl(TPM_CRB_ADDR_BASE + A_CRB_LOC_STS);
-+    uint32_t sts = readl(TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
- 
-     g_assert_cmpint(FIELD_EX32(intfid, CRB_INTF_ID, InterfaceType), ==, 1);
-     g_assert_cmpint(FIELD_EX32(intfid, CRB_INTF_ID, InterfaceVersion), ==, 1);
-@@ -45,9 +49,47 @@ static void tpm_crb_test(const void *data)
-     g_assert_cmpint(caddr, >, TPM_CRB_ADDR_BASE);
-     g_assert_cmpint(raddr, >, TPM_CRB_ADDR_BASE);
- 
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, tpmEstablished), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, locAssigned), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, activeLocality), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, reserved), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, tpmRegValidSts), ==, 1);
-+
-+    g_assert_cmpint(locctrl, ==, 0);
-+
-+    g_assert_cmpint(FIELD_EX32(locsts, CRB_LOC_STS, Granted), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locsts, CRB_LOC_STS, beenSeized), ==, 0);
-+
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmIdle), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmSts), ==, 0);
-+
-+    /* request access to locality 0 */
-+    writeb(TPM_CRB_ADDR_BASE + A_CRB_LOC_CTRL, 1);
-+
-+    /* granted bit must be set now */
-+    locsts = readl(TPM_CRB_ADDR_BASE + A_CRB_LOC_STS);
-+    g_assert_cmpint(FIELD_EX32(locsts, CRB_LOC_STS, Granted), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(locsts, CRB_LOC_STS, beenSeized), ==, 0);
-+
-+    /* we must have an assigned locality */
-+    locstate = readb(TPM_CRB_ADDR_BASE + A_CRB_LOC_STATE);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, tpmEstablished), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, locAssigned), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, activeLocality), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, reserved), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, tpmRegValidSts), ==, 1);
-+
-+    /* set into ready state */
-+    writel(TPM_CRB_ADDR_BASE + A_CRB_CTRL_REQ, 1);
-+
-+    /* TPM must not be in the idle state */
-+    sts = readl(TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmIdle), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmSts), ==, 0);
-+
-     memwrite(caddr, TPM_CMD, sizeof(TPM_CMD));
- 
--    uint32_t sts, start = 1;
-+    uint32_t start = 1;
-     uint64_t end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
-     writel(TPM_CRB_ADDR_BASE + A_CRB_CTRL_START, start);
-     do {
-@@ -58,12 +100,40 @@ static void tpm_crb_test(const void *data)
-     } while (g_get_monotonic_time() < end_time);
-     start = readl(TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
-     g_assert_cmpint(start & 1, ==, 0);
-+
-+    /* TPM must still not be in the idle state */
-     sts = readl(TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
--    g_assert_cmpint(sts & 1, ==, 0);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmIdle), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmSts), ==, 0);
- 
-     struct tpm_hdr tpm_msg;
-     memread(raddr, &tpm_msg, sizeof(tpm_msg));
-     g_assert_cmpmem(&tpm_msg, sizeof(tpm_msg), s->tpm_msg, sizeof(*s->tpm_msg));
-+
-+    /* set TPM into idle state */
-+    writel(TPM_CRB_ADDR_BASE + A_CRB_CTRL_REQ, 2);
-+
-+    /* idle state must be indicated now */
-+    sts = readl(TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmIdle), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_CTRL_STS, tpmSts), ==, 0);
-+
-+    /* relinquish locality */
-+    writel(TPM_CRB_ADDR_BASE + A_CRB_LOC_CTRL, 2);
-+
-+    /* Granted flag must be cleared */
-+    sts = readl(TPM_CRB_ADDR_BASE + A_CRB_LOC_STS);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_LOC_STS, Granted), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(sts, CRB_LOC_STS, beenSeized), ==, 0);
-+
-+    /* no locality may be assigned */
-+    locstate = readb(TPM_CRB_ADDR_BASE + A_CRB_LOC_STATE);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, tpmEstablished), ==, 1);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, locAssigned), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, activeLocality), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, reserved), ==, 0);
-+    g_assert_cmpint(FIELD_EX32(locstate, CRB_LOC_STATE, tpmRegValidSts), ==, 1);
-+
- }
- 
- int main(int argc, char **argv)
--- 
-2.5.5
+Assigning an e1000e device with a 64kB host, here are the traces I get:
+
+Region XXX is not aligned to 0x10000 and cannot be mapped for DMA
+
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0x3fb0
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0xffb0
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0x3fb0
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0xffb0
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0x3fb0
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100a4808 size=0xb7f8
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100e0050 size=0x3fb0
+"0004:01:00.0 BAR 3 mmaps[0]" 0x100e4808 size=0xb7f8
+
+It took me some time to understand what happens but here is now my
+understanding:
+
+1) When looking at vfio_pci_write_config() pdev->io_regions[bar].addr =
+bar_addr in vfio_sub_page_bar_update_mapping() I see the following values:
+
+UNMAPPED -> 0x0 ->UNMAPPED -> 0x100a0000 -> UNMAPPED -> 0x100a0000 ->
+UNMAPPED -> 0x100e0000
+
+vfio_sub_page_bar_update_mapping() create mrs with base bar at
+0x100a0000 and 0x100e0000 successively, hence the
+vfio_listener_region_add on 0x100axxxx. Indeed, 0x0-0x50 msix-table mmio
+region induces some memory section at 0x100a0050 and 0x100e50 successively.
+
+However this is confusing for the end-user who only has access to the
+final mapping (0x100e0000) through lspi [1].
+
+2) The changes in the size (0x3fb0 <-> 0xffb0) relate to the extension
+of the 16kB bar to 64kB in vfio_sub_page_bar_update_mapping
+
+3) Also it happens that I have a virtio-scsi-pci device that is put just
+after the BAR3 at 0x100a4000 and 0x100e4000 successively. The device has
+its own msi-table and pba mmio regions[2]. As mmaps[0] is extended to
+64kB (with prio 0), we have those MMIO regions which result in new
+memory sections, which cause vfio_listener_region_add calls. This
+typically explains why we get a warning on 0x100e4808 (0xb7f8). By the
+way I don't get why we don't have a trace for "0004:01:00.0 BAR 3
+mmaps[0]" 0x100e4040 size=0x7c0, ie. mmaps[0] space between
+virtio-scsi-pci msic-table and pba.
+
+So at the end of the day, my fear is all those info become really
+frightening and confusing for the end-user and even not relevant
+(0x100a0000 stuff). So I would rather simply remove the trace in 2.12
+until we find a place where we could generate a clear hint for the
+end-user, suggesting to relocate the msix bar.
+
+Thoughts?
+
+Thanks
+
+Eric
+
+
+[1] lspci
+
+Region 3: Memory at 104e0000 (32-bit, non-prefetchable) [size=16K]
+Expansion ROM at 10480000 [disabled] [size=256K]
+../..
+Capabilities: [a0] MSI-X: Enable+ Count=5 Masked-
+Vector table: BAR=3 offset=00000000
+              PBA: BAR=3 offset=00002000
+
+[2] info mtree (final)
+
+100e0000-00000000100effff (prio 0, i/o): 0004:01:00.0 base BAR 3
+ 100e0000-00000000100e004f (prio 0, i/o): msix-table
+ 100e0000-00000000100effff (prio 0, i/o): 0004:01:00.0 BAR 3
+  100e0000-00000000100effff (prio 0, ramd): 0004:01:00.0 BAR 3 mmaps[0]
+      100e2000-00000000100e2007 (prio 0, i/o): msix-pba [disabled]
+100e4000-00000000100e4fff (prio 1, i/o): virtio-scsi-pci-msix
+ 00000000100e4000-00000000100e403f (prio 0, i/o): msix-table
+ 00000000100e4800-00000000100e4807 (prio 0, i/o): msix-pba
+
+
+
+
+
+
+
+> ---
+> 
+> Message on slightly hacked QEMU (iommu pagesize=8K) looks now like this:
+> 
+> qemu-system-x86_64: Region "0000:00:1a.0 BAR 0 mmaps[0]" 0xfebc0000 size=0x1000 is not aligned to 0x2000 and cannot be mapped for DMA
+> ---
+>  hw/vfio/common.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 5e84716..e2db596 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -548,10 +548,11 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>          hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+>  
+>          if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
+> -            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
+> +            error_report("Region \"%s\" 0x%"HWADDR_PRIx" size=0x%"HWADDR_PRIx
+>                           " is not aligned to 0x%"HWADDR_PRIx
+>                           " and cannot be mapped for DMA",
+> -                         section->offset_within_region,
+> +                         memory_region_name(section->mr),
+> +                         section->offset_within_address_space,
+>                           int128_getlo(section->size),
+>                           pgmask + 1);
+>              return;
+> 
