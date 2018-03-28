@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1CAC-0000f8-VY
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:35:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f1CB3-0001A9-Ib
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1CA8-0000XP-4R
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:34:57 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44247)
+	(envelope-from <alex.bennee@linaro.org>) id 1f1CAy-0001DW-KA
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:35:49 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:45543)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f1CA7-0000Wu-Ke
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:34:52 -0400
-Received: by mail-wr0-x241.google.com with SMTP id u46so2462493wrc.11
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 07:34:51 -0700 (PDT)
+	id 1f1CAy-0001BR-5k
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:35:44 -0400
+Received: by mail-wr0-x243.google.com with SMTP id u11so2459375wri.12
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 07:35:44 -0700 (PDT)
 References: <20180323225739.17329-1-laurent@vivier.eu>
 	<20180323225739.17329-4-laurent@vivier.eu>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 In-reply-to: <20180323225739.17329-4-laurent@vivier.eu>
-Date: Wed, 28 Mar 2018 15:34:48 +0100
-Message-ID: <87d0zo8e0n.fsf@linaro.org>
+Date: Wed, 28 Mar 2018 15:35:41 +0100
+Message-ID: <87bmf88dz6.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -43,7 +43,8 @@ Laurent Vivier <laurent@vivier.eu> writes:
 >
 > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Apparently there are some tabs in the old code, could you de-tabify on
+the next iteration please?
 
 > ---
 >  linux-user/arm/signal.c        | 754 +++++++++++++++++++++++++++++++++++=
