@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f16WV-00046Z-2m
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:33:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f16kV-0000k2-TD
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f16WQ-0002CX-Cu
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:33:35 -0400
-Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:52317)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f16WQ-0002Bz-6P
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:33:30 -0400
-Received: from player794.ha.ovh.net (unknown [10.109.122.34])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id B684914DB2D
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 10:33:28 +0200 (CEST)
-Date: Wed, 28 Mar 2018 10:33:19 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180328103319.7df9ab8b@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20180327043741.7705-9-david@gibson.dropbear.id.au>
+	(envelope-from <dgibson@ozlabs.org>) id 1f16kU-0001LX-Th
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 04:48:03 -0400
+Date: Wed, 28 Mar 2018 19:47:20 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180328084720.GI3510@umbus.fritz.box>
 References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
-	<20180327043741.7705-9-david@gibson.dropbear.id.au>
+	<20180327043741.7705-12-david@gibson.dropbear.id.au>
+	<f3c7bb1c-f4b9-3ffe-aeeb-bcedba620283@kaod.org>
+	<05dd7870-11ba-7be8-ce45-6c9aba653226@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.13 08/12] target/ppc: Make hash64_opts
- field mandatory for 64-bit hash MMUs
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jaTU8Y2VLE5tlY1O"
+Content-Disposition: inline
+In-Reply-To: <05dd7870-11ba-7be8-ce45-6c9aba653226@kaod.org>
+Subject: Re: [Qemu-devel] [RFC for-2.13 11/12] target/ppc: Remove
+ unnecessary POWERPC_MMU_V3 flag from mmu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com, clg@kaod.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, groug@kaod.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com
 
-On Tue, 27 Mar 2018 15:37:37 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> Currently some cpus set the hash64_opts field in the class structure, with
-> specific details of their variant of the 64-bit hash mmu.  For the
-> remaining cpus with that mmu, ppc_hash64_realize() fills in defaults.
-> 
-> But there are only a couple of cpus that use those fallbacks, so just have
-> them to set the has64_opts field instead, simplifying the logic.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+--jaTU8Y2VLE5tlY1O
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+On Wed, Mar 28, 2018 at 09:49:25AM +0200, C=E9dric Le Goater wrote:
+> On 03/28/2018 09:43 AM, C=E9dric Le Goater wrote:
+> > On 03/27/2018 06:37 AM, David Gibson wrote:
+> >> The only place we test this flag is in conjunction with
+> >> ppc64_use_proc_tbl().  That checks for the LPCR_UPRT bit, which we alr=
+eady
+> >> ensure can't be set except on a machine with a v3 MMU (i.e. POWER9).
+> >=20
+> > hmm, ok, but what will I use for the PowerNV hash MMU support then ?=20
+>=20
+> That will be POWERPC_MMU_3_00.
 
->  target/ppc/mmu-hash64.c     | 36 ++++++++++++++++++------------------
->  target/ppc/mmu-hash64.h     |  1 +
->  target/ppc/translate_init.c |  2 ++
->  3 files changed, 21 insertions(+), 18 deletions(-)
-> 
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index d7a0e5615f..d369b1bf86 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -1100,25 +1100,12 @@ void ppc_hash64_init(PowerPCCPU *cpu)
->      CPUPPCState *env = &cpu->env;
->      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
->  
-> -    if (pcc->hash64_opts) {
-> -        cpu->hash64_opts = g_memdup(pcc->hash64_opts,
-> -                                    sizeof(*cpu->hash64_opts));
-> -    } else if (env->mmu_model & POWERPC_MMU_64) {
-> -        /* Use default sets of page sizes. We don't support MPSS */
-> -        static const PPCHash64Options defopts = {
-> -            .sps = {
-> -                { .page_shift = 12, /* 4K */
-> -                  .slb_enc = 0,
-> -                  .enc = { { .page_shift = 12, .pte_enc = 0 } }
-> -                },
-> -                { .page_shift = 24, /* 16M */
-> -                  .slb_enc = 0x100,
-> -                  .enc = { { .page_shift = 24, .pte_enc = 0 } }
-> -                },
-> -            },
-> -        };
-> -        cpu->hash64_opts = g_memdup(&defopts, sizeof(*cpu->hash64_opts));
-> +    if (!pcc->hash64_opts) {
-> +        assert(!(env->mmu_model & POWERPC_MMU_64));
-> +        return;
->      }
-> +
-> +    cpu->hash64_opts = g_memdup(pcc->hash64_opts, sizeof(*cpu->hash64_opts));
->  }
->  
->  void ppc_hash64_finalize(PowerPCCPU *cpu)
-> @@ -1126,6 +1113,19 @@ void ppc_hash64_finalize(PowerPCCPU *cpu)
->      g_free(cpu->hash64_opts);
->  }
->  
-> +const PPCHash64Options ppc_hash64_opts_basic = {
-> +    .sps = {
-> +        { .page_shift = 12, /* 4K */
-> +          .slb_enc = 0,
-> +          .enc = { { .page_shift = 12, .pte_enc = 0 } }
-> +        },
-> +        { .page_shift = 24, /* 16M */
-> +          .slb_enc = 0x100,
-> +          .enc = { { .page_shift = 24, .pte_enc = 0 } }
-> +        },
-> +    },
-> +};
-> +
->  const PPCHash64Options ppc_hash64_opts_POWER7 = {
->      .sps = {
->          {
-> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> index d42cbc2762..ff0c48af55 100644
-> --- a/target/ppc/mmu-hash64.h
-> +++ b/target/ppc/mmu-hash64.h
-> @@ -155,6 +155,7 @@ struct PPCHash64Options {
->      struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
->  };
->  
-> +extern const PPCHash64Options ppc_hash64_opts_basic;
->  extern const PPCHash64Options ppc_hash64_opts_POWER7;
->  
->  #endif /* CONFIG_USER_ONLY */
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 040d6fbac3..ae005b2a54 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8242,6 +8242,7 @@ POWERPC_FAMILY(970)(ObjectClass *oc, void *data)
->      pcc->mmu_model = POWERPC_MMU_64B;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-> +    pcc->hash64_opts = &ppc_hash64_opts_basic;
->  #endif
->      pcc->excp_model = POWERPC_EXCP_970;
->      pcc->bus_model = PPC_FLAGS_INPUT_970;
-> @@ -8319,6 +8320,7 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data)
->      pcc->mmu_model = POWERPC_MMU_2_03;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-> +    pcc->hash64_opts = &ppc_hash64_opts_basic;
->  #endif
->      pcc->excp_model = POWERPC_EXCP_970;
->      pcc->bus_model = PPC_FLAGS_INPUT_970;
+You could check for that explicitly, or you could just check for
+presence of non-NULL hash64_opts.  The idea is that will always be the
+case for cpus capable of using the hash MMU.
+
+I'm also considering adding a similar radix_opts with radix specific
+details.  POWER9 would have both, since it can support either mode.
+
+> I didn't realize mmu_model was so=20
+> crowded ..
+
+It's not so that it's short of space.  It's more that the mix of enum
+like pieces and bitflag like pieces like bits makes it confusing to
+know whether it should be tested with simple equality or with &.  And
+if testing with equality which bits should be masked for a sensible
+comparison.
+
+Additionally, I'd like to get options that are strictly related to the
+hash mmu out of the general structures.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--jaTU8Y2VLE5tlY1O
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq7VpYACgkQbDjKyiDZ
+s5LewA//bR8lBEUX/cvKqcDZ4tEbETv837sTjjgRVqDzhbvD7qzqMWSsaAOvymtb
+BLkvQuLLyxyZPGB93nkk5dNKjNFhWeNKgY2KXdzjIkWuQ+rIFblFIWXuorD13MAn
+T33PUUomU0Pg1OuYhhda2jaTZ+Hcan6zyR1bqqakVofHWeyqc2GNSoJf4dJzhLpe
+PfKxmOExK52gM8QT+ICDKuKkGESzTKmUtyCrLSS4B4oQZgddFIdnBmw3GpUi3aq1
+sZC6F3+kkonODz4/hqlyN3O1pnqDQw+OizCcNqcBA+yvim8QZ0Qk8vKeJEk4HW1z
+bJ1vw2WPdM9s1bLHvy6A4OravmR8r+Qr7VdoKwsN5fuV0ks19BB0cMLv0a52jRhG
+epBDPn/i23Ecemh3hgHYdZ2ebFcYGiU0B43SFd7Qg1DhBB+02uRRAUbeyw+QcUrX
+v4iGdyeXijIVN/qfY5OwmgIMajsYTXVxiY1l/LQoip5w9cAGnEaDUBQ8P6SSSB1T
+uG+zvZudEghRnOi/7SvioeQ/9bQwRtJSXN5wCzSnRDxMY6zDiBJ4k4ejS/r9m25m
+SuWsWgW+F8iU8p2uvcOydJomzS9sFuZ91RYHNV1BVVBK0fUqLv1w2kpkVD/9q89f
+rdHttMVNmCEPSIZkA6IYgDnIz5A68tceewW5N9e6IQeaeFQVqYM=
+=mH+Z
+-----END PGP SIGNATURE-----
+
+--jaTU8Y2VLE5tlY1O--
