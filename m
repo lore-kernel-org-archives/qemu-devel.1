@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1CTh-00039Z-06
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:55:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1f1Cs6-0004Tv-Hb
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1CTd-00013f-4q
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:55:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41552)
+	(envelope-from <bounces@canonical.com>) id 1f1Cs1-0000bW-Kn
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:20:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49646)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f1CTc-00013J-VD
-	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 10:55:01 -0400
+	id 1f1Cs1-0000aq-Af
+	for qemu-devel@nongnu.org; Wed, 28 Mar 2018 11:20:13 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f1CTb-0007pr-K6
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 14:54:59 +0000
+	id 1f1Cs0-0003vW-94
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 15:20:12 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 972852E8042
-	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 14:54:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 418E52E8050
+	for <qemu-devel@nongnu.org>; Wed, 28 Mar 2018 15:20:12 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Mar 2018 14:36:25 -0000
-From: "mike@papersolve.com" <mike@papersolve.com>
+Date: Wed, 28 Mar 2018 15:08:48 -0000
+From: Zhen Ning Lim <limzn88@gmail.com>
 Reply-To: Bug 1539940 <1539940@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160130164153.25136.87723.malonedeb@soybean.canonical.com>
-Message-Id: <152224778516.20696.6474124526328492710.malone@chaenomeles.canonical.com>
+Message-Id: <152224972878.30094.2567895219211313411.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1539940] Re: Qemu 2.5 Solaris 8 and 9 sparc hang
  after terminal type menu
@@ -39,35 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This is no longer a problem (for sure in latest git, probably further
-back than that, as I installed Solaris 9/SPARC on SS-20 a few months
-ago):
-
-Type the number of your choice and press Return: 3
-syslog service starting.
-savecore: no dump device configured
-Running in command line mode
-
-Please wait while the system information is loaded... /
-
-
-
-Welcome to the Web Start Solaris Command Line installation!
-
-The following questions will gather information about this system.
-This information will be used to configure:
-
-	Network
-	Kerberos Security
-	Name Service
-	Date and Time
-	Root Password
-	Power Management
-
-   <Press Return to continue>
-
-
-This can be resolved.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
@@ -79,7 +52,7 @@ Title:
   Qemu 2.5 Solaris 8 and 9 sparc hang after terminal type menu
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
   Qemu command:
