@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1Ucg-0001es-6O
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:17:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f1UgL-0004Mw-2O
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1Ucc-0007ql-0Z
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:17:34 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f1Ucb-0007qZ-QW
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:17:29 -0400
-Received: by mail-wr0-x244.google.com with SMTP id c24so4885937wrc.6
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 03:17:29 -0700 (PDT)
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-9-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1519709965-29833-9-git-send-email-cota@braap.org>
-Date: Thu, 29 Mar 2018 11:17:27 +0100
-Message-ID: <87tvsz6v9k.fsf@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1f1UgH-0001Fz-2a
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:21 -0400
+Resent-Message-Id: <E1f1UgH-0001Fz-2a@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f1UgG-0001Fp-TS
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:16 -0400
+In-Reply-To: <1522270761-29646-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152231886419.720.7928916739860804817@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/16] translate-all: work page-by-page in
- tb_invalidate_phys_range_1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 29 Mar 2018 03:21:05 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] tpm: More improvements on CRB interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: stefanb@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> So that we pass a same-page range to tb_invalidate_phys_page_range,
-> instead of always passing an end address that could be on a different
-> page.
->
-> As discussed with Peter Maydell on the list [1], tb_invalidate_phys_page_=
-range
-> doesn't actually do much with 'end', which explains why we have never
-> hit a bug despite going against what the comment on top of
-> tb_invalidate_phys_page_range requires:
->
->> * Invalidate all TBs which intersect with the target physical address ra=
-nge
->> * [start;end[. NOTE: start and end must refer to the *same* physical pag=
-e.
->
-> The appended honours the comment, which avoids confusion.
->
-> While at it, rework the loop into a for loop, which is less error prone
-> (e.g. "continue" won't result in an infinite loop).
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg09165.html
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  accel/tcg/translate-all.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 816419a..a98e182 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1381,10 +1381,14 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->   */
->  static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_add=
-r_t end)
->  {
-> -    while (start < end) {
-> -        tb_invalidate_phys_page_range(start, end, 0);
-> -        start &=3D TARGET_PAGE_MASK;
-> -        start +=3D TARGET_PAGE_SIZE;
-> +    tb_page_addr_t next;
-> +
-> +    for (next =3D (start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-> +         start < end;
-> +         start =3D next, next +=3D TARGET_PAGE_SIZE) {
-> +        tb_page_addr_t bound =3D MIN(next, end);
-> +
-> +        tb_invalidate_phys_page_range(start, bound, 0);
->      }
->  }
-
-
---
-Alex Benn=C3=A9e
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjIyNzA3NjEtMjk2NDYtMS1naXQtc2VuZC1lbWFpbC1zdGVmYW5iQGxpbnV4
+LnZuZXQuaWJtLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdHBtOiBNb3Jl
+IGltcHJvdmVtZW50cyBvbiBDUkIgaW50ZXJmYWNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA5NDkxZTI2ZTMgdGVzdHM6IFRlc3Rz
+IG1vcmUgZmxhZ3Mgb2YgdGhlIENSQiBpbnRlcmZhY2UKZDU1Yzk0NDZjNCB0cG06IENSQjogRW5m
+b3JjZSBsb2NhbGl0eSBpcyByZXF1ZXN0ZWQgYmVmb3JlIHByb2Nlc3NpbmcgYnVmZmVyCmJjMGNm
+MzU0ZjYgdHBtOiBDUkI6IFJlc2V0IEdyYW50ZWQgZmxhZyB3aGVuIHJlbGlucXVpc2hpbmcgbG9j
+YWxpdHkKZDUwMzBhZDNiNiB0cG06IENSQjogc2V0IHRoZSBJZGxlIGZsYWcgYnkgZGVmYXVsdAoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiB0cG06IENSQjogc2V0IHRo
+ZSBJZGxlIGZsYWcgYnkgZGVmYXVsdC4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHRwbTogQ1JCOiBS
+ZXNldCBHcmFudGVkIGZsYWcgd2hlbiByZWxpbnF1aXNoaW5nIGxvY2FsaXR5Li4uCkNoZWNraW5n
+IFBBVENIIDMvNDogdHBtOiBDUkI6IEVuZm9yY2UgbG9jYWxpdHkgaXMgcmVxdWVzdGVkIGJlZm9y
+ZSBwcm9jZXNzaW5nIGJ1ZmZlci4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29u
+ZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgOSkKIzM1OiBGSUxFOiBody90cG0vdHBtX2NyYi5jOjEw
+MjoKKyAgICBpZiAoIUFSUkFZX0ZJRUxEX0VYMzIocy0+cmVncywgQ1JCX0xPQ19TVEFURSwgbG9j
+QXNzaWduZWQpKQorICAgICAgICAgcmV0dXJuIFRQTV9DUkJfTk9fTE9DQUxJVFk7CgpFUlJPUjog
+YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMz
+NTogRklMRTogaHcvdHBtL3RwbV9jcmIuYzoxMDI6CisgICAgaWYgKCFBUlJBWV9GSUVMRF9FWDMy
+KHMtPnJlZ3MsIENSQl9MT0NfU1RBVEUsIGxvY0Fzc2lnbmVkKSkKWy4uLl0KCnRvdGFsOiAyIGVy
+cm9ycywgMCB3YXJuaW5ncywgMzUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiB0ZXN0czogVGVzdHMgbW9yZSBm
+bGFncyBvZiB0aGUgQ1JCIGludGVyZmFjZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
