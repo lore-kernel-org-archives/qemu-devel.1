@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1UIa-0004MO-Pm
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:56:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f1ULo-0006zZ-Jm
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1UIX-00083E-NX
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:56:48 -0400
-Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:44125)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1UIX-0007zs-8V
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:56:45 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.108.111])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 8A22E149188
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:56:43 +0200 (CEST)
-Date: Thu, 29 Mar 2018 11:56:35 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180329115635.151cc34d@bahia.lan>
-In-Reply-To: <20180329083748.15264f31@bahia.lan>
-References: <20180329052537.32163-1-david@gibson.dropbear.id.au>
-	<20180329083748.15264f31@bahia.lan>
+	(envelope-from <no-reply@patchew.org>) id 1f1ULj-0000X0-Tf
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:00:08 -0400
+Resent-Message-Id: <E1f1ULj-0000X0-Tf@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21022)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f1ULj-0000Vk-My
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:00:03 -0400
+In-Reply-To: <1522128840-498-1-git-send-email-cota@braap.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152231755792.714.17297582902553081901@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.13] Add
- host_memory_backend_pagesize() helper
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 29 Mar 2018 02:59:19 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/14] fp-test + hardfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, qemu-ppc@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com
+To: cota@braap.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, richard.henderson@linaro.org, laurent@vivier.eu, kbastian@mail.uni-paderborn.de, pbonzini@redhat.com, alex.bennee@linaro.org, aurelien@aurel32.net
 
-On Thu, 29 Mar 2018 08:37:48 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> On Thu, 29 Mar 2018 16:25:37 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> 
-> > There are a couple places (one generic, one target specific) where we need
-> > to get the host page size associated with a particular memory backend.  I
-> > have some upcoming code which will add another place which wants this.  So,
-> > for convenience, add a helper function to calculate this.
-> > 
-> > host_memory_backend_pagesize() returns the host pagesize for a given
-> > HostMemoryBackend object, or for the default backend (-mem-path) if passed
-> > NULL.
-> > 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---  
-> 
-[...]
-> > diff --git a/exec.c b/exec.c
-> > index c09bd93df3..04856c2402 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -1488,18 +1488,13 @@ void ram_block_dump(Monitor *mon)
-> >   */
-> >  static int find_max_supported_pagesize(Object *obj, void *opaque)
-> >  {
-> > -    char *mem_path;
-> >      long *hpsize_min = opaque;
-> >  
-> >      if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
-> > -        mem_path = object_property_get_str(obj, "mem-path", NULL);
-> > -        if (mem_path) {
-> > -            long hpsize = qemu_mempath_getpagesize(mem_path);  
-> 
-> ... ie, this code currently leaks mem_path. This should be fixed in 2.12...
-> 
-
-FYI, I've sent a series to fix various object_property_get_str()-based
-leaks, including this one.
-
-https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg07266.html
-
-> > -            if (hpsize < *hpsize_min) {
-> > -                *hpsize_min = hpsize;
-> > -            }
-> > -        } else {
-> > -            *hpsize_min = getpagesize();
-> > +        long hpsize = host_memory_backend_pagesize(MEMORY_BACKEND(obj));
-> > +
-> > +        if (hpsize < *hpsize_min) {
-> > +            *hpsize_min = hpsize;
-> >          }
-> >      }
-> >  
-> > @@ -1509,15 +1504,9 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
-> >  long qemu_getrampagesize(void)
-> >  {
-> >      long hpsize = LONG_MAX;
-> > -    long mainrampagesize;
-> > +    long mainrampagesize = host_memory_backend_pagesize(NULL);
-> >      Object *memdev_root;
-> >  
-> > -    if (mem_path) {
-> > -        mainrampagesize = qemu_mempath_getpagesize(mem_path);
-> > -    } else {
-> > -        mainrampagesize = getpagesize();
-> > -    }
-> > -
-> >      /* it's possible we have memory-backend objects with
-> >       * hugepage-backed RAM. these may get mapped into system
-> >       * address space via -numa parameters or memory hotplug
-> > diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-> > index 47bc9846ac..f474ef97f6 100644
-> > --- a/include/sysemu/hostmem.h
-> > +++ b/include/sysemu/hostmem.h
-> > @@ -68,4 +68,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
-> >  
-> >  void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool mapped);
-> >  bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
-> > +long host_memory_backend_pagesize(HostMemoryBackend *memdev);
-> > +
-> >  #endif
-> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > index b329cd8173..0adcf18c9f 100644
-> > --- a/target/ppc/kvm.c
-> > +++ b/target/ppc/kvm.c
-> > @@ -493,15 +493,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-> >  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-> >  {
-> >      Object *mem_obj = object_resolve_path(obj_path, NULL);
-> > -    char *mempath = object_property_get_str(mem_obj, "mem-path", NULL);
-> > -    long pagesize;
-> > -
-> > -    if (mempath) {
-> > -        pagesize = qemu_mempath_getpagesize(mempath);
-> > -        g_free(mempath);  
-> 
-> ... but this code is ok. No leak :)
-> 
-> > -    } else {
-> > -        pagesize = getpagesize();
-> > -    }
-> > +    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
-> >  
-> >      return pagesize >= max_cpu_page_size;
-> >  }  
-> 
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjIxMjg4NDAtNDk4LTEtZ2l0LXNlbmQtZW1haWwtY290YUBicmFhcC5vcmcK
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8xNF0gZnAtdGVzdCArIGhhcmRmbG9h
+dAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDMyODEzMDcyMy4yMDgzMS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3
+LzIwMTgwMzI4MTMwNzIzLjIwODMxLTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWNmMTIxYWIwMiBoYXJkZmxvYXQ6IHN1cHBvcnQg
+ZmxvYXQzMl90b19mbG9hdDY0CjcxN2M1M2U5ZTEgaGFyZGZsb2F0OiBzdXBwb3J0IGZsb2F0MzIv
+NjQgY29tcGFyaXNvbgo5NmMwMTkyM2YwIGhhcmRmbG9hdDogc3VwcG9ydCBmbG9hdDMyLzY0IHNx
+dWFyZSByb290CmYyZGY2MzJkY2QgaGFyZGZsb2F0OiBzdXBwb3J0IGZsb2F0MzIvNjQgZnVzZWQg
+bXVsdGlwbHktYWRkCjllZDEyNjE5NDEgaGFyZGZsb2F0OiBzdXBwb3J0IGZsb2F0MzIvNjQgZGl2
+aXNpb24KMDMwMDU1ZTVkZCBoYXJkZmxvYXQ6IHN1cHBvcnQgZmxvYXQzMi82NCBtdWx0aXBsaWNh
+dGlvbgphNmNlYWFlM2ZkIGhhcmRmbG9hdDogc3VwcG9ydCBmbG9hdDMyLzY0IGFkZGl0aW9uIGFu
+ZCBzdWJ0cmFjdGlvbgo4NWFjMzQ5ZDAzIGZwdTogaW50cm9kdWNlIGhhcmRmbG9hdAo0NjYxYzJj
+N2E4IHRhcmdldC90cmljb3JlOiB1c2UgZmxvYXQzMl9pc19kZW5vcm1hbApiYjZiNGU5ZWU5IHNv
+ZnRmbG9hdDogYWRkIGZsb2F0ezMyLCA2NH1faXNfe2RlLCB9bm9ybWFsCjZiMGQ1NDc4NzAgZnAt
+dGVzdDogYWRkIG11bGFkZCB2YXJpYW50cwpjNTZmNmRjN2QxIHNvZnRmbG9hdDogZml4IHttaW4s
+IG1heH1udW1tYWcgZm9yIHNhbWUtYWJzLXZhbHVlIGlucHV0cwpiZmE0YzlmNjgyIHRlc3RzOiBh
+ZGQgZnAtdGVzdCwgYSBmbG9hdGluZyBwb2ludCB0ZXN0IHN1aXRlCjA3ODdjMTU3YjQgdGVzdHM6
+IGFkZCBmcC1iZW5jaCwgYSBjb2xsZWN0aW9uIG9mIHNpbXBsZSBmbG9hdGluZy1wb2ludCBtaWNy
+b2JlbmNobWFya3MKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTQ6IHRl
+c3RzOiBhZGQgZnAtYmVuY2gsIGEgY29sbGVjdGlvbiBvZiBzaW1wbGUgZmxvYXRpbmctcG9pbnQg
+bWljcm9iZW5jaG1hcmtzLi4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE1ODogRklMRTogdGVzdHMvZnAtYmVuY2guYzoxMDc6
+CisgICAgfSB3aGlsZSAoIWYzMl9pc19ub3JtYWwocikpOwpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
+fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTgzOiBGSUxF
+OiB0ZXN0cy9mcC1iZW5jaC5jOjEzMjoKKyAgICB9IHdoaWxlICghZjY0X2lzX25vcm1hbChyKSk7
+ClsuLi5dCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikK
+IzIwNjogRklMRTogdGVzdHMvZnAtYmVuY2guYzoxNTU6CisgICAgc3RhdGljIHZvaWQgTkFNRSh2
+b2xhdGlsZSBQUkVDSVNJT04gKnJlcykgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IFVzZSBvZiB2b2xh
+dGlsZSBpcyB1c3VhbGx5IHdyb25nLCBwbGVhc2UgYWRkIGEgY29tbWVudAojMjA2OiBGSUxFOiB0
+ZXN0cy9mcC1iZW5jaC5jOjE1NToKKyAgICBzdGF0aWMgdm9pZCBOQU1FKHZvbGF0aWxlIFBSRUNJ
+U0lPTiAqcmVzKSAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKCkVSUk9SOiBVc2Ugb2Ygdm9s
+YXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzIxMjogRklMRTog
+dGVzdHMvZnAtYmVuY2guYzoxNjE6CisgICAgICAgICAgICB2b2xhdGlsZSBQUkVDSVNJT04gYTsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCgpFUlJPUjogVXNlIG9mIHZv
+bGF0aWxlIGlzIHVzdWFsbHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiMyMjY6IEZJTEU6
+IHRlc3RzL2ZwLWJlbmNoLmM6MTc1OgorICAgIHN0YXRpYyB2b2lkIE5BTUUodm9sYXRpbGUgUFJF
+Q0lTSU9OICpyZXMpICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKRVJST1I6IFVzZSBvZiB2
+b2xhdGlsZSBpcyB1c3VhbGx5IHdyb25nLCBwbGVhc2UgYWRkIGEgY29tbWVudAojMjMzOiBGSUxF
+OiB0ZXN0cy9mcC1iZW5jaC5jOjE4MjoKKyAgICAgICAgICAgIHZvbGF0aWxlIFBSRUNJU0lPTiBh
+ID0gZ2x1ZShnZXRfcmFuZG9tXywgUFJFQ0lTSU9OKSgmcmEpOyAgIFwKCkVSUk9SOiBVc2Ugb2Yg
+dm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzIzNDogRklM
+RTogdGVzdHMvZnAtYmVuY2guYzoxODM6CisgICAgICAgICAgICB2b2xhdGlsZSBQUkVDSVNJT04g
+YiA9IGdsdWUoZ2V0X3JhbmRvbV8sIFBSRUNJU0lPTikoJnJiKTsgICBcCgpFUlJPUjogVXNlIG9m
+IHZvbGF0aWxlIGlzIHVzdWFsbHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiMyNTM6IEZJ
+TEU6IHRlc3RzL2ZwLWJlbmNoLmM6MjAyOgorICAgIHN0YXRpYyB2b2lkIE5BTUUodm9sYXRpbGUg
+UFJFQ0lTSU9OICpyZXMpICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKRVJST1I6IFVzZSBv
+ZiB2b2xhdGlsZSBpcyB1c3VhbGx5IHdyb25nLCBwbGVhc2UgYWRkIGEgY29tbWVudAojMjYwOiBG
+SUxFOiB0ZXN0cy9mcC1iZW5jaC5jOjIwOToKKyAgICAgICAgICAgIHZvbGF0aWxlIFBSRUNJU0lP
+TiBhID0gZ2x1ZShnZXRfcmFuZG9tXywgUFJFQ0lTSU9OKSgmcmEpOyAgIFwKCkVSUk9SOiBVc2Ug
+b2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzI2MTog
+RklMRTogdGVzdHMvZnAtYmVuY2guYzoyMTA6CisgICAgICAgICAgICB2b2xhdGlsZSBQUkVDSVNJ
+T04gYiA9IGdsdWUoZ2V0X3JhbmRvbV8sIFBSRUNJU0lPTikoJnJiKTsgICBcCgpFUlJPUjogVXNl
+IG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiMyNzQ6
+IEZJTEU6IHRlc3RzL2ZwLWJlbmNoLmM6MjIzOgorICAgIHN0YXRpYyB2b2lkIE5BTUUodm9sYXRp
+bGUgUFJFQ0lTSU9OICpyZXMpICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKRVJST1I6IFVz
+ZSBvZiB2b2xhdGlsZSBpcyB1c3VhbGx5IHdyb25nLCBwbGVhc2UgYWRkIGEgY29tbWVudAojMjgy
+OiBGSUxFOiB0ZXN0cy9mcC1iZW5jaC5jOjIzMToKKyAgICAgICAgICAgIHZvbGF0aWxlIFBSRUNJ
+U0lPTiBhID0gZ2x1ZShnZXRfcmFuZG9tXywgUFJFQ0lTSU9OKSgmcmEpOyAgIFwKCkVSUk9SOiBV
+c2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzI4
+MzogRklMRTogdGVzdHMvZnAtYmVuY2guYzoyMzI6CisgICAgICAgICAgICB2b2xhdGlsZSBQUkVD
+SVNJT04gYiA9IGdsdWUoZ2V0X3JhbmRvbV8sIFBSRUNJU0lPTikoJnJiKTsgICBcCgpFUlJPUjog
+VXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiMy
+ODQ6IEZJTEU6IHRlc3RzL2ZwLWJlbmNoLmM6MjMzOgorICAgICAgICAgICAgdm9sYXRpbGUgUFJF
+Q0lTSU9OIGMgPSBnbHVlKGdldF9yYW5kb21fLCBQUkVDSVNJT04pKCZyYyk7ICAgXAoKRVJST1I6
+IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
+MzU5OiBGSUxFOiB0ZXN0cy9mcC1iZW5jaC5jOjMwODoKKyAgICB9IHdoaWxlICgwKQpbLi4uXQoK
+dG90YWw6IDE2IGVycm9ycywgMCB3YXJuaW5ncywgMzU2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMTQ6IHRlc3Rz
+OiBhZGQgZnAtdGVzdCwgYSBmbG9hdGluZyBwb2ludCB0ZXN0IHN1aXRlLi4uCkVSUk9SOiBNYWNy
+b3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMK
+IzM5MTogRklMRTogdGVzdHMvZnAtdGVzdC9mcC10ZXN0LmM6MjIwOgorI2RlZmluZSBQUl9FWENF
+UFRJT05TKHgpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgICgoeCkg
+JiBTVEFOREFSRF9FWENFUFRJT05TID8gIiIgOiAibm9uZSIpLCAgICAgIFwKKyAgICAgICAgKCgo
+eCkgJiBmbG9hdF9mbGFnX2luZXhhY3QpICAgPyAieCIgOiAiIiksICAgICAgXAorICAgICAgICAo
+KCh4KSAmIGZsb2F0X2ZsYWdfdW5kZXJmbG93KSA/ICJ1IiA6ICIiKSwgICAgICBcCisgICAgICAg
+ICgoKHgpICYgZmxvYXRfZmxhZ19vdmVyZmxvdykgID8gIm8iIDogIiIpLCAgICAgIFwKKyAgICAg
+ICAgKCgoeCkgJiBmbG9hdF9mbGFnX2RpdmJ5emVybykgPyAieiIgOiAiIiksICAgICAgXAorICAg
+ICAgICAoKCh4KSAmIGZsb2F0X2ZsYWdfaW52YWxpZCkgICA/ICJpIiA6ICIiKQoKRVJST1I6IGNv
+bnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvdWwKIzg1Mjog
+RklMRTogdGVzdHMvZnAtdGVzdC9mcC10ZXN0LmM6NjgxOgorICAgICAgICAgICAgc2lnbmlmaWNh
+bmQgPSBzdHJ0b3VsKCZwWzNdLCAmcG9zLCAxNik7CgpFUlJPUjogY29uc2lkZXIgdXNpbmcgcWVt
+dV9zdHJ0b2wgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2wKIzg1NzogRklMRTogdGVzdHMvZnAtdGVz
+dC9mcC10ZXN0LmM6Njg2OgorICAgICAgICAgICAgZXhwb25lbnQgPSBzdHJ0b2wocG9zLCAmcG9z
+LCAxMCkgKyAxMjc7CgpFUlJPUjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZl
+cmVuY2UgdG8gc3RydG91bAojODgyOiBGSUxFOiB0ZXN0cy9mcC10ZXN0L2ZwLXRlc3QuYzo3MTE6
+CisgICAgICAgICAgICBzaWduaWZpY2FuZCA9IHN0cnRvdWwoJnBbM10sICZwb3MsIDE2KTsKCkVS
+Uk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAoj
+ODg3OiBGSUxFOiB0ZXN0cy9mcC10ZXN0L2ZwLXRlc3QuYzo3MTY6CisgICAgICAgICAgICBleHBv
+bmVudCA9IHN0cnRvbChwb3MsICZwb3MsIDEwKSArIDEwMjM7CgpFUlJPUjogY29uc2lkZXIgdXNp
+bmcgcWVtdV9zdHJ0b2YgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2YKIzkwNjogRklMRTogdGVzdHMv
+ZnAtdGVzdC9mcC10ZXN0LmM6NzM1OgorICAgICAgICAgICAgZmxvYXQgZiA9IHN0cnRvZihwLCAm
+cG9zKTsKCnRvdGFsOiA2IGVycm9ycywgMCB3YXJuaW5ncywgMTIyNSBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzE0
+OiBzb2Z0ZmxvYXQ6IGZpeCB7bWluLCBtYXh9bnVtbWFnIGZvciBzYW1lLWFicy12YWx1ZSBpbnB1
+dHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xNDogZnAtdGVzdDogYWRkIG11bGFkZCB2YXJpYW50cy4u
+LgpDaGVja2luZyBQQVRDSCA1LzE0OiBzb2Z0ZmxvYXQ6IGFkZCBmbG9hdHszMiwgNjR9X2lzX3tk
+ZSwgfW5vcm1hbC4uLgpDaGVja2luZyBQQVRDSCA2LzE0OiB0YXJnZXQvdHJpY29yZTogdXNlIGZs
+b2F0MzJfaXNfZGVub3JtYWwuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNDogZnB1OiBpbnRyb2R1Y2Ug
+aGFyZGZsb2F0Li4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6
+V3hWKQojOTA6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxNTU6CisgICAgc29mdF90ICMjIF9pbnB1
+dF9mbHVzaF9fbm9jaGVjayhzb2Z0X3QgKmEsIGZsb2F0X3N0YXR1cyAqcykgICAgICAgICBcCiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzEw
+MDogRklMRTogZnB1L3NvZnRmbG9hdC5jOjE2NToKKyAgICBzb2Z0X3QgIyMgX2lucHV0X2ZsdXNo
+MShzb2Z0X3QgKmEsIGZsb2F0X3N0YXR1cyAqcykgICAgICAgICAgICAgICAgIFwKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzEwOTogRklMRTogZnB1L3Nv
+ZnRmbG9hdC5jOjE3NDoKKyAgICBzb2Z0X3QgIyMgX2lucHV0X2ZsdXNoMihzb2Z0X3QgKmEsIHNv
+ZnRfdCAqYiwgZmxvYXRfc3RhdHVzICpzKSAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTIwOiBGSUxFOiBmcHUvc29mdGZs
+b2F0LmM6MTg1OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZsb2F0X3N0YXR1cyAqcykg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDEwMyBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
+QVRDSCA4LzE0OiBoYXJkZmxvYXQ6IHN1cHBvcnQgZmxvYXQzMi82NCBhZGRpdGlvbiBhbmQgc3Vi
+dHJhY3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNDogaGFyZGZsb2F0OiBzdXBwb3J0IGZsb2F0
+MzIvNjQgbXVsdGlwbGljYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTQ6IGhhcmRmbG9hdDog
+c3VwcG9ydCBmbG9hdDMyLzY0IGRpdmlzaW9uLi4uCkNoZWNraW5nIFBBVENIIDExLzE0OiBoYXJk
+ZmxvYXQ6IHN1cHBvcnQgZmxvYXQzMi82NCBmdXNlZCBtdWx0aXBseS1hZGQuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTIvMTQ6IGhhcmRmbG9hdDogc3VwcG9ydCBmbG9hdDMyLzY0IHNxdWFyZSByb290Li4u
+CkNoZWNraW5nIFBBVENIIDEzLzE0OiBoYXJkZmxvYXQ6IHN1cHBvcnQgZmxvYXQzMi82NCBjb21w
+YXJpc29uLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hW
+KQojNDI6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoyMzA2OgorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBib29sIGlzX3F1aWV0LCBmbG9hdF9zdGF0dXMgKnMpICAgICAgICAgICAgXAogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
+RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM2NzogRklM
+RTogZnB1L3NvZnRmbG9hdC5jOjIzMjA6CitmbG9hdDE2X2NvbXBhcmUoZmxvYXQxNiBhLCBmbG9h
+dDE2IGIsIGZsb2F0X3N0YXR1cyAqcykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgODMgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggMTQvMTQ6IGhhcmRmbG9hdDogc3VwcG9ydCBmbG9hdDMyX3RvX2Zsb2F0NjQuLi4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
+aXN0cy5vcmc=
