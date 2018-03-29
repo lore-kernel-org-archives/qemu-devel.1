@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=0626c35109=borntraeger@de.ibm.com>)
-	id 1f1UPV-00010L-98
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:03:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f1URj-0002Ta-QY
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=0626c35109=borntraeger@de.ibm.com>)
-	id 1f1UPS-0002eM-6a
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:03:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=0626c35109=borntraeger@de.ibm.com>)
-	id 1f1UPR-0002dJ-TT
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:03:54 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2T9o8ZO032950
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 06:03:50 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h0v0y5dca-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 06:03:49 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 29 Mar 2018 11:03:46 +0100
-References: <1522316251-16399-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 29 Mar 2018 12:03:42 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1f1URd-0003Xz-NP
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:06:15 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34063)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f1URd-0003Ww-H1
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:06:09 -0400
+Received: by mail-wr0-x243.google.com with SMTP id o8so4873993wra.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 03:06:09 -0700 (PDT)
+References: <1519709965-29833-1-git-send-email-cota@braap.org>
+	<1519709965-29833-5-git-send-email-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1519709965-29833-5-git-send-email-cota@braap.org>
+Date: Thu, 29 Mar 2018 11:06:07 +0100
+Message-ID: <871sg38acw.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1522316251-16399-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <2103b547-66aa-d1f7-a504-cb6ef3672039@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: Increase virtio
- timeout to 30 seconds
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/16] tcg: move
+ tb_ctx.tb_phys_invalidate_count to tcg_ctx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,44 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, ldoktor@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
 
+Emilio G. Cota <cota@braap.org> writes:
 
-On 03/29/2018 11:37 AM, Thomas Huth wrote:
-> The current timeout is set to only three seconds - and considering that
-> vring_wait_reply() or rather get_second() is not doing any rounding,
-> the real timeout is likely rather 2 seconds in most cases. When the
-> host is really badly loaded and we run the guest in TCG mode instead
-> of KVM, it's possible that we hit this timeout by mistake. So let's
-> increase the timeout to 30 seconds instead to ease this situation (30
-> seconds is also the timeout that is used by the Linux SCSI subsystem
-> for example, so this seems to be a sane value for block IO timeout).
-
-I have never seen this, but cant this also with KVM (e.g. host paging
-and the swap disk is busy for some seconds).
-
-Wouldnt it also qualify for 2.12?
-
-> 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1549079
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Thereby making it per-TCGContext. Once we remove tb_lock, this will
+> avoid an atomic increment every time a TB is invalidated.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  pc-bios/s390-ccw/virtio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index 817e7f5..cdb66f4 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -14,7 +14,7 @@
->  #include "virtio-scsi.h"
->  #include "bswap.h"
-> 
-> -#define VRING_WAIT_REPLY_TIMEOUT 3
-> +#define VRING_WAIT_REPLY_TIMEOUT 30
-> 
->  static VRing block[VIRTIO_MAX_VQS];
->  static char ring_area[VIRTIO_RING_SIZE * VIRTIO_MAX_VQS]
-> 
+>  accel/tcg/translate-all.c |  5 +++--
+>  include/exec/tb-context.h |  1 -
+>  tcg/tcg.c                 | 14 ++++++++++++++
+>  tcg/tcg.h                 |  3 +++
+>  4 files changed, 20 insertions(+), 3 deletions(-)
+>
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 3a51d49..20ad3fc 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1072,7 +1072,8 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_pa=
+ge_addr_t page_addr)
+>      /* suppress any remaining jumps to this TB */
+>      tb_jmp_unlink(tb);
+>
+> -    tb_ctx.tb_phys_invalidate_count++;
+> +    atomic_set(&tcg_ctx->tb_phys_invalidate_count,
+> +               tcg_ctx->tb_phys_invalidate_count + 1);
+
+We do have an atomic_inc helper for this or we need comment that we only
+have atomic_reads() to worry about hence no races.
+
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>  }
+>
+>  #ifdef CONFIG_SOFTMMU
+> @@ -1862,7 +1863,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_f=
+printf)
+>      cpu_fprintf(f, "\nStatistics:\n");
+>      cpu_fprintf(f, "TB flush count      %u\n",
+>                  atomic_read(&tb_ctx.tb_flush_count));
+> -    cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate=
+_count);
+> +    cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_c=
+ount());
+>      cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
+>      tcg_dump_info(f, cpu_fprintf);
+>  }
+> diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
+> index d8472c8..8c9b49c 100644
+> --- a/include/exec/tb-context.h
+> +++ b/include/exec/tb-context.h
+> @@ -37,7 +37,6 @@ struct TBContext {
+>
+>      /* statistics */
+>      unsigned tb_flush_count;
+> -    int tb_phys_invalidate_count;
+>  };
+>
+>  extern TBContext tb_ctx;
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index b471708..a7b596e 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -791,6 +791,20 @@ size_t tcg_code_capacity(void)
+>      return capacity;
+>  }
+>
+> +size_t tcg_tb_phys_invalidate_count(void)
+> +{
+> +    unsigned int n_ctxs =3D atomic_read(&n_tcg_ctxs);
+> +    unsigned int i;
+> +    size_t total =3D 0;
+> +
+> +    for (i =3D 0; i < n_ctxs; i++) {
+> +        const TCGContext *s =3D atomic_read(&tcg_ctxs[i]);
+> +
+> +        total +=3D atomic_read(&s->tb_phys_invalidate_count);
+> +    }
+> +    return total;
+> +}
+> +
+>  /* pool based memory allocation */
+>  void *tcg_malloc_internal(TCGContext *s, int size)
+>  {
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 8bf29cc..9dd9448 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -694,6 +694,8 @@ struct TCGContext {
+>      /* Threshold to flush the translated code buffer.  */
+>      void *code_gen_highwater;
+>
+> +    size_t tb_phys_invalidate_count;
+> +
+>      /* Track which vCPU triggers events */
+>      CPUState *cpu;                      /* *_trans */
+>
+> @@ -852,6 +854,7 @@ size_t tcg_code_capacity(void);
+>
+>  void tcg_tb_insert(TranslationBlock *tb);
+>  void tcg_tb_remove(TranslationBlock *tb);
+> +size_t tcg_tb_phys_invalidate_count(void);
+>  TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr);
+>  void tcg_tb_foreach(GTraverseFunc func, gpointer user_data);
+>  size_t tcg_nb_tbs(void);
+
+
+--
+Alex Benn=C3=A9e
