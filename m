@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f1VR5-0001Uo-NG
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:40 -0400
+	(envelope-from <famz@redhat.com>) id 1f1VR5-0001V4-Va
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f1VR4-00037b-IO
+	(envelope-from <famz@redhat.com>) id 1f1VR4-00037l-V0
 	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:39 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 29 Mar 2018 19:09:08 +0800
-Message-Id: <20180329110914.20888-3-famz@redhat.com>
+Date: Thu, 29 Mar 2018 19:09:07 +0800
+Message-Id: <20180329110914.20888-2-famz@redhat.com>
 In-Reply-To: <20180329110914.20888-1-famz@redhat.com>
 References: <20180329110914.20888-1-famz@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 2/8] qcow2: Implement bdrv_co_map_range
+Subject: [Qemu-devel] [RFC PATCH 1/8] block: Introduce bdrv_co_map_range API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,149 +22,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-Extract the common code from qcow2_co_block_status, then use it to
-implement qcow2_co_map_range. The major difference is the allocation
-logic, enabled by BDRV_REQ_ALLOCATE.
+A little similar to bdrv_co_block_status but with the capability to do
+allocation depending on the BDRV_REQ_ALLOCATE flag, this API is the
+building block needed by copy offloading to work for format drivers.
+
+The idea is the format drivers return "where" to copy from/to in its
+underlying "file", then the block layer will drill down until it reaches
+a protocol layer that can do offloaded copying.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/qcow2.c | 103 +++++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 73 insertions(+), 30 deletions(-)
+ block/io.c                | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ include/block/block.h     |  8 +++++++-
+ include/block/block_int.h | 21 +++++++++++++++++++++
+ 3 files changed, 72 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 486f3e83b7..86bbeb69db 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1755,6 +1755,73 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
-     return status;
+diff --git a/block/io.c b/block/io.c
+index bd9a19a9c4..1b4cfcacb1 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2826,3 +2826,47 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
+         bdrv_unregister_buf(child->bs, host);
+     }
  }
- 
-+static int qcow2_handle_l2meta(BlockDriverState *bs, QCowL2Meta *l2meta)
++
++int coroutine_fn bdrv_co_map_range(BdrvChild *child, int64_t offset,
++                                   int64_t bytes, int64_t *pnum, int64_t *map,
++                                   BlockDriverState **file,
++                                   int flags)
 +{
-+    int ret = 0;
++    BlockDriverState *bs = child->bs;
 +
-+    while (l2meta != NULL) {
-+        QCowL2Meta *next;
-+
-+        if (!ret) {
-+            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
++    if (bs->encrypted) {
++        return -ENOTSUP;
++    }
++    while (bs && bs->drv && bs->drv->bdrv_co_map_range) {
++        int64_t cur_pnum, cur_map;
++        BlockDriverState *cur_file = NULL;
++        int r = bs->drv->bdrv_co_map_range(bs, offset, bytes,
++                                           &cur_pnum, &cur_map, &cur_file,
++                                           flags);
++        if (r < 0) {
++            return r;
 +        }
-+
-+        /* Take the request off the list of running requests */
-+        if (l2meta->nb_clusters != 0) {
-+            QLIST_REMOVE(l2meta, next_in_flight);
++        offset = cur_map;
++        bytes = cur_pnum;
++        if (pnum) {
++            *pnum = cur_pnum;
 +        }
-+
-+        qemu_co_queue_restart_all(&l2meta->dependent_requests);
-+
-+        next = l2meta->next;
-+        g_free(l2meta);
-+        l2meta = next;
++        if (map) {
++            *map = cur_map;
++        }
++        if (!(r & BDRV_BLOCK_OFFSET_VALID)) {
++            return -ENOTSUP;
++        }
++        if (file) {
++            *file = cur_file;
++        }
++        if (!cur_file) {
++            return -ENOTSUP;
++        }
++        if (cur_file == bs) {
++            return r;
++        }
++        bs = cur_file;
 +    }
-+    return ret;
++    return -ENOTSUP;
 +}
+diff --git a/include/block/block.h b/include/block/block.h
+index cdec3639a3..21d3e9db32 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -53,9 +53,10 @@ typedef enum {
+     BDRV_REQ_NO_SERIALISING     = 0x8,
+     BDRV_REQ_FUA                = 0x10,
+     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
++    BDRV_REQ_ALLOCATE           = 0x40,
+ 
+     /* Mask of valid flags */
+-    BDRV_REQ_MASK               = 0x3f,
++    BDRV_REQ_MASK               = 0x7f,
+ } BdrvRequestFlags;
+ 
+ typedef struct BlockSizes {
+@@ -604,4 +605,9 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+  */
+ void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
+ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
 +
-+static int coroutine_fn qcow2_co_map_range(BlockDriverState *bs, int64_t offset,
-+                                           int64_t bytes, int64_t *pnum, int64_t *map,
-+                                           BlockDriverState **file,
-+                                           int flags)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int ret;
-+    uint64_t cluster_offset;
-+    unsigned int cur_bytes = MIN(bytes, INT_MAX);
-+    int offset_in_cluster;
-+    QCowL2Meta *l2meta = NULL;
++int bdrv_co_map_range(BdrvChild *child, int64_t offset,
++                      int64_t bytes, int64_t *pnum, int64_t *map,
++                      BlockDriverState **file,
++                      int flags);
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c4dd1d4bb8..3f3f6f3efd 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -475,6 +475,27 @@ struct BlockDriver {
+      */
+     void (*bdrv_register_buf)(BlockDriverState *bs, void *host, size_t size);
+     void (*bdrv_unregister_buf)(BlockDriverState *bs, void *host);
 +
-+    if (!(flags & BDRV_REQ_ALLOCATE)) {
-+        return qcow2_co_block_status(bs, true, offset, bytes, pnum, map, file);
-+    }
-+    qemu_co_mutex_lock(&s->lock);
-+    ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
-+                                     &cluster_offset, &l2meta);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    offset_in_cluster = offset_into_cluster(s, offset);
-+    ret = qcow2_pre_write_overlap_check(bs, 0,
-+                                        cluster_offset + offset_in_cluster,
-+                                        cur_bytes);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+    ret = qcow2_handle_l2meta(bs, l2meta);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+    *pnum = cur_bytes;
-+    *map = cluster_offset + offset_in_cluster;
-+    *file = bs->file->bs;
-+    ret = BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA;
-+out:
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
-+}
-+
- static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                                         uint64_t bytes, QEMUIOVector *qiov,
-                                         int flags)
-@@ -2041,24 +2108,10 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-             }
-         }
++    /**
++     * Get or create offset mappings for a virtual range.
++     *
++     * @offset: the offset of the beginning of the range.
++     * @bytes: the maximum bytes of the range to map.
++     * @pnum: at return, this will point to the number of bytes in the returned
++     * mapping status
++     * @map: at return, this will point to the offset which the range maps to
++     * @file: at return, this will point to the file where the data is mapped.
++     * If it is set to bs, it means the mapping is terminal and the result can
++     * be used for read/write and copy_range; if it is NULL, it means the range
++     * doesn't map to a file, or no I/O to any file is necessary; otherwise, it
++     * means the query should be passed down to an underlying format/protocol.
++     * @flags: flags for the request. BDRV_REQ_ALLOCATE means the range
++     * should be allocated if necessary.
++     */
++    int (*bdrv_co_map_range)(BlockDriverState *bs, int64_t offset,
++                             int64_t bytes, int64_t *pnum, int64_t *map,
++                             BlockDriverState **file,
++                             int flags);
+     QLIST_ENTRY(BlockDriver) list;
+ };
  
--        while (l2meta != NULL) {
--            QCowL2Meta *next;
--
--            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
--            if (ret < 0) {
--                goto fail;
--            }
--
--            /* Take the request off the list of running requests */
--            if (l2meta->nb_clusters != 0) {
--                QLIST_REMOVE(l2meta, next_in_flight);
--            }
--
--            qemu_co_queue_restart_all(&l2meta->dependent_requests);
--
--            next = l2meta->next;
--            g_free(l2meta);
--            l2meta = next;
-+        ret = qcow2_handle_l2meta(bs, l2meta);
-+        l2meta = NULL;
-+        if (ret) {
-+            goto fail;
-         }
- 
-         bytes -= cur_bytes;
-@@ -2069,18 +2122,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-     ret = 0;
- 
- fail:
--    while (l2meta != NULL) {
--        QCowL2Meta *next;
--
--        if (l2meta->nb_clusters != 0) {
--            QLIST_REMOVE(l2meta, next_in_flight);
--        }
--        qemu_co_queue_restart_all(&l2meta->dependent_requests);
--
--        next = l2meta->next;
--        g_free(l2meta);
--        l2meta = next;
--    }
-+    qcow2_handle_l2meta(bs, l2meta);
- 
-     qemu_co_mutex_unlock(&s->lock);
- 
-@@ -4508,6 +4550,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_co_create       = qcow2_co_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
-     .bdrv_co_block_status = qcow2_co_block_status,
-+    .bdrv_co_map_range    = qcow2_co_map_range,
- 
-     .bdrv_co_preadv         = qcow2_co_preadv,
-     .bdrv_co_pwritev        = qcow2_co_pwritev,
 -- 
 2.14.3
