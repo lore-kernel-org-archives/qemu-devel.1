@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f1b0z-0007WP-17
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:07:06 -0400
+	(envelope-from <mjc@sifive.com>) id 1f1bKw-0007lH-Co
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f1b0y-0007w8-2o
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:07:05 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:53321)
+	(envelope-from <mjc@sifive.com>) id 1f1bKs-0004JQ-GD
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:27:42 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:42826)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1f1b0x-0007uu-RZ
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:07:04 -0400
-Received: by mail-wm0-x235.google.com with SMTP id p9so11950284wmc.3
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 10:07:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f1bKs-0004Ih-B3
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:27:38 -0400
+Received: by mail-pg0-x242.google.com with SMTP id f10so3488532pgs.9
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 10:27:38 -0700 (PDT)
+From: Michael Clark <mjc@sifive.com>
+Date: Thu, 29 Mar 2018 10:26:57 -0700
+Message-Id: <1522344417-60114-2-git-send-email-mjc@sifive.com>
+In-Reply-To: <1522344417-60114-1-git-send-email-mjc@sifive.com>
+References: <1522344417-60114-1-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <944288fa-05f1-7ed1-b35d-f7010d28d4c9@linux.vnet.ibm.com>
-References: <1519934373-3629-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1519934373-3629-3-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAMxuvaxDVJxH0BwdtdqgvCUpOzaFf_0NsjvjQnceVjeO5dDhbQ@mail.gmail.com>
-	<944288fa-05f1-7ed1-b35d-f7010d28d4c9@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 29 Mar 2018 19:07:01 +0200
-Message-ID: <CAJ+F1CLvt9Uirf+DmF7KQLA0-eN5cHzd=ar8igMmJ5ZGi3cpVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] tpm: extend TPM TIS with state
- migration support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 1/1] RISC-V: Workaround for critical mstatus.FS
+ bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,103 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Hi
+This change is a workaround for a bug where mstatus.FS
+is not correctly reporting dirty after operations that
+modify floating point registers. This a critical bug
+or RISC-V in QEMU as it results in floating point
+register file corruption when running SMP Linux due to
+task migration and possibly uniprocessor Linux if
+more than one process is using the FPU.
 
-On Thu, Mar 29, 2018 at 1:56 AM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> On 03/28/2018 11:41 AM, Marc-Andr=C3=A9 Lureau wrote:
->>
->> Hi
->>
->> On Thu, Mar 1, 2018 at 8:59 PM, Stefan Berger
->> <stefanb@linux.vnet.ibm.com> wrote:
->>>
->>> +
->>> +static const VMStateDescription vmstate_locty =3D {
->>> +    .name =3D "loc",
->>> +    .version_id =3D 1,
->>> +    .minimum_version_id =3D 0,
->>> +    .minimum_version_id_old =3D 0,
->>
->> I don't understand the problem there is leaving all the version fields
->> to 0, just like CRB.
->>
->>> +    .fields      =3D (VMStateField[]) {
->>> +        VMSTATE_UINT32(state, TPMLocality),
->>> +        VMSTATE_UINT32(inte, TPMLocality),
->>> +        VMSTATE_UINT32(ints, TPMLocality),
->>> +        VMSTATE_UINT8(access, TPMLocality),
->>> +        VMSTATE_UINT32(sts, TPMLocality),
->>> +        VMSTATE_UINT32(iface_id, TPMLocality),
->>> +        VMSTATE_END_OF_LIST(),
->>> +    }
->>> +};
->>> +
->>>   static const VMStateDescription vmstate_tpm_tis =3D {
->>>       .name =3D "tpm",
->>> -    .unmigratable =3D 1,
->>> +    .version_id =3D 1,
->>> +    .minimum_version_id =3D 0,
->>> +    .minimum_version_id_old =3D 0,
->>
->> same
->>
->> If you remove the version fields: Reviewed-by: Marc-Andr=C3=A9 Lureau
->> <marcandre.lureau@redhat.com>
->
->
-> This is the error I got when setting .version_id =3D 0 (on both) and doin=
-g a
-> localhost migration
->
-> qemu-system-x86_64: Missing section footer for tpm-tis
-> qemu-system-x86_64: load of migration failed: Invalid argument
+This workaround will return dirty if mstatus.FS is
+switched from off to initial or clean. According to
+the specification it is legal for an implementation
+to return only off, or dirty.
 
-It's clearly not the most friendly error message, but I debugged it,
-you just have to specify the right version for VMSTATE_STRUCT_ARRAY:
-0.
-        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 0,
-                             vmstate_locty, TPMLocality),
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alex Bennée <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/op_helper.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-Then it all works with version 0 (or default value)
-
-thanks
->
-> It must have something to do with the nesting invoked by
-> VMSTATE_STRUCT_ARRAY(loc,...) below.
->
->
->
->
->>
->>
->>
->>> +    .pre_save  =3D tpm_tis_pre_save,
->>> +    .fields =3D (VMStateField[]) {
->>> +        VMSTATE_BUFFER(buffer, TPMState),
->>> +        VMSTATE_UINT16(rw_offset, TPMState),
->>> +        VMSTATE_UINT8(active_locty, TPMState),
->>> +        VMSTATE_UINT8(aborting_locty, TPMState),
->>> +        VMSTATE_UINT8(next_locty, TPMState),
->>> +
->>> +        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 1,
->>> +                             vmstate_locty, TPMLocality),
->>> +
->>> +        VMSTATE_END_OF_LIST()
->>> +    }
->>>   };
->>>
->>>   static Property tpm_tis_properties[] =3D {
->>> --
->>> 2.5.5
->>>
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index e34715d..7c6068b 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -144,8 +144,21 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
+         }
+ 
+         mstatus = (mstatus & ~mask) | (val_to_write & mask);
+-        int dirty = (mstatus & MSTATUS_FS) == MSTATUS_FS;
+-        dirty |= (mstatus & MSTATUS_XS) == MSTATUS_XS;
++
++        /* Note: this is a workaround for an issue where mstatus.FS
++           does not report dirty after floating point operations
++           that modify floating point state. This workaround is
++           technically compliant with the RISC-V Privileged
++           specification as it is legal to return only off, or dirty.
++           at the expense of extra floating point save/restore. */
++
++        /* FP is always dirty or off */
++        if (mstatus & MSTATUS_FS) {
++            mstatus |= MSTATUS_FS;
++        }
++
++        int dirty = ((mstatus & MSTATUS_FS) == MSTATUS_FS) |
++                    ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+         mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+         env->mstatus = mstatus;
+         break;
+-- 
+2.7.0
