@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1fI0-0003Ud-6e
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1f1goo-0004lo-Mn
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 19:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1fHx-00035m-30
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1fHw-00034j-Qs
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:53 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 29 Mar 2018 18:38:57 -0300
-Message-Id: <20180329213857.15499-19-ehabkost@redhat.com>
-In-Reply-To: <20180329213857.15499-1-ehabkost@redhat.com>
-References: <20180329213857.15499-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC 18/18] Collection of validator.py test cases
+	(envelope-from <eblake@redhat.com>) id 1f1gon-0002ZP-Pr
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 19:18:54 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 29 Mar 2018 18:18:37 -0500
+Message-Id: <20180329231837.1914680-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12] nbd/client: Correctly handle bad
+ server REP_META_CONTEXT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +19,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>, Amador Pahim <apahim@redhat.com>
+Cc: vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-These test case specifications demonstrate what kind of tests can
-be specified using validator.py.
+It's never a good idea to blindly read for size bytes as
+returned by the server without first validating that the size
+is within bounds; a malicious or buggy server could cause us
+to hang or get out of sync from reading further messages.
 
-Most of them can replace existing unit tests written in C, and
-device-crash-test.yaml can replace most of the functionality of
-scripts/device-crash-test.
+It may be smarter to try and teach the client to cope with
+unexpected context ids by silently ignoring them instead of
+hanging up on the server, but for now, if the server doesn't
+reply with exactly the one context we expect, it's easier to
+just give up - however, if we give up for any reason other
+than an I/O failure, we might as well try to politely tell
+the server we are quitting rather than continuing.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Fix some typos in the process.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/validator/cpu.yaml               |  5 +++++
- tests/validator/device-add.yaml        | 17 +++++++++++++++++
- tests/validator/device-crash-test.yaml |  7 +++++++
- tests/validator/device-help.yaml       |  3 +++
- tests/validator/device-introspect.yaml | 23 +++++++++++++++++++++++
- tests/validator/device-list.yaml       | 10 ++++++++++
- tests/validator/just-help.yaml         |  3 +++
- 7 files changed, 68 insertions(+)
- create mode 100644 tests/validator/cpu.yaml
- create mode 100644 tests/validator/device-add.yaml
- create mode 100644 tests/validator/device-crash-test.yaml
- create mode 100644 tests/validator/device-help.yaml
- create mode 100644 tests/validator/device-introspect.yaml
- create mode 100644 tests/validator/device-list.yaml
- create mode 100644 tests/validator/just-help.yaml
+ nbd/client.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/tests/validator/cpu.yaml b/tests/validator/cpu.yaml
-new file mode 100644
-index 0000000000..48032995ff
---- /dev/null
-+++ b/tests/validator/cpu.yaml
-@@ -0,0 +1,5 @@
-+# Simply check if QEMU will run without errors using a CPU model:
-+command-line: '$QEMU -S -cpu $CPU'
-+expected-failures:
-+    # "host" doesn't always work
-+    - CPU: 'host'
-diff --git a/tests/validator/device-add.yaml b/tests/validator/device-add.yaml
-new file mode 100644
-index 0000000000..b4c0daf70c
---- /dev/null
-+++ b/tests/validator/device-add.yaml
-@@ -0,0 +1,17 @@
-+# This test specification will try device_add with all device types
-+command-line: '$QEMU -S -machine $MACHINE,accel=$ACCEL'
-+monitor-commands:
-+- qmp:
-+  - execute: 'device_add'
-+    arguments:
-+      driver: '$DEVICE'
-+      id: 'test-device-for-$DEVICE'
-+  - execute: 'device_del'
-+    arguments:
-+      id: 'test-device-for-$DEVICE'
-+defaults:
-+  MACHINE: 'none'
-+  ACCEL: 'kvm:tcg'
-+expected-failures:
-+  - MACHINE: 'xenpv'
-+  - MACHINE: 'xenfv'
-diff --git a/tests/validator/device-crash-test.yaml b/tests/validator/device-crash-test.yaml
-new file mode 100644
-index 0000000000..edaab0ee8f
---- /dev/null
-+++ b/tests/validator/device-crash-test.yaml
-@@ -0,0 +1,7 @@
-+# this is a very simple test case generator that will run QEMU
-+# using all combinations of -machine and -device.
-+# This replaces scripts/device-crash-test.
-+# TODO: use a $MACHINE_OPT variable to make -machine optional
-+command-line: '$QEMU -S -machine $MACHINE,accel=$ACCEL -device $DEVICE'
+diff --git a/nbd/client.c b/nbd/client.c
+index 9b9b7f0ea29..4ee1d9a4a2c 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -599,8 +599,8 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+  * Set one meta context. Simple means that reply must contain zero (not
+  * negotiated) or one (negotiated) contexts. More contexts would be considered
+  * as a protocol error. It's also implied that meta-data query equals queried
+- * context name, so, if server replies with something different then @context,
+- * it considered as error too.
++ * context name, so, if server replies with something different than @context,
++ * it is considered an error too.
+  * return 1 for successful negotiation, context_id is set
+  *        0 if operation is unsupported,
+  *        -1 with errp set for any other error
+@@ -651,6 +651,14 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+         char *name;
+         size_t len;
+
++        if (reply.length != sizeof(received_id) + context_len) {
++            error_setg(errp, "Failed to negotiate meta context '%s', server "
++                       "answered with unexpected length %u", context,
++                       reply.length);
++            nbd_send_opt_abort(ioc);
++            return -1;
++        }
 +
-+#TODO: represent the whitelist from device-crash-test script somehow
-diff --git a/tests/validator/device-help.yaml b/tests/validator/device-help.yaml
-new file mode 100644
-index 0000000000..95aa5c9f5b
---- /dev/null
-+++ b/tests/validator/device-help.yaml
-@@ -0,0 +1,3 @@
-+# Just check if -device ...,help works:
-+command-line: '$QEMU -device $DEVICE,help'
-+qmp: false
-diff --git a/tests/validator/device-introspect.yaml b/tests/validator/device-introspect.yaml
-new file mode 100644
-index 0000000000..f5b10aff9a
---- /dev/null
-+++ b/tests/validator/device-introspect.yaml
-@@ -0,0 +1,23 @@
-+# This test specification is equivalent to "device/introspect/concrete" in
-+# tests/device-introspect-test.c
-+command-line: '$QEMU -S -machine $MACHINE,accel=$ACCEL'
-+monitor-commands:
-+- qmp:
-+  - execute: 'device-list-properties'
-+    arguments:
-+      typename: '$DEVICE'
-+- hmp: 'device_add $DEVICE,help'
-+- hmp: 'info qom-tree'
-+defaults:
-+  MACHINE: 'none'
-+  ACCEL: 'kvm:tcg'
-+expected-failures:
-+  - MACHINE: 'xenpv'
-+  - MACHINE: 'xenfv'
-+
-+#TODO: the test runner could support something like:
-+# extra-cases:
-+#   # like "device/introspect/none":
-+#   - DEVICE: 'nonexistent'
-+#   # like "device/introspect/abstract":
-+#   - DEVICE: 'device'
-diff --git a/tests/validator/device-list.yaml b/tests/validator/device-list.yaml
-new file mode 100644
-index 0000000000..ac0004c05d
---- /dev/null
-+++ b/tests/validator/device-list.yaml
-@@ -0,0 +1,10 @@
-+# this test specification is equivalent to the
-+# "device/introspect/list" test case in device-introspect-test.c
-+command-line: '$QEMU -nodefaults -machine none'
-+monitor-commands:
-+- qmp:
-+  - execute: qom-list-types
-+    arguments:
-+      implements: 'device'
-+      abstract: true
-+- hmp: 'device_add help'
-diff --git a/tests/validator/just-help.yaml b/tests/validator/just-help.yaml
-new file mode 100644
-index 0000000000..84ec8d7090
---- /dev/null
-+++ b/tests/validator/just-help.yaml
-@@ -0,0 +1,3 @@
-+# just run $QEMU -help and ensure it won't crash
-+command-line: '$QEMU -help'
-+qmp: false
+         if (nbd_read(ioc, &received_id, sizeof(received_id), errp) < 0) {
+             return -1;
+         }
+@@ -668,6 +676,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+                        "answered with different context '%s'", context,
+                        name);
+             g_free(name);
++            nbd_send_opt_abort(ioc);
+             return -1;
+         }
+         g_free(name);
+@@ -690,6 +699,12 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+     if (reply.type != NBD_REP_ACK) {
+         error_setg(errp, "Unexpected reply type %" PRIx32 " expected %x",
+                    reply.type, NBD_REP_ACK);
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++    if (reply.length) {
++        error_setg(errp, "Unexpected length to ACK response");
++        nbd_send_opt_abort(ioc);
+         return -1;
+     }
+
 -- 
 2.14.3
