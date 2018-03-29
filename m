@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f1Y9r-0006oV-Gn
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:04:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f1YGa-0001iz-Af
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:11:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f1Y9h-0002WH-MQ
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:04:03 -0400
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-	<fce080fd-1970-b856-82e0-42c62306da6c@redhat.com>
-	<4add3400-b4d4-4812-72f2-0f184b2f4fd6@virtuozzo.com>
-	<b1fe16fd-05fe-73c6-f2f5-31b23459a131@virtuozzo.com>
-	<2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
-	<48dbaef0-0a9f-de65-9c7d-584021fc4759@redhat.com>
-	<a9b1455f-185d-4461-2d72-ed9d3aa329e9@virtuozzo.com>
+	(envelope-from <mreitz@redhat.com>) id 1f1YGZ-0005FI-6Y
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:11:00 -0400
+References: <20180322124155.16257-1-berto@igalia.com>
+	<de89f57b-bbcc-20c9-b1e4-e9a96e87a31b@redhat.com>
+	<a60b56cd-c786-fa4f-1405-8017140ff801@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1870fc0d-0c36-f983-8496-3cb5119851ba@redhat.com>
-Date: Thu, 29 Mar 2018 16:03:30 +0200
+Message-ID: <de1a759f-731f-2cdc-f02e-fadd5f44be6b@redhat.com>
+Date: Thu, 29 Mar 2018 16:10:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <a9b1455f-185d-4461-2d72-ed9d3aa329e9@virtuozzo.com>
+In-Reply-To: <a60b56cd-c786-fa4f-1405-8017140ff801@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="dgZ3vQfKMauCc8GAVuVT8eMA4kCnwwzUS"
-Subject: Re: [Qemu-devel] [PATCH v4 for 2.12 0/3] fix bitmaps migration
- through shared storage
+	boundary="3cdrZWRPyPCkXI0sWd8eaR9cwjUL7GGnl"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v4] iotests: Test abnormally large
+ size in compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dgZ3vQfKMauCc8GAVuVT8eMA4kCnwwzUS
+--3cdrZWRPyPCkXI0sWd8eaR9cwjUL7GGnl
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <1870fc0d-0c36-f983-8496-3cb5119851ba@redhat.com>
-Subject: Re: [PATCH v4 for 2.12 0/3] fix bitmaps migration through shared
- storage
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
- <fce080fd-1970-b856-82e0-42c62306da6c@redhat.com>
- <4add3400-b4d4-4812-72f2-0f184b2f4fd6@virtuozzo.com>
- <b1fe16fd-05fe-73c6-f2f5-31b23459a131@virtuozzo.com>
- <2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
- <48dbaef0-0a9f-de65-9c7d-584021fc4759@redhat.com>
- <a9b1455f-185d-4461-2d72-ed9d3aa329e9@virtuozzo.com>
-In-Reply-To: <a9b1455f-185d-4461-2d72-ed9d3aa329e9@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <de1a759f-731f-2cdc-f02e-fadd5f44be6b@redhat.com>
+Subject: Re: [PATCH for-2.12 v4] iotests: Test abnormally large size in
+ compressed cluster descriptor
+References: <20180322124155.16257-1-berto@igalia.com>
+ <de89f57b-bbcc-20c9-b1e4-e9a96e87a31b@redhat.com>
+ <a60b56cd-c786-fa4f-1405-8017140ff801@redhat.com>
+In-Reply-To: <a60b56cd-c786-fa4f-1405-8017140ff801@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-03-29 10:08, Vladimir Sementsov-Ogievskiy wrote:
-> 28.03.2018 17:53, Max Reitz wrote:
->> On 2018-03-27 12:11, Vladimir Sementsov-Ogievskiy wrote:
+On 2018-03-28 19:58, Eric Blake wrote:
+> On 03/28/2018 12:34 PM, Max Reitz wrote:
 
 [...]
 
->>> isn't it because a lot of cat processes? will check, update loop to
->>> i=3D0; while check -qcow2 169; do ((i++)); echo $i OK; killall -9 cat=
-;
->>> done
->> Hmm...=C2=A0 I know I tried to kill all of the cats, but for some reas=
-on that
->> didn't really help yesterday.=C2=A0 Seems to help now, for 2.12.0-rc0 =
-at
->> least (that is, before this series).
+>> The OFLAG_COPIED repair looks a bit interesting, but, er, well.
+>>
+>> Max
+>>
+>> (Since a compressed cluster does not correspond 1:1 to a host cluster,=
+
+>> you cannot say that a compressed cluster has a refcount -- only host
+>> clusters are refcounted.=C2=A0 So what is it supposed to mean that a
+>> compressed cluster has a refcount of 1?
 >=20
-> reproduced with killing... (without these series, just on master)
+> A compressed cluster may affect the refcount of multiple clusters: the
+> cluster that contains the initial offset, and the cluster that contains=
+
+> any of the nb_sectors that did not fit in the first cluster.=C2=A0 So, =
+if I
+> have a 4k-cluster image (where each character is a sector), and where
+> the compressed clusters are nicely sector-aligned:
+>=20
+> |1-------|2-------|3-------|
+> |AAAAAABB|BBBBCCCC|CC------|
+>=20
+> Here, the L2 entry for A, B, and C each list nb_sectors of 5, as it
+> takes 6 sectors to list the entire image, but nb_sectors does not
+> include the sector that includes the original offset.=C2=A0 The refcoun=
+t for
+> cluster 1 is 2 (the full contents of compressed A and the first half of=
+
+> compressed B); for cluster 2 is 2 (the second half of compressed B and
+> the first half of compressed C); and for cluster 3 is 1 (the second hal=
+f
+> of compressed C).
+>=20
+> But what this patch is dealing with is when nb_sectors is larger than
+> required.=C2=A0 With 4k sectors, qemu will never populate nb_clusters m=
+ore
+> than 8 (if the output is not nicely aligned, and 4096 bytes compresses
+> down to only 4095, we can end up with 1 byte in the first sector, then =
+7
+> complete sectors, then 510 bytes in a final sector, for 8 sectors beyon=
+d
+> the initial offset).=C2=A0 But the qcow2 image is still valid even if t=
+he L2
+> entry claims nb_sectors of 15; if that happens, then a compressed
+> cluster can now affect the refcount of 3 clusters rather than the usual=
+
+> 1 or 2.
 >=20
 >>
->> After the whole series, I still get a lot of failures in 169
->> (mismatching bitmap hash, mostly).
->>
->> And interestingly, if I add an abort():
->>
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 486f3e83b7..9204c1c0ac 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -1481,6 +1481,7 @@ static int coroutine_fn
->> qcow2_do_open(BlockDriverState *bs, QDict *options,=C2=A0=C2=A0=C2=A0=C2=
-=A0 }
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_next(bs, NULL)) {=
+>> I'd argue from a point of usefulness.=C2=A0 In theory, you could modif=
+y
+>> compressed clusters in-place, and then you'd need the information
+>> whether you are allowed to.=C2=A0 But that doesn't really depend on wh=
+ether
+>> the host clusters touched by the compressed cluster have a refcount of=
 
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 abort();
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* It's some ki=
-nd of reopen with already existing dirty
->> bitmaps. There
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * are no =
-known cases where we need loading bitmaps in such
->> situation,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * so it's=
- safer don't load them.
+>> 1, instead if depends on how many times the compressed cluster itself =
+is
+>> referenced.=C2=A0 Unfortunately we have no refcounting structure for t=
+hat.
 >>
->> Then this fires for a couple of test cases of 169 even without the thi=
-rd
->> patch of this series.
->>
->> I guess bdrv_dirty_bitmap_next() reacts to some bitmaps that migration=
-
->> adds or something?=C2=A0 Then this would be the wrong condition, becau=
-se I
->> guess we still want to load the bitmaps that are in the qcow2 file.
->>
->> I'm not sure whether bdrv_has_readonly_bitmaps() is the correct
->> condition then, either, though.=C2=A0 Maybe let's take a step back: We=
- want
->> to load all the bitmaps from the file exactly once, and that is when i=
-t
->> is opened the first time.=C2=A0 Or that's what I would have thought...=
-=C2=A0 Is
->> that even correct?
->>
->> Why do we load the bitmaps when the device is inactive anyway?
->> Shouldn't we load them only once the device is activated?
+>> So all in all OFLAG_COPIED is just useless for compressed clusters.)
 >=20
-> Hmm, not sure. May be, we don't need. But we anyway need to load them,
-> when opening read-only, and we should correspondingly reopen in this ca=
-se.
+> In general, because we intentionally allow multiple compressed clusters=
 
-Yeah, well, yeah, but the current state seems just wrong.  Apparently
-there are cases where a qcow2 node may have bitmaps before we try to
-load them from the file, so the current condition doesn't work.
+> to (try to) share a single host cluster, the refcount for compressed
+> clusters will usually be larger than 1.=C2=A0 And OFLAG_COPIED is only =
+useful
+> when the refcount is 1, right?
 
-Furthermore, it seems like the current "state machine" is too complex so
-we don't know which cases are possible anymore and what to do when.
+OFLAG_COPIED is only useful when it reflects the number of references to
+the data cluster, because only then can we update it in-place without
+having to worry about other users.  For normal clusters, one data
+cluster is one host cluster, so we can get the number of references from
+the refcount structures (which contain the reference counts for host
+clusters, but *not* for data clusters).
 
-So the first thing we could do is add a field to the BDRVQCow2State that
-tells us whether the bitmaps have been loaded already or not.  If not,
-we invoke qcow2_load_dirty_bitmaps() and set the value to true.  If the
-value was true already and the BDS is active and R/W now, we call
-qcow2_reopen_bitmaps_rw_hint().  That should solve one problem.
+But for compressed clusters, the data cluster may be part of a host
+cluster, or it may even be multiple host clusters.  So the information
+we get from the refcount structures is totally useless here, it doesn't
+tell us how many references there are to that compressed data cluster.
 
-The other problem of course is the question whether we should call
-qcow2_load_dirty_bitmaps() at all while the drive is still inactive.
-You know the migration model better than me, so I'm asking this question
-to you.  We can phrase it differently: Do we need to load the bitmaps
-before the drive is activated?
+There is only one exception: If all of the host clusters the compressed
+cluster touches have a refcount of 1, we can be certain that there are
+no other users, so then we know there is only one reference to the
+compressed cluster.  But as soon as they have a higher refcount... We
+don't know whether that's because of multiple references to this
+compressed cluster or because of multiple compressed cluster sharing a
+single host cluster.
+
+In practice it doesn't really matter of course because modifying
+compressed clusters in-place seems like a whole different can of worms.
 
 Max
 
 
---dgZ3vQfKMauCc8GAVuVT8eMA4kCnwwzUS
+--3cdrZWRPyPCkXI0sWd8eaR9cwjUL7GGnl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlq88jIACgkQ9AfbAGHV
-z0ALWAf/aB1xZSldoQgGlFFI5NlnpdCuPhnddRnCvCFOPwQFNNkNyP/27lGTXhg+
-4WS3wC+97gC4s/rzsJb8pGyFHxdBM+tmorUNsGvMH4QfGG8QbED4Rs97jo5+R4/+
-LudUk5iovsetLlEadAo6XA+eVoCS/regTHz6kRnyRcVN18uDQq4jjRqdnloE7Pw5
-N7TvHlR8DfS+x443ka53p15lm4NP2Ha1b4XoQEWCUSwgv7p2l3K959uvEOnKUnsN
-UnI93miH3TQKhZPkg97bYTcEOw26u9L/tK6aUehF0ng3nfRw0qWis6AJJJyCT1DL
-Vam47le6AghFZpvvHPDAuRvk++anqw==
-=ppQU
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlq88+IACgkQ9AfbAGHV
+z0B3QAgAm8t3WaqjGcG1HCE5FF3myonuMAU/N6FH9TAg2t7T97z5FQIsRNh9RpOZ
+JQeGIB10ZuT68+zVRDZjeE65RUjL31W+I0VgukA+FPkpswlOvkx+8Kwjxa0AafDw
+VvsNN3NaExKRDOzWphE2Tr3IhCg9mPls0f+/HlzT09lcj2ACbaKniKVait3gbekb
+C/c6shkBpSClCOU11YXl5/CdGkK6bFFbJP0wn3D4D9RBMek5meRJ4WmuDF8cGado
+bp52Cr+VCRIRRLTJ7O5Eb9rlWMGrhuYP1l6t8AF4c5RtvbiR/zsGx8s1NmDjWzmF
+B/OBR/rQpiq05Tw0tksueAj6FKNO4Q==
+=UFfY
 -----END PGP SIGNATURE-----
 
---dgZ3vQfKMauCc8GAVuVT8eMA4kCnwwzUS--
+--3cdrZWRPyPCkXI0sWd8eaR9cwjUL7GGnl--
