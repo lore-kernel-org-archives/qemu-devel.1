@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1TZC-0001aP-2w
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:09:55 -0400
+	(envelope-from <groug@kaod.org>) id 1f1TZQ-0001kw-89
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1TZ8-0005o5-2w
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:09:54 -0400
-Received: from 13.mo7.mail-out.ovh.net ([87.98.150.175]:56033)
+	(envelope-from <groug@kaod.org>) id 1f1TZM-0005x9-0f
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:10:07 -0400
+Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:54255)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1TZ7-0005iK-S5
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:09:50 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.120.13])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 9007699B5C
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:09:41 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1TZL-0005vm-Qm
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:10:03 -0400
+Received: from player728.ha.ovh.net (unknown [10.109.105.27])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 2455014E5CE
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:10:01 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Thu, 29 Mar 2018 11:09:25 +0200
-Message-ID: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
+Date: Thu, 29 Mar 2018 11:09:46 +0200
+Message-ID: <152231458624.69730.1752893648612848392.stgit@bahia.lan>
+In-Reply-To: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
+References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 0/3] fix memory leaks when using
- object_property_get_str()
+Subject: [Qemu-devel] [PATCH 1/3] exec: fix memory leak in
+ find_max_supported_pagesize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +33,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-According to include/qom/object.h:
+The string returned by object_property_get_str() is dynamically allocated.
 
-/**
- * object_property_get_str:
- * @obj: the object
- * @name: the name of the property
- * @errp: returns an error if this function fails
- *
- * Returns: the value of the property, converted to a C string, or NULL if
- * an error occurs (including when the property value is not a string).
- * The caller should free the string.
- */
-
-So I've checked all the call sites and found three places where the
-string is obviously [*] leaked. Patch 2 and 3 fix very recent 2.12
-commits, while patch 1 fixes a 2.4 commit (backported to 2.3.1).
-
-Another potential candidate sits in query_memdev(), called during
-the "info memdev" HMP and the "query-memdev" QMP commands, but
-both take care of freeing the string eventually. Nothing to fix
-there.
-
-[*] allocated string is put in a local variable and not freed before
-    returning
-
---
-Greg
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+ exec.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-Greg Kurz (3):
-      exec: fix memory leak in find_max_supported_pagesize()
-      hw/s390x: fix memory leak in s390_init_ipl_dev()
-      sev/i386: fix memory leak in sev_guest_init()
-
-
- exec.c                     |    1 +
- hw/s390x/s390-virtio-ccw.c |    5 ++++-
- target/i386/sev.c          |    4 +++-
- 3 files changed, 8 insertions(+), 2 deletions(-)
+diff --git a/exec.c b/exec.c
+index c09bd93df31e..02b1efebb7c3 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1495,6 +1495,7 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
+         mem_path = object_property_get_str(obj, "mem-path", NULL);
+         if (mem_path) {
+             long hpsize = qemu_mempath_getpagesize(mem_path);
++            g_free(mem_path);
+             if (hpsize < *hpsize_min) {
+                 *hpsize_min = hpsize;
+             }
