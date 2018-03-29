@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f1Thq-0006rt-1N
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:18:50 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f1Tju-0008KY-Gd
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f1Thm-0000x0-1l
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:18:49 -0400
-Date: Thu, 29 Mar 2018 11:18:31 +0200
+	(envelope-from <cohuck@redhat.com>) id 1f1Tjr-0001xy-9n
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:20:58 -0400
+Date: Thu, 29 Mar 2018 11:20:51 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180329111831.2ffad2bd.cohuck@redhat.com>
-In-Reply-To: <152231458624.69730.1752893648612848392.stgit@bahia.lan>
+Message-ID: <20180329112051.7750d625.cohuck@redhat.com>
+In-Reply-To: <152231460685.69730.14860451936216690693.stgit@bahia.lan>
 References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
-	<152231458624.69730.1752893648612848392.stgit@bahia.lan>
+	<152231460685.69730.14860451936216690693.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] exec: fix memory leak in
- find_max_supported_pagesize()
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/s390x: fix memory leak in
+ s390_init_ipl_dev()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +27,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-On Thu, 29 Mar 2018 11:09:46 +0200
+On Thu, 29 Mar 2018 11:10:06 +0200
 Greg Kurz <groug@kaod.org> wrote:
 
 > The string returned by object_property_get_str() is dynamically allocated.
 > 
+> Fixes: 3c4e9baacf4d9
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  exec.c |    1 +
->  1 file changed, 1 insertion(+)
+>  hw/s390x/s390-virtio-ccw.c |    5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/exec.c b/exec.c
-> index c09bd93df31e..02b1efebb7c3 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1495,6 +1495,7 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
->          mem_path = object_property_get_str(obj, "mem-path", NULL);
->          if (mem_path) {
->              long hpsize = qemu_mempath_getpagesize(mem_path);
-> +            g_free(mem_path);
->              if (hpsize < *hpsize_min) {
->                  *hpsize_min = hpsize;
->              }
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 864145a7c6f3..435f7c99e77c 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>  {
+>      Object *new = object_new(TYPE_S390_IPL);
+>      DeviceState *dev = DEVICE(new);
+> +    char *netboot_fw_prop;
+>  
+>      if (kernel_filename) {
+>          qdev_prop_set_string(dev, "kernel", kernel_filename);
+> @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>      qdev_prop_set_string(dev, "firmware", firmware);
+>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
+> +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
+> +    if (!strlen(netboot_fw_prop)) {
+>          qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>      }
+> +    g_free(netboot_fw_prop);
+>      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+>                                new, NULL);
+>      object_unref(new);
 > 
 
-Personally, I'd probably do the g_free() at the end of the if
-(mem_path) branch, but this works as well.
+It's a bit ugly that we need a new variable for this, but it can't be
+helped.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+I'll queue this to s390-fixes unless there are any complaints.
