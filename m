@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f1Yfy-0005fq-0m
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:37:14 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1f1Yky-0007xt-Az
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f1Yfx-0001UQ-4c
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:37:14 -0400
-References: <20180329120745.11154-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c4589769-90ac-dbe7-7f54-84700793a77e@redhat.com>
-Date: Thu, 29 Mar 2018 09:37:06 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1f1Ykv-0006CL-6R
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:42:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35916 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1f1Yku-0006BY-W2
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:42:21 -0400
+References: <20180322081837.21460-1-aik@ozlabs.ru>
+	<6975e05c-da7a-5a96-4fb5-1234694136d0@redhat.com>
+	<20180328161313.67c1a17c@w520.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2470338f-7824-d9c1-fb61-837d89764af2@redhat.com>
+Date: Thu, 29 Mar 2018 16:42:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180329120745.11154-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20180328161313.67c1a17c@w520.home>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v5] iotests: Test abnormally large
- size in compressed cluster descriptor
+Subject: Re: [Qemu-devel] [PATCH qemu] vfio: Print address space address
+ when cannot map MMIO for DMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +30,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-On 03/29/2018 07:07 AM, Alberto Garcia wrote:
-> L2 entries for compressed clusters have a field that indicates the
-> number of sectors used to store the data in the image.
+Hi Alex,
+
+On 29/03/18 00:13, Alex Williamson wrote:
+> On Wed, 28 Mar 2018 23:03:23 +0200
+> Auger Eric <eric.auger@redhat.com> wrote:
 > 
-> That's however not the size of the compressed data itself, just the
-> number of sectors where that data is located. The actual data size is
-> usually not a multiple of the sector size, and therefore cannot be
-> represented with this field.
+>> Hi Alexey, Alex,
+>> On 22/03/18 09:18, Alexey Kardashevskiy wrote:
+>>> The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions") added
+>>> an error message if a passed memory section address or size is not aligned
+>>> to the minimal IOMMU page size. However although it checks
+>>> offset_within_address_space for the alignment, offset_within_region is
+>>> printed instead which makes it harder to find out what device caused
+>>> the message so this replaces offset_within_region with
+>>> offset_within_address_space.
+>>>
+>>> While we are here, this replaces '..' with 'size=' (as the second number
+>>> is a size, not an end offset) and adds a memory region name.
+>>>
+>>> Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>  
+>> The patch indeed fixes the reported format issues.
+>>
+>> However I have some other concerns with the info that is reported to the
+>> end-user. See below.
+>>
+>> Assigning an e1000e device with a 64kB host, here are the traces I get:
+>>
+>> Region XXX is not aligned to 0x10000 and cannot be mapped for DMA
+>>
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0x3fb0
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0xffb0
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0x3fb0
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0xffb0
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100a0050 size=0x3fb0
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100a4808 size=0xb7f8
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100e0050 size=0x3fb0
+>> "0004:01:00.0 BAR 3 mmaps[0]" 0x100e4808 size=0xb7f8
+>>
+>> It took me some time to understand what happens but here is now my
+>> understanding:
+>>
+>> 1) When looking at vfio_pci_write_config() pdev->io_regions[bar].addr =
+>> bar_addr in vfio_sub_page_bar_update_mapping() I see the following values:
+>>
+>> UNMAPPED -> 0x0 ->UNMAPPED -> 0x100a0000 -> UNMAPPED -> 0x100a0000 ->
+>> UNMAPPED -> 0x100e0000
+>>
+>> vfio_sub_page_bar_update_mapping() create mrs with base bar at
+>> 0x100a0000 and 0x100e0000 successively, hence the
+>> vfio_listener_region_add on 0x100axxxx. Indeed, 0x0-0x50 msix-table mmio
+>> region induces some memory section at 0x100a0050 and 0x100e50 successively.
+>>
+>> However this is confusing for the end-user who only has access to the
+>> final mapping (0x100e0000) through lspi [1].
+>>
+>> 2) The changes in the size (0x3fb0 <-> 0xffb0) relate to the extension
+>> of the 16kB bar to 64kB in vfio_sub_page_bar_update_mapping
+>>
+>> 3) Also it happens that I have a virtio-scsi-pci device that is put just
+>> after the BAR3 at 0x100a4000 and 0x100e4000 successively. The device has
+>> its own msi-table and pba mmio regions[2]. As mmaps[0] is extended to
+>> 64kB (with prio 0), we have those MMIO regions which result in new
+>> memory sections, which cause vfio_listener_region_add calls. This
+>> typically explains why we get a warning on 0x100e4808 (0xb7f8). By the
+>> way I don't get why we don't have a trace for "0004:01:00.0 BAR 3
+>> mmaps[0]" 0x100e4040 size=0x7c0, ie. mmaps[0] space between
+>> virtio-scsi-pci msic-table and pba.
+>>
+>> So at the end of the day, my fear is all those info become really
+>> frightening and confusing for the end-user and even not relevant
+>> (0x100a0000 stuff). So I would rather simply remove the trace in 2.12
+>> until we find a place where we could generate a clear hint for the
+>> end-user, suggesting to relocate the msix bar.
+>>
+>> Thoughts?
 > 
-
-> One possible task for the future is to make 'qemu-img check' verify
-> the sizes of the compressed clusters, by trying to decompress the data
-> and checking that the size stored in the L2 entry is correct.
-
-Is it still worth trying to add such a check in 2.12?  (Probably not - 
-the bug has been there "since the beginning", so it's not a regression 
-and thus not a showstopper if it stays there for another release)
-
+> Yep, I think that's probably the right approach.  Everything works as
+> it should and nothing has worse access in 2.12 than it did in 2.11,
+> there's only the opportunity to make things better with msi-x
+> relocation and I don't think we want to error on the side of reporting
+> too many errors that users cannot understand in an attempt to advise
+> them of an unsupported option that might be better.  Let's remove the
+> error report for 2.12 and think about how we could make a concise
+> suggestion, once, while initializing the device.  Who's posting the
+> patch?  Thanks,
 > 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
-> v5: Use 'write -c' instead of 'write' followed by 'convert' [Max]
->      Add TODO comment explaining that the size of compressed clusters
->      should also be corrected when it's too large in order to avoid
->      referencing other unrelated clusters.
+> Alex
+> 
+> PS - Why isn't the firmware/kernel on aarch64 making an attempt to
+> align PCI resources on page boundaries?
 
-Thanks, those changes look good.
+so according to Laszlo's input I understand virtio-scsi-pci region 1 is
+4K and the spec only mandates a natural alignment.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  Does
+> pci=realloc,resource_alignment=pci:ffffffff:ffffffff change it? (I'm
+> not sure if PCI_ANY_ID works for that option)
+no, it does not.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks
+
+Eric
+> 
