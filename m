@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f1UgL-0004Mw-2O
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f1Ugl-0004bV-4f
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f1UgH-0001Fz-2a
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:21 -0400
-Resent-Message-Id: <E1f1UgH-0001Fz-2a@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f1UgG-0001Fp-TS
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:16 -0400
-In-Reply-To: <1522270761-29646-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152231886419.720.7928916739860804817@71c20359a636>
+	(envelope-from <peter.maydell@linaro.org>) id 1f1Ugk-0001ds-8i
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:47 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f1Ugk-0001dn-3A
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:21:46 -0400
+Received: by mail-ot0-x243.google.com with SMTP id m7-v6so5914611otd.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 03:21:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 29 Mar 2018 03:21:05 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] tpm: More improvements on CRB interface
+In-Reply-To: <1522269619-48636-1-git-send-email-mjc@sifive.com>
+References: <1522269619-48636-1-git-send-email-mjc@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Mar 2018 11:21:24 +0100
+Message-ID: <CAFEAcA9VVr-2DBDBUK6gq8+2B6xtruqqGA=d6WqfwC6jxwV5dA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] RISC-V: Important fixes for QEMU 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanb@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjIyNzA3NjEtMjk2NDYtMS1naXQtc2VuZC1lbWFpbC1zdGVmYW5iQGxpbnV4
-LnZuZXQuaWJtLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdHBtOiBNb3Jl
-IGltcHJvdmVtZW50cyBvbiBDUkIgaW50ZXJmYWNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA5NDkxZTI2ZTMgdGVzdHM6IFRlc3Rz
-IG1vcmUgZmxhZ3Mgb2YgdGhlIENSQiBpbnRlcmZhY2UKZDU1Yzk0NDZjNCB0cG06IENSQjogRW5m
-b3JjZSBsb2NhbGl0eSBpcyByZXF1ZXN0ZWQgYmVmb3JlIHByb2Nlc3NpbmcgYnVmZmVyCmJjMGNm
-MzU0ZjYgdHBtOiBDUkI6IFJlc2V0IEdyYW50ZWQgZmxhZyB3aGVuIHJlbGlucXVpc2hpbmcgbG9j
-YWxpdHkKZDUwMzBhZDNiNiB0cG06IENSQjogc2V0IHRoZSBJZGxlIGZsYWcgYnkgZGVmYXVsdAoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiB0cG06IENSQjogc2V0IHRo
-ZSBJZGxlIGZsYWcgYnkgZGVmYXVsdC4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHRwbTogQ1JCOiBS
-ZXNldCBHcmFudGVkIGZsYWcgd2hlbiByZWxpbnF1aXNoaW5nIGxvY2FsaXR5Li4uCkNoZWNraW5n
-IFBBVENIIDMvNDogdHBtOiBDUkI6IEVuZm9yY2UgbG9jYWxpdHkgaXMgcmVxdWVzdGVkIGJlZm9y
-ZSBwcm9jZXNzaW5nIGJ1ZmZlci4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29u
-ZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgOSkKIzM1OiBGSUxFOiBody90cG0vdHBtX2NyYi5jOjEw
-MjoKKyAgICBpZiAoIUFSUkFZX0ZJRUxEX0VYMzIocy0+cmVncywgQ1JCX0xPQ19TVEFURSwgbG9j
-QXNzaWduZWQpKQorICAgICAgICAgcmV0dXJuIFRQTV9DUkJfTk9fTE9DQUxJVFk7CgpFUlJPUjog
-YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMz
-NTogRklMRTogaHcvdHBtL3RwbV9jcmIuYzoxMDI6CisgICAgaWYgKCFBUlJBWV9GSUVMRF9FWDMy
-KHMtPnJlZ3MsIENSQl9MT0NfU1RBVEUsIGxvY0Fzc2lnbmVkKSkKWy4uLl0KCnRvdGFsOiAyIGVy
-cm9ycywgMCB3YXJuaW5ncywgMzUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiB0ZXN0czogVGVzdHMgbW9yZSBm
-bGFncyBvZiB0aGUgQ1JCIGludGVyZmFjZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 28 March 2018 at 21:40, Michael Clark <mjc@sifive.com> wrote:
+> The following changes since commit 043289bef4d9c0d277c45695c676a6cc9fca48a0:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180328' into staging (2018-03-28 13:30:10 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-important-fixes
+>
+> for you to fetch changes up to 33b4f859f1e1ea6722d10c3e9c0e3d85afb44ff4:
+>
+>   RISC-V: Fix incorrect disassembly for addiw (2018-03-28 11:12:02 -0700)
+>
+> ----------------------------------------------------------------
+> RISC-V: Important fixes for QEMU 2.12
+>
+> This series includes changes that are considered important.
+> i.e. correct user-visible bugs that are exercised by common
+> operations such as -cpu list (CPU model changes) or -d in_asm
+> (fix for disassembly of addiw)
+>
+> ----------------------------------------------------------------
+> Michael Clark (2):
+>       RISC-V: Convert cpu definition to future model
+>       RISC-V: Fix incorrect disassembly for addiw
+>
+>  disas/riscv.c      |   2 +-
+>  target/riscv/cpu.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------
+>  2 files changed, 70 insertions(+), 55 deletions(-)
+
+
+Applied, thanks.
+
+-- PMM
