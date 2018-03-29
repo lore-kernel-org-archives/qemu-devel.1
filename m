@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f1bpY-0003j7-1X
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:59:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f1cIH-0006zw-Ak
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:29:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f1bpX-00038W-E2
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:59:20 -0400
-Received: from mail-yb0-x236.google.com ([2607:f8b0:4002:c09::236]:41156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f1bpX-00037u-9P
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 13:59:19 -0400
-Received: by mail-yb0-x236.google.com with SMTP id x72-v6so2265137ybe.8
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 10:59:18 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1f1cIG-0006w7-9F
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:29:01 -0400
+References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <30a96f63-4cdf-23e6-c4d2-b4de59411a11@redhat.com>
+Date: Thu, 29 Mar 2018 14:28:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAMo8BfKW3g6K4MU+eEz71Cq-FaSWox4ffHjj-1_zj9jM9CB7jw@mail.gmail.com>
-References: <CAMo8BfKW3g6K4MU+eEz71Cq-FaSWox4ffHjj-1_zj9jM9CB7jw@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 29 Mar 2018 10:59:17 -0700
-Message-ID: <CAMo8Bf+5Rg=OKY8jh4330brGUi=nb4S=Bzq2LwOXtAX5SGa-4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] linux-user: missing synchronization in CPU object
- realization
+In-Reply-To: <1521178795-21894-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Add new CD-ROM related qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On Thu, Mar 29, 2018 at 7:15 AM, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> I'm running xtensa linux-user application that rapidly creates
-> a lot of threads and I observe the following assertion failure:
->
-> (process:26953): GLib-CRITICAL **: g_hash_table_iter_next: assertion
-> 'ri->version == ri->hash_table->version' failed
-> **
-> ERROR:qemu/qom/object.c:1663:object_get_canonical_path_component: code
-> should not be reached
 
-[...]
 
-> This happens because multiple threads concurrently call
-> object_property_set_bool to realize cpu object in cpu_create,
-> which results in the following call chain:
->   device_set_realized -> object_property_add_child ->
->   object_property_add -> g_hash_table_insert
-> inserting newly created CPUs as children to /unattached without
-> any locking.
+On 03/16/2018 01:39 AM, Thomas Huth wrote:
+> With one of my clean-up patches (see commit 1454509726719e0933c800), I
+> recently accidentially broke the "-cdrom" parameter (more precisely
+> "-drive if=scsi") on a couple of boards, since there was no error
+> detected during the "make check" regression testing. This is clearly an
+> indication that we are lacking tests in this area.
+> So this small patch series now introduces some tests for CD-ROM drives:
+> The first two patches introduce the possibility to check that booting
+> from CD-ROM drives still works fine for x86 and s390x, and the third
+> patch adds a test that certain machines can at least still be started
+> with the "-cdrom" parameter (i.e. that test would have catched the
+> mistake that I did with my SCSI cleanup patch).
+> 
+> v2:
+>  - Use g_spawn_sync() instead of execlp() to run genisoimage
+>  - The "-cdrom" parameter test is now run on all architectures (with
+>    machine "none" for the machines that are not explicitly checked)
+>  - Some rewordings and improved comments here and there
+> 
+> Thomas Huth (3):
+>   tests/boot-sector: Add magic bytes to s390x boot code header
+>   tests/cdrom-test: Test booting from CD-ROM ISO image file
+>   tests/cdrom-test: Test that -cdrom parameter is working
+> 
+>  tests/Makefile.include |   2 +
+>  tests/boot-sector.c    |   9 +-
+>  tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 230 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/cdrom-test.c
+> 
 
-Looking at it some more I wonder why do we build this object tree
-n linux-user in the first place? It doesn't seem to be used anywhere.
-
--- 
-Thanks.
--- Max
+New file, but no edit to MAINTAINERS.
