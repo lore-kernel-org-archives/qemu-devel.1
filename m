@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1WAe-0004t9-0q
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:56:44 -0400
+	(envelope-from <berto@igalia.com>) id 1f1WLn-00021m-BF
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 08:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1WAZ-00056v-3R
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:56:44 -0400
-References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
-	<152231462116.69730.14119625999092384450.stgit@bahia.lan>
-	<20180329112416.28b99184.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d5c2a929-737c-aa25-b531-8a8570468e0d@redhat.com>
-Date: Thu, 29 Mar 2018 13:56:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180329112416.28b99184.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] sev/i386: fix memory leak
- in sev_guest_init()
+	(envelope-from <berto@igalia.com>) id 1f1WLj-0005Ba-8A
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 08:08:15 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Thu, 29 Mar 2018 15:07:45 +0300
+Message-Id: <20180329120745.11154-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH for-2.12 v5] iotests: Test abnormally large
+ size in compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +18,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 29.03.2018 11:24, Cornelia Huck wrote:
-> On Thu, 29 Mar 2018 11:10:21 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
->> The string returned by object_property_get_str() is dynamically allocated.
->>
->> Fixes: d8575c6c0242b
->> Signed-off-by: Greg Kurz <groug@kaod.org>
->> ---
->>  target/i386/sev.c |    4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index 019d84cef2c7..c01167143f1c 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -748,9 +748,11 @@ sev_guest_init(const char *id)
->>      if (s->sev_fd < 0) {
->>          error_report("%s: Failed to open %s '%s'", __func__,
->>                       devname, strerror(errno));
->> -        goto err;
->>      }
->>      g_free(devname);
->> +    if (s->sev_fd < 0) {
->> +        goto err;
->> +    }
->>  
->>      ret = sev_platform_ioctl(s->sev_fd, SEV_PLATFORM_STATUS, &status,
->>                               &fw_error);
->>
-> 
-> I would probably add an extra g_free(devname) right before the goto
-> err, but this works as well, obviously.
+L2 entries for compressed clusters have a field that indicates the
+number of sectors used to store the data in the image.
 
-Or maybe remove devname from the error_report ("%s: Failed to open
-sev-device '%s', __func__ strerror(errno)) and move the g_free right
-before the if-statement?
+That's however not the size of the compressed data itself, just the
+number of sectors where that data is located. The actual data size is
+usually not a multiple of the sector size, and therefore cannot be
+represented with this field.
 
-Anyway:
+The way it works is that QEMU reads all the specified sectors and
+starts decompressing the data until there's enough to recover the
+original uncompressed cluster. If there are any bytes left that
+haven't been decompressed they are simply ignored.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+One consequence of this is that even if the size field is larger than
+it needs to be QEMU can handle it just fine: it will read more data
+from disk but it will ignore the extra bytes.
+
+This test creates an image with two compressed clusters that use 5
+sectors (2.5 KB) each, increases the size field to the maximum (8192
+sectors, or 4 MB) and verifies that the data can be read without
+problems.
+
+This test is important because while the decompressed data takes
+exactly one cluster, the maximum value allowed in the compressed size
+field is twice the cluster size. So although QEMU won't produce images
+with such large values we need to make sure that it can handle them.
+
+Another effect of increasing the size field is that it can make
+it include data from the following host cluster(s). In this case
+'qemu-img check' will detect that the refcounts are not correct, and
+we'll need to rebuild them.
+
+Additionally, this patch also tests that decreasing the size corrupts
+the image since the original data can no longer be recovered. In this
+case QEMU returns an error when trying to read the compressed data,
+but 'qemu-img check' doesn't see anything wrong if the refcounts are
+consistent.
+
+One possible task for the future is to make 'qemu-img check' verify
+the sizes of the compressed clusters, by trying to decompress the data
+and checking that the size stored in the L2 entry is correct.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+v5: Use 'write -c' instead of 'write' followed by 'convert' [Max]
+    Add TODO comment explaining that the size of compressed clusters
+    should also be corrected when it's too large in order to avoid
+    referencing other unrelated clusters.
+
+v4: Resend for 2.12
+
+v3: Add TODO comment, as suggested by Eric.
+
+    Corrupt the length of the second compressed cluster as well so the
+    uncompressed data would span three host clusters.
+
+v2: We now have two scenarios where we make QEMU read data from the
+    next host cluster and from beyond the end of the image. This
+    version also runs qemu-img check on the corrupted image.
+
+    If the size field is too small, reading fails but qemu-img check
+    succeeds.
+
+    If the size field is too large, reading succeeds but qemu-img
+    check fails (this can be repaired, though).
+---
+ tests/qemu-iotests/122     | 47 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/122.out | 33 ++++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+)
+
+diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
+index 45b359c2ba..6cf4fcb866 100755
+--- a/tests/qemu-iotests/122
++++ b/tests/qemu-iotests/122
+@@ -130,6 +130,53 @@ $QEMU_IO -c "read -P 0    1024k 1022k" "$TEST_IMG" 2>&1 | _filter_qemu_io | _fil
+ 
+ 
+ echo
++echo "=== Corrupted size field in compressed cluster descriptor ==="
++echo
++# Create an empty image and fill half of it with compressed data.
++# The L2 entries of the two compressed clusters are located at
++# 0x800000 and 0x800008, their original values are 0x4008000000a00000
++# and 0x4008000000a00802 (5 sectors for compressed data each).
++_make_test_img 8M -o cluster_size=2M
++$QEMU_IO -c "write -c -P 0x11 0 2M" -c "write -c -P 0x11 2M 2M" "$TEST_IMG" \
++         2>&1 | _filter_qemu_io | _filter_testdir
++
++# Reduce size of compressed data to 4 sectors: this corrupts the image.
++poke_file "$TEST_IMG" $((0x800000)) "\x40\x06"
++$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
++
++# 'qemu-img check' however doesn't see anything wrong because it
++# doesn't try to decompress the data and the refcounts are consistent.
++# TODO: update qemu-img so this can be detected.
++_check_test_img
++
++# Increase size of compressed data to the maximum (8192 sectors).
++# This makes QEMU read more data (8192 sectors instead of 5, host
++# addresses [0xa00000, 0xdfffff]), but the decompression algorithm
++# stops once we have enough to restore the uncompressed cluster, so
++# the rest of the data is ignored.
++poke_file "$TEST_IMG" $((0x800000)) "\x7f\xfe"
++# Do it also for the second compressed cluster (L2 entry at 0x800008).
++# In this case the compressed data would span 3 host clusters
++# (host addresses: [0xa00802, 0xe00801])
++poke_file "$TEST_IMG" $((0x800008)) "\x7f\xfe"
++
++# Here the image is too small so we're asking QEMU to read beyond the
++# end of the image.
++$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
++# But if we grow the image we won't be reading beyond its end anymore.
++$QEMU_IO -c "write -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
++
++# The refcount data is however wrong because due to the increased size
++# of the compressed data it now reaches the following host clusters.
++# This can be repaired by qemu-img check by increasing the refcount of
++# those clusters.
++# TODO: update qemu-img to correct the compressed cluster size instead.
++_check_test_img -r all
++$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -c "read  -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
++
++echo
+ echo "=== Full allocation with -S 0 ==="
+ echo
+ 
+diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
+index 47d8656db8..a6b7fe007e 100644
+--- a/tests/qemu-iotests/122.out
++++ b/tests/qemu-iotests/122.out
+@@ -99,6 +99,39 @@ read 1024/1024 bytes at offset 1047552
+ read 1046528/1046528 bytes at offset 1048576
+ 1022 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
++=== Corrupted size field in compressed cluster descriptor ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 2097152/2097152 bytes at offset 0
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 2097152
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read failed: Input/output error
++No errors were found on the image.
++read 4194304/4194304 bytes at offset 0
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 4194304/4194304 bytes at offset 4194304
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4194304/4194304 bytes at offset 0
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++ERROR cluster 6 refcount=1 reference=3
++ERROR cluster 7 refcount=1 reference=2
++Repairing cluster 6 refcount=1 reference=3
++Repairing cluster 7 refcount=1 reference=2
++Repairing OFLAG_COPIED data cluster: l2_entry=8000000000c00000 refcount=3
++Repairing OFLAG_COPIED data cluster: l2_entry=8000000000e00000 refcount=2
++The following inconsistencies were found and repaired:
++
++    0 leaked clusters
++    4 corruptions
++
++Double checking the fixed image now...
++No errors were found on the image.
++read 4194304/4194304 bytes at offset 0
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4194304/4194304 bytes at offset 4194304
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
+ === Full allocation with -S 0 ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+-- 
+2.11.0
