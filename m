@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1W3X-0000RZ-IQ
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:49:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1f1W4Y-0001C4-VZ
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:50:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1W3S-0001Wi-FK
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:49:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1f1W4T-0001uA-3C
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:50:26 -0400
 References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
 	<152231460685.69730.14860451936216690693.stgit@bahia.lan>
-	<20180329112721.6c7ee3f3@redhat.com>
-	<20180329113941.6eebc57f@bahia.lan>
-	<20180329123131.45d4a76c.cohuck@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <30257c4e-f1d9-7652-80dc-bc43eb0cf16d@redhat.com>
-Date: Thu, 29 Mar 2018 13:49:07 +0200
+Message-ID: <4d3cb89d-f4c2-6bde-7e4d-ee0562527823@redhat.com>
+Date: Thu, 29 Mar 2018 13:50:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180329123131.45d4a76c.cohuck@redhat.com>
+In-Reply-To: <152231460685.69730.14860451936216690693.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -28,58 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 29.03.2018 12:31, Cornelia Huck wrote:
-> On Thu, 29 Mar 2018 11:39:41 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+On 29.03.2018 11:10, Greg Kurz wrote:
+> The string returned by object_property_get_str() is dynamically allocated.
 > 
->> On Thu, 29 Mar 2018 11:27:21 +0200
->> Igor Mammedov <imammedo@redhat.com> wrote:
->>
->>> On Thu, 29 Mar 2018 11:10:06 +0200
->>> Greg Kurz <groug@kaod.org> wrote:
->>>   
->>>> The string returned by object_property_get_str() is dynamically allocated.
->>>>
->>>> Fixes: 3c4e9baacf4d9
->>>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>>> ---
->>>>  hw/s390x/s390-virtio-ccw.c |    5 ++++-
->>>>  1 file changed, 4 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>>> index 864145a7c6f3..435f7c99e77c 100644
->>>> --- a/hw/s390x/s390-virtio-ccw.c
->>>> +++ b/hw/s390x/s390-virtio-ccw.c
->>>> @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
->>>>  {
->>>>      Object *new = object_new(TYPE_S390_IPL);
->>>>      DeviceState *dev = DEVICE(new);
->>>> +    char *netboot_fw_prop;
->>>>  
->>>>      if (kernel_filename) {
->>>>          qdev_prop_set_string(dev, "kernel", kernel_filename);
->>>> @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
->>>>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
->>>>      qdev_prop_set_string(dev, "firmware", firmware);
->>>>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
->>>> -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
->>>> +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
->>>> +    if (!strlen(netboot_fw_prop)) {    
->>> probably not really issue here but,
->>> is strlen really safe in case netboot_fw_prop == NULL?
->>>   
->>
->> You're right, object_property_get_str() can theoretically return NULL and
->> strlen() would crash... Not sure how this would happen though. Anyway, the
->> current code doesn't check if object_property_get_str() returns NULL so
->> if this needs to be fixed as well, let's do it in a followup patch.
+> Fixes: 3c4e9baacf4d9
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/s390x/s390-virtio-ccw.c |    5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> I don't think so - if the attribute exists, we'll always get != NULL if
-> I read the code correctly.
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 864145a7c6f3..435f7c99e77c 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>  {
+>      Object *new = object_new(TYPE_S390_IPL);
+>      DeviceState *dev = DEVICE(new);
+> +    char *netboot_fw_prop;
+>  
+>      if (kernel_filename) {
+>          qdev_prop_set_string(dev, "kernel", kernel_filename);
+> @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>      qdev_prop_set_string(dev, "firmware", firmware);
+>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
+> +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
+> +    if (!strlen(netboot_fw_prop)) {
+>          qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>      }
+> +    g_free(netboot_fw_prop);
+>      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+>                                new, NULL);
+>      object_unref(new);
+> 
+> 
 
-Right, the property is always there, so this should never be NULL.
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
