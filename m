@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f1ZnG-000546-Vy
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f1ZnG-000547-WB
 	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 11:48:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f1ZnB-0006S9-WD
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f1ZnD-0006VE-Fs
 	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 11:48:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38464 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43516 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1f1ZnB-0006QL-Qm
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 11:48:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	id 1f1ZnD-0006UQ-9I
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 11:48:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 500DE4068053
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 15:48:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7C7181902A6
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 15:48:46 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 29 Mar 2018 17:48:29 +0200
-Message-Id: <20180329154833.566-1-marcandre.lureau@redhat.com>
+Date: Thu, 29 Mar 2018 17:48:31 +0200
+Message-Id: <20180329154833.566-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20180329154833.566-1-marcandre.lureau@redhat.com>
+References: <20180329154833.566-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/4] RFC: simplify qobject refcount
+Subject: [Qemu-devel] [PATCH v3 2/4] qobject: introduce QObjectCommon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,130 +36,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+By moving the common fields to a QObjectCommon, QObject can be a type
+which also has a 'base' QObjectCommon field. This allows to write a
+generic QOBJECT() macro that will work with any QObject type,
+including QObject itself. The container_of() macro ensures that the
+object to cast has a QObjectCommon base field, give me some type
+safety guarantees. However, for it to work properly, all QObject types
+must have 'base' at offset 0 (which is ensured by static checking from
+previous patch)
 
-This series aims to get rid of the distinction between QObject, that
-must use qobject_incref/qobject_decref and its various derived types
-that have to use QINCREF/QDECREF. Instead, replace it with
-qobject_ref/qobject_unref for all types.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qapi/qmp/qbool.h   |  2 +-
+ include/qapi/qmp/qdict.h   |  2 +-
+ include/qapi/qmp/qlist.h   |  2 +-
+ include/qapi/qmp/qnull.h   |  2 +-
+ include/qapi/qmp/qnum.h    |  2 +-
+ include/qapi/qmp/qobject.h | 29 ++++++++++++++++++-----------
+ include/qapi/qmp/qstring.h |  2 +-
+ qobject/qobject.c          | 12 ++++++------
+ tests/check-qdict.c        |  6 +++---
+ 9 files changed, 33 insertions(+), 26 deletions(-)
 
-v3: after v2 review with Eric and Paolo
-- fix clang ubsan warning when a null pointer is given to QOBJECT.
-- add a patch to make qobject_ref() assert on null pointer, and return
-  the same pointer, simplifying some code.
-
-v2:
-- use the QObjectCommon base approach suggested by Paolo and Eric
-- remove need for QEMU_GENERIC
-
-Marc-Andr=C3=A9 Lureau (4):
-  qobject: ensure base is at offset 0
-  qobject: introduce QObjectCommon
-  qobject: replace qobject_incref/QINCREF qobject_decref/QDECREF
-  qobject: modify qobject_ref() to assert on NULL and return obj
-
- scripts/qapi/events.py              |   2 +-
- include/qapi/qmp/qbool.h            |   2 +-
- include/qapi/qmp/qdict.h            |   2 +-
- include/qapi/qmp/qlist.h            |   2 +-
- include/qapi/qmp/qnull.h            |   4 +-
- include/qapi/qmp/qnum.h             |   2 +-
- include/qapi/qmp/qobject.h          |  75 +++++++++++---------
- include/qapi/qmp/qstring.h          |   2 +-
- block.c                             |  82 ++++++++++-----------
- block/blkdebug.c                    |   7 +-
- block/blkverify.c                   |   8 +--
- block/crypto.c                      |   4 +-
- block/gluster.c                     |   4 +-
- block/iscsi.c                       |   2 +-
- block/nbd.c                         |   4 +-
- block/nfs.c                         |   4 +-
- block/null.c                        |   3 +-
- block/nvme.c                        |   3 +-
- block/parallels.c                   |   4 +-
- block/qapi.c                        |   2 +-
- block/qcow.c                        |   8 +--
- block/qcow2.c                       |   8 +--
- block/qed.c                         |   4 +-
- block/quorum.c                      |   4 +-
- block/rbd.c                         |  14 ++--
- block/sheepdog.c                    |  12 ++--
- block/snapshot.c                    |   4 +-
- block/ssh.c                         |   4 +-
- block/vdi.c                         |   2 +-
- block/vhdx.c                        |   4 +-
- block/vpc.c                         |   4 +-
- block/vvfat.c                       |   2 +-
- block/vxhs.c                        |   2 +-
- blockdev.c                          |  16 ++---
- hw/i386/acpi-build.c                |  12 ++--
- hw/ppc/spapr_drc.c                  |   2 +-
- hw/usb/xen-usb.c                    |   4 +-
- migration/migration.c               |   4 +-
- migration/qjson.c                   |   2 +-
- monitor.c                           |  57 +++++++--------
- qapi/qapi-dealloc-visitor.c         |   4 +-
- qapi/qmp-dispatch.c                 |   6 +-
- qapi/qobject-input-visitor.c        |  10 ++-
- qapi/qobject-output-visitor.c       |  11 ++-
- qemu-img.c                          |  18 ++---
- qemu-io.c                           |   6 +-
- qga/main.c                          |  12 ++--
- qmp.c                               |   4 +-
- qobject/json-parser.c               |  10 +--
- qobject/qdict.c                     |  49 +++++--------
- qobject/qjson.c                     |   2 +-
- qobject/qlist.c                     |   4 +-
- qobject/qobject.c                   |  21 ++++--
- qom/object.c                        |  16 ++---
- qom/object_interfaces.c             |   2 +-
- target/ppc/translate_init.c         |   2 +-
- target/s390x/cpu_models.c           |   2 +-
- tests/ahci-test.c                   |   6 +-
- tests/check-qdict.c                 | 106 ++++++++++++++--------------
- tests/check-qjson.c                 |  84 +++++++++++-----------
- tests/check-qlist.c                 |   8 +--
- tests/check-qlit.c                  |  10 +--
- tests/check-qnull.c                 |  10 +--
- tests/check-qnum.c                  |  28 ++++----
- tests/check-qobject.c               |   2 +-
- tests/check-qstring.c               |  10 +--
- tests/cpu-plug-test.c               |   4 +-
- tests/device-introspect-test.c      |  24 +++----
- tests/drive_del-test.c              |   4 +-
- tests/libqos/libqos.c               |   8 +--
- tests/libqos/pci-pc.c               |   2 +-
- tests/libqtest.c                    |  24 +++----
- tests/machine-none-test.c           |   2 +-
- tests/migration-test.c              |  24 +++----
- tests/numa-test.c                   |  16 ++---
- tests/pvpanic-test.c                |   2 +-
- tests/q35-test.c                    |   2 +-
- tests/qmp-test.c                    |  38 +++++-----
- tests/qom-test.c                    |   8 +--
- tests/tco-test.c                    |  12 ++--
- tests/test-char.c                   |   2 +-
- tests/test-keyval.c                 |  82 ++++++++++-----------
- tests/test-netfilter.c              |  26 +++----
- tests/test-qemu-opts.c              |  14 ++--
- tests/test-qga.c                    |  76 ++++++++++----------
- tests/test-qmp-cmds.c               |  24 +++----
- tests/test-qmp-event.c              |   2 +-
- tests/test-qobject-input-visitor.c  |  10 +--
- tests/test-qobject-output-visitor.c |  18 ++---
- tests/test-visitor-serialization.c  |   6 +-
- tests/test-x86-cpuid-compat.c       |  14 ++--
- tests/tmp105-test.c                 |   4 +-
- tests/vhost-user-test.c             |   6 +-
- tests/virtio-net-test.c             |   6 +-
- tests/vmgenid-test.c                |   2 +-
- tests/wdt_ib700-test.c              |  14 ++--
- util/keyval.c                       |  12 ++--
- util/qemu-config.c                  |   4 +-
- docs/devel/qapi-code-gen.txt        |   2 +-
- roms/seabios                        |   2 +-
- scripts/coccinelle/qobject.cocci    |   8 +--
- 101 files changed, 665 insertions(+), 669 deletions(-)
-
+diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
+index b9a44a1bfe..38e6287973 100644
+--- a/include/qapi/qmp/qbool.h
++++ b/include/qapi/qmp/qbool.h
+@@ -17,7 +17,7 @@
+ #include "qapi/qmp/qobject.h"
+=20
+ struct QBool {
+-    QObject base;
++    struct QObjectCommon base;
+     bool value;
+ };
+=20
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 2cc3e906f7..3e54df2291 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -25,7 +25,7 @@ typedef struct QDictEntry {
+ } QDictEntry;
+=20
+ struct QDict {
+-    QObject base;
++    struct QObjectCommon base;
+     size_t size;
+     QLIST_HEAD(,QDictEntry) table[QDICT_BUCKET_MAX];
+ };
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index 5c673acb06..5cf26554ae 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -22,7 +22,7 @@ typedef struct QListEntry {
+ } QListEntry;
+=20
+ struct QList {
+-    QObject base;
++    struct QObjectCommon base;
+     QTAILQ_HEAD(,QListEntry) head;
+ };
+=20
+diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+index c992ee2ae1..32d4ce98af 100644
+--- a/include/qapi/qmp/qnull.h
++++ b/include/qapi/qmp/qnull.h
+@@ -16,7 +16,7 @@
+ #include "qapi/qmp/qobject.h"
+=20
+ struct QNull {
+-    QObject base;
++    struct QObjectCommon base;
+ };
+=20
+ extern QNull qnull_;
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index 3e47475b2c..3326547f2c 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -45,7 +45,7 @@ typedef enum {
+  * convert under the hood.
+  */
+ struct QNum {
+-    QObject base;
++    struct QObjectCommon base;
+     QNumKind kind;
+     union {
+         int64_t i64;
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index 5206ff9ee1..96085b7dfa 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -34,13 +34,19 @@
+=20
+ #include "qapi/qapi-builtin-types.h"
+=20
+-struct QObject {
++struct QObjectCommon {
+     QType type;
+     size_t refcnt;
+ };
+=20
+-/* Get the 'base' part of an object */
+-#define QOBJECT(obj) (&(obj)->base)
++struct QObject {
++    struct QObjectCommon base;
++};
++
++#define QOBJECT(x) ({                                       \
++    typeof(x) __x =3D (x);                                    \
++    __x ? container_of(&(__x)->base, QObject, base) : NULL; \
++})
+=20
+ /* High-level interface for qobject_incref() */
+ #define QINCREF(obj)      \
+@@ -68,8 +74,8 @@ QEMU_BUILD_BUG_MSG(QTYPE__MAX !=3D 7,
+ static inline void qobject_init(QObject *obj, QType type)
+ {
+     assert(QTYPE_NONE < type && type < QTYPE__MAX);
+-    obj->refcnt =3D 1;
+-    obj->type =3D type;
++    obj->base.refcnt =3D 1;
++    obj->base.type =3D type;
+ }
+=20
+ /**
+@@ -77,8 +83,9 @@ static inline void qobject_init(QObject *obj, QType typ=
+e)
+  */
+ static inline void qobject_incref(QObject *obj)
+ {
+-    if (obj)
+-        obj->refcnt++;
++    if (obj) {
++        obj->base.refcnt++;
++    }
+ }
+=20
+ /**
+@@ -101,8 +108,8 @@ void qobject_destroy(QObject *obj);
+  */
+ static inline void qobject_decref(QObject *obj)
+ {
+-    assert(!obj || obj->refcnt);
+-    if (obj && --obj->refcnt =3D=3D 0) {
++    assert(!obj || obj->base.refcnt);
++    if (obj && --obj->base.refcnt =3D=3D 0) {
+         qobject_destroy(obj);
+     }
+ }
+@@ -112,8 +119,8 @@ static inline void qobject_decref(QObject *obj)
+  */
+ static inline QType qobject_type(const QObject *obj)
+ {
+-    assert(QTYPE_NONE < obj->type && obj->type < QTYPE__MAX);
+-    return obj->type;
++    assert(QTYPE_NONE < obj->base.type && obj->base.type < QTYPE__MAX);
++    return obj->base.type;
+ }
+=20
+ /**
+diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+index 30ae260a7f..dc50f6a0c7 100644
+--- a/include/qapi/qmp/qstring.h
++++ b/include/qapi/qmp/qstring.h
+@@ -16,7 +16,7 @@
+ #include "qapi/qmp/qobject.h"
+=20
+ struct QString {
+-    QObject base;
++    struct QObjectCommon base;
+     char *string;
+     size_t length;
+     size_t capacity;
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index 87649c5be5..cf4b7e229e 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -37,9 +37,9 @@ static void (*qdestroy[QTYPE__MAX])(QObject *) =3D {
+=20
+ void qobject_destroy(QObject *obj)
+ {
+-    assert(!obj->refcnt);
+-    assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
+-    qdestroy[obj->type](obj);
++    assert(!obj->base.refcnt);
++    assert(QTYPE_QNULL < obj->base.type && obj->base.type < QTYPE__MAX);
++    qdestroy[obj->base.type](obj);
+ }
+=20
+=20
+@@ -62,11 +62,11 @@ bool qobject_is_equal(const QObject *x, const QObject=
+ *y)
+         return true;
+     }
+=20
+-    if (!x || !y || x->type !=3D y->type) {
++    if (!x || !y || x->base.type !=3D y->base.type) {
+         return false;
+     }
+=20
+-    assert(QTYPE_NONE < x->type && x->type < QTYPE__MAX);
++    assert(QTYPE_NONE < x->base.type && x->base.type < QTYPE__MAX);
+=20
+-    return qis_equal[x->type](x, y);
++    return qis_equal[x->base.type](x, y);
+ }
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index 2e73c2f86e..029b6b15b9 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -570,11 +570,11 @@ static void qdict_join_test(void)
+         }
+=20
+         /* Check the references */
+-        g_assert(qdict_get(dict1, "foo")->refcnt =3D=3D 1);
+-        g_assert(qdict_get(dict1, "bar")->refcnt =3D=3D 1);
++        g_assert(qdict_get(dict1, "foo")->base.refcnt =3D=3D 1);
++        g_assert(qdict_get(dict1, "bar")->base.refcnt =3D=3D 1);
+=20
+         if (!overwrite) {
+-            g_assert(qdict_get(dict2, "foo")->refcnt =3D=3D 1);
++            g_assert(qdict_get(dict2, "foo")->base.refcnt =3D=3D 1);
+         }
+=20
+         /* Clean up */
 --=20
 2.17.0.rc1.36.gcedb63ea2f
