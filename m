@@ -1,16 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f1VRV-0001tk-8g
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:10:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f1VSj-0002zC-NE
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:11:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f1VRU-0003J9-74
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:10:05 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 29 Mar 2018 19:09:14 +0800
-Message-Id: <20180329110914.20888-9-famz@redhat.com>
-In-Reply-To: <20180329110914.20888-1-famz@redhat.com>
-References: <20180329110914.20888-1-famz@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 8/8] qemu-img: Convert with copy offloading
+	(envelope-from <dgilbert@redhat.com>) id 1f1VSf-00046E-C1
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:11:21 -0400
+Date: Thu, 29 Mar 2018 12:11:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180329111059.GD2982@work-vm>
+References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
+	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
+	<CAFEAcA96qV_f7i_36Yzb-QV7W9SRHKfJpg=rvv3tia2X-Xi7QQ@mail.gmail.com>
+	<5AB0F254.3050503@huawei.com>
+	<CAFEAcA-Ct3qa0OFZ4U+9RH68SQJgmkxJKKS5e+if_MuL2pSu3A@mail.gmail.com>
+	<5AB21130.2020309@huawei.com>
+	<CAFEAcA8yr+KJFwBSksMP-VjNbsSd190VCzB4wGwOCoaX2ScDiA@mail.gmail.com>
+	<CAFEAcA_r=S=YWAuZue1zZnFdtFYK2wU7NnaCcGThZU_u33qD4g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_r=S=YWAuZue1zZnFdtFYK2wU7NnaCcGThZU_u33qD4g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 2/2] arm_gicv3_kvm:
+ kvm_dist_get/put: skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,132 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-The new blk_co_copy_range interface offers a more efficient way in the
-case of network based storage. Make use of it to allow faster convert
-operation.
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 23 March 2018 at 12:08, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 21 March 2018 at 08:00, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> >> On 2018/3/20 19:54, Peter Maydell wrote:
+> >>> Can you still successfully migrate a VM from a QEMU version
+> >>> without this bugfix to one with the bugfix ?
+> >>>
+> >> I've tested this case. I can migrate a VM between these two versions.
+> >
+> > Hmm. Looking at the code I can't see how that would work,
+> > except by accident. Let me see if I understand what's happening
+> > here:
+> >
+> > In the code in master, we have QEMU data structures
+> > (bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
+> > irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
+> > for a 1-bit-per-irq bitmap:
+> >  [0x00000000, irq 32, irq 33, .... ]
+> >
+> > When we fill in the values from KVM into these data structures,
+> > we start after the unused space, because the for_each_dist_irq_reg()
+> > macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
+> > the offset value we use for the KVM access, so we start by
+> > reading the RAZ/WI values from KVM, and the data structure
+> > contents end up with:
+> >  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+> > (and the last irqs wouldn't get transferred).
+> >
+> > With this change to the code we will get the offset right and
+> > the data structure will be filled as
+> >  [0x00000000, irq 32, irq 33, .... ]
+> >
+> > But for migration from the old version, the data structure
+> > we receive from the migration source will contain the old
+> > broken layout of
+> >  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+> > so if the new code doesn't do anything special to handle
+> > migration from that old version then it will write zeroes to
+> > irq 32..63, and then write incorrect values for all the irqs
+> > after that, won't it?
+> >
+> > That suggests to me that we need to have some code in the
+> > migration post-load routine that identifies that the data
+> > is coming from an old version with this bug, and shifts
+> > all the data down in the arrays so that the code to write
+> > it to the kernel can handle it.
+> 
+> I was thinking a bit more about how to handle this, and
+> my best idea was:
+> 
+> (1) send something in the migration stream that says
+> "I don't have this bug" (version number change?
+> vmstate field that's just a "no bug" flag? subsection
+> with no contents?)
+> 
+> (2) on the destination, if the source doesn't tell us
+> it doesn't have this bug, and we are running KVM, then
+> shift all the data in the arrays down to fix it up
+> [Strictly what we want to know is if the source is
+> running KVM, not if the destination is, but I don't
+> know of a way to find that out, and in practice TCG->KVM
+> migrations don't work anyway, so it's not a big deal.]
+> 
+> Juan, David, do you have any suggestions for the best
+> mechanism for part 1; or is there some clever way to
+> handle this sort of bug that I've missed?
 
-Since copy offloading cannot do zero detection ('-S') and compression
-(-c), only try it when these options are not used.
+The subsection is probably the best bet; unless that is you can find
+a bit to misuse in an existing field.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- qemu-img.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 43 insertions(+), 2 deletions(-)
+Dave
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 855fa52514..571b6e2e49 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1544,6 +1544,7 @@ typedef struct ImgConvertState {
-     bool compressed;
-     bool target_has_backing;
-     bool wr_in_order;
-+    bool copy_range;
-     int min_sparse;
-     size_t cluster_sectors;
-     size_t buf_sectors;
-@@ -1737,6 +1738,37 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
-     return 0;
- }
- 
-+static int coroutine_fn convert_co_copy_range(ImgConvertState *s, int64_t sector_num,
-+                                              int nb_sectors)
-+{
-+    int n, ret;
-+
-+    while (nb_sectors > 0) {
-+        BlockBackend *blk;
-+        int src_cur;
-+        int64_t bs_sectors, src_cur_offset;
-+        int64_t offset;
-+
-+        convert_select_part(s, sector_num, &src_cur, &src_cur_offset);
-+        offset = (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
-+        blk = s->src[src_cur];
-+        bs_sectors = s->src_sectors[src_cur];
-+
-+        n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
-+
-+        ret = blk_co_copy_range(blk, offset, s->target,
-+                                sector_num << BDRV_SECTOR_BITS,
-+                                n << BDRV_SECTOR_BITS);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        sector_num += n;
-+        nb_sectors -= n;
-+    }
-+    return 0;
-+}
-+
- static void coroutine_fn convert_co_do_copy(void *opaque)
- {
-     ImgConvertState *s = opaque;
-@@ -1759,6 +1791,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         int n;
-         int64_t sector_num;
-         enum ImgConvertBlockStatus status;
-+        bool copy_range;
- 
-         qemu_co_mutex_lock(&s->lock);
-         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
-@@ -1777,6 +1810,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         if (!s->min_sparse && s->status == BLK_ZERO) {
-             n = MIN(n, s->buf_sectors);
-         }
-+        copy_range = s->copy_range && s->status == BLK_DATA;
-         /* increment global sector counter so that other coroutines can
-          * already continue reading beyond this request */
-         s->sector_num += n;
-@@ -1788,7 +1822,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-                                         s->allocated_sectors, 0);
-         }
- 
--        if (status == BLK_DATA) {
-+        if (status == BLK_DATA && !copy_range) {
-             ret = convert_co_read(s, sector_num, n, buf);
-             if (ret < 0) {
-                 error_report("error while reading sector %" PRId64
-@@ -1810,7 +1844,11 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         }
- 
-         if (s->ret == -EINPROGRESS) {
--            ret = convert_co_write(s, sector_num, n, buf, status);
-+            if (copy_range) {
-+                ret = convert_co_copy_range(s, sector_num, n);
-+            } else {
-+                ret = convert_co_write(s, sector_num, n, buf, status);
-+            }
-             if (ret < 0) {
-                 error_report("error while writing sector %" PRId64
-                              ": %s", sector_num, strerror(-ret));
-@@ -1933,6 +1971,7 @@ static int img_convert(int argc, char **argv)
-     ImgConvertState s = (ImgConvertState) {
-         /* Need at least 4k of zeros for sparse detection */
-         .min_sparse         = 8,
-+        .copy_range         = true,
-         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
-         .wr_in_order        = true,
-         .num_coroutines     = 8,
-@@ -1973,6 +2012,7 @@ static int img_convert(int argc, char **argv)
-             break;
-         case 'c':
-             s.compressed = true;
-+            s.copy_range = false;
-             break;
-         case 'o':
-             if (!is_valid_option_list(optarg)) {
-@@ -2014,6 +2054,7 @@ static int img_convert(int argc, char **argv)
-             }
- 
-             s.min_sparse = sval / BDRV_SECTOR_SIZE;
-+            s.copy_range = false;
-             break;
-         }
-         case 'p':
--- 
-2.14.3
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
