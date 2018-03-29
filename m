@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f1cIH-0006zw-Ak
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:29:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f1cle-0001Vv-OD
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f1cIG-0006w7-9F
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:29:01 -0400
-References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <30a96f63-4cdf-23e6-c4d2-b4de59411a11@redhat.com>
-Date: Thu, 29 Mar 2018 14:28:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f1clc-0000Eh-5K
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:59:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34008 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f1clb-0000Db-Nj
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 14:59:20 -0400
+Date: Thu, 29 Mar 2018 19:59:09 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180329185909.GG2982@work-vm>
+References: <20180228072558.7434-1-haozhong.zhang@intel.com>
+	<20180228072558.7434-6-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Add new CD-ROM related qtests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180228072558.7434-6-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 5/8] migration/ram: ensure write
+ persistence on loading zero pages to PMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
+* Haozhong Zhang (haozhong.zhang@intel.com) wrote:
+> When loading a zero page, check whether it will be loaded to
+> persistent memory If yes, load it by libpmem function
+> pmem_memset_nodrain().  Combined with a call to pmem_drain() at the
+> end of RAM loading, we can guarantee all those zero pages are
+> persistently loaded.
+> 
+> Depending on the host HW/SW configurations, pmem_drain() can be
+> "sfence".  Therefore, we do not call pmem_drain() after each
+> pmem_memset_nodrain(), or use pmem_memset_persist() (equally
+> pmem_memset_nodrain() + pmem_drain()), in order to avoid unnecessary
+> overhead.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 
+I'm still thinking this is way too invasive;  especially the next patch
+that touches qemu_file.
 
-On 03/16/2018 01:39 AM, Thomas Huth wrote:
-> With one of my clean-up patches (see commit 1454509726719e0933c800), I
-> recently accidentially broke the "-cdrom" parameter (more precisely
-> "-drive if=scsi") on a couple of boards, since there was no error
-> detected during the "make check" regression testing. This is clearly an
-> indication that we are lacking tests in this area.
-> So this small patch series now introduces some tests for CD-ROM drives:
-> The first two patches introduce the possibility to check that booting
-> from CD-ROM drives still works fine for x86 and s390x, and the third
-> patch adds a test that certain machines can at least still be started
-> with the "-cdrom" parameter (i.e. that test would have catched the
-> mistake that I did with my SCSI cleanup patch).
-> 
-> v2:
->  - Use g_spawn_sync() instead of execlp() to run genisoimage
->  - The "-cdrom" parameter test is now run on all architectures (with
->    machine "none" for the machines that are not explicitly checked)
->  - Some rewordings and improved comments here and there
-> 
-> Thomas Huth (3):
->   tests/boot-sector: Add magic bytes to s390x boot code header
->   tests/cdrom-test: Test booting from CD-ROM ISO image file
->   tests/cdrom-test: Test that -cdrom parameter is working
-> 
->  tests/Makefile.include |   2 +
->  tests/boot-sector.c    |   9 +-
->  tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 230 insertions(+), 3 deletions(-)
->  create mode 100644 tests/cdrom-test.c
-> 
+One thing that would help a little, but not really enough, would be
+to define a :
 
-New file, but no edit to MAINTAINERS.
+struct MemOps {
+  void (*copy)(like a memcpy);
+  void (*set)(like a memset);
+}
+
+then you could have:
+
+struct MemOps normalops = {memcpy, memset};
+struct MemOps pmem_nodrain_ops = { pmem_memcopy_nodrain, pmem_memset_nodrain };
+
+then things like ram_handle_compressed would be:
+
+void ram_handle_compressed(void *host, uint8_t ch, uint64_t size, const struct MemOps *mem)
+{
+    if (ch != 0 || !is_zero_range(host, size)) {
+        mem->set(host, ch,size);
+    }
+}
+
+which means the change is pretty tiny to each function.
+
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index da474fc19f..573bcd2cb0 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -3229,7 +3229,7 @@ static int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
+>              host_addr = block->local_host_addr +
+>                              (comp->offset - block->offset);
+>  
+> -            ram_handle_compressed(host_addr, comp->value, comp->length);
+> +            ram_handle_compressed(host_addr, comp->value, comp->length, false);
+
+Is that right? Is RDMA not allowed to work on PMEM?
+(and anyway this call is a normal clear rather than an actual RDMA op).
+
+Dave
+
+>              break;
+>  
+>          case RDMA_CONTROL_REGISTER_FINISHED:
+> diff --git a/stubs/pmem.c b/stubs/pmem.c
+> index 03d990e571..a65b3bfc6b 100644
+> --- a/stubs/pmem.c
+> +++ b/stubs/pmem.c
+> @@ -17,3 +17,12 @@ void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
+>  {
+>      return memcpy(pmemdest, src, len);
+>  }
+> +
+> +void *pmem_memset_nodrain(void *pmemdest, int c, size_t len)
+> +{
+> +    return memset(pmemdest, c, len);
+> +}
+> +
+> +void pmem_drain(void)
+> +{
+> +}
+> -- 
+> 2.14.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
