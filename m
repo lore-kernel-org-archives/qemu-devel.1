@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1URj-0002Ta-QY
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:06:18 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f1UTx-0003uh-Kg
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:08:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f1URd-0003Xz-NP
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:06:15 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34063)
+	(envelope-from <alex.bennee@linaro.org>) id 1f1UTw-0004ui-DU
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:08:33 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f1URd-0003Ww-H1
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:06:09 -0400
-Received: by mail-wr0-x243.google.com with SMTP id o8so4873993wra.1
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 03:06:09 -0700 (PDT)
+	id 1f1UTw-0004ua-6I
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:08:32 -0400
+Received: by mail-wr0-x242.google.com with SMTP id l49so4870759wrl.4
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 03:08:32 -0700 (PDT)
 References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-5-git-send-email-cota@braap.org>
+	<1519709965-29833-10-git-send-email-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1519709965-29833-5-git-send-email-cota@braap.org>
-Date: Thu, 29 Mar 2018 11:06:07 +0100
-Message-ID: <871sg38acw.fsf@linaro.org>
+In-reply-to: <1519709965-29833-10-git-send-email-cota@braap.org>
+Date: Thu, 29 Mar 2018 11:08:29 +0100
+Message-ID: <87zi2r6voi.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/16] tcg: move
- tb_ctx.tb_phys_invalidate_count to tcg_ctx
+Subject: Re: [Qemu-devel] [PATCH 09/16] translate-all: move
+ tb_invalidate_phys_page_range up in the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,110 +37,124 @@ Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderso
 
 Emilio G. Cota <cota@braap.org> writes:
 
-> Thereby making it per-TCGContext. Once we remove tb_lock, this will
-> avoid an atomic increment every time a TB is invalidated.
+> This greatly simplifies next commit's diff.
 >
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  accel/tcg/translate-all.c |  5 +++--
->  include/exec/tb-context.h |  1 -
->  tcg/tcg.c                 | 14 ++++++++++++++
->  tcg/tcg.h                 |  3 +++
->  4 files changed, 20 insertions(+), 3 deletions(-)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 3a51d49..20ad3fc 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1072,7 +1072,8 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_pa=
-ge_addr_t page_addr)
->      /* suppress any remaining jumps to this TB */
->      tb_jmp_unlink(tb);
->
-> -    tb_ctx.tb_phys_invalidate_count++;
-> +    atomic_set(&tcg_ctx->tb_phys_invalidate_count,
-> +               tcg_ctx->tb_phys_invalidate_count + 1);
-
-We do have an atomic_inc helper for this or we need comment that we only
-have atomic_reads() to worry about hence no races.
-
-Otherwise:
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
+> ---
+>  accel/tcg/translate-all.c | 77 ++++++++++++++++++++++++-----------------=
+------
+>  1 file changed, 39 insertions(+), 38 deletions(-)
+>
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index a98e182..4cb03f1 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1371,44 +1371,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>
+>  /*
+>   * Invalidate all TBs which intersect with the target physical address r=
+ange
+> - * [start;end[. NOTE: start and end may refer to *different* physical pa=
+ges.
+> - * 'is_cpu_write_access' should be true if called from a real cpu write
+> - * access: the virtual CPU will exit the current TB if code is modified =
+inside
+> - * this TB.
+> - *
+> - * Called with mmap_lock held for user-mode emulation, grabs tb_lock
+> - * Called with tb_lock held for system-mode emulation
+> - */
+> -static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_add=
+r_t end)
+> -{
+> -    tb_page_addr_t next;
+> -
+> -    for (next =3D (start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+> -         start < end;
+> -         start =3D next, next +=3D TARGET_PAGE_SIZE) {
+> -        tb_page_addr_t bound =3D MIN(next, end);
+> -
+> -        tb_invalidate_phys_page_range(start, bound, 0);
+> -    }
+> -}
+> -
+> -#ifdef CONFIG_SOFTMMU
+> -void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
+> -{
+> -    assert_tb_locked();
+> -    tb_invalidate_phys_range_1(start, end);
+> -}
+> -#else
+> -void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
+> -{
+> -    assert_memory_lock();
+> -    tb_lock();
+> -    tb_invalidate_phys_range_1(start, end);
+> -    tb_unlock();
+> -}
+> -#endif
+> -/*
+> - * Invalidate all TBs which intersect with the target physical address r=
+ange
+>   * [start;end[. NOTE: start and end must refer to the *same* physical pa=
+ge.
+>   * 'is_cpu_write_access' should be true if called from a real cpu write
+>   * access: the virtual CPU will exit the current TB if code is modified =
+inside
+> @@ -1505,6 +1467,45 @@ void tb_invalidate_phys_page_range(tb_page_addr_t =
+start, tb_page_addr_t end,
+>  #endif
 >  }
 >
->  #ifdef CONFIG_SOFTMMU
-> @@ -1862,7 +1863,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_f=
-printf)
->      cpu_fprintf(f, "\nStatistics:\n");
->      cpu_fprintf(f, "TB flush count      %u\n",
->                  atomic_read(&tb_ctx.tb_flush_count));
-> -    cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate=
-_count);
-> +    cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_c=
-ount());
->      cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
->      tcg_dump_info(f, cpu_fprintf);
->  }
-> diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
-> index d8472c8..8c9b49c 100644
-> --- a/include/exec/tb-context.h
-> +++ b/include/exec/tb-context.h
-> @@ -37,7 +37,6 @@ struct TBContext {
->
->      /* statistics */
->      unsigned tb_flush_count;
-> -    int tb_phys_invalidate_count;
->  };
->
->  extern TBContext tb_ctx;
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index b471708..a7b596e 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -791,6 +791,20 @@ size_t tcg_code_capacity(void)
->      return capacity;
->  }
->
-> +size_t tcg_tb_phys_invalidate_count(void)
+> +/*
+> + * Invalidate all TBs which intersect with the target physical address r=
+ange
+> + * [start;end[. NOTE: start and end may refer to *different* physical pa=
+ges.
+> + * 'is_cpu_write_access' should be true if called from a real cpu write
+> + * access: the virtual CPU will exit the current TB if code is modified =
+inside
+> + * this TB.
+> + *
+> + * Called with mmap_lock held for user-mode emulation, grabs tb_lock
+> + * Called with tb_lock held for system-mode emulation
+> + */
+> +static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_add=
+r_t end)
 > +{
-> +    unsigned int n_ctxs =3D atomic_read(&n_tcg_ctxs);
-> +    unsigned int i;
-> +    size_t total =3D 0;
+> +    tb_page_addr_t next;
 > +
-> +    for (i =3D 0; i < n_ctxs; i++) {
-> +        const TCGContext *s =3D atomic_read(&tcg_ctxs[i]);
+> +    for (next =3D (start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+> +         start < end;
+> +         start =3D next, next +=3D TARGET_PAGE_SIZE) {
+> +        tb_page_addr_t bound =3D MIN(next, end);
 > +
-> +        total +=3D atomic_read(&s->tb_phys_invalidate_count);
+> +        tb_invalidate_phys_page_range(start, bound, 0);
 > +    }
-> +    return total;
 > +}
 > +
->  /* pool based memory allocation */
->  void *tcg_malloc_internal(TCGContext *s, int size)
->  {
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 8bf29cc..9dd9448 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -694,6 +694,8 @@ struct TCGContext {
->      /* Threshold to flush the translated code buffer.  */
->      void *code_gen_highwater;
->
-> +    size_t tb_phys_invalidate_count;
+> +#ifdef CONFIG_SOFTMMU
+> +void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
+> +{
+> +    assert_tb_locked();
+> +    tb_invalidate_phys_range_1(start, end);
+> +}
+> +#else
+> +void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
+> +{
+> +    assert_memory_lock();
+> +    tb_lock();
+> +    tb_invalidate_phys_range_1(start, end);
+> +    tb_unlock();
+> +}
+> +#endif
 > +
->      /* Track which vCPU triggers events */
->      CPUState *cpu;                      /* *_trans */
->
-> @@ -852,6 +854,7 @@ size_t tcg_code_capacity(void);
->
->  void tcg_tb_insert(TranslationBlock *tb);
->  void tcg_tb_remove(TranslationBlock *tb);
-> +size_t tcg_tb_phys_invalidate_count(void);
->  TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr);
->  void tcg_tb_foreach(GTraverseFunc func, gpointer user_data);
->  size_t tcg_nb_tbs(void);
+>  #ifdef CONFIG_SOFTMMU
+>  /* len must be <=3D 8 and start must be a multiple of len.
+>   * Called via softmmu_template.h when code areas are written to with
 
 
 --
