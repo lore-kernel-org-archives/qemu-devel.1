@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1U2L-0002U4-6U
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:40:02 -0400
+	(envelope-from <groug@kaod.org>) id 1f1U6e-00060V-C6
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1U2G-00017q-6l
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:40:01 -0400
-Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:36210)
+	(envelope-from <groug@kaod.org>) id 1f1U6Z-0002nO-Kr
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:44:28 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:37991)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1U2G-00017K-0x
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:39:56 -0400
-Received: from player728.ha.ovh.net (unknown [10.109.122.16])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 66688B171F
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:39:54 +0200 (CEST)
-Date: Thu, 29 Mar 2018 11:39:41 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1U6Z-0002mv-Dy
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:44:23 -0400
+Received: from player728.ha.ovh.net (unknown [10.109.122.24])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id B716CD3B39
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:44:21 +0200 (CEST)
+Date: Thu, 29 Mar 2018 11:44:11 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180329113941.6eebc57f@bahia.lan>
-In-Reply-To: <20180329112721.6c7ee3f3@redhat.com>
+Message-ID: <20180329114411.5c96c586@bahia.lan>
+In-Reply-To: <20180329111831.2ffad2bd.cohuck@redhat.com>
 References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
-	<152231460685.69730.14860451936216690693.stgit@bahia.lan>
-	<20180329112721.6c7ee3f3@redhat.com>
+	<152231458624.69730.1752893648612848392.stgit@bahia.lan>
+	<20180329111831.2ffad2bd.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/s390x: fix memory leak in
- s390_init_ipl_dev()
+Subject: Re: [Qemu-devel] [PATCH 1/3] exec: fix memory leak in
+ find_max_supported_pagesize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-On Thu, 29 Mar 2018 11:27:21 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+On Thu, 29 Mar 2018 11:18:31 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Thu, 29 Mar 2018 11:10:06 +0200
+> On Thu, 29 Mar 2018 11:09:46 +0200
 > Greg Kurz <groug@kaod.org> wrote:
 > 
 > > The string returned by object_property_get_str() is dynamically allocated.
 > > 
-> > Fixes: 3c4e9baacf4d9
 > > Signed-off-by: Greg Kurz <groug@kaod.org>
 > > ---
-> >  hw/s390x/s390-virtio-ccw.c |    5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >  exec.c |    1 +
+> >  1 file changed, 1 insertion(+)
 > > 
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index 864145a7c6f3..435f7c99e77c 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
-> >  {
-> >      Object *new = object_new(TYPE_S390_IPL);
-> >      DeviceState *dev = DEVICE(new);
-> > +    char *netboot_fw_prop;
-> >  
-> >      if (kernel_filename) {
-> >          qdev_prop_set_string(dev, "kernel", kernel_filename);
-> > @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
-> >      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
-> >      qdev_prop_set_string(dev, "firmware", firmware);
-> >      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
-> > -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
-> > +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
-> > +    if (!strlen(netboot_fw_prop)) {  
-> probably not really issue here but,
-> is strlen really safe in case netboot_fw_prop == NULL?
-> 
-
-You're right, object_property_get_str() can theoretically return NULL and
-strlen() would crash... Not sure how this would happen though. Anyway, the
-current code doesn't check if object_property_get_str() returns NULL so
-if this needs to be fixed as well, let's do it in a followup patch.
-
-> >          qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
-> >      }
-> > +    g_free(netboot_fw_prop);
-> >      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
-> >                                new, NULL);
-> >      object_unref(new);
-> > 
+> > diff --git a/exec.c b/exec.c
+> > index c09bd93df31e..02b1efebb7c3 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -1495,6 +1495,7 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
+> >          mem_path = object_property_get_str(obj, "mem-path", NULL);
+> >          if (mem_path) {
+> >              long hpsize = qemu_mempath_getpagesize(mem_path);
+> > +            g_free(mem_path);
+> >              if (hpsize < *hpsize_min) {
+> >                  *hpsize_min = hpsize;
+> >              }
 > >   
 > 
+> Personally, I'd probably do the g_free() at the end of the if
+> (mem_path) branch, but this works as well.
+> 
+
+I usually prefer to free the string as soon as it isn't needed
+anymore... matter of taste :)
+
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
