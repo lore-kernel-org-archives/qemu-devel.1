@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1fGP-0001b6-37
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:39:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f1fGV-0001ha-Lp
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1fGM-0007vB-SO
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:39:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51560)
+	(envelope-from <ehabkost@redhat.com>) id 1f1fGU-0008M4-QX
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:39:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56102)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1fGM-0007rf-MY
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:39:14 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1fGU-0008Ja-Kr
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:39:22 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 29 Mar 2018 18:38:41 -0300
-Message-Id: <20180329213857.15499-3-ehabkost@redhat.com>
+Date: Thu, 29 Mar 2018 18:38:42 -0300
+Message-Id: <20180329213857.15499-4-ehabkost@redhat.com>
 In-Reply-To: <20180329213857.15499-1-ehabkost@redhat.com>
 References: <20180329213857.15499-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC 02/18] qmp.py: Fix error handling for Python 3
+Subject: [Qemu-devel] [RFC 03/18] qmp.py: Cleanly handle unexpectedly closed
+ socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +27,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>, Amador Pahim <apahim@redhat.com>
 
-socket.error doesn't behave like a tuple in Python 3, but we can
-use error.args on both Python 2.7 and 3.
+QEMUMonitorProtocol.cmd() returns None if the socket was closed,
+so callers must handle this case explicltly.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qmp.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/qmp/qmp.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index 078ce65f3b..e9cb6b2683 100644
+index e9cb6b2683..91b537ea04 100644
 --- a/scripts/qmp/qmp.py
 +++ b/scripts/qmp/qmp.py
-@@ -108,7 +108,7 @@ class QEMUMonitorProtocol(object):
-         try:
-             self.__json_read()
-         except socket.error as err:
--            if err[0] == errno.EAGAIN:
-+            if err.args[0] == errno.EAGAIN:
-                 # No data available
-                 pass
-         self.__sock.setblocking(1)
-@@ -168,9 +168,9 @@ class QEMUMonitorProtocol(object):
-         try:
-             self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
-         except socket.error as err:
--            if err[0] == errno.EPIPE:
-+            if err.args[0] == errno.EPIPE:
-                 return
--            raise socket.error(err)
-+            raise
-         resp = self.__json_read()
-         self.logger.debug("<<< %s", resp)
-         return resp
+@@ -73,6 +73,8 @@ class QEMUMonitorProtocol(object):
+             raise QMPConnectError
+         # Greeting seems ok, negotiate capabilities
+         resp = self.cmd('qmp_capabilities')
++        if resp is None:
++            raise QMPConnectError("QMP connection unexpectedly closed")
+         if "return" in resp:
+             return greeting
+         raise QMPCapabilitiesError
+@@ -182,6 +184,8 @@ class QEMUMonitorProtocol(object):
+         @param name: command name (string)
+         @param args: command arguments (dict)
+         @param cmd_id: command id (dict, list, string or int)
++        @return QMP response as a Python dict or None if the connection has
++                been closed
+         """
+         qmp_cmd = {'execute': name}
+         if args:
+@@ -195,6 +199,8 @@ class QEMUMonitorProtocol(object):
+         Build and send a QMP command to the monitor, report errors if any
+         """
+         ret = self.cmd(cmd, kwds)
++        if ret is None:
++            raise QMPConnectError("QMP connection unexpectedly closed")
+         if "error" in ret:
+             raise Exception(ret['error']['desc'])
+         return ret['return']
 -- 
 2.14.3
