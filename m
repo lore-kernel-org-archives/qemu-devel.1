@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1VnI-0007Dn-J4
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:32:37 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f1Vo7-0007jw-QA
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1VnE-0003Xx-LR
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:32:36 -0400
-References: <1522316251-16399-1-git-send-email-thuth@redhat.com>
-	<2103b547-66aa-d1f7-a504-cb6ef3672039@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <769c8228-7b3a-278d-7711-0e5a87167fb1@redhat.com>
-Date: Thu, 29 Mar 2018 13:32:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <2103b547-66aa-d1f7-a504-cb6ef3672039@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: Increase virtio
- timeout to 30 seconds
+	(envelope-from <cohuck@redhat.com>) id 1f1Vo7-0003lH-0h
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:33:27 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu, 29 Mar 2018 13:33:20 +0200
+Message-Id: <20180329113320.8053-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.13] s390x: introduce 2.13 compat machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +17,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, ldoktor@redhat.com
+To: qemu-s390x@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-On 29.03.2018 12:03, Christian Borntraeger wrote:
->=20
->=20
-> On 03/29/2018 11:37 AM, Thomas Huth wrote:
->> The current timeout is set to only three seconds - and considering tha=
-t
->> vring_wait_reply() or rather get_second() is not doing any rounding,
->> the real timeout is likely rather 2 seconds in most cases. When the
->> host is really badly loaded and we run the guest in TCG mode instead
->> of KVM, it's possible that we hit this timeout by mistake. So let's
->> increase the timeout to 30 seconds instead to ease this situation (30
->> seconds is also the timeout that is used by the Linux SCSI subsystem
->> for example, so this seems to be a sane value for block IO timeout).
->=20
-> I have never seen this, but cant this also with KVM (e.g. host paging
-> and the swap disk is busy for some seconds).
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+Yes, it's that time again :)
+---
+ hw/s390x/s390-virtio-ccw.c | 17 ++++++++++++++++-
+ include/hw/compat.h        |  3 +++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-Sure, I even assume that Luk=C3=A1=C5=A1 might have hit this with KVM, an=
-d not
-with TCG. It's just a little bit more unlikely there.
-
-> Wouldnt it also qualify for 2.12?
-
-Yes, I was just not sure whether we want to rebuild the s390-ccw.img
-just because of this ... I'd like to leave that decision to you and
-Cornelia.
-
- Thomas
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 864145a7c6..122f316f6a 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -668,6 +668,9 @@ bool css_migration_enabled(void)
+     }                                                                         \
+     type_init(ccw_machine_register_##suffix)
+ 
++#define CCW_COMPAT_2_12 \
++        HW_COMPAT_2_12
++
+ #define CCW_COMPAT_2_11 \
+         HW_COMPAT_2_11 \
+         {\
+@@ -753,14 +756,26 @@ bool css_migration_enabled(void)
+             .value    = "0",\
+         },
+ 
++static void ccw_machine_2_13_instance_options(MachineState *machine)
++{
++}
++
++static void ccw_machine_2_13_class_options(MachineClass *mc)
++{
++}
++DEFINE_CCW_MACHINE(2_13, "2.13", true);
++
+ static void ccw_machine_2_12_instance_options(MachineState *machine)
+ {
++    ccw_machine_2_13_instance_options(machine);
+ }
+ 
+ static void ccw_machine_2_12_class_options(MachineClass *mc)
+ {
++    ccw_machine_2_13_class_options(mc);
++    SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_12);
+ }
+-DEFINE_CCW_MACHINE(2_12, "2.12", true);
++DEFINE_CCW_MACHINE(2_12, "2.12", false);
+ 
+ static void ccw_machine_2_11_instance_options(MachineState *machine)
+ {
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index bc9e3a6627..6e91491b77 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -1,6 +1,9 @@
+ #ifndef HW_COMPAT_H
+ #define HW_COMPAT_H
+ 
++#define HW_COMPAT_2_12 \
++    /* empty */
++
+ #define HW_COMPAT_2_11 \
+     {\
+         .driver   = "hpet",\
+-- 
+2.14.3
