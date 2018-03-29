@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f1P7t-0008Ov-SP
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:25:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f1Phc-0005lD-MW
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 01:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f1P7o-0000gY-Kv
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:25:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35018 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f1P7o-0000gI-Az
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:25:20 -0400
-Date: Thu, 29 Mar 2018 12:25:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180329042510.GC8456@xz-mi>
-References: <20180327091043.30220-1-xiaoguangrong@tencent.com>
-	<20180327091043.30220-5-xiaoguangrong@tencent.com>
-	<20180328095952.GG29554@xz-mi>
-	<c3c7cf6e-709b-64ee-a090-741d9633114d@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1f1Phb-0000w1-NW
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 01:02:20 -0400
+Date: Thu, 29 Mar 2018 16:02:06 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180329050206.GM3510@umbus.fritz.box>
+References: <20180327043741.7705-1-david@gibson.dropbear.id.au>
+	<20180327043741.7705-12-david@gibson.dropbear.id.au>
+	<f3c7bb1c-f4b9-3ffe-aeeb-bcedba620283@kaod.org>
+	<05dd7870-11ba-7be8-ce45-6c9aba653226@kaod.org>
+	<20180328084720.GI3510@umbus.fritz.box>
+	<1e220d03-11cf-2c8d-d3ba-b816741fa4e3@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="I4g3zIzscEHdx6fd"
 Content-Disposition: inline
-In-Reply-To: <c3c7cf6e-709b-64ee-a090-741d9633114d@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/10] migration: detect compression and
- decompression errors
+In-Reply-To: <1e220d03-11cf-2c8d-d3ba-b816741fa4e3@kaod.org>
+Subject: Re: [Qemu-devel] [RFC for-2.13 11/12] target/ppc: Remove
+ unnecessary POWERPC_MMU_V3 flag from mmu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, groug@kaod.org, agraf@suse.de, qemu-devel@nongnu.org, benh@kernel.crashing.org, bharata@linux.vnet.ibm.com
 
-On Thu, Mar 29, 2018 at 11:51:03AM +0800, Xiao Guangrong wrote:
-> 
-> 
-> On 03/28/2018 05:59 PM, Peter Xu wrote:
-> > On Tue, Mar 27, 2018 at 05:10:37PM +0800, guangrong.xiao@gmail.com wrote:
-> > 
-> > [...]
-> > 
-> > > -static int compress_threads_load_setup(void)
-> > > +static int compress_threads_load_setup(QEMUFile *f)
-> > >   {
-> > >       int i, thread_count;
-> > > @@ -2665,6 +2685,7 @@ static int compress_threads_load_setup(void)
-> > >           }
-> > >           decomp_param[i].stream.opaque = &decomp_param[i];
-> > > +        decomp_param[i].file = f;
-> > 
-> > On the source side the error will be set via:
-> > 
-> >          qemu_file_set_error(migrate_get_current()->to_dst_file, blen);
-> > 
-> > Maybe we can do similar things using migrate_incoming_get_current() to
-> > avoid caching the QEMUFile multiple times?
-> > 
-> 
-> I have considered it, however, it can not work as the @file used by ram
-> loader is not the file got from migrate_incoming_get_current() under some
-> cases.
-> 
-> For example, in colo_process_incoming_thread(), the file passed to
-> qemu_loadvm_state() is a internal buffer and it is not easy to switch it
-> to incoming file.
 
-I see. How about cache it in a global variable?  We have these
-already:
+--I4g3zIzscEHdx6fd
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    thread_count = migrate_decompress_threads();
-    decompress_threads = g_new0(QemuThread, thread_count);
-    decomp_param = g_new0(DecompressParam, thread_count);
-    ...
+On Wed, Mar 28, 2018 at 12:19:37PM +0200, C=E9dric Le Goater wrote:
+> On 03/28/2018 10:47 AM, David Gibson wrote:
+> > On Wed, Mar 28, 2018 at 09:49:25AM +0200, C=E9dric Le Goater wrote:
+> >> On 03/28/2018 09:43 AM, C=E9dric Le Goater wrote:
+> >>> On 03/27/2018 06:37 AM, David Gibson wrote:
+> >>>> The only place we test this flag is in conjunction with
+> >>>> ppc64_use_proc_tbl().  That checks for the LPCR_UPRT bit, which we a=
+lready
+> >>>> ensure can't be set except on a machine with a v3 MMU (i.e. POWER9).
+> >>>
+> >>> hmm, ok, but what will I use for the PowerNV hash MMU support then ?=
+=20
+> >>
+> >> That will be POWERPC_MMU_3_00.
+> >=20
+> > You could check for that explicitly, or you could just check for
+> > presence of non-NULL hash64_opts.  The idea is that will always be the
+> > case for cpus capable of using the hash MMU.
+>=20
+> ok. I will rebase when your patchset is merged.
+> =20
+> > I'm also considering adding a similar radix_opts with radix specific
+> > details. =20
+>=20
+> yes. It looks a bit unbalanced now.
 
-IMHO we can add a new one too, at least we don't cache it multiple
-times (after all decomp_param[i]s are global variables too).
+Right.  In theory it would be nice to split out hash32 / BookE /
+whatever options into their own substructures as well, but I doubt
+anyone will ever care enough to actually do it.
 
--- 
-Peter Xu
+> > POWER9 would have both, since it can support either mode.
+> >=20
+> >> I didn't realize mmu_model was so=20
+> >> crowded ..
+> >=20
+> > It's not so that it's short of space.  It's more that the mix of enum
+> > like pieces and bitflag like pieces like bits makes it confusing to
+> > know whether it should be tested with simple equality or with &.  And
+> > if testing with equality which bits should be masked for a sensible
+> > comparison.
+> >=20
+> > Additionally, I'd like to get options that are strictly related to the
+> > hash mmu out of the general structures.
+>=20
+> which are ? vrma_slb, rmls ?
+
+Ah.. so.. for now I'm just thinking about MMU options / capabilities
+rather than MMU state.  That is, things which are set at
+initialization but then don't change.  rmls and vrma_slb don't fit in
+that category.  slb_nr does, though - I had a shot at moving it to
+hash64_opts, but hit some complications, so I might come back to it
+later.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--I4g3zIzscEHdx6fd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlq8c04ACgkQbDjKyiDZ
+s5JGPQ//dQoxuglNfXIfRR7AjwPk0lQmxHLOKkU4cqg6SnvOQZfOoNLpv75fRogB
+tuOnWyrTXwpIhTL4lVGotvN/FggbgWF7AdWe30dih35BSPe2udORJi0Psr7GvrOJ
+Mz/NP2Pl6pKvskPGFusyv+1ysdqzIO/6QEpCh6PydV97YtDp1R9xBozkLnLODpX4
+HC9TjfAwbsZB2MpYDdxgtbAt58YXN8v4uWNpXm3XRf2mMhddojySV8RYpKO9WcRC
+ySPB854jXt64MpOpumWek7Z0LMiA4uFX0Sp9nZB2hSI6Mt+p+QdfQOKFhSODAowS
+8PgHmJuTZgUe4wBKpE4XRgjbL1P0yKKgtLRc8Ia5xWDAOCnBFWi+ecljOrWXxktj
+qYelVMieXG3x0s4Ykk3tzbsQJrgo6ZI7eIRbX12Qd+k0Z3692AiYjVYQP4a/p1PJ
+eykEclfdKwyMoueOB2GCXZnFBbDRCqxumx20ExN7E4qIph9AmKGsRhSbfTO2Fiwv
+fLN3Tg/EjRR8nql/dtMqDcstKgL9MOd8DwyF5S4QyJ2Q+XCC2U5GkBvbwLrhNc8b
+AmoDv5LwRSLBra2pK0Q64uy9GtyIeEZxcc4unODgZ7HKcLozumjd9IXd9PDrka+r
+vEFBqsmLXu7l6Kc+VkK31iTdXO+FrTT0wQ/fOZj9adnyWYDRjtI=
+=NWeg
+-----END PGP SIGNATURE-----
+
+--I4g3zIzscEHdx6fd--
