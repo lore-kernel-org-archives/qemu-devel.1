@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f1U1m-0001vZ-EB
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:39:27 -0400
+	(envelope-from <groug@kaod.org>) id 1f1U2L-0002U4-6U
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:40:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f1U1h-0000ph-I9
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:39:26 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <de89f57b-bbcc-20c9-b1e4-e9a96e87a31b@redhat.com>
-References: <20180322124155.16257-1-berto@igalia.com>
-	<de89f57b-bbcc-20c9-b1e4-e9a96e87a31b@redhat.com>
-Date: Thu, 29 Mar 2018 11:39:18 +0200
-Message-ID: <w51y3ib43w9.fsf@maestria.local.igalia.com>
+	(envelope-from <groug@kaod.org>) id 1f1U2G-00017q-6l
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:40:01 -0400
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:36210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1U2G-00017K-0x
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:39:56 -0400
+Received: from player728.ha.ovh.net (unknown [10.109.122.16])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 66688B171F
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:39:54 +0200 (CEST)
+Date: Thu, 29 Mar 2018 11:39:41 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180329113941.6eebc57f@bahia.lan>
+In-Reply-To: <20180329112721.6c7ee3f3@redhat.com>
+References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
+	<152231460685.69730.14860451936216690693.stgit@bahia.lan>
+	<20180329112721.6c7ee3f3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v4] iotests: Test abnormally large
- size in compressed cluster descriptor
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/s390x: fix memory leak in
+ s390_init_ipl_dev()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed 28 Mar 2018 07:34:15 PM CEST, Max Reitz wrote:
->> diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
->> index 45b359c2ba..5b9593016c 100755
->> --- a/tests/qemu-iotests/122
->> +++ b/tests/qemu-iotests/122
->
-> Not sure if 122 is the right file for this...
->
-> Or, let me rephrase, it does look to me like it is not the right file.
-> But on the other hand, I don't see a more suitable file.
+On Thu, 29 Mar 2018 11:27:21 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Yeah I was tempted to create a new one, but in the end I decided to put
-it there. We can still create a new one if you feel strongly about it.
+> On Thu, 29 Mar 2018 11:10:06 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > The string returned by object_property_get_str() is dynamically allocated.
+> > 
+> > Fixes: 3c4e9baacf4d9
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/s390x/s390-virtio-ccw.c |    5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> > index 864145a7c6f3..435f7c99e77c 100644
+> > --- a/hw/s390x/s390-virtio-ccw.c
+> > +++ b/hw/s390x/s390-virtio-ccw.c
+> > @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+> >  {
+> >      Object *new = object_new(TYPE_S390_IPL);
+> >      DeviceState *dev = DEVICE(new);
+> > +    char *netboot_fw_prop;
+> >  
+> >      if (kernel_filename) {
+> >          qdev_prop_set_string(dev, "kernel", kernel_filename);
+> > @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+> >      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+> >      qdev_prop_set_string(dev, "firmware", firmware);
+> >      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> > -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
+> > +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
+> > +    if (!strlen(netboot_fw_prop)) {  
+> probably not really issue here but,
+> is strlen really safe in case netboot_fw_prop == NULL?
+> 
 
->>  echo
->> +echo "=== Corrupted size field in compressed cluster descriptor ==="
->> +echo
->> +# Create an empty image, fill half of it with data and compress it.
->> +# The L2 entries of the two compressed clusters are located at
->> +# 0x800000 and 0x800008, their original values are 0x4008000000a00000
->> +# and 0x4008000000a00802 (5 sectors for compressed data each).
->> +TEST_IMG="$TEST_IMG".1 _make_test_img 8M
->> +$QEMU_IO -c "write -P 0x11 0 4M" "$TEST_IMG".1 2>&1 | _filter_qemu_io | _filter_testdir
->> +$QEMU_IMG convert -c -O qcow2 -o cluster_size=2M "$TEST_IMG".1 "$TEST_IMG"
->
-> Why not just use "write -c" and drop the convert?  (You'd have to use
-> two writes, though, one for each cluster.)
+You're right, object_property_get_str() can theoretically return NULL and
+strlen() would crash... Not sure how this would happen though. Anyway, the
+current code doesn't check if object_property_get_str() returns NULL so
+if this needs to be fixed as well, let's do it in a followup patch.
 
-Yeah, it's also possible, you have to do it in the same qemu-io command
-though, else it will allocate two host clusters. But yes, I can change
-that.
-
->> +# Reduce size of compressed data to 4 sectors: this corrupts the image.
->> +poke_file "$TEST_IMG" $((0x800000)) "\x40\x06"
->> +$QEMU_IO -c "read  -P 0x11 0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
->> +
->> +# 'qemu-img check' however doesn't see anything wrong because it
->> +# doesn't try to decompress the data and the refcounts are consistent.
->> +# TODO: update qemu-img so this can be detected
->> +_check_test_img
->> +
->> +# Increase size of compressed data to the maximum (8192 sectors).
->> +# This makes QEMU read more data (8192 sectors instead of 5, host
->> +# addresses [0xa00000, 0xdfffff]), but the decompression algorithm
->> +# stops once we have enough to restore the uncompressed cluster, so
->> +# the rest of the data is ignored.
->> +poke_file "$TEST_IMG" $((0x800000)) "\x7f\xfe"
->> +# Do it also for the second compressed cluster (L2 entry at 0x800008).
->> +# In this case the compressed data would span 3 host clusters
->> +# (host addresses: [0xa00802, 0xe00801])
->> +poke_file "$TEST_IMG" $((0x800008)) "\x7f\xfe"
->> +
->> +# Here the image is too small so we're asking QEMU to read beyond the
->> +# end of the image.
->> +$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
->> +# But if we grow the image we won't be reading beyond its end anymore.
->> +$QEMU_IO -c "write -P 0x22 4M 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
->> +$QEMU_IO -c "read  -P 0x11  0 4M" "$TEST_IMG" 2>&1 | _filter_qemu_io | _filter_testdir
->
-> Both reads result in exactly the same output, though, so it doesn't
-> seem like qemu cares.
->
-> (This is the reason I'm not merging this patch now, because that looks
-> a bit fishy.)
-
-In this example the size stored on the compressed cluster descriptor is
-corrupted and larger than the size of the compressed data on disk.
-
-In the first read the image is too small so this makes QEMU read not
-only past the end of the compressed data, but also past the end of the
-qcow2 image itself.
-
-In the second read the qcow2 image is larger so QEMU reads actual data
-from the subsequent clusters.
-
-It doesn't make much difference. In the first case the buffer is padded
-with zeroes and in the second with data from other clusters, but QEMU
-only uses the data needed to restore the original uncompressed cluster
-and the rest is ignored. But I thought I could still test both cases,
-that's why there's two reads.
-
->> +# The refcount data is however wrong because due to the increased size
->> +# of the compressed data it now reaches the following host clusters.
->> +# This can be repaired by qemu-img check.
->
-> The OFLAG_COPIED repair looks a bit interesting, but, er, well.
->
-> Max
->
-> (Since a compressed cluster does not correspond 1:1 to a host cluster,
-> you cannot say that a compressed cluster has a refcount -- only host
-> clusters are refcounted.  So what is it supposed to mean that a
-> compressed cluster has a refcount of 1?
-
-Compressed clusters never have OFLAG_COPIED and we treat it as an error
-if they do (see check_refcounts_l2()), but their host clusters still
-have a reference count.
-
-A host cluster with 4 compressed clusters has a reference count of 4.
-
-A compressed cluster that uses two host clusters (even if it's only
-partially) increases the reference count of both of them.
-
-In this test case the size field of the compressed cluster is too large,
-so it includes uncompressed clusters that are contiguous to it. The
-uncompressed clusters have refcount == 1 and OFLAG_COPIED, but QEMU
-detects that the refcount should be larger and that OFLAG_COPIED should
-not be there, that's why it's repaired.
-
-Admittedly the way it's repaired is not the best one: the uncompressed
-clusters have now extra references, but other than that I don't see any
-harmful effect.
-
-The proper fix for this would be to detect that the compressed cluster
-size is incorrect and correct its value. There's a TODO for that (in the
-first _check_test_img call where it's more severe), but now that I think
-of it I should probably mention that in the second one as well.
-
-Berto
+> >          qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+> >      }
+> > +    g_free(netboot_fw_prop);
+> >      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+> >                                new, NULL);
+> >      object_unref(new);
+> > 
+> >   
+> 
