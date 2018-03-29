@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f1YLO-0004AE-8z
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:16:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f1YSL-0006od-AM
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f1YLN-0007Sx-3g
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:15:58 -0400
-Received: from mail-yw0-x22b.google.com ([2607:f8b0:4002:c05::22b]:39545)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f1YLM-0007Sd-Vl
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:15:57 -0400
-Received: by mail-yw0-x22b.google.com with SMTP id q66so1985929ywg.6
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 07:15:56 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f1YSI-00026t-3i
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:23:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40360 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1f1YSH-00025G-VG
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:23:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 463A98182D01
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 14:23:01 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 29 Mar 2018 16:22:21 +0200
+Message-Id: <20180329142225.18297-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 29 Mar 2018 07:15:55 -0700
-Message-ID: <CAMo8BfKW3g6K4MU+eEz71Cq-FaSWox4ffHjj-1_zj9jM9CB7jw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] linux-user: missing synchronization in CPU object
- realization
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/4] RFC: simplify qobject refcount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hello,
+Hi,
 
-I'm running xtensa linux-user application that rapidly creates
-a lot of threads and I observe the following assertion failure:
+This series aims to get rid of the distinction between QObject, that
+must use qobject_incref/qobject_decref and its various derived types
+that have to use QINCREF/QDECREF. Instead, replace it with
+qobject_ref/qobject_unref for all types.
 
-(process:26953): GLib-CRITICAL **: g_hash_table_iter_next: assertion
-'ri->version == ri->hash_table->version' failed
-**
-ERROR:qemu/qom/object.c:1663:object_get_canonical_path_component: code
-should not be reached
+v3: after v2 review with Eric and Paolo
+- fix clang ubsan warning when a null pointer is given to QOBJECT.
+- add a patch to make qobject_ref() assert on null pointer, and return
+  the same pointer, simplifying some code.
 
-The backtrace:
+v2:
+- use the QObjectCommon base approach suggested by Paolo and Eric
+- remove need for QEMU_GENERIC
 
-#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
-#1  0x00007ffff667c42a in __GI_abort () at abort.c:89
-#2  0x00007ffff79345a5 in g_assertion_message
-(domain=domain@entry=0x0, file=file@entry=0x5555557f8ef8
-"/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c",
-line=line@entry=1662,
-    func=func@entry=0x5555557f96c0 <__func__.17879>
-"object_get_canonical_path_component",
-message=message@entry=0x7fffa80808a0 "code should not be reached") at
-././glib/gtestutils.c:2432
-#3  0x00007ffff793463a in g_assertion_message_expr (domain=0x0,
-file=0x5555557f8ef8
-"/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c", line=1662,
-    func=0x5555557f96c0 <__func__.17879>
-"object_get_canonical_path_component", expr=<optimized out>) at
-././glib/gtestutils.c:2455
-#4  0x00005555556c6cec in object_get_canonical_path_component
-(obj=0x7fffa80777d0) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c:1662
-#5  0x00005555556c6d1e in object_get_canonical_path
-(obj=0x7fffa80777d0) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c:1672
-#6  0x00005555556bc693 in device_set_realized (obj=0x7fffa80777d0,
-value=true, errp=0x7ffff7f020f8) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/hw/core/qdev.c:874
-#7  0x00005555556c75c4 in property_set_bool (obj=0x7fffa80777d0,
-v=0x7fffa8080750, name=0x5555557f889c "realized",
-opaque=0x7fffa8077660, errp=0x7ffff7f020f8) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c:1923
-#8  0x00005555556c58ea in object_property_set (obj=0x7fffa80777d0,
-v=0x7fffa8080750, name=0x5555557f889c "realized", errp=0x7ffff7f020f8)
-at /home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c:1122
-#9  0x00005555556c8901 in object_property_set_qobject
-(obj=0x7fffa80777d0, value=0x7fffa80806a0, name=0x5555557f889c
-"realized", errp=0x7ffff7f020f8) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/qom-qobject.c:27
-#10 0x00005555556c5b62 in object_property_set_bool
-(obj=0x7fffa80777d0, value=true, name=0x5555557f889c "realized",
-errp=0x7ffff7f020f8) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/object.c:1188
-#11 0x00005555556c166f in cpu_create (typename=0x555557cb0d20
-"dc233c-xtensa-cpu") at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/qom/cpu.c:64
-#12 0x000055555564ec0e in cpu_copy (env=0x55555924d420) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/linux-user/main.c:4121
-#13 0x000055555565d4e1 in do_fork (env=0x55555924d420, flags=4001536,
-newsp=829419520, parent_tidptr=829420792, newtls=829421856,
-child_tidptr=829420792) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/linux-user/syscall.c:6350
-#14 0x00005555556664c7 in do_syscall (cpu_env=0x55555924d420, num=116,
-arg1=4001536, arg2=829419520, arg3=829420792, arg4=829421856,
-arg5=829420792, arg6=829420688, arg7=0, arg8=0)
-    at /home/jcmvbkbc/ws/tensilica/qemu/qemu/linux-user/syscall.c:10003
-#15 0x000055555564e85b in cpu_loop (env=0x55555924d420) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/linux-user/main.c:3999
-#16 0x000055555565d3d9 in clone_func (arg=0x7fffffffbcd0) at
-/home/jcmvbkbc/ws/tensilica/qemu/qemu/linux-user/syscall.c:6313
-#17 0x00007ffff69ee494 in start_thread (arg=0x7ffff7f04700) at
-pthread_create.c:333
-#18 0x00007ffff6730acf in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:97
+Marc-Andr=C3=A9 Lureau (4):
+  qobject: ensure base is at offset 0
+  qobject: introduce QObjectCommon
+  qobject: replace qobject_incref/QINCREF qobject_decref/QDECREF
+  qobject: modify qobject_ref() to assert on NULL and return obj
 
-This happens because multiple threads concurrently call
-object_property_set_bool to realize cpu object in cpu_create,
-which results in the following call chain:
-  device_set_realized -> object_property_add_child ->
-  object_property_add -> g_hash_table_insert
-inserting newly created CPUs as children to /unattached without
-any locking.
+ scripts/qapi/events.py              |   2 +-
+ include/qapi/qmp/qbool.h            |   2 +-
+ include/qapi/qmp/qdict.h            |   2 +-
+ include/qapi/qmp/qlist.h            |   2 +-
+ include/qapi/qmp/qnull.h            |   4 +-
+ include/qapi/qmp/qnum.h             |   2 +-
+ include/qapi/qmp/qobject.h          |  75 +++++++++++---------
+ include/qapi/qmp/qstring.h          |   2 +-
+ block.c                             |  82 ++++++++++-----------
+ block/blkdebug.c                    |   7 +-
+ block/blkverify.c                   |   8 +--
+ block/crypto.c                      |   4 +-
+ block/gluster.c                     |   4 +-
+ block/iscsi.c                       |   2 +-
+ block/nbd.c                         |   4 +-
+ block/nfs.c                         |   4 +-
+ block/null.c                        |   3 +-
+ block/nvme.c                        |   3 +-
+ block/parallels.c                   |   4 +-
+ block/qapi.c                        |   2 +-
+ block/qcow.c                        |   8 +--
+ block/qcow2.c                       |   8 +--
+ block/qed.c                         |   4 +-
+ block/quorum.c                      |   4 +-
+ block/rbd.c                         |  14 ++--
+ block/sheepdog.c                    |  12 ++--
+ block/snapshot.c                    |   4 +-
+ block/ssh.c                         |   4 +-
+ block/vdi.c                         |   2 +-
+ block/vhdx.c                        |   4 +-
+ block/vpc.c                         |   4 +-
+ block/vvfat.c                       |   2 +-
+ block/vxhs.c                        |   2 +-
+ blockdev.c                          |  16 ++---
+ hw/i386/acpi-build.c                |  12 ++--
+ hw/ppc/spapr_drc.c                  |   2 +-
+ hw/usb/xen-usb.c                    |   4 +-
+ migration/migration.c               |   4 +-
+ migration/qjson.c                   |   2 +-
+ monitor.c                           |  57 +++++++--------
+ qapi/qapi-dealloc-visitor.c         |   4 +-
+ qapi/qmp-dispatch.c                 |   6 +-
+ qapi/qobject-input-visitor.c        |  10 ++-
+ qapi/qobject-output-visitor.c       |  11 ++-
+ qemu-img.c                          |  18 ++---
+ qemu-io.c                           |   6 +-
+ qga/main.c                          |  12 ++--
+ qmp.c                               |   4 +-
+ qobject/json-parser.c               |  10 +--
+ qobject/qdict.c                     |  49 +++++--------
+ qobject/qjson.c                     |   2 +-
+ qobject/qlist.c                     |   4 +-
+ qobject/qobject.c                   |  21 ++++--
+ qom/object.c                        |  16 ++---
+ qom/object_interfaces.c             |   2 +-
+ target/ppc/translate_init.c         |   2 +-
+ target/s390x/cpu_models.c           |   2 +-
+ tests/ahci-test.c                   |   6 +-
+ tests/check-qdict.c                 | 106 ++++++++++++++--------------
+ tests/check-qjson.c                 |  84 +++++++++++-----------
+ tests/check-qlist.c                 |   8 +--
+ tests/check-qlit.c                  |  10 +--
+ tests/check-qnull.c                 |  10 +--
+ tests/check-qnum.c                  |  28 ++++----
+ tests/check-qobject.c               |   2 +-
+ tests/check-qstring.c               |  10 +--
+ tests/cpu-plug-test.c               |   4 +-
+ tests/device-introspect-test.c      |  24 +++----
+ tests/drive_del-test.c              |   4 +-
+ tests/libqos/libqos.c               |   8 +--
+ tests/libqos/pci-pc.c               |   2 +-
+ tests/libqtest.c                    |  24 +++----
+ tests/machine-none-test.c           |   2 +-
+ tests/migration-test.c              |  24 +++----
+ tests/numa-test.c                   |  16 ++---
+ tests/pvpanic-test.c                |   2 +-
+ tests/q35-test.c                    |   2 +-
+ tests/qmp-test.c                    |  38 +++++-----
+ tests/qom-test.c                    |   8 +--
+ tests/tco-test.c                    |  12 ++--
+ tests/test-char.c                   |   2 +-
+ tests/test-keyval.c                 |  82 ++++++++++-----------
+ tests/test-netfilter.c              |  26 +++----
+ tests/test-qemu-opts.c              |  14 ++--
+ tests/test-qga.c                    |  76 ++++++++++----------
+ tests/test-qmp-cmds.c               |  24 +++----
+ tests/test-qmp-event.c              |   2 +-
+ tests/test-qobject-input-visitor.c  |  10 +--
+ tests/test-qobject-output-visitor.c |  18 ++---
+ tests/test-visitor-serialization.c  |   6 +-
+ tests/test-x86-cpuid-compat.c       |  14 ++--
+ tests/tmp105-test.c                 |   4 +-
+ tests/vhost-user-test.c             |   6 +-
+ tests/virtio-net-test.c             |   6 +-
+ tests/vmgenid-test.c                |   2 +-
+ tests/wdt_ib700-test.c              |  14 ++--
+ util/keyval.c                       |  12 ++--
+ util/qemu-config.c                  |   4 +-
+ docs/devel/qapi-code-gen.txt        |   2 +-
+ roms/seabios                        |   2 +-
+ scripts/coccinelle/qobject.cocci    |   8 +--
+ 101 files changed, 665 insertions(+), 669 deletions(-)
 
-I've put locking around the
- object_property_set_bool(OBJECT(cpu), true, "realized", &err);
-call in the cpu_create and that fixed this issue. Any suggestion
-regarding how to fix this properly?
-
--- 
-Thanks.
--- Max
+--=20
+2.17.0.rc1.36.gcedb63ea2f
