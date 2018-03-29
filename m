@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1TVP-0008Ad-KE
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:06:00 -0400
+	(envelope-from <groug@kaod.org>) id 1f1TZC-0001aP-2w
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:09:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1TVL-0004D1-Kd
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:05:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f1TVL-0004Cg-Dz
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:05:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f1TVJ-0001wJ-Tu
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 09:05:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D8BBC2E8025
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 09:05:53 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1f1TZ8-0005o5-2w
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:09:54 -0400
+Received: from 13.mo7.mail-out.ovh.net ([87.98.150.175]:56033)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1TZ7-0005iK-S5
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 05:09:50 -0400
+Received: from player729.ha.ovh.net (unknown [10.109.120.13])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 9007699B5C
+	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 11:09:41 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 29 Mar 2018 11:09:25 +0200
+Message-ID: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 29 Mar 2018 08:55:26 -0000
-From: Zhen Ning Lim <limzn88@gmail.com>
-Reply-To: Bug 1588591 <1588591@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160603031333.20018.31663.malonedeb@wampee.canonical.com>
-Message-Id: <152231372633.12283.13924147775777231573.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1588591] Re: Qemu 2.6 Solaris 8 Sparc telnet
- terminate itself
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 0/3] fix memory leaks when using
+ object_property_get_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,33 +29,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-Nope. Not anymore. I shall close this. Thanks!
+According to include/qom/object.h:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+/**
+ * object_property_get_str:
+ * @obj: the object
+ * @name: the name of the property
+ * @errp: returns an error if this function fails
+ *
+ * Returns: the value of the property, converted to a C string, or NULL if
+ * an error occurs (including when the property value is not a string).
+ * The caller should free the string.
+ */
 
--- =
+So I've checked all the call sites and found three places where the
+string is obviously [*] leaked. Patch 2 and 3 fix very recent 2.12
+commits, while patch 1 fixes a 2.4 commit (backported to 2.3.1).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1588591
+Another potential candidate sits in query_memdev(), called during
+the "info memdev" HMP and the "query-memdev" QMP commands, but
+both take care of freeing the string eventually. Nothing to fix
+there.
 
-Title:
-  Qemu 2.6 Solaris 8 Sparc telnet terminate itself
+[*] allocated string is put in a local variable and not freed before
+    returning
 
-Status in QEMU:
-  Fix Released
+--
+Greg
 
-Bug description:
-  With Qemu 2.6, Solaris 8 can be installed and run. However, it
-  sometimes terminate itself with I/O thread spun for 1000 iterations.
+---
 
-  qemu-system-sparc -nographic -monitor null -serial mon:telnet:0.0.0.0:300=
-0,server -hda ./Sparc8.disk -m 256 -boot c -net nic,macaddr=3D52:54:0:12:34=
-:56 -net tap,ifname=3Dtap0,script=3Dno,downscript=3DnoQEMU waiting for conn=
-ection on: disconnected:telnet:0.0.0.0:3000,server
-  main-loop: WARNING: I/O thread spun for 1000 iterations
+Greg Kurz (3):
+      exec: fix memory leak in find_max_supported_pagesize()
+      hw/s390x: fix memory leak in s390_init_ipl_dev()
+      sev/i386: fix memory leak in sev_guest_init()
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1588591/+subscriptions
+
+ exec.c                     |    1 +
+ hw/s390x/s390-virtio-ccw.c |    5 ++++-
+ target/i386/sev.c          |    4 +++-
+ 3 files changed, 8 insertions(+), 2 deletions(-)
