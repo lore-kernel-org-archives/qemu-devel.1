@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1aLa-00056b-1k
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 12:24:19 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f1aSR-0000Et-8b
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 12:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1aLV-0004sB-2o
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 12:24:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52008)
+	(envelope-from <ehabkost@redhat.com>) id 1f1aSL-00032N-60
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 12:31:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54716)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1aLU-0004qj-I9
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 12:24:12 -0400
-Date: Thu, 29 Mar 2018 13:24:09 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1aSK-00031d-UB
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 12:31:17 -0400
+Date: Thu, 29 Mar 2018 13:31:13 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180329162409.GX5046@localhost.localdomain>
+Message-ID: <20180329163113.GY5046@localhost.localdomain>
 References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<1520860275-101576-4-git-send-email-imammedo@redhat.com>
-	<20180323212508.GF28161@localhost.localdomain>
-	<20180327170541.295fc29a@redhat.com>
-	<20180328134835.04f95535@redhat.com>
-	<20180328192148.GR5046@localhost.localdomain>
-	<20180329134303.548a864b@redhat.com>
+	<1520860275-101576-3-git-send-email-imammedo@redhat.com>
+	<20180323204218.GC28161@localhost.localdomain>
+	<20180327150827.532e8486@redhat.com>
+	<20180328185428.GO5046@localhost.localdomain>
+	<20180329150509.7e39a81c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180329134303.548a864b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
+In-Reply-To: <20180329150509.7e39a81c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/9] numa: split out NumaOptions parsing
+ into parse_NumaOptions()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,145 +35,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Thu, Mar 29, 2018 at 01:43:03PM +0200, Igor Mammedov wrote:
-> On Wed, 28 Mar 2018 16:21:48 -0300
+On Thu, Mar 29, 2018 at 03:05:09PM +0200, Igor Mammedov wrote:
+> On Wed, 28 Mar 2018 15:54:28 -0300
 > Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> > On Wed, Mar 28, 2018 at 01:48:35PM +0200, Igor Mammedov wrote:
-> > > On Tue, 27 Mar 2018 17:05:41 +0200
-> > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > On Tue, Mar 27, 2018 at 03:08:27PM +0200, Igor Mammedov wrote:
+> > > On Fri, 23 Mar 2018 17:42:18 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
 > > >   
-> > > > On Fri, 23 Mar 2018 18:25:08 -0300
-> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > >   
-> > > > > On Mon, Mar 12, 2018 at 02:11:09PM +0100, Igor Mammedov wrote:    
-> > > > [...]  
-> > > [...]  
-> > > > > > @@ -1886,6 +1895,13 @@ static bool main_loop_should_exit(void)
-> > > > > >      RunState r;
-> > > > > >      ShutdownCause request;
-> > > > > >  
-> > > > > > +    if (preconfig_exit_requested) {
-> > > > > > +        if (runstate_check(RUN_STATE_PRECONFIG)) {      
+> > > > On Mon, Mar 12, 2018 at 02:11:08PM +0100, Igor Mammedov wrote:  
+> > > > > it will allow to reuse parse_NumaOptions() for parsing
+> > > > > configuration commands received via QMP interface
 > > > > > 
-> > > > > Is it possible to have preconfig_exit_request set outside of
-> > > > > RUN_STATE_PRECONFIG?  When and why?    
-> > > > preconfig_exit_requested is initialized with TRUE and
-> > > > in combo with '-inmigrate' we need this runstate check.
-> > > > it's the same as it was with
-> > > >  { RUN_STATE_PRELAUNCH, RUN_STATE_INMIGRATE },
-> > > > which I probably should remove (I need to check it though)  
-> > > [...]
-> > >   
-> > > > > > @@ -4594,6 +4623,10 @@ int main(int argc, char **argv, char **envp)
-> > > > > >      }
-> > > > > >      parse_numa_opts(current_machine);
-> > > > > >  
-> > > > > > +    /* do monitor/qmp handling at preconfig state if requested */
-> > > > > > +    main_loop();      
+> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > ---
+> > > > >  include/sysemu/numa.h |  1 +
+> > > > >  numa.c                | 48 +++++++++++++++++++++++++++++-------------------
+> > > > >  2 files changed, 30 insertions(+), 19 deletions(-)
 > > > > > 
-> > > > > Wouldn't it be simpler to do "if (!preconfig) { main_loop(); }"
-> > > > > instead of entering main_loop() just to exit immediately?    
-> > > > The thought didn't cross my mind, it might work and more readable
-> > > > as one doesn't have to jump into main_loop() to find out that
-> > > > it would exit immediately.
-> > > > I'll try to it on respin.  
-> > > Well doing as suggested end ups more messy:
-> > > 
-> > >     @@static bool main_loop_should_exit(void)
-> > >     ...
-> > >     if (preconfig_exit_requested) {
-> > >         runstate_set(RUN_STATE_PRELAUNCH);                                        
-> > >         return true;
-> > >     }
-> > >    
-> > >     @@main
-> > >     /* do monitor/qmp handling at preconfig state if requested */
-> > >     if (!preconfig_exit_requested) {
-> > >         main_loop();
-> > >     } else if (runstate_check(RUN_STATE_PRECONFIG)) {
-> > >         runstate_set(RUN_STATE_PRELAUNCH);
-> > >     }  
+> > > > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > > > > index 21713b7..7a0ae75 100644
+> > > > > --- a/include/sysemu/numa.h
+> > > > > +++ b/include/sysemu/numa.h
+> > > > > @@ -22,6 +22,7 @@ struct NumaNodeMem {
+> > > > >  };
+> > > > >  
+> > > > >  extern NodeInfo numa_info[MAX_NODES];
+> > > > > +int parse_numa(void *opaque, QemuOpts *opts, Error **errp);
+> > > > >  void parse_numa_opts(MachineState *ms);
+> > > > >  void numa_complete_configuration(MachineState *ms);
+> > > > >  void query_numa_node_mem(NumaNodeMem node_mem[]);
+> > > > > diff --git a/numa.c b/numa.c
+> > > > > index 126c649..2b1d292 100644
+> > > > > --- a/numa.c
+> > > > > +++ b/numa.c
+> > > > > @@ -169,28 +169,11 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
+> > > > >      have_numa_distance = true;
+> > > > >  }
+> > > > >  
+> > > > > -static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+> > > > > +static
+> > > > > +void parse_NumaOptions(MachineState *ms, NumaOptions *object, Error **errp)    
+> > > > 
+> > > > I wonder if we should rename the parse_numa_{node,distance}()
+> > > > functions to configure_numa_{node,distance}(), and this one
+> > > > configure_numa().  These functions don't parse anything, anymore.  
+> > > I'd preffer to do it in another patch on top of this series
+> > > (added it my TODO list)  
 > > 
-> > This doesn't make sense to me.  Why would we enter
-> > RUN_STATE_PRECONFIG state if -preconfig is not used at all?
-> because of RUN_STATE_PRECONFIG becomes new initial state of
-> our state machine where we start of (used to be RUN_STATE_PRELAUNCH)
-
-Oh, I missed that part.
-
-> Lets call it variant 1:
+> > I agree with renaming parse_numa*() later, but the new function
+> > you are creating can have a more reasonable name as it doesn't
+> > parse anything.
 > 
-> with this we have 2 possible transitions:
->  RUN_STATE_PRECONFIG -> RUN_STATE_PRELAUNCH (machine_init)
 > 
-> and
-> 
->  RUN_STATE_PRECONFIG -> RUN_STATE_INMIGRATE
->    ugly but it was the same with RUN_STATE_PRELAUNCH initial transition
+> how about: s/parse_NumaOptions/set_NumaOptions/
 
-That explains a lot, thanks.
-
-> 
-> Another variant 2, in case we switch to RUN_STATE_PRECONFIG only on -preconfig
-> transitions would be
->   RUN_STATE_PRELAUNCH -> RUN_STATE_PRECONFIG
->     (allow switch from initial to -preconfig)
-> 
->   RUN_STATE_PRECONFIG -> RUN_STATE_PRELAUNCH
-> 
-> while the last is valid transition, the 1st one isn't really
-> valid because of (beside of switching from initial state) it
-> allows bouncing back to RUN_STATE_PRECONFIG later.
-> 
-> If we consider only state machine transitions, I think it's
-> cleaner to start with variant 1 with the same
-> -inmigrate hack we already have (which potentially could
-> be fixed later), than allowing arbitrary bouncing to
-> RUN_STATE_PRECONFIG at later stage.
-> 
-> With this approach all processing before machine_init()
-> would run at RUN_STATE_PRECONFIG and then we would switch
-> to RUN_STATE_PRELAUNCH. Even though it is far reaching
-> goal but at least that's where we should be moving to
-> have sane initialization flow in vl.c
-
-Thanks, now variant 1 makes more sense to me.  But I really miss
-here are very clear and explicit descriptions of what each state
-really mean, and what are the differences between them.
-
-It looks like the existing description for `prelaunch` isn't
-accurate:
-
-# @prelaunch: QEMU was started with -S and guest has not started
-
-This is false, as QEMU can be in `prelaunch` state even if -S is
-not used.
-
-
-Also, this is the description you proposed for `preconfig`:
-
-# @preconfig: QEMU is paused before board specific init callback is executed.
-#             The state is reachable only if -preconfig CLI option is used.
-#             (Since 2.12)
-
-This seems wrong as well: the `prelaunch` state is reachable even
-if `-preconfig` isn't used in the command-line (because it is the
-initial state).
-
-
-> 
-> > >     preconfig_exit_requested = false;
-> > >     ...
-> > > 
-> > > I'd prefer original v4 approach, where only main_loop_should_exit()
-> > > has to deal with state transitions and book-keeping.  
-> > 
-> > If the above is unavoidable, I agree.  But I still don't
-> > understand we have to enter PRECONFIG state if the user didn't
-> > specify -preconfig.
-> > 
-> 
+No strong preference.  "register", "configure", "set" would all
+be good enough to me.  I would avoid the weird
+underline_and_CamelCase naming style, though (this style seems to
+be used only by generated QAPI code).
 
 -- 
 Eduardo
