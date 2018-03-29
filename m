@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f1VR5-0001V4-Va
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:41 -0400
+	(envelope-from <famz@redhat.com>) id 1f1VRE-0001eb-VR
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f1VR4-00037l-V0
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:39 -0400
+	(envelope-from <famz@redhat.com>) id 1f1VR9-00039T-V2
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:09:48 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 29 Mar 2018 19:09:07 +0800
-Message-Id: <20180329110914.20888-2-famz@redhat.com>
+Date: Thu, 29 Mar 2018 19:09:09 +0800
+Message-Id: <20180329110914.20888-4-famz@redhat.com>
 In-Reply-To: <20180329110914.20888-1-famz@redhat.com>
 References: <20180329110914.20888-1-famz@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 1/8] block: Introduce bdrv_co_map_range API
+Subject: [Qemu-devel] [RFC PATCH 3/8] block: Introduce bdrv_co_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,128 +22,208 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-A little similar to bdrv_co_block_status but with the capability to do
-allocation depending on the BDRV_REQ_ALLOCATE flag, this API is the
-building block needed by copy offloading to work for format drivers.
-
-The idea is the format drivers return "where" to copy from/to in its
-underlying "file", then the block layer will drill down until it reaches
-a protocol layer that can do offloaded copying.
+This tries to do offloaded data copying in the same procotol (but
+possibly a different BDS), or fall back to a bounce buffer if not
+supported.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c                | 44 ++++++++++++++++++++++++++++++++++++++++++++
- include/block/block.h     |  8 +++++++-
- include/block/block_int.h | 21 +++++++++++++++++++++
- 3 files changed, 72 insertions(+), 1 deletion(-)
+ block/io.c                | 148 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/block/block.h     |   4 ++
+ include/block/block_int.h |  14 +++++
+ 3 files changed, 166 insertions(+)
 
 diff --git a/block/io.c b/block/io.c
-index bd9a19a9c4..1b4cfcacb1 100644
+index 1b4cfcacb1..64cd3a5170 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -2826,3 +2826,47 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
-         bdrv_unregister_buf(child->bs, host);
+@@ -2870,3 +2870,151 @@ int coroutine_fn bdrv_co_map_range(BdrvChild *child, int64_t offset,
      }
+     return -ENOTSUP;
  }
 +
-+int coroutine_fn bdrv_co_map_range(BdrvChild *child, int64_t offset,
-+                                   int64_t bytes, int64_t *pnum, int64_t *map,
-+                                   BlockDriverState **file,
-+                                   int flags)
-+{
-+    BlockDriverState *bs = child->bs;
++typedef struct {
++    BdrvChild *child;
++    int64_t offset;
++    int64_t remaining;
++    BlockDriverState *file;
++    int64_t map;
++    int64_t pnum;
++    int status;
++} BdrvCopyRangeState;
 +
-+    if (bs->encrypted) {
-+        return -ENOTSUP;
++static inline void bdrv_range_advance(BdrvCopyRangeState *s, int bytes)
++{
++    s->offset += bytes;
++    s->remaining -= bytes;
++    assert(s->remaining >= 0);
++    s->map = 0;
++    s->pnum = MAX(0, s->pnum - bytes);
++    s->file = NULL;
++}
++
++static int coroutine_fn
++bdrv_co_copy_range_iteration(BdrvCopyRangeState *in, BdrvCopyRangeState *out)
++{
++    int ret;
++    int bytes = MIN(in->remaining, out->remaining);
++    QEMUIOVector qiov;
++    BlockDriverState *in_bs = in->child->bs;
++    BlockDriverState *out_bs = out->child->bs;
++    uint8_t *buf;
++
++    if (!in->pnum) {
++        in->status = bdrv_co_map_range(in->child, in->offset, in->remaining,
++                                       &in->pnum, &in->map, &in->file, 0);
 +    }
-+    while (bs && bs->drv && bs->drv->bdrv_co_map_range) {
-+        int64_t cur_pnum, cur_map;
-+        BlockDriverState *cur_file = NULL;
-+        int r = bs->drv->bdrv_co_map_range(bs, offset, bytes,
-+                                           &cur_pnum, &cur_map, &cur_file,
-+                                           flags);
-+        if (r < 0) {
-+            return r;
-+        }
-+        offset = cur_map;
-+        bytes = cur_pnum;
-+        if (pnum) {
-+            *pnum = cur_pnum;
-+        }
-+        if (map) {
-+            *map = cur_map;
-+        }
-+        if (!(r & BDRV_BLOCK_OFFSET_VALID)) {
-+            return -ENOTSUP;
-+        }
-+        if (file) {
-+            *file = cur_file;
-+        }
-+        if (!cur_file) {
-+            return -ENOTSUP;
-+        }
-+        if (cur_file == bs) {
-+            return r;
-+        }
-+        bs = cur_file;
++    if (in->status < 0 || !in->file ||
++        in->offset + bytes > bdrv_getlength(in->file)) {
++        goto fallback;
 +    }
-+    return -ENOTSUP;
++
++    assert(in->pnum > 0);
++    bytes = MIN(bytes, in->pnum);
++    if (in->status & BDRV_BLOCK_ZERO) {
++        ret = bdrv_co_pwrite_zeroes(out->child, out->offset, in->pnum, 0);
++        if (ret) {
++            return ret;
++        }
++        bdrv_range_advance(in, bytes);
++        bdrv_range_advance(out, bytes);
++        return 0;
++    }
++
++    if (!(in->status & BDRV_BLOCK_OFFSET_VALID)) {
++        goto fallback;
++    }
++
++    out->status = bdrv_co_map_range(out->child, out->offset, out->remaining,
++                                    &out->pnum, &out->map, &out->file,
++                                    BDRV_REQ_ALLOCATE);
++    if (out->status < 0 || !out->file ||
++        !(out->status & BDRV_BLOCK_OFFSET_VALID)) {
++        goto fallback;
++    }
++
++    bytes = MIN(bytes, out->pnum);
++
++    if (in->file->drv->bdrv_co_copy_range) {
++        if (!in->file->drv->bdrv_co_copy_range(in->file, in->map,
++                                               out->file, out->map,
++                                               bytes)) {
++            bdrv_range_advance(in, bytes);
++            bdrv_range_advance(out, bytes);
++            return 0;
++        }
++    }
++    /* At this point we could maximize bytes again */
++    bytes = MIN(in->remaining, out->remaining);
++
++fallback:
++    buf = qemu_try_memalign(MAX(bdrv_opt_mem_align(in_bs),
++                                bdrv_opt_mem_align(out_bs)),
++                            bytes);
++    if (!buf) {
++        return -ENOMEM;
++    }
++
++    qemu_iovec_init(&qiov, 1);
++    qemu_iovec_add(&qiov, buf, bytes);
++
++    ret = bdrv_co_preadv(in->child, in->offset, bytes, &qiov, 0);
++    if (ret) {
++        goto out;
++    }
++    ret = bdrv_co_pwritev(out->child, out->offset, bytes, &qiov, 0);
++    if (!ret) {
++        bdrv_range_advance(in, bytes);
++        bdrv_range_advance(out, bytes);
++    }
++
++out:
++    qemu_vfree(buf);
++    qemu_iovec_destroy(&qiov);
++    return ret;
++}
++
++int coroutine_fn bdrv_co_copy_range(BdrvChild *child_in, int64_t off_in,
++                                    BdrvChild *child_out, int64_t off_out,
++                                    int bytes)
++{
++    BdrvTrackedRequest in_req, out_req;
++    BlockDriverState *in_bs = child_in->bs;
++    BlockDriverState *out_bs = child_out->bs;
++    int ret = 0;
++    BdrvCopyRangeState in = (BdrvCopyRangeState) {
++        .child = child_in,
++        .offset = off_in,
++        .remaining = bytes,
++    };
++    BdrvCopyRangeState out = (BdrvCopyRangeState) {
++        .child = child_out,
++        .offset = off_out,
++        .remaining = bytes,
++    };
++
++    bdrv_inc_in_flight(in_bs);
++    bdrv_inc_in_flight(out_bs);
++    tracked_request_begin(&in_req, in_bs, off_in, bytes, BDRV_TRACKED_READ);
++    tracked_request_begin(&out_req, out_bs, off_out, bytes, BDRV_TRACKED_WRITE);
++
++    wait_serialising_requests(&in_req);
++    wait_serialising_requests(&out_req);
++
++    while (in.remaining > 0) {
++        ret = bdrv_co_copy_range_iteration(&in, &out);
++        assert(in.remaining == out.remaining);
++        if (ret < 0) {
++            goto out;
++        }
++    }
++    assert(in.remaining == 0);
++    assert(out.remaining == 0);
++out:
++    tracked_request_end(&in_req);
++    tracked_request_end(&out_req);
++    bdrv_dec_in_flight(in_bs);
++    bdrv_dec_in_flight(out_bs);
++    return ret;
 +}
 diff --git a/include/block/block.h b/include/block/block.h
-index cdec3639a3..21d3e9db32 100644
+index 21d3e9db32..7d57e53cfe 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -53,9 +53,10 @@ typedef enum {
-     BDRV_REQ_NO_SERIALISING     = 0x8,
-     BDRV_REQ_FUA                = 0x10,
-     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
-+    BDRV_REQ_ALLOCATE           = 0x40,
- 
-     /* Mask of valid flags */
--    BDRV_REQ_MASK               = 0x3f,
-+    BDRV_REQ_MASK               = 0x7f,
- } BdrvRequestFlags;
- 
- typedef struct BlockSizes {
-@@ -604,4 +605,9 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
-  */
- void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
- void bdrv_unregister_buf(BlockDriverState *bs, void *host);
+@@ -610,4 +610,8 @@ int bdrv_co_map_range(BdrvChild *child, int64_t offset,
+                       int64_t bytes, int64_t *pnum, int64_t *map,
+                       BlockDriverState **file,
+                       int flags);
++int bdrv_co_copy_range(BdrvChild *child_in, int64_t off_in,
++                       BdrvChild *child_out, int64_t off_out,
++                       int bytes);
 +
-+int bdrv_co_map_range(BdrvChild *child, int64_t offset,
-+                      int64_t bytes, int64_t *pnum, int64_t *map,
-+                      BlockDriverState **file,
-+                      int flags);
  #endif
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index c4dd1d4bb8..3f3f6f3efd 100644
+index 3f3f6f3efd..10a23b5754 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -475,6 +475,27 @@ struct BlockDriver {
-      */
-     void (*bdrv_register_buf)(BlockDriverState *bs, void *host, size_t size);
-     void (*bdrv_unregister_buf)(BlockDriverState *bs, void *host);
-+
+@@ -496,6 +496,20 @@ struct BlockDriver {
+                              int64_t bytes, int64_t *pnum, int64_t *map,
+                              BlockDriverState **file,
+                              int flags);
 +    /**
-+     * Get or create offset mappings for a virtual range.
++     * Do offloaded copying of data range. Must be implemented together with
++     * bdrv_co_map_range.
 +     *
-+     * @offset: the offset of the beginning of the range.
-+     * @bytes: the maximum bytes of the range to map.
-+     * @pnum: at return, this will point to the number of bytes in the returned
-+     * mapping status
-+     * @map: at return, this will point to the offset which the range maps to
-+     * @file: at return, this will point to the file where the data is mapped.
-+     * If it is set to bs, it means the mapping is terminal and the result can
-+     * be used for read/write and copy_range; if it is NULL, it means the range
-+     * doesn't map to a file, or no I/O to any file is necessary; otherwise, it
-+     * means the query should be passed down to an underlying format/protocol.
-+     * @flags: flags for the request. BDRV_REQ_ALLOCATE means the range
-+     * should be allocated if necessary.
++     * @bs: where to copy data from
++     * @off_in: the offset to copy data from in @bs
++     * @out: where to write data to. This is guaranteed to be the same
++     *       BlockDriver as @bs
++     * @off_out: the offset to copy data to in @out
++     * @bytes: the number of bytes to copy
 +     */
-+    int (*bdrv_co_map_range)(BlockDriverState *bs, int64_t offset,
-+                             int64_t bytes, int64_t *pnum, int64_t *map,
-+                             BlockDriverState **file,
-+                             int flags);
++    int (*bdrv_co_copy_range)(BlockDriverState *bs, int64_t off_in,
++                              BlockDriverState *out, int64_t off_out,
++                              int bytes);
      QLIST_ENTRY(BlockDriver) list;
  };
  
