@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f1Ydh-0004We-Aq
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:34:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1f1Yfy-0005fq-0m
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f1Ydd-00085Q-8R
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:34:53 -0400
-Date: Thu, 29 Mar 2018 16:34:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180329163437.149bb755.cohuck@redhat.com>
-In-Reply-To: <1522316251-16399-1-git-send-email-thuth@redhat.com>
-References: <1522316251-16399-1-git-send-email-thuth@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1f1Yfx-0001UQ-4c
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 10:37:14 -0400
+References: <20180329120745.11154-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c4589769-90ac-dbe7-7f54-84700793a77e@redhat.com>
+Date: Thu, 29 Mar 2018 09:37:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180329120745.11154-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: Increase virtio
- timeout to 30 seconds
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v5] iotests: Test abnormally large
+ size in compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, ldoktor@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, 29 Mar 2018 11:37:31 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> The current timeout is set to only three seconds - and considering that
-> vring_wait_reply() or rather get_second() is not doing any rounding,
-> the real timeout is likely rather 2 seconds in most cases. When the
-> host is really badly loaded and we run the guest in TCG mode instead
-> of KVM, it's possible that we hit this timeout by mistake. So let's
-> increase the timeout to 30 seconds instead to ease this situation (30
-> seconds is also the timeout that is used by the Linux SCSI subsystem
-> for example, so this seems to be a sane value for block IO timeout).
+On 03/29/2018 07:07 AM, Alberto Garcia wrote:
+> L2 entries for compressed clusters have a field that indicates the
+> number of sectors used to store the data in the image.
 > 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1549079
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> That's however not the size of the compressed data itself, just the
+> number of sectors where that data is located. The actual data size is
+> usually not a multiple of the sector size, and therefore cannot be
+> represented with this field.
+> 
+
+> One possible task for the future is to make 'qemu-img check' verify
+> the sizes of the compressed clusters, by trying to decompress the data
+> and checking that the size stored in the L2 entry is correct.
+
+Is it still worth trying to add such a check in 2.12?  (Probably not - 
+the bug has been there "since the beginning", so it's not a regression 
+and thus not a showstopper if it stays there for another release)
+
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  pc-bios/s390-ccw/virtio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index 817e7f5..cdb66f4 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -14,7 +14,7 @@
->  #include "virtio-scsi.h"
->  #include "bswap.h"
->  
-> -#define VRING_WAIT_REPLY_TIMEOUT 3
-> +#define VRING_WAIT_REPLY_TIMEOUT 30
->  
->  static VRing block[VIRTIO_MAX_VQS];
->  static char ring_area[VIRTIO_RING_SIZE * VIRTIO_MAX_VQS]
+> v5: Use 'write -c' instead of 'write' followed by 'convert' [Max]
+>      Add TODO comment explaining that the size of compressed clusters
+>      should also be corrected when it's too large in order to avoid
+>      referencing other unrelated clusters.
 
-Thanks, merged this and a rebuild into s390-fixes.
+Thanks, those changes look good.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
