@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrezanin@redhat.com>) id 1f1P3L-0006BN-TC
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:20:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1f1P7t-0008Ov-SP
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:25:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrezanin@redhat.com>) id 1f1P3H-0006Yn-07
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:20:43 -0400
-Received: from 212-4-128-36.cust.selfnet.cz ([212.4.128.36]:38238
-	helo=workimage.localdomain) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrezanin@redhat.com>) id 1f1P3G-0006WA-Ok
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:20:38 -0400
-Date: Thu, 29 Mar 2018 05:45:27 +0200
-From: Miroslav Rezanina <mrezanin@redhat.com>
-Message-ID: <20180329034527.te57zxf3ylzw4n4g@lws.brq.redhat.com>
-References: <20180328133152.24623-1-lvivier@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1f1P7o-0000gY-Kv
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:25:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35018 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f1P7o-0000gI-Az
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:25:20 -0400
+Date: Thu, 29 Mar 2018 12:25:10 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180329042510.GC8456@xz-mi>
+References: <20180327091043.30220-1-xiaoguangrong@tencent.com>
+	<20180327091043.30220-5-xiaoguangrong@tencent.com>
+	<20180328095952.GG29554@xz-mi>
+	<c3c7cf6e-709b-64ee-a090-741d9633114d@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180328133152.24623-1-lvivier@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg: fix 16-byte vector operations
- detection
+In-Reply-To: <c3c7cf6e-709b-64ee-a090-741d9633114d@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 04/10] migration: detect compression and
+ decompression errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Wed, Mar 28, 2018 at 03:31:52PM +0200, Laurent Vivier wrote:
-> configure tries to detect if the compiler
-> supports 16-byte vector operations.
->=20
-> As stated in the comment of the detection
-> program, there is a problem with the system
-> compiler on GCC on Centos 7.
->=20
-> This program doesn't actually detect the problem
-> with GCC on RHEL7 on PPC64LE (Red Hat 4.8.5-28).
->=20
-> This patch updates the test to look more like
-> it is in QEMU helpers, and now detects the problem.
->=20
-> The error reported is:
->=20
->   CC      ppc64-softmmu/accel/tcg/tcg-runtime-gvec.o
->   ..//accel/tcg/tcg-runtime-gvec.c: In function =E2=80=98helper_gvec_sh=
-l8i=E2=80=99:
->   ../accel/tcg/tcg-runtime-gvec.c:558:26: internal compiler error: in e=
-mit_move_insn, at expr.c:3495
->            *(vec8 *)(d + i) =3D *(vec8 *)(a + i) << shift;
->                             ^
-> Fixes: db43267 "tcg: Add generic vector expanders"
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  configure | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/configure b/configure
-> index 4d0e92c96c..a2301dd0dc 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5054,6 +5054,14 @@ static S2 c2;
->  static S4 c4;
->  static S8 c8;
->  static int i;
-> +void helper(void *d, void *a, int shift, int i);
-> +void helper(void *d, void *a, int shift, int i)
-> +{
-> +  *(U1 *)(d + i) =3D *(U1 *)(a + i) << shift;
-> +  *(U2 *)(d + i) =3D *(U2 *)(a + i) << shift;
-> +  *(U4 *)(d + i) =3D *(U4 *)(a + i) << shift;
-> +  *(U8 *)(d + i) =3D *(U8 *)(a + i) << shift;
-> +}
->  int main(void)
->  {
->    a1 +=3D b1; a2 +=3D b2; a4 +=3D b4; a8 +=3D b8;
-> --=20
-> 2.14.3
->=20
->
+On Thu, Mar 29, 2018 at 11:51:03AM +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 03/28/2018 05:59 PM, Peter Xu wrote:
+> > On Tue, Mar 27, 2018 at 05:10:37PM +0800, guangrong.xiao@gmail.com wrote:
+> > 
+> > [...]
+> > 
+> > > -static int compress_threads_load_setup(void)
+> > > +static int compress_threads_load_setup(QEMUFile *f)
+> > >   {
+> > >       int i, thread_count;
+> > > @@ -2665,6 +2685,7 @@ static int compress_threads_load_setup(void)
+> > >           }
+> > >           decomp_param[i].stream.opaque = &decomp_param[i];
+> > > +        decomp_param[i].file = f;
+> > 
+> > On the source side the error will be set via:
+> > 
+> >          qemu_file_set_error(migrate_get_current()->to_dst_file, blen);
+> > 
+> > Maybe we can do similar things using migrate_incoming_get_current() to
+> > avoid caching the QEMUFile multiple times?
+> > 
+> 
+> I have considered it, however, it can not work as the @file used by ram
+> loader is not the file got from migrate_incoming_get_current() under some
+> cases.
+> 
+> For example, in colo_process_incoming_thread(), the file passed to
+> qemu_loadvm_state() is a internal buffer and it is not easy to switch it
+> to incoming file.
 
-Build works correctly for RHEL 7 with this patch
+I see. How about cache it in a global variable?  We have these
+already:
 
-Reviewed-by: Miroslav Rezanina <mrezanin@redhat.com>=20
+    thread_count = migrate_decompress_threads();
+    decompress_threads = g_new0(QemuThread, thread_count);
+    decomp_param = g_new0(DecompressParam, thread_count);
+    ...
+
+IMHO we can add a new one too, at least we don't cache it multiple
+times (after all decomp_param[i]s are global variables too).
+
+-- 
+Peter Xu
