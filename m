@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1fHN-0002hR-Di
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f1fHW-0002pE-Nz
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f1fHK-0001mJ-C5
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57694)
+	(envelope-from <ehabkost@redhat.com>) id 1f1fHV-0002AL-SO
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1fHJ-0001j5-Qo
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:14 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f1fHV-00029T-JT
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 17:40:25 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 29 Mar 2018 18:38:50 -0300
-Message-Id: <20180329213857.15499-12-ehabkost@redhat.com>
+Date: Thu, 29 Mar 2018 18:38:52 -0300
+Message-Id: <20180329213857.15499-14-ehabkost@redhat.com>
 In-Reply-To: <20180329213857.15499-1-ehabkost@redhat.com>
 References: <20180329213857.15499-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC 11/18] qemu.py: Log crashes inside
- _post_shutdown()
+Subject: [Qemu-devel] [RFC 13/18] qemu.py: 'force' parameter on shutdown()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +26,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>, Amador Pahim <apahim@redhat.com>
 
-This will allow us to log QEMU crashes even if the test code uses
-.wait() instead of .shutdown().
+This will allow test code to shut down the VM without trying to
+run a 'quit' QMP command.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qemu.py | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ scripts/qemu.py | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 226d2c4d48..e19e4b34d0 100644
+index aaba04b3c1..045dca5d02 100644
 --- a/scripts/qemu.py
 +++ b/scripts/qemu.py
-@@ -225,6 +225,15 @@ class QEMUMachine(object):
-             shutil.rmtree(self._temp_dir)
-             self._temp_dir = None
+@@ -279,13 +279,24 @@ class QEMUMachine(object):
+             self._popen.wait()
+         self._post_shutdown()
  
-+        exitcode = self.exitcode()
-+        if exitcode is not None and exitcode < 0:
-+            msg = 'qemu received signal %i: %s'
-+            if self._qemu_full_args:
-+                command = ' '.join(self._qemu_full_args)
-+            else:
-+                command = ''
-+            LOG.warn(msg, exitcode, command)
+-    def shutdown(self):
+-        '''Terminate the VM and clean up'''
+-        if self.is_running():
++    def shutdown(self, force=None):
++        '''Terminate the VM and clean up
 +
-         self._launched = False
- 
-     def launch(self):
-@@ -279,15 +288,6 @@ class QEMUMachine(object):
++        @param force: If True, terminate QEMU process, if False always try
++                      clean shutdown, if None terminate QEMU process if
++                      clean shutdown fails.
++        '''
++        if not force and self.is_running():
+             try:
+                 self._qmp.cmd('quit')
+             except:
+-                self._popen.kill()
++                if force is None:
++                    force = True
++                else:
++                    raise
++
++        if force and self.is_running():
++            self._popen.kill()
  
          self.wait()
  
--        exitcode = self.exitcode()
--        if exitcode is not None and exitcode < 0:
--            msg = 'qemu received signal %i: %s'
--            if self._qemu_full_args:
--                command = ' '.join(self._qemu_full_args)
--            else:
--                command = ''
--            LOG.warn(msg, exitcode, command)
--
-     def qmp(self, cmd, conv_keys=True, **args):
-         '''Invoke a QMP command and return the response dict'''
-         qmp_args = dict()
 -- 
 2.14.3
