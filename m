@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1Unp-0007sW-3e
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:29:06 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f1UqR-0001TJ-BV
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f1Unl-0003sC-60
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:29:05 -0400
-Received: from 6.mo7.mail-out.ovh.net ([188.165.39.218]:33614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f1Unk-0003rj-WF
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:29:01 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.105.8])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2AFBD926C8
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 12:28:58 +0200 (CEST)
-Date: Thu, 29 Mar 2018 12:27:24 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180329122724.5a15b489@bahia.lan>
-In-Reply-To: <20180329112416.28b99184.cohuck@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1f1UqN-0004lQ-DL
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 06:31:47 -0400
+Date: Thu, 29 Mar 2018 12:31:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180329123131.45d4a76c.cohuck@redhat.com>
+In-Reply-To: <20180329113941.6eebc57f@bahia.lan>
 References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
-	<152231462116.69730.14119625999092384450.stgit@bahia.lan>
-	<20180329112416.28b99184.cohuck@redhat.com>
+	<152231460685.69730.14860451936216690693.stgit@bahia.lan>
+	<20180329112721.6c7ee3f3@redhat.com>
+	<20180329113941.6eebc57f@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] sev/i386: fix memory leak in
- sev_guest_init()
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/s390x: fix memory leak in
+ s390_init_ipl_dev()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 29 Mar 2018 11:24:16 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Thu, 29 Mar 2018 11:39:41 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-> On Thu, 29 Mar 2018 11:10:21 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+> On Thu, 29 Mar 2018 11:27:21 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
 > 
-> > The string returned by object_property_get_str() is dynamically allocated.
-> > 
-> > Fixes: d8575c6c0242b
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  target/i386/sev.c |    4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/target/i386/sev.c b/target/i386/sev.c
-> > index 019d84cef2c7..c01167143f1c 100644
-> > --- a/target/i386/sev.c
-> > +++ b/target/i386/sev.c
-> > @@ -748,9 +748,11 @@ sev_guest_init(const char *id)
-> >      if (s->sev_fd < 0) {
-> >          error_report("%s: Failed to open %s '%s'", __func__,
-> >                       devname, strerror(errno));
-> > -        goto err;
-> >      }
-> >      g_free(devname);
-> > +    if (s->sev_fd < 0) {
-> > +        goto err;
-> > +    }
-> >  
-> >      ret = sev_platform_ioctl(s->sev_fd, SEV_PLATFORM_STATUS, &status,
-> >                               &fw_error);
+> > On Thu, 29 Mar 2018 11:10:06 +0200
+> > Greg Kurz <groug@kaod.org> wrote:
+> >   
+> > > The string returned by object_property_get_str() is dynamically allocated.
+> > > 
+> > > Fixes: 3c4e9baacf4d9
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >  hw/s390x/s390-virtio-ccw.c |    5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> > > index 864145a7c6f3..435f7c99e77c 100644
+> > > --- a/hw/s390x/s390-virtio-ccw.c
+> > > +++ b/hw/s390x/s390-virtio-ccw.c
+> > > @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+> > >  {
+> > >      Object *new = object_new(TYPE_S390_IPL);
+> > >      DeviceState *dev = DEVICE(new);
+> > > +    char *netboot_fw_prop;
+> > >  
+> > >      if (kernel_filename) {
+> > >          qdev_prop_set_string(dev, "kernel", kernel_filename);
+> > > @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+> > >      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+> > >      qdev_prop_set_string(dev, "firmware", firmware);
+> > >      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+> > > -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
+> > > +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
+> > > +    if (!strlen(netboot_fw_prop)) {    
+> > probably not really issue here but,
+> > is strlen really safe in case netboot_fw_prop == NULL?
 > >   
 > 
-> I would probably add an extra g_free(devname) right before the goto
-> err, but this works as well, obviously.
+> You're right, object_property_get_str() can theoretically return NULL and
+> strlen() would crash... Not sure how this would happen though. Anyway, the
+> current code doesn't check if object_property_get_str() returns NULL so
+> if this needs to be fixed as well, let's do it in a followup patch.
+
+I don't think so - if the attribute exists, we'll always get != NULL if
+I read the code correctly.
+
 > 
-
-An alternative could have been to use glib's g_autofree macro, which
-is especially designed to handle the case where an allocated buffer is
-put in a local variable and we want g_free() to be called when the
-variable goes out of scope. Unfortunately it requires glib >= 2.44 and
-we're still at 2.22 AFAIK.
-
-https://developer.gnome.org/glib/unstable/glib-Miscellaneous-Macros.html#g-autofree
-
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> > >          qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+> > >      }
+> > > +    g_free(netboot_fw_prop);
+> > >      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+> > >                                new, NULL);
+> > >      object_unref(new);
+> > > 
+> > >     
+> >   
+> 
