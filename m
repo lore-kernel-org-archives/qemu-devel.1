@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f1OzE-0003dJ-7o
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:16:29 -0400
+	(envelope-from <mrezanin@redhat.com>) id 1f1P3L-0006BN-TC
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f1OzB-0004tc-1P
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:16:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46938 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f1OzA-0004tN-SC
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:16:24 -0400
-Date: Thu, 29 Mar 2018 07:16:14 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180329071003-mutt-send-email-mst@kernel.org>
-References: <20180319071537.28649-1-tiwei.bie@intel.com>
-	<20180322181952-mutt-send-email-mst@kernel.org>
-	<20180328122407.gc6yba26gijlm5g6@debian>
-	<20180328183159-mutt-send-email-mst@kernel.org>
-	<20180329033329.ucnx34nzimgec7pp@debian>
+	(envelope-from <mrezanin@redhat.com>) id 1f1P3H-0006Yn-07
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:20:43 -0400
+Received: from 212-4-128-36.cust.selfnet.cz ([212.4.128.36]:38238
+	helo=workimage.localdomain) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mrezanin@redhat.com>) id 1f1P3G-0006WA-Ok
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 00:20:38 -0400
+Date: Thu, 29 Mar 2018 05:45:27 +0200
+From: Miroslav Rezanina <mrezanin@redhat.com>
+Message-ID: <20180329034527.te57zxf3ylzw4n4g@lws.brq.redhat.com>
+References: <20180328133152.24623-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180329033329.ucnx34nzimgec7pp@debian>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 0/6] Extend vhost-user
- to support VFIO based accelerators
+In-Reply-To: <20180328133152.24623-1-lvivier@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tcg: fix 16-byte vector operations
+ detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Thu, Mar 29, 2018 at 11:33:29AM +0800, Tiwei Bie wrote:
-> On Wed, Mar 28, 2018 at 06:33:01PM +0300, Michael S. Tsirkin wrote:
-> > On Wed, Mar 28, 2018 at 08:24:07PM +0800, Tiwei Bie wrote:
-> > > > > Update notes
-> > > > > ============
-> > > > > 
-> > > > > IOMMU feature bit check is removed in this version, because:
-> > > > > 
-> > > > > The IOMMU feature is negotiable, when an accelerator is used and
-> > > > > it doesn't support virtual IOMMU, its driver just won't provide
-> > > > > this feature bit when vhost library querying its features. And if
-> > > > > it supports the virtual IOMMU, its driver can provide this feature
-> > > > > bit. It's not reasonable to add this limitation in this patch set.
-> > > > 
-> > > > Fair enough. Still:
-> > > > Can hardware on intel platforms actually support IOTLB requests?
-> > > > Don't you need to add support for vIOMMU shadowing instead?
-> > > > 
-> > > 
-> > > For the hardware I have, I guess they can't for now.
-> > 
-> > So VFIO in QEMU has support for vIOMMU shadowing.
-> > Can you use that somehow?
-> 
-> Yeah, I guess we can use it in some way. Actually supporting
-> vIOMMU is a quite interesting feature. It would provide
-> better security, and for the hardware backend case there
-> would be no performance penalty with static mapping after
-> the backend got all the mappings. I think it could be done
-> as another work. Based on your previous suggestion in this
-> thread, I have split the guest notification offload and host
-> notification offload (I'll send the new version very soon).
-> And I plan to let this patch set just focus on fixing the
-> most critical performance issue - the host notification offload.
-> With this fix, using hardware backend in vhost-user could get
-> a very big performance boost and become much more practicable.
-> So maybe we can focus on fixing this critical performance issue
-> first. How do you think?
+On Wed, Mar 28, 2018 at 03:31:52PM +0200, Laurent Vivier wrote:
+> configure tries to detect if the compiler
+> supports 16-byte vector operations.
+>=20
+> As stated in the comment of the detection
+> program, there is a problem with the system
+> compiler on GCC on Centos 7.
+>=20
+> This program doesn't actually detect the problem
+> with GCC on RHEL7 on PPC64LE (Red Hat 4.8.5-28).
+>=20
+> This patch updates the test to look more like
+> it is in QEMU helpers, and now detects the problem.
+>=20
+> The error reported is:
+>=20
+>   CC      ppc64-softmmu/accel/tcg/tcg-runtime-gvec.o
+>   ..//accel/tcg/tcg-runtime-gvec.c: In function =E2=80=98helper_gvec_sh=
+l8i=E2=80=99:
+>   ../accel/tcg/tcg-runtime-gvec.c:558:26: internal compiler error: in e=
+mit_move_insn, at expr.c:3495
+>            *(vec8 *)(d + i) =3D *(vec8 *)(a + i) << shift;
+>                             ^
+> Fixes: db43267 "tcg: Add generic vector expanders"
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  configure | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/configure b/configure
+> index 4d0e92c96c..a2301dd0dc 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5054,6 +5054,14 @@ static S2 c2;
+>  static S4 c4;
+>  static S8 c8;
+>  static int i;
+> +void helper(void *d, void *a, int shift, int i);
+> +void helper(void *d, void *a, int shift, int i)
+> +{
+> +  *(U1 *)(d + i) =3D *(U1 *)(a + i) << shift;
+> +  *(U2 *)(d + i) =3D *(U2 *)(a + i) << shift;
+> +  *(U4 *)(d + i) =3D *(U4 *)(a + i) << shift;
+> +  *(U8 *)(d + i) =3D *(U8 *)(a + i) << shift;
+> +}
+>  int main(void)
+>  {
+>    a1 +=3D b1; a2 +=3D b2; a4 +=3D b4; a8 +=3D b8;
+> --=20
+> 2.14.3
+>=20
+>
 
-I think correctness and security go first before performance.
-vIOMMU goes under security.
+Build works correctly for RHEL 7 with this patch
 
-> > 
-> > Ability to run dpdk within guest seems important.
-> 
-> I think vIOMMU isn't a must to run DPDK in guest.
-
-Oh yes it is.
-
-> For Linux
-> guest we also have igb_uio and uio_pci_generic to run DPDK,
-> for FreeBSD guest we have nic_uio.
-
-These hacks offer no protection from a buggy userspace corrupting guest
-kernel memory. Given DPDK is routinely linked into closed source
-applications, this is not a configuration anyone can support.
-
-
-> They don't need vIOMMU,
-> and they could offer the best performance.
-> 
-> Best regards,
-> Tiwei Bie
-> 
-> > 
-> > -- 
-> > MST
-> > 
-> > ---------------------------------------------------------------------
-> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> > 
+Reviewed-by: Miroslav Rezanina <mrezanin@redhat.com>=20
