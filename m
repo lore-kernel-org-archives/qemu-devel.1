@@ -1,42 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=0626c35109=borntraeger@de.ibm.com>)
-	id 1f1W18-00079Y-OY
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:46:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1f1W1s-0007XQ-0P
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=0626c35109=borntraeger@de.ibm.com>)
-	id 1f1W15-0000id-Iv
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:46:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50048
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=0626c35109=borntraeger@de.ibm.com>)
-	id 1f1W15-0000iT-CZ
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:46:51 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w2TBiEJV131541
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 07:46:50 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2h0x0h42gu-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Mar 2018 07:46:50 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 29 Mar 2018 12:46:48 +0100
-References: <1522316251-16399-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 29 Mar 2018 13:46:45 +0200
+	(envelope-from <thuth@redhat.com>) id 1f1W1o-0000yn-OY
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:47:39 -0400
+References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
+	<152231458624.69730.1752893648612848392.stgit@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d0678319-ed49-1ad0-8019-0c292be50434@redhat.com>
+Date: Thu, 29 Mar 2018 13:47:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <1522316251-16399-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <152231458624.69730.1752893648612848392.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <ee0b89fe-6d09-efb3-bdf9-9e98f3e852f9@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: Increase virtio
- timeout to 30 seconds
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/3] exec: fix memory leak in
+ find_max_supported_pagesize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,44 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, ldoktor@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-
-
-On 03/29/2018 11:37 AM, Thomas Huth wrote:
-> The current timeout is set to only three seconds - and considering that
-> vring_wait_reply() or rather get_second() is not doing any rounding,
-> the real timeout is likely rather 2 seconds in most cases. When the
-> host is really badly loaded and we run the guest in TCG mode instead
-> of KVM, it's possible that we hit this timeout by mistake. So let's
-> increase the timeout to 30 seconds instead to ease this situation (30
-> seconds is also the timeout that is used by the Linux SCSI subsystem
-> for example, so this seems to be a sane value for block IO timeout).
+On 29.03.2018 11:09, Greg Kurz wrote:
+> The string returned by object_property_get_str() is dynamically allocated.
 > 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1549079
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-I think this should go into 2.12 with a rebuild
-
-
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  pc-bios/s390-ccw/virtio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  exec.c |    1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index 817e7f5..cdb66f4 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -14,7 +14,7 @@
->  #include "virtio-scsi.h"
->  #include "bswap.h"
+> diff --git a/exec.c b/exec.c
+> index c09bd93df31e..02b1efebb7c3 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1495,6 +1495,7 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
+>          mem_path = object_property_get_str(obj, "mem-path", NULL);
+>          if (mem_path) {
+>              long hpsize = qemu_mempath_getpagesize(mem_path);
+> +            g_free(mem_path);
+>              if (hpsize < *hpsize_min) {
+>                  *hpsize_min = hpsize;
+>              }
 > 
-> -#define VRING_WAIT_REPLY_TIMEOUT 3
-> +#define VRING_WAIT_REPLY_TIMEOUT 30
 > 
->  static VRing block[VIRTIO_MAX_VQS];
->  static char ring_area[VIRTIO_RING_SIZE * VIRTIO_MAX_VQS]
-> 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
