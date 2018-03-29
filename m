@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1W4Y-0001C4-VZ
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:50:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1f1WAe-0004t9-0q
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f1W4T-0001uA-3C
-	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:50:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1f1WAZ-00056v-3R
+	for qemu-devel@nongnu.org; Thu, 29 Mar 2018 07:56:44 -0400
 References: <152231456507.69730.15601462044394150786.stgit@bahia.lan>
-	<152231460685.69730.14860451936216690693.stgit@bahia.lan>
+	<152231462116.69730.14119625999092384450.stgit@bahia.lan>
+	<20180329112416.28b99184.cohuck@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4d3cb89d-f4c2-6bde-7e4d-ee0562527823@redhat.com>
-Date: Thu, 29 Mar 2018 13:50:15 +0200
+Message-ID: <d5c2a929-737c-aa25-b531-8a8570468e0d@redhat.com>
+Date: Thu, 29 Mar 2018 13:56:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <152231460685.69730.14860451936216690693.stgit@bahia.lan>
+In-Reply-To: <20180329112416.28b99184.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 2/3] hw/s390x: fix memory leak
- in s390_init_ipl_dev()
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] sev/i386: fix memory leak
+ in sev_guest_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-stable@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 29.03.2018 11:10, Greg Kurz wrote:
-> The string returned by object_property_get_str() is dynamically allocated.
+On 29.03.2018 11:24, Cornelia Huck wrote:
+> On Thu, 29 Mar 2018 11:10:21 +0200
+> Greg Kurz <groug@kaod.org> wrote:
 > 
-> Fixes: 3c4e9baacf4d9
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/s390x/s390-virtio-ccw.c |    5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>> The string returned by object_property_get_str() is dynamically allocated.
+>>
+>> Fixes: d8575c6c0242b
+>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>> ---
+>>  target/i386/sev.c |    4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>> index 019d84cef2c7..c01167143f1c 100644
+>> --- a/target/i386/sev.c
+>> +++ b/target/i386/sev.c
+>> @@ -748,9 +748,11 @@ sev_guest_init(const char *id)
+>>      if (s->sev_fd < 0) {
+>>          error_report("%s: Failed to open %s '%s'", __func__,
+>>                       devname, strerror(errno));
+>> -        goto err;
+>>      }
+>>      g_free(devname);
+>> +    if (s->sev_fd < 0) {
+>> +        goto err;
+>> +    }
+>>  
+>>      ret = sev_platform_ioctl(s->sev_fd, SEV_PLATFORM_STATUS, &status,
+>>                               &fw_error);
+>>
 > 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 864145a7c6f3..435f7c99e77c 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -246,6 +246,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
->  {
->      Object *new = object_new(TYPE_S390_IPL);
->      DeviceState *dev = DEVICE(new);
-> +    char *netboot_fw_prop;
->  
->      if (kernel_filename) {
->          qdev_prop_set_string(dev, "kernel", kernel_filename);
-> @@ -256,9 +257,11 @@ static void s390_init_ipl_dev(const char *kernel_filename,
->      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
->      qdev_prop_set_string(dev, "firmware", firmware);
->      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
-> -    if (!strlen(object_property_get_str(new, "netboot_fw", &error_abort))) {
-> +    netboot_fw_prop = object_property_get_str(new, "netboot_fw", &error_abort);
-> +    if (!strlen(netboot_fw_prop)) {
->          qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
->      }
-> +    g_free(netboot_fw_prop);
->      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
->                                new, NULL);
->      object_unref(new);
-> 
-> 
+> I would probably add an extra g_free(devname) right before the goto
+> err, but this works as well, obviously.
+
+Or maybe remove devname from the error_report ("%s: Failed to open
+sev-device '%s', __func__ strerror(errno)) and move the g_free right
+before the if-statement?
+
+Anyway:
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
