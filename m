@@ -1,34 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1wXX-0006YZ-RW
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:06:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f1wc4-0000lo-EP
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1wXU-0003N7-BJ
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:06:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f1wXU-0003MA-4t
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:06:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f1wXR-0002bm-4I
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 16:06:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9AF582E819D
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 16:05:59 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Mar 2018 15:54:44 -0000
-From: jcmvbkbc <jcmvbkbc@gmail.com>
-Reply-To: Bug 1756519 <1756519@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152127850171.4068.8714943507984957739.malonedeb@gac.canonical.com>
-Message-Id: <152242528410.6164.13181782931532548598.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1756519] Re: qemu linux-user crash in QOM path
- canonicalization during do_fork() call to cpu_create
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f1wc1-00071y-Kh
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:10:48 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 30 Mar 2018 19:10:40 +0300
+Message-Id: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,112 +17,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-The following patch should fix that:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg07437.html
+Use MIGRATION events instead of RESUME. Also, make a TODO: enable
+dirty-bitmaps capability for offline case.
 
--- =
+This (likely) fixes racy faults at least of the following types:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1756519
+    - timeout on waiting for RESUME event
+    - sha256 mismatch on 136 (138 after this patch)
 
-Title:
-  qemu linux-user crash in QOM path canonicalization during do_fork()
-  call to cpu_create
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Status in QEMU:
-  New
+This patch is a true change for the test anyway. But I don't understand,
+why (and do really) it fixes the things. And I'm not sure about do we
+really have a bug in bitmap migration or persistence. So, it's up to you,
+take it into 2.12... 
 
-Bug description:
-  qemu-riscv64 version 2.11.50 (v2.11.0-2491-g2bb39a657a)  crashes
-  running gcc libgomp.c/sort-1.c testsuite test case with the following
-  message:
+It was already discussed, that "STOP" event is bad for tests. What about
+"RESUME"? How can we miss it? And sha256 mismatch is really something
+strange.
 
-  (process:11683): GLib-CRITICAL **: g_hash_table_iter_next: assertion 'ri-=
->version =3D=3D ri->hash_table->version' failed
-  **
-  ERROR:qom/object.c:1665:object_get_canonical_path_component: code should =
-not be reached
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6013=
-9c16
+Max, please check, do it fix 169 for you.
 
-  =
+ tests/qemu-iotests/169 | 44 +++++++++++++++++++++++---------------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
 
-  Backtrace obtained via gdb:
-
-  #0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
-  #1  0x0000000060139b21 in abort () at abort.c:79
-  #2  0x0000000060100505 in g_assertion_message (domain=3Ddomain@entry=3D0x=
-0, file=3Dfile@entry=3D0x60213ca1 "qom/object.c", line=3Dline@entry=3D1665, =
-
-      func=3Dfunc@entry=3D0x60214420 <__func__.18106> "object_get_canonical=
-_path_component", message=3Dmessage@entry=3D0x7fffe8000cd0 "code should not=
- be reached")
-      at gtestutils.c:2430
-  #3  0x0000000060100586 in g_assertion_message_expr (domain=3D0x0, file=3D=
-0x60213ca1 "qom/object.c", line=3D1665, =
-
-      func=3D0x60214420 <__func__.18106> "object_get_canonical_path_compone=
-nt", expr=3D<optimized out>) at gtestutils.c:2453
-  #4  0x0000000060098334 in object_get_canonical_path_component (obj=3D0x7f=
-ffe81340b0) at qom/object.c:1665
-  #5  0x0000000060098366 in object_get_canonical_path (obj=3D0x7fffe81340b0=
-) at qom/object.c:1675
-  #6  0x000000006008e152 in device_set_realized (obj=3D0x7fffe81340b0, valu=
-e=3Dtrue, errp=3D0x7ffff762fe68) at hw/core/qdev.c:874
-  #7  0x0000000060098bf4 in property_set_bool (obj=3D0x7fffe81340b0, v=3D0x=
-7fffe80fd3c0, name=3D0x60213694 "realized", opaque=3D0x7fffe80fd140, errp=
-=3D0x7ffff762fe68)
-      at qom/object.c:1926
-  #8  0x0000000060096fee in object_property_set (obj=3D0x7fffe81340b0, v=3D=
-0x7fffe80fd3c0, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom=
-/object.c:1122
-  #9  0x0000000060099ebd in object_property_set_qobject (obj=3D0x7fffe81340=
-b0, value=3D0x7fffe80fd310, name=3D0x60213694 "realized", errp=3D0x7ffff762=
-fe68)
-      at qom/qom-qobject.c:27
-  #10 0x0000000060097274 in object_property_set_bool (obj=3D0x7fffe81340b0,=
- value=3Dtrue, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom/=
-object.c:1191
-  #11 0x0000000060092ec5 in cpu_create (typename=3D0x6250e1a0 "any-riscv-cp=
-u") at qom/cpu.c:61
-  #12 0x000000006009301a in cpu_generic_init (typename=3D0x601dd58f "riscv-=
-cpu", cpu_model=3D0x601dd527 "any") at qom/cpu.c:98
-  #13 0x000000006004cb61 in cpu_copy (env=3D0x7ffff008cd60) at /opt/qemu/li=
-nux-user/main.c:3881
-  #14 0x000000006005b79a in do_fork (env=3D0x7ffff008cd60, flags=3D4001536,=
- newsp=3D275531880704, parent_tidptr=3D275531882704, newtls=3D275531884288, =
-
-      child_tidptr=3D275531882704) at /opt/qemu/linux-user/syscall.c:6348
-  #15 0x0000000060063e56 in do_syscall (cpu_env=3D0x7ffff008cd60, num=3D220=
-, arg1=3D4001536, arg2=3D275531880704, arg3=3D275531882704, arg4=3D27553188=
-4288, =
-
-      arg5=3D275531882704, arg6=3D275531884288, arg7=3D0, arg8=3D0) at /opt=
-/qemu/linux-user/syscall.c:10001
-  #16 0x000000006004c89f in cpu_loop (env=3D0x7ffff008cd60) at /opt/qemu/li=
-nux-user/main.c:3600
-  #17 0x000000006005b68f in clone_func (arg=3D0x7ffff7775050) at /opt/qemu/=
-linux-user/syscall.c:6311
-  #18 0x0000000060121797 in start_thread (arg=3D0x7ffff7632700) at pthread_=
-create.c:463
-  #19 0x000000006019b4fb in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:95
-
-  =
-
-  Attached is a test case source code extracted from libgomp test suite.
-
-  Note that it is a multi-threaded and requires 5 or more threads to
-  fail. Number of launched threads is controlled by OMP_NUM_THREADS
-  evironment variable, defaulting to number of hardware threads.
-  Changing constants in the test case makes it fail with different
-  numbers of threads.
-
-  I will attach statically linked riscv64 binary executable if size
-  limits permit.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1756519/+subscriptions
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index 153b10b6e7..5e525ab9d5 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -31,6 +31,8 @@ disk_a = os.path.join(iotests.test_dir, 'disk_a')
+ disk_b = os.path.join(iotests.test_dir, 'disk_b')
+ size = '1M'
+ mig_file = os.path.join(iotests.test_dir, 'mig_file')
++mig_cmd = 'exec: cat > ' + mig_file
++incoming_cmd = 'exec: cat ' + mig_file
+ 
+ 
+ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+@@ -49,7 +51,6 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+         self.vm_a.launch()
+ 
+         self.vm_b = iotests.VM(path_suffix='b')
+-        self.vm_b.add_incoming("exec: cat '" + mig_file + "'")
+ 
+     def add_bitmap(self, vm, granularity, persistent):
+         params = {'node': 'drive0',
+@@ -86,36 +87,30 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+                    (0xa0201, 0x1000))
+ 
+         should_migrate = migrate_bitmaps or persistent and shared_storage
++        mig_caps = [{'capability': 'events', 'state': True}]
++        if migrate_bitmaps:
++            mig_caps.append({'capability': 'dirty-bitmaps', 'state': True})
+ 
++        result = self.vm_a.qmp('migrate-set-capabilities',
++                               capabilities=mig_caps)
++        self.assert_qmp(result, 'return', {})
++
++        self.vm_b.add_incoming(incoming_cmd if online else "defer")
+         self.vm_b.add_drive(disk_a if shared_storage else disk_b)
+ 
+         if online:
+             os.mkfifo(mig_file)
+             self.vm_b.launch()
++            result = self.vm_b.qmp('migrate-set-capabilities',
++                                   capabilities=mig_caps)
++            self.assert_qmp(result, 'return', {})
+ 
+         self.add_bitmap(self.vm_a, granularity, persistent)
+         for r in regions:
+             self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
+         sha256 = self.get_bitmap_hash(self.vm_a)
+ 
+-        if migrate_bitmaps:
+-            capabilities = [{'capability': 'dirty-bitmaps', 'state': True}]
+-
+-            result = self.vm_a.qmp('migrate-set-capabilities',
+-                                   capabilities=capabilities)
+-            self.assert_qmp(result, 'return', {})
+-
+-            if online:
+-                result = self.vm_b.qmp('migrate-set-capabilities',
+-                                       capabilities=capabilities)
+-                self.assert_qmp(result, 'return', {})
+-
+-        result = self.vm_a.qmp('migrate-set-capabilities',
+-                               capabilities=[{'capability': 'events',
+-                                              'state': True}])
+-        self.assert_qmp(result, 'return', {})
+-
+-        result = self.vm_a.qmp('migrate', uri='exec:cat>' + mig_file)
++        result = self.vm_a.qmp('migrate', uri=mig_cmd)
+         while True:
+             event = self.vm_a.event_wait('MIGRATION')
+             if event['data']['status'] == 'completed':
+@@ -124,9 +119,16 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+         if not online:
+             self.vm_a.shutdown()
+             self.vm_b.launch()
+-            # TODO enable bitmap capability for vm_b in this case
++            result = self.vm_b.qmp('migrate-set-capabilities',
++                                   capabilities=mig_caps)
++            self.assert_qmp(result, 'return', {})
++            result = self.vm_b.qmp('migrate-incoming', uri=incoming_cmd)
++            self.assert_qmp(result, 'return', {})
+ 
+-        self.vm_b.event_wait("RESUME", timeout=10.0)
++        while True:
++            event = self.vm_b.event_wait('MIGRATION')
++            if event['data']['status'] == 'completed':
++                break
+ 
+         self.check_bitmap(self.vm_b, sha256 if should_migrate else False)
+ 
+-- 
+2.11.1
