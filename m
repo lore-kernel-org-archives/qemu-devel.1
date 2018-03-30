@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f1xPL-0002HV-IM
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:01:45 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1f1xQ1-0002i5-8k
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f1xPJ-0006V6-Bz
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:01:43 -0400
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:41366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f1xPJ-0006Uc-4f
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:01:41 -0400
-Received: by mail-ot0-x234.google.com with SMTP id i28-v6so10068451otf.8
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 10:01:40 -0700 (PDT)
+	(envelope-from <rkagan@virtuozzo.com>) id 1f1xPw-0006wG-Sg
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:02:25 -0400
+Received: from mail-he1eur01on0711.outbound.protection.outlook.com
+	([2a01:111:f400:fe1e::711]:39856
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1f1xPw-0006si-Kg
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:02:20 -0400
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Fri, 30 Mar 2018 20:02:08 +0300
+Message-Id: <20180330170209.20627-2-rkagan@virtuozzo.com>
+In-Reply-To: <20180330170209.20627-1-rkagan@virtuozzo.com>
+References: <20180330170209.20627-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <87po3m6nr8.fsf@linaro.org>
-References: <1522180487-22899-1-git-send-email-mjc@sifive.com>
-	<1522180487-22899-2-git-send-email-mjc@sifive.com>
-	<0b20ff75-00d7-80db-ed2a-8b644a57b415@amsat.org>
-	<CAHNT7Nt40C8Bh3VJHjv8f+obSbU6Ki8ThXH2L7o4zoSM2LnK5A@mail.gmail.com>
-	<87po3m6nr8.fsf@linaro.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 30 Mar 2018 10:01:39 -0700
-Message-ID: <CAHNT7Nv9R0nKvz7-ENck190pX-RgSXpN27ut4hJ5OXWQ3XCqOw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] RISC-V: Workaround for critical
- mstatus.FS MTTCG bug
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.12 v3 1/2] i386/hyperv: add
+ hv-frequencies cpu property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,189 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 
-On Fri, Mar 30, 2018 at 12:11 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org>
-wrote:
+In order to guarantee compatibility on migration, QEMU should have
+complete control over the features it announces to the guest via CPUID.
 
->
-> Michael Clark <mjc@sifive.com> writes:
->
-> > On Tue, Mar 27, 2018 at 3:17 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
-at.org
-> >
-> > wrote:
-> >
-> >> Cc'ing Alex and Richard.
-> >>
-> >> On 03/27/2018 04:54 PM, Michael Clark wrote:
-> >> > This change is a workaround for a bug where mstatus.FS
-> >> > is not correctly reporting dirty when MTTCG and SMP are
-> >> > enabled which results in the floating point register file
-> >> > not being saved during context switches. This a critical
-> >> > bug for RISC-V in QEMU as it results in floating point
-> >> > register file corruption when running SMP Linux in the
-> >> > RISC-V 'virt' machine.
-> >> >
-> >> > This workaround will return dirty if mstatus.FS is
-> >> > switched from off to initial or clean. We have checked
-> >> > the specification and it is legal for an implementation
-> >> > to return either off, or dirty, if set to initial or clean.
-> >> >
-> >> > This workaround will result in unnecessary floating point
-> >> > save restore. When mstatus.FS is off, floating point
-> >> > instruction trap to indicate the process is using the FPU.
-> >> > The OS can then save floating-point state of the previous
-> >> > process using the FPU and set mstatus.FS to initial or
-> >> > clean. With this workaround, mstatus.FS will always return
-> >> > dirty if set to a non-zero value, indicating floating point
-> >> > save restore is necessary, versus misreporting mstatus.FS
-> >> > resulting in floating point register file corruption.
-> >> >
-> >> > Cc: Palmer Dabbelt <palmer@sifive.com>
-> >> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> >> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> >> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> >> > Tested-by: Richard W.M. Jones <rjones@redhat.com>
-> >> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> >> > ---
-> >> >  target/riscv/op_helper.c | 19 +++++++++++++++++--
-> >> >  1 file changed, 17 insertions(+), 2 deletions(-)
-> >> >
-> >> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> >> > index e34715d..7281b98 100644
-> >> > --- a/target/riscv/op_helper.c
-> >> > +++ b/target/riscv/op_helper.c
-> >> > @@ -144,8 +144,23 @@ void csr_write_helper(CPURISCVState *env,
-> >> target_ulong val_to_write,
-> >> >          }
-> >> >
-> >> >          mstatus =3D (mstatus & ~mask) | (val_to_write & mask);
-> >> > -        int dirty =3D (mstatus & MSTATUS_FS) =3D=3D MSTATUS_FS;
-> >> > -        dirty |=3D (mstatus & MSTATUS_XS) =3D=3D MSTATUS_XS;
-> >> > +
-> >> > +        /* Note: this is a workaround for an issue where mstatus.FS
-> >> > +           does not report dirty when SMP and MTTCG is enabled. Thi=
-s
-> >> > +           workaround is technically compliant with the RISC-V
-> >> Privileged
-> >> > +           specification as it is legal to return only off, or dirt=
-y,
-> >> > +           however this may cause unnecessary saves of floating poi=
-nt
-> >> state.
-> >> > +           Without this workaround, floating point state is not sav=
-ed
-> >> and
-> >> > +           restored correctly when SMP and MTTCG is enabled, */
-> >>
-> >
-> > On looking at this again, I think we may need to remove the
-> > qemu_tcg_mttcg_enabled conditional and always return dirty if the state
-> is
-> > initial or clean, but not off.
-> >
-> > While testing on uniprocessor worked okay, it's likely because we were
-> > lucky and there was no task migration or multiple FPU tasks working. Th=
-is
-> > would mean we would revert to Richard W.M. Jones initial patch.
-> >
-> >> +        if (qemu_tcg_mttcg_enabled()) {
-> >> > +            /* FP is always dirty or off */
-> >> > +            if (mstatus & MSTATUS_FS) {
-> >> > +                mstatus |=3D MSTATUS_FS;
-> >> > +            }
-> >> > +        }
->
->
-> I'm confused. If mstatus is a per-vCPU variable why does the enabling or
-> not of MTTCG matter here?
+However, the availability of Hyper-V frequency MSRs
+(HV_X64_MSR_TSC_FREQUENCY and HV_X64_MSR_APIC_FREQUENCY) depends solely
+on the support for them in the underlying KVM.
 
+Introduce "hv-frequencies" cpu property (off by default) which gives
+QEMU full control over whether these MSRs are announced.
 
-It was an incorrect inference from the available data at the time given the
-problem showed up on SMP but not uniprocessor.
+While at this, drop the redundant check of the cpu tsc frequency, and
+decouple this feature from hv-time.
 
-After inspecting the logic we concluded we were just lucky in the
-uniprocessor case because our test case only have once process using the
-CPU, whereas with SMP the process was rescheduled to another core which
-made the corruption visible on SMP.
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+v2 -> v3:
+ - no changes
 
-We removed the MTTCG condition from the subsequent version of the patch,
-updated the patch description and comment and removed references to MTTCG.
+v1 -> v2:
+ - indicate what flag requested the feature that can't be enabled in the
+   error message
 
+ target/i386/cpu.h |  1 +
+ target/i386/cpu.c |  1 +
+ target/i386/kvm.c | 13 +++++++++----
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
-> >> > +
-> >> > +        int dirty =3D ((mstatus & MSTATUS_FS) =3D=3D MSTATUS_FS) |
-> >> > +                    ((mstatus & MSTATUS_XS) =3D=3D MSTATUS_XS);
-> >> >          mstatus =3D set_field(mstatus, MSTATUS_SD, dirty);
-> >> >          env->mstatus =3D mstatus;
-> >> >          break;
-> >> >
-> >>
-> >
-> > The text from the specification that allows us to always return dirty i=
-f
-> > set to initial or clean, is below i.e. Dirty implies state has
-> > "potentially" been modified, so that gives us wriggle room.
-> >
-> > "
-> > When an extension's status is set to Off , any instruction that attempt=
-s
-> to
-> > read or write the corresponding
-> > state will cause an exception. When the status is Initial, the
-> > corresponding state should
-> > have an initial constant value. When the status is Clean, the
-> corresponding
-> > state is potentially
-> > di fferent from the initial value, but matches the last value stored on=
- a
-> > context swap. When the
-> > status is Dirty, the corresponding state has potentially been modif ed
-> > since the last context save.
-> > "
-> >
-> > I think the problem is Linux is setting the state to clean after saving
-> > fpu register state [1], but we have no code in the QEMU FPU operations =
-to
-> > set the state to dirty, if is clean or initial, only code to cause an
-> > exception if the floating point extension state is set to off e.g.
-> >
-> > static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
-> >         int rs2, target_long imm)
-> > {
-> >     TCGv t0;
-> >
-> >     if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-> >         gen_exception_illegal(ctx);
-> >         return;
-> >     }
-> >
-> >     t0 =3D tcg_temp_new();
-> >     gen_get_gpr(t0, rs1);
-> >     tcg_gen_addi_tl(t0, t0, imm);
-> >
-> >     switch (opc) {
-> >     case OPC_RISC_FSW:
-> >         tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
-> >         break;
-> >     case OPC_RISC_FSD:
-> >         tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
-> >         break;
-> >     default:
-> >         gen_exception_illegal(ctx);
-> >         break;
-> >     }
-> >
-> >     tcg_temp_free(t0);
-> > }
-> >
-> > [1]
-> > https://github.com/torvalds/linux/blob/master/arch/riscv/
-> include/asm/switch_to.h
->
->
-> --
-> Alex Benn=C3=A9e
->
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 78db1b833a..1b219fafc4 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1296,6 +1296,7 @@ struct X86CPU {
+     bool hyperv_runtime;
+     bool hyperv_synic;
+     bool hyperv_stimer;
++    bool hyperv_frequencies;
+     bool check_cpuid;
+     bool enforce_cpuid;
+     bool expose_kvm;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 555ae79d29..1a6b082b6f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4761,6 +4761,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("hv-runtime", X86CPU, hyperv_runtime, false),
+     DEFINE_PROP_BOOL("hv-synic", X86CPU, hyperv_synic, false),
+     DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
++    DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index d23fff12f5..b35623ae24 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -648,11 +648,16 @@ static int hyperv_handle_properties(CPUState *cs)
+         env->features[FEAT_HYPERV_EAX] |= HV_HYPERCALL_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
+-
+-        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
+-            env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+-            env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
++    }
++    if (cpu->hyperv_frequencies) {
++        if (!has_msr_hv_frequencies) {
++            fprintf(stderr, "Hyper-V frequency MSRs "
++                    "(requested by 'hv-frequencies' cpu flag) "
++                    "are not supported by kernel\n");
++            return -ENOSYS;
+         }
++        env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
++        env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+     }
+     if (cpu->hyperv_crash && has_msr_hv_crash) {
+         env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
+-- 
+2.14.3
