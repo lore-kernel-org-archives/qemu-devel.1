@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f1w1K-0007TL-RT
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 11:32:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1f1wXX-0006YZ-RW
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f1w1J-00044Y-E1
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 11:32:50 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180320170521.32152-1-vsementsov@virtuozzo.com>
-	<fce080fd-1970-b856-82e0-42c62306da6c@redhat.com>
-	<4add3400-b4d4-4812-72f2-0f184b2f4fd6@virtuozzo.com>
-	<b1fe16fd-05fe-73c6-f2f5-31b23459a131@virtuozzo.com>
-	<2520cd8d-990b-e7b9-c7b6-0b345e414ce8@virtuozzo.com>
-	<48dbaef0-0a9f-de65-9c7d-584021fc4759@redhat.com>
-	<a9b1455f-185d-4461-2d72-ed9d3aa329e9@virtuozzo.com>
-	<1870fc0d-0c36-f983-8496-3cb5119851ba@redhat.com>
-	<50eaf53c-871e-6081-7c4d-4d8de9b0d87f@virtuozzo.com>
-	<9f49e65a-fc44-ea11-ff0a-cb38270451aa@virtuozzo.com>
-Message-ID: <7be588fb-dd63-d6fd-0e39-81fbee1bdd25@virtuozzo.com>
-Date: Fri, 30 Mar 2018 18:32:37 +0300
+	(envelope-from <bounces@canonical.com>) id 1f1wXU-0003N7-BJ
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:06:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53816)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f1wXU-0003MA-4t
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 12:06:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f1wXR-0002bm-4I
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 16:06:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9AF582E819D
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 16:05:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <9f49e65a-fc44-ea11-ff0a-cb38270451aa@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 for 2.12 0/3] fix bitmaps migration
- through shared storage
+Date: Fri, 30 Mar 2018 15:54:44 -0000
+From: jcmvbkbc <jcmvbkbc@gmail.com>
+Reply-To: Bug 1756519 <1756519@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152127850171.4068.8714943507984957739.malonedeb@gac.canonical.com>
+Message-Id: <152242528410.6164.13181782931532548598.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1756519] Re: qemu linux-user crash in QOM path
+ canonicalization during do_fork() call to cpu_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,187 +37,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
-30.03.2018 16:31, Vladimir Sementsov-Ogievskiy wrote:
-> 29.03.2018 18:09, Vladimir Sementsov-Ogievskiy wrote:
->> 29.03.2018 17:03, Max Reitz wrote:
->>> On 2018-03-29 10:08, Vladimir Sementsov-Ogievskiy wrote:
->>>> 28.03.2018 17:53, Max Reitz wrote:
->>>>> On 2018-03-27 12:11, Vladimir Sementsov-Ogievskiy wrote:
->>> [...]
->>>
->>>>>> isn't it because a lot of cat processes? will check, update loop to
->>>>>> i=3D0; while check -qcow2 169; do ((i++)); echo $i OK; killall -9 ca=
-t;
->>>>>> done
->>>>> Hmm...=C2=A0 I know I tried to kill all of the cats, but for some=20
->>>>> reason that
->>>>> didn't really help yesterday.=C2=A0 Seems to help now, for 2.12.0-rc0=
- at
->>>>> least (that is, before this series).
->>>> reproduced with killing... (without these series, just on master)
->>>>
->>>>> After the whole series, I still get a lot of failures in 169
->>>>> (mismatching bitmap hash, mostly).
->>>>>
->>>>> And interestingly, if I add an abort():
->>>>>
->>>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>>> index 486f3e83b7..9204c1c0ac 100644
->>>>> --- a/block/qcow2.c
->>>>> +++ b/block/qcow2.c
->>>>> @@ -1481,6 +1481,7 @@ static int coroutine_fn
->>>>> qcow2_do_open(BlockDriverState *bs, QDict *options,=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->>>>>
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_next(bs, N=
-ULL)) {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 abort();
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* It's =
-some kind of reopen with already existing dirty
->>>>> bitmaps. There
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * =
-are no known cases where we need loading bitmaps in=20
->>>>> such
->>>>> situation,
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * =
-so it's safer don't load them.
->>>>>
->>>>> Then this fires for a couple of test cases of 169 even without the=20
->>>>> third
->>>>> patch of this series.
->>>>>
->>>>> I guess bdrv_dirty_bitmap_next() reacts to some bitmaps that=20
->>>>> migration
->>>>> adds or something?=C2=A0 Then this would be the wrong condition, beca=
-use I
->>>>> guess we still want to load the bitmaps that are in the qcow2 file.
->>>>>
->>>>> I'm not sure whether bdrv_has_readonly_bitmaps() is the correct
->>>>> condition then, either, though.=C2=A0 Maybe let's take a step back: W=
-e=20
->>>>> want
->>>>> to load all the bitmaps from the file exactly once, and that is=20
->>>>> when it
->>>>> is opened the first time.=C2=A0 Or that's what I would have thought..=
-.=C2=A0 Is
->>>>> that even correct?
->>>>>
->>>>> Why do we load the bitmaps when the device is inactive anyway?
->>>>> Shouldn't we load them only once the device is activated?
->>>> Hmm, not sure. May be, we don't need. But we anyway need to load them,
->>>> when opening read-only, and we should correspondingly reopen in=20
->>>> this case.
->>> Yeah, well, yeah, but the current state seems just wrong. Apparently
->>> there are cases where a qcow2 node may have bitmaps before we try to
->>> load them from the file, so the current condition doesn't work.
->>>
->>> Furthermore, it seems like the current "state machine" is too=20
->>> complex so
->>> we don't know which cases are possible anymore and what to do when.
->>>
->>> So the first thing we could do is add a field to the BDRVQCow2State=20
->>> that
->>> tells us whether the bitmaps have been loaded already or not. If not,
->>> we invoke qcow2_load_dirty_bitmaps() and set the value to true. If the
->>> value was true already and the BDS is active and R/W now, we call
->>> qcow2_reopen_bitmaps_rw_hint().=C2=A0 That should solve one problem.
->>
->> good idea, will do.
->>
->>>
->>> The other problem of course is the question whether we should call
->>> qcow2_load_dirty_bitmaps() at all while the drive is still inactive.
->>> You know the migration model better than me, so I'm asking this=20
->>> question
->>> to you.=C2=A0 We can phrase it differently: Do we need to load the bitm=
-aps
->>> before the drive is activated?
->>
->> Now I think that we don't need. At least, we don't have such cases in=20
->> Virtuozzo (I hope :).
->>
->> Why did I doubt:
->>
->> 1. We have cases, when we want to start vm as inactive, to be able to=20
->> export it's drive as NBD export, push some data to it and then start=20
->> the VM (which involves activating)
->> 2. We have cases, when we want to start vm stopped and operate on=20
->> dirty bitmaps.
->>
->> If just open all images in inactive mode until vm start, it looks=20
->> like we need bitmaps in inactive mode (for 2.). But it looks like=20
->> wrong approach anyway.
->> Firstly, I tried to solve (1.) by simply inactivate_all() in case of=20
->> start vm in paused mode, but it breaks at least (2.), so finally, I=20
->> solved (1.) by an approach similar with "-incoming defer". So, we=20
->> have inactive mode in two cases:
->> =C2=A0- incoming migration
->> =C2=A0- push data to vm before start
->>
->> and, in these cases, we don't need to load dirty-bitmaps.
->>
->> Also, inconsistency: now, we remove persistent bitmaps on inactivate.=20
->> So, it is inconsistent to load the in inactive mode.
->>
->> Ok, I'll try to respin.
->
-> finally, what cases we actually have for qcow2_do_open?
->
-> 1. INACTIVE -> ACTIVE (through invalidate_cache, we obviously should=20
-> load bitmaps, if we decided that we have no persistent bitmaps in=20
-> INACTIVE mode)
-> 2. creating new bdrv state (first open of the image) in INACTIVE mode=20
-> (will not load bitmaps)
-> 3. creating new bdrv state (first open of the image) in ACTIVE mode=20
-> (will load bitmaps, maybe read-only if disk is RO)
->
-> If only these three cases, it would be enough to just load bitmaps if=20
-> !INACTIVE and do nothing otherwise.
->
-> Or, we have some of the following cases too?
->
-> 1?. ACTIVE -> ACTIVE (through invalidate_cache, some kind of no-op, we=20
-> should not reload bitmaps)
-> 2?. RO -> RW (we should reopen_bitmaps_rw) (or it is possible only=20
-> through bdrv_reopen, which will not touch qcow2_do_open?
-> 3?. RW -> RO (reopen_bitmaps_ro ?)
-> ? something other??
->
->>
->>>
->>> Max
->>>
->>
->> about 169, how often is it reproducible for you?
->>
->
-> it becomes very interseting.
->
-> persistent-migbitmap-online case failed on line 136. with mismathced=20
-> bitmap sha. This check is not relate to migration, on this line,=20
-> bitmap is already successfully migrated. But for some reason it is=20
-> corrupted after stop/start the VM. How is it possible - I can't=20
-> imagine. But it looks not really related to migration.. May it relate=20
-> to case, when postcopy was not finished or something like this?..=20
-> maybe fixing wait(RESUME) to something more appropriate will help. But=20
-> it is strange anyway.
->
-> persistent-notmigbitmap-offline case failed on ine 128, which is=20
-> "self.vm_b.event_wait("RESUME", timeout=3D10.0)" with timeout.. can we=20
-> skip RESUME for some reason? maybe just move to MIGRATION event will=20
-> help, will check
->
+The following patch should fix that:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg07437.html
 
-looks like moving from "RESUME" to "MIGRATION" events fixes the whole=20
-issue (I've already 740 successful iterations, which is good enough, but=20
-I will not stop the loop until at least 2000). I'll submit a patch. But=20
-I don't understand, why it fix sha256 mismatch, and why sha256-check=20
-fails with "RESUME" (check success after migration and fail after=20
-stop/start, o_O)...
+-- =
 
---=20
-Best regards,
-Vladimir
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1756519
+
+Title:
+  qemu linux-user crash in QOM path canonicalization during do_fork()
+  call to cpu_create
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-riscv64 version 2.11.50 (v2.11.0-2491-g2bb39a657a)  crashes
+  running gcc libgomp.c/sort-1.c testsuite test case with the following
+  message:
+
+  (process:11683): GLib-CRITICAL **: g_hash_table_iter_next: assertion 'ri-=
+>version =3D=3D ri->hash_table->version' failed
+  **
+  ERROR:qom/object.c:1665:object_get_canonical_path_component: code should =
+not be reached
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6013=
+9c16
+
+  =
+
+  Backtrace obtained via gdb:
+
+  #0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
+  #1  0x0000000060139b21 in abort () at abort.c:79
+  #2  0x0000000060100505 in g_assertion_message (domain=3Ddomain@entry=3D0x=
+0, file=3Dfile@entry=3D0x60213ca1 "qom/object.c", line=3Dline@entry=3D1665, =
+
+      func=3Dfunc@entry=3D0x60214420 <__func__.18106> "object_get_canonical=
+_path_component", message=3Dmessage@entry=3D0x7fffe8000cd0 "code should not=
+ be reached")
+      at gtestutils.c:2430
+  #3  0x0000000060100586 in g_assertion_message_expr (domain=3D0x0, file=3D=
+0x60213ca1 "qom/object.c", line=3D1665, =
+
+      func=3D0x60214420 <__func__.18106> "object_get_canonical_path_compone=
+nt", expr=3D<optimized out>) at gtestutils.c:2453
+  #4  0x0000000060098334 in object_get_canonical_path_component (obj=3D0x7f=
+ffe81340b0) at qom/object.c:1665
+  #5  0x0000000060098366 in object_get_canonical_path (obj=3D0x7fffe81340b0=
+) at qom/object.c:1675
+  #6  0x000000006008e152 in device_set_realized (obj=3D0x7fffe81340b0, valu=
+e=3Dtrue, errp=3D0x7ffff762fe68) at hw/core/qdev.c:874
+  #7  0x0000000060098bf4 in property_set_bool (obj=3D0x7fffe81340b0, v=3D0x=
+7fffe80fd3c0, name=3D0x60213694 "realized", opaque=3D0x7fffe80fd140, errp=
+=3D0x7ffff762fe68)
+      at qom/object.c:1926
+  #8  0x0000000060096fee in object_property_set (obj=3D0x7fffe81340b0, v=3D=
+0x7fffe80fd3c0, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom=
+/object.c:1122
+  #9  0x0000000060099ebd in object_property_set_qobject (obj=3D0x7fffe81340=
+b0, value=3D0x7fffe80fd310, name=3D0x60213694 "realized", errp=3D0x7ffff762=
+fe68)
+      at qom/qom-qobject.c:27
+  #10 0x0000000060097274 in object_property_set_bool (obj=3D0x7fffe81340b0,=
+ value=3Dtrue, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom/=
+object.c:1191
+  #11 0x0000000060092ec5 in cpu_create (typename=3D0x6250e1a0 "any-riscv-cp=
+u") at qom/cpu.c:61
+  #12 0x000000006009301a in cpu_generic_init (typename=3D0x601dd58f "riscv-=
+cpu", cpu_model=3D0x601dd527 "any") at qom/cpu.c:98
+  #13 0x000000006004cb61 in cpu_copy (env=3D0x7ffff008cd60) at /opt/qemu/li=
+nux-user/main.c:3881
+  #14 0x000000006005b79a in do_fork (env=3D0x7ffff008cd60, flags=3D4001536,=
+ newsp=3D275531880704, parent_tidptr=3D275531882704, newtls=3D275531884288, =
+
+      child_tidptr=3D275531882704) at /opt/qemu/linux-user/syscall.c:6348
+  #15 0x0000000060063e56 in do_syscall (cpu_env=3D0x7ffff008cd60, num=3D220=
+, arg1=3D4001536, arg2=3D275531880704, arg3=3D275531882704, arg4=3D27553188=
+4288, =
+
+      arg5=3D275531882704, arg6=3D275531884288, arg7=3D0, arg8=3D0) at /opt=
+/qemu/linux-user/syscall.c:10001
+  #16 0x000000006004c89f in cpu_loop (env=3D0x7ffff008cd60) at /opt/qemu/li=
+nux-user/main.c:3600
+  #17 0x000000006005b68f in clone_func (arg=3D0x7ffff7775050) at /opt/qemu/=
+linux-user/syscall.c:6311
+  #18 0x0000000060121797 in start_thread (arg=3D0x7ffff7632700) at pthread_=
+create.c:463
+  #19 0x000000006019b4fb in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:95
+
+  =
+
+  Attached is a test case source code extracted from libgomp test suite.
+
+  Note that it is a multi-threaded and requires 5 or more threads to
+  fail. Number of launched threads is controlled by OMP_NUM_THREADS
+  evironment variable, defaulting to number of hardware threads.
+  Changing constants in the test case makes it fail with different
+  numbers of threads.
+
+  I will attach statically linked riscv64 binary executable if size
+  limits permit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1756519/+subscriptions
