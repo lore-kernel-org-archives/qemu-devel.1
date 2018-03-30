@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1f1qZO-0007Jq-MB
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:43:39 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1f1qf6-00037a-Cl
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1f1qZL-0007Kv-IW
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:43:38 -0400
-Received: from mga06.intel.com ([134.134.136.31]:45750)
+	(envelope-from <wei.w.wang@intel.com>) id 1f1qf3-0002ZA-74
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:49:32 -0400
+Received: from mga12.intel.com ([192.55.52.136]:2094)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1f1qZL-0007Io-96
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:43:35 -0400
+	id 1f1qf2-0002YF-U2
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:49:29 -0400
+Message-ID: <5ABE08E7.2060108@intel.com>
+Date: Fri, 30 Mar 2018 17:52:39 +0800
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri, 30 Mar 2018 17:24:36 +0800
-Message-Id: <1522401876-39613-6-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1522401876-39613-1-git-send-email-wei.w.wang@intel.com>
-References: <1522401876-39613-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v6 5/5] migration: use the free page hint
- feature from balloon
+MIME-Version: 1.0
+References: <1521197309-13544-1-git-send-email-wei.w.wang@intel.com>
+	<1521197309-13544-5-git-send-email-wei.w.wang@intel.com>
+	<20180316165319-mutt-send-email-mst@kernel.org>
+	<5AAE4124.5010602@intel.com>
+	<20180319062023-mutt-send-email-mst@kernel.org>
+	<5AAF7C72.5070403@intel.com>
+	<20180320004900-mutt-send-email-mst@kernel.org>
+	<5AB06EE9.1030306@intel.com>
+	<20180320045134-mutt-send-email-mst@kernel.org>
+	<5AB07D7F.90205@intel.com>
+	<20180320051840-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180320051840-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v5 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +38,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Start the free page optimization after the migration bitmap is
-synchronized. This can't be used in the stop&copy phase since the guest
-is paused. Make sure the guest reporting has stopped before
-synchronizing the migration dirty bitmap. Currently, the optimization is
-added to precopy only.
+On 03/20/2018 11:24 AM, Michael S. Tsirkin wrote:
+> On Tue, Mar 20, 2018 at 11:18:23AM +0800, Wei Wang wrote:
+>> On 03/20/2018 10:59 AM, Michael S. Tsirkin wrote:
+>>> On Tue, Mar 20, 2018 at 10:16:09AM +0800, Wei Wang wrote:
+>>>> On 03/20/2018 06:55 AM, Michael S. Tsirkin wrote:
+>>>>> On Mon, Mar 19, 2018 at 05:01:38PM +0800, Wei Wang wrote:
+>>>>>> On 03/19/2018 12:24 PM, Michael S. Tsirkin wrote:
+>>>>>>> On Sun, Mar 18, 2018 at 06:36:20PM +0800, Wei Wang wrote:
+>>>>>>>> On 03/16/2018 11:16 PM, Michael S. Tsirkin wrote:
+>>>>>>>>> On Fri, Mar 16, 2018 at 06:48:28PM +0800, Wei Wang wrote:
+>>>>>>> OTOH it seems that if thread stops nothing will wake it up
+>>>>>>> whem vm is restarted. Such bahaviour change across vmstop/vmstart
+>>>>>>> is unexpected.
+>>>>>>> I do not understand why we want to increment the counter
+>>>>>>> on vm stop though. It does make sense to stop the thread
+>>>>>>> but why not resume where we left off when vm is resumed?
+>>>>>>>
+>>>>>> I'm not sure which counter we incremented. But it would be clear if we have
+>>>>>> a high level view of how it works (it is symmetric actually). Basically, we
+>>>>>> start the optimization when each round starts and stop it at the end of each
+>>>>>> round (i.e. before we do the bitmap sync), as shown below:
+>>>>>>
+>>>>>> 1) 1st Round starts --> free_page_start
+>>>>>> 2) 1st Round in progress..
+>>>>>> 3) 1st Round ends  --> free_page_stop
+>>>>>> 4) 2nd Round starts --> free_page_start
+>>>>>> 5) 2nd Round in progress..
+>>>>>> 6) 2nd Round ends --> free_page_stop
+>>>>>> ......
+>>>>>>
+>>>>>> For example, in 2), the VM is stopped. virtio_balloon_poll_free_page_hints
+>>>>>> finds the vq is empty (i.e. elem == NULL) and the runstate is stopped, the
+>>>>>> optimization thread exits immediately. That is, this optimization thread is
+>>>>>> gone forever (the optimization we can do for this round is done). We won't
+>>>>>> know when would the VM be woken up:
+>>>>>> A) If the VM is woken up very soon when the migration thread is still in
+>>>>>> progress of 2), then in 4) a new optimization thread (not the same one for
+>>>>>> the first round) will be created and start the optimization for the 2nd
+>>>>>> round as usual (If you have questions about 3) in this case, that
+>>>>>> free_page_stop will do nothing than just return, since the optimization
+>>>>>> thread has exited) ;
+>>>>>> B) If the VM is woken up after the whole migration has ended, there is still
+>>>>>> no point in resuming the optimization.
+>>>>>>
+>>>>>> I think this would be the simple design for the first release of this
+>>>>>> optimization. There are possibilities to improve case A) above by continuing
+>>>>>> optimization for the 1st Round as it is still in progress, but I think
+>>>>>> adding that complexity for this rare case wouldn't be worthwhile (at least
+>>>>>> for now). What would you think?
+>>>>>>
+>>>>>>
+>>>>>> Best,
+>>>>>> Wei
+>>>>> In my opinion this just makes the patch very messy.
+>>>>>
+>>>>> E.g. attempts to attach a debugger to the guest will call vmstop and
+>>>>> then behaviour changes. This is a receipe for heisenbugs which are then
+>>>>> extremely painful to debug.
+>>>>>
+>>>>> It is not really hard to make things symmetrical:
+>>>>> e.g. if you stop on vmstop then you should start on vmstart, etc.
+>>>>> And stopping thread should not involve a bunch of state
+>>>>> changes, just stop it and that's it.
+>>>>>
+>>>> "stop it" - do you mean to
+>>>> 1) make the thread exit (i.e.make virtio_balloon_poll_free_page_hints exit
+>>>> the while loop and return NULL); or
+>>>> 2) keep the thread staying in the while loop but yield running (e.g.
+>>>> sleep(1) or block on a mutex)? (or please let me know if you suggested a
+>>>> different implementation about stopping the thread)
+>>> I would say it makes more sense to make it block on something.
+>>>
+>>> BTW I still think you are engaging in premature optimization here.
+>>> What you are doing here is a "data plane for balloon".
+>>> I would make the feature work first by processing this in a BH.
+>>> Creating threads immediately opens up questions of isolation,
+>>> cgroups etc.
+>>>
+>> Could you please share more about how creating threads affects isolation and
+>> cgroup?
+> When threads are coming and going, they are hard to control.
+>
+> Consider the rich API libvirt exposes for controlling the io threads:
+>
+> https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
+>
+>
+>> and how does BH solve it? Thanks.
+>> Best,
+>> Wei
+> It's late at night so I don't remember whether it's the emulator
+> or the io thread that runs the BH, but the point is it's
+> already controlled by libvirt.
+>
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Juan Quintela <quintela@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
----
- migration/ram.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+Thanks all for reviewing the patches. I've changed to use iothread in 
+the new version. Please have a check if that would be good enough.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 0147548..1d85ffa 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -51,6 +51,7 @@
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
- #include "migration/block.h"
-+#include "sysemu/balloon.h"
- 
- /***********************************************************/
- /* ram save/restore */
-@@ -213,6 +214,8 @@ struct RAMState {
-     uint32_t last_version;
-     /* We are in the first round */
-     bool ram_bulk_stage;
-+    /* The free pages optimization feature is supported */
-+    bool free_page_support;
-     /* How many times we have dirty too many pages */
-     int dirty_rate_high_cnt;
-     /* these variables are used for bitmap sync */
-@@ -841,6 +844,10 @@ static void migration_bitmap_sync(RAMState *rs)
-     int64_t end_time;
-     uint64_t bytes_xfer_now;
- 
-+    if (rs->free_page_support) {
-+        balloon_free_page_stop();
-+    }
-+
-     ram_counters.dirty_sync_count++;
- 
-     if (!rs->time_last_bitmap_sync) {
-@@ -907,6 +914,10 @@ static void migration_bitmap_sync(RAMState *rs)
-     if (migrate_use_events()) {
-         qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
-     }
-+
-+    if (rs->free_page_support) {
-+        balloon_free_page_start();
-+    }
- }
- 
- /**
-@@ -1663,7 +1674,17 @@ static void ram_state_reset(RAMState *rs)
-     rs->last_sent_block = NULL;
-     rs->last_page = 0;
-     rs->last_version = ram_list.version;
--    rs->ram_bulk_stage = true;
-+    rs->free_page_support = balloon_free_page_support() && !migrate_postcopy();
-+    if (rs->free_page_support) {
-+        /*
-+         * When the free page optimization is used, not all the pages are
-+         * treated as dirty pages (via migration_bitmap_find_dirty), which need
-+         * to be sent. So disable ram_bulk_stage in this case.
-+         */
-+        rs->ram_bulk_stage = false;
-+    } else {
-+        rs->ram_bulk_stage = true;
-+    }
- }
- 
- #define MAX_WAIT 50 /* ms, half buffered_file limit */
-@@ -2369,6 +2390,9 @@ out:
- 
-     ret = qemu_file_get_error(f);
-     if (ret < 0) {
-+        if (rs->free_page_support) {
-+            balloon_free_page_stop();
-+        }
-         return ret;
-     }
- 
--- 
-1.8.3.1
+Best,
+Wei
