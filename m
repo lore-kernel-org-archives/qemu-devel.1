@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f1xOP-0001iv-Ec
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:00:46 -0400
+	(envelope-from <mjc@sifive.com>) id 1f1xPL-0002HV-IM
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f1xOK-0005qt-K0
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:00:45 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:36641)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f1xOK-0005qD-AG
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:00:40 -0400
-References: <20180320090813.852-1-laurent@vivier.eu>
-	<d409453e-21c4-c989-c40c-442dcb8f2636@landley.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7cac14a3-c097-572e-4b61-8960209f6bd9@vivier.eu>
-Date: Fri, 30 Mar 2018 19:00:35 +0200
+	(envelope-from <mjc@sifive.com>) id 1f1xPJ-0006V6-Bz
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:01:43 -0400
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:41366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f1xPJ-0006Uc-4f
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 13:01:41 -0400
+Received: by mail-ot0-x234.google.com with SMTP id i28-v6so10068451otf.8
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 10:01:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d409453e-21c4-c989-c40c-442dcb8f2636@landley.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 0/2] M68k for 2.12 patches
+In-Reply-To: <87po3m6nr8.fsf@linaro.org>
+References: <1522180487-22899-1-git-send-email-mjc@sifive.com>
+	<1522180487-22899-2-git-send-email-mjc@sifive.com>
+	<0b20ff75-00d7-80db-ed2a-8b644a57b415@amsat.org>
+	<CAHNT7Nt40C8Bh3VJHjv8f+obSbU6Ki8ThXH2L7o4zoSM2LnK5A@mail.gmail.com>
+	<87po3m6nr8.fsf@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 30 Mar 2018 10:01:39 -0700
+Message-ID: <CAHNT7Nv9R0nKvz7-ENck190pX-RgSXpN27ut4hJ5OXWQ3XCqOw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] RISC-V: Workaround for critical
+ mstatus.FS MTTCG bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +33,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rob Landley <rob@landley.net>, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, RISC-V Patches <patches@groups.riscv.org>
 
-Le 30/03/2018 à 18:54, Rob Landley a écrit :
-> On 03/20/2018 04:08 AM, Laurent Vivier wrote:> This series of patches is needed
-> to fix a problem
->> in the m68k translator that can crash QEMU when translation
->> cache has too many instructions:
->>
->>   qemu-m68k: tcg/tcg.c:883: tcg_temp_alloc: Assertion `n < 512' failed.
->>   qemu: uncaught target signal 11 (Segmentation fault) - core dumped
->>
->> I have reproduced it in linux user mode, with "ghc", and in
->> system mode with the debian-installer for unstable distro
->> from debian-ports.
-> 
-> If someone wanted to follow along with your "boot linux on qemu-system-m68k"
-> work on https://github.com/vivier/qemu-m68k, which of the 51 branches should
-> qemu-system-m68k with like -M q800 or whatever you had working be built from?
+On Fri, Mar 30, 2018 at 12:11 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org>
+wrote:
 
-The branch to use is q800-dev
+>
+> Michael Clark <mjc@sifive.com> writes:
+>
+> > On Tue, Mar 27, 2018 at 3:17 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org
+> >
+> > wrote:
+> >
+> >> Cc'ing Alex and Richard.
+> >>
+> >> On 03/27/2018 04:54 PM, Michael Clark wrote:
+> >> > This change is a workaround for a bug where mstatus.FS
+> >> > is not correctly reporting dirty when MTTCG and SMP are
+> >> > enabled which results in the floating point register file
+> >> > not being saved during context switches. This a critical
+> >> > bug for RISC-V in QEMU as it results in floating point
+> >> > register file corruption when running SMP Linux in the
+> >> > RISC-V 'virt' machine.
+> >> >
+> >> > This workaround will return dirty if mstatus.FS is
+> >> > switched from off to initial or clean. We have checked
+> >> > the specification and it is legal for an implementation
+> >> > to return either off, or dirty, if set to initial or clean.
+> >> >
+> >> > This workaround will result in unnecessary floating point
+> >> > save restore. When mstatus.FS is off, floating point
+> >> > instruction trap to indicate the process is using the FPU.
+> >> > The OS can then save floating-point state of the previous
+> >> > process using the FPU and set mstatus.FS to initial or
+> >> > clean. With this workaround, mstatus.FS will always return
+> >> > dirty if set to a non-zero value, indicating floating point
+> >> > save restore is necessary, versus misreporting mstatus.FS
+> >> > resulting in floating point register file corruption.
+> >> >
+> >> > Cc: Palmer Dabbelt <palmer@sifive.com>
+> >> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> >> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> >> > Cc: Peter Maydell <peter.maydell@linaro.org>
+> >> > Tested-by: Richard W.M. Jones <rjones@redhat.com>
+> >> > Signed-off-by: Michael Clark <mjc@sifive.com>
+> >> > ---
+> >> >  target/riscv/op_helper.c | 19 +++++++++++++++++--
+> >> >  1 file changed, 17 insertions(+), 2 deletions(-)
+> >> >
+> >> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> >> > index e34715d..7281b98 100644
+> >> > --- a/target/riscv/op_helper.c
+> >> > +++ b/target/riscv/op_helper.c
+> >> > @@ -144,8 +144,23 @@ void csr_write_helper(CPURISCVState *env,
+> >> target_ulong val_to_write,
+> >> >          }
+> >> >
+> >> >          mstatus =3D (mstatus & ~mask) | (val_to_write & mask);
+> >> > -        int dirty =3D (mstatus & MSTATUS_FS) =3D=3D MSTATUS_FS;
+> >> > -        dirty |=3D (mstatus & MSTATUS_XS) =3D=3D MSTATUS_XS;
+> >> > +
+> >> > +        /* Note: this is a workaround for an issue where mstatus.FS
+> >> > +           does not report dirty when SMP and MTTCG is enabled. Thi=
+s
+> >> > +           workaround is technically compliant with the RISC-V
+> >> Privileged
+> >> > +           specification as it is legal to return only off, or dirt=
+y,
+> >> > +           however this may cause unnecessary saves of floating poi=
+nt
+> >> state.
+> >> > +           Without this workaround, floating point state is not sav=
+ed
+> >> and
+> >> > +           restored correctly when SMP and MTTCG is enabled, */
+> >>
+> >
+> > On looking at this again, I think we may need to remove the
+> > qemu_tcg_mttcg_enabled conditional and always return dirty if the state
+> is
+> > initial or clean, but not off.
+> >
+> > While testing on uniprocessor worked okay, it's likely because we were
+> > lucky and there was no task migration or multiple FPU tasks working. Th=
+is
+> > would mean we would revert to Richard W.M. Jones initial patch.
+> >
+> >> +        if (qemu_tcg_mttcg_enabled()) {
+> >> > +            /* FP is always dirty or off */
+> >> > +            if (mstatus & MSTATUS_FS) {
+> >> > +                mstatus |=3D MSTATUS_FS;
+> >> > +            }
+> >> > +        }
+>
+>
+> I'm confused. If mstatus is a per-vCPU variable why does the enabling or
+> not of MTTCG matter here?
 
-> 
-> Also, "git pull" of the last tree I had from there exploded into a fireball of
-> automerge conflicts. Is there something I should know?
 
-As I rebase the branch regularly, a simple "git pull" will not work.
+It was an incorrect inference from the available data at the time given the
+problem showed up on SMP but not uniprocessor.
 
-If the branch already exist locally
+After inspecting the logic we concluded we were just lucky in the
+uniprocessor case because our test case only have once process using the
+CPU, whereas with SMP the process was rescheduled to another core which
+made the corruption visible on SMP.
 
-  git checkout q800-dev
-  git reset --hard vivier/q800-dev
+We removed the MTTCG condition from the subsequent version of the patch,
+updated the patch description and comment and removed references to MTTCG.
 
-  [I guess the remote name is "vivier"]
 
-otherwise, a simple "git checkout q800-dev" should create the branch
-from scrash.
-
-Thanks,
-Laurent
+> >> > +
+> >> > +        int dirty =3D ((mstatus & MSTATUS_FS) =3D=3D MSTATUS_FS) |
+> >> > +                    ((mstatus & MSTATUS_XS) =3D=3D MSTATUS_XS);
+> >> >          mstatus =3D set_field(mstatus, MSTATUS_SD, dirty);
+> >> >          env->mstatus =3D mstatus;
+> >> >          break;
+> >> >
+> >>
+> >
+> > The text from the specification that allows us to always return dirty i=
+f
+> > set to initial or clean, is below i.e. Dirty implies state has
+> > "potentially" been modified, so that gives us wriggle room.
+> >
+> > "
+> > When an extension's status is set to Off , any instruction that attempt=
+s
+> to
+> > read or write the corresponding
+> > state will cause an exception. When the status is Initial, the
+> > corresponding state should
+> > have an initial constant value. When the status is Clean, the
+> corresponding
+> > state is potentially
+> > di fferent from the initial value, but matches the last value stored on=
+ a
+> > context swap. When the
+> > status is Dirty, the corresponding state has potentially been modif ed
+> > since the last context save.
+> > "
+> >
+> > I think the problem is Linux is setting the state to clean after saving
+> > fpu register state [1], but we have no code in the QEMU FPU operations =
+to
+> > set the state to dirty, if is clean or initial, only code to cause an
+> > exception if the floating point extension state is set to off e.g.
+> >
+> > static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+> >         int rs2, target_long imm)
+> > {
+> >     TCGv t0;
+> >
+> >     if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> >         gen_exception_illegal(ctx);
+> >         return;
+> >     }
+> >
+> >     t0 =3D tcg_temp_new();
+> >     gen_get_gpr(t0, rs1);
+> >     tcg_gen_addi_tl(t0, t0, imm);
+> >
+> >     switch (opc) {
+> >     case OPC_RISC_FSW:
+> >         tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
+> >         break;
+> >     case OPC_RISC_FSD:
+> >         tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
+> >         break;
+> >     default:
+> >         gen_exception_illegal(ctx);
+> >         break;
+> >     }
+> >
+> >     tcg_temp_free(t0);
+> > }
+> >
+> > [1]
+> > https://github.com/torvalds/linux/blob/master/arch/riscv/
+> include/asm/switch_to.h
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
