@@ -1,35 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1f1qf6-00037a-Cl
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:49:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1f1tnG-00059U-Op
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 09:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1f1qf3-0002ZA-74
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:49:32 -0400
-Received: from mga12.intel.com ([192.55.52.136]:2094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1f1qf2-0002YF-U2
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 05:49:29 -0400
-Message-ID: <5ABE08E7.2060108@intel.com>
-Date: Fri, 30 Mar 2018 17:52:39 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1521197309-13544-1-git-send-email-wei.w.wang@intel.com>
-	<1521197309-13544-5-git-send-email-wei.w.wang@intel.com>
-	<20180316165319-mutt-send-email-mst@kernel.org>
-	<5AAE4124.5010602@intel.com>
-	<20180319062023-mutt-send-email-mst@kernel.org>
-	<5AAF7C72.5070403@intel.com>
-	<20180320004900-mutt-send-email-mst@kernel.org>
-	<5AB06EE9.1030306@intel.com>
-	<20180320045134-mutt-send-email-mst@kernel.org>
-	<5AB07D7F.90205@intel.com>
-	<20180320051840-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180320051840-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v5 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+	(envelope-from <eblake@redhat.com>) id 1f1tnF-0002jL-JP
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 09:10:10 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 30 Mar 2018 08:09:50 -0500
+Message-Id: <20180330130950.1931229-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12] nbd: trace meta context negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,106 +17,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On 03/20/2018 11:24 AM, Michael S. Tsirkin wrote:
-> On Tue, Mar 20, 2018 at 11:18:23AM +0800, Wei Wang wrote:
->> On 03/20/2018 10:59 AM, Michael S. Tsirkin wrote:
->>> On Tue, Mar 20, 2018 at 10:16:09AM +0800, Wei Wang wrote:
->>>> On 03/20/2018 06:55 AM, Michael S. Tsirkin wrote:
->>>>> On Mon, Mar 19, 2018 at 05:01:38PM +0800, Wei Wang wrote:
->>>>>> On 03/19/2018 12:24 PM, Michael S. Tsirkin wrote:
->>>>>>> On Sun, Mar 18, 2018 at 06:36:20PM +0800, Wei Wang wrote:
->>>>>>>> On 03/16/2018 11:16 PM, Michael S. Tsirkin wrote:
->>>>>>>>> On Fri, Mar 16, 2018 at 06:48:28PM +0800, Wei Wang wrote:
->>>>>>> OTOH it seems that if thread stops nothing will wake it up
->>>>>>> whem vm is restarted. Such bahaviour change across vmstop/vmstart
->>>>>>> is unexpected.
->>>>>>> I do not understand why we want to increment the counter
->>>>>>> on vm stop though. It does make sense to stop the thread
->>>>>>> but why not resume where we left off when vm is resumed?
->>>>>>>
->>>>>> I'm not sure which counter we incremented. But it would be clear if we have
->>>>>> a high level view of how it works (it is symmetric actually). Basically, we
->>>>>> start the optimization when each round starts and stop it at the end of each
->>>>>> round (i.e. before we do the bitmap sync), as shown below:
->>>>>>
->>>>>> 1) 1st Round starts --> free_page_start
->>>>>> 2) 1st Round in progress..
->>>>>> 3) 1st Round ends  --> free_page_stop
->>>>>> 4) 2nd Round starts --> free_page_start
->>>>>> 5) 2nd Round in progress..
->>>>>> 6) 2nd Round ends --> free_page_stop
->>>>>> ......
->>>>>>
->>>>>> For example, in 2), the VM is stopped. virtio_balloon_poll_free_page_hints
->>>>>> finds the vq is empty (i.e. elem == NULL) and the runstate is stopped, the
->>>>>> optimization thread exits immediately. That is, this optimization thread is
->>>>>> gone forever (the optimization we can do for this round is done). We won't
->>>>>> know when would the VM be woken up:
->>>>>> A) If the VM is woken up very soon when the migration thread is still in
->>>>>> progress of 2), then in 4) a new optimization thread (not the same one for
->>>>>> the first round) will be created and start the optimization for the 2nd
->>>>>> round as usual (If you have questions about 3) in this case, that
->>>>>> free_page_stop will do nothing than just return, since the optimization
->>>>>> thread has exited) ;
->>>>>> B) If the VM is woken up after the whole migration has ended, there is still
->>>>>> no point in resuming the optimization.
->>>>>>
->>>>>> I think this would be the simple design for the first release of this
->>>>>> optimization. There are possibilities to improve case A) above by continuing
->>>>>> optimization for the 1st Round as it is still in progress, but I think
->>>>>> adding that complexity for this rare case wouldn't be worthwhile (at least
->>>>>> for now). What would you think?
->>>>>>
->>>>>>
->>>>>> Best,
->>>>>> Wei
->>>>> In my opinion this just makes the patch very messy.
->>>>>
->>>>> E.g. attempts to attach a debugger to the guest will call vmstop and
->>>>> then behaviour changes. This is a receipe for heisenbugs which are then
->>>>> extremely painful to debug.
->>>>>
->>>>> It is not really hard to make things symmetrical:
->>>>> e.g. if you stop on vmstop then you should start on vmstart, etc.
->>>>> And stopping thread should not involve a bunch of state
->>>>> changes, just stop it and that's it.
->>>>>
->>>> "stop it" - do you mean to
->>>> 1) make the thread exit (i.e.make virtio_balloon_poll_free_page_hints exit
->>>> the while loop and return NULL); or
->>>> 2) keep the thread staying in the while loop but yield running (e.g.
->>>> sleep(1) or block on a mutex)? (or please let me know if you suggested a
->>>> different implementation about stopping the thread)
->>> I would say it makes more sense to make it block on something.
->>>
->>> BTW I still think you are engaging in premature optimization here.
->>> What you are doing here is a "data plane for balloon".
->>> I would make the feature work first by processing this in a BH.
->>> Creating threads immediately opens up questions of isolation,
->>> cgroups etc.
->>>
->> Could you please share more about how creating threads affects isolation and
->> cgroup?
-> When threads are coming and going, they are hard to control.
->
-> Consider the rich API libvirt exposes for controlling the io threads:
->
-> https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
->
->
->> and how does BH solve it? Thanks.
->> Best,
->> Wei
-> It's late at night so I don't remember whether it's the emulator
-> or the io thread that runs the BH, but the point is it's
-> already controlled by libvirt.
->
+Having a more detailed log of the interaction between client and
+server is invaluable in debugging how meta context negotiation
+actually works.
 
-Thanks all for reviewing the patches. I've changed to use iothread in 
-the new version. Please have a check if that would be good enough.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/client.c     | 2 ++
+ nbd/server.c     | 8 ++++++++
+ nbd/trace-events | 6 ++++++
+ 3 files changed, 16 insertions(+)
 
-Best,
-Wei
+diff --git a/nbd/client.c b/nbd/client.c
+index 4ee1d9a4a2c..478b6085df7 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -623,6 +623,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+     char *data = g_malloc(data_len);
+     char *p = data;
+
++    trace_nbd_opt_meta_request(context, export);
+     stl_be_p(p, export_len);
+     memcpy(p += sizeof(export_len), export, export_len);
+     stl_be_p(p += export_len, 1);
+@@ -681,6 +682,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+         }
+         g_free(name);
+
++        trace_nbd_opt_meta_reply(context, received_id);
+         received = true;
+
+         /* receive NBD_REP_ACK */
+diff --git a/nbd/server.c b/nbd/server.c
+index cea158913ba..9e1f2271784 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -726,6 +726,7 @@ static int nbd_negotiate_send_meta_context(NBDClient *client,
+         context_id = 0;
+     }
+
++    trace_nbd_negotiate_meta_query_reply(context, context_id);
+     set_be_option_rep(&opt.h, client->opt, NBD_REP_META_CONTEXT,
+                       sizeof(opt) - sizeof(opt.h) + iov[1].iov_len);
+     stl_be_p(&opt.context_id, context_id);
+@@ -752,10 +753,12 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
+         if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
+             meta->base_allocation = true;
+         }
++        trace_nbd_negotiate_meta_query_parse("base:");
+         return 1;
+     }
+
+     if (len != alen) {
++        trace_nbd_negotiate_meta_query_skip("not base:allocation");
+         return nbd_opt_skip(client, len, errp);
+     }
+
+@@ -768,6 +771,7 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
+         meta->base_allocation = true;
+     }
+
++    trace_nbd_negotiate_meta_query_parse("base:allocation");
+     return 1;
+ }
+
+@@ -800,6 +804,7 @@ static int nbd_negotiate_meta_query(NBDClient *client,
+     /* The only supported namespace for now is 'base'. So query should start
+      * with 'base:'. Otherwise, we can ignore it and skip the remainder. */
+     if (len < baselen) {
++        trace_nbd_negotiate_meta_query_skip("length too short");
+         return nbd_opt_skip(client, len, errp);
+     }
+
+@@ -809,6 +814,7 @@ static int nbd_negotiate_meta_query(NBDClient *client,
+         return ret;
+     }
+     if (strncmp(query, "base:", baselen) != 0) {
++        trace_nbd_negotiate_meta_query_skip("not for base: namespace");
+         return nbd_opt_skip(client, len, errp);
+     }
+
+@@ -858,6 +864,8 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
+         return ret;
+     }
+     cpu_to_be32s(&nb_queries);
++    trace_nbd_negotiate_meta_context(nbd_opt_lookup(client->opt),
++                                     meta->export_name, nb_queries);
+
+     if (client->opt == NBD_OPT_LIST_META_CONTEXT && !nb_queries) {
+         /* enable all known contexts */
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 0d03edc967d..cfdbe04b447 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -10,6 +10,8 @@ nbd_receive_query_exports_start(const char *wantname) "Querying export list for
+ nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+ nbd_receive_starttls_new_client(void) "Setting up TLS"
+ nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
++nbd_opt_meta_request(const char *context, const char *export) "Requesting to set meta context %s for export %s"
++nbd_opt_meta_reply(const char *context, int id) "Received mapping of context %s to id %d"
+ nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
+ nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
+ nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global flags are 0x%" PRIx32
+@@ -44,6 +46,10 @@ nbd_negotiate_handle_info_request(int request, const char *name) "Client request
+ nbd_negotiate_handle_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t maximum) "advertising minimum 0x%" PRIx32 ", preferred 0x%" PRIx32 ", maximum 0x%" PRIx32
+ nbd_negotiate_handle_starttls(void) "Setting up TLS"
+ nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
++nbd_negotiate_meta_context(const char *optname, const char *export, int queries) "Client requested %s for export %s, with %d queries"
++nbd_negotiate_meta_query_skip(const char *reason) "Skipping meta query: %s"
++nbd_negotiate_meta_query_parse(const char *query) "Parsed meta query '%s'"
++nbd_negotiate_meta_query_reply(const char *context, unsigned int id) "Replying with meta context '%s' id %d"
+ nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
+ nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
+ nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option %" PRIu32 " (%s)"
+-- 
+2.14.3
