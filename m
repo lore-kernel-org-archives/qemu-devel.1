@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1zBg-00070z-5j
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:55:45 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f21Lj-0000H2-Tm
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 17:14:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1zBb-0003M5-AH
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:55:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41254)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f1zBb-0003Lt-4H
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:55:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f1zBZ-0001X6-Uc
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:55:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E531D2E8050
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:55:37 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1f21Lf-0005w2-Da
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 17:14:15 -0400
+Resent-Message-Id: <E1f21Lf-0005w2-Da@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f21Lf-0005q7-5x
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 17:14:11 -0400
+In-Reply-To: <20180329213857.15499-1-ehabkost@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152244170935.810.11822339174914403802@71c20359a636>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Mar 2018 18:43:38 -0000
-From: Fritz Hudnut <este.el.paz@gmail.com>
-Reply-To: Bug 1760176 <1760176@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152243541894.4250.1548453889395485127.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1760176] [NEW] optical drive doesn't open in
- Lubuntu 18.04 on '12 MacPro
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 30 Mar 2018 13:28:30 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC 00/18] QEMU validator: A method to specify
+ QEMU crash-test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, thuth@redhat.com, apahim@redhat.com, f4bug@amsat.org, armbru@redhat.com, crosa@redhat.com, marcel@redhat.com, pbonzini@redhat.com
 
-Public bug reported:
-
-Running an install to HD of Lubuntu 18.04 and after running
-update/upgrade this morning now the optical drive door doesn't respond
-to keyboard "eject" key on a Mac keyboard for '12 MacPro . . . .  I
-tried to use "xfburn" to get the door to open, nothing seems to get it
-to work that I know of.  Yesterday there was no issue . . . .  Tried to
-run "apt -f install" and it showed some old kernels to "autoremove" . .
-. which I did; didn't try to reboot into old kernel to test, perhaps now
-old kernel is gone?
-
-F
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1760176
-
-Title:
-  optical drive doesn't open in Lubuntu 18.04 on '12 MacPro
-
-Status in QEMU:
-  New
-
-Bug description:
-  Running an install to HD of Lubuntu 18.04 and after running
-  update/upgrade this morning now the optical drive door doesn't respond
-  to keyboard "eject" key on a Mac keyboard for '12 MacPro . . . .  I
-  tried to use "xfburn" to get the door to open, nothing seems to get it
-  to work that I know of.  Yesterday there was no issue . . . .  Tried
-  to run "apt -f install" and it showed some old kernels to "autoremove"
-  . . . which I did; didn't try to reboot into old kernel to test,
-  perhaps now old kernel is gone?
-
-  F
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1760176/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMzI5MjEzODU3LjE1NDk5LTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyAwMC8xOF0gUUVNVSB2YWxpZGF0b3I6IEEgbWV0aG9kIHRv
+IHNwZWNpZnkgUUVNVSBjcmFzaC10ZXN0IGNhc2VzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVw
+ZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMzMwMTcwMjA5LjIwNjI3LTEtcmthZ2FuQHZp
+cnR1b3p6by5jb20gLT4gcGF0Y2hldy8yMDE4MDMzMDE3MDIwOS4yMDYyNy0xLXJrYWdhbkB2aXJ0
+dW96em8uY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMzAxOTU5
+MjguMTU2MDctMS1qY212YmtiY0BnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE4MDMzMDE5NTkyOC4x
+NTYwNy0xLWpjbXZia2JjQGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjBmZGIxYTJmMDUgQ29sbGVjdGlvbiBvZiB2YWxpZGF0b3IucHkgdGVzdCBjYXNlcwo5NjJjN2I5
+YTQ1IHZhbGlkYXRvci5weSBzY3JpcHQKMTExMjUxMjVkOCBxZW11LnB5OiBpc19sYXVuY2hlZCgp
+IG1ldGhvZAplN2I5MzYwZmM3IHFlbXUucHk6IHFtcF9vYmooKSBtZXRob2QKMDRmMWQwM2U1NiBx
+ZW11LnB5OiBEb24ndCB0cnkgdG8gcXVpdCBjbGVhbmx5IG9uIGV4Y2VwdGlvbnMKYjUwNDIwNzg2
+OSBxZW11LnB5OiAnZm9yY2UnIHBhcmFtZXRlciBvbiBzaHV0ZG93bigpCjljZmVkYjczMzcgcWVt
+dS5weTogT25seSB3YWl0IGZvciBwcm9jZXNzIGlmIGl0J3Mgc3RpbGwgcnVubmluZwo4YzdlODQz
+ZDZlIHFlbXUucHk6IExvZyBjcmFzaGVzIGluc2lkZSBfcG9zdF9zaHV0ZG93bigpCjk5MmMxYjZi
+YjIgcWVtdS5weTogU2V0IF9sYXVuY2hlZCA9IEZhbHNlIG9uIF9wb3N0X3NodXRkb3duCjllNGJj
+YjQyMTUgcWVtdS5weTogTWFrZSBtb25pdG9yIG9wdGlvbmFsCjRkNzhkYWJmZTIgcWVtdS5weTog
+Q2xvc2UgX3FtcCBpbnNpZGUgX3Bvc3Rfc2h1dGRvd24oKQozOTM3Y2UyOGUyIHFlbXUucHk6IFVz
+ZSB3YWl0KCkgbG9naWMgaW5zaWRlIHNodXRkb3duKCkKYzJiNTE0MGUzZCBxZW11LnB5OiBNb3Zl
+IF9sb2FkX2lvX2xvZygpIGNhbGwgdG8gX3Bvc3Rfc2h1dGRvd24oKQphMjAyNTRjOWUwIHFlbXUu
+cHk6IFNwbGl0IF9iYXNlX2FyZ3MoKQpiYjVlNjA5YTZiIHFlbXUucHk6IE1ha2UgX3ZtX21vbml0
+b3IgYSBtZXRob2QKYTU3MWZlZWEwYyBxbXAucHk6IENsZWFubHkgaGFuZGxlIHVuZXhwZWN0ZWRs
+eSBjbG9zZWQgc29ja2V0CjlhOTI3NTljMGMgcW1wLnB5OiBGaXggZXJyb3IgaGFuZGxpbmcgZm9y
+IFB5dGhvbiAzCjFmOGY1NjA5NWQgcW1wLnB5OiBNYWtlIGl0IHNhZmUgdG8gY2FsbCBjbG9zZSgp
+IGFueSB0aW1lCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE4OiBxbXAu
+cHk6IE1ha2UgaXQgc2FmZSB0byBjYWxsIGNsb3NlKCkgYW55IHRpbWUuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMi8xODogcW1wLnB5OiBGaXggZXJyb3IgaGFuZGxpbmcgZm9yIFB5dGhvbiAzLi4uCkNoZWNr
+aW5nIFBBVENIIDMvMTg6IHFtcC5weTogQ2xlYW5seSBoYW5kbGUgdW5leHBlY3RlZGx5IGNsb3Nl
+ZCBzb2NrZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xODogcWVtdS5weTogTWFrZSBfdm1fbW9uaXRv
+ciBhIG1ldGhvZC4uLgpDaGVja2luZyBQQVRDSCA1LzE4OiBxZW11LnB5OiBTcGxpdCBfYmFzZV9h
+cmdzKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xODogcWVtdS5weTogTW92ZSBfbG9hZF9pb19sb2co
+KSBjYWxsIHRvIF9wb3N0X3NodXRkb3duKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xODogcWVtdS5w
+eTogVXNlIHdhaXQoKSBsb2dpYyBpbnNpZGUgc2h1dGRvd24oKS4uLgpDaGVja2luZyBQQVRDSCA4
+LzE4OiBxZW11LnB5OiBDbG9zZSBfcW1wIGluc2lkZSBfcG9zdF9zaHV0ZG93bigpLi4uCkNoZWNr
+aW5nIFBBVENIIDkvMTg6IHFlbXUucHk6IE1ha2UgbW9uaXRvciBvcHRpb25hbC4uLgpDaGVja2lu
+ZyBQQVRDSCAxMC8xODogcWVtdS5weTogU2V0IF9sYXVuY2hlZCA9IEZhbHNlIG9uIF9wb3N0X3No
+dXRkb3duLi4uCkNoZWNraW5nIFBBVENIIDExLzE4OiBxZW11LnB5OiBMb2cgY3Jhc2hlcyBpbnNp
+ZGUgX3Bvc3Rfc2h1dGRvd24oKS4uLgpDaGVja2luZyBQQVRDSCAxMi8xODogcWVtdS5weTogT25s
+eSB3YWl0IGZvciBwcm9jZXNzIGlmIGl0J3Mgc3RpbGwgcnVubmluZy4uLgpDaGVja2luZyBQQVRD
+SCAxMy8xODogcWVtdS5weTogJ2ZvcmNlJyBwYXJhbWV0ZXIgb24gc2h1dGRvd24oKS4uLgpDaGVj
+a2luZyBQQVRDSCAxNC8xODogcWVtdS5weTogRG9uJ3QgdHJ5IHRvIHF1aXQgY2xlYW5seSBvbiBl
+eGNlcHRpb25zLi4uCkNoZWNraW5nIFBBVENIIDE1LzE4OiBxZW11LnB5OiBxbXBfb2JqKCkgbWV0
+aG9kLi4uCkNoZWNraW5nIFBBVENIIDE2LzE4OiBxZW11LnB5OiBpc19sYXVuY2hlZCgpIG1ldGhv
+ZC4uLgpDaGVja2luZyBQQVRDSCAxNy8xODogdmFsaWRhdG9yLnB5IHNjcmlwdC4uLgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTg4OiBGSUxFOiBzY3JpcHRzL3ZhbGlkYXRvci5w
+eToxNjk6CisgICAgICAgICAgICBzZWxmLmFsbGRldnMgPSBxb21fdHlwZV9uYW1lcyh2bSwgaW1w
+bGVtZW50cz0nZGV2aWNlJywgYWJzdHJhY3Q9RmFsc2UpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMTkxOiBGSUxFOiBzY3JpcHRzL3ZhbGlkYXRvci5weToxNzI6CisgICAgICAg
+ICAgICBzZWxmLm5vX3VzZXJfZGV2cyA9IFtkWyduYW1lJ10gZm9yIGQgaW4gaW5mb19xZG0odm0s
+ICkgaWYgZFsnbm8tdXNlciddXQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5
+MzogRklMRTogc2NyaXB0cy92YWxpZGF0b3IucHk6MTc0OgorICAgICAgICAgICAgc2VsZi51c2Vy
+X2RldnMgPSBbZGV2IGZvciBkZXYgaW4gc2VsZi5hbGxkZXZzIGlmIGRldiBub3QgaW4gc2VsZi5u
+b191c2VyX2RldnNdCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTk1OiBGSUxF
+OiBzY3JpcHRzL3ZhbGlkYXRvci5weToxNzY6CisgICAgICAgICAgICBzZWxmLmNwdV9tb2RlbHMg
+PSBbY1snbmFtZSddIGZvciBjIGluIHZtLmNvbW1hbmQoJ3F1ZXJ5LWNwdS1kZWZpbml0aW9ucycp
+XQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMDE6IEZJTEU6IHNjcmlwdHMvdmFs
+aWRhdG9yLnB5OjI4MjoKKyAgICA+Pj4gbGlzdCh0YykgPT0gW3snYSc6W2ldLCAnYic6W2pdLCAn
+Yyc6WzEwMCwgMjAwLCAzMDBdfSBmb3IgaSBpbiBbMSwyXSBmb3IgaiBpbiBbMTAsIDIwXV0KCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzYyOiBGSUxFOiBzY3JpcHRzL3ZhbGlkYXRv
+ci5weTozNDM6CisgICAgICAgIHNlbGYuX3ZhcnMgPSBkaWN0KCh2LCBnZXRhdHRyKEJ1aWx0aW5W
+YXJzLCB2KSgpKSBmb3IgdiBpbiBkaXIoQnVpbHRpblZhcnMpIGlmIG5vdCB2LnN0YXJ0c3dpdGgo
+J18nKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNzI6IEZJTEU6IHNjcmlw
+dHMvdmFsaWRhdG9yLnB5OjM1MzoKKyAgICAgICAgRGVmYXVsdCB2YWx1ZXMgb3ZlcnJpZGUgdGhl
+IHZhbHVlcyByZXR1cm5lZCBieSBWYXJpYWJsZURlZmluaXRpb24uZW51bWVyYXRlKCkKCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzOTI6IEZJTEU6IHNjcmlwdHMvdmFsaWRhdG9y
+LnB5OjM3MzoKKyAgICAgICAgIiIiUmV0dXJuIGZ1bGwgbGlzdCBvZiB2YXJpYWJsZXMsIGluY2x1
+ZGluZyBkZXBlbmRlbmNpZXMgaW4gdGhlIHJpZ2h0IG9yZGVyCgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzQxMTogRklMRTogc2NyaXB0cy92YWxpZGF0b3IucHk6MzkyOgorICAgICAg
+ICAgICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIlZhcmlhYmxlIGRlcGVuZGVuY3kgY3ljbGU6
+ICVzIiAlICgnIC0+ICcuam9pbih2YXJzLmtleXMoKSkpKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiM1MzA6IEZJTEU6IHNjcmlwdHMvdmFsaWRhdG9yLnB5OjUxMToKKyAgICAgICAg
+dmFycyA9IHZhcnNfZm9yX3RlbXBsYXRlKHNlbGYuZ2V0KCdjb21tYW5kLWxpbmUnKSkgKyB2YXJz
+X2Zvcl90ZW1wbGF0ZShzZWxmLmdldCgnbW9uaXRvci1jb21tYW5kcycpKQoKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU0ODogRklMRTogc2NyaXB0cy92YWxpZGF0b3IucHk6NTI5
+OgorICAgICAgICByZXR1cm4gJyAnLmpvaW4oJyVzPSVzJyAlIChrLCBzaHF1b3RlKHYpKSBmb3Ig
+ayx2IGluIHNlbGYudmFsdWVzLml0ZW1zKCkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNTg4OiBGSUxFOiBzY3JpcHRzL3ZhbGlkYXRvci5weTo1Njk6CisgICAgICAgICAgICAg
+ICAgICAgIHJhaXNlIEludmFsaWRTcGVjaWZpY2F0aW9uKCJJbnZhbGlkIG1vbml0b3IgY29tbWFu
+ZDogJXI6ICVyIiAlIChrLCB2KSkKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjg4
+OiBGSUxFOiBzY3JpcHRzL3ZhbGlkYXRvci5weTo2Njk6CisgICAgICAgICAgICAgICAgICAgICAg
+ICBoZWxwPSJSdW4gYWxsIHRlc3QgY2FzZSBjb21iaW5hdGlvbnMsIG5vdCBqdXN0IHRoZSBkZWZh
+dWx0IGZvciB0aGUgdGVzdCBzcGVjaWZpY2F0aW9uIikKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojNzAyOiBGSUxFOiBzY3JpcHRzL3ZhbGlkYXRvci5weTo2ODM6CisgICAgbG9nZ2lu
+Zy5iYXNpY0NvbmZpZyhzdHJlYW09c3lzLnN0ZG91dCwgbGV2ZWw9YXJncy5sb2dsZXZlbCwgZm9y
+bWF0PSclKGxldmVsbmFtZSlzOiAlKG1lc3NhZ2UpcycpCgp0b3RhbDogNiBlcnJvcnMsIDggd2Fy
+bmluZ3MsIDcyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgpDaGVja2luZyBQQVRDSCAxOC8xODogQ29sbGVjdGlvbiBvZiB2YWxpZGF0b3IucHkg
+dGVzdCBjYXNlcy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
