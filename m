@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1z2M-0001y5-6U
+	(envelope-from <bounces@canonical.com>) id 1f1z2M-0001y3-6D
 	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:46:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f1z2J-0003xH-23
+	(envelope-from <bounces@canonical.com>) id 1f1z2K-000414-G4
 	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:46:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40446)
+Received: from indium.canonical.com ([91.189.90.7]:40578)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f1z2I-0003sk-Rp
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:46:02 -0400
+	id 1f1z2K-0003xJ-91
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:46:04 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f1z2F-0000RK-Ds
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:45:59 +0000
+	id 1f1z2H-0000RK-J7
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:46:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7D0832E81A6
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:45:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 06ECF2E8195
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:46:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Mar 2018 18:35:54 -0000
-From: Dmitrii Shcherbakov <1728256@bugs.launchpad.net>
+Date: Fri, 30 Mar 2018 18:36:30 -0000
+From: Launchpad Bug Tracker <1728256@bugs.launchpad.net>
 Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
-Message-Id: <152243495455.5421.9984939476286091194.launchpad@gac.canonical.com>
+Message-Id: <152243499143.5904.7019401721248325087.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1728256] Re: Memory corruption in Windows 10
  guest / amd64
@@ -39,9 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Also affects: linux (Ubuntu)
-   Importance: Undecided
-       Status: New
+Status changed to 'Confirmed' because the bug affects multiple users.
+
+** Changed in: linux (Ubuntu)
+       Status: New =3D> Confirmed
 
 -- =
 
