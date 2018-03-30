@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f20Be-000791-3Z
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 15:59:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1f1zBg-00070z-5j
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f20Bd-0001o8-9u
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 15:59:46 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:42123)
+	(envelope-from <bounces@canonical.com>) id 1f1zBb-0003M5-AH
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:55:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41254)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f20Bd-0001nO-1W
-	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 15:59:45 -0400
-Received: by mail-lf0-x241.google.com with SMTP id a22-v6so13727149lfg.9
-	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 12:59:44 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 30 Mar 2018 12:59:28 -0700
-Message-Id: <20180330195928.15607-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] target/xtensa: linux-user: rewind pc for
- restarted syscall
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f1zBb-0003Lt-4H
+	for qemu-devel@nongnu.org; Fri, 30 Mar 2018 14:55:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f1zBZ-0001X6-Uc
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:55:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E531D2E8050
+	for <qemu-devel@nongnu.org>; Fri, 30 Mar 2018 18:55:37 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 30 Mar 2018 18:43:38 -0000
+From: Fritz Hudnut <este.el.paz@gmail.com>
+Reply-To: Bug 1760176 <1760176@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152243541894.4250.1548453889395485127.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1760176] [NEW] optical drive doesn't open in
+ Lubuntu 18.04 on '12 MacPro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +37,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-In case of syscall restart request set pc back to the syscall
-instruction.
+Public bug reported:
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- linux-user/main.c | 3 +++
- 1 file changed, 3 insertions(+)
+Running an install to HD of Lubuntu 18.04 and after running
+update/upgrade this morning now the optical drive door doesn't respond
+to keyboard "eject" key on a Mac keyboard for '12 MacPro . . . .  I
+tried to use "xfburn" to get the door to open, nothing seems to get it
+to work that I know of.  Yesterday there was no issue . . . .  Tried to
+run "apt -f install" and it showed some old kernels to "autoremove" . .
+. which I did; didn't try to reboot into old kernel to test, perhaps now
+old kernel is gone?
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index ba09b7d0c873..8907a8411411 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -4006,6 +4006,9 @@ void cpu_loop(CPUXtensaState *env)
-                     break;
- 
-                 case -TARGET_ERESTARTSYS:
-+                    env->pc -= 3;
-+                    break;
-+
-                 case -TARGET_QEMU_ESIGRETURN:
-                     break;
-                 }
--- 
-2.11.0
+F
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1760176
+
+Title:
+  optical drive doesn't open in Lubuntu 18.04 on '12 MacPro
+
+Status in QEMU:
+  New
+
+Bug description:
+  Running an install to HD of Lubuntu 18.04 and after running
+  update/upgrade this morning now the optical drive door doesn't respond
+  to keyboard "eject" key on a Mac keyboard for '12 MacPro . . . .  I
+  tried to use "xfburn" to get the door to open, nothing seems to get it
+  to work that I know of.  Yesterday there was no issue . . . .  Tried
+  to run "apt -f install" and it showed some old kernels to "autoremove"
+  . . . which I did; didn't try to reboot into old kernel to test,
+  perhaps now old kernel is gone?
+
+  F
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1760176/+subscriptions
