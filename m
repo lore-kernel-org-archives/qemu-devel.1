@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f2CLq-0005Bd-AL
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 04:59:08 -0400
+	(envelope-from <jan.kiszka@web.de>) id 1f2CMU-0005eV-K5
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 04:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f2CLm-0004Pu-DJ
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 04:59:06 -0400
-Resent-Message-Id: <E1f2CLm-0004Pu-DJ@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f2CLm-0004Pg-5u
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 04:59:02 -0400
-In-Reply-To: <152246970464.28900.5033274314150943057.malonedeb@chaenomeles.canonical.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152248581272.870.17819493848540113082@71c20359a636>
+	(envelope-from <jan.kiszka@web.de>) id 1f2CMQ-0004go-Jx
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 04:59:46 -0400
+Received: from mout.web.de ([212.227.17.11]:35937)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1f2CMQ-0004g8-7K
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 04:59:42 -0400
+References: <152248152782.864.1806063787962449652@71c20359a636>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <75a4713c-ccae-07e7-ad34-800e87404cb8@web.de>
+Date: Sat, 31 Mar 2018 10:59:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 31 Mar 2018 01:43:33 -0700 (PDT)
-Subject: Re: [Qemu-devel] [Bug 1760262] [NEW] cmsdk-apb-uart doesn't appear
- to clear interrupt flags
+In-Reply-To: <152248152782.864.1806063787962449652@71c20359a636>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="UURiWaRqdrqJV6As0OHMwheWTMr3aTmk1"
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix IVHD entry length for AMD
+ IOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,186 +28,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: patrick.oppenlander@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQ
-bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
-ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
-dApsb2NhbGx5LgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE1MjI0Njk3MDQ2NC4yODkwMC41
-MDMzMjc0MzE0MTUwOTQzMDU3Lm1hbG9uZWRlYkBjaGFlbm9tZWxlcy5jYW5vbmljYWwuY29tClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbQnVnIDE3NjAyNjJdIFtORVddIGNtc2RrLWFwYi11YXJ0IGRv
-ZXNuJ3QgYXBwZWFyIHRvIGNsZWFyIGludGVycnVwdCBmbGFncwoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0
-YwojIExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9XX0VO
-Vj0xCmV4cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYQo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjExZTVlNmI0OGMgY21z
-ZGstYXBiLXVhcnQgZG9lc24ndCBhcHBlYXIgdG8gY2xlYXIgaW50ZXJydXB0IGZsYWdzCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qu
-b3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYmZla3ZwZ2Yvc3JjL2R0YycuLi4KU3VibW9kdWxlIHBh
-dGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICdlNTQzODgwMTVhZjFmYjRiZjA0ZDBiY2E5OWNhYmExMDc0
-ZDljYzQyJwogIEJVSUxEICAgZmVkb3JhCm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJmZWt2cGdmL3NyYycKICBHRU4gICAgIC92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC1iZmVrdnBnZi9zcmMvZG9ja2VyLXNyYy4yMDE4LTAzLTMxLTA0
-LjQzLjA1LjE1ODk5L3FlbXUudGFyCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0
-ZXItdG1wLWJmZWt2cGdmL3NyYy9kb2NrZXItc3JjLjIwMTgtMDMtMzEtMDQuNDMuMDUuMTU4OTkv
-cWVtdS50YXIudnJvb3QnLi4uCmRvbmUuCkNoZWNraW5nIG91dCBmaWxlczogIDI4JSAoMTc0Ny82
-MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAyOSUgKDE3NjAvNjA2NikgICAKQ2hlY2tpbmcg
-b3V0IGZpbGVzOiAgMzAlICgxODIwLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDMxJSAo
-MTg4MS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAzMSUgKDE5MzgvNjA2NikgICAKQ2hl
-Y2tpbmcgb3V0IGZpbGVzOiAgMzIlICgxOTQyLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczog
-IDMzJSAoMjAwMi82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAzNCUgKDIwNjMvNjA2Nikg
-ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgMzUlICgyMTI0LzYwNjYpICAgCkNoZWNraW5nIG91dCBm
-aWxlczogIDM2JSAoMjE4NC82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAzNyUgKDIyNDUv
-NjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgMzglICgyMzA2LzYwNjYpICAgCkNoZWNraW5n
-IG91dCBmaWxlczogIDM5JSAoMjM2Ni82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA0MCUg
-KDI0MjcvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDElICgyNDg4LzYwNjYpICAgCkNo
-ZWNraW5nIG91dCBmaWxlczogIDQyJSAoMjU0OC82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
-ICA0MyUgKDI2MDkvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDQlICgyNjcwLzYwNjYp
-ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ1JSAoMjczMC82MDY2KSAgIApDaGVja2luZyBvdXQg
-ZmlsZXM6ICA0NiUgKDI3OTEvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDclICgyODUy
-LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ4JSAoMjkxMi82MDY2KSAgIApDaGVja2lu
-ZyBvdXQgZmlsZXM6ICA0OSUgKDI5NzMvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNTAl
-ICgzMDMzLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUxJSAoMzA5NC82MDY2KSAgIApD
-aGVja2luZyBvdXQgZmlsZXM6ICA1MiUgKDMxNTUvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
-OiAgNTMlICgzMjE1LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU0JSAoMzI3Ni82MDY2
-KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NSUgKDMzMzcvNjA2NikgICAKQ2hlY2tpbmcgb3V0
-IGZpbGVzOiAgNTYlICgzMzk3LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU3JSAoMzQ1
-OC82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1OCUgKDM1MTkvNjA2NikgICAKQ2hlY2tp
-bmcgb3V0IGZpbGVzOiAgNTklICgzNTc5LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDYw
-JSAoMzY0MC82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MSUgKDM3MDEvNjA2NikgICAK
-Q2hlY2tpbmcgb3V0IGZpbGVzOiAgNjIlICgzNzYxLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxl
-czogIDYzJSAoMzgyMi82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2NCUgKDM4ODMvNjA2
-NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjUlICgzOTQzLzYwNjYpICAgCkNoZWNraW5nIG91
-dCBmaWxlczogIDY2JSAoNDAwNC82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2NyUgKDQw
-NjUvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjglICg0MTI1LzYwNjYpICAgCkNoZWNr
-aW5nIG91dCBmaWxlczogIDY5JSAoNDE4Ni82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA3
-MCUgKDQyNDcvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzElICg0MzA3LzYwNjYpICAg
-CkNoZWNraW5nIG91dCBmaWxlczogIDcyJSAoNDM2OC82MDY2KSAgIApDaGVja2luZyBvdXQgZmls
-ZXM6ICA3MyUgKDQ0MjkvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzQlICg0NDg5LzYw
-NjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc1JSAoNDU1MC82MDY2KSAgIApDaGVja2luZyBv
-dXQgZmlsZXM6ICA3NSUgKDQ2MTAvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzYlICg0
-NjExLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc3JSAoNDY3MS82MDY2KSAgIApDaGVj
-a2luZyBvdXQgZmlsZXM6ICA3OCUgKDQ3MzIvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAg
-NzklICg0NzkzLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgwJSAoNDg1My82MDY2KSAg
-IApDaGVja2luZyBvdXQgZmlsZXM6ICA4MSUgKDQ5MTQvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZp
-bGVzOiAgODIlICg0OTc1LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgzJSAoNTAzNS82
-MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NCUgKDUwOTYvNjA2NikgICAKQ2hlY2tpbmcg
-b3V0IGZpbGVzOiAgODUlICg1MTU3LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg2JSAo
-NTIxNy82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NyUgKDUyNzgvNjA2NikgICAKQ2hl
-Y2tpbmcgb3V0IGZpbGVzOiAgODglICg1MzM5LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczog
-IDg5JSAoNTM5OS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MCUgKDU0NjAvNjA2Nikg
-ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTElICg1NTIxLzYwNjYpICAgCkNoZWNraW5nIG91dCBm
-aWxlczogIDkyJSAoNTU4MS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MyUgKDU2NDIv
-NjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTQlICg1NzAzLzYwNjYpICAgCkNoZWNraW5n
-IG91dCBmaWxlczogIDk1JSAoNTc2My82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5NiUg
-KDU4MjQvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTclICg1ODg1LzYwNjYpICAgCkNo
-ZWNraW5nIG91dCBmaWxlczogIDk4JSAoNTk0NS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
-ICA5OSUgKDYwMDYvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAxMDAlICg2MDY2LzYwNjYp
-ICAgCkNoZWNraW5nIG91dCBmaWxlczogMTAwJSAoNjA2Ni82MDY2KSwgZG9uZS4KWW91ciBicmFu
-Y2ggaXMgdXAtdG8tZGF0ZSB3aXRoICdvcmlnaW4vdGVzdCcuClN1Ym1vZHVsZSAnZHRjJyAoZ2l0
-Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRj
-JwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1iZmVrdnBnZi9zcmMv
-ZG9ja2VyLXNyYy4yMDE4LTAzLTMxLTA0LjQzLjA1LjE1ODk5L3FlbXUudGFyLnZyb290L2R0Yycu
-Li4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICdlNTQzODgwMTVhZjFmYjRiZjA0
-ZDBiY2E5OWNhYmExMDc0ZDljYzQyJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGdpdDov
-L2dpdC5xZW11Lm9yZy9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9r
-ZXljb2RlbWFwZGInCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJm
-ZWt2cGdmL3NyYy9kb2NrZXItc3JjLjIwMTgtMDMtMzEtMDQuNDMuMDUuMTU4OTkvcWVtdS50YXIu
-dnJvb3QvdWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1hcGRi
-JzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMyY2Un
-CnRhcjogL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJmZWt2cGdmL3NyYy9kb2NrZXItc3Jj
-LjIwMTgtMDMtMzEtMDQuNDMuMDUuMTU4OTkvcWVtdS50YXI6IFdyb3RlIG9ubHkgMjA0OCBvZiAx
-MDI0MCBieXRlcwp0YXI6IEVycm9yIGlzIG5vdCByZWNvdmVyYWJsZTogZXhpdGluZyBub3cKZmFp
-bGVkIHRvIGNyZWF0ZSB0YXIgZmlsZQogIENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1taW5n
-dyBpbiBxZW11OmZlZG9yYSAKdGFyOiBVbmV4cGVjdGVkIEVPRiBpbiBhcmNoaXZlCnRhcjogcm10
-bHNlZWsgbm90IHN0b3BwZWQgYXQgYSByZWNvcmQgYm91bmRhcnkKdGFyOiBFcnJvciBpcyBub3Qg
-cmVjb3ZlcmFibGU6IGV4aXRpbmcgbm93Ci92YXIvdG1wL3FlbXUvcnVuOiBsaW5lIDMyOiBwcmVw
-X2ZhaWw6IGNvbW1hbmQgbm90IGZvdW5kClBhY2thZ2VzIGluc3RhbGxlZDoKUHlZQU1MLTMuMTIt
-NS5mYzI3Lng4Nl82NApTREwtZGV2ZWwtMS4yLjE1LTI5LmZjMjcueDg2XzY0CmJjLTEuMDcuMS0z
-LmZjMjcueDg2XzY0CmJpc29uLTMuMC40LTguZmMyNy54ODZfNjQKYnppcDItMS4wLjYtMjQuZmMy
-Ny54ODZfNjQKY2NhY2hlLTMuMy42LTEuZmMyNy54ODZfNjQKY2xhbmctNS4wLjEtMy5mYzI3Lng4
-Nl82NApmaW5kdXRpbHMtNC42LjAtMTYuZmMyNy54ODZfNjQKZmxleC0yLjYuMS01LmZjMjcueDg2
-XzY0CmdjYy03LjMuMS01LmZjMjcueDg2XzY0CmdjYy1jKystNy4zLjEtNS5mYzI3Lng4Nl82NApn
-ZXR0ZXh0LTAuMTkuOC4xLTEyLmZjMjcueDg2XzY0CmdpdC0yLjE0LjMtMy5mYzI3Lng4Nl82NApn
-bGliMi1kZXZlbC0yLjU0LjMtMi5mYzI3Lng4Nl82NApob3N0bmFtZS0zLjE4LTQuZmMyNy54ODZf
-NjQKbGliYWlvLWRldmVsLTAuMy4xMTAtOS5mYzI3Lng4Nl82NApsaWJhc2FuLTcuMy4xLTUuZmMy
-Ny54ODZfNjQKbGliZmR0LWRldmVsLTEuNC42LTEuZmMyNy54ODZfNjQKbGlidWJzYW4tNy4zLjEt
-NS5mYzI3Lng4Nl82NApsbHZtLTUuMC4xLTMuZmMyNy54ODZfNjQKbWFrZS00LjIuMS00LmZjMjcu
-eDg2XzY0Cm1pbmd3MzItU0RMLTEuMi4xNS05LmZjMjcubm9hcmNoCm1pbmd3MzItYnppcDItMS4w
-LjYtOS5mYzI3Lm5vYXJjaAptaW5ndzMyLWN1cmwtNy41NC4xLTIuZmMyNy5ub2FyY2gKbWluZ3cz
-Mi1nbGliMi0yLjU0LjEtMS5mYzI3Lm5vYXJjaAptaW5ndzMyLWdtcC02LjEuMi0yLmZjMjcubm9h
-cmNoCm1pbmd3MzItZ251dGxzLTMuNS4xMy0yLmZjMjcubm9hcmNoCm1pbmd3MzItZ3RrMi0yLjI0
-LjMxLTQuZmMyNy5ub2FyY2gKbWluZ3czMi1ndGszLTMuMjIuMTYtMS5mYzI3Lm5vYXJjaAptaW5n
-dzMyLWxpYmpwZWctdHVyYm8tMS41LjEtMy5mYzI3Lm5vYXJjaAptaW5ndzMyLWxpYnBuZy0xLjYu
-MjktMi5mYzI3Lm5vYXJjaAptaW5ndzMyLWxpYnNzaDItMS44LjAtMy5mYzI3Lm5vYXJjaAptaW5n
-dzMyLWxpYnRhc24xLTQuMTMtMS5mYzI3Lm5vYXJjaAptaW5ndzMyLW5ldHRsZS0zLjMtMy5mYzI3
-Lm5vYXJjaAptaW5ndzMyLXBpeG1hbi0wLjM0LjAtMy5mYzI3Lm5vYXJjaAptaW5ndzMyLXBrZy1j
-b25maWctMC4yOC05LmZjMjcueDg2XzY0Cm1pbmd3NjQtU0RMLTEuMi4xNS05LmZjMjcubm9hcmNo
-Cm1pbmd3NjQtYnppcDItMS4wLjYtOS5mYzI3Lm5vYXJjaAptaW5ndzY0LWN1cmwtNy41NC4xLTIu
-ZmMyNy5ub2FyY2gKbWluZ3c2NC1nbGliMi0yLjU0LjEtMS5mYzI3Lm5vYXJjaAptaW5ndzY0LWdt
-cC02LjEuMi0yLmZjMjcubm9hcmNoCm1pbmd3NjQtZ251dGxzLTMuNS4xMy0yLmZjMjcubm9hcmNo
-Cm1pbmd3NjQtZ3RrMi0yLjI0LjMxLTQuZmMyNy5ub2FyY2gKbWluZ3c2NC1ndGszLTMuMjIuMTYt
-MS5mYzI3Lm5vYXJjaAptaW5ndzY0LWxpYmpwZWctdHVyYm8tMS41LjEtMy5mYzI3Lm5vYXJjaApt
-aW5ndzY0LWxpYnBuZy0xLjYuMjktMi5mYzI3Lm5vYXJjaAptaW5ndzY0LWxpYnNzaDItMS44LjAt
-My5mYzI3Lm5vYXJjaAptaW5ndzY0LWxpYnRhc24xLTQuMTMtMS5mYzI3Lm5vYXJjaAptaW5ndzY0
-LW5ldHRsZS0zLjMtMy5mYzI3Lm5vYXJjaAptaW5ndzY0LXBpeG1hbi0wLjM0LjAtMy5mYzI3Lm5v
-YXJjaAptaW5ndzY0LXBrZy1jb25maWctMC4yOC05LmZjMjcueDg2XzY0Cm5ldHRsZS1kZXZlbC0z
-LjQtMS5mYzI3Lng4Nl82NApwZXJsLTUuMjYuMS00MDMuZmMyNy54ODZfNjQKcGl4bWFuLWRldmVs
-LTAuMzQuMC00LmZjMjcueDg2XzY0CnB5dGhvbjMtMy42LjItMTMuZmMyNy54ODZfNjQKc3BhcnNl
-LTAuNS4xLTIuZmMyNy54ODZfNjQKdGFyLTEuMjktNy5mYzI3Lng4Nl82NAp3aGljaC0yLjIxLTQu
-ZmMyNy54ODZfNjQKemxpYi1kZXZlbC0xLjIuMTEtNC5mYzI3Lng4Nl82NAoKRW52aXJvbm1lbnQg
-dmFyaWFibGVzOgpUQVJHRVRfTElTVD0KUEFDS0FHRVM9Y2NhY2hlIGdldHRleHQgZ2l0IHRhciBQ
-eVlBTUwgc3BhcnNlIGZsZXggYmlzb24gcHl0aG9uMyBiemlwMiBob3N0bmFtZSAgICAgZ2xpYjIt
-ZGV2ZWwgcGl4bWFuLWRldmVsIHpsaWItZGV2ZWwgU0RMLWRldmVsIGxpYmZkdC1kZXZlbCAgICAg
-Z2NjIGdjYy1jKysgbGx2bSBjbGFuZyBtYWtlIHBlcmwgd2hpY2ggYmMgZmluZHV0aWxzIGxpYmFp
-by1kZXZlbCAgICAgbmV0dGxlLWRldmVsIGxpYmFzYW4gbGlidWJzYW4gICAgIG1pbmd3MzItcGl4
-bWFuIG1pbmd3MzItZ2xpYjIgbWluZ3czMi1nbXAgbWluZ3czMi1TREwgbWluZ3czMi1wa2ctY29u
-ZmlnICAgICBtaW5ndzMyLWd0azIgbWluZ3czMi1ndGszIG1pbmd3MzItZ251dGxzIG1pbmd3MzIt
-bmV0dGxlIG1pbmd3MzItbGlidGFzbjEgICAgIG1pbmd3MzItbGlianBlZy10dXJibyBtaW5ndzMy
-LWxpYnBuZyBtaW5ndzMyLWN1cmwgbWluZ3czMi1saWJzc2gyICAgICBtaW5ndzMyLWJ6aXAyICAg
-ICBtaW5ndzY0LXBpeG1hbiBtaW5ndzY0LWdsaWIyIG1pbmd3NjQtZ21wIG1pbmd3NjQtU0RMIG1p
-bmd3NjQtcGtnLWNvbmZpZyAgICAgbWluZ3c2NC1ndGsyIG1pbmd3NjQtZ3RrMyBtaW5ndzY0LWdu
-dXRscyBtaW5ndzY0LW5ldHRsZSBtaW5ndzY0LWxpYnRhc24xICAgICBtaW5ndzY0LWxpYmpwZWct
-dHVyYm8gbWluZ3c2NC1saWJwbmcgbWluZ3c2NC1jdXJsIG1pbmd3NjQtbGlic3NoMiAgICAgbWlu
-Z3c2NC1iemlwMgpKPTgKVj0KSE9TVE5BTUU9ODdkMWEwZTdhMWYwCkRFQlVHPQpTSE9XX0VOVj0x
-ClBXRD0vCkhPTUU9L3Jvb3QKQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUKRElTVFRBRz1mMjdj
-b250YWluZXIKUUVNVV9DT05GSUdVUkVfT1BUUz0tLXB5dGhvbj0vdXNyL2Jpbi9weXRob24zCkZH
-Qz1mMjcKVEVTVF9ESVI9L3RtcC9xZW11LXRlc3QKU0hMVkw9MQpGRUFUVVJFUz1taW5ndyBjbGFu
-ZyBweXlhbWwgYXNhbiBkdGMKUEFUSD0vdXNyL2xpYi9jY2FjaGU6L3Vzci9saWI2NC9jY2FjaGU6
-L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2Jpbjov
-YmluCk1BS0VGTEFHUz0gLWo4CkVYVFJBX0NPTkZJR1VSRV9PUFRTPQpfPS91c3IvYmluL2VudgoK
-L3Zhci90bXAvcWVtdS9ydW46IGxpbmUgNTI6IGNkOiAvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMv
-ZG9ja2VyOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Ci92YXIvdG1wL3FlbXUvcnVuOiBsaW5l
-IDU3OiAvdGVzdC1taW5ndzogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpUcmFjZWJhY2sgKG1v
-c3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5Iiwg
-bGluZSA0MDcsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCiAgRmlsZSAiLi90ZXN0
-cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA0MDQsIGluIG1haW4KICAgIHJldHVybiBhcmdzLmNt
-ZG9iai5ydW4oYXJncywgYXJndikKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
-aW5lIDI2MSwgaW4gcnVuCiAgICByZXR1cm4gRG9ja2VyKCkucnVuKGFyZ3YsIGFyZ3Mua2VlcCwg
-cXVpZXQ9YXJncy5xdWlldCkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5l
-IDIyOSwgaW4gcnVuCiAgICBxdWlldD1xdWlldCkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
-ZXIucHkiLCBsaW5lIDE0NywgaW4gX2RvX2NoZWNrCiAgICByZXR1cm4gc3VicHJvY2Vzcy5jaGVj
-a19jYWxsKHNlbGYuX2NvbW1hbmQgKyBjbWQsICoqa3dhcmdzKQogIEZpbGUgIi91c3IvbGliNjQv
-cHl0aG9uMi43L3N1YnByb2Nlc3MucHkiLCBsaW5lIDE4NiwgaW4gY2hlY2tfY2FsbAogICAgcmFp
-c2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9j
-ZXNzRXJyb3I6IENvbW1hbmQgJ1snZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11
-Lmluc3RhbmNlLnV1aWQ9OTI4MWI1NDQzNGJmMTFlODlkMzQ1MjU0MDA2OWM4MzAnLCAnLXUnLCAn
-MCcsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctLW5l
-dD1ub25lJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BU
-Uz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj04JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9X
-X0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9yb290
-Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJmZWt2cGdmL3NyYy9kb2NrZXItc3JjLjIwMTgtMDMt
-MzEtMDQuNDMuMDUuMTU4OTk6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92
-YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
-dGF0dXMgMTI3Cm1ha2VbMV06ICoqKiBbdGVzdHMvZG9ja2VyL01ha2VmaWxlLmluY2x1ZGU6MTI5
-OiBkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5ICcvdmFyL3Rt
-cC9wYXRjaGV3LXRlc3Rlci10bXAtYmZla3ZwZ2Yvc3JjJwptYWtlOiAqKiogW3Rlc3RzL2RvY2tl
-ci9NYWtlZmlsZS5pbmNsdWRlOjE2MzogZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJy
-b3IgMgoKcmVhbAkwbTM0LjU3N3MKdXNlcgkwbTkuMTA4cwpzeXMJMG02Ljc1NnMKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMgoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UURiWaRqdrqJV6As0OHMwheWTMr3aTmk1
+From: Jan Kiszka <jan.kiszka@web.de>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com
+Message-ID: <75a4713c-ccae-07e7-ad34-800e87404cb8@web.de>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix IVHD entry length for AMD IOMMU
+References: <152248152782.864.1806063787962449652@71c20359a636>
+In-Reply-To: <152248152782.864.1806063787962449652@71c20359a636>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-03-31 09:32, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed docker-quick@centos6 build test. Please find the tes=
+ting commands and
+> their output below. If you have Docker installed, you can probably repr=
+oduce it
+> locally.
+
+Apparently, this test case is broken. Who is operating this?
+
+Jan
+
+>=20
+> Type: series
+> Message-id: f6aa6ac8-3c3c-bf90-6273-3d584f4707c8@web.de
+> Subject: [Qemu-devel] [PATCH] hw/i386: Fix IVHD entry length for AMD IO=
+MMU
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> set -e
+> git submodule update --init dtc
+> # Let docker tests dump environment info
+> export SHOW_ENV=3D1
+> export J=3D8
+> time make docker-test-quick@centos6
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 335e2a05e9 hw/i386: Fix IVHD entry length for AMD IOMMU
+>=20
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for pat=
+h 'dtc'
+> Cloning into '/var/tmp/patchew-tester-tmp-ooh2mz2y/src/dtc'...
+> Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9=
+cc42'
+>   BUILD   centos6
+> make[1]: Entering directory '/var/tmp/patchew-tester-tmp-ooh2mz2y/src'
+>   GEN     /var/tmp/patchew-tester-tmp-ooh2mz2y/src/docker-src.2018-03-3=
+1-03.31.12.17223/qemu.tar
+> Cloning into '/var/tmp/patchew-tester-tmp-ooh2mz2y/src/docker-src.2018-=
+03-31-03.31.12.17223/qemu.tar.vroot'...
+> done.
+> Checking out files:  23% (1428/6066)  =20
+> Checking out files:  24% (1456/6066)  =20
+> Checking out files:  25% (1517/6066)  =20
+> Checking out files:  26% (1578/6066)  =20
+> Checking out files:  27% (1638/6066)  =20
+> Checking out files:  27% (1664/6066)  =20
+> Checking out files:  28% (1699/6066)  =20
+> Checking out files:  29% (1760/6066)  =20
+> Checking out files:  30% (1820/6066)  =20
+> Checking out files:  31% (1881/6066)  =20
+> Checking out files:  32% (1942/6066)  =20
+> Checking out files:  33% (2002/6066)  =20
+> Checking out files:  34% (2063/6066)  =20
+> Checking out files:  35% (2124/6066)  =20
+> Checking out files:  36% (2184/6066)  =20
+> Checking out files:  37% (2245/6066)  =20
+> Checking out files:  38% (2306/6066)  =20
+> Checking out files:  39% (2366/6066)  =20
+> Checking out files:  40% (2427/6066)  =20
+> Checking out files:  41% (2488/6066)  =20
+> Checking out files:  42% (2548/6066)  =20
+> Checking out files:  43% (2609/6066)  =20
+> Checking out files:  44% (2670/6066)  =20
+> Checking out files:  45% (2730/6066)  =20
+> Checking out files:  46% (2791/6066)  =20
+> Checking out files:  47% (2852/6066)  =20
+> Checking out files:  48% (2912/6066)  =20
+> Checking out files:  49% (2973/6066)  =20
+> Checking out files:  50% (3033/6066)  =20
+> Checking out files:  51% (3094/6066)  =20
+> Checking out files:  52% (3155/6066)  =20
+> Checking out files:  53% (3215/6066)  =20
+> Checking out files:  54% (3276/6066)  =20
+> Checking out files:  55% (3337/6066)  =20
+> Checking out files:  56% (3397/6066)  =20
+> Checking out files:  57% (3458/6066)  =20
+> Checking out files:  58% (3519/6066)  =20
+> Checking out files:  59% (3579/6066)  =20
+> Checking out files:  60% (3640/6066)  =20
+> Checking out files:  61% (3701/6066)  =20
+> Checking out files:  62% (3761/6066)  =20
+> Checking out files:  63% (3822/6066)  =20
+> Checking out files:  64% (3883/6066)  =20
+> Checking out files:  65% (3943/6066)  =20
+> Checking out files:  66% (4004/6066)  =20
+> Checking out files:  67% (4065/6066)  =20
+> Checking out files:  68% (4125/6066)  =20
+> Checking out files:  69% (4186/6066)  =20
+> Checking out files:  70% (4247/6066)  =20
+> Checking out files:  71% (4307/6066)  =20
+> Checking out files:  72% (4368/6066)  =20
+> Checking out files:  73% (4429/6066)  =20
+> Checking out files:  74% (4489/6066)  =20
+> Checking out files:  75% (4550/6066)  =20
+> Checking out files:  76% (4611/6066)  =20
+> Checking out files:  77% (4671/6066)  =20
+> Checking out files:  78% (4732/6066)  =20
+> Checking out files:  79% (4793/6066)  =20
+> Checking out files:  80% (4853/6066)  =20
+> Checking out files:  81% (4914/6066)  =20
+> Checking out files:  82% (4975/6066)  =20
+> Checking out files:  83% (5035/6066)  =20
+> Checking out files:  84% (5096/6066)  =20
+> Checking out files:  85% (5157/6066)  =20
+> Checking out files:  86% (5217/6066)  =20
+> Checking out files:  87% (5278/6066)  =20
+> Checking out files:  88% (5339/6066)  =20
+> Checking out files:  88% (5393/6066)  =20
+> Checking out files:  89% (5399/6066)  =20
+> Checking out files:  90% (5460/6066)  =20
+> Checking out files:  91% (5521/6066)  =20
+> Checking out files:  92% (5581/6066)  =20
+> Checking out files:  93% (5642/6066)  =20
+> Checking out files:  94% (5703/6066)  =20
+> Checking out files:  95% (5763/6066)  =20
+> Checking out files:  96% (5824/6066)  =20
+> Checking out files:  97% (5885/6066)  =20
+> Checking out files:  98% (5945/6066)  =20
+> Checking out files:  99% (6006/6066)  =20
+> Checking out files: 100% (6066/6066)  =20
+> Checking out files: 100% (6066/6066), done.
+> Your branch is up-to-date with 'origin/test'.
+> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for pat=
+h 'dtc'
+> Cloning into '/var/tmp/patchew-tester-tmp-ooh2mz2y/src/docker-src.2018-=
+03-31-03.31.12.17223/qemu.tar.vroot/dtc'...
+> Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9=
+cc42'
+> Submodule 'ui/keycodemapdb' (git://git.qemu.org/keycodemapdb.git) regis=
+tered for path 'ui/keycodemapdb'
+> Cloning into '/var/tmp/patchew-tester-tmp-ooh2mz2y/src/docker-src.2018-=
+03-31-03.31.12.17223/qemu.tar.vroot/ui/keycodemapdb'...
+> Submodule path 'ui/keycodemapdb': checked out '6b3d716e2b6472eb7189d322=
+0552280ef3d832ce'
+> tar: /var/tmp/patchew-tester-tmp-ooh2mz2y/src/docker-src.2018-03-31-03.=
+31.12.17223/qemu.tar: Wrote only 2048 of 10240 bytes
+> tar: Error is not recoverable: exiting now
+> failed to create tar file
+>   COPY    RUNNER
+>     RUN test-quick in qemu:centos6=20
+> tar: Unexpected EOF in archive
+> tar: Unexpected EOF in archive
+> tar: Error is not recoverable: exiting now
+> /var/tmp/qemu/run: line 32: prep_fail: command not found
+> Packages installed:
+> SDL-devel-1.2.14-7.el6_7.1.x86_64
+> bison-2.4.1-5.el6.x86_64
+> bzip2-devel-1.0.5-7.el6_0.x86_64
+> ccache-3.1.6-2.el6.x86_64
+> csnappy-devel-0-6.20150729gitd7bc683.el6.x86_64
+> flex-2.5.35-9.el6.x86_64
+> gcc-4.4.7-18.el6.x86_64
+> gettext-0.17-18.el6.x86_64
+> git-1.7.1-9.el6_9.x86_64
+> glib2-devel-2.28.8-9.el6.x86_64
+> libepoxy-devel-1.2-3.el6.x86_64
+> libfdt-devel-1.4.0-1.el6.x86_64
+> librdmacm-devel-1.0.21-0.el6.x86_64
+> lzo-devel-2.03-3.1.el6_5.1.x86_64
+> make-3.81-23.el6.x86_64
+> mesa-libEGL-devel-11.0.7-4.el6.x86_64
+> mesa-libgbm-devel-11.0.7-4.el6.x86_64
+> package g++ is not installed
+> pixman-devel-0.32.8-1.el6.x86_64
+> spice-glib-devel-0.26-8.el6.x86_64
+> spice-server-devel-0.12.4-16.el6.x86_64
+> tar-1.23-15.el6_8.x86_64
+> vte-devel-0.25.1-9.el6.x86_64
+> xen-devel-4.6.6-2.el6.x86_64
+> zlib-devel-1.2.3-29.el6.x86_64
+>=20
+> Environment variables:
+> PACKAGES=3Dbison     bzip2-devel     ccache     csnappy-devel     flex =
+    g++     gcc     gettext     git     glib2-devel     libepoxy-devel   =
+  libfdt-devel     librdmacm-devel     lzo-devel     make     mesa-libEGL=
+-devel     mesa-libgbm-devel     pixman-devel     SDL-devel     spice-gli=
+b-devel     spice-server-devel     tar     vte-devel     xen-devel     zl=
+ib-devel
+> HOSTNAME=3D3294c7b71f58
+> MAKEFLAGS=3D -j8
+> J=3D8
+> CCACHE_DIR=3D/var/tmp/ccache
+> EXTRA_CONFIGURE_OPTS=3D
+> V=3D
+> SHOW_ENV=3D1
+> PATH=3D/usr/lib/ccache:/usr/lib64/ccache:/usr/local/sbin:/usr/local/bin=
+:/usr/sbin:/usr/bin:/sbin:/bin
+> PWD=3D/
+> TARGET_LIST=3D
+> SHLVL=3D1
+> HOME=3D/root
+> TEST_DIR=3D/tmp/qemu-test
+> FEATURES=3D dtc
+> DEBUG=3D
+> _=3D/usr/bin/env
+>=20
+> Configure options:
+> --enable-werror --target-list=3Dx86_64-softmmu,aarch64-softmmu --prefix=
+=3D/tmp/qemu-test/install
+>=20
+> ERROR: DTC (libfdt) version >=3D 1.4.2 not present.
+>        Please install the DTC (libfdt) devel package
+>=20
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 407, in <module>
+>     sys.exit(main())
+>   File "./tests/docker/docker.py", line 404, in main
+>     return args.cmdobj.run(args, argv)
+>   File "./tests/docker/docker.py", line 261, in run
+>     return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
+>   File "./tests/docker/docker.py", line 229, in run
+>     quiet=3Dquiet)
+>   File "./tests/docker/docker.py", line 147, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'c=
+om.qemu.instance.uuid=3D8cdf8bca34b511e8817452540069c830', '-u', '0', '--=
+security-opt', 'seccomp=3Dunconfined', '--rm', '--net=3Dnone', '-e', 'TAR=
+GET_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D8=
+', '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/c=
+cache', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', =
+'/var/tmp/patchew-tester-tmp-ooh2mz2y/src/docker-src.2018-03-31-03.31.12.=
+17223:/var/tmp/qemu:z,ro', 'qemu:centos6', '/var/tmp/qemu/run', 'test-qui=
+ck']' returned non-zero exit status 1
+> make[1]: *** [tests/docker/Makefile.include:129: docker-run] Error 1
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-ooh2mz2y/src'
+> make: *** [tests/docker/Makefile.include:163: docker-run-test-quick@cen=
+tos6] Error 2
+>=20
+> real	1m0.294s
+> user	0m9.404s
+> sys	0m6.923s
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 2
+>=20
+>=20
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+>=20
+
+
+
+--UURiWaRqdrqJV6As0OHMwheWTMr3aTmk1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlq/TfUACgkQitSsb3rl5xSHzwCfXTrW5fgrFHQM9EPh9UxjmAb+
+eA0AmwUFQnO+AJzjPt1Sg5R9vFcXxqw/
+=xpEt
+-----END PGP SIGNATURE-----
+
+--UURiWaRqdrqJV6As0OHMwheWTMr3aTmk1--
