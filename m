@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f2Ncb-00072M-NU
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 17:01:11 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f2QXV-00050o-5n
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 20:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f2NcX-0000e9-Rk
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 17:01:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f2NcX-0000bG-JC
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 17:01:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f2NcU-0007gA-F8
-	for <qemu-devel@nongnu.org>; Sat, 31 Mar 2018 21:01:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 642B62E80D3
-	for <qemu-devel@nongnu.org>; Sat, 31 Mar 2018 21:01:01 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1f2QXR-0003rZ-Ua
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 20:08:05 -0400
+Resent-Message-Id: <E1f2QXR-0003rZ-Ua@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21024)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f2QXR-0003iV-Mj
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 20:08:01 -0400
+In-Reply-To: <20180329120745.11154-1-berto@igalia.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152248445785.870.1520222980399744107@71c20359a636>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Mar 2018 20:54:46 -0000
-From: Erik Kristian Sverre Uri <1758819@bugs.launchpad.net>
-Reply-To: Bug 1758819 <1758819@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152204272199.688.3778854075369133494.malonedeb@wampee.canonical.com>
-Message-Id: <152252968664.3132.12205040712398091559.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1758819] Re: HVF Illegal instruction: 4,
- High Sierra, v2.12-rc0
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 31 Mar 2018 01:20:58 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v5] iotests: Test abnormally large
+ size in compressed cluster descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,197 +29,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: berto@igalia.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Disregard the above log; that was from a September 2017 build.
-
-On RC1:
-
-Process:               qemu-system-x86_64 [6567]
-Path:                  /usr/local/bin/qemu-system-x86_64
-Identifier:            qemu-system-x86_64
-Version:               0
-Code Type:             X86-64 (Native)
-Parent Process:        bash [1558]
-Responsible:           qemu-system-x86_64 [6567]
-User ID:               501
-
-Date/Time:             2018-03-31 13:53:57.851 -0700
-OS Version:            Mac OS X 10.13.4 (17E199)
-Report Version:        12
-Anonymous UUID:        28693BB0-7F66-6066-026C-DDE857D912F6
-
-
-Time Awake Since Boot: 2200 seconds
-
-System Integrity Protection: disabled
-
-Crashed Thread:        0  Dispatch queue: com.apple.main-thread
-
-Exception Type:        EXC_BAD_INSTRUCTION (SIGILL)
-Exception Codes:       0x0000000000000001, 0x0000000000000000
-Exception Note:        EXC_CORPSE_NOTIFY
-
-Termination Signal:    Illegal instruction: 4
-Termination Reason:    Namespace SIGNAL, Code 0x4
-Terminating Process:   exc handler [0]
-
-Thread 0 Crashed:: Dispatch queue: com.apple.main-thread
-0   qemu-system-x86_64            	0x000000010524165b 0x105134000 + 1103451
-1   qemu-system-x86_64            	0x00000001051e2481 0x105134000 + 713857
-2   qemu-system-x86_64            	0x00000001051e2170 0x105134000 + 713072
-3   qemu-system-x86_64            	0x00000001051e3e2a 0x105134000 + 720426
-4   qemu-system-x86_64            	0x00000001052b625a 0x105134000 + 1581658
-5   qemu-system-x86_64            	0x00000001053e5606 0x105134000 + 2823686
-6   qemu-system-x86_64            	0x00000001053e65bb 0x105134000 + 2827707
-7   qemu-system-x86_64            	0x00000001053e4126 0x105134000 + 2818342
-8   qemu-system-x86_64            	0x00000001051c35fc 0x105134000 + 587260
-9   qemu-system-x86_64            	0x00000001051c36e6 0x105134000 + 587494
-10  qemu-system-x86_64            	0x00000001051c8040 0x105134000 + 606272
-11  qemu-system-x86_64            	0x000000010525a462 0x105134000 + 1205346
-12  qemu-system-x86_64            	0x00000001053c8e28 0x105134000 + 2706984
-13  com.apple.CoreFoundation      	0x00007fff5294561c __CFNOTIFICATIONCENTE=
-R_IS_CALLING_OUT_TO_AN_OBSERVER__ + 12
-14  com.apple.CoreFoundation      	0x00007fff529454ea _CFXRegistrationPost =
-+ 458
-15  com.apple.CoreFoundation      	0x00007fff52945221 ___CFXNotificationPos=
-t_block_invoke + 225
-16  com.apple.CoreFoundation      	0x00007fff52903d72 -[_CFXNotificationReg=
-istrar find:object:observer:enumerator:] + 1826
-17  com.apple.CoreFoundation      	0x00007fff52902e03 _CFXNotificationPost =
-+ 659
-18  com.apple.Foundation          	0x00007fff54a1f8c7 -[NSNotificationCente=
-r postNotificationName:object:userInfo:] + 66
-19  com.apple.AppKit              	0x00007fff4fff3206 -[NSApplication _post=
-DidFinishNotification] + 313
-20  com.apple.AppKit              	0x00007fff4fff2e4f -[NSApplication _send=
-FinishLaunchingNotification] + 220
-21  com.apple.AppKit              	0x00007fff4fec5ab3 -[NSApplication(NSApp=
-leEventHandling) _handleAEOpenEvent:] + 562
-22  com.apple.AppKit              	0x00007fff4fec56e9 -[NSApplication(NSApp=
-leEventHandling) _handleCoreEvent:withReplyEvent:] + 690
-23  com.apple.Foundation          	0x00007fff54a62714 -[NSAppleEventManager=
- dispatchRawAppleEvent:withRawReply:handlerRefCon:] + 287
-24  com.apple.Foundation          	0x00007fff54a62592 _NSAppleEventManagerG=
-enericHandler + 102
-25  com.apple.AE                  	0x00007fff53a3bdd0 aeDispatchAppleEvent(=
-AEDesc const*, AEDesc*, unsigned int, unsigned char*) + 1788
-26  com.apple.AE                  	0x00007fff53a3b677 dispatchEventAndSendR=
-eply(AEDesc const*, AEDesc*) + 41
-27  com.apple.AE                  	0x00007fff53a3b565 aeProcessAppleEvent +=
- 383
-28  com.apple.HIToolbox           	0x00007fff51c1d4a0 AEProcessAppleEvent +=
- 55
-29  com.apple.AppKit              	0x00007fff4fec0d32 _DPSNextEvent + 2788
-30  com.apple.AppKit              	0x00007fff50656e34 -[NSApplication(NSEve=
-nt) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 3044
-31  com.apple.AppKit              	0x00007fff4feb5885 -[NSApplication run] =
-+ 764
-32  qemu-system-x86_64            	0x00000001053ca853 0x105134000 + 2713683
-33  libdyld.dylib                 	0x00007fff7ace7015 start + 1
-
-Thread 1:
-0   libsystem_kernel.dylib        	0x00007fff7ae37a1e __psynch_cvwait + 10
-1   libsystem_pthread.dylib       	0x00007fff7b000589 _pthread_cond_wait + =
-732
-2   qemu-system-x86_64            	0x00000001054b0b27 0x105134000 + 3656487
-3   qemu-system-x86_64            	0x00000001054bf128 0x105134000 + 3715368
-4   libsystem_pthread.dylib       	0x00007fff7afff661 _pthread_body + 340
-5   libsystem_pthread.dylib       	0x00007fff7afff50d _pthread_start + 377
-6   libsystem_pthread.dylib       	0x00007fff7affebf9 thread_start + 13
-
-Thread 2:
-0   libsystem_kernel.dylib        	0x00007fff7ae38292 __workq_kernreturn + =
-10
-1   libsystem_pthread.dylib       	0x00007fff7afff009 _pthread_wqthread + 1=
-035
-2   libsystem_pthread.dylib       	0x00007fff7affebe9 start_wqthread + 13
-
-Thread 3:: Dispatch queue: NSCGSDisableUpdates
-0   libsystem_kernel.dylib        	0x00007fff7ae2e20a mach_msg_trap + 10
-1   libsystem_kernel.dylib        	0x00007fff7ae2d724 mach_msg + 60
-2   com.apple.SkyLight            	0x00007fff74b129f5 CGSUpdateManager::ena=
-ble_updates_common() + 565
-3   com.apple.SkyLight            	0x00007fff74ab6b28 CGSUpdateManager::ena=
-ble_update(unsigned long long) + 320
-4   libdispatch.dylib             	0x00007fff7acb564a _dispatch_call_block_=
-and_release + 12
-5   libdispatch.dylib             	0x00007fff7acade08 _dispatch_client_call=
-out + 8
-6   libdispatch.dylib             	0x00007fff7acc2267 _dispatch_queue_seria=
-l_drain + 635
-7   libdispatch.dylib             	0x00007fff7acb51b6 _dispatch_queue_invok=
-e + 373
-8   libdispatch.dylib             	0x00007fff7acc2f5d _dispatch_root_queue_=
-drain_deferred_wlh + 332
-9   libdispatch.dylib             	0x00007fff7acc6d71 _dispatch_workloop_wo=
-rker_thread + 880
-10  libsystem_pthread.dylib       	0x00007fff7affefd2 _pthread_wqthread + 9=
-80
-11  libsystem_pthread.dylib       	0x00007fff7affebe9 start_wqthread + 13
-
-Thread 4:
-0   libsystem_pthread.dylib       	0x00007fff7affebdc start_wqthread + 0
-1   ???                           	0x000070000e958b50 0 + 123145546992464
-
-Thread 5:
-0   libsystem_kernel.dylib        	0x00007fff7ae38292 __workq_kernreturn + =
-10
-1   libsystem_pthread.dylib       	0x00007fff7afff009 _pthread_wqthread + 1=
-035
-2   libsystem_pthread.dylib       	0x00007fff7affebe9 start_wqthread + 13
-
-Thread 6:
-0   libsystem_kernel.dylib        	0x00007fff7ae38042 __sigwait + 10
-1   libsystem_pthread.dylib       	0x00007fff7b001ad9 sigwait + 61
-2   qemu-system-x86_64            	0x00000001054aee62 0x105134000 + 3649122
-3   libsystem_pthread.dylib       	0x00007fff7afff661 _pthread_body + 340
-4   libsystem_pthread.dylib       	0x00007fff7afff50d _pthread_start + 377
-5   libsystem_pthread.dylib       	0x00007fff7affebf9 thread_start + 13
-
-Thread 7:
-0   libsystem_kernel.dylib        	0x00007fff7ae37cfa __select + 10
-1   libglib-2.0.0.dylib           	0x00000001061ebb60 g_poll + 430
-2   qemu-system-x86_64            	0x00000001054ae80b 0x105134000 + 3647499
-3   qemu-system-x86_64            	0x0000000105252eb2 0x105134000 + 1175218
-4   libsystem_pthread.dylib       	0x00007fff7afff661 _pthread_body + 340
-5   libsystem_pthread.dylib       	0x00007fff7afff50d _pthread_start + 377
-6   libsystem_pthread.dylib       	0x00007fff7affebf9 thread_start + 13
-
-Thread 0 crashed with X86 Thread State (64-bit):
-  rax: 0x0000000000000001  rbx: 0x000000000000000d  rcx: 0x0000000000000000=
-  rdx: 0x0000000000000000
-  rdi: 0x000000000000000d  rsi: 0x0000000000000000  rbp: 0x00007ffeeaac9f40=
-  rsp: 0x00007ffeeaac9f00
-   r8: 0x00007ffeeaac9f04   r9: 0x00007ffeeaac9f00  r10: 0x00007ffeeaac9f08=
-  r11: 0x00007ffeeaac9f0c
-  r12: 0x0000000000000000  r13: 0x00007fe43f0af400  r14: 0x0000000000000000=
-  r15: 0x0000000000000000
-  rip: 0x000000010524165b  rfl: 0x0000000000010246  cr2: 0x000000010518235d
-  =
-
-Logical CPU:     0
-Error Code:      0x00000000
-Trap Number:     6
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1758819
-
-Title:
-  HVF Illegal instruction: 4, High Sierra, v2.12-rc0
-
-Status in QEMU:
-  New
-
-Bug description:
-  I've built v2.12.0-rc0 on MacOS using homebrew. I'm running 10.13.3 on
-  a 5,1 Mac Pro with a X5690 processor.
-
-  When I run 'qemu-system-x86_64 -M accel=3Dhvf', I get a crash "Illegal
-  instruction: 4".
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1758819/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLWJ1aWxkQG1pbi1nbGliIGJ1aWxkIHRlc3Qu
+IFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cu
+IElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNl
+IGl0CmxvY2FsbHkuCgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODAzMjkxMjA3NDUuMTEx
+NTQtMS1iZXJ0b0BpZ2FsaWEuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTIu
+MTIgdjVdIGlvdGVzdHM6IFRlc3QgYWJub3JtYWxseSBsYXJnZSBzaXplIGluIGNvbXByZXNzZWQg
+Y2x1c3RlciBkZXNjcmlwdG9yCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0
+cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEKZXhwb3J0IEo9OAp0aW1l
+IG1ha2UgZG9ja2VyLXRlc3QtYnVpbGRAbWluLWdsaWIKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkYjM2ZDAyMGM4IGlvdGVzdHM6IFRlc3QgYWJub3Jt
+YWxseSBsYXJnZSBzaXplIGluIGNvbXByZXNzZWQgY2x1c3RlciBkZXNjcmlwdG9yCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3Jn
+L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFyL3Rt
+cC9wYXRjaGV3LXRlc3Rlci10bXAtXzcxMF96bGUvc3JjL2R0YycuLi4KU3VibW9kdWxlIHBhdGgg
+J2R0Yyc6IGNoZWNrZWQgb3V0ICdlNTQzODgwMTVhZjFmYjRiZjA0ZDBiY2E5OWNhYmExMDc0ZDlj
+YzQyJwogIEJVSUxEICAgbWluLWdsaWIKbWFrZVsxXTogRW50ZXJpbmcgZGlyZWN0b3J5ICcvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzcxMF96bGUvc3JjJwogIEdFTiAgICAgL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLV83MTBfemxlL3NyYy9kb2NrZXItc3JjLjIwMTgtMDMtMzEtMDQu
+MjAuMjkuMjY4NDAvcWVtdS50YXIKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
+ci10bXAtXzcxMF96bGUvc3JjL2RvY2tlci1zcmMuMjAxOC0wMy0zMS0wNC4yMC4yOS4yNjg0MC9x
+ZW11LnRhci52cm9vdCcuLi4KZG9uZS4KQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDYlICgyNzkzLzYw
+NjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ3JSAoMjg1Mi82MDY2KSAgIApDaGVja2luZyBv
+dXQgZmlsZXM6ICA0NyUgKDI5MDYvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDglICgy
+OTEyLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ5JSAoMjk3My82MDY2KSAgIApDaGVj
+a2luZyBvdXQgZmlsZXM6ICA1MCUgKDMwMzMvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAg
+NTElICgzMDk0LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUyJSAoMzE1NS82MDY2KSAg
+IApDaGVja2luZyBvdXQgZmlsZXM6ICA1MyUgKDMyMTUvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZp
+bGVzOiAgNTQlICgzMjc2LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU1JSAoMzMzNy82
+MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NiUgKDMzOTcvNjA2NikgICAKQ2hlY2tpbmcg
+b3V0IGZpbGVzOiAgNTclICgzNDU4LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU4JSAo
+MzUxOS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1OSUgKDM1NzkvNjA2NikgICAKQ2hl
+Y2tpbmcgb3V0IGZpbGVzOiAgNjAlICgzNjQwLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczog
+IDYxJSAoMzcwMS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MiUgKDM3NjEvNjA2Nikg
+ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjMlICgzODIyLzYwNjYpICAgCkNoZWNraW5nIG91dCBm
+aWxlczogIDY0JSAoMzg4My82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2NSUgKDM5NDMv
+NjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjYlICg0MDA0LzYwNjYpICAgCkNoZWNraW5n
+IG91dCBmaWxlczogIDY3JSAoNDA2NS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2OCUg
+KDQxMjUvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjklICg0MTg2LzYwNjYpICAgCkNo
+ZWNraW5nIG91dCBmaWxlczogIDcwJSAoNDI0Ny82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
+ICA3MSUgKDQzMDcvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzIlICg0MzY4LzYwNjYp
+ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDczJSAoNDQyOS82MDY2KSAgIApDaGVja2luZyBvdXQg
+ZmlsZXM6ICA3NCUgKDQ0ODkvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzUlICg0NTUw
+LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc2JSAoNDYxMS82MDY2KSAgIApDaGVja2lu
+ZyBvdXQgZmlsZXM6ICA3NyUgKDQ2NzEvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzgl
+ICg0NzMyLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc5JSAoNDc5My82MDY2KSAgIApD
+aGVja2luZyBvdXQgZmlsZXM6ICA4MCUgKDQ4NTMvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
+OiAgODElICg0OTE0LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgyJSAoNDk3NS82MDY2
+KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MyUgKDUwMzUvNjA2NikgICAKQ2hlY2tpbmcgb3V0
+IGZpbGVzOiAgODQlICg1MDk2LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg1JSAoNTE1
+Ny82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NiUgKDUyMTcvNjA2NikgICAKQ2hlY2tp
+bmcgb3V0IGZpbGVzOiAgODclICg1Mjc4LzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg4
+JSAoNTMzOS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4OSUgKDUzOTkvNjA2NikgICAK
+Q2hlY2tpbmcgb3V0IGZpbGVzOiAgOTAlICg1NDYwLzYwNjYpICAgCkNoZWNraW5nIG91dCBmaWxl
+czogIDkxJSAoNTUyMS82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MiUgKDU1ODEvNjA2
+NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTMlICg1NjQyLzYwNjYpICAgCkNoZWNraW5nIG91
+dCBmaWxlczogIDk0JSAoNTcwMy82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5NCUgKDU3
+MjUvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTUlICg1NzYzLzYwNjYpICAgCkNoZWNr
+aW5nIG91dCBmaWxlczogIDk2JSAoNTgyNC82MDY2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5
+NyUgKDU4ODUvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTglICg1OTQ1LzYwNjYpICAg
+CkNoZWNraW5nIG91dCBmaWxlczogIDk5JSAoNjAwNi82MDY2KSAgIApDaGVja2luZyBvdXQgZmls
+ZXM6IDEwMCUgKDYwNjYvNjA2NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAxMDAlICg2MDY2LzYw
+NjYpLCBkb25lLgpZb3VyIGJyYW5jaCBpcyB1cC10by1kYXRlIHdpdGggJ29yaWdpbi90ZXN0Jy4K
+U3VibW9kdWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0KSByZWdp
+c3RlcmVkIGZvciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLV83MTBfemxlL3NyYy9kb2NrZXItc3JjLjIwMTgtMDMtMzEtMDQuMjAuMjkuMjY4NDAv
+cWVtdS50YXIudnJvb3QvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQg
+J2U1NDM4ODAxNWFmMWZiNGJmMDRkMGJjYTk5Y2FiYTEwNzRkOWNjNDInClN1Ym1vZHVsZSAndWkv
+a2V5Y29kZW1hcGRiJyAoZ2l0Oi8vZ2l0LnFlbXUub3JnL2tleWNvZGVtYXBkYi5naXQpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9w
+YXRjaGV3LXRlc3Rlci10bXAtXzcxMF96bGUvc3JjL2RvY2tlci1zcmMuMjAxOC0wMy0zMS0wNC4y
+MC4yOS4yNjg0MC9xZW11LnRhci52cm9vdC91aS9rZXljb2RlbWFwZGInLi4uClN1Ym1vZHVsZSBw
+YXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0NzJlYjcxODlk
+MzIyMDU1MjI4MGVmM2Q4MzJjZScKdGFyOiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzcx
+MF96bGUvICBDT1BZICAgIFJVTk5FUgogICAgUlVOIHRlc3QtYnVpbGQgaW4gcWVtdTptaW4tZ2xp
+YiAKdGFyOiBVbmV4cGVjdGVkIEVPRiBpbiBhcmNoaXZlCnRhcjogVW5leHBlY3RlZCBFT0YgaW4g
+YXJjaGl2ZQp0YXI6IEVycm9yIGlzIG5vdCByZWNvdmVyYWJsZTogZXhpdGluZyBub3cKL3Zhci90
+bXAvcWVtdS9ydW46IGxpbmUgMzI6IHByZXBfZmFpbDogY29tbWFuZCBub3QgZm91bmQKRW52aXJv
+bm1lbnQgdmFyaWFibGVzOgpIT1NUTkFNRT00MzM3ZTFjNzlmNDMKTUFLRUZMQUdTPSAtajgKSj04
+CkNDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlCkVYVFJBX0NPTkZJR1VSRV9PUFRTPQpWPQpTSE9X
+X0VOVj0xClBBVEg9L3Vzci9saWIvY2NhY2hlOi91c3IvbGliNjQvY2NhY2hlOi91c3IvbG9jYWwv
+c2JpbjovdXNyL2xvY2FsL2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3NiaW46L2JpbgpQV0Q9LwpU
+QVJHRVRfTElTVD0KU0hMVkw9MQpIT01FPS9yb290ClRFU1RfRElSPS90bXAvcWVtdS10ZXN0CkZF
+QVRVUkVTPSBkdGMKREVCVUc9Cl89L3Vzci9iaW4vZW52CgovdmFyL3RtcC9xZW11L3J1bjogbGlu
+ZSA1MjogY2Q6IC90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9kb2NrZXI6IE5vIHN1Y2ggZmlsZSBv
+ciBkaXJlY3RvcnkKL3Zhci90bXAvcWVtdS9ydW46IGxpbmUgNTc6IC90ZXN0LWJ1aWxkOiBObyBz
+dWNoIGZpbGUgb3IgZGlyZWN0b3J5Ci92YXIvdG1wL3FlbXUvcnVuOiBsaW5lIDU3OiBleGVjOiAv
+dGVzdC1idWlsZDogY2Fubm90IGV4ZWN1dGU6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKVHJh
+Y2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2Rv
+Y2tlci5weSIsIGxpbmUgNDA3LCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQobWFpbigpKQogIEZp
+bGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNDA0LCBpbiBtYWluCiAgICByZXR1
+cm4gYXJncy5jbWRvYmoucnVuKGFyZ3MsIGFyZ3YpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9j
+a2VyLnB5IiwgbGluZSAyNjEsIGluIHJ1bgogICAgcmV0dXJuIERvY2tlcigpLnJ1bihhcmd2LCBh
+cmdzLmtlZXAsIHF1aWV0PWFyZ3MucXVpZXQpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2Vy
+LnB5IiwgbGluZSAyMjksIGluIHJ1bgogICAgcXVpZXQ9cXVpZXQpCiAgRmlsZSAiLi90ZXN0cy9k
+b2NrZXIvZG9ja2VyLnB5IiwgbGluZSAxNDcsIGluIF9kb19jaGVjawogICAgcmV0dXJuIHN1YnBy
+b2Nlc3MuY2hlY2tfY2FsbChzZWxmLl9jb21tYW5kICsgY21kLCAqKmt3YXJncykKICBGaWxlICIv
+dXNyL2xpYjY0L3B5dGhvbjIuNy9zdWJwcm9jZXNzLnB5IiwgbGluZSAxODYsIGluIGNoZWNrX2Nh
+bGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3Mu
+Q2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcs
+ICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTZiNzA0MTU4MzRiYzExZTg5M2EwNTI1NDAwNjljODMw
+JywgJy11JywgJzAnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0t
+cm0nLCAnLS1uZXQ9bm9uZScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09O
+RklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9OCcsICctZScsICdERUJVRz0nLCAn
+LWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICct
+dicsICcvcm9vdC8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6Jywg
+Jy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1fNzEwX3psZS9zcmMvZG9ja2VyLXNy
+Yy4yMDE4LTAzLTMxLTA0LjIwLjI5LjI2ODQwOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11Om1p
+bi1nbGliJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtYnVpbGQnXScgcmV0dXJuZWQgbm9u
+LXplcm8gZXhpdCBzdGF0dXMgMTI2Cm1ha2VbMV06ICoqKiBbdGVzdHMvZG9ja2VyL01ha2VmaWxl
+LmluY2x1ZGU6MTI5OiBkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0
+b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzcxMF96bGUvc3JjJwptYWtlOiAqKiog
+W3Rlc3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjE2MzogZG9ja2VyLXJ1bi10ZXN0LWJ1aWxk
+QG1pbi1nbGliXSBFcnJvciAyCgpyZWFsCTBtMzIuOTA3cwp1c2VyCTBtOC45NDJzCnN5cwkwbTYu
+NTIzcwo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAy
+CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
