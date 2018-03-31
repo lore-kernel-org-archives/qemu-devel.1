@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f2K2A-00080q-QF
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 13:11:21 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f2K7A-0001qF-DH
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 13:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f2K29-0001Zh-Pn
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 13:11:18 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34868)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f2K79-00014s-Fk
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 13:16:28 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f2K29-0001Xp-IU
-	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 13:11:17 -0400
-Received: by mail-lf0-x244.google.com with SMTP id t132-v6so15962773lfe.2
-	for <qemu-devel@nongnu.org>; Sat, 31 Mar 2018 10:11:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f2K79-00013c-73
+	for qemu-devel@nongnu.org; Sat, 31 Mar 2018 13:16:27 -0400
+Received: by mail-lf0-x241.google.com with SMTP id c78-v6so15988738lfh.1
+	for <qemu-devel@nongnu.org>; Sat, 31 Mar 2018 10:16:27 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sat, 31 Mar 2018 10:10:54 -0700
-Message-Id: <20180331171054.20473-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] linux-user: fix mq_getsetattr implementation
+Date: Sat, 31 Mar 2018 10:16:15 -0700
+Message-Id: <20180331171615.21259-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v3] linux-user: fix mq_getsetattr implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,6 +42,9 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>
 Cc: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
+Changes v2->v3:
+- don't defer get_errno call;
+
 Changes v1->v2:
 - don't copy output back to user in case of error;
 - fix changelog.
@@ -50,7 +53,7 @@ Changes v1->v2:
  1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 18ea79140f16..3ff00cc6c098 100644
+index 18ea79140f16..d51e2a00ee31 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
 @@ -12092,15 +12092,16 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
@@ -64,15 +67,15 @@ index 18ea79140f16..3ff00cc6c098 100644
              if (arg2 != 0) {
                  copy_from_user_mq_attr(&posix_mq_attr_in, arg2);
 -                ret |= mq_setattr(arg1, &posix_mq_attr_in, &posix_mq_attr_out);
-+                ret = mq_setattr(arg1, &posix_mq_attr_in, &posix_mq_attr_out);
++                ret = get_errno(mq_setattr(arg1, &posix_mq_attr_in,
++                                           &posix_mq_attr_out));
 +            } else if (arg3 != 0) {
-+                ret = mq_getattr(arg1, &posix_mq_attr_out);
-             }
--
++                ret = get_errno(mq_getattr(arg1, &posix_mq_attr_out));
++            }
 +            if (ret == 0 && arg3 != 0) {
 +                copy_to_user_mq_attr(arg3, &posix_mq_attr_out);
-+            }
-+            ret = get_errno(ret);
+             }
+-
          }
          break;
  #endif
