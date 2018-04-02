@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f332A-0004Cp-3e
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 13:14:19 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f332C-0004EC-RQ
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 13:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f3329-0004ZB-AZ
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 13:14:18 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34756)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f332B-0004aB-Tp
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 13:14:20 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52121)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f3329-0004Yy-2w
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 13:14:17 -0400
-Received: by mail-wm0-x235.google.com with SMTP id w2so7109577wmw.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Apr 2018 10:14:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f332B-0004Zj-NU
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 13:14:19 -0400
+Received: by mail-wm0-x242.google.com with SMTP id v21so27101833wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 02 Apr 2018 10:14:19 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon,  2 Apr 2018 10:13:46 -0700
-Message-Id: <20180402171354.27706-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL 0/8] xtensa-specific and generic fixes for
- linux-user
+Date: Mon,  2 Apr 2018 10:13:47 -0700
+Message-Id: <20180402171354.27706-2-jcmvbkbc@gmail.com>
+In-Reply-To: <20180402171354.27706-1-jcmvbkbc@gmail.com>
+References: <20180402171354.27706-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL 1/8] target/xtensa: fix flush_window_regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +28,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Hi Peter,
+flush_window_regs uses wrong stack frame to save overflow registers in
+call8 and call12 frames, which results in wrong register values in
+callers of a function that received a signal.
+Reimplement flush_window_regs closely following window overflow
+sequence.
 
-please pull the following batch of linux-user fixes for 2.12.
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ linux-user/signal.c | 55 +++++++++++++++++++++++------------------------------
+ 1 file changed, 24 insertions(+), 31 deletions(-)
 
-The following changes since commit dfe732fb68ef9195517f4f380a477d58a054edc1:
-
-  Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2018-03-27 16:25:12 +0100)
-
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20180402-xtensa
-
-for you to fetch changes up to 64a563dd8dd6ca2661d96a2e4b69f0a5465cab94:
-
-  target/xtensa: linux-user: fix fadvise64 call (2018-04-02 04:15:35 -0700)
-
-----------------------------------------------------------------
-xtensa-specific fixes for linux-user:
-
-- fix flushing registers for signal processing in call8 and call12 frames;
-- fix PC value for restarted syscalls;
-- fix sysv IPC structures;
-- fix fadvise64 syscall;
-
-generic fixes for linux-user:
-
-- fix QEMU assertion in multithreaded application by calling cpu_copy
-  under clone_lock;
-- fix mq_getsetattr implementation;
-- fix error propagation in clock_gettime;
-- implement clock_settime.
-
-----------------------------------------------------------------
-Max Filippov (8):
-      target/xtensa: fix flush_window_regs
-      target/xtensa: linux-user: rewind pc for restarted syscall
-      linux-user: call cpu_copy under clone_lock
-      linux-user: fix mq_getsetattr implementation
-      target/xtensa: linux-user: fix sysv IPC structures
-      linux-user: fix error propagation in clock_gettime
-      linux-user: implement clock_settime
-      target/xtensa: linux-user: fix fadvise64 call
-
- linux-user/main.c                  |  3 +++
- linux-user/signal.c                | 55 +++++++++++++++++---------------------
- linux-user/syscall.c               | 36 +++++++++++++++++--------
- linux-user/xtensa/target_structs.h | 37 ++++++++++++++++++++-----
- 4 files changed, 82 insertions(+), 49 deletions(-)
-
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 2ea3e0321f4d..33d5ced30c98 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -7094,52 +7094,45 @@ static abi_ulong get_sigframe(struct target_sigaction *sa,
+ 
+ static int flush_window_regs(CPUXtensaState *env)
+ {
+-    const uint32_t nareg_mask = env->config->nareg - 1;
+     uint32_t wb = env->sregs[WINDOW_BASE];
+-    uint32_t ws = (xtensa_replicate_windowstart(env) >> (wb + 1)) &
+-        ((1 << env->config->nareg / 4) - 1);
+-    uint32_t d = ctz32(ws) + 1;
+-    uint32_t sp;
+-    abi_long ret = 0;
+-
+-    wb += d;
+-    ws >>= d;
++    uint32_t ws = xtensa_replicate_windowstart(env) >> (wb + 1);
++    unsigned d = ctz32(ws) + 1;
++    unsigned i;
++    int ret = 0;
+ 
+-    xtensa_sync_phys_from_window(env);
+-    sp = env->phys_regs[(wb * 4 + 1) & nareg_mask];
++    for (i = d; i < env->config->nareg / 4; i += d) {
++        uint32_t ssp, osp;
++        unsigned j;
+ 
+-    while (ws && ret == 0) {
+-        int d;
+-        int i;
+-        int idx;
++        ws >>= d;
++        xtensa_rotate_window(env, d);
+ 
+         if (ws & 0x1) {
+-            ws >>= 1;
++            ssp = env->regs[5];
+             d = 1;
+         } else if (ws & 0x2) {
+-            ws >>= 2;
++            ssp = env->regs[9];
++            ret |= get_user_ual(osp, env->regs[1] - 12);
++            osp -= 32;
+             d = 2;
+-            for (i = 0; i < 4; ++i) {
+-                idx = (wb * 4 + 4 + i) & nareg_mask;
+-                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 12) * 4);
+-            }
+         } else if (ws & 0x4) {
+-            ws >>= 3;
++            ssp = env->regs[13];
++            ret |= get_user_ual(osp, env->regs[1] - 12);
++            osp -= 48;
+             d = 3;
+-            for (i = 0; i < 8; ++i) {
+-                idx = (wb * 4 + 4 + i) & nareg_mask;
+-                ret |= put_user_ual(env->phys_regs[idx], sp + (i - 16) * 4);
+-            }
+         } else {
+             g_assert_not_reached();
+         }
+-        sp = env->phys_regs[((wb + d) * 4 + 1) & nareg_mask];
+-        for (i = 0; i < 4; ++i) {
+-            idx = (wb * 4 + i) & nareg_mask;
+-            ret |= put_user_ual(env->phys_regs[idx], sp + (i - 4) * 4);
++
++        for (j = 0; j < 4; ++j) {
++            ret |= put_user_ual(env->regs[j], ssp - 16 + j * 4);
++        }
++        for (j = 4; j < d * 4; ++j) {
++            ret |= put_user_ual(env->regs[j], osp - 16 + j * 4);
+         }
+-        wb += d;
+     }
++    xtensa_rotate_window(env, d);
++    g_assert(env->sregs[WINDOW_BASE] == wb);
+     return ret == 0;
+ }
+ 
 -- 
-Thanks.
--- Max
+2.11.0
