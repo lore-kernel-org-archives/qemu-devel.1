@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jidong.xiao@gmail.com>) id 1f2uxl-0002rz-NW
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 04:37:14 -0400
+	(envelope-from <fzheng@redhat.com>) id 1f2vae-0007hf-Vd
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 05:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jidong.xiao@gmail.com>) id 1f2uxk-0000jl-G0
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 04:37:13 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:39190)
+	(envelope-from <fzheng@redhat.com>) id 1f2vab-0002cu-0E
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 05:17:24 -0400
+Received: from mail-ua0-f173.google.com ([209.85.217.173]:45535)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jidong.xiao@gmail.com>)
-	id 1f2uxk-0000hq-7q
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 04:37:12 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id c24so12741450wrc.6
-	for <qemu-devel@nongnu.org>; Mon, 02 Apr 2018 01:37:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1f2vaa-0002ae-SX
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 05:17:20 -0400
+Received: by mail-ua0-f173.google.com with SMTP id j18so8521404uae.12
+	for <qemu-devel@nongnu.org>; Mon, 02 Apr 2018 02:17:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180402082442.GA29205@lemon.usersys.redhat.com>
-References: <CAG4AFWYeyxHVsFsZHgqrL2+k=-6KtAvmXzK_0HdHU2H4E1fSYA@mail.gmail.com>
-	<20180402082442.GA29205@lemon.usersys.redhat.com>
-From: Jidong Xiao <jidong.xiao@gmail.com>
-Date: Mon, 2 Apr 2018 02:37:10 -0600
-Message-ID: <CAG4AFWbn3gv=AYfRgcLbF8B8SXiHncsWzX9LrENp590Q9ZOsXA@mail.gmail.com>
+In-Reply-To: <277c755c-f777-03ac-7288-50d00d6e9bc8@amsat.org>
+References: <152248705425.873.8800157035194343108@71c20359a636>
+	<277c755c-f777-03ac-7288-50d00d6e9bc8@amsat.org>
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 2 Apr 2018 17:16:38 +0800
+Message-ID: <CAK1Eb9mkR=QjDsjWU8CaeRf2gMZ61ZTrUz-fXriz5DuhaJcLMw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] qemu testing image link not work
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 00/18] QEMU validator: A method to specify
+ QEMU crash-test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: patchew-devel@redhat.com, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Apr 2, 2018 at 2:24 AM, Fam Zheng <famz@redhat.com> wrote:
-> On Mon, 04/02 01:52, Jidong Xiao wrote:
+On Mon, Apr 2, 2018 at 7:10 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> [/var]/tmp full due to some jobs not cleaning well their workspaces?
+
+Somehow our "make check" now keeps hanging in the container,
+preventing it from being cleaned up correctly...
+
+Will try to find time for it this week.
+
+Fam
+
+>
+> On 03/31/2018 06:04 AM, no-reply@patchew.org wrote:
 >> Hi,
 >>
->> A huge amount of documents has referenced this testing image:
+>> This series failed docker-build@min-glib build test. Please find the tes=
+ting commands and
+>> their output below. If you have Docker installed, you can probably repro=
+duce it
+>> locally.
 >>
->> http://wiki.qemu.org/download/linux-0.2.img.bz2
+>> N/A. Internal error while reading log file
 >>
->> However, the image is no longer there. Is the image still available
->> somewhere? Thanks.
->
-> According to the edit history of https://wiki.qemu.org/System_Images these
-> images are no longer provided by qemu.org. So we should fix the documents. Where
-> are they?
->
-> Fam
-
-
-When I was saying documents, I meant all kinds of online documents,
-whenever people talk about qemu test images, they refer to the above
-link. For example, that link was included in the native kvm tool
-readme file.
-
-Whatever, I just found one available mirror:
-
-http://lassauge.free.fr/qemu/release/
-
-At least, we can download those testing images here.
-
--Jidong
+>>
+>>
+>> ---
+>> Email generated automatically by Patchew [http://patchew.org/].
+>> Please send your feedback to patchew-devel@redhat.com
+>>
