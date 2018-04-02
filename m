@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f2q4h-0002Kf-F9
-	for qemu-devel@nongnu.org; Sun, 01 Apr 2018 23:24:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1f2qCP-00050Z-N0
+	for qemu-devel@nongnu.org; Sun, 01 Apr 2018 23:32:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f2q4e-0006Ee-Aa
-	for qemu-devel@nongnu.org; Sun, 01 Apr 2018 23:24:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54052 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f2qCM-0001bW-Js
+	for qemu-devel@nongnu.org; Sun, 01 Apr 2018 23:32:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50502 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f2q4e-0006DL-69
-	for qemu-devel@nongnu.org; Sun, 01 Apr 2018 23:24:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5759722E1
-	for <qemu-devel@nongnu.org>; Mon,  2 Apr 2018 03:23:56 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Mon,  2 Apr 2018 11:23:36 +0800
-Message-Id: <20180402032336.31834-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] scsi-block: Handle error from host devices
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f2qCM-0001aF-Ef
+	for qemu-devel@nongnu.org; Sun, 01 Apr 2018 23:31:58 -0400
+Date: Mon, 2 Apr 2018 12:26:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180402042633.GA26441@xz-mi>
+References: <20180327091043.30220-1-xiaoguangrong@tencent.com>
+	<20180327091043.30220-5-xiaoguangrong@tencent.com>
+	<20180328095952.GG29554@xz-mi>
+	<c3c7cf6e-709b-64ee-a090-741d9633114d@gmail.com>
+	<20180329042510.GC8456@xz-mi>
+	<e92d75bc-8f53-039b-f4ac-04eb94e54bd1@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e92d75bc-8f53-039b-f4ac-04eb94e54bd1@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 04/10] migration: detect compression and
+ decompression errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-The callback of blk_aio_ioctl is not sensible to SCSI errors, so
-werror=stop doesn't work if ioctl returns 0 but the scsi status is
-error.
+On Fri, Mar 30, 2018 at 11:11:27AM +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 03/29/2018 12:25 PM, Peter Xu wrote:
+> > On Thu, Mar 29, 2018 at 11:51:03AM +0800, Xiao Guangrong wrote:
+> > > 
+> > > 
+> > > On 03/28/2018 05:59 PM, Peter Xu wrote:
+> > > > On Tue, Mar 27, 2018 at 05:10:37PM +0800, guangrong.xiao@gmail.com wrote:
+> > > > 
+> > > > [...]
+> > > > 
+> > > > > -static int compress_threads_load_setup(void)
+> > > > > +static int compress_threads_load_setup(QEMUFile *f)
+> > > > >    {
+> > > > >        int i, thread_count;
+> > > > > @@ -2665,6 +2685,7 @@ static int compress_threads_load_setup(void)
+> > > > >            }
+> > > > >            decomp_param[i].stream.opaque = &decomp_param[i];
+> > > > > +        decomp_param[i].file = f;
+> > > > 
+> > > > On the source side the error will be set via:
+> > > > 
+> > > >           qemu_file_set_error(migrate_get_current()->to_dst_file, blen);
+> > > > 
+> > > > Maybe we can do similar things using migrate_incoming_get_current() to
+> > > > avoid caching the QEMUFile multiple times?
+> > > > 
+> > > 
+> > > I have considered it, however, it can not work as the @file used by ram
+> > > loader is not the file got from migrate_incoming_get_current() under some
+> > > cases.
+> > > 
+> > > For example, in colo_process_incoming_thread(), the file passed to
+> > > qemu_loadvm_state() is a internal buffer and it is not easy to switch it
+> > > to incoming file.
+> > 
+> > I see. How about cache it in a global variable?  We have these
+> > already:
+> > 
+> >      thread_count = migrate_decompress_threads();
+> >      decompress_threads = g_new0(QemuThread, thread_count);
+> >      decomp_param = g_new0(DecompressParam, thread_count);
+> >      ...
+> > 
+> > IMHO we can add a new one too, at least we don't cache it multiple
+> > times (after all decomp_param[i]s are global variables too).
+> > 
+> 
+> Nice, that's good to me. Will add your Reviewed-by on this patch
+> as well if you do not mind. :)
 
-Peek at the sg_io_hdr_t fields and amend ret to fix that.
+Yes, please. :)
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- hw/scsi/scsi-disk.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+Thanks,
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index f5ab767ab5..2c43830586 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2651,10 +2651,26 @@ typedef struct SCSIBlockReq {
-     /* Selected bytes of the original CDB, copied into our own CDB.  */
-     uint8_t cmd, cdb1, group_number;
- 
-+    BlockCompletionFunc *cb;
-+    void *cb_opaque;
-+
-     /* CDB passed to SG_IO.  */
-     uint8_t cdb[16];
- } SCSIBlockReq;
- 
-+static void scsi_block_sgio_cb(void *opaque, int ret)
-+{
-+    SCSIBlockReq *req = opaque;
-+
-+    if (!ret &&
-+        (req->io_header.status ||
-+         req->io_header.host_status ||
-+         req->io_header.driver_status)) {
-+        ret = -EIO;
-+    }
-+    req->cb(req->cb_opaque, ret);
-+}
-+
- static BlockAIOCB *scsi_block_do_sgio(SCSIBlockReq *req,
-                                       int64_t offset, QEMUIOVector *iov,
-                                       int direction,
-@@ -2734,7 +2750,9 @@ static BlockAIOCB *scsi_block_do_sgio(SCSIBlockReq *req,
-     io_header->usr_ptr = r;
-     io_header->flags |= SG_FLAG_DIRECT_IO;
- 
--    aiocb = blk_aio_ioctl(s->qdev.conf.blk, SG_IO, io_header, cb, opaque);
-+    req->cb_opaque = opaque;
-+    aiocb = blk_aio_ioctl(s->qdev.conf.blk, SG_IO, io_header,
-+                          scsi_block_sgio_cb, req);
-     assert(aiocb != NULL);
-     return aiocb;
- }
 -- 
-2.14.3
+Peter Xu
