@@ -1,24 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f32Pw-0003od-PZ
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 12:34:50 -0400
+	(envelope-from <prvs=063091f310=akrowiak@linux.vnet.ibm.com>)
+	id 1f32Rk-0004wq-5E
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 12:36:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f32Pt-0005NA-7j
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 12:34:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55590 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1f32Pt-0005L5-2C
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 12:34:45 -0400
-References: <152248010946.861.11797909277921857391@71c20359a636>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a017f198-a05e-8a60-ca87-fcb6e88b28a6@redhat.com>
-Date: Mon, 2 Apr 2018 12:34:34 -0400
+	(envelope-from <prvs=063091f310=akrowiak@linux.vnet.ibm.com>)
+	id 1f32Rh-0006TU-9D
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 12:36:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51254
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=063091f310=akrowiak@linux.vnet.ibm.com>)
+	id 1f32Rh-0006Sy-1w
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 12:36:37 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w32GTW8u112293
+	for <qemu-devel@nongnu.org>; Mon, 2 Apr 2018 12:36:36 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2h3k0x5an4-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 02 Apr 2018 12:36:35 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Mon, 2 Apr 2018 12:36:35 -0400
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Mon, 2 Apr 2018 12:36:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <152248010946.861.11797909277921857391@71c20359a636>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
 Content-Language: en-US
+Message-Id: <0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/2] Ide patches
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,120 +49,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, peter.maydell@linaro.org
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
+On 03/26/2018 05:03 AM, Pierre Morel wrote:
+> On 26/03/2018 10:32, David Hildenbrand wrote:
+>> On 16.03.2018 00:24, Tony Krowiak wrote:
+>>> If the CPU model indicates that AP facility is installed on
+>>> the guest (i.e., -cpu xxxx,ap=on), then the expectation is that
+>>> the AP bus running in the guest will initialize; however, if the
+>>> AP instructions are not being interpreted by the firmware, then
+>>> they will be intercepted and routed back to QEMU for handling.
+>>> If a handler is not defined to process the intercepted instruciton,
+>>> t
+> ...snip...
+>>
+>>> +int ap_device_handle_nqap(S390CPU *cpu)
+>>> +{
+>>> +    CPUS390XState *env = &cpu->env;
+>>> +
+>>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>>> +        env->regs[1] = 0x10000;
+>>> +
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    return -EOPNOTSUPP;
+>>> +}
+>>> +
+>>> +int ap_device_handle_dqap(S390CPU *cpu)
+>>> +{
+>>> +    CPUS390XState *env = &cpu->env;
+>>> +
+>>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>>> +        env->regs[1] = 0x10000;
+>>> +
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    return -EOPNOTSUPP;
+>>> +}
+>>> +
+>>> +int ap_device_handle_pqap(S390CPU *cpu)
+>>> +{
+>>> +    CPUS390XState *env = &cpu->env;
+>>> +    int fc = 4 & (env->regs[0] >> 24);
+>>> +
+>>> +    /*
+>>> +     * The Query Configuration Information (QCI) function (fc == 4) 
+>>> does not
+>>> +     * set a response code in reg 1, so check for that along with the
+>>> +     * AP feature.
+>>> +     */
+>>> +    if ((fc != 4) && s390_has_feat(S390_FEAT_AP)) {
+>>> +        env->regs[1] = 0x10000;
+>>> +
+>>> +        return 0;
+>>> +    }
+>> This would imply an operation exception in case fc==4, which sounds very
+>> wrong.
+>
+> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must be 
+> tested
+> to know what to answer.
+> If the feature is there, QCI must be answered correctly.
+This is an interesting proposition which raises several issues that will 
+need to
+be addressed. The only time the PQAP(QCI) instruction is intercepted is 
+when:
+* A vfio-ap device is NOT defined for the guest because the vfio_ap 
+device driver
+   will set ECA.28 and the PQAP(QCI) instruction will be interpreted
+* STFLE.12 is set for the guest
 
-
-On 03/31/2018 03:08 AM, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series failed docker-build@min-glib build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> Type: series
-> Message-id: 20180327045646.21112-1-jsnow@redhat.com
-> Subject: [Qemu-devel] [PULL 0/2] Ide patches
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> set -e
-> git submodule update --init dtc
-> # Let docker tests dump environment info
-> export SHOW_ENV=1
-> export J=8
-> time make docker-test-build@min-glib
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> 49a0f26939 Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180328' into staging
-> a60769352d tcg: Mark muluh_i64 and mulsh_i64 as 64-bit ops
-> 
-> === OUTPUT BEGIN ===
-> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> Cloning into '/var/tmp/patchew-tester-tmp-vi1_8690/src/dtc'...
-> Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9cc42'
->   BUILD   min-glib
-> make[1]: Entering directory '/var/tmp/patchew-tester-tmp-vi1_8690/src'
->   GEN     /var/tmp/patchew-tester-tmp-vi1_8690/src/docker-src.2018-03-31-03.07.40.30023/qemu.tar
-> Cloning into '/var/tmp/patchew-tester-tmp-vi1_8690/src/docker-src.2018-03-31-03.07.40.30023/qemu.tar.vroot'...
-> done.
-> Your branch is up-to-date with 'origin/test'.
-> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> Cloning into '/var/tmp/patchew-tester-tmp-vi1_8690/src/docker-src.2018-03-31-03.07.40.30023/qemu.tar.vroot/dtc'...
-> Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9cc42'
-> Submodule 'ui/keycodemapdb' (git://git.qemu.org/keycodemapdb.git) registered for path 'ui/keycodemapdb'
-> Cloning into '/var/tmp/patchew-tester-tmp-vi1_8690/src/docker-src.2018-03-31-03.07.40.30023/qemu.tar.vroot/ui/keycodemapdb'...
-> Submodule path 'ui/keycodemapdb': checked out '6b3d716e2b6472eb7189d3220552280ef3d832ce'
-> tar: /var/tmp/patchew-tester-tmp-vi1_8690/src/docker-src.2018-03-31-03.07.40.30023/qemu.tar: Wrote only 2048 of 10240 bytes
-> tar: Error is not recoverable: exiting now
-> failed to create tar file
->   COPY    RUNNER
->     RUN test-build in qemu:min-glib 
-> tar: Unexpected EOF in archive
-> tar: Unexpected EOF in archive
-> tar: Error is not recoverable: exiting now
-> /var/tmp/qemu/run: line 32: prep_fail: command not found
-> Environment variables:
-> HOSTNAME=d3de5b81f6a8
-> MAKEFLAGS= -j8
-> J=8
-> CCACHE_DIR=/var/tmp/ccache
-> EXTRA_CONFIGURE_OPTS=
-> V=
-> SHOW_ENV=1
-> PATH=/usr/lib/ccache:/usr/lib64/ccache:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-> PWD=/
-> TARGET_LIST=
-> SHLVL=1
-> HOME=/root
-> TEST_DIR=/tmp/qemu-test
-> FEATURES= dtc
-> DEBUG=
-> _=/usr/bin/env
-> 
-> Configure options:
-> --enable-werror --target-list=x86_64-softmmu,aarch64-softmmu --prefix=/tmp/qemu-test/install
-> 
-> ERROR: DTC (libfdt) version >= 1.4.2 not present.
->        Please install the DTC (libfdt) devel package
-> 
-
-Environment problems?
-
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 407, in <module>
->     sys.exit(main())
->   File "./tests/docker/docker.py", line 404, in main
->     return args.cmdobj.run(args, argv)
->   File "./tests/docker/docker.py", line 261, in run
->     return Docker().run(argv, args.keep, quiet=args.quiet)
->   File "./tests/docker/docker.py", line 229, in run
->     quiet=quiet)
->   File "./tests/docker/docker.py", line 147, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=3f76e41234b211e8813a52540069c830', '-u', '0', '--security-opt', 'seccomp=unconfined', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-vi1_8690/src/docker-src.2018-03-31-03.07.40.30023:/var/tmp/qemu:z,ro', 'qemu:min-glib', '/var/tmp/qemu/run', 'test-build']' returned non-zero exit status 1
-> make[1]: *** [tests/docker/Makefile.include:129: docker-run] Error 1
-> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-vi1_8690/src'
-> make: *** [tests/docker/Makefile.include:163: docker-run-test-build@min-glib] Error 2
-> 
-> real	0m51.988s
-> user	0m9.352s
-> sys	0m6.949s
-> === OUTPUT END ===
-> 
-> Test command exited with code: 2
-> 
-> 
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
-
-Unrelated to the patch as far as I can tell.
-
---js
+You say that the QCI must be answered correctly, but what is the correct 
+response?
+If we return the matrix - i.e., APM, ADM and AQM - configured via the 
+mediated
+matrix device's sysfs attributes files, then if any APQNs are defined in 
+the matrix,
+we will have to handle *ALL* AP instructions by executing them on behalf 
+of the
+guest. I suppose we could return an empty matrix in which case the AP 
+bus will come
+up without any devices on the guest, but what is the expectation of an 
+admin who
+deliberately configures the mediated matrix device? Should we forego 
+handling interception
+of AP instructions and consider a guest configuration that turns on 
+S390_FEAT_AP but
+does not define a vfio-ap device to be erroneous and terminate starting 
+of the guest?
+Anybody have any thoughts?
+>
+>
+> there are also some error situations to handle in all three functions.
+To what error situations are you referring?
+>
+>
+>
+>>
+>> Hard to review without access to documentation. (hard to understand why
+>> such stuff is to be kept confidential for decades)
+>>
+>>> +
+>>> +    return -EOPNOTSUPP;
+>>> +}
+>>> +
+>>>   static Property vfio_ap_properties[] = {
+>>>       DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
+>>>       DEFINE_PROP_END_OF_LIST(),
+>>> diff --git a/include/hw/s390x/ap-device.h 
+>>> b/include/hw/s390x/ap-device.h
+>>> index 693df90..d45ae38 100644
+>>> --- a/include/hw/s390x/ap-device.h
+>>> +++ b/include/hw/s390x/ap-device.h
+>>> @@ -11,6 +11,8 @@
+>>>   #ifndef HW_S390X_AP_DEVICE_H
+>>>   #define HW_S390X_AP_DEVICE_H
+>>
+>
