@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boqun.feng@intel.com>) id 1f2rqo-0007Th-UF
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:17:51 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1f2sSv-000682-T8
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <boqun.feng@intel.com>) id 1f2rql-0005WS-PO
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:17:50 -0400
-Received: from mga12.intel.com ([192.55.52.136]:52654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <boqun.feng@intel.com>)
-	id 1f2rql-0005VI-HG
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:17:47 -0400
-Date: Mon, 2 Apr 2018 13:14:30 +0800
-From: Boqun Feng <boqun.feng@intel.com>
-Message-ID: <20180402051429.GB453@dragonstone>
-References: <20180320000821.8337-1-boqun.feng@intel.com>
+	(envelope-from <mjt@tls.msk.ru>) id 1f2sSs-0006W8-1c
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:57:13 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:45875)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mjt@tls.msk.ru>) id 1f2sSr-0006NQ-Pd
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:57:09 -0400
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <6c7ac1ff-b375-f1f7-094e-7fb603c5e40b@msgid.tls.msk.ru>
+Date: Mon, 2 Apr 2018 08:56:59 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180320000821.8337-1-boqun.feng@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2] i386: add KnightsMill cpu model
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] some ROMs questions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, chao.p.peng@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Ping ;-)
+In the recent 2.12-rc1 tarball, there are the following things present:
 
-Regards,
-Boqun
+roms/u-boot-sam460ex/tools/updater/stubs.c -
+ it is some strange symlink pointing to a strange place, probably should be removed?
 
-On Tue, Mar 20, 2018 at 08:08:15AM +0800, Boqun Feng wrote:
-> A new cpu model called "KnightsMill" is added to model Knights Mill
-> processors.  Compared to "Skylake-Server" cpu model, the following
-> features are added:
-> 
-> 	avx512_4vnniw avx512_4fmaps avx512pf avx512er avx512_vpopcntdq
-> 
-> and the following features are removed:
-> 
-> 	pcid invpcid clflushopt avx512dq avx512bw clwb smap rtm mpx
-> 	xsavec xgetbv1 hle
-> 
-> Signed-off-by: Boqun Feng <boqun.feng@intel.com>
-> ---
-> v1 --> v2:
-> 
-> *	Change the model name to "KnightsMill" as per Daniel's
-> 	suggestion.
-> 
->  target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 2c04645ceac9..c484afdb7023 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1795,6 +1795,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
->          .xlevel = 0x80000008,
->          .model_id = "Intel Xeon Processor (Skylake, IBRS)",
->      },
-> +    {
-> +        .name = "KnightsMill",
-> +        .level = 0xd,
-> +        .vendor = CPUID_VENDOR_INTEL,
-> +        .family = 6,
-> +        .model = 133,
-> +        .stepping = 0,
-> +        .features[FEAT_1_EDX] =
-> +            CPUID_VME | CPUID_SS | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
-> +            CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
-> +            CPUID_MCA | CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC |
-> +            CPUID_CX8 | CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
-> +            CPUID_PSE | CPUID_DE | CPUID_FP87,
-> +        .features[FEAT_1_ECX] =
-> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-> +            CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-> +        .features[FEAT_8000_0001_EDX] =
-> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-> +        .features[FEAT_8000_0001_ECX] =
-> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-> +        .features[FEAT_7_0_EBX] =
-> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-> +            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-> +            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_AVX512F |
-> +            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_AVX512PF |
-> +            CPUID_7_0_EBX_AVX512ER,
-> +        .features[FEAT_7_0_ECX] =
-> +            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
-> +        .features[FEAT_7_0_EDX] =
-> +            CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS,
-> +        .features[FEAT_XSAVE] =
-> +            CPUID_XSAVE_XSAVEOPT,
-> +        .features[FEAT_6_EAX] =
-> +            CPUID_6_EAX_ARAT,
-> +        .xlevel = 0x80000008,
-> +        .model_id = "Intel Xeon Phi Processor (Knights Mill)",
-> +    },
->      {
->          .name = "Opteron_G1",
->          .level = 5,
-> -- 
-> 2.16.1
-> 
+When making u-boot-am460ex image, in roms/Makefile, we do a plain copy, while 5
+lines above, u-boot image is being stripped on copy. Should we perform strip for
+u-boot-am460ex image too, if not only to be consistent?
+
+BTW, can't u-boot-am460ex image be made from regular u-boot sources, maybe with an
+additional board added? :)
+
+Also, skiboot image can't be built from roms/skiboot in the source tarball, it fails
+because there's no .version file present in roms/skiboot/ directory, but this file
+is present in the git repository (submodule). Perhaps this .version file is wrongly
+removed when making release tarball?
+
+Maybe these trivial issues can be fixed for 2.12 release?
+
+Thanks,
+
+/mjt
