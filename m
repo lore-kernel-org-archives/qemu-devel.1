@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f35NH-0005i3-Fl
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 15:44:16 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1f36Vx-0005Dd-CU
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 16:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f35NG-0000cD-FN
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 15:44:15 -0400
-References: <1521178795-21894-1-git-send-email-thuth@redhat.com>
-	<30a96f63-4cdf-23e6-c4d2-b4de59411a11@redhat.com>
-	<2d69038f-f859-eb42-afb6-acde2e0c5182@redhat.com>
-	<316190e9-552f-23c8-e9e6-2b24f708ae7c@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cb2451b1-fa49-cc6c-4398-5cf7e8963924@redhat.com>
-Date: Mon, 2 Apr 2018 21:43:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <316190e9-552f-23c8-e9e6-2b24f708ae7c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Add new CD-ROM related qtests
+	(envelope-from <andrew.smirnov@gmail.com>) id 1f36Vu-0008Bz-En
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 16:57:17 -0400
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon,  2 Apr 2018 13:56:54 -0700
+Message-Id: <20180402205654.14572-1-andrew.smirnov@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw/arm: Allow manually specified /psci node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +17,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Victor Kaplansky <victork@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On 02.04.2018 21:34, John Snow wrote:
-> 
-> 
-> On 04/02/2018 02:39 PM, Thomas Huth wrote:
->> On 29.03.2018 20:28, John Snow wrote:
->>>
->>>
->>> On 03/16/2018 01:39 AM, Thomas Huth wrote:
->>>> With one of my clean-up patches (see commit 1454509726719e0933c800), I
->>>> recently accidentially broke the "-cdrom" parameter (more precisely
->>>> "-drive if=scsi") on a couple of boards, since there was no error
->>>> detected during the "make check" regression testing. This is clearly an
->>>> indication that we are lacking tests in this area.
->>>> So this small patch series now introduces some tests for CD-ROM drives:
->>>> The first two patches introduce the possibility to check that booting
->>>> from CD-ROM drives still works fine for x86 and s390x, and the third
->>>> patch adds a test that certain machines can at least still be started
->>>> with the "-cdrom" parameter (i.e. that test would have catched the
->>>> mistake that I did with my SCSI cleanup patch).
->>>>
->>>> v2:
->>>>  - Use g_spawn_sync() instead of execlp() to run genisoimage
->>>>  - The "-cdrom" parameter test is now run on all architectures (with
->>>>    machine "none" for the machines that are not explicitly checked)
->>>>  - Some rewordings and improved comments here and there
->>>>
->>>> Thomas Huth (3):
->>>>   tests/boot-sector: Add magic bytes to s390x boot code header
->>>>   tests/cdrom-test: Test booting from CD-ROM ISO image file
->>>>   tests/cdrom-test: Test that -cdrom parameter is working
->>>>
->>>>  tests/Makefile.include |   2 +
->>>>  tests/boot-sector.c    |   9 +-
->>>>  tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  3 files changed, 230 insertions(+), 3 deletions(-)
->>>>  create mode 100644 tests/cdrom-test.c
->>>>
->>>
->>> New file, but no edit to MAINTAINERS.
->>
->> Which section do you suggest? It tests IDE CD-ROMs, SCSI CD-ROMs, and
->> even virtio-block (on s390x) ... so I have a hard time to decide where
->> this should belong to...
->>
->>  Thomas
->>
-> 
-> I was hoping you'd figure it out, but fine :D
-> 
-> You can stick it under my section if you want, but I'll probably defer
-> to you if the s390x parts break.
+Change the code to avoid exiting QEMU if user provided DTB contains
+manually specified /psci node and skip any /psci related fixups
+instead.
 
-Ok, thanks. But in the long run, we might even need a generic "QTESTS"
-section in the MAINTAINERS file, since most of the qtests are currently
-not listed there.
-And while we're at it, we should maybe also move the qtests to a
-separate folder tests/qtests/ or so, so that it is clearer which of the
-tests is a qtest and which are something different.
-I'll try to come up with some patches once the hard freeze is over...
+Fixes: 4cbca7d9b4 ("hw/arm: Move virt's PSCI DT fixup code to
+arm/boot.c")
 
- Thomas
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+
+Mark:
+
+Sorry about the inconvenience, here's the fix (hopefully) to the
+prolem you reported in [1]. Let me know if skipping all PSCI related
+DTB fixup if /psic node is present is not the behaviour you had in
+mind for your suggested fix.
+
+Thanks,
+Andrey Smirnov
+
+[1] http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06914.html
+
+ hw/arm/boot.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 6d0c92ab88..d9f9375cdb 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -422,6 +422,7 @@ static void fdt_add_psci_node(void *fdt)
+     ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(0));
+     const char *psci_method;
+     int64_t psci_conduit;
++    int rc;
+ 
+     psci_conduit = object_property_get_int(OBJECT(armcpu),
+                                            "psci-conduit",
+@@ -439,6 +440,15 @@ static void fdt_add_psci_node(void *fdt)
+         g_assert_not_reached();
+     }
+ 
++    /*
++     * If /psci node is present in provided DTB, assume that no fixup
++     * is necessary and all PSCI configuration should be taken as-is
++     */
++    rc = fdt_path_offset(fdt, "/psci");
++    if (rc >= 0) {
++        return;
++    }
++
+     qemu_fdt_add_subnode(fdt, "/psci");
+     if (armcpu->psci_version == 2) {
+         const char comp[] = "arm,psci-0.2\0arm,psci";
+-- 
+2.14.3
