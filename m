@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f2sSv-000682-T8
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:57:14 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1f2snM-0005bM-Qm
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 02:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f2sSs-0006W8-1c
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:57:13 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:45875)
+	(envelope-from <chen_han_xiao@126.com>) id 1f2snJ-0006sP-K2
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 02:18:20 -0400
+Received: from m15-112.126.com ([220.181.15.112]:43578)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f2sSr-0006NQ-Pd
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 01:57:09 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <6c7ac1ff-b375-f1f7-094e-7fb603c5e40b@msgid.tls.msk.ru>
-Date: Mon, 2 Apr 2018 08:56:59 +0300
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] some ROMs questions
+	(envelope-from <chen_han_xiao@126.com>) id 1f2snI-0006p6-N4
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 02:18:17 -0400
+From: Chen Hanxiao <chen_han_xiao@126.com>
+Date: Mon,  2 Apr 2018 14:15:48 +0800
+Message-Id: <20180402061548.29145-1-chen_han_xiao@126.com>
+Subject: [Qemu-devel] [PATCH resend v2] qga: unset frozen state if no mount
+ points are frozen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +22,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, BALATON Zoltan <balaton@eik.bme.hu>
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Chen Hanxiao <chen_han_xiao@126.com>
 
-In the recent 2.12-rc1 tarball, there are the following things present:
+From: Chen Hanxiao <chenhanxiao@gmail.com>
 
-roms/u-boot-sam460ex/tools/updater/stubs.c -
- it is some strange symlink pointing to a strange place, probably should be removed?
+If we set mountpoints to qmp_guest_fsfreeze_freeze_list,
+we may got nothing to freeze as all mountpoints are
+not valid.
+So call ga_unset_frozen in this senario.
 
-When making u-boot-am460ex image, in roms/Makefile, we do a plain copy, while 5
-lines above, u-boot image is being stripped on copy. Should we perform strip for
-u-boot-am460ex image too, if not only to be consistent?
+Also, if we return 0 frozen fs, there is no need to call
+guest-fsfreeze-thaw.
 
-BTW, can't u-boot-am460ex image be made from regular u-boot sources, maybe with an
-additional board added? :)
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
 
-Also, skiboot image can't be built from roms/skiboot in the source tarball, it fails
-because there's no .version file present in roms/skiboot/ directory, but this file
-is present in the git repository (submodule). Perhaps this .version file is wrongly
-removed when making release tarball?
+---
+v2:
+  remove has_mountpoints special case
+  add qapi-schema.json section
 
-Maybe these trivial issues can be fixed for 2.12 release?
+ qga/commands-posix.c | 6 ++++++
+ qga/qapi-schema.json | 4 +++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-Thanks,
-
-/mjt
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 0dc219dbcf..93bfc5b4ab 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1274,6 +1274,12 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+     }
+ 
+     free_fs_mount_list(&mounts);
++    /* We may not issue any FIFREEZE here.
++     * Just unset ga_state here and ready for the next call.
++     */
++    if (i == 0) {
++        ga_unset_frozen(ga_state);
++    }
+     return i;
+ 
+ error:
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 17884c7c70..1045cef386 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -435,7 +435,9 @@
+ # for up to 10 seconds by VSS.
+ #
+ # Returns: Number of file systems currently frozen. On error, all filesystems
+-# will be thawed.
++# will be thawed. If no filesystems are frozen as a result of this call,
++# then @guest-fsfreeze-status will remain "thawed" and calling
++# @guest-fsfreeze-thaw is not necessary.
+ #
+ # Since: 0.15.0
+ ##
+-- 
+2.14.3
