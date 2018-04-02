@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1f36Vx-0005Dd-CU
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 16:57:18 -0400
+	(envelope-from <rob@landley.net>) id 1f383G-0003gp-Qy
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 18:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1f36Vu-0008Bz-En
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 16:57:17 -0400
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon,  2 Apr 2018 13:56:54 -0700
-Message-Id: <20180402205654.14572-1-andrew.smirnov@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/arm: Allow manually specified /psci node
+	(envelope-from <rob@landley.net>) id 1f383D-0005RF-NH
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 18:35:46 -0400
+Received: from mail-it0-x236.google.com ([2607:f8b0:4001:c0b::236]:55391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rob@landley.net>) id 1f383D-0005OF-Ic
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 18:35:43 -0400
+Received: by mail-it0-x236.google.com with SMTP id 142-v6so20716721itl.5
+	for <qemu-devel@nongnu.org>; Mon, 02 Apr 2018 15:35:43 -0700 (PDT)
+References: <20180320090813.852-1-laurent@vivier.eu>
+	<d409453e-21c4-c989-c40c-442dcb8f2636@landley.net>
+	<7cac14a3-c097-572e-4b61-8960209f6bd9@vivier.eu>
+	<67f4fb22-9ad5-7f41-371a-001d1346fc4f@landley.net>
+	<e95756ac-f3e8-dc5c-31db-c88fbb37756d@vivier.eu>
+From: Rob Landley <rob@landley.net>
+Message-ID: <2b88e5c6-41a9-5aff-6fe2-f29c0e403d17@landley.net>
+Date: Mon, 2 Apr 2018 17:35:40 -0500
+MIME-Version: 1.0
+In-Reply-To: <e95756ac-f3e8-dc5c-31db-c88fbb37756d@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 0/2] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,65 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Finn Thain <fthain@telegraphics.com.au>
 
-Change the code to avoid exiting QEMU if user provided DTB contains
-manually specified /psci node and skip any /psci related fixups
-instead.
+On 04/02/2018 02:05 PM, Laurent Vivier wrote:
+> Le 02/04/2018 à 20:13, Rob Landley a écrit :
+>>> The branch to use is q800-dev
+...
+>> It booted Linux to a shell prompt, I could wget a file from the internet, and
+>> /home had the 2 gigabyte ext3 mount from the virtual block device.
+>>
+>> I.E. it works for me. Why is it still out of tree?
+...
+> I have to submit some enhancements in the FPU emulation...
+> I have to add some specific m68k hardware emulation...
+> but via support should be rewritten...
+> I have to update some existing hardware emulation...
+...
+> So, this only needs some work and time.
+10 years ago:
 
-Fixes: 4cbca7d9b4 ("hw/arm: Move virt's PSCI DT fixup code to
-arm/boot.c")
+https://lists.gnu.org/archive/html/qemu-devel/2007-10/msg00248.html
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
----
+6 years ago:
 
-Mark:
+https://lists.gnu.org/archive/html/qemu-devel/2011-08/msg02123.html
 
-Sorry about the inconvenience, here's the fix (hopefully) to the
-prolem you reported in [1]. Let me know if skipping all PSCI related
-DTB fixup if /psic node is present is not the behaviour you had in
-mind for your suggested fix.
+> I hope q800 will be available in QEMU 2.13.
 
-Thanks,
-Andrey Smirnov
+Good luck,
 
-[1] http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06914.html
-
- hw/arm/boot.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 6d0c92ab88..d9f9375cdb 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -422,6 +422,7 @@ static void fdt_add_psci_node(void *fdt)
-     ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(0));
-     const char *psci_method;
-     int64_t psci_conduit;
-+    int rc;
- 
-     psci_conduit = object_property_get_int(OBJECT(armcpu),
-                                            "psci-conduit",
-@@ -439,6 +440,15 @@ static void fdt_add_psci_node(void *fdt)
-         g_assert_not_reached();
-     }
- 
-+    /*
-+     * If /psci node is present in provided DTB, assume that no fixup
-+     * is necessary and all PSCI configuration should be taken as-is
-+     */
-+    rc = fdt_path_offset(fdt, "/psci");
-+    if (rc >= 0) {
-+        return;
-+    }
-+
-     qemu_fdt_add_subnode(fdt, "/psci");
-     if (armcpu->psci_version == 2) {
-         const char comp[] = "arm,psci-0.2\0arm,psci";
--- 
-2.14.3
+Rob
