@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f3Nu3-0004fz-Tq
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:31:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f3NuV-0004yr-JP
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f3Nu0-0003EB-Lx
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:31:19 -0400
-Date: Tue, 3 Apr 2018 17:30:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180403153055.GH11070@localhost.localdomain>
-References: <1522421052-8657-1-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <ehabkost@redhat.com>) id 1f3NuS-0003hf-Br
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:31:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f3NuS-0003hJ-2n
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:31:44 -0400
+Date: Tue, 3 Apr 2018 12:31:29 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180403153129.GV5046@localhost.localdomain>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<1520860275-101576-4-git-send-email-imammedo@redhat.com>
+	<20180323212508.GF28161@localhost.localdomain>
+	<20180327170541.295fc29a@redhat.com>
+	<20180328134835.04f95535@redhat.com>
+	<20180328192148.GR5046@localhost.localdomain>
+	<20180329134303.548a864b@redhat.com>
+	<20180329162409.GX5046@localhost.localdomain>
+	<20180403163253.1d13633f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1522421052-8657-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.12] iotests: fix 208 for luks format
+In-Reply-To: <20180403163253.1d13633f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,14 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, stefanha@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-Am 30.03.2018 um 16:44 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Support luks images creatins like in 205
+On Tue, Apr 03, 2018 at 04:32:53PM +0200, Igor Mammedov wrote:
+> On Thu, 29 Mar 2018 13:24:09 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > On Thu, Mar 29, 2018 at 01:43:03PM +0200, Igor Mammedov wrote:
+> > > On Wed, 28 Mar 2018 16:21:48 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >   
+> > > > On Wed, Mar 28, 2018 at 01:48:35PM +0200, Igor Mammedov wrote:  
+> > > > > On Tue, 27 Mar 2018 17:05:41 +0200
+> > > > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > > > >     
+> > > > > > On Fri, 23 Mar 2018 18:25:08 -0300
+> > > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> [...]
+> > > > This doesn't make sense to me.  Why would we enter
+> > > > RUN_STATE_PRECONFIG state if -preconfig is not used at all?  
+> > > because of RUN_STATE_PRECONFIG becomes new initial state of
+> > > our state machine where we start of (used to be RUN_STATE_PRELAUNCH)  
+> > 
+> > Oh, I missed that part.
+> > 
+> > > Lets call it variant 1:
+> > > 
+> > > with this we have 2 possible transitions:
+> > >  RUN_STATE_PRECONFIG -> RUN_STATE_PRELAUNCH (machine_init)
+> > > 
+> > > and
+> > > 
+> > >  RUN_STATE_PRECONFIG -> RUN_STATE_INMIGRATE
+> > >    ugly but it was the same with RUN_STATE_PRELAUNCH initial transition  
+> [...]
+> > 
+> > Thanks, now variant 1 makes more sense to me.  But I really miss
+> > here are very clear and explicit descriptions of what each state
+> > really mean, and what are the differences between them.
+> > 
+> > It looks like the existing description for `prelaunch` isn't
+> > accurate:
+> > 
+> > # @prelaunch: QEMU was started with -S and guest has not started
+> > 
+> > This is false, as QEMU can be in `prelaunch` state even if -S is
+> > not used.
+> > 
+> > 
+> > Also, this is the description you proposed for `preconfig`:
+> > 
+> > # @preconfig: QEMU is paused before board specific init callback is executed.
+> > #             The state is reachable only if -preconfig CLI option is used.
+> > #             (Since 2.12)
+> > 
+> > This seems wrong as well: the `prelaunch` state is reachable even
+> > if `-preconfig` isn't used in the command-line (because it is the
+> > initial state).
+> I'm not sure we should describe transitions/initial state here
+> (it's not the case now).
+> 
+> I think descriptions 'almost' match 'end' result of what QMP client
+> cloud see and the initial state is not something that QMP user could
+> observe.
 
-Thanks, applied to the block branch.
+That's my impression as well: `prelaunch` should be visible
+externally only if `-S` was used, and `preconfig` should be
+visible externally only if `-preconfig` was used.
 
-Kevin
+However, I miss documentation on what are the
+expectations/requirements internally.  e.g. there's no
+explanation why a reset request moves QEMU to
+RUN_STATE_PRELAUNCH.  Ideally, each line in
+runstate_transition_def would have a clear explanation for
+when/why each transition happens.
+
+But this isn't a requirement for the new feature you are
+implementing, anyway.
+
+-- 
+Eduardo
