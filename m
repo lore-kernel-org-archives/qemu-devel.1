@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f3BaP-00060B-98
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 22:22:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f3BfG-0007jA-6s
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 22:27:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f3BaM-0001GX-5e
-	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 22:22:13 -0400
-Date: Mon, 2 Apr 2018 23:22:06 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1f3BfD-0005NL-3u
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 22:27:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f3BfC-0005Mq-RO
+	for qemu-devel@nongnu.org; Mon, 02 Apr 2018 22:27:11 -0400
+Date: Mon, 2 Apr 2018 23:27:08 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180403022206.GK5046@localhost.localdomain>
-References: <20180329052537.32163-1-david@gibson.dropbear.id.au>
+Message-ID: <20180403022708.GO5046@localhost.localdomain>
+References: <20180320000821.8337-1-boqun.feng@intel.com>
+	<20180402051429.GB453@dragonstone>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180329052537.32163-1-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [PATCH for-2.13] Add
- host_memory_backend_pagesize() helper
+In-Reply-To: <20180402051429.GB453@dragonstone>
+Subject: Re: [Qemu-devel] [PATCH v2] i386: add KnightsMill cpu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,186 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: imammedo@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Boqun Feng <boqun.feng@intel.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, chao.p.peng@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Mar 29, 2018 at 04:25:37PM +1100, David Gibson wrote:
-> There are a couple places (one generic, one target specific) where we need
-> to get the host page size associated with a particular memory backend.  I
-> have some upcoming code which will add another place which wants this.  So,
-> for convenience, add a helper function to calculate this.
+On Mon, Apr 02, 2018 at 01:14:30PM +0800, Boqun Feng wrote:
+> Ping ;-)
+
+It missed soft feature freeze (March 13th), so I will queue this
+for 2.13.  Thanks!
+
 > 
-> host_memory_backend_pagesize() returns the host pagesize for a given
-> HostMemoryBackend object, or for the default backend (-mem-path) if passed
-> NULL.
+> Regards,
+> Boqun
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  backends/hostmem.c       | 20 ++++++++++++++++++++
->  exec.c                   | 21 +++++----------------
->  include/sysemu/hostmem.h |  2 ++
->  target/ppc/kvm.c         | 10 +---------
->  4 files changed, 28 insertions(+), 25 deletions(-)
-> 
-> diff --git a/backends/hostmem.c b/backends/hostmem.c
-> index f61093654e..b6a60cfc5d 100644
-> --- a/backends/hostmem.c
-> +++ b/backends/hostmem.c
-> @@ -18,6 +18,7 @@
->  #include "qapi/visitor.h"
->  #include "qemu/config-file.h"
->  #include "qom/object_interfaces.h"
-> +#include "qemu/mmap-alloc.h"
->  
->  #ifdef CONFIG_NUMA
->  #include <numaif.h>
-> @@ -262,6 +263,25 @@ bool host_memory_backend_is_mapped(HostMemoryBackend *backend)
->      return backend->is_mapped;
->  }
->  
-> +long host_memory_backend_pagesize(HostMemoryBackend *memdev)
-
-qemu_mempath_getpagesize() returns size_t.  Why are you using
-long here?
-
-> +{
-> +    const char *path = NULL;
-> +
-> +#ifdef __linux__
-> +    if (memdev) {
-> +        path = object_property_get_str(OBJECT(memdev), "mem-path", NULL);
-> +    } else {
-> +        path = mem_path;
-> +    }
-> +#endif
-> +
-> +    if (path) {
-> +        return qemu_mempath_getpagesize(path);
-> +    } else {
-> +        return getpagesize();
-
-Isn't it simpler to make qemu_mempath_getpagesize() handle
-path==NULL?
-
-
-> +    }
-> +}
-> +
->  static void
->  host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
->  {
-> diff --git a/exec.c b/exec.c
-> index c09bd93df3..04856c2402 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1488,18 +1488,13 @@ void ram_block_dump(Monitor *mon)
->   */
->  static int find_max_supported_pagesize(Object *obj, void *opaque)
->  {
-> -    char *mem_path;
->      long *hpsize_min = opaque;
->  
->      if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
-> -        mem_path = object_property_get_str(obj, "mem-path", NULL);
-> -        if (mem_path) {
-> -            long hpsize = qemu_mempath_getpagesize(mem_path);
-> -            if (hpsize < *hpsize_min) {
-> -                *hpsize_min = hpsize;
-> -            }
-> -        } else {
-> -            *hpsize_min = getpagesize();
-> +        long hpsize = host_memory_backend_pagesize(MEMORY_BACKEND(obj));
-
-So in this caller, `backend` is always non-NULL...
-
-> +
-> +        if (hpsize < *hpsize_min) {
-> +            *hpsize_min = hpsize;
->          }
->      }
->  
-> @@ -1509,15 +1504,9 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
->  long qemu_getrampagesize(void)
->  {
->      long hpsize = LONG_MAX;
-> -    long mainrampagesize;
-> +    long mainrampagesize = host_memory_backend_pagesize(NULL);
-
-...on this caller `backend` is always NULL...
-
-
->      Object *memdev_root;
->  
-> -    if (mem_path) {
-> -        mainrampagesize = qemu_mempath_getpagesize(mem_path);
-> -    } else {
-> -        mainrampagesize = getpagesize();
-> -    }
-> -
->      /* it's possible we have memory-backend objects with
->       * hugepage-backed RAM. these may get mapped into system
->       * address space via -numa parameters or memory hotplug
-[...]
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index b329cd8173..0adcf18c9f 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -493,15 +493,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
->  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
->  {
->      Object *mem_obj = object_resolve_path(obj_path, NULL);
-> -    char *mempath = object_property_get_str(mem_obj, "mem-path", NULL);
-> -    long pagesize;
-> -
-> -    if (mempath) {
-> -        pagesize = qemu_mempath_getpagesize(mempath);
-> -        g_free(mempath);
-> -    } else {
-> -        pagesize = getpagesize();
-> -    }
-> +    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
->  
-
-...and here `backend` is always non-NULL.
-
-If there's no caller that relies on both code paths, why overload
-a single function for two different operations?
-
-I would simply make qemu_mempath_getpagesize() work if path is
-NULL, use qemu_mempath_getpagesize(mem_path) at
-qemu_getrampagesize(), and make host_memory_backend_pagesize()
-assume require a non-NULL `memdev`.
-
-
-
-> +long host_memory_backend_pagesize(HostMemoryBackend *memdev)
-
-Why is the code duplicated in target/ppc/kvm.c?
-
-
-> +{
-> +    const char *path = NULL;
-> +
-> +#ifdef __linux__
-> +    if (memdev) {
-> +        path = object_property_get_str(OBJECT(memdev), "mem-path", NULL);
-> +    } else {
-> +        path = mem_path;
-> +    }
-> +#endif
-> +
-> +    if (path) {
-> +        return qemu_mempath_getpagesize(path);
-> +    } else {
-> +        return getpagesize();
-> +    }
-> +}
-> +
->      return pagesize >= max_cpu_page_size;
->  }
-> -- 
-> 2.14.3
-> 
+> On Tue, Mar 20, 2018 at 08:08:15AM +0800, Boqun Feng wrote:
+> > A new cpu model called "KnightsMill" is added to model Knights Mill
+> > processors.  Compared to "Skylake-Server" cpu model, the following
+> > features are added:
+> > 
+> > 	avx512_4vnniw avx512_4fmaps avx512pf avx512er avx512_vpopcntdq
+> > 
+> > and the following features are removed:
+> > 
+> > 	pcid invpcid clflushopt avx512dq avx512bw clwb smap rtm mpx
+> > 	xsavec xgetbv1 hle
+> > 
+> > Signed-off-by: Boqun Feng <boqun.feng@intel.com>
+> > ---
+> > v1 --> v2:
+> > 
+> > *	Change the model name to "KnightsMill" as per Daniel's
+> > 	suggestion.
+> > 
+> >  target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 42 insertions(+)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 2c04645ceac9..c484afdb7023 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -1795,6 +1795,48 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> >          .xlevel = 0x80000008,
+> >          .model_id = "Intel Xeon Processor (Skylake, IBRS)",
+> >      },
+> > +    {
+> > +        .name = "KnightsMill",
+> > +        .level = 0xd,
+> > +        .vendor = CPUID_VENDOR_INTEL,
+> > +        .family = 6,
+> > +        .model = 133,
+> > +        .stepping = 0,
+> > +        .features[FEAT_1_EDX] =
+> > +            CPUID_VME | CPUID_SS | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR |
+> > +            CPUID_MMX | CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
+> > +            CPUID_MCA | CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC |
+> > +            CPUID_CX8 | CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC |
+> > +            CPUID_PSE | CPUID_DE | CPUID_FP87,
+> > +        .features[FEAT_1_ECX] =
+> > +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+> > +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+> > +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+> > +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+> > +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
+> > +            CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+> > +        .features[FEAT_8000_0001_EDX] =
+> > +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+> > +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+> > +        .features[FEAT_8000_0001_ECX] =
+> > +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+> > +        .features[FEAT_7_0_EBX] =
+> > +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+> > +            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
+> > +            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_AVX512F |
+> > +            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_AVX512PF |
+> > +            CPUID_7_0_EBX_AVX512ER,
+> > +        .features[FEAT_7_0_ECX] =
+> > +            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
+> > +        .features[FEAT_7_0_EDX] =
+> > +            CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS,
+> > +        .features[FEAT_XSAVE] =
+> > +            CPUID_XSAVE_XSAVEOPT,
+> > +        .features[FEAT_6_EAX] =
+> > +            CPUID_6_EAX_ARAT,
+> > +        .xlevel = 0x80000008,
+> > +        .model_id = "Intel Xeon Phi Processor (Knights Mill)",
+> > +    },
+> >      {
+> >          .name = "Opteron_G1",
+> >          .level = 5,
+> > -- 
+> > 2.16.1
+> > 
 
 -- 
 Eduardo
