@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f3NeG-00022i-C1
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:15:01 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3Ngb-0003Yb-VK
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f3NeC-0001yU-9H
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:15:00 -0400
-Resent-Message-Id: <E1f3NeC-0001yU-9H@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f3NeC-0001uk-1c
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:14:56 -0400
-In-Reply-To: <cover.1522767657.git.jan.kiszka@web.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152276846283.1410.3954094891854775501@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 3 Apr 2018 08:14:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] target-i386: Enhance SVM support
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NgX-0004UQ-Sw
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:17:25 -0400
+Received: from smtp21.cstnet.cn ([159.226.251.21]:60045 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NgX-0004P7-6W
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:17:21 -0400
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Tue,  3 Apr 2018 23:17:14 +0800
+Message-Id: <1522768634-5548-4-git-send-email-suhang16@mails.ucas.ac.cn>
+In-Reply-To: <1522768634-5548-1-git-send-email-suhang16@mails.ucas.ac.cn>
+References: <1522768634-5548-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH 2/2] Add QTest testcase for the Hex File Loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +23,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jan.kiszka@web.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, valentine.sinitsyn@gmail.com
+To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IGNvdmVyLjE1MjI3Njc2NTcuZ2l0Lmphbi5raXN6a2FAd2ViLmRlClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSB0YXJnZXQtaTM4NjogRW5oYW5jZSBTVk0gc3VwcG9y
-dAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
-Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8zYzM2
-ZGIxZGMwNzAyNzYzZWJiNzk2NmNjMjc0MjhlZDY3ZDQzODA0LjE1MjI3NTE2MjQuZ2l0Lm1wcml2
-b3puQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8zYzM2ZGIxZGMwNzAyNzYzZWJiNzk2NmNjMjc0Mjhl
-ZDY3ZDQzODA0LjE1MjI3NTE2MjQuZ2l0Lm1wcml2b3puQHJlZGhhdC5jb20KICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy9jb3Zlci4xNTIyNzY3NjU3LmdpdC5qYW4ua2lzemthQHdl
-Yi5kZSAtPiBwYXRjaGV3L2NvdmVyLjE1MjI3Njc2NTcuZ2l0Lmphbi5raXN6a2FAd2ViLmRlClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjM1YTdlZGRmNiB0YXJnZXQtaTM4NjogQWRk
-IE5QVCBzdXBwb3J0CjYwNmU3NDVkZDYgdGFyZ2V0LWkzODY6IE1hcmsgY3B1X3ZtZXhpdCBub3Jl
-dHVybgo2ZTgzYzlkZTQxIHRhcmdldC1pMzg2OiBBbGxvdyBpbnRlcnJ1cHQgaW5qZWN0aW9uIGFm
-dGVyIFNUR0kKOWUwZTMxNzE2NCB0YXJnZXQtaTM4NjogQWRkIE5NSSBpbnRlcmNlcHRpb24gdG8g
-U1ZNCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IHRhcmdldC1pMzg2
-OiBBZGQgTk1JIGludGVyY2VwdGlvbiB0byBTVk0uLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiB0YXJn
-ZXQtaTM4NjogQWxsb3cgaW50ZXJydXB0IGluamVjdGlvbiBhZnRlciBTVEdJLi4uCkNoZWNraW5n
-IFBBVENIIDMvNDogdGFyZ2V0LWkzODY6IE1hcmsgY3B1X3ZtZXhpdCBub3JldHVybi4uLgpDaGVj
-a2luZyBQQVRDSCA0LzQ6IHRhcmdldC1pMzg2OiBBZGQgTlBUIHN1cHBvcnQuLi4KRVJST1I6IGJy
-YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTA0
-OiBGSUxFOiB0YXJnZXQvaTM4Ni9leGNwX2hlbHBlci5jOjE4NDoKKyAgICAgICAgaWYgKGVudi0+
-bmVzdGVkX3BnX21vZGUgJiBTVk1fTlBUX0xNQSkgewpbLi4uXQorICAgICAgICB9IGVsc2UKWy4u
-Ll0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzg2IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+'test.hex' file is a bare metal ARM software stored in Hexadecimal
+Object Format. When it's loaded by QEMU, it will print "Hello world!\n"
+on console.
+
+`pre_store` array in 'hexloader-test.c' file, stores the binary format
+of 'test.hex' file, which is used to verify correctness.
+
+Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+---
+ tests/Makefile.include |  2 ++
+ tests/hexloader-test.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/test.hex         | 11 ++++++++++
+ 3 files changed, 69 insertions(+)
+ create mode 100644 tests/hexloader-test.c
+ create mode 100644 tests/test.hex
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e31a2c2..f4a3e71f34ee 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -380,6 +380,7 @@ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+ gcov-files-arm-y += hw/timer/arm_mptimer.c
+ check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
++check-qtest-arm-y += tests/hexloader-test$(EXESUF)
+ 
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+ check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
+@@ -755,6 +756,7 @@ tests/qmp-test$(EXESUF): tests/qmp-test.o
+ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+ tests/rtc-test$(EXESUF): tests/rtc-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
++tests/hexloader-test$(EXESUF): tests/hexloader-test.o
+ tests/endianness-test$(EXESUF): tests/endianness-test.o
+ tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
+diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
+new file mode 100644
+index 000000000000..b1a491dcd9de
+--- /dev/null
++++ b/tests/hexloader-test.c
+@@ -0,0 +1,56 @@
++/*
++ * QTest testcase for the Intel Hexadecimal Object File Loader
++ *
++ * Authors:
++ *  Su Hang <suhang16@mails.ucas.ac.cn> 2018
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++#define BIN_SIZE 146
++
++static unsigned char pre_store[BIN_SIZE] = {
++    4,   208, 159, 229, 22,  0,   0,   235, 254, 255, 255, 234, 152, 16,  1,
++    0,   4,   176, 45,  229, 0,   176, 141, 226, 12,  208, 77,  226, 8,   0,
++    11,  229, 6,   0,   0,   234, 8,   48,  27,  229, 0,   32,  211, 229, 44,
++    48,  159, 229, 0,   32,  131, 229, 8,   48,  27,  229, 1,   48,  131, 226,
++    8,   48,  11,  229, 8,   48,  27,  229, 0,   48,  211, 229, 0,   0,   83,
++    227, 244, 255, 255, 26,  0,   0,   160, 225, 0,   208, 139, 226, 4,   176,
++    157, 228, 30,  255, 47,  225, 0,   16,  31,  16,  0,   72,  45,  233, 4,
++    176, 141, 226, 8,   0,   159, 229, 230, 255, 255, 235, 0,   0,   160, 225,
++    0,   136, 189, 232, 132, 0,   1,   0,   0,   16,  31,  16,  72,  101, 108,
++    108, 111, 32,  119, 111, 114, 108, 100, 33,  10,  0};
++
++/* success if no crash or abort */
++static void hex_loader_test(void)
++{
++    unsigned int i;
++    unsigned char memory_content[BIN_SIZE];
++    const unsigned int base_addr = 0x00010000;
++
++    QTestState *s = qtest_startf(
++        "-M versatilepb -m 128M -nographic -kernel ../tests/test.hex");
++
++    for (i = 0; i < BIN_SIZE; ++i) {
++        memory_content[i] = qtest_readb(s, base_addr + i);
++        g_assert_cmpuint(memory_content[i], ==, pre_store[i]);
++    }
++    qtest_quit(s);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("/tmp/hex_loader", hex_loader_test);
++    ret = g_test_run();
++
++    return ret;
++}
+diff --git a/tests/test.hex b/tests/test.hex
+new file mode 100644
+index 000000000000..59b96e3e6fa7
+--- /dev/null
++++ b/tests/test.hex
+@@ -0,0 +1,11 @@
++:1000000004D09FE5160000EBFEFFFFEA9810010008
++:1000100004B02DE500B08DE20CD04DE208000BE5F8
++:10002000060000EA08301BE50020D3E52C309FE5F0
++:10003000002083E508301BE5013083E208300BE542
++:1000400008301BE50030D3E5000053E3F4FFFF1A4E
++:100050000000A0E100D08BE204B09DE41EFF2FE180
++:1000600000101F1000482DE904B08DE208009FE544
++:10007000E6FFFFEB0000A0E10088BDE8840001007E
++:1000800000101F1048656C6C6F20776F726C6421D4
++:020090000A0064
++:00000001FF
+-- 
+2.7.4
