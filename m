@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3LVE-0003Go-92
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:57:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f3LX2-0004XA-Hd
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3LVD-0005sf-Dd
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:57:32 -0400
-References: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c9b947ec-a9ea-bcd3-efb9-c6d0bce1e150@redhat.com>
-Date: Tue, 3 Apr 2018 07:57:14 -0500
+	(envelope-from <stefanha@gmail.com>) id 1f3LWz-0007BD-BF
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:59:24 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:45848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3LWy-0007Ap-WB
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:59:21 -0400
+Received: by mail-wr0-x242.google.com with SMTP id u11so18632092wri.12
+	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 05:59:20 -0700 (PDT)
+Date: Tue, 3 Apr 2018 13:59:18 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180403125918.GF4467@stefanha-x1.localdomain>
+References: <20180326061157.24865-1-peterx@redhat.com>
+	<20180326104739.GC5267@localhost.localdomain>
+	<20180327022155.GE17789@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3w5luOgqShfREAPI6NcXupyVFGrXm35Mr"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] block: handle invalid lseek
- returns gracefully
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="z+pzSjdB7cqptWpS"
+Content-Disposition: inline
+In-Reply-To: <20180327022155.GE17789@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3w5luOgqShfREAPI6NcXupyVFGrXm35Mr
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
-Message-ID: <c9b947ec-a9ea-bcd3-efb9-c6d0bce1e150@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] block: handle invalid lseek returns
- gracefully
-References: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
-In-Reply-To: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--z+pzSjdB7cqptWpS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 04/02/2018 11:37 PM, Jeff Cody wrote:
-> In commit 223a23c198787328ae75bc65d84edf5fde33c0b6, we implemented a
-> workaround in the gluster driver to handle invalid values returned for
-> SEEK_DATA or SEEK_HOLE.
+On Tue, Mar 27, 2018 at 10:21:55AM +0800, Peter Xu wrote:
+> On Mon, Mar 26, 2018 at 12:47:39PM +0200, Kevin Wolf wrote:
+> > Am 26.03.2018 um 08:11 hat Peter Xu geschrieben:
+> > > If there are more than one events, wait_until_completed() might return
+> > > the 2nd event even if the 1st event is JOB_COMPLETED, since the for l=
+oop
+> > > will continue to run even if completed is set to True.
+> > >=20
+> > > It never happened before, but it can be triggered when OOB is enabled
+> > > due to the RESUME startup message. Fix that up by removing the boolean
+> > > and make sure we return the correct event.
+> > >=20
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  tests/qemu-iotests/iotests.py | 20 ++++++++------------
+> > >  1 file changed, 8 insertions(+), 12 deletions(-)
+> > >=20
+> > > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
+ts.py
+> > > index b5d7945af8..11704e6583 100644
+> > > --- a/tests/qemu-iotests/iotests.py
+> > > +++ b/tests/qemu-iotests/iotests.py
+> > > @@ -470,18 +470,14 @@ class QMPTestCase(unittest.TestCase):
+> > > =20
+> > >      def wait_until_completed(self, drive=3D'drive0', check_offset=3D=
+True):
+> > >          '''Wait for a block job to finish, returning the event'''
+> > > -        completed =3D False
+> > > -        while not completed:
+> > > -            for event in self.vm.get_qmp_events(wait=3DTrue):
+> > > -                if event['event'] =3D=3D 'BLOCK_JOB_COMPLETED':
+> > > -                    self.assert_qmp(event, 'data/device', drive)
+> > > -                    self.assert_qmp_absent(event, 'data/error')
+> > > -                    if check_offset:
+> > > -                        self.assert_qmp(event, 'data/offset', event[=
+'data']['len'])
+> > > -                    completed =3D True
+> > > -
+> > > -        self.assert_no_active_block_jobs()
+> > > -        return event
+> > > +        for event in self.vm.get_qmp_events(wait=3DTrue):
+> > > +            if event['event'] =3D=3D 'BLOCK_JOB_COMPLETED':
+> > > +                self.assert_qmp(event, 'data/device', drive)
+> > > +                self.assert_qmp_absent(event, 'data/error')
+> > > +                if check_offset:
+> > > +                    self.assert_qmp(event, 'data/offset', event['dat=
+a']['len'])
+> > > +                self.assert_no_active_block_jobs()
+> > > +                return event
+> > > =20
+> > >      def wait_ready(self, drive=3D'drive0'):
+> > >          '''Wait until a block job BLOCK_JOB_READY event'''
+> >=20
+> > If an event is pending, but it's not the expected event, won't we return
+> > None now instead of waiting for the BLOCK_JOB_COMPLETED event?
 >=20
-> In some instances, these same invalid values can be seen in the posix
-> file handler as well - for example, it has been reported on FUSE gluste=
-r
-> mounts.
+> If so, we'll return none.
 
-Yuck - that should be reported to the FUSE and gluster folks, as it does
-not scale to have everyone else work around their bug.  But in the
-meantime, working around it here is acceptable.
+Kevin is pointing out that this patch is broken.  Previously the
+function waited for BLOCK_JOB_COMPLETED, even when other events were
+pending when we entered the function.  Now it returns None and does not
+wait for BLOCK_JOB_COMPLETED!
 
+> The patch fixes the other case when there
+> are two events: one JOB_COMPLETED plus another (e.g., RESUME) event.
+> When that happens, logically we should return one JOB_COMPLETED event,
+> but the old code will return the other event (e.g., RESUME).
 >=20
-> Calling assert() for these invalid values is overly harsh; we can safel=
-y
-> return -EIO and allow this case to be treated as a "learned nothing"
-> case (e.g., D4 / H4, as commented in the code).
+> >=20
+> > Wouldn't it be much easier to just add a 'break'?
 >=20
-> This patch does the same thing that 223a23c198787 did for gluster.c,
-> except in file-posix.c
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/file-posix.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+> Yes, it's the same.  But IMHO those logics (e.g., the completed
+> variable) are not really needed at all.  This one is simpler.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+No, the outer loop is needed so that the function waits until
+BLOCK_JOB_COMPLETED is received.  It's not possible to do it with a
+single for loop.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Stefan
 
-
---3w5luOgqShfREAPI6NcXupyVFGrXm35Mr
+--z+pzSjdB7cqptWpS
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrDei4ACgkQp6FrSiUn
-Q2r71wf+JrF38pmOIctGPBKgY4o6Pp9qt5anqvajlf0XKep4VnJdpxI+O5iDq28g
-Sea03q60lvqemSLko3i/gWjfqcWp3G87hsOpLbUzeexClSxEjyj810hbFaYaXpuT
-WrDj3aOqq8YBAzRQboPhLw114gdw4bVaF1C7bw4xrY8NFWnMLmNBJOfQaBbz0DMe
-RScpCb1McQebdzt9u8j4i66guUOVfYn4UUsA+FnhEXdVJ0Fogy35qVlI8AeQ+Kt2
-/CcvWY+9V66ItEI3vDPo3jQnigA4mBMUH2PhvpppH1cFioVijrZ5jRiIOqp6unGp
-gNuyWNffVS5aSIKdtAmMz6ZRNQMMgg==
-=+qGk
+iQEcBAEBAgAGBQJaw3qmAAoJEJykq7OBq3PIsJMIAIv6jzLjYMj6yPTOXEY+Apjr
+SSd7Cj+LCWTNpXICgEyqeCgeII4tH6rK/JbbJeLCeVyxd7JeAsKHxFtLdO3+UYPL
+0/xDOVmjJskykKffGTOFbyZ6TlKfdPDSVjCcSJaypue4pqMqR6Gx4aSvGYJrJChw
+GWYlz+5U6eAAohvMry7/k5dxAMYrQcUhkAGQYjCLtFYCiBOec1T7C+3vzyIs9s42
+sMqyHGv1naAizsGXaRZ3cSaa1c+37OAjiWq9S/BY0FDk0bwPcOWdsjYANNV7n/yZ
+LVLvvbkpD0Ypk96AX0ufGyeZlAgY8Kt9C1tinG1jpgGrDJEJ7YubL2yJaxVDpoI=
+=+32o
 -----END PGP SIGNATURE-----
 
---3w5luOgqShfREAPI6NcXupyVFGrXm35Mr--
+--z+pzSjdB7cqptWpS--
