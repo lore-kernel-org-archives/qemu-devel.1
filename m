@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3HjP-00056k-9S
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 04:55:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1f3HjV-0005AI-Fo
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 04:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3HjN-000421-OA
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 04:55:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60506)
+	(envelope-from <bounces@canonical.com>) id 1f3HjR-00044A-Fa
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 04:56:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3HjN-00041G-FE
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 04:55:53 -0400
+	id 1f3HjR-00042H-8Z
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 04:55:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3HjJ-0001RY-C3
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 08:55:49 +0000
+	id 1f3HjM-0001VB-Uo
+	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 08:55:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1339A2E8024
-	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 08:55:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7BBC22E8190
+	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 08:55:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Apr 2018 08:38:26 -0000
+Date: Tue, 03 Apr 2018 08:39:39 -0000
 From: ChristianEhrhardt <1481272@bugs.launchpad.net>
 Reply-To: Bug 1481272 <1481272@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20150804095638.25012.1470.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152274470657.29099.16670737579158786332.malone@chaenomeles.canonical.com>
+Message-Id: <152274478000.2603.763392285233456160.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1481272] Re: main-loop: WARNING: I/O thread spun
  for 1000 iterations
@@ -39,40 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Nice, thanks for the update.
-I checked a few recent logs and agree that the message is gone since 2.9
-
-Some might still encounter slow guests (for other reasons) and trigger
-the message, but the most common TCG emulation case is solved by this
-since Artful and later.
-
-I think we don't want to backport all the prereqs (I/O thread locking
-changes) to Xenial that allow to add this change here.
-
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
-
-** Also affects: qemu (Ubuntu Bionic)
-   Importance: Undecided
-       Status: New
-
-** Also affects: qemu (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
-
-** Also affects: qemu (Ubuntu Artful)
-   Importance: Undecided
-       Status: New
-
-** Changed in: qemu (Ubuntu Xenial)
-       Status: New =3D> Won't Fix
-
-** Changed in: qemu (Ubuntu Artful)
-       Status: New =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Bionic)
-       Status: New =3D> Fix Released
+Updated the Ubuntu tasks on this bug, leaving the qemu state to a
+triager of the project.
 
 -- =
 
