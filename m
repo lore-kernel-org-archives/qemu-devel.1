@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f3NPE-0007dN-39
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:59:30 -0400
+	(envelope-from <slp@redhat.com>) id 1f3NQD-0008SZ-Nc
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f3NPD-0007RF-7i
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:59:28 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:41792)
+	(envelope-from <slp@redhat.com>) id 1f3NQ8-0007vC-Ej
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:00:29 -0400
+Received: from mail-wr0-f178.google.com ([209.85.128.178]:37228)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f3NPD-0007R0-2i
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:59:27 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id 188-v6so16233137oih.8
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 07:59:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1f3NQ8-0007uJ-3D
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:00:24 -0400
+Received: by mail-wr0-f178.google.com with SMTP id l49so19046094wrl.4
+	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 08:00:23 -0700 (PDT)
+Date: Tue, 3 Apr 2018 17:00:20 +0200
+From: Sergio Lopez <slp@redhat.com>
+Message-ID: <20180403150020.g5rbp3zphgkf7ind@dritchie>
+References: <20171229094206.14512-1-slp@redhat.com>
+	<CAAiTLFXrMF1pw-rk9UNCcgLYGB48YkMS+2Ft29dzpifw3K-msw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1522381996-19462-1-git-send-email-jasowang@redhat.com>
-References: <1522381996-19462-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Apr 2018 15:59:06 +0100
-Message-ID: <CAFEAcA9ktBBLzKjrBwe5mQ0sNd7S8xWWHUfsY2JtupXjJTY9Ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] Net patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAiTLFXrMF1pw-rk9UNCcgLYGB48YkMS+2Ft29dzpifw3K-msw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] pvpanic: implement abort_on_panic
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: f4bug@amsat.org, mjt@tls.msk.ru, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 30 March 2018 at 04:53, Jason Wang <jasowang@redhat.com> wrote:
-> The following changes since commit 47d3b60858d90ac8a0cc3a72af7f95c96781125a:
->
->   Merge remote-tracking branch 'remotes/riscv/tags/riscv-qemu-2.12-important-fixes' into staging (2018-03-28 22:13:38 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to abbbb0350d780e24d2f6a0cf8fc3191badb0329a:
->
->   qemu-doc: Rework the network options chapter to make "-net" less prominent (2018-03-30 11:44:11 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
-> Thomas Huth (1):
->       qemu-doc: Rework the network options chapter to make "-net" less prominent
->
->  qemu-options.hx | 189 ++++++++++++++++++++++++++++----------------------------
->  1 file changed, 94 insertions(+), 95 deletions(-)
->
-Applied, thanks.
+On Fri, Jan 12, 2018 at 05:31:58PM +0100, Sergio Lopez wrote:
+> On Fri, Dec 29, 2017 at 10:42 AM, Sergio Lopez <slp@redhat.com> wrote:
+> > Extend pvpanic and qemu_system_guest_panicked so it's possible to
+> > configure the first to induce an abort() when the Guest panics.
+> >
+> > This is specially useful (and mainly intended to be enabled only) when
+> > debugging soft/hard lockups on the Guest OS.
+> >
+> > Sergio Lopez (2):
+> >   vl: extend qemu_system_guest_panicked with abort_on_panic
+> >   pvpanic: add PVPANIC_ABORT_PROP
+> 
+> If someone has a minute, please consider taking a look at this (small)
+> patch series.
 
--- PMM
+Pretty pretty please?
+
+Sergio.
