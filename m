@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3S7P-0008R7-V8
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 16:01:24 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f3SJY-0004IN-6E
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 16:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3S7L-0007XG-3u
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 16:01:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3S7K-0007WG-TR
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 16:01:19 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3S7J-0006Qe-Fx
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 20:01:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 527B82E80CD
-	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 20:01:17 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1f3SJX-0005aM-3J
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 16:13:56 -0400
+References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
+Date: Tue, 3 Apr 2018 16:13:40 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Apr 2018 19:49:18 -0000
-From: Fritz Hudnut <este.el.paz@gmail.com>
-Reply-To: Bug 1760176 <1760176@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152243541894.4250.1548453889395485127.malonedeb@chaenomeles.canonical.com>
-	<152278174998.30756.8908259323086367658.malone@gac.canonical.com>
-Message-Id: <CAG62idCnhZXy6rS20uiSHHk+LDzj-7jYn+qjrZEHGTRV1L8YcQ@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1760176] Re: optical drive doesn't open in
- Lubuntu 18.04 on '12 MacPro
+In-Reply-To: <b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-@John Snow:
 
-Don't know on the "QEMU" front, this is install to HD partitions of Lu
-18.04 . . . while trying to burn an iso to DVD, pressing the "eject"
-keyboard button will not open the open drive door, so no DVD can be put
-there . . . problem remains in Lu.  Whereas I have a couple installs of
-OpenSUSE & OSX and the keyboard "eject" button works without issue . . . .
 
--- =
+On 04/03/2018 12:23 PM, Max Reitz wrote:
+> On 2018-03-30 18:10, Vladimir Sementsov-Ogievskiy wrote:
+>> Use MIGRATION events instead of RESUME. Also, make a TODO: enable
+>> dirty-bitmaps capability for offline case.
+>>
+>> This (likely) fixes racy faults at least of the following types:
+>>
+>>     - timeout on waiting for RESUME event
+>>     - sha256 mismatch on 136 (138 after this patch)
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> This patch is a true change for the test anyway. But I don't understand,
+>> why (and do really) it fixes the things. And I'm not sure about do we
+>> really have a bug in bitmap migration or persistence. So, it's up to you,
+>> take it into 2.12... 
+>>
+>> It was already discussed, that "STOP" event is bad for tests. What about
+>> "RESUME"? How can we miss it? And sha256 mismatch is really something
+>> strange.
+>>
+>> Max, please check, do it fix 169 for you.
+>>
+>>  tests/qemu-iotests/169 | 44 +++++++++++++++++++++++---------------------
+>>  1 file changed, 23 insertions(+), 21 deletions(-)
+> 
+> This makes the test pass (thanks!), but it still leaves behind five cats...
+> 
+> Max
+> 
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1760176
+Hmm:
 
-Title:
-  optical drive doesn't open in Lubuntu 18.04 on '12 MacPro
+jhuston  14772  0.0  0.0   4296   784 pts/3    S    16:12   0:00 cat
+/home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+jhuston  14796  0.0  0.0   4296   764 pts/3    S    16:12   0:00 cat
+/home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+jhuston  14940  0.0  0.0   4296   788 pts/3    S    16:12   0:00 cat
+/home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+jhuston  14964  0.0  0.0   4296   720 pts/3    S    16:12   0:00 cat
+/home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+jhuston  15052  0.0  0.0   4296   768 pts/3    S    16:12   0:00 cat
+/home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Running an install to HD of Lubuntu 18.04 and after running
-  update/upgrade this morning now the optical drive door doesn't respond
-  to keyboard "eject" key on a Mac keyboard for '12 MacPro . . . .  I
-  tried to use "xfburn" to get the door to open, nothing seems to get it
-  to work that I know of.  Yesterday there was no issue . . . .  Tried
-  to run "apt -f install" and it showed some old kernels to "autoremove"
-  . . . which I did; didn't try to reboot into old kernel to test,
-  perhaps now old kernel is gone?
-
-  F
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1760176/+subscriptions
+Why do these get left behind? Nothing to consume the data...?
