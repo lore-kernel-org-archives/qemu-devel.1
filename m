@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1f3LTb-0002EY-Vv
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:55:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1f3LVE-0003Go-92
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1f3LTY-0004ez-PN
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:55:52 -0400
-Received: from mail-eopbgr40104.outbound.protection.outlook.com
-	([40.107.4.104]:53432
-	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1f3LTY-0004cs-3w
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:55:48 -0400
-References: <41b63d9b-c551-4e22-28f5-1144724dff2e@virtuozzo.com>
-	<b446d661-f0f1-2fcb-ada1-b08af58a9c27@redhat.com>
-	<618a6c6e-ab1a-1c55-d44d-847c0e3729f4@virtuozzo.com>
-	<20180403122714.GB4467@stefanha-x1.localdomain>
-From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Message-ID: <1ca2b599-0a26-ae7d-bee5-e0e2e6385f42@virtuozzo.com>
-Date: Tue, 3 Apr 2018 15:55:39 +0300
+	(envelope-from <eblake@redhat.com>) id 1f3LVD-0005sf-Dd
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:57:32 -0400
+References: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c9b947ec-a9ea-bcd3-efb9-c6d0bce1e150@redhat.com>
+Date: Tue, 3 Apr 2018 07:57:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180403122714.GB4467@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Some thoughts about per-queue iothreads in
- VirtIOBlock
+In-Reply-To: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3w5luOgqShfREAPI6NcXupyVFGrXm35Mr"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] block: handle invalid lseek
+ returns gracefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3w5luOgqShfREAPI6NcXupyVFGrXm35Mr
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Message-ID: <c9b947ec-a9ea-bcd3-efb9-c6d0bce1e150@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12] block: handle invalid lseek returns
+ gracefully
+References: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
+In-Reply-To: <f7011b6ebc323b45b46a8f01310249e2e6d77617.1522730165.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/02/2018 11:37 PM, Jeff Cody wrote:
+> In commit 223a23c198787328ae75bc65d84edf5fde33c0b6, we implemented a
+> workaround in the gluster driver to handle invalid values returned for
+> SEEK_DATA or SEEK_HOLE.
+>=20
+> In some instances, these same invalid values can be seen in the posix
+> file handler as well - for example, it has been reported on FUSE gluste=
+r
+> mounts.
+
+Yuck - that should be reported to the FUSE and gluster folks, as it does
+not scale to have everyone else work around their bug.  But in the
+meantime, working around it here is acceptable.
+
+>=20
+> Calling assert() for these invalid values is overly harsh; we can safel=
+y
+> return -EIO and allow this case to be treated as a "learned nothing"
+> case (e.g., D4 / H4, as commented in the code).
+>=20
+> This patch does the same thing that 223a23c198787 did for gluster.c,
+> except in file-posix.c
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/file-posix.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-On 4/3/18 3:27 PM, Stefan Hajnoczi wrote:
-> On Tue, Mar 20, 2018 at 07:30:04PM +0300, Edgar Kaziakhmedov wrote:
->> On 3/20/18 6:34 PM, Paolo Bonzini wrote:
->>> On 20/03/2018 15:45, Edgar Kaziakhmedov wrote:
->>>
->>>> As I understood from
->>>> Stefan description, it is expected to change significantly
->>>> the approach we use to interact with BlockDriverState.
->>> I don't think the change is very large actually, at least for on-disk
->>> devices.  I haven't yet considered network devices such as libiscsi or ceph.
->> Well, in that case, I will keep working on per-queue iothreads with an
->> existing interface.
->> I asked because it might be reasonable to create BlockBackend device for
->> each queue context and
->> use them independently to avoid some additional locks and synchronization.
->> On the other hand, it can lead to multiple
->> opening of the same image, but as I said it doesn't seem to be a problem for
->> the simplest formats such as raw.
-> The special case for raw approach is not suitable for upstream QEMU.
-> It's what we started with in -device virtio-blk,x-data-plane=on (see the
-> old dataplane implementation in QEMU v1.4).
+--3w5luOgqShfREAPI6NcXupyVFGrXm35Mr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Yes, definitely. I went through the whole development path and analyzed 
-all your patches. Moreover,
-it is clear that this approach is not suitable for the upstream, but I 
-am considering it like the first step toward
-per-queue iothread implementation, for now the work seems to be almost 
-done, may be it might take one more week to
-refine and debug.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrDei4ACgkQp6FrSiUn
+Q2r71wf+JrF38pmOIctGPBKgY4o6Pp9qt5anqvajlf0XKep4VnJdpxI+O5iDq28g
+Sea03q60lvqemSLko3i/gWjfqcWp3G87hsOpLbUzeexClSxEjyj810hbFaYaXpuT
+WrDj3aOqq8YBAzRQboPhLw114gdw4bVaF1C7bw4xrY8NFWnMLmNBJOfQaBbz0DMe
+RScpCb1McQebdzt9u8j4i66guUOVfYn4UUsA+FnhEXdVJ0Fogy35qVlI8AeQ+Kt2
+/CcvWY+9V66ItEI3vDPo3jQnigA4mBMUH2PhvpppH1cFioVijrZ5jRiIOqp6unGp
+gNuyWNffVS5aSIKdtAmMz6ZRNQMMgg==
+=+qGk
+-----END PGP SIGNATURE-----
 
->
-> It took a lot of work to make the IOThread use the QEMU block layer
-> instead of a special case code path for raw.
->
-> Currently QEMU is not that far away from being able to use
-> BlockDriverState from multiple threads for multiqueue.
->
-> Paolo, can you share your current progress and pointers to what needs to
-> be done next?  Maybe Edgar can help complete the work.
->
-> Stefan
+--3w5luOgqShfREAPI6NcXupyVFGrXm35Mr--
