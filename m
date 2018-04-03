@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f3NS3-0001Rq-G2
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:02:32 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f3NeG-00022i-C1
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f3NS2-0000v5-Se
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:02:23 -0400
-Date: Tue, 3 Apr 2018 17:02:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180403150202.GG11070@localhost.localdomain>
-References: <cover.1521729843.git.berto@igalia.com>
+	(envelope-from <no-reply@patchew.org>) id 1f3NeC-0001yU-9H
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:15:00 -0400
+Resent-Message-Id: <E1f3NeC-0001yU-9H@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21008)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f3NeC-0001uk-1c
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:14:56 -0400
+In-Reply-To: <cover.1522767657.git.jan.kiszka@web.de>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152276846283.1410.3954094891854775501@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1521729843.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v4 0/2] Update output of some
- iotests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 3 Apr 2018 08:14:23 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] target-i386: Enhance SVM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: jan.kiszka@web.de
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, valentine.sinitsyn@gmail.com
 
-Am 22.03.2018 um 15:45 hat Alberto Garcia geschrieben:
-> I sent a patch a few days ago correction the output of iotests 051 and
-> 186. I wanted to resend it again but I noticed that 186 needs now more
-> changes due to commit ac64273c66ab136c44043259162, so I'm including
-> those changes too.
-
-[ Cc: qemu-block ]
-
-Thanks, applied to the block branch.
-
-Kevin
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IGNvdmVyLjE1MjI3Njc2NTcuZ2l0Lmphbi5raXN6a2FAd2ViLmRlClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSB0YXJnZXQtaTM4NjogRW5oYW5jZSBTVk0gc3VwcG9y
+dAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8zYzM2
+ZGIxZGMwNzAyNzYzZWJiNzk2NmNjMjc0MjhlZDY3ZDQzODA0LjE1MjI3NTE2MjQuZ2l0Lm1wcml2
+b3puQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8zYzM2ZGIxZGMwNzAyNzYzZWJiNzk2NmNjMjc0Mjhl
+ZDY3ZDQzODA0LjE1MjI3NTE2MjQuZ2l0Lm1wcml2b3puQHJlZGhhdC5jb20KICogW25ldyB0YWdd
+ICAgICAgICAgICAgICAgcGF0Y2hldy9jb3Zlci4xNTIyNzY3NjU3LmdpdC5qYW4ua2lzemthQHdl
+Yi5kZSAtPiBwYXRjaGV3L2NvdmVyLjE1MjI3Njc2NTcuZ2l0Lmphbi5raXN6a2FAd2ViLmRlClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjM1YTdlZGRmNiB0YXJnZXQtaTM4NjogQWRk
+IE5QVCBzdXBwb3J0CjYwNmU3NDVkZDYgdGFyZ2V0LWkzODY6IE1hcmsgY3B1X3ZtZXhpdCBub3Jl
+dHVybgo2ZTgzYzlkZTQxIHRhcmdldC1pMzg2OiBBbGxvdyBpbnRlcnJ1cHQgaW5qZWN0aW9uIGFm
+dGVyIFNUR0kKOWUwZTMxNzE2NCB0YXJnZXQtaTM4NjogQWRkIE5NSSBpbnRlcmNlcHRpb24gdG8g
+U1ZNCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IHRhcmdldC1pMzg2
+OiBBZGQgTk1JIGludGVyY2VwdGlvbiB0byBTVk0uLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiB0YXJn
+ZXQtaTM4NjogQWxsb3cgaW50ZXJydXB0IGluamVjdGlvbiBhZnRlciBTVEdJLi4uCkNoZWNraW5n
+IFBBVENIIDMvNDogdGFyZ2V0LWkzODY6IE1hcmsgY3B1X3ZtZXhpdCBub3JldHVybi4uLgpDaGVj
+a2luZyBQQVRDSCA0LzQ6IHRhcmdldC1pMzg2OiBBZGQgTlBUIHN1cHBvcnQuLi4KRVJST1I6IGJy
+YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTA0
+OiBGSUxFOiB0YXJnZXQvaTM4Ni9leGNwX2hlbHBlci5jOjE4NDoKKyAgICAgICAgaWYgKGVudi0+
+bmVzdGVkX3BnX21vZGUgJiBTVk1fTlBUX0xNQSkgewpbLi4uXQorICAgICAgICB9IGVsc2UKWy4u
+Ll0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzg2IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
