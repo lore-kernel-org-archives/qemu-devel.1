@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3L22-0006BW-UP
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:27:23 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f3L7k-0000fv-J9
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3L1x-0003Wc-TC
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:27:22 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:32781)
+	(envelope-from <stefanha@gmail.com>) id 1f3L7e-0007nD-S7
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:33:16 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40441)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3L1x-0003WH-Ki
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:27:17 -0400
-Received: by mail-wr0-x232.google.com with SMTP id z73so18558781wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 05:27:17 -0700 (PDT)
-Date: Tue, 3 Apr 2018 13:27:14 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3L7e-0007lv-L4
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:33:10 -0400
+Received: by mail-wm0-x244.google.com with SMTP id x4so34804732wmh.5
+	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 05:33:10 -0700 (PDT)
+Date: Tue, 3 Apr 2018 13:33:07 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180403122714.GB4467@stefanha-x1.localdomain>
-References: <41b63d9b-c551-4e22-28f5-1144724dff2e@virtuozzo.com>
-	<b446d661-f0f1-2fcb-ada1-b08af58a9c27@redhat.com>
-	<618a6c6e-ab1a-1c55-d44d-847c0e3729f4@virtuozzo.com>
+Message-ID: <20180403123307.GC4467@stefanha-x1.localdomain>
+References: <BEF9E38582252C4BB07E4CB23BD2FB1C02287BDD65@H3CMLB12-EX.srv.huawei-3com.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
+	protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
 Content-Disposition: inline
-In-Reply-To: <618a6c6e-ab1a-1c55-d44d-847c0e3729f4@virtuozzo.com>
-Subject: Re: [Qemu-devel] Some thoughts about per-queue iothreads in
- VirtIOBlock
+In-Reply-To: <BEF9E38582252C4BB07E4CB23BD2FB1C02287BDD65@H3CMLB12-EX.srv.huawei-3com.com>
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?snapshot=EF=BC=9Acreate__snapshot_for_rbd?=
+ =?utf-8?q?_disk_failed=2E?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>
+To: Zhangzijian <zhang.zijian@h3c.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>
 
 
---p4qYPpj5QlsIQJ0K
+--B4IIlcmfBL/1gGOG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 20, 2018 at 07:30:04PM +0300, Edgar Kaziakhmedov wrote:
+On Thu, Mar 22, 2018 at 03:44:00AM +0000, Zhangzijian wrote:
+> Hello,
+
+CCing Sheepdog block driver maintainers.
+
+You can find maintainers for a source file using:
+
+  $ scripts/get_maintainers -f block/sheepdog.c
+
 >=20
-> On 3/20/18 6:34 PM, Paolo Bonzini wrote:
-> > On 20/03/2018 15:45, Edgar Kaziakhmedov wrote:
-> >=20
-> > > As I understood from
-> > > Stefan description, it is expected to change significantly
-> > > the approach we use to interact with BlockDriverState.
-> > I don't think the change is very large actually, at least for on-disk
-> > devices.  I haven't yet considered network devices such as libiscsi or =
-ceph.
+> In 'bdrv_all_create_snapshot', each block will create snapshot in a for l=
+oop. If a domain configured disk mixed with qcow2 and rbd.
+> In 'qcow2_snapshot_create', sn_info->id_str will be set. But in 'qemu_rbd=
+_snap_create' the 'id_str' is checked.=20
+> On this condition, 'id_str' check will be failed. Since 'id_str' is usele=
+ss for rbd, why this check is needed, Can it be removed?
 >=20
-> Well, in that case, I will keep working on per-queue iothreads with an
-> existing interface.
-> I asked because it might be reasonable to create BlockBackend device for
-> each queue context and
-> use them independently to avoid some additional locks and synchronization.
-> On the other hand, it can lead to multiple
-> opening of the same image, but as I said it doesn't seem to be a problem =
-for
-> the simplest formats such as raw.
+> #0  qemu_rbd_snap_create (bs=3D0x55596a51eba0, sn_info=3D0x7fff4b0a0d60) =
+at /root/code/qemu_201801/block/rbd.c:982
+> #1  0x0000555967fca15e in bdrv_snapshot_create (bs=3D0x55596a51eba0, sn_i=
+nfo=3D0x7fff4b0a0d60) at /root/code/qemu_201801/block/snapshot.c:171
+> #2  0x0000555967fca18d in bdrv_snapshot_create (bs=3D0x55596a518890, sn_i=
+nfo=3D0x7fff4b0a0d60) at /root/code/qemu_201801/block/snapshot.c:174
+> #3  0x0000555967fcaf43 in bdrv_all_create_snapshot (sn=3D0x7fff4b0a0d60, =
+vm_state_bs=3D0x55596a509750, vm_state_size=3D0, first_bad_bs=3D0x7fff4b0a0=
+d10)
+>     at /root/code/qemu_201801/block/snapshot.c:531
+> #4  0x0000555967ed9362 in save_snapshot (name=3D0x55596bc37bf0 "snap1", n=
+ostate=3Dtrue, errp=3D0x7fff4b0a10c0) at /root/code/qemu_201801/migration/s=
+avevm.c:2256
+> #5  0x0000555967ca9ad7 in hmp_savevm (mon=3D0x7fff4b0a1180, qdict=3D0x555=
+96af40d60) at /root/code/qemu_201801/hmp.c:1334
+> #6  0x0000555967b0f034 in handle_hmp_command (mon=3D0x7fff4b0a1180, cmdli=
+ne=3D0x55596b4741e7 "-n snap1") at /root/code/qemu_201801/monitor.c:3110
+> #7  0x0000555967b0872b in qmp_human_monitor_command (command_line=3D0x555=
+96b4741e0 "savevm -n snap1", has_cpu_index=3Dfalse, cpu_index=3D0, errp=3D0=
+x7fff4b0a12f0)
+>     at /root/code/qemu_201801/monitor.c:614
+>=20
 
-The special case for raw approach is not suitable for upstream QEMU.
-It's what we started with in -device virtio-blk,x-data-plane=3Don (see the
-old dataplane implementation in QEMU v1.4).
-
-It took a lot of work to make the IOThread use the QEMU block layer
-instead of a special case code path for raw.
-
-Currently QEMU is not that far away from being able to use
-BlockDriverState from multiple threads for multiqueue.
-
-Paolo, can you share your current progress and pointers to what needs to
-be done next?  Maybe Edgar can help complete the work.
-
-Stefan
-
---p4qYPpj5QlsIQJ0K
+--B4IIlcmfBL/1gGOG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaw3MiAAoJEJykq7OBq3PIYYoH+wSHcv2YuKMZ0KBMb4GMGIBc
-lrJOmJwCMbn+Sk8zHpJxsYAiJPT4g8asIWUjL3qp0SD6TS3OAhn3cqB9H+h1GrIr
-cv7+jFTzjkZVe79IioDjzX3BN4qZCIwZUvLyH884cGrk0MQqYVEyArR5DgSyzwSr
-e0kApAGHuOcslKGg2FaXqMZNSe9+ZI5JsaP5GkhILV6A850By65ZlulwctNr2xZz
-oE/yercNMH9W3dydglSo9uHHwCFgTFUvRs7hof/rGEjmlmtr5UgNPiloZykJTPZJ
-+qldf3xzmSBCh+XMbU2jhrOrpt/7fyinH2Kj5ofjZe1g+XV8WtbdTfb3fODrDF4=
-=UhYr
+iQEcBAEBAgAGBQJaw3SDAAoJEJykq7OBq3PIhtsH+wf581RZ2GBIRf25sFz6QrlV
+Sh7rmrTqzjP1ff1ba51uEluo+BK6zq4OcKQA8hZrTDtka+hdwI5/WlLI5EVg1gCt
+FhtxG75CshDz7NV+foGP8BPokH7V/VT0s3HitE+swnby/N6RBVrXROCNuPfcQ9qC
+srpOmmIEFJdjUvVBNieznJQVAjZI23kKpj6H22xIf1AATL6Z1hT+WfIOrzxXGZmc
+ujvBHABAOTSJgo3URZ9H20rBjZo5mLoMIYZjd/uTvgLmX50LGjCJ23AgpCg7QET/
+D1ktjAzCs7NaNjbZcCN3CvSEwZP4a+8f/SQeipyRSZ6wD3qW0856sla+h8RjrdM=
+=tb0Z
 -----END PGP SIGNATURE-----
 
---p4qYPpj5QlsIQJ0K--
+--B4IIlcmfBL/1gGOG--
