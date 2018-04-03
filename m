@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3RKi-0006an-MN
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:11:05 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f3RL2-0006kS-D3
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3RKe-0006gZ-NF
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:11:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33378)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3RKe-0006g4-H8
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:11:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3RKd-0003eY-0z
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 19:10:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 05F052E80C8
-	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 19:10:59 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1f3RKy-0006t3-CY
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:11:24 -0400
+Resent-Message-Id: <E1f3RKy-0006t3-CY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21063)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f3RKy-0006rZ-4c
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:11:20 -0400
+In-Reply-To: <1522768634-5548-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152276912198.1413.4384049985136346832@71c20359a636>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Apr 2018 18:55:49 -0000
-From: John Snow <1760176@bugs.launchpad.net>
-Reply-To: Bug 1760176 <1760176@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152243541894.4250.1548453889395485127.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152278174998.30756.8908259323086367658.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1760176] Re: optical drive doesn't open in
- Lubuntu 18.04 on '12 MacPro
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 3 Apr 2018 08:25:22 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/2 RFC] Implement Hex file loader and add
+ test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: suhang16@mails.ucas.ac.cn
+Cc: famz@redhat.com, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
 
-Sorry, I'm not sure if I understand you.
-
-Does this bug have anything to do with QEMU? Are you running a virtual
-machine?
-
-If so:
-(A) What is your host OS, version, and QEMU version?
-(B) What is your guest OS and version?
-(C) What are you trying to do, and
-(D) What is the expected behavior?
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1760176
-
-Title:
-  optical drive doesn't open in Lubuntu 18.04 on '12 MacPro
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Running an install to HD of Lubuntu 18.04 and after running
-  update/upgrade this morning now the optical drive door doesn't respond
-  to keyboard "eject" key on a Mac keyboard for '12 MacPro . . . .  I
-  tried to use "xfburn" to get the door to open, nothing seems to get it
-  to work that I know of.  Yesterday there was no issue . . . .  Tried
-  to run "apt -f install" and it showed some old kernels to "autoremove"
-  . . . which I did; didn't try to reboot into old kernel to test,
-  perhaps now old kernel is gone?
-
-  F
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1760176/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjI3Njg2MzQtNTU0OC0xLWdpdC1zZW5kLWVtYWlsLXN1aGFuZzE2QG1haWxz
+LnVjYXMuYWMuY24KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzIgUkZDXSBJbXBsZW1l
+bnQgSGV4IGZpbGUgbG9hZGVyIGFuZCBhZGQgdGVzdCBjYXNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBb
+bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjI3Njg2MzQtNTU0OC0xLWdpdC1zZW5k
+LWVtYWlsLXN1aGFuZzE2QG1haWxzLnVjYXMuYWMuY24gLT4gcGF0Y2hldy8xNTIyNzY4NjM0LTU1
+NDgtMS1naXQtc2VuZC1lbWFpbC1zdWhhbmcxNkBtYWlscy51Y2FzLmFjLmNuClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKYWU2ZTRlYTYzMSBBZGQgUVRlc3QgdGVzdGNhc2UgZm9yIHRo
+ZSBIZXggRmlsZSBMb2FkZXIKMzM5MmJiZjE3YyBJbXBsZW1lbnQgLmhleCBmaWxlIGxvYWRlcgoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yOiBJbXBsZW1lbnQgLmhleCBm
+aWxlIGxvYWRlci4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
+IG9mIHRoaXMgc3RhdGVtZW50CiMyMjA6IEZJTEU6IGh3L2NvcmUvbG9hZGVyLmM6MTQ2MzoKKyAg
+ICB9IHdoaWxlICgrK2hleF9ibG9iICE9IGVuZCk7ClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAg
+d2FybmluZ3MsIDMyOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzI6IEFkZCBRVGVzdCB0ZXN0Y2FzZSBmb3IgdGhl
+IEhleCBGaWxlIExvYWRlci4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
