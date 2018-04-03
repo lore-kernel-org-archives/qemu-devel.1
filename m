@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f3Me6-0001KZ-I5
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:10:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f3Mh3-0003Kq-7J
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f3Me1-0000Zf-K6
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:10:46 -0400
-Date: Tue, 3 Apr 2018 16:10:33 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180403161033.74ed9838.cohuck@redhat.com>
-In-Reply-To: <20180329113320.8053-1-cohuck@redhat.com>
-References: <20180329113320.8053-1-cohuck@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1f3Mh2-0002OC-FL
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:13:49 -0400
+Date: Tue, 3 Apr 2018 16:13:36 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180403141336.GE11070@localhost.localdomain>
+References: <20180403140314.8795-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.13] s390x: introduce 2.13 compat
- machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180403140314.8795-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: update 185 output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,18 +22,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>
 
-On Thu, 29 Mar 2018 13:33:20 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+Am 03.04.2018 um 16:03 hat Stefan Hajnoczi geschrieben:
+> Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
+> vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
+> drain operation the block job iterates one more time than before.  The
+> 185 output no longer matches and the test is failing now.
+> 
+> It may be possible to avoid the superfluous block job iteration, but
+> that type of patch is not suitable late in the QEMU 2.12 release cycle.
+> 
+> This patch simply updates the 185 output file.  The new behavior is
+> correct, just not optimal, so make the test pass again.
+> 
+> Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shutdown()")
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> Yes, it's that time again :)
-> ---
->  hw/s390x/s390-virtio-ccw.c | 17 ++++++++++++++++-
->  include/hw/compat.h        |  3 +++
->  2 files changed, 19 insertions(+), 1 deletion(-)
+Do you want to update the comment in the 185 test case code that
+explains which values we expect?
 
-Queued to s390-next (but will still take R-bs/A-bs).
+Kevin
