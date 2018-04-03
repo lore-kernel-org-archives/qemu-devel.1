@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1f3NzF-00004x-Gq
+	(envelope-from <jan.kiszka@web.de>) id 1f3NzD-0008Vo-QV
 	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1f3NzE-0008Db-PL
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:41 -0400
-Received: from mout.web.de ([212.227.15.4]:45141)
+	(envelope-from <jan.kiszka@web.de>) id 1f3NzD-0008CR-0f
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:39 -0400
+Received: from mout.web.de ([212.227.15.3]:42819)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1f3NzE-0008Cl-CB
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:40 -0400
+	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1f3NzC-0008B9-OQ
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:38 -0400
 From: Jan Kiszka <jan.kiszka@web.de>
-Date: Tue,  3 Apr 2018 17:36:13 +0200
-Message-Id: <6f4d44ffde55d074cbceb48309c1678600abad2f.1522769774.git.jan.kiszka@web.de>
+Date: Tue,  3 Apr 2018 17:36:12 +0200
+Message-Id: <37939b244dda0e9cccf96ce50f2b15df1e48315d.1522769774.git.jan.kiszka@web.de>
 In-Reply-To: <cover.1522769774.git.jan.kiszka@web.de>
 References: <cover.1522769774.git.jan.kiszka@web.de>
 In-Reply-To: <cover.1522769774.git.jan.kiszka@web.de>
 References: <cover.1522769774.git.jan.kiszka@web.de>
-Subject: [Qemu-devel] [PATCH v2 3/4] target-i386: Mark cpu_vmexit noreturn
+Subject: [Qemu-devel] [PATCH v2 2/4] target-i386: Allow interrupt injection
+ after STGI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +31,31 @@ Cc: Valentine Sinitsyn <valentine.sinitsyn@gmail.com>
 
 From: Jan Kiszka <jan.kiszka@siemens.com>
 
-It calls cpu_loop_exit in system emulation mode (and should never be
-called in user emulation mode).
+We need to terminate the translation block after STGI so that pending
+interrupts can be injected.
+
+This fixes pending NMI injection for Jailhouse which uses "stgi; clgi"
+to open a brief injection window.
 
 Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 ---
- target/i386/cpu.h        | 4 ++--
- target/i386/svm_helper.c | 1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ target/i386/translate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 78db1b833a..d711634c2f 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1764,8 +1764,8 @@ void helper_lock_init(void);
- /* svm_helper.c */
- void cpu_svm_check_intercept_param(CPUX86State *env1, uint32_t type,
-                                    uint64_t param, uintptr_t retaddr);
--void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
--                uintptr_t retaddr);
-+void QEMU_NORETURN cpu_vmexit(CPUX86State *nenv, uint32_t exit_code,
-+                              uint64_t exit_info_1, uintptr_t retaddr);
- void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1);
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 0135415d92..71d97876c7 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -7450,8 +7450,9 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+                 break;
+             }
+             gen_update_cc_op(s);
+-            gen_jmp_im(pc_start - s->cs_base);
+             gen_helper_stgi(cpu_env);
++            gen_jmp_im(s->pc - s->cs_base);
++            gen_eob(s);
+             break;
  
- /* seg_helper.c */
-diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
-index 303106981c..e3288955f1 100644
---- a/target/i386/svm_helper.c
-+++ b/target/i386/svm_helper.c
-@@ -62,6 +62,7 @@ void helper_invlpga(CPUX86State *env, int aflag)
- void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
-                 uintptr_t retaddr)
- {
-+    assert(0);
- }
- 
- void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
+         case 0xdd: /* CLGI */
 -- 
 2.13.6
