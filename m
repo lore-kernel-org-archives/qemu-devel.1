@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f3Mzl-0004VH-Q5
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:33:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f3N5b-0006xr-Sd
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:39:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f3Mzh-0005Mc-T1
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:33:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40228 helo=mx1.redhat.com)
+	(envelope-from <kwolf@redhat.com>) id 1f3N5X-0008Bt-Va
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:39:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36374 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f3Mzh-0005ML-NT
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:33:05 -0400
-Date: Tue, 3 Apr 2018 16:32:53 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180403163253.1d13633f@redhat.com>
-In-Reply-To: <20180329162409.GX5046@localhost.localdomain>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<1520860275-101576-4-git-send-email-imammedo@redhat.com>
-	<20180323212508.GF28161@localhost.localdomain>
-	<20180327170541.295fc29a@redhat.com>
-	<20180328134835.04f95535@redhat.com>
-	<20180328192148.GR5046@localhost.localdomain>
-	<20180329134303.548a864b@redhat.com>
-	<20180329162409.GX5046@localhost.localdomain>
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1f3N5X-0008BX-Qb
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:39:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 11F77402314E
+	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 14:39:04 +0000 (UTC)
+Date: Tue, 3 Apr 2018 16:38:57 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180403143857.GF11070@localhost.localdomain>
+References: <20180328170207.49512-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180328170207.49512-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: Don't activate block devices if
+ using -S
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, jdenemar@redhat.com, peterx@redhat.com
 
-On Thu, 29 Mar 2018 13:24:09 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Am 28.03.2018 um 19:02 hat Dr. David Alan Gilbert (git) geschrieben:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Activating the block devices causes the locks to be taken on
+> the backing file.  If we're running with -S and the destination libvirt
+> hasn't started the destination with 'cont', it's expecting the locks are
+> still untaken.
+> 
+> Don't activate the block devices if we're not going to autostart the VM;
+> 'cont' already will do that anyway.
+> 
+> bz: https://bugzilla.redhat.com/show_bug.cgi?id=1560854
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> On Thu, Mar 29, 2018 at 01:43:03PM +0200, Igor Mammedov wrote:
-> > On Wed, 28 Mar 2018 16:21:48 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Wed, Mar 28, 2018 at 01:48:35PM +0200, Igor Mammedov wrote:  
-> > > > On Tue, 27 Mar 2018 17:05:41 +0200
-> > > > Igor Mammedov <imammedo@redhat.com> wrote:
-> > > >     
-> > > > > On Fri, 23 Mar 2018 18:25:08 -0300
-> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-[...]
-> > > This doesn't make sense to me.  Why would we enter
-> > > RUN_STATE_PRECONFIG state if -preconfig is not used at all?  
-> > because of RUN_STATE_PRECONFIG becomes new initial state of
-> > our state machine where we start of (used to be RUN_STATE_PRELAUNCH)  
-> 
-> Oh, I missed that part.
-> 
-> > Lets call it variant 1:
-> > 
-> > with this we have 2 possible transitions:
-> >  RUN_STATE_PRECONFIG -> RUN_STATE_PRELAUNCH (machine_init)
-> > 
-> > and
-> > 
-> >  RUN_STATE_PRECONFIG -> RUN_STATE_INMIGRATE
-> >    ugly but it was the same with RUN_STATE_PRELAUNCH initial transition  
-[...]
-> 
-> Thanks, now variant 1 makes more sense to me.  But I really miss
-> here are very clear and explicit descriptions of what each state
-> really mean, and what are the differences between them.
-> 
-> It looks like the existing description for `prelaunch` isn't
-> accurate:
-> 
-> # @prelaunch: QEMU was started with -S and guest has not started
-> 
-> This is false, as QEMU can be in `prelaunch` state even if -S is
-> not used.
-> 
-> 
-> Also, this is the description you proposed for `preconfig`:
-> 
-> # @preconfig: QEMU is paused before board specific init callback is executed.
-> #             The state is reachable only if -preconfig CLI option is used.
-> #             (Since 2.12)
-> 
-> This seems wrong as well: the `prelaunch` state is reachable even
-> if `-preconfig` isn't used in the command-line (because it is the
-> initial state).
-I'm not sure we should describe transitions/initial state here
-(it's not the case now).
+I'm not sure that this is a good idea. Going back to my old writeup of
+the migration phases...
 
-I think descriptions 'almost' match 'end' result of what QMP client
-cloud see and the initial state is not something that QMP user could
-observe.
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07917.html
 
-[...]
+...the phase between migration completion and 'cont' is described like
+this:
+
+    b) Migration converges:
+       Both VMs are stopped (assuming -S is given on the destination,
+       otherwise this phase is skipped), the destination is in control of
+       the resources
+
+This patch changes the definition of the phase so that neither side is
+in control of the resources. We lose the phase where the destination is
+in control, but the VM isn't running yet. This feels like a problem to
+me.
+
+Consider a case where the management tool keeps a mirror job with
+sync=none running to expose all I/O requests to some external process.
+It needs to shut down the old block job on the source in the
+'pre-switchover' state, and start a new block job on the destination
+when the destination controls the images, but the VM doesn't run yet (so
+that it doesn't miss an I/O request). This patch removes the migration
+phase that the management tool needs to implement this correctly.
+
+If we need a "neither side has control" phase, we might need to
+introduce it in addition to the existing phases rather than replacing a
+phase that is still needed in other cases.
+
+Kevin
