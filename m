@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3Mnd-0006cu-PH
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:20:43 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f3Mzl-0004VH-Q5
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3Mnc-0006N8-P0
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:20:37 -0400
-Date: Tue, 3 Apr 2018 15:20:26 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180403142026.GG4467@stefanha-x1.localdomain>
-References: <20180323034356.72130-1-haoqf@linux.vnet.ibm.com>
-	<20180323034356.72130-2-haoqf@linux.vnet.ibm.com>
-	<CAJSP0QUtM4HrvTDgK_u8hDSSy4KaeCjskDdM7-AZjShd50Qw5g@mail.gmail.com>
-	<57467bb4-9143-2239-87a2-4bada0e1719d@linux.vnet.ibm.com>
+	(envelope-from <imammedo@redhat.com>) id 1f3Mzh-0005Mc-T1
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:33:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40228 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f3Mzh-0005ML-NT
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:33:05 -0400
+Date: Tue, 3 Apr 2018 16:32:53 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180403163253.1d13633f@redhat.com>
+In-Reply-To: <20180329162409.GX5046@localhost.localdomain>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<1520860275-101576-4-git-send-email-imammedo@redhat.com>
+	<20180323212508.GF28161@localhost.localdomain>
+	<20180327170541.295fc29a@redhat.com>
+	<20180328134835.04f95535@redhat.com>
+	<20180328192148.GR5046@localhost.localdomain>
+	<20180329134303.548a864b@redhat.com>
+	<20180329162409.GX5046@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TmwHKJoIRFM7Mu/A"
-Content-Disposition: inline
-In-Reply-To: <57467bb4-9143-2239-87a2-4bada0e1719d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] iotests: fix test case 185
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +33,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Jeff Cody <jcody@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
+On Thu, 29 Mar 2018 13:24:09 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
---TmwHKJoIRFM7Mu/A
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, Mar 29, 2018 at 01:43:03PM +0200, Igor Mammedov wrote:
+> > On Wed, 28 Mar 2018 16:21:48 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> > > On Wed, Mar 28, 2018 at 01:48:35PM +0200, Igor Mammedov wrote:  
+> > > > On Tue, 27 Mar 2018 17:05:41 +0200
+> > > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > > >     
+> > > > > On Fri, 23 Mar 2018 18:25:08 -0300
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+[...]
+> > > This doesn't make sense to me.  Why would we enter
+> > > RUN_STATE_PRECONFIG state if -preconfig is not used at all?  
+> > because of RUN_STATE_PRECONFIG becomes new initial state of
+> > our state machine where we start of (used to be RUN_STATE_PRELAUNCH)  
+> 
+> Oh, I missed that part.
+> 
+> > Lets call it variant 1:
+> > 
+> > with this we have 2 possible transitions:
+> >  RUN_STATE_PRECONFIG -> RUN_STATE_PRELAUNCH (machine_init)
+> > 
+> > and
+> > 
+> >  RUN_STATE_PRECONFIG -> RUN_STATE_INMIGRATE
+> >    ugly but it was the same with RUN_STATE_PRELAUNCH initial transition  
+[...]
+> 
+> Thanks, now variant 1 makes more sense to me.  But I really miss
+> here are very clear and explicit descriptions of what each state
+> really mean, and what are the differences between them.
+> 
+> It looks like the existing description for `prelaunch` isn't
+> accurate:
+> 
+> # @prelaunch: QEMU was started with -S and guest has not started
+> 
+> This is false, as QEMU can be in `prelaunch` state even if -S is
+> not used.
+> 
+> 
+> Also, this is the description you proposed for `preconfig`:
+> 
+> # @preconfig: QEMU is paused before board specific init callback is executed.
+> #             The state is reachable only if -preconfig CLI option is used.
+> #             (Since 2.12)
+> 
+> This seems wrong as well: the `prelaunch` state is reachable even
+> if `-preconfig` isn't used in the command-line (because it is the
+> initial state).
+I'm not sure we should describe transitions/initial state here
+(it's not the case now).
 
-On Tue, Mar 27, 2018 at 11:32:00AM +0800, QingFeng Hao wrote:
->=20
-> =E5=9C=A8 2018/3/23 18:04, Stefan Hajnoczi =E5=86=99=E9=81=93:
-> > On Fri, Mar 23, 2018 at 3:43 AM, QingFeng Hao <haoqf@linux.vnet.ibm.com=
-> wrote:
-> > > Test case 185 failed since commit 4486e89c219 --- "vl: introduce vm_s=
-hutdown()".
-> > > It's because of the newly introduced function vm_shutdown calls bdrv_=
-drain_all,
-> > > which is called later by bdrv_close_all. bdrv_drain_all resumes the j=
-obs
-> > > that doubles the speed and offset is doubled.
-> > > Some jobs' status are changed as well.
-> > >=20
-> > > The fix is to not resume the jobs that are already yielded and also c=
-hange
-> > > 185.out accordingly.
-> > >=20
-> > > Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
-> > > Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> > > ---
-> > >   blockjob.c                 | 10 +++++++++-
-> > >   include/block/blockjob.h   |  5 +++++
-> > >   tests/qemu-iotests/185.out | 11 +++++++++--
-> >=20
-> > If drain no longer forces the block job to iterate, shouldn't the test
-> > output remain the same?  (The means the test is fixed by the QEMU
-> > patch.)
-> >=20
-> > >   3 files changed, 23 insertions(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/blockjob.c b/blockjob.c
-> > > index ef3ed69ff1..fa9838ac97 100644
-> > > --- a/blockjob.c
-> > > +++ b/blockjob.c
-> > > @@ -206,11 +206,16 @@ void block_job_txn_add_job(BlockJobTxn *txn, Bl=
-ockJob *job)
-> > >=20
-> > >   static void block_job_pause(BlockJob *job)
-> > >   {
-> > > -    job->pause_count++;
-> > > +    if (!job->yielded) {
-> > > +        job->pause_count++;
-> > > +    }
-> >=20
-> > The pause cannot be ignored.  This change introduces a bug.
-> >=20
-> > Pause is not a synchronous operation that stops the job immediately.
-> > Pause just remembers that the job needs to be paused.   When the job
-> > runs again (e.g. timer callback, fd handler) it eventually reaches
-> > block_job_pause_point() where it really pauses.
-> >=20
-> > The bug in this patch is:
-> >=20
-> > 1. The job has a timer pending.
-> > 2. block_job_pause() is called during drain.
-> > 3. The timer fires during drain but now the job doesn't know it needs
-> > to pause, so it continues running!
-> >=20
-> > Instead what needs to happen is that block_job_pause() remains
-> > unmodified but block_job_resume if extended:
-> >=20
-> > static void block_job_resume(BlockJob *job)
-> > {
-> >      assert(job->pause_count > 0);
-> >      job->pause_count--;
-> >      if (job->pause_count) {
-> >          return;
-> >      }
-> > +    if (job_yielded_before_pause_and_is_still_yielded) {
-> Thanks a lot for your great comments! But I can't figure out how to check
-> this.
-> >      block_job_enter(job);
-> > +    }
-> > }
-> >=20
-> > This handles the case I mentioned above, where the yield ends before
-> > pause ends (therefore resume must enter the job!).
-> >=20
-> > To make this a little clearer, there are two cases to consider:
-> >=20
-> > Case 1:
-> > 1. Job yields
-> > 2. Pause
-> > 3. Job is entered from timer/fd callback
-> How do I know that if job is entered from ...? thanks
+I think descriptions 'almost' match 'end' result of what QMP client
+cloud see and the initial state is not something that QMP user could
+observe.
 
-Sorry, in order to answer your question properly I would have to study
-the code and get the point where I could write the patch myself.
-
-I have sent a patch to update the test output for the upcoming QEMU 2.12
-release.  At this time in the release cycle it's the most appropriate
-solution.
-
-Stefan
-
---TmwHKJoIRFM7Mu/A
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaw42qAAoJEJykq7OBq3PIF1sH/1t1TzUCIHOqRciax2D+vtEw
-xkuHxPR+fjl+MlRcFdP3Zj1+/zP79tTZomHVrsbVuYqvnFIUAIZSjMZCgzmy217q
-7gPWrLTazibRQVPt01CIU5X4u3b6pBe37nhD9Jn+IGFtthexYwq4z59S8sxIIk/L
-AQ+TpfCsBpL4xiJ9Y6PbNzXlaU75yEdYb8UjAjm/vxSGrEE5+bna6ZEmo7pQMJtC
-vgTTf3/MarEcYgBw8IvaLfIuS4GW+fgGXKLIREzJXvdLP2CcL/zUB+dTmm/p2lJj
-CQ4XASf3XCNzTDssbxHxMdslqG8J5cA/2hiodt5NxeX6W7yOBx2YYOqEEiJMPDM=
-=4XvK
------END PGP SIGNATURE-----
-
---TmwHKJoIRFM7Mu/A--
+[...]
