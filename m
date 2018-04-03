@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NsG-0003Iq-BG
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:29:29 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NtJ-00043p-RK
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NsD-00025X-2m
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:29:28 -0400
-Received: from smtp65.cstnet.cn ([159.226.251.65]:49746 helo=cstnet.cn)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NtG-0002aT-Jb
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:30:33 -0400
+Received: from smtp21.cstnet.cn ([159.226.251.21]:39000 helo=cstnet.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NsC-00024K-DE
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:29:25 -0400
-Date: Tue, 3 Apr 2018 23:29:15 +0800 (GMT+08:00)
-From: "Su Hang" <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <1522768634-5548-3-git-send-email-suhang16@mails.ucas.ac.cn>
-References: <1522768634-5548-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<1522768634-5548-3-git-send-email-suhang16@mails.ucas.ac.cn>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
-MIME-Version: 1.0
-Message-ID: <3e47526d.39f.1628c206165.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [PATCH v2] scripts/checkpatch.pl: Bug fix
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3NtF-0002Ya-U9
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:30:30 -0400
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Tue,  3 Apr 2018 23:30:24 +0800
+Message-Id: <1522769426-6056-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH 0/2 RFC] Implement Hex file loader and add test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +24,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
 
-UGxlYXNlIGlnbm9yZSB0aGlzIGVtYWlsLCB0aGlzIHBhdGNoIHdhcyBhY2NpZGVudGFsbHkgc2Vu
-dC4KCiJTdSBIYW5nIiA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5jbj53cm90ZToKPiBjaGVja3Bh
-dGNoLnBsIHN0b3BzIGNvbXBsYWluaW5nIGFib3V0IGZvbGxvd2luZyBwYXR0ZXJuOg0KPiAiIiIN
-Cj4gZG8gew0KPiAgICAgLy9kbyBzb21ldGhpbnM7DQo+IH0gd2hpbGUgKGNvbmRpdGlvbnMpOw0K
-PiAiIiINCj4gDQo+IE9uZSB0aGluZ3MgbmVlZCB0byBiZSBtZW50aW9uZWQ6DQo+IEJlY2FzdWUg
-YGlmYCwgYHdoaWxlYCBhbmQgYGZvcmAgY2hlY2sgaGF2ZSBiZWVuIGRvbmUgaW4gdGhpcw0KPiBg
-aWZgIGJsb2NrKExpbmU6IDIzNTYpLCBhbmQgdGhpcyBibG9jayBjb250YWlucyBmb2xsb3dpbmcg
-c3RhdGVtZW50Og0KPiAiIiIgTGluZTogMjM3OQ0KPiAkc3VwcHJlc3NfaWZicmFjZXN7JGxuICsg
-JG9mZnNldH0gPSAxOw0KPiAiIiINCj4gU28gdGhlIGJlaGluZCBibG9jayBtYXkgbmV2ZXIgcnVu
-Og0KPiAiIiIgTGluZTogMjQxNQ0KPiBpZiAoIWRlZmluZWQgJHN1cHByZXNzX2lmYnJhY2VzeyRs
-aW5lbnIgLSAxfSAmJg0KPiAgICAgJGxpbmUgPX4gL1xiKGlmfHdoaWxlfGZvcnxlbHNlKVxiLyAm
-Jg0KPiAgICAgJGxpbmUgIX4gL1wjXHMqaWYvICYmDQo+ICAgICAkbGluZSAhfiAvXCNccyplbHNl
-Lykgew0KPiAiIiINCj4gSSdtIG5vdCBzdXJlLCBwbGVhc2UgZ2l2ZSBtZSBzb21lIGFkdmljZS4N
-Cj4gDQo+IChTb3JyeSwgSSBkb24ndCBrbm93IHRoaXMgcGF0Y2ggc2hvdWxkIGJhc2Ugb24gd2hp
-Y2ggY29tbWl0LA0KPiAgc28gSSBnZW5lcmF0ZSB0aGlzIHBhdGNoIGJhc2VkIG9uDQo+ICBjb21t
-aXQ6ZmI4NDQ2ZDk0ZWM3YTNkYzBjM2E3ZTdkYTY3MjQwNjQ3NmYwNzVhYywNCj4gIEkgY2hvb3Nl
-IHRoaXMgYnkgYGdpdCBsb2cgLTIgc2NyaXB0cy9jaGVja3BhdGgucGxgLg0KPiAgU2luY2VyZWx5
-IHNheSBzb3JyeSwgaWYgSSBoYXZlIG1pc3VuZGVyc3RhbmQgYW55IG1lYW5pbmcuKQ0KPiANCj4g
-U2lnbmVkLW9mZi1ieTogU3UgSGFuZyA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5jbj4NCj4gLS0t
-DQo+ICBzY3JpcHRzL2NoZWNrcGF0Y2gucGwgfCAyMSArKysrKysrKysrKysrKysrKy0tLS0NCj4g
-IDEgZmlsZSBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4g
-ZGlmZiAtLWdpdCBhL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBiL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bA0KPiBpbmRleCBhODhhZjYxZWQ0ZWUuLmQ2ZjA3NDdiYTIwYSAxMDA3NTUNCj4gLS0tIGEvc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsDQo+ICsrKyBiL3NjcmlwdHMvY2hlY2twYXRjaC5wbA0KPiBAQCAt
-MjM1Miw4ICsyMzUyLDIyIEBAIHN1YiBwcm9jZXNzIHsNCj4gIAkJCX0NCj4gIAkJfQ0KPiANCj4g
-LSMgY2hlY2sgZm9yIG1pc3NpbmcgYnJhY2luZyByb3VuZCBpZiBldGMNCj4gLQkJaWYgKCRsaW5l
-ID1+IC8oXi4qKVxiaWZcYi8gJiYgJGxpbmUgIX4gL1wjXHMqaWYvKSB7DQo+ICsjIGNoZWNrIGZv
-ciBtaXNzaW5nIGJyYWNpbmcgYXJvdW5kIGlmIGV0Yw0KPiArCQlpZiAoJGxpbmUgPX4gLyheLiop
-XGIoPzppZnx3aGlsZXxmb3IpXGIvICYmDQo+ICsJCQkkbGluZSAhfiAvXCNccyppZi8pIHsNCj4g
-KwkJCW15ICRhbGxvd2VkID0gMDsNCj4gKw0KPiArCQkJIyBDaGVjayB0aGUgcHJlLWNvbnRleHQu
-DQo+ICsJCQlpZiAoJGxpbmUgPX4gLyhcfS4qPykkLykgew0KPiArCQkJCW15ICRwcmUgPSAkMTsN
-Cj4gKw0KPiArCQkJCWlmICgkbGluZSAhfiAvZWxzZS8pIHsNCj4gKwkJCQkJcHJpbnQgIkFQVzog
-QUxMT1dFRDogcHJlPCRwcmU+IGxpbmU8JGxpbmU+XG4iDQo+ICsJCQkJCQlpZiAkZGJnX2Fkdl9h
-cHc7DQo+ICsJCQkJCSRhbGxvd2VkID0gMTsNCj4gKwkJCQl9DQo+ICsJCQl9DQo+ICsNCj4gIAkJ
-CW15ICgkbGV2ZWwsICRlbmRsbiwgQGNodW5rcykgPQ0KPiAgCQkJCWN0eF9zdGF0ZW1lbnRfZnVs
-bCgkbGluZW5yLCAkcmVhbGNudCwgMSk7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAo
-JGRiZ19hZHZfYXB3KSB7DQo+IEBAIC0yMzYyLDcgKzIzNzYsNiBAQCBzdWIgcHJvY2VzcyB7DQo+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmICQjY2h1bmtzID49IDE7DQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgICB9DQo+ICAJCQlpZiAoJCNjaHVua3MgPj0gMCAmJiAkbGV2
-ZWwgPT0gMCkgew0KPiAtCQkJCW15ICRhbGxvd2VkID0gMDsNCj4gIAkJCQlteSAkc2VlbiA9IDA7
-DQo+ICAJCQkJbXkgJGhlcmVjdHggPSAkaGVyZSAuICJcbiI7DQo+ICAJCQkJbXkgJGxuID0gJGxp
-bmVuciAtIDE7DQo+IEBAIC0yNDA2LDcgKzI0MTksNyBAQCBzdWIgcHJvY2VzcyB7DQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICRhbGxvd2VkID0gMTsNCj4g
-IAkJCQkJfQ0KPiAgCQkJCX0NCj4gLQkJCQlpZiAoJHNlZW4gIT0gKCQjY2h1bmtzICsgMSkpIHsN
-Cj4gKwkJCQlpZiAoJHNlZW4gIT0gKCQjY2h1bmtzICsgMSkgJiYgISRhbGxvd2VkKSB7DQo+ICAJ
-CQkJCUVSUk9SKCJicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
-dGF0ZW1lbnRcbiIgLiAkaGVyZWN0eCk7DQo+ICAJCQkJfQ0KPiAgCQkJfQ0KPiAtLQ0KPiAyLjcu
-NA0KPiANCg==
+These series of patchs implement Intel Hexadecimal File loader and
+add QTest testcase to verify the correctness of Loader.  
+
+Su Hang (2):
+  Implement .hex file loader
+  Add QTest testcase for the Intel Hexadecimal Object File Loader.
+
+ hw/arm/boot.c          |   9 +-
+ hw/core/loader.c       | 280 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/loader.h    |  17 +++
+ tests/Makefile.include |   2 +
+ tests/hexloader-test.c |  56 ++++++++++
+ tests/test.hex         |  11 ++
+ 6 files changed, 374 insertions(+), 1 deletion(-)
+ create mode 100644 tests/hexloader-test.c
+ create mode 100644 tests/test.hex
+
+-- 
+2.7.4
