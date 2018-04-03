@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3RhT-0006t7-1s
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:34:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1f3RhV-0006vA-KE
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3RhR-0002at-Vl
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:34:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45756 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1f3RhS-0002b1-9C
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:34:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36094 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f3RhR-0002ak-Pi
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:34:33 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f3RhS-0002ap-4X
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 15:34:34 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E1C5402314E
+	by mx1.redhat.com (Postfix) with ESMTPS id BAEE74067EF0
+	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 19:34:33 +0000 (UTC)
+Received: from red.redhat.com (ovpn-123-104.rdu2.redhat.com [10.10.123.104])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 82543100727E
 	for <qemu-devel@nongnu.org>; Tue,  3 Apr 2018 19:34:33 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  3 Apr 2018 14:34:18 -0500
-Message-Id: <20180403193420.2065215-2-eblake@redhat.com>
+Date: Tue,  3 Apr 2018 14:34:19 -0500
+Message-Id: <20180403193420.2065215-3-eblake@redhat.com>
 In-Reply-To: <20180403193420.2065215-1-eblake@redhat.com>
 References: <20180403193420.2065215-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 1/3] monitor: bind dispatch bh to iohandler
- context
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/3] maint: Add .mailmap entries for patches
+ claiming list authorship
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +37,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+The list did not author any patches, but it does rewrite the
+'From:' header of messages sent from any domain with restrictive
+SPF policies that would otherwise prevent the message from reaching
+all list recipients.  If a maintainer is not careful to undo the
+list header rewrite, and the author did not include a manual
+'From:' line in the body to fix the munged header, then 'git am'
+happily attributes the patch to the list.  Add some mailmap
+entries to correct the few that have escaped our attention; while
+we also work on improving the tooling to catch the problem in
+the future before a merge is even made.
 
-Eric Auger reported the problem days ago that OOB broke ARM when running
-with libvirt:
+Also improve the comments occurring in the file, including line
+length improvements.
 
-http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
-
-This patch fixes the problem.
-
-It's not really needed now since we have turned OOB off now, but it's
-still a bug fix, and it'll start to work when we turn OOB on for ARM.
-
-The problem was that the monitor dispatcher bottom half was bound to
-qemu_aio_context, but that context seems to be for block only.  For the
-rest of the QEMU world we should be using iohandler context.  So
-assign the monitor dispatcher bottom half to that context.
-
-Without this change, the QMP dispatcher might be run even before reaching
-the main loop in a block IO path, for example, in a stack like:
-
-        #0  qmp_cont ()
-        #1  0x00000000006bd210 in qmp_marshal_cont ()
-        #2  0x0000000000ac05c4 in do_qmp_dispatch ()
-        #3  0x0000000000ac07a0 in qmp_dispatch ()
-        #4  0x0000000000472d60 in monitor_qmp_dispatch_one ()
-        #5  0x000000000047302c in monitor_qmp_bh_dispatcher ()
-        #6  0x0000000000acf374 in aio_bh_call ()
-        #7  0x0000000000acf428 in aio_bh_poll ()
-        #8  0x0000000000ad5110 in aio_poll ()
-        #9  0x0000000000a08ab8 in blk_prw ()
-        #10 0x0000000000a091c4 in blk_pread ()
-        #11 0x0000000000734f94 in pflash_cfi01_realize ()
-        #12 0x000000000075a3a4 in device_set_realized ()
-        #13 0x00000000009a26cc in property_set_bool ()
-        #14 0x00000000009a0a40 in object_property_set ()
-        #15 0x00000000009a3a08 in object_property_set_qobject ()
-        #16 0x00000000009a0c8c in object_property_set_bool ()
-        #17 0x0000000000758f94 in qdev_init_nofail ()
-        #18 0x000000000058e190 in create_one_flash ()
-        #19 0x000000000058e2f4 in create_flash ()
-        #20 0x00000000005902f0 in machvirt_init ()
-        #21 0x00000000007635cc in machine_run_board_init ()
-        #22 0x00000000006b135c in main ()
-
-This can cause ARM to crash when used with both OOB capability enabled
-and libvirt as upper layer, since libvirt will start QEMU with "-S" and
-the first "cont" command will arrive very early if the context is not
-correct (which is what above stack shows).  Then, the vcpu threads will
-start to run right after the qmp_cont() call, even when GICs have not
-been setup correctly yet (which is done in kvm_arm_machine_init_done()).
-
-My sincere thanks to Eric Auger who offered great help during both
-debugging and verifying the problem.  The ARM test was carried out by
-applying this patch upon QEMU 2.12.0-rc0 and problem is gone after the
-patch.
-
-A quick test of mine shows that after this patch is applied we can pass all
-raw iotests even with OOB on by default.
-
-CC: Eric Blake <eblake@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Fam Zheng <famz@redhat.com>
-Reported-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180403050115.6037-1-peterx@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180326184147.1565719-1-eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- monitor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .mailmap | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 51f4cf480f8..39f8ee17ba7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4467,7 +4467,7 @@ static void monitor_iothread_init(void)
-      * have assumption to be run on main loop thread.  It would be
-      * nice that one day we can remove this assumption in the future.
-      */
--    mon_global.qmp_dispatcher_bh = aio_bh_new(qemu_get_aio_context(),
-+    mon_global.qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
-                                               monitor_qmp_bh_dispatcher,
-                                               NULL);
-
--- 
+diff --git a/.mailmap b/.mailmap
+index cf689b9ec99..778a4d4e2c7 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -1,6 +1,7 @@
+-# This mailmap just translates the weird addresses from the original imp=
+ort into git
+-# into proper addresses so that they are counted properly in git shortlo=
+g output.
+-#
++# This mailmap fixes up author names/addresses.
++
++# The first section translates weird addresses from the original git imp=
+ort
++# into proper addresses so that they are counted properly by git shortlo=
+g.
+ Andrzej Zaborowski <balrogg@gmail.com> balrog <balrog@c046a42c-6fe2-441c=
+-8c8c-71466251a162>
+ Anthony Liguori <anthony@codemonkey.ws> aliguori <aliguori@c046a42c-6fe2=
+-441c-8c8c-71466251a162>
+ Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm=
+.com>
+@@ -15,10 +16,19 @@ Paul Burton <paul.burton@mips.com> <paul.burton@imgte=
+c.com>
+ Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-714662=
+51a162>
+ malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
++
+ # There is also a:
+ #    (no author) <(no author)@c046a42c-6fe2-441c-8c8c-71466251a162>
+ # for the cvs2svn initialization commit e63c3dc74bf.
+-#
++
++# Next, translate a few commits where mailman rewrote the From: line due
++# to strict SPF, although we prefer to avoid adding more entries like th=
+at.
++Ed Swierk <eswierk@skyportsystems.com> Ed Swierk via Qemu-devel <qemu-de=
+vel@nongnu.org>
++Ian McKellar <ianloic@google.com> Ian McKellar via Qemu-devel <qemu-deve=
+l@nongnu.org>
++Julia Suvorova <jusual@mail.ru> Julia Suvorova via Qemu-devel <qemu-deve=
+l@nongnu.org>
++Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-dev=
+el <qemu-devel@nongnu.org>
++
++
+ # Also list preferred name forms where people have changed their
+ # git author config
+ Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+--=20
 2.14.3
