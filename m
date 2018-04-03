@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f3OZ5-00043p-Lk
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:13:44 -0400
+	(envelope-from <jcody@redhat.com>) id 1f3OZ6-00044b-B3
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f3OZ4-0005FZ-Ra
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:13:43 -0400
+	(envelope-from <jcody@redhat.com>) id 1f3OZ5-0005Fr-B1
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:13:44 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  3 Apr 2018 12:13:23 -0400
-Message-Id: <20180403161324.24514-3-jcody@redhat.com>
+Date: Tue,  3 Apr 2018 12:13:24 -0400
+Message-Id: <20180403161324.24514-4-jcody@redhat.com>
 In-Reply-To: <20180403161324.24514-1-jcody@redhat.com>
 References: <20180403161324.24514-1-jcody@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/3] blockjob: use qapi enum helpers
+Subject: [Qemu-devel] [PULL 3/3] gluster: Fix blockdev-add with
+ server.N.type=unix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +21,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: peter.maydell@linaro.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-stable@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Kevin Wolf <kwolf@redhat.com>
 
-QAPI generator provide #define helpers for looking up enum string.
+The legacy command line interface gets the socket path from an option
+called 'socket'. QAPI in contract uses SocketAddress, where the
+corresponding option is called 'path'.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20180327153011.29569-1-marcandre.lureau@redhat.com
+Fix the gluster block driver to accept both 'socket' and 'path', with
+'path' being the preferred syntax.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1545155
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20180403110810.25624-1-kwolf@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- blockjob.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ block/gluster.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index c510a9fde5..27f957e571 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -75,10 +75,8 @@ static void block_job_state_transition(BlockJob *job, =
-BlockJobStatus s1)
-     assert(s1 >=3D 0 && s1 <=3D BLOCK_JOB_STATUS__MAX);
-     trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] =
-?
-                                      "allowed" : "disallowed",
--                                     qapi_enum_lookup(&BlockJobStatus_lo=
-okup,
--                                                      s0),
--                                     qapi_enum_lookup(&BlockJobStatus_lo=
-okup,
--                                                      s1));
-+                                     BlockJobStatus_str(s0),
-+                                     BlockJobStatus_str(s1));
-     assert(BlockJobSTT[s0][s1]);
-     job->status =3D s1;
- }
-@@ -86,17 +84,15 @@ static void block_job_state_transition(BlockJob *job,=
- BlockJobStatus s1)
- static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error **=
-errp)
- {
-     assert(bv >=3D 0 && bv <=3D BLOCK_JOB_VERB__MAX);
--    trace_block_job_apply_verb(job, qapi_enum_lookup(&BlockJobStatus_loo=
-kup,
--                                                     job->status),
--                               qapi_enum_lookup(&BlockJobVerb_lookup, bv=
-),
-+    trace_block_job_apply_verb(job, BlockJobStatus_str(job->status),
-+                               BlockJobVerb_str(bv),
-                                BlockJobVerbTable[bv][job->status] ?
-                                "allowed" : "prohibited");
-     if (BlockJobVerbTable[bv][job->status]) {
-         return 0;
-     }
-     error_setg(errp, "Job '%s' in state '%s' cannot accept command verb =
-'%s'",
--               job->id, qapi_enum_lookup(&BlockJobStatus_lookup, job->st=
-atus),
--               qapi_enum_lookup(&BlockJobVerb_lookup, bv));
-+               job->id, BlockJobStatus_str(job->status), BlockJobVerb_st=
-r(bv));
-     return -EPERM;
- }
-=20
---=20
+diff --git a/block/gluster.c b/block/gluster.c
+index 296e036b3d..4adc1a875b 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -167,7 +167,12 @@ static QemuOptsList runtime_unix_opts = {
+         {
+             .name = GLUSTER_OPT_SOCKET,
+             .type = QEMU_OPT_STRING,
+-            .help = "socket file path)",
++            .help = "socket file path (legacy)",
++        },
++        {
++            .name = GLUSTER_OPT_PATH,
++            .type = QEMU_OPT_STRING,
++            .help = "socket file path (QAPI)",
+         },
+         { /* end of list */ }
+     },
+@@ -615,10 +620,18 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+                 goto out;
+             }
+ 
+-            ptr = qemu_opt_get(opts, GLUSTER_OPT_SOCKET);
++            ptr = qemu_opt_get(opts, GLUSTER_OPT_PATH);
++            if (!ptr) {
++                ptr = qemu_opt_get(opts, GLUSTER_OPT_SOCKET);
++            } else if (qemu_opt_get(opts, GLUSTER_OPT_SOCKET)) {
++                error_setg(&local_err,
++                           "Conflicting parameters 'path' and 'socket'");
++                error_append_hint(&local_err, GERR_INDEX_HINT, i);
++                goto out;
++            }
+             if (!ptr) {
+                 error_setg(&local_err, QERR_MISSING_PARAMETER,
+-                           GLUSTER_OPT_SOCKET);
++                           GLUSTER_OPT_PATH);
+                 error_append_hint(&local_err, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+@@ -684,7 +697,7 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
+                              "file.server.0.host=1.2.3.4,"
+                              "file.server.0.port=24007,"
+                              "file.server.1.transport=unix,"
+-                             "file.server.1.socket=/var/run/glusterd.socket ..."
++                             "file.server.1.path=/var/run/glusterd.socket ..."
+                              "\n");
+             return ret;
+         }
+-- 
 2.13.6
