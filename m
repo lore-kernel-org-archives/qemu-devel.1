@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1f3NzD-0008VU-EE
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:40 -0400
+	(envelope-from <jan.kiszka@web.de>) id 1f3NzF-00004x-Gq
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1f3NzA-0008Am-7w
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:39 -0400
-Received: from mout.web.de ([212.227.15.3]:54891)
+	(envelope-from <jan.kiszka@web.de>) id 1f3NzE-0008Db-PL
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:41 -0400
+Received: from mout.web.de ([212.227.15.4]:45141)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1f3Nz9-0008AH-UP
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:36 -0400
+	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1f3NzE-0008Cl-CB
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 11:36:40 -0400
 From: Jan Kiszka <jan.kiszka@web.de>
-Date: Tue,  3 Apr 2018 17:36:10 +0200
-Message-Id: <cover.1522769774.git.jan.kiszka@web.de>
-Subject: [Qemu-devel] [PATCH v2 0/4] target-i386: Enhance SVM support
+Date: Tue,  3 Apr 2018 17:36:13 +0200
+Message-Id: <6f4d44ffde55d074cbceb48309c1678600abad2f.1522769774.git.jan.kiszka@web.de>
+In-Reply-To: <cover.1522769774.git.jan.kiszka@web.de>
+References: <cover.1522769774.git.jan.kiszka@web.de>
+In-Reply-To: <cover.1522769774.git.jan.kiszka@web.de>
+References: <cover.1522769774.git.jan.kiszka@web.de>
+Subject: [Qemu-devel] [PATCH v2 3/4] target-i386: Mark cpu_vmexit noreturn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +28,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 Cc: Valentine Sinitsyn <valentine.sinitsyn@gmail.com>
 
-These patches allow to run Jailhouse in emulated x86-64 mode under QEMU.
-AMD IOMMU only works with one additional hack, but that's a different
-story, and we can test these changes without it.
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Change in v2:
- - build fix for 32-bit hosts
- - replaces NPT exitinfo magics with symbolic constants
+It calls cpu_loop_exit in system emulation mode (and should never be
+called in user emulation mode).
 
-Jan
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ target/i386/cpu.h        | 4 ++--
+ target/i386/svm_helper.c | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Jan Kiszka (4):
-  target-i386: Add NMI interception to SVM
-  target-i386: Allow interrupt injection after STGI
-  target-i386: Mark cpu_vmexit noreturn
-  target-i386: Add NPT support
-
- target/i386/cpu.c         |   2 +-
- target/i386/cpu.h         |  10 ++-
- target/i386/excp_helper.c | 216 +++++++++++++++++++++++++++++++++++++++++++++-
- target/i386/mem_helper.c  |   6 +-
- target/i386/seg_helper.c  |   1 +
- target/i386/svm.h         |  14 +++
- target/i386/svm_helper.c  |  23 +++++
- target/i386/translate.c   |   3 +-
- 8 files changed, 266 insertions(+), 9 deletions(-)
-
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 78db1b833a..d711634c2f 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1764,8 +1764,8 @@ void helper_lock_init(void);
+ /* svm_helper.c */
+ void cpu_svm_check_intercept_param(CPUX86State *env1, uint32_t type,
+                                    uint64_t param, uintptr_t retaddr);
+-void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
+-                uintptr_t retaddr);
++void QEMU_NORETURN cpu_vmexit(CPUX86State *nenv, uint32_t exit_code,
++                              uint64_t exit_info_1, uintptr_t retaddr);
+ void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1);
+ 
+ /* seg_helper.c */
+diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+index 303106981c..e3288955f1 100644
+--- a/target/i386/svm_helper.c
++++ b/target/i386/svm_helper.c
+@@ -62,6 +62,7 @@ void helper_invlpga(CPUX86State *env, int aflag)
+ void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
+                 uintptr_t retaddr)
+ {
++    assert(0);
+ }
+ 
+ void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
 -- 
 2.13.6
