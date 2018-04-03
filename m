@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f3MPf-0006hh-K4
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:55:57 -0400
+	(envelope-from <jcody@redhat.com>) id 1f3MQ1-0006yS-R9
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f3MPb-0000qH-Ji
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:55:51 -0400
-Date: Tue, 3 Apr 2018 09:55:38 -0400
+	(envelope-from <jcody@redhat.com>) id 1f3MPy-0001HG-Sa
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:56:13 -0400
+Date: Tue, 3 Apr 2018 09:55:57 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180403135538.GB31365@localhost.localdomain>
+Message-ID: <20180403135557.GC31365@localhost.localdomain>
 References: <20180403110810.25624-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -38,9 +38,6 @@ On Tue, Apr 03, 2018 at 01:08:10PM +0200, Kevin Wolf wrote:
 > 
 > Cc: qemu-stable@nongnu.org
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
 > ---
 >  block/gluster.c | 21 +++++++++++++++++----
 >  1 file changed, 17 insertions(+), 4 deletions(-)
@@ -96,3 +93,11 @@ Reviewed-by: Jeff Cody <jcody@redhat.com>
 > -- 
 > 2.13.6
 > 
+
+Thanks,
+
+Applied to my block branch:
+
+git://github.com/codyprime/qemu-kvm-jtc block
+
+-Jeff
