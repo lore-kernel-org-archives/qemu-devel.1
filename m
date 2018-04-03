@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f3NOH-0006wS-0W
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:58:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f3NOi-0007Es-2G
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:58:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f3NOD-0006uc-7V
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:58:29 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:33873)
+	(envelope-from <peter.maydell@linaro.org>) id 1f3NOh-0007Az-Bo
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:58:56 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f3NOD-0006uM-0u
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:58:25 -0400
-Received: by mail-ot0-x229.google.com with SMTP id m7-v6so19731914otd.1
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 07:58:24 -0700 (PDT)
+	id 1f3NOh-0007Ah-6m
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 10:58:55 -0400
+Received: by mail-oi0-x244.google.com with SMTP id 188-v6so16231436oih.8
+	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 07:58:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1522344417-60114-1-git-send-email-mjc@sifive.com>
-References: <1522344417-60114-1-git-send-email-mjc@sifive.com>
+In-Reply-To: <20180329135730.95774-1-dgilbert@redhat.com>
+References: <20180329135730.95774-1-dgilbert@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Apr 2018 15:58:03 +0100
-Message-ID: <CAFEAcA-+SHHZzbEUg7i7uiTOmhuTPX=QiHQkakGbj+SupJ0KQg@mail.gmail.com>
+Date: Tue, 3 Apr 2018 15:58:34 +0100
+Message-ID: <CAFEAcA8cNbS0wtk+MT52LXj35sPJToJSztbxrGiBvDZjt__ypg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] RISC-V: Critical fixes for QEMU 2.12
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 29 March 2018 at 18:26, Michael Clark <mjc@sifive.com> wrote:
-> The following changes since commit 47d3b60858d90ac8a0cc3a72af7f95c96781125a:
+On 29 March 2018 at 14:57, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
->   Merge remote-tracking branch 'remotes/riscv/tags/riscv-qemu-2.12-important-fixes' into staging (2018-03-28 22:13:38 +0100)
+> The following changes since commit 47d3b60858d90ac8a0cc3a72af7f95c9678112=
+5a:
 >
-> are available in the git repository at:
+>   Merge remote-tracking branch 'remotes/riscv/tags/riscv-qemu-2.12-import=
+ant-fixes' into staging (2018-03-28 22:13:38 +0100)
 >
->   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.12-critical-fixes
+> are available in the Git repository at:
 >
-> for you to fetch changes up to b02403363f1056421d120c8e974fdf9c76a84f95:
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20180329a
 >
->   RISC-V: Workaround for critical mstatus.FS bug (2018-03-29 10:22:26 -0700)
+> for you to fetch changes up to 0746a92612276aee69e66dfe6782b0f882d221d5:
 >
-> ----------------------------------------------------------------
-> RISC-V: Critical fixes for QEMU 2.12
->
-> This series includes changes that are considered release critical,
-> such as floating point register file corruption under SMP Linux
-> due to incorrect handling of mstatus.FS.
->
-> This workaround will be replaced with a more comprehensive fix
-> for mstatus.FS handling in QEMU 2.13.
+>   migration: Don't activate block devices if using -S (2018-03-29 14:53:1=
+6 +0100)
 >
 > ----------------------------------------------------------------
+> Migration pull (small fixes)
+>
+> A pair of two small fixes for 2.12.
+>
+> ----------------------------------------------------------------
+> Dr. David Alan Gilbert (1):
+>       migration: Don't activate block devices if using -S
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>       migration: fix pfd leak
+>
+>  migration/migration.c    | 22 +++++++++++++++-------
+>  migration/postcopy-ram.c |  1 +
+>  2 files changed, 16 insertions(+), 7 deletions(-)
+>
 
 Applied, thanks.
 
