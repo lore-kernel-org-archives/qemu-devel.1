@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3LX2-0004XA-Hd
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:59:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1f3LaU-0006Nb-PL
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:03:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3LWz-0007BD-BF
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:59:24 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:45848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3LWy-0007Ap-WB
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:59:21 -0400
-Received: by mail-wr0-x242.google.com with SMTP id u11so18632092wri.12
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 05:59:20 -0700 (PDT)
-Date: Tue, 3 Apr 2018 13:59:18 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180403125918.GF4467@stefanha-x1.localdomain>
-References: <20180326061157.24865-1-peterx@redhat.com>
-	<20180326104739.GC5267@localhost.localdomain>
-	<20180327022155.GE17789@xz-mi>
+	(envelope-from <eblake@redhat.com>) id 1f3LaP-000180-RQ
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:02:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37918 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f3LaP-00016S-KU
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 09:02:53 -0400
+References: <20180403050115.6037-1-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e9d37d29-82ae-ac3e-9919-62586206c88a@redhat.com>
+Date: Tue, 3 Apr 2018 08:02:44 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z+pzSjdB7cqptWpS"
-Content-Disposition: inline
-In-Reply-To: <20180327022155.GE17789@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
+In-Reply-To: <20180403050115.6037-1-peterx@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5ll1PVVbF4bcqC4uh3Zm0vuFKtHAAVZc4"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] monitor: bind dispatch bh to
+ iohandler context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-
---z+pzSjdB7cqptWpS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5ll1PVVbF4bcqC4uh3Zm0vuFKtHAAVZc4
+From: Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi
+ <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <e9d37d29-82ae-ac3e-9919-62586206c88a@redhat.com>
+Subject: Re: [PATCH for-2.12] monitor: bind dispatch bh to iohandler context
+References: <20180403050115.6037-1-peterx@redhat.com>
+In-Reply-To: <20180403050115.6037-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 27, 2018 at 10:21:55AM +0800, Peter Xu wrote:
-> On Mon, Mar 26, 2018 at 12:47:39PM +0200, Kevin Wolf wrote:
-> > Am 26.03.2018 um 08:11 hat Peter Xu geschrieben:
-> > > If there are more than one events, wait_until_completed() might return
-> > > the 2nd event even if the 1st event is JOB_COMPLETED, since the for l=
-oop
-> > > will continue to run even if completed is set to True.
-> > >=20
-> > > It never happened before, but it can be triggered when OOB is enabled
-> > > due to the RESUME startup message. Fix that up by removing the boolean
-> > > and make sure we return the correct event.
-> > >=20
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  tests/qemu-iotests/iotests.py | 20 ++++++++------------
-> > >  1 file changed, 8 insertions(+), 12 deletions(-)
-> > >=20
-> > > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
-ts.py
-> > > index b5d7945af8..11704e6583 100644
-> > > --- a/tests/qemu-iotests/iotests.py
-> > > +++ b/tests/qemu-iotests/iotests.py
-> > > @@ -470,18 +470,14 @@ class QMPTestCase(unittest.TestCase):
-> > > =20
-> > >      def wait_until_completed(self, drive=3D'drive0', check_offset=3D=
-True):
-> > >          '''Wait for a block job to finish, returning the event'''
-> > > -        completed =3D False
-> > > -        while not completed:
-> > > -            for event in self.vm.get_qmp_events(wait=3DTrue):
-> > > -                if event['event'] =3D=3D 'BLOCK_JOB_COMPLETED':
-> > > -                    self.assert_qmp(event, 'data/device', drive)
-> > > -                    self.assert_qmp_absent(event, 'data/error')
-> > > -                    if check_offset:
-> > > -                        self.assert_qmp(event, 'data/offset', event[=
-'data']['len'])
-> > > -                    completed =3D True
-> > > -
-> > > -        self.assert_no_active_block_jobs()
-> > > -        return event
-> > > +        for event in self.vm.get_qmp_events(wait=3DTrue):
-> > > +            if event['event'] =3D=3D 'BLOCK_JOB_COMPLETED':
-> > > +                self.assert_qmp(event, 'data/device', drive)
-> > > +                self.assert_qmp_absent(event, 'data/error')
-> > > +                if check_offset:
-> > > +                    self.assert_qmp(event, 'data/offset', event['dat=
-a']['len'])
-> > > +                self.assert_no_active_block_jobs()
-> > > +                return event
-> > > =20
-> > >      def wait_ready(self, drive=3D'drive0'):
-> > >          '''Wait until a block job BLOCK_JOB_READY event'''
-> >=20
-> > If an event is pending, but it's not the expected event, won't we return
-> > None now instead of waiting for the BLOCK_JOB_COMPLETED event?
+On 04/03/2018 12:01 AM, Peter Xu wrote:
+> Eric Auger reported the problem days ago that OOB broke ARM when runnin=
+g
+> with libvirt:
 >=20
-> If so, we'll return none.
-
-Kevin is pointing out that this patch is broken.  Previously the
-function waited for BLOCK_JOB_COMPLETED, even when other events were
-pending when we entered the function.  Now it returns None and does not
-wait for BLOCK_JOB_COMPLETED!
-
-> The patch fixes the other case when there
-> are two events: one JOB_COMPLETED plus another (e.g., RESUME) event.
-> When that happens, logically we should return one JOB_COMPLETED event,
-> but the old code will return the other event (e.g., RESUME).
+> http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
 >=20
-> >=20
-> > Wouldn't it be much easier to just add a 'break'?
+> This patch fixes the problem.
 >=20
-> Yes, it's the same.  But IMHO those logics (e.g., the completed
-> variable) are not really needed at all.  This one is simpler.
+> It's not really needed now since we have turned OOB off now, but it's
+> still a bug fix, and it'll start to work when we turn OOB on for ARM.
 
-No, the outer loop is needed so that the function waits until
-BLOCK_JOB_COMPLETED is received.  It's not possible to do it with a
-single for loop.
+It may be more than just ARM affected, and just that ARM happened to
+trigger the problem easier.
 
-Stefan
+I'm queuing this on my qapi tree, and will send a pull request,
+hopefully for -rc2, but even if I miss that, this qualifies as -rc3
+material.
 
---z+pzSjdB7cqptWpS
+>=20
+> The problem was that the monitor dispatcher bottom half was bound to
+> qemu_aio_context, but that context seems to be for block only.  For the=
+
+> rest of the QEMU world we should be using iohandler context.  So
+> assigning monitor dispatcher bottom half to that context.
+>=20
+
+>=20
+> A quick test of mine shows that after this patch applied we can pass al=
+l
+> raw iotests even with OOB on by default.
+>=20
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> CC: Fam Zheng <famz@redhat.com>
+> Reported-by: Eric Auger <eric.auger@redhat.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>=20
+> This patch will fix all known OOB breakages I know so far, but I think
+> for better safety I'll still keep OOB off, and I'll send another patch
+> to turn default OOB on after 2.12 release.
+
+Yes, leaving OOB defaulting to off unless you use x-oob=3Don for 2.12 is
+the most conservative action, although we still want to fix all known
+bugs that you can trigger by using that.
+
+How did you run iotests with OOB on by default, by recompiling the
+binary to undo commit be933ffc2, or by tweaking the iotests scripts to
+pass x-oob=3Don by default?
+
+> ---
+>  monitor.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/monitor.c b/monitor.c
+> index 51f4cf480f..39f8ee17ba 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4467,7 +4467,7 @@ static void monitor_iothread_init(void)
+>       * have assumption to be run on main loop thread.  It would be
+>       * nice that one day we can remove this assumption in the future.
+>       */
+> -    mon_global.qmp_dispatcher_bh =3D aio_bh_new(qemu_get_aio_context()=
+,
+> +    mon_global.qmp_dispatcher_bh =3D aio_bh_new(iohandler_get_aio_cont=
+ext(),
+>                                                monitor_qmp_bh_dispatche=
+r,
+>                                                NULL);
+> =20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--5ll1PVVbF4bcqC4uh3Zm0vuFKtHAAVZc4
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJaw3qmAAoJEJykq7OBq3PIsJMIAIv6jzLjYMj6yPTOXEY+Apjr
-SSd7Cj+LCWTNpXICgEyqeCgeII4tH6rK/JbbJeLCeVyxd7JeAsKHxFtLdO3+UYPL
-0/xDOVmjJskykKffGTOFbyZ6TlKfdPDSVjCcSJaypue4pqMqR6Gx4aSvGYJrJChw
-GWYlz+5U6eAAohvMry7/k5dxAMYrQcUhkAGQYjCLtFYCiBOec1T7C+3vzyIs9s42
-sMqyHGv1naAizsGXaRZ3cSaa1c+37OAjiWq9S/BY0FDk0bwPcOWdsjYANNV7n/yZ
-LVLvvbkpD0Ypk96AX0ufGyeZlAgY8Kt9C1tinG1jpgGrDJEJ7YubL2yJaxVDpoI=
-=+32o
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrDe3QACgkQp6FrSiUn
+Q2oYHgf/YwBplyNcqWDu1YgpBLkbH25fZBK3xn7PWL4hyckzHi2uaXDBjA0wUhvE
+IDrN/nebRjqjhZLUs6xtJPV0GZgI2/OsjkKCv/JtJ7aR5Iw4wbykLQ7U50RViiTW
+ZxyMQgDhNfpnqIzCQdSMxhbGvFH5JWSF/51VkbERmha+b/puZ57aEyUVF2pXI6PP
+Bc7gHKvnm1ir9oUZIqdh3BH6yyTETr+fRkcthXtKzAeMLPQloobRPeYYVadfVwYf
+g9IMrqiU0klP5EtPRuxACMFgM5nANDnDTLwsnhL91M9HQsNFnZlZxqw8WFZ4tfnN
+eF3nu4nU6KQWyi/64e/wwsoqm9Y8Ow==
+=Qvro
 -----END PGP SIGNATURE-----
 
---z+pzSjdB7cqptWpS--
+--5ll1PVVbF4bcqC4uh3Zm0vuFKtHAAVZc4--
