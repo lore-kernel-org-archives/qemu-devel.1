@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f3OZ5-00043k-Iu
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:13:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f3OjA-0001ep-0S
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1f3OZ4-0005FU-Q6
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:13:43 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  3 Apr 2018 12:13:21 -0400
-Message-Id: <20180403161324.24514-1-jcody@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1f3Oj9-0006Vz-3E
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:24:08 -0400
+References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+Date: Tue, 3 Apr 2018 18:23:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] Block patches for 2.12-rc2
+In-Reply-To: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
 
-The following changes since commit f184de7553272223d6af731d7d623a7cebf710=
-b5:
+On 2018-03-30 18:10, Vladimir Sementsov-Ogievskiy wrote:
+> Use MIGRATION events instead of RESUME. Also, make a TODO: enable
+> dirty-bitmaps capability for offline case.
+> 
+> This (likely) fixes racy faults at least of the following types:
+> 
+>     - timeout on waiting for RESUME event
+>     - sha256 mismatch on 136 (138 after this patch)
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> 
+> This patch is a true change for the test anyway. But I don't understand,
+> why (and do really) it fixes the things. And I'm not sure about do we
+> really have a bug in bitmap migration or persistence. So, it's up to you,
+> take it into 2.12... 
+> 
+> It was already discussed, that "STOP" event is bad for tests. What about
+> "RESUME"? How can we miss it? And sha256 mismatch is really something
+> strange.
+> 
+> Max, please check, do it fix 169 for you.
+> 
+>  tests/qemu-iotests/169 | 44 +++++++++++++++++++++++---------------------
+>  1 file changed, 23 insertions(+), 21 deletions(-)
 
-  Merge remote-tracking branch 'remotes/riscv/tags/riscv-qemu-2.12-critic=
-al-fixes' into staging (2018-03-31 09:42:33 +0100)
+This makes the test pass (thanks!), but it still leaves behind five cats...
 
-are available in the git repository at:
-
-  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
-
-for you to fetch changes up to 9dae635afa98f83688806861cefe77ff1b4d76a8:
-
-  gluster: Fix blockdev-add with server.N.type=3Dunix (2018-04-03 09:57:1=
-4 -0400)
-
-----------------------------------------------------------------
-Blockjob and Gluster patches
-----------------------------------------------------------------
-
-Kevin Wolf (1):
-  gluster: Fix blockdev-add with server.N.type=3Dunix
-
-Marc-Andr=C3=A9 Lureau (2):
-  blockjob: leak fix, remove from txn when failing early
-  blockjob: use qapi enum helpers
-
- block/gluster.c | 21 +++++++++++++++++----
- blockjob.c      | 28 +++++++++++++++++-----------
- 2 files changed, 34 insertions(+), 15 deletions(-)
-
---=20
-2.13.6
+Max
