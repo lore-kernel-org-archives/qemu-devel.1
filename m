@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3LLC-0006Li-Bf
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:47:11 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f3LOq-0007sh-D0
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:50:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3LL6-0006Zc-Q2
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:47:10 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3LL6-0006ZE-HP
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:47:04 -0400
-Received: by mail-wr0-x241.google.com with SMTP id 80so18648937wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 03 Apr 2018 05:47:04 -0700 (PDT)
-Date: Tue, 3 Apr 2018 13:47:01 +0100
+	(envelope-from <stefanha@gmail.com>) id 1f3LOk-0000Xh-Ux
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 08:50:56 -0400
+Date: Tue, 3 Apr 2018 13:50:47 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180403124701.GD4467@stefanha-x1.localdomain>
-References: <CAEZT4ROV4k_3qokwB_JmK5NcmWW5nBwN24i_8JjreU++WVoTOw@mail.gmail.com>
+Message-ID: <20180403125047.GE4467@stefanha-x1.localdomain>
+References: <20180323164254.26487-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AbQceqfdZEv+FvjW"
+	protocol="application/pgp-signature"; boundary="PGNNI9BzQDUtgA2J"
 Content-Disposition: inline
-In-Reply-To: <CAEZT4ROV4k_3qokwB_JmK5NcmWW5nBwN24i_8JjreU++WVoTOw@mail.gmail.com>
-Subject: Re: [Qemu-devel] Regarding qemu console?
+In-Reply-To: <20180323164254.26487-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: remove
+ bdrv_dirty_bitmap_make_anon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Arun raj <krarun88@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>
 
 
---AbQceqfdZEv+FvjW
+--PGNNI9BzQDUtgA2J
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 25, 2018 at 06:46:50PM +0530, Arun raj wrote:
-> I'm new to qemu.i'm using qemu 2.11 version in my laptop.In qemu system i
-> have two serial port.If i type the any information on the minicom serial
-> port, this message are redirected into QEMU console. How you are
-> redirecting all message onto qemu console. Are you using any virtual
-> console driver. Which file and whilch driver it does? Can anyone tell me
-> how qemu redirecting messages from serial port?
+On Fri, Mar 23, 2018 at 05:42:53PM +0100, Paolo Bonzini wrote:
+> All this function is doing will be repeated by
+> bdrv_do_release_matching_dirty_bitmap_locked, except
+> resetting bm->persistent.  But even that does not matter
+> because the bitmap will be freed.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/dirty-bitmap.c         | 9 ---------
+>  blockdev.c                   | 1 -
+>  include/block/dirty-bitmap.h | 1 -
+>  3 files changed, 11 deletions(-)
 
-Hi Arun,
-I have a hard time understanding what exactly you are asking.
+CCing Fam and John, who maintain block/dirty-bitmap.c.
 
-Please post the QEMU command-line you used so we can see how the guest
-is configured.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-If you are running minicom inside the guest, then the guest operating
-system's serial device driver transfers the data to the hardware just
-like on a real machine, except that QEMU traps hardware register
-accesses and emulates a serial device instead of a real hardware device.
-
-Stefan
-
---AbQceqfdZEv+FvjW
+--PGNNI9BzQDUtgA2J
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaw3fFAAoJEJykq7OBq3PIAakH/3jngJv3Sc4zQ0Dz9LUaZ/gw
-6NMIZO816w/1Izr6oyLpqNKgAChBLqsALbM47+6Q17IT11Ee4KiWFf29TjDEJgc3
-ps5p0uIcihKG+++ePhhwpbQ81Mywy51dhTqvfH30k8jNaQbfp0V8tBu5PbHfueXe
-AIJE02F0K6y5b8MRI7r2nH/oCiBUSn7/3kiB+JbxIBMIxWxiWCOImU7CCl/RZris
-exoAh8wnToVQRre15iowTR5kNfeVlNqbI3CVgA4cP3Xs1MQKfwBPh5GSKhuIFuah
-Qtc5IW7nx4ZFZLn+kySrWAxEMiL0adt/q86VXI+C4NkNew0sscwO6z/o+6wvZEY=
-=WQfU
+iQEcBAEBAgAGBQJaw3inAAoJEJykq7OBq3PIwTQIAJt6+aM3h1fZrAyk2vK5SW+O
+cIOtdiPYOWSWiwHL9z5lvG3OhcPJqCNFFmMOUjiwdK2XKnK7CO+IqKSJB3FugdV6
+Du8BWh41ySJqifhoyqCf4CmaISV+JVhiy8B9WWNqvWqilvivmUOLNZstlu5FzcPc
+Yv+wSmqM4ollXihvTt6v1IjOpdPolN1Uf46h0wPLRPa4nuN8ZRaO3H0fwSBZNkyJ
+zTPUkQEmu4lbk2QiJ1aPBvrzC3z/Ae5FVBEncz/g1pFayU621RHSD+SV11BxbBAI
+pDm3f8GYKfxs+b2tsZJt14sgJk8iCz262+i7FLenzxVZtXHnUeJeUC3DAHeC/S4=
+=m1ts
 -----END PGP SIGNATURE-----
 
---AbQceqfdZEv+FvjW--
+--PGNNI9BzQDUtgA2J--
