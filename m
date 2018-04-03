@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1f3JHG-00085r-U6
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 06:34:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f3JJr-0000oy-1Z
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 06:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1f3JHD-0002pt-Ru
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 06:34:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38910 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1f3JHD-0002pg-Mi
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 06:34:55 -0400
-From: Michal Privoznik <mprivozn@redhat.com>
-Date: Tue,  3 Apr 2018 12:34:37 +0200
-Message-Id: <3c36db1dc0702763ebb7966cc27428ed67d43804.1522751624.git.mprivozn@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] ccid-card: include libcacard.h only
+	(envelope-from <laurent@vivier.eu>) id 1f3JJo-00043P-2c
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 06:37:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:46193)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f3JJn-00042H-QE
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 06:37:36 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue,  3 Apr 2018 12:35:38 +0200
+Message-Id: <20180403103540.7303-2-laurent@vivier.eu>
+In-Reply-To: <20180403103540.7303-1-laurent@vivier.eu>
+References: <20180403103540.7303-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 1/3] linux-user: fix alpha signal emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +24,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, kraxel@redhat.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-When trying to build with latest libcacard-2.5.1, I hit the
-following error:
+setup_frame() doesn't set correctly the address of the trampoline code.
+The offset of retcode array must be added to the stack frame address.
 
-In file included from hw/usb/ccid-card-passthru.c:12:0:
-/usr/include/cacard/vscard_common.h:26:2: error: #warning "Only <libcacard.h> can be included directly" [-Werror=cpp]
- #warning "Only <libcacard.h> can be included directly"
-
-While it was fixed in libcacard upstream (so that individual
-files can be included directly), it doesn't make much sense.
-Let's switch to including the main libcacard.h and also require
-at least libcacard-2.5.1 which introduced it. It's available
-since late 2015.
-
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180401204653.14211-1-laurent@vivier.eu>
 ---
+ linux-user/signal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff to v1:
-- Introduce configure change to require newer libcacard version
-
- configure                   | 2 +-
- hw/usb/ccid-card-emulated.c | 5 +----
- hw/usb/ccid-card-passthru.c | 2 +-
- 3 files changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/configure b/configure
-index 4d0e92c96c..0edec24fff 100755
---- a/configure
-+++ b/configure
-@@ -4440,7 +4440,7 @@ fi
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 2ea3e0321f..9399f0ec47 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -6367,7 +6367,7 @@ static void setup_frame(int sig, struct target_sigaction *ka,
+                    &frame->retcode[1]);
+         __put_user(INSN_CALLSYS, &frame->retcode[2]);
+         /* imb() */
+-        r26 = frame_addr;
++        r26 = frame_addr + offsetof(struct target_sigframe, retcode);
+     }
  
- # check for smartcard support
- if test "$smartcard" != "no"; then
--    if $pkg_config libcacard; then
-+    if $pkg_config --atleast-version=2.5.1 libcacard; then
-         libcacard_cflags=$($pkg_config --cflags libcacard)
-         libcacard_libs=$($pkg_config --libs libcacard)
-         smartcard="yes"
-diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
-index ea42e4681d..7b538ae6da 100644
---- a/hw/usb/ccid-card-emulated.c
-+++ b/hw/usb/ccid-card-emulated.c
-@@ -27,10 +27,7 @@
-  */
+     unlock_user_struct(frame, frame_addr, 1);
+@@ -6424,7 +6424,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+                    &frame->retcode[1]);
+         __put_user(INSN_CALLSYS, &frame->retcode[2]);
+         /* imb(); */
+-        r26 = frame_addr;
++        r26 = frame_addr + offsetof(struct target_sigframe, retcode);
+     }
  
- #include "qemu/osdep.h"
--#include <eventt.h>
--#include <vevent.h>
--#include <vreader.h>
--#include <vcard_emul.h>
-+#include <cacard/libcacard.h>
- 
- #include "qemu/thread.h"
- #include "qemu/main-loop.h"
-diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-index b7dd3602dc..982d575edd 100644
---- a/hw/usb/ccid-card-passthru.c
-+++ b/hw/usb/ccid-card-passthru.c
-@@ -9,7 +9,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include <cacard/vscard_common.h>
-+#include <cacard/libcacard.h>
- #include "chardev/char-fe.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
+     if (err) {
 -- 
-2.16.1
+2.14.3
