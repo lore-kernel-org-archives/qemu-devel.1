@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f3Osy-0006mM-UX
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:34:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f3Ot1-0006pm-6Q
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f3Osx-0006Xu-Mw
-	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:34:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f3Ot0-0006Zz-0O
+	for qemu-devel@nongnu.org; Tue, 03 Apr 2018 12:34:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  3 Apr 2018 18:33:53 +0200
-Message-Id: <20180403163400.6307-3-kwolf@redhat.com>
+Date: Tue,  3 Apr 2018 18:33:57 +0200
+Message-Id: <20180403163400.6307-7-kwolf@redhat.com>
 In-Reply-To: <20180403163400.6307-1-kwolf@redhat.com>
 References: <20180403163400.6307-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 2/9] block: handle invalid lseek returns
- gracefully
+Subject: [Qemu-devel] [PULL 6/9] block/file-posix: Fix fully preallocated
+ truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Jeff Cody <jcody@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-In commit 223a23c198787328ae75bc65d84edf5fde33c0b6, we implemented a
-workaround in the gluster driver to handle invalid values returned for
-SEEK_DATA or SEEK_HOLE.
+Storing the lseek() result in an int results in it overflowing when the
+file is at least 2 GB big.  Then, we have a 50 % chance of the result
+being "negative" and thus thinking an error occurred when actually
+everything went just fine.
 
-In some instances, these same invalid values can be seen in the posix
-file handler as well - for example, it has been reported on FUSE gluster
-mounts.
+So we should use the correct type for storing the result: off_t.
 
-Calling assert() for these invalid values is overly harsh; we can safely
-return -EIO and allow this case to be treated as a "learned nothing"
-case (e.g., D4 / H4, as commented in the code).
-
-This patch does the same thing that 223a23c198787 did for gluster.c,
-except in file-posix.c
-
-Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reported-by: Daniel P. Berrange <berrange@redhat.com>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1549231
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180228131315.30194-2-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/file-posix.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ block/file-posix.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index d7fb772c14..a2f6d8a8c8 100644
+index a2f6d8a8c8..3794c0007a 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -2114,7 +2114,12 @@ static int find_allocation(BlockDriverState *bs, off_t start,
-     if (offs < 0) {
-         return -errno;          /* D3 or D4 */
-     }
--    assert(offs >= start);
-+
-+    if (offs < start) {
-+        /* This is not a valid return by lseek().  We are safe to just return
-+         * -EIO in this case, and we'll treat it like D4. */
-+        return -EIO;
-+    }
+@@ -1701,6 +1701,7 @@ static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
+     case PREALLOC_MODE_FULL:
+     {
+         int64_t num = 0, left = offset - current_length;
++        off_t seek_result;
  
-     if (offs > start) {
-         /* D2: in hole, next data at offs */
-@@ -2146,7 +2151,12 @@ static int find_allocation(BlockDriverState *bs, off_t start,
-     if (offs < 0) {
-         return -errno;          /* D1 and (H3 or H4) */
-     }
--    assert(offs >= start);
-+
-+    if (offs < start) {
-+        /* This is not a valid return by lseek().  We are safe to just return
-+         * -EIO in this case, and we'll treat it like H4. */
-+        return -EIO;
-+    }
- 
-     if (offs > start) {
          /*
+          * Knowing the final size from the beginning could allow the file
+@@ -1715,8 +1716,8 @@ static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
+ 
+         buf = g_malloc0(65536);
+ 
+-        result = lseek(fd, current_length, SEEK_SET);
+-        if (result < 0) {
++        seek_result = lseek(fd, current_length, SEEK_SET);
++        if (seek_result < 0) {
+             result = -errno;
+             error_setg_errno(errp, -result,
+                              "Failed to seek to the old end of file");
 -- 
 2.13.6
