@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3fdp-0004Ji-P4
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:27:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f3fkl-0000Tu-7n
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3fdm-0003dk-ET
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:27:45 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:50766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f3fdm-0003dD-7B
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:27:42 -0400
-Received: by mail-wm0-x234.google.com with SMTP id t67so19823817wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 03:27:42 -0700 (PDT)
-References: <20180330133525.10994-1-jcmvbkbc@gmail.com>
-	<87vad8cl2v.fsf@linaro.org>
-	<CAMo8BfJV-2wbx=JnudOB_+GZqQziSuuARNpiJ5rhpGH-KwEbWw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAMo8BfJV-2wbx=JnudOB_+GZqQziSuuARNpiJ5rhpGH-KwEbWw@mail.gmail.com>
-Date: Wed, 04 Apr 2018 11:27:39 +0100
-Message-ID: <87muyjcllw.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: call cpu_copy under clone_lock
+	(envelope-from <stefanha@redhat.com>) id 1f3fki-00063X-3V
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41076 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f3fkh-00063Q-VS
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:52 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  4 Apr 2018 11:34:40 +0100
+Message-Id: <20180404103440.19546-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] scripts/qemugdb: support coroutine backtrace
+ in coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+Use the 'select-frame' GDB command to switch stacks instead of manually
+setting the debugged thread's registers (this only works when debugging
+a live process, not in a coredump).
 
-Max Filippov <jcmvbkbc@gmail.com> writes:
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+Vladimir: Does this work for you?
 
-> Hi Alex,
->
-> On Tue, Apr 3, 2018 at 9:26 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->> Max Filippov <jcmvbkbc@gmail.com> writes:
->>
->>> cpu_copy adds newly created CPU object to container/machine/unattached,
->>> but does it w/o proper locking. As a result when multiple threads are
->>> created rapidly QEMU may abort with the following message:
->>>
->>>   GLib-CRITICAL **: g_hash_table_iter_next: assertion
->>>   'ri->version =3D=3D ri->hash_table->version' failed
->>>
->>>   ERROR:qemu/qom/object.c:1663:object_get_canonical_path_component:
->>>   code should not be reached
->>>
->>> Move cpu_copy invocation under clone_lock to fix that.
->>
->> So my main concern is are we duplicating something already (should be?)
->> handled by fork_start/fork_end?
->
-> clone_lock already exists, it protects state in case of thread creation,
-> it just didn't protect enough of it.
->
-> The work done by fork_start/fork_end appears to be heavier than
-> what's needed for thread creation, because fork_start stops all
-> other CPUs (to make sure that child process won't get locks owned
-> by threads that no longer exist in the child process), which is not
-> required for thread creation, hence thread creation uses clone_lock.
+ scripts/qemugdb/coroutine.py | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-I'm wondering if it should be doing more. After all start/end_exclusive
-rely on the cpu list and that isn't updated on thread creation - and
-without that a bunch of other things fail like ld/st exclusive after
-your first new thread is spawned.
-
-This really needs some test cases to check.
-
-So while I think clone_lock fixes this immediate problem I suspect there
-is more to do for this case.
-
->
->> This serialises forks and ensures things like the cpu_list (which ~ a
->> thread list for linux-user) are updated safely.
-
-
---
-Alex Benn=C3=A9e
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index ab699794ab..ed96434aee 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -77,13 +77,11 @@ def bt_jmpbuf(jmpbuf):
+     for i in regs:
+         old[i] = gdb.parse_and_eval('(uint64_t)$%s' % i)
+ 
+-    for i in regs:
+-        gdb.execute('set $%s = %s' % (i, regs[i]))
++    gdb.execute('select-frame %s %s' % (regs['rsp'], regs['rip']))
+ 
+     gdb.execute('bt')
+ 
+-    for i in regs:
+-        gdb.execute('set $%s = %s' % (i, old[i]))
++    gdb.execute('select-frame %s %s' % (old['rsp'], old['rip']))
+ 
+ def coroutine_to_jmpbuf(co):
+     coroutine_pointer = co.cast(gdb.lookup_type('CoroutineUContext').pointer())
+-- 
+2.14.3
