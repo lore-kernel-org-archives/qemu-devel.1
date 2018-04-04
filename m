@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f3iRM-0006W0-AJ
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:27:05 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f3iYF-0001Cb-5d
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f3iRI-00059x-8L
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:27:04 -0400
-Resent-Message-Id: <E1f3iRI-00059x-8L@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21045)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f3iY8-0007Zz-WA
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:34:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51582)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f3iRI-00059g-0Q
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:27:00 -0400
-In-Reply-To: <1522846444-31725-1-git-send-email-wexu@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152284748683.1698.15229434900044918804@71c20359a636>
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1f3iY8-0007Zj-Ni
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:34:04 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w34DUjse039851
+	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 09:34:03 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h4vf3ar55-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 09:34:03 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Wed, 4 Apr 2018 09:34:01 -0400
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
+	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
+	<ce32e96c-f448-c375-cc25-96bb3cf35d69@linux.vnet.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Wed, 4 Apr 2018 09:33:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 4 Apr 2018 06:11:27 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/8] virtio-net 1.1 userspace backend
- support
+In-Reply-To: <ce32e96c-f448-c375-cc25-96bb3cf35d69@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <3735c70a-2b6b-1962-08bb-8badcad7b487@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +47,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wexu@redhat.com
-Cc: famz@redhat.com, jasowang@redhat.com, mst@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com, qemu-devel@nongnu.org
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjI4NDY0NDQtMzE3MjUtMS1naXQtc2VuZC1lbWFpbC13ZXh1QHJlZGhhdC5j
-b20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC84XSB2aXJ0aW8tbmV0IDEuMSB1
-c2Vyc3BhY2UgYmFja2VuZCBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICAwOTRiNjJjZDljLi5l
-NWVmYTFmNWYyICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
-ICBwYXRjaGV3LzE1MjI4NDY0NDQtMzE3MjUtMS1naXQtc2VuZC1lbWFpbC13ZXh1QHJlZGhhdC5j
-b20gLT4gcGF0Y2hldy8xNTIyODQ2NDQ0LTMxNzI1LTEtZ2l0LXNlbmQtZW1haWwtd2V4dUByZWRo
-YXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMjkxMTMzMjAu
-ODA1My0xLWNvaHVja0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAzMjkxMTMzMjAuODA1My0x
-LWNvaHVja0ByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
-ODA0MDQxMTQ3MDkuNDUxMTgtMS1qaWFuZ3NoYW5sYWlAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAx
-ODA0MDQxMTQ3MDkuNDUxMTgtMS1qaWFuZ3NoYW5sYWlAZ21haWwuY29tClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKYTVlZDRmOTM1NCB2aXJ0aW86IHF1ZXVlIHBvcCBzdXBwb3J0IGZv
-ciBwYWNrZWQgcmluZwplZGEzOGNjY2ZjIHZpcnRpbzogZ2V0IGF2YWlsIGJ5dGVzIGNoZWNrIGZv
-ciBwYWNrZWQgcmluZwpkNmI3YjhmMTkyIHZpcnRpbzogZmx1c2gvcHVzaCBzdXBwb3J0IGZvciBw
-YWNrZWQgcmluZwoyYWUxZjIzNGRjIHZpcnRpbzogbm90aWZpY2F0aW9uIHR3ZWFrIGZvciBwYWNr
-ZWQgcmluZwo1YzQ0YjY3NjI5IHZpcnRpbzogYWRkIGRldGFjaCBlbGVtZW50IGZvciBwYWNrZWQg
-cmluZygxLjEpCjdiYzczNzJlOTMgdmlydGlvOiBhZGQgZW1wdHkgY2hlY2sgZm9yIHBhY2tlZCBy
-aW5nCmNmMzk5ZGEwMzUgdmlydGlvOiBtZW1vcnkgY2FjaGUgZm9yIHBhY2tlZCByaW5nCjYwNmVj
-NWRjMjMgdmlydGlvOiBmZWF0dXJlIGJpdCwgZGF0YSBzdHJ1Y3R1cmUgZm9yIHBhY2tlZCByaW5n
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IHZpcnRpbzogZmVhdHVy
-ZSBiaXQsIGRhdGEgc3RydWN0dXJlIGZvciBwYWNrZWQgcmluZy4uLgpFUlJPUjogb3BlbiBicmFj
-ZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiMyMTogRklMRTogaHcv
-dmlydGlvL3ZpcnRpby5jOjQzOgordHlwZWRlZiBzdHJ1Y3QgVlJpbmdEZXNjUGFja2VkCit7CgpF
-UlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5l
-CiM2NDogRklMRTogaHcvdmlydGlvL3ZpcnRpby5jOjEwNDoKK3R5cGVkZWYgc3RydWN0IFZSaW5n
-UGFja2VkCit7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAy
-Lzg6IHZpcnRpbzogbWVtb3J5IGNhY2hlIGZvciBwYWNrZWQgcmluZy4uLgpDaGVja2luZyBQQVRD
-SCAzLzg6IHZpcnRpbzogYWRkIGVtcHR5IGNoZWNrIGZvciBwYWNrZWQgcmluZy4uLgpFUlJPUjog
-ImZvbyogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojNDA6IEZJTEU6IGh3L3ZpcnRpby92aXJ0
-aW8uYzo0NjM6CitzdGF0aWMgaW5saW5lIGJvb2wgaXNfZGVzY19hdmFpbChzdHJ1Y3QgVlJpbmdE
-ZXNjUGFja2VkKiBkZXNjKQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50
-aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNDI6IEZJTEU6IGh3L3ZpcnRpby92aXJ0aW8uYzo0NjU6
-CisgICAgcmV0dXJuICghIShkZXNjLT5mbGFncyAmIEFWQUlMX0RFU0NfUEFDS0VEKDEpKSAhPQoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc3OiBGSUxFOiBody92aXJ0aW8vdmly
-dGlvLmM6NTEzOgorICAgIHZyaW5nX2Rlc2NfcmVhZF9wYWNrZWQodnEtPnZkZXYsICZkZXNjLCAm
-Y2FjaGUtPmRlc2NfcGFja2VkLCB2cS0+bGFzdF9hdmFpbF9pZHgpOwoKdG90YWw6IDIgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0Lzg6IHZpcnRpbzogYWRkIGRldGFjaCBlbGVt
-ZW50IGZvciBwYWNrZWQgcmluZygxLjEpLi4uCkNoZWNraW5nIFBBVENIIDUvODogdmlydGlvOiBu
-b3RpZmljYXRpb24gdHdlYWsgZm9yIHBhY2tlZCByaW5nLi4uCkNoZWNraW5nIFBBVENIIDYvODog
-dmlydGlvOiBmbHVzaC9wdXNoIHN1cHBvcnQgZm9yIHBhY2tlZCByaW5nLi4uCkNoZWNraW5nIFBB
-VENIIDcvODogdmlydGlvOiBnZXQgYXZhaWwgYnl0ZXMgY2hlY2sgZm9yIHBhY2tlZCByaW5nLi4u
-CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
-ZW1lbnQKIzEyNTogRklMRTogaHcvdmlydGlvL3ZpcnRpby5jOjEwNTY6CisgICAgICAgIH0gd2hp
-bGUgKGRlc2MuZmxhZ3MgJiBWUklOR19ERVNDX0ZfTkVYVCk7ClsuLi5dCgp0b3RhbDogMSBlcnJv
-cnMsIDAgd2FybmluZ3MsIDE1NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA4Lzg6IHZpcnRpbzogcXVldWUgcG9wIHN1
-cHBvcnQgZm9yIHBhY2tlZCByaW5nLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 04/04/2018 07:09 AM, Pierre Morel wrote:
+> On 02/04/2018 18:36, Tony Krowiak wrote:
+>> On 03/26/2018 05:03 AM, Pierre Morel wrote:
+>>> On 26/03/2018 10:32, David Hildenbrand wrote:
+>>>> On 16.03.2018 00:24, Tony Krowiak wrote:
+>>>>> If the CPU model indicates that AP facility is installed on
+>>>>> the guest (i.e., -cpu xxxx,ap=on), then the expectation is that
+>>>>> the AP bus running in the guest will initialize; however, if the
+>>>>> AP instructions are not being interpreted by the firmware, then
+>>>>> they will be intercepted and routed back to QEMU for handling.
+>>>>> If a handler is not defined to process the intercepted instruciton,
+>>>>> t
+>>> ...snip...
+>>>>
+>>>>> +int ap_device_handle_nqap(S390CPU *cpu)
+>>>>> +{
+>>>>> +    CPUS390XState *env = &cpu->env;
+>>>>> +
+>>>>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] = 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>>> +
+>>>>> +    return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +
+>>>>> +int ap_device_handle_dqap(S390CPU *cpu)
+>>>>> +{
+>>>>> +    CPUS390XState *env = &cpu->env;
+>>>>> +
+>>>>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] = 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>>> +
+>>>>> +    return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +
+>>>>> +int ap_device_handle_pqap(S390CPU *cpu)
+>>>>> +{
+>>>>> +    CPUS390XState *env = &cpu->env;
+>>>>> +    int fc = 4 & (env->regs[0] >> 24);
+>>>>> +
+>>>>> +    /*
+>>>>> +     * The Query Configuration Information (QCI) function (fc == 
+>>>>> 4) does not
+>>>>> +     * set a response code in reg 1, so check for that along with 
+>>>>> the
+>>>>> +     * AP feature.
+>>>>> +     */
+>>>>> +    if ((fc != 4) && s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] = 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>> This would imply an operation exception in case fc==4, which sounds 
+>>>> very
+>>>> wrong.
+>>>
+>>> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must 
+>>> be tested
+>>> to know what to answer.
+>>> If the feature is there, QCI must be answered correctly.
+>> This is an interesting proposition which raises several issues that 
+>> will need to
+>> be addressed. The only time the PQAP(QCI) instruction is intercepted 
+>> is when:
+>> * A vfio-ap device is NOT defined for the guest because the vfio_ap 
+>> device driver
+>>   will set ECA.28 and the PQAP(QCI) instruction will be interpreted
+>> * STFLE.12 is set for the guest
+>>
+>> You say that the QCI must be answered correctly, but what is the 
+>> correct response?
+>> If we return the matrix - i.e., APM, ADM and AQM - configured via the 
+>> mediated
+>> matrix device's sysfs attributes files, then if any APQNs are defined 
+>> in the matrix,
+>> we will have to handle *ALL* AP instructions by executing them on 
+>> behalf of the
+>> guest. I suppose we could return an empty matrix in which case the AP 
+>> bus will come
+>> up without any devices on the guest, but what is the expectation of 
+>> an admin who
+>> deliberately configures the mediated matrix device? Should we forego 
+>> handling interception
+>> of AP instructions and consider a guest configuration that turns on 
+>> S390_FEAT_AP but
+>> does not define a vfio-ap device to be erroneous and terminate 
+>> starting of the guest?
+>> Anybody have any thoughts?
+>>>
+>>>
+>>> there are also some error situations to handle in all three functions.
+>> To what error situations are you referring?
+>
+> program exceptions, like access, privilege or specification exceptions.
+Are you suggesting that these handlers need to verify that the instruction
+specification is correct? For example, the NQAP instruction - NQAP r1,r2 -
+expects an even-odd pair of general registers in the r1 and r2 and must
+designate an even register; otherwise a specification exception is
+recognized. Are you saying that the handler for NQAP must verify this
+requirement and inject a specification exception if it is not met? If not,
+then can you provide a specific example of what you are talking about?
+>
+>
+>
+>>>
+>>>
+>>>
+>>>>
+>>>> Hard to review without access to documentation. (hard to understand 
+>>>> why
+>>>> such stuff is to be kept confidential for decades)
+>>>>
+>>>>> +
+>>>>> +    return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +
+>>>>>   static Property vfio_ap_properties[] = {
+>>>>>       DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
+>>>>>       DEFINE_PROP_END_OF_LIST(),
+>>>>> diff --git a/include/hw/s390x/ap-device.h 
+>>>>> b/include/hw/s390x/ap-device.h
+>>>>> index 693df90..d45ae38 100644
+>>>>> --- a/include/hw/s390x/ap-device.h
+>>>>> +++ b/include/hw/s390x/ap-device.h
+>>>>> @@ -11,6 +11,8 @@
+>>>>>   #ifndef HW_S390X_AP_DEVICE_H
+>>>>>   #define HW_S390X_AP_DEVICE_H
+>>>>
+>>>
+>>
+>>
+>
