@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3gWW-0005Ox-JT
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:24:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1f3gZr-0006oL-5v
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3gWT-0004xA-7w
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:24:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37286 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1f3gZm-0007hc-T8
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59042 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f3gWT-0004wh-2w
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:24:13 -0400
-References: <1519324303-5674-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1519324303-5674-4-git-send-email-aleksandar.markovic@rt-rk.com>
-	<87tvsrclsh.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6b04fe74-2a84-63d8-5519-fd2fdfe3f4a3@redhat.com>
-Date: Wed, 4 Apr 2018 13:23:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <87tvsrclsh.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] hw/mips_int: hold BQL for all
- interrupt requests
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f3gZm-0007h8-Kn
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3DB807B4AD
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 11:27:38 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed,  4 Apr 2018 13:27:24 +0200
+Message-Id: <20180404112731.5922-2-quintela@redhat.com>
+In-Reply-To: <20180404112731.5922-1-quintela@redhat.com>
+References: <20180404112731.5922-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 1/8] qemu-sockets: Export
+ SocketAddress_to_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <aleksandar.markovic@mips.com>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Goran Ferenc <goran.ferenc@mips.com>, Miodrag Dinic <miodrag.dinic@mips.com>, Petar Jovanovic <petar.jovanovic@mips.com>, Raghu Gandham <raghu.gandham@mips.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 04/04/2018 12:23, Alex Benn=C3=A9e wrote:
->=20
->> From: Aleksandar Markovic <aleksandar.markovic@mips.com>
->>
->> Make sure BQL is held for all interrupt requests.
->>
->> For MTTCG-enabled configurations, handling soft and hard interrupts
->> between vCPUs must be properly locked. By acquiring BQL, make sure
->> all paths triggering an IRQ are synchronized.
->>
->> Signed-off-by: Miodrag Dinic <miodrag.dinic@mips.com>
->> Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+Migration code needs that function in hmp.c (so we need to export it),
+and it needs it on tests/migration-test.c, so we need to move it to a
+place where it is compiled into the test framework.
 
-Is this actually necessary?  What paths are not taking the lock?
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ chardev/char-socket.c  | 29 -----------------------------
+ include/qemu/sockets.h |  3 +++
+ util/qemu-sockets.c    | 29 +++++++++++++++++++++++++++++
+ 3 files changed, 32 insertions(+), 29 deletions(-)
 
-Thanks,
-
-Paolo
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 159e69c3b1..3bbf3a37a0 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -382,35 +382,6 @@ static void tcp_chr_free_connection(Chardev *chr)
+     s->connected = 0;
+ }
+ 
+-static char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
+-                                  bool is_listen, bool is_telnet)
+-{
+-    switch (addr->type) {
+-    case SOCKET_ADDRESS_TYPE_INET:
+-        return g_strdup_printf("%s%s:%s:%s%s", prefix,
+-                               is_telnet ? "telnet" : "tcp",
+-                               addr->u.inet.host,
+-                               addr->u.inet.port,
+-                               is_listen ? ",server" : "");
+-        break;
+-    case SOCKET_ADDRESS_TYPE_UNIX:
+-        return g_strdup_printf("%sunix:%s%s", prefix,
+-                               addr->u.q_unix.path,
+-                               is_listen ? ",server" : "");
+-        break;
+-    case SOCKET_ADDRESS_TYPE_FD:
+-        return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.str,
+-                               is_listen ? ",server" : "");
+-        break;
+-    case SOCKET_ADDRESS_TYPE_VSOCK:
+-        return g_strdup_printf("%svsock:%s:%s", prefix,
+-                               addr->u.vsock.cid,
+-                               addr->u.vsock.port);
+-    default:
+-        abort();
+-    }
+-}
+-
+ static void update_disconnected_filename(SocketChardev *s)
+ {
+     Chardev *chr = CHARDEV(s);
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 8140fea685..efea0ea850 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -110,4 +110,7 @@ SocketAddress *socket_remote_address(int fd, Error **errp);
+  */
+ SocketAddress *socket_address_flatten(SocketAddressLegacy *addr);
+ 
++char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
++                           bool is_listen, bool is_telnet);
++
+ #endif /* QEMU_SOCKETS_H */
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 8bd8bb64eb..09f04bf76b 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1333,3 +1333,32 @@ SocketAddress *socket_address_flatten(SocketAddressLegacy *addr_legacy)
+ 
+     return addr;
+ }
++
++char *SocketAddress_to_str(const char *prefix, SocketAddress *addr,
++                                  bool is_listen, bool is_telnet)
++{
++    switch (addr->type) {
++    case SOCKET_ADDRESS_TYPE_INET:
++        return g_strdup_printf("%s%s:%s:%s%s", prefix,
++                               is_telnet ? "telnet" : "tcp",
++                               addr->u.inet.host,
++                               addr->u.inet.port,
++                               is_listen ? ",server" : "");
++        break;
++    case SOCKET_ADDRESS_TYPE_UNIX:
++        return g_strdup_printf("%sunix:%s%s", prefix,
++                               addr->u.q_unix.path,
++                               is_listen ? ",server" : "");
++        break;
++    case SOCKET_ADDRESS_TYPE_FD:
++        return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd.str,
++                               is_listen ? ",server" : "");
++        break;
++    case SOCKET_ADDRESS_TYPE_VSOCK:
++        return g_strdup_printf("%svsock:%s:%s", prefix,
++                               addr->u.vsock.cid,
++                               addr->u.vsock.port);
++    default:
++        abort();
++    }
++}
+-- 
+2.14.3
