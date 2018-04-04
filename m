@@ -1,44 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f3gFM-0005Ly-IM
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:06:33 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f3gHh-0006ZR-RZ
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:08:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f3gFI-0005JW-GJ
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:06:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1f3gFI-0005JB-72
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:06:28 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w34B4Biv056070
-	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 07:06:26 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h4vvma0r2-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 07:06:26 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Wed, 4 Apr 2018 12:06:21 +0100
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
-	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
-	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
-	<20180403113619.54ff1e18.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Wed, 4 Apr 2018 13:06:15 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1f3gHg-0006ov-MK
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:08:57 -0400
+Date: Wed, 4 Apr 2018 20:56:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180404105659.GC20851@umbus.fritz.box>
+References: <20180402150254.38B857456A2@zero.eik.bme.hu>
+	<alpine.BSF.2.21.1804041123590.39205@zero.eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <20180403113619.54ff1e18.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <3e3ed537-d025-164c-aae5-00256aa251e7@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
- interception
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="f+W+jCU1fRNres8c"
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.1804041123590.39205@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] roms/u-boot-sam460ex: Change to
+ qemu git mirror and update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,87 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 
-On 03/04/2018 11:36, Cornelia Huck wrote:
-> On Mon, 2 Apr 2018 12:36:27 -0400
-> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
->
->> On 03/26/2018 05:03 AM, Pierre Morel wrote:
->>> On 26/03/2018 10:32, David Hildenbrand wrote:
->>>> On 16.03.2018 00:24, Tony Krowiak wrote:
->>>>> +    /*
->>>>> +     * The Query Configuration Information (QCI) function (fc =3D=3D=
- 4)
->>>>> does not
->>>>> +     * set a response code in reg 1, so check for that along with =
-the
->>>>> +     * AP feature.
->>>>> +     */
->>>>> +    if ((fc !=3D 4) && s390_has_feat(S390_FEAT_AP)) {
->>>>> +        env->regs[1] =3D 0x10000;
->>>>> +
->>>>> +        return 0;
->>>>> +    }
->>>> This would imply an operation exception in case fc=3D=3D4, which sou=
-nds very
->>>> wrong.
->>> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must b=
-e
->>> tested
->>> to know what to answer.
->>> If the feature is there, QCI must be answered correctly.
->> This is an interesting proposition which raises several issues that wi=
-ll
->> need to
->> be addressed. The only time the PQAP(QCI) instruction is intercepted i=
-s
->> when:
->> * A vfio-ap device is NOT defined for the guest because the vfio_ap
->> device driver
->>     will set ECA.28 and the PQAP(QCI) instruction will be interpreted
->> * STFLE.12 is set for the guest
->>
->> You say that the QCI must be answered correctly, but what is the corre=
-ct
->> response?
->> If we return the matrix - i.e., APM, ADM and AQM - configured via the
->> mediated
->> matrix device's sysfs attributes files, then if any APQNs are defined =
-in
->> the matrix,
->> we will have to handle *ALL* AP instructions by executing them on beha=
-lf
->> of the
->> guest. I suppose we could return an empty matrix in which case the AP
->> bus will come
->> up without any devices on the guest, but what is the expectation of an
->> admin who
->> deliberately configures the mediated matrix device? Should we forego
->> handling interception
->> of AP instructions and consider a guest configuration that turns on
->> S390_FEAT_AP but
->> does not define a vfio-ap device to be erroneous and terminate startin=
-g
->> of the guest?
->> Anybody have any thoughts?
-> Hard to really give good advice without access to the documentation, bu=
-t:
-> - If we tell the guest that the feature is available, but it does not
->    get any cards to use, returning an empty matrix makes the most sense
->    to me.
 
-+1
+--f+W+jCU1fRNres8c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> - I would not tie starting the guest to the presence of a vfio-ap
->    device. Having the feature available in theory but without any
->    devices actually being usable by the guest does not really sound
->    wrong (can we hotplug this later?)
->
-+1
+On Wed, Apr 04, 2018 at 11:27:09AM +0200, BALATON Zoltan wrote:
+> On Mon, 2 Apr 2018, BALATON Zoltan wrote:
+> > Now that we have a mirror of this repo on git.qemu.org change the
+> > submodule to use that and also update it to latest HEAD which has a
+> > commit to fix a dangling symlink.
+> >=20
+> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> > ---
+> > .gitmodules          | 2 +-
+> > roms/u-boot-sam460ex | 2 +-
+> > 2 files changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/.gitmodules b/.gitmodules
+> > index c613722..49e9c2e 100644
+> > --- a/.gitmodules
+> > +++ b/.gitmodules
+> > @@ -45,4 +45,4 @@
+> > 	url =3D git://github.com/hdeller/seabios-hppa.git
+> > [submodule "roms/u-boot-sam460ex"]
+> > 	path =3D roms/u-boot-sam460ex
+> > -	url =3D git://github.com/zbalaton/u-boot-sam460ex
+> > +	url =3D git://git.qemu.org/u-boot-sam460ex.git
+> > diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
+> > index 119aa27..930735b 160000
+> > --- a/roms/u-boot-sam460ex
+> > +++ b/roms/u-boot-sam460ex
+> > @@ -1 +1 @@
+> > -Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
+> > +Subproject commit 930735bdd6edbb0588d6a54882feb58ab3cb2d08
+>=20
+> Forgot to cc MJT and mark it as for-2.12. Will this be taken before relese
+> to fix dangling symlink in tarball?
 
+Ok, I've applied this to ppc-for-2.12.  Unfortunately, my queue is
+blocked because of a regression in the SCSI code.  I believe a fix is
+on the way, but right now it means I can't complete my usual test cycle.
 
 --=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--f+W+jCU1fRNres8c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrEr3kACgkQbDjKyiDZ
+s5Lo1BAAttR6Z5XPRpG8S9i+NFS/9lxhgE1LU+HO6yoP4rkPQcOWqZfIb/23qODm
+KjjeBJ9+0VXz+u5o57YygvPWPbWXmsZxFvvhgEidZwuN+oCSFSN8/yu2DRaTHOje
+aGSmJVQ43WmLBo6wmho/h+HUrTH9pEjVoscm4ckMZQhSVGlJTGl6ywH9AwxIH/L5
+a1bRzX6lpJxLVJNGfWsmnp5/XzjGtpB+N1FT4utx63mIgDZKkMBVAiQ2zo+pCV06
+BS/8qhybetBldfpeJ7rQNcKB8QCIpOkwIGT+Ha+/UymmhpcfX07PWY9ED9GzNFuD
+Jzz0pdX/qI8HIoZ+z9I4LR08bEOWHrQ1VeRdngQJDj/Apa/tWmZTR5RlhGHGCieA
+1VRDd58Le2pWzFsYqx+iOCJncGZMilzpeqiaxE9tiSDQzNhUMNdaWRYeZKLnGdLb
+++4gI3hgoLhfmcLiEcwoZgabJbtQa33f1FKyd9YtIU/uLz59ciIRQGoXOEP7SXCL
+DYwrUJhjvRzfJVWi0D4P9YeqFahWQ+cf7d4SsFW3MvZArjJn0u70kPi6cl7nbA8G
+iOQZi1tIoLq+EEnqenTsMWTRrSUX1kV0oV7sLIeO61BEC35hFpZUS0nql7WLboDl
+yO9OtZEXj3FiSRe2nOiPuPMq3qF/FMD0pSCg8nb0CfhqceMiu7E=
+=Om4c
+-----END PGP SIGNATURE-----
+
+--f+W+jCU1fRNres8c--
