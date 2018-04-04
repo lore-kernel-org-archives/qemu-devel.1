@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f3iwI-00022B-Uv
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:59:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1f3j32-0004tO-ES
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f3iwE-0006PJ-KK
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:59:03 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:45049)
+	(envelope-from <bounces@canonical.com>) id 1f3j2y-0003x9-F2
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:06:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1f3iwE-0006Ox-A6
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:58:58 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id u46so22861212wrc.11
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 06:58:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f3j2y-0003uh-8X
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:05:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f3j2w-0002sw-R8
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 14:05:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C758F2E80C8
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 14:05:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180328040209.GA29554@xz-mi>
-References: <20180309090006.10018-1-peterx@redhat.com>
-	<20180309090006.10018-15-peterx@redhat.com>
-	<CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
-	<20180326080738.GA17789@xz-mi>
-	<CAJ+F1C+t9kvCq-h1JogM+cm=vP8jx=ZvZVma1niHD_X3GkwiyQ@mail.gmail.com>
-	<20180326090822.GC17789@xz-mi>
-	<CAJ+F1CJ5KKfATgp2dOUhuRCcwV8V95nbebhd_fcqJgbMejc1-A@mail.gmail.com>
-	<20180328040209.GA29554@xz-mi>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Apr 2018 15:58:56 +0200
-Message-ID: <CAJ+F1CJj+V30nGcUWvFntEiPu-D=PDuczHSZAxAmYiJwJVpc7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
- dispatcher
+Date: Wed, 04 Apr 2018 13:54:21 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <152285006155.9211.6828154086681739464.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,200 +37,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi Peter
-
-On Wed, Mar 28, 2018 at 6:02 AM, Peter Xu <peterx@redhat.com> wrote:
-> On Mon, Mar 26, 2018 at 11:46:13AM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
->>
->> On Mon, Mar 26, 2018 at 11:08 AM, Peter Xu <peterx@redhat.com> wrote:
->> > On Mon, Mar 26, 2018 at 10:33:27AM +0200, Marc-Andr=C3=A9 Lureau wrote=
-:
->> >> Hi
->> >>
->> >> On Mon, Mar 26, 2018 at 10:07 AM, Peter Xu <peterx@redhat.com> wrote:
->> >> > On Fri, Mar 23, 2018 at 05:18:53PM +0100, Marc-Andr=C3=A9 Lureau wr=
-ote:
->> >> >
->> >> > [...]
->> >> >
->> >> >> > +/*
->> >> >> > + * Dispatch one single QMP request. The function will free the =
-req_obj
->> >> >> > + * and objects inside it before return.
->> >> >> > + */
->> >> >> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
->> >> >> >  {
->> >> >> > -    QObject *req, *rsp =3D NULL, *id =3D NULL;
->> >> >> > +    Monitor *mon, *old_mon;
->> >> >> > +    QObject *req, *rsp =3D NULL, *id;
->> >> >> >      QDict *qdict =3D NULL;
->> >> >> > -    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP, pa=
-rser);
->> >> >> > -    Monitor *old_mon, *mon =3D container_of(mon_qmp, Monitor, q=
-mp);
->> >> >> > -
->> >> >> > -    Error *err =3D NULL;
->> >> >> > +    bool need_resume;
->> >> >> >
->> >> >> > -    req =3D json_parser_parse_err(tokens, NULL, &err);
->> >> >> > -    if (!req && !err) {
->> >> >> > -        /* json_parser_parse_err() sucks: can fail without sett=
-ing @err */
->> >> >> > -        error_setg(&err, QERR_JSON_PARSING);
->> >> >> > -    }
->> >> >> > -    if (err) {
->> >> >> > -        goto err_out;
->> >> >> > -    }
->> >> >> > +    req =3D req_obj->req;
->> >> >> > +    mon =3D req_obj->mon;
->> >> >> > +    id =3D req_obj->id;
->> >> >> > +    need_resume =3D req_obj->need_resume;
->> >> >> >
->> >> >> > -    qdict =3D qobject_to_qdict(req);
->> >> >> > -    if (qdict) {
->> >> >> > -        id =3D qdict_get(qdict, "id");
->> >> >> > -        qobject_incref(id);
->> >> >> > -        qdict_del(qdict, "id");
->> >> >> > -    } /* else will fail qmp_dispatch() */
->> >> >> > +    g_free(req_obj);
->> >> >> >
->> >> >> >      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND=
-)) {
->> >> >> >          QString *req_json =3D qobject_to_json(req);
->> >> >> > @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMessage=
-Parser *parser, GQueue *tokens)
->> >> >> >      old_mon =3D cur_mon;
->> >> >> >      cur_mon =3D mon;
->> >> >>
->> >> >> There is another issue with this series, since cur_mon is global (=
-and
->> >> >> not protected), an oob command may change the cur_mon while anothe=
-r
->> >> >> command is running in the main thread with unexpected consequences=
-. I
->> >> >> don't have a clear idea what is the best way to solve it. Making t=
-he
->> >> >> variable per-thread, or going all the way to get rid of cur_mon (m=
-y
->> >> >> preference, but much harder)
->> >> >
->> >> > IMHO it is fine too.
->> >> >
->> >> > Note that this cur_mon operation is in monitor_qmp_dispatch_one() n=
-ow,
->> >> > which is still running in main thread.  So AFAICT all the cur_mon
->> >> > references are in main thread, and monitor IOThread does not modify
->> >> > that variable at all.  Then we should probably be safe.
->> >>
->> >> But monitor_qmp_dispatch_one() is called from iothread if the command
->> >> is oob, so cur_mon may be updated while another command is running in
->> >> main thread, or am I wrong?
->> >
->> > You are right. I missed that, sorry...
->> >
->> > Would this be a simple workaround (but hopefully efficient) solution?
->> >
->> > diff --git a/monitor.c b/monitor.c
->> > index 77f4c41cfa..99641c0c6d 100644
->> > --- a/monitor.c
->> > +++ b/monitor.c
->> > @@ -4023,7 +4023,7 @@ typedef struct QMPRequest QMPRequest;
->> >   * Dispatch one single QMP request. The function will free the req_ob=
-j
->> >   * and objects inside it before return.
->> >   */
->> > -static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
->> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj, bool hack_c=
-urmon)
->> >  {
->> >      Monitor *mon, *old_mon;
->> >      QObject *req, *rsp =3D NULL, *id;
->> > @@ -4043,12 +4043,16 @@ static void monitor_qmp_dispatch_one(QMPReques=
-t *req_obj)
->> >          QDECREF(req_json);
->> >      }
->> >
->> > -    old_mon =3D cur_mon;
->> > -    cur_mon =3D mon;
->> > +    if (hack_curmon) {
->> > +        old_mon =3D cur_mon;
->> > +        cur_mon =3D mon;
->> > +    }
->> >
->> >      rsp =3D qmp_dispatch(mon->qmp.commands, req);
->> >
->> > -    cur_mon =3D old_mon;
->> > +    if (hack_curmon) {
->> > +        cur_mon =3D old_mon;
->> > +    }
->> >
->> >      if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
->> >          qdict =3D qdict_get_qdict(qobject_to(QDict, rsp), "error");
->> > @@ -4116,7 +4120,7 @@ static void monitor_qmp_bh_dispatcher(void *data=
-)
->> >
->> >      if (req_obj) {
->> >          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id=
-) ?: "");
->> > -        monitor_qmp_dispatch_one(req_obj);
->> > +        monitor_qmp_dispatch_one(req_obj, true);
->> >          /* Reschedule instead of looping so the main loop stays respo=
-nsive */
->> >          qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
->> >      }
->> > @@ -4175,7 +4179,7 @@ static void handle_qmp_command(JSONMessageParser=
- *parser, GQueue *tokens)
->> >          /* Out-Of-Band (OOB) requests are executed directly in parser=
-. */
->> >          trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj=
-->id)
->> >                                            ?: "");
->> > -        monitor_qmp_dispatch_one(req_obj);
->> > +        monitor_qmp_dispatch_one(req_obj, false);
->> >          return;
->> >      }
->> >
->> > Then we forbit touching that evil cur_mon in OOB-capable command
->> > handlers.  Thanks,
->>
->> That's not easy to enforce though, afaict it is being used for:
->> - error reporting decision
->
-> IMO this should not be a problem, since any QMP handler (including
-> OOB-capable ones) will be with an Error** there, so logically speaking
-> people should never call things like error_report() in that.
->
->> - file & socket lookup (fd: & /dev/fdset etc)
->
-> I suppose only very rare commands will use it?  It'll be a big problem
-> to solve when we want to completely remove cur_mon though.
->
->> - the current state of the monitor / list of commands, cpu_path, capabil=
-ities..
->
-> This is very rare to be used too?  Most commands should not use them AFAI=
-U.
->
->>
->> Wouldn't it be simpler to make it per-thread? I think it could also
->> use helpers to push/pop the current monitor.
->
-> Anyway I think yes this is still a good option (though the cur_mon
-> logic will be a bit more complicated).
->
-> Do you plan to post some patch about this, or do you want me to do
-> this?  I suppose we'll change the qemu_thread_create() a bit to pass
-> the cur_mon inside, and I suppose this might be better material after
-> 2.12 release if OOB is off now.
-
-Have you looked at making cur_mon per-thread?
-
-thanks
+We don't generally mark bugs 'fix released' until the final (non-rc)
+release is made.
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+** Changed in: qemu
+       Status: Fix Released =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
+
+Title:
+  static linux-user ARM emulation has several-second startup time
+
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Triaged
+
+Bug description:
+  static linux-user emulation has several-second startup time
+
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
+
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
+
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
+
+  ----
+
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
+
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
+
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
+
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
+
+  ----
+
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
