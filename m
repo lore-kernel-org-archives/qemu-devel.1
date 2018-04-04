@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3g0m-0007EC-9q
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:51:31 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f3gFM-0005Ly-IM
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3g0h-0007B1-KY
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:51:28 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50612)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f3g0h-0007Ai-Aw
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:51:23 -0400
-Received: by mail-wm0-x242.google.com with SMTP id t67so20010904wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 03:51:23 -0700 (PDT)
-References: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1521034084-17344-3-git-send-email-abdallah.bouassida@lauterbach.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1521034084-17344-3-git-send-email-abdallah.bouassida@lauterbach.com>
-Date: Wed, 04 Apr 2018 11:51:20 +0100
-Message-ID: <87in97ckif.fsf@linaro.org>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f3gFI-0005JW-GJ
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:06:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1f3gFI-0005JB-72
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:06:28 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w34B4Biv056070
+	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 07:06:26 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h4vvma0r2-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 07:06:26 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Wed, 4 Apr 2018 12:06:21 +0100
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
+	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
+	<20180403113619.54ff1e18.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Wed, 4 Apr 2018 13:06:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180403113619.54ff1e18.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <3e3ed537-d025-164c-aae5-00256aa251e7@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 2/3] target/arm: Add "_S"
- suffix to the secure version of a sysreg
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,156 +47,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, khaled.jmal@lauterbach.com, qemu-arm@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-
-Abdallah Bouassida <abdallah.bouassida@lauterbach.com> writes:
-
-> This is a preparation for the coming feature of creating dynamically an X=
-ML
-> description for the ARM sysregs.
-> Add "_S" suffix to the secure version of sysregs that have both S and NS =
-views
-> Replace (S) and (NS) by _S and _NS for the register that are manually def=
-ined,
-> so all the registers follow the same convention.
+On 03/04/2018 11:36, Cornelia Huck wrote:
+> On Mon, 2 Apr 2018 12:36:27 -0400
+> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
 >
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> On 03/26/2018 05:03 AM, Pierre Morel wrote:
+>>> On 26/03/2018 10:32, David Hildenbrand wrote:
+>>>> On 16.03.2018 00:24, Tony Krowiak wrote:
+>>>>> +    /*
+>>>>> +     * The Query Configuration Information (QCI) function (fc =3D=3D=
+ 4)
+>>>>> does not
+>>>>> +     * set a response code in reg 1, so check for that along with =
+the
+>>>>> +     * AP feature.
+>>>>> +     */
+>>>>> +    if ((fc !=3D 4) && s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] =3D 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>> This would imply an operation exception in case fc=3D=3D4, which sou=
+nds very
+>>>> wrong.
+>>> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must b=
+e
+>>> tested
+>>> to know what to answer.
+>>> If the feature is there, QCI must be answered correctly.
+>> This is an interesting proposition which raises several issues that wi=
+ll
+>> need to
+>> be addressed. The only time the PQAP(QCI) instruction is intercepted i=
+s
+>> when:
+>> * A vfio-ap device is NOT defined for the guest because the vfio_ap
+>> device driver
+>>     will set ECA.28 and the PQAP(QCI) instruction will be interpreted
+>> * STFLE.12 is set for the guest
+>>
+>> You say that the QCI must be answered correctly, but what is the corre=
+ct
+>> response?
+>> If we return the matrix - i.e., APM, ADM and AQM - configured via the
+>> mediated
+>> matrix device's sysfs attributes files, then if any APQNs are defined =
+in
+>> the matrix,
+>> we will have to handle *ALL* AP instructions by executing them on beha=
+lf
+>> of the
+>> guest. I suppose we could return an empty matrix in which case the AP
+>> bus will come
+>> up without any devices on the guest, but what is the expectation of an
+>> admin who
+>> deliberately configures the mediated matrix device? Should we forego
+>> handling interception
+>> of AP instructions and consider a guest configuration that turns on
+>> S390_FEAT_AP but
+>> does not define a vfio-ap device to be erroneous and terminate startin=
+g
+>> of the guest?
+>> Anybody have any thoughts?
+> Hard to really give good advice without access to the documentation, bu=
+t:
+> - If we tell the guest that the feature is available, but it does not
+>    get any cards to use, returning an empty matrix makes the most sense
+>    to me.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
++1
 
-> ---
->  target/arm/helper.c | 29 ++++++++++++++++++-----------
->  1 file changed, 18 insertions(+), 11 deletions(-)
+> - I would not tie starting the guest to the presence of a vfio-ap
+>    device. Having the feature available in theory but without any
+>    devices actually being usable by the guest does not really sound
+>    wrong (can we hotplug this later?)
 >
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index db8c925..1360a14 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -695,12 +695,12 @@ static const ARMCPRegInfo cp_reginfo[] =3D {
->       * the secure register to be properly reset and migrated. There is a=
-lso no
->       * v8 EL1 version of the register so the non-secure instance stands =
-alone.
->       */
-> -    { .name =3D "FCSEIDR(NS)",
-> +    { .name =3D "FCSEIDR",
->        .cp =3D 15, .opc1 =3D 0, .crn =3D 13, .crm =3D 0, .opc2 =3D 0,
->        .access =3D PL1_RW, .secure =3D ARM_CP_SECSTATE_NS,
->        .fieldoffset =3D offsetof(CPUARMState, cp15.fcseidr_ns),
->        .resetvalue =3D 0, .writefn =3D fcse_write, .raw_writefn =3D raw_w=
-rite, },
-> -    { .name =3D "FCSEIDR(S)",
-> +    { .name =3D "FCSEIDR_S",
->        .cp =3D 15, .opc1 =3D 0, .crn =3D 13, .crm =3D 0, .opc2 =3D 0,
->        .access =3D PL1_RW, .secure =3D ARM_CP_SECSTATE_S,
->        .fieldoffset =3D offsetof(CPUARMState, cp15.fcseidr_s),
-> @@ -716,7 +716,7 @@ static const ARMCPRegInfo cp_reginfo[] =3D {
->        .access =3D PL1_RW, .secure =3D ARM_CP_SECSTATE_NS,
->        .fieldoffset =3D offsetof(CPUARMState, cp15.contextidr_el[1]),
->        .resetvalue =3D 0, .writefn =3D contextidr_write, .raw_writefn =3D=
- raw_write, },
-> -    { .name =3D "CONTEXTIDR(S)", .state =3D ARM_CP_STATE_AA32,
-> +    { .name =3D "CONTEXTIDR_S", .state =3D ARM_CP_STATE_AA32,
->        .cp =3D 15, .opc1 =3D 0, .crn =3D 13, .crm =3D 0, .opc2 =3D 1,
->        .access =3D PL1_RW, .secure =3D ARM_CP_SECSTATE_S,
->        .fieldoffset =3D offsetof(CPUARMState, cp15.contextidr_s),
-> @@ -1967,7 +1967,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[=
-] =3D {
->                                     cp15.c14_timer[GTIMER_PHYS].ctl),
->        .writefn =3D gt_phys_ctl_write, .raw_writefn =3D raw_write,
->      },
-> -    { .name =3D "CNTP_CTL(S)",
-> +    { .name =3D "CNTP_CTL_S",
->        .cp =3D 15, .crn =3D 14, .crm =3D 2, .opc1 =3D 0, .opc2 =3D 1,
->        .secure =3D ARM_CP_SECSTATE_S,
->        .type =3D ARM_CP_IO | ARM_CP_ALIAS, .access =3D PL1_RW | PL0_R,
-> @@ -2006,7 +2006,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[=
-] =3D {
->        .accessfn =3D gt_ptimer_access,
->        .readfn =3D gt_phys_tval_read, .writefn =3D gt_phys_tval_write,
->      },
-> -    { .name =3D "CNTP_TVAL(S)",
-> +    { .name =3D "CNTP_TVAL_S",
->        .cp =3D 15, .crn =3D 14, .crm =3D 2, .opc1 =3D 0, .opc2 =3D 0,
->        .secure =3D ARM_CP_SECSTATE_S,
->        .type =3D ARM_CP_NO_RAW | ARM_CP_IO, .access =3D PL1_RW | PL0_R,
-> @@ -2060,7 +2060,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[=
-] =3D {
->        .accessfn =3D gt_ptimer_access,
->        .writefn =3D gt_phys_cval_write, .raw_writefn =3D raw_write,
->      },
-> -    { .name =3D "CNTP_CVAL(S)", .cp =3D 15, .crm =3D 14, .opc1 =3D 2,
-> +    { .name =3D "CNTP_CVAL_S", .cp =3D 15, .crm =3D 14, .opc1 =3D 2,
->        .secure =3D ARM_CP_SECSTATE_S,
->        .access =3D PL1_RW | PL0_R,
->        .type =3D ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
-> @@ -5563,7 +5563,8 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(E=
-rror **errp)
->
->  static void add_cpreg_to_hashtable(ARMCPU *cpu, const ARMCPRegInfo *r,
->                                     void *opaque, int state, int secstate,
-> -                                   int crm, int opc1, int opc2)
-> +                                   int crm, int opc1, int opc2,
-> +                                   const char *name)
->  {
->      /* Private utility function for define_one_arm_cp_reg_with_opaque():
->       * add a single reginfo struct to the hash table.
-> @@ -5573,6 +5574,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, con=
-st ARMCPRegInfo *r,
->      int is64 =3D (r->type & ARM_CP_64BIT) ? 1 : 0;
->      int ns =3D (secstate & ARM_CP_SECSTATE_NS) ? 1 : 0;
->
-> +    r2->name =3D g_strdup(name);
->      /* Reset the secure state to the specific incoming state.  This is
->       * necessary as the register may have been defined with both states.
->       */
-> @@ -5804,19 +5806,24 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cp=
-u,
->                          /* Under AArch32 CP registers can be common
->                           * (same for secure and non-secure world) or ban=
-ked.
->                           */
-> +                        char *name;
-> +
->                          switch (r->secure) {
->                          case ARM_CP_SECSTATE_S:
->                          case ARM_CP_SECSTATE_NS:
->                              add_cpreg_to_hashtable(cpu, r, opaque, state,
-> -                                                   r->secure, crm, opc1,=
- opc2);
-> +                                                   r->secure, crm, opc1,=
- opc2,
-> +                                                   r->name);
->                              break;
->                          default:
-> +                            name =3D g_strdup_printf("%s_S", r->name);
->                              add_cpreg_to_hashtable(cpu, r, opaque, state,
->                                                     ARM_CP_SECSTATE_S,
-> -                                                   crm, opc1, opc2);
-> +                                                   crm, opc1, opc2, name=
-);
-> +                            g_free(name);
->                              add_cpreg_to_hashtable(cpu, r, opaque, state,
->                                                     ARM_CP_SECSTATE_NS,
-> -                                                   crm, opc1, opc2);
-> +                                                   crm, opc1, opc2, r->n=
-ame);
->                              break;
->                          }
->                      } else {
-> @@ -5824,7 +5831,7 @@ void define_one_arm_cp_reg_with_opaque(ARMCPU *cpu,
->                           * of AArch32 */
->                          add_cpreg_to_hashtable(cpu, r, opaque, state,
->                                                 ARM_CP_SECSTATE_NS,
-> -                                               crm, opc1, opc2);
-> +                                               crm, opc1, opc2, r->name);
->                      }
->                  }
->              }
++1
 
 
---
-Alex Benn=C3=A9e
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
