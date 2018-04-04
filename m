@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f3e8i-0004hW-AD
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:51:36 -0400
+	(envelope-from <quintela@redhat.com>) id 1f3eK4-00082R-T5
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f3e8f-0003u2-8g
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:51:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53768 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1f3eJy-0007sA-Ud
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:03:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58422 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f3e8f-0003th-2L
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:51:29 -0400
-Date: Wed, 4 Apr 2018 10:51:19 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180404105119.1620b1b0@redhat.com>
-In-Reply-To: <20180403153129.GV5046@localhost.localdomain>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<1520860275-101576-4-git-send-email-imammedo@redhat.com>
-	<20180323212508.GF28161@localhost.localdomain>
-	<20180327170541.295fc29a@redhat.com>
-	<20180328134835.04f95535@redhat.com>
-	<20180328192148.GR5046@localhost.localdomain>
-	<20180329134303.548a864b@redhat.com>
-	<20180329162409.GX5046@localhost.localdomain>
-	<20180403163253.1d13633f@redhat.com>
-	<20180403153129.GV5046@localhost.localdomain>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f3eJy-0007rz-QL
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:03:10 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180403061040.GD26441@xz-mi> (Peter Xu's message of "Tue, 3 Apr
+	2018 14:10:40 +0800")
+References: <20180331185536.4835-1-bala24@linux.vnet.ibm.com>
+	<20180403061040.GD26441@xz-mi>
+Reply-To: quintela@redhat.com
+Date: Wed, 04 Apr 2018 11:02:56 +0200
+Message-ID: <87zi2jz6m7.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/9] cli: add -preconfig option
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: calculate expected_downtime
+ with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,94 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Peter Xu <peterx@redhat.com>
+Cc: Balamuruhan S <bala24@linux.vnet.ibm.com>, qemu-devel@nongnu.org, amit.shah@redhat.com
 
-On Tue, 3 Apr 2018 12:31:29 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Peter Xu <peterx@redhat.com> wrote:
+> On Sun, Apr 01, 2018 at 12:25:36AM +0530, Balamuruhan S wrote:
+>> expected_downtime value is not accurate with dirty_pages_rate * page_size,
+>> using ram_bytes_remaining would yeild it correct.
+>> 
+>> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+>> ---
+>>  migration/migration.c | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>> 
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 58bd382730..4e43dc4f92 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -2245,8 +2245,7 @@ static void migration_update_counters(MigrationState *s,
+>>       * recalculate. 10000 is a small enough number for our purposes
+>>       */
+>>      if (ram_counters.dirty_pages_rate && transferred > 10000) {
+>> -        s->expected_downtime = ram_counters.dirty_pages_rate *
+>> -            qemu_target_page_size() / bandwidth;
+>> +        s->expected_downtime = ram_bytes_remaining() / bandwidth;
+>
+> This field was removed in e4ed1541ac ("savevm: New save live migration
+> method: pending", 2012-12-20), in which remaing RAM was used.
 
-> On Tue, Apr 03, 2018 at 04:32:53PM +0200, Igor Mammedov wrote:
-> > On Thu, 29 Mar 2018 13:24:09 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Thu, Mar 29, 2018 at 01:43:03PM +0200, Igor Mammedov wrote:  
-> > > > On Wed, 28 Mar 2018 16:21:48 -0300
-> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > >     
-> > > > > On Wed, Mar 28, 2018 at 01:48:35PM +0200, Igor Mammedov wrote:    
-> > > > > > On Tue, 27 Mar 2018 17:05:41 +0200
-> > > > > > Igor Mammedov <imammedo@redhat.com> wrote:
-> > > > > >       
-> > > > > > > On Fri, 23 Mar 2018 18:25:08 -0300
-> > > > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:  
-> > [...]  
-> > > > > This doesn't make sense to me.  Why would we enter
-> > > > > RUN_STATE_PRECONFIG state if -preconfig is not used at all?    
-> > > > because of RUN_STATE_PRECONFIG becomes new initial state of
-> > > > our state machine where we start of (used to be RUN_STATE_PRELAUNCH)    
-> > > 
-> > > Oh, I missed that part.
-> > >   
-> > > > Lets call it variant 1:
-> > > > 
-> > > > with this we have 2 possible transitions:
-> > > >  RUN_STATE_PRECONFIG -> RUN_STATE_PRELAUNCH (machine_init)
-> > > > 
-> > > > and
-> > > > 
-> > > >  RUN_STATE_PRECONFIG -> RUN_STATE_INMIGRATE
-> > > >    ugly but it was the same with RUN_STATE_PRELAUNCH initial transition    
-> > [...]  
-> > > 
-> > > Thanks, now variant 1 makes more sense to me.  But I really miss
-> > > here are very clear and explicit descriptions of what each state
-> > > really mean, and what are the differences between them.
-> > > 
-> > > It looks like the existing description for `prelaunch` isn't
-> > > accurate:
-> > > 
-> > > # @prelaunch: QEMU was started with -S and guest has not started
-> > > 
-> > > This is false, as QEMU can be in `prelaunch` state even if -S is
-> > > not used.
-> > > 
-> > > 
-> > > Also, this is the description you proposed for `preconfig`:
-> > > 
-> > > # @preconfig: QEMU is paused before board specific init callback is executed.
-> > > #             The state is reachable only if -preconfig CLI option is used.
-> > > #             (Since 2.12)
-> > > 
-> > > This seems wrong as well: the `prelaunch` state is reachable even
-> > > if `-preconfig` isn't used in the command-line (because it is the
-> > > initial state).  
-> > I'm not sure we should describe transitions/initial state here
-> > (it's not the case now).
-> > 
-> > I think descriptions 'almost' match 'end' result of what QMP client
-> > cloud see and the initial state is not something that QMP user could
-> > observe.  
-> 
-> That's my impression as well: `prelaunch` should be visible
-> externally only if `-S` was used, and `preconfig` should be
-> visible externally only if `-preconfig` was used.
-> 
-> However, I miss documentation on what are the
-> expectations/requirements internally.  e.g. there's no
-> explanation why a reset request moves QEMU to
-> RUN_STATE_PRELAUNCH.  Ideally, each line in
-> runstate_transition_def would have a clear explanation for
-> when/why each transition happens.
-> 
-> But this isn't a requirement for the new feature you are
-> implementing, anyway.
-I'll add TODO comment to inmigrate to transition I'm adding,
-to tag it for future work.
+Unrelated O:-)
 
-+    /* Early switch to inmigrate state to allow
-+     * -incoming CLI option work as it used to.
-+     * TODO: delay actual switching to inmigrate
-+     * state to the point after machine is built
-+     * and remove this hack.
-+     */
-+    { RUN_STATE_PRECONFIG, RUN_STATE_INMIGRATE },
+> And it was added back in 90f8ae724a ("migration: calculate
+> expected_downtime", 2013-02-22), in which dirty rate was used.
+
+We didn't want to update the field if there haven't been enough activity.
+
+> However I didn't find a clue on why we changed from using remaining
+> RAM to using dirty rate...  So I'll leave this question to Juan.
+>
+> Besides, I'm a bit confused on when we'll want such a value.  AFAIU
+> precopy is mostly used by setting up the target downtime before hand,
+> so we should already know the downtime before hand.  Then why we want
+> to observe such a thing?
+
+What that field means is how much time the system needs to send
+everything that is pending.
+
+I.e. if expected_downtime = 2seconds, it means that with current dirty
+rate, if we set a downtime of 2 or bigger it is going to finish
+migration.
+
+It is a help for upper layers to decide that:
+- they want a 1second downtime
+- system calculates with current load that they need a 2second downtime
+
+So they can decide:
+- change the downtime to 2seconds (easy)
+- change the apps running on the guest to dirty less memory (It dependes
+  on the guest, app, etc).
+
+I don't know if anyone is using it at all.
+
+Later, Juan.
