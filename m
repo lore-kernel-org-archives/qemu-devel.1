@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3g09-0006ti-Ie
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:50:50 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f3g0g-0007C9-8u
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3g04-0006Mw-UR
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:50:49 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42925)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f3g04-0006LF-Mr
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:50:44 -0400
-Received: by mail-wr0-x242.google.com with SMTP id s18so21848652wrg.9
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 03:50:44 -0700 (PDT)
-References: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1521034084-17344-2-git-send-email-abdallah.bouassida@lauterbach.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1521034084-17344-2-git-send-email-abdallah.bouassida@lauterbach.com>
-Date: Wed, 04 Apr 2018 11:50:42 +0100
-Message-ID: <87k1tnckjh.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1f3g0b-00079s-GQ
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:51:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33588 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f3g0b-00079k-Am
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:51:17 -0400
+References: <20180111125444.6498-1-pbonzini@redhat.com>
+	<87lge3cl9u.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d7c8f261-5683-a2ce-3f5e-d6d53c104267@redhat.com>
+Date: Wed, 4 Apr 2018 12:51:04 +0200
 MIME-Version: 1.0
+In-Reply-To: <87lge3cl9u.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 1/3] target/arm: Add
- "ARM_CP_NO_GDB" as a new bit field for ARMCPRegInfo type
+Subject: Re: [Qemu-devel] [PATCH] cpus: unify qemu_*_wait_io_event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +28,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, khaled.jmal@lauterbach.com, qemu-arm@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
+On 04/04/2018 12:34, Alex Benn=C3=A9e wrote:
+>=20
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>=20
+>> Except for round-robin TCG, every other accelerator is using more or
+>> less the same code around qemu_wait_io_event_common.  The exception
+>> is HAX, which also has to eat the dummy APC that is queued by
+>> qemu_cpu_kick_thread.
+>>
+>> We can add the SleepEx call to qemu_wait_io_event under "if
+>> (!tcg_enabled())", since that is the condition that is used in
+>> qemu_cpu_kick_thread, and unify the function for KVM, HAX, HVF and
+>> multi-threaded TCG.  Single-threaded TCG code can also be simplified
+>> since it is only used in the round-robin, sleep-if-all-CPUs-idle case.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> I had trouble applying this patch but the change seems sane to me
+>=20
+> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Abdallah Bouassida <abdallah.bouassida@lauterbach.com> writes:
+Isn't this commit db08b687cdd5319286665aabd34f82665630416f?
 
-> This is a preparation for the coming feature of creating dynamically an X=
-ML
-> description for the ARM sysregs.
-> A register has ARM_CP_NO_GDB enabled will not be shown in the dynamic XML.
-> This bit is enabled automatically when creating CP_ANY wildcard aliases.
-> This bit could be enabled manually for any register we want to remove fro=
-m the
-> dynamic XML description.
->
-> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Paolo
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/cpu.h    | 3 ++-
->  target/arm/helper.c | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 1e7e1f8..5a6ea24 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1815,10 +1815,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t c=
-pregid)
->  #define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
->  #define ARM_CP_FPU               0x1000
->  #define ARM_CP_SVE               0x2000
-> +#define ARM_CP_NO_GDB            0x4000
->  /* Used only as a terminator for ARMCPRegInfo lists */
->  #define ARM_CP_SENTINEL          0xffff
->  /* Mask of only the flag bits in a type field */
-> -#define ARM_CP_FLAG_MASK         0x30ff
-> +#define ARM_CP_FLAG_MASK         0x70ff
->
->  /* Valid values for ARMCPRegInfo state field, indicating which of
->   * the AArch32 and AArch64 execution states this register is visible in.
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 09893e3..db8c925 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5664,7 +5664,7 @@ static void add_cpreg_to_hashtable(ARMCPU *cpu, con=
-st ARMCPRegInfo *r,
->      if (((r->crm =3D=3D CP_ANY) && crm !=3D 0) ||
->          ((r->opc1 =3D=3D CP_ANY) && opc1 !=3D 0) ||
->          ((r->opc2 =3D=3D CP_ANY) && opc2 !=3D 0)) {
-> -        r2->type |=3D ARM_CP_ALIAS;
-> +        r2->type |=3D ARM_CP_ALIAS | ARM_CP_NO_GDB;
->      }
->
->      /* Check that raw accesses are either forbidden or handled. Note that
-
-
---
-Alex Benn=C3=A9e
+>> ---
+>>  cpus.c | 49 +++++++++++++++++--------------------------------
+>>  1 file changed, 17 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 440b9291f5..3b6c9879ec 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -911,7 +911,8 @@ static void kick_tcg_thread(void *opaque)
+>>
+>>  static void start_tcg_kick_timer(void)
+>>  {
+>> -    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)=
+) {
+>> +    assert(!mttcg_enabled);
+>> +    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+>>          tcg_kick_vcpu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>>                                             kick_tcg_thread, NULL);
+>>          timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+>> @@ -920,6 +921,7 @@ static void start_tcg_kick_timer(void)
+>>
+>>  static void stop_tcg_kick_timer(void)
+>>  {
+>> +    assert(!mttcg_enabled);
+>>      if (tcg_kick_vcpu_timer) {
+>>          timer_del(tcg_kick_vcpu_timer);
+>>          tcg_kick_vcpu_timer =3D NULL;
+>> @@ -1154,18 +1156,9 @@ static void qemu_wait_io_event_common(CPUState =
+*cpu)
+>>      process_queued_cpu_work(cpu);
+>>  }
+>>
+>> -static bool qemu_tcg_should_sleep(CPUState *cpu)
+>> +static void qemu_tcg_rr_wait_io_event(CPUState *cpu)
+>>  {
+>> -    if (mttcg_enabled) {
+>> -        return cpu_thread_is_idle(cpu);
+>> -    } else {
+>> -        return all_cpu_threads_idle();
+>> -    }
+>> -}
+>> -
+>> -static void qemu_tcg_wait_io_event(CPUState *cpu)
+>> -{
+>> -    while (qemu_tcg_should_sleep(cpu)) {
+>> +    while (all_cpu_threads_idle()) {
+>>          stop_tcg_kick_timer();
+>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>      }
+>> @@ -1175,20 +1168,18 @@ static void qemu_tcg_wait_io_event(CPUState *c=
+pu)
+>>      qemu_wait_io_event_common(cpu);
+>>  }
+>>
+>> -static void qemu_kvm_wait_io_event(CPUState *cpu)
+>> +static void qemu_wait_io_event(CPUState *cpu)
+>>  {
+>>      while (cpu_thread_is_idle(cpu)) {
+>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>      }
+>>
+>> -    qemu_wait_io_event_common(cpu);
+>> -}
+>> -
+>> -static void qemu_hvf_wait_io_event(CPUState *cpu)
+>> -{
+>> -    while (cpu_thread_is_idle(cpu)) {
+>> -        qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>> +#ifdef _WIN32
+>> +    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
+>> +    if (!tcg_enabled()) {
+>> +        SleepEx(0, TRUE);
+>>      }
+>> +#endif
+>>      qemu_wait_io_event_common(cpu);
+>>  }
+>>
+>> @@ -1224,7 +1215,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>>                  cpu_handle_guest_debug(cpu);
+>>              }
+>>          }
+>> -        qemu_kvm_wait_io_event(cpu);
+>> +        qemu_wait_io_event(cpu);
+>>      } while (!cpu->unplug || cpu_can_run(cpu));
+>>
+>>      qemu_kvm_destroy_vcpu(cpu);
+>> @@ -1270,7 +1261,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>>              exit(1);
+>>          }
+>>          qemu_mutex_lock_iothread();
+>> -        qemu_wait_io_event_common(cpu);
+>> +        qemu_wait_io_event(cpu);
+>>      }
+>>
+>>      return NULL;
+>> @@ -1487,7 +1478,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg=
+)
+>>              atomic_mb_set(&cpu->exit_request, 0);
+>>          }
+>>
+>> -        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+>> +        qemu_tcg_rr_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+>>          deal_with_unplugged_cpus();
+>>      }
+>>
+>> @@ -1518,13 +1509,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>>              }
+>>          }
+>>
+>> -        while (cpu_thread_is_idle(cpu)) {
+>> -            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>> -        }
+>> -#ifdef _WIN32
+>> -        SleepEx(0, TRUE);
+>> -#endif
+>> -        qemu_wait_io_event_common(cpu);
+>> +        qemu_wait_io_event(cpu);
+>>      }
+>>      return NULL;
+>>  }
+>> @@ -1561,7 +1546,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>>                  cpu_handle_guest_debug(cpu);
+>>              }
+>>          }
+>> -        qemu_hvf_wait_io_event(cpu);
+>> +        qemu_wait_io_event(cpu);
+>>      } while (!cpu->unplug || cpu_can_run(cpu));
+>>
+>>      hvf_vcpu_destroy(cpu);
+>> @@ -1640,7 +1625,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>>          }
+>>
+>>          atomic_mb_set(&cpu->exit_request, 0);
+>> -        qemu_tcg_wait_io_event(cpu);
+>> +        qemu_wait_io_event(cpu);
+>>      }
+>>
+>>      return NULL;
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
