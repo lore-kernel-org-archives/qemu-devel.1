@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3kX3-0003RJ-Ib
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:41:06 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1f3kXp-0003un-B7
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3kWz-0004Ku-KO
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:41:05 -0400
-References: <20180404150146.23281-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <02284d07-59e1-cf58-d955-51ffade51ab5@redhat.com>
-Date: Wed, 4 Apr 2018 10:40:48 -0500
+	(envelope-from <pkrempa@redhat.com>) id 1f3kXo-0005Hw-B1
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:41:53 -0400
+Date: Wed, 4 Apr 2018 17:41:41 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20180404154141.GS38016@angien.pipo.sk>
+References: <20180403110810.25624-1-kwolf@redhat.com>
+	<d1633a50-2aad-af64-081c-bfac72b89e12@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180404150146.23281-1-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="F6uKInhCsqnmr3kRDG6XpFRBz7KOpKm03"
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
+	protocol="application/pgp-signature"; boundary="jZNlLGxhPb4urluq"
+Content-Disposition: inline
+In-Reply-To: <d1633a50-2aad-af64-081c-bfac72b89e12@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12] gluster: Fix
+ blockdev-add with server.N.type=unix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, prasanna.kalever@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F6uKInhCsqnmr3kRDG6XpFRBz7KOpKm03
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <02284d07-59e1-cf58-d955-51ffade51ab5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
-References: <20180404150146.23281-1-stefanha@redhat.com>
-In-Reply-To: <20180404150146.23281-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--jZNlLGxhPb4urluq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 04/04/2018 10:01 AM, Stefan Hajnoczi wrote:
-> Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
-> vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the=
+On Tue, Apr 03, 2018 at 08:09:49 -0500, Eric Blake wrote:
+> On 04/03/2018 06:08 AM, Kevin Wolf wrote:
+> > The legacy command line interface gets the socket path from an option
+> > called 'socket'. QAPI in contract uses SocketAddress, where the
+> > corresponding option is called 'path'.
+> >=20
+> > Fix the gluster block driver to accept both 'socket' and 'path', with
+> > 'path' being the preferred syntax.
+> >=20
+> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1545155
+> >=20
+> > Cc: qemu-stable@nongnu.org
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block/gluster.c | 21 +++++++++++++++++----
+> >  1 file changed, 17 insertions(+), 4 deletions(-)
 
-> drain operation the block job iterates one more time than before.  The
-> 185 output no longer matches and the test is failing now.
+Thanks for fixing this. I'm using the new syntax in the -blockdev code
+in libvirt and since I'm qapi- schema-checking the results, it would
+not be possible to use the legacy approach.
+
 >=20
-> It may be possible to avoid the superfluous block job iteration, but
-> that type of patch is not suitable late in the QEMU 2.12 release cycle.=
-
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 >=20
-> This patch simply updates the 185 output file.  The new behavior is
-> correct, just not optimal, so make the test pass again.
->=20
-> Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shut=
-down()")
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/185     | 10 ++++++----
->  tests/qemu-iotests/185.out | 12 +++++++-----
->  2 files changed, 13 insertions(+), 9 deletions(-)
+> Should we also add a deprecation warning for 'socket' and update the
+> deprecation documentation, so we can start the clock ticking on getting
+> rid of maintaining the back-compat glue forever?
 
-> @@ -102,11 +101,14 @@ echo
->  # command to be received (after receiving the command, the rest runs
->  # synchronously, so jobs can arbitrarily continue or complete).
->  #
-> +# Jobs present while QEMU is terminating iterate once more due to
-> +# bdrv_drain_all().
+Well, that won't be as easy. Since there is at least one qemu release
+which declared this in the QAPI schema but did not support using it it's
+hard for libvirt to detect that this was fixed, and thus we can't infer
+a capability which would be used to switch to the new-syntax only.
 
-Do we want to add something like: "FIXME: removing the bdrv_drain_all()
-may be desirable in a future patch; and would warrant a change to the
-expected output."?  Either way,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---F6uKInhCsqnmr3kRDG6XpFRBz7KOpKm03
+--jZNlLGxhPb4urluq
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrE8gAACgkQp6FrSiUn
-Q2r61wgAgDkoLuPtIIdjdAXQJFr/a9rT0qa5brblru7nA4vzN0Nbyjh8s3Ac3xfg
-hYNBq6dN/SwUPfBUllfNPv11ENeJnFQaZf01IEJd1Drrf2EocqZuZuYCciUjvgT2
-FfCMi8dcmD/bXjlVtiD2v/NKFM8Evnb31QjFGOodmgpKg0o1RmewoNt60+bM5/W0
-ch3E9oyqpmbxJYDMqkrFv2otWsDRqntCuOjMdCLXKh6xJusyOCRHHlCzwTe0Zf6Z
-2EIEvKrCiACop/mdsppiBexb/woHccjjE4uU/7U/MTvbnHqn5wqB/5PocX7CNNet
-APjz5ZjGZi4+p4OtBdMPMrJvyZKYAw==
-=QXhf
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlrE8jIACgkQHGwCByjY
+1Gq4jxAAjBTAYwSidRlKYFBkP5C2J3YfctNpnk+ejsgDGqocvUWdG4U/mfEgZoa9
+Lwkw77Vsi7MdwAMwnm0H+dv6FmVo9ENumiQo+1qfOE9Pc3I7dpCiaydsP9HNU6By
+FLGOiV3iDqdm8PGSJF+1VbwtuFwkzMTK5uTuocttnRYULzk2WvFOG2D0qv2J2j6e
+oK1bu9RelmdY4x7dwkMYTSYYPx+QegpZyLvRmx6lM82lCA3zZeEROtTGwbWKrXkF
+b+FdaThWtYslDsvN2WDtUUKAVIjGph2wxwZD4Z3p/wpOFbtb9UN7UvIaYmSH1oaM
+XRLv2XPJxk828a3ye9vwbXSdp2FpxCqZCpKBjZryuop+ClkfyViEfJrtyF+88PRC
+CCCkBezZ34HayTdedWkGk8R4+4roDcADVG/thq56xoSEDHdwsZdnGZpveG7kb7QT
+jRskdPutrXkcq2O79gJGT4dJJ90yHROKSZ7gcdH9rRNda7pyrauhwWxWl8x+36kA
+1ObM/8Axeos3SvaGI/FOXHBuR13R+4EXqbOZUJCWzV+jPZNrKCTT8DEpz5x7ZsXH
+7XWAn0rmNj3lmCLuTFeZf4JRjSyL1F+TpkSaUVlyE/Ic//xNUMr7lqlUAC4QN3Oe
+SZ2AeFJH2SfJNZQ/b6fk5j/L2hmrABj9h7+g4HnVNaTpdRty/JM=
+=OUd4
 -----END PGP SIGNATURE-----
 
---F6uKInhCsqnmr3kRDG6XpFRBz7KOpKm03--
+--jZNlLGxhPb4urluq--
