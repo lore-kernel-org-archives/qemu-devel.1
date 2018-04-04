@@ -1,46 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f3olS-0008Fn-A9
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 16:12:15 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1f3p47-000790-Da
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 16:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f3olP-0003pP-3E
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 16:12:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1f3olO-0003oy-Rc
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 16:12:11 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w34KBODE075517
-	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 16:12:08 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h53am5ms1-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 16:12:08 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Wed, 4 Apr 2018 16:12:06 -0400
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
-	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
-	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
-	<ce32e96c-f448-c375-cc25-96bb3cf35d69@linux.vnet.ibm.com>
-	<3735c70a-2b6b-1962-08bb-8badcad7b487@linux.vnet.ibm.com>
-	<4866a115-b34d-9a5c-6c73-0d066a9b09b8@linux.vnet.ibm.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Wed, 4 Apr 2018 16:12:00 -0400
-MIME-Version: 1.0
-In-Reply-To: <4866a115-b34d-9a5c-6c73-0d066a9b09b8@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <1dc47cbd-876c-7fb4-defe-cefe95c16b41@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
- interception
+	(envelope-from <eric.auger@redhat.com>) id 1f3p43-0005Jb-Fk
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 16:31:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1f3p43-0005JK-Ae
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 16:31:27 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed,  4 Apr 2018 22:30:50 +0200
+Message-Id: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 for 2.12] vfio: Use a trace point when a RAM
+ section cannot be DMA mapped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,181 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+Cc: aik@ozlabs.ru
 
-On 04/04/2018 09:43 AM, Pierre Morel wrote:
-> On 04/04/2018 15:33, Tony Krowiak wrote:
->> On 04/04/2018 07:09 AM, Pierre Morel wrote:
->>> On 02/04/2018 18:36, Tony Krowiak wrote:
->>>> On 03/26/2018 05:03 AM, Pierre Morel wrote:
->>>>> On 26/03/2018 10:32, David Hildenbrand wrote:
->>>>>> On 16.03.2018 00:24, Tony Krowiak wrote:
->>>>>>> If the CPU model indicates that AP facility is installed on
->>>>>>> the guest (i.e., -cpu xxxx,ap=on), then the expectation is that
->>>>>>> the AP bus running in the guest will initialize; however, if the
->>>>>>> AP instructions are not being interpreted by the firmware, then
->>>>>>> they will be intercepted and routed back to QEMU for handling.
->>>>>>> If a handler is not defined to process the intercepted instruciton,
->>>>>>> t
->>>>> ...snip...
->>>>>>
->>>>>>> +int ap_device_handle_nqap(S390CPU *cpu)
->>>>>>> +{
->>>>>>> +    CPUS390XState *env = &cpu->env;
->>>>>>> +
->>>>>>> +    if (s390_has_feat(S390_FEAT_AP)) {
->>>>>>> +        env->regs[1] = 0x10000;
->>>>>>> +
->>>>>>> +        return 0;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    return -EOPNOTSUPP;
->>>>>>> +}
->>>>>>> +
->>>>>>> +int ap_device_handle_dqap(S390CPU *cpu)
->>>>>>> +{
->>>>>>> +    CPUS390XState *env = &cpu->env;
->>>>>>> +
->>>>>>> +    if (s390_has_feat(S390_FEAT_AP)) {
->>>>>>> +        env->regs[1] = 0x10000;
->>>>>>> +
->>>>>>> +        return 0;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    return -EOPNOTSUPP;
->>>>>>> +}
->>>>>>> +
->>>>>>> +int ap_device_handle_pqap(S390CPU *cpu)
->>>>>>> +{
->>>>>>> +    CPUS390XState *env = &cpu->env;
->>>>>>> +    int fc = 4 & (env->regs[0] >> 24);
->>>>>>> +
->>>>>>> +    /*
->>>>>>> +     * The Query Configuration Information (QCI) function (fc 
->>>>>>> == 4) does not
->>>>>>> +     * set a response code in reg 1, so check for that along 
->>>>>>> with the
->>>>>>> +     * AP feature.
->>>>>>> +     */
->>>>>>> +    if ((fc != 4) && s390_has_feat(S390_FEAT_AP)) {
->>>>>>> +        env->regs[1] = 0x10000;
->>>>>>> +
->>>>>>> +        return 0;
->>>>>>> +    }
->>>>>> This would imply an operation exception in case fc==4, which 
->>>>>> sounds very
->>>>>> wrong.
->>>>>
->>>>> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO 
->>>>> must be tested
->>>>> to know what to answer.
->>>>> If the feature is there, QCI must be answered correctly.
->>>> This is an interesting proposition which raises several issues that 
->>>> will need to
->>>> be addressed. The only time the PQAP(QCI) instruction is 
->>>> intercepted is when:
->>>> * A vfio-ap device is NOT defined for the guest because the vfio_ap 
->>>> device driver
->>>>   will set ECA.28 and the PQAP(QCI) instruction will be interpreted
->>>> * STFLE.12 is set for the guest
->>>>
->>>> You say that the QCI must be answered correctly, but what is the 
->>>> correct response?
->>>> If we return the matrix - i.e., APM, ADM and AQM - configured via 
->>>> the mediated
->>>> matrix device's sysfs attributes files, then if any APQNs are 
->>>> defined in the matrix,
->>>> we will have to handle *ALL* AP instructions by executing them on 
->>>> behalf of the
->>>> guest. I suppose we could return an empty matrix in which case the 
->>>> AP bus will come
->>>> up without any devices on the guest, but what is the expectation of 
->>>> an admin who
->>>> deliberately configures the mediated matrix device? Should we 
->>>> forego handling interception
->>>> of AP instructions and consider a guest configuration that turns on 
->>>> S390_FEAT_AP but
->>>> does not define a vfio-ap device to be erroneous and terminate 
->>>> starting of the guest?
->>>> Anybody have any thoughts?
->>>>>
->>>>>
->>>>> there are also some error situations to handle in all three 
->>>>> functions.
->>>> To what error situations are you referring?
->>>
->>> program exceptions, like access, privilege or specification exceptions.
->> Are you suggesting that these handlers need to verify that the 
->> instruction
->> specification is correct? For example, the NQAP instruction - NQAP 
->> r1,r2 -
->> expects an even-odd pair of general registers in the r1 and r2 and must
->> designate an even register; otherwise a specification exception is
->> recognized. Are you saying that the handler for NQAP must verify this
->> requirement and inject a specification exception if it is not met? If 
->> not,
->> then can you provide a specific example of what you are talking about?
->
-> Yes I mean this.
->
-> But one other thing.
-> Returning code 0x01 seems wrong for me, this is right if no AP card
-> are in the system but I do not thing that it is what we mean.
-I disagree .... for the guest, this is exactly what we mean. In my 
-opinion, assigning
-AP devices to the mediated matrix device is like assigning AP devices to 
-an LPAR.
-If no vfio-ap device is defined for the guest, then it is effectively 
-the same as
-starting a linux host in an LPAR without any AP devices assigned to it.
->
-> I think we should return code 0x03 stating that the AP card is not in 
-> configured state
+The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions")
+added an error message if a passed memory section address or size
+is not aligned to the page size and thus cannot be DMA mapped.
 
->
->
-> The difference is that we can get out of a not-configured state with a 
-> SCLP command but
-> we can not recover from an un-existing APQN.
-Remember, this state will occur only when the AP feature of the CPU 
-model is turned on for
-the guest and no vfio-ap device is defined, so there is no configuration 
-to recover for
-the guest because no AP devices will be configured for the guest.
->
->
->
->>>
->>>
->>>
->>>>>
->>>>>
->>>>>
->>>>>>
->>>>>> Hard to review without access to documentation. (hard to 
->>>>>> understand why
->>>>>> such stuff is to be kept confidential for decades)
->>>>>>
->>>>>>> +
->>>>>>> +    return -EOPNOTSUPP;
->>>>>>> +}
->>>>>>> +
->>>>>>>   static Property vfio_ap_properties[] = {
->>>>>>>       DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
->>>>>>>       DEFINE_PROP_END_OF_LIST(),
->>>>>>> diff --git a/include/hw/s390x/ap-device.h 
->>>>>>> b/include/hw/s390x/ap-device.h
->>>>>>> index 693df90..d45ae38 100644
->>>>>>> --- a/include/hw/s390x/ap-device.h
->>>>>>> +++ b/include/hw/s390x/ap-device.h
->>>>>>> @@ -11,6 +11,8 @@
->>>>>>>   #ifndef HW_S390X_AP_DEVICE_H
->>>>>>>   #define HW_S390X_AP_DEVICE_H
->>>>>>
->>>>>
->>>>
->>>>
->>>
->>
->
+This patch fixes the trace by printing the region name and the
+memory region section offset within the address space (instead of
+offset_within_region).
+
+We also turn the error_report into a trace event. Indeed, In some
+cases, the traces can be confusing to non expert end-users and
+let think the use case does not work (whereas it
+works as before).
+
+This is the case where a BAR is successively mapped at different
+GPAs and its sections are not compatible with dma map. The listener
+is called several times and traces are issued for each intermediate
+mapping.  The end-user cannot easily match those GPAs against the
+final GPA output by lscpi. So let's keep those information to
+informed users. In mid term, the plan is to advise the user about
+BAR relocation relevance.
+
+Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+---
+
+v1 -> v2:
+- use a trace point
+- add some details in the commit message
+---
+ hw/vfio/common.c     | 11 +++++------
+ hw/vfio/trace-events |  1 +
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 5e84716..07ffa0b 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -548,12 +548,11 @@ static void vfio_listener_region_add(MemoryListener *listener,
+         hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+ 
+         if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
+-            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
+-                         " is not aligned to 0x%"HWADDR_PRIx
+-                         " and cannot be mapped for DMA",
+-                         section->offset_within_region,
+-                         int128_getlo(section->size),
+-                         pgmask + 1);
++            trace_vfio_listener_region_add_no_dma_map(
++                memory_region_name(section->mr),
++                section->offset_within_address_space,
++                int128_getlo(section->size),
++                pgmask + 1);
+             return;
+         }
+     }
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 79f63a2..20109cb 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -90,6 +90,7 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "i
+ vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
+ vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
+ vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
++vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uint64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=0x%"PRIx64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
+ vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
+ vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
+ vfio_disconnect_container(int fd) "close container->fd=%d"
+-- 
+2.5.5
