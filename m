@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3e3C-0001Ht-Fy
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:45:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1f3e3a-0001TY-4Z
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3e39-0000tD-Dh
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:45:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57122)
+	(envelope-from <bounces@canonical.com>) id 1f3e3X-0001Rp-2z
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:46:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3e39-0000r9-7g
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:45:47 -0400
+	id 1f3e3W-0001Qb-Sj
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:46:11 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3e37-0001T8-GT
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 08:45:45 +0000
+	id 1f3e3V-00027R-JR
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 08:46:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4C5FC2E80CE
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 08:45:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A2B52E80CE
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 08:46:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 08:33:27 -0000
-From: Thomas Huth <1761027@bugs.launchpad.net>
-Reply-To: Bug 1761027 <1761027@bugs.launchpad.net>
+Date: Wed, 04 Apr 2018 08:37:57 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1756927 <1756927@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152280226155.9459.1066946337801120026.malonedeb@soybean.canonical.com>
-Message-Id: <152283080715.30312.9615209522398880736.malone@gac.canonical.com>
+References: <152147650577.14987.10547442810122600910.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152283107769.29675.7932732064894332523.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1761027] Re: Unexpected error
+Subject: [Qemu-devel] [Bug 1756927] Re: ARMv7 LPAE: IFSR doesn't have the
+ LPAE bit in case of BKPT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,38 +39,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Which version of QEMU are you using? And which parameters are you using
-when you  start it?
+The patches are in master now.
+
 
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: In Progress =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1761027
+https://bugs.launchpad.net/bugs/1756927
 
 Title:
-  Unexpected error
+  ARMv7 LPAE: IFSR doesn't have the LPAE bit in case of BKPT
 
 Status in QEMU:
-  Incomplete
+  Fix Committed
 
 Bug description:
-  When run it this error happens:
-  Unexpected error in aio_context_set_poll_params() at /home/stefan/src/qem=
-u/repo.or.cz/qemu/ar7/util/aio-win32.c:413:
-  C:\Program Files\qemu\qemu-system-x86_64.exe: AioContext polling is not i=
-mplemented on Windows
+  When a user application triggers a 'bkpt' instruction while LPAE is
+  used, the bit [9] of IFSR is not correctly set during the prefetch
+  abort exception.
 
-  This application has requested the Runtime to terminate it in an unusual =
-way.
-  Please contact the application's support team for more information.
+  You'll find attached a minimal example to reproduce the issue (just run '=
+make all').
+  The output I get is:
 
+  supervisor
+  user
+  prefetch
+  short-descriptor
 
-  System:
-  Windows 10 x64
+  The last entry should read 'long-descriptor'.
+
+  =
+
+  Qemu revision: 48ae1f60d8c9a770e6da64407984d84e25253c69
+  Ubuntu verison: 16.04 LTS
+  Cross Compiler: gcc linaro 6.3.1-2017.02-x86_64_arm-eabi
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1761027/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1756927/+subscriptions
