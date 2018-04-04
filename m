@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3lEN-0006vD-I1
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:25:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f3laB-0006VD-8U
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3lEK-00067e-9W
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:25:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49610)
+	(envelope-from <peter.maydell@linaro.org>) id 1f3laA-0007oJ-Gv
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:48:23 -0400
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:39161)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3lEK-00066s-1y
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:25:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3lEH-0000n9-W2
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 16:25:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F132F2E80D1
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 16:25:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f3laA-0007ny-Bd
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:48:22 -0400
+Received: by mail-oi0-x235.google.com with SMTP id q71-v6so19853482oic.6
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 09:48:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 16:16:10 -0000
-From: Matthias Klose <doko@ubuntu.com>
-Reply-To: Bug 1749393 <1749393@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151859702399.9461.6832978283203997178.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152285857075.30083.12631226667654707192.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1749393] Re: sbrk() not working under qemu-user
- with a PIE-compiled binary?
+In-Reply-To: <5398bc08-58ad-32ac-8125-e079441216e7@redhat.com>
+References: <20180328133152.24623-1-lvivier@redhat.com>
+	<cb19950a-9b8e-90be-49df-b145900e2958@redhat.com>
+	<5398bc08-58ad-32ac-8125-e079441216e7@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 4 Apr 2018 17:48:00 +0100
+Message-ID: <CAFEAcA_91+QLBLWtfRkrJ5aVBHCRpO8BMBaxGUuRSAk1nFnrFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg: fix 16-byte vector operations
+ detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Miroslav Rezanina <mrezanin@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-qemu patch proposed at http://lists.nongnu.org/archive/html/qemu-
-devel/2018-03/msg04700.html
+On 3 April 2018 at 16:45, Laurent Vivier <lvivier@redhat.com> wrote:
+> On 29/03/2018 18:54, Laurent Vivier wrote:
+>> Hi,
+>>
+>> I think it would be good to have this fix (or something similar) in -rc2.
+>
+> So no one agrees with that?
 
--- =
+Applied to master, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1749393
-
-Title:
-  sbrk() not working under qemu-user with a PIE-compiled binary?
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  In Debian unstable, we recently switched bash to be a PIE-compiled
-  binary (for hardening). Unfortunately this resulted in bash being
-  broken when run under qemu-user (for all target architectures, host
-  being amd64 for me).
-
-  $ sudo chroot /srv/chroots/sid-i386/ qemu-i386-static /bin/bash
-  bash: xmalloc: .././shell.c:1709: cannot allocate 10 bytes (0 bytes alloc=
-ated)
-
-  bash has its own malloc implementation based on sbrk():
-  https://git.savannah.gnu.org/cgit/bash.git/tree/lib/malloc/malloc.c
-
-  When we disable this internal implementation and rely on glibc's
-  malloc, then everything is fine. But it might be that glibc has a
-  fallback when sbrk() is not working properly and it might hide the
-  underlying problem in qemu-user.
-
-  This issue has also been reported to the bash upstream author and he sugg=
-ested that the issue might be in qemu-user so I'm opening a ticket here. He=
-re's the discussion with the bash upstream author:
-  https://lists.gnu.org/archive/html/bug-bash/2018-02/threads.html#00080
-
-  You can find the problematic bash binary in that .deb file:
-  http://snapshot.debian.org/archive/debian/20180206T154716Z/pool/main/b/ba=
-sh/bash_4.4.18-1_i386.deb
-
-  The version of qemu I have been using is 2.11 (Debian package qemu-
-  user-static version 1:2.11+dfsg-1) but I have had reports that the
-  problem is reproducible with older versions (back to 2.8 at least).
-
-  Here are the related Debian bug reports:
-  https://bugs.debian.org/889869
-  https://bugs.debian.org/865599
-
-  It's worth noting that bash used to have this problem (when compiled as a=
- PIE binary) even when run directly but then something got fixed in the ker=
-nel and now the problem only appears when run under qemu-user:
-  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1518483
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1749393/+subscriptions
+-- PMM
