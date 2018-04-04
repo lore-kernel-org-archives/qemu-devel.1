@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3iO4-00046h-MJ
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:23:41 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f3iRM-0006W0-AJ
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:27:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3iO0-0003Pi-KU
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:23:40 -0400
-Date: Wed, 4 Apr 2018 14:23:32 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180404132332.GR4467@stefanha-x1.localdomain>
-References: <20180329110914.20888-1-famz@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1f3iRI-00059x-8L
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:27:04 -0400
+Resent-Message-Id: <E1f3iRI-00059x-8L@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21045)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f3iRI-00059g-0Q
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:27:00 -0400
+In-Reply-To: <1522846444-31725-1-git-send-email-wexu@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152284748683.1698.15229434900044918804@71c20359a636>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9uazBBczf8QSjDPd"
-Content-Disposition: inline
-In-Reply-To: <20180329110914.20888-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 0/8] qemu-img convert with
- copy offloading
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 4 Apr 2018 06:11:27 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/8] virtio-net 1.1 userspace backend
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com
+To: wexu@redhat.com
+Cc: famz@redhat.com, jasowang@redhat.com, mst@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com, qemu-devel@nongnu.org
 
-
---9uazBBczf8QSjDPd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 29, 2018 at 07:09:06PM +0800, Fam Zheng wrote:
-> [Posting a preview RFC for the general idea discussion and internal API r=
-eview.
-> Libiscsi support is being worked on in the meantime.]
->=20
-> This series introduces block layer API for copy offloading and makes use =
-of it
-> in qemu-img convert.
->=20
-> For now we implemented the operation in local file protocol with
-> copy_file_range(2).  Besides that it's possible to add similar to iscsi, =
-nfs
-> and potentially more.
->=20
-> As far as its usage goes, in addition to qemu-img convert, we can emulate
-> offloading in scsi-disk (EXTENDED COPY), and do similar to drive-mirror.
->=20
-> The new bdrv_co_map_range can also be an alternative way to implement for=
-mat
-> drivers in the future, once we make block/io.c use it in preadv/pwritev p=
-aths.
-
-I posted concerns about the bdrv_co_map_range() interface.  It would be
-safer to only have a copy_range() interface without exposing how data is
-mapped outside the driver where race conditions can occur and the format
-driver no longer has full control over file layout.
-
-Stefan
-
---9uazBBczf8QSjDPd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaxNHUAAoJEJykq7OBq3PI35AH/0tPZRmp2X/8pbHc+/wsW7VN
-Djxli4Xofdgcdiu2yrR+Ik45JNU6Q0irrlHabxdwZ8ByltpTrY0XpAJXhoVv38UF
-hEmv3YE1zaenUGXkvxe851lCI4FqWkJ7O89+vNRV0JvW2Q7ql+mwR3jHtsnbdHGR
-v96x8b0yaICt/nyahvDl6HHudnZfORc+ym8vPelXt0GEVJTZFNwCI+qGTBET8mZE
-FooU7LDD+9n64saQHvhWaGxjJl3moyA//R5wXJsIcjHalQnz76wieMyALdzrjOD5
-WNdQsNYdV170HMINYA/9gAk5VieFS4umvEg6462J05V4P/8c+43+ognJAVtABbI=
-=OeZS
------END PGP SIGNATURE-----
-
---9uazBBczf8QSjDPd--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjI4NDY0NDQtMzE3MjUtMS1naXQtc2VuZC1lbWFpbC13ZXh1QHJlZGhhdC5j
+b20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC84XSB2aXJ0aW8tbmV0IDEuMSB1
+c2Vyc3BhY2UgYmFja2VuZCBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICAwOTRiNjJjZDljLi5l
+NWVmYTFmNWYyICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
+ICBwYXRjaGV3LzE1MjI4NDY0NDQtMzE3MjUtMS1naXQtc2VuZC1lbWFpbC13ZXh1QHJlZGhhdC5j
+b20gLT4gcGF0Y2hldy8xNTIyODQ2NDQ0LTMxNzI1LTEtZ2l0LXNlbmQtZW1haWwtd2V4dUByZWRo
+YXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMjkxMTMzMjAu
+ODA1My0xLWNvaHVja0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAzMjkxMTMzMjAuODA1My0x
+LWNvaHVja0ByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODA0MDQxMTQ3MDkuNDUxMTgtMS1qaWFuZ3NoYW5sYWlAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAx
+ODA0MDQxMTQ3MDkuNDUxMTgtMS1qaWFuZ3NoYW5sYWlAZ21haWwuY29tClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKYTVlZDRmOTM1NCB2aXJ0aW86IHF1ZXVlIHBvcCBzdXBwb3J0IGZv
+ciBwYWNrZWQgcmluZwplZGEzOGNjY2ZjIHZpcnRpbzogZ2V0IGF2YWlsIGJ5dGVzIGNoZWNrIGZv
+ciBwYWNrZWQgcmluZwpkNmI3YjhmMTkyIHZpcnRpbzogZmx1c2gvcHVzaCBzdXBwb3J0IGZvciBw
+YWNrZWQgcmluZwoyYWUxZjIzNGRjIHZpcnRpbzogbm90aWZpY2F0aW9uIHR3ZWFrIGZvciBwYWNr
+ZWQgcmluZwo1YzQ0YjY3NjI5IHZpcnRpbzogYWRkIGRldGFjaCBlbGVtZW50IGZvciBwYWNrZWQg
+cmluZygxLjEpCjdiYzczNzJlOTMgdmlydGlvOiBhZGQgZW1wdHkgY2hlY2sgZm9yIHBhY2tlZCBy
+aW5nCmNmMzk5ZGEwMzUgdmlydGlvOiBtZW1vcnkgY2FjaGUgZm9yIHBhY2tlZCByaW5nCjYwNmVj
+NWRjMjMgdmlydGlvOiBmZWF0dXJlIGJpdCwgZGF0YSBzdHJ1Y3R1cmUgZm9yIHBhY2tlZCByaW5n
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IHZpcnRpbzogZmVhdHVy
+ZSBiaXQsIGRhdGEgc3RydWN0dXJlIGZvciBwYWNrZWQgcmluZy4uLgpFUlJPUjogb3BlbiBicmFj
+ZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiMyMTogRklMRTogaHcv
+dmlydGlvL3ZpcnRpby5jOjQzOgordHlwZWRlZiBzdHJ1Y3QgVlJpbmdEZXNjUGFja2VkCit7CgpF
+UlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5l
+CiM2NDogRklMRTogaHcvdmlydGlvL3ZpcnRpby5jOjEwNDoKK3R5cGVkZWYgc3RydWN0IFZSaW5n
+UGFja2VkCit7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAy
+Lzg6IHZpcnRpbzogbWVtb3J5IGNhY2hlIGZvciBwYWNrZWQgcmluZy4uLgpDaGVja2luZyBQQVRD
+SCAzLzg6IHZpcnRpbzogYWRkIGVtcHR5IGNoZWNrIGZvciBwYWNrZWQgcmluZy4uLgpFUlJPUjog
+ImZvbyogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojNDA6IEZJTEU6IGh3L3ZpcnRpby92aXJ0
+aW8uYzo0NjM6CitzdGF0aWMgaW5saW5lIGJvb2wgaXNfZGVzY19hdmFpbChzdHJ1Y3QgVlJpbmdE
+ZXNjUGFja2VkKiBkZXNjKQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50
+aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNDI6IEZJTEU6IGh3L3ZpcnRpby92aXJ0aW8uYzo0NjU6
+CisgICAgcmV0dXJuICghIShkZXNjLT5mbGFncyAmIEFWQUlMX0RFU0NfUEFDS0VEKDEpKSAhPQoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc3OiBGSUxFOiBody92aXJ0aW8vdmly
+dGlvLmM6NTEzOgorICAgIHZyaW5nX2Rlc2NfcmVhZF9wYWNrZWQodnEtPnZkZXYsICZkZXNjLCAm
+Y2FjaGUtPmRlc2NfcGFja2VkLCB2cS0+bGFzdF9hdmFpbF9pZHgpOwoKdG90YWw6IDIgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0Lzg6IHZpcnRpbzogYWRkIGRldGFjaCBlbGVt
+ZW50IGZvciBwYWNrZWQgcmluZygxLjEpLi4uCkNoZWNraW5nIFBBVENIIDUvODogdmlydGlvOiBu
+b3RpZmljYXRpb24gdHdlYWsgZm9yIHBhY2tlZCByaW5nLi4uCkNoZWNraW5nIFBBVENIIDYvODog
+dmlydGlvOiBmbHVzaC9wdXNoIHN1cHBvcnQgZm9yIHBhY2tlZCByaW5nLi4uCkNoZWNraW5nIFBB
+VENIIDcvODogdmlydGlvOiBnZXQgYXZhaWwgYnl0ZXMgY2hlY2sgZm9yIHBhY2tlZCByaW5nLi4u
+CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
+ZW1lbnQKIzEyNTogRklMRTogaHcvdmlydGlvL3ZpcnRpby5jOjEwNTY6CisgICAgICAgIH0gd2hp
+bGUgKGRlc2MuZmxhZ3MgJiBWUklOR19ERVNDX0ZfTkVYVCk7ClsuLi5dCgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDE1NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA4Lzg6IHZpcnRpbzogcXVldWUgcG9wIHN1
+cHBvcnQgZm9yIHBhY2tlZCByaW5nLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
