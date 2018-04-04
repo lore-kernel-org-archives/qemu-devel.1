@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3mxU-0004n4-J0
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:16:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f3n5e-0007kh-6d
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f3mxT-0003vt-IU
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:16:32 -0400
-References: <20180403110810.25624-1-kwolf@redhat.com>
-	<d1633a50-2aad-af64-081c-bfac72b89e12@redhat.com>
-	<20180404154141.GS38016@angien.pipo.sk>
-	<20180404155420.GG4482@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <98cbcf10-6dd4-3373-5b08-f5c73691fa73@redhat.com>
-Date: Wed, 4 Apr 2018 13:16:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1f3n5b-0001Eh-2P
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:24:58 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:53762)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f3n5a-0001Dy-Pm
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:24:54 -0400
+Received: by mail-wm0-x244.google.com with SMTP id p9so43493770wmc.3
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 11:24:54 -0700 (PDT)
+References: <20180207225540.31698-1-richard.henderson@linaro.org>
+	<20180207225540.31698-17-richard.henderson@linaro.org>
+	<20180404164908.GA7582@flamenco>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180404164908.GA7582@flamenco>
+Date: Wed, 04 Apr 2018 19:24:52 +0100
+Message-ID: <878ta2de2z.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180404155420.GG4482@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12] gluster: Fix
- blockdev-add with server.N.type=unix
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 16/20] target/arm: Use vector infrastructure
+ for aa64 compares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, prasanna.kalever@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- mreitz@redhat.com, prasanna.kalever@redhat.com
-Message-ID: <98cbcf10-6dd4-3373-5b08-f5c73691fa73@redhat.com>
-Subject: Re: [Qemu-block] [PATCH for-2.12] gluster: Fix blockdev-add with
- server.N.type=unix
-References: <20180403110810.25624-1-kwolf@redhat.com>
- <d1633a50-2aad-af64-081c-bfac72b89e12@redhat.com>
- <20180404154141.GS38016@angien.pipo.sk>
- <20180404155420.GG4482@localhost.localdomain>
-In-Reply-To: <20180404155420.GG4482@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/04/2018 10:54 AM, Kevin Wolf wrote:
-
->>> Should we also add a deprecation warning for 'socket' and update the
->>> deprecation documentation, so we can start the clock ticking on getti=
-ng
->>> rid of maintaining the back-compat glue forever?
->>
->> Well, that won't be as easy. Since there is at least one qemu release
->> which declared this in the QAPI schema but did not support using it it=
-'s
->> hard for libvirt to detect that this was fixed, and thus we can't infe=
-r
->> a capability which would be used to switch to the new-syntax only.
->=20
-> Markus wanted to add some way to declare capabilities for a command in
-> the schema that could be queried with schema introspection and would
-> cover such cases. I think we even discussed this with you at KVM Forum?=
-
->=20
-> Eric, do you happen to know if there were any patches on the list
-> related to this?
-
-I don't recall seeing any patches from Markus before his leave, and
-doubt anyone else has tackled anything along these lines.  It's too late
-for 2.12, at any rate, so even if we had such a feature implemented in
-time for 2.13, it won't help introspecting the 2.12 release.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
---G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Emilio G. Cota <cota@braap.org> writes:
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> On Wed, Feb 07, 2018 at 14:55:36 -0800, Richard Henderson wrote:
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Just bisected a segfault for aarch64 nbench on a PowerPC host
+> to this commit (79d61de6bdc398). I've also tested on x86_64 and
+> aarch64 hosts, and these do not seem to be affected.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrFFm8ACgkQp6FrSiUn
-Q2qPdgf/bQS1whZnQn6ifRkflhSxkEGzrVIxjOW4vhEkF4VNfgjcbeODd+oFNLiV
-wMi3Lg74e1zxocbsTQhIRa3cKMu7ynBuqFsgwz8TsDcfp9v/EWNzy9euntsJjZOh
-dEjN8N7n7AXSKoQ4MsRAdiSefhh+HAN4Oh5+YsqY4NX1iZVtwKkajhtubjYGyzcj
-mGaJLclHNLfwAZCVhpN6WMTo2x2KJGr8UdCpKL6qQoLzzfbR/L8qyUl0d0QteUkz
-ZWG0w8a3j+w7Hs1Lqebws1DBYRTDYejNXytRcmrDtNnq538tG4xCnKkt2Uvfaa2+
-3dHamZuYRzYTAWOV53sQGXJyRr5eRA==
-=0TUq
------END PGP SIGNATURE-----
+I wonder about other hosts without TCG_vec backend support (powerpc is
+one)? I suspect it must be the fall-back for the vector expanders is
+wrong.
 
---G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk--
+>
+> To reproduce:
+> 1. grab this binary:
+>   http://cs.columbia.edu/~cota/qemu/nbench-aarch64
+> 2. run it on a PowerPC host with:
+>   $ aarch64-linux-user/qemu-aarch64 nbench-aarch64 -V
+>
+> Note: the "-V" (or "-v") flag is important! Without it, there's no segfau=
+lt.
+>
+> I can reproduce this consistently on a Power8 host -- I'm using gcc112
+> from the gcc compile farm.
+>
+> Thanks,
+>
+> 		Emilio
+
+
+--
+Alex Benn=C3=A9e
