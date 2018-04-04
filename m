@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f3hmb-0003R3-4B
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:44:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1f3hnJ-0003xJ-Mf
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f3hmX-0000rv-Us
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:44:57 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:50031)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f3hmX-0000ro-LG
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:44:53 -0400
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-11-git-send-email-mjc@sifive.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b9b4f754-911c-8f23-8809-1a2d463f784e@vivier.eu>
-Date: Wed, 4 Apr 2018 14:44:47 +0200
+	(envelope-from <bounces@canonical.com>) id 1f3hnG-00014t-IO
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:45:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35774)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f3hnG-00013u-C4
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:45:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f3hnF-0000GN-CL
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 12:45:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 50C382E805D
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 12:45:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1519998711-73430-11-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 10/23] RISC-V Linux User Emulation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Apr 2018 12:38:33 -0000
+From: Matthieu Gautier <1761153@bugs.launchpad.net>
+Reply-To: Bug 1761153 <1761153@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152284551397.28710.6742910020765706357.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1761153] [NEW] qemu-user incorrect mmap for large
+ files on 64bits host and 32bits executable.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
 
-Le 02/03/2018 à 14:51, Michael Clark a écrit :
-> Implementation of linux user emulation for RISC-V.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->  linux-user/elfload.c              |  22 +++
->  linux-user/main.c                 |  99 +++++++++++++
->  linux-user/riscv/syscall_nr.h     | 287 ++++++++++++++++++++++++++++++++++++++
->  linux-user/riscv/target_cpu.h     |  18 +++
->  linux-user/riscv/target_elf.h     |  14 ++
->  linux-user/riscv/target_signal.h  |  23 +++
->  linux-user/riscv/target_structs.h |  46 ++++++
->  linux-user/riscv/target_syscall.h |  56 ++++++++
->  linux-user/riscv/termbits.h       | 222 +++++++++++++++++++++++++++++
->  linux-user/signal.c               | 203 ++++++++++++++++++++++++++-
->  linux-user/syscall.c              |   2 +
->  linux-user/syscall_defs.h         |  13 +-
->  target/riscv/cpu_user.h           |  13 ++
->  13 files changed, 1012 insertions(+), 6 deletions(-)
->  create mode 100644 linux-user/riscv/syscall_nr.h
->  create mode 100644 linux-user/riscv/target_cpu.h
->  create mode 100644 linux-user/riscv/target_elf.h
->  create mode 100644 linux-user/riscv/target_signal.h
->  create mode 100644 linux-user/riscv/target_structs.h
->  create mode 100644 linux-user/riscv/target_syscall.h
->  create mode 100644 linux-user/riscv/termbits.h
->  create mode 100644 target/riscv/cpu_user.h
-> 
-...
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index 9a380b9..4d3f244 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-...
-> +static abi_ulong get_sigframe(struct target_sigaction *ka,
-> +                              CPURISCVState *regs, size_t framesize)
-> +{
-> +    abi_ulong sp = regs->gpr[xSP];
-> +    int onsigstack = on_sig_stack(sp);
-> +
-> +    /* redzone */
-> +    /* This is the X/Open sanctioned signal stack switching.  */
-> +    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
-> +        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-> +    }
-> +
-> +    sp -= framesize;
-> +    sp &= ~3UL; /* align sp on 4-byte boundary */
+Public bug reported:
 
-kernel aligns using 0xf. Why do you use a different alignment?
+qemu-user seems to incorrectly mmap a file if the offset is > 4GiB and
+guest binary is 32 bits elf.
 
-> +
-> +    /* If we are on the alternate signal stack and would overflow it, don't.
-> +       Return an always-bogus address instead so we will die with SIGSEGV. */
-> +    if (onsigstack && !likely(on_sig_stack(sp))) {
-> +        return -1L;
-> +    }
-> +
-> +    return sp;
-> +}
-Other question why don't you use the same logic as in kernel?
+See attached test program `test_mmap.c`.
 
-1- check for signal stack overflow
-2- check for X/Open sanctioned signal stack switching
+```
+$ gcc -g -m32 -march=3Di386 test_mmap.c -o test_mmap
+$ file test_mmap
+test_mmap: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynami=
+cally linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 3.2.0, BuildID[=
+sha1]=3De36db05f4dfd8a9cfde8a969214a242c1f5a4b49, with debug_info, not stri=
+pped
+$ uname -a
+Linux localhost.localdomain 4.15.10-300.fc27.x86_64 #1 SMP Thu Mar 15 17:13=
+:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+$ qemu-i386 --version
+qemu-i386 version 2.10.1(qemu-2.10.1-2.fc27)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+$ ./test_mmap
+$ qemu-i386 test_mmap
+Incorrect data 1
+```
 
-static inline void __user *get_sigframe(struct ksignal *ksig,
-        struct pt_regs *regs, size_t framesize)
-{
-        unsigned long sp;
-        /* Default to using normal stack */
-        sp = regs->sp;
+Tested with qemu-i386 packaged in Fedora 27 and qemu-i386 compiled from
+git master (094b62cd9c)
 
-        /*
-         * If we are on the alternate signal stack and would overflow
-it, don't.
-         * Return an always-bogus address instead so we will die with
-SIGSEGV.
-         */
-        if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
-                return (void __user __force *)(-1UL);
+The issue was firstly detected on (more complex program) using qemu-arm
+(with 32bits binary) so it is probably a 32/64bits problem independently
+of the cpu family.
 
-        /* This is the X/Open sanctioned signal stack switching. */
-        sp = sigsp(sp, ksig) - framesize;
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-        /* Align the stack frame. */
-        sp &= ~0xfUL;
+** Attachment added: "test_mmap.c"
+   https://bugs.launchpad.net/bugs/1761153/+attachment/5101253/+files/test_=
+mmap.c
 
-        return (void __user *)sp;
-}
+-- =
 
-Thanks,
-Laurent
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1761153
+
+Title:
+  qemu-user incorrect mmap for large files on 64bits host and 32bits
+  executable.
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-user seems to incorrectly mmap a file if the offset is > 4GiB and
+  guest binary is 32 bits elf.
+
+  See attached test program `test_mmap.c`.
+
+  ```
+  $ gcc -g -m32 -march=3Di386 test_mmap.c -o test_mmap
+  $ file test_mmap
+  test_mmap: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dyna=
+mically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 3.2.0, BuildI=
+D[sha1]=3De36db05f4dfd8a9cfde8a969214a242c1f5a4b49, with debug_info, not st=
+ripped
+  $ uname -a
+  Linux localhost.localdomain 4.15.10-300.fc27.x86_64 #1 SMP Thu Mar 15 17:=
+13:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+  $ qemu-i386 --version
+  qemu-i386 version 2.10.1(qemu-2.10.1-2.fc27)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  $ ./test_mmap
+  $ qemu-i386 test_mmap
+  Incorrect data 1
+  ```
+
+  Tested with qemu-i386 packaged in Fedora 27 and qemu-i386 compiled
+  from git master (094b62cd9c)
+
+  The issue was firstly detected on (more complex program) using qemu-
+  arm (with 32bits binary) so it is probably a 32/64bits problem
+  independently of the cpu family.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1761153/+subscriptions
