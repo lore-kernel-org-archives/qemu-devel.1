@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f3jrd-0006dh-IG
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:58:18 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f3jvC-0008BJ-3M
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:01:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f3jrZ-0004Fg-NI
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:58:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53894 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f3jrZ-0004FI-Hx
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:58:13 -0400
-Date: Wed, 4 Apr 2018 15:58:03 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180404145803.GJ3186@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <mailman.35816.1522678020.27992.qemu-devel@nongnu.org>
-	<B4011235-0338-474D-90E4-ABDF3DC8CCB7@gmail.com>
-	<eeb9a3c8-e7ee-742b-fd6a-41c364d971c4@redhat.com>
-	<57D8CDA1-C9D1-4CD7-99A1-203B570BF4D3@gmail.com>
-	<20180404143859.GI3186@redhat.com>
-	<e283ef1f-a1cd-c21a-9058-c68c76182486@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e283ef1f-a1cd-c21a-9058-c68c76182486@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add instructions for
- MacPorts
+	(envelope-from <stefanha@redhat.com>) id 1f3jvA-0007yt-JH
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:01:58 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  4 Apr 2018 16:01:46 +0100
+Message-Id: <20180404150146.23281-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +17,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, Rainer M?ller <raimue@macports.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>
 
-On Wed, Apr 04, 2018 at 04:45:48PM +0200, Paolo Bonzini wrote:
-> On 04/04/2018 16:38, Daniel P. Berrang=C3=A9 wrote:
-> >>> Actually I believe we should remove those links.  I don't think hos=
-ting
-> >>> QEMU binaries on mediafire is a good idea.
-> >>>
-> >>> Paolo
-> >> Why not?
-> > The source/quality of those binaries is completely opaque. We've no i=
-dea who
-> > built them, nor what build options were used, nor what/where the corr=
-esponding
-> > source is (required for GPL compliance), nor any checksum / signature=
- to
-> > validate the binary isn't compromised since build, etc, etc.
-> >=20
-> > Pointing users to those binaries makes it appear QEMU project is bles=
-sing
-> > them, and so any issues with them directly reflect on QEMU's reputati=
-on.
-> >=20
-> > If we're going to link to binaries telling users to download them, we=
- need
-> > to be hosting them on qemu.org and have a clearly documented formal p=
-rocess
-> > around building & distributing them.
-> >=20
-> > Since both Homebrew & Macports are providing formal bulds though, it =
-looks
-> > simpler to just entirely delegate the problem to them, as we do for L=
-inux
-> > where we delegate to distro vendors to build & distribute binaries.
->=20
-> Note that, to some extent, the same issues do apply to Win32 binaries
-> (in particular, they are distributed under http and there are no
-> signatures).  However, the situation is better in that they are hosted
-> on an identifiable person's website, and of course Windows doesn't have
-> something akin to Homebrew and Macports so there is no alternative to
-> volunteers building and hosting the binaries.
+Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
+vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
+drain operation the block job iterates one more time than before.  The
+185 output no longer matches and the test is failing now.
 
-It would be desirable & practical to address that for Win32, by building
-the Win32 binaries at time of cutting the release, using the Mingw toolch=
-ain
-via one of our formal Docker environments. Would need buy-in of our relea=
-se
-manager to accept the extra work for making releases though...
+It may be possible to avoid the superfluous block job iteration, but
+that type of patch is not suitable late in the QEMU 2.12 release cycle.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+This patch simply updates the 185 output file.  The new behavior is
+correct, just not optimal, so make the test pass again.
+
+Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shutdown()")
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qemu-iotests/185     | 10 ++++++----
+ tests/qemu-iotests/185.out | 12 +++++++-----
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index f5b47e4c1a..298d88d04e 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -92,9 +92,8 @@ echo === Start commit job and exit qemu ===
+ echo
+ 
+ # Note that the reference output intentionally includes the 'offset' field in
+-# BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
+-# predictable and any change in the offsets would hint at a bug in the job
+-# throttling code.
++# BLOCK_JOB_* events for all of the following block jobs. They are predictable
++# and any change in the offsets would hint at a bug in the job throttling code.
+ #
+ # In order to achieve these predictable offsets, all of the following tests
+ # use speed=65536. Each job will perform exactly one iteration before it has
+@@ -102,11 +101,14 @@ echo
+ # command to be received (after receiving the command, the rest runs
+ # synchronously, so jobs can arbitrarily continue or complete).
+ #
++# Jobs present while QEMU is terminating iterate once more due to
++# bdrv_drain_all().
++#
+ # The buffer size for commit and streaming is 512k (waiting for 8 seconds after
+ # the first request), for active commit and mirror it's large enough to cover
+ # the full 4M, and for backup it's the qcow2 cluster size, which we know is
+ # 64k. As all of these are at least as large as the speed, we are sure that the
+-# offset doesn't advance after the first iteration before qemu exits.
++# offset advances exactly twice before qemu exits.
+ 
+ _send_qemu_cmd $h \
+     "{ 'execute': 'block-commit',
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index 57eaf8d699..2c4b04de73 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -20,7 +20,7 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "commit"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 1048576, "speed": 65536, "type": "commit"}}
+ 
+ === Start active commit job and exit qemu ===
+ 
+@@ -28,16 +28,18 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
+ 
+ === Start mirror job and exit qemu ===
+ 
+ {"return": {}}
+ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+ {"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
+ 
+ === Start backup job and exit qemu ===
+ 
+@@ -46,7 +48,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 65536, "speed": 65536, "type": "backup"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 131072, "speed": 65536, "type": "backup"}}
+ 
+ === Start streaming job and exit qemu ===
+ 
+@@ -54,6 +56,6 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "stream"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 1048576, "speed": 65536, "type": "stream"}}
+ No errors were found on the image.
+ *** done
+-- 
+2.14.3
