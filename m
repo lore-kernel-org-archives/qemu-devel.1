@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f3cPt-00058n-0R
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 03:01:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1f3dQv-0000Au-5i
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f3cPn-000126-7D
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 03:01:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55150 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f3dQr-0000Uk-1B
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:06:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52462 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f3cPn-00011y-0P
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 03:01:03 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF71A43075C3
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 07:00:59 +0000 (UTC)
-Date: Wed, 4 Apr 2018 15:00:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180404070054.GD12052@lemon.usersys.redhat.com>
-References: <20180404065346.3252-1-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f3dQq-0000UI-T2
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 04:06:12 -0400
+Date: Wed, 4 Apr 2018 16:06:00 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180404080600.GA10540@xz-mi>
+References: <bb088a1ba2e344273db32402f7c9fae4@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180404065346.3252-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] iothread: workaround glib bug
- which hangs qmp-test
+In-Reply-To: <bb088a1ba2e344273db32402f7c9fae4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: calculate expected_downtime
+ with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, quintela@redhat.com
 
-On Wed, 04/04 14:53, Peter Xu wrote:
-> Free the AIO context earlier than the GMainContext (if we have) to
-> workaround a possible Glib bug.  No functional change at all.
-> 
-> We encountered a qmp-test hang with oob:
-> 
->   #0  0x00007f35ffe45334 in __lll_lock_wait () from /lib64/libpthread.so.0
->   #1  0x00007f35ffe405d8 in _L_lock_854 () from /lib64/libpthread.so.0
->   #2  0x00007f35ffe404a7 in pthread_mutex_lock () from /lib64/libpthread.so.0
->   #3  0x00007f35fc5b9c9d in g_source_unref_internal (source=0x24f0600, context=0x7f35f0000960, have_lock=0) at gmain.c:1685
->   #4  0x0000000000aa6672 in aio_context_unref (ctx=0x24f0600) at /root/qemu/util/async.c:497
->   #5  0x000000000065851c in iothread_instance_finalize (obj=0x24f0380) at /root/qemu/iothread.c:129
->   #6  0x0000000000962d79 in object_deinit (obj=0x24f0380, type=0x242e960) at /root/qemu/qom/object.c:462
->   #7  0x0000000000962e0d in object_finalize (data=0x24f0380) at /root/qemu/qom/object.c:476
->   #8  0x0000000000964146 in object_unref (obj=0x24f0380) at /root/qemu/qom/object.c:924
->   #9  0x0000000000965880 in object_finalize_child_property (obj=0x24ec640, name=0x24efca0 "mon_iothread", opaque=0x24f0380) at /root/qemu/qom/object.c:1436
->   #10 0x0000000000962c33 in object_property_del_child (obj=0x24ec640, child=0x24f0380, errp=0x0) at /root/qemu/qom/object.c:436
->   #11 0x0000000000962d26 in object_unparent (obj=0x24f0380) at /root/qemu/qom/object.c:455
->   #12 0x0000000000658f00 in iothread_destroy (iothread=0x24f0380) at /root/qemu/iothread.c:365
->   #13 0x00000000004c67a8 in monitor_cleanup () at /root/qemu/monitor.c:4663
->   #14 0x0000000000669e27 in main (argc=16, argv=0x7ffc8b1ae2f8, envp=0x7ffc8b1ae380) at /root/qemu/vl.c:4749
-> 
-> With glib version 2.28.8-9 (current default version on centos6) we might
-> encounter above with the old code. It is verified that glib version
-> 2.50.3-3 won't trigger that bug again, but since we are still supporting
-> glib 2.28.8-9, we may want this workaround.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  iothread.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
-> 
-> diff --git a/iothread.c b/iothread.c
-> index e675c38442..d41d661cdf 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -117,16 +117,26 @@ static void iothread_instance_finalize(Object *obj)
->      IOThread *iothread = IOTHREAD(obj);
->  
->      iothread_stop(iothread);
-> +    /*
-> +     * With glib version 2.28.8-9 (current default version on centos6)
-> +     * we might encounter problem of qmp-test OOB hang if we unref the
-> +     * AIO context later than the GMainContext below.  Let's free the
-> +     * AIO context earlier to bypass that possible glib bug.
-> +     *
-> +     * It is verified that glib version 2.50.3-3 (or even earlier)
-> +     * won't trigger that bug again, but since we are still supporting
-> +     * glib 2.28.8-9, we need this workaround.
-> +     */
-> +    if (iothread->ctx) {
-> +        aio_context_unref(iothread->ctx);
-> +        iothread->ctx = NULL;
-> +    }
->      if (iothread->worker_context) {
->          g_main_context_unref(iothread->worker_context);
->          iothread->worker_context = NULL;
->      }
->      qemu_cond_destroy(&iothread->init_done_cond);
->      qemu_mutex_destroy(&iothread->init_done_lock);
-> -    if (!iothread->ctx) {
-> -        return;
-> -    }
-> -    aio_context_unref(iothread->ctx);
->  }
->  
->  static void iothread_complete(UserCreatable *obj, Error **errp)
-> -- 
-> 2.14.3
-> 
+On Wed, Apr 04, 2018 at 11:55:14AM +0530, Balamuruhan S wrote:
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+[...]
+
+> > too. So still I'll put aside the "which one is better" question.
+> > 
+> > For your use case, you can have a look on either of below way to
+> > have a converged migration:
+> > 
+> > - auto-converge: that's a migration capability that throttles CPU
+> >   usage of guests
+> 
+> I used auto-converge option before hand and still it doesn't help
+> for migration to complete
+
+Have you digged about why?  AFAIK auto-convergence will at last absort
+merely the whole vcpu resource (99% of them maximum).  Maybe you are
+not with the best throttle values?  Or do you think that could be a
+auto-convergence bug too?
+
+> 
+> > 
+> > - postcopy: that'll let you start the destination VM even without
+> >   transferring all the RAMs before hand
+> 
+> I am seeing issue in postcopy migration between POWER8(16M) -> POWER9(1G)
+> where the hugepage size is different. I am trying to enable it but host
+> start
+> address have to be aligned with 1G page size in ram_block_discard_range(),
+> which I am debugging further to fix it.
+
+I thought the huge page size needs to be matched on both side
+currently for postcopy but I'm not sure.  CC Dave (though I think
+Dave's still on PTO).
+
+-- 
+Peter Xu
