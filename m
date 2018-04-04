@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f3fkl-0000Tu-7n
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f3fkp-0000WN-DV
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:35:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f3fki-00063X-3V
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41076 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f3fkh-00063Q-VS
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:52 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  4 Apr 2018 11:34:40 +0100
-Message-Id: <20180404103440.19546-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] scripts/qemugdb: support coroutine backtrace
- in coredumps
+	(envelope-from <alex.bennee@linaro.org>) id 1f3fkm-00067X-7p
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:59 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f3fkl-00065B-V8
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 06:34:56 -0400
+Received: by mail-wr0-x244.google.com with SMTP id n2so18465438wrj.7
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 03:34:55 -0700 (PDT)
+References: <20180111125444.6498-1-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180111125444.6498-1-pbonzini@redhat.com>
+Date: Wed, 04 Apr 2018 11:34:53 +0100
+Message-ID: <87lge3cl9u.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cpus: unify qemu_*_wait_io_event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +29,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Use the 'select-frame' GDB command to switch stacks instead of manually
-setting the debugged thread's registers (this only works when debugging
-a live process, not in a coredump).
 
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-Vladimir: Does this work for you?
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
- scripts/qemugdb/coroutine.py | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+> Except for round-robin TCG, every other accelerator is using more or
+> less the same code around qemu_wait_io_event_common.  The exception
+> is HAX, which also has to eat the dummy APC that is queued by
+> qemu_cpu_kick_thread.
+>
+> We can add the SleepEx call to qemu_wait_io_event under "if
+> (!tcg_enabled())", since that is the condition that is used in
+> qemu_cpu_kick_thread, and unify the function for KVM, HAX, HVF and
+> multi-threaded TCG.  Single-threaded TCG code can also be simplified
+> since it is only used in the round-robin, sleep-if-all-CPUs-idle case.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
-index ab699794ab..ed96434aee 100644
---- a/scripts/qemugdb/coroutine.py
-+++ b/scripts/qemugdb/coroutine.py
-@@ -77,13 +77,11 @@ def bt_jmpbuf(jmpbuf):
-     for i in regs:
-         old[i] = gdb.parse_and_eval('(uint64_t)$%s' % i)
- 
--    for i in regs:
--        gdb.execute('set $%s = %s' % (i, regs[i]))
-+    gdb.execute('select-frame %s %s' % (regs['rsp'], regs['rip']))
- 
-     gdb.execute('bt')
- 
--    for i in regs:
--        gdb.execute('set $%s = %s' % (i, old[i]))
-+    gdb.execute('select-frame %s %s' % (old['rsp'], old['rip']))
- 
- def coroutine_to_jmpbuf(co):
-     coroutine_pointer = co.cast(gdb.lookup_type('CoroutineUContext').pointer())
--- 
-2.14.3
+I had trouble applying this patch but the change seems sane to me
+
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  cpus.c | 49 +++++++++++++++++--------------------------------
+>  1 file changed, 17 insertions(+), 32 deletions(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index 440b9291f5..3b6c9879ec 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -911,7 +911,8 @@ static void kick_tcg_thread(void *opaque)
+>
+>  static void start_tcg_kick_timer(void)
+>  {
+> -    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+> +    assert(!mttcg_enabled);
+> +    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+>          tcg_kick_vcpu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>                                             kick_tcg_thread, NULL);
+>          timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+> @@ -920,6 +921,7 @@ static void start_tcg_kick_timer(void)
+>
+>  static void stop_tcg_kick_timer(void)
+>  {
+> +    assert(!mttcg_enabled);
+>      if (tcg_kick_vcpu_timer) {
+>          timer_del(tcg_kick_vcpu_timer);
+>          tcg_kick_vcpu_timer =3D NULL;
+> @@ -1154,18 +1156,9 @@ static void qemu_wait_io_event_common(CPUState *cp=
+u)
+>      process_queued_cpu_work(cpu);
+>  }
+>
+> -static bool qemu_tcg_should_sleep(CPUState *cpu)
+> +static void qemu_tcg_rr_wait_io_event(CPUState *cpu)
+>  {
+> -    if (mttcg_enabled) {
+> -        return cpu_thread_is_idle(cpu);
+> -    } else {
+> -        return all_cpu_threads_idle();
+> -    }
+> -}
+> -
+> -static void qemu_tcg_wait_io_event(CPUState *cpu)
+> -{
+> -    while (qemu_tcg_should_sleep(cpu)) {
+> +    while (all_cpu_threads_idle()) {
+>          stop_tcg_kick_timer();
+>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>      }
+> @@ -1175,20 +1168,18 @@ static void qemu_tcg_wait_io_event(CPUState *cpu)
+>      qemu_wait_io_event_common(cpu);
+>  }
+>
+> -static void qemu_kvm_wait_io_event(CPUState *cpu)
+> +static void qemu_wait_io_event(CPUState *cpu)
+>  {
+>      while (cpu_thread_is_idle(cpu)) {
+>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>      }
+>
+> -    qemu_wait_io_event_common(cpu);
+> -}
+> -
+> -static void qemu_hvf_wait_io_event(CPUState *cpu)
+> -{
+> -    while (cpu_thread_is_idle(cpu)) {
+> -        qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> +#ifdef _WIN32
+> +    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
+> +    if (!tcg_enabled()) {
+> +        SleepEx(0, TRUE);
+>      }
+> +#endif
+>      qemu_wait_io_event_common(cpu);
+>  }
+>
+> @@ -1224,7 +1215,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>                  cpu_handle_guest_debug(cpu);
+>              }
+>          }
+> -        qemu_kvm_wait_io_event(cpu);
+> +        qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>
+>      qemu_kvm_destroy_vcpu(cpu);
+> @@ -1270,7 +1261,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>              exit(1);
+>          }
+>          qemu_mutex_lock_iothread();
+> -        qemu_wait_io_event_common(cpu);
+> +        qemu_wait_io_event(cpu);
+>      }
+>
+>      return NULL;
+> @@ -1487,7 +1478,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>              atomic_mb_set(&cpu->exit_request, 0);
+>          }
+>
+> -        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+> +        qemu_tcg_rr_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+>          deal_with_unplugged_cpus();
+>      }
+>
+> @@ -1518,13 +1509,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>              }
+>          }
+>
+> -        while (cpu_thread_is_idle(cpu)) {
+> -            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> -        }
+> -#ifdef _WIN32
+> -        SleepEx(0, TRUE);
+> -#endif
+> -        qemu_wait_io_event_common(cpu);
+> +        qemu_wait_io_event(cpu);
+>      }
+>      return NULL;
+>  }
+> @@ -1561,7 +1546,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>                  cpu_handle_guest_debug(cpu);
+>              }
+>          }
+> -        qemu_hvf_wait_io_event(cpu);
+> +        qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>
+>      hvf_vcpu_destroy(cpu);
+> @@ -1640,7 +1625,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>          }
+>
+>          atomic_mb_set(&cpu->exit_request, 0);
+> -        qemu_tcg_wait_io_event(cpu);
+> +        qemu_wait_io_event(cpu);
+>      }
+>
+>      return NULL;
+
+
+--
+Alex Benn=C3=A9e
