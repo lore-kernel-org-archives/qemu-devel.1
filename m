@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3l0n-0008L5-Uy
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:11:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f3l5P-00039f-4Q
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:16:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3l0j-0008Eq-SP
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:11:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43546 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f3l0j-0008E1-MF
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:11:45 -0400
-References: <mailman.35816.1522678020.27992.qemu-devel@nongnu.org>
-	<B4011235-0338-474D-90E4-ABDF3DC8CCB7@gmail.com>
-	<eeb9a3c8-e7ee-742b-fd6a-41c364d971c4@redhat.com>
-	<57D8CDA1-C9D1-4CD7-99A1-203B570BF4D3@gmail.com>
-	<20180404143859.GI3186@redhat.com>
-	<e283ef1f-a1cd-c21a-9058-c68c76182486@redhat.com>
-	<20180404145803.GJ3186@redhat.com>
-	<b5f3cb9f-d40a-439a-34a4-58bba9ec0387@weilnetz.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6171cf9f-6c76-33a7-9654-c6ed78dbe02f@redhat.com>
-Date: Wed, 4 Apr 2018 18:11:42 +0200
+	(envelope-from <mreitz@redhat.com>) id 1f3l5N-0002no-Qf
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:16:35 -0400
+References: <20180404150146.23281-1-stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
+Date: Wed, 4 Apr 2018 18:16:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <b5f3cb9f-d40a-439a-34a4-58bba9ec0387@weilnetz.de>
+In-Reply-To: <20180404150146.23281-1-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add instructions for
- MacPorts
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, Rainer M?ller <raimue@macports.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>
 
-On 04/04/2018 17:55, Stefan Weil wrote:
-> Am 04.04.2018 um 16:58 schrieb Daniel P. Berrang=C3=A9:
->> On Wed, Apr 04, 2018 at 04:45:48PM +0200, Paolo Bonzini wrote:
->>> On 04/04/2018 16:38, Daniel P. Berrang=C3=A9 wrote:
->>>> The source/quality of those binaries is completely opaque. We've no =
-idea who
->>>> built them, nor what build options were used, nor what/where the cor=
-responding
->>>> source is (required for GPL compliance), nor any checksum / signatur=
-e to
->>>> validate the binary isn't compromised since build, etc, etc.
->>>>
->>>> Pointing users to those binaries makes it appear QEMU project is ble=
-ssing
->>>> them, and so any issues with them directly reflect on QEMU's reputat=
-ion.
->>>>
->>>> If we're going to link to binaries telling users to download them, w=
-e need
->>>> to be hosting them on qemu.org and have a clearly documented formal =
-process
->>>> around building & distributing them.
->>>>
->>>> Since both Homebrew & Macports are providing formal bulds though, it=
- looks
->>>> simpler to just entirely delegate the problem to them, as we do for =
-Linux
->>>> where we delegate to distro vendors to build & distribute binaries.
->>>
->>> Note that, to some extent, the same issues do apply to Win32 binaries
->>> (in particular, they are distributed under http and there are no
->>> signatures).  However, the situation is better in that they are hoste=
-d
->>> on an identifiable person's website, and of course Windows doesn't ha=
-ve
->>> something akin to Homebrew and Macports so there is no alternative to
->>> volunteers building and hosting the binaries.
->>
->> It would be desirable & practical to address that for Win32, by buildi=
-ng
->> the Win32 binaries at time of cutting the release, using the Mingw too=
-lchain
->> via one of our formal Docker environments. Would need buy-in of our re=
-lease
->> manager to accept the extra work for making releases though...
->>
->> Regards,
->> Daniel
->=20
-> That would be one possible way. A more automated way could use CI build=
-s
-> (for example on GitHub) to generate executables for Windows.
->=20
-> By the way: https://qemu.weilnetz.de provides https (maybe I should
-> enforce it), it includes sha512, and I also sign the binaries with my
-> key. You still have to trust me, Debian and Cygwin (which provides lots
-> of libraries used for the build).
+On 2018-04-04 17:01, Stefan Hajnoczi wrote:
+> Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
+> vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
+> drain operation the block job iterates one more time than before.  The
+> 185 output no longer matches and the test is failing now.
+> 
+> It may be possible to avoid the superfluous block job iteration, but
+> that type of patch is not suitable late in the QEMU 2.12 release cycle.
+> 
+> This patch simply updates the 185 output file.  The new behavior is
+> correct, just not optimal, so make the test pass again.
+> 
+> Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shutdown()")
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tests/qemu-iotests/185     | 10 ++++++----
+>  tests/qemu-iotests/185.out | 12 +++++++-----
+>  2 files changed, 13 insertions(+), 9 deletions(-)
 
-Cool!  I had noticed sha512, but it is not very useful without https
-(except to verify bitflips).  Good news that you support https, we
-should change the website to use https links instead.
+On tmpfs, this isn't enough to let the test pass.  There, the active
+commit job finishes before the quit is sent, resulting in this diff:
 
-Regarding signing, there is no GPG signature.  That's okay, but we
-should document how to verify the installer signature from either Linux
-or Windows.
+--- tests/qemu-iotests/185.out      2018-04-04 18:10:02.015935435 +0200
++++ tests/qemu-iotests/185.out.bad  2018-04-04 18:10:21.045473817 +0200
+@@ -26,9 +26,9 @@
 
-Thanks,
+ {"return": {}}
+ {"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304,
+"offset": 4194304, "speed": 65536, "type": "commit"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304,
+"offset": 4194304, "speed": 65536, "type": "commit"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+"event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len":
+4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
 
-Paolo
+ === Start mirror job and exit qemu ===
+
+This seems to be independent of whether there is actually data on
+TEST_IMG (the commit source), so something doesn't seem quite right with
+the block job throttling here...?
+
+Max
