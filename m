@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1f3l8J-0004YM-Mm
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:19:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1f3lEN-0006vD-I1
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1f3l8G-0003Kf-DA
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:19:35 -0400
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:41398)
+	(envelope-from <bounces@canonical.com>) id 1f3lEK-00067e-9W
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:25:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49610)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1f3l8G-0003KR-6v
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:19:32 -0400
-Received: by mail-io0-x235.google.com with SMTP id m83so27011754ioi.8
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 09:19:32 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <395f732f-dca2-a2e8-7c4c-0cbe79f3e8c5@redhat.com>
-Date: Wed, 4 Apr 2018 12:19:29 -0400
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f3lEK-00066s-1y
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:25:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f3lEH-0000n9-W2
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 16:25:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F132F2E80D1
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 16:25:45 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <0B844F19-6C50-475D-B33D-3A66620A2595@gmail.com>
-References: <mailman.35816.1522678020.27992.qemu-devel@nongnu.org>
-	<B4011235-0338-474D-90E4-ABDF3DC8CCB7@gmail.com>
-	<eeb9a3c8-e7ee-742b-fd6a-41c364d971c4@redhat.com>
-	<57D8CDA1-C9D1-4CD7-99A1-203B570BF4D3@gmail.com>
-	<20180404143859.GI3186@redhat.com>
-	<e283ef1f-a1cd-c21a-9058-c68c76182486@redhat.com>
-	<20180404145803.GJ3186@redhat.com>
-	<b5f3cb9f-d40a-439a-34a4-58bba9ec0387@weilnetz.de>
-	<6C36CDC6-851D-41A3-BDA8-1D2712437117@gmail.com>
-	<395f732f-dca2-a2e8-7c4c-0cbe79f3e8c5@redhat.com>
-Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add instructions for
- MacPorts
+Date: Wed, 04 Apr 2018 16:16:10 -0000
+From: Matthias Klose <doko@ubuntu.com>
+Reply-To: Bug 1749393 <1749393@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151859702399.9461.6832978283203997178.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152285857075.30083.12631226667654707192.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1749393] Re: sbrk() not working under qemu-user
+ with a PIE-compiled binary?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,102 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Weil <sw@weilnetz.de>, =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>, Rainer M?ller <raimue@macports.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
+qemu patch proposed at http://lists.nongnu.org/archive/html/qemu-
+devel/2018-03/msg04700.html
 
-> On Apr 4, 2018, at 12:08 PM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 04/04/2018 18:05, Programmingkid wrote:
->>=20
->>> On Apr 4, 2018, at 11:55 AM, Stefan Weil <sw@weilnetz.de> wrote:
->>>=20
->>> Am 04.04.2018 um 16:58 schrieb Daniel P. Berrang=C3=A9:
->>>> On Wed, Apr 04, 2018 at 04:45:48PM +0200, Paolo Bonzini wrote:
->>>>> On 04/04/2018 16:38, Daniel P. Berrang=C3=A9 wrote:
->>>>>> The source/quality of those binaries is completely opaque. We've =
-no idea who
->>>>>> built them, nor what build options were used, nor what/where the =
-corresponding
->>>>>> source is (required for GPL compliance), nor any checksum / =
-signature to
->>>>>> validate the binary isn't compromised since build, etc, etc.
->>>>>>=20
->>>>>> Pointing users to those binaries makes it appear QEMU project is =
-blessing
->>>>>> them, and so any issues with them directly reflect on QEMU's =
-reputation.
->>>>>>=20
->>>>>> If we're going to link to binaries telling users to download =
-them, we need
->>>>>> to be hosting them on qemu.org and have a clearly documented =
-formal process
->>>>>> around building & distributing them.
->>>>>>=20
->>>>>> Since both Homebrew & Macports are providing formal bulds though, =
-it looks
->>>>>> simpler to just entirely delegate the problem to them, as we do =
-for Linux
->>>>>> where we delegate to distro vendors to build & distribute =
-binaries.
->>>>>=20
->>>>> Note that, to some extent, the same issues do apply to Win32 =
-binaries
->>>>> (in particular, they are distributed under http and there are no
->>>>> signatures).  However, the situation is better in that they are =
-hosted
->>>>> on an identifiable person's website, and of course Windows doesn't =
-have
->>>>> something akin to Homebrew and Macports so there is no alternative =
-to
->>>>> volunteers building and hosting the binaries.
->>>>=20
->>>> It would be desirable & practical to address that for Win32, by =
-building
->>>> the Win32 binaries at time of cutting the release, using the Mingw =
-toolchain
->>>> via one of our formal Docker environments. Would need buy-in of our =
-release
->>>> manager to accept the extra work for making releases though...
->>>>=20
->>>> Regards,
->>>> Daniel
->>>=20
->>> That would be one possible way. A more automated way could use CI =
-builds
->>> (for example on GitHub) to generate executables for Windows.
->>>=20
->>> By the way: https://qemu.weilnetz.de provides https (maybe I should
->>> enforce it), it includes sha512, and I also sign the binaries with =
-my
->>> key. You still have to trust me, Debian and Cygwin (which provides =
-lots
->>> of libraries used for the build).
->>>=20
->>> Regards,
->>> Stefan
->>=20
->> I guess there is just too much distrust to provide a QEMU binary for =
-download.
->=20
-> It's not distrust, it's responsibility.
->=20
-> Paolo
+-- =
 
-So from what I learned, in order to provide a binary of QEMU, these =
-things must be done:
-- Some kind of checksum be provided for the binary (md5, SHA512, ...)
-- A zip file that has the exact code used to build the binary be =
-provided
-- The complete environment use to build the binary be documented
--- Operating system name and version
--- name and version of various tools used to build the binary (GCC, =
-make, ...)
--- name and version of libraries that are linked to QEMU (libc, pixman, =
-...)
-- The exact command-line options used to build the binary be provided
-- The email address and identity of the person who made the binary be =
-provided
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1749393
 
-If anything is missing please feel free to share.=20
+Title:
+  sbrk() not working under qemu-user with a PIE-compiled binary?
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  In Debian unstable, we recently switched bash to be a PIE-compiled
+  binary (for hardening). Unfortunately this resulted in bash being
+  broken when run under qemu-user (for all target architectures, host
+  being amd64 for me).
+
+  $ sudo chroot /srv/chroots/sid-i386/ qemu-i386-static /bin/bash
+  bash: xmalloc: .././shell.c:1709: cannot allocate 10 bytes (0 bytes alloc=
+ated)
+
+  bash has its own malloc implementation based on sbrk():
+  https://git.savannah.gnu.org/cgit/bash.git/tree/lib/malloc/malloc.c
+
+  When we disable this internal implementation and rely on glibc's
+  malloc, then everything is fine. But it might be that glibc has a
+  fallback when sbrk() is not working properly and it might hide the
+  underlying problem in qemu-user.
+
+  This issue has also been reported to the bash upstream author and he sugg=
+ested that the issue might be in qemu-user so I'm opening a ticket here. He=
+re's the discussion with the bash upstream author:
+  https://lists.gnu.org/archive/html/bug-bash/2018-02/threads.html#00080
+
+  You can find the problematic bash binary in that .deb file:
+  http://snapshot.debian.org/archive/debian/20180206T154716Z/pool/main/b/ba=
+sh/bash_4.4.18-1_i386.deb
+
+  The version of qemu I have been using is 2.11 (Debian package qemu-
+  user-static version 1:2.11+dfsg-1) but I have had reports that the
+  problem is reproducible with older versions (back to 2.8 at least).
+
+  Here are the related Debian bug reports:
+  https://bugs.debian.org/889869
+  https://bugs.debian.org/865599
+
+  It's worth noting that bash used to have this problem (when compiled as a=
+ PIE binary) even when run directly but then something got fixed in the ker=
+nel and now the problem only appears when run under qemu-user:
+  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1518483
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1749393/+subscriptions
