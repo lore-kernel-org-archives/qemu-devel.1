@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f3ihZ-0008R8-3l
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:43:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f3iiB-0000lP-BP
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:44:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f3ihU-0004nx-4p
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:43:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1f3ihT-0004nU-Rr
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:43:44 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w34Dg4V8055247
-	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 09:43:42 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h4xktbxe5-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 09:43:41 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Wed, 4 Apr 2018 14:43:37 +0100
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
-	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
-	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
-	<ce32e96c-f448-c375-cc25-96bb3cf35d69@linux.vnet.ibm.com>
-	<3735c70a-2b6b-1962-08bb-8badcad7b487@linux.vnet.ibm.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Wed, 4 Apr 2018 15:43:32 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f3iiA-00053Z-II
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:44:27 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180319161556.16446-1-peter.maydell@linaro.org>
+	<20180319161556.16446-2-peter.maydell@linaro.org>
+	<6431180d-fcaa-6a9c-de22-5ded33433be8@amsat.org>
+	<CAFEAcA9sAsrcw-AwZU3QW5BQJfi2td3pi8zOS2iVK09D9qAH2g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <388842e2-fe60-d034-0c43-3a967aa02688@amsat.org>
+Date: Wed, 4 Apr 2018 10:44:15 -0300
 MIME-Version: 1.0
-In-Reply-To: <3735c70a-2b6b-1962-08bb-8badcad7b487@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA9sAsrcw-AwZU3QW5BQJfi2td3pi8zOS2iVK09D9qAH2g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <4866a115-b34d-9a5c-6c73-0d066a9b09b8@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
- interception
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12 1/2]
+ hw/sd/bcm2835_sdhost: Add tracepoints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,176 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Pekka Enberg <penberg@iki.fi>
 
-On 04/04/2018 15:33, Tony Krowiak wrote:
-> On 04/04/2018 07:09 AM, Pierre Morel wrote:
->> On 02/04/2018 18:36, Tony Krowiak wrote:
->>> On 03/26/2018 05:03 AM, Pierre Morel wrote:
->>>> On 26/03/2018 10:32, David Hildenbrand wrote:
->>>>> On 16.03.2018 00:24, Tony Krowiak wrote:
->>>>>> If the CPU model indicates that AP facility is installed on
->>>>>> the guest (i.e., -cpu xxxx,ap=3Don), then the expectation is that
->>>>>> the AP bus running in the guest will initialize; however, if the
->>>>>> AP instructions are not being interpreted by the firmware, then
->>>>>> they will be intercepted and routed back to QEMU for handling.
->>>>>> If a handler is not defined to process the intercepted instruciton=
-,
->>>>>> t
->>>> ...snip...
->>>>>
->>>>>> +int ap_device_handle_nqap(S390CPU *cpu)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 CPUS390XState *env =3D &cpu->env;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 if (s390_has_feat(S390_FEAT_AP)) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 env->regs[1] =3D 0x100=
-00;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 return -EOPNOTSUPP;
->>>>>> +}
->>>>>> +
->>>>>> +int ap_device_handle_dqap(S390CPU *cpu)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 CPUS390XState *env =3D &cpu->env;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 if (s390_has_feat(S390_FEAT_AP)) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 env->regs[1] =3D 0x100=
-00;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 return -EOPNOTSUPP;
->>>>>> +}
->>>>>> +
->>>>>> +int ap_device_handle_pqap(S390CPU *cpu)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 CPUS390XState *env =3D &cpu->env;
->>>>>> +=C2=A0=C2=A0=C2=A0 int fc =3D 4 & (env->regs[0] >> 24);
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 /*
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * The Query Configuration Information (Q=
-CI) function (fc =3D=3D=20
->>>>>> 4) does not
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * set a response code in reg 1, so check=
- for that along=20
->>>>>> with the
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * AP feature.
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>>>>> +=C2=A0=C2=A0=C2=A0 if ((fc !=3D 4) && s390_has_feat(S390_FEAT_AP)=
-) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 env->regs[1] =3D 0x100=
-00;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>> This would imply an operation exception in case fc=3D=3D4, which=20
->>>>> sounds very
->>>>> wrong.
->>>>
->>>> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must=20
->>>> be tested
->>>> to know what to answer.
->>>> If the feature is there, QCI must be answered correctly.
->>> This is an interesting proposition which raises several issues that=20
->>> will need to
->>> be addressed. The only time the PQAP(QCI) instruction is intercepted=20
->>> is when:
->>> * A vfio-ap device is NOT defined for the guest because the vfio_ap=20
->>> device driver
->>> =C2=A0 will set ECA.28 and the PQAP(QCI) instruction will be interpre=
-ted
->>> * STFLE.12 is set for the guest
->>>
->>> You say that the QCI must be answered correctly, but what is the=20
->>> correct response?
->>> If we return the matrix - i.e., APM, ADM and AQM - configured via=20
->>> the mediated
->>> matrix device's sysfs attributes files, then if any APQNs are=20
->>> defined in the matrix,
->>> we will have to handle *ALL* AP instructions by executing them on=20
->>> behalf of the
->>> guest. I suppose we could return an empty matrix in which case the=20
->>> AP bus will come
->>> up without any devices on the guest, but what is the expectation of=20
->>> an admin who
->>> deliberately configures the mediated matrix device? Should we forego=20
->>> handling interception
->>> of AP instructions and consider a guest configuration that turns on=20
->>> S390_FEAT_AP but
->>> does not define a vfio-ap device to be erroneous and terminate=20
->>> starting of the guest?
->>> Anybody have any thoughts?
->>>>
->>>>
->>>> there are also some error situations to handle in all three function=
-s.
->>> To what error situations are you referring?
+On 04/04/2018 08:54 AM, Peter Maydell wrote:
+> On 4 April 2018 at 12:42, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Hi Peter,
 >>
->> program exceptions, like access, privilege or specification exceptions.
-> Are you suggesting that these handlers need to verify that the=20
-> instruction
-> specification is correct? For example, the NQAP instruction - NQAP=20
-> r1,r2 -
-> expects an even-odd pair of general registers in the r1 and r2 and must
-> designate an even register; otherwise a specification exception is
-> recognized. Are you saying that the handler for NQAP must verify this
-> requirement and inject a specification exception if it is not met? If=20
-> not,
-> then can you provide a specific example of what you are talking about?
-
-Yes I mean this.
-
-But one other thing.
-Returning code 0x01 seems wrong for me, this is right if no AP card
-are in the system but I do not thing that it is what we mean.
-I think we should return code 0x03 stating that the AP card is not in=20
-configured state
-
-The difference is that we can get out of a not-configured state with a=20
-SCLP command but
-we can not recover from an un-existing APQN.
-
-
+>> On 03/19/2018 01:15 PM, Peter Maydell wrote:
+>>> Add some tracepoints to the bcm2835_sdhost driver, to assist
+>>> debugging.
+> 
+>>> +# hw/sd/bcm2835_sdhost.c
+>>> +bcm2835_sdhost_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>>> +bcm2835_sdhost_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
 >>
->>
->>
->>>>
->>>>
->>>>
->>>>>
->>>>> Hard to review without access to documentation. (hard to=20
->>>>> understand why
->>>>> such stuff is to be kept confidential for decades)
->>>>>
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 return -EOPNOTSUPP;
->>>>>> +}
->>>>>> +
->>>>>> =C2=A0 static Property vfio_ap_properties[] =3D {
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DEFINE_PROP_STRING("sysfsdev", VFIO=
-APDevice, vdev.sysfsdev),
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DEFINE_PROP_END_OF_LIST(),
->>>>>> diff --git a/include/hw/s390x/ap-device.h=20
->>>>>> b/include/hw/s390x/ap-device.h
->>>>>> index 693df90..d45ae38 100644
->>>>>> --- a/include/hw/s390x/ap-device.h
->>>>>> +++ b/include/hw/s390x/ap-device.h
->>>>>> @@ -11,6 +11,8 @@
->>>>>> =C2=A0 #ifndef HW_S390X_AP_DEVICE_H
->>>>>> =C2=A0 #define HW_S390X_AP_DEVICE_H
->>>>>
->>>>
->>>
->>>
->>
->
+>> Can you use the more explicit "size_t" and "%zu" please?
+> 
+> The argument to the read/write functions which we're tracing
+> here isn't a size_t, though (and since it's only ever 1/2/4/8
+> it makes sense that it isn't a size_t). What would be the
+> point in casting it to an size_t here?>
+> A quick grep through hw/*/trace-events suggests we don't
+> use size_t for tracing of mmio read/write functions
+> in other devices.
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Oh... I find using 'unsigned' confusing, but that's fine this way.
+
+Regards,
+
+Phil.
