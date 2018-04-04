@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3mdg-0004h9-9Z
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 13:56:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1f3mn5-00081V-9t
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:05:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3mdb-0001lH-Du
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 13:56:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60370)
+	(envelope-from <bounces@canonical.com>) id 1f3mn4-00078x-6x
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:05:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34892)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3mdb-0001l7-7j
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 13:55:59 -0400
+	id 1f3mn3-00078l-SL
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:05:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3mdX-0005Xo-Kg
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 17:55:55 +0000
+	id 1f3mn2-0000gI-Tr
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 18:05:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ADFAD2E818C
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 17:55:52 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C929D2E80C9
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 18:05:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 17:41:20 -0000
-From: Thomas Huth <1441443@bugs.launchpad.net>
-Reply-To: Bug 1441443 <1441443@bugs.launchpad.net>
+Date: Wed, 04 Apr 2018 17:52:23 -0000
+From: Thomas Huth <1025244@bugs.launchpad.net>
+Reply-To: Bug 1025244 <1025244@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150408062216.7311.52657.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152286368013.8590.7601486193968184353.malone@soybean.canonical.com>
+References: <20120716123031.26191.29124.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152286434325.9839.18315812041678068453.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1441443] Re: Is there a way to create a 10G
- network interface for VMs in KVM2.0?
+Subject: [Qemu-devel] [Bug 1025244] Re: qcow2 image increasing disk size
+ above the virtual limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,63 +39,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Looking through old bug tickets ... have you already tried to use vhost-
-net? That should be one of the fastest ways of networking with QEMU as
-far as I know...
+Looking through old bug tickets... is there anything left to do here? Or
+should we rather close this ticket nowadays?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
+
+** Changed in: qemu-kvm (Ubuntu)
+       Status: Triaged =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1441443
+https://bugs.launchpad.net/bugs/1025244
 
 Title:
-  Is there a way to create a 10G network interface for VMs in KVM2.0?
+  qcow2 image increasing disk size above the virtual limit
 
 Status in QEMU:
   Incomplete
+Status in qemu-kvm package in Ubuntu:
+  Incomplete
 
 Bug description:
+  Using qemu/kvm, qcow2 images, ext4 file systems on both guest and host
+   Host and Guest: Ubuntu server 12.04 64bit
+  To create an image I did this:
 
-  We have installed & configured the KVM 2.0 (qemu-kvm 2.0.0+dfsg-
-  2ubuntu1.10) on Ubuntu 14.04. The physical server is connected to 10G
-  network, KVM is configured in Bridged mode But the issue is, when we
-  create Network interface on VMs, we have only 1G device as an options
-  for vmhosts. Is this the limit of the KVM or is there a way to create
-  a 10G network interface for VMs? Available device models
+  qemu-img create -f qcow2 -o preallocation=3Dmetadata ubuntu-pdc-vda.img 1=
+0737418240 (not sure about the exact bytes, but around this)
+  ls -l ubuntu-pdc-vda.img
+  fallocate -l theSizeInBytesFromAbove ubuntu-pdc-vda.img
 
-  E1000
-  Ne2k_pci
-  Pcnet
-  Rtl8139
-  virtio
+  The problem is that the image is growing progressively and has
+  obviously no limit, although I gave it one. The root filesystem's
+  image is the same case:
 
-  Please find the network configuration details
+  qemu-img info ubuntu-pdc-vda.img
+   image: ubuntu-pdc-vda.img
+   file format: qcow2
+   virtual size: 10G (10737418240 bytes)
+   disk size: 14G
+   cluster_size: 65536
 
-  Source device : Host device vnet1 (Bridge =E2=80=98br0=E2=80=99)
-  Device model : virtio =
+  and for confirmation:
+   du -sh ubuntu-pdc-vda.img
+   15G ubuntu-pdc-vda.img
 
+  I made a test and saw that when I delete something from the guest, the re=
+al size of the image is not decreasing (I read it is normal). OK, but when =
+I write something again, it doesn't use the freed space, but instead grows =
+the image. So for example:
+   1. The initial physical size of the image is 1GB.
+   2. I copy 1GB of data in the guest. It's physical size becomes 2GB.
+   3. I delete this data (1GB). The physical size of the image remains 2GB.
+   4. I copy another 1GB of data to the guest.
+   5. The physical size of the image becomes 3GB.
+   6. And so on with no limit. It doesn't care if the virtual size is less.
 
-  Network configuration in the host /etc/network/interfaces
-
-  auto br0
-  iface br0 inet static
-          address 10.221.x.10
-          netmask 255.255.255.0
-          network 10.221.x.0
-          broadcast 10.221.x.255
-          gateway 10.221.x.1
-          # dns-* options are implemented by the resolvconf package, if ins=
-talled
-          dns-nameservers X.X.X.X
-          dns-search XXX.NET
-          bridge_ports em1
-          bridge_fd 0
-          bridge_stp off
-          bridge_maxwait 0
+  Is this normal - the real/physical size of the image to be larger than
+  the virtual limit???
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1441443/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1025244/+subscriptions
