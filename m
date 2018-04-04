@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3f5S-0004uX-6E
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:52:18 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f3f6e-0005Qv-Ce
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3f5O-0004wy-1K
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:52:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45796 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f3f5N-0004wh-SP
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:52:09 -0400
-References: <20180328173238.507470-1-vsementsov@virtuozzo.com>
-	<20180328173238.507470-2-vsementsov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <749bccbe-614a-143b-6520-d6e3f82b9da6@redhat.com>
-Date: Wed, 4 Apr 2018 11:52:03 +0200
+	(envelope-from <stefanha@gmail.com>) id 1f3f6b-0005Hv-BB
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:53:28 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33161)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3f6b-0005Hf-38
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:53:25 -0400
+Received: by mail-wr0-x236.google.com with SMTP id z73so21601449wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 02:53:24 -0700 (PDT)
+Date: Wed, 4 Apr 2018 10:53:22 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180404095322.GK4467@stefanha-x1.localdomain>
+References: <20180328133435.20112-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20180328173238.507470-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] scripts/qemugdb: get pthread_self from
- "info threads" command
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Jtds+vpI57xq70EV"
+Content-Disposition: inline
+In-Reply-To: <20180328133435.20112-1-linzhecheng@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v2] virtio-serial: fix heap-over-flow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, den@openvz.org
+To: pbonzini@redhat.com, mst@redhat.com
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, wangxinxin.wang@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-On 28/03/2018 19:32, Vladimir Sementsov-Ogievskiy wrote:
-> When debugging a coredump, pthread_self can't be obtained from
-> function arch_prctl. Moreover if qemu crashed in coroutine, we
-> can't find 'start_thread' in current stack-trace. So, add a method,
-> actually proposed in 1138f24645e9e, which should work for gdb
-> version >=3D 7.3.
+
+--Jtds+vpI57xq70EV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Mar 28, 2018 at 09:34:35PM +0800, linzhecheng wrote:
+> Check device having the feature of VIRTIO_CONSOLE_F_EMERG_WRITE before
+> get config->emerg_wr. It is neccessary because sizeof(virtio_console_conf=
+ig)
+> is 8 byte if VirtIOSerial doesn't have the feature of
+> VIRTIO_CONSOLE_F_EMERG_WRITE(see virtio_serial_device_realize),
+> read/write emerg_wr will lead to heap-over-flow.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-New-enough gdb can also use gdb.selected_thread()
-> ---
->  scripts/qemugdb/coroutine.py | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->=20
-> diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.p=
-y
-> index ab699794ab..ffaa45c464 100644
-> --- a/scripts/qemugdb/coroutine.py
-> +++ b/scripts/qemugdb/coroutine.py
-> @@ -14,6 +14,7 @@
->  # GNU GPL, version 2 or (at your option) any later version.
-> =20
->  import gdb
-> +import re
-> =20
->  VOID_PTR =3D gdb.lookup_type('void').pointer()
-> =20
-> @@ -28,7 +29,17 @@ def get_fs_base():
->      return fs_base
-> =20
->  def pthread_self():
-> -    '''Fetch pthread_self() from the glibc start_thread function.'''
-> +    # Try read pthread_self from gdb command 'info threads'.
-> +    # Will fail for old gdb.
-> +    try:
-> +        threads =3D gdb.execute('info threads', False, True)
-> +        m =3D re.search('^\* 1    Thread (0x[0-9a-f]+)', threads, re.M=
-ULTILINE)
+Michael or Paolo: Please merge for QEMU 2.12
 
-I don't think hard-coding "1" works here, and the spacing of the table
-might differ as well.  However, looking for the asterisk seems safe from
-a quick look at gdb source, and "Thread" looks like it isn't localized.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Paolo
+--Jtds+vpI57xq70EV
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +        return int(m.group(1), 16)
-> +    except TypeError:
-> +        # gdb doesn't support third parameter for execute
-> +        pass
-> +
-> +    # Try fetch pthread_self() from the glibc start_thread function.
->      f =3D gdb.newest_frame()
->      while f.name() !=3D 'start_thread':
->          f =3D f.older()
->=20
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaxKCSAAoJEJykq7OBq3PI784H/Rmj3TKzSVua9fpIcegpk8C+
++s8GcxFluRrZNrCxc1vT94D9dLrJLrC+Ame8KT7r7s0r6gaHYMBDzJWE6Ya4HcrB
+hyyU0hIqyTFF+6Lz7yd2X1Zk8XyWQo+lSkHz2hZsPsmfM5aHSL4Ov3ZaCjxDMHkW
+BgXqlYIx1rui5ixOTnOwFUso7CNc2AjxwKA1jS5aQ0GEDZ2pNbBoRZcKT0hPw2Nl
+sfNyKZdEq4awCv2VH9b66JNXUCKYDR/nm4YzRGXcK3LDxN6MoTf6bEAPbXE8B0mP
+jJIZVzpDzP2eHuH5tw57C73V3byOG2rHfYCxyoXtgKifM12cCEs3bXqREltolfw=
+=HNTV
+-----END PGP SIGNATURE-----
+
+--Jtds+vpI57xq70EV--
