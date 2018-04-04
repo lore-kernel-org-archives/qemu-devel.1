@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3hra-0006Ld-KZ
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:50:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f3htf-0007VR-0o
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:52:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3hrX-0002X3-Fm
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:50:06 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40849)
+	(envelope-from <alex.bennee@linaro.org>) id 1f3htb-0003rd-T4
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:52:15 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35179)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f3hrX-0002Wd-5B
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:50:03 -0400
-Received: by mail-wm0-x244.google.com with SMTP id x4so42120690wmh.5
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 05:50:02 -0700 (PDT)
-References: <20180111125444.6498-1-pbonzini@redhat.com>
-	<87lge3cl9u.fsf@linaro.org>
-	<d7c8f261-5683-a2ce-3f5e-d6d53c104267@redhat.com>
+	id 1f3htb-0003rL-Ko
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:52:11 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id 80so22505157wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 05:52:11 -0700 (PDT)
+References: <20180330133525.10994-1-jcmvbkbc@gmail.com>
+	<87vad8cl2v.fsf@linaro.org>
+	<CAMo8BfJV-2wbx=JnudOB_+GZqQziSuuARNpiJ5rhpGH-KwEbWw@mail.gmail.com>
+	<87muyjcllw.fsf@linaro.org>
+	<CAFEAcA_WJSoa0-3w7uKZo_zScPCM6qQCfyXiiU44OTV-w_0q+g@mail.gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <d7c8f261-5683-a2ce-3f5e-d6d53c104267@redhat.com>
-Date: Wed, 04 Apr 2018 13:50:00 +0100
-Message-ID: <87efjvcf0n.fsf@linaro.org>
+In-reply-to: <CAFEAcA_WJSoa0-3w7uKZo_zScPCM6qQCfyXiiU44OTV-w_0q+g@mail.gmail.com>
+Date: Wed, 04 Apr 2018 13:52:09 +0100
+Message-ID: <87d0zfcex2.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cpus: unify qemu_*_wait_io_event
+Subject: Re: [Qemu-devel] [PATCH] linux-user: call cpu_copy under clone_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,184 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 04/04/2018 12:34, Alex Benn=C3=A9e wrote:
->>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->>> Except for round-robin TCG, every other accelerator is using more or
->>> less the same code around qemu_wait_io_event_common.  The exception
->>> is HAX, which also has to eat the dummy APC that is queued by
->>> qemu_cpu_kick_thread.
->>>
->>> We can add the SleepEx call to qemu_wait_io_event under "if
->>> (!tcg_enabled())", since that is the condition that is used in
->>> qemu_cpu_kick_thread, and unify the function for KVM, HAX, HVF and
->>> multi-threaded TCG.  Single-threaded TCG code can also be simplified
->>> since it is only used in the round-robin, sleep-if-all-CPUs-idle case.
->>>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> I had trouble applying this patch but the change seems sane to me
->>
->> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> On 4 April 2018 at 11:27, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>> I'm wondering if it should be doing more. After all start/end_exclusive
+>> rely on the cpu list and that isn't updated on thread creation - and
+>> without that a bunch of other things fail like ld/st exclusive after
+>> your first new thread is spawned.
 >
-> Isn't this commit db08b687cdd5319286665aabd34f82665630416f?
+> I think that is handled because creating a new thread calls
+> cpu_copy(), which creates a new CPU object, which adds itself
+> to the CPU list in its realize function (same as for system
+> emulation new CPU objects).
 
-Doh sorry, that makes even more sense. My check-if-merged script failed
-me...
-
->
-> Paolo
->
->>> ---
->>>  cpus.c | 49 +++++++++++++++++--------------------------------
->>>  1 file changed, 17 insertions(+), 32 deletions(-)
->>>
->>> diff --git a/cpus.c b/cpus.c
->>> index 440b9291f5..3b6c9879ec 100644
->>> --- a/cpus.c
->>> +++ b/cpus.c
->>> @@ -911,7 +911,8 @@ static void kick_tcg_thread(void *opaque)
->>>
->>>  static void start_tcg_kick_timer(void)
->>>  {
->>> -    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu))=
- {
->>> +    assert(!mttcg_enabled);
->>> +    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
->>>          tcg_kick_vcpu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
->>>                                             kick_tcg_thread, NULL);
->>>          timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
->>> @@ -920,6 +921,7 @@ static void start_tcg_kick_timer(void)
->>>
->>>  static void stop_tcg_kick_timer(void)
->>>  {
->>> +    assert(!mttcg_enabled);
->>>      if (tcg_kick_vcpu_timer) {
->>>          timer_del(tcg_kick_vcpu_timer);
->>>          tcg_kick_vcpu_timer =3D NULL;
->>> @@ -1154,18 +1156,9 @@ static void qemu_wait_io_event_common(CPUState *=
-cpu)
->>>      process_queued_cpu_work(cpu);
->>>  }
->>>
->>> -static bool qemu_tcg_should_sleep(CPUState *cpu)
->>> +static void qemu_tcg_rr_wait_io_event(CPUState *cpu)
->>>  {
->>> -    if (mttcg_enabled) {
->>> -        return cpu_thread_is_idle(cpu);
->>> -    } else {
->>> -        return all_cpu_threads_idle();
->>> -    }
->>> -}
->>> -
->>> -static void qemu_tcg_wait_io_event(CPUState *cpu)
->>> -{
->>> -    while (qemu_tcg_should_sleep(cpu)) {
->>> +    while (all_cpu_threads_idle()) {
->>>          stop_tcg_kick_timer();
->>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
->>>      }
->>> @@ -1175,20 +1168,18 @@ static void qemu_tcg_wait_io_event(CPUState *cp=
-u)
->>>      qemu_wait_io_event_common(cpu);
->>>  }
->>>
->>> -static void qemu_kvm_wait_io_event(CPUState *cpu)
->>> +static void qemu_wait_io_event(CPUState *cpu)
->>>  {
->>>      while (cpu_thread_is_idle(cpu)) {
->>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
->>>      }
->>>
->>> -    qemu_wait_io_event_common(cpu);
->>> -}
->>> -
->>> -static void qemu_hvf_wait_io_event(CPUState *cpu)
->>> -{
->>> -    while (cpu_thread_is_idle(cpu)) {
->>> -        qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
->>> +#ifdef _WIN32
->>> +    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
->>> +    if (!tcg_enabled()) {
->>> +        SleepEx(0, TRUE);
->>>      }
->>> +#endif
->>>      qemu_wait_io_event_common(cpu);
->>>  }
->>>
->>> @@ -1224,7 +1215,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
->>>                  cpu_handle_guest_debug(cpu);
->>>              }
->>>          }
->>> -        qemu_kvm_wait_io_event(cpu);
->>> +        qemu_wait_io_event(cpu);
->>>      } while (!cpu->unplug || cpu_can_run(cpu));
->>>
->>>      qemu_kvm_destroy_vcpu(cpu);
->>> @@ -1270,7 +1261,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
->>>              exit(1);
->>>          }
->>>          qemu_mutex_lock_iothread();
->>> -        qemu_wait_io_event_common(cpu);
->>> +        qemu_wait_io_event(cpu);
->>>      }
->>>
->>>      return NULL;
->>> @@ -1487,7 +1478,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->>>              atomic_mb_set(&cpu->exit_request, 0);
->>>          }
->>>
->>> -        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
->>> +        qemu_tcg_rr_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
->>>          deal_with_unplugged_cpus();
->>>      }
->>>
->>> @@ -1518,13 +1509,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
->>>              }
->>>          }
->>>
->>> -        while (cpu_thread_is_idle(cpu)) {
->>> -            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
->>> -        }
->>> -#ifdef _WIN32
->>> -        SleepEx(0, TRUE);
->>> -#endif
->>> -        qemu_wait_io_event_common(cpu);
->>> +        qemu_wait_io_event(cpu);
->>>      }
->>>      return NULL;
->>>  }
->>> @@ -1561,7 +1546,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
->>>                  cpu_handle_guest_debug(cpu);
->>>              }
->>>          }
->>> -        qemu_hvf_wait_io_event(cpu);
->>> +        qemu_wait_io_event(cpu);
->>>      } while (!cpu->unplug || cpu_can_run(cpu));
->>>
->>>      hvf_vcpu_destroy(cpu);
->>> @@ -1640,7 +1625,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
->>>          }
->>>
->>>          atomic_mb_set(&cpu->exit_request, 0);
->>> -        qemu_tcg_wait_io_event(cpu);
->>> +        qemu_wait_io_event(cpu);
->>>      }
->>>
->>>      return NULL;
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
-
+Ahh that makes sense - I missed it hidden behind the realize.
 
 --
 Alex Benn=C3=A9e
