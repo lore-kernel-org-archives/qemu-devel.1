@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3jKd-0005UU-UF
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:13 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1f3jLS-0005z0-ND
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3jKa-00011L-Pt
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:11 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:53776)
+	(envelope-from <programmingkidx@gmail.com>) id 1f3jLP-0001LV-IR
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:25:02 -0400
+Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:34916)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3jKa-00010v-Ik
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:08 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id p9so41452363wmc.3
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 07:24:08 -0700 (PDT)
-Date: Wed, 4 Apr 2018 15:24:05 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180404142405.GU4467@stefanha-x1.localdomain>
-References: <20180326061157.24865-1-peterx@redhat.com>
-	<20180326104739.GC5267@localhost.localdomain>
-	<20180327022155.GE17789@xz-mi>
-	<20180403125918.GF4467@stefanha-x1.localdomain>
-	<20180404014241.GG26441@xz-mi>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NQqDiQVflaif2hna"
-Content-Disposition: inline
-In-Reply-To: <20180404014241.GG26441@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1f3jLP-0001LE-Bm
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:59 -0400
+Received: by mail-it0-x22f.google.com with SMTP id v194-v6so27809138itb.0
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 07:24:58 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <eeb9a3c8-e7ee-742b-fd6a-41c364d971c4@redhat.com>
+Date: Wed, 4 Apr 2018 10:24:48 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <57D8CDA1-C9D1-4CD7-99A1-203B570BF4D3@gmail.com>
+References: <mailman.35816.1522678020.27992.qemu-devel@nongnu.org>
+	<B4011235-0338-474D-90E4-ABDF3DC8CCB7@gmail.com>
+	<eeb9a3c8-e7ee-742b-fd6a-41c364d971c4@redhat.com>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add instructions for
+ MacPorts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Rainer M?ller <raimue@macports.org>, QEMU Developers <qemu-devel@nongnu.org>
 
 
---NQqDiQVflaif2hna
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 04, 2018 at 09:42:41AM +0800, Peter Xu wrote:
-> On Tue, Apr 03, 2018 at 01:59:18PM +0100, Stefan Hajnoczi wrote:
-> > On Tue, Mar 27, 2018 at 10:21:55AM +0800, Peter Xu wrote:
-> > > On Mon, Mar 26, 2018 at 12:47:39PM +0200, Kevin Wolf wrote:
-> > > > Am 26.03.2018 um 08:11 hat Peter Xu geschrieben:
-> > > The patch fixes the other case when there
-> > > are two events: one JOB_COMPLETED plus another (e.g., RESUME) event.
-> > > When that happens, logically we should return one JOB_COMPLETED event,
-> > > but the old code will return the other event (e.g., RESUME).
-> > >=20
-> > > >=20
-> > > > Wouldn't it be much easier to just add a 'break'?
-> > >=20
-> > > Yes, it's the same.  But IMHO those logics (e.g., the completed
-> > > variable) are not really needed at all.  This one is simpler.
-> >=20
-> > No, the outer loop is needed so that the function waits until
-> > BLOCK_JOB_COMPLETED is received.  It's not possible to do it with a
-> > single for loop.
+> On Apr 4, 2018, at 7:15 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >=20
-> Indeed.  But then I would still slightly prefer removing the
-> "completed" var:
+> On 02/04/2018 16:13, Programmingkid wrote:
+>>=20
+>>> On Apr 2, 2018, at 10:07 AM, qemu-devel-request@nongnu.org wrote:
+>>>=20
+>>> Message: 2
+>>> Date: Mon, 2 Apr 2018 04:22:52 +0200
+>>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>> To: Rainer M?ller <raimue@macports.org>, qemu-devel@nongnu.org
+>>> Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add =
+instructions
+>>> 	for MacPorts
+>>> Message-ID: <357029f4-71c0-a9f9-7bda-a5a44f609b27@redhat.com>
+>>> Content-Type: text/plain; charset=3Dutf-8
+>>>=20
+>>> On 01/04/2018 18:22, Rainer M?ller wrote:
+>>>> Signed-off-by: Rainer M?ller <raimue@macports.org>
+>>>> ---
+>>>> _download/macos.md | 6 +++++-
+>>>> 1 file changed, 5 insertions(+), 1 deletion(-)
+>>>>=20
+>>>> diff --git a/_download/macos.md b/_download/macos.md
+>>>> index dbb312c..06aa811 100644
+>>>> --- a/_download/macos.md
+>>>> +++ b/_download/macos.md
+>>>> @@ -1,6 +1,10 @@
+>>>> -QEMU can be installed from Homebrew:
+>>>> +QEMU can be installed from <strong>Homebrew</strong>:
+>>>>=20
+>>>> <pre>brew install qemu</pre>
+>>>>=20
+>>>> +QEMU can be installed from <strong>MacPorts</strong>:
+>>>> +
+>>>> +<pre>sudo port install qemu</pre>
+>>>> +
+>>>> QEMU requires Mac OS X 10.5 or later, but it is recommended
+>>>> to use Mac OS X 10.7 or later.
+>>>>=20
+>>>=20
+>>> Thanks for the patch!  I'm travelling but I will apply it as soon as =
+I can.
+>>>=20
+>>> Paolo
+>>=20
+>> I was wondering if a link to the Mac OS X host wiki page could be =
+added to this page.
+>> It does have prebuilt binaries ready for use.
+>>=20
+>> https://wiki.qemu.org/Hosts/Mac
 >=20
->     def wait_until_completed(self, drive=3D'drive0', check_offset=3DTrue):
->         '''Wait for a block job to finish, returning the event'''
->         while True:
->             for event in self.vm.get_qmp_events(wait=3DTrue):
->                 if event['event'] =3D=3D 'BLOCK_JOB_COMPLETED':
->                     self.assert_qmp(event, 'data/device', drive)
->                     self.assert_qmp_absent(event, 'data/error')
->                     if check_offset:
->                         self.assert_qmp(event, 'data/offset', event['data=
-']['len'])
->                     self.assert_no_active_block_jobs()
->                     return event
+> Actually I believe we should remove those links.  I don't think =
+hosting
+> QEMU binaries on mediafire is a good idea.
 >=20
-> Or a single break would work too.  Do either of you have any
-> preference?  I can repost in either way.  Thanks,
+> Paolo
 
-Looks good to me!
-
-Stefan
-
---NQqDiQVflaif2hna
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaxOAFAAoJEJykq7OBq3PI7KsH/3ROgCBXScs0M6tRcUomBm9p
-A9z5q5amrVk5YE4atqHmn9xJWde26BQ97mtaInUxktOaY6yuWCY/QbZ0US+5ZkBZ
-7Cb2seZb/CN42K0Vv1mEZnI2z6S7aMUAmnyEkpUTBR1g1hJ86UMs0ncUnG1LJSrb
-oitC8zpdrWJ1adyTyn/bBDoJP6CGFPpsuCJxsrd4BL3ppR/o7eqDt4WUYTpy1hxX
-Q7+Ea88YgBjD+a1Xkgq79hZXmCTNd02DtCnqXidc65Yl3QZV7zgnWyCY4loH2cqK
-ks3ujjm/ngCKrs+ONEzb4yFF4Ld/CSPhZOq+KftEpNvH/uFIe5gjAkynCI8sSls=
-=QEX0
------END PGP SIGNATURE-----
-
---NQqDiQVflaif2hna--
+Why not?=
