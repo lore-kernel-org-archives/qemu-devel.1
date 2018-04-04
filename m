@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3jIx-0004Cw-2O
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:22:28 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f3jKd-0005UU-UF
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3jIt-00084I-Tr
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:22:27 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39730)
+	(envelope-from <stefanha@gmail.com>) id 1f3jKa-00011L-Pt
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:11 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:53776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3jIt-00082I-Jt
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:22:23 -0400
-Received: by mail-wm0-x243.google.com with SMTP id f125so42997465wme.4
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 07:22:23 -0700 (PDT)
-Date: Wed, 4 Apr 2018 15:22:20 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f3jKa-00010v-Ik
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:24:08 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id p9so41452363wmc.3
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 07:24:08 -0700 (PDT)
+Date: Wed, 4 Apr 2018 15:24:05 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180404142220.GT4467@stefanha-x1.localdomain>
-References: <20180403050115.6037-1-peterx@redhat.com>
+Message-ID: <20180404142405.GU4467@stefanha-x1.localdomain>
+References: <20180326061157.24865-1-peterx@redhat.com>
+	<20180326104739.GC5267@localhost.localdomain>
+	<20180327022155.GE17789@xz-mi>
+	<20180403125918.GF4467@stefanha-x1.localdomain>
+	<20180404014241.GG26441@xz-mi>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dBMBt2YGaTHbdllf"
+	protocol="application/pgp-signature"; boundary="NQqDiQVflaif2hna"
 Content-Disposition: inline
-In-Reply-To: <20180403050115.6037-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] monitor: bind dispatch bh to
- iohandler context
+In-Reply-To: <20180404014241.GG26441@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix wait_until_completed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,138 +34,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 
---dBMBt2YGaTHbdllf
+--NQqDiQVflaif2hna
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 03, 2018 at 01:01:15PM +0800, Peter Xu wrote:
-> Eric Auger reported the problem days ago that OOB broke ARM when running
-> with libvirt:
+On Wed, Apr 04, 2018 at 09:42:41AM +0800, Peter Xu wrote:
+> On Tue, Apr 03, 2018 at 01:59:18PM +0100, Stefan Hajnoczi wrote:
+> > On Tue, Mar 27, 2018 at 10:21:55AM +0800, Peter Xu wrote:
+> > > On Mon, Mar 26, 2018 at 12:47:39PM +0200, Kevin Wolf wrote:
+> > > > Am 26.03.2018 um 08:11 hat Peter Xu geschrieben:
+> > > The patch fixes the other case when there
+> > > are two events: one JOB_COMPLETED plus another (e.g., RESUME) event.
+> > > When that happens, logically we should return one JOB_COMPLETED event,
+> > > but the old code will return the other event (e.g., RESUME).
+> > >=20
+> > > >=20
+> > > > Wouldn't it be much easier to just add a 'break'?
+> > >=20
+> > > Yes, it's the same.  But IMHO those logics (e.g., the completed
+> > > variable) are not really needed at all.  This one is simpler.
+> >=20
+> > No, the outer loop is needed so that the function waits until
+> > BLOCK_JOB_COMPLETED is received.  It's not possible to do it with a
+> > single for loop.
 >=20
-> http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
+> Indeed.  But then I would still slightly prefer removing the
+> "completed" var:
 >=20
-> This patch fixes the problem.
+>     def wait_until_completed(self, drive=3D'drive0', check_offset=3DTrue):
+>         '''Wait for a block job to finish, returning the event'''
+>         while True:
+>             for event in self.vm.get_qmp_events(wait=3DTrue):
+>                 if event['event'] =3D=3D 'BLOCK_JOB_COMPLETED':
+>                     self.assert_qmp(event, 'data/device', drive)
+>                     self.assert_qmp_absent(event, 'data/error')
+>                     if check_offset:
+>                         self.assert_qmp(event, 'data/offset', event['data=
+']['len'])
+>                     self.assert_no_active_block_jobs()
+>                     return event
 >=20
-> It's not really needed now since we have turned OOB off now, but it's
-> still a bug fix, and it'll start to work when we turn OOB on for ARM.
->=20
-> The problem was that the monitor dispatcher bottom half was bound to
-> qemu_aio_context, but that context seems to be for block only.
+> Or a single break would work too.  Do either of you have any
+> preference?  I can repost in either way.  Thanks,
 
-No, it is not block-only.  iohandler_ctx is for the legacy
-qemu_set_fd_handler() API only and modern code should use
-qemu_aio_context.
+Looks good to me!
 
-The difference between qemu_aio_context and iohandler_ctx is that
-aio_poll(qemu_aio_context) does not process iohandler_ctx (since it's a
-difference context).  That is the legacy behavior that
-qemu_set_fd_handler() expects and it's implemented by keeping a separate
-iohandler_ctx.
+Stefan
 
-> For the
-> rest of the QEMU world we should be using iohandler context.  So
-> assigning monitor dispatcher bottom half to that context.
-
-This patch relies on the side-effect that iohandler_ctx is only called
-later by the main loop, which seems to prevent the crash below.
-
-What is the actual crash/problem?  You mentioned the GIC, but what does
-that have to do with monitor code crashing?
-
->=20
-> If without this change, QMP dispatcher might be run even before reaching
-> main loop in block IO path, for example, in a stack like:
->=20
->         #0  qmp_cont ()
->         #1  0x00000000006bd210 in qmp_marshal_cont ()
->         #2  0x0000000000ac05c4 in do_qmp_dispatch ()
->         #3  0x0000000000ac07a0 in qmp_dispatch ()
->         #4  0x0000000000472d60 in monitor_qmp_dispatch_one ()
->         #5  0x000000000047302c in monitor_qmp_bh_dispatcher ()
->         #6  0x0000000000acf374 in aio_bh_call ()
->         #7  0x0000000000acf428 in aio_bh_poll ()
->         #8  0x0000000000ad5110 in aio_poll ()
->         #9  0x0000000000a08ab8 in blk_prw ()
->         #10 0x0000000000a091c4 in blk_pread ()
->         #11 0x0000000000734f94 in pflash_cfi01_realize ()
->         #12 0x000000000075a3a4 in device_set_realized ()
->         #13 0x00000000009a26cc in property_set_bool ()
->         #14 0x00000000009a0a40 in object_property_set ()
->         #15 0x00000000009a3a08 in object_property_set_qobject ()
->         #16 0x00000000009a0c8c in object_property_set_bool ()
->         #17 0x0000000000758f94 in qdev_init_nofail ()
->         #18 0x000000000058e190 in create_one_flash ()
->         #19 0x000000000058e2f4 in create_flash ()
->         #20 0x00000000005902f0 in machvirt_init ()
->         #21 0x00000000007635cc in machine_run_board_init ()
->         #22 0x00000000006b135c in main ()
->=20
-> This can cause ARM to crash when used with both OOB capability enabled
-> and libvirt as upper layer, since libvirt will start QEMU with "-S" and
-> the first "cont" command will arrive very early if the context is not
-> correct (which is what above stack shows).  Then, the vcpu threads will
-> start to run right after the qmp_cont() call, even when GICs have not
-> been setup correctly yet (which is done in kvm_arm_machine_init_done()).
->
-> My sincere thanks to Eric Auger who offered great help during both
-> debugging and verifying the problem.  The ARM test was carried out by
-> applying this patch upon QEMU 2.12.0-rc0 and problem is gone after the
-> patch.
->=20
-> A quick test of mine shows that after this patch applied we can pass all
-> raw iotests even with OOB on by default.
->=20
-> CC: Eric Blake <eblake@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Fam Zheng <famz@redhat.com>
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Tested-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->=20
-> This patch will fix all known OOB breakages I know so far, but I think
-> for better safety I'll still keep OOB off, and I'll send another patch
-> to turn default OOB on after 2.12 release.
-> ---
->  monitor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/monitor.c b/monitor.c
-> index 51f4cf480f..39f8ee17ba 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4467,7 +4467,7 @@ static void monitor_iothread_init(void)
->       * have assumption to be run on main loop thread.  It would be
->       * nice that one day we can remove this assumption in the future.
->       */
-> -    mon_global.qmp_dispatcher_bh =3D aio_bh_new(qemu_get_aio_context(),
-> +    mon_global.qmp_dispatcher_bh =3D aio_bh_new(iohandler_get_aio_contex=
-t(),
->                                                monitor_qmp_bh_dispatcher,
->                                                NULL);
-> =20
-> --=20
-> 2.14.3
->=20
->=20
-
---dBMBt2YGaTHbdllf
+--NQqDiQVflaif2hna
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaxN+cAAoJEJykq7OBq3PIiVIIALc2txDTgopoC/oEGsQgqF8Z
-Q8lCARt6RBobI105FnbYXky/dG5Va0nO6Cf5OKStwI2sTbMRCkBDY/HHMB8cLp07
-Wr7YFReaSTqLZCvwY5B4N3jfr9vdOjNquVasiWFO2ebjn5HgR0XczNCEqVE3BcGL
-syUvb0w/1VRd96N9NSNylOrkJXf6rkckWaxWE6wba1X611ZAw4LrbkF3G53kegcZ
-/IJZ364qvt7vIAxCQls+cURhSHxG86wckmDycBsMkKOYKpDvaEA65oQwoaLfH8o/
-0yo24hgpkRCB+xTA+9Vi4cd2dbmYQqS5HzYNAil0lm83b4fNCllkIJweDRn/+yw=
-=RV0M
+iQEcBAEBAgAGBQJaxOAFAAoJEJykq7OBq3PI7KsH/3ROgCBXScs0M6tRcUomBm9p
+A9z5q5amrVk5YE4atqHmn9xJWde26BQ97mtaInUxktOaY6yuWCY/QbZ0US+5ZkBZ
+7Cb2seZb/CN42K0Vv1mEZnI2z6S7aMUAmnyEkpUTBR1g1hJ86UMs0ncUnG1LJSrb
+oitC8zpdrWJ1adyTyn/bBDoJP6CGFPpsuCJxsrd4BL3ppR/o7eqDt4WUYTpy1hxX
+Q7+Ea88YgBjD+a1Xkgq79hZXmCTNd02DtCnqXidc65Yl3QZV7zgnWyCY4loH2cqK
+ks3ujjm/ngCKrs+ONEzb4yFF4Ld/CSPhZOq+KftEpNvH/uFIe5gjAkynCI8sSls=
+=QEX0
 -----END PGP SIGNATURE-----
 
---dBMBt2YGaTHbdllf--
+--NQqDiQVflaif2hna--
