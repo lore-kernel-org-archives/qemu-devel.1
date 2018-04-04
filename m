@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3knx-0005Q7-QA
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:58:35 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3kq1-00078F-AB
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f3knt-0007e1-RV
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:58:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56574 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f3knt-0007dg-Lr
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:58:29 -0400
-References: <20180328163630.48576-1-dgilbert@redhat.com>
-	<20180328163630.48576-6-dgilbert@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <86bfefcd-f256-2522-0635-ccb38d34214d@redhat.com>
-Date: Wed, 4 Apr 2018 17:58:23 +0200
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3kpx-00009v-9p
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:00:41 -0400
+Received: from smtp66.cstnet.cn ([159.226.251.66]:40225 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f3kpw-00008X-Tk
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 12:00:37 -0400
+Date: Thu, 5 Apr 2018 00:00:31 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <06bd734b-3b48-ab51-3425-4cbb2dfe3bc0@redhat.com>
+References: <152276983686.1416.16137563993301721352@71c20359a636>
+	<06bd734b-3b48-ab51-3425-4cbb2dfe3bc0@redhat.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <20180328163630.48576-6-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] e1000: Choose which set of props to
- migrate
+Message-ID: <13cc673.2fff.16291635e5b.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH 0/2 RFC] Implement Hex file loader and add
+ test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, eswierk@skyportsystems.com, jasowang@redhat.com
-Cc: quintela@redhat.com, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, no-reply@patchew.org, stefanha@gmail.com, jim@groklearning.com, famz@redhat.com, joel@jms.id.au
 
-On 28/03/2018 18:36, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> When we're using the subsection we migrate both
-> the 'props' and 'tso_props' data; when we're not using
-> the subsection (to migrate to 2.11 or old machine types) we've
-> got to choose what to migrate in the main structure.
-> 
-> If we're using the subsection migrate 'props' in the main structure.
-> If we're not using the subsection then migrate the last one
-> that changed, which gives behaviour similar to the old behaviour.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/net/e1000.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-> index 4e606d4b2a..13a9494a8d 100644
-> --- a/hw/net/e1000.c
-> +++ b/hw/net/e1000.c
-> @@ -130,6 +130,7 @@ typedef struct E1000State_st {
->  #define E1000_FLAG_TSO (1 << E1000_FLAG_TSO_BIT)
->      uint32_t compat_flags;
->      bool received_tx_tso;
-> +    bool use_tso_for_migration;
->      e1000x_txd_props mig_props;
->  } E1000State;
->  
-> @@ -622,9 +623,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
->      if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
->          if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
->              e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
-> +            s->use_tso_for_migration = 1;
->              tp->tso_frames = 0;
->          } else {
->              e1000x_read_tx_ctx_descr(xp, &tp->props);
-> +            s->use_tso_for_migration = 0;
->          }
->          return;
->      } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
-> @@ -1366,7 +1369,20 @@ static int e1000_pre_save(void *opaque)
->          s->phy_reg[PHY_STATUS] |= MII_SR_AUTONEG_COMPLETE;
->      }
->  
-> -    s->mig_props = s->tx.props;
-> +    /* Decide which set of props to migrate in the main structure */
-> +    if (chkflag(TSO) || !s->use_tso_for_migration) {
-> +        /* Either we're migrating with the extra subsection, in which
-> +         * case the mig_props is always 'props' OR
-> +         * we've not got the subsection, but 'props' was the last
-> +         * updated.
-> +         */
-> +        s->mig_props = s->tx.props;
-> +    } else {
-> +        /* We're not using the subsection, and 'tso_props' was
-> +         * the last updated.
-> +         */
-> +        s->mig_props = s->tx.tso_props;
-> +    }
->      return 0;
->  }
-
-Looks good, thanks!
-
-Paolo
+QSBiaXQgZW1iYXJyYXNzaW5nLCB0aGlzIG1pc3Rha2Ugd2FzIGludHJvZHVjZWQgYnkgbWUuIEkg
+c3VibWl0dGVkIGEgY29ycmVzcG9uZGluZyBwYXRjaCB0byBmaXggaXQsIGJ1dCBubyBvbmUgaGFz
+IHJldmlld2VkIGl0LgpTZWUgbGluayBiZWxvdzoKaHR0cDovL2xpc3RzLm5vbmdudS5vcmcvYXJj
+aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOC0wMy9tc2cwNjUwNi5odG1sCgoiRXJpYyBCbGFrZSIg
+PGVibGFrZUByZWRoYXQuY29tPndyb3RlOgo+IE9uIDA0LzAzLzIwMTggMTA6MzcgQU0sIG5vLXJl
+cGx5QHBhdGNoZXcub3JnIHdyb3RlOg0KPiA+IEhpLA0KPiA+IA0KPiA+IFRoaXMgc2VyaWVzIHNl
+ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
+Zm9yDQo+ID4gbW9yZSBpbmZvcm1hdGlvbjoNCj4gPiANCj4gDQo+ID4gPT09IE9VVFBVVCBCRUdJ
+TiA9PT0NCj4gPiBDaGVja2luZyBQQVRDSCAxLzI6IEltcGxlbWVudCAuaGV4IGZpbGUgbG9hZGVy
+Li4uDQo+ID4gRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0
+aGlzIHN0YXRlbWVudA0KPiA+ICMyMjA6IEZJTEU6IGh3L2NvcmUvbG9hZGVyLmM6MTQ2MzoNCj4g
+PiArICAgIH0gd2hpbGUgKCsraGV4X2Jsb2IgIT0gZW5kKTsNCj4gPiBbLi4uXQ0KPiANCj4gRmFs
+c2UgcG9zaXRpdmU7IHRoaXMgaXMgYSBrbm93biBidWcgaW4gY2hlY2twYXRjaC5wbCwgYW5kIHRo
+ZXJlIGlzIGV2ZW4NCj4gYSBwYXRjaCBwcm9wb3NlZCB0byByZXNvbHZlIGl0LCBidXQgbm8gb25l
+IGhhcyBpbmNvcnBvcmF0ZWQgdGhlIHBhdGNoIHlldDoNCj4gDQo+IGh0dHBzOi8vbGlzdHMuZ251
+Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTAzL21zZzA1MjMyLmh0bWwNCj4gDQo+
+IC0tIA0KPiBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5naW5lZXINCj4gUmVkIEhh
+dCwgSW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2DQo+IFZpcnR1YWxpemF0aW9uOiAgcWVt
+dS5vcmcgfCBsaWJ2aXJ0Lm9yZw0KPiANCg==
