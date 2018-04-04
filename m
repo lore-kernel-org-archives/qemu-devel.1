@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3j32-0004tO-ES
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:06:07 -0400
+	(envelope-from <tournier.elie@gmail.com>) id 1f3er0-0000gy-Am
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3j2y-0003x9-F2
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:06:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45982)
+	(envelope-from <tournier.elie@gmail.com>) id 1f3eqx-0004PZ-4c
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:37:18 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35201)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3j2y-0003uh-8X
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:05:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3j2w-0002sw-R8
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 14:05:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C758F2E80C8
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 14:05:54 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 13:54:21 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152285006155.9211.6828154086681739464.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
+	id 1f3eqw-0004P5-Ud
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 05:37:15 -0400
+Received: by mail-wm0-x242.google.com with SMTP id r82so40991141wme.0
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 02:37:14 -0700 (PDT)
+From: Elie Tournier <tournier.elie@gmail.com>
+Date: Wed,  4 Apr 2018 10:30:40 +0100
+Message-Id: <20180404093040.26009-1-tournier.elie@gmail.com>
+Subject: [Qemu-devel] [PATCH] sdl2: Remove unused epoxy include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,86 +25,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, Elie Tournier <tournier.elie@gmail.com>
 
-We don't generally mark bugs 'fix released' until the final (non-rc)
-release is made.
+Signed-off-by: Elie Tournier <elie.tournier@collabora.com>
+---
+Can someone push this patch for me please.
+I don't have commit access.
 
+ ui/sdl2-gl.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-** Changed in: qemu
-       Status: Fix Released =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
-
-Title:
-  static linux-user ARM emulation has several-second startup time
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
+index 5e1073a084..c3683e6b65 100644
+--- a/ui/sdl2-gl.c
++++ b/ui/sdl2-gl.c
+@@ -32,8 +32,6 @@
+ #include "ui/sdl2.h"
+ #include "sysemu/sysemu.h"
+ 
+-#include <epoxy/gl.h>
+-
+ static void sdl2_set_scanout_mode(struct sdl2_console *scon, bool scanout)
+ {
+     if (scon->scanout_mode == scanout) {
+-- 
+2.16.3
