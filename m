@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3mn5-00081U-6O
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:05:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1f3mxU-0004n4-J0
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:16:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3mn2-00077u-0O
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:05:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3mn1-00077f-Pa
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:05:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3mn0-0000dx-LY
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 18:05:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9F6882E80C8
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 18:05:42 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1f3mxT-0003vt-IU
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 14:16:32 -0400
+References: <20180403110810.25624-1-kwolf@redhat.com>
+	<d1633a50-2aad-af64-081c-bfac72b89e12@redhat.com>
+	<20180404154141.GS38016@angien.pipo.sk>
+	<20180404155420.GG4482@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <98cbcf10-6dd4-3373-5b08-f5c73691fa73@redhat.com>
+Date: Wed, 4 Apr 2018 13:16:15 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 17:45:50 -0000
-From: Thomas Huth <1426092@bugs.launchpad.net>
-Reply-To: Bug 1426092 <1426092@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150226192349.17124.43439.malonedeb@gac.canonical.com>
-Message-Id: <152286395010.9393.5756954761390511624.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1426092] Re: virtio-balloon-device locks up Guest
+In-Reply-To: <20180404155420.GG4482@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12] gluster: Fix
+ blockdev-add with server.N.type=unix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+Cc: qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, prasanna.kalever@redhat.com
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? ... anyway, this rather sounds like a
-bug with the guest kernel to me, so in case this problem persists, you
-likely should report this in the kernel bug tracker instead.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+Cc: qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ mreitz@redhat.com, prasanna.kalever@redhat.com
+Message-ID: <98cbcf10-6dd4-3373-5b08-f5c73691fa73@redhat.com>
+Subject: Re: [Qemu-block] [PATCH for-2.12] gluster: Fix blockdev-add with
+ server.N.type=unix
+References: <20180403110810.25624-1-kwolf@redhat.com>
+ <d1633a50-2aad-af64-081c-bfac72b89e12@redhat.com>
+ <20180404154141.GS38016@angien.pipo.sk>
+ <20180404155420.GG4482@localhost.localdomain>
+In-Reply-To: <20180404155420.GG4482@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On 04/04/2018 10:54 AM, Kevin Wolf wrote:
 
--- =
+>>> Should we also add a deprecation warning for 'socket' and update the
+>>> deprecation documentation, so we can start the clock ticking on getti=
+ng
+>>> rid of maintaining the back-compat glue forever?
+>>
+>> Well, that won't be as easy. Since there is at least one qemu release
+>> which declared this in the QAPI schema but did not support using it it=
+'s
+>> hard for libvirt to detect that this was fixed, and thus we can't infe=
+r
+>> a capability which would be used to switch to the new-syntax only.
+>=20
+> Markus wanted to add some way to declare capabilities for a command in
+> the schema that could be queried with schema introspection and would
+> cover such cases. I think we even discussed this with you at KVM Forum?=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1426092
+>=20
+> Eric, do you happen to know if there were any patches on the list
+> related to this?
 
-Title:
-  virtio-balloon-device locks up Guest
+I don't recall seeing any patches from Markus before his leave, and
+doubt anyone else has tackled anything along these lines.  It's too late
+for 2.12, at any rate, so even if we had such a feature implemented in
+time for 2.13, it won't help introspecting the 2.12 release.
 
-Status in QEMU:
-  Incomplete
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  Setting arbitrary balloon target values locks up the guest in some cases =
-crashes it, if the target memory is < used +~5% free.  =
 
-  Found while testing aggressive memory over-commit, scenarios.
-  You get messages like:
+--G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  [  155.827448] [<c002060c>] (show_stack) from [<c041c518>] (dump_stack+0x=
-6c/0x88)
-  [  155.837076] [<c041c518>] (dump_stack) from [<c0091994>] (warn_alloc_fa=
-iled+0xe0/0x120)
-  [  155.847075] [<c0091994>] (warn_alloc_failed) from [<c0094480>] (__allo=
-c_pages_nodemask+0x600/0x91c)
-  [  155.859039] [<c0094480>] (__alloc_pages_nodemask) from [<c00da414>] (b=
-alloon_page_enqueue+0x20/0xbc)
-  [  155.870556] [<c00da414>] (balloon_page_enqueue) from [<c025d794>] (bal=
-loon+0x140/0x2cc)
-  [  155.881377] [<c025d794>] (balloon) from [<c0043b38>] (kthread+0xd8/0xf=
-4)
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  page dumped bacause: nonzero _count
-  BUG: BAad page state in process Xorg pfn:396e5
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrFFm8ACgkQp6FrSiUn
+Q2qPdgf/bQS1whZnQn6ifRkflhSxkEGzrVIxjOW4vhEkF4VNfgjcbeODd+oFNLiV
+wMi3Lg74e1zxocbsTQhIRa3cKMu7ynBuqFsgwz8TsDcfp9v/EWNzy9euntsJjZOh
+dEjN8N7n7AXSKoQ4MsRAdiSefhh+HAN4Oh5+YsqY4NX1iZVtwKkajhtubjYGyzcj
+mGaJLclHNLfwAZCVhpN6WMTo2x2KJGr8UdCpKL6qQoLzzfbR/L8qyUl0d0QteUkz
+ZWG0w8a3j+w7Hs1Lqebws1DBYRTDYejNXytRcmrDtNnq538tG4xCnKkt2Uvfaa2+
+3dHamZuYRzYTAWOV53sQGXJyRr5eRA==
+=0TUq
+-----END PGP SIGNATURE-----
 
-  Test Environment:
-  x86_64
-  Ubuntu 13.10, Guest Linux Kernel 3.19, qemu 2.2.0 with following patches =
-applied - balloon OOM enhancement
-  commit 5a10b7dbf904bfe01bb9fcc6298f7df09eed77d5
-  Author: Raushaniya Maksudova <rmaksudova@parallels.com>
-
-  Boot guest with '-balloon virtio', -qmp .... -hmp access
-  1. sudo info balloon | socat - tcp4-connect:127.0.0.1:4444
-     - or over qmp interface
-  {"execute":"qom-get", "arguments": { "path": "/machine/peripheral-anon/de=
-vice[1]","property": "guest-stats" }}
-  {"return": {"stats": {"stat-swap-out": 0, "stat-free-memory": 513454080, =
-"stat-minor-faults": 1261, "stat-major-faults": 0, "stat-total-memory": 526=
-073856, "stat-swap-in": 0}, "last-update": 11109}}
-
-  2. Take memory down check free memory using (1)
-  3. Issue "sudo echo balloon XXX | socat - tcp4-connect:127.0.0.1:4444" - =
-XXX is value in threshold mentioned above
-     and you get Guest lockup
-
-  ARM - samething except '-device virtio-balloon-device' used
-
-  Libvirt - virsh setmem causes same issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1426092/+subscriptions
+--G8BpqsSxnQN7QaalA4r5Gkc3THTQDIOXk--
