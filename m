@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiangshanlai@gmail.com>) id 1f3gsq-0002w4-NT
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:47:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f3gwB-00050v-D7
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiangshanlai@gmail.com>) id 1f3gsm-0004Np-Va
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:47:20 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:37556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiangshanlai@gmail.com>)
-	id 1f3gsm-0004Ll-MT
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:47:16 -0400
-Received: by mail-pl0-x242.google.com with SMTP id v5-v6so11590889plo.4
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 04:47:16 -0700 (PDT)
-From: Lai Jiangshan <jiangshanlai@gmail.com>
-Date: Wed,  4 Apr 2018 19:47:09 +0800
-Message-Id: <20180404114709.45118-1-jiangshanlai@gmail.com>
-In-Reply-To: <20180401084848.36725-1-jiangshanlai@gmail.com>
-References: <20180401084848.36725-1-jiangshanlai@gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f3gw6-0006m7-NH
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:50:47 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180319161556.16446-1-peter.maydell@linaro.org>
+	<20180319161556.16446-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6db56a4f-f877-8052-e6e7-65f3ac58a95b@amsat.org>
+Date: Wed, 4 Apr 2018 08:50:38 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180319161556.16446-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH V4] migration: add capability to bypass the
- shared memory
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] hw/sd/bcm2835_sdhost: Don't
+ raise spurious interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,254 +29,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, "James O . D . Hunt" <james.o.hunt@intel.com>, Xu Wang <gnawux@gmail.com>, Peng Tao <bergwolf@gmail.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Gerd Hoffmann <kraxel@redhat.com>, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-1) What's this
+Hi Peter,
 
-When the migration capability 'bypass-shared-memory'
-is set, the shared memory will be bypassed when migration.
+On 03/19/2018 01:15 PM, Peter Maydell wrote:
+> The Linux bcm2835_sdhost driver doesn't work on QEMU, because our
+> model raises spurious data interrupts.  Our function
+> bcm2835_sdhost_fifo_run() will flag an interrupt any time it is
+> called with s->datacnt == 0, even if the host hasn't actually issued
+> a data read or write command yet.  This means that the driver gets a
+> spurious data interrupt as soon as it enables IRQs and then does
+> something else that causes us to call the fifo_run routine, like
+> writing to SDHCFG, and before it does the write to SDCMD to issue the
+> read.  The driver's IRQ handler then spins forever complaining that
+> there's no data and the SD controller isn't in a state where there's
+> going to be any data:
+> 
+> [   41.040738] sdhost-bcm2835 3f202000.mmc: fsm 1, hsts 00000000
+> [   41.042059] sdhost-bcm2835 3f202000.mmc: fsm 1, hsts 00000000
+> (continues forever).
+> 
+> Move the interrupt flag setting to more plausible places:
+>  * for BUSY, raise this as soon as a BUSYWAIT command has executed
+>  * for DATA, raise this when the FIFO has any space free (for a write)
+>    or any data in it (for a read)
+>  * for BLOCK, raise this when the data count is 0 and we've
+>    actually done some reading or writing
+> 
+> This is pure guesswork since the documentation for this hardware is
+> not public, but it is sufficient to get the Linux bcm2835_sdhost
+> driver to work.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/sd/bcm2835_sdhost.c | 43 +++++++++++++++++++++++--------------------
+>  1 file changed, 23 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
+> index 79f3c5ceeb..0fd0853fa3 100644
+> --- a/hw/sd/bcm2835_sdhost.c
+> +++ b/hw/sd/bcm2835_sdhost.c
+> @@ -137,6 +137,9 @@ static void bcm2835_sdhost_send_command(BCM2835SDHostState *s)
+>          }
+>  #undef RWORD
+>      }
+> +    if ((s->cmd & SDCMD_BUSYWAIT) && (s->config & SDHCFG_BUSY_IRPT_EN)) {
+> +        s->status |= SDHSTS_BUSY_IRPT;
+> +    }
+>      return;
+>  
+>  error:
+> @@ -187,18 +190,27 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+>                  n++;
+>                  if (n == 4) {
+>                      bcm2835_sdhost_fifo_push(s, value);
+> +                    s->status |= SDHSTS_DATA_FLAG;
 
-It is the key feature to enable several excellent features for
-the qemu, such as qemu-local-migration, qemu-live-update,
-extremely-fast-save-restore, vm-template, vm-fast-live-clone,
-yet-another-post-copy-migration, etc..
+^ I'd move this line in bcm2835_sdhost_fifo_push(),
 
-The philosophy behind this key feature, including the resulting
-advanced key features, is that a part of the memory management
-is separated out from the qemu, and let the other toolkits
-such as libvirt, kata-containers (https://github.com/kata-containers)
-runv(https://github.com/hyperhq/runv/) or some multiple cooperative
-qemu commands directly access to it, manage it, provide features on it.
+> +                    if (s->config & SDHCFG_DATA_IRPT_EN) {
+> +                        s->status |= SDHSTS_SDIO_IRPT;
+> +                    }
+>                      n = 0;
+>                      value = 0;
+>                  }
+>              }
+>              if (n != 0) {
+>                  bcm2835_sdhost_fifo_push(s, value);
+> +                s->status |= SDHSTS_DATA_FLAG;
 
-2) Status in real world
+removing this one.
 
-The hyperhq(http://hyper.sh  http://hypercontainer.io/)
-introduced the feature vm-template(vm-fast-live-clone)
-to the hyper container for several years, it works perfect.
-(see https://github.com/hyperhq/runv/pull/297).
+>              }
+>          } else { /* write */
+>              n = 0;
+>              while (s->datacnt > 0 && (s->fifo_len > 0 || n > 0)) {
+>                  if (n == 0) {
+>                      value = bcm2835_sdhost_fifo_pop(s);
+> +                    s->status |= SDHSTS_DATA_FLAG;
+> +                    if (s->config & SDHCFG_DATA_IRPT_EN) {
+> +                        s->status |= SDHSTS_SDIO_IRPT;
+> +                    }
+>                      n = 4;
+>                  }
+>                  n--;
+> @@ -207,28 +219,19 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+>                  value >>= 8;
+>              }
+>          }
+> +        if (s->datacnt == 0) {
+> +            s->edm &= ~0xf;
 
-The feature vm-template makes the containers(VMs) can
-be started in 130ms and save 80M memory for every
-container(VM). So that the hyper containers are fast
-and high-density as normal containers.
+while here, let's use SDEDM_FSM_MASK.
 
-kata-containers project (https://github.com/kata-containers)
-which was launched by hyper, intel and friends and which descended
-from runv (and clear-container) should have this feature enabled.
-Unfortunately, due to the code confliction between runv&cc,
-this feature was temporary disabled and it is being brought
-back by hyper and intel team.
+> +            s->edm |= SDEDM_FSM_DATAMODE;
+> +            trace_bcm2835_sdhost_edm_change("datacnt 0", s->edm);
+> +
+> +            if ((s->cmd & SDCMD_WRITE_CMD) &&
+> +                (s->config & SDHCFG_BLOCK_IRPT_EN)) {
+> +                s->status |= SDHSTS_BLOCK_IRPT;
+> +            }
+> +        }
 
-3) How to use and bring up advanced features.
+Your guesswork makes sens to me.
 
-In current qemu command line, shared memory has
-to be configured via memory-object.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-a) feature: qemu-local-migration, qemu-live-update
-Set the mem-path on the tmpfs and set share=on for it when
-start the vm. example:
--object \
-memory-backend-file,id=mem,size=128M,mem-path=/dev/shm/memory,share=on \
--numa node,nodeid=0,cpus=0-7,memdev=mem
-
-when you want to migrate the vm locally (after fixed a security bug
-of the qemu-binary, or other reason), you can start a new qemu with
-the same command line and -incoming, then you can migrate the
-vm from the old qemu to the new qemu with the migration capability
-'bypass-shared-memory' set. The migration will migrate the device-state
-*ONLY*, the memory is the origin memory backed by tmpfs file.
-
-b) feature: extremely-fast-save-restore
-the same above, but the mem-path is on the persistent file system.
-
-c)  feature: vm-template, vm-fast-live-clone
-the template vm is started as 1), and paused when the guest reaches
-the template point(example: the guest app is ready), then the template
-vm is saved. (the qemu process of the template can be killed now, because
-we need only the memory and the device state files (in tmpfs)).
-
-Then we can launch one or multiple VMs base on the template vm states,
-the new VMs are started without the “share=on”, all the new VMs share
-the initial memory from the memory file, they save a lot of memory.
-all the new VMs start from the template point, the guest app can go to
-work quickly.
-
-The new VM booted from template vm can’t become template again,
-if you need this unusual chained-template feature, you can write
-a cloneable-tmpfs kernel module for it.
-
-The libvirt toolkit can’t manage vm-template currently, in the
-hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
-“libvrit managed template” feature to libvirt.
-
-d) feature: yet-another-post-copy-migration
-It is a possible feature, no toolkit can do it well now.
-Using nbd server/client on the memory file is reluctantly Ok but
-inconvenient. A special feature for tmpfs might be needed to
-fully complete this feature.
-No one need yet another post copy migration method,
-but it is possible when some crazy man need it.
-
-Cc: Samuel Ortiz <sameo@linux.intel.com>
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Cc: James O. D. Hunt <james.o.hunt@intel.com>
-Cc: Xu Wang <gnawux@gmail.com>
-Cc: Peng Tao <bergwolf@gmail.com>
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Signed-off-by: Lai Jiangshan <jiangshanlai@gmail.com>
----
-
-Changes in V4:
- fixes checkpatch.pl errors
-
-Changes in V3:
- rebased on upstream master
- update the available version of the capability to
- v2.13
-
-Changes in V2:
- rebased on 2.11.1
-
- migration/migration.c | 14 ++++++++++++++
- migration/migration.h |  1 +
- migration/ram.c       | 27 ++++++++++++++++++---------
- qapi/migration.json   |  6 +++++-
- 4 files changed, 38 insertions(+), 10 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index 52a5092add..6a63102d7f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1509,6 +1509,20 @@ bool migrate_release_ram(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_RELEASE_RAM];
- }
- 
-+bool migrate_bypass_shared_memory(void)
-+{
-+    MigrationState *s;
-+
-+    /* it is not workable with postcopy yet. */
-+    if (migrate_postcopy_ram()) {
-+        return false;
-+    }
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_BYPASS_SHARED_MEMORY];
-+}
-+
- bool migrate_postcopy_ram(void)
- {
-     MigrationState *s;
-diff --git a/migration/migration.h b/migration/migration.h
-index 8d2f320c48..cfd2513ef0 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -206,6 +206,7 @@ MigrationState *migrate_get_current(void);
- 
- bool migrate_postcopy(void);
- 
-+bool migrate_bypass_shared_memory(void);
- bool migrate_release_ram(void);
- bool migrate_postcopy_ram(void);
- bool migrate_zero_blocks(void);
-diff --git a/migration/ram.c b/migration/ram.c
-index 0e90efa092..bca170c386 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -780,6 +780,11 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-     unsigned long *bitmap = rb->bmap;
-     unsigned long next;
- 
-+    /* when this ramblock is requested bypassing */
-+    if (!bitmap) {
-+        return size;
-+    }
-+
-     if (rs->ram_bulk_stage && start > 0) {
-         next = start + 1;
-     } else {
-@@ -850,7 +855,9 @@ static void migration_bitmap_sync(RAMState *rs)
-     qemu_mutex_lock(&rs->bitmap_mutex);
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
--        migration_bitmap_sync_range(rs, block, 0, block->used_length);
-+        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
-+            migration_bitmap_sync_range(rs, block, 0, block->used_length);
-+        }
-     }
-     rcu_read_unlock();
-     qemu_mutex_unlock(&rs->bitmap_mutex);
-@@ -2132,18 +2139,12 @@ static int ram_state_init(RAMState **rsp)
-     qemu_mutex_init(&(*rsp)->src_page_req_mutex);
-     QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
- 
--    /*
--     * Count the total number of pages used by ram blocks not including any
--     * gaps due to alignment or unplugs.
--     */
--    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
--
-     ram_state_reset(*rsp);
- 
-     return 0;
- }
- 
--static void ram_list_init_bitmaps(void)
-+static void ram_list_init_bitmaps(RAMState *rs)
- {
-     RAMBlock *block;
-     unsigned long pages;
-@@ -2151,9 +2152,17 @@ static void ram_list_init_bitmaps(void)
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
-         QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+            if (migrate_bypass_shared_memory() && qemu_ram_is_shared(block)) {
-+                continue;
-+            }
-             pages = block->max_length >> TARGET_PAGE_BITS;
-             block->bmap = bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-+            /*
-+             * Count the total number of pages used by ram blocks not
-+             * including any gaps due to alignment or unplugs.
-+             */
-+            rs->migration_dirty_pages += pages;
-             if (migrate_postcopy_ram()) {
-                 block->unsentmap = bitmap_new(pages);
-                 bitmap_set(block->unsentmap, 0, pages);
-@@ -2169,7 +2178,7 @@ static void ram_init_bitmaps(RAMState *rs)
-     qemu_mutex_lock_ramlist();
-     rcu_read_lock();
- 
--    ram_list_init_bitmaps();
-+    ram_list_init_bitmaps(rs);
-     memory_global_dirty_log_start();
-     migration_bitmap_sync(rs);
- 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 9d0bf82cf4..45326480bd 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -357,13 +357,17 @@
- # @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
- #                 (since 2.12)
- #
-+# @bypass-shared-memory: the shared memory region will be bypassed on migration.
-+#          This feature allows the memory region to be reused by new qemu(s)
-+#          or be migrated separately. (since 2.13)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-            'block', 'return-path', 'pause-before-switchover', 'x-multifd',
--           'dirty-bitmaps' ] }
-+           'dirty-bitmaps', 'bypass-shared-memory' ] }
- 
- ##
- # @MigrationCapabilityStatus:
--- 
-2.14.3 (Apple Git-98)
+>      }
+> -    if (s->datacnt == 0) {
+> -        s->status |= SDHSTS_DATA_FLAG;
+>  
+> -        s->edm &= ~0xf;
+> -        s->edm |= SDEDM_FSM_DATAMODE;
+> -        trace_bcm2835_sdhost_edm_change("datacnt 0", s->edm);
+> -
+> -        if (s->config & SDHCFG_DATA_IRPT_EN) {
+> -            s->status |= SDHSTS_SDIO_IRPT;
+> -        }
+> -
+> -        if ((s->cmd & SDCMD_BUSYWAIT) && (s->config & SDHCFG_BUSY_IRPT_EN)) {
+> -            s->status |= SDHSTS_BUSY_IRPT;
+> -        }
+> -
+> -        if ((s->cmd & SDCMD_WRITE_CMD) && (s->config & SDHCFG_BLOCK_IRPT_EN)) {
+> -            s->status |= SDHSTS_BLOCK_IRPT;
+> -        }
+> -
+> -        bcm2835_sdhost_update_irq(s);
+> -    }
+> +    bcm2835_sdhost_update_irq(s);
+>  
+>      s->edm &= ~(0x1f << 4);
+>      s->edm |= ((s->fifo_len & 0x1f) << 4);
+> 
