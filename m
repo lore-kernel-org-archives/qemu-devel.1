@@ -1,14 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f3jvC-0008BJ-3M
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:01:59 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f3jvX-0008M9-O4
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f3jvA-0007yt-JH
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:01:58 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  4 Apr 2018 16:01:46 +0100
-Message-Id: <20180404150146.23281-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
+	(envelope-from <stefanha@gmail.com>) id 1f3jvS-0008LU-BD
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 11:02:19 -0400
+Date: Wed, 4 Apr 2018 16:02:10 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180404150210.GW4467@stefanha-x1.localdomain>
+References: <20180403140314.8795-1-stefanha@redhat.com>
+	<a8c52de6-14a4-a5c4-4186-3c49c9a0b6b9@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KRJ4yArSHF8vY7I3"
+Content-Disposition: inline
+In-Reply-To: <a8c52de6-14a4-a5c4-4186-3c49c9a0b6b9@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: update 185
+ output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,111 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
-vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
-drain operation the block job iterates one more time than before.  The
-185 output no longer matches and the test is failing now.
 
-It may be possible to avoid the superfluous block job iteration, but
-that type of patch is not suitable late in the QEMU 2.12 release cycle.
+--KRJ4yArSHF8vY7I3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch simply updates the 185 output file.  The new behavior is
-correct, just not optimal, so make the test pass again.
+On Wed, Apr 04, 2018 at 02:59:14PM +0800, QingFeng Hao wrote:
+> =E5=9C=A8 2018/4/3 22:03, Stefan Hajnoczi =E5=86=99=E9=81=93:
+> Need we add the comment in 185.out that this change is to make the test p=
+ass for the superfluous block job iteration?
 
-Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shutdown()")
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/185     | 10 ++++++----
- tests/qemu-iotests/185.out | 12 +++++++-----
- 2 files changed, 13 insertions(+), 9 deletions(-)
+Thanks, I have sent v2.
 
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index f5b47e4c1a..298d88d04e 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -92,9 +92,8 @@ echo === Start commit job and exit qemu ===
- echo
- 
- # Note that the reference output intentionally includes the 'offset' field in
--# BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
--# predictable and any change in the offsets would hint at a bug in the job
--# throttling code.
-+# BLOCK_JOB_* events for all of the following block jobs. They are predictable
-+# and any change in the offsets would hint at a bug in the job throttling code.
- #
- # In order to achieve these predictable offsets, all of the following tests
- # use speed=65536. Each job will perform exactly one iteration before it has
-@@ -102,11 +101,14 @@ echo
- # command to be received (after receiving the command, the rest runs
- # synchronously, so jobs can arbitrarily continue or complete).
- #
-+# Jobs present while QEMU is terminating iterate once more due to
-+# bdrv_drain_all().
-+#
- # The buffer size for commit and streaming is 512k (waiting for 8 seconds after
- # the first request), for active commit and mirror it's large enough to cover
- # the full 4M, and for backup it's the qcow2 cluster size, which we know is
- # 64k. As all of these are at least as large as the speed, we are sure that the
--# offset doesn't advance after the first iteration before qemu exits.
-+# offset advances exactly twice before qemu exits.
- 
- _send_qemu_cmd $h \
-     "{ 'execute': 'block-commit',
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-index 57eaf8d699..2c4b04de73 100644
---- a/tests/qemu-iotests/185.out
-+++ b/tests/qemu-iotests/185.out
-@@ -20,7 +20,7 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 1048576, "speed": 65536, "type": "commit"}}
- 
- === Start active commit job and exit qemu ===
- 
-@@ -28,16 +28,18 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
- 
- === Start mirror job and exit qemu ===
- 
- {"return": {}}
- Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
- 
- === Start backup job and exit qemu ===
- 
-@@ -46,7 +48,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 65536, "speed": 65536, "type": "backup"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 131072, "speed": 65536, "type": "backup"}}
- 
- === Start streaming job and exit qemu ===
- 
-@@ -54,6 +56,6 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 524288, "speed": 65536, "type": "stream"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, "offset": 1048576, "speed": 65536, "type": "stream"}}
- No errors were found on the image.
- *** done
--- 
-2.14.3
+Stefan
+
+--KRJ4yArSHF8vY7I3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaxOjyAAoJEJykq7OBq3PIRegIAKXZUgeQJBaS0RHTbmE5Gfj+
+0Wsv8eTtQ7T5l9MS6LhcohDDau7vsm2qJZBYlHfDv7ltYZbhTmDvyKaK+Oi8VO9e
+xZYqe94Ww1WnX0SEForXgfC+EQk2MNwaZVHbRSJ9okEOSQ5ZltthirBW8Kj2QlSE
+2jorE3Frf5ifpFBhereFhvvt/klm3sKV6+gVNnX4Ys/PmkR+zBOug6geJIH2joxh
+ViAeiUn+tRw515nthKFLoDcGeEe3PwAWW4BzPlfuo9fHGexYXnVdWmaSMWxBMQ7X
+GY23DQ7yMDTa4Mi4GxvrfKOqBaatacyf6J317+hczHcJmEKSsdGW/Qn1kfqfd/Y=
+=hSpO
+-----END PGP SIGNATURE-----
+
+--KRJ4yArSHF8vY7I3--
