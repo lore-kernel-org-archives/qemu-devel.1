@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1f3gZs-0006pS-IB
+	(envelope-from <quintela@redhat.com>) id 1f3gZt-0006qg-Co
 	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1f3gZr-0007jY-0i
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34330 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1f3gZs-0007kP-Ak
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59046 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f3gZq-0007jG-RL
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:42 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f3gZs-0007kD-4e
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:44 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FE83406E8B9
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 11:27:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFE807B4AD
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 11:27:43 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  4 Apr 2018 13:27:27 +0200
-Message-Id: <20180404112731.5922-5-quintela@redhat.com>
+Date: Wed,  4 Apr 2018 13:27:28 +0200
+Message-Id: <20180404112731.5922-6-quintela@redhat.com>
 In-Reply-To: <20180404112731.5922-1-quintela@redhat.com>
 References: <20180404112731.5922-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 4/8] migration: Create socket-address
- parameter
+Subject: [Qemu-devel] [PATCH v7 5/8] tests: Migration ppc now inlines its
+ program
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,233 +33,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-It will be used to store the uri parameters. We want this only for
-tcp, so we don't set it for other uris.  We need it to know what port
-is migration running.
+No need to write it to a file.  Just need a proper firmware O:-)
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-
---
-
-This used to be uri parameter, but it has so many troubles to
-reproduce that it don't just make sense.
-
-This used to be a port parameter.  I was asked to move to
-SocketAddress, done.
-I also merged the setting of the migration tcp port in this one
-because now I need to free the address, and this makes it easier.
-This used to be x-socket-address with a single direction, now it is a
-list of addresses.
+CC: Laurent Vivier <lvivier@redhat.com>
 ---
- hmp.c                 | 14 ++++++++++++++
- migration/migration.c | 25 +++++++++++++++++++++++++
- migration/migration.h |  1 +
- migration/socket.c    | 11 +++++++++++
- qapi/migration.json   | 13 +++++++++++--
- qapi/sockets.json     | 13 +++++++++++++
- 6 files changed, 75 insertions(+), 2 deletions(-)
+ tests/migration-test.c | 41 +++++------------------------------------
+ 1 file changed, 5 insertions(+), 36 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index a25c7bd9a8..caf94345c9 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -355,6 +355,20 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %" PRIu64 "\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-             params->xbzrle_cache_size);
-+        if (params->has_socket_address) {
-+            SocketAddressList *addr;
-+
-+            monitor_printf(mon, "%s: [\n",
-+                MigrationParameter_str(MIGRATION_PARAMETER_SOCKET_ADDRESS));
-+
-+            for (addr = params->socket_address; addr; addr = addr->next) {
-+                char *s = SocketAddress_to_str("", addr->value,
-+                                               false, false);
-+                monitor_printf(mon, "\t%s\n", s);
-+            }
-+
-+            monitor_printf(mon, "]\n");
-+        }
-     }
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index fd885ba909..4a94d3d598 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -19,9 +19,6 @@
+ #include "qemu/sockets.h"
+ #include "chardev/char.h"
+ #include "sysemu/sysemu.h"
+-#include "hw/nvram/chrp_nvram.h"
+-
+-#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
  
-     qapi_free_MigrationParameters(params);
-diff --git a/migration/migration.c b/migration/migration.c
-index 58bd382730..71fa4c8176 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -31,6 +31,8 @@
- #include "migration/vmstate.h"
- #include "block/block.h"
- #include "qapi/error.h"
-+#include "qapi/clone-visitor.h"
-+#include "qapi/qapi-visit-sockets.h"
- #include "qapi/qapi-commands-migration.h"
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
-@@ -277,6 +279,21 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-     return migrate_send_rp_message(mis, msg_type, msglen, bufc);
+ const unsigned start_address = 1024 * 1024;
+ const unsigned end_address = 100 * 1024 * 1024;
+@@ -90,36 +87,6 @@ static void init_bootfile_x86(const char *bootpath)
+     fclose(bootfile);
  }
  
-+void migrate_set_address(SocketAddress *address)
-+{
-+    MigrationState *s = migrate_get_current();
-+    SocketAddressList *addrs;
-+
-+    addrs = g_new0(SocketAddressList, 1);
-+    addrs->next = s->parameters.socket_address;
-+    s->parameters.socket_address = addrs;
-+
-+    if (!s->parameters.has_socket_address) {
-+        s->parameters.has_socket_address = true;
-+    }
-+    addrs->value = QAPI_CLONE(SocketAddress, address);
-+}
-+
- void qemu_start_incoming_migration(const char *uri, Error **errp)
- {
-     const char *p;
-@@ -564,6 +581,11 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
-     params->x_multifd_page_count = s->parameters.x_multifd_page_count;
-     params->has_xbzrle_cache_size = true;
-     params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
-+    if (s->parameters.socket_address) {
-+        params->has_socket_address = true;
-+        params->socket_address =
-+            QAPI_CLONE(SocketAddressList, s->parameters.socket_address);
-+    }
- 
-     return params;
- }
-@@ -2571,6 +2593,9 @@ static void migration_instance_finalize(Object *obj)
-     qemu_mutex_destroy(&ms->error_mutex);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-+    if (params->socket_address) {
-+        qapi_free_SocketAddressList(params->socket_address);
-+    }
-     qemu_sem_destroy(&ms->pause_sem);
-     error_free(ms->error);
- }
-diff --git a/migration/migration.h b/migration/migration.h
-index 8d2f320c48..4774ee305f 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -241,5 +241,6 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
- 
- void dirty_bitmap_mig_before_vm_start(void);
- void init_dirty_bitmap_incoming_migration(void);
-+void migrate_set_address(SocketAddress *address);
- 
- #endif
-diff --git a/migration/socket.c b/migration/socket.c
-index 122d8ccfbe..5195fd57c5 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -15,6 +15,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- 
- #include "qemu-common.h"
- #include "qemu/error-report.h"
-@@ -152,6 +153,7 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
-                                             Error **errp)
- {
-     QIONetListener *listener = qio_net_listener_new();
-+    int i;
- 
-     qio_net_listener_set_name(listener, "migration-socket-listener");
- 
-@@ -163,6 +165,15 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
-     qio_net_listener_set_client_func(listener,
-                                      socket_accept_incoming_migration,
-                                      NULL, NULL);
-+
-+    for (i = 0; i < listener->nsioc; i++)  {
-+        SocketAddress *address =
-+            qio_channel_socket_get_local_address(listener->sioc[i], errp);
-+        if (address < 0) {
-+            return;
-+        }
-+        migrate_set_address(address);
-+    }
- }
- 
- void tcp_start_incoming_migration(const char *host_port, Error **errp)
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 9d0bf82cf4..c3aafaf8fe 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -6,6 +6,7 @@
- ##
- 
- { 'include': 'common.json' }
-+{ 'include': 'sockets.json' }
- 
- ##
- # @MigrationStats:
-@@ -494,6 +495,9 @@
- #                     and a power of 2
- #                     (Since 2.11)
- #
-+# @socket-address: Only used for tcp, to know what the real port is
-+#                  (Since 2.13)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-@@ -502,7 +506,7 @@
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
-            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-            'x-multifd-channels', 'x-multifd-page-count',
--           'xbzrle-cache-size' ] }
-+           'xbzrle-cache-size', 'socket-address' ] }
- 
- ##
- # @MigrateSetParameters:
-@@ -671,6 +675,10 @@
- #                     needs to be a multiple of the target page size
- #                     and a power of 2
- #                     (Since 2.11)
-+#
-+# @socket-address: Only used for tcp, to know what the real port is
-+#                  (Since 2.13)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -687,7 +695,8 @@
-             '*block-incremental': 'bool' ,
-             '*x-multifd-channels': 'uint8',
-             '*x-multifd-page-count': 'uint32',
--            '*xbzrle-cache-size': 'size' } }
-+            '*xbzrle-cache-size': 'size',
-+            '*socket-address': ['SocketAddress'] } }
- 
- ##
- # @query-migrate-parameters:
-diff --git a/qapi/sockets.json b/qapi/sockets.json
-index fc81d8d5e8..f1ca09a927 100644
---- a/qapi/sockets.json
-+++ b/qapi/sockets.json
-@@ -152,3 +152,16 @@
-             'unix': 'UnixSocketAddress',
-             'vsock': 'VsockSocketAddress',
-             'fd': 'String' } }
-+
-+##
-+# @DummyStruct:
-+#
-+# Both block-core and migration needs SocketAddressList
-+# I am open to comments about how to share it
-+#
-+# @dummy-list: A dummy list
-+#
-+# Since: 2.13
-+##
-+{ 'struct': 'DummyStruct',
-+  'data': { 'dummy-list': ['SocketAddress'] } }
+-static void init_bootfile_ppc(const char *bootpath)
+-{
+-    FILE *bootfile;
+-    char buf[MIN_NVRAM_SIZE];
+-    ChrpNvramPartHdr *header = (ChrpNvramPartHdr *)buf;
+-
+-    memset(buf, 0, MIN_NVRAM_SIZE);
+-
+-    /* Create a "common" partition in nvram to store boot-command property */
+-
+-    header->signature = CHRP_NVPART_SYSTEM;
+-    memcpy(header->name, "common", 6);
+-    chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
+-
+-    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
+-     * so let's modify memory between 1MB and 100MB
+-     * to do like PC bootsector
+-     */
+-
+-    sprintf(buf + 16,
+-            "boot-command=hex .\" _\" begin %x %x do i c@ 1 + i c! 1000 +loop "
+-            ".\" B\" 0 until", end_address, start_address);
+-
+-    /* Write partition to the NVRAM file */
+-
+-    bootfile = fopen(bootpath, "wb");
+-    g_assert_cmpint(fwrite(buf, MIN_NVRAM_SIZE, 1, bootfile), ==, 1);
+-    fclose(bootfile);
+-}
+-
+ /*
+  * Wait for some output in the serial output file,
+  * we get an 'A' followed by an endless string of 'B's
+@@ -410,12 +377,14 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+         if (access("/sys/module/kvm_hv", F_OK)) {
+             accel = "tcg";
+         }
+-        init_bootfile_ppc(bootpath);
+         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+                                   " -name source,debug-threads=on"
+                                   " -serial file:%s/src_serial"
+-                                  " -drive file=%s,if=pflash,format=raw",
+-                                  accel, tmpfs, bootpath);
++                                  " -prom-env '"
++                                  "boot-command=hex .\" _\" begin %x %x "
++                                  "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
++                                  "until'",  accel, tmpfs, end_address,
++                                  start_address);
+         cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
+                                   " -name target,debug-threads=on"
+                                   " -serial file:%s/dest_serial"
 -- 
 2.14.3
