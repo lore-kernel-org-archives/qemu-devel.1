@@ -1,22 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3hzF-00034b-0s
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:58:07 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f3i0V-0004JH-DP
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f3hz6-0007eZ-3r
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:58:01 -0400
-Date: Wed, 4 Apr 2018 13:57:48 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180404125748.GO4467@stefanha-x1.localdomain>
-References: <20180329110914.20888-1-famz@redhat.com>
-	<20180329110914.20888-2-famz@redhat.com>
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f3i0Q-0008Ss-7f
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:59:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43856
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1f3i0Q-0008SF-2O
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:59:14 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w34Cnr05033279
+	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 08:59:12 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2h4vm60bdb-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 08:59:12 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Wed, 4 Apr 2018 08:59:11 -0400
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
+	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
+	<ce32e96c-f448-c375-cc25-96bb3cf35d69@linux.vnet.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Wed, 4 Apr 2018 08:59:05 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FrxVhwK/bNRjN48l"
-Content-Disposition: inline
-In-Reply-To: <20180329110914.20888-2-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 1/8] block: Introduce
- bdrv_co_map_range API
+In-Reply-To: <ce32e96c-f448-c375-cc25-96bb3cf35d69@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <7bafd11f-9357-eebf-b6ee-78bbc8b8f406@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +48,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-
---FrxVhwK/bNRjN48l
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Mar 29, 2018 at 07:09:07PM +0800, Fam Zheng wrote:
-> diff --git a/block/io.c b/block/io.c
-> index bd9a19a9c4..1b4cfcacb1 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2826,3 +2826,47 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
->          bdrv_unregister_buf(child->bs, host);
->      }
->  }
-> +
-> +int coroutine_fn bdrv_co_map_range(BdrvChild *child, int64_t offset,
-> +                                   int64_t bytes, int64_t *pnum, int64_t *map,
-
-s/map/file_offset/ is clearer, since this function has self-expanatory
-'offset' and 'file' arguments.  This is the "offset within the file" ->
-file_offset.
-
-> +    /**
-> +     * Get or create offset mappings for a virtual range.
-> +     *
-> +     * @offset: the offset of the beginning of the range.
-
-Adding the units and avoiding reusing "offset" in the description:
-
-"byte position of the beginning of the range"
-
-> +     * @bytes: the maximum bytes of the range to map.
-> +     * @pnum: at return, this will point to the number of bytes in the returned
-> +     * mapping status
-> +     * @map: at return, this will point to the offset which the range maps to
-> +     * @file: at return, this will point to the file where the data is mapped.
-> +     * If it is set to bs, it means the mapping is terminal and the result can
-> +     * be used for read/write and copy_range; if it is NULL, it means the range
-> +     * doesn't map to a file, or no I/O to any file is necessary; otherwise, it
-> +     * means the query should be passed down to an underlying format/protocol.
-
-What does "the query should be passed down to an underlying
-format/protocol" mean?
-
-> +     * @flags: flags for the request. BDRV_REQ_ALLOCATE means the range
-> +     * should be allocated if necessary.
-> +     */
-
-What are return values?
-
-Please include a statement describing how long the mapping is considered
-stable.  For example, a qcow2 copy-on-write could "move" the data
-somewhere else.  Therefore it's not safe to store the value of "map" and
-use it again later on.
-
-Additionally, please explain what the caller is allowed to do with the
-returned information.  Using qcow2 copy-on-write as an example again, it
-is not okay to write to "map" since that bypasses qcow2's COW mechanism.
-
---FrxVhwK/bNRjN48l
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaxMvMAAoJEJykq7OBq3PI7qIH/RMULaUNl48zDcVt6gaO7/u5
-unNi+yZphaGgSLqmDZTEmzBoZK9KpL54KxmGXYm1O/LFdRIY2ej0xE9fcr8joDT9
-Cki01X+xikOf/ZJDVLl8VRD12w2B9kuh2EbpKvqCFKihoTfRoWv/b+4bosGMyar9
-HZmbPlijrfuR6DCmQWfFrs8kEgmS2QpKBtMivxj2pYaUQhME4WFKY/3+bkFMqiAd
-wAdUb5+B4X21tSvWrvJx0By7yD6YJWg9SzoCTVdRnIbcWRszRdoNxgnGpoIKP1g3
-tSueGZ9rUHRW7eAQow65vLpNbfXXfTv4p/iTTQYO3Lgr38XS04YV4HJIOq+85bM=
-=jxIC
------END PGP SIGNATURE-----
-
---FrxVhwK/bNRjN48l--
+On 04/04/2018 07:09 AM, Pierre Morel wrote:
+> On 02/04/2018 18:36, Tony Krowiak wrote:
+>> On 03/26/2018 05:03 AM, Pierre Morel wrote:
+>>> On 26/03/2018 10:32, David Hildenbrand wrote:
+>>>> On 16.03.2018 00:24, Tony Krowiak wrote:
+>>>>> If the CPU model indicates that AP facility is installed on
+>>>>> the guest (i.e., -cpu xxxx,ap=on), then the expectation is that
+>>>>> the AP bus running in the guest will initialize; however, if the
+>>>>> AP instructions are not being interpreted by the firmware, then
+>>>>> they will be intercepted and routed back to QEMU for handling.
+>>>>> If a handler is not defined to process the intercepted instruciton,
+>>>>> t
+>>> ...snip...
+>>>>
+>>>>> +int ap_device_handle_nqap(S390CPU *cpu)
+>>>>> +{
+>>>>> +    CPUS390XState *env = &cpu->env;
+>>>>> +
+>>>>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] = 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>>> +
+>>>>> +    return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +
+>>>>> +int ap_device_handle_dqap(S390CPU *cpu)
+>>>>> +{
+>>>>> +    CPUS390XState *env = &cpu->env;
+>>>>> +
+>>>>> +    if (s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] = 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>>> +
+>>>>> +    return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +
+>>>>> +int ap_device_handle_pqap(S390CPU *cpu)
+>>>>> +{
+>>>>> +    CPUS390XState *env = &cpu->env;
+>>>>> +    int fc = 4 & (env->regs[0] >> 24);
+>>>>> +
+>>>>> +    /*
+>>>>> +     * The Query Configuration Information (QCI) function (fc == 
+>>>>> 4) does not
+>>>>> +     * set a response code in reg 1, so check for that along with 
+>>>>> the
+>>>>> +     * AP feature.
+>>>>> +     */
+>>>>> +    if ((fc != 4) && s390_has_feat(S390_FEAT_AP)) {
+>>>>> +        env->regs[1] = 0x10000;
+>>>>> +
+>>>>> +        return 0;
+>>>>> +    }
+>>>> This would imply an operation exception in case fc==4, which sounds 
+>>>> very
+>>>> wrong.
+>>>
+>>> It depends but I think that the S390_FEAT_AP_QUERY_CONFIG_INFO must 
+>>> be tested
+>>> to know what to answer.
+>>> If the feature is there, QCI must be answered correctly.
+>> This is an interesting proposition which raises several issues that 
+>> will need to
+>> be addressed. The only time the PQAP(QCI) instruction is intercepted 
+>> is when:
+>> * A vfio-ap device is NOT defined for the guest because the vfio_ap 
+>> device driver
+>>   will set ECA.28 and the PQAP(QCI) instruction will be interpreted
+>> * STFLE.12 is set for the guest
+>>
+>> You say that the QCI must be answered correctly, but what is the 
+>> correct response?
+>> If we return the matrix - i.e., APM, ADM and AQM - configured via the 
+>> mediated
+>> matrix device's sysfs attributes files, then if any APQNs are defined 
+>> in the matrix,
+>> we will have to handle *ALL* AP instructions by executing them on 
+>> behalf of the
+>> guest. I suppose we could return an empty matrix in which case the AP 
+>> bus will come
+>> up without any devices on the guest, but what is the expectation of 
+>> an admin who
+>> deliberately configures the mediated matrix device? Should we forego 
+>> handling interception
+>> of AP instructions and consider a guest configuration that turns on 
+>> S390_FEAT_AP but
+>> does not define a vfio-ap device to be erroneous and terminate 
+>> starting of the guest?
+>> Anybody have any thoughts?
+>>>
+>>>
+>>> there are also some error situations to handle in all three functions.
+>> To what error situations are you referring?
+>
+> program exceptions, like access, privilege or specification exceptions.
+I'm sorry, I still don't know what you are referring to, can you be more 
+specific?
+>
+>
+>
+>>>
+>>>
+>>>
+>>>>
+>>>> Hard to review without access to documentation. (hard to understand 
+>>>> why
+>>>> such stuff is to be kept confidential for decades)
+>>>>
+>>>>> +
+>>>>> +    return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +
+>>>>>   static Property vfio_ap_properties[] = {
+>>>>>       DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
+>>>>>       DEFINE_PROP_END_OF_LIST(),
+>>>>> diff --git a/include/hw/s390x/ap-device.h 
+>>>>> b/include/hw/s390x/ap-device.h
+>>>>> index 693df90..d45ae38 100644
+>>>>> --- a/include/hw/s390x/ap-device.h
+>>>>> +++ b/include/hw/s390x/ap-device.h
+>>>>> @@ -11,6 +11,8 @@
+>>>>>   #ifndef HW_S390X_AP_DEVICE_H
+>>>>>   #define HW_S390X_AP_DEVICE_H
+>>>>
+>>>
+>>
+>>
+>
