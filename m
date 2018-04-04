@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3hgB-0000c0-OF
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:38:20 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f3hmb-0003R3-4B
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:44:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f3hg7-0004bF-R7
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:38:19 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:54379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f3hg7-0004aj-JB
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:38:15 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id r191so9930296wmg.4
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 05:38:15 -0700 (PDT)
-References: <20180228180215.25470-1-wei@redhat.com>
-	<20180228180215.25470-2-wei@redhat.com>
-	<ca21f795-dae7-d6b5-44f1-ef8ba792ac04@redhat.com>
-	<20180305110122.GD3131@work-vm>
-	<20180305133654.7aokepvzcmxhzk4q@kamzik.brq.redhat.com>
-	<20180305135244.GJ3131@work-vm>
-	<868c6039-35fb-16cb-67bb-39cee11e8118@redhat.com>
-	<28739cac-ad18-a46d-23b0-fef9458da75e@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <28739cac-ad18-a46d-23b0-fef9458da75e@redhat.com>
-Date: Wed, 04 Apr 2018 13:38:12 +0100
-Message-ID: <87fu4bcfkb.fsf@linaro.org>
+	(envelope-from <laurent@vivier.eu>) id 1f3hmX-0000rv-Us
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:44:57 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:50031)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f3hmX-0000ro-LG
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:44:53 -0400
+References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
+	<1519998711-73430-11-git-send-email-mjc@sifive.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <b9b4f754-911c-8f23-8809-1a2d463f784e@vivier.eu>
+Date: Wed, 4 Apr 2018 14:44:47 +0200
 MIME-Version: 1.0
+In-Reply-To: <1519998711-73430-11-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V7 1/4] rules: Move cross compilation auto
- detection functions to rules.mak
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 10/23] RISC-V Linux User Emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Wei Huang <wei@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Andrew Jones <drjones@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, quintela@redhat.com
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
+Le 02/03/2018 à 14:51, Michael Clark a écrit :
+> Implementation of linux user emulation for RISC-V.
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>  linux-user/elfload.c              |  22 +++
+>  linux-user/main.c                 |  99 +++++++++++++
+>  linux-user/riscv/syscall_nr.h     | 287 ++++++++++++++++++++++++++++++++++++++
+>  linux-user/riscv/target_cpu.h     |  18 +++
+>  linux-user/riscv/target_elf.h     |  14 ++
+>  linux-user/riscv/target_signal.h  |  23 +++
+>  linux-user/riscv/target_structs.h |  46 ++++++
+>  linux-user/riscv/target_syscall.h |  56 ++++++++
+>  linux-user/riscv/termbits.h       | 222 +++++++++++++++++++++++++++++
+>  linux-user/signal.c               | 203 ++++++++++++++++++++++++++-
+>  linux-user/syscall.c              |   2 +
+>  linux-user/syscall_defs.h         |  13 +-
+>  target/riscv/cpu_user.h           |  13 ++
+>  13 files changed, 1012 insertions(+), 6 deletions(-)
+>  create mode 100644 linux-user/riscv/syscall_nr.h
+>  create mode 100644 linux-user/riscv/target_cpu.h
+>  create mode 100644 linux-user/riscv/target_elf.h
+>  create mode 100644 linux-user/riscv/target_signal.h
+>  create mode 100644 linux-user/riscv/target_structs.h
+>  create mode 100644 linux-user/riscv/target_syscall.h
+>  create mode 100644 linux-user/riscv/termbits.h
+>  create mode 100644 target/riscv/cpu_user.h
+> 
+...
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 9a380b9..4d3f244 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+...
+> +static abi_ulong get_sigframe(struct target_sigaction *ka,
+> +                              CPURISCVState *regs, size_t framesize)
+> +{
+> +    abi_ulong sp = regs->gpr[xSP];
+> +    int onsigstack = on_sig_stack(sp);
+> +
+> +    /* redzone */
+> +    /* This is the X/Open sanctioned signal stack switching.  */
+> +    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
+> +        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+> +    }
+> +
+> +    sp -= framesize;
+> +    sp &= ~3UL; /* align sp on 4-byte boundary */
 
-Laurent Vivier <lvivier@redhat.com> writes:
+kernel aligns using 0xf. Why do you use a different alignment?
 
-> On 05/03/2018 18:59, Wei Huang wrote:
-> ...
->>
->> SLO build actually is OK if we don't move the cross-compile stuff to the
->> generic rules.mak.
->>
->> So this cross-compile approach has lots of objection (unclean, broken
->> rom build etc.). A complete solution will make this patchset bloated,
->> which is diverted away from original purpose of migration-test.
->>
->> Dave & Drew: will the following be acceptable?
->>
->> 1. Still use Makefile for .s->.h compilation
->> 2. In Makefile, we don't support cross-compilation. This avoids
->> duplicating the cross-compile detection code at all. Whoever really
->> wants to re-generate .h file must be avid programmers. They can either
->> find a native machine or fix Makefile themselves.
->> 3. The cross-compile re-factoring will become a separate patchset. In
->> that patchset, both ROM and migration-test Makefiles will be changed to
->> support cross compilation.
->>
->> Thoughts?
->
-> I agree with Peter: I think an improvement would be to detect/configure
-> cross-compilers at the configure level, not in the Makefile.
+> +
+> +    /* If we are on the alternate signal stack and would overflow it, don't.
+> +       Return an always-bogus address instead so we will die with SIGSEGV. */
+> +    if (onsigstack && !likely(on_sig_stack(sp))) {
+> +        return -1L;
+> +    }
+> +
+> +    return sp;
+> +}
+Other question why don't you use the same logic as in kernel?
 
-I'm going to have a go at this now for docker and host installed
-cross-compilers.
+1- check for signal stack overflow
+2- check for X/Open sanctioned signal stack switching
 
->
-> thanks,
-> Laurent
+static inline void __user *get_sigframe(struct ksignal *ksig,
+        struct pt_regs *regs, size_t framesize)
+{
+        unsigned long sp;
+        /* Default to using normal stack */
+        sp = regs->sp;
 
+        /*
+         * If we are on the alternate signal stack and would overflow
+it, don't.
+         * Return an always-bogus address instead so we will die with
+SIGSEGV.
+         */
+        if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
+                return (void __user __force *)(-1UL);
 
---
-Alex Benn=C3=A9e
+        /* This is the X/Open sanctioned signal stack switching. */
+        sp = sigsp(sp, ksig) - framesize;
+
+        /* Align the stack frame. */
+        sp &= ~0xfUL;
+
+        return (void __user *)sp;
+}
+
+Thanks,
+Laurent
