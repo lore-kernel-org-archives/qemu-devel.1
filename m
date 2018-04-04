@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f3rG5-0004WZ-H6
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 18:52:02 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1f3rXT-000375-Se
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:10:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f3rG4-00073V-Jf
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 18:52:01 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1522869306-17292-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ba4e459e-5b7f-aa25-180c-9e7e9dd8a51a@amsat.org>
-Date: Wed, 4 Apr 2018 19:51:51 -0300
+	(envelope-from <alex.williamson@redhat.com>) id 1f3rXQ-0003Pe-CP
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:09:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54862)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1f3rXQ-0003PD-3X
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:09:56 -0400
+Date: Wed, 4 Apr 2018 17:09:50 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180404170950.54eb7975@w520.home>
+In-Reply-To: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
+References: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1522869306-17292-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12] hw/arm/integratorcp:
- Don't do things that could be fatal in the instance_init
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for 2.12] vfio: Use a trace point when a
+ RAM section cannot be DMA mapped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-Hi Thomas,
+On Wed,  4 Apr 2018 22:30:50 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On 04/04/2018 04:15 PM, Thomas Huth wrote:
-> An instance_init function must not fail - and might be called multiple times,
-> e.g. during device introspection with the 'device-list-properties' QMP
-> command. Since the integratorcm device ignores this rule, QEMU currently
-> aborts in this case (though it really should not):
+> The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions")
+> added an error message if a passed memory section address or size
+> is not aligned to the page size and thus cannot be DMA mapped.
 > 
-> echo "{'execute':'qmp_capabilities'}"\
->      "{'execute':'device-list-properties',"\
->      "'arguments':{'typename':'integrator_core'}}" \
->      | arm-softmmu/qemu-system-arm -M integratorcp,accel=qtest -qmp stdio
-> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->  "package": "build-all"}, "capabilities": []}}
-> {"return": {}}
-> RAMBlock "integrator.flash" already registered, abort!
-> Aborted (core dumped)
+> This patch fixes the trace by printing the region name and the
+> memory region section offset within the address space (instead of
+> offset_within_region).
 > 
-> Move the problematic code to the realize() function instead to fix this
-> problem.
+> We also turn the error_report into a trace event. Indeed, In some
+> cases, the traces can be confusing to non expert end-users and
+> let think the use case does not work (whereas it
+> works as before).
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> This is the case where a BAR is successively mapped at different
+> GPAs and its sections are not compatible with dma map. The listener
+> is called several times and traces are issued for each intermediate
+> mapping.  The end-user cannot easily match those GPAs against the
+> final GPA output by lscpi. So let's keep those information to
+> informed users. In mid term, the plan is to advise the user about
+> BAR relocation relevance.
+> 
+> Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  hw/arm/integratorcp.c | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
 > 
-> diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
-> index e8303b8..9e2df34 100644
-> --- a/hw/arm/integratorcp.c
-> +++ b/hw/arm/integratorcp.c
-> @@ -266,7 +266,6 @@ static const MemoryRegionOps integratorcm_ops = {
->  static void integratorcm_init(Object *obj)
->  {
->      IntegratorCMState *s = INTEGRATOR_CM(obj);
-> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
->  
->      s->cm_osc = 0x01000048;
->      /* ??? What should the high bits of this value be?  */
-> @@ -276,20 +275,28 @@ static void integratorcm_init(Object *obj)
->      s->cm_init = 0x00000112;
->      s->cm_refcnt_offset = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), 24,
->                                     1000);
-> -    memory_region_init_ram(&s->flash, obj, "integrator.flash", 0x100000,
-> -                           &error_fatal);
->  
-> -    memory_region_init_io(&s->iomem, obj, &integratorcm_ops, s,
-> -                          "integratorcm", 0x00800000);
-> -    sysbus_init_mmio(dev, &s->iomem);
-> -
-> -    integratorcm_do_remap(s);
->      /* ??? Save/restore.  */
->  }
->  
->  static void integratorcm_realize(DeviceState *d, Error **errp)
->  {
->      IntegratorCMState *s = INTEGRATOR_CM(d);
-> +    SysBusDevice *dev = SYS_BUS_DEVICE(d);
-> +    Error *local_err = NULL;
-> +
-> +    memory_region_init_ram(&s->flash, (Object *)d, "integrator.flash", 0x100000,
+> v1 -> v2:
+> - use a trace point
+> - add some details in the commit message
 
-To keep consistency:
+I think this is v2 with v1 being
+Message-Id:<20180322081837.21460-1-aik@ozlabs.ru> but this is
+substantially different from Alexey's posting so I'd like to verify the
+Sign-off.  Alexey?
 
-    memory_region_init_ram(&s->flash, OBJECT(d), "integrator.flash", ...
+I agree that this seems to be the right thing to do for 2.12, nothing
+has changed for these mappings and the error reports are difficult even
+for experts to decipher and explain to users.  Thanks,
 
-> +                           &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    memory_region_init_io(&s->iomem, (Object *)d, &integratorcm_ops, s,
+Alex
 
-    memory_region_init_io(&s->iomem, OBJECT(d), &integratorcm_ops, s,
-
-> +                          "integratorcm", 0x00800000);
-> +    sysbus_init_mmio(dev, &s->iomem);
-> +
-> +    integratorcm_do_remap(s);
->  
->      if (s->memsz >= 256) {
->          integrator_spd[31] = 64;
+> ---
+>  hw/vfio/common.c     | 11 +++++------
+>  hw/vfio/trace-events |  1 +
+>  2 files changed, 6 insertions(+), 6 deletions(-)
 > 
-
-With the macro instead of the cast:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Regards,
-
-Phil.
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 5e84716..07ffa0b 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -548,12 +548,11 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>          hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+>  
+>          if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
+> -            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
+> -                         " is not aligned to 0x%"HWADDR_PRIx
+> -                         " and cannot be mapped for DMA",
+> -                         section->offset_within_region,
+> -                         int128_getlo(section->size),
+> -                         pgmask + 1);
+> +            trace_vfio_listener_region_add_no_dma_map(
+> +                memory_region_name(section->mr),
+> +                section->offset_within_address_space,
+> +                int128_getlo(section->size),
+> +                pgmask + 1);
+>              return;
+>          }
+>      }
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index 79f63a2..20109cb 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -90,6 +90,7 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "i
+>  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
+>  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
+>  vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
+> +vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uint64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=0x%"PRIx64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
+>  vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
+>  vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
+>  vfio_disconnect_container(int fd) "close container->fd=%d"
