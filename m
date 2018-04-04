@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1f3gZt-0006qg-Co
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:46 -0400
+	(envelope-from <quintela@redhat.com>) id 1f3gZu-0006tG-Nx
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1f3gZs-0007kP-Ak
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59046 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1f3gZt-0007l2-Js
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48164 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f3gZs-0007kD-4e
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:44 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f3gZt-0007kq-FB
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 07:27:45 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFE807B4AD
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 11:27:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A7258160F99
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 11:27:45 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  4 Apr 2018 13:27:28 +0200
-Message-Id: <20180404112731.5922-6-quintela@redhat.com>
+Date: Wed,  4 Apr 2018 13:27:29 +0200
+Message-Id: <20180404112731.5922-7-quintela@redhat.com>
 In-Reply-To: <20180404112731.5922-1-quintela@redhat.com>
 References: <20180404112731.5922-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 5/8] tests: Migration ppc now inlines its
- program
+Subject: [Qemu-devel] [PATCH v7 6/8] tests: Add basic migration precopy tcp
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +33,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-No need to write it to a file.  Just need a proper firmware O:-)
+Not sharing code from precopy/unix because we have to read back the
+tcp parameter.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-CC: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- tests/migration-test.c | 41 +++++------------------------------------
- 1 file changed, 5 insertions(+), 36 deletions(-)
+ tests/migration-test.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 80 insertions(+), 3 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index fd885ba909..4a94d3d598 100644
+index 4a94d3d598..309ae4793e 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -19,9 +19,6 @@
+@@ -19,6 +19,9 @@
  #include "qemu/sockets.h"
  #include "chardev/char.h"
  #include "sysemu/sysemu.h"
--#include "hw/nvram/chrp_nvram.h"
--
--#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
++#include "qapi/qapi-visit-sockets.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-output-visitor.h"
  
  const unsigned start_address = 1024 * 1024;
  const unsigned end_address = 100 * 1024 * 1024;
-@@ -90,36 +87,6 @@ static void init_bootfile_x86(const char *bootpath)
-     fclose(bootfile);
+@@ -277,8 +280,32 @@ static void cleanup(const char *filename)
+     g_free(path);
  }
  
--static void init_bootfile_ppc(const char *bootpath)
--{
--    FILE *bootfile;
--    char buf[MIN_NVRAM_SIZE];
--    ChrpNvramPartHdr *header = (ChrpNvramPartHdr *)buf;
--
--    memset(buf, 0, MIN_NVRAM_SIZE);
--
--    /* Create a "common" partition in nvram to store boot-command property */
--
--    header->signature = CHRP_NVPART_SYSTEM;
--    memcpy(header->name, "common", 6);
--    chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
--
--    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
--     * so let's modify memory between 1MB and 100MB
--     * to do like PC bootsector
--     */
--
--    sprintf(buf + 16,
--            "boot-command=hex .\" _\" begin %x %x do i c@ 1 + i c! 1000 +loop "
--            ".\" B\" 0 until", end_address, start_address);
--
--    /* Write partition to the NVRAM file */
--
--    bootfile = fopen(bootpath, "wb");
--    g_assert_cmpint(fwrite(buf, MIN_NVRAM_SIZE, 1, bootfile), ==, 1);
--    fclose(bootfile);
--}
--
- /*
-  * Wait for some output in the serial output file,
-  * we get an 'A' followed by an endless string of 'B's
-@@ -410,12 +377,14 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-         if (access("/sys/module/kvm_hv", F_OK)) {
-             accel = "tcg";
-         }
--        init_bootfile_ppc(bootpath);
-         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
--                                  " -drive file=%s,if=pflash,format=raw",
--                                  accel, tmpfs, bootpath);
-+                                  " -prom-env '"
-+                                  "boot-command=hex .\" _\" begin %x %x "
-+                                  "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
-+                                  "until'",  accel, tmpfs, end_address,
-+                                  start_address);
-         cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial"
+-static void migrate_check_parameter(QTestState *who, const char *parameter,
+-                                    const char *value)
++static char *migrate_get_socket_address(QTestState *who, const char *parameter)
++{
++    QDict *rsp, *rsp_return;
++    char *result;
++    Error *local_err = NULL;
++    SocketAddressList *addrs;
++    Visitor *iv = NULL;
++    QObject *object;
++
++    rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
++    rsp_return = qdict_get_qdict(rsp, "return");
++    object = qdict_get(rsp_return, parameter);
++
++    iv = qobject_input_visitor_new(object);
++    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
++
++    /* we are only using a single address */
++    result = g_strdup_printf("%s", SocketAddress_to_str("", addrs->value,
++                                                        false, false));
++
++    qapi_free_SocketAddressList(addrs);
++    QDECREF(rsp);
++    return result;
++}
++
++static char *migrate_get_parameter(QTestState *who, const char *parameter)
+ {
+     QDict *rsp, *rsp_return;
+     char *result;
+@@ -287,9 +314,18 @@ static void migrate_check_parameter(QTestState *who, const char *parameter,
+     rsp_return = qdict_get_qdict(rsp, "return");
+     result = g_strdup_printf("%" PRId64,
+                              qdict_get_try_int(rsp_return,  parameter, -1));
++    QDECREF(rsp);
++    return result;
++}
++
++static void migrate_check_parameter(QTestState *who, const char *parameter,
++                                    const char *value)
++{
++    char *result;
++
++    result = migrate_get_parameter(who, parameter);
+     g_assert_cmpstr(result, ==, value);
+     g_free(result);
+-    QDECREF(rsp);
+ }
+ 
+ static void migrate_set_parameter(QTestState *who, const char *parameter,
+@@ -666,6 +702,46 @@ static void test_xbzrle_unix(void)
+     g_free(uri);
+ }
+ 
++static void test_precopy_tcp(void)
++{
++    char *uri;
++    QTestState *from, *to;
++
++    test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false);
++
++    /* We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter(from, "downtime-limit", "1");
++    /* 1GB/s */
++    migrate_set_parameter(from, "max-bandwidth", "1000000000");
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    uri = migrate_get_socket_address(to, "socket-address");
++
++    migrate(from, uri);
++
++    wait_for_migration_pass(from);
++
++    /* 300ms should converge */
++    migrate_set_parameter(from, "downtime-limit", "300");
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    test_migrate_end(from, to, true);
++    g_free(uri);
++}
++
+ int main(int argc, char **argv)
+ {
+     char template[] = "/tmp/migration-test-XXXXXX";
+@@ -689,6 +765,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
++    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+ 
+     ret = g_test_run();
 -- 
 2.14.3
