@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f3rZe-0004O0-Oo
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:12:16 -0400
+	(envelope-from <cota@braap.org>) id 1f3rZh-0004QT-Cp
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f3rZd-00045t-9V
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:12:14 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:38979)
+	(envelope-from <cota@braap.org>) id 1f3rZg-000489-7F
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:12:17 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:33229)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f3rZd-00045i-4c
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:12:13 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f3rZg-00047f-3F
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:12:16 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed,  4 Apr 2018 19:11:10 -0400
-Message-Id: <1522883475-27858-11-git-send-email-cota@braap.org>
+Date: Wed,  4 Apr 2018 19:11:12 -0400
+Message-Id: <1522883475-27858-13-git-send-email-cota@braap.org>
 In-Reply-To: <1522883475-27858-1-git-send-email-cota@braap.org>
 References: <1522883475-27858-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 10/15] hardfloat: support float32/64
- addition and subtraction
+Subject: [Qemu-devel] [PATCH v3 12/15] hardfloat: support float32/64 division
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,209 +26,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Performance results (single and double precision) for fp-bench:
+Performance results for fp-bench:
 
 1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
 - before:
-add-single: 135.07 MFlops
-add-double: 131.60 MFlops
-sub-single: 130.04 MFlops
-sub-double: 133.01 MFlops
+div-single: 34.84 MFlops
+div-double: 34.04 MFlops
 - after:
-add-single: 443.04 MFlops
-add-double: 301.95 MFlops
-sub-single: 411.36 MFlops
-sub-double: 293.15 MFlops
+div-single: 275.23 MFlops
+div-double: 216.38 MFlops
 
 2. ARM Aarch64 A57 @ 2.4GHz
 - before:
-add-single: 44.79 MFlops
-add-double: 49.20 MFlops
-sub-single: 44.55 MFlops
-sub-double: 49.06 MFlops
+div-single: 9.33 MFlops
+div-double: 9.30 MFlops
 - after:
-add-single: 93.28 MFlops
-add-double: 88.27 MFlops
-sub-single: 91.47 MFlops
-sub-double: 88.27 MFlops
+div-single: 51.55 MFlops
+div-double: 15.09 MFlops
 
 3. IBM POWER8E @ 2.1 GHz
 - before:
-add-single: 72.59 MFlops
-add-double: 72.27 MFlops
-sub-single: 75.33 MFlops
-sub-double: 70.54 MFlops
+div-single: 25.65 MFlops
+div-double: 24.91 MFlops
 - after:
-add-single: 112.95 MFlops
-add-double: 201.11 MFlops
-sub-single: 116.80 MFlops
-sub-double: 188.72 MFlops
+div-single: 96.83 MFlops
+div-double: 31.01 MFlops
 
-Note that the IBM and ARM machines benefit from having
-HARDFLOAT_2F{32,64}_USE_FP set to 0. Otherwise their performance
-can suffer significantly:
-- IBM Power8:
-add-single: [1] 54.94 vs [0] 116.37 MFlops
-add-double: [1] 58.92 vs [0] 201.44 MFlops
-- Aarch64 A57:
-add-single: [1] 80.72 vs [0] 93.24 MFlops
-add-double: [1] 82.10 vs [0] 88.18 MFlops
-
-On the Intel machine, having 2F64 set to 1 pays off, but it
-doesn't for 2F32:
-- Intel i7-6700K:
-add-single: [1] 285.79 vs [0] 426.70 MFlops
-add-double: [1] 302.15 vs [0] 278.82 MFlops
+Here setting 2FP64_USE_FP to 1 pays off for x86_64:
+[1] 215.97 vs [0] 62.15 MFlops
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 98 insertions(+), 8 deletions(-)
+ fpu/softfloat.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 86 insertions(+), 2 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 956b938..ca0b8ab 100644
+index 2c68b9d..4323dc2 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1080,8 +1080,8 @@ float16  __attribute__((flatten)) float16_add(float16 a, float16 b,
+@@ -1666,7 +1666,8 @@ float16 float16_div(float16 a, float16 b, float_status *status)
      return float16_round_pack_canonical(pr, status);
  }
  
--float32 __attribute__((flatten)) float32_add(float32 a, float32 b,
--                                             float_status *status)
+-float32 float32_div(float32 a, float32 b, float_status *status)
 +static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_add(float32 a, float32 b, float_status *status)
++soft_float32_div(float32 a, float32 b, float_status *status)
  {
      FloatParts pa = float32_unpack_canonical(a, status);
      FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1090,8 +1090,8 @@ float32 __attribute__((flatten)) float32_add(float32 a, float32 b,
+@@ -1675,7 +1676,8 @@ float32 float32_div(float32 a, float32 b, float_status *status)
      return float32_round_pack_canonical(pr, status);
  }
  
--float64 __attribute__((flatten)) float64_add(float64 a, float64 b,
--                                             float_status *status)
+-float64 float64_div(float64 a, float64 b, float_status *status)
 +static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_add(float64 a, float64 b, float_status *status)
++soft_float64_div(float64 a, float64 b, float_status *status)
  {
      FloatParts pa = float64_unpack_canonical(a, status);
      FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1110,8 +1110,8 @@ float16 __attribute__((flatten)) float16_sub(float16 a, float16 b,
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 __attribute__((flatten)) float32_sub(float32 a, float32 b,
--                                             float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_sub(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1120,8 +1120,8 @@ float32 __attribute__((flatten)) float32_sub(float32 a, float32 b,
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 __attribute__((flatten)) float64_sub(float64 a, float64 b,
--                                             float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_sub(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1130,6 +1130,96 @@ float64 __attribute__((flatten)) float64_sub(float64 a, float64 b,
+@@ -1684,6 +1686,88 @@ float64 float64_div(float64 a, float64 b, float_status *status)
      return float64_round_pack_canonical(pr, status);
  }
  
-+static float float_add(float a, float b)
++static float float_div(float a, float b)
 +{
-+    return a + b;
++    return a / b;
 +}
 +
-+static float float_sub(float a, float b)
++static double double_div(double a, double b)
 +{
-+    return a - b;
++    return a / b;
 +}
 +
-+static double double_add(double a, double b)
++static bool f32_div_pre(float32 a, float32 b, const struct float_status *s)
 +{
-+    return a + b;
++    return likely(float32_is_zero_or_normal(a) &&
++                  float32_is_normal(b) &&
++                  can_use_fpu(s));
 +}
 +
-+static double double_sub(double a, double b)
++static bool f64_div_pre(float64 a, float64 b, const struct float_status *s)
 +{
-+    return a - b;
++    return likely(float64_is_zero_or_normal(a) &&
++                  float64_is_normal(b) &&
++                  can_use_fpu(s));
 +}
 +
-+static bool f32_addsub_post(float32 a, float32 b, const struct float_status *s)
++static bool float_div_pre(float a, float b, const struct float_status *s)
 +{
-+    return !(float32_is_zero(a) && float32_is_zero(b));
++    return likely((fpclassify(a) == FP_NORMAL || fpclassify(a) == FP_ZERO) &&
++                  fpclassify(b) == FP_NORMAL &&
++                  can_use_fpu(s));
 +}
 +
-+static bool
-+float_addsub_post(float a, float b, const struct float_status *s)
++static bool double_div_pre(double a, double b, const struct float_status *s)
 +{
-+    return !(fpclassify(a) == FP_ZERO && fpclassify(b) == FP_ZERO);
++    return likely((fpclassify(a) == FP_NORMAL || fpclassify(a) == FP_ZERO) &&
++                  fpclassify(b) == FP_NORMAL &&
++                  can_use_fpu(s));
 +}
 +
-+static bool f64_addsub_post(float64 a, float64 b, const struct float_status *s)
++static bool f32_div_post(float32 a, float32 b, const struct float_status *s)
 +{
-+    return !(float64_is_zero(a) && float64_is_zero(b));
++    return !float32_is_zero(a);
 +}
 +
-+static bool
-+double_addsub_post(double a, double b, const struct float_status *s)
++static bool f64_div_post(float64 a, float64 b, const struct float_status *s)
 +{
-+    return !(fpclassify(a) == FP_ZERO && fpclassify(b) == FP_ZERO);
++    return !float64_is_zero(a);
 +}
 +
-+static float32 float32_addsub(float32 a, float32 b, float_status *s,
-+                              float_op2_func_t hard, f32_op2_func_t soft)
++static bool float_div_post(float a, float b, const struct float_status *s)
++{
++    return fpclassify(a) != FP_ZERO;
++}
++
++static bool double_div_post(double a, double b, const struct float_status *s)
++{
++    return fpclassify(a) != FP_ZERO;
++}
++
++float32 __attribute__((flatten))
++float32_div(float32 a, float32 b, float_status *s)
 +{
 +    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return float_gen2(a, b, s, hard, soft, float_is_zon2, float_addsub_post,
-+                          NULL, NULL);
++        return float_gen2(a, b, s, float_div, soft_float32_div, float_div_pre,
++                          float_div_post, NULL, NULL);
 +    } else {
-+        return f32_gen2(a, b, s, hard, soft, f32_is_zon2, f32_addsub_post,
-+                        NULL, NULL);
++        return f32_gen2(a, b, s, float_div, soft_float32_div, f32_div_pre,
++                        f32_div_post, NULL, NULL);
 +    }
 +}
 +
-+static float64 float64_addsub(float64 a, float64 b, float_status *s,
-+                              double_op2_func_t hard, f64_op2_func_t soft)
++float64 __attribute__((flatten))
++float64_div(float64 a, float64 b, float_status *s)
 +{
 +    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return double_gen2(a, b, s, hard, soft, double_is_zon2,
-+                           double_addsub_post, NULL, NULL);
++        return double_gen2(a, b, s, double_div, soft_float64_div,
++                           double_div_pre, double_div_post, NULL, NULL);
 +    } else {
-+        return f64_gen2(a, b, s, hard, soft, f64_is_zon2, f64_addsub_post,
-+                        NULL, NULL);
++        return f64_gen2(a, b, s, double_div, soft_float64_div, f64_div_pre,
++                        f64_div_post, NULL, NULL);
 +    }
-+}
-+
-+float32 __attribute__((flatten))
-+float32_add(float32 a, float32 b, float_status *s)
-+{
-+    return float32_addsub(a, b, s, float_add, soft_float32_add);
-+}
-+
-+float32 __attribute__((flatten))
-+float32_sub(float32 a, float32 b, float_status *s)
-+{
-+    return float32_addsub(a, b, s, float_sub, soft_float32_sub);
-+}
-+
-+float64 __attribute__((flatten))
-+float64_add(float64 a, float64 b, float_status *s)
-+{
-+    return float64_addsub(a, b, s, double_add, soft_float64_add);
-+}
-+
-+float64 __attribute__((flatten))
-+float64_sub(float64 a, float64 b, float_status *s)
-+{
-+    return float64_addsub(a, b, s, double_sub, soft_float64_sub);
 +}
 +
  /*
-  * Returns the result of multiplying the floating-point values `a' and
-  * `b'. The operation is performed according to the IEC/IEEE Standard
+  * Rounds the floating-point value `a' to an integer, and returns the
+  * result as a floating-point value. The operation is performed
 -- 
 2.7.4
