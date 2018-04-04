@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3hnJ-0003xJ-Mf
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:45:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f3hra-0006Ld-KZ
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3hnG-00014t-IO
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:45:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35774)
+	(envelope-from <alex.bennee@linaro.org>) id 1f3hrX-0002X3-Fm
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:50:06 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40849)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3hnG-00013u-C4
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:45:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3hnF-0000GN-CL
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 12:45:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 50C382E805D
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 12:45:37 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f3hrX-0002Wd-5B
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 08:50:03 -0400
+Received: by mail-wm0-x244.google.com with SMTP id x4so42120690wmh.5
+	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 05:50:02 -0700 (PDT)
+References: <20180111125444.6498-1-pbonzini@redhat.com>
+	<87lge3cl9u.fsf@linaro.org>
+	<d7c8f261-5683-a2ce-3f5e-d6d53c104267@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <d7c8f261-5683-a2ce-3f5e-d6d53c104267@redhat.com>
+Date: Wed, 04 Apr 2018 13:50:00 +0100
+Message-ID: <87efjvcf0n.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 12:38:33 -0000
-From: Matthieu Gautier <1761153@bugs.launchpad.net>
-Reply-To: Bug 1761153 <1761153@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152284551397.28710.6742910020765706357.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1761153] [NEW] qemu-user incorrect mmap for large
- files on 64bits host and 32bits executable.
+Subject: Re: [Qemu-devel] [PATCH] cpus: unify qemu_*_wait_io_event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,91 +31,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Public bug reported:
 
-qemu-user seems to incorrectly mmap a file if the offset is > 4GiB and
-guest binary is 32 bits elf.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-See attached test program `test_mmap.c`.
+> On 04/04/2018 12:34, Alex Benn=C3=A9e wrote:
+>>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>>> Except for round-robin TCG, every other accelerator is using more or
+>>> less the same code around qemu_wait_io_event_common.  The exception
+>>> is HAX, which also has to eat the dummy APC that is queued by
+>>> qemu_cpu_kick_thread.
+>>>
+>>> We can add the SleepEx call to qemu_wait_io_event under "if
+>>> (!tcg_enabled())", since that is the condition that is used in
+>>> qemu_cpu_kick_thread, and unify the function for KVM, HAX, HVF and
+>>> multi-threaded TCG.  Single-threaded TCG code can also be simplified
+>>> since it is only used in the round-robin, sleep-if-all-CPUs-idle case.
+>>>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> I had trouble applying this patch but the change seems sane to me
+>>
+>> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> Isn't this commit db08b687cdd5319286665aabd34f82665630416f?
 
-```
-$ gcc -g -m32 -march=3Di386 test_mmap.c -o test_mmap
-$ file test_mmap
-test_mmap: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynami=
-cally linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 3.2.0, BuildID[=
-sha1]=3De36db05f4dfd8a9cfde8a969214a242c1f5a4b49, with debug_info, not stri=
-pped
-$ uname -a
-Linux localhost.localdomain 4.15.10-300.fc27.x86_64 #1 SMP Thu Mar 15 17:13=
-:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
-$ qemu-i386 --version
-qemu-i386 version 2.10.1(qemu-2.10.1-2.fc27)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-$ ./test_mmap
-$ qemu-i386 test_mmap
-Incorrect data 1
-```
+Doh sorry, that makes even more sense. My check-if-merged script failed
+me...
 
-Tested with qemu-i386 packaged in Fedora 27 and qemu-i386 compiled from
-git master (094b62cd9c)
+>
+> Paolo
+>
+>>> ---
+>>>  cpus.c | 49 +++++++++++++++++--------------------------------
+>>>  1 file changed, 17 insertions(+), 32 deletions(-)
+>>>
+>>> diff --git a/cpus.c b/cpus.c
+>>> index 440b9291f5..3b6c9879ec 100644
+>>> --- a/cpus.c
+>>> +++ b/cpus.c
+>>> @@ -911,7 +911,8 @@ static void kick_tcg_thread(void *opaque)
+>>>
+>>>  static void start_tcg_kick_timer(void)
+>>>  {
+>>> -    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu))=
+ {
+>>> +    assert(!mttcg_enabled);
+>>> +    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+>>>          tcg_kick_vcpu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>>>                                             kick_tcg_thread, NULL);
+>>>          timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+>>> @@ -920,6 +921,7 @@ static void start_tcg_kick_timer(void)
+>>>
+>>>  static void stop_tcg_kick_timer(void)
+>>>  {
+>>> +    assert(!mttcg_enabled);
+>>>      if (tcg_kick_vcpu_timer) {
+>>>          timer_del(tcg_kick_vcpu_timer);
+>>>          tcg_kick_vcpu_timer =3D NULL;
+>>> @@ -1154,18 +1156,9 @@ static void qemu_wait_io_event_common(CPUState *=
+cpu)
+>>>      process_queued_cpu_work(cpu);
+>>>  }
+>>>
+>>> -static bool qemu_tcg_should_sleep(CPUState *cpu)
+>>> +static void qemu_tcg_rr_wait_io_event(CPUState *cpu)
+>>>  {
+>>> -    if (mttcg_enabled) {
+>>> -        return cpu_thread_is_idle(cpu);
+>>> -    } else {
+>>> -        return all_cpu_threads_idle();
+>>> -    }
+>>> -}
+>>> -
+>>> -static void qemu_tcg_wait_io_event(CPUState *cpu)
+>>> -{
+>>> -    while (qemu_tcg_should_sleep(cpu)) {
+>>> +    while (all_cpu_threads_idle()) {
+>>>          stop_tcg_kick_timer();
+>>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>>      }
+>>> @@ -1175,20 +1168,18 @@ static void qemu_tcg_wait_io_event(CPUState *cp=
+u)
+>>>      qemu_wait_io_event_common(cpu);
+>>>  }
+>>>
+>>> -static void qemu_kvm_wait_io_event(CPUState *cpu)
+>>> +static void qemu_wait_io_event(CPUState *cpu)
+>>>  {
+>>>      while (cpu_thread_is_idle(cpu)) {
+>>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>>      }
+>>>
+>>> -    qemu_wait_io_event_common(cpu);
+>>> -}
+>>> -
+>>> -static void qemu_hvf_wait_io_event(CPUState *cpu)
+>>> -{
+>>> -    while (cpu_thread_is_idle(cpu)) {
+>>> -        qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>> +#ifdef _WIN32
+>>> +    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
+>>> +    if (!tcg_enabled()) {
+>>> +        SleepEx(0, TRUE);
+>>>      }
+>>> +#endif
+>>>      qemu_wait_io_event_common(cpu);
+>>>  }
+>>>
+>>> @@ -1224,7 +1215,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>>>                  cpu_handle_guest_debug(cpu);
+>>>              }
+>>>          }
+>>> -        qemu_kvm_wait_io_event(cpu);
+>>> +        qemu_wait_io_event(cpu);
+>>>      } while (!cpu->unplug || cpu_can_run(cpu));
+>>>
+>>>      qemu_kvm_destroy_vcpu(cpu);
+>>> @@ -1270,7 +1261,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>>>              exit(1);
+>>>          }
+>>>          qemu_mutex_lock_iothread();
+>>> -        qemu_wait_io_event_common(cpu);
+>>> +        qemu_wait_io_event(cpu);
+>>>      }
+>>>
+>>>      return NULL;
+>>> @@ -1487,7 +1478,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>>>              atomic_mb_set(&cpu->exit_request, 0);
+>>>          }
+>>>
+>>> -        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+>>> +        qemu_tcg_rr_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+>>>          deal_with_unplugged_cpus();
+>>>      }
+>>>
+>>> @@ -1518,13 +1509,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>>>              }
+>>>          }
+>>>
+>>> -        while (cpu_thread_is_idle(cpu)) {
+>>> -            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>> -        }
+>>> -#ifdef _WIN32
+>>> -        SleepEx(0, TRUE);
+>>> -#endif
+>>> -        qemu_wait_io_event_common(cpu);
+>>> +        qemu_wait_io_event(cpu);
+>>>      }
+>>>      return NULL;
+>>>  }
+>>> @@ -1561,7 +1546,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>>>                  cpu_handle_guest_debug(cpu);
+>>>              }
+>>>          }
+>>> -        qemu_hvf_wait_io_event(cpu);
+>>> +        qemu_wait_io_event(cpu);
+>>>      } while (!cpu->unplug || cpu_can_run(cpu));
+>>>
+>>>      hvf_vcpu_destroy(cpu);
+>>> @@ -1640,7 +1625,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>>>          }
+>>>
+>>>          atomic_mb_set(&cpu->exit_request, 0);
+>>> -        qemu_tcg_wait_io_event(cpu);
+>>> +        qemu_wait_io_event(cpu);
+>>>      }
+>>>
+>>>      return NULL;
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
 
-The issue was firstly detected on (more complex program) using qemu-arm
-(with 32bits binary) so it is probably a 32/64bits problem independently
-of the cpu family.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "test_mmap.c"
-   https://bugs.launchpad.net/bugs/1761153/+attachment/5101253/+files/test_=
-mmap.c
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1761153
-
-Title:
-  qemu-user incorrect mmap for large files on 64bits host and 32bits
-  executable.
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu-user seems to incorrectly mmap a file if the offset is > 4GiB and
-  guest binary is 32 bits elf.
-
-  See attached test program `test_mmap.c`.
-
-  ```
-  $ gcc -g -m32 -march=3Di386 test_mmap.c -o test_mmap
-  $ file test_mmap
-  test_mmap: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dyna=
-mically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 3.2.0, BuildI=
-D[sha1]=3De36db05f4dfd8a9cfde8a969214a242c1f5a4b49, with debug_info, not st=
-ripped
-  $ uname -a
-  Linux localhost.localdomain 4.15.10-300.fc27.x86_64 #1 SMP Thu Mar 15 17:=
-13:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
-  $ qemu-i386 --version
-  qemu-i386 version 2.10.1(qemu-2.10.1-2.fc27)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ ./test_mmap
-  $ qemu-i386 test_mmap
-  Incorrect data 1
-  ```
-
-  Tested with qemu-i386 packaged in Fedora 27 and qemu-i386 compiled
-  from git master (094b62cd9c)
-
-  The issue was firstly detected on (more complex program) using qemu-
-  arm (with 32bits binary) so it is probably a 32/64bits problem
-  independently of the cpu family.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1761153/+subscriptions
+--
+Alex Benn=C3=A9e
