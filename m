@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3ijz-0002V1-8q
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:46:20 -0400
+	(envelope-from <famz@redhat.com>) id 1f3in9-00052Q-BP
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3iju-0005zU-8t
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:46:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36178)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3iju-0005xY-2k
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:46:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3ijr-00067D-9X
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 13:46:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 89ABC2E81FF
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 13:46:07 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1f3in8-0007DI-Hj
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 09:49:35 -0400
+Date: Wed, 4 Apr 2018 21:49:23 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180404134923.GL12052@lemon.usersys.redhat.com>
+References: <20180329110914.20888-1-famz@redhat.com>
+	<20180404132332.GR4467@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 13:33:36 -0000
-From: ChristianEhrhardt <1740219@bugs.launchpad.net>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152284881688.2364.4351297955107440851.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180404132332.GR4467@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 0/8] qemu-img convert with
+ copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,85 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com
 
-Considering 2.12-rcX a release set the upstream status to that
+On Wed, 04/04 14:23, Stefan Hajnoczi wrote:
+> On Thu, Mar 29, 2018 at 07:09:06PM +0800, Fam Zheng wrote:
+> > [Posting a preview RFC for the general idea discussion and internal API review.
+> > Libiscsi support is being worked on in the meantime.]
+> > 
+> > This series introduces block layer API for copy offloading and makes use of it
+> > in qemu-img convert.
+> > 
+> > For now we implemented the operation in local file protocol with
+> > copy_file_range(2).  Besides that it's possible to add similar to iscsi, nfs
+> > and potentially more.
+> > 
+> > As far as its usage goes, in addition to qemu-img convert, we can emulate
+> > offloading in scsi-disk (EXTENDED COPY), and do similar to drive-mirror.
+> > 
+> > The new bdrv_co_map_range can also be an alternative way to implement format
+> > drivers in the future, once we make block/io.c use it in preadv/pwritev paths.
+> 
+> I posted concerns about the bdrv_co_map_range() interface.  It would be
+> safer to only have a copy_range() interface without exposing how data is
+> mapped outside the driver where race conditions can occur and the format
+> driver no longer has full control over file layout.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+It's a good point, but I couldn't think of a way to implement copy_range between
+two format drivers: both of them need to recurse down to their bs->file and what
+we eventually want is a copy_file_range() on two fds (or an iscsi equivalent):
 
--- =
+    src[qcow2]           ->              dst[raw]
+        |                                   |
+        v                                   v
+    src[file]            ->              dst[file]
+        |                                   |
+        v                                   v
+       fd1               ->                 fd2
+                    copy_file_range
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
+Maybe we should add BlockDriver.bdrv_co_map_range_{prepare,commit,abort} and
+call them from bdrv_co_copy_range(). This way the code path works pretty much
+the same way to .bdrv_co_preadv/pwritev.
 
-Title:
-  static linux-user ARM emulation has several-second startup time
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+Fam
