@@ -1,37 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f3cOJ-0003yq-M6
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 02:59:32 -0400
+	(envelope-from <famz@redhat.com>) id 1f3cPt-00058n-0R
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 03:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f3cOF-0000Vu-Pa
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 02:59:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57910)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1f3cOF-0000Vo-Ge
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 02:59:27 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w346x8IP119435
-	for <qemu-devel@nongnu.org>; Wed, 4 Apr 2018 02:59:26 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h4puhxr1q-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 02:59:25 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Wed, 4 Apr 2018 02:59:24 -0400
-References: <20180403140314.8795-1-stefanha@redhat.com>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Wed, 4 Apr 2018 14:59:14 +0800
+	(envelope-from <famz@redhat.com>) id 1f3cPn-000126-7D
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 03:01:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55150 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f3cPn-00011y-0P
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 03:01:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF71A43075C3
+	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 07:00:59 +0000 (UTC)
+Date: Wed, 4 Apr 2018 15:00:54 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180404070054.GD12052@lemon.usersys.redhat.com>
+References: <20180404065346.3252-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180403140314.8795-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=gbk
-Message-Id: <a8c52de6-14a4-a5c4-4186-3c49c9a0b6b9@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: update 185 output
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180404065346.3252-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12] iothread: workaround glib bug
+ which hangs qmp-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,73 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-=D4=DA 2018/4/3 22:03, Stefan Hajnoczi =D0=B4=B5=C0:
-> Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
-> vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
-> drain operation the block job iterates one more time than before.  The
-> 185 output no longer matches and the test is failing now.
->=20
-> It may be possible to avoid the superfluous block job iteration, but
-> that type of patch is not suitable late in the QEMU 2.12 release cycle.
->=20
-> This patch simply updates the 185 output file.  The new behavior is
-> correct, just not optimal, so make the test pass again.
->=20
-> Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shut=
-down()")
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Wed, 04/04 14:53, Peter Xu wrote:
+> Free the AIO context earlier than the GMainContext (if we have) to
+> workaround a possible Glib bug.  No functional change at all.
+> 
+> We encountered a qmp-test hang with oob:
+> 
+>   #0  0x00007f35ffe45334 in __lll_lock_wait () from /lib64/libpthread.so.0
+>   #1  0x00007f35ffe405d8 in _L_lock_854 () from /lib64/libpthread.so.0
+>   #2  0x00007f35ffe404a7 in pthread_mutex_lock () from /lib64/libpthread.so.0
+>   #3  0x00007f35fc5b9c9d in g_source_unref_internal (source=0x24f0600, context=0x7f35f0000960, have_lock=0) at gmain.c:1685
+>   #4  0x0000000000aa6672 in aio_context_unref (ctx=0x24f0600) at /root/qemu/util/async.c:497
+>   #5  0x000000000065851c in iothread_instance_finalize (obj=0x24f0380) at /root/qemu/iothread.c:129
+>   #6  0x0000000000962d79 in object_deinit (obj=0x24f0380, type=0x242e960) at /root/qemu/qom/object.c:462
+>   #7  0x0000000000962e0d in object_finalize (data=0x24f0380) at /root/qemu/qom/object.c:476
+>   #8  0x0000000000964146 in object_unref (obj=0x24f0380) at /root/qemu/qom/object.c:924
+>   #9  0x0000000000965880 in object_finalize_child_property (obj=0x24ec640, name=0x24efca0 "mon_iothread", opaque=0x24f0380) at /root/qemu/qom/object.c:1436
+>   #10 0x0000000000962c33 in object_property_del_child (obj=0x24ec640, child=0x24f0380, errp=0x0) at /root/qemu/qom/object.c:436
+>   #11 0x0000000000962d26 in object_unparent (obj=0x24f0380) at /root/qemu/qom/object.c:455
+>   #12 0x0000000000658f00 in iothread_destroy (iothread=0x24f0380) at /root/qemu/iothread.c:365
+>   #13 0x00000000004c67a8 in monitor_cleanup () at /root/qemu/monitor.c:4663
+>   #14 0x0000000000669e27 in main (argc=16, argv=0x7ffc8b1ae2f8, envp=0x7ffc8b1ae380) at /root/qemu/vl.c:4749
+> 
+> With glib version 2.28.8-9 (current default version on centos6) we might
+> encounter above with the old code. It is verified that glib version
+> 2.50.3-3 won't trigger that bug again, but since we are still supporting
+> glib 2.28.8-9, we may want this workaround.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  tests/qemu-iotests/185.out | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-> index 57eaf8d699..2c4b04de73 100644
-> --- a/tests/qemu-iotests/185.out
-> +++ b/tests/qemu-iotests/185.out
-> @@ -20,7 +20,7 @@ Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D671=
-08864 backing_file=3DTEST_DIR/t.q
->  {"return": {}}
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "SHUTDOWN", "data": {"guest": false}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, =
-"offset": 524288, "speed": 65536, "type": "commit"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 67108864, =
-"offset": 1048576, "speed": 65536, "type": "commit"}}
-Need we add the comment in 185.out that this change is to make the test p=
-ass for the superfluous block job iteration?
-thanks
->=20
->  =3D=3D=3D Start active commit job and exit qemu =3D=3D=3D
->=20
-> @@ -28,16 +28,18 @@ Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D6=
-7108864 backing_file=3DTEST_DIR/t.q
->  {"return": {}}
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "SHUTDOWN", "data": {"guest": false}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "=
-offset": 4194304, "speed": 65536, "type": "commit"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offs=
-et": 4194304, "speed": 65536, "type": "commit"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "=
-offset": 4194304, "speed": 65536, "type": "commit"}}
+>  iothread.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/iothread.c b/iothread.c
+> index e675c38442..d41d661cdf 100644
+> --- a/iothread.c
+> +++ b/iothread.c
+> @@ -117,16 +117,26 @@ static void iothread_instance_finalize(Object *obj)
+>      IOThread *iothread = IOTHREAD(obj);
+>  
+>      iothread_stop(iothread);
+> +    /*
+> +     * With glib version 2.28.8-9 (current default version on centos6)
+> +     * we might encounter problem of qmp-test OOB hang if we unref the
+> +     * AIO context later than the GMainContext below.  Let's free the
+> +     * AIO context earlier to bypass that possible glib bug.
+> +     *
+> +     * It is verified that glib version 2.50.3-3 (or even earlier)
+> +     * won't trigger that bug again, but since we are still supporting
+> +     * glib 2.28.8-9, we need this workaround.
+> +     */
+> +    if (iothread->ctx) {
+> +        aio_context_unref(iothread->ctx);
+> +        iothread->ctx = NULL;
+> +    }
+>      if (iothread->worker_context) {
+>          g_main_context_unref(iothread->worker_context);
+>          iothread->worker_context = NULL;
+>      }
+>      qemu_cond_destroy(&iothread->init_done_cond);
+>      qemu_mutex_destroy(&iothread->init_done_lock);
+> -    if (!iothread->ctx) {
+> -        return;
+> -    }
+> -    aio_context_unref(iothread->ctx);
+>  }
+>  
+>  static void iothread_complete(UserCreatable *obj, Error **errp)
+> -- 
+> 2.14.3
+> 
 
-[...]
->=20
-
---=20
-Regards
-QingFeng Hao
+Reviewed-by: Fam Zheng <famz@redhat.com>
