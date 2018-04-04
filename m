@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f3rXT-000375-Se
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:10:01 -0400
+	(envelope-from <cota@braap.org>) id 1f3rZJ-00049J-T7
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f3rXQ-0003Pe-CP
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:09:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54862)
+	(envelope-from <cota@braap.org>) id 1f3rZG-0003yu-Cr
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:11:53 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:56421)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f3rXQ-0003PD-3X
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:09:56 -0400
-Date: Wed, 4 Apr 2018 17:09:50 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180404170950.54eb7975@w520.home>
-In-Reply-To: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
-References: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 2.12] vfio: Use a trace point when a
- RAM section cannot be DMA mapped
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f3rZG-0003yc-60
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 19:11:50 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Wed,  4 Apr 2018 19:11:00 -0400
+Message-Id: <1522883475-27858-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v3 00/15] fp-test + hardfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +21,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Wed,  4 Apr 2018 22:30:50 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+v2: https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06805.html
 
-> The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions")
-> added an error message if a passed memory section address or size
-> is not aligned to the page size and thus cannot be DMA mapped.
-> 
-> This patch fixes the trace by printing the region name and the
-> memory region section offset within the address space (instead of
-> offset_within_region).
-> 
-> We also turn the error_report into a trace event. Indeed, In some
-> cases, the traces can be confusing to non expert end-users and
-> let think the use case does not work (whereas it
-> works as before).
-> 
-> This is the case where a BAR is successively mapped at different
-> GPAs and its sections are not compatible with dma map. The listener
-> is called several times and traces are issued for each intermediate
-> mapping.  The end-user cannot easily match those GPAs against the
-> final GPA output by lscpi. So let's keep those information to
-> informed users. In mid term, the plan is to advise the user about
-> BAR relocation relevance.
-> 
-> Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - use a trace point
-> - add some details in the commit message
+Changes since v2:
 
-I think this is v2 with v1 being
-Message-Id:<20180322081837.21460-1-aik@ozlabs.ru> but this is
-substantially different from Alexey's posting so I'd like to verify the
-Sign-off.  Alexey?
+- Add R-b tags
 
-I agree that this seems to be the right thing to do for 2.12, nothing
-has changed for these mappings and the error reports are difficult even
-for experts to decipher and explain to users.  Thanks,
+- Add a patch to rename our canonicalize to sf_canonicalize,
+  to avoid clashing with glibc's.
 
-Alex
+- Add a patch to define float{32,64}_is_zero_or_normal
 
-> ---
->  hw/vfio/common.c     | 11 +++++------
->  hw/vfio/trace-events |  1 +
->  2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 5e84716..07ffa0b 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -548,12 +548,11 @@ static void vfio_listener_region_add(MemoryListener *listener,
->          hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
->  
->          if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
-> -            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
-> -                         " is not aligned to 0x%"HWADDR_PRIx
-> -                         " and cannot be mapped for DMA",
-> -                         section->offset_within_region,
-> -                         int128_getlo(section->size),
-> -                         pgmask + 1);
-> +            trace_vfio_listener_region_add_no_dma_map(
-> +                memory_region_name(section->mr),
-> +                section->offset_within_address_space,
-> +                int128_getlo(section->size),
-> +                pgmask + 1);
->              return;
->          }
->      }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 79f63a2..20109cb 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -90,6 +90,7 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "i
->  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
->  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
->  vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
-> +vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uint64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=0x%"PRIx64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
->  vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
->  vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
->  vfio_disconnect_container(int fd) "close container->fd=%d"
+- Simplify the float{32,64}_input_flushX macros -- now the
+  macros are more verbose but the full function names are greppable.
+
+- Move tests/fp-test to tests/fp, since now both fp-bench and fp-test
+  are under tests/fp.
+  + Use tests/fp/fp-test.h for helpers common to both fp-bench and fp-test.
+
+- Complete rewrite of fp-bench:
+  + We can now directly call the softfloat functions, thereby
+    making the benchmark more sensitive to changes to those functions.
+  + We can still use the native ops with "-t host".
+  + The rewrite also has less macro trickery; we rely instead on
+    constant propagation by the compiler.
+  + Alex: dropped your R-b since this changed a lot. I think you'll
+    like this version better though!
+
+- Define a generic function to generate the hardfloat implementation
+  for ops with 2 inputs; add, sub, mul and div depend on it.
+  Instead of using macros, rely on the constant propagation done
+  by the compiler. [Alex: I dropped your R-b for the addsub
+  patch because it changed a lot]
+  + I kept macros for other ops, because I think the subsequent
+    code duplication savings are worth the pain.
+
+- Add #define's to select whether to use fpclassify etc. or
+  float32_is_zero etc.
+  + Benchmark perf differences on x86_64, aarch64 and IBM Power8 hosts.
+  + For 32-bit we don't use fpclassify etc. for any architectures,
+    so I was tempted to get rid of this option to save some code.
+    It's possible however that on some hosts I have not tested this option
+    might pay off, so I decided to keep it there.
+
+- Add a #define to select whether to use isinf() or floatX_is_infinity().
+  Turns out this makes a big difference for power64.
+
+- Remove float32_to_float64 support in hardfloat, since nbench or
+  SPEC actually showed a small yet measurable slowdown with it,
+  despite fp-bench showing a significant speedup for this operation.
+
+- Do not flatten soft-fp functions; these are now slow paths.
+  This shrinks the size of the softfloat object below its original
+  size (see last patch's log).
+
+- Add a #define to disable hardfloat for some targets. I noticed that
+  some targets (at least I noticed PPC, there might be others) do
+  clear the FP flags before calling softfloat. This precludes hardfloat
+  since it relies on inexact not being set. In the long run we should
+  fix these targets though.
+
+Note: fp-bench can run _very_ slowly (~0.5 IPC) for -o fma on some x86_64
+hosts. I have not pinned down what's going on, but from the few hosts
+I have access to, it seems that machines that have been patched for
+Spectre/Meltdown are susceptible to this slowdown.
+Fortunately though:
+1) when fma is run in QEMU (and not under a microbenchmark such as
+   fp-bench), fma performance is still very good (much better than with
+   soft-fp).
+2) Compiling with -march=native gets rid of the problem.
+I've reproduced this with both gcc 5.4.0 and gcc 7.1.0. The *very* same
+fp-bench binary that performs very well for FMA on two machines (one
+AMD, one Intel, neither patched against Meltdown/Spectre) performs
+below soft-fp on another three machines (all Intel, all patched).
+
+Note: there are some checkpatch errors, but they are false positives.
+
+Perf numbers for fp-bench are in each commit log; numbers for several
+benchmarks are in the last patch's commit log.
+
+You can fetch this series from:
+  https://github.com/cota/qemu/tree/hardfloat-v3
+
+Thanks,
+
+		Emilio
+
+---
+ configure                   |    2 +
+ fpu/softfloat.c             |  945 ++++++++++++++++++++++++++++++--
+ include/fpu/softfloat.h     |   30 +
+ target/tricore/fpu_helper.c |    9 +-
+ tests/Makefile.include      |    3 +
+ tests/fp/.gitignore         |    4 +
+ tests/fp/Makefile           |   36 ++
+ tests/fp/fp-bench.c         |  528 ++++++++++++++++++
+ tests/fp/fp-test.c          | 1183 ++++++++++++++++++++++++++++++++++++++++
+ tests/fp/muladd.fptest      |   51 ++
+ 10 files changed, 2737 insertions(+), 54 deletions(-)
+ create mode 100644 tests/fp/.gitignore
+ create mode 100644 tests/fp/Makefile
+ create mode 100644 tests/fp/fp-bench.c
+ create mode 100644 tests/fp/fp-test.c
+ create mode 100644 tests/fp/muladd.fptest
