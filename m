@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3jWs-0003Pf-TY
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:36:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1f3jZB-0004tn-Ix
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:39:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f3jWo-00014M-0B
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:36:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f3jWn-00013j-PN
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:36:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f3jWl-0001iq-AF
-	for <qemu-devel@nongnu.org>; Wed, 04 Apr 2018 14:36:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2A6362E80E2
-	for <qemu-devel@nongnu.org>; Wed,  4 Apr 2018 14:36:43 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1f3jZ7-0002TK-Tm
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:39:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53102 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f3jZ7-0002Sx-Og
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 10:39:09 -0400
+Date: Wed, 4 Apr 2018 15:38:59 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180404143859.GI3186@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <mailman.35816.1522678020.27992.qemu-devel@nongnu.org>
+	<B4011235-0338-474D-90E4-ABDF3DC8CCB7@gmail.com>
+	<eeb9a3c8-e7ee-742b-fd6a-41c364d971c4@redhat.com>
+	<57D8CDA1-C9D1-4CD7-99A1-203B570BF4D3@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Apr 2018 14:23:10 -0000
-From: ChristianEhrhardt <1740219@bugs.launchpad.net>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152285179025.8904.5938601612745159483.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <57D8CDA1-C9D1-4CD7-99A1-203B570BF4D3@gmail.com>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add instructions for
+ MacPorts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Rainer M?ller <raimue@macports.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-I wasn't sure if you'd usually take the interim step to "Fix Committed",
-thanks Peter.
+On Wed, Apr 04, 2018 at 10:24:48AM -0400, Programmingkid wrote:
+> 
+> > On Apr 4, 2018, at 7:15 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > 
+> > On 02/04/2018 16:13, Programmingkid wrote:
+> >> 
+> >>> On Apr 2, 2018, at 10:07 AM, qemu-devel-request@nongnu.org wrote:
+> >>> 
+> >>> Message: 2
+> >>> Date: Mon, 2 Apr 2018 04:22:52 +0200
+> >>> From: Paolo Bonzini <pbonzini@redhat.com>
+> >>> To: Rainer M?ller <raimue@macports.org>, qemu-devel@nongnu.org
+> >>> Subject: Re: [Qemu-devel] [qemu-web PATCH] download: Add instructions
+> >>> 	for MacPorts
+> >>> Message-ID: <357029f4-71c0-a9f9-7bda-a5a44f609b27@redhat.com>
+> >>> Content-Type: text/plain; charset=utf-8
+> >>> 
+> >>> On 01/04/2018 18:22, Rainer M?ller wrote:
+> >>>> Signed-off-by: Rainer M?ller <raimue@macports.org>
+> >>>> ---
+> >>>> _download/macos.md | 6 +++++-
+> >>>> 1 file changed, 5 insertions(+), 1 deletion(-)
+> >>>> 
+> >>>> diff --git a/_download/macos.md b/_download/macos.md
+> >>>> index dbb312c..06aa811 100644
+> >>>> --- a/_download/macos.md
+> >>>> +++ b/_download/macos.md
+> >>>> @@ -1,6 +1,10 @@
+> >>>> -QEMU can be installed from Homebrew:
+> >>>> +QEMU can be installed from <strong>Homebrew</strong>:
+> >>>> 
+> >>>> <pre>brew install qemu</pre>
+> >>>> 
+> >>>> +QEMU can be installed from <strong>MacPorts</strong>:
+> >>>> +
+> >>>> +<pre>sudo port install qemu</pre>
+> >>>> +
+> >>>> QEMU requires Mac OS X 10.5 or later, but it is recommended
+> >>>> to use Mac OS X 10.7 or later.
+> >>>> 
+> >>> 
+> >>> Thanks for the patch!  I'm travelling but I will apply it as soon as I can.
+> >>> 
+> >>> Paolo
+> >> 
+> >> I was wondering if a link to the Mac OS X host wiki page could be added to this page.
+> >> It does have prebuilt binaries ready for use.
+> >> 
+> >> https://wiki.qemu.org/Hosts/Mac
+> > 
+> > Actually I believe we should remove those links.  I don't think hosting
+> > QEMU binaries on mediafire is a good idea.
+> > 
+> > Paolo
+> 
+> Why not?
 
--- =
+The source/quality of those binaries is completely opaque. We've no idea who
+built them, nor what build options were used, nor what/where the corresponding
+source is (required for GPL compliance), nor any checksum / signature to
+validate the binary isn't compromised since build, etc, etc.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
+Pointing users to those binaries makes it appear QEMU project is blessing
+them, and so any issues with them directly reflect on QEMU's reputation.
 
-Title:
-  static linux-user ARM emulation has several-second startup time
+If we're going to link to binaries telling users to download them, we need
+to be hosting them on qemu.org and have a clearly documented formal process
+around building & distributing them.
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Triaged
+Since both Homebrew & Macports are providing formal bulds though, it looks
+simpler to just entirely delegate the problem to them, as we do for Linux
+where we delegate to distro vendors to build & distribute binaries.
 
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
