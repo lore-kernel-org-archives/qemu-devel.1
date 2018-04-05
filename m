@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f41BA-0005Q5-Hu
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:27:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1f41G8-0007xO-QW
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f41B9-0001R5-Kg
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:27:36 -0400
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:41201)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f41B9-0001Qd-Ez
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:27:35 -0400
-Received: by mail-ot0-x233.google.com with SMTP id i28-v6so26482524otf.8
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 02:27:35 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180405012241.25714-2-f4bug@amsat.org>
-References: <20180405012241.25714-1-f4bug@amsat.org>
-	<20180405012241.25714-2-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Apr 2018 10:27:14 +0100
-Message-ID: <CAFEAcA9Qvjo680JX1yQRKLdqTcL1r7V42adaQrVDh3ne=jt8WQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] memory: Avoid to create tiny RAM
- regions, handled as subpages
+	(envelope-from <thuth@redhat.com>) id 1f41G4-0003QM-T0
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:32:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52756 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f41G4-0003Q2-Oq
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:32:40 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  5 Apr 2018 11:32:30 +0200
+Message-Id: <1522920750-11020-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/sparc64/sun4u: Fix introspection by
+ converting prom instance_init to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +22,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 5 April 2018 at 02:22, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> If an user creates a RAM region smaller than TARGET_PAGE_SIZE,
-> this region will be handled as a subpage.
-> While the subpage behavior can be noticed by an experienced QEMU
-> developper, it might takes hours to a novice to figure it out.
-> To save time to novices, do not allow subpage creation via the
-> memory_region_init_ram_*() functions.
+The instance_init function of devices should always succeed to be able
+to introspect the device. However, the instance_init function of the
+"openprom" device can currently fail, for example like this:
 
-This commit message doesn't make it clear to me what actually
-goes wrong. Why doesn't the subpage mechanism do the right thing
-here?
+$ echo "{'execute':'qmp_capabilities'}"\
+       "{'execute':'device-list-properties',"\
+       " 'arguments':{'typename':'openprom'}}" \
+       | sparc64-softmmu/qemu-system-sparc64 -M sun4v,accel=qtest -qmp stdio
+{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+ "package": "build-all"}, "capabilities": []}}
+{"return": {}}
+RAMBlock "sun4u.prom" already registered, abort!
+Aborted (core dumped)
 
-Also, a quick grep revealed at least one caller that's currently
-creating a less-than-a-page sized RAM block, in
-hw/pci-host/xilinx-pcie.c. We would need to change all the
-call sites that rely on creating small RAM blocks before we
-could make this throw an error. (Better still would be if we
-could make small lumps of RAM actually work.)
+This should not happen. Fix this problem by moving the affected code from
+instance_init into a realize function instead.
 
-thanks
--- PMM
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/sparc64/sun4u.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 2044a52..d62f5a2 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -425,13 +425,19 @@ static void prom_init(hwaddr addr, const char *bios_name)
+     }
+ }
+ 
+-static void prom_init1(Object *obj)
++static void prom_realize(DeviceState *ds, Error **errp)
+ {
+-    PROMState *s = OPENPROM(obj);
+-    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
++    PROMState *s = OPENPROM(ds);
++    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
++    Error *local_err = NULL;
++
++    memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4u.prom",
++                                     PROM_SIZE_MAX, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+-    memory_region_init_ram_nomigrate(&s->prom, obj, "sun4u.prom", PROM_SIZE_MAX,
+-                           &error_fatal);
+     vmstate_register_ram_global(&s->prom);
+     memory_region_set_readonly(&s->prom, true);
+     sysbus_init_mmio(dev, &s->prom);
+@@ -446,6 +452,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->props = prom_properties;
++    dc->realize = prom_realize;
+ }
+ 
+ static const TypeInfo prom_info = {
+@@ -453,7 +460,6 @@ static const TypeInfo prom_info = {
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(PROMState),
+     .class_init    = prom_class_init,
+-    .instance_init = prom_init1,
+ };
+ 
+ 
+-- 
+1.8.3.1
