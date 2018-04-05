@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f47FX-0002A1-U6
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:56:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f47Km-0006sx-4Y
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f47FU-0005Mb-ST
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:56:32 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36798)
+	(envelope-from <peter.maydell@linaro.org>) id 1f47Kj-0007PT-QX
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:01:56 -0400
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:45667)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1f47FU-0005MH-KC
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:56:28 -0400
-Received: by mail-wr0-x229.google.com with SMTP id y55so29253647wry.3
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 08:56:28 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180327211451.14647-1-danielhb@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9bb77420-4a76-6a1b-3542-4205fcc8334b@redhat.com>
-Date: Thu, 5 Apr 2018 17:56:25 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f47Kj-0007OX-Kf
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:01:53 -0400
+Received: by mail-ot0-x229.google.com with SMTP id h26-v6so27716538otj.12
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 09:01:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180327211451.14647-1-danielhb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] hw/scsi: support SCSI-2 passthrough
- without PI
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Apr 2018 17:01:32 +0100
+Message-ID: <CAFEAcA9PbAr+0U1dJ22fr3+B0-KO3Oy73-mk755rJQtmY_rSKA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] TCG icount interaction with timer deadlines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
 
-On 27/03/2018 23:14, Daniel Henrique Barboza wrote:
->          /* We get here only for BYTCHK == 0x01 and only for scsi-block.
->           * As far as DMA is concerned, we can treat it the same as a write;
->           * scsi_block_do_sgio will send VERIFY commands.
-> +         *
-> +         * For scsi versions 2 and older, the BYTCHK isn't related
-> +         * to VRPROTECT (in fact, there is no VRPROTECT). Skip
-> +         * this check in these versions.
->           */
-> -        if (r->req.cmd.buf[1] & 0xe0) {
-> +        if ((r->req.cmd.buf[1] & 0xe0) && (s->qdev.scsi_version > 2)) {
->              goto illegal_request;
->          }
+Does anybody understand how icount TCG is supposed to arrange to
+respect timer deadlines?
 
-This also has to check for "s->qdev.scsi_version != -1" so that the
-behavior of emulated SCSI isn't changed (they claim SPC-3).  I made this
-change and queued the patch.
+https://bugs.launchpad.net/qemu/+bug/1754038 has a test case which
+shows that we don't get this right.
 
-Paolo
+At the moment what happens is:
+ * when we're about to call tcg_cpu_exec(), we call
+   prepare_icount_for_run(), which looks at the closest clock deadline
+   to figure out how many insns to execute before dropping out, with
+   a cap at INT32_MAX nanoseconds
+ * however, if the guest reprograms the clock during the tcg_cpu_exec()
+   run, we don't do anything to cause us to stop earlier
+ * so we blithely continue on til that INT32_MAX cap, and then
+   belatedly notice that we should have fired a timer interrupt
+
+In the test case this manifests as the first timer interrupt being
+very delayed, because the first tcg_cpu_exec() goes from "start of
+program" to INT32_MAX nanoseconds. Later interrupts happen OK, because
+the guest isn't reprogramming the timer interrupt, so the deadline
+picked at the start of each tcg_cpu_exec run is correct.
+
+What should we be doing to arrange to stop execution of the
+tcg_cpu_exec() earlier when the deadline moves closer?
+
+thanks
+-- PMM
