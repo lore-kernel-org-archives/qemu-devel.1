@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f43h9-0003Jg-DI
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:08:48 -0400
+	(envelope-from <pagupta@redhat.com>) id 1f43hu-0003ol-Nf
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f43h5-0006er-BV
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:08:47 -0400
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:36227)
+	(envelope-from <pagupta@redhat.com>) id 1f43hq-0007A8-KB
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:09:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f43h5-0006ZB-2W
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:08:43 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.120.90])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5F629122622
-	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 14:08:34 +0200 (CEST)
-Date: Thu, 5 Apr 2018 14:06:19 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180405140619.5f6112b9@bahia.lan>
-In-Reply-To: <20180405021437.16761-10-david@gibson.dropbear.id.au>
-References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
-	<20180405021437.16761-10-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1f43hq-00079T-BF
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:09:30 -0400
+Date: Thu, 5 Apr 2018 08:09:26 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <416823501.16310251.1522930166070.JavaMail.zimbra@redhat.com>
+In-Reply-To: <ad08ca09-71ee-08d5-3479-8b3d06380a03@redhat.com>
+References: <20180405104834.10457-1-pagupta@redhat.com>
+	<20180405104834.10457-4-pagupta@redhat.com>
+	<ad08ca09-71ee-08d5-3479-8b3d06380a03@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.13 09/13] target/ppc: Move 1T segment
- and AMR options to PPCHash64Options
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] qemu: Add virtio pmem device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,202 +28,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, riel@surriel.com, niteshnarayanlal@hotmail.com, mst@redhat.com, ross zwisler <ross.zwisler@intel.com>, hch@infradead.org, stefanha@redhat.com, imammedo@redhat.com, marcel@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-On Thu,  5 Apr 2018 12:14:33 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> Currently env->mmu_model is a bit of an unholy mess of an enum of distinct
-> MMU types, with various flag bits as well.  This makes which bits of the
-> field should be compared pretty confusing.
->=20
-> Make a start on cleaning that up by moving two of the flags bits -
-> POWERPC_MMU_1TSEG and POWERPC_MMU_AMR - which are specific to the 64-bit
-> hash MMU into a new flags field in PPCHash64Options structure.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
+Hi David,
 
-While investigating a migration failure from an older QEMU, I realized
-this patch has a problem. The *cpu->hash64_opts structure is zeroed in
-kvm_fixup_page_sizes(), which has now the unwanted effect of clearing
-the cpu->hash64_opts->flags as well.
+> >  This patch adds virtio-pmem Qemu device.
+> > 
+> >  This device configures memory address range information with file
+> >  backend type. It acts like persistent memory device for KVM guest.
+> >  It presents the memory address range to virtio-pmem driver over
+> >  virtio channel and does the block flush whenever there is request
+> >  from guest to flush/sync. (Qemu part for backing file flush
+> >  is yet to be implemented).
+> > 
+> >  Current code is a RFC to support guest with persistent memory
+> >  range & DAX.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  hw/virtio/Makefile.objs                     |   2 +-
+> >  hw/virtio/virtio-pci.c                      |  44 +++++++++
+> >  hw/virtio/virtio-pci.h                      |  14 +++
+> >  hw/virtio/virtio-pmem.c                     | 133
+> >  ++++++++++++++++++++++++++++
+> >  include/hw/pci/pci.h                        |   1 +
+> >  include/hw/virtio/virtio-pmem.h             |  43 +++++++++
+> >  include/standard-headers/linux/virtio_ids.h |   1 +
+> >  7 files changed, 237 insertions(+), 1 deletion(-)
+> >  create mode 100644 hw/virtio/virtio-pmem.c
+> >  create mode 100644 include/hw/virtio/virtio-pmem.h
+> > 
+> > diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> > index 765d363c1f..bb5573d2ef 100644
+> > --- a/hw/virtio/Makefile.objs
+> > +++ b/hw/virtio/Makefile.objs
+> > @@ -5,7 +5,7 @@ common-obj-y += virtio-bus.o
+> >  common-obj-y += virtio-mmio.o
+> >  
+> >  obj-y += virtio.o virtio-balloon.o
+> > -obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+> > +obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o virtio-pmem.o
+> >  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+> >  obj-y += virtio-crypto.o
+> >  obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
+> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > index c20537f31d..114ca05497 100644
+> > --- a/hw/virtio/virtio-pci.c
+> > +++ b/hw/virtio/virtio-pci.c
+> > @@ -2491,6 +2491,49 @@ static const TypeInfo virtio_rng_pci_info = {
+> >      .class_init    = virtio_rng_pci_class_init,
+> >  };
+> >  
+> > +/* virtio-pmem-pci */
+> > +
+> > +static void virtio_pmem_pci_realize(VirtIOPCIProxy *vpci_dev, Error
+> > **errp)
+> > +{
+> > +    VirtIOPMEMPCI *vpmem = VIRTIO_PMEM_PCI(vpci_dev);
+> > +    DeviceState *vdev = DEVICE(&vpmem->vdev);
+> > +
+> > +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> > +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+> > +}
+> > +
+> > +static void virtio_pmem_pci_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+> > +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+> > +    k->realize = virtio_pmem_pci_realize;
+> > +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> > +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+> > +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_PMEM;
+> > +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+> > +    pcidev_k->class_id = PCI_CLASS_OTHERS;
+> > +}
+> > +
+> > +static void virtio_pmem_pci_instance_init(Object *obj)
+> > +{
+> > +    VirtIOPMEMPCI *dev = VIRTIO_PMEM_PCI(obj);
+> > +
+> > +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+> > +                                TYPE_VIRTIO_PMEM);
+> > +    object_property_add_alias(obj, "memdev", OBJECT(&dev->vdev), "memdev",
+> > +                              &error_abort);
+> > +}
+> > +
+> > +static const TypeInfo virtio_pmem_pci_info = {
+> > +    .name          = TYPE_VIRTIO_PMEM_PCI,
+> > +    .parent        = TYPE_VIRTIO_PCI,
+> > +    .instance_size = sizeof(VirtIOPMEMPCI),
+> > +    .instance_init = virtio_pmem_pci_instance_init,
+> > +    .class_init    = virtio_pmem_pci_class_init,
+> > +};
+> > +
+> > +
+> >  /* virtio-input-pci */
+> >  
+> >  static Property virtio_input_pci_properties[] = {
+> > @@ -2683,6 +2726,7 @@ static void virtio_pci_register_types(void)
+> >      type_register_static(&virtio_balloon_pci_info);
+> >      type_register_static(&virtio_serial_pci_info);
+> >      type_register_static(&virtio_net_pci_info);
+> > +    type_register_static(&virtio_pmem_pci_info);
+> >  #ifdef CONFIG_VHOST_SCSI
+> >      type_register_static(&vhost_scsi_pci_info);
+> >  #endif
+> > diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> > index 813082b0d7..fe74fcad3f 100644
+> > --- a/hw/virtio/virtio-pci.h
+> > +++ b/hw/virtio/virtio-pci.h
+> > @@ -19,6 +19,7 @@
+> >  #include "hw/virtio/virtio-blk.h"
+> >  #include "hw/virtio/virtio-net.h"
+> >  #include "hw/virtio/virtio-rng.h"
+> > +#include "hw/virtio/virtio-pmem.h"
+> >  #include "hw/virtio/virtio-serial.h"
+> >  #include "hw/virtio/virtio-scsi.h"
+> >  #include "hw/virtio/virtio-balloon.h"
+> > @@ -57,6 +58,7 @@ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+> >  typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+> >  typedef struct VHostVSockPCI VHostVSockPCI;
+> >  typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+> > +typedef struct VirtIOPMEMPCI VirtIOPMEMPCI;
+> >  
+> >  /* virtio-pci-bus */
+> >  
+> > @@ -274,6 +276,18 @@ struct VirtIOBlkPCI {
+> >      VirtIOBlock vdev;
+> >  };
+> >  
+> > +/*
+> > + * virtio-pmem-pci: This extends VirtioPCIProxy.
+> > + */
+> > +#define TYPE_VIRTIO_PMEM_PCI "virtio-pmem-pci"
+> > +#define VIRTIO_PMEM_PCI(obj) \
+> > +        OBJECT_CHECK(VirtIOPMEMPCI, (obj), TYPE_VIRTIO_PMEM_PCI)
+> > +
+> > +struct VirtIOPMEMPCI {
+> > +    VirtIOPCIProxy parent_obj;
+> > +    VirtIOPMEM vdev;
+> > +};
+> > +
+> >  /*
+> >   * virtio-balloon-pci: This extends VirtioPCIProxy.
+> >   */
+> > diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+> > new file mode 100644
+> > index 0000000000..28d06fc501
+> > --- /dev/null
+> > +++ b/hw/virtio/virtio-pmem.c
+> > @@ -0,0 +1,133 @@
+> > +/*
+> > + * Virtio pmem device
+> > + *
+> > + */
+> > +
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu-common.h"
+> > +#include "qemu/error-report.h"
+> > +#include "hw/virtio/virtio-pmem.h"
+> > +
+> > +
+> > +static void virtio_pmem_system_reset(void *opaque)
+> > +{
+> > +
+> > +}
+> > +
+> > +static void virtio_pmem_flush(VirtIODevice *vdev, VirtQueue *vq)
+> > +{
+> > +    VirtQueueElement *elem;
+> > +
+> > +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+> > +    if (!elem) {
+> > +        return;
+> > +    }
+> > +    /* todo flush raw file */
+> > +
+> > +    virtio_notify(vdev, vq);
+> > +    g_free(elem);
+> > +
+> > +}
+> > +
+> > +static void virtio_pmem_get_config(VirtIODevice *vdev, uint8_t *config)
+> > +{
+> > +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
+> > +    struct virtio_pmem_config *pmemcfg = (struct virtio_pmem_config *)
+> > config;
+> > +
+> > +    pmemcfg->start = pmem->start;
+> > +    pmemcfg->size  = pmem->size;
+> > +    pmemcfg->align = pmem->align;
+> > +}
+> > +
+> > +static uint64_t virtio_pmem_get_features(VirtIODevice *vdev, uint64_t
+> > features,
+> > +                                        Error **errp)
+> > +{
+> > +    virtio_add_feature(&features, VIRTIO_PMEM_PLUG);
+> > +    return features;
+> > +}
+> > +
+> > +
+> > +static void virtio_pmem_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    VirtIODevice   *vdev   = VIRTIO_DEVICE(dev);
+> > +    VirtIOPMEM     *pmem   = VIRTIO_PMEM(dev);
+> > +    MachineState   *ms     = MACHINE(qdev_get_machine());
+> > +    MemoryRegion   *mr;
+> > +    PCMachineState *pcms   = PC_MACHINE(object_dynamic_cast(OBJECT(ms),
+> > TYPE_PC_MACHINE));
+> > +    uint64_t addr;
+> > +
+> > +    if (!pmem->memdev) {
+> > +        error_setg(errp, "virtio-pmem not set");
+> > +        return;
+> > +    }
+> > +
+> > +    mr               = host_memory_backend_get_memory(pmem->memdev, errp);
+> > +    addr             = pcms->hotplug_memory.base;
+> > +    pmem->start      = addr;
+> > +    pmem->size       = memory_region_size(mr);
+> > +    pmem->align      = memory_region_get_alignment(mr);
+> > +
+> > +    memory_region_init_alias(&pmem->mr, OBJECT(ms),
+> > +                             "virtio_pmem-memory", mr, 0, pmem->size);
+> > +
+> > +    host_memory_backend_set_mapped(pmem->memdev, true);
+> > +    virtio_init(vdev, TYPE_VIRTIO_PMEM, VIRTIO_ID_PMEM,
+> > +                sizeof(struct virtio_pmem_config));
+> > +
+> > +    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
+> > +    qemu_register_reset(virtio_pmem_system_reset, pmem);
+> 
+> 
+> So right now you're just using some memdev for testing.
 
-We only need to zero the segment page sizes actually. The following
-fixes migration:
+yes.
 
-@@ -442,7 +442,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-     }
-=20
-     /* Convert to QEMU form */
--    memset(cpu->hash64_opts, 0, sizeof(*cpu->hash64_opts));
-+    memset(&cpu->hash64_opts->sps, 0, sizeof(cpu->hash64_opts->sps));
-=20
-     /* If we have HV KVM, we need to forbid CI large pages if our
-      * host page size is smaller than 64K.
+> 
+> I assume that the memory region we will provide to the guest will be a
+> simple memory mapped raw file. Dirty tracking (using the kvm slot) will
+> be used to detect which blocks actually changed and have to be flushed
+> to disk.
 
->  hw/ppc/pnv.c            |  3 ++-
->  hw/ppc/spapr.c          |  2 +-
->  target/ppc/cpu-qom.h    | 11 +++--------
->  target/ppc/kvm.c        |  4 ++--
->  target/ppc/mmu-hash64.c |  6 ++++--
->  target/ppc/mmu-hash64.h |  8 ++++++++
->  6 files changed, 20 insertions(+), 14 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 5a79b24828..5905be3f71 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -36,6 +36,7 @@
->  #include "monitor/monitor.h"
->  #include "hw/intc/intc.h"
->  #include "hw/ipmi/ipmi.h"
-> +#include "target/ppc/mmu-hash64.h"
-> =20
->  #include "hw/ppc/xics.h"
->  #include "hw/ppc/pnv_xscom.h"
-> @@ -187,7 +188,7 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, v=
-oid *fdt)
->          _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
->      }
-> =20
-> -    if (env->mmu_model & POWERPC_MMU_1TSEG) {
-> +    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
->          _FDT((fdt_setprop(fdt, offset, "ibm,processor-segment-sizes",
->                             segs, sizeof(segs))));
->      }
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 14c31f82fa..f86cb09080 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -557,7 +557,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
-*fdt, int offset,
->          _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
->      }
-> =20
-> -    if (env->mmu_model & POWERPC_MMU_1TSEG) {
-> +    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
->          _FDT((fdt_setprop(fdt, offset, "ibm,processor-segment-sizes",
->                            segs, sizeof(segs))));
->      }
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index 3e5ef7375f..2bd58b2a84 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -68,22 +68,17 @@ enum powerpc_mmu_t {
->      /* PowerPC 601 MMU model (specific BATs format)            */
->      POWERPC_MMU_601        =3D 0x0000000A,
->  #define POWERPC_MMU_64       0x00010000
-> -#define POWERPC_MMU_1TSEG    0x00020000
-> -#define POWERPC_MMU_AMR      0x00040000
->  #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
->      /* 64 bits PowerPC MMU                                     */
->      POWERPC_MMU_64B        =3D POWERPC_MMU_64 | 0x00000001,
->      /* Architecture 2.03 and later (has LPCR) */
->      POWERPC_MMU_2_03       =3D POWERPC_MMU_64 | 0x00000002,
->      /* Architecture 2.06 variant                               */
-> -    POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> -                             | POWERPC_MMU_AMR | 0x00000003,
-> +    POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | 0x00000003,
->      /* Architecture 2.07 variant                               */
-> -    POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> -                             | POWERPC_MMU_AMR | 0x00000004,
-> +    POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | 0x00000004,
->      /* Architecture 3.00 variant                               */
-> -    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> -                             | POWERPC_MMU_AMR | POWERPC_MMU_V3
-> +    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_V3
->                               | 0x00000005,
->  };
->  #define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index bc6d0a8314..22487cef06 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -302,7 +302,7 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cp=
-u,
->          /* HV KVM has backing store size restrictions */
->          info->flags =3D KVM_PPC_PAGE_SIZES_REAL;
-> =20
-> -        if (env->mmu_model & POWERPC_MMU_1TSEG) {
-> +        if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
->              info->flags |=3D KVM_PPC_1T_SEGMENTS;
->          }
-> =20
-> @@ -482,7 +482,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
->      }
->      env->slb_nr =3D smmu_info.slb_size;
->      if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
-> -        env->mmu_model &=3D ~POWERPC_MMU_1TSEG;
-> +        cpu->hash64_opts->flags &=3D ~PPC_HASH64_1TSEG;
->      }
->  }
-> =20
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 2809c31170..c9ee55e1ea 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -160,7 +160,7 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
->      if (vsid & (SLB_VSID_B & ~SLB_VSID_B_1T)) {
->          return -1; /* Bad segment size */
->      }
-> -    if ((vsid & SLB_VSID_B) && !(env->mmu_model & POWERPC_MMU_1TSEG)) {
-> +    if ((vsid & SLB_VSID_B) && !(ppc_hash64_has(cpu, PPC_HASH64_1TSEG)))=
- {
->          return -1; /* 1T segment on MMU that doesn't support it */
->      }
-> =20
-> @@ -369,7 +369,7 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_h=
-ash_pte64_t pte)
->      int prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-> =20
->      /* Only recent MMUs implement Virtual Page Class Key Protection */
-> -    if (!(env->mmu_model & POWERPC_MMU_AMR)) {
-> +    if (!ppc_hash64_has(cpu, PPC_HASH64_AMR)) {
->          return prot;
->      }
-> =20
-> @@ -1114,6 +1114,7 @@ void ppc_hash64_finalize(PowerPCCPU *cpu)
->  }
-> =20
->  const PPCHash64Options ppc_hash64_opts_basic =3D {
-> +    .flags =3D 0,
->      .sps =3D {
->          { .page_shift =3D 12, /* 4K */
->            .slb_enc =3D 0,
-> @@ -1127,6 +1128,7 @@ const PPCHash64Options ppc_hash64_opts_basic =3D {
->  };
-> =20
->  const PPCHash64Options ppc_hash64_opts_POWER7 =3D {
-> +    .flags =3D PPC_HASH64_1TSEG | PPC_HASH64_AMR,
->      .sps =3D {
->          {
->              .page_shift =3D 12, /* 4K */
-> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> index 341c1524c2..b2b5d25238 100644
-> --- a/target/ppc/mmu-hash64.h
-> +++ b/target/ppc/mmu-hash64.h
-> @@ -153,12 +153,20 @@ struct PPCHash64SegmentPageSizes {
->  };
-> =20
->  struct PPCHash64Options {
-> +#define PPC_HASH64_1TSEG        0x00001
-> +#define PPC_HASH64_AMR          0x00002
-> +    unsigned flags;
->      PPCHash64SegmentPageSizes sps[PPC_PAGE_SIZES_MAX_SZ];
->  };
-> =20
->  extern const PPCHash64Options ppc_hash64_opts_basic;
->  extern const PPCHash64Options ppc_hash64_opts_POWER7;
-> =20
-> +static inline bool ppc_hash64_has(PowerPCCPU *cpu, unsigned feature)
-> +{
-> +    return !!(cpu->hash64_opts->flags & feature);
-> +}
-> +
->  #endif /* CONFIG_USER_ONLY */
-> =20
->  #if defined(CONFIG_USER_ONLY) || !defined(TARGET_PPC64)
+Not really, we will perform fsync on raw file. As this file is created
+on regular storage and not nvdimm, so host page cache radix tree would have 
+the dirty pages information which will be used for fsync.
+   
+> 
+> Will this raw file already have the "disk information header" (no idea
+> how that stuff is called) encoded? Are there any plans/possible ways to
+> 
+> a) automatically create the headers? (if that's even possible)
+
+Its raw. Right now we are just supporting raw format.  
+
+As this is direct mapping of memory into guest address space, I don't
+think we can have an abstraction of headers for block specific features.
+Or may be we can get opinion of others(Qemu block people) it is at all possible?
+
+> b) support anything but raw files?
+> 
+> Please note that under x86, a KVM memory slot still has a (in my
+> opinion) fairly big overhead depending on the size of the slot (rmap,
+> page_track). We might have to optimize that.
+
+I have not tried/observed this. Right now I just used single memory slot and cold add
+few MB's of memory in Qemu. Can you please provide more details on this?
+
+> 
+> --
+> 
+> Thanks,
+> 
+> David / dhildenb
+> 
+> 
