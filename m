@@ -1,41 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f4CUQ-0004V9-T7
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 17:32:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1f4CxH-0000XV-JK
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f4CUN-0007pB-8x
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 17:32:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59618
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1f4CUN-0007ow-3n
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 17:32:11 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w35LTnmo095245
-	for <qemu-devel@nongnu.org>; Thu, 5 Apr 2018 17:32:10 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h5tthj97u-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 17:32:10 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 5 Apr 2018 17:32:09 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <bounces@canonical.com>) id 1f4CxC-00088H-Pv
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:02:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37706)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f4CxC-00087Z-IU
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:01:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f4Cx8-0002Za-KX
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 22:01:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5914C2E8258
+	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 22:01:44 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <41774c00-7462-f2b0-9314-3b3d7e0f9fb0@redhat.com>
-References: <1518116908-10852-1-git-send-email-mst@redhat.com>
-	<1518116908-10852-12-git-send-email-mst@redhat.com>
-	<41774c00-7462-f2b0-9314-3b3d7e0f9fb0@redhat.com>
-Date: Thu, 05 Apr 2018 16:32:01 -0500
-Message-Id: <152296392100.15508.4909516390524737427@sif>
-Subject: Re: [Qemu-devel] [PULL 11/26] pci-bridge/i82801b11: clear bridge
- registers on platform reset
+Date: Thu, 05 Apr 2018 21:52:08 -0000
+From: LukeShu <lukeshu@lukeshu.com>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <152296512879.30416.6232769502254207484.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,119 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
 
-Quoting Laszlo Ersek (2018-03-23 13:42:07)
-> Michael, Peter,
-> =
+I'm not on a Debian/Ubuntu-ish system, but extracting
 
-> On 02/08/18 20:09, Michael S. Tsirkin wrote:
-> > From: Laszlo Ersek <lersek@redhat.com>
-> > =
+    qemu-user-static_2.11+dfsg-1ubuntu6~ppa3_amd64.deb : data.tar.xz :
+usr/bin/qemu-arm-static
 
-> > The "i82801b11-bridge" device model is a descendant of "base-pci-bridge"
-> > (TYPE_PCI_BRIDGE). However, unlike other similar devices, such as
-> > =
+and testing with that binary:
 
-> > - pci-bridge,
-> > - pcie-pci-bridge,
-> > - PCIE Root Port,
-> > - xio3130 switch upstream and downstream ports,
-> > - dec-21154-p2p-bridge,
-> > - pbm-bridge,
-> > - xilinx-pcie-root,
-> > =
+    $ time usr/bin/qemu-arm-static /var/lib/archbuild/dbscripts@armv7h/luke=
+/usr/bin/ldconfig --help
+    Usage: ldconfig [OPTION...]
+  ...
+    <https://github.com/archlinuxarm/PKGBUILDs/issues>.
 
-> > "i82801b11-bridge" does not clear the bridge specific registers at
-> > platform reset.
-> > =
+    real	0m0.068s
+    user	0m0.067s
+    sys	0m0.000s
 
-> > This is a problem because devices on "i82801b11-bridge" continue to
-> > respond to config space cycles after platform reset, when addressed with
-> > the bus number that was previously programmed into the secondary bus
-> > number register of "i82801b11-bridge". This error breaks OVMF's search =
-for
-> > extra (PXB) root buses, for example.
-> > =
+That is: LGTM.
 
-> > The device class reset method for "i82801b11-bridge" is currently NULL;
-> > set it directly to pci_bridge_reset(), like the last three bridge models
-> > in the above listing do.
-> > =
+-- =
 
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel@redhat.com>
-> > Cc: qemu-stable@nongnu.org
-> > Ref: https://bugzilla.redhat.com/show_bug.cgi?id=3D1541839
-> > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  hw/pci-bridge/i82801b11.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > =
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
 
-> > diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-> > index cb522bf..ebf7f5f 100644
-> > --- a/hw/pci-bridge/i82801b11.c
-> > +++ b/hw/pci-bridge/i82801b11.c
-> > @@ -98,6 +98,7 @@ static void i82801b11_bridge_class_init(ObjectClass *=
-klass, void *data)
-> >      k->realize =3D i82801b11_bridge_realize;
-> >      k->config_write =3D pci_bridge_write_config;
-> >      dc->vmsd =3D &i82801b11_bridge_dev_vmstate;
-> > +    dc->reset =3D pci_bridge_reset;
-> >      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> >  }
-> >  =
+Title:
+  static linux-user ARM emulation has several-second startup time
 
-> > =
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Triaged
 
-> =
+Bug description:
+  static linux-user emulation has several-second startup time
 
-> this patch didn't get included in the 2.11.1 round-up:
-> =
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
 
-> http://mid.mail-archive.com/20180206191515.25830-1-mdroth@linux.vnet.ibm.=
-com
-> =
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
 
-> (The patch was posted, CC stable, between Mike's round-up set and the
-> actual 2.11.1 release.)
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
 
-Looks like I had it tagged as pending but the PULL got held up for a while
-and it didn't hit master till the day before release. I'm okay with
-cherry-picking from a maintainer tree but generally only do it if I get
-poked about it or it's on my radar for other reasons.
+  ----
 
-> =
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
 
-> Can we please make sure that the commit doesn't miss the 2.11.2 bus?
-> 2.12 is still a month out, and without this patch, rebooting an UEFI
-> guest OS (with OVMF) hangs, on certain VM configs (see the commit message=
-).
-> =
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
 
-> (Apologies if there is a "queue" or "next" branch for stable releases --
-> in that case I should have probably checked that branch before sending
-> this email.)
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
 
-There's https://github.com/mdroth/qemu/commits/stable-2.11-staging but
-as you can see it generally doesn't see much action in-between releases.
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
 
-Will start queueing patches for 2.11.2 soon and make sure it gets in,
-but probably looking at a similar release timeframe as 2.12.
+  ----
 
-Thanks for the heads up!
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
 
-> =
-
-> The commit hash on the master branch is
-> ed247f40db84c8bd4bb7d10948702cd47cc4d5ae; it's part of v2.12.0-rc0.
-> =
-
-> Thanks!
-> Laszlo
->=20
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
