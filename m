@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f3uQL-0001Xb-Ja
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:51 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1f3uSi-0003QJ-F1
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:17:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f3uQK-0000uO-04
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:49 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  5 Apr 2018 12:14:32 +1000
-Message-Id: <20180405021437.16761-9-david@gibson.dropbear.id.au>
-In-Reply-To: <20180405021437.16761-1-david@gibson.dropbear.id.au>
-References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
+	(envelope-from <alex.williamson@redhat.com>) id 1f3uSe-0002Yg-3n
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:17:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1f3uSd-0002YE-Qb
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:17:12 -0400
+Date: Wed, 4 Apr 2018 20:17:06 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180404201706.22af4643@t450s.home>
+In-Reply-To: <beaf3c80-767c-9fcf-2cc3-09a294d77c0c@ozlabs.ru>
+References: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
+	<20180404170950.54eb7975@w520.home>
+	<beaf3c80-767c-9fcf-2cc3-09a294d77c0c@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.13 08/13] target/ppc: Make hash64_opts
- field mandatory for 64-bit hash MMUs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for 2.12] vfio: Use a trace point when a
+ RAM section cannot be DMA mapped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,116 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, groug@kaod.org
-Cc: qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org
 
-Currently some cpus set the hash64_opts field in the class structure, wit=
-h
-specific details of their variant of the 64-bit hash mmu.  For the
-remaining cpus with that mmu, ppc_hash64_realize() fills in defaults.
+On Thu, 5 Apr 2018 10:53:38 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-But there are only a couple of cpus that use those fallbacks, so just hav=
-e
-them to set the has64_opts field instead, simplifying the logic.
+> On 5/4/18 9:09 am, Alex Williamson wrote:
+> > On Wed,  4 Apr 2018 22:30:50 +0200
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions")
+> >> added an error message if a passed memory section address or size
+> >> is not aligned to the page size and thus cannot be DMA mapped.
+> >>
+> >> This patch fixes the trace by printing the region name and the
+> >> memory region section offset within the address space (instead of
+> >> offset_within_region).
+> >>
+> >> We also turn the error_report into a trace event. Indeed, In some
+> >> cases, the traces can be confusing to non expert end-users and
+> >> let think the use case does not work (whereas it
+> >> works as before).
+> >>
+> >> This is the case where a BAR is successively mapped at different
+> >> GPAs and its sections are not compatible with dma map. The listener
+> >> is called several times and traces are issued for each intermediate
+> >> mapping.  The end-user cannot easily match those GPAs against the
+> >> final GPA output by lscpi. So let's keep those information to
+> >> informed users. In mid term, the plan is to advise the user about
+> >> BAR relocation relevance.
+> >>
+> >> Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
+> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >>
+> >> v1 -> v2:
+> >> - use a trace point
+> >> - add some details in the commit message  
+> > 
+> > I think this is v2 with v1 being
+> > Message-Id:<20180322081837.21460-1-aik@ozlabs.ru> but this is
+> > substantially different from Alexey's posting so I'd like to verify the
+> > Sign-off.  Alexey?  
+> 
+> My understanding it is not "sign-off" any more (I am fine either way, it
+> just does not seem fully correct), but
+> 
+> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- target/ppc/mmu-hash64.c     | 36 ++++++++++++++++++------------------
- target/ppc/mmu-hash64.h     |  1 +
- target/ppc/translate_init.c |  2 ++
- 3 files changed, 21 insertions(+), 18 deletions(-)
+Yep, I think Eric was intending to give you credit since this patch
+builds on your patch.  I'll include the R-b.
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 6758afd9de..2809c31170 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -1100,25 +1100,12 @@ void ppc_hash64_init(PowerPCCPU *cpu)
-     CPUPPCState *env =3D &cpu->env;
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-=20
--    if (pcc->hash64_opts) {
--        cpu->hash64_opts =3D g_memdup(pcc->hash64_opts,
--                                    sizeof(*cpu->hash64_opts));
--    } else if (env->mmu_model & POWERPC_MMU_64) {
--        /* Use default sets of page sizes. We don't support MPSS */
--        static const PPCHash64Options defopts =3D {
--            .sps =3D {
--                { .page_shift =3D 12, /* 4K */
--                  .slb_enc =3D 0,
--                  .enc =3D { { .page_shift =3D 12, .pte_enc =3D 0 } }
--                },
--                { .page_shift =3D 24, /* 16M */
--                  .slb_enc =3D 0x100,
--                  .enc =3D { { .page_shift =3D 24, .pte_enc =3D 0 } }
--                },
--            },
--        };
--        cpu->hash64_opts =3D g_memdup(&defopts, sizeof(*cpu->hash64_opts=
-));
-+    if (!pcc->hash64_opts) {
-+        assert(!(env->mmu_model & POWERPC_MMU_64));
-+        return;
-     }
-+
-+    cpu->hash64_opts =3D g_memdup(pcc->hash64_opts, sizeof(*cpu->hash64_=
-opts));
- }
-=20
- void ppc_hash64_finalize(PowerPCCPU *cpu)
-@@ -1126,6 +1113,19 @@ void ppc_hash64_finalize(PowerPCCPU *cpu)
-     g_free(cpu->hash64_opts);
- }
-=20
-+const PPCHash64Options ppc_hash64_opts_basic =3D {
-+    .sps =3D {
-+        { .page_shift =3D 12, /* 4K */
-+          .slb_enc =3D 0,
-+          .enc =3D { { .page_shift =3D 12, .pte_enc =3D 0 } }
-+        },
-+        { .page_shift =3D 24, /* 16M */
-+          .slb_enc =3D 0x100,
-+          .enc =3D { { .page_shift =3D 24, .pte_enc =3D 0 } }
-+        },
-+    },
-+};
-+
- const PPCHash64Options ppc_hash64_opts_POWER7 =3D {
-     .sps =3D {
-         {
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 957bd68e33..341c1524c2 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -156,6 +156,7 @@ struct PPCHash64Options {
-     PPCHash64SegmentPageSizes sps[PPC_PAGE_SIZES_MAX_SZ];
- };
-=20
-+extern const PPCHash64Options ppc_hash64_opts_basic;
- extern const PPCHash64Options ppc_hash64_opts_POWER7;
-=20
- #endif /* CONFIG_USER_ONLY */
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 040d6fbac3..ae005b2a54 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8242,6 +8242,7 @@ POWERPC_FAMILY(970)(ObjectClass *oc, void *data)
-     pcc->mmu_model =3D POWERPC_MMU_64B;
- #if defined(CONFIG_SOFTMMU)
-     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
-+    pcc->hash64_opts =3D &ppc_hash64_opts_basic;
- #endif
-     pcc->excp_model =3D POWERPC_EXCP_970;
-     pcc->bus_model =3D PPC_FLAGS_INPUT_970;
-@@ -8319,6 +8320,7 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data=
-)
-     pcc->mmu_model =3D POWERPC_MMU_2_03;
- #if defined(CONFIG_SOFTMMU)
-     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
-+    pcc->hash64_opts =3D &ppc_hash64_opts_basic;
- #endif
-     pcc->excp_model =3D POWERPC_EXCP_970;
-     pcc->bus_model =3D PPC_FLAGS_INPUT_970;
---=20
-2.14.3
+There's still work to do, I'd like to see a single, concise message as
+we're parsing the device, but there's no benefit in alarming users when
+nothing has changed and it's too late into the release cycle to do more
+than just silence this for now.  Patches welcome towards a better
+solution, to be considered for 2.13.  Thanks,
+
+Alex
+
+> > 
+> > I agree that this seems to be the right thing to do for 2.12, nothing
+> > has changed for these mappings and the error reports are difficult even
+> > for experts to decipher and explain to users.  Thanks,
+> > 
+> > Alex
+> >   
+> >> ---
+> >>  hw/vfio/common.c     | 11 +++++------
+> >>  hw/vfio/trace-events |  1 +
+> >>  2 files changed, 6 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> >> index 5e84716..07ffa0b 100644
+> >> --- a/hw/vfio/common.c
+> >> +++ b/hw/vfio/common.c
+> >> @@ -548,12 +548,11 @@ static void vfio_listener_region_add(MemoryListener *listener,
+> >>          hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+> >>  
+> >>          if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
+> >> -            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
+> >> -                         " is not aligned to 0x%"HWADDR_PRIx
+> >> -                         " and cannot be mapped for DMA",
+> >> -                         section->offset_within_region,
+> >> -                         int128_getlo(section->size),
+> >> -                         pgmask + 1);
+> >> +            trace_vfio_listener_region_add_no_dma_map(
+> >> +                memory_region_name(section->mr),
+> >> +                section->offset_within_address_space,
+> >> +                int128_getlo(section->size),
+> >> +                pgmask + 1);
+> >>              return;
+> >>          }
+> >>      }
+> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> >> index 79f63a2..20109cb 100644
+> >> --- a/hw/vfio/trace-events
+> >> +++ b/hw/vfio/trace-events
+> >> @@ -90,6 +90,7 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "i
+> >>  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
+> >>  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
+> >>  vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
+> >> +vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uint64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=0x%"PRIx64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
+> >>  vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
+> >>  vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
+> >>  vfio_disconnect_container(int fd) "close container->fd=%d"  
+> >   
+> 
+> 
