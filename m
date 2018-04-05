@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f4Ayp-00025Y-GP
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 15:55:32 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f4B4N-0005iT-96
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 16:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f4Ayl-0001rA-Hm
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 15:55:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f4Ayl-0001qi-A8
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 15:55:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 361A080B29
-	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 19:55:26 +0000 (UTC)
-Date: Thu, 5 Apr 2018 13:55:11 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180405135511.03552ede@w520.home>
-In-Reply-To: <20180405194654.GB2277@work-vm>
-References: <20180323153939.16684-1-dgilbert@redhat.com>
-	<20180405121313.3bf29ca8@w520.home> <20180405194654.GB2277@work-vm>
+	(envelope-from <pbonzini@redhat.com>) id 1f4B4K-0004tj-1w
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 16:01:15 -0400
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:43581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f4B4J-0004tT-R8
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 16:01:11 -0400
+Received: by mail-wr0-f196.google.com with SMTP id p53so30364470wrc.10
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 13:01:11 -0700 (PDT)
+References: <CAFEAcA9PbAr+0U1dJ22fr3+B0-KO3Oy73-mk755rJQtmY_rSKA@mail.gmail.com>
+	<cfb5230b-ec8e-ccb7-788d-0b389a93e128@redhat.com>
+	<CAFEAcA-vUuGWqPfDEz9Qu+q3PGqctSw-YxRnH3jWJGH+QVLHsg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d7f67671-c8e8-f05e-722b-7616a2ac11c0@redhat.com>
+Date: Thu, 5 Apr 2018 22:01:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] vhost: Allow adjoining regions
+In-Reply-To: <CAFEAcA-vUuGWqPfDEz9Qu+q3PGqctSw-YxRnH3jWJGH+QVLHsg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] TCG icount interaction with timer deadlines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, mst@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 5 Apr 2018 20:46:55 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Fri, 23 Mar 2018 15:39:39 +0000
-> > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> >   
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > My rework of section adding combines overlapping or adjoining regions,
-> > > but checks they're actually the same underlying RAM block.
-> > > Fix the case where two blocks adjoin but don't overlap; that new region
-> > > should get added (but not combined), but my previous patch was disallowing it.
-> > > 
-> > > Fixes: c1ece84e7c9
-> > > 
-> > > Reported-by: Alex Williamson <alex.williamson@redhat.com>
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---  
-> > 
-> > 
-> > Ping?  This error report is a regression and should be considered for
-> > 2.12.
-> > 
-> > Tested-by: Alex Williamson <alex.williamson@redhat.com>  
+
+----- Original Message -----
+> From: "Peter Maydell" <peter.maydell@linaro.org>
+> To: "Paolo Bonzini" <pbonzini@redhat.com>
+> Cc: "QEMU Developers" <qemu-devel@nongnu.org>, "Alex Bennée" <alex.bennee@linaro.org>, "Richard Henderson"
+> <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+> Sent: Thursday, April 5, 2018 7:35:56 PM
+> Subject: Re: TCG icount interaction with timer deadlines
 > 
-> It's a change in vhost - so mst is taking it ?
+> On 5 April 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > On 05/04/2018 18:01, Peter Maydell wrote:
+> >>  * however, if the guest reprograms the clock during the tcg_cpu_exec()
+> >>    run, we don't do anything to cause us to stop earlier
+> >
+> > Anything that does this from the vCPU thread should be between
+> > gen_icount_start and gen_icount_end.  (In fact, it's the entire reason
+> > why cpu_io_recompile exists).
+> 
+> Yes, and this does cause us to do a cpu_io_recompile, which
+> rebuilds the TB and does a longjmp. However:
+>  (1) that only takes us out to cpu_exec(), which will then
+>  just go ahead and execute the next TB, whereas the
+>  recalculation of deadlines happens at the next level out
+>  in tcg_cpu_exec()
+>  (2) the io_recompile happens *before* the guest writes to
+>  the timer register that reprograms the deadline, so even
+>  if we recomputed deadlines after this longjmp they wouldn't
+>  be correct
 
-That's my assumption, sorry, I should have set to/cc explicitly rather
-than just replying.  Thanks,
+Right - that part would be handled here:
 
-Alex
+void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+{
+    if (!use_icount || type != QEMU_CLOCK_VIRTUAL) {
+        qemu_notify_event();
+        return;
+    }
 
-> > >  hw/virtio/vhost.c | 13 +++++++++----
-> > >  1 file changed, 9 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > > index 250f886acb..2a720cca3d 100644
-> > > --- a/hw/virtio/vhost.c
-> > > +++ b/hw/virtio/vhost.c
-> > > @@ -595,10 +595,15 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-> > >                                          prev_sec->offset_within_address_space,
-> > >                                          prev_sec->offset_within_region);
-> > >              } else {
-> > > -                error_report("%s: Overlapping but not coherent sections "
-> > > -                             "at %"PRIx64,
-> > > -                             __func__, mrs_gpa);
-> > > -                return;
-> > > +                /* adjoining regions are fine, but overlapping ones with
-> > > +                 * different blocks/offsets shouldn't happen
-> > > +                 */
-> > > +                if (mrs_gpa != prev_gpa_end + 1) {
-> > > +                    error_report("%s: Overlapping but not coherent sections "
-> > > +                                 "at %"PRIx64,
-> > > +                                 __func__, mrs_gpa);
-> > > +                    return;
-> > > +                }
-> > >              }
-> > >          }
-> > >      }  
-> >   
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    if (!qemu_in_vcpu_thread() && first_cpu) {
+        /* qemu_cpu_kick is not enough to kick a halted CPU out of
+         * qemu_tcg_wait_io_event.  async_run_on_cpu, instead,
+         * causes cpu_thread_is_idle to return false.  This way,
+         * handle_icount_deadline can run.
+         */
+        async_run_on_cpu(first_cpu, do_nothing, RUN_ON_CPU_NULL);
+    }
+}
+
+(called by timerlist_notify, called in turn by timerlist_rearm)
+but that second "if" is too restrictive.  Maybe just removing
+the first arm is enough.  All this was broken by MTTCG.
+
+Paolo
