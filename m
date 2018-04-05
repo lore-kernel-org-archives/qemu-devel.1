@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f47TN-0005YG-LE
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:10:50 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f47pC-0000p4-6w
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f47TI-0003SK-LM
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:10:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f47TI-0003SA-Cv
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:10:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f47TH-0006wU-Cx
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 16:10:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5CABA2E805D
-	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 16:10:43 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1f47p9-0008Pl-2w
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:33:22 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:38113)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f47p8-0008PQ-Pg
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:33:19 -0400
+References: <20180405134702.5020-1-jcmvbkbc@gmail.com>
+	<6b21a387-7ebd-c738-e1c4-b65645f11fed@vivier.eu>
+	<CAMo8Bf+9h2vSMcQQftkh0DDLNJbHV_beGARSn2RaB_MjkRMtFg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <31415928-bff1-7c2b-ec01-a56d708a7002@vivier.eu>
+Date: Thu, 5 Apr 2018 18:33:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Apr 2018 16:00:37 -0000
-From: Richard Henwood <richard.henwood@arm.com>
-Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1761535] [NEW] qemu-aarch64-static docker
- arm64v8/openjdk coredump
+In-Reply-To: <CAMo8Bf+9h2vSMcQQftkh0DDLNJbHV_beGARSn2RaB_MjkRMtFg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: fix preadv/pwritev offsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,114 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-Public bug reported:
+Le 05/04/2018 à 18:27, Max Filippov a écrit :
+> On Thu, Apr 5, 2018 at 8:52 AM, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Why don't you try to de-construct then re-construct the offset?
+> 
+> It would require 128-bit arithmetic on 64-bit host.
+> 
+>> Kernel commit
+>>   601cc11d054a "Make non-compat preadv/pwritev use native register size"
+>> is interesting.
+>>
+>> static inline abi_llong target_pos_from_hilo(abi_ulong high,
+>>                                              abi_ulong low)
+>> {
+>> #define TARGET_HALF_LONG_BITS (TARGET_LONG_BITS / 2)
+>>    return (((abi_llong)high << TARGET_HALF_LONG_BITS) <<
+>>                              TARGET_HALF_LONG_BITS) | low;
+>> }
+>>
+>> #define HOST_HALF_LONG_BITS (HOST_LONG_BITS / 2)
+>>
+>>  abi_llong pos = target_pos_from_hilo(arg4, arg5);
+>>  ret = get_errno(safe_preadv(arg1, vec, arg3,
+>>           pos,
+>>           (pos >> HOST_HALF_LONG_BITS) >> HOST_HALF_LONG_BITS));
+>>
+>> It looks simpler, but perhaps I miss something
+>> (it's just cut&paste, I don't pretend to understand that code...)?
+> 
+> If we decide that host unsigned long long is wide enough to represent
+> meaningful file positions then this function may be simplified to
+> something like
+> 
+> unsigned long long off = (unsigned long long)tlow |
+> ((unsigned long long)thigh << (TARGET_LONG_BITS / 2)) << (TARGET_LONG_BITS / 2);
+> *hlow = (unsigned long)off;
+> *hhigh = (unsigned long)((off >> (HOST_LONG_BITS / 2)) >> (HOST_LONG_BITS / 2));
+> 
+> There's also a bug that the target may specify an offset not representable
+> on the host, that will get truncated and point to a different location in the
+> file, possibly resulting in data corruption.
 
-I am using qemu-aarch64-static to run the arm64v8/openjdk official image
-on my x86 machine. Using QEMU master, I immediately hit a bug which
-hangs the container. With Ubuntu default version qemu-aarch64 version
-2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64 version 2.11.1
-(v2.11.1-dirty) the hang does not take place.
+I don't think it can happen, because "long long" is always 64bit, so it
+fits in two 32bit (long is 32bit on 32bit, 64bit on 64bit).
 
-To reproduce (and get to the core dump):
-
-$ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
-qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-$ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aarc=
-h64-static arm64v8/openjdk /bin/bash
-root@bf75cf45d311:/# javac
-Usage: javac <options> <source files>
-where possible options include:
-  -g                         Generate all debugging info
-<...snip...>
-  @<filename>                Read options and filenames from file
-
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-...TERMINAL HANGS...
-
-
-To get the core dump, In a separate terminal:
-
-# snapshot the file system of the hung image
-$ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
-
-# connect with known working qemu
-$ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-stati=
-c  -i qemu_coredump /bin/bash
-
-$$ ls -lat
-total 10608
-<snip>
--rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_1.=
-core
-drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
-<snip>
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: aarch64 core dump hang static
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1761535
-
-Title:
-  qemu-aarch64-static docker arm64v8/openjdk coredump
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am using qemu-aarch64-static to run the arm64v8/openjdk official
-  image on my x86 machine. Using QEMU master, I immediately hit a bug
-  which hangs the container. With Ubuntu default version qemu-aarch64
-  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
-  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
-
-  To reproduce (and get to the core dump):
-
-  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
-  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
-rch64-static arm64v8/openjdk /bin/bash
-  root@bf75cf45d311:/# javac
-  Usage: javac <options> <source files>
-  where possible options include:
-    -g                         Generate all debugging info
-  <...snip...>
-    @<filename>                Read options and filenames from file
-
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  ...TERMINAL HANGS...
-
-  =
-
-  To get the core dump, In a separate terminal:
-
-  # snapshot the file system of the hung image
-  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
-
-  # connect with known working qemu
-  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
-tic  -i qemu_coredump /bin/bash
-
-  $$ ls -lat
-  total 10608
-  <snip>
-  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
-1.core
-  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
-  <snip>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
+Thanks,
+Laurent
