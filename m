@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f4Bub-00087s-7y
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 16:55:14 -0400
+	(envelope-from <alarson@ddci.com>) id 1f4CM2-0000t6-W6
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 17:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f4BuY-00004v-0V
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 16:55:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f4BuX-0008WJ-QV
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 16:55:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f4BuW-0002NN-LB
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 20:55:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9CDAE2E8023
-	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 20:55:08 +0000 (UTC)
+	(envelope-from <alarson@ddci.com>) id 1f4CLz-0004tW-1H
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 17:23:35 -0400
+Received: from phx2.ddci.com ([184.183.10.180]:64154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alarson@ddci.com>) id 1f4CLy-0004sz-Q5
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 17:23:30 -0400
+In-Reply-To: <CAFEAcA8KrrzDacQXsiW-UxKsy4sodCteUWgAHu6ZdyMG4u7riQ@mail.gmail.com>
+References: <OF802C7AAD.A9501847-ON0625823D.000350FE-0625823D.0003998B@ddci.com>
+	<CAFEAcA9hNNT_ooL+YKsU-V8X_FKT9x-ca+ae03DtybV13s7GoA@mail.gmail.com>
+	<OF03E560EC.20D03DEC-ON88258258.001D166A-86258258.001E50AC@ddci.com>
+	<CAFEAcA-PXNDUfj7b6awd5KjtGuQd3F4Diy1tkEmYa9gBoxUjiA@mail.gmail.com>
+	<OF28E56C94.CBE4DE9D-ON88258266.005BC5B3-86258266.005BFAF5@ddci.com>
+	<CAFEAcA8KrrzDacQXsiW-UxKsy4sodCteUWgAHu6ZdyMG4u7riQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Apr 2018 20:41:22 -0000
-From: liang yan <lyan@suse.com>
-Reply-To: Bug 1441443 <1441443@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150408062216.7311.52657.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152296088223.29099.10280693186955336737.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1441443] Re: Is there a way to create a 10G
- network interface for VMs in KVM2.0?
+From: alarson@ddci.com
+Message-ID: <OFDC2B6138.CF2B5F15-ON88258266.00751F63-86258266.0075810C@ddci.com>
+Date: Thu, 5 Apr 2018 16:23:27 -0500
+Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: [Qemu-devel] -icount changes physical address assignments in
+ QEMU 2.10/2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Unless you are using SRIOV or DPDK which both need hardware support. If
-could support SRIOV, then using IOMMU+VFIO, and pass-through to VM, this
-will get a close number. Or DPDK, using a user-space driver + vhost-net,
-will also get a pretty good value.
+"Peter Maydell" <peter.maydell@linaro.org> wrote on 04/05/2018 12:28:01 
+PM:
 
--- =
+> From: "Peter Maydell" <peter.maydell@linaro.org>
+> To: alarson@ddci.com
+> Cc: "QEMU Developers" <qemu-devel@nongnu.org>
+> Date: 04/05/2018 12:28 PM
+> Subject: Re: [Qemu-devel] -icount changes physical address assignments 
+in QEMU 2.10/2.11
+> 
+> On 5 April 2018 at 17:44,  <alarson@ddci.com> wrote:
+> > "Peter Maydell" <peter.maydell@linaro.org> wrote on 04/05/2018 
+09:05:53
+> > AM:
+> >> I've just tried your attached test image ...
+> >
+> > Curious.  I just downloaded qemu-2.12.0-rc2.tar.xz and built it using
+> > Cygwin (a version from about a month ago) using mingw compilers
+> > (mingw64-i686-gcc-g++ 6.4.0), and I still see the issue when the
+> > resulting QEMU binary is run using -icount 2 against my test binary,
+> > but not when run without -icount.  Here are the commands used:
+> >
+> > ../qemu-2.12.0-rc2/configure --python=/usr/bin/python \
+> >    '--with-pkgversion=DDCI QEMU 2.12.0-rc2' \
+> >    --prefix=/usr/local/qemu \
+> >    --enable-sdl --with-sdlabi=2.0 \
+> >    '--target-list=aarch64-softmmu ppc64-softmmu x86_64-softmmu' \
+> >    --cross-prefix=i686-w64-mingw32-
+> > /usr/bin/make -Otarget -j 8
+> >
+> > Any suggestions of things to try?
+> 
+> Can you reproduce the problem on a Linux host? It would
+> be interesting to identify if this is a Windows-host
+> specific issue somehow.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1441443
+Linux "works".  I installed ubuntu 17.10 in a VM on my windows box, 
+recompiled QEMU 2.12.0-rc2 (same sources as above), using a configure 
+line the same as above except omitting --cross-prefix and --with-sdlabi.
+Both with "-icount 2" and without show expected results.
 
-Title:
-  Is there a way to create a 10G network interface for VMs in KVM2.0?
+I installed a fresh Cygwin with just the packages suggested at
+https://wiki.qemu.org/Hosts/W32#Native_builds_with_Mingw-w64 (plus
+some obviously missing ones like python, make, etc.) and the problem 
+persists.  The updated configure line is:
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-
-  We have installed & configured the KVM 2.0 (qemu-kvm 2.0.0+dfsg-
-  2ubuntu1.10) on Ubuntu 14.04. The physical server is connected to 10G
-  network, KVM is configured in Bridged mode But the issue is, when we
-  create Network interface on VMs, we have only 1G device as an options
-  for vmhosts. Is this the limit of the KVM or is there a way to create
-  a 10G network interface for VMs? Available device models
-
-  E1000
-  Ne2k_pci
-  Pcnet
-  Rtl8139
-  virtio
-
-  Please find the network configuration details
-
-  Source device : Host device vnet1 (Bridge =E2=80=98br0=E2=80=99)
-  Device model : virtio =
-
-
-  Network configuration in the host /etc/network/interfaces
-
-  auto br0
-  iface br0 inet static
-          address 10.221.x.10
-          netmask 255.255.255.0
-          network 10.221.x.0
-          broadcast 10.221.x.255
-          gateway 10.221.x.1
-          # dns-* options are implemented by the resolvconf package, if ins=
-talled
-          dns-nameservers X.X.X.X
-          dns-search XXX.NET
-          bridge_ports em1
-          bridge_fd 0
-          bridge_stp off
-          bridge_maxwait 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1441443/+subscriptions
+../qemu-2.12.0-rc2/configure \
+    '--with-pkgversion=DDCI QEMU 2.12.0-rc2' \
+    --prefix=/usr/local/qemu \
+    '--target-list=aarch64-softmmu ppc64-softmmu x86_64-softmmu' \
+    --cross-prefix=i686-w64-mingw32-
