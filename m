@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f3zrc-0007FF-SD
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 04:03:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f3zsE-0007ip-Qz
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 04:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f3zrY-0001LV-UL
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 04:03:20 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f3zs9-0001fG-27
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 04:03:58 -0400
+Date: Thu, 5 Apr 2018 10:03:46 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180405100346.7789e8e1.cohuck@redhat.com>
+In-Reply-To: <11ca3563-dd2c-f8b0-8336-323177477a00@de.ibm.com>
 References: <20180326092036.12780-1-david@redhat.com>
 	<11ca3563-dd2c-f8b0-8336-323177477a00@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <16089aab-820c-f24f-908d-109d9eb1f2a0@redhat.com>
-Date: Thu, 5 Apr 2018 10:03:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <11ca3563-dd2c-f8b0-8336-323177477a00@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH RFC] s390x/kvm: call
  cpu_synchronize_state() on every kvm_arch_handle_exit()
@@ -25,46 +24,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-On 05.04.2018 09:53, Christian Borntraeger wrote:
-> 
-> 
+On Thu, 5 Apr 2018 09:53:45 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
 > On 03/26/2018 11:20 AM, David Hildenbrand wrote:
->> Manually having to use cpu_synchronize_state() is error prone. I don't
->> think that the performance impact is that huge if we simply synchronize
->> the state on every kvm_arch_handle_exit() call. This makes the code
->> easier to maintain.
->>
->> We now also call it (although not neded) for
->> - KVM_EXIT_S390_RESET -> s390_reipl_request()
->> - KVM_EXIT_DEBUG -> kvm_arch_handle_debug_exit()
->> - unmanagable/unimplemented intercepts
->> - ICPT_WAITPSW -> s390_handle_wait() -> cpu gets halted
->> - ICPT_CPU_STOP -> do_stop_interrupt() -> cpu gets halted
->> - Scenarios where we inject an operation exception
->> - handle_sigp() on the source CPU
->> - handle_stsi()
->>
->> I don't think any of these are performance critical. Especially as we
->> have all information directly contained in kvm_run, there are no
->> additional IOCTLs to issue on modern kernels.
-> 
-> We had other issues in the past in other (common code) places. For example
-> see
-> 
-> commit 79ca7a1b898eb97c4192f3c78027a0f20485e7b4
-> Author:     Christian Borntraeger <borntraeger@de.ibm.com>
-> AuthorDate: Tue Mar 7 15:19:08 2017 +0100
-> Commit:     Paolo Bonzini <pbonzini@redhat.com>
-> CommitDate: Tue Mar 14 13:26:36 2017 +0100
-> 
->     exec: add cpu_synchronize_state to cpu_memory_rw_debug
-> 
-> so we might consider going even further.....But this will be tricky.
-> 
-> 
+
 > FWIW, I think your patch even fixes a bug:
 > 
 > --- snip ----
@@ -79,7 +46,7 @@ On 05.04.2018 09:53, Christian Borntraeger wrote:
 >      */
 >     func_code = decode_basedisp_rs(&cpu->env, ipb, NULL) & DIAG_KVM_CODE_MASK;
 > 
-> ---->
+> ---->  
 > 	static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
 > 	                                       uint8_t *ar)
 > 	{
@@ -90,7 +57,7 @@ On 05.04.2018 09:53, Christian Borntraeger wrote:
 > 	    if (reg > 0) {
 > 	        addr = env->regs[reg];
 > 
-> ----> we do the sync_regs after this in the diag handler!
+> ----> we do the sync_regs after this in the diag handler!  
 > So currently we only handle the case with base reg == 0 correctly.
 > So
 > diag x,y,0x500(0) 
@@ -102,28 +69,28 @@ On 05.04.2018 09:53, Christian Borntraeger wrote:
 > diag x,y,0(1)
 > 
 > not unless I miss something.
+
+I think you are right.
+
 > 
 > 
 > [...]
->> @@ -1778,6 +1760,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>
->>      qemu_mutex_lock_iothread();
->>
->> +    cpu_synchronize_state(CPU(cpu));
->> +
->>      switch (run->exit_reason) {
->>          case KVM_EXIT_S390_SIEIC:
->>              ret = handle_intercept(cpu);
->>
+> > @@ -1778,6 +1760,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> > 
+> >      qemu_mutex_lock_iothread();
+> > 
+> > +    cpu_synchronize_state(CPU(cpu));
+> > +
+> >      switch (run->exit_reason) {
+> >          case KVM_EXIT_S390_SIEIC:
+> >              ret = handle_intercept(cpu);
+> >   
 > 
 > Does it make sense to do this hunk NOW for 2.12 (cc stable)
 > and queue your full patch for 2.13?
 > 
 
-I think so - Conny?
+I'd prefer a cpu_synchronize_state() at the start of handle_diag() and
+a respin of this patch for 2.13, but that should be fine as well.
 
--- 
-
-Thanks,
-
-David / dhildenb
+I'll queue a proper patch for 2.12-rc.
