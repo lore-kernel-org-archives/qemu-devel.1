@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f40mD-00063H-Tn
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:01:51 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f40o7-0007Rg-5V
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:03:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f40m9-0004Dg-P2
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:01:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f40m9-0004D3-Il
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:01:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f40m8-0006xN-B9
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 09:01:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 529042E80CB
-	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 09:01:44 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1f40o4-00054V-1a
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:03:47 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:59467)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f40o3-00053v-O3
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 05:03:43 -0400
+References: <20180405014135.3235-1-jcmvbkbc@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a8f34bc8-fb07-94d2-c906-e17ee2b4595c@vivier.eu>
+Date: Thu, 5 Apr 2018 11:03:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Apr 2018 08:48:06 -0000
-From: ChristianEhrhardt <1740219@bugs.launchpad.net>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152291808691.29479.1905581250588445351.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+In-Reply-To: <20180405014135.3235-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix preadv/pwritev offsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-For Ubuntu: PPA: https://launchpad.net/~ci-train-ppa-
-service/+archive/ubuntu/3225
+Le 05/04/2018 à 03:41, Max Filippov a écrit :
+> preadv/pwritev accept low and high parts of file offset in two separate
+> parameters. When host bitness doesn't match guest bitness these parts
+> must be appropriately recombined.
+> Introduce target_low_high_to_host_low_high that does this recombination
+> and use it in preadv/pwritev syscalls.
+> 
+> This fixes glibc testsuite test misc/tst-preadvwritev64.
+> 
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+> Changes v1->v2:
+> - fix host high computation in TARGET_LONG_BITS > HOST_LONG_BITS case
+> 
+>  linux-user/syscall.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 5ef517613577..7e014066260a 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -3386,6 +3386,23 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+>      return ret;
+>  }
+>  
+> +static void target_low_high_to_host_low_high(abi_ulong tlow,
+> +                                             abi_ulong thigh,
+> +                                             unsigned long *hlow,
+> +                                             unsigned long *hhigh)
+> +{
+> +#if TARGET_LONG_BITS == HOST_LONG_BITS
+> +        *hlow = tlow;
+> +        *hhigh = thigh;
+> +#elif TARGET_LONG_BITS < HOST_LONG_BITS
+> +        *hlow = tlow | (unsigned long)thigh << TARGET_LONG_BITS;
+> +        *hhigh = 0;
+> +#else
+> +        *hlow = (unsigned long)tlow;
+> +        *hhigh = (unsigned long)(tlow >> HOST_LONG_BITS);
+> +#endif
+> +}
+> +
+>  static struct iovec *lock_iovec(int type, abi_ulong target_addr,
+>                                  abi_ulong count, int copy)
+>  {
+> @@ -10449,7 +10466,10 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>          {
+>              struct iovec *vec = lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
+>              if (vec != NULL) {
+> -                ret = get_errno(safe_preadv(arg1, vec, arg3, arg4, arg5));
+> +                unsigned long low, high;
+> +
+> +                target_low_high_to_host_low_high(arg4, arg5, &low, &high);
+> +                ret = get_errno(safe_preadv(arg1, vec, arg3, low, high));
+>                  unlock_iovec(vec, arg2, arg3, 1);
+>              } else {
+>                  ret = -host_to_target_errno(errno);
+> @@ -10462,7 +10482,10 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>          {
+>              struct iovec *vec = lock_iovec(VERIFY_READ, arg2, arg3, 1);
+>              if (vec != NULL) {
+> -                ret = get_errno(safe_pwritev(arg1, vec, arg3, arg4, arg5));
+> +                unsigned long low, high;
+> +
+> +                target_low_high_to_host_low_high(arg4, arg5, &low, &high);
+> +                ret = get_errno(safe_pwritev(arg1, vec, arg3, low, high));
+>                  unlock_iovec(vec, arg2, arg3, 0);
+>              } else {
+>                  ret = -host_to_target_errno(errno);
+> 
 
-Regression test against ppa looked good tonight.
+Did you try to use the regpairs_aligned() and target_offset64()
+functions as it is done for pread64(), pwrite64(), fadvise64(),... ?
 
-There are new changes which I need to add for two more bugs.
-But testing from the ppa is ok right now already.
-
-@Luke: Please test against this PPA, as I want to ensure it is working
-for your case before pushing to Bionic.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
-
-Title:
-  static linux-user ARM emulation has several-second startup time
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+Thanks,
+Laurent
