@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f42MP-0007kz-S6
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 06:43:19 -0400
+	(envelope-from <pagupta@redhat.com>) id 1f42S8-0001qR-Ts
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 06:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f42MM-0000mA-Le
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 06:43:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60726 helo=mx1.redhat.com)
+	(envelope-from <pagupta@redhat.com>) id 1f42S7-0003fQ-KR
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 06:49:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60500 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f42MM-0000ls-Gs
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 06:43:14 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  5 Apr 2018 12:43:03 +0200
-Message-Id: <1522924983-4523-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/sparc/sun4m: Fix problems with device
- introspection
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1f42S7-0003fJ-Fw
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 06:49:11 -0400
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Thu,  5 Apr 2018 16:18:31 +0530
+Message-Id: <20180405104834.10457-1-pagupta@redhat.com>
+Subject: [Qemu-devel] [RFC 0/2] kvm "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,180 +21,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org
+Cc: jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, marcel@redhat.com, mst@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, pagupta@redhat.com
 
-Several devices of the sun4m machines are using &error_fatal in
-their instance_init function and thus can cause QEMU to abort
-unexpectedly:
+We are sharing RFC version of 'fake DAX' flushing
+interface for feedback. This is still work in progress
+and not yet ready for merging.
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'openprom'}}" \
-       | sparc-softmmu/qemu-system-sparc -M SS-10 -S -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-RAMBlock "sun4m.prom" already registered, abort!
-Aborted (core dumped)
+Prototype implements two major parts:
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'macio_idreg'}}" \
-       | sparc-softmmu/qemu-system-sparc -M SS-10 -S -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-RAMBlock "sun4m.idreg" already registered, abort!
-Aborted (core dumped)
+- Qemu virtio-pmem device
+  It exposes a persistent memory range to KVM guest which at host side is file
+  backed memory and works as persistent memory device. In addition to this it
+  provides a virtio flushing interface for KVM guest to do a Qemu side sync for
+  guest DAX persistent memory range.  
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'tcx_afx'}}" \
-       | sparc-softmmu/qemu-system-sparc -M SS-5 -S -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-RAMBlock "sun4m.afx" already registered, abort!
-Aborted (core dumped)
+- Guest virtio-pmem driver
+  Reads persistent memory range from paravirt device and registers with 'nvdimm_bus'.
+  'nvdimm/pmem' driver uses this information to allocate persistent memory range. 
+  Also, we have implemented guest side of VIRTIO flushing interface.
+  
+Changes from previous RFC:
 
-Fix the issues by converting the instance_init functions into realize()
-functions instead, which are allowed to fail (and not called during
-device introspection).
+- Reuse existing 'pmem' code instead of creating an entirely new block driver.
+- Use VIRTIO driver to register memory information with nvdimm_bus and create
+  region_type accordingly. 
+- Use VIRTIO flushing interface from existing pmem driver code based on
+  registered flushign mechanism.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/sparc/sun4m.c | 67 ++++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 50 insertions(+), 17 deletions(-)
+We have done the implementation based on suggestions here [1]. Previous RFC is
+shared here [2]. Details of project idea for 'fake DAX' flushing is shared 
+here [3] & [4].
 
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 6471aca..8254ec3 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -572,23 +572,36 @@ typedef struct IDRegState {
-     MemoryRegion mem;
- } IDRegState;
- 
--static void idreg_init1(Object *obj)
-+static void idreg_realize(DeviceState *ds, Error **errp)
- {
--    IDRegState *s = MACIO_ID_REGISTER(obj);
--    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+    IDRegState *s = MACIO_ID_REGISTER(ds);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
-+    Error *local_err = NULL;
-+
-+    memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.idreg",
-+                                     sizeof(idreg_data), &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
- 
--    memory_region_init_ram_nomigrate(&s->mem, obj,
--                           "sun4m.idreg", sizeof(idreg_data), &error_fatal);
-     vmstate_register_ram_global(&s->mem);
-     memory_region_set_readonly(&s->mem, true);
-     sysbus_init_mmio(dev, &s->mem);
- }
- 
-+static void idreg_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = idreg_realize;
-+}
-+
- static const TypeInfo idreg_info = {
-     .name          = TYPE_MACIO_ID_REGISTER,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(IDRegState),
--    .instance_init = idreg_init1,
-+    .class_init    = idreg_class_init,
- };
- 
- #define TYPE_TCX_AFX "tcx_afx"
-@@ -613,21 +626,35 @@ static void afx_init(hwaddr addr)
-     sysbus_mmio_map(s, 0, addr);
- }
- 
--static void afx_init1(Object *obj)
-+static void afx_realize(DeviceState *ds, Error **errp)
- {
--    AFXState *s = TCX_AFX(obj);
--    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+    AFXState *s = TCX_AFX(ds);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
-+    Error *local_err = NULL;
-+
-+    memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.afx", 4,
-+                                     &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
- 
--    memory_region_init_ram_nomigrate(&s->mem, obj, "sun4m.afx", 4, &error_fatal);
-     vmstate_register_ram_global(&s->mem);
-     sysbus_init_mmio(dev, &s->mem);
- }
- 
-+static void afx_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = afx_realize;
-+}
-+
- static const TypeInfo afx_info = {
-     .name          = TYPE_TCX_AFX,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(AFXState),
--    .instance_init = afx_init1,
-+    .class_init    = afx_class_init,
- };
- 
- #define TYPE_OPENPROM "openprom"
-@@ -680,13 +707,19 @@ static void prom_init(hwaddr addr, const char *bios_name)
-     }
- }
- 
--static void prom_init1(Object *obj)
-+static void prom_realize(DeviceState *ds, Error **errp)
- {
--    PROMState *s = OPENPROM(obj);
--    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+    PROMState *s = OPENPROM(ds);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
-+    Error *local_err = NULL;
-+
-+    memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4m.prom",
-+                                     PROM_SIZE_MAX, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
- 
--    memory_region_init_ram_nomigrate(&s->prom, obj, "sun4m.prom", PROM_SIZE_MAX,
--                           &error_fatal);
-     vmstate_register_ram_global(&s->prom);
-     memory_region_set_readonly(&s->prom, true);
-     sysbus_init_mmio(dev, &s->prom);
-@@ -701,6 +734,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->props = prom_properties;
-+    dc->realize = prom_realize;
- }
- 
- static const TypeInfo prom_info = {
-@@ -708,7 +742,6 @@ static const TypeInfo prom_info = {
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(PROMState),
-     .class_init    = prom_class_init,
--    .instance_init = prom_init1,
- };
- 
- #define TYPE_SUN4M_MEMORY "memory"
--- 
-1.8.3.1
+[1] https://marc.info/?l=linux-mm&m=150782346802290&w=2
+[2] https://marc.info/?l=kvm&m=151630416506527&w=2
+[3] https://www.spinics.net/lists/kvm/msg149761.html
+[4] https://www.spinics.net/lists/kvm/msg153095.html
+
+Work yet to be done:
+
+- Qemu RAM address handling independent of PC-DIMM so that memory
+  operations(get_free_address) can be used for VIRTIO device type as well. 
+  (David Hildenbrand CCed has a prototype for this).
+- Qemu device flush functionality trigger with guest fsync on file.
+- Qemu live migration work when host page cache is used.
+- Multiple virtio-pmem disks support.
+- Prepare virtio spec after we get feedback on current approach.
+
+ drivers/nvdimm/region_devs.c     |    7 ++
+ drivers/virtio/Kconfig           |   12 +++
+ drivers/virtio/Makefile          |    1 
+ drivers/virtio/virtio_pmem.c     |  122 +++++++++++++++++++++++++++++++++++++++
+ include/linux/libnvdimm.h        |    2 
+ include/uapi/linux/virtio_ids.h  |    1 
+ include/uapi/linux/virtio_pmem.h |   61 +++++++++++++++++++
+ 7 files changed, 206 insertions(+)
