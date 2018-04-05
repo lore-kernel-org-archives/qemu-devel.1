@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f446N-0005vW-EK
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:34:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f446p-0006Cd-9q
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f446I-0005qf-D5
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:34:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52044 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f446I-0005qW-7Y
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:34:46 -0400
-Date: Thu, 5 Apr 2018 13:34:31 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180405123431.GI32222@stefanha-x1.localdomain>
-References: <20180403050115.6037-1-peterx@redhat.com>
-	<20180404142220.GT4467@stefanha-x1.localdomain>
-	<3d6c0d02-60ab-3501-611e-cd5f881d59e3@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1f446o-0005wl-Bq
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:35:19 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38669)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f446o-0005wd-5S
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:35:18 -0400
+Received: by mail-ot0-x244.google.com with SMTP id o9-v6so26993149otj.5
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 05:35:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PWfwoUCx3AFJRUBq"
-Content-Disposition: inline
-In-Reply-To: <3d6c0d02-60ab-3501-611e-cd5f881d59e3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] monitor: bind dispatch bh to
- iohandler context
+In-Reply-To: <20180404142505.4mpvautvlqemjlpp@sirius.home.kraxel.org>
+References: <20180319161556.16446-1-peter.maydell@linaro.org>
+	<CAFEAcA8trs8tMKBqbOLaNx4OR9H9+xO4jJQjY2+yeCNdsdCBCA@mail.gmail.com>
+	<20180404142505.4mpvautvlqemjlpp@sirius.home.kraxel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Apr 2018 13:34:57 +0100
+Message-ID: <CAFEAcA_psOOs6f+hgdcB0qT1M+O+X2P1aBKysPfdAqSc6nAMyA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12 0/2] bcm2835_sdhost:
+ fix interrupt handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Peter Xu <peterx@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Pekka Enberg <penberg@iki.fi>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, "patches@linaro.org" <patches@linaro.org>
 
+On 4 April 2018 at 15:25, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On Wed, Apr 04, 2018 at 11:18:23AM +0100, Peter Maydell wrote:
+>> Ping for code review, please? It would be nice if our 'raspi3'
+>> model for 2.12 was one we could say actually booted a known
+>> Linux image...
+>
+> The Fedora 27 image kernel (aarch64, 4.13) boots and mounts the root
+> filesystem.  This is an improvement, so:
+>
+> Tested-by: Gerd Hoffmann <kraxel@redhat.com>
+>
+> It doesn't finish boot though, at some point the kernel starts to
+> complain about timeouts and xfs throws io errors, so things are not
+> perfect yet.
+>
+> raspi2 doesn't boot the fedora 27 armhfp kernel.  Looks unrelated
+> though, it fails with "Division by zero in kernel" before even loading
+> the sdhost driver.  I suspect the kernel tries to access some hardware
+> not emulated by qemu ...
+>
+> Trying to run u-boot as boot-loader (so I don't have to copy the kernel
+> from the image) doesn't work too.
 
---PWfwoUCx3AFJRUBq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for the testing. I've applied this series to target-arm.next
+for 2.12 (with minor tweaks as per code review).
 
-On Wed, Apr 04, 2018 at 10:07:34AM -0500, Eric Blake wrote:
-> On 04/04/2018 09:22 AM, Stefan Hajnoczi wrote:
-> > On Tue, Apr 03, 2018 at 01:01:15PM +0800, Peter Xu wrote:
-> >> Eric Auger reported the problem days ago that OOB broke ARM when runni=
-ng
-> >> with libvirt:
-> >>
-> >> http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
-> >>
-> >> This patch fixes the problem.
-> >>
-> >> It's not really needed now since we have turned OOB off now, but it's
-> >> still a bug fix, and it'll start to work when we turn OOB on for ARM.
-> >>
-> >> The problem was that the monitor dispatcher bottom half was bound to
-> >> qemu_aio_context, but that context seems to be for block only.
-> >=20
-> > No, it is not block-only.  iohandler_ctx is for the legacy
-> > qemu_set_fd_handler() API only and modern code should use
-> > qemu_aio_context.
-> >=20
-> > The difference between qemu_aio_context and iohandler_ctx is that
-> > aio_poll(qemu_aio_context) does not process iohandler_ctx (since it's a
-> > difference context).  That is the legacy behavior that
-> > qemu_set_fd_handler() expects and it's implemented by keeping a separate
-> > iohandler_ctx.
->=20
-> Do I need to put a hold on my pull request while we come to a better
-> understanding of root cause, or is this patch still okay to include?
+I have a blog post pending which describes how to boot a Debian
+image on the raspi3 model, which I'll publish once this hits
+master.
 
-The cover letter says this patch is not critical for 2.12:
-
-"It's not really needed now since we have turned OOB off now, but it's
-still a bug fix, and it'll start to work when we turn OOB on for ARM."
-
-Please hold off until the nature of the bug is understood.
-
-Thanks,
-Stefan
-
---PWfwoUCx3AFJRUBq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaxhfWAAoJEJykq7OBq3PIeQkH/1bakMsUhgxpxaqGY+s+RNTJ
-vdP8Txs6PVE30Sn8KNAOqYBaN+QQqz8zI7V5bMyu41KWCfv/zlSWTD0LUlw/LrDp
-UX8KyBR2Uk9vTpFh7IN/f9L25O5GpiKHqR74ST1D0kJ2MqjEDXx+ko+n5mzzLfiO
-pi/4VUvHls+70L/8l/OSGRjPu9RCHt2elIq1tTCvHLxTtYTPXb9qJTz/pMOySMj2
-ncht3JRc+C0Xo54pRXRrBi/bMqtvtYVDc0KIO/EgQ7rUM/hUPAL98o5i+/GR6vbc
-YF/FBAavhXx9poUj1DxC9A4q4SiWm9CC2pHhxSF8Dwrg1Tk/6CU8FxgdUdKhsaU=
-=kSMr
------END PGP SIGNATURE-----
-
---PWfwoUCx3AFJRUBq--
+thanks
+-- PMM
