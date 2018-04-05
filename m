@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f3uQL-0001XQ-Ej
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uQL-0001XW-Hd
 	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f3uQG-0000ro-Oi
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uQH-0000sH-5m
 	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:49 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  5 Apr 2018 12:14:24 +1000
-Message-Id: <20180405021437.16761-1-david@gibson.dropbear.id.au>
+Date: Thu,  5 Apr 2018 12:14:27 +1000
+Message-Id: <20180405021437.16761-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20180405021437.16761-1-david@gibson.dropbear.id.au>
+References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.13 00/13] target/ppc: Assorted cpu
- cleanups (esp. hash64 MMU)
+Subject: [Qemu-devel] [PATCH for-2.13 03/13] target/ppc: Pass cpu instead of
+ env to ppc_create_page_sizes_prop()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +26,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, groug@kaod.org
 Cc: qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-Here's a set of cleanups for the ppc cpu code.  Most are related
-specifically to the 64-bit hash MMU, but there are some others as
-well.
+As a rule we prefer to pass PowerPCCPU instead of CPUPPCState, and this
+change will make some things simpler later on.
 
-In particular it establishes a new structure PPCHash64Options which
-contains details of the hash64 mmu which can vary from one cpu to
-another.  This attempts to gather such options in one place, instead
-of spreading them around various bits of env->mmu_model as well as
-other fields.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/fdt.c         | 5 +++--
+ hw/ppc/pnv.c         | 4 ++--
+ hw/ppc/spapr.c       | 4 ++--
+ include/hw/ppc/fdt.h | 2 +-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
-Most of these arose while I was looking to improve the way we handle
-available page sizes for the pseries machine type, although they're
-mostly not closely tied to that.
-
-Changes since RFC:
-  * Added an extra patch folding slb_nr into the new scheme
-  * Assorted minor fixes based on feedback
-
-David Gibson (13):
-  target/ppc: Standardize instance_init and realize function names
-  target/ppc: Simplify cpu valid check in ppc_cpu_realize
-  target/ppc: Pass cpu instead of env to ppc_create_page_sizes_prop()
-  target/ppc: Avoid taking "env" parameter to mmu-hash64 functions
-  target/ppc: Remove fallback 64k pagesize information
-  target/ppc: Move page size setup to helper function
-  target/ppc: Split page size information into a separate allocation
-  target/ppc: Make hash64_opts field mandatory for 64-bit hash MMUs
-  target/ppc: Move 1T segment and AMR options to PPCHash64Options
-  target/ppc: Fold ci_large_pages flag into PPCHash64Options
-  target/ppc: Remove unnecessary POWERPC_MMU_V3 flag from mmu_model
-  target/ppc: Get rid of POWERPC_MMU_VER() macros
-  target/ppc: Fold slb_nr into PPCHash64Options
-
- hw/ppc/fdt.c                |   7 +-
- hw/ppc/pnv.c                |   9 +--
- hw/ppc/spapr.c              |  20 +++---
- include/hw/ppc/fdt.h        |   2 +-
- target/ppc/cpu-qom.h        |  27 ++------
- target/ppc/cpu.h            |  30 ++-------
- target/ppc/kvm.c            |  31 ++++-----
- target/ppc/machine.c        |  23 ++++++-
- target/ppc/mmu-hash64.c     | 152 +++++++++++++++++++++++++++++++-------=
-------
- target/ppc/mmu-hash64.h     |  48 +++++++++++++-
- target/ppc/mmu_helper.c     |  24 +++----
- target/ppc/translate.c      |  12 ++--
- target/ppc/translate_init.c | 126 +++++++-----------------------------
- 13 files changed, 263 insertions(+), 248 deletions(-)
-
+diff --git a/hw/ppc/fdt.c b/hw/ppc/fdt.c
+index 2ffc5866e4..2721603ffa 100644
+--- a/hw/ppc/fdt.c
++++ b/hw/ppc/fdt.c
+@@ -13,9 +13,10 @@
+ #include "hw/ppc/fdt.h"
+=20
+ #if defined(TARGET_PPC64)
+-size_t ppc_create_page_sizes_prop(CPUPPCState *env, uint32_t *prop,
+-                                     size_t maxsize)
++size_t ppc_create_page_sizes_prop(PowerPCCPU *cpu, uint32_t *prop,
++                                  size_t maxsize)
+ {
++    CPUPPCState *env =3D &cpu->env;
+     size_t maxcells =3D maxsize / sizeof(uint32_t);
+     int i, j, count;
+     uint32_t *p =3D prop;
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 98ee3c607a..5a79b24828 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -209,8 +209,8 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, v=
+oid *fdt)
+         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
+     }
+=20
+-    page_sizes_prop_size =3D ppc_create_page_sizes_prop(env, page_sizes_=
+prop,
+-                                                  sizeof(page_sizes_prop=
+));
++    page_sizes_prop_size =3D ppc_create_page_sizes_prop(cpu, page_sizes_=
+prop,
++                                                      sizeof(page_sizes_=
+prop));
+     if (page_sizes_prop_size) {
+         _FDT((fdt_setprop(fdt, offset, "ibm,segment-page-sizes",
+                            page_sizes_prop, page_sizes_prop_size)));
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e764f999c5..14c31f82fa 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -581,8 +581,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
+*fdt, int offset,
+         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
+     }
+=20
+-    page_sizes_prop_size =3D ppc_create_page_sizes_prop(env, page_sizes_=
+prop,
+-                                                  sizeof(page_sizes_prop=
+));
++    page_sizes_prop_size =3D ppc_create_page_sizes_prop(cpu, page_sizes_=
+prop,
++                                                      sizeof(page_sizes_=
+prop));
+     if (page_sizes_prop_size) {
+         _FDT((fdt_setprop(fdt, offset, "ibm,segment-page-sizes",
+                           page_sizes_prop, page_sizes_prop_size)));
+diff --git a/include/hw/ppc/fdt.h b/include/hw/ppc/fdt.h
+index bd5b0a8c3d..a8cd85069f 100644
+--- a/include/hw/ppc/fdt.h
++++ b/include/hw/ppc/fdt.h
+@@ -23,7 +23,7 @@
+         }                                                          \
+     } while (0)
+=20
+-size_t ppc_create_page_sizes_prop(CPUPPCState *env, uint32_t *prop,
++size_t ppc_create_page_sizes_prop(PowerPCCPU *cpu, uint32_t *prop,
+                                   size_t maxsize);
+=20
+ #endif /* PPC_FDT_H */
 --=20
 2.14.3
