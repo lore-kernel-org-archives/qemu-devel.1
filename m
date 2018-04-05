@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f48o8-000189-IU
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:36:21 -0400
+	(envelope-from <jan.kiszka@web.de>) id 1f48ta-0003mN-QO
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f48o3-0000TR-Qk
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:36:20 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180405172554.27401-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <aef5b809-2cac-1490-239f-47ef97496133@amsat.org>
-Date: Thu, 5 Apr 2018 14:36:12 -0300
+	(envelope-from <jan.kiszka@web.de>) id 1f48tV-0004EB-Se
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:41:58 -0400
+Received: from mout.web.de ([212.227.17.11]:52609)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1f48tV-0004DQ-HX
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:41:53 -0400
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <bfb309be-3ef4-bd01-b4f8-3ebdeaa64374@web.de>
+Date: Thu, 5 Apr 2018 19:41:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180405172554.27401-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12] target/arm: Report
- unsupported MPU region sizes more clearly
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] e1000e: Prevent MSI/MSI-X storms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 04/05/2018 02:25 PM, Peter Maydell wrote:
-> Currently our PMSAv7 and ARMv7M MPU implementation cannot handle
-> MPU region sizes smaller than our TARGET_PAGE_SIZE. However we
-> report that in a slightly confusing way:
-> 
->  DRSR[3]: No support for MPU (sub)region alignment of 9 bits. Minimum is 10
-> 
-> The problem is not the alignment of the region, but its size;
-> tweak the error message to say so:
->  DRSR[3]: No support for MPU (sub)region size of 512 bytes. Minimum is 1024.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Only signal MSI/MSI-X events on rising edges. So far we re-triggered the
+interrupt sources even if the guest did no consumed the pending one,
+easily causing interrupt storms.
 
-> ---
-> This doesn't really need to go into 2.12, but as a cleanup to a warning
-> message it's pretty harmless.
-> 
->  target/arm/helper.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index dcb8476d9e..b14fdab140 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -9625,9 +9625,9 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->              }
->              if (rsize < TARGET_PAGE_BITS) {
->                  qemu_log_mask(LOG_UNIMP,
-> -                              "DRSR[%d]: No support for MPU (sub)region "
-> -                              "alignment of %" PRIu32 " bits. Minimum is %d\n",
-> -                              n, rsize, TARGET_PAGE_BITS);
-> +                              "DRSR[%d]: No support for MPU (sub)region size of"
-> +                              " %" PRIu32 " bytes. Minimum is %d.\n",
-> +                              n, (1 << rsize), TARGET_PAGE_SIZE);
->                  continue;
->              }
->              if (srdis) {
-> 
+Issue was observable with Linux 4.16 e1000e driver when MSI-X was used.
+Vector 2 was causing interrupt storms after the driver activated the
+device.
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+
+Changes in v2:
+ - also update msi_causes_pending after EIAC changes (required because
+   there is no e1000e_update_interrupt_state after that
+
+ hw/net/e1000e_core.c | 11 +++++++++++
+ hw/net/e1000e_core.h |  2 ++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index c93c4661ed..d6ddd59986 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -2027,6 +2027,7 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
+     }
+ 
+     core->mac[ICR] &= ~effective_eiac;
++    core->msi_causes_pending &= ~effective_eiac;
+ 
+     if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+         core->mac[IMS] &= ~effective_eiac;
+@@ -2123,6 +2124,13 @@ e1000e_send_msi(E1000ECore *core, bool msix)
+ {
+     uint32_t causes = core->mac[ICR] & core->mac[IMS] & ~E1000_ICR_ASSERTED;
+ 
++    core->msi_causes_pending &= causes;
++    causes ^= core->msi_causes_pending;
++    if (causes == 0) {
++        return;
++    }
++    core->msi_causes_pending |= causes;
++
+     if (msix) {
+         e1000e_msix_notify(core, causes);
+     } else {
+@@ -2160,6 +2168,9 @@ e1000e_update_interrupt_state(E1000ECore *core)
+     core->mac[ICS] = core->mac[ICR];
+ 
+     interrupts_pending = (core->mac[IMS] & core->mac[ICR]) ? true : false;
++    if (!interrupts_pending) {
++        core->msi_causes_pending = 0;
++    }
+ 
+     trace_e1000e_irq_pending_interrupts(core->mac[ICR] & core->mac[IMS],
+                                         core->mac[ICR], core->mac[IMS]);
+diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
+index 7d8ff41890..63a15510cc 100644
+--- a/hw/net/e1000e_core.h
++++ b/hw/net/e1000e_core.h
+@@ -109,6 +109,8 @@ struct E1000Core {
+     NICState *owner_nic;
+     PCIDevice *owner;
+     void (*owner_start_recv)(PCIDevice *d);
++
++    uint32_t msi_causes_pending;
+ };
+ 
+ void
+-- 
+2.13.6
