@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f44Eo-0001l7-HU
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:43:35 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f44O5-0005l9-1i
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f44En-0000dk-Nf
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:43:34 -0400
-Date: Thu, 5 Apr 2018 14:43:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180405124317.GC4077@localhost.localdomain>
-References: <5ac0b76e-213a-60c3-c010-87512d3a564a@redhat.com>
-	<20180212135206.GG5103@localhost.localdomain>
-	<81af35f9-4934-0c21-e3b1-b27c2fa7fdd9@redhat.com>
-	<20180212143040.GH5103@localhost.localdomain>
-	<3d6031b0-7d75-c3ab-e466-ce3d87d630df@redhat.com>
-	<20180212144824.GI5103@localhost.localdomain>
-	<31e295bd-3012-c34c-a96d-54122557b20c@redhat.com>
-	<2d47ca9e-6f68-ab4e-0ec0-9f932128a93f@redhat.com>
-	<20180312115846.GC31537@localhost.localdomain>
-	<9aed83cb-e718-3d47-87e1-f66a1c5c7c1a@redhat.com>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f44O4-0005g5-BA
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:53:09 -0400
+Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:39806)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f44O4-0005fp-6P
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 08:53:08 -0400
+Received: by mail-yb0-x244.google.com with SMTP id g197-v6so6499888ybf.6
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 05:53:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9aed83cb-e718-3d47-87e1-f66a1c5c7c1a@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] scsi: add block job
- opblockers for scsi-block
+In-Reply-To: <e1b21f62-098d-405d-40b8-fac6bdf941df@linaro.org>
+References: <20180405014135.3235-1-jcmvbkbc@gmail.com>
+	<e1b21f62-098d-405d-40b8-fac6bdf941df@linaro.org>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 5 Apr 2018 05:53:06 -0700
+Message-ID: <CAMo8BfLXdomti0MDeUtjLLV7XwHPYSCmnQsdOdiK3m0hsz1g=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix preadv/pwritev offsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Am 05.04.2018 um 13:59 hat Paolo Bonzini geschrieben:
-> On 12/03/2018 12:58, Kevin Wolf wrote:
-> >> - users of dirty bitmaps would call use perm/shared_perm as in your
-> >> message above
-> >>
-> >> - dirty bitmaps creation calls bdrv_get_cumulative_perm (which should
-> >> now become public) and checks that it doesn't have BLK_PERM_BYPASS in
-> >> shared_perm
-> > 
-> > My proposal was really that users of dirty bitmaps don't change
-> > anything, but we do everything in the dirty bitmap implementation. Dirty
-> > bitmap creation would add a BdrvChild with the above permissions.
-> > Deleting a dirty bitmap would remove the BdrvChild again.
-> 
-> This is also better because it works if somebody requests
-> BLK_PERM_BYPASS after dirty bitmap creation.
-> 
-> However, is there any better way than also creating a dummy BlockDriver
-> and BlockDriverState?  I first thought of a root role similar to
-> BlockBackend's, but BdrvChildRole doesn't have a way to inject its own
-> permissions.  I then tried moving bdrv_child_perm to BdrvChildRole, and
-> that almost works except that child_backing has special requirements
-> (mostly due to commit_top and mirror_top's special block drivers).
+On Wed, Apr 4, 2018 at 8:43 PM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 04/05/2018 11:41 AM, Max Filippov wrote:
+>> +static void target_low_high_to_host_low_high(abi_ulong tlow,
+>> +                                             abi_ulong thigh,
+>> +                                             unsigned long *hlow,
+>> +                                             unsigned long *hhigh)
+>> +{
+>> +#if TARGET_LONG_BITS == HOST_LONG_BITS
+>> +        *hlow = tlow;
+>> +        *hhigh = thigh;
+>> +#elif TARGET_LONG_BITS < HOST_LONG_BITS
+>> +        *hlow = tlow | (unsigned long)thigh << TARGET_LONG_BITS;
+>> +        *hhigh = 0;
+>> +#else
+>> +        *hlow = (unsigned long)tlow;
+>> +        *hhigh = (unsigned long)(tlow >> HOST_LONG_BITS);
+>> +#endif
+>
+> It might still be worth a check for HOST_LONG_BITS >= 2 * TARGET_LONG_BITS and
+> #error otherwise.  Or explicit checks vs 32 & 64 if you like.
 
-Have a look at block_job_add_bdrv(), which does the same thing to
-restrict permissions while a block job is working on the subchain.
+Ok, will do in v3.
 
-Essentially, yes, you'll probably have a new BdrvChildRole (I suppose
-with .stay_at_node = true and .get_parent_desc only), but the place
-where you specify the permissions is the bdrv_root_attach_child() call.
-When you're done, you call bdrv_root_unref_child().
-
-Kevin
-
-> Perhaps child_perm should be in BdrvChildRole and BlockDriverState
-> should only have a bdrv_get_backing_perm (called by
-> child_backing.child_perm).  This makes sense to me since those
-> permissions are specific to the driver, e.g. whether it has metadata at
-> all.  But this becomes 2.13 material.
-> 
-> Do you still object to the two opblocker patches?
-> 
-> Paolo
+-- 
+Thanks.
+-- Max
