@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f45qH-0004BH-Af
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 10:26:22 -0400
+	(envelope-from <spopovyc@redhat.com>) id 1f45zF-0007RJ-ID
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 10:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f45qC-00062D-E7
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 10:26:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56168 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f45qC-00060o-8o
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 10:26:16 -0400
-Date: Thu, 5 Apr 2018 15:26:06 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180405142606.GB28352@stefanha-x1.localdomain>
-References: <1522856003-26861-1-git-send-email-thuth@redhat.com>
-	<39b47744-c5fb-f541-0e68-62d50bd85e5b@redhat.com>
-	<62cabc20-dd16-07ae-5395-5e6f6f4d6135@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uXxzq0nDebZQVNAZ"
-Content-Disposition: inline
-In-Reply-To: <62cabc20-dd16-07ae-5395-5e6f6f4d6135@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.13 0/2] net: Get rid of 'vlan'
- terminology and use 'hub' instead
+	(envelope-from <spopovyc@redhat.com>) id 1f45zB-0001Qg-KU
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 10:35:37 -0400
+From: Serhii Popovych <spopovyc@redhat.com>
+Date: Thu,  5 Apr 2018 10:35:23 -0400
+Message-Id: <1522938923-96058-3-git-send-email-spopovyc@redhat.com>
+In-Reply-To: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
+References: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.13 2/2] spapr: Add ibm,
+ max-associativity-domains property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +20,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
+Now recent kernels (i.e. since linux-stable commit a346137e9142
+("powerpc/numa: Use ibm,max-associativity-domains to discover possible nodes")
+support this property to mark initially memory-less NUMA nodes as "possible"
+to allow further memory hot-add to them.
 
---uXxzq0nDebZQVNAZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Advertise this property for pSeries machines to let guest kernels detect
+maximum supported node configuration and benefit from kernel side change
+when hot-add memory to specific, possibly empty before, NUMA node.
 
-On Wed, Apr 04, 2018 at 05:55:57PM +0200, Thomas Huth wrote:
-> On 04.04.2018 17:49, Paolo Bonzini wrote:
-> > On 04/04/2018 17:33, Thomas Huth wrote:
-> >> The 'vlan' term caused a lot of confusion in the past, so let's try
-> >> to switch to the better word "hub" everywhere where it is appropriate.
-> >> (Note: The CLI parameter "vlan=3Dxxx" still remains as is to not break=
- the
-> >> compatibility with older versions)
-> >>
-> >> Thomas Huth (2):
-> >>   net: Get rid of 'vlan' terminology and use 'hub' instead in the sour=
-ce
-> >>     files
-> >>   net: Get rid of 'vlan' terminology and use 'hub' instead in the doc
-> >>     files
-> >=20
-> > Bold proposal: remove 'vlan' property/suboption in 2.13, so that we can
-> > remove the "aka"s altogether.  Yes, it's early, but even though I've
-> > occasionally used vlans I've never used more than one...
->=20
-> Fine for me, too - if we all feel confident enough already for that. The
-> "vlan=3D..." parameter of "-net" has been declared as deprecated since
-> QEMU v2.9, so unless somebody sees an urgent need to still keep it, I
-> can add another patch to this series to remove it ("-net" will then only
-> work with the default hub #0).
+Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+---
+ hw/ppc/spapr.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Sound good to me.
-
-Stefan
-
---uXxzq0nDebZQVNAZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaxjH+AAoJEJykq7OBq3PI0bsIAMBx1t8pCCPPXaflZA6is6Pi
-eTuxyoYkm8b7nB88mZerQaamiNUOZTG9XhczJe2Gnpuid7GKGOv2aZGDj1cNZv+q
-408fHEvqzGTwAQen8qomZrESV9g3RF0UzQ6DdCx9/sGTXSibiIWfsG7JsIWdkaKx
-PC+UTsKJe2izG/IH7do5I/1utGY9ufiX+F7CZqP1cRKNkGwzunSayXVc9kHr5CLC
-jVdf7eTh+OGMd2XhTVQZpJjO3QtD6iLQAhB1J5+BAXAKYBkM6K0jNrlFyCy6D9iQ
-zMBq/Hs4CiXc51dA/CokymmIs0ikdpsFWZdHF+QNyCuGpMqVE3QTWYGdMP+Lju4=
-=2SEQ
------END PGP SIGNATURE-----
-
---uXxzq0nDebZQVNAZ--
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3ad4545..e02fc94 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -909,6 +909,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+         0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
+         cpu_to_be32(max_cpus / smp_threads),
+     };
++    uint32_t maxdomains[] = {
++        cpu_to_be32(5),
++        cpu_to_be32(0),
++        cpu_to_be32(0),
++        cpu_to_be32(0),
++        cpu_to_be32(nb_numa_nodes - 1),
++        cpu_to_be32(max_cpus - 1),
++    };
+ 
+     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+ 
+@@ -945,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+     _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+                      refpoints, sizeof(refpoints)));
+ 
++    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
++                     maxdomains, sizeof(maxdomains)));
++
+     _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
+                           RTAS_ERROR_LOG_MAX));
+     _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
+-- 
+1.8.3.1
