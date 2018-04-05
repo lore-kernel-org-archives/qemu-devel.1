@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f44aM-0003mc-Jp
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:05:51 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f44e4-0005QD-11
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f44aL-0004oe-LF
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:05:50 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42275)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1f44e3-00070N-4S
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:09:39 -0400
+Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:39928)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f44aL-0004nI-F2
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:05:49 -0400
-Received: by mail-oi0-x242.google.com with SMTP id l190-v6so22456796oig.9
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 06:05:49 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f44e2-000704-VT
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:09:39 -0400
+Received: by mail-yb0-x244.google.com with SMTP id g197-v6so6537162ybf.6
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 06:09:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1522908551-14885-1-git-send-email-thuth@redhat.com>
-References: <1522908551-14885-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Apr 2018 14:05:28 +0100
-Message-ID: <CAFEAcA81joSt3wNxaezi0ZzpOZm=Wt0TShcmQ0YtAYV+_ipeeA@mail.gmail.com>
+In-Reply-To: <a8f34bc8-fb07-94d2-c906-e17ee2b4595c@vivier.eu>
+References: <20180405014135.3235-1-jcmvbkbc@gmail.com>
+	<a8f34bc8-fb07-94d2-c906-e17ee2b4595c@vivier.eu>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 5 Apr 2018 06:09:37 -0700
+Message-ID: <CAMo8BfLL4B+mJLJfc0g9J=H52tAK4uETiJAuPnLhenRFs2sbfA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] hw/arm/fsl-imx: Fix introspection
- problem with fsl-imx6 and fsl-imx7
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix preadv/pwritev offsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On 5 April 2018 at 07:09, Thomas Huth <thuth@redhat.com> wrote:
-> QEMU currently exits unexpectedly when trying to introspect the fsl-imx6
-> and fsl-imx7 devices on systems with many SMP CPUs:
->
-> $ echo "{'execute':'qmp_capabilities'}"\
->        "{'execute':'device-list-properties',"\
->        " 'arguments':{'typename':'fsl,imx6'}}" \
->        | arm-softmmu/qemu-system-arm -M virt,accel=qtest -qmp stdio -smp 8
-> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->  "package": "build-all"}, "capabilities": []}}
-> {"return": {}}
-> fsl,imx6: Only 4 CPUs are supported (8 requested)
->
-> And:
->
-> $ echo "{'execute':'qmp_capabilities'}"\
->        "{'execute':'device-list-properties',"\
->        " 'arguments':{'typename':'fsl,imx7'}}" \
->        | arm-softmmu/qemu-system-arm -M raspi2,accel=qtest -qmp stdio
-> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->  "package": "build-all"}, "capabilities": []}}
-> {"return": {}}
-> fsl,imx7: Only 2 CPUs are supported (4 requested)
->
-> This happens because these devices are doing an exit() from their
-> instance_init function - which should never be done since instance_init
-> can be called at any time for device introspection! Fix it by moving
-> the deadly check into the realize() function instead.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Thu, Apr 5, 2018 at 2:03 AM, Laurent Vivier <laurent@vivier.eu> wrote:
+> Did you try to use the regpairs_aligned() and target_offset64()
+> functions as it is done for pread64(), pwrite64(), fadvise64(),... ?
 
+My understanding is that if the syscalls had single parameter that took
+two registers then it'd be a place to use regpairs_aligned. By the syscalls
+are defined as follows:
 
+SYSCALL_DEFINE5(preadv, unsigned long, fd, const struct iovec __user *, vec,
+                unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h)
 
-Applied to target-arm.next, thanks.
+SYSCALL_DEFINE5(pwritev, unsigned long, fd, const struct iovec __user *, vec,
+                unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h)
 
--- PMM
+so these are normal unsigned long arguments, low part, then the high part.
+target_offset64 treats arguments differently depending on the target
+endianness, which is not needed for preadv/pwritev.
+
+-- 
+Thanks.
+-- Max
