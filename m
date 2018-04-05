@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f3uQL-0001X4-7b
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uQL-0001Xn-S0
 	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f3uQJ-0000tW-GG
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uQJ-0000u6-UI
 	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:49 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  5 Apr 2018 12:14:28 +1000
-Message-Id: <20180405021437.16761-5-david@gibson.dropbear.id.au>
+Date: Thu,  5 Apr 2018 12:14:34 +1000
+Message-Id: <20180405021437.16761-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20180405021437.16761-1-david@gibson.dropbear.id.au>
 References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.13 04/13] target/ppc: Avoid taking "env"
- parameter to mmu-hash64 functions
+Subject: [Qemu-devel] [PATCH for-2.13 10/13] target/ppc: Fold ci_large_pages
+ flag into PPCHash64Options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,207 +26,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, groug@kaod.org
 Cc: qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-In most cases we prefer to pass a PowerPCCPU rather than the (embedded)
-CPUPPCState.
-
-For ppc_hash64_update_{rmls,vrma}() change to take "cpu" instead of "env"=
-.
-For ppc_hash64_set_{dsi,isi}() remove the redundant "env" parameter.
-
-In theory this makes more work for the functions, but since "cs", "cpu"
-and "env" are related by at most constant offsets, the compiler should be
-able to optimize out the difference at effectively zero cost.
-
-helper_*() functions are left alone - since they're more closely tied to
-the TCG generated code, passing "env" is still the standard there.
-
-While we're there, fix an incorrect indentation.
+The ci_large_pages boolean in CPUPPCState is only relevant to 64-bit hash
+MMU machines, indicating whether it's possible to map large (> 4kiB) page=
+s
+as cache-inhibitied (i.e. for IO, rather than memory).  Fold it as anothe=
+r
+flag into the PPCHash64Options structure.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mmu-hash64.c     | 35 +++++++++++++++++++----------------
- target/ppc/mmu-hash64.h     |  4 ++--
- target/ppc/translate_init.c |  4 ++--
- 3 files changed, 23 insertions(+), 20 deletions(-)
+ hw/ppc/spapr.c              | 3 +--
+ target/ppc/cpu.h            | 1 -
+ target/ppc/kvm.c            | 6 +++++-
+ target/ppc/mmu-hash64.c     | 2 +-
+ target/ppc/mmu-hash64.h     | 1 +
+ target/ppc/translate_init.c | 3 ---
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index c9b72b7429..a87fa7c83f 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -633,9 +633,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU =
-*cpu,
-     return 0;
- }
-=20
--static void ppc_hash64_set_isi(CPUState *cs, CPUPPCState *env,
--                               uint64_t error_code)
-+static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f86cb09080..60bc8417b6 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -263,7 +263,6 @@ static void spapr_populate_pa_features(sPAPRMachineSt=
+ate *spapr,
+                                        void *fdt, int offset,
+                                        bool legacy_guest)
  {
-+    CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
-     bool vpm;
-=20
-     if (msr_ir) {
-@@ -659,9 +659,9 @@ static void ppc_hash64_set_isi(CPUState *cs, CPUPPCSt=
-ate *env,
-     env->error_code =3D error_code;
- }
-=20
--static void ppc_hash64_set_dsi(CPUState *cs, CPUPPCState *env, uint64_t =
-dar,
--                               uint64_t dsisr)
-+static void ppc_hash64_set_dsi(CPUState *cs, uint64_t dar, uint64_t dsis=
-r)
- {
-+    CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
-     bool vpm;
-=20
-     if (msr_dr) {
-@@ -741,13 +741,13 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
-             } else {
-                 /* The access failed, generate the approriate interrupt =
-*/
-                 if (rwx =3D=3D 2) {
--                    ppc_hash64_set_isi(cs, env, SRR1_PROTFAULT);
-+                    ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-                     int dsisr =3D DSISR_PROTFAULT;
-                     if (rwx =3D=3D 1) {
-                         dsisr |=3D DSISR_ISSTORE;
-                     }
--                    ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-+                    ppc_hash64_set_dsi(cs, eaddr, dsisr);
-                 }
-                 return 1;
-             }
-@@ -783,7 +783,7 @@ skip_slb_search:
-=20
-     /* 3. Check for segment level no-execute violation */
-     if ((rwx =3D=3D 2) && (slb->vsid & SLB_VSID_N)) {
--        ppc_hash64_set_isi(cs, env, SRR1_NOEXEC_GUARD);
-+        ppc_hash64_set_isi(cs, SRR1_NOEXEC_GUARD);
-         return 1;
+-    CPUPPCState *env =3D &cpu->env;
+     uint8_t pa_features_206[] =3D { 6, 0,
+         0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+     uint8_t pa_features_207[] =3D { 24, 0,
+@@ -315,7 +314,7 @@ static void spapr_populate_pa_features(sPAPRMachineSt=
+ate *spapr,
+         return;
      }
 =20
-@@ -791,13 +791,13 @@ skip_slb_search:
-     ptex =3D ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
-     if (ptex =3D=3D -1) {
-         if (rwx =3D=3D 2) {
--            ppc_hash64_set_isi(cs, env, SRR1_NOPTE);
-+            ppc_hash64_set_isi(cs, SRR1_NOPTE);
-         } else {
-             int dsisr =3D DSISR_NOPTE;
-             if (rwx =3D=3D 1) {
-                 dsisr |=3D DSISR_ISSTORE;
-             }
--            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-+            ppc_hash64_set_dsi(cs, eaddr, dsisr);
-         }
-         return 1;
-     }
-@@ -824,7 +824,7 @@ skip_slb_search:
-             if (PAGE_EXEC & ~amr_prot) {
-                 srr1 |=3D SRR1_IAMR; /* Access violates virt pg class ke=
-y prot */
-             }
--            ppc_hash64_set_isi(cs, env, srr1);
-+            ppc_hash64_set_isi(cs, srr1);
-         } else {
-             int dsisr =3D 0;
-             if (need_prot[rwx] & ~pp_prot) {
-@@ -836,7 +836,7 @@ skip_slb_search:
-             if (need_prot[rwx] & ~amr_prot) {
-                 dsisr |=3D DSISR_AMR;
-             }
--            ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-+            ppc_hash64_set_dsi(cs, eaddr, dsisr);
-         }
-         return 1;
-     }
-@@ -942,8 +942,9 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, targe=
-t_ulong ptex,
-     cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_F=
-LUSH;
- }
-=20
--void ppc_hash64_update_rmls(CPUPPCState *env)
-+void ppc_hash64_update_rmls(PowerPCCPU *cpu)
- {
-+    CPUPPCState *env =3D &cpu->env;
-     uint64_t lpcr =3D env->spr[SPR_LPCR];
-=20
-     /*
-@@ -976,8 +977,9 @@ void ppc_hash64_update_rmls(CPUPPCState *env)
-     }
- }
-=20
--void ppc_hash64_update_vrma(CPUPPCState *env)
-+void ppc_hash64_update_vrma(PowerPCCPU *cpu)
- {
-+    CPUPPCState *env =3D &cpu->env;
-     const struct ppc_one_seg_page_size *sps =3D NULL;
-     target_ulong esid, vsid, lpcr;
-     ppc_slb_t *slb =3D &env->vrma_slb;
-@@ -1002,7 +1004,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
-     vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
-     esid =3D SLB_ESID_V;
-=20
--   for (i =3D 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-+    for (i =3D 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-         const struct ppc_one_seg_page_size *sps1 =3D &env->sps.sps[i];
-=20
-         if (!sps1->page_shift) {
-@@ -1028,6 +1030,7 @@ void ppc_hash64_update_vrma(CPUPPCState *env)
-=20
- void helper_store_lpcr(CPUPPCState *env, target_ulong val)
- {
-+    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-     uint64_t lpcr =3D 0;
-=20
-     /* Filter out bits */
-@@ -1089,6 +1092,6 @@ void helper_store_lpcr(CPUPPCState *env, target_ulo=
-ng val)
-         ;
-     }
-     env->spr[SPR_LPCR] =3D lpcr;
--    ppc_hash64_update_rmls(env);
--    ppc_hash64_update_vrma(env);
-+    ppc_hash64_update_rmls(cpu);
-+    ppc_hash64_update_vrma(cpu);
- }
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index d297b97d37..95a8c330d6 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -17,8 +17,8 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
-                                target_ulong pte0, target_ulong pte1);
- unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
-                                           uint64_t pte0, uint64_t pte1);
--void ppc_hash64_update_vrma(CPUPPCState *env);
--void ppc_hash64_update_rmls(CPUPPCState *env);
-+void ppc_hash64_update_vrma(PowerPCCPU *cpu);
-+void ppc_hash64_update_rmls(PowerPCCPU *cpu);
+-    if (env->ci_large_pages) {
++    if (ppc_hash64_has(cpu, PPC_HASH64_CI_LARGEPAGE)) {
+         /*
+          * Note: we keep CI large pages off by default because a 64K cap=
+able
+          * guest provisioned with large pages might otherwise try to map=
+ a qemu
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 1c5c33ca11..c0c44fb91d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1090,7 +1090,6 @@ struct CPUPPCState {
+ #if defined(TARGET_PPC64)
+     ppc_slb_t vrma_slb;
+     target_ulong rmls;
+-    bool ci_large_pages;
  #endif
 =20
- /*
+ #if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 22487cef06..fff2c601e0 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -448,7 +448,11 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+      * host page size is smaller than 64K.
+      */
+     if (smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL) {
+-        env->ci_large_pages =3D getpagesize() >=3D 0x10000;
++        if (getpagesize() >=3D 0x10000) {
++            cpu->hash64_opts->flags |=3D PPC_HASH64_CI_LARGEPAGE;
++        } else {
++            cpu->hash64_opts->flags &=3D ~PPC_HASH64_CI_LARGEPAGE;
++        }
+     }
+=20
+     /*
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index c9ee55e1ea..f341714550 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1128,7 +1128,7 @@ const PPCHash64Options ppc_hash64_opts_basic =3D {
+ };
+=20
+ const PPCHash64Options ppc_hash64_opts_POWER7 =3D {
+-    .flags =3D PPC_HASH64_1TSEG | PPC_HASH64_AMR,
++    .flags =3D PPC_HASH64_1TSEG | PPC_HASH64_AMR | PPC_HASH64_CI_LARGEPA=
+GE,
+     .sps =3D {
+         {
+             .page_shift =3D 12, /* 4K */
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index b2b5d25238..f1babb0afc 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -155,6 +155,7 @@ struct PPCHash64SegmentPageSizes {
+ struct PPCHash64Options {
+ #define PPC_HASH64_1TSEG        0x00001
+ #define PPC_HASH64_AMR          0x00002
++#define PPC_HASH64_CI_LARGEPAGE 0x00004
+     unsigned flags;
+     PPCHash64SegmentPageSizes sps[PPC_PAGE_SIZES_MAX_SZ];
+ };
 diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 2ae718242a..29bd6f3654 100644
+index ae005b2a54..a925cf5cd3 100644
 --- a/target/ppc/translate_init.c
 +++ b/target/ppc/translate_init.c
-@@ -8975,8 +8975,8 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHy=
-pervisor *vhyp)
-     env->spr[SPR_AMOR] =3D amor->default_value =3D 0xffffffffffffffffull=
-;
+@@ -8392,7 +8392,6 @@ static void init_proc_POWER7(CPUPPCState *env)
+ #if !defined(CONFIG_USER_ONLY)
+     env->slb_nr =3D 32;
+ #endif
+-    env->ci_large_pages =3D true;
+     env->dcache_line_size =3D 128;
+     env->icache_line_size =3D 128;
 =20
-     /* Update some env bits based on new LPCR value */
--    ppc_hash64_update_rmls(env);
--    ppc_hash64_update_vrma(env);
-+    ppc_hash64_update_rmls(cpu);
-+    ppc_hash64_update_vrma(cpu);
+@@ -8547,7 +8546,6 @@ static void init_proc_POWER8(CPUPPCState *env)
+ #if !defined(CONFIG_USER_ONLY)
+     env->slb_nr =3D 32;
+ #endif
+-    env->ci_large_pages =3D true;
+     env->dcache_line_size =3D 128;
+     env->icache_line_size =3D 128;
 =20
-     /* Tell KVM that we're in PAPR mode */
-     if (kvm_enabled()) {
+@@ -8748,7 +8746,6 @@ static void init_proc_POWER9(CPUPPCState *env)
+ #if !defined(CONFIG_USER_ONLY)
+     env->slb_nr =3D 32;
+ #endif
+-    env->ci_large_pages =3D true;
+     env->dcache_line_size =3D 128;
+     env->icache_line_size =3D 128;
+=20
 --=20
 2.14.3
