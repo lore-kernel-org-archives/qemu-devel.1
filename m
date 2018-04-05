@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1f3uJX-0006XZ-FE
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:07:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uQH-0001U9-M8
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1f3uJT-0006Sj-U6
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:07:47 -0400
-Received: from [107.173.13.209] (port=38860 helo=ozlabs.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1f3uJT-0006S5-Md
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:07:43 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu,  5 Apr 2018 12:07:38 +1000
-Message-Id: <20180405020738.35865-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu] spapr: Initialize reserved areas list in
- FDT in H_CAS handler
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uQG-0000rL-Ls
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:14:45 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu,  5 Apr 2018 12:14:26 +1000
+Message-Id: <20180405021437.16761-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20180405021437.16761-1-david@gibson.dropbear.id.au>
+References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH for-2.13 02/13] target/ppc: Simplify cpu valid
+ check in ppc_cpu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +20,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-ppc@nongnu.org, groug@kaod.org
+Cc: qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-At the moment the device tree produced by the H_CAS handler has no
-reserved map initialized at all which is not correct as at least one
-empty record is required to be present as a marker of the end.
-This does not cause problems now as the only consumer is SLOF which
-does not look at the reserved map area.
+The #if isn't necessary, because there's a suitable one inside
+ppc_cpu_is_valid().  We've already filtered for suitable cpu models in the
+functions that search and register them.  So by the time we get to realize
+having an invalid one indicates a code error, not a user error, so an
+assert() is more appropriate than error_setg().
 
-However when DTC's "Improve libfdt's memory safety" changeset hits
-the QEMU upstream, there will be errors reported and crashes observed.
-
-This fixes the problem by adding an empty entry to the reserved map,
-just like create_device_tree() does already.
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c | 1 +
- 1 file changed, 1 insertion(+)
+ target/ppc/translate_init.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2c0be8c..a81570e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -865,6 +865,7 @@ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
-     /* Create skeleton */
-     fdt_skel = g_malloc0(size);
-     _FDT((fdt_create(fdt_skel, size)));
-+    _FDT((fdt_finish_reservemap(fdt_skel)));
-     _FDT((fdt_begin_node(fdt_skel, "")));
-     _FDT((fdt_end_node(fdt_skel)));
-     _FDT((fdt_finish(fdt_skel)));
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 56b80a204a..2ae718242a 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9749,14 +9749,7 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+         }
+     }
+ 
+-#if defined(TARGET_PPCEMB)
+-    if (!ppc_cpu_is_valid(pcc)) {
+-        error_setg(errp, "CPU does not possess a BookE or 4xx MMU. "
+-                   "Please use qemu-system-ppc or qemu-system-ppc64 instead "
+-                   "or choose another CPU model.");
+-        goto unrealize;
+-    }
+-#endif
++    assert(ppc_cpu_is_valid(pcc));
+ 
+     create_ppc_opcodes(cpu, &local_err);
+     if (local_err != NULL) {
 -- 
-2.11.0
+2.14.3
