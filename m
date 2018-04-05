@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f3uSi-0003QJ-F1
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:17:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uVV-0005q6-8n
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:20:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f3uSe-0002Yg-3n
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:17:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f3uSd-0002YE-Qb
-	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:17:12 -0400
-Date: Wed, 4 Apr 2018 20:17:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180404201706.22af4643@t450s.home>
-In-Reply-To: <beaf3c80-767c-9fcf-2cc3-09a294d77c0c@ozlabs.ru>
-References: <1522873850-28733-1-git-send-email-eric.auger@redhat.com>
-	<20180404170950.54eb7975@w520.home>
-	<beaf3c80-767c-9fcf-2cc3-09a294d77c0c@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 2.12] vfio: Use a trace point when a
- RAM section cannot be DMA mapped
+	(envelope-from <dgibson@ozlabs.org>) id 1f3uVU-0003zK-1I
+	for qemu-devel@nongnu.org; Wed, 04 Apr 2018 22:20:09 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu,  5 Apr 2018 12:20:02 +1000
+Message-Id: <20180405022002.17809-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20180405022002.17809-1-david@gibson.dropbear.id.au>
+References: <20180405022002.17809-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv2 for-2.13 2/2] Add
+ host_memory_backend_pagesize() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +20,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org
+To: ehabkost@redhat.com, imammedo@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, 5 Apr 2018 10:53:38 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+There are a couple places (one generic, one target specific) where we need
+to get the host page size associated with a particular memory backend.  I
+have some upcoming code which will add another place which wants this.  So,
+for convenience, add a helper function to calculate this.
 
-> On 5/4/18 9:09 am, Alex Williamson wrote:
-> > On Wed,  4 Apr 2018 22:30:50 +0200
-> > Eric Auger <eric.auger@redhat.com> wrote:
-> >   
-> >> The 567b5b309abe ("vfio/pci: Relax DMA map errors for MMIO regions")
-> >> added an error message if a passed memory section address or size
-> >> is not aligned to the page size and thus cannot be DMA mapped.
-> >>
-> >> This patch fixes the trace by printing the region name and the
-> >> memory region section offset within the address space (instead of
-> >> offset_within_region).
-> >>
-> >> We also turn the error_report into a trace event. Indeed, In some
-> >> cases, the traces can be confusing to non expert end-users and
-> >> let think the use case does not work (whereas it
-> >> works as before).
-> >>
-> >> This is the case where a BAR is successively mapped at different
-> >> GPAs and its sections are not compatible with dma map. The listener
-> >> is called several times and traces are issued for each intermediate
-> >> mapping.  The end-user cannot easily match those GPAs against the
-> >> final GPA output by lscpi. So let's keep those information to
-> >> informed users. In mid term, the plan is to advise the user about
-> >> BAR relocation relevance.
-> >>
-> >> Fixes: 567b5b309abe "vfio/pci: Relax DMA map errors for MMIO regions"
-> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v1 -> v2:
-> >> - use a trace point
-> >> - add some details in the commit message  
-> > 
-> > I think this is v2 with v1 being
-> > Message-Id:<20180322081837.21460-1-aik@ozlabs.ru> but this is
-> > substantially different from Alexey's posting so I'd like to verify the
-> > Sign-off.  Alexey?  
-> 
-> My understanding it is not "sign-off" any more (I am fine either way, it
-> just does not seem fully correct), but
-> 
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+host_memory_backend_pagesize() returns the host pagesize for a given
+HostMemoryBackend object.
 
-Yep, I think Eric was intending to give you credit since this patch
-builds on your patch.  I'll include the R-b.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ backends/hostmem.c       | 11 +++++++++++
+ exec.c                   |  5 ++---
+ include/sysemu/hostmem.h |  2 ++
+ target/ppc/kvm.c         |  6 +-----
+ 4 files changed, 16 insertions(+), 8 deletions(-)
 
-There's still work to do, I'd like to see a single, concise message as
-we're parsing the device, but there's no benefit in alarming users when
-nothing has changed and it's too late into the release cycle to do more
-than just silence this for now.  Patches welcome towards a better
-solution, to be considered for 2.13.  Thanks,
-
-Alex
-
-> > 
-> > I agree that this seems to be the right thing to do for 2.12, nothing
-> > has changed for these mappings and the error reports are difficult even
-> > for experts to decipher and explain to users.  Thanks,
-> > 
-> > Alex
-> >   
-> >> ---
-> >>  hw/vfio/common.c     | 11 +++++------
-> >>  hw/vfio/trace-events |  1 +
-> >>  2 files changed, 6 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> >> index 5e84716..07ffa0b 100644
-> >> --- a/hw/vfio/common.c
-> >> +++ b/hw/vfio/common.c
-> >> @@ -548,12 +548,11 @@ static void vfio_listener_region_add(MemoryListener *listener,
-> >>          hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-> >>  
-> >>          if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
-> >> -            error_report("Region 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx
-> >> -                         " is not aligned to 0x%"HWADDR_PRIx
-> >> -                         " and cannot be mapped for DMA",
-> >> -                         section->offset_within_region,
-> >> -                         int128_getlo(section->size),
-> >> -                         pgmask + 1);
-> >> +            trace_vfio_listener_region_add_no_dma_map(
-> >> +                memory_region_name(section->mr),
-> >> +                section->offset_within_address_space,
-> >> +                int128_getlo(section->size),
-> >> +                pgmask + 1);
-> >>              return;
-> >>          }
-> >>      }
-> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> >> index 79f63a2..20109cb 100644
-> >> --- a/hw/vfio/trace-events
-> >> +++ b/hw/vfio/trace-events
-> >> @@ -90,6 +90,7 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "i
-> >>  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
-> >>  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
-> >>  vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
-> >> +vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uint64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=0x%"PRIx64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
-> >>  vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
-> >>  vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
-> >>  vfio_disconnect_container(int fd) "close container->fd=%d"  
-> >   
-> 
-> 
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index f61093654e..ff2bb0489c 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -18,6 +18,7 @@
+ #include "qapi/visitor.h"
+ #include "qemu/config-file.h"
+ #include "qom/object_interfaces.h"
++#include "qemu/mmap-alloc.h"
+ 
+ #ifdef CONFIG_NUMA
+ #include <numaif.h>
+@@ -262,6 +263,16 @@ bool host_memory_backend_is_mapped(HostMemoryBackend *backend)
+     return backend->is_mapped;
+ }
+ 
++size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
++{
++    Object *obj = OBJECT(memdev);
++    char *path = object_property_get_str(obj, "mem-path", NULL);
++    size_t pagesize = qemu_mempath_getpagesize(path);
++
++    g_free(path);
++    return pagesize;
++}
++
+ static void
+ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+ {
+diff --git a/exec.c b/exec.c
+index b38b004563..c7fcefa851 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1491,9 +1491,8 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
+     long *hpsize_min = opaque;
+ 
+     if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+-        char *mem_path = object_property_get_str(obj, "mem-path", NULL);
+-        long hpsize = qemu_mempath_getpagesize(mem_path);
+-        g_free(mem_path);
++        long hpsize = host_memory_backend_pagesize(MEMORY_BACKEND(obj));
++
+         if (hpsize < *hpsize_min) {
+             *hpsize_min = hpsize;
+         }
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 47bc9846ac..bc36899bb8 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -68,4 +68,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
+ 
+ void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool mapped);
+ bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
++size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
++
+ #endif
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index f393eae127..1ab9cf3a8a 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -493,11 +493,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     Object *mem_obj = object_resolve_path(obj_path, NULL);
+-    char *mempath = object_property_get_str(mem_obj, "mem-path", NULL);
+-    long pagesize;
+-
+-    pagesize = qemu_mempath_getpagesize(mempath);
+-    g_free(mempath);
++    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
+ 
+     return pagesize >= max_cpu_page_size;
+ }
+-- 
+2.14.3
