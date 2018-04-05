@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f48Mt-0005JJ-4I
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:08:11 -0400
+	(envelope-from <cota@braap.org>) id 1f48Pc-0006yA-Pq
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:11:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f48Mp-0002Px-6E
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:08:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44268 helo=mx1.redhat.com)
+	(envelope-from <cota@braap.org>) id 1f48PY-0003WA-J9
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:11:00 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:40715)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f48Mp-0002Pl-17
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:08:07 -0400
-References: <CAFEAcA9PbAr+0U1dJ22fr3+B0-KO3Oy73-mk755rJQtmY_rSKA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cfb5230b-ec8e-ccb7-788d-0b389a93e128@redhat.com>
-Date: Thu, 5 Apr 2018 19:07:58 +0200
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f48PY-0003Vo-BT
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 13:10:56 -0400
+Date: Thu, 5 Apr 2018 13:10:54 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180405171054.GA15681@flamenco>
+References: <1519709965-29833-1-git-send-email-cota@braap.org>
+	<1519709965-29833-3-git-send-email-cota@braap.org>
+	<87605g88je.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9PbAr+0U1dJ22fr3+B0-KO3Oy73-mk755rJQtmY_rSKA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] TCG icount interaction with timer deadlines
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87605g88je.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 02/16] qht: return existing entry when
+ qht_insert fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,20 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-On 05/04/2018 18:01, Peter Maydell wrote:
->  * however, if the guest reprograms the clock during the tcg_cpu_exec()
->    run, we don't do anything to cause us to stop earlier
+On Wed, Mar 28, 2018 at 17:33:09 +0100, Alex Bennée wrote:
+> Emilio G. Cota <cota@braap.org> writes:
+> > -bool qht_insert(struct qht *ht, void *p, uint32_t hash);
+> > +void *qht_insert(struct qht *ht, void *p, uint32_t hash);
+> 
+> Hmm this seems needlessly counter intuitive. I realise the potential
+> efficiency in overloading success/fail but wouldn't a:
+> 
+>   bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing);
+> 
+> be conceptually nicer?
 
-Anything that does this from the vCPU thread should be between
-gen_icount_start and gen_icount_end.  (In fact, it's the entire reason
-why cpu_io_recompile exists).
+Good point, fixed in v2.
 
-For completeness, if the I/O thread does it, it should (in icount mode
-only) kick the running VCPU.
+Thanks,
 
-Am I missing something?
-
-Paolo
+		E.
