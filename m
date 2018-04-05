@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f3x6P-0002mB-U1
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 01:06:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1f3xXt-0002jk-QN
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 01:34:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f3x6L-000830-6j
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 01:06:25 -0400
-References: <20180207225540.31698-1-richard.henderson@linaro.org>
-	<20180207225540.31698-17-richard.henderson@linaro.org>
-	<20180404164908.GA7582@flamenco>
-	<330b4559-52a5-50d6-3a85-da7bb0850107@linaro.org>
-	<0f10b5a5-2be0-4b6b-3c58-e718a062f07d@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1f3xXs-0005mQ-Uk
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 01:34:49 -0400
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <84a25fa4-d1a6-0e9c-a28f-770baeff0ce4@redhat.com>
-Date: Thu, 5 Apr 2018 07:06:08 +0200
+Date: Thu,  5 Apr 2018 07:34:33 +0200
+Message-Id: <1522906473-11252-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <0f10b5a5-2be0-4b6b-3c58-e718a062f07d@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 16/20] target/arm: Use vector infrastructure
- for aa64 compares
+Subject: [Qemu-devel] [PATCH v2] hw/arm/integratorcp: Don't do things that
+ could be fatal in the instance_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +21,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>
-Cc: peter.maydell@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
 
-On 05.04.2018 02:54, Richard Henderson wrote:
-> On 04/05/2018 10:07 AM, Richard Henderson wrote:
->> On 04/05/2018 02:49 AM, Emilio G. Cota wrote:
->>> 1. grab this binary:
->>>   http://cs.columbia.edu/~cota/qemu/nbench-aarch64
->>> 2. run it on a PowerPC host with:
->>>   $ aarch64-linux-user/qemu-aarch64 nbench-aarch64 -V
->>>
->>> Note: the "-V" (or "-v") flag is important! Without it, there's no se=
-gfault.
->>
->> How quickly?  I did not see one up until it exited for lack of NNET.DA=
-T.
->>
->> I will note that I am using gcc 7.2 on gcc112 (/opt/cfarm/gcc-latest/b=
-in/gcc).
->>
->> Are you using gcc 4.8.5, and is commit 74912f6dad in your tree?
->> That commit might have made a difference...
->=20
-> Bah.  I confirm that it doesn't, and that the test still fails.
->=20
-> Since qemu does work on the same host when built with gcc 7.2, I can on=
-ly blame
-> this failure on a compiler bug wrt gcc 4.8 on ppc64.
->=20
-> I have not tracked down exactly what's going wrong, and probably won't =
-unless
-> someone feels that it's worthwhile.  This only begs the question of whe=
-ther we
-> should blacklist this compiler entirely.  Certainly it's old enough tha=
-t it's
-> probably not worth fixing.
+An instance_init function must not fail - and might be called multiple ti=
+mes,
+e.g. during device introspection with the 'device-list-properties' QMP
+command. Since the integratorcm device ignores this rule, QEMU currently
+aborts in this case (though it really should not):
 
-GCC 4.8 is still used in enterprise distros like RHEL7 and AFAIK also in
-SLES 12 ... so blacklisting this compiler does not sound like a good
-idea to me.
+echo "{'execute':'qmp_capabilities'}"\
+     "{'execute':'device-list-properties',"\
+     "'arguments':{'typename':'integrator_core'}}" \
+     | arm-softmmu/qemu-system-arm -M integratorcp,accel=3Dqtest -qmp std=
+io
+{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+ "package": "build-all"}, "capabilities": []}}
+{"return": {}}
+RAMBlock "integrator.flash" already registered, abort!
+Aborted (core dumped)
 
- Thomas
+Move the problematic code to the realize() function instead to fix this
+problem.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Use "OBJECT(d)" instead of "(Object *)d"
+
+ hw/arm/integratorcp.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+index e8303b8..58b40ef 100644
+--- a/hw/arm/integratorcp.c
++++ b/hw/arm/integratorcp.c
+@@ -266,7 +266,6 @@ static const MemoryRegionOps integratorcm_ops =3D {
+ static void integratorcm_init(Object *obj)
+ {
+     IntegratorCMState *s =3D INTEGRATOR_CM(obj);
+-    SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
+=20
+     s->cm_osc =3D 0x01000048;
+     /* ??? What should the high bits of this value be?  */
+@@ -276,20 +275,28 @@ static void integratorcm_init(Object *obj)
+     s->cm_init =3D 0x00000112;
+     s->cm_refcnt_offset =3D muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUA=
+L), 24,
+                                    1000);
+-    memory_region_init_ram(&s->flash, obj, "integrator.flash", 0x100000,
+-                           &error_fatal);
+=20
+-    memory_region_init_io(&s->iomem, obj, &integratorcm_ops, s,
+-                          "integratorcm", 0x00800000);
+-    sysbus_init_mmio(dev, &s->iomem);
+-
+-    integratorcm_do_remap(s);
+     /* ??? Save/restore.  */
+ }
+=20
+ static void integratorcm_realize(DeviceState *d, Error **errp)
+ {
+     IntegratorCMState *s =3D INTEGRATOR_CM(d);
++    SysBusDevice *dev =3D SYS_BUS_DEVICE(d);
++    Error *local_err =3D NULL;
++
++    memory_region_init_ram(&s->flash, OBJECT(d), "integrator.flash", 0x1=
+00000,
++                           &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    memory_region_init_io(&s->iomem, OBJECT(d), &integratorcm_ops, s,
++                          "integratorcm", 0x00800000);
++    sysbus_init_mmio(dev, &s->iomem);
++
++    integratorcm_do_remap(s);
+=20
+     if (s->memsz >=3D 256) {
+         integrator_spd[31] =3D 64;
+--=20
+1.8.3.1
