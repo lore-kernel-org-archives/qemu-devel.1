@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f44oh-0001A8-9Z
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:20:40 -0400
+	(envelope-from <git@johnthomson.fastmail.com.au>) id 1f44pR-0001dJ-Ik
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f44og-0004PC-4u
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:20:39 -0400
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:37073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f44of-0004Ou-Uv
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:20:38 -0400
-Received: by mail-ot0-x22a.google.com with SMTP id y46-v6so27149405otd.4
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 06:20:37 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <eabfade9-5ac5-ce1f-8907-96943231c1ec@amsat.org>
-References: <20180405012241.25714-1-f4bug@amsat.org>
-	<20180405012241.25714-2-f4bug@amsat.org>
-	<CAFEAcA9Qvjo680JX1yQRKLdqTcL1r7V42adaQrVDh3ne=jt8WQ@mail.gmail.com>
-	<eabfade9-5ac5-ce1f-8907-96943231c1ec@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Apr 2018 14:20:16 +0100
-Message-ID: <CAFEAcA81MOAJ5n5b8g2j=JFcH79MVhTzxPdRy2t9BjB92x+mQw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] memory: Avoid to create tiny RAM
- regions, handled as subpages
+	(envelope-from <git@johnthomson.fastmail.com.au>) id 1f44pO-0004qK-Tj
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:21:25 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:37155)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <git@johnthomson.fastmail.com.au>)
+	id 1f44pO-0004pm-Mk
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 09:21:22 -0400
+From: John Thomson <git@johnthomson.fastmail.com.au>
+Date: Thu,  5 Apr 2018 23:20:46 +1000
+Message-Id: <20180405132046.4968-1-git@johnthomson.fastmail.com.au>
+Subject: [Qemu-devel] [PATCH] Fix libusb-1.0.22 deprecated libusb_set_debug
+ with libusb_set_option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, John Thomson <git@johnthomson.fastmail.com.au>
 
-On 5 April 2018 at 13:53, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> On 04/05/2018 06:27 AM, Peter Maydell wrote:
->> On 5 April 2018 at 02:22, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->>> If an user creates a RAM region smaller than TARGET_PAGE_SIZE,
->>> this region will be handled as a subpage.
->>> While the subpage behavior can be noticed by an experienced QEMU
->>> developper, it might takes hours to a novice to figure it out.
->>> To save time to novices, do not allow subpage creation via the
->>> memory_region_init_ram_*() functions.
->>
->> This commit message doesn't make it clear to me what actually
->> goes wrong. Why doesn't the subpage mechanism do the right thing
->> here?
->
-> Trying to understand a bit more, I think the problem is "you can not
-> _execute_ from a region smaller than TARGET_PAGE_SIZE", however if this
-> region is used for I/O this is not a problem (the xilinx-pcie.c case).
->
-> In my case I create a 2K SRAM which contains the exception vectors, but
-> instructions are never fetched because it is handled as I/O.
+libusb-1.0.22 marked libusb_set_debug deprecated
+it is replaced with
+libusb_set_option(libusb_context, LIBUSB_OPTION_LOG_LEVEL, libusb_log_level);
 
-Ah, I wondered if it might be that. Yes, you can't execute from
-small lumps of memory at the moment. We might be able in theory
-to fix this for TCG, though I think it's harder to do so for KVM.
-If we end up implementing small-MPU-region support for ARM v7M/v8M
-that will have a similar setup. When RTH and I last discussed that:
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00293.html
-I think the favoured idea was to have a way to say "always take the
-slow path and do an MPU/MMU check". If we also had a mechanism for
-taking the slow path for code execution that would effectively
-also allow execution from subpages, though done only slowly one
-guest insn per TLB. The two use cases aren't exactly the same but
-some of the implementation seems similar enough to do the same way.
-(There's a lot of unresolved detail and irritating corner cases to
-deal with, though.)
+details here: https://github.com/libusb/libusb/commit/539f22e2fd916558d11ab9a66f10f461c5593168
 
-thanks
--- PMM
+Warning here:
+
+  CC      hw/usb/host-libusb.o
+/builds/xen/src/qemu-xen/hw/usb/host-libusb.c: In function 'usb_host_init':
+/builds/xen/src/qemu-xen/hw/usb/host-libusb.c:250:5: error: 'libusb_set_debug' is deprecated: Use libusb_set_option instead [-Werror=deprecated-declarations]
+     libusb_set_debug(ctx, loglevel);
+     ^~~~~~~~~~~~~~~~
+In file included from /builds/xen/src/qemu-xen/hw/usb/host-libusb.c:40:0:
+/usr/include/libusb-1.0/libusb.h:1300:18: note: declared here
+ void LIBUSB_CALL libusb_set_debug(libusb_context *ctx, int level);
+                  ^~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/builds/xen/src/qemu-xen/rules.mak:66: hw/usb/host-libusb.o] Error 1
+make: Leaving directory '/builds/xen/src/xen/tools/qemu-xen-build'
+
+Signed-off-by: John Thomson <git@johnthomson.fastmail.com.au>
+---
+ hw/usb/host-libusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index 1b0be071cc..dc0a8fe295 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -247,7 +247,11 @@ static int usb_host_init(void)
+     if (rc != 0) {
+         return -1;
+     }
++#if LIBUSB_API_VERSION >= 0x01000106
++    libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, loglevel);
++#else
+     libusb_set_debug(ctx, loglevel);
++#endif
+ #ifdef CONFIG_WIN32
+     /* FIXME: add support for Windows. */
+ #else
+-- 
+2.16.3
