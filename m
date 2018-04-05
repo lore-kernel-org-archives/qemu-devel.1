@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@de.ibm.com>) id 1f46UE-0001R6-LM
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:07:44 -0400
+	(envelope-from <mihajlov@de.ibm.com>) id 1f46UF-0001Re-AM
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@de.ibm.com>) id 1f46U8-0007we-IO
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:07:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57794
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mihajlov@de.ibm.com>) id 1f46UB-0007yp-Vq
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:07:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51264)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1f46U8-0007vl-Cl
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:07:32 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w35F3JdT144709
-	for <qemu-devel@nongnu.org>; Thu, 5 Apr 2018 11:07:31 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2h5nuu9b8m-1
+	(Exim 4.71) (envelope-from <mihajlov@de.ibm.com>) id 1f46UB-0007yH-MW
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 11:07:35 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w35F3ctc088535
+	for <qemu-devel@nongnu.org>; Thu, 5 Apr 2018 11:07:34 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h5jjrbfkw-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 11:07:31 -0400
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 11:07:34 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mihajlov@de.ibm.com>;
-	Thu, 5 Apr 2018 16:07:28 +0100
+	Thu, 5 Apr 2018 16:07:31 +0100
 From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Thu,  5 Apr 2018 17:07:22 +0200
+Date: Thu,  5 Apr 2018 17:07:24 +0200
 In-Reply-To: <1522940844-12336-1-git-send-email-mihajlov@linux.vnet.ibm.com>
 References: <1522940844-12336-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-Message-Id: <1522940844-12336-2-git-send-email-mihajlov@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/3] s390: Refactor IPL parameter block
- generation
+Message-Id: <1522940844-12336-4-git-send-email-mihajlov@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 3/3] s390: Do not pass inofficial IPL type to
+ the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,125 +40,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org
 
-Splitting out the the CCW device extraction allows reuse.
+IPL over a virtio-scsi device requires special handling not
+available in the real architecture. For this purpose the IPL
+type 0xFF has been chosen as means of communication between
+QEMU and the pc-bios. However, a guest OS could be confused
+by seeing an unknown IPL type.
+
+This change sets the IPL parameter type to 0x02 (CCW) to prevent
+this. Pre-existing Linux has looked up the IPL parameters only in
+the case of FCP IPL. This means that the behavior should stay
+the same even if Linux checks for the IPL type unconditionally.
 
 Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 ---
- hw/s390x/ipl.c | 81 ++++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 51 insertions(+), 30 deletions(-)
+ pc-bios/s390-ccw/bootmap.c |  7 +++++++
+ pc-bios/s390-ccw/iplb.h    | 15 +++++++++++++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index fdeaec3..58e33c5 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -279,44 +279,52 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
-     *timeout = cpu_to_be32(splash_time);
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index fc2a9fe..9287b7a 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -70,6 +70,13 @@ static void jump_to_IPL_code(uint64_t address)
+ {
+     /* store the subsystem information _after_ the bootmap was loaded */
+     write_subsystem_identification();
++
++    /* prevent unknown IPL types in the guest */
++    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
++        iplb.pbt = S390_IPL_TYPE_CCW;
++        set_iplb(&iplb);
++    }
++
+     /*
+      * The IPL PSW is at address 0. We also must not overwrite the
+      * content of non-BIOS memory after we loaded the guest, so we
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 7dfce4f..5357a36 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -97,16 +97,27 @@ extern QemuIplParameters qipl;
+ #define S390_IPL_TYPE_CCW 0x02
+ #define S390_IPL_TYPE_QEMU_SCSI 0xff
+ 
+-static inline bool store_iplb(IplParameterBlock *iplb)
++static inline bool manage_iplb(IplParameterBlock *iplb, bool store)
+ {
+     register unsigned long addr asm("0") = (unsigned long) iplb;
+     register unsigned long rc asm("1") = 0;
+ 
+     asm volatile ("diag %0,%2,0x308\n"
+                   : "+d" (addr), "+d" (rc)
+-                  : "d" (6)
++                  : "d" (store ? 6 : 5)
+                   : "memory", "cc");
+     return rc == 0x01;
  }
  
-+static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
++
++static inline bool store_iplb(IplParameterBlock *iplb)
 +{
-+    CcwDevice *ccw_dev = NULL;
-+
-+    if (dev_st) {
-+        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
-+            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
-+                                TYPE_VIRTIO_CCW_DEVICE);
-+        if (virtio_ccw_dev) {
-+            ccw_dev = CCW_DEVICE(virtio_ccw_dev);
-+        } else {
-+            SCSIDevice *sd = (SCSIDevice *)
-+                object_dynamic_cast(OBJECT(dev_st),
-+                                    TYPE_SCSI_DEVICE);
-+            if (sd) {
-+                SCSIBus *bus = scsi_bus_from_device(sd);
-+                VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
-+                VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw,
-+                                                       vdev);
-+
-+                ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
-+                                                           TYPE_CCW_DEVICE);
-+            }
-+        }
-+    }
-+    return ccw_dev;
++    return manage_iplb(iplb, true);
 +}
 +
- static bool s390_gen_initial_iplb(S390IPLState *ipl)
- {
-     DeviceState *dev_st;
-+    CcwDevice *ccw_dev = NULL;
- 
-     dev_st = get_boot_device(0);
-     if (dev_st) {
--        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
--            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
--                TYPE_VIRTIO_CCW_DEVICE);
-+        ccw_dev = s390_get_ccw_device(dev_st);
-+    }
++static inline bool set_iplb(IplParameterBlock *iplb)
++{
++    return manage_iplb(iplb, false);
++}
 +
-+    /*
-+     * Currently allow IPL only from CCW devices.
-+     */
-+    if (ccw_dev) {
-         SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
-                                                             TYPE_SCSI_DEVICE);
--        VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
--                                                          TYPE_VIRTIO_NET);
--
--        if (vn) {
--            ipl->netboot = true;
--        }
--        if (virtio_ccw_dev) {
--            CcwDevice *ccw_dev = CCW_DEVICE(virtio_ccw_dev);
--
--            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
--            ipl->iplb.blk0_len =
--                cpu_to_be32(S390_IPLB_MIN_CCW_LEN - S390_IPLB_HEADER_LEN);
--            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
--            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
--            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
--        } else if (sd) {
--            SCSIBus *bus = scsi_bus_from_device(sd);
--            VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
--            VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
--            CcwDevice *ccw_dev;
--
--            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
--                                                       TYPE_CCW_DEVICE);
--            if (!ccw_dev) {       /* It might be a PCI device instead */
--                return false;
--            }
- 
-+        if (sd) {
-             ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
-             ipl->iplb.blk0_len =
-                 cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN - S390_IPLB_HEADER_LEN);
-@@ -327,12 +335,25 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
-             ipl->iplb.scsi.devno = cpu_to_be16(ccw_dev->sch->devno);
-             ipl->iplb.scsi.ssid = ccw_dev->sch->ssid & 3;
-         } else {
--            return false; /* unknown device */
-+            VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
-+                                                              TYPE_VIRTIO_NET);
-+
-+            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
-+            ipl->iplb.blk0_len =
-+                cpu_to_be32(S390_IPLB_MIN_CCW_LEN - S390_IPLB_HEADER_LEN);
-+            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
-+            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
-+            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
-+
-+            if (vn) {
-+                ipl->netboot = true;
-+            }
-         }
- 
-         if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
-             ipl->iplb.flags |= DIAG308_FLAGS_LP_VALID;
-         }
-+
-         return true;
-     }
- 
+ #endif /* IPLB_H */
 -- 
 1.9.1
