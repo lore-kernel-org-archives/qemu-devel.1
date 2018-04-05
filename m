@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f3y5P-0006eb-SQ
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 02:09:29 -0400
+	(envelope-from <bjsprakash.linux@gmail.com>) id 1f3y5f-0006rI-Vr
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 02:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f3y5O-0008Gw-SG
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 02:09:27 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  5 Apr 2018 08:09:11 +0200
-Message-Id: <1522908551-14885-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.12] hw/arm/fsl-imx: Fix introspection
- problem with fsl-imx6 and fsl-imx7
+	(envelope-from <bjsprakash.linux@gmail.com>) id 1f3y5e-00004r-TY
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 02:09:43 -0400
+MIME-Version: 1.0
+From: Prakash B <bjsprakash.linux@gmail.com>
+Date: Thu, 5 Apr 2018 11:39:41 +0530
+Message-ID: <CACJhumcLYPhMkO5idkL0eW6nsdbwhFv3KMWi9c5Q5bPv_2Rq6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Virito devices bridge vs Macvtap performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,106 +19,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>, Sunil Goutham <sgoutham@cavium.com>, bprakash@caviumnetworks.com, berrange@redhat.com
 
-QEMU currently exits unexpectedly when trying to introspect the fsl-imx6
-and fsl-imx7 devices on systems with many SMP CPUs:
+Hi,
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'fsl,imx6'}}" \
-       | arm-softmmu/qemu-system-arm -M virt,accel=qtest -qmp stdio -smp 8
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-fsl,imx6: Only 4 CPUs are supported (8 requested)
+I am doing kvm guest network performance analysis to compare relevant
+alternatives for  virtio devices on Arrach64.
 
-And:
+I have generated bridge tap and macvtap performance numbers  on guest
+10G interface
+connected back to  another 10G on other host.
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'fsl,imx7'}}" \
-       | arm-softmmu/qemu-system-arm -M raspi2,accel=qtest -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-fsl,imx7: Only 2 CPUs are supported (4 requested)
+The results for guest with  "macvtap" vs  "bridge" are  marginally
+differed and the difference is +/- 3%. As per my understanding on
+macvtap, expected better performance values with macvtap.
 
-This happens because these devices are doing an exit() from their
-instance_init function - which should never be done since instance_init
-can be called at any time for device introspection! Fix it by moving
-the deadly check into the realize() function instead.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/arm/fsl-imx6.c | 14 +++++++-------
- hw/arm/fsl-imx7.c | 13 +++++++------
- 2 files changed, 14 insertions(+), 13 deletions(-)
+--------------------<Begin of commands > --------------------
+for  macvtap device:-
+-netdev tap,vhost=on,vhostforce=on,id=macvtap_netdev,fd=3
+3<>/dev/tap$(cat /sys/class/net/macvtap1/ifindex)  \
+ -device virtionet-pci,netdev=macvtap_netdev,id=net0,mac=$(cat
+/sys/class/net/macvtap1/address)
 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index b6ac72d..9dfbc9a 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -37,13 +37,7 @@ static void fsl_imx6_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
- 
--    if (smp_cpus > FSL_IMX6_NUM_CPUS) {
--        error_report("%s: Only %d CPUs are supported (%d requested)",
--                     TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
--        exit(1);
--    }
--
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX6_NUM_CPUS); i++) {
-         object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
-                           "cortex-a9-" TYPE_ARM_CPU);
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-@@ -119,6 +113,12 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-     uint16_t i;
-     Error *err = NULL;
- 
-+    if (smp_cpus > FSL_IMX6_NUM_CPUS) {
-+        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-+                   TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
-+        return;
-+    }
-+
-     for (i = 0; i < smp_cpus; i++) {
- 
-         /* On uniprocessor, the CBAR is set to 0 */
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 26ef36c..390b431 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -35,13 +35,8 @@ static void fsl_imx7_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
- 
--    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
--        error_report("%s: Only %d CPUs are supported (%d requested)",
--                     TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
--        exit(1);
--    }
- 
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
-         object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
-                           ARM_CPU_TYPE_NAME("cortex-a7"));
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-@@ -197,6 +192,12 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-     qemu_irq irq;
-     char name[NAME_SIZE];
- 
-+    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
-+        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-+                   TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
-+        return;
-+    }
-+
-     for (i = 0; i < smp_cpus; i++) {
-         o = OBJECT(&s->cpu[i]);
- 
--- 
-1.8.3.1
+for Bridge tap device:-
+-netdev type=tap,vhost=on,vhostforce=on,id=tap0,ifname=tap0,script=no,downscript=no
+-device virtio-net-pci,netdev=tap0,mac=12:03:04:05:06:07
+
+-----------------------< End of commands> ------------------------
+
+Anyone please tell me if I missed anything.
+
+Other information.
+-------------------------
+Kernel sources :  4.14.28
+qemu-aarch64 :  2.11.91
+
+Did the same  experiments with ThunderX vnic and Intel 10G nic and
+results are as mentioned above.
+Tried macvtap in bridge and passthru modes.
+
+
+Tell me if  you  need further investigations or more data .
+
+thanks,
+Prakash B
