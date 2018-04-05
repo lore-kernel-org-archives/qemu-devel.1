@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f47g3-0002Sy-Kw
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:23:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f47jP-0005Cr-NX
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f47g1-0002Kv-I6
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:23:55 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36854)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f47jL-0003tW-NL
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:27:23 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:38936)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1f47g1-0002Ka-7p
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:23:53 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x82so8797680wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 09:23:53 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  5 Apr 2018 18:23:46 +0200
-Message-Id: <20180405162347.5623-2-pbonzini@redhat.com>
-In-Reply-To: <20180405162347.5623-1-pbonzini@redhat.com>
-References: <20180405162347.5623-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] scsi-disk: allow customizing the SCSI
- version
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f47jL-0003tP-Hk
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 12:27:19 -0400
+Received: by mail-qk0-x241.google.com with SMTP id j73so26954443qke.6
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 09:27:19 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <1522920750-11020-1-git-send-email-thuth@redhat.com>
+	<8a8d49e3-478f-0d9d-80d1-f11101fd18bb@amsat.org>
+Message-ID: <7ab77e4d-ea50-19e3-d1f4-5e1219c368a4@amsat.org>
+Date: Thu, 5 Apr 2018 13:27:16 -0300
+MIME-Version: 1.0
+In-Reply-To: <8a8d49e3-478f-0d9d-80d1-f11101fd18bb@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/sparc64/sun4u: Fix introspection by
+ converting prom instance_init to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,153 +36,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, danielhb@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 
-We would like to have different behavior for passthrough devices
-depending on the SCSI version they expose.  To prepare for that,
-allow the user of emulated devices to specify the desired SCSI
-level, and adjust the emulation according to the property value.
-The next patch will set the level for scsi-block and scsi-generic
-devices.
+On 04/05/2018 01:22 PM, Philippe Mathieu-Daudé wrote:
+> On 04/05/2018 06:32 AM, Thomas Huth wrote:
+>> The instance_init function of devices should always succeed to be able
+>> to introspect the device. However, the instance_init function of the
+>> "openprom" device can currently fail, for example like this:
+>>
+>> $ echo "{'execute':'qmp_capabilities'}"\
+>>        "{'execute':'device-list-properties',"\
+>>        " 'arguments':{'typename':'openprom'}}" \
+>>        | sparc64-softmmu/qemu-system-sparc64 -M sun4v,accel=qtest -qmp stdio
+>> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+>>  "package": "build-all"}, "capabilities": []}}
+>> {"return": {}}
+>> RAMBlock "sun4u.prom" already registered, abort!
+>> Aborted (core dumped)
+>>
+>> This should not happen. Fix this problem by moving the affected code from
+>> instance_init into a realize function instead.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/sparc64/sun4u.c | 18 ++++++++++++------
+>>  1 file changed, 12 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>> index 2044a52..d62f5a2 100644
+>> --- a/hw/sparc64/sun4u.c
+>> +++ b/hw/sparc64/sun4u.c
+>> @@ -425,13 +425,19 @@ static void prom_init(hwaddr addr, const char *bios_name)
+>>      }
+>>  }
+>>  
+>> -static void prom_init1(Object *obj)
+>> +static void prom_realize(DeviceState *ds, Error **errp)
+>>  {
+>> -    PROMState *s = OPENPROM(obj);
+>> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+>> +    PROMState *s = OPENPROM(ds);
+>> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
+>> +    Error *local_err = NULL;
+>> +
+>> +    memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4u.prom",
+>> +                                     PROM_SIZE_MAX, &local_err);
+> 
+> This looks the memory_region_init_ram() pattern...
+> 
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>>  
+>> -    memory_region_init_ram_nomigrate(&s->prom, obj, "sun4u.prom", PROM_SIZE_MAX,
+>> -                           &error_fatal);
+>>      vmstate_register_ram_global(&s->prom);
+> 
+> ...    ^
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>>      memory_region_set_readonly(&s->prom, true);
 
-Based on a patch by Daniel Henrique Barboza
-<danielhb@linux.vnet.ibm.com>.
+Maybe memory_region_init_rom_nomigrate() even?
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/scsi-disk.c    | 29 ++++++++++++++++++++++++-----
- hw/scsi/scsi-generic.c |  1 +
- include/hw/scsi/scsi.h |  2 ++
- 3 files changed, 27 insertions(+), 5 deletions(-)
-
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index f8ed8cf2b4..9400b97387 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -825,7 +825,7 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
-      * block characteristics VPD page by default.  Not all of SPC-3
-      * is actually implemented, but we're good enough.
-      */
--    outbuf[2] = 5;
-+    outbuf[2] = s->qdev.default_scsi_version;
-     outbuf[3] = 2 | 0x10; /* Format 2, HiSup */
- 
-     if (buflen > 36) {
-@@ -2193,7 +2193,11 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
-     case READ_12:
-     case READ_16:
-         DPRINTF("Read (sector %" PRId64 ", count %u)\n", r->req.cmd.lba, len);
--        if (r->req.cmd.buf[1] & 0xe0) {
-+        /* Protection information is not supported.  For SCSI versions 2 and
-+         * older (as determined by snooping the guest's INQUIRY commands),
-+         * there is no RD/WR/VRPROTECT, so skip this check in these versions.
-+         */
-+        if (s->qdev.scsi_version > 2 && (r->req.cmd.buf[1] & 0xe0)) {
-             goto illegal_request;
-         }
-         if (!check_lba_range(s, r->req.cmd.lba, len)) {
-@@ -2224,7 +2228,7 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
-          * As far as DMA is concerned, we can treat it the same as a write;
-          * scsi_block_do_sgio will send VERIFY commands.
-          */
--        if (r->req.cmd.buf[1] & 0xe0) {
-+        if (s->qdev.scsi_version > 2 && (r->req.cmd.buf[1] & 0xe0)) {
-             goto illegal_request;
-         }
-         if (!check_lba_range(s, r->req.cmd.lba, len)) {
-@@ -2270,6 +2274,8 @@ static void scsi_disk_reset(DeviceState *dev)
-     /* reset tray statuses */
-     s->tray_locked = 0;
-     s->tray_open = 0;
-+
-+    s->qdev.scsi_version = s->qdev.default_scsi_version;
- }
- 
- static void scsi_disk_resize_cb(void *opaque)
-@@ -2814,6 +2820,8 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
- static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
- {
-     SCSIBlockReq *r = (SCSIBlockReq *)req;
-+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, req->dev);
-+
-     r->cmd = req->cmd.buf[0];
-     switch (r->cmd >> 5) {
-     case 0:
-@@ -2839,8 +2847,11 @@ static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
-         abort();
-     }
- 
--    if (r->cdb1 & 0xe0) {
--        /* Protection information is not supported.  */
-+    /* Protection information is not supported.  For SCSI versions 2 and
-+     * older (as determined by snooping the guest's INQUIRY commands),
-+     * there is no RD/WR/VRPROTECT, so skip this check in these versions.
-+     */
-+    if (s->qdev.scsi_version > 2 && (req->cmd.buf[1] & 0xe0)) {
-         scsi_check_condition(&r->req, SENSE_CODE(INVALID_FIELD));
-         return 0;
-     }
-@@ -2952,6 +2963,8 @@ static Property scsi_hd_properties[] = {
-     DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
-                        DEFAULT_MAX_IO_SIZE),
-     DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
-+    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
-+                      5),
-     DEFINE_BLOCK_CHS_PROPERTIES(SCSIDiskState, qdev.conf),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -2997,6 +3010,8 @@ static Property scsi_cd_properties[] = {
-     DEFINE_PROP_UINT16("port_index", SCSIDiskState, port_index, 0),
-     DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
-                        DEFAULT_MAX_IO_SIZE),
-+    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
-+                      5),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -3025,6 +3040,8 @@ static Property scsi_block_properties[] = {
-     DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
-     DEFINE_PROP_BOOL("share-rw", SCSIDiskState, qdev.conf.share_rw, false),
-     DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
-+    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
-+                      5),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -3065,6 +3082,8 @@ static Property scsi_disk_properties[] = {
-                        DEFAULT_MAX_UNMAP_SIZE),
-     DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
-                        DEFAULT_MAX_IO_SIZE),
-+    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
-+                      5),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 4753f8738f..1870085762 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -474,6 +474,7 @@ static void scsi_generic_reset(DeviceState *dev)
- {
-     SCSIDevice *s = SCSI_DEVICE(dev);
- 
-+    s->scsi_version = s->default_scsi_version;
-     scsi_device_purge_requests(s, SENSE_CODE(RESET));
- }
- 
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index 7ecaddac9d..e35137ea78 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -85,6 +85,8 @@ struct SCSIDevice
-     uint64_t max_lba;
-     uint64_t wwn;
-     uint64_t port_wwn;
-+    int scsi_version;
-+    int default_scsi_version;
- };
- 
- extern const VMStateDescription vmstate_scsi_device;
--- 
-2.16.2
+>>      sysbus_init_mmio(dev, &s->prom);
+>> @@ -446,6 +452,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>>  
+>>      dc->props = prom_properties;
+>> +    dc->realize = prom_realize;
+>>  }
+>>  
+>>  static const TypeInfo prom_info = {
+>> @@ -453,7 +460,6 @@ static const TypeInfo prom_info = {
+>>      .parent        = TYPE_SYS_BUS_DEVICE,
+>>      .instance_size = sizeof(PROMState),
+>>      .class_init    = prom_class_init,
+>> -    .instance_init = prom_init1,
+>>  };
+>>  
+>>  
+>>
