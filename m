@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f4CxH-0000XV-JK
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:02:09 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1f4DhM-0000vv-02
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f4CxC-00088H-Pv
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:02:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f4CxC-00087Z-IU
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:01:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f4Cx8-0002Za-KX
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 22:01:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5914C2E8258
-	for <qemu-devel@nongnu.org>; Thu,  5 Apr 2018 22:01:44 +0000 (UTC)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1f4DhH-0004gd-0L
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:49:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1f4DhG-0004g7-Nf
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 18:49:34 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w35MiPYf047439
+	for <qemu-devel@nongnu.org>; Thu, 5 Apr 2018 18:49:33 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h5qvubvb0-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 18:49:32 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 5 Apr 2018 18:49:31 -0400
+References: <20180405162347.5623-1-pbonzini@redhat.com>
+	<20180405162347.5623-2-pbonzini@redhat.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu, 5 Apr 2018 19:49:27 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Apr 2018 21:52:08 -0000
-From: LukeShu <lukeshu@lukeshu.com>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152296512879.30416.6232769502254207484.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+In-Reply-To: <20180405162347.5623-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <13f4a0b7-a2d7-d512-80d5-deb8c38525d0@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] scsi-disk: allow customizing the SCSI
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,99 +43,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-I'm not on a Debian/Ubuntu-ish system, but extracting
 
-    qemu-user-static_2.11+dfsg-1ubuntu6~ppa3_amd64.deb : data.tar.xz :
-usr/bin/qemu-arm-static
 
-and testing with that binary:
+On 04/05/2018 01:23 PM, Paolo Bonzini wrote:
+> We would like to have different behavior for passthrough devices
+> depending on the SCSI version they expose.  To prepare for that,
+> allow the user of emulated devices to specify the desired SCSI
+> level, and adjust the emulation according to the property value.
+> The next patch will set the level for scsi-block and scsi-generic
+> devices.
+>
+> Based on a patch by Daniel Henrique Barboza
+> <danielhb@linux.vnet.ibm.com>.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-    $ time usr/bin/qemu-arm-static /var/lib/archbuild/dbscripts@armv7h/luke=
-/usr/bin/ldconfig --help
-    Usage: ldconfig [OPTION...]
-  ...
-    <https://github.com/archlinuxarm/PKGBUILDs/issues>.
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-    real	0m0.068s
-    user	0m0.067s
-    sys	0m0.000s
 
-That is: LGTM.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
-
-Title:
-  static linux-user ARM emulation has several-second startup time
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+>   hw/scsi/scsi-disk.c    | 29 ++++++++++++++++++++++++-----
+>   hw/scsi/scsi-generic.c |  1 +
+>   include/hw/scsi/scsi.h |  2 ++
+>   3 files changed, 27 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index f8ed8cf2b4..9400b97387 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -825,7 +825,7 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
+>        * block characteristics VPD page by default.  Not all of SPC-3
+>        * is actually implemented, but we're good enough.
+>        */
+> -    outbuf[2] = 5;
+> +    outbuf[2] = s->qdev.default_scsi_version;
+>       outbuf[3] = 2 | 0x10; /* Format 2, HiSup */
+>
+>       if (buflen > 36) {
+> @@ -2193,7 +2193,11 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+>       case READ_12:
+>       case READ_16:
+>           DPRINTF("Read (sector %" PRId64 ", count %u)\n", r->req.cmd.lba, len);
+> -        if (r->req.cmd.buf[1] & 0xe0) {
+> +        /* Protection information is not supported.  For SCSI versions 2 and
+> +         * older (as determined by snooping the guest's INQUIRY commands),
+> +         * there is no RD/WR/VRPROTECT, so skip this check in these versions.
+> +         */
+> +        if (s->qdev.scsi_version > 2 && (r->req.cmd.buf[1] & 0xe0)) {
+>               goto illegal_request;
+>           }
+>           if (!check_lba_range(s, r->req.cmd.lba, len)) {
+> @@ -2224,7 +2228,7 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+>            * As far as DMA is concerned, we can treat it the same as a write;
+>            * scsi_block_do_sgio will send VERIFY commands.
+>            */
+> -        if (r->req.cmd.buf[1] & 0xe0) {
+> +        if (s->qdev.scsi_version > 2 && (r->req.cmd.buf[1] & 0xe0)) {
+>               goto illegal_request;
+>           }
+>           if (!check_lba_range(s, r->req.cmd.lba, len)) {
+> @@ -2270,6 +2274,8 @@ static void scsi_disk_reset(DeviceState *dev)
+>       /* reset tray statuses */
+>       s->tray_locked = 0;
+>       s->tray_open = 0;
+> +
+> +    s->qdev.scsi_version = s->qdev.default_scsi_version;
+>   }
+>
+>   static void scsi_disk_resize_cb(void *opaque)
+> @@ -2814,6 +2820,8 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
+>   static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
+>   {
+>       SCSIBlockReq *r = (SCSIBlockReq *)req;
+> +    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, req->dev);
+> +
+>       r->cmd = req->cmd.buf[0];
+>       switch (r->cmd >> 5) {
+>       case 0:
+> @@ -2839,8 +2847,11 @@ static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
+>           abort();
+>       }
+>
+> -    if (r->cdb1 & 0xe0) {
+> -        /* Protection information is not supported.  */
+> +    /* Protection information is not supported.  For SCSI versions 2 and
+> +     * older (as determined by snooping the guest's INQUIRY commands),
+> +     * there is no RD/WR/VRPROTECT, so skip this check in these versions.
+> +     */
+> +    if (s->qdev.scsi_version > 2 && (req->cmd.buf[1] & 0xe0)) {
+>           scsi_check_condition(&r->req, SENSE_CODE(INVALID_FIELD));
+>           return 0;
+>       }
+> @@ -2952,6 +2963,8 @@ static Property scsi_hd_properties[] = {
+>       DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
+>                          DEFAULT_MAX_IO_SIZE),
+>       DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
+> +    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
+> +                      5),
+>       DEFINE_BLOCK_CHS_PROPERTIES(SCSIDiskState, qdev.conf),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+> @@ -2997,6 +3010,8 @@ static Property scsi_cd_properties[] = {
+>       DEFINE_PROP_UINT16("port_index", SCSIDiskState, port_index, 0),
+>       DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
+>                          DEFAULT_MAX_IO_SIZE),
+> +    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
+> +                      5),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>
+> @@ -3025,6 +3040,8 @@ static Property scsi_block_properties[] = {
+>       DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
+>       DEFINE_PROP_BOOL("share-rw", SCSIDiskState, qdev.conf.share_rw, false),
+>       DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
+> +    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
+> +                      5),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>
+> @@ -3065,6 +3082,8 @@ static Property scsi_disk_properties[] = {
+>                          DEFAULT_MAX_UNMAP_SIZE),
+>       DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
+>                          DEFAULT_MAX_IO_SIZE),
+> +    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
+> +                      5),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index 4753f8738f..1870085762 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -474,6 +474,7 @@ static void scsi_generic_reset(DeviceState *dev)
+>   {
+>       SCSIDevice *s = SCSI_DEVICE(dev);
+>
+> +    s->scsi_version = s->default_scsi_version;
+>       scsi_device_purge_requests(s, SENSE_CODE(RESET));
+>   }
+>
+> diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+> index 7ecaddac9d..e35137ea78 100644
+> --- a/include/hw/scsi/scsi.h
+> +++ b/include/hw/scsi/scsi.h
+> @@ -85,6 +85,8 @@ struct SCSIDevice
+>       uint64_t max_lba;
+>       uint64_t wwn;
+>       uint64_t port_wwn;
+> +    int scsi_version;
+> +    int default_scsi_version;
+>   };
+>
+>   extern const VMStateDescription vmstate_scsi_device;
