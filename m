@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f4TLu-0006GM-L4
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:32:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f4TOJ-0007tn-O6
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f4TLt-0003mN-L5
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:32:34 -0400
-References: <20180406151759.11223-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <29bf83ee-4ee2-5278-7dd8-31fb50b28842@redhat.com>
-Date: Fri, 6 Apr 2018 10:32:27 -0500
+	(envelope-from <mreitz@redhat.com>) id 1f4TOI-0005Uc-TT
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:35:03 -0400
+References: <20180406151731.4285-1-mreitz@redhat.com>
+	<af728288-9d73-4a78-8fd1-40e93f566eaf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4d3ba88f-4156-4087-2115-e96c4e7131ee@redhat.com>
+Date: Fri, 6 Apr 2018 17:34:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180406151759.11223-1-mreitz@redhat.com>
+In-Reply-To: <af728288-9d73-4a78-8fd1-40e93f566eaf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="kNoCd3VLVUL19x449Neul7zttM1gjOEuE"
-Subject: Re: [Qemu-devel] [PATCH] iotests: 122 needs at least two refcount
- bits now
+	boundary="kgHtRzn9FNyWxW6E2EEYSe89az8uwBAgd"
+Subject: Re: [Qemu-devel] [PATCH 0/2 for-2.12?] iotests: Skip 181 and 201
+ without userfaultfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kNoCd3VLVUL19x449Neul7zttM1gjOEuE
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+--kgHtRzn9FNyWxW6E2EEYSe89az8uwBAgd
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <29bf83ee-4ee2-5278-7dd8-31fb50b28842@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: 122 needs at least two refcount
- bits now
-References: <20180406151759.11223-1-mreitz@redhat.com>
-In-Reply-To: <20180406151759.11223-1-mreitz@redhat.com>
+Message-ID: <4d3ba88f-4156-4087-2115-e96c4e7131ee@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2 for-2.12?] iotests: Skip 181 and 201
+ without userfaultfd
+References: <20180406151731.4285-1-mreitz@redhat.com>
+ <af728288-9d73-4a78-8fd1-40e93f566eaf@redhat.com>
+In-Reply-To: <af728288-9d73-4a78-8fd1-40e93f566eaf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/06/2018 10:17 AM, Max Reitz wrote:
-> The new test case for compressed clusters (added in commit
-> abd3622cc03cf41ed542126a540385f30a4c0175) requires two refcount bits to=
-
-> succeed, so we need to skip the test when refcount_bits=3D1 was request=
-ed.
-
-We already questioned whether the changes to 122 were appropriate, given
-that it didn't even use qemu-img convert.  Should we instead split this
-into two tests (keeping 122 as it was before, and making the new
-compressed refcount munging tests be separate), where only the new test
-needs this filter?
-
+On 2018-04-06 17:30, Eric Blake wrote:
+> On 04/06/2018 10:17 AM, Max Reitz wrote:
+>> My non-Fedora testing system does not have a kernel with userfaultfd
+>> support which causes 181 and 201 to fail.  That is annoying.  This
+>> series makes those tests recognize the issue and convert it into a
+>> _notrun.
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/122 | 4 ++++
->  1 file changed, 4 insertions(+)
+> As this is just testsuite fixes, is this worth including in 2.12?  Then=
+
+> again, as we are now building for -rc3, missing the release merely mean=
+s
+> tests fail, and not a broken binary.
+
+I usually merge test patches independently of freeze, but on the other
+hand I prefer to only take the really necessary things for the later
+RCs.  Sooo... I haven't decided yet. :-)
+
+Max
+
+>> Max Reitz (2):
+>>   iotests: Add failure matching to common.qemu
+>>   iotests: Skip 181 and 201 without userfaultfd
+>>
+>>  tests/qemu-iotests/181         | 13 ++++++++++
+>>  tests/qemu-iotests/201         | 13 ++++++++++
+>>  tests/qemu-iotests/common.qemu | 58 +++++++++++++++++++++++++++++++++=
+++++-----
+>>  3 files changed, 77 insertions(+), 7 deletions(-)
+>>
 >=20
-> diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-> index 6cf4fcb866..95e7c51e72 100755
-> --- a/tests/qemu-iotests/122
-> +++ b/tests/qemu-iotests/122
-> @@ -42,6 +42,10 @@ _supported_fmt qcow2
->  _supported_proto file
->  _supported_os Linux
-> =20
-> +# Repairing the compressed image requires qemu-img check to store a
-> +# refcount up to 3, which requires at least two refcount bits.
-> +_unsupported_imgopts 'refcount_bits=3D1[^0-9]'
-> +
-
-This makes sense, but I'm withholding R-b until we decide if splitting
-the tests is wiser.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
 
 
---kNoCd3VLVUL19x449Neul7zttM1gjOEuE
+
+--kgHtRzn9FNyWxW6E2EEYSe89az8uwBAgd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrHkwwACgkQp6FrSiUn
-Q2rWLQf6Ar9PgZCGCi0L0EXu4j9RN5tZ9403LVXb+Q4B44jM9Z8sWFhEZYHmiSLq
-6Xcwyp6qUNUHmclblRarfpgsQUxXDjd3HI45pWM+H+SWjr3ZeYmWqW1Vb7JdTwq9
-tcMDm+3/Qb0OGL0ilEd+bkqzm7NNcRQj89jy/UTUrfo8i+IaIl8R+v/F+TXRzjca
-IxVMgCNlFIWpCJ4SvmUoyo6+wbO1V1BgsX883ALFb0l5uucI6yvJhnuIn07fcZc1
-lwbS77oyxPFHSngY6cBcrKjB1RPay0+jWS4T4lO8PPFqCqXmnAaGm0IdaLBdjVKm
-l2bHBVX1wP/EudaTPPhu554V0jkWoA==
-=bTG/
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrHk54ACgkQ9AfbAGHV
+z0CP3wgAvSPMmcPxkgZwCl3oHpCOc+dRHJ2AGzXw+qlBQyhisTOLd2CWPVUoIDRb
+PHxYeLYa7lBX3BcTrDYGXL9XX3MoyDNW5iH366sA2SI161p2ADJEdU/PBV+5VYkN
+ZoO31U1gHyMTtTmZ+lX40jFUCFaqZ0iKwAyV1xgCN8q0lU8Q1y6se9SREVsnOeV1
+RXsquX3x3Kx8NPD1UV2WrZET8AU0umkFPQuG3FLbNR9NwEVPVns4HwWk4erpD9n5
+jfTJDmGNx3tx3YgllWcPLXGIS/C14GAWu07Guy23R/s7R+XQnXHINwPlAB/UbxuW
+tSTaU9KK/JgSdRpMAik3g77ZTQbLew==
+=gdHT
 -----END PGP SIGNATURE-----
 
---kNoCd3VLVUL19x449Neul7zttM1gjOEuE--
+--kgHtRzn9FNyWxW6E2EEYSe89az8uwBAgd--
