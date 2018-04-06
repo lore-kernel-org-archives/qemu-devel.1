@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f4Nfq-0005u2-Ml
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:28:47 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f4Nk8-00005x-TT
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f4Nfm-0000ti-Os
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:28:46 -0400
-References: <1522940844-12336-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1522940844-12336-4-git-send-email-mihajlov@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8080442a-bd0b-6231-630c-39b48f910c7a@redhat.com>
-Date: Fri, 6 Apr 2018 11:28:31 +0200
+	(envelope-from <kraxel@redhat.com>) id 1f4Nk5-0003cL-0q
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:33:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47424 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f4Nk4-0003cF-TT
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:33:08 -0400
+Date: Fri, 6 Apr 2018 11:33:07 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180406093307.s7wkhpmddd5d4r7a@sirius.home.kraxel.org>
+References: <20180316074650.5415-1-kraxel@redhat.com>
+	<7547e99b-0e3c-264e-e52b-40ad5d52b49a@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1522940844-12336-4-git-send-email-mihajlov@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390: Do not pass inofficial IPL type
- to the guest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7547e99b-0e3c-264e-e52b-40ad5d52b49a@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Add udmabuf misc device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+To: christian.koenig@amd.com
+Cc: dri-devel@lists.freedesktop.org, Daniel Vetter <daniel.vetter@ffwll.ch>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
 
-On 05.04.2018 17:07, Viktor Mihajlovski wrote:
-> IPL over a virtio-scsi device requires special handling not
-> available in the real architecture. For this purpose the IPL
-> type 0xFF has been chosen as means of communication between
-> QEMU and the pc-bios. However, a guest OS could be confused
-> by seeing an unknown IPL type.
-> 
-> This change sets the IPL parameter type to 0x02 (CCW) to prevent
-> this. Pre-existing Linux has looked up the IPL parameters only in
-> the case of FCP IPL. This means that the behavior should stay
-> the same even if Linux checks for the IPL type unconditionally.
-> 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> ---
->  pc-bios/s390-ccw/bootmap.c |  7 +++++++
->  pc-bios/s390-ccw/iplb.h    | 15 +++++++++++++--
->  2 files changed, 20 insertions(+), 2 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-> index fc2a9fe..9287b7a 100644
-> --- a/pc-bios/s390-ccw/bootmap.c
-> +++ b/pc-bios/s390-ccw/bootmap.c
-> @@ -70,6 +70,13 @@ static void jump_to_IPL_code(uint64_t address)
->  {
->      /* store the subsystem information _after_ the bootmap was loaded */
->      write_subsystem_identification();
-> +
-> +    /* prevent unknown IPL types in the guest */
-> +    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
-> +        iplb.pbt = S390_IPL_TYPE_CCW;
-> +        set_iplb(&iplb);
-> +    }
-> +
->      /*
->       * The IPL PSW is at address 0. We also must not overwrite the
->       * content of non-BIOS memory after we loaded the guest, so we
-> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-> index 7dfce4f..5357a36 100644
-> --- a/pc-bios/s390-ccw/iplb.h
-> +++ b/pc-bios/s390-ccw/iplb.h
-> @@ -97,16 +97,27 @@ extern QemuIplParameters qipl;
->  #define S390_IPL_TYPE_CCW 0x02
->  #define S390_IPL_TYPE_QEMU_SCSI 0xff
->  
-> -static inline bool store_iplb(IplParameterBlock *iplb)
-> +static inline bool manage_iplb(IplParameterBlock *iplb, bool store)
->  {
->      register unsigned long addr asm("0") = (unsigned long) iplb;
->      register unsigned long rc asm("1") = 0;
->  
->      asm volatile ("diag %0,%2,0x308\n"
->                    : "+d" (addr), "+d" (rc)
-> -                  : "d" (6)
-> +                  : "d" (store ? 6 : 5)
->                    : "memory", "cc");
+  Hi,
 
-I can't find a proper public specification for diag 308, so no clue how
-to review this properly. Christian, could you please have a look?
+> The pages backing a DMA-buf are not allowed to move (at least not without a
+> patch set I'm currently working on), but for certain MM operations to work
+> correctly you must be able to modify the page tables entries and move the
+> pages backing them around.
+> 
+> For example try to use fork() with some copy on write pages with this
+> approach. You will find that you have only two options to correctly handle
+> this.
 
- Thomas
+The fork() issue should go away with shared memory pages (no cow).
+I guess this is the reason why vgem is internally backed by shmem.
+
+Hmm.  So I could try to limit the udmabuf driver to shmem too (i.e.
+have the ioctl take a shmem filehandle and offset instead of a virtual
+address).
+
+But maybe it is better then to just extend vgem, i.e. add support to
+create gem objects from existing shmem.
+
+Comments?
+
+cheers,
+  Gerd
