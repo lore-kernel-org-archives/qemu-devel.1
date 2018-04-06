@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f4Xvw-0001Ol-Qx
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 16:26:07 -0400
+	(envelope-from <prvs=627e6164f=igor.druzhinin@citrix.com>)
+	id 1f4Ynk-0006gO-K9
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 17:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f4Xvt-0000PN-Hs
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 16:26:04 -0400
-Resent-Message-Id: <E1f4Xvt-0000PN-Hs@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21001)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f4Xvt-0000O0-Bf
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 16:26:01 -0400
-In-Reply-To: <1523038800-2494-1-git-send-email-cota@braap.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152303995842.1734.1103475917931806849@71c20359a636>
+	(envelope-from <prvs=627e6164f=igor.druzhinin@citrix.com>)
+	id 1f4Ynd-0007Kk-3i
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 17:21:40 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:28794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=627e6164f=igor.druzhinin@citrix.com>)
+	id 1f4Ync-0006z6-KT
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 17:21:32 -0400
+From: Igor Druzhinin <igor.druzhinin@citrix.com>
+Date: Fri, 6 Apr 2018 22:21:23 +0100
+Message-ID: <1523049683-11782-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 6 Apr 2018 11:39:20 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc/riscv targets
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] xen/pt: use address_space_memory object for
+ memory region hooks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, palmer@sifive.com, sagark@eecs.berkeley.edu, david@redhat.com, mark.cave-ayland@ilande.co.uk, cohuck@redhat.com, richard.henderson@linaro.org, agraf@suse.de, qemu-s390x@nongnu.org, mjc@sifive.com, atar4qemu@gmail.com, kbastian@mail.uni-paderborn.de, shorne@gmail.com, yongbok.kim@mips.com, aurelien@aurel32.net
+To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, Igor Druzhinin <igor.druzhinin@citrix.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjMwMzg4MDAtMjQ5NC0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3Jn
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTddIFRyYW5zbGF0aW9uIGxvb3Ag
-Y29udmVyc2lvbiBmb3Igc2g0L3NwYXJjL21pcHMvczM5MHgvb3BlbnJpc2MvcmlzY3YgdGFyZ2V0
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
-Y2hldy1wcm9qZWN0L3FlbXUKICAgZDdmYTdmYjUwNC4uMDhlMTczZjI5NCAgbWFzdGVyICAgICAt
-PiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTIzMDM4ODAwLTI0
-OTQtMS1naXQtc2VuZC1lbWFpbC1jb3RhQGJyYWFwLm9yZyAtPiBwYXRjaGV3LzE1MjMwMzg4MDAt
-MjQ5NC0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKM2JmMGMxYzZkNCB0YXJnZXQvcmlzY3Y6IGNvbnZlcnQgdG8gVHJhbnNsYXRv
-ck9wcwo4YzhjZjcxM2VhIHRhcmdldC9yaXNjdjogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNl
-CmNkYTY1ZGM5MjMgdGFyZ2V0L3Jpc2N2OiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUKYjk1OWUy
-MDM5NiB0YXJnZXQvb3BlbnJpc2M6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcwo4YTFmNWFkMmNk
-IHRhcmdldC9vcGVucmlzYzogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNlCmY2ZWYzYjc1M2Eg
-dGFyZ2V0L3MzOTB4OiBjb252ZXJ0IHRvIFRyYW5zbGF0b3JPcHMKOGRhZDZmYzgyOSB0YXJnZXQv
-czM5MHg6IGNvbnZlcnQgdG8gRGlzYXNDb250ZXh0QmFzZQphZmM5YWFjNTUwIHRhcmdldC9zMzkw
-eDogY29udmVydCB0byBEaXNhc0p1bXBUeXBlCmY1ODhmZmJkMGMgdGFyZ2V0L21pcHM6IGNvbnZl
-cnQgdG8gVHJhbnNsYXRvck9wcwpiODc5N2FhNWMyIHRhcmdldC9taXBzOiB1c2UgKmN0eCBmb3Ig
-RGlzYXNDb250ZXh0CmJmNGY4MzUzNzMgdGFyZ2V0L21pcHM6IGNvbnZlcnQgdG8gRGlzYXNDb250
-ZXh0QmFzZQphNDIyODcwODk0IHRhcmdldC9taXBzOiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUK
-ZmRjOTdlNjIwZiB0YXJnZXQvc3BhcmM6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcwo4ODBjMjE0
-YmQwIHRhcmdldC9zcGFyYzogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNlCmZlZWM4N2RlZjEg
-dGFyZ2V0L3NwYXJjOiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUKNWQwMjE3ZWUyOSB0YXJnZXQv
-c2g0OiBjb252ZXJ0IHRvIFRyYW5zbGF0b3JPcHMKYzFmZmZkYWJhNSB0cmFuc2xhdG9yOiBtZXJn
-ZSBtYXhfaW5zbnMgaW50byBEaXNhc0NvbnRleHRCYXNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzE3OiB0cmFuc2xhdG9yOiBtZXJnZSBtYXhfaW5zbnMgaW50byBEaXNh
-c0NvbnRleHRCYXNlLi4uCkNoZWNraW5nIFBBVENIIDIvMTc6IHRhcmdldC9zaDQ6IGNvbnZlcnQg
-dG8gVHJhbnNsYXRvck9wcy4uLgpDaGVja2luZyBQQVRDSCAzLzE3OiB0YXJnZXQvc3BhcmM6IGNv
-bnZlcnQgdG8gRGlzYXNKdW1wVHlwZS4uLgpDaGVja2luZyBQQVRDSCA0LzE3OiB0YXJnZXQvc3Bh
-cmM6IGNvbnZlcnQgdG8gRGlzYXNDb250ZXh0QmFzZS4uLgpDaGVja2luZyBQQVRDSCA1LzE3OiB0
-YXJnZXQvc3BhcmM6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcy4uLgpDaGVja2luZyBQQVRDSCA2
-LzE3OiB0YXJnZXQvbWlwczogY29udmVydCB0byBEaXNhc0p1bXBUeXBlLi4uCkNoZWNraW5nIFBB
-VENIIDcvMTc6IHRhcmdldC9taXBzOiBjb252ZXJ0IHRvIERpc2FzQ29udGV4dEJhc2UuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOC8xNzogdGFyZ2V0L21pcHM6IHVzZSAqY3R4IGZvciBEaXNhc0NvbnRleHQu
-Li4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM4MTog
-RklMRTogdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmM6MjAyMjA6CisgICAgY3R4LT5rc2NyZXhpc3Qg
-PSAoZW52LT5DUDBfQ29uZmlnNCA+PiBDUDBDNF9LU2NyRXhpc3QpICYgMHhmZjsKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8xNzogdGFyZ2V0L21p
-cHM6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcy4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogdGFy
-Z2V0L3MzOTB4OiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUuLi4KRVJST1I6IGJyYWNlcyB7fSBh
-cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzQ2NDogRklMRTog
-dGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5jOjYyMjU6CisgICAgfSB3aGlsZSAoc3RhdHVzID09IERJ
-U0FTX05FWFQpOwpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzQwIGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDExLzE3OiB0YXJnZXQvczM5MHg6IGNvbnZlcnQgdG8gRGlzYXNDb250ZXh0QmFzZS4u
-LgpDaGVja2luZyBQQVRDSCAxMi8xNzogdGFyZ2V0L3MzOTB4OiBjb252ZXJ0IHRvIFRyYW5zbGF0
-b3JPcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTc6IHRhcmdldC9vcGVucmlzYzogY29udmVydCB0
-byBEaXNhc0NvbnRleHRCYXNlLi4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
-YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIyMzogRklMRTogdGFyZ2V0L29wZW5yaXNjL3Ry
-YW5zbGF0ZS5jOjE2MDU6CisgICAgfSB3aGlsZSAoIWRjLT5iYXNlLmlzX2ptcApbLi4uXQoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNDYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTQvMTc6IHRhcmdldC9v
-cGVucmlzYzogY29udmVydCB0byBUcmFuc2xhdG9yT3BzLi4uCkNoZWNraW5nIFBBVENIIDE1LzE3
-OiB0YXJnZXQvcmlzY3Y6IGNvbnZlcnQgdG8gRGlzYXNKdW1wVHlwZS4uLgpDaGVja2luZyBQQVRD
-SCAxNi8xNzogdGFyZ2V0L3Jpc2N2OiBjb252ZXJ0IHRvIERpc2FzQ29udGV4dEJhc2UuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTcvMTc6IHRhcmdldC9yaXNjdjogY29udmVydCB0byBUcmFuc2xhdG9yT3Bz
-Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+Commit 99605175c (xen-pt: Fix PCI devices re-attach failed) introduced
+a subtle bug. As soon as the guest switches off Bus Mastering on the
+device it immediately causes all the BARs be unmapped due to the DMA
+address space of the device being changed. This is undesired behavior
+because the guest may try to communicate with the device after that
+which triggers the following errors in the logs:
+
+[00:05.0] xen_pt_bar_read: Error: Should not read BAR through QEMU. @0x0000000000000200
+[00:05.0] xen_pt_bar_write: Error: Should not write BAR through QEMU. @0x0000000000000200
+
+The issue that the original patch tried to workaround (uneven number of
+region_add/del calls on device attach/detach) was fixed in later QEMU
+versions.
+
+Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+Reported-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+---
+ hw/xen/xen_pt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 9b7a960..e5a6eff 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -907,7 +907,7 @@ out:
+         }
+     }
+ 
+-    memory_listener_register(&s->memory_listener, &s->dev.bus_master_as);
++    memory_listener_register(&s->memory_listener, &address_space_memory);
+     memory_listener_register(&s->io_listener, &address_space_io);
+     s->listener_set = true;
+     XEN_PT_LOG(d,
+-- 
+2.7.4
