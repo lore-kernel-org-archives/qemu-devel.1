@@ -1,41 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f4S2X-0001BT-ND
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:08:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1f4S5B-0003HI-4G
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f4S2U-0007cZ-HJ
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:08:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39074
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1f4S2U-0007c6-Ab
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:08:26 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w36DtVt0136796
-	for <qemu-devel@nongnu.org>; Fri, 6 Apr 2018 10:08:24 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2h68h75eg3-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:08:23 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Fri, 6 Apr 2018 15:08:21 +0100
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Fri, 6 Apr 2018 16:08:17 +0200
+	(envelope-from <bounces@canonical.com>) id 1f4S57-0000HY-Ue
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:11:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f4S57-0000HH-Np
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:11:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f4S56-0005l0-Ah
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 14:11:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4FBAD2E80C8
+	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 14:11:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <c6973c82-8331-15e3-a74d-061d8fe58353@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
- interception
+Date: Fri, 06 Apr 2018 14:04:46 -0000
+From: Antoine <1754038@bugs.launchpad.net>
+Reply-To: Bug 1754038 <1754038@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152043137992.20954.13820740787208030462.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152302348695.28954.8801784466393043572.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1754038] Re: ARM M: Systick first wrap delayed
+ (qemu-timers/icount prb?)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,186 +37,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-On 16/03/2018 00:24, Tony Krowiak wrote:
-> If the CPU model indicates that AP facility is installed on
-> the guest (i.e., -cpu xxxx,ap=3Don), then the expectation is that
-> the AP bus running in the guest will initialize; however, if the
-> AP instructions are not being interpreted by the firmware, then
-> they will be intercepted and routed back to QEMU for handling.
-> If a handler is not defined to process the intercepted instruciton,
-> then an operation exception will be injected into the
-> guest, in which case the AP bus will not initialize.
->
-> There are two situations where AP instructions will not be
-> interpreted:
->
-> 1. The guest is not configured with a vfio-ap device (i.e.,
->     -device vfio-ap,sysfsdev=3D$path-to-mdev). The realize function for
->     the vfio-ap device enables interpretive execution of AP
->     instructions.
->
-> 2. The guest is a second level guest but the first level guest has
->     not enabled interpretive execution.
->
-> This patch introduces AP instruction handlers to ensure the AP bus
-> module initializes on the guest when the AP facility is installed
-> on the guest but AP instructions are not being interpreted. The logic
-> incorporated is:
->
-> * If the CPU model indicates AP instructions are
->    installed
->
->    * Set the status response code for the instruction to indicate that
->      the APQN contained in the instruction is not valid. This is
->      a valid response because there will be no devices configured for
->      the guest in any of the above scenarios.
->
-> * Else return an error from the handler. This will result in an
->    operation being injected into the guest and the AP bus will not
->    initialize on the guest. That is commensurate with how things work
->    today.
->
-> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-> ---
->   hw/vfio/ap.c                 |   45 +++++++++++++++++++++++++++++++++=
-+++++++++
->   include/hw/s390x/ap-device.h |    6 +++++
->   target/s390x/kvm.c           |   14 +++++++++++++
->   3 files changed, 65 insertions(+), 0 deletions(-)
->
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index b397bb1..88e744d 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -148,6 +148,51 @@ static void vfio_ap_unrealize(DeviceState *dev, Er=
-ror **errp)
->       kvm_s390_set_interpret_ap(0);
->   }
->
-> +int ap_device_handle_nqap(S390CPU *cpu)
-> +{
-> +    CPUS390XState *env =3D &cpu->env;
-> +
-> +    if (s390_has_feat(S390_FEAT_AP)) {
-> +        env->regs[1] =3D 0x10000;
-> +
-> +        return 0;
-> +    }
-> +
-> +    return -EOPNOTSUPP;
-> +}
-> +
-> +int ap_device_handle_dqap(S390CPU *cpu)
-> +{
-> +    CPUS390XState *env =3D &cpu->env;
-> +
-> +    if (s390_has_feat(S390_FEAT_AP)) {
-> +        env->regs[1] =3D 0x10000;
-> +
-> +        return 0;
-> +    }
-> +
-> +    return -EOPNOTSUPP;
-> +}
-> +
-> +int ap_device_handle_pqap(S390CPU *cpu)
-> +{
-> +    CPUS390XState *env =3D &cpu->env;
-> +    int fc =3D 4 & (env->regs[0] >> 24);
-> +
-> +    /*
-> +     * The Query Configuration Information (QCI) function (fc =3D=3D 4=
-) does not
-> +     * set a response code in reg 1, so check for that along with the
-> +     * AP feature.
-> +     */
+Hi Peter,
 
-APFT-t must be taken care of, depending on APQN and APFT feature:
+I just tested your patch, I confirm it is also working on my side. Many
+thanks.
 
-If APFT feature is enabled it should report the right information for=20
-the existing AP
-If it is not enabled it should report OPERATION_EXCEPTION
+-- =
 
-> +    if ((fc !=3D 4) && s390_has_feat(S390_FEAT_AP)) {
-> +        env->regs[1] =3D 0x10000;
-> +
-> +        return 0;
-> +    }
-> +
-> +    return -EOPNOTSUPP;
-> +}
-> +
->   static Property vfio_ap_properties[] =3D {
->       DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
->       DEFINE_PROP_END_OF_LIST(),
-> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.=
-h
-> index 693df90..d45ae38 100644
-> --- a/include/hw/s390x/ap-device.h
-> +++ b/include/hw/s390x/ap-device.h
-> @@ -11,6 +11,8 @@
->   #ifndef HW_S390X_AP_DEVICE_H
->   #define HW_S390X_AP_DEVICE_H
->
-> +#include "cpu.h"
-> +
->   #define AP_DEVICE_TYPE       "ap-device"
->
->   typedef struct APDevice {
-> @@ -35,4 +37,8 @@ static inline APDevice *to_ap_dev(DeviceState *dev)
->   #define AP_DEVICE_CLASS(klass) \
->       OBJECT_CLASS_CHECK(APDeviceClass, (klass), AP_DEVICE_TYPE)
->
-> +int ap_device_handle_nqap(S390CPU *cpu);
-> +int ap_device_handle_dqap(S390CPU *cpu);
-> +int ap_device_handle_pqap(S390CPU *cpu);
-> +
->   #endif /* HW_S390X_AP_DEVICE_H */
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 2812e28..a636394 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -50,6 +50,7 @@
->   #include "exec/memattrs.h"
->   #include "hw/s390x/s390-virtio-ccw.h"
->   #include "hw/s390x/s390-virtio-hcall.h"
-> +#include "hw/s390x/ap-device.h"
->
->   #ifndef DEBUG_KVM
->   #define DEBUG_KVM  0
-> @@ -88,6 +89,9 @@
->   #define PRIV_B2_CHSC                    0x5f
->   #define PRIV_B2_SIGA                    0x74
->   #define PRIV_B2_XSCH                    0x76
-> +#define PRIV_B2_NQAP                    0xad
-> +#define PRIV_B2_DQAP                    0xae
-> +#define PRIV_B2_PQAP                    0xaf
->
->   #define PRIV_EB_SQBS                    0x8a
->   #define PRIV_EB_PCISTB                  0xd0
-> @@ -1245,6 +1249,16 @@ static int handle_b2(S390CPU *cpu, struct kvm_ru=
-n *run, uint8_t ipa1)
->       case PRIV_B2_SCLP_CALL:
->           rc =3D kvm_sclp_service_call(cpu, run, ipbh0);
->           break;
-> +    case PRIV_B2_NQAP:
-> +        rc =3D ap_device_handle_nqap(cpu);
-> +        break;
-> +    case PRIV_B2_DQAP:
-> +        rc =3D ap_device_handle_dqap(cpu);
-> +        break;
-> +    case PRIV_B2_PQAP:
-> +        rc =3D ap_device_handle_pqap(cpu);
-> +        break;
-> +        break;
->       default:
->           rc =3D -1;
->           DPRINTF("KVM: unhandled PRIV: 0xb2%x\n", ipa1);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754038
+
+Title:
+  ARM M: Systick first wrap delayed (qemu-timers/icount prb?)
+
+Status in QEMU:
+  New
+
+Bug description:
+  When running this kind of code with qemu:
+
+  static void SysTickISR(void)
+  {
+  	printf("SysTick\n");
+  }
+
+  void main()
+  {
+  	volatile int i, j;
+  	printf("setup timer\n");
+  	*(uint32_t*) 0xE000E014 =3D 0x8FFFFF; //reload value
+  	*(uint32_t*) 0xE000E018 =3D 0;        //force reload
+  	*(uint32_t*) 0xE000E010 =3D 7;        //cpu clk + ISR + enable =
 
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+  	for (j =3D 0; j < 0x100; j++) {
+  		for (i =3D 0; i < 0x100000; i++)
+  			;
+  		printf("cnt %08x  -- %8x\n", *(uint32_t*) 0xE000E018, *(uint32_t*)0xE00=
+0E010);
+  	}
+  }
+
+  I get the following output (comments added after '#'):
+
+  setup timer
+  cnt 007cccca  --        7
+  cnt 006998a2  --        7
+  cnt 00566479  --        7
+  cnt 0043304f  --        7
+  cnt 002ffc26  --        7
+  cnt 001cc7fd  --        7
+  cnt 000993d5  --        7
+  cnt 00000000  --        7  <--- problem here, systick should wrap and rai=
+se isr
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  cnt 00000000  --        7
+  SysTick                     <--- delayed isr occuring here
+  cnt 000986e0  --    10007
+  SysTick
+  cnt 00865290  --    10007   <---- then running fine as long as regs not m=
+odified
+  cnt 00731e51  --        7
+  cnt 005fea27  --        7
+  cnt 004cb5ff  --        7
+  cnt 003981d6  --        7
+  cnt 00264dad  --        7
+  cnt 00131984  --        7
+  SysTick
+  cnt 008fe545  --    10007
+  cnt 007cb106  --        7
+  cnt 00697cdd  --        7
+  cnt 005648b4  --        7
+  cnt 0043148b  --        7
+  cnt 002fe061  --        7
+  cnt 001cac38  --        7
+  cnt 00097810  --        7
+  SysTick
+  cnt 008643d6  --    10007
+  cnt 00730f97  --        7
+  cnt 005fdb6d  --        7
+  cnt 004ca745  --        7
+  cnt 0039731c  --        7
+  cnt 00263ef3  --        7
+  cnt 00130aca  --        7
+  SysTick
+  cnt 008fd68b  --    10007
+  cnt 007ca24c  --        7
+  cnt 00696e23  --        7
+  cnt 005639fa  --        7
+  cnt 004305d1  --        7
+  cnt 002fd1a8  --        7
+  cnt 001c9d7f  --        7
+  cnt 00096956  --        7
+  SysTick
+  cnt 0086351d  --    10007
+  cnt 007300dd  --        7
+  cnt 005fccb4  --        7
+  cnt 004c988c  --        7
+  cnt 00396463  --        7
+  cnt 00263039  --        7
+  cnt 0012fc10  --        7
+  [...]
+
+  Command line and version:
+  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -monitor stdi=
+o -serial file:/dev/pts/6 -icount 4 -cpu cortex-m4
+  QEMU 2.11.50
+
+  I am compiling from git repo, head is:
+  commit f32408f3b472a088467474ab152be3b6285b2d7b
+  Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+  Date:   Tue Mar 6 13:43:17 2018 +0000
+
+  Config options:
+  ./configure --target-list=3Darm-softmmu --enable-debug --disable-slirp --=
+enable-tcg-interpreter --disable-blobs --disable-docs --disable-guest-agent=
+ --disable-gnutls --disable-nettle --disable-gcrypt --disable-sdl --disable=
+-gtk --disable-vnc --disable-virtfs --disable-mpath --disable-xen --disable=
+-brlapi --disable-curl --disable-bluez --disable-kvm --disable-hax --disabl=
+e-hvf --disable-whpx --disable-rdma --disable-vde --disable-netmap --disabl=
+e-linux-aio --disable-cap-ng --disable-attr --disable-vhost-net --disable-s=
+pice --disable-rbd --disable-libiscsi --disable-libnfs --disable-smartcard =
+--disable-libusb --disable-live-block-migration --disable-usb-redir --disab=
+le-lzo --disable-snappy --disable-bzip2 --disable-seccomp --disable-gluster=
+fs --disable-tpm --disable-libssh2 --disable-numa --disable-libxml2 --disab=
+le-tcmalloc --disable-jemalloc --disable-replication --disable-vhost-vsock =
+--disable-opengl --disable-virglrenderer --disable-xfsctl --disable-qom-cas=
+t-debug --disable-vxhs --disable-crypto-afalg --disable-vhost-user --disabl=
+e-capstone --disable-pie --extra-cflags=3D-mtune=3Dnative
+
+  =
+
+  Not working with git tag 2.10.0 (almost same config)
+
+  Working with stock qemu-arm 2.5.0 from Ubuntu 16.04.
+
+  I started investigating, though I am not familiar with qemu code and I
+  could see that the execution is not geting out of
+  qemu_tcg_rr_cpu_thread_fn() 'while' loop and timers are not triggered
+  because the values in cpu->icount_extra or cpu->icount_budget are not
+  to modified accordingly after the timer is set (host side) when the
+  systick register is written (target side).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754038/+subscriptions
