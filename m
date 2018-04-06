@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1f4VA1-0006ZV-L1
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:28:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1f4VQ5-0003Ep-TR
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:45:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1f4V9x-0002Si-KF
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:28:25 -0400
-Received: from smtp1.lauterbach.com ([62.154.241.196]:54216)
+	(envelope-from <eblake@redhat.com>) id 1f4VQ2-0003Ka-M9
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:45:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36812 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
-	id 1f4V9x-0002Jn-A5
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:28:21 -0400
-References: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1521034084-17344-4-git-send-email-abdallah.bouassida@lauterbach.com>
-	<87h8orcg3a.fsf@linaro.org>
-From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Message-ID: <7a39d3f5-af2b-e21d-fa10-798b67fe4f63@lauterbach.com>
-Date: Fri, 6 Apr 2018 18:28:05 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f4VQ2-0003KA-G0
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:44:58 -0400
+References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
+	<1523034681-33787-2-git-send-email-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <32d5bc55-45cc-1a7e-3e8a-91a3d6688aa3@redhat.com>
+Date: Fri, 6 Apr 2018 12:44:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <87h8orcg3a.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 3/3] target/arm: Add the XML
- dynamic generation
+In-Reply-To: <1523034681-33787-2-git-send-email-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MTjTmwDnhJl8OEPJjwzUZYHzqWis7HqMJ"
+Subject: Re: [Qemu-devel] [PULL 01/20] sys_membarrier: fix up include
+ directives
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, khaled.jmal@lauterbach.com, qemu-arm@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Bruce Rogers <brogers@suse.com>
 
-Hi Alex,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MTjTmwDnhJl8OEPJjwzUZYHzqWis7HqMJ
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Bruce Rogers <brogers@suse.com>
+Message-ID: <32d5bc55-45cc-1a7e-3e8a-91a3d6688aa3@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 01/20] sys_membarrier: fix up include
+ directives
+References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
+ <1523034681-33787-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1523034681-33787-2-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-First of all, thanks for the review!
->> +static int arm_gdb_get_sysreg(CPUARMState *env, uint8_t *buf, int reg)
->> +{
->> +    ARMCPU *cpu = arm_env_get_cpu(env);
->> +    const ARMCPRegInfo *ri;
->> +    uint32_t key;
->> +
->> +    key = cpu->dyn_xml.cpregs_keys[reg];
->> +    ri = get_arm_cp_reginfo(cpu->cp_regs, key);
->> +    if (ri) {
->> +        if (cpreg_field_is_64bit(ri)) {
->> +            return gdb_get_reg64(buf, (uint64_t)read_raw_cp_reg(env, ri));
->> +        } else {
->> +            return gdb_get_reg32(buf, (uint32_t)read_raw_cp_reg(env, ri));
->> +        }
->> +    }
->> +    return 0;
-> There is something odd going on here because if I run a simple little
-> features binary
-> (https://github.com/stsquad/testcases/blob/master/aarch64/features.c) I
-> get:
->
->   ID_AA64ISAR0_EL1    : 0x0000000000011120
->   ID_AA64ISAR1_EL1    : 0x0000000000000000
->   ID_AA64MMFR0_EL1    : 0x00000000ff000000
->   ID_AA64MMFR1_EL1    : 0x0000000000000000
->   ID_AA64PFR0_EL1     : 0x0000000000000011
->   ID_AA64PFR1_EL1     : 0x0000000000000000
->   ID_AA64DFR0_EL1     : 0x0000000000000006
->   ID_AA64DFR1_EL1     : 0x0000000000000000
->   MIDR_EL1            : 0x00000000411fd070
->   MPIDR_EL1           : 0x0000000080000000
->   REVIDR_EL1          : 0x0000000000000000
->
-> However in the gdb output we see:
->
->   ID_AA64ISAR0_EL1           0x11120	69920
->   ID_AA64ISAR1_EL1           0x0	0
->   ID_AA64MMFR0_EL1           0x1124	4388  <-?
->   ID_AA64MMFR1_EL1           0x0	0
->   ID_PFR0                    0x131	305   <-name and value?
->   ID_AA64PFR1_EL1            0x0	0
->   ID_AA64DFR0_EL1            0x10305106	271601926 <-?
->   ID_AA64DFR1_EL1            0x0	0
->   REVIDR_EL1                 0x0	0
->
-> So why the discrepancies?
+On 04/06/2018 12:11 PM, Paolo Bonzini wrote:
+> From: Bruce Rogers <brogers@suse.com>
+>=20
+> Our rule right now is to use <> for external headers only.
+> util/sys_membarrier.c violates that. Fix it up.
+>=20
+> Signed-off-by: Bruce Rogers <brogers@suse.com>
+> Message-Id: <20180329151018.15319-1-brogers@suse.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  util/sys_membarrier.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
->  ID_AA64MMFR0_EL1           0x1124	4388  <-?
->  ID_AA64DFR0_EL1            0x10305106	271601926 <-?
-I get the same value in x1 (= 0x1124) and x2 (= 0x10305106) when I execute 
-the following instructions on the guest:
-  MRS x1, ID_AA64MMFR0_EL1
-  MRS x2, ID_AA64DFR0_EL1
-So, I think that there is no problem on how GDB is reading these registers!
+Keeping this one as-is is fine, since it is already part of a pull
+request, but...
 
->  ID_PFR0                    0x131	305   <-name and value?
-This is not ID_AA64PFR0_EL1 - the ID_AA64PFR0_EL1 is not registered in our
-dynamic XML as it has "ARM_CP_NO_RAW" type.
-So should we add some modifications to handle this special case?
+>=20
+> diff --git a/util/sys_membarrier.c b/util/sys_membarrier.c
+> index 8dcb53e..1362c0c 100644
+> --- a/util/sys_membarrier.c
+> +++ b/util/sys_membarrier.c
+> @@ -6,9 +6,9 @@
+>   * Author: Paolo Bonzini <pbonzini@redhat.com>
+>   */
+> =20
+> -#include <qemu/osdep.h>
+> -#include <qemu/sys_membarrier.h>
+> -#include <qemu/error-report.h>
+> +#include "qemu/osdep.h"
+> +#include "qemu/sys_membarrier.h"
+> +#include "qemu/error-report.h"
+> =20
+>  #ifdef CONFIG_LINUX
+>  #include <linux/membarrier.h>
 
-Best regards,
-Abdallah
+Our style also recommends ordering things as:
+
+"qemu/osdep.h"
+all <system.h>
+"any other qemu.h"
+
+to minimize chances of collisions from something in a qemu header
+causing a system header to go wrong (that is, osdep.h has to go first,
+because it might influence a system header, but nothing else should risk
+influencing a system header).  So if you wanted, you could also sink the
+"qemu/sys_membarrier.h" and "qemu/error-report.h" includes after the
+<linux/membarrier.h> and any other system headers not shown in the
+context of the patch.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--MTjTmwDnhJl8OEPJjwzUZYHzqWis7HqMJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrHshEACgkQp6FrSiUn
+Q2os8gf/dKMvQFjscwdnK+4ccEy689RAk8CUS2AvjVC+3P3fsX1j7rHJ0lvjC/8x
+pd3aamUttG7oNm/fcrX5EdGXkjobdn9cvjXGxpnBqPD/OCXHxloLv1er0KtVsl42
+KlUJH0lnIkfWTp7GPz/KISoPQaMjI2YoW0iZ4q33Hg86mQaUDWfO+0ijRKG/fLGc
+ejJpaZS+8UUE7zdPkMGG0lYWHSw7nV6sYbg/4Wse7E8LpC+W4Ot3KE7e3CJtjqIK
+HP58NBu7cUwDOUNUq7KFCHzzL+5chIKPubCp9UolGFegnxZOE8rD4CaH8v3kodin
+DnmJ3JKm+wqKIk8qDwCMJ8/xEJPzDw==
+=WbzF
+-----END PGP SIGNATURE-----
+
+--MTjTmwDnhJl8OEPJjwzUZYHzqWis7HqMJ--
