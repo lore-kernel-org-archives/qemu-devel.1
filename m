@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f4UdI-0005hV-Jb
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:54:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1f4UmP-0001eR-5A
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:04:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f4UdF-0003G2-D1
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:54:36 -0400
-Date: Fri, 6 Apr 2018 18:54:13 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180406185413.0af47db3.cohuck@redhat.com>
-In-Reply-To: <152302765908.144052.14302567702608397806.stgit@bahia.lan>
-References: <152302765908.144052.14302567702608397806.stgit@bahia.lan>
+	(envelope-from <eblake@redhat.com>) id 1f4UmO-0000JA-6c
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:04:01 -0400
+References: <20180406164108.26118-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <edb3c0fd-c1fd-e9ba-e081-eef19297f3c7@redhat.com>
+Date: Fri, 6 Apr 2018 12:03:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] vfio-ccw: fix memory leak in
- vfio_ccw_realize()
+In-Reply-To: <20180406164108.26118-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SntvYZZ6BzHwtEGBqRZMBazS6jMXsl3wI"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Split 214 off of 122
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,147 +23,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Fri, 06 Apr 2018 17:14:19 +0200
-Greg Kurz <groug@kaod.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SntvYZZ6BzHwtEGBqRZMBazS6jMXsl3wI
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Alberto Garcia <berto@igalia.com>
+Message-ID: <edb3c0fd-c1fd-e9ba-e081-eef19297f3c7@redhat.com>
+Subject: Re: [PATCH] iotests: Split 214 off of 122
+References: <20180406164108.26118-1-mreitz@redhat.com>
+In-Reply-To: <20180406164108.26118-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> The vfio_ccw_realize() function currently leaks vcdev->vdev.name if
-> the subchannel is already attached or if vfio_get_device() fails.
-> 
-> This happens because vcdev->vdev.name is expected to be freed in
-> vfio_put_device() which isn't called in this case.
-> 
-> Adding g_free(vcdev->vdev.name) on these two error paths would be
-> enough to fix the leak, but this is unfortunate since we would then
-> have three locations doing this. Also, this would be inconsistent
-> with the label based rollback scheme of this function.
+On 04/06/2018 11:41 AM, Max Reitz wrote:
+> Commit abd3622cc03cf41ed542126a540385f30a4c0175 added a case to 122
+> regarding how the qcow2 driver handles an incorrect compressed data
+> length value.  This does not really fit into 122, as that file is
+> supposed to contain qemu-img convert test cases, which this case is not=
+=2E
+> So this patch splits it off into its own file; maybe we will even get
+> more qcow2-only compression tests in the future.
+>=20
+> Also, that test case does not work with refcount_bits=3D1, so mark that=
 
-This is all a bit awkward :(
-
-But I'd actually prefer adding the two g_free calls for now, as that
-would be a nice, small patch that my brain can still process at this
-point in the evening :)
-
-Your patch would be a nice cleanup for 2.13, though.
-
-Alternatively, I could be convinced to queue this if I get a R-b from
-someone :)
-
-> 
-> The root issue is that vcdev->vdev.name is set before vfio_get_device()
-> is called, which theoretically prevents to call vfio_put_device() to
-> do the freeing. Well actually, we could call it anyway  because
-> vfio_put_base_device() is a nop if the device isn't attached, but this
-> would be confusing.
-> 
-> This patch hence moves all the logic of attaching the device to a
-> separate vfio_ccw_get_device() function, which is the counterpart
-> of vfio_put_device(). While here, vfio_put_device() is renamed to
-> vfio_ccw_put_device() for consistency.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> option as unsupported.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  hw/vfio/ccw.c |   54 ++++++++++++++++++++++++++++++++++++------------------
->  1 file changed, 36 insertions(+), 18 deletions(-)
-> 
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 4e5855741a64..49ae986d288d 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -292,12 +292,44 @@ static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
->      g_free(vcdev->io_region);
->  }
->  
-> -static void vfio_put_device(VFIOCCWDevice *vcdev)
-> +static void vfio_ccw_put_device(VFIOCCWDevice *vcdev)
->  {
->      g_free(vcdev->vdev.name);
->      vfio_put_base_device(&vcdev->vdev);
->  }
->  
-> +static int vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
-> +                               Error **errp)
-> +{
-> +    char *name = g_strdup_printf("%x.%x.%04x", vcdev->cdev.hostid.cssid,
-> +                                 vcdev->cdev.hostid.ssid,
-> +                                 vcdev->cdev.hostid.devid);
-> +    VFIODevice *vbasedev;
-> +
-> +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> +        if (strcmp(vbasedev->name, name) == 0) {
-> +            error_setg(errp, "vfio: subchannel %s has already been attached",
-> +                       name);
-> +            goto out_err;
-> +        }
-> +    }
-> +
-> +    if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
-> +        goto out_err;
-> +    }
-> +
-> +    vcdev->vdev.ops = &vfio_ccw_ops;
-> +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-> +    vcdev->vdev.name = name;
-> +    vcdev->vdev.dev = &vcdev->cdev.parent_obj.parent_obj;
-> +
-> +    return 0;
-> +
-> +out_err:
-> +    g_free(name);
-> +    return -1;
-> +}
-> +
->  static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
->  {
->      char *tmp, group_path[PATH_MAX];
-> @@ -327,7 +359,6 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
->  
->  static void vfio_ccw_realize(DeviceState *dev, Error **errp)
->  {
-> -    VFIODevice *vbasedev;
->      VFIOGroup *group;
->      CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
->      S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> @@ -348,20 +379,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
->          goto out_group_err;
->      }
->  
-> -    vcdev->vdev.ops = &vfio_ccw_ops;
-> -    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-> -    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
-> -                                       cdev->hostid.ssid, cdev->hostid.devid);
-> -    vcdev->vdev.dev = dev;
-> -    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> -        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
-> -            error_setg(&err, "vfio: subchannel %s has already been attached",
-> -                       vcdev->vdev.name);
-> -            goto out_device_err;
-> -        }
-> -    }
-> -
-> -    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, &err)) {
-> +    if (vfio_ccw_get_device(group, vcdev, &err)) {
->          goto out_device_err;
->      }
->  
-> @@ -380,7 +398,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
->  out_notifier_err:
->      vfio_ccw_put_region(vcdev);
->  out_region_err:
-> -    vfio_put_device(vcdev);
-> +    vfio_ccw_put_device(vcdev);
->  out_device_err:
->      vfio_put_group(group);
->  out_group_err:
-> @@ -401,7 +419,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
->  
->      vfio_ccw_unregister_io_notifier(vcdev);
->      vfio_ccw_put_region(vcdev);
-> -    vfio_put_device(vcdev);
-> +    vfio_ccw_put_device(vcdev);
->      vfio_put_group(group);
->  
->      if (cdc->unrealize) {
-> 
+> Kind of a v2 for "iotests: 122 needs at least two refcount bits now"
+> (fulfills the same purpose, but also splits the case into its own file
+>  so you can still run 122 with refcount_bits=3D1 [Eric]).
+>=20
+> I was a bit lost what to do about the copyright text, since this test
+> case was written by Berto.  I figured I'd drop the "owner" variable (it=
+
+> isn't used anyway), but I put "Red Hat" into the copyright line --
+> currently every test has copyright information, so I decided it'd be
+> difficult to leave that out, and I figured I simply cannot claim
+> copyright for Igalia.  So, here we go.
+
+Yeah, you'll want Berto's Signed-off-by if you tweak that line, or at
+least his Reviewed-by otherwise :)
+
+But you can have mine,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--SntvYZZ6BzHwtEGBqRZMBazS6jMXsl3wI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrHqGoACgkQp6FrSiUn
+Q2oCEAf/RtpoX9oNzDyg5JZeMeXo+A/Mwya9TTmMMYminfmYTwtFoOaje9USLg0i
+mx6U5+p8XIccdiLod79e2vSVSNA8KIboaROUCCC6h2I7POStlLGG1ihjR6LmbE4F
+J0F2r//iQp0snstehLh1hGlgs5XkT/dv+2nMUJzm9iWN7KGRz7TvGYpEEeBHKwUP
+1G+4mcNV5CjKV4m25hgAFCMEuQM3BJw+xAr5Pe4sZ0GLC9o0C8R7K7JohXMY0w25
+jCaMZbB2bDFpYhlGI0ghG775HAFL16kay3iKJ3gHL3nwmLH8eBkEdMjuxX6LIvPr
+0ViUEP6Vca3CNFMi6FH5aI7FwcgQ3g==
+=x3bY
+-----END PGP SIGNATURE-----
+
+--SntvYZZ6BzHwtEGBqRZMBazS6jMXsl3wI--
