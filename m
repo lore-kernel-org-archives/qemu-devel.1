@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4GsL-0002GH-8M
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:17 -0400
+	(envelope-from <cota@braap.org>) id 1f4GsO-0002I1-VE
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4GsI-0003Td-Ng
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:13 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:55965)
+	(envelope-from <cota@braap.org>) id 1f4GsK-0003Wh-Rk
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:16 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:39197)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4GsI-0003T4-IB
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:10 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4GsK-0003W4-Kf
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:12 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  5 Apr 2018 22:12:54 -0400
-Message-Id: <1522980788-1252-4-git-send-email-cota@braap.org>
+Date: Thu,  5 Apr 2018 22:13:05 -0400
+Message-Id: <1522980788-1252-15-git-send-email-cota@braap.org>
 In-Reply-To: <1522980788-1252-1-git-send-email-cota@braap.org>
 References: <1522980788-1252-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/17] tcg: track TBs with per-region BST's
+Subject: [Qemu-devel] [PATCH v2 14/17] translate-all: protect TB jumps with
+ a per-destination-TB lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,579 +30,398 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This paves the way for enabling scalable parallel generation of TCG code.
+This applies to both user-mode and !user-mode emulation.
 
-Instead of tracking TBs with a single binary search tree (BST), use a
-BST for each TCG region, protecting it with a lock. This is as scalable
-as it gets, since each TCG thread operates on a separate region.
+Instead of relying on a global lock, protect the list of incoming
+jumps with tb->jmp_lock. This lock also protects tb->cflags,
+so update all tb->cflags readers outside tb->jmp_lock to use
+atomic reads via tb_cflags().
 
-The core of this change is the introduction of struct tcg_region_tree,
-which contains a pointer to a GTree and an associated lock to serialize
-accesses to it. We then allocate an array of tcg_region_tree's, adding
-the appropriate padding to avoid false sharing based on
-qemu_dcache_linesize.
+In order to find the destination TB (and therefore its jmp_lock)
+from the origin TB, we introduce tb->jmp_dest[].
 
-Given a tc_ptr, we first find the corresponding region_tree. This
-is done by special-casing the first and last regions first, since they
-might be of size != region.size; otherwise we just divide the offset
-by region.stride. I was worried about this division (several dozen
-cycles of latency), but profiling shows that this is not a fast path.
-Note that region.stride is not required to be a power of two; it
-is only required to be a multiple of the host's page size.
+I considered not using a linked list of jumps, which simplifies
+code and makes the struct smaller. However, it unnecessarily increases
+memory usage, which results in a performance decrease. See for
+instance these numbers booting+shutting down debian-arm:
+                      Time (s)  Rel. err (%)  Abs. err (s)  Rel. slowdown (%)
+------------------------------------------------------------------------------
+ before                  20.88          0.74      0.154512                 0.
+ after                   20.81          0.38      0.079078        -0.33524904
+ GTree                   21.02          0.28      0.058856         0.67049808
+ GHashTable + xxhash     21.63          1.08      0.233604          3.5919540
 
-Note that with this design we can also provide consistent snapshots
-about all region trees at once; for instance, tcg_tb_foreach
-acquires/releases all region_tree locks before/after iterating over them.
-For this reason we now drop tb_lock in dump_exec_info().
+Using a hash table or a binary tree to keep track of the jumps
+doesn't really pay off, not only due to the increased memory usage,
+but also because most TBs have only 0 or 1 jumps to them. The maximum
+number of jumps when booting debian-arm that I measured is 35, but
+as we can see in the histogram below a TB with that many incoming jumps
+is extremely rare; the average TB has 0.80 incoming jumps.
 
-As an alternative I considered implementing a concurrent BST, but this
-can be tricky to get right, offers no consistent snapshots of the BST,
-and performance and scalability-wise I don't think it could ever beat
-having separate GTrees, given that our workload is insert-mostly (all
-concurrent BST designs I've seen focus, understandably, on making
-lookups fast, which comes at the expense of convoluted, non-wait-free
-insertions/removals).
+n_jumps: 379208; avg jumps/tb: 0.801099
+dist: [0.0,1.0)|▄█▁▁▁▁▁▁▁▁▁▁▁ ▁▁▁▁▁▁ ▁▁▁  ▁▁▁     ▁|[34.0,35.0]
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/exec-all.h   |   1 -
- include/exec/tb-context.h |   1 -
- tcg/tcg.h                 |   6 ++
- accel/tcg/cpu-exec.c      |   2 +-
- accel/tcg/translate-all.c | 101 ++++--------------------
- tcg/tcg.c                 | 191 ++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 213 insertions(+), 89 deletions(-)
+ docs/devel/multi-thread-tcg.txt |   6 +-
+ include/exec/exec-all.h         |  35 +++++++-----
+ accel/tcg/cpu-exec.c            |  41 +++++++++-----
+ accel/tcg/translate-all.c       | 118 ++++++++++++++++++++++++----------------
+ 4 files changed, 124 insertions(+), 76 deletions(-)
 
+diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.txt
+index faf09c6..df83445 100644
+--- a/docs/devel/multi-thread-tcg.txt
++++ b/docs/devel/multi-thread-tcg.txt
+@@ -131,8 +131,10 @@ DESIGN REQUIREMENT: Safely handle invalidation of TBs
+ 
+ The direct jump themselves are updated atomically by the TCG
+ tb_set_jmp_target() code. Modification to the linked lists that allow
+-searching for linked pages are done under the protect of the
+-tb_lock().
++searching for linked pages are done under the protection of tb->jmp_lock,
++where tb is the destination block of a jump. Each origin block keeps a
++pointer to its destinations so that the appropriate lock can be acquired before
++iterating over a jump list.
+ 
+ The global page table is a lockless radix tree; cmpxchg is used
+ to atomically insert new elements.
 diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index e5afd2e..17e08b3 100644
+index 7911e69..f8adeb8 100644
 --- a/include/exec/exec-all.h
 +++ b/include/exec/exec-all.h
-@@ -401,7 +401,6 @@ static inline uint32_t curr_cflags(void)
-          | (use_icount ? CF_USE_ICOUNT : 0);
- }
+@@ -341,7 +341,7 @@ struct TranslationBlock {
+ #define CF_LAST_IO     0x00008000 /* Last insn may be an IO access.  */
+ #define CF_NOCACHE     0x00010000 /* To be freed after execution */
+ #define CF_USE_ICOUNT  0x00020000
+-#define CF_INVALID     0x00040000 /* TB is stale. Setters need tb_lock */
++#define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held */
+ #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context */
+ /* cflags' mask for hashing/comparison */
+ #define CF_HASH_MASK   \
+@@ -360,6 +360,9 @@ struct TranslationBlock {
+     uintptr_t page_next[2];
+     tb_page_addr_t page_addr[2];
  
--void tb_remove(TranslationBlock *tb);
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
- TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
-index 1d41202..d8472c8 100644
---- a/include/exec/tb-context.h
-+++ b/include/exec/tb-context.h
-@@ -31,7 +31,6 @@ typedef struct TBContext TBContext;
- 
- struct TBContext {
- 
--    GTree *tb_tree;
-     struct qht htable;
-     /* any access to the tbs or the page table must use this lock */
-     QemuMutex tb_lock;
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 9e2d909..8bf29cc 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -850,6 +850,12 @@ void tcg_region_reset_all(void);
- size_t tcg_code_size(void);
- size_t tcg_code_capacity(void);
- 
-+void tcg_tb_insert(TranslationBlock *tb);
-+void tcg_tb_remove(TranslationBlock *tb);
-+TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr);
-+void tcg_tb_foreach(GTraverseFunc func, gpointer user_data);
-+size_t tcg_nb_tbs(void);
++    /* jmp_lock placed here to fill a 4-byte hole. Its documentation is below */
++    QemuSpin jmp_lock;
 +
- /* user-mode: Called with tb_lock held.  */
- static inline void *tcg_malloc(int size)
- {
+     /* The following data are used to directly call another TB from
+      * the code of this one. This can be done either by emitting direct or
+      * indirect native jump instructions. These jumps are reset so that the TB
+@@ -371,20 +374,26 @@ struct TranslationBlock {
+ #define TB_JMP_RESET_OFFSET_INVALID 0xffff /* indicates no jump generated */
+     uintptr_t jmp_target_arg[2];  /* target address or offset */
+ 
+-    /* Each TB has an associated circular list of TBs jumping to this one.
+-     * jmp_list_first points to the first TB jumping to this one.
+-     * jmp_list_next is used to point to the next TB in a list.
+-     * Since each TB can have two jumps, it can participate in two lists.
+-     * jmp_list_first and jmp_list_next are 4-byte aligned pointers to a
+-     * TranslationBlock structure, but the two least significant bits of
+-     * them are used to encode which data field of the pointed TB should
+-     * be used to traverse the list further from that TB:
+-     * 0 => jmp_list_next[0], 1 => jmp_list_next[1], 2 => jmp_list_first.
+-     * In other words, 0/1 tells which jump is used in the pointed TB,
+-     * and 2 means that this is a pointer back to the target TB of this list.
++    /*
++     * Each TB has a NULL-terminated list (jmp_list_head) of incoming jumps.
++     * Each TB can have two outgoing jumps, and therefore can participate
++     * in two lists. The list entries are kept in jmp_list_next[2]. The least
++     * significant bit (LSB) of the pointers in these lists is used to encode
++     * which of the two list entries is to be used in the pointed TB.
++     *
++     * List traversals are protected by jmp_lock. The destination TB of each
++     * outgoing jump is kept in jmp_dest[] so that the appropriate jmp_lock
++     * can be acquired from any origin TB.
++     *
++     * jmp_dest[] are tagged pointers as well. The LSB is set when the TB is
++     * being invalidated, so that no further outgoing jumps from it can be set.
++     *
++     * jmp_lock also protects the CF_INVALID cflag; a jump must not be chained
++     * to a destination TB that has CF_INVALID set.
+      */
++    uintptr_t jmp_list_head;
+     uintptr_t jmp_list_next[2];
+-    uintptr_t jmp_list_first;
++    uintptr_t jmp_dest[2];
+ };
+ 
+ extern bool parallel_cpus;
 diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index dabf292..778801a 100644
+index c79c43b..178452a 100644
 --- a/accel/tcg/cpu-exec.c
 +++ b/accel/tcg/cpu-exec.c
-@@ -222,7 +222,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
- 
-     tb_lock();
-     tb_phys_invalidate(tb, -1);
--    tb_remove(tb);
-+    tcg_tb_remove(tb);
-     tb_unlock();
- }
- #endif
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index d16e094..449d4de 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -205,8 +205,6 @@ void tb_lock_reset(void)
+@@ -350,28 +350,43 @@ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
      }
- }
- 
--static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
--
- void cpu_gen_init(void)
- {
-     tcg_context_init(&tcg_init_ctx);
-@@ -375,13 +373,13 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc)
- 
-     if (check_offset < tcg_init_ctx.code_gen_buffer_size) {
-         tb_lock();
--        tb = tb_find_pc(host_pc);
-+        tb = tcg_tb_lookup(host_pc);
-         if (tb) {
-             cpu_restore_state_from_tb(cpu, tb, host_pc);
-             if (tb->cflags & CF_NOCACHE) {
-                 /* one-shot translation, invalidate it immediately */
-                 tb_phys_invalidate(tb, -1);
--                tb_remove(tb);
-+                tcg_tb_remove(tb);
-             }
-             r = true;
-         }
-@@ -731,48 +729,6 @@ static inline void *alloc_code_gen_buffer(void)
- }
- #endif /* USE_STATIC_CODE_GEN_BUFFER, WIN32, POSIX */
- 
--/* compare a pointer @ptr and a tb_tc @s */
--static int ptr_cmp_tb_tc(const void *ptr, const struct tb_tc *s)
--{
--    if (ptr >= s->ptr + s->size) {
--        return 1;
--    } else if (ptr < s->ptr) {
--        return -1;
--    }
--    return 0;
--}
--
--static gint tb_tc_cmp(gconstpointer ap, gconstpointer bp)
--{
--    const struct tb_tc *a = ap;
--    const struct tb_tc *b = bp;
--
--    /*
--     * When both sizes are set, we know this isn't a lookup.
--     * This is the most likely case: every TB must be inserted; lookups
--     * are a lot less frequent.
--     */
--    if (likely(a->size && b->size)) {
--        if (a->ptr > b->ptr) {
--            return 1;
--        } else if (a->ptr < b->ptr) {
--            return -1;
--        }
--        /* a->ptr == b->ptr should happen only on deletions */
--        g_assert(a->size == b->size);
--        return 0;
--    }
--    /*
--     * All lookups have either .size field set to 0.
--     * From the glib sources we see that @ap is always the lookup key. However
--     * the docs provide no guarantee, so we just mark this case as likely.
--     */
--    if (likely(a->size == 0)) {
--        return ptr_cmp_tb_tc(a->ptr, b);
--    }
--    return ptr_cmp_tb_tc(b->ptr, a);
--}
--
- static inline void code_gen_alloc(size_t tb_size)
- {
-     tcg_ctx->code_gen_buffer_size = size_code_gen_buffer(tb_size);
-@@ -781,7 +737,6 @@ static inline void code_gen_alloc(size_t tb_size)
-         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
-         exit(1);
-     }
--    tb_ctx.tb_tree = g_tree_new(tb_tc_cmp);
-     qemu_mutex_init(&tb_ctx.tb_lock);
- }
- 
-@@ -842,14 +797,6 @@ static TranslationBlock *tb_alloc(target_ulong pc)
-     return tb;
  }
  
 -/* Called with tb_lock held.  */
--void tb_remove(TranslationBlock *tb)
--{
--    assert_tb_locked();
--
--    g_tree_remove(tb_ctx.tb_tree, &tb->tc);
--}
--
- static inline void invalidate_page_bitmap(PageDesc *p)
+ static inline void tb_add_jump(TranslationBlock *tb, int n,
+                                TranslationBlock *tb_next)
  {
- #ifdef CONFIG_SOFTMMU
-@@ -914,10 +861,10 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
++    uintptr_t old;
++
+     assert(n < ARRAY_SIZE(tb->jmp_list_next));
+-    if (tb->jmp_list_next[n]) {
+-        /* Another thread has already done this while we were
+-         * outside of the lock; nothing to do in this case */
+-        return;
++    qemu_spin_lock(&tb_next->jmp_lock);
++
++    /* make sure the destination TB is valid */
++    if (tb_next->cflags & CF_INVALID) {
++        goto out_unlock_next;
++    }
++    /* Atomically claim the jump destination slot only if it was NULL */
++    old = atomic_cmpxchg(&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
++    if (old) {
++        goto out_unlock_next;
      }
++
++    /* patch the native jump address */
++    tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc.ptr);
++
++    /* add in TB jmp list */
++    tb->jmp_list_next[n] = tb_next->jmp_list_head;
++    tb_next->jmp_list_head = (uintptr_t)tb | n;
++
++    qemu_spin_unlock(&tb_next->jmp_lock);
++
+     qemu_log_mask_and_addr(CPU_LOG_EXEC, tb->pc,
+                            "Linking TBs %p [" TARGET_FMT_lx
+                            "] index %d -> %p [" TARGET_FMT_lx "]\n",
+                            tb->tc.ptr, tb->pc, n,
+                            tb_next->tc.ptr, tb_next->pc);
++    return;
  
-     if (DEBUG_TB_FLUSH_GATE) {
--        size_t nb_tbs = g_tree_nnodes(tb_ctx.tb_tree);
-+        size_t nb_tbs = tcg_nb_tbs();
-         size_t host_size = 0;
- 
--        g_tree_foreach(tb_ctx.tb_tree, tb_host_size_iter, &host_size);
-+        tcg_tb_foreach(tb_host_size_iter, &host_size);
-         printf("qemu: flush code_size=%zu nb_tbs=%zu avg_tb_size=%zu\n",
-                tcg_code_size(), nb_tbs, nb_tbs > 0 ? host_size / nb_tbs : 0);
-     }
-@@ -926,10 +873,6 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-         cpu_tb_jmp_cache_clear(cpu);
-     }
- 
--    /* Increment the refcount first so that destroy acts as a reset */
--    g_tree_ref(tb_ctx.tb_tree);
--    g_tree_destroy(tb_ctx.tb_tree);
+-    /* patch the native jump address */
+-    tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc.ptr);
 -
-     qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
-     page_flush_tb();
- 
-@@ -1409,7 +1352,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-      * through the physical hash table and physical page list.
-      */
-     tb_link_page(tb, phys_pc, phys_page2);
--    g_tree_insert(tb_ctx.tb_tree, &tb->tc, tb);
-+    tcg_tb_insert(tb);
-     return tb;
+-    /* add in TB jmp circular list */
+-    tb->jmp_list_next[n] = tb_next->jmp_list_first;
+-    tb_next->jmp_list_first = (uintptr_t)tb | n;
++ out_unlock_next:
++    qemu_spin_unlock(&tb_next->jmp_lock);
++    return;
  }
  
-@@ -1513,7 +1456,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-                 current_tb = NULL;
-                 if (cpu->mem_io_pc) {
-                     /* now we have a real cpu fault */
--                    current_tb = tb_find_pc(cpu->mem_io_pc);
-+                    current_tb = tcg_tb_lookup(cpu->mem_io_pc);
+ static inline TranslationBlock *tb_find(CPUState *cpu,
+@@ -414,9 +429,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+             tb_lock();
+             acquired_tb_lock = true;
+         }
+-        if (!(tb->cflags & CF_INVALID)) {
+-            tb_add_jump(last_tb, tb_exit, tb);
+-        }
++        tb_add_jump(last_tb, tb_exit, tb);
+     }
+     if (acquired_tb_lock) {
+         tb_unlock();
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index aabde7e..486c9df 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -170,6 +170,9 @@ struct page_collection {
+ #define PAGE_FOR_EACH_TB(pagedesc, tb, n)                       \
+     TB_FOR_EACH_TAGGED((pagedesc)->first_tb, tb, n, page_next)
+ 
++#define TB_FOR_EACH_JMP(head_tb, tb, n)                                 \
++    TB_FOR_EACH_TAGGED((head_tb)->jmp_list_head, tb, n, jmp_list_next)
++
+ /* In system mode we want L1_MAP to be based on ram offsets,
+    while in user mode we want it to be based on virtual addresses.  */
+ #if !defined(CONFIG_USER_ONLY)
+@@ -387,7 +390,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
+     return -1;
+ 
+  found:
+-    if (tb->cflags & CF_USE_ICOUNT) {
++    if (tb_cflags(tb) & CF_USE_ICOUNT) {
+         assert(use_icount);
+         /* Reset the cycle counter to the start of the block.  */
+         cpu->icount_decr.u16.low += num_insns;
+@@ -432,7 +435,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc)
+         tb = tcg_tb_lookup(host_pc);
+         if (tb) {
+             cpu_restore_state_from_tb(cpu, tb, host_pc);
+-            if (tb->cflags & CF_NOCACHE) {
++            if (tb_cflags(tb) & CF_NOCACHE) {
+                 /* one-shot translation, invalidate it immediately */
+                 tb_phys_invalidate(tb, -1);
+                 tcg_tb_remove(tb);
+@@ -1360,34 +1363,53 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
+     g_assert_not_reached();
+ }
+ 
+-/* remove the TB from a list of TBs jumping to the n-th jump target of the TB */
+-static inline void tb_remove_from_jmp_list(TranslationBlock *tb, int n)
++/* remove @orig from its @n_orig-th jump list */
++static inline void tb_remove_from_jmp_list(TranslationBlock *orig, int n_orig)
+ {
+-    TranslationBlock *tb1;
+-    uintptr_t *ptb, ntb;
+-    unsigned int n1;
++    uintptr_t ptr, ptr_locked;
++    TranslationBlock *dest;
++    TranslationBlock *tb;
++    uintptr_t *pprev;
++    int n;
+ 
+-    ptb = &tb->jmp_list_next[n];
+-    if (*ptb) {
+-        /* find tb(n) in circular list */
+-        for (;;) {
+-            ntb = *ptb;
+-            n1 = ntb & 3;
+-            tb1 = (TranslationBlock *)(ntb & ~3);
+-            if (n1 == n && tb1 == tb) {
+-                break;
+-            }
+-            if (n1 == 2) {
+-                ptb = &tb1->jmp_list_first;
+-            } else {
+-                ptb = &tb1->jmp_list_next[n1];
+-            }
+-        }
+-        /* now we can suppress tb(n) from the list */
+-        *ptb = tb->jmp_list_next[n];
++    /* mark the LSB of jmp_dest[] so that no further jumps can be inserted */
++    ptr = atomic_or_fetch(&orig->jmp_dest[n_orig], 1);
++    dest = (TranslationBlock *)(ptr & ~1);
++    if (dest == NULL) {
++        return;
++    }
+ 
+-        tb->jmp_list_next[n] = (uintptr_t)NULL;
++    qemu_spin_lock(&dest->jmp_lock);
++    /*
++     * While acquiring the lock, the jump might have been removed if the
++     * destination TB was invalidated; check again.
++     */
++    ptr_locked = atomic_read(&orig->jmp_dest[n_orig]);
++    if (ptr_locked != ptr) {
++        qemu_spin_unlock(&dest->jmp_lock);
++        /*
++         * The only possibility is that the jump was unlinked via
++         * tb_jump_unlink(dest). Seeing here another destination would be a bug,
++         * because we set the LSB above.
++         */
++        g_assert(ptr_locked == 1 && dest->cflags & CF_INVALID);
++        return;
+     }
++    /*
++     * We first acquired the lock, and since the destination pointer matches,
++     * we know for sure that @orig is in the jmp list.
++     */
++    pprev = &dest->jmp_list_head;
++    TB_FOR_EACH_JMP(dest, tb, n) {
++        if (tb == orig && n == n_orig) {
++            *pprev = tb->jmp_list_next[n];
++            /* no need to set orig->jmp_dest[n]; setting the LSB was enough */
++            qemu_spin_unlock(&dest->jmp_lock);
++            return;
++        }
++        pprev = &tb->jmp_list_next[n];
++    }
++    g_assert_not_reached();
+ }
+ 
+ /* reset the jump entry 'n' of a TB so that it is not chained to
+@@ -1399,24 +1421,21 @@ static inline void tb_reset_jump(TranslationBlock *tb, int n)
+ }
+ 
+ /* remove any jumps to the TB */
+-static inline void tb_jmp_unlink(TranslationBlock *tb)
++static inline void tb_jmp_unlink(TranslationBlock *dest)
+ {
+-    TranslationBlock *tb1;
+-    uintptr_t *ptb, ntb;
+-    unsigned int n1;
++    TranslationBlock *tb;
++    int n;
+ 
+-    ptb = &tb->jmp_list_first;
+-    for (;;) {
+-        ntb = *ptb;
+-        n1 = ntb & 3;
+-        tb1 = (TranslationBlock *)(ntb & ~3);
+-        if (n1 == 2) {
+-            break;
+-        }
+-        tb_reset_jump(tb1, n1);
+-        *ptb = tb1->jmp_list_next[n1];
+-        tb1->jmp_list_next[n1] = (uintptr_t)NULL;
++    qemu_spin_lock(&dest->jmp_lock);
++
++    TB_FOR_EACH_JMP(dest, tb, n) {
++        tb_reset_jump(tb, n);
++        atomic_and(&tb->jmp_dest[n], (uintptr_t)NULL | 1);
++        /* No need to clear the list entry; setting the dest ptr is enough */
+     }
++    dest->jmp_list_head = (uintptr_t)NULL;
++
++    qemu_spin_unlock(&dest->jmp_lock);
+ }
+ 
+ /* If @rm_from_page_list is set, call with the TB's pages' locks held */
+@@ -1429,11 +1448,14 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+ 
+     assert_tb_locked();
+ 
++    /* make sure no further incoming jumps will be chained to this TB */
++    qemu_spin_lock(&tb->jmp_lock);
+     atomic_set(&tb->cflags, tb->cflags | CF_INVALID);
++    qemu_spin_unlock(&tb->jmp_lock);
+ 
+     /* remove the TB from the hash list */
+     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+-    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
++    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb_cflags(tb) & CF_HASH_MASK,
+                      tb->trace_vcpu_dstate);
+     if (!qht_remove(&tb_ctx.htable, tb, h)) {
+         return;
+@@ -1784,10 +1806,12 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+                  CODE_GEN_ALIGN));
+ 
+     /* init jump list */
+-    assert(((uintptr_t)tb & 3) == 0);
+-    tb->jmp_list_first = (uintptr_t)tb | 2;
++    qemu_spin_init(&tb->jmp_lock);
++    tb->jmp_list_head = (uintptr_t)NULL;
+     tb->jmp_list_next[0] = (uintptr_t)NULL;
+     tb->jmp_list_next[1] = (uintptr_t)NULL;
++    tb->jmp_dest[0] = (uintptr_t)NULL;
++    tb->jmp_dest[1] = (uintptr_t)NULL;
+ 
+     /* init original jump addresses wich has been set during tcg_gen_code() */
+     if (tb->jmp_reset_offset[0] != TB_JMP_RESET_OFFSET_INVALID) {
+@@ -1879,7 +1903,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
                  }
              }
              if (current_tb == tb &&
-@@ -1629,7 +1572,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
-     tb = p->first_tb;
+-                (current_tb->cflags & CF_COUNT_MASK) != 1) {
++                (tb_cflags(current_tb) & CF_COUNT_MASK) != 1) {
+                 /* If we are modifying the current TB, we must stop
+                 its execution. We could be more precise by checking
+                 that the modification is after the current PC, but it
+@@ -2076,7 +2100,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+     PAGE_FOR_EACH_TB(p, tb, n) {
  #ifdef TARGET_HAS_PRECISE_SMC
-     if (tb && pc != 0) {
--        current_tb = tb_find_pc(pc);
-+        current_tb = tcg_tb_lookup(pc);
-     }
-     if (cpu != NULL) {
-         env = cpu->env_ptr;
-@@ -1672,18 +1615,6 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
- }
- #endif
+         if (current_tb == tb &&
+-            (current_tb->cflags & CF_COUNT_MASK) != 1) {
++            (tb_cflags(current_tb) & CF_COUNT_MASK) != 1) {
+                 /* If we are modifying the current TB, we must stop
+                    its execution. We could be more precise by checking
+                    that the modification is after the current PC, but it
+@@ -2201,7 +2225,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+     /* Generate a new TB executing the I/O insn.  */
+     cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
  
--/*
-- * Find the TB 'tb' such that
-- * tb->tc.ptr <= tc_ptr < tb->tc.ptr + tb->tc.size
-- * Return NULL if not found.
-- */
--static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
--{
--    struct tb_tc s = { .ptr = (void *)tc_ptr };
--
--    return g_tree_lookup(tb_ctx.tb_tree, &s);
--}
--
- #if !defined(CONFIG_USER_ONLY)
- void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
- {
-@@ -1711,7 +1642,7 @@ void tb_check_watchpoint(CPUState *cpu)
- {
-     TranslationBlock *tb;
- 
--    tb = tb_find_pc(cpu->mem_io_pc);
-+    tb = tcg_tb_lookup(cpu->mem_io_pc);
-     if (tb) {
-         /* We can use retranslation to find the PC.  */
-         cpu_restore_state_from_tb(cpu, tb, cpu->mem_io_pc);
-@@ -1745,7 +1676,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     uint32_t n;
- 
-     tb_lock();
--    tb = tb_find_pc(retaddr);
-+    tb = tcg_tb_lookup(retaddr);
-     if (!tb) {
-         cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
-                   (void *)retaddr);
-@@ -1784,7 +1715,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+-    if (tb->cflags & CF_NOCACHE) {
++    if (tb_cflags(tb) & CF_NOCACHE) {
+         if (tb->orig_tb) {
+             /* Invalidate original TB if this TB was generated in
               * cpu_exec_nocache() */
-             tb_phys_invalidate(tb->orig_tb, -1);
-         }
--        tb_remove(tb);
-+        tcg_tb_remove(tb);
-     }
- 
-     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
-@@ -1855,6 +1786,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
- }
- 
- struct tb_tree_stats {
-+    size_t nb_tbs;
-     size_t host_size;
-     size_t target_size;
-     size_t max_target_size;
-@@ -1868,6 +1800,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-     const TranslationBlock *tb = value;
-     struct tb_tree_stats *tst = data;
- 
-+    tst->nb_tbs++;
-     tst->host_size += tb->tc.size;
-     tst->target_size += tb->size;
-     if (tb->size > tst->max_target_size) {
-@@ -1891,10 +1824,8 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     struct qht_stats hst;
-     size_t nb_tbs;
- 
--    tb_lock();
--
--    nb_tbs = g_tree_nnodes(tb_ctx.tb_tree);
--    g_tree_foreach(tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
-+    tcg_tb_foreach(tb_tree_stats_iter, &tst);
-+    nb_tbs = tst.nb_tbs;
-     /* XXX: avoid using doubles ? */
-     cpu_fprintf(f, "Translation buffer state:\n");
-     /*
-@@ -1929,8 +1860,6 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate_count);
-     cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
-     tcg_dump_info(f, cpu_fprintf);
--
--    tb_unlock();
- }
- 
- void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
-@@ -2198,7 +2127,7 @@ int page_unprotect(target_ulong address, uintptr_t pc)
-              * set the page to PAGE_WRITE and did the TB invalidate for us.
-              */
- #ifdef TARGET_HAS_PRECISE_SMC
--            TranslationBlock *current_tb = tb_find_pc(pc);
-+            TranslationBlock *current_tb = tcg_tb_lookup(pc);
-             if (current_tb) {
-                 current_tb_invalidated = tb_cflags(current_tb) & CF_INVALID;
-             }
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index bb24526..b471708 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -135,6 +135,12 @@ static TCGContext **tcg_ctxs;
- static unsigned int n_tcg_ctxs;
- TCGv_env cpu_env = 0;
- 
-+struct tcg_region_tree {
-+    QemuMutex lock;
-+    GTree *tree;
-+    /* padding to avoid false sharing is computed at run-time */
-+};
-+
- /*
-  * We divide code_gen_buffer into equally-sized "regions" that TCG threads
-  * dynamically allocate from as demand dictates. Given appropriate region
-@@ -158,6 +164,13 @@ struct tcg_region_state {
- };
- 
- static struct tcg_region_state region;
-+/*
-+ * This is an array of struct tcg_region_tree's, with padding.
-+ * We use void * to simplify the computation of region_trees[i]; each
-+ * struct is found every tree_size bytes.
-+ */
-+static void *region_trees;
-+static size_t tree_size;
- static TCGRegSet tcg_target_available_regs[TCG_TYPE_COUNT];
- static TCGRegSet tcg_target_call_clobber_regs;
- 
-@@ -295,6 +308,180 @@ TCGLabel *gen_new_label(void)
- 
- #include "tcg-target.inc.c"
- 
-+/* compare a pointer @ptr and a tb_tc @s */
-+static int ptr_cmp_tb_tc(const void *ptr, const struct tb_tc *s)
-+{
-+    if (ptr >= s->ptr + s->size) {
-+        return 1;
-+    } else if (ptr < s->ptr) {
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static gint tb_tc_cmp(gconstpointer ap, gconstpointer bp)
-+{
-+    const struct tb_tc *a = ap;
-+    const struct tb_tc *b = bp;
-+
-+    /*
-+     * When both sizes are set, we know this isn't a lookup.
-+     * This is the most likely case: every TB must be inserted; lookups
-+     * are a lot less frequent.
-+     */
-+    if (likely(a->size && b->size)) {
-+        if (a->ptr > b->ptr) {
-+            return 1;
-+        } else if (a->ptr < b->ptr) {
-+            return -1;
-+        }
-+        /* a->ptr == b->ptr should happen only on deletions */
-+        g_assert(a->size == b->size);
-+        return 0;
-+    }
-+    /*
-+     * All lookups have either .size field set to 0.
-+     * From the glib sources we see that @ap is always the lookup key. However
-+     * the docs provide no guarantee, so we just mark this case as likely.
-+     */
-+    if (likely(a->size == 0)) {
-+        return ptr_cmp_tb_tc(a->ptr, b);
-+    }
-+    return ptr_cmp_tb_tc(b->ptr, a);
-+}
-+
-+static void tcg_region_trees_init(void)
-+{
-+    size_t i;
-+
-+    tree_size = ROUND_UP(sizeof(struct tcg_region_tree), qemu_dcache_linesize);
-+    region_trees = qemu_memalign(qemu_dcache_linesize, region.n * tree_size);
-+    for (i = 0; i < region.n; i++) {
-+        struct tcg_region_tree *rt = region_trees + i * tree_size;
-+
-+        qemu_mutex_init(&rt->lock);
-+        rt->tree = g_tree_new(tb_tc_cmp);
-+    }
-+}
-+
-+static struct tcg_region_tree *tc_ptr_to_region_tree(void *p)
-+{
-+    size_t region_idx;
-+
-+    if (p < region.start_aligned) {
-+        region_idx = 0;
-+    } else {
-+        ptrdiff_t offset = p - region.start_aligned;
-+
-+        if (offset > region.stride * (region.n - 1)) {
-+            region_idx = region.n - 1;
-+        } else {
-+            region_idx = offset / region.stride;
-+        }
-+    }
-+    return region_trees + region_idx * tree_size;
-+}
-+
-+void tcg_tb_insert(TranslationBlock *tb)
-+{
-+    struct tcg_region_tree *rt = tc_ptr_to_region_tree(tb->tc.ptr);
-+
-+    qemu_mutex_lock(&rt->lock);
-+    g_tree_insert(rt->tree, &tb->tc, tb);
-+    qemu_mutex_unlock(&rt->lock);
-+}
-+
-+void tcg_tb_remove(TranslationBlock *tb)
-+{
-+    struct tcg_region_tree *rt = tc_ptr_to_region_tree(tb->tc.ptr);
-+
-+    qemu_mutex_lock(&rt->lock);
-+    g_tree_remove(rt->tree, &tb->tc);
-+    qemu_mutex_unlock(&rt->lock);
-+}
-+
-+/*
-+ * Find the TB 'tb' such that
-+ * tb->tc.ptr <= tc_ptr < tb->tc.ptr + tb->tc.size
-+ * Return NULL if not found.
-+ */
-+TranslationBlock *tcg_tb_lookup(uintptr_t tc_ptr)
-+{
-+    struct tcg_region_tree *rt = tc_ptr_to_region_tree((void *)tc_ptr);
-+    TranslationBlock *tb;
-+    struct tb_tc s = { .ptr = (void *)tc_ptr };
-+
-+    qemu_mutex_lock(&rt->lock);
-+    tb = g_tree_lookup(rt->tree, &s);
-+    qemu_mutex_unlock(&rt->lock);
-+    return tb;
-+}
-+
-+static void tcg_region_tree_lock_all(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < region.n; i++) {
-+        struct tcg_region_tree *rt = region_trees + i * tree_size;
-+
-+        qemu_mutex_lock(&rt->lock);
-+    }
-+}
-+
-+static void tcg_region_tree_unlock_all(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < region.n; i++) {
-+        struct tcg_region_tree *rt = region_trees + i * tree_size;
-+
-+        qemu_mutex_unlock(&rt->lock);
-+    }
-+}
-+
-+void tcg_tb_foreach(GTraverseFunc func, gpointer user_data)
-+{
-+    size_t i;
-+
-+    tcg_region_tree_lock_all();
-+    for (i = 0; i < region.n; i++) {
-+        struct tcg_region_tree *rt = region_trees + i * tree_size;
-+
-+        g_tree_foreach(rt->tree, func, user_data);
-+    }
-+    tcg_region_tree_unlock_all();
-+}
-+
-+size_t tcg_nb_tbs(void)
-+{
-+    size_t nb_tbs = 0;
-+    size_t i;
-+
-+    tcg_region_tree_lock_all();
-+    for (i = 0; i < region.n; i++) {
-+        struct tcg_region_tree *rt = region_trees + i * tree_size;
-+
-+        nb_tbs += g_tree_nnodes(rt->tree);
-+    }
-+    tcg_region_tree_unlock_all();
-+    return nb_tbs;
-+}
-+
-+static void tcg_region_tree_reset_all(void)
-+{
-+    size_t i;
-+
-+    tcg_region_tree_lock_all();
-+    for (i = 0; i < region.n; i++) {
-+        struct tcg_region_tree *rt = region_trees + i * tree_size;
-+
-+        /* Increment the refcount first so that destroy acts as a reset */
-+        g_tree_ref(rt->tree);
-+        g_tree_destroy(rt->tree);
-+    }
-+    tcg_region_tree_unlock_all();
-+}
-+
- static void tcg_region_bounds(size_t curr_region, void **pstart, void **pend)
- {
-     void *start, *end;
-@@ -380,6 +567,8 @@ void tcg_region_reset_all(void)
-         g_assert(!err);
-     }
-     qemu_mutex_unlock(&region.lock);
-+
-+    tcg_region_tree_reset_all();
- }
- 
- #ifdef CONFIG_USER_ONLY
-@@ -496,6 +685,8 @@ void tcg_region_init(void)
-         g_assert(!rc);
-     }
- 
-+    tcg_region_trees_init();
-+
-     /* In user-mode we support only one ctx, so do the initial allocation now */
- #ifdef CONFIG_USER_ONLY
-     {
 -- 
 2.7.4
