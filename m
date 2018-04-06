@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f4VzB-0004qv-As
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:21:19 -0400
+	(envelope-from <groug@kaod.org>) id 1f4W50-0001eQ-Kf
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f4Vz6-0001LO-9M
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:21:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55276 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1f4W4v-00041D-Oi
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:27:18 -0400
+Received: from 13.mo5.mail-out.ovh.net ([87.98.182.191]:48796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f4Vz5-0001Kb-TO
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:21:12 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B3DD406E8A4
-	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 18:21:11 +0000 (UTC)
-References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
-	<20180307151836.GK20201@redhat.com>
-	<20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>
-	<20180308101728.GG4718@redhat.com>
-	<f30635f1-5773-2046-1efd-fc37a0a49753@redhat.com>
-	<85d1416c-c442-eaf2-c4a5-3308fd63de3a@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <721a331e-0ba9-58e2-8659-81b725a0ddff@redhat.com>
-Date: Fri, 6 Apr 2018 20:21:00 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f4W4v-0003zf-Fg
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:27:13 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.108.113])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BE37019E777
+	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 20:27:11 +0200 (CEST)
+Date: Fri, 6 Apr 2018 20:27:06 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180406202706.48304b60@bahia.lan>
+In-Reply-To: <20180406185413.0af47db3.cohuck@redhat.com>
+References: <152302765908.144052.14302567702608397806.stgit@bahia.lan>
+	<20180406185413.0af47db3.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <85d1416c-c442-eaf2-c4a5-3308fd63de3a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
- et al) metadata format & file
+Subject: Re: [Qemu-devel] [PATCH for-2.12] vfio-ccw: fix memory leak in
+ vfio_ccw_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,76 +31,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-On 04/06/18 20:10, Eric Blake wrote:
-> On 04/06/2018 12:28 PM, Laszlo Ersek wrote:
->
->> I've created an RFC-level "qapi/firmware.json" schema file, based on
->> this discussion. It "builds", and the generated documentation looks
->> acceptable, superficially speaking.
->>
->> Before I post "qapi/firmware.json" for getting comments, I'd like to
->> write JSON text that (a) describes firmware that I use, and (b)
->> conforms to the schema. IOW, I'd like to validate whether the schema
->> is good enough for describing at least such firmware that I know.
->>
->> Is there a tool that generates example JSON objects from a given
->> schema?
->
-> I know the QMP shell (scripts/qmp/qmp-shell) lets you enter commands
-> with a lot less typing than full JSON, and has a mode where it will
-> then echo the full JSON command it constructed from what you typed. To
-> be able to quickly validate examples, it may be sufficient to
-> temporarily add a new QMP command 'check-firmware':
->
-> { 'command': 'check-firmware', 'boxed': true, 'data': 'Firmware' }
->
-> assuming 'Firmware' is your top-level 'struct' in the QAPI file, then
-> implement a trivial:
->
-> qmp_check_firmware(Firmware *obj, Error **errp) {
->     return 0;
-> }
->
-> so that you can then run QMP shell, and type:
->
-> check-firmware arg1=foo arg2=bar ...
->
-> which will then generate the corresponding JSON, then either
-> successfully do nothing (what you typed validated, AND you have the
-> JSON output printed), or print an error (what you typed failed QAPI
-> validation, perhaps because it had an unrecognized key, was missing a
-> required key, used a wrong type, etc).
->
->> I vaguely recall there used to be one. Otherwise, writing the
->> examples manually looks arduous (and I wouldn't know how to verify
->> them against the schema).
->
-> Similarly, if you generate a command the produces a 'Firmware' as the
-> return value, then you can populate the generated C struct (since you
-> did manage to run the QAPI generator over your new file, you should be
-> able to look at the C struct it generated), then output that over QMP
-> to show the counterpart JSON that matches the struct as populated.
->
+On Fri, 6 Apr 2018 18:54:13 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-The top level structure is complex / nested, but that doesn't appear to
-be an issue. According to the script,
+> On Fri, 06 Apr 2018 17:14:19 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > The vfio_ccw_realize() function currently leaks vcdev->vdev.name if
+> > the subchannel is already attached or if vfio_get_device() fails.
+> > 
+> > This happens because vcdev->vdev.name is expected to be freed in
+> > vfio_put_device() which isn't called in this case.
+> > 
+> > Adding g_free(vcdev->vdev.name) on these two error paths would be
+> > enough to fix the leak, but this is unfortunate since we would then
+> > have three locations doing this. Also, this would be inconsistent
+> > with the label based rollback scheme of this function.  
+> 
+> This is all a bit awkward :(
+> 
+> But I'd actually prefer adding the two g_free calls for now, as that
+> would be a nice, small patch that my brain can still process at this
+> point in the evening :)
+> 
+> Your patch would be a nice cleanup for 2.13, though.
+> 
+> Alternatively, I could be convinced to queue this if I get a R-b from
+> someone :)
+> 
 
-# key=value pairs also support Python or JSON object literal subset notations,
-# without spaces. Dictionaries/objects {} are supported as are arrays [].
-#
-#    example-command arg-name1={'key':'value','obj'={'prop':"value"}}
-#
-# Both JSON and Python formatting should work, including both styles of
-# string literal quotes. Both paradigms of literal values should work,
-# including null/true/false for JSON and None/True/False for Python.
+I guess I should rather split the patch in two: a bug fix with the two
+g_free calls for 2.12 and stable, and a cleanup patch for 2.13.
 
-This looks awesome, because it should let me provide messy nested input
-(which I'll obviously compose in my $EDITOR and then paste it), and then
-the QMP shell will both validate and pretty print that. I'm going to try
-this.
-
-Thank you, Eric!
-Laszlo
+> > 
+> > The root issue is that vcdev->vdev.name is set before vfio_get_device()
+> > is called, which theoretically prevents to call vfio_put_device() to
+> > do the freeing. Well actually, we could call it anyway  because
+> > vfio_put_base_device() is a nop if the device isn't attached, but this
+> > would be confusing.
+> > 
+> > This patch hence moves all the logic of attaching the device to a
+> > separate vfio_ccw_get_device() function, which is the counterpart
+> > of vfio_put_device(). While here, vfio_put_device() is renamed to
+> > vfio_ccw_put_device() for consistency.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/vfio/ccw.c |   54 ++++++++++++++++++++++++++++++++++++------------------
+> >  1 file changed, 36 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> > index 4e5855741a64..49ae986d288d 100644
+> > --- a/hw/vfio/ccw.c
+> > +++ b/hw/vfio/ccw.c
+> > @@ -292,12 +292,44 @@ static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
+> >      g_free(vcdev->io_region);
+> >  }
+> >  
+> > -static void vfio_put_device(VFIOCCWDevice *vcdev)
+> > +static void vfio_ccw_put_device(VFIOCCWDevice *vcdev)
+> >  {
+> >      g_free(vcdev->vdev.name);
+> >      vfio_put_base_device(&vcdev->vdev);
+> >  }
+> >  
+> > +static int vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
+> > +                               Error **errp)
+> > +{
+> > +    char *name = g_strdup_printf("%x.%x.%04x", vcdev->cdev.hostid.cssid,
+> > +                                 vcdev->cdev.hostid.ssid,
+> > +                                 vcdev->cdev.hostid.devid);
+> > +    VFIODevice *vbasedev;
+> > +
+> > +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> > +        if (strcmp(vbasedev->name, name) == 0) {
+> > +            error_setg(errp, "vfio: subchannel %s has already been attached",
+> > +                       name);
+> > +            goto out_err;
+> > +        }
+> > +    }
+> > +
+> > +    if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
+> > +        goto out_err;
+> > +    }
+> > +
+> > +    vcdev->vdev.ops = &vfio_ccw_ops;
+> > +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+> > +    vcdev->vdev.name = name;
+> > +    vcdev->vdev.dev = &vcdev->cdev.parent_obj.parent_obj;
+> > +
+> > +    return 0;
+> > +
+> > +out_err:
+> > +    g_free(name);
+> > +    return -1;
+> > +}
+> > +
+> >  static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
+> >  {
+> >      char *tmp, group_path[PATH_MAX];
+> > @@ -327,7 +359,6 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
+> >  
+> >  static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+> >  {
+> > -    VFIODevice *vbasedev;
+> >      VFIOGroup *group;
+> >      CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> >      S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> > @@ -348,20 +379,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+> >          goto out_group_err;
+> >      }
+> >  
+> > -    vcdev->vdev.ops = &vfio_ccw_ops;
+> > -    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+> > -    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
+> > -                                       cdev->hostid.ssid, cdev->hostid.devid);
+> > -    vcdev->vdev.dev = dev;
+> > -    QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> > -        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+> > -            error_setg(&err, "vfio: subchannel %s has already been attached",
+> > -                       vcdev->vdev.name);
+> > -            goto out_device_err;
+> > -        }
+> > -    }
+> > -
+> > -    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, &err)) {
+> > +    if (vfio_ccw_get_device(group, vcdev, &err)) {
+> >          goto out_device_err;
+> >      }
+> >  
+> > @@ -380,7 +398,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+> >  out_notifier_err:
+> >      vfio_ccw_put_region(vcdev);
+> >  out_region_err:
+> > -    vfio_put_device(vcdev);
+> > +    vfio_ccw_put_device(vcdev);
+> >  out_device_err:
+> >      vfio_put_group(group);
+> >  out_group_err:
+> > @@ -401,7 +419,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+> >  
+> >      vfio_ccw_unregister_io_notifier(vcdev);
+> >      vfio_ccw_put_region(vcdev);
+> > -    vfio_put_device(vcdev);
+> > +    vfio_ccw_put_device(vcdev);
+> >      vfio_put_group(group);
+> >  
+> >      if (cdc->unrealize) {
+> >   
+> 
