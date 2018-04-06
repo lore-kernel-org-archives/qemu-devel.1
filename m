@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1f4Tuz-0001NN-Tw
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:08:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1f4U1n-0004VY-Nx
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1f4Tuw-0007r1-N4
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:08:49 -0400
-Received: from mail-bn3nam01on0067.outbound.protection.outlook.com
-	([104.47.33.67]:38358
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1f4Tuw-0007qX-7L
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:08:46 -0400
-References: <20180406120356.24757-1-brijesh.singh@amd.com>
-	<18da2a0b-bb37-a3bf-d9ca-220835df7ae2@redhat.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <05b0dea5-7dd1-b695-de96-82db2c76441c@amd.com>
-Date: Fri, 6 Apr 2018 11:08:38 -0500
+	(envelope-from <bounces@canonical.com>) id 1f4U1k-0003Cy-JK
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:15:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f4U1k-0003Cn-CS
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:15:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f4U1j-0000Pc-0q
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 16:15:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 012142E80C8
+	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 16:15:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <18da2a0b-bb37-a3bf-d9ca-220835df7ae2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] tap: set vhostfd passed from qemu
- cli to non-blocking
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Apr 2018 16:03:09 -0000
+From: Thomas Huth <855800@bugs.launchpad.net>
+Reply-To: Bug 855800 <855800@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110921182430.29459.49832.malonedeb@wampee.canonical.com>
+Message-Id: <152303059114.29388.12121247844358426644.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 855800] Re: KVM crashes when attempting to
+ restart migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: brijesh.singh@amd.com, Thomas.Lendacky@amd.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu-kvm (Ubuntu)
+       Status: Confirmed =3D> Incomplete
 
+-- =
 
-On 04/06/2018 10:44 AM, Eric Blake wrote:
-> On 04/06/2018 07:03 AM, Brijesh Singh wrote:
->> A guest boot hangs while probing the network interface when
->> iommu_platform=on is used.
->>
->> The following qemu cli hangs without this patch:
->>
->> # $QEMU \
->>    -netdev tap,fd=3,id=hostnet0,vhost=on,vhostfd=4 3<>/dev/tap67 4<>/dev/host-net \
->>    -device virtio-net-pci,netdev=hostnet0,id=net0,iommu_platform=on,disable-legacy=on \
->>    ...
->>
->> Commit: c471ad0e9bd46 (vhost_net: device IOTLB support) took care of
->> setting vhostfd to non-blocking when QEMU opens /dev/host-net but if
->> the fd is passed from qemu cli then we need to ensure that fd is set
->> to non-blocking.
->>
->> Fixes: c471ad0e9bd46 "vhost_net: device IOTLB support"
->> Cc: Michael S. Tsirkin <mst@redhat.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>   net/tap.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/net/tap.c b/net/tap.c
->> index 2b3a36f9b50d..8c026fbf95cd 100644
->> --- a/net/tap.c
->> +++ b/net/tap.c
->> @@ -693,6 +693,7 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
->>                   }
->>                   return;
->>               }
->> +            fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-> 
-> Please use qemu_set_nonblock() instead.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/855800
 
+Title:
+  KVM crashes when attempting to restart migration
 
-Sure will do.
+Status in QEMU:
+  Incomplete
+Status in qemu-kvm package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Operations performed:
+  Sequence to trigger crash:
+
+      * Start two kvm systems, one on gerph (primary), one on nbuild2 (list=
+ening for incoming migration) - do not use -daemonize
+      * On gerph, connect to monitor.
+      * "migrate -d -b tcp:nbuild2:4444"
+      * "info migrate"
+      * "migrate_cancel"
+      * "info migrate"
+      * "migrate -d -b tcp:nbuild2:4444"
+      * crashed with assertion:
+  kvm: block-migration.c:355: flush_blks: Assertion `block_mig_state.read_d=
+one >=3D 0' failed.
+                   Connection closed by foreign host.
+  [1]+  Aborted                 (core dumped) kvm -drive file=3D./copy-disk=
+2.img,boot=3Don -m 4096 -serial mon:telnet::23023,server,nowait -balloon vi=
+rtio -vnc :99 -usbdevice tablet -net nic,macaddr=3Df6:a6:31:53:89:9a,model=
+=3Drtl8139,vlan=3D0 -net tap,vlan=3D0
+
+  =
+
+  Repeating the operations above often dies in different places; just repea=
+t the cancel and restart the operation. Because the KVM system dies, the un=
+derlying VM is obviously terminated.
+
+  Distribution:
+
+  jfletcher@gerph:~$ lsb_release -rd
+  Description:	Ubuntu 10.04.3 LTS
+  Release:	10.04
+
+  Package:
+
+  jfletcher@gerph:~$ apt-cache policy kvm
+  kvm:
+    Installed: 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15
+    Candidate: 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15
+    Version table:
+   *** 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15 0
+          500 http://gb.archive.ubuntu.com/ubuntu/ lucid-updates/main Packa=
+ges
+          500 http://security.ubuntu.com/ubuntu/ lucid-security/main Packag=
+es
+          100 /var/lib/dpkg/status
+       1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9 0
+          500 http://gb.archive.ubuntu.com/ubuntu/ lucid/main Packages
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/855800/+subscriptions
