@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f4KkW-0004z8-S8
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 02:21:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f4LTF-0002eB-F4
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 03:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f4KkR-0002Yx-U0
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 02:21:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f4KkR-0002V0-Mn
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 02:21:19 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f4KkO-00042r-7C
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 06:21:16 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 640622E81A2
-	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 06:21:13 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1f4LTD-0003r6-Rf
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 03:07:37 -0400
+Date: Fri, 6 Apr 2018 15:01:58 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180406050158.GD3212@umbus.fritz.box>
+References: <20180405022002.17809-1-david@gibson.dropbear.id.au>
+	<20180405022002.17809-2-david@gibson.dropbear.id.au>
+	<20180405155636.288f9672@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Apr 2018 06:12:33 -0000
-From: ChristianEhrhardt <1740219@bugs.launchpad.net>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152299515371.29009.10458730958338863916.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="GpGaEY17fSl8rd50"
+Content-Disposition: inline
+In-Reply-To: <20180405155636.288f9672@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv2 for-2.13 1/2] Make
+ qemu_mempath_getpagesize() accept NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +26,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Thanks Luke.
-I tried the same from the deb of libc for arm in bionic.
 
-Down from
-real    0m2.031s
-to
-real    0m0.002s
+--GpGaEY17fSl8rd50
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So confirmed as well.
+On Thu, Apr 05, 2018 at 03:56:36PM +0200, Greg Kurz wrote:
+> On Thu,  5 Apr 2018 12:20:01 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > qemu_mempath_getpagesize() gets the effective (host side) page size for
+> > a block of memory backed by an mmap()ed file on the host.  It requires
+> > the mem_path parameter to be non-NULL.
+> >=20
+> > This ends up meaning all the callers need a different case for handling
+> > anonymous memory (for memory-backend-ram or default memory with -mem-pa=
+th
+> > is not specified).
+> >=20
+> > We can make all those callers a little simpler by
+>=20
+> by "having" ?
 
-** Changed in: qemu (Ubuntu)
-       Status: Triaged =3D> In Progress
+Yes, oops.
 
--- =
+> > qemu_mempath_getpagesize() accept NULL, and treat that as the anonymous
+> > memory case.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> >  exec.c            | 21 ++++++---------------
+> >  target/ppc/kvm.c  |  8 ++------
+> >  util/mmap-alloc.c | 26 ++++++++++++++------------
+> >  3 files changed, 22 insertions(+), 33 deletions(-)
+> >=20
+> > diff --git a/exec.c b/exec.c
+> > index 02b1efebb7..b38b004563 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -1488,19 +1488,14 @@ void ram_block_dump(Monitor *mon)
+> >   */
+> >  static int find_max_supported_pagesize(Object *obj, void *opaque)
+> >  {
+> > -    char *mem_path;
+> >      long *hpsize_min =3D opaque;
+> > =20
+> >      if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+> > -        mem_path =3D object_property_get_str(obj, "mem-path", NULL);
+> > -        if (mem_path) {
+> > -            long hpsize =3D qemu_mempath_getpagesize(mem_path);
+> > -            g_free(mem_path);
+> > -            if (hpsize < *hpsize_min) {
+> > -                *hpsize_min =3D hpsize;
+> > -            }
+> > -        } else {
+> > -            *hpsize_min =3D getpagesize();
+> > +        char *mem_path =3D object_property_get_str(obj, "mem-path", NU=
+LL);
+> > +        long hpsize =3D qemu_mempath_getpagesize(mem_path);
+> > +        g_free(mem_path);
+> > +        if (hpsize < *hpsize_min) {
+> > +            *hpsize_min =3D hpsize;
+> >          }
+> >      }
+> > =20
+> > @@ -1513,11 +1508,7 @@ long qemu_getrampagesize(void)
+> >      long mainrampagesize;
+> >      Object *memdev_root;
+> > =20
+> > -    if (mem_path) {
+> > -        mainrampagesize =3D qemu_mempath_getpagesize(mem_path);
+> > -    } else {
+> > -        mainrampagesize =3D getpagesize();
+> > -    }
+> > +    mainrampagesize =3D qemu_mempath_getpagesize(mem_path);
+> > =20
+> >      /* it's possible we have memory-backend objects with
+> >       * hugepage-backed RAM. these may get mapped into system
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 1bd38c6a90..f393eae127 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -496,12 +496,8 @@ bool kvmppc_is_mem_backend_page_size_ok(const char=
+ *obj_path)
+> >      char *mempath =3D object_property_get_str(mem_obj, "mem-path", NUL=
+L);
+> >      long pagesize;
+> > =20
+> > -    if (mempath) {
+> > -        pagesize =3D qemu_mempath_getpagesize(mempath);
+> > -        g_free(mempath);
+> > -    } else {
+> > -        pagesize =3D getpagesize();
+> > -    }
+> > +    pagesize =3D qemu_mempath_getpagesize(mempath);
+> > +    g_free(mempath);
+> > =20
+> >      return pagesize >=3D max_cpu_page_size;
+> >  }
+> > diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> > index 2fd8cbcc6f..fd329eccd8 100644
+> > --- a/util/mmap-alloc.c
+> > +++ b/util/mmap-alloc.c
+> > @@ -50,19 +50,21 @@ size_t qemu_mempath_getpagesize(const char *mem_pat=
+h)
+> >      struct statfs fs;
+> >      int ret;
+> > =20
+> > -    do {
+> > -        ret =3D statfs(mem_path, &fs);
+> > -    } while (ret !=3D 0 && errno =3D=3D EINTR);
+> > -
+> > -    if (ret !=3D 0) {
+> > -        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
+> > -                strerror(errno));
+> > -        exit(1);
+> > -    }
+> > +    if (mem_path) {
+> > +        do {
+> > +            ret =3D statfs(mem_path, &fs);
+> > +        } while (ret !=3D 0 && errno =3D=3D EINTR);
+> > =20
+> > -    if (fs.f_type =3D=3D HUGETLBFS_MAGIC) {
+> > -        /* It's hugepage, return the huge page size */
+> > -        return fs.f_bsize;
+> > +        if (ret !=3D 0) {
+> > +            fprintf(stderr, "Couldn't statfs() memory path: %s\n",
+> > +                    strerror(errno));
+> > +            exit(1);
+> > +        }
+> > +
+> > +        if (fs.f_type =3D=3D HUGETLBFS_MAGIC) {
+> > +            /* It's hugepage, return the huge page size */
+> > +            return fs.f_bsize;
+> > +        }
+> >      }
+> >  #ifdef __sparc__
+> >      /* SPARC Linux needs greater alignment than the pagesize */
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Title:
-  static linux-user ARM emulation has several-second startup time
+--GpGaEY17fSl8rd50
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  In Progress
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  static linux-user emulation has several-second startup time
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrG/0YACgkQbDjKyiDZ
+s5KuSw//SO8fC+a1knILzoFsdeDv3n9ra/IP06JpSRTzPIgza5SvMgB6q0mwFRmS
+nf6Ui5X3bQkvVBnyfPV77CNpJlsoTnRavQJ5LozeCLvoIcwsHhJRrjesrMybyKOX
+dCCgT/sxqrJ/7kwCuLcgoNBcHP4Oc11Xssl0wsIKbqST/ILBgpmX7kUNsuUdirit
+Tp0JDtX6KeKT+6VVVFzJXU2GWt7x0h1CfNOdOcOWWovveYGd5m+UV5rfExehoI2I
+KHuyGMbcCElalLqXugzKh2Ue0vWxHX1raJmEQZSfxwUwdmNOZY0EpNwC8INzHDei
+DzscWMB7a20ZUYziPI2BlK6BWDVTdR3CM6ObTbbU1ZpceJWfOlT8hYtXhNxlz8DD
+F5gSeGBoMXuf2j0QXAgW572q0emUG8bnqKtjBJWdC67mNEFj+uO9M6Fh1Ogk3oMt
+VdE/7yU7wNC2/+zqjx5+gC2igapaGjPCidNd3pCDVlYanbXUUkKtA0HAJSayUljA
+Gff/5wFM7LWMZsUFviU0iiDW43Ldra2OaJWpj99/egxcdeltBB1pHtohBqU4WtOU
+CwA61e0ZU4KCTXfpxng05d4QJFTcBnxSK9je9464U6zthdqqxi1i3zm/4eYCUBtb
+T5fSsY36B3JZD8pFPBRbTiOHOkx0yFyEAxuPVaLPpVwDlKlW6ME=
+=lp0w
+-----END PGP SIGNATURE-----
 
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+--GpGaEY17fSl8rd50--
