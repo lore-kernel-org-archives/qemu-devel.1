@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f4KFc-00043a-46
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 01:49:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1f4KW9-0000K8-Ir
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 02:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f4KFZ-0002Fj-2W
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 01:49:28 -0400
-References: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
-	<1522938923-96058-2-git-send-email-spopovyc@redhat.com>
-	<20180406035249.GA10482@in.ibm.com>
-From: Serhii Popovych <spopovyc@redhat.com>
-Message-ID: <1d1893fc-1484-86e0-ed1b-f9cf7b35fbb5@redhat.com>
-Date: Fri, 6 Apr 2018 08:48:55 +0300
+	(envelope-from <bounces@canonical.com>) id 1f4KW6-0004IT-D3
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 02:06:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60118)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f4KW6-0004I7-6L
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 02:06:30 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f4KW5-0002jS-CP
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 06:06:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 55EB22E806B
+	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 06:06:29 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180406035249.GA10482@in.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="bQnCCfBUqY2IatVVq7ozwWoa5YqsdGKqE"
-Subject: Re: [Qemu-devel] [PATCH for 2.13 1/2] Revert "spapr: Don't allow
- memory hotplug to memory less nodes"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Apr 2018 05:53:44 -0000
+From: Bug Watch Updater <1245703@bugs.launchpad.net>
+Reply-To: Bug 1245703 <1245703@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131028231528.17025.5795.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152299402506.12149.16281095181244604105.launchpad@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1245703] Re: LD_PREFIX option reads directories
+ recursively in an endless loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bQnCCfBUqY2IatVVq7ozwWoa5YqsdGKqE
-From: Serhii Popovych <spopovyc@redhat.com>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Message-ID: <1d1893fc-1484-86e0-ed1b-f9cf7b35fbb5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.13 1/2] Revert "spapr: Don't allow
- memory hotplug to memory less nodes"
-References: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
- <1522938923-96058-2-git-send-email-spopovyc@redhat.com>
- <20180406035249.GA10482@in.ibm.com>
-In-Reply-To: <20180406035249.GA10482@in.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu (Debian)
+       Status: Confirmed =3D> Fix Released
 
-Bharata B Rao wrote:
-> On Thu, Apr 05, 2018 at 10:35:22AM -0400, Serhii Popovych wrote:
->> This reverts commit b556854bd8524c26b8be98ab1bfdf0826831e793.
->>
->> Leave change @node type from uint32_t to to int from reverted commit
->> because node < 0 is always false.
->>
->> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 22 ----------------------
->>  1 file changed, 22 deletions(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 2c0be8c..3ad4545 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -3477,28 +3477,6 @@ static void spapr_machine_device_plug(HotplugHa=
-ndler *hotplug_dev,
->>              return;
->>          }
->>
->> -        /*
->> -         * Currently PowerPC kernel doesn't allow hot-adding memory t=
-o
->> -         * memory-less node, but instead will silently add the memory=
+-- =
 
->> -         * to the first node that has some memory. This causes two
->> -         * unexpected behaviours for the user.
->> -         *
->> -         * - Memory gets hotplugged to a different node than what the=
- user
->> -         *   specified.
->> -         * - Since pc-dimm subsystem in QEMU still thinks that memory=
- belongs
->> -         *   to memory-less node, a reboot will set things accordingl=
-y
->> -         *   and the previously hotplugged memory now ends in the rig=
-ht node.
->> -         *   This appears as if some memory moved from one node to an=
-other.
->> -         *
->> -         * So until kernel starts supporting memory hotplug to memory=
--less
->> -         * nodes, just prevent such attempts upfront in QEMU.
->> -         */
->> -        if (nb_numa_nodes && !numa_info[node].node_mem) {
->> -            error_setg(errp, "Can't hotplug memory to memory-less nod=
-e %d",
->> -                       node);
->> -            return;
->> -        }
->> -
->=20
-> If you remove this unconditionally, wouldn't it be a problem in case
-> of newer QEMU with older guest kernels ?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1245703
 
-Yes, that definitely would affect guest kernels without such support. We
-probably need to add some capability to test for guest kernel
-functionality presence.
+Title:
+  LD_PREFIX option reads directories recursively in an endless loop
 
->=20
-> Regards,
-> Bharata.
->=20
->=20
+Status in QEMU:
+  Confirmed
+Status in qemu package in Debian:
+  Fix Released
 
+Bug description:
+  If I run qemu user emulation with -L /path/to/my/sysroot/ in which
+  also the proc and dev filesystem is mounted QEMU eats my memory until
+  it gets killed by the kernel.
 
---=20
-Thanks,
-Serhii
+  According to the strace output it follows the symbolic links in the
+  proc filesystem running forever in a recursive loop.
 
+  The easiest solution would be to add in the function "add_dir_maybe"
+  in the file util/path.c an additional check for symbolic links that it
+  don't follow them.
 
---bQnCCfBUqY2IatVVq7ozwWoa5YqsdGKqE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Also I don't really understand the need of doing this. A lot of
+  ressources are wasted everytime QEMU-user is started just by having
+  the directory structure in memory. In my case this are more than 20000
+  entries which QEMU is loading every time.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQEcBAEBAgAGBQJaxwpOAAoJEBTawMmQ61bBt2sIAINMKolu1qzu0n3afg0nrQZN
-VhblmS9v53c4w8Za2ZDz3olrjZoFDYESXRE0ZH2Nh3q6j3UP1KEkFV8DZ5R3POLV
-uMXWXOj3ShACHkARUcjxcHlZwDkDbFDrnyuDbnyFm9RPC6a1oNWajkZmmuMRaHCM
-4BOPj0p3rg7THwUxdm9GoG+BH/ZdwBQnuA0tcligj/QcAuw302vANx6+HgFZBWms
-P6L+qpU9UFXrKhKL8PwC5hUAQso1gd+3f+8NVvDmWYOmNvdQ/2GJO8wtV7EP4k1A
-tFdYE5xViBGk1vMhTJUtkMVLVoQJAlGlDpTQBmdkJsbGvE6tKjjqaUIKSx6Oi+A=
-=ioKx
------END PGP SIGNATURE-----
-
---bQnCCfBUqY2IatVVq7ozwWoa5YqsdGKqE--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1245703/+subscriptions
