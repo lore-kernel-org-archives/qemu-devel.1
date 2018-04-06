@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f4T4b-0001im-7Y
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:14:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f4T7X-0003Fx-0C
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:17:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f4T4Y-0002Dt-0N
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:14:41 -0400
-Received: from 6.mo7.mail-out.ovh.net ([188.165.39.218]:48913)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f4T4X-000295-P1
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:14:37 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.122.48])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id EEA1E96C90
-	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 17:14:29 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 06 Apr 2018 17:14:19 +0200
-Message-ID: <152302765908.144052.14302567702608397806.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-2.12] vfio-ccw: fix memory leak in
- vfio_ccw_realize()
+	(envelope-from <mreitz@redhat.com>) id 1f4T7V-0003sE-NX
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:17:42 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Fri,  6 Apr 2018 17:17:30 +0200
+Message-Id: <20180406151731.4285-2-mreitz@redhat.com>
+In-Reply-To: <20180406151731.4285-1-mreitz@redhat.com>
+References: <20180406151731.4285-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] iotests: Add failure matching to
+ common.qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +20,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-The vfio_ccw_realize() function currently leaks vcdev->vdev.name if
-the subchannel is already attached or if vfio_get_device() fails.
+Currently, common.qemu only allows to match for results indicating
+success.  The only way to fail is by provoking a timeout.  However,
+sometimes we do have a defined failure output and can match for that,
+which saves us from having to wait for the timeout in case of failure.
+Because failure can sometimes just result in a _notrun in the test, it
+is actually important to care about being able to fail quickly.
 
-This happens because vcdev->vdev.name is expected to be freed in
-vfio_put_device() which isn't called in this case.
+Also, sometimes we simply do not get any specific output in case of
+success.  The only way to handle this currently would be to define an
+error message as the string to look for, which means that actual success
+results in a timeout.  This is really bad because it unnecessarily slows
+down a succeeding test.
 
-Adding g_free(vcdev->vdev.name) on these two error paths would be
-enough to fix the leak, but this is unfortunate since we would then
-have three locations doing this. Also, this would be inconsistent
-with the label based rollback scheme of this function.
+Therefore, this patch adds a new parameter $success_or_failure to
+_timed_wait_for and _send_qemu_cmd.  Setting this to a non-empty string
+makes both commands expect two match parameters: If the first matches,
+the function succeeds.  If the second matches, the function fails.
 
-The root issue is that vcdev->vdev.name is set before vfio_get_device()
-is called, which theoretically prevents to call vfio_put_device() to
-do the freeing. Well actually, we could call it anyway  because
-vfio_put_base_device() is a nop if the device isn't attached, but this
-would be confusing.
-
-This patch hence moves all the logic of attaching the device to a
-separate vfio_ccw_get_device() function, which is the counterpart
-of vfio_put_device(). While here, vfio_put_device() is renamed to
-vfio_ccw_put_device() for consistency.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/vfio/ccw.c |   54 ++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 36 insertions(+), 18 deletions(-)
+ tests/qemu-iotests/common.qemu | 58 +++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 51 insertions(+), 7 deletions(-)
 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 4e5855741a64..49ae986d288d 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -292,12 +292,44 @@ static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
-     g_free(vcdev->io_region);
+diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
+index 85f66b852c..f285484951 100644
+--- a/tests/qemu-iotests/common.qemu
++++ b/tests/qemu-iotests/common.qemu
+@@ -52,11 +52,29 @@ _in_fd=4
+ # response is not echoed out.
+ # If $mismatch_only is set, only non-matching responses will
+ # be echoed.
++#
++# If $success_or_failure is set, the meaning of the arguments is
++# changed as follows:
++# $2: A string to search for in the response; if found, this indicates
++#     success and ${QEMU_STATUS[$1]} is set to 0.
++# $3: A string to search for in the response; if found, this indicates
++#     failure and the test is either aborted (if $qemu_error_no_exit
++#     is not set) or ${QEMU_STATUS[$1]} is set to -1 (otherwise).
+ function _timed_wait_for()
+ {
+     local h=${1}
+     shift
+ 
++    if [ -z "${success_or_failure}" ]; then
++        success_match=${*}
++        failure_match=
++    else
++        success_match=${1}
++        failure_match=${2}
++    fi
++
++    timeout=yes
++
+     QEMU_STATUS[$h]=0
+     while IFS= read -t ${QEMU_COMM_TIMEOUT} resp <&${QEMU_OUT[$h]}
+     do
+@@ -64,10 +82,18 @@ function _timed_wait_for()
+             echo "${resp}" | _filter_testdir | _filter_qemu \
+                            | _filter_qemu_io | _filter_qmp | _filter_hmp
+         fi
+-        grep -q "${*}" < <(echo "${resp}")
++        if [ -n "${failure_match}" ]; then
++            grep -q "${failure_match}" < <(echo "${resp}")
++            if [ $? -eq 0 ]; then
++                timeout=
++                break
++            fi
++        fi
++        grep -q "${success_match}" < <(echo "${resp}")
+         if [ $? -eq 0 ]; then
+             return
+-        elif [ -z "${silent}" ] && [ -n "${mismatch_only}" ]; then
++        fi
++        if [ -z "${silent}" ] && [ -n "${mismatch_only}" ]; then
+             echo "${resp}" | _filter_testdir | _filter_qemu \
+                            | _filter_qemu_io | _filter_qmp | _filter_hmp
+         fi
+@@ -75,8 +101,12 @@ function _timed_wait_for()
+     done
+     QEMU_STATUS[$h]=-1
+     if [ -z "${qemu_error_no_exit}" ]; then
+-        echo "Timeout waiting for ${*} on handle ${h}"
+-        exit 1  # Timeout means the test failed
++        if [ -n "${timeout}" ]; then
++            echo "Timeout waiting for ${success_match} on handle ${h}"
++        else
++            echo "Wrong response matching ${failure_match} on handle ${h}"
++        fi
++        exit 1  # Timeout or wrong match mean the test failed
+     fi
  }
  
--static void vfio_put_device(VFIOCCWDevice *vcdev)
-+static void vfio_ccw_put_device(VFIOCCWDevice *vcdev)
+@@ -96,6 +126,11 @@ function _timed_wait_for()
+ # If $qemu_error_no_exit is set, then even if the expected response
+ # is not seen, we will not exit.  $QEMU_STATUS[$1] will be set it -1 in
+ # that case.
++#
++# If $success_or_failure is set, then the last two strings are the
++# strings the response will be scanned for.  The first of the two
++# indicates success, the latter indicates failure.  Failure is handled
++# like a timeout.
+ function _send_qemu_cmd()
  {
-     g_free(vcdev->vdev.name);
-     vfio_put_base_device(&vcdev->vdev);
- }
+     local h=${1}
+@@ -109,14 +144,23 @@ function _send_qemu_cmd()
+         use_error="no"
+     fi
+     # This array element extraction is done to accommodate pathnames with spaces
+-    cmd=${@: 1:${#@}-1}
+-    shift $(($# - 1))
++    if [ -z "${success_or_failure}" ]; then
++        cmd=${@: 1:${#@}-1}
++        shift $(($# - 1))
++    else
++        cmd=${@: 1:${#@}-2}
++        shift $(($# - 2))
++    fi
  
-+static int vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
-+                               Error **errp)
-+{
-+    char *name = g_strdup_printf("%x.%x.%04x", vcdev->cdev.hostid.cssid,
-+                                 vcdev->cdev.hostid.ssid,
-+                                 vcdev->cdev.hostid.devid);
-+    VFIODevice *vbasedev;
-+
-+    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+        if (strcmp(vbasedev->name, name) == 0) {
-+            error_setg(errp, "vfio: subchannel %s has already been attached",
-+                       name);
-+            goto out_err;
-+        }
-+    }
-+
-+    if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
-+        goto out_err;
-+    }
-+
-+    vcdev->vdev.ops = &vfio_ccw_ops;
-+    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-+    vcdev->vdev.name = name;
-+    vcdev->vdev.dev = &vcdev->cdev.parent_obj.parent_obj;
-+
-+    return 0;
-+
-+out_err:
-+    g_free(name);
-+    return -1;
-+}
-+
- static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
- {
-     char *tmp, group_path[PATH_MAX];
-@@ -327,7 +359,6 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
- 
- static void vfio_ccw_realize(DeviceState *dev, Error **errp)
- {
--    VFIODevice *vbasedev;
-     VFIOGroup *group;
-     CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-     S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-@@ -348,20 +379,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-         goto out_group_err;
-     }
- 
--    vcdev->vdev.ops = &vfio_ccw_ops;
--    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
--    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
--                                       cdev->hostid.ssid, cdev->hostid.devid);
--    vcdev->vdev.dev = dev;
--    QLIST_FOREACH(vbasedev, &group->device_list, next) {
--        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
--            error_setg(&err, "vfio: subchannel %s has already been attached",
--                       vcdev->vdev.name);
--            goto out_device_err;
--        }
--    }
--
--    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, &err)) {
-+    if (vfio_ccw_get_device(group, vcdev, &err)) {
-         goto out_device_err;
-     }
- 
-@@ -380,7 +398,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
- out_notifier_err:
-     vfio_ccw_put_region(vcdev);
- out_region_err:
--    vfio_put_device(vcdev);
-+    vfio_ccw_put_device(vcdev);
- out_device_err:
-     vfio_put_group(group);
- out_group_err:
-@@ -401,7 +419,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
- 
-     vfio_ccw_unregister_io_notifier(vcdev);
-     vfio_ccw_put_region(vcdev);
--    vfio_put_device(vcdev);
-+    vfio_ccw_put_device(vcdev);
-     vfio_put_group(group);
- 
-     if (cdc->unrealize) {
+     while [ ${count} -gt 0 ]
+     do
+         echo "${cmd}" >&${QEMU_IN[${h}]}
+         if [ -n "${1}" ]; then
+-            qemu_error_no_exit=${use_error} _timed_wait_for ${h} "${1}"
++            if [ -z "${success_or_failure}" ]; then
++                qemu_error_no_exit=${use_error} _timed_wait_for ${h} "${1}"
++            else
++                qemu_error_no_exit=${use_error} _timed_wait_for ${h} "${1}" "${2}"
++            fi
+             if [ ${QEMU_STATUS[$h]} -eq 0 ]; then
+                 return
+             fi
+-- 
+2.14.3
