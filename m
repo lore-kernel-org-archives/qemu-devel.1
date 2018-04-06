@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utr-0007wU-8S
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utr-0007wV-8h
 	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utm-0007dy-Hb
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utp-0007jJ-G3
 	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:43 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34937)
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:39562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1f4Utm-0007cs-AY
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:38 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r82so4637440wme.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:38 -0700 (PDT)
+	id 1f4Utp-0007hZ-5q
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:41 -0400
+Received: by mail-wr0-x235.google.com with SMTP id c24so2415266wrc.6
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:41 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Apr 2018 19:11:10 +0200
-Message-Id: <1523034681-33787-10-git-send-email-pbonzini@redhat.com>
+Date: Fri,  6 Apr 2018 19:11:12 +0200
+Message-Id: <1523034681-33787-12-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
 References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 09/20] scsi-disk: Don't enlarge min_io_size to
- max_io_size
+Subject: [Qemu-devel] [PULL 11/20] hw/scsi: support SCSI-2 passthrough
+ without PI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +29,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-From: Fam Zheng <famz@redhat.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Some backends report big max_io_sectors. Making min_io_size the same
-value in this case will make it impossible for guest to align memory,
-therefore the disk may not be usable at all.
+QEMU SCSI code makes assumptions about how the PROTECT and BYTCHK
+works in the protocol, denying support for PI (Protection
+Information) in case the guest OS requests it. However, in SCSI versions 2
+and older, there is no PI concept in the protocol.
 
-Do not enlarge them when they are zero.
+This means that when dealing with such devices:
 
-Reported-by: David Gibson <dgibson@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+- there is no PROTECT bit in byte 5 of the standard INQUIRY response. The
+whole byte is marked as "Reserved";
 
-Message-Id: <20180327164141.19075-1-famz@redhat.com>
+- there is no RDPROTECT in byte 2 of READ. We have 'Logical Unit Number'
+in this field instead;
+
+- there is no VRPROTECT in byte 2 of VERIFY. We have 'Logical Unit Number'
+in this field instead. This also means that the BYTCHK bit in this case
+is not related to PI.
+
+Since QEMU does not consider these changes, a SCSI passthrough using
+a SCSI-2 device will not work. It will mistake these fields with
+PI information and return Illegal Request SCSI SENSE thinking
+that the driver is asking for PI support.
+
+This patch fixes it by adding a new attribute called 'scsi_version'
+that is read from the standard INQUIRY response of passthrough
+devices. This allows for a version verification before applying
+conditions related to PI that doesn't apply for older versions.
+
+Reported-by: Dac Nguyen <dacng@us.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Message-Id: <20180327211451.14647-1-danielhb@linux.vnet.ibm.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ hw/scsi/scsi-disk.c    |  2 +-
+ hw/scsi/scsi-generic.c | 47 ++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 37 insertions(+), 12 deletions(-)
 
 diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index f5ab767..f8ed8cf 100644
+index 9400b97..ded23d3 100644
 --- a/hw/scsi/scsi-disk.c
 +++ b/hw/scsi/scsi-disk.c
-@@ -714,10 +714,12 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
+@@ -3041,7 +3041,7 @@ static Property scsi_block_properties[] = {
+     DEFINE_PROP_BOOL("share-rw", SCSIDiskState, qdev.conf.share_rw, false),
+     DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
+     DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
+-                      5),
++                      -1),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-                 /* min_io_size and opt_io_size can't be greater than
-                  * max_io_sectors */
--                min_io_size =
--                    MIN_NON_ZERO(min_io_size, max_io_sectors);
--                opt_io_size =
--                    MIN_NON_ZERO(opt_io_size, max_io_sectors);
-+                if (min_io_size) {
-+                    min_io_size = MIN(min_io_size, max_io_sectors);
-+                }
-+                if (opt_io_size) {
-+                    opt_io_size = MIN(opt_io_size, max_io_sectors);
-+                }
-             }
-             /* required VPD size with unmap support */
-             buflen = 0x40;
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 1870085..381f04e 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -194,17 +194,40 @@ static void scsi_read_complete(void * opaque, int ret)
+             r->buf[3] |= 0x80;
+         }
+     }
+-    if (s->type == TYPE_DISK &&
+-        r->req.cmd.buf[0] == INQUIRY &&
+-        r->req.cmd.buf[2] == 0xb0) {
+-        uint32_t max_transfer =
+-            blk_get_max_transfer(s->conf.blk) / s->blocksize;
+-
+-        assert(max_transfer);
+-        stl_be_p(&r->buf[8], max_transfer);
+-        /* Also take care of the opt xfer len. */
+-        stl_be_p(&r->buf[12],
+-                 MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12])));
++    if (r->req.cmd.buf[0] == INQUIRY) {
++        /*
++         *  EVPD set to zero returns the standard INQUIRY data.
++         *
++         *  Check if scsi_version is unset (-1) to avoid re-defining it
++         *  each time an INQUIRY with standard data is received.
++         *  scsi_version is initialized with -1 in scsi_generic_reset
++         *  and scsi_disk_reset, making sure that we'll set the
++         *  scsi_version after a reset. If the version field of the
++         *  INQUIRY response somehow changes after a guest reboot,
++         *  we'll be able to keep track of it.
++         *
++         *  On SCSI-2 and older, first 3 bits of byte 2 is the
++         *  ANSI-approved version, while on later versions the
++         *  whole byte 2 contains the version. Check if we're dealing
++         *  with a newer version and, in that case, assign the
++         *  whole byte.
++         */
++        if (s->scsi_version == -1 && !(r->req.cmd.buf[1] & 0x01)) {
++            s->scsi_version = r->buf[2] & 0x07;
++            if (s->scsi_version > 2) {
++                s->scsi_version = r->buf[2];
++            }
++        }
++        if (s->type == TYPE_DISK && r->req.cmd.buf[2] == 0xb0) {
++            uint32_t max_transfer =
++                blk_get_max_transfer(s->conf.blk) / s->blocksize;
++
++            assert(max_transfer);
++            stl_be_p(&r->buf[8], max_transfer);
++            /* Also take care of the opt xfer len. */
++            stl_be_p(&r->buf[12],
++                     MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12])));
++        }
+     }
+     scsi_req_data(&r->req, len);
+     scsi_req_unref(&r->req);
+@@ -550,6 +573,8 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+ 
+     DPRINTF("block size %d\n", s->blocksize);
+ 
++    /* Only used by scsi-block, but initialize it nevertheless to be clean.  */
++    s->default_scsi_version = -1;
+     scsi_generic_read_device_identification(s);
+ }
+ 
 -- 
 1.8.3.1
