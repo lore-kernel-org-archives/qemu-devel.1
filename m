@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f4SZq-0000rS-Pb
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:42:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1f4SeZ-0003ed-7v
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f4SZm-0000Ti-33
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:42:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1f4SZl-0000Sb-Ki
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:42:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w36EfsRw114438
-	for <qemu-devel@nongnu.org>; Fri, 6 Apr 2018 10:42:48 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h67xh8dgc-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:42:47 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Fri, 6 Apr 2018 15:42:45 +0100
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<c6973c82-8331-15e3-a74d-061d8fe58353@linux.vnet.ibm.com>
-Date: Fri, 6 Apr 2018 16:42:39 +0200
+	(envelope-from <thuth@redhat.com>) id 1f4SeU-0004bG-KZ
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:47:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38916 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f4SeU-0004bB-F2
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:47:42 -0400
+References: <1522920750-11020-1-git-send-email-thuth@redhat.com>
+	<6ce4143a-b96f-1367-a773-8da9924f1953@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <911f1f80-fb79-8749-ddc4-c8c42f7aca1c@redhat.com>
+Date: Fri, 6 Apr 2018 16:47:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <c6973c82-8331-15e3-a74d-061d8fe58353@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <6ce4143a-b96f-1367-a773-8da9924f1953@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <42e38b18-a601-3c42-11eb-dcd05527a39d@linux.vnet.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
- interception
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/sparc64/sun4u: Fix introspection by
+ converting prom instance_init to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,132 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 
-T24gMDYvMDQvMjAxOCAxNjowOCwgUGllcnJlIE1vcmVsIHdyb3RlOg0KPiBPbiAxNi8wMy8y
-MDE4IDAwOjI0LCBUb255IEtyb3dpYWsgd3JvdGU6DQo+PiBJZiB0aGUgQ1BVIG1vZGVsIGlu
-ZGljYXRlcyB0aGF0IEFQIGZhY2lsaXR5IGlzIGluc3RhbGxlZCBvbg0KPj4gdGhlIGd1ZXN0
-IChpLmUuLCAtY3B1IHh4eHgsYXA9b24pLCB0aGVuIHRoZSBleHBlY3RhdGlvbiBpcyB0aGF0
-DQo+PiB0aGUgQVAgYnVzIHJ1bm5pbmcgaW4gdGhlIGd1ZXN0IHdpbGwgaW5pdGlhbGl6ZTsg
-aG93ZXZlciwgaWYgdGhlDQo+PiBBUCBpbnN0cnVjdGlvbnMgYXJlIG5vdCBiZWluZyBpbnRl
-cnByZXRlZCBieSB0aGUgZmlybXdhcmUsIHRoZW4NCj4+IHRoZXkgd2lsbCBiZSBpbnRlcmNl
-cHRlZCBhbmQgcm91dGVkIGJhY2sgdG8gUUVNVSBmb3IgaGFuZGxpbmcuDQo+PiBJZiBhIGhh
-bmRsZXIgaXMgbm90IGRlZmluZWQgdG8gcHJvY2VzcyB0aGUgaW50ZXJjZXB0ZWQgaW5zdHJ1
-Y2l0b24sDQo+PiB0aGVuIGFuIG9wZXJhdGlvbiBleGNlcHRpb24gd2lsbCBiZSBpbmplY3Rl
-ZCBpbnRvIHRoZQ0KPj4gZ3Vlc3QsIGluIHdoaWNoIGNhc2UgdGhlIEFQIGJ1cyB3aWxsIG5v
-dCBpbml0aWFsaXplLg0KPj4NCj4+IFRoZXJlIGFyZSB0d28gc2l0dWF0aW9ucyB3aGVyZSBB
-UCBpbnN0cnVjdGlvbnMgd2lsbCBub3QgYmUNCj4+IGludGVycHJldGVkOg0KPj4NCj4+IDEu
-IFRoZSBndWVzdCBpcyBub3QgY29uZmlndXJlZCB3aXRoIGEgdmZpby1hcCBkZXZpY2UgKGku
-ZS4sDQo+PiDCoMKgwqAgLWRldmljZSB2ZmlvLWFwLHN5c2ZzZGV2PSRwYXRoLXRvLW1kZXYp
-LiBUaGUgcmVhbGl6ZSBmdW5jdGlvbiBmb3INCj4+IMKgwqDCoCB0aGUgdmZpby1hcCBkZXZp
-Y2UgZW5hYmxlcyBpbnRlcnByZXRpdmUgZXhlY3V0aW9uIG9mIEFQDQo+PiDCoMKgwqAgaW5z
-dHJ1Y3Rpb25zLg0KPj4NCj4+IDIuIFRoZSBndWVzdCBpcyBhIHNlY29uZCBsZXZlbCBndWVz
-dCBidXQgdGhlIGZpcnN0IGxldmVsIGd1ZXN0IGhhcw0KPj4gwqDCoMKgIG5vdCBlbmFibGVk
-IGludGVycHJldGl2ZSBleGVjdXRpb24uDQo+Pg0KPj4gVGhpcyBwYXRjaCBpbnRyb2R1Y2Vz
-IEFQIGluc3RydWN0aW9uIGhhbmRsZXJzIHRvIGVuc3VyZSB0aGUgQVAgYnVzDQo+PiBtb2R1
-bGUgaW5pdGlhbGl6ZXMgb24gdGhlIGd1ZXN0IHdoZW4gdGhlIEFQIGZhY2lsaXR5IGlzIGlu
-c3RhbGxlZA0KPj4gb24gdGhlIGd1ZXN0IGJ1dCBBUCBpbnN0cnVjdGlvbnMgYXJlIG5vdCBi
-ZWluZyBpbnRlcnByZXRlZC4gVGhlIGxvZ2ljDQo+PiBpbmNvcnBvcmF0ZWQgaXM6DQo+Pg0K
-Pj4gKiBJZiB0aGUgQ1BVIG1vZGVsIGluZGljYXRlcyBBUCBpbnN0cnVjdGlvbnMgYXJlDQo+
-PiDCoMKgIGluc3RhbGxlZA0KPj4NCj4+IMKgwqAgKiBTZXQgdGhlIHN0YXR1cyByZXNwb25z
-ZSBjb2RlIGZvciB0aGUgaW5zdHJ1Y3Rpb24gdG8gaW5kaWNhdGUgdGhhdA0KPj4gwqDCoMKg
-wqAgdGhlIEFQUU4gY29udGFpbmVkIGluIHRoZSBpbnN0cnVjdGlvbiBpcyBub3QgdmFsaWQu
-IFRoaXMgaXMNCj4+IMKgwqDCoMKgIGEgdmFsaWQgcmVzcG9uc2UgYmVjYXVzZSB0aGVyZSB3
-aWxsIGJlIG5vIGRldmljZXMgY29uZmlndXJlZCBmb3INCj4+IMKgwqDCoMKgIHRoZSBndWVz
-dCBpbiBhbnkgb2YgdGhlIGFib3ZlIHNjZW5hcmlvcy4NCj4+DQo+PiAqIEVsc2UgcmV0dXJu
-IGFuIGVycm9yIGZyb20gdGhlIGhhbmRsZXIuIFRoaXMgd2lsbCByZXN1bHQgaW4gYW4NCj4+
-IMKgwqAgb3BlcmF0aW9uIGJlaW5nIGluamVjdGVkIGludG8gdGhlIGd1ZXN0IGFuZCB0aGUg
-QVAgYnVzIHdpbGwgbm90DQo+PiDCoMKgIGluaXRpYWxpemUgb24gdGhlIGd1ZXN0LiBUaGF0
-IGlzIGNvbW1lbnN1cmF0ZSB3aXRoIGhvdyB0aGluZ3Mgd29yaw0KPj4gwqDCoCB0b2RheS4N
-Cj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBUb255IEtyb3dpYWsgPGFrcm93aWFrQGxpbnV4LnZu
-ZXQuaWJtLmNvbT4NCj4+IC0tLQ0KPj4gwqAgaHcvdmZpby9hcC5jwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgfMKgwqAgNDUgDQo+PiArKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysNCj4+IMKgIGluY2x1ZGUvaHcvczM5MHgvYXAtZGV2aWNl
-LmggfMKgwqDCoCA2ICsrKysrDQo+PiDCoCB0YXJnZXQvczM5MHgva3ZtLmPCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB8wqDCoCAxNCArKysrKysrKysrKysrDQo+PiDCoCAzIGZpbGVzIGNoYW5n
-ZWQsIDY1IGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdp
-dCBhL2h3L3ZmaW8vYXAuYyBiL2h3L3ZmaW8vYXAuYw0KPj4gaW5kZXggYjM5N2JiMS4uODhl
-NzQ0ZCAxMDA2NDQNCj4+IC0tLSBhL2h3L3ZmaW8vYXAuYw0KPj4gKysrIGIvaHcvdmZpby9h
-cC5jDQo+PiBAQCAtMTQ4LDYgKzE0OCw1MSBAQCBzdGF0aWMgdm9pZCB2ZmlvX2FwX3VucmVh
-bGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCANCj4+IEVycm9yICoqZXJycCkNCj4+IMKgwqDCoMKg
-wqAga3ZtX3MzOTBfc2V0X2ludGVycHJldF9hcCgwKTsNCj4+IMKgIH0NCj4+DQo+PiAraW50
-IGFwX2RldmljZV9oYW5kbGVfbnFhcChTMzkwQ1BVICpjcHUpDQo+PiArew0KPj4gK8KgwqDC
-oCBDUFVTMzkwWFN0YXRlICplbnYgPSAmY3B1LT5lbnY7DQo+PiArDQo+PiArwqDCoMKgIGlm
-IChzMzkwX2hhc19mZWF0KFMzOTBfRkVBVF9BUCkpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoCBl
-bnYtPnJlZ3NbMV0gPSAweDEwMDAwOw0KPj4gKw0KPj4gK8KgwqDCoMKgwqDCoMKgIHJldHVy
-biAwOw0KPj4gK8KgwqDCoCB9DQo+PiArDQo+PiArwqDCoMKgIHJldHVybiAtRU9QTk9UU1VQ
-UDsNCj4+ICt9DQo+PiArDQo+PiAraW50IGFwX2RldmljZV9oYW5kbGVfZHFhcChTMzkwQ1BV
-ICpjcHUpDQo+PiArew0KPj4gK8KgwqDCoCBDUFVTMzkwWFN0YXRlICplbnYgPSAmY3B1LT5l
-bnY7DQo+PiArDQo+PiArwqDCoMKgIGlmIChzMzkwX2hhc19mZWF0KFMzOTBfRkVBVF9BUCkp
-IHsNCj4+ICvCoMKgwqDCoMKgwqDCoCBlbnYtPnJlZ3NbMV0gPSAweDEwMDAwOw0KPj4gKw0K
-Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAwOw0KPj4gK8KgwqDCoCB9DQo+PiArDQo+PiAr
-wqDCoMKgIHJldHVybiAtRU9QTk9UU1VQUDsNCj4+ICt9DQo+PiArDQo+PiAraW50IGFwX2Rl
-dmljZV9oYW5kbGVfcHFhcChTMzkwQ1BVICpjcHUpDQo+PiArew0KPj4gK8KgwqDCoCBDUFVT
-MzkwWFN0YXRlICplbnYgPSAmY3B1LT5lbnY7DQo+PiArwqDCoMKgIGludCBmYyA9IDQgJiAo
-ZW52LT5yZWdzWzBdID4+IDI0KTsNCj4+ICsNCj4+ICvCoMKgwqAgLyoNCj4+ICvCoMKgwqDC
-oCAqIFRoZSBRdWVyeSBDb25maWd1cmF0aW9uIEluZm9ybWF0aW9uIChRQ0kpIGZ1bmN0aW9u
-IChmYyA9PSA0KSANCj4+IGRvZXMgbm90DQo+PiArwqDCoMKgwqAgKiBzZXQgYSByZXNwb25z
-ZSBjb2RlIGluIHJlZyAxLCBzbyBjaGVjayBmb3IgdGhhdCBhbG9uZyB3aXRoIHRoZQ0KPj4g
-K8KgwqDCoMKgICogQVAgZmVhdHVyZS4NCj4+ICvCoMKgwqDCoCAqLw0KPg0KPiBBUEZULXQg
-bXVzdCBiZSB0YWtlbiBjYXJlIG9mLCBkZXBlbmRpbmcgb24gQVBRTiBhbmQgQVBGVCBmZWF0
-dXJlOg0KPg0KPiBJZiBBUEZUIGZlYXR1cmUgaXMgZW5hYmxlZCBpdCBzaG91bGQgcmVwb3J0
-IHRoZSByaWdodCBpbmZvcm1hdGlvbiBmb3IgDQo+IHRoZSBleGlzdGluZyBBUA0KPiBJZiBp
-dCBpcyBub3QgZW5hYmxlZCBpdCBzaG91bGQgcmVwb3J0IE9QRVJBVElPTl9FWENFUFRJT04N
-Cg0KaHVtLCBzb3JyeSwgb25seSBpZiBpbnRlcmNlcHRpb24gb2YgVEFQUS10IGlzIGVuYWJs
-ZWQgYW5kIGl0IGlzIG5vdC4NCnNvIGZvcmdldCBpdC4NClNvcnJ5IGZvciB0aGUgbm9pc2Uu
-DQoNCj4NCj4+ICvCoMKgwqAgaWYgKChmYyAhPSA0KSAmJiBzMzkwX2hhc19mZWF0KFMzOTBf
-RkVBVF9BUCkpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoCBlbnYtPnJlZ3NbMV0gPSAweDEwMDAw
-Ow0KPj4gKw0KPj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAwOw0KPj4gK8KgwqDCoCB9DQo+
-PiArDQo+PiArwqDCoMKgIHJldHVybiAtRU9QTk9UU1VQUDsNCj4+ICt9DQo+PiArDQo+PiDC
-oCBzdGF0aWMgUHJvcGVydHkgdmZpb19hcF9wcm9wZXJ0aWVzW10gPSB7DQo+PiDCoMKgwqDC
-oMKgIERFRklORV9QUk9QX1NUUklORygic3lzZnNkZXYiLCBWRklPQVBEZXZpY2UsIHZkZXYu
-c3lzZnNkZXYpLA0KPj4gwqDCoMKgwqDCoCBERUZJTkVfUFJPUF9FTkRfT0ZfTElTVCgpLA0K
-Pj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcvczM5MHgvYXAtZGV2aWNlLmggYi9pbmNsdWRl
-L2h3L3MzOTB4L2FwLWRldmljZS5oDQo+PiBpbmRleCA2OTNkZjkwLi5kNDVhZTM4IDEwMDY0
-NA0KPj4gLS0tIGEvaW5jbHVkZS9ody9zMzkweC9hcC1kZXZpY2UuaA0KPj4gKysrIGIvaW5j
-bHVkZS9ody9zMzkweC9hcC1kZXZpY2UuaA0KPj4gQEAgLTExLDYgKzExLDggQEANCj4+IMKg
-ICNpZm5kZWYgSFdfUzM5MFhfQVBfREVWSUNFX0gNCj4+IMKgICNkZWZpbmUgSFdfUzM5MFhf
-QVBfREVWSUNFX0gNCj4+DQo+PiArI2luY2x1ZGUgImNwdS5oIg0KPj4gKw0KPj4gwqAgI2Rl
-ZmluZSBBUF9ERVZJQ0VfVFlQRcKgwqDCoMKgwqDCoCAiYXAtZGV2aWNlIg0KPj4NCj4+IMKg
-IHR5cGVkZWYgc3RydWN0IEFQRGV2aWNlIHsNCj4+IEBAIC0zNSw0ICszNyw4IEBAIHN0YXRp
-YyBpbmxpbmUgQVBEZXZpY2UgKnRvX2FwX2RldihEZXZpY2VTdGF0ZSAqZGV2KQ0KPj4gwqAg
-I2RlZmluZSBBUF9ERVZJQ0VfQ0xBU1Moa2xhc3MpIFwNCj4+IMKgwqDCoMKgwqAgT0JKRUNU
-X0NMQVNTX0NIRUNLKEFQRGV2aWNlQ2xhc3MsIChrbGFzcyksIEFQX0RFVklDRV9UWVBFKQ0K
-Pj4NCj4+ICtpbnQgYXBfZGV2aWNlX2hhbmRsZV9ucWFwKFMzOTBDUFUgKmNwdSk7DQo+PiAr
-aW50IGFwX2RldmljZV9oYW5kbGVfZHFhcChTMzkwQ1BVICpjcHUpOw0KPj4gK2ludCBhcF9k
-ZXZpY2VfaGFuZGxlX3BxYXAoUzM5MENQVSAqY3B1KTsNCj4+ICsNCj4+IMKgICNlbmRpZiAv
-KiBIV19TMzkwWF9BUF9ERVZJQ0VfSCAqLw0KPj4gZGlmZiAtLWdpdCBhL3RhcmdldC9zMzkw
-eC9rdm0uYyBiL3RhcmdldC9zMzkweC9rdm0uYw0KPj4gaW5kZXggMjgxMmUyOC4uYTYzNjM5
-NCAxMDA2NDQNCj4+IC0tLSBhL3RhcmdldC9zMzkweC9rdm0uYw0KPj4gKysrIGIvdGFyZ2V0
-L3MzOTB4L2t2bS5jDQo+PiBAQCAtNTAsNiArNTAsNyBAQA0KPj4gwqAgI2luY2x1ZGUgImV4
-ZWMvbWVtYXR0cnMuaCINCj4+IMKgICNpbmNsdWRlICJody9zMzkweC9zMzkwLXZpcnRpby1j
-Y3cuaCINCj4+IMKgICNpbmNsdWRlICJody9zMzkweC9zMzkwLXZpcnRpby1oY2FsbC5oIg0K
-Pj4gKyNpbmNsdWRlICJody9zMzkweC9hcC1kZXZpY2UuaCINCj4+DQo+PiDCoCAjaWZuZGVm
-IERFQlVHX0tWTQ0KPj4gwqAgI2RlZmluZSBERUJVR19LVk3CoCAwDQo+PiBAQCAtODgsNiAr
-ODksOSBAQA0KPj4gwqAgI2RlZmluZSBQUklWX0IyX0NIU0PCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCAweDVmDQo+PiDCoCAjZGVmaW5lIFBSSVZfQjJfU0lHQcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDB4NzQNCj4+IMKgICNkZWZp
-bmUgUFJJVl9CMl9YU0NIwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-MHg3Ng0KPj4gKyNkZWZpbmUgUFJJVl9CMl9OUUFQwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgMHhhZA0KPj4gKyNkZWZpbmUgUFJJVl9CMl9EUUFQwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMHhhZQ0KPj4gKyNkZWZpbmUgUFJJVl9C
-Ml9QUUFQwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMHhhZg0KPj4N
-Cj4+IMKgICNkZWZpbmUgUFJJVl9FQl9TUUJTwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgMHg4YQ0KPj4gwqAgI2RlZmluZSBQUklWX0VCX1BDSVNUQsKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMHhkMA0KPj4gQEAgLTEyNDUsNiArMTI0OSwx
-NiBAQCBzdGF0aWMgaW50IGhhbmRsZV9iMihTMzkwQ1BVICpjcHUsIHN0cnVjdCANCj4+IGt2
-bV9ydW4gKnJ1biwgdWludDhfdCBpcGExKQ0KPj4gwqDCoMKgwqDCoCBjYXNlIFBSSVZfQjJf
-U0NMUF9DQUxMOg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHJjID0ga3ZtX3NjbHBfc2Vydmlj
-ZV9jYWxsKGNwdSwgcnVuLCBpcGJoMCk7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7
-DQo+PiArwqDCoMKgIGNhc2UgUFJJVl9CMl9OUUFQOg0KPj4gK8KgwqDCoMKgwqDCoMKgIHJj
-ID0gYXBfZGV2aWNlX2hhbmRsZV9ucWFwKGNwdSk7DQo+PiArwqDCoMKgwqDCoMKgwqAgYnJl
-YWs7DQo+PiArwqDCoMKgIGNhc2UgUFJJVl9CMl9EUUFQOg0KPj4gK8KgwqDCoMKgwqDCoMKg
-IHJjID0gYXBfZGV2aWNlX2hhbmRsZV9kcWFwKGNwdSk7DQo+PiArwqDCoMKgwqDCoMKgwqAg
-YnJlYWs7DQo+PiArwqDCoMKgIGNhc2UgUFJJVl9CMl9QUUFQOg0KPj4gK8KgwqDCoMKgwqDC
-oMKgIHJjID0gYXBfZGV2aWNlX2hhbmRsZV9wcWFwKGNwdSk7DQo+PiArwqDCoMKgwqDCoMKg
-wqAgYnJlYWs7DQo+PiArwqDCoMKgwqDCoMKgwqAgYnJlYWs7DQo+PiDCoMKgwqDCoMKgIGRl
-ZmF1bHQ6DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmMgPSAtMTsNCj4+IMKgwqDCoMKgwqDC
-oMKgwqDCoCBEUFJJTlRGKCJLVk06IHVuaGFuZGxlZCBQUklWOiAweGIyJXhcbiIsIGlwYTEp
-Ow0KPg0KPg0KDQotLSANClBpZXJyZSBNb3JlbA0KTGludXgvS1ZNL1FFTVUgaW4gQsO2Ymxp
-bmdlbiAtIEdlcm1hbnkNCg0K
+On 06.04.2018 16:41, Mark Cave-Ayland wrote:
+> On 05/04/18 10:32, Thomas Huth wrote:
+>=20
+>> The instance_init function of devices should always succeed to be able
+>> to introspect the device. However, the instance_init function of the
+>> "openprom" device can currently fail, for example like this:
+>>
+>> $ echo "{'execute':'qmp_capabilities'}"\
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "{'execute':'device-list-pr=
+operties',"\
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " 'arguments':{'typename':'=
+openprom'}}" \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | sparc64-softmmu/qemu-syst=
+em-sparc64 -M sun4v,accel=3Dqtest
+>> -qmp stdio
+>> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+>> =C2=A0 "package": "build-all"}, "capabilities": []}}
+>> {"return": {}}
+>> RAMBlock "sun4u.prom" already registered, abort!
+>> Aborted (core dumped)
+>>
+>> This should not happen. Fix this problem by moving the affected code f=
+rom
+>> instance_init into a realize function instead.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>> =C2=A0 hw/sparc64/sun4u.c | 18 ++++++++++++------
+>> =C2=A0 1 file changed, 12 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>> index 2044a52..d62f5a2 100644
+>> --- a/hw/sparc64/sun4u.c
+>> +++ b/hw/sparc64/sun4u.c
+>> @@ -425,13 +425,19 @@ static void prom_init(hwaddr addr, const char
+>> *bios_name)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 }
+>> =C2=A0 -static void prom_init1(Object *obj)
+>> +static void prom_realize(DeviceState *ds, Error **errp)
+>> =C2=A0 {
+>> -=C2=A0=C2=A0=C2=A0 PROMState *s =3D OPENPROM(obj);
+>> -=C2=A0=C2=A0=C2=A0 SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
+>> +=C2=A0=C2=A0=C2=A0 PROMState *s =3D OPENPROM(ds);
+>> +=C2=A0=C2=A0=C2=A0 SysBusDevice *dev =3D SYS_BUS_DEVICE(ds);
+>> +=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 memory_region_init_ram_nomigrate(&s->prom, OBJECT(=
+ds), "sun4u.prom",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+PROM_SIZE_MAX, &local_err);
+>> +=C2=A0=C2=A0=C2=A0 if (local_err) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, loca=
+l_err);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 memory_region_init_ram_nomigrate(&s->prom, =
+obj, "sun4u.prom",
+>> PROM_SIZE_MAX,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 &error_fatal);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vmstate_register_ram_global(&s->prom);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memory_region_set_readonly(&s->prom, tr=
+ue);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sysbus_init_mmio(dev, &s->prom);
+>> @@ -446,6 +452,7 @@ static void prom_class_init(ObjectClass *klass,
+>> void *data)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceClass *dc =3D DEVICE_CLASS(klass)=
+;
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dc->props =3D prom_properties;
+>> +=C2=A0=C2=A0=C2=A0 dc->realize =3D prom_realize;
+>> =C2=A0 }
+>> =C2=A0 =C2=A0 static const TypeInfo prom_info =3D {
+>> @@ -453,7 +460,6 @@ static const TypeInfo prom_info =3D {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .parent=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 =3D TYPE_SYS_BUS_DEVICE,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size =3D sizeof(PROMState),
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .class_init=C2=A0=C2=A0=C2=A0 =3D prom_=
+class_init,
+>> -=C2=A0=C2=A0=C2=A0 .instance_init =3D prom_init1,
+>> =C2=A0 };
+>=20
+> Looks good to me:
+>=20
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>=20
+> I thought this would have been caught by the device introspect test, or
+> is this something you've found whilst trying to add sun4v to the list o=
+f
+> machines to include in the test?
+
+I've found it with this patch here:
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg05033.html
+
+The current device-introspect-test only checks with the "none" machine,
+so it did not detect this problem yet since this only happens when you
+use the sun4v machine.
+
+ Thomas
