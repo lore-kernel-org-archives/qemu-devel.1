@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4Vy5-0003kZ-9j
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:13 -0400
+	(envelope-from <cota@braap.org>) id 1f4Vy7-0003lJ-86
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4Vy0-0000Qx-KL
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:09 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:34641)
+	(envelope-from <cota@braap.org>) id 1f4Vy4-0000Tx-1G
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:11 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:33097)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4Vy0-0000PQ-Gh
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:04 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4Vy3-0000Tb-Rs
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:07 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri,  6 Apr 2018 14:19:45 -0400
-Message-Id: <1523038800-2494-3-git-send-email-cota@braap.org>
+Date: Fri,  6 Apr 2018 14:19:57 -0400
+Message-Id: <1523038800-2494-15-git-send-email-cota@braap.org>
 In-Reply-To: <1523038800-2494-1-git-send-email-cota@braap.org>
 References: <1523038800-2494-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 02/17] target/sh4: convert to TranslatorOps
+Subject: [Qemu-devel] [PATCH v2 14/17] target/openrisc: convert to
+ TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,235 +25,241 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
 
-This was fairly straightforward since it had already been converted
-to DisasContextBase; just had to add TARGET_TOO_MANY to the switch
-in tb_stop.
+Notes:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+- Changed the num_insns test in insn_start to check for
+  dc->base.num_insns > 1, since when tb_start is first
+  called in a TB, base.num_insns is already set to 1.
+
+- Removed DISAS_NEXT from the switch in tb_stop; use
+  DISAS_TOO_MANY instead.
+
+- Added an assert_not_reached on tb_stop for DISAS_NEXT
+  and the default case.
+
+- Merged the two separate log_target_disas calls into the
+  disas_log op.
+
+Cc: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/sh4/translate.c | 171 +++++++++++++++++++++++++------------------------
- 1 file changed, 86 insertions(+), 85 deletions(-)
+ target/openrisc/translate.c | 163 +++++++++++++++++++++-----------------------
+ 1 file changed, 79 insertions(+), 84 deletions(-)
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 012156b..58bdfeb 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2258,126 +2258,127 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index b37414f..7cf29cd 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -1520,46 +1520,22 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+     }
  }
- #endif
  
 -void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+static void sh4_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
++static void openrisc_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
  {
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPUSH4State *env = cs->env_ptr;
--    DisasContext ctx;
--    target_ulong pc_start;
++    DisasContext *dc = container_of(dcb, DisasContext, base);
+     CPUOpenRISCState *env = cs->env_ptr;
+-    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+-    struct DisasContext ctx, *dc = &ctx;
+-    uint32_t pc_start;
+-    uint32_t next_page_start;
 -    int num_insns;
 -    int max_insns;
 -
 -    pc_start = tb->pc;
--    ctx.base.pc_next = pc_start;
--    ctx.tbflags = (uint32_t)tb->flags;
--    ctx.envflags = tb->flags & TB_FLAG_ENVFLAGS_MASK;
--    ctx.base.is_jmp = DISAS_NEXT;
--    ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-+    int bound;
-+
-+    ctx->tbflags = (uint32_t)ctx->base.tb->flags;
-+    ctx->envflags = ctx->base.tb->flags & TB_FLAG_ENVFLAGS_MASK;
-+    ctx->memidx = (ctx->tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-     /* We don't know if the delayed pc came from a dynamic or static branch,
-        so assume it is a dynamic branch.  */
--    ctx.delayed_pc = -1; /* use delayed pc from env pointer */
--    ctx.base.tb = tb;
--    ctx.base.singlestep_enabled = cs->singlestep_enabled;
--    ctx.features = env->features;
--    ctx.has_movcal = (ctx.tbflags & TB_FLAG_PENDING_MOVCA);
--    ctx.gbank = ((ctx.tbflags & (1 << SR_MD)) &&
--                 (ctx.tbflags & (1 << SR_RB))) * 0x10;
--    ctx.fbank = ctx.tbflags & FPSCR_FR ? 0x10 : 0;
 -
+-    dc->base.tb = tb;
+-    dc->base.singlestep_enabled = cs->singlestep_enabled;
+-    dc->base.pc_next = pc_start;
+-    dc->base.is_jmp = DISAS_NEXT;
++    int bound;
+ 
+-    dc->mem_idx = cpu_mmu_index(&cpu->env, false);
++    dc->mem_idx = cpu_mmu_index(env, false);
+     dc->tb_flags = dc->base.tb->flags;
+     dc->delayed_branch = (dc->tb_flags & TB_FLAGS_DFLAG) != 0;
++    bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
++    dc->base.max_insns = MIN(dc->base.max_insns, bound);
++}
+ 
+-    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+-    num_insns = 0;
 -    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
+-
 -    if (max_insns == 0) {
 -        max_insns = CF_COUNT_MASK;
 -    }
--    max_insns = MIN(max_insns, TCG_MAX_INSNS);
-+    ctx->delayed_pc = -1; /* use delayed pc from env pointer */
-+    ctx->features = env->features;
-+    ctx->has_movcal = (ctx->tbflags & TB_FLAG_PENDING_MOVCA);
-+    ctx->gbank = ((ctx->tbflags & (1 << SR_MD)) &&
-+                  (ctx->tbflags & (1 << SR_RB))) * 0x10;
-+    ctx->fbank = ctx->tbflags & FPSCR_FR ? 0x10 : 0;
- 
-     /* Since the ISA is fixed-width, we can bound by the number
-        of instructions remaining on the page.  */
--    num_insns = -(ctx.base.pc_next | TARGET_PAGE_MASK) / 2;
--    max_insns = MIN(max_insns, num_insns);
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns = TCG_MAX_INSNS;
+-    }
 -
--    /* Single stepping means just that.  */
--    if (ctx.base.singlestep_enabled || singlestep) {
--        max_insns = 1;
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(pc_start)) {
+-        qemu_log_lock();
+-        qemu_log("----------------\n");
+-        qemu_log("IN: %s\n", lookup_symbol(pc_start));
 -    }
 -
 -    gen_tb_start(tb);
--    num_insns = 0;
-+    bound = -(ctx->base.pc_next | TARGET_PAGE_MASK) / 2;
-+    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
-+}
- 
-+static void sh4_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
++static void openrisc_tr_tb_start(DisasContextBase *db, CPUState *cs)
 +{
- #ifdef CONFIG_USER_ONLY
--    if (ctx.tbflags & GUSA_MASK) {
--        num_insns = decode_gusa(&ctx, env, &max_insns);
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
-+    CPUSH4State *env = cs->env_ptr;
-+
-+    if (ctx->tbflags & GUSA_MASK) {
-+        ctx->base.num_insns = decode_gusa(ctx, env, &ctx->base.max_insns);
++    DisasContext *dc = container_of(db, DisasContext, base);
+ 
+     /* Allow the TCG optimizer to see that R0 == 0,
+        when it's true, which is the common case.  */
+@@ -1568,50 +1544,55 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     } else {
+         cpu_R[0] = cpu_R0;
      }
- #endif
 +}
  
--    while (ctx.base.is_jmp == DISAS_NEXT
--           && num_insns < max_insns
--           && !tcg_op_buf_full()) {
--        tcg_gen_insn_start(ctx.base.pc_next, ctx.envflags);
+-    do {
+-        tcg_gen_insn_start(dc->base.pc_next, (dc->delayed_branch ? 1 : 0)
+-			   | (num_insns ? 2 : 0));
 -        num_insns++;
-+static void sh4_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
++static void openrisc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
 +{
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
  
--        if (unlikely(cpu_breakpoint_test(cs, ctx.base.pc_next, BP_ANY))) {
--            /* We have hit a breakpoint - make sure PC is up-to-date */
--            gen_save_cpu_state(&ctx, true);
--            gen_helper_debug(cpu_env);
--            ctx.base.is_jmp = DISAS_NORETURN;
+-        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next, BP_ANY))) {
+-            tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
+-            gen_exception(dc, EXCP_DEBUG);
+-            dc->base.is_jmp = DISAS_NORETURN;
 -            /* The address covered by the breakpoint must be included in
 -               [tb->pc, tb->pc + tb->size) in order to for it to be
 -               properly cleared -- thus we increment the PC here so that
 -               the logic setting tb->size below does the right thing.  */
--            ctx.base.pc_next += 2;
+-            dc->base.pc_next += 4;
 -            break;
 -        }
-+    tcg_gen_insn_start(ctx->base.pc_next, ctx->envflags);
++    tcg_gen_insn_start(dc->base.pc_next, (dc->delayed_branch ? 1 : 0)
++                       | (dc->base.num_insns > 1 ? 2 : 0));
 +}
  
 -        if (num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
 -            gen_io_start();
 -        }
-+static bool sh4_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-+                                    const CPUBreakpoint *bp)
+-        disas_openrisc_insn(dc, cpu);
+-        dc->base.pc_next += 4;
+-
+-        /* delay slot */
+-        if (dc->delayed_branch) {
+-            dc->delayed_branch--;
+-            if (!dc->delayed_branch) {
+-                tcg_gen_mov_tl(cpu_pc, jmp_pc);
+-                tcg_gen_discard_tl(jmp_pc);
+-                dc->base.is_jmp = DISAS_UPDATE;
+-                break;
+-            }
++static bool openrisc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
++                                         const CPUBreakpoint *bp)
 +{
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--        ctx.opcode = cpu_lduw_code(env, ctx.base.pc_next);
--	decode_opc(&ctx);
--        ctx.base.pc_next += 2;
--    }
--    if (tb_cflags(tb) & CF_LAST_IO) {
--        gen_io_end();
--    }
-+    /* We have hit a breakpoint - make sure PC is up-to-date */
-+    gen_save_cpu_state(ctx, true);
-+    gen_helper_debug(cpu_env);
-+    ctx->base.is_jmp = DISAS_NORETURN;
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
++    gen_exception(dc, EXCP_DEBUG);
++    dc->base.is_jmp = DISAS_NORETURN;
 +    /* The address covered by the breakpoint must be included in
 +       [tb->pc, tb->pc + tb->size) in order to for it to be
 +       properly cleared -- thus we increment the PC here so that
 +       the logic setting tb->size below does the right thing.  */
-+    ctx->base.pc_next += 2;
++    dc->base.pc_next += 4;
 +    return true;
 +}
 +
-+static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
++static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
 +{
-+    CPUSH4State *env = cs->env_ptr;
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    if (ctx.tbflags & GUSA_EXCLUSIVE) {
-+    ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
-+    decode_opc(ctx);
-+    ctx->base.pc_next += 2;
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    OpenRISCCPU *cpu = OPENRISC_CPU(cs);
++
++    disas_openrisc_insn(dc, cpu);
++    dc->base.pc_next += 4;
++
++    /* delay slot */
++    if (dc->delayed_branch) {
++        dc->delayed_branch--;
++        if (!dc->delayed_branch) {
++            tcg_gen_mov_tl(cpu_pc, jmp_pc);
++            tcg_gen_discard_tl(jmp_pc);
++            dc->base.is_jmp = DISAS_UPDATE;
++            return;
+         }
+-    } while (!dc->base.is_jmp
+-             && !tcg_op_buf_full()
+-             && !dc->base.singlestep_enabled
+-             && !singlestep
+-             && (dc->base.pc_next < next_page_start)
+-             && num_insns < max_insns);
+-
+-    if (tb_cflags(tb) & CF_LAST_IO) {
+-        gen_io_end();
+     }
 +}
 +
-+static void sh4_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
++static void openrisc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
 +{
-+    DisasContext *ctx = container_of(dcbase, DisasContext, base);
-+
-+    if (ctx->tbflags & GUSA_EXCLUSIVE) {
-         /* Ending the region of exclusivity.  Clear the bits.  */
--        ctx.envflags &= ~GUSA_MASK;
-+        ctx->envflags &= ~GUSA_MASK;
-     }
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
  
--    switch (ctx.base.is_jmp) {
-+    switch (ctx->base.is_jmp) {
-     case DISAS_STOP:
--        gen_save_cpu_state(&ctx, true);
--        if (ctx.base.singlestep_enabled) {
-+        gen_save_cpu_state(ctx, true);
-+        if (ctx->base.singlestep_enabled) {
-             gen_helper_debug(cpu_env);
-         } else {
+     if ((dc->tb_flags & TB_FLAGS_DFLAG ? 1 : 0) != (dc->delayed_branch != 0)) {
+         tcg_gen_movi_i32(cpu_dflag, dc->delayed_branch != 0);
+@@ -1626,10 +1607,9 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+         gen_exception(dc, EXCP_DEBUG);
+     } else {
+         switch (dc->base.is_jmp) {
+-        case DISAS_NEXT:
++        case DISAS_TOO_MANY:
+             gen_goto_tb(dc, 0, dc->base.pc_next);
+             break;
+-        default:
+         case DISAS_NORETURN:
+         case DISAS_JUMP:
+         case DISAS_TB_JUMP:
+@@ -1639,20 +1619,35 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+                to find the next TB */
              tcg_gen_exit_tb(0);
+             break;
++        default:
++            g_assert_not_reached();
          }
-         break;
-     case DISAS_NEXT:
--        gen_save_cpu_state(&ctx, false);
--        gen_goto_tb(&ctx, 0, ctx.base.pc_next);
-+    case DISAS_TOO_MANY:
-+        gen_save_cpu_state(ctx, false);
-+        gen_goto_tb(ctx, 0, ctx->base.pc_next);
-         break;
-     case DISAS_NORETURN:
-         break;
-     default:
-         g_assert_not_reached();
      }
 +}
  
 -    gen_tb_end(tb, num_insns);
-+static void sh4_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
++static void openrisc_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
 +{
-+    qemu_log("IN:\n");  /* , lookup_symbol(dcbase->pc_first)); */
-+    log_target_disas(cs, dcbase->pc_first, dcbase->tb->size);
++    DisasContext *s = container_of(dcbase, DisasContext, base);
+ 
+-    tb->size = dc->base.pc_next - pc_start;
+-    tb->icount = num_insns;
++    qemu_log("IN: %s\n", lookup_symbol(s->base.pc_first));
++    log_target_disas(cs, s->base.pc_first, s->base.tb->size);
 +}
  
--    tb->size = ctx.base.pc_next - pc_start;
--    tb->icount = num_insns;
-+static const TranslatorOps sh4_tr_ops = {
-+    .init_disas_context = sh4_tr_init_disas_context,
-+    .tb_start           = sh4_tr_tb_start,
-+    .insn_start         = sh4_tr_insn_start,
-+    .breakpoint_check   = sh4_tr_breakpoint_check,
-+    .translate_insn     = sh4_tr_translate_insn,
-+    .tb_stop            = sh4_tr_tb_stop,
-+    .disas_log          = sh4_tr_disas_log,
-+};
-+
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+{
-+    DisasContext ctx;
- 
--#ifdef DEBUG_DISAS
 -    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
 -        && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
--	qemu_log("IN:\n");	/* , lookup_symbol(pc_start)); */
--        log_target_disas(cs, pc_start, ctx.base.pc_next - pc_start);
--	qemu_log("\n");
+-        log_target_disas(cs, pc_start, tb->size);
+-        qemu_log("\n");
 -        qemu_log_unlock();
 -    }
--#endif
-+    translator_loop(&sh4_tr_ops, &ctx.base, cs, tb);
++static const TranslatorOps openrisc_tr_ops = {
++    .init_disas_context = openrisc_tr_init_disas_context,
++    .tb_start           = openrisc_tr_tb_start,
++    .insn_start         = openrisc_tr_insn_start,
++    .breakpoint_check   = openrisc_tr_breakpoint_check,
++    .translate_insn     = openrisc_tr_translate_insn,
++    .tb_stop            = openrisc_tr_tb_stop,
++    .disas_log          = openrisc_tr_disas_log,
++};
++
++void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
++{
++    DisasContext ctx;
++
++    translator_loop(&openrisc_tr_ops, &ctx.base, cs, tb);
  }
  
- void restore_state_to_opc(CPUSH4State *env, TranslationBlock *tb,
+ void openrisc_cpu_dump_state(CPUState *cs, FILE *f,
 -- 
 2.7.4
