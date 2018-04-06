@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f4Q51-0004Ji-8l
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:02:56 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1f4Q6e-0005gg-0d
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:04:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f4Q4x-0000cX-BV
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:02:55 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:52892)
+	(envelope-from <brijesh.singh@amd.com>) id 1f4Q6Z-0001YI-39
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:04:36 -0400
+Received: from mail-co1nam03on0081.outbound.protection.outlook.com
+	([104.47.40.81]:3680
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1f4Q4x-0000c4-0V
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:02:51 -0400
-References: <1522883475-27858-1-git-send-email-cota@braap.org>
-	<1522883475-27858-8-git-send-email-cota@braap.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <b5516512-9a3b-8327-f0e7-48e2a238040f@mail.uni-paderborn.de>
-Date: Fri, 6 Apr 2018 14:02:39 +0200
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1f4Q6Y-0001XM-Ba
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:04:31 -0400
+From: Brijesh Singh <brijesh.singh@amd.com>
+Date: Fri,  6 Apr 2018 07:03:56 -0500
+Message-Id: <20180406120356.24757-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <1522883475-27858-8-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 07/15] softfloat: rename canonicalize to
- sf_canonicalize
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.12] tap: set vhostfd passed from qemu cli
+ to non-blocking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: Thomas.Lendacky@amd.com, Brijesh Singh <brijesh.singh@amd.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On 04/05/2018 01:11 AM, Emilio G. Cota wrote:
-> glibc >= 2.25 defines canonicalize in commit eaf5ad0
-> (Add canonicalize, canonicalizef, canonicalizel., 2016-10-26).
-> 
-> Given that we'll be including <math.h> soon, prepare
-> for this by prefixing our canonicalize() with sf_ to avoid
-> clashing with the libc's canonicalize().
-> 
-> Reported-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
+A guest boot hangs while probing the network interface when
+iommu_platform=on is used.
 
-This fixes the problem.
-Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+The following qemu cli hangs without this patch:
 
-Cheers,
-Bastian
+# $QEMU \
+  -netdev tap,fd=3,id=hostnet0,vhost=on,vhostfd=4 3<>/dev/tap67 4<>/dev/host-net \
+  -device virtio-net-pci,netdev=hostnet0,id=net0,iommu_platform=on,disable-legacy=on \
+  ...
+
+Commit: c471ad0e9bd46 (vhost_net: device IOTLB support) took care of
+setting vhostfd to non-blocking when QEMU opens /dev/host-net but if
+the fd is passed from qemu cli then we need to ensure that fd is set
+to non-blocking.
+
+Fixes: c471ad0e9bd46 "vhost_net: device IOTLB support"
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ net/tap.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/tap.c b/net/tap.c
+index 2b3a36f9b50d..8c026fbf95cd 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -693,6 +693,7 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+                 }
+                 return;
+             }
++            fcntl(vhostfd, F_SETFL, O_NONBLOCK);
+         } else {
+             vhostfd = open("/dev/vhost-net", O_RDWR);
+             if (vhostfd < 0) {
+-- 
+2.14.3
