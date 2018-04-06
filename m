@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f4HBV-0001gu-UG
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:33:03 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1f4IW7-0001xW-1W
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 23:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f4HBR-0007tY-V6
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:33:01 -0400
-Resent-Message-Id: <E1f4HBR-0007tY-V6@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21064)
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1f4IW3-0008D6-64
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 23:58:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47386
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f4HBR-0007pA-OD
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:32:57 -0400
-In-Reply-To: <1522980788-1252-1-git-send-email-cota@braap.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152298194898.1704.6128284305238639960@71c20359a636>
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1f4IW2-0008CX-VT
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 23:58:19 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w363t91s106829
+	for <qemu-devel@nongnu.org>; Thu, 5 Apr 2018 23:58:17 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2h5u6svb51-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 23:58:17 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Fri, 6 Apr 2018 04:58:14 +0100
+Date: Fri, 6 Apr 2018 09:28:08 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
+	<1522938923-96058-2-git-send-email-spopovyc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 5 Apr 2018 19:32:30 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] tcg: tb_lock_removal redux v2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1522938923-96058-2-git-send-email-spopovyc@redhat.com>
+Message-Id: <20180406035249.GA10482@in.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.13 1/2] Revert "spapr: Don't allow
+ memory hotplug to memory less nodes"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +44,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, richard.henderson@linaro.org, alex.bennee@linaro.org, pbonzini@redhat.com
+To: Serhii Popovych <spopovyc@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjI5ODA3ODgtMTI1Mi0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3Jn
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTddIHRjZzogdGJfbG9ja19yZW1v
-dmFsIHJlZHV4IHYyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
-RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
-dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
-b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
-MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBw
-YXRjaGV3LzE1MjI5ODA3ODgtMTI1Mi0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3JnIC0+
-IHBhdGNoZXcvMTUyMjk4MDc4OC0xMjUyLTEtZ2l0LXNlbmQtZW1haWwtY290YUBicmFhcC5vcmcK
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1OTZiMGFlMTI2IHRjZzogcmVtb3ZlIHRi
-X2xvY2sKMzkzNzQwZjRiYyB0cmFuc2xhdGUtYWxsOiByZW1vdmUgdGJfbG9jayBtZW50aW9uIGZy
-b20gY3B1X3Jlc3RvcmVfc3RhdGVfZnJvbV90YgoxZDIyNWQ0OWU4IGNwdXRsYjogcmVtb3ZlIHRi
-X2xvY2sgZnJvbSB0bGJfZmx1c2ggZnVuY3Rpb25zCjcxMTczNjdkZTYgdHJhbnNsYXRlLWFsbDog
-cHJvdGVjdCBUQiBqdW1wcyB3aXRoIGEgcGVyLWRlc3RpbmF0aW9uLVRCIGxvY2sKMWQxZmQyMWRk
-NyB0cmFuc2xhdGUtYWxsOiBkaXNjYXJkIFRCIHdoZW4gdGJfbGlua19wYWdlIHJldHVybnMgYW4g
-ZXhpc3RpbmcgbWF0Y2hpbmcgVEIKY2EyMmZhNDQxNyB0cmFuc2xhdGUtYWxsOiBhZGQgcGFnZV9j
-b2xsZWN0aW9uIGFzc2VydGlvbnMKNTBiNjA4MTk1NiB0cmFuc2xhdGUtYWxsOiBhZGQgcGFnZV9s
-b2NrZWQgYXNzZXJ0aW9ucwo1YjZkN2RkMzlmIHRyYW5zbGF0ZS1hbGw6IHVzZSBwZXItcGFnZSBs
-b2NraW5nIGluICF1c2VyLW1vZGUKOWZiNzI5YjRhMSB0cmFuc2xhdGUtYWxsOiBtb3ZlIHRiX2lu
-dmFsaWRhdGVfcGh5c19wYWdlX3JhbmdlIHVwIGluIHRoZSBmaWxlCmUzNDM1MDcwYzQgdHJhbnNs
-YXRlLWFsbDogd29yayBwYWdlLWJ5LXBhZ2UgaW4gdGJfaW52YWxpZGF0ZV9waHlzX3JhbmdlXzEK
-YjdmNDBmYjU5OSB0cmFuc2xhdGUtYWxsOiByZW1vdmUgaG9sZSBpbiBQYWdlRGVzYwoyNTZmYzQy
-NzE0IHRyYW5zbGF0ZS1hbGw6IG1ha2UgbDFfbWFwIGxvY2tsZXNzCjliYjE2NWVjMTQgdHJhbnNs
-YXRlLWFsbDogaXRlcmF0ZSBvdmVyIFRCcyBpbiBhIHBhZ2Ugd2l0aCBQQUdFX0ZPUl9FQUNIX1RC
-CjhhMzhjYTMxNjggdGNnOiBtb3ZlIHRiX2N0eC50Yl9waHlzX2ludmFsaWRhdGVfY291bnQgdG8g
-dGNnX2N0eApjMGU3YTUwZGVhIHRjZzogdHJhY2sgVEJzIHdpdGggcGVyLXJlZ2lvbiBCU1Qncwo4
-MTJlMzU2ZDk3IHFodDogcmV0dXJuIGV4aXN0aW5nIGVudHJ5IHdoZW4gcWh0X2luc2VydCBmYWls
-cwphYTYzOWM2ZTZmIHFodDogcmVxdWlyZSBhIGRlZmF1bHQgY29tcGFyaXNvbiBmdW5jdGlvbgoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNzogcWh0OiByZXF1aXJlIGEg
-ZGVmYXVsdCBjb21wYXJpc29uIGZ1bmN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIvMTc6IHFodDog
-cmV0dXJuIGV4aXN0aW5nIGVudHJ5IHdoZW4gcWh0X2luc2VydCBmYWlscy4uLgpDaGVja2luZyBQ
-QVRDSCAzLzE3OiB0Y2c6IHRyYWNrIFRCcyB3aXRoIHBlci1yZWdpb24gQlNUJ3MuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC8xNzogdGNnOiBtb3ZlIHRiX2N0eC50Yl9waHlzX2ludmFsaWRhdGVfY291bnQg
-dG8gdGNnX2N0eC4uLgpDaGVja2luZyBQQVRDSCA1LzE3OiB0cmFuc2xhdGUtYWxsOiBpdGVyYXRl
-IG92ZXIgVEJzIGluIGEgcGFnZSB3aXRoIFBBR0VfRk9SX0VBQ0hfVEIuLi4KRVJST1I6IGJyYWNl
-cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTA6IEZJ
-TEU6IGFjY2VsL3RjZy90cmFuc2xhdGUtYWxsLmM6MTE5OgorICAgIGZvciAobiA9IChoZWFkKSAm
-IDEsIHRiID0gKFRyYW5zbGF0aW9uQmxvY2sgKikoKGhlYWQpICYgfjEpOyAgICAgICAgXApbLi4u
-XQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNjggbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi8xNzogdHJh
-bnNsYXRlLWFsbDogbWFrZSBsMV9tYXAgbG9ja2xlc3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNzog
-dHJhbnNsYXRlLWFsbDogcmVtb3ZlIGhvbGUgaW4gUGFnZURlc2MuLi4KQ2hlY2tpbmcgUEFUQ0gg
-OC8xNzogdHJhbnNsYXRlLWFsbDogd29yayBwYWdlLWJ5LXBhZ2UgaW4gdGJfaW52YWxpZGF0ZV9w
-aHlzX3JhbmdlXzEuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNzogdHJhbnNsYXRlLWFsbDogbW92ZSB0
-Yl9pbnZhbGlkYXRlX3BoeXNfcGFnZV9yYW5nZSB1cCBpbiB0aGUgZmlsZS4uLgpDaGVja2luZyBQ
-QVRDSCAxMC8xNzogdHJhbnNsYXRlLWFsbDogdXNlIHBlci1wYWdlIGxvY2tpbmcgaW4gIXVzZXIt
-bW9kZS4uLgpDaGVja2luZyBQQVRDSCAxMS8xNzogdHJhbnNsYXRlLWFsbDogYWRkIHBhZ2VfbG9j
-a2VkIGFzc2VydGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTc6IHRyYW5zbGF0ZS1hbGw6IGFk
-ZCBwYWdlX2NvbGxlY3Rpb24gYXNzZXJ0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxMy8xNzogdHJh
-bnNsYXRlLWFsbDogZGlzY2FyZCBUQiB3aGVuIHRiX2xpbmtfcGFnZSByZXR1cm5zIGFuIGV4aXN0
-aW5nIG1hdGNoaW5nIFRCLi4uCkNoZWNraW5nIFBBVENIIDE0LzE3OiB0cmFuc2xhdGUtYWxsOiBw
-cm90ZWN0IFRCIGp1bXBzIHdpdGggYSBwZXItZGVzdGluYXRpb24tVEIgbG9jay4uLgpDaGVja2lu
-ZyBQQVRDSCAxNS8xNzogY3B1dGxiOiByZW1vdmUgdGJfbG9jayBmcm9tIHRsYl9mbHVzaCBmdW5j
-dGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMTc6IHRyYW5zbGF0ZS1hbGw6IHJlbW92ZSB0Yl9s
-b2NrIG1lbnRpb24gZnJvbSBjcHVfcmVzdG9yZV9zdGF0ZV9mcm9tX3RiLi4uCkNoZWNraW5nIFBB
-VENIIDE3LzE3OiB0Y2c6IHJlbW92ZSB0Yl9sb2NrLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu, Apr 05, 2018 at 10:35:22AM -0400, Serhii Popovych wrote:
+> This reverts commit b556854bd8524c26b8be98ab1bfdf0826831e793.
+> 
+> Leave change @node type from uint32_t to to int from reverted commit
+> because node < 0 is always false.
+> 
+> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+> ---
+>  hw/ppc/spapr.c | 22 ----------------------
+>  1 file changed, 22 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2c0be8c..3ad4545 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3477,28 +3477,6 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>              return;
+>          }
+> 
+> -        /*
+> -         * Currently PowerPC kernel doesn't allow hot-adding memory to
+> -         * memory-less node, but instead will silently add the memory
+> -         * to the first node that has some memory. This causes two
+> -         * unexpected behaviours for the user.
+> -         *
+> -         * - Memory gets hotplugged to a different node than what the user
+> -         *   specified.
+> -         * - Since pc-dimm subsystem in QEMU still thinks that memory belongs
+> -         *   to memory-less node, a reboot will set things accordingly
+> -         *   and the previously hotplugged memory now ends in the right node.
+> -         *   This appears as if some memory moved from one node to another.
+> -         *
+> -         * So until kernel starts supporting memory hotplug to memory-less
+> -         * nodes, just prevent such attempts upfront in QEMU.
+> -         */
+> -        if (nb_numa_nodes && !numa_info[node].node_mem) {
+> -            error_setg(errp, "Can't hotplug memory to memory-less node %d",
+> -                       node);
+> -            return;
+> -        }
+> -
+
+If you remove this unconditionally, wouldn't it be a problem in case
+of newer QEMU with older guest kernels ?
+
+Regards,
+Bharata.
