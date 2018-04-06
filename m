@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f4JSL-0003Ov-DW
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 00:58:34 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1f4JhW-00004t-2g
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 01:14:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f4JSK-00034u-E9
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 00:58:33 -0400
-Date: Fri, 6 Apr 2018 14:58:19 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180406045819.GC3212@umbus.fritz.box>
-References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
-	<20180405021437.16761-10-david@gibson.dropbear.id.au>
-	<20180405140619.5f6112b9@bahia.lan>
+	(envelope-from <aik@ozlabs.ru>) id 1f4JhS-0006HX-SH
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 01:14:14 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:55299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1f4JhS-0006HJ-In
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 01:14:10 -0400
+Received: by mail-it0-x243.google.com with SMTP id 142-v6so201824itl.5
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 22:14:09 -0700 (PDT)
+References: <20180405012241.25714-1-f4bug@amsat.org>
+	<20180405012241.25714-5-f4bug@amsat.org>
+	<fc68eee3-cd18-016c-a323-3e62250e4ea8@adacore.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <aca2ee26-8b6d-0385-5a90-1ee753fea16a@ozlabs.ru>
+Date: Fri, 6 Apr 2018 15:14:03 +1000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HG+GLK89HZ1zG0kk"
-Content-Disposition: inline
-In-Reply-To: <20180405140619.5f6112b9@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-2.13 09/13] target/ppc: Move 1T segment
- and AMR options to PPCHash64Options
+In-Reply-To: <fc68eee3-cd18-016c-a323-3e62250e4ea8@adacore.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] memory: Add
+ memory_region_set_priority()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com
+To: KONRAD Frederic <frederic.konrad@adacore.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
+
+On 5/4/18 6:44 pm, KONRAD Frederic wrote:
+> 
+> 
+> On 04/05/2018 03:22 AM, Philippe Mathieu-Daudé wrote:
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> Sadly I'm missing something, this does not work.
+> 
+> Hmmm is that supposed to work dynamically?
+> 
+> If so I think you might need to call
+> memory_region_update_container_subregions(..) because it will
+> actually change the map?
+> 
+> Take a look at how memory_add_subregion works.
 
 
---HG+GLK89HZ1zG0kk
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, right, I guess it should be:
 
-On Thu, Apr 05, 2018 at 02:06:19PM +0200, Greg Kurz wrote:
-> On Thu,  5 Apr 2018 12:14:33 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > Currently env->mmu_model is a bit of an unholy mess of an enum of disti=
-nct
-> > MMU types, with various flag bits as well.  This makes which bits of the
-> > field should be compared pretty confusing.
-> >=20
-> > Make a start on cleaning that up by moving two of the flags bits -
-> > POWERPC_MMU_1TSEG and POWERPC_MMU_AMR - which are specific to the 64-bit
-> > hash MMU into a new flags field in PPCHash64Options structure.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > ---
->=20
-> While investigating a migration failure from an older QEMU, I realized
-> this patch has a problem. The *cpu->hash64_opts structure is zeroed in
-> kvm_fixup_page_sizes(), which has now the unwanted effect of clearing
-> the cpu->hash64_opts->flags as well.
->=20
-> We only need to zero the segment page sizes actually. The following
-> fixes migration:
->=20
-> @@ -442,7 +442,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
->      }
-> =20
->      /* Convert to QEMU form */
-> -    memset(cpu->hash64_opts, 0, sizeof(*cpu->hash64_opts));
-> +    memset(&cpu->hash64_opts->sps, 0, sizeof(cpu->hash64_opts->sps));
-> =20
->      /* If we have HV KVM, we need to forbid CI large pages if our
->       * host page size is smaller than 64K.
+memory_region_transaction_begin();
+mr->priority = priority;
+memory_region_update_pending = true;
+memory_region_transaction_commit();
 
-Ah, good catch.  I mistakenly thought that kvm_fixup_page_sizes() was
-completely rewriting those flags as well.  I've made this fix now.
 
-I'm also currently working on some other patches which amongst other
-things get rid of kvm_fixup_page_sizes(), because it's completely
-broken by design.  But might as well not break things excessively in
-the meantime.
+as the priority may change the final layout of flatview.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---HG+GLK89HZ1zG0kk
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> Thanks,
+> Fred
+> 
+>>
+>>   memory.c | 18 +++++++++++++++++-
+>>   1 file changed, 17 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/memory.c b/memory.c
+>> index eaa5fa7f23..ae45ea7779 100644
+>> --- a/memory.c
+>> +++ b/memory.c
+>> @@ -1225,6 +1225,22 @@ static void memory_region_get_priority(Object
+>> *obj, Visitor *v,
+>>       visit_type_int32(v, name, &value, errp);
+>>   }
+>>   +static void memory_region_set_priority(Object *obj, Visitor *v,
+>> +                                       const char *name, void *opaque,
+>> +                                       Error **errp)
+>> +{
+>> +    MemoryRegion *mr = MEMORY_REGION(obj);
+>> +    int32_t priority;
+>> +    Error *local_err = NULL;
+>> +
+>> +    visit_type_int32(v, name, &priority, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +    mr->priority = priority;
+>> +}
+>> +
+>>   static void memory_region_get_size(Object *obj, Visitor *v, const char
+>> *name,
+>>                                      void *opaque, Error **errp)
+>>   {
+>> @@ -1260,7 +1276,7 @@ static void memory_region_initfn(Object *obj)
+>>                           NULL, NULL, &error_abort);
+>>       object_property_add(OBJECT(mr), "priority", "int32",
+>>                           memory_region_get_priority,
+>> -                        NULL, /* memory_region_set_priority */
+>> +                        memory_region_set_priority,
+>>                           NULL, NULL, &error_abort);
+>>       object_property_add(OBJECT(mr), "size", "uint64",
+>>                           memory_region_get_size,
+>>
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrG/mgACgkQbDjKyiDZ
-s5Ieeg/9GKZEgBE/+6afBredaOdTOC0s4ZK9KNiaQoEVxl/8MzQrsQ6K6+z2eGb9
-si69zPJd1smjzEvUpgIaVpC7J8wTjhPT0wTfBjXpeljTUoMAEA6qu7cx1Y2e+vpp
-7hqZ0sP6wVmsGxBpwbvv3J5e3kX1X6pRNmKaaVIaQg8t5wfOvDAE5KG33Fmm2NY7
-TUk+6hrAUi/lQ1x9emVL9IxCDIWr5+OOyis+RIX9Ad3O4bl/qKMHS2aWWqyleryZ
-1MtoHdvNCyAnxtEU2f/ylxfceXU5B4yiUVpdyArnzi1S1b9AKedSxQm7P/7uZOp7
-8hxF9++t88aKkyWKFOrA7otOYspC93ET6bSCAhg4LyuiOLoimusFn3io0eEyINBU
-7pMHSxL55Gbm6rD6FU/yZr1lsD+nw/dkq7CAcRvs+1h/rJkq51mQKlH7Rgs9msdq
-Fi6Qu1w4v5bOMoxEuwVF5B0b5HTazqzyfEwGtyKEJKaEfFhAdh24t+VXp6Ybk5cA
-gM4eD7X3JvxgA96iNQi9b6eIioVQfq5nxnEoeFWr6fElP7qDMXyvrzOyiHfPKwHM
-ULDx72OybftnC2LAT7ZzkzqQA5ltUQIOQ6AWQUUoeCmv+mCAlf63xlBWAed6OFOS
-qbGFDPg6jj0sgic3dk9+o04FTAWRGEW7gnpNezh9QQJZPQUq7g0=
-=Fx7G
------END PGP SIGNATURE-----
-
---HG+GLK89HZ1zG0kk--
+-- 
+Alexey
