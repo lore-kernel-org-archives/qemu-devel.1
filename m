@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4GsL-0002GA-6c
+	(envelope-from <cota@braap.org>) id 1f4GsL-0002GF-7X
 	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4GsI-0003UB-Tv
+	(envelope-from <cota@braap.org>) id 1f4GsH-0003Sm-To
 	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:13 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:56219)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:60895)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4GsI-0003TO-Oj
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:10 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4GsH-0003Rc-Mr
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:09 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  5 Apr 2018 22:12:57 -0400
-Message-Id: <1522980788-1252-7-git-send-email-cota@braap.org>
-In-Reply-To: <1522980788-1252-1-git-send-email-cota@braap.org>
-References: <1522980788-1252-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 06/17] translate-all: make l1_map lockless
+Date: Thu,  5 Apr 2018 22:12:51 -0400
+Message-Id: <1522980788-1252-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 00/17] tcg: tb_lock_removal redux v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +24,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Groundwork for supporting parallel TCG generation.
+v1: http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06499.html
 
-We never remove entries from the radix tree, so we can use cmpxchg
-to implement lockless insertions.
+Changes since v1:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+- Add R-b's
+
+- Rebase onto master
+
+- qht_lookup_custom: move @func to be the last argument, which
+  simplifies the new qht_lookup function. (I've kept R-b's tags
+  here because this is a very simple change.)
+
+- qht_insert: add an **existing argument and keep the bool return value,
+  as suggested by Alex.
+
+- Fix indentation of TB_FOR_EACH_TAGGED macro
+
+- Add page_locked assertions, as suggested by Alex.
+
+- Expand comment in tb_link_page and in docs/mttcg about parallel
+  code insertion.
+
+- Fix stale comment about tb_lock next to CF_INVALID
+
+- Fix stale comment in cpu_restore_state, as suggested by Alex.
+
+There is only one checkpatch error for the entire series -- it is
+a false positive.
+
+You can fetch the tree from:
+  https://github.com/cota/qemu/tree/tb-lock-removal-redux-v2
+
+Thanks,
+
+		Emilio
 ---
- docs/devel/multi-thread-tcg.txt |  4 ++--
- accel/tcg/translate-all.c       | 24 ++++++++++++++----------
- 2 files changed, 16 insertions(+), 12 deletions(-)
-
-diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.txt
-index a99b456..faf8918 100644
---- a/docs/devel/multi-thread-tcg.txt
-+++ b/docs/devel/multi-thread-tcg.txt
-@@ -134,8 +134,8 @@ tb_set_jmp_target() code. Modification to the linked lists that allow
- searching for linked pages are done under the protect of the
- tb_lock().
- 
--The global page table is protected by the tb_lock() in system-mode and
--mmap_lock() in linux-user mode.
-+The global page table is a lockless radix tree; cmpxchg is used
-+to atomically insert new elements.
- 
- The lookup caches are updated atomically and the lookup hash uses QHT
- which is designed for concurrent safe lookup.
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index ecf898c..83aec43 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -469,20 +469,12 @@ static void page_init(void)
- #endif
- }
- 
--/* If alloc=1:
-- * Called with tb_lock held for system emulation.
-- * Called with mmap_lock held for user-mode emulation.
-- */
- static PageDesc *page_find_alloc(tb_page_addr_t index, int alloc)
- {
-     PageDesc *pd;
-     void **lp;
-     int i;
- 
--    if (alloc) {
--        assert_memory_lock();
--    }
--
-     /* Level 1.  Always allocated.  */
-     lp = l1_map + ((index >> v_l1_shift) & (v_l1_size - 1));
- 
-@@ -491,11 +483,17 @@ static PageDesc *page_find_alloc(tb_page_addr_t index, int alloc)
-         void **p = atomic_rcu_read(lp);
- 
-         if (p == NULL) {
-+            void *existing;
-+
-             if (!alloc) {
-                 return NULL;
-             }
-             p = g_new0(void *, V_L2_SIZE);
--            atomic_rcu_set(lp, p);
-+            existing = atomic_cmpxchg(lp, NULL, p);
-+            if (unlikely(existing)) {
-+                g_free(p);
-+                p = existing;
-+            }
-         }
- 
-         lp = p + ((index >> (i * V_L2_BITS)) & (V_L2_SIZE - 1));
-@@ -503,11 +501,17 @@ static PageDesc *page_find_alloc(tb_page_addr_t index, int alloc)
- 
-     pd = atomic_rcu_read(lp);
-     if (pd == NULL) {
-+        void *existing;
-+
-         if (!alloc) {
-             return NULL;
-         }
-         pd = g_new0(PageDesc, V_L2_SIZE);
--        atomic_rcu_set(lp, pd);
-+        existing = atomic_cmpxchg(lp, NULL, pd);
-+        if (unlikely(existing)) {
-+            g_free(pd);
-+            pd = existing;
-+        }
-     }
- 
-     return pd + (index & (V_L2_SIZE - 1));
--- 
-2.7.4
+ accel/tcg/cpu-exec.c            |   96 ++-
+ accel/tcg/cputlb.c              |    8 -
+ accel/tcg/translate-all.c       | 1053 ++++++++++++++++++++++----------
+ accel/tcg/translate-all.h       |    6 +-
+ docs/devel/multi-thread-tcg.txt |   24 +-
+ exec.c                          |   25 +-
+ include/exec/cpu-common.h       |    2 +-
+ include/exec/exec-all.h         |   51 +-
+ include/exec/memory-internal.h  |    6 +-
+ include/exec/tb-context.h       |    4 -
+ include/qemu/qht.h              |   32 +-
+ linux-user/main.c               |    3 -
+ tcg/tcg.c                       |  205 +++++++
+ tcg/tcg.h                       |   13 +-
+ tests/qht-bench.c               |   18 +-
+ tests/test-qht.c                |   23 +-
+ util/qht.c                      |   41 +-
+ 17 files changed, 1133 insertions(+), 477 deletions(-)
