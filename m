@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f4VtD-0000vw-8M
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:15:08 -0400
+	(envelope-from <cota@braap.org>) id 1f4Vy4-0003kT-MS
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f4VtC-0005BR-3k
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:15:07 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34072)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f4VtB-0005BH-UK
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:15:06 -0400
-Received: by mail-ot0-x241.google.com with SMTP id m7-v6so2141470otd.1
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 11:15:05 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-aVoyMGegYLrzZAaQgs2nebRZ1+wCBEXw2iHE7FSeZRg@mail.gmail.com>
-References: <20180309172622.4277-1-peter.maydell@linaro.org>
-	<20180309172622.4277-11-peter.maydell@linaro.org>
-	<CAFEAcA-aVoyMGegYLrzZAaQgs2nebRZ1+wCBEXw2iHE7FSeZRg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Apr 2018 19:14:44 +0100
-Message-ID: <CAFEAcA_xNAWOOC26PT=5BC6onaqtPd+9pLq67awE2owuZZm42A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 10/25] aarch64-linux-user: Add support for
- SVE signal frame records
+	(envelope-from <cota@braap.org>) id 1f4Vy0-0000QV-7T
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:20:08 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Fri,  6 Apr 2018 14:19:43 -0400
+Message-Id: <1523038800-2494-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
+ sh4/sparc/mips/s390x/openrisc/riscv targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +18,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, Richard Henwood <richard.henwood@arm.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On 6 April 2018 at 19:12, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 9 March 2018 at 17:26, Peter Maydell <peter.maydell@linaro.org> wrote:
->> From: Richard Henderson <richard.henderson@linaro.org>
->>
->> Depending on the currently selected size of the SVE vector registers,
->> we can either store the data within the "standard" allocation, or we
->> may beedn to allocate additional space with an EXTRA record.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> Message-id: 20180303143823.27055-6-richard.henderson@linaro.org
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  linux-user/signal.c | 210 +++++++++++++++++++++++++++++++++++++++++++++++-----
->>  1 file changed, 192 insertions(+), 18 deletions(-)
->
-> I did a 'git bisect' looking for when we introduced the segv
-> bug described in https://bugs.launchpad.net/qemu/+bug/1761535,
-> and git bisect thinks this commit is it.
->
-> At least for me, with a xenial aarch64 chroot, with this
-> patch if I chroot in and run 'ls' then we get a spurious
-> segfault (I think in the guest bash):
->
-> e104462:xenial:chroot$ sudo chroot xenial-aarch64
-> root@e104462:/# ls
-> Deadlock.class    bin   home                  hotspot_pid17113.log
-> mnt   root   srv  var
-> Deadlock.java     boot  hotspot_pid14759.log  hotspot_pid19407.log
-> opt   run    sys
-> HelloWorld.class  dev   hotspot_pid16542.log  lib
-> proc  sbin   tmp
-> HelloWorld.java   etc   hotspot_pid16895.log  media
-> risu  sdbg9  usr
-> qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-> Segmentation fault (core dumped)
->
-> Reverting f914baef8e39f7 on master fixes the segfault.
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00445.html
 
-Er, I mean "reverting 8c5931de0ac77388096d79c". Accidentally quoted
-the git hash of the local revert-commit I was testing rather than
-of the commit it's reverting...
+Changes since v1:
 
-thanks
--- PMM
+- Rebase onto master
+
+- Add R-b's
+
+- Add riscv conversion
+
+- s390x:
+  + fix comment in s390x_tr_breakpoint_check
+
+You can fetch this series from:
+  https://github.com/cota/qemu/tree/trloop-conv-v2
+
+Thanks,
+
+		Emilio
+---
+ accel/tcg/translator.c      |   21 +-
+ include/exec/translator.h   |    8 +-
+ target/alpha/translate.c    |    6 +-
+ target/arm/translate-a64.c  |    8 +-
+ target/arm/translate.c      |    9 +-
+ target/hppa/translate.c     |    7 +-
+ target/i386/translate.c     |    5 +-
+ target/mips/translate.c     |  623 +++++-----
+ target/openrisc/translate.c |  226 ++--
+ target/ppc/translate.c      |    5 +-
+ target/riscv/translate.c    |  255 ++---
+ target/s390x/translate.c    | 1529 ++++++++++++-------------
+ target/sh4/translate.c      |  171 +--
+ target/sparc/translate.c    |  207 ++--
+ 14 files changed, 1522 insertions(+), 1558 deletions(-)
