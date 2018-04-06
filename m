@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongwon.kim@intel.com>) id 1f4WYW-0004id-4R
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:57:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f4Xvw-0001Ol-Qx
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 16:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongwon.kim@intel.com>) id 1f4WYT-0006Om-1X
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:57:48 -0400
-Received: from mga05.intel.com ([192.55.52.43]:58036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dongwon.kim@intel.com>)
-	id 1f4WYS-0006OC-Jg
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 14:57:44 -0400
-Date: Fri, 6 Apr 2018 11:57:46 -0700
-From: Dongwon Kim <dongwon.kim@intel.com>
-Message-ID: <20180406185746.GA4983@downor-Z87X-UD5H>
-References: <20180313154826.20436-1-kraxel@redhat.com>
-	<20180313161035.GL4788@phenom.ffwll.local>
-	<20180314080301.366zycak3whqvvqx@sirius.home.kraxel.org>
-	<CAKMK7uGG6Z6XLc6GuKv7-3grCNg+EK2Lh6XWpavjsbZWF_L5Wg@mail.gmail.com>
-	<20180406001117.GD31612@mdroper-desk.amr.corp.intel.com>
-	<2411d2c1-33c0-2ba5-67ea-3bb9af5d5ec9@epam.com>
-	<20180406090747.gwiegu22z4noj23i@sirius.home.kraxel.org>
-	<9a085854-3758-1500-9971-806c611cb54f@gmail.com>
-	<20180406115730.jtwcbz5okrphlxli@sirius.home.kraxel.org>
-	<7ef89a29-6584-d23c-efd1-f30d9b767a24@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1f4Xvt-0000PN-Hs
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 16:26:04 -0400
+Resent-Message-Id: <E1f4Xvt-0000PN-Hs@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21001)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f4Xvt-0000O0-Bf
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 16:26:01 -0400
+In-Reply-To: <1523038800-2494-1-git-send-email-cota@braap.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152303995842.1734.1103475917931806849@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ef89a29-6584-d23c-efd1-f30d9b767a24@gmail.com>
-Subject: Re: [Qemu-devel] [RfC PATCH] Add udmabuf misc device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 6 Apr 2018 11:39:20 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
+ sh4/sparc/mips/s390x/openrisc/riscv targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,124 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Oleksandr Andrushchenko <andr2000@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Oleksandr Andrushchenko <Oleksandr_Andrushchenko@epam.com>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>, Matt Roper <matthew.d.roper@intel.com>
+To: cota@braap.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, palmer@sifive.com, sagark@eecs.berkeley.edu, david@redhat.com, mark.cave-ayland@ilande.co.uk, cohuck@redhat.com, richard.henderson@linaro.org, agraf@suse.de, qemu-s390x@nongnu.org, mjc@sifive.com, atar4qemu@gmail.com, kbastian@mail.uni-paderborn.de, shorne@gmail.com, yongbok.kim@mips.com, aurelien@aurel32.net
 
-On Fri, Apr 06, 2018 at 03:36:03PM +0300, Oleksandr Andrushchenko wrote:
-> On 04/06/2018 02:57 PM, Gerd Hoffmann wrote:
-> >   Hi,
-> >
-> >>>I fail to see any common ground for xen-zcopy and udmabuf ...
-> >>Does the above mean you can assume that xen-zcopy and udmabuf
-> >>can co-exist as two different solutions?
-> >Well, udmabuf route isn't fully clear yet, but yes.
-> >
-> >See also gvt (intel vgpu), where the hypervisor interface is abstracted
-> >away into a separate kernel modules even though most of the actual vgpu
-> >emulation code is common.
-> Thank you for your input, I'm just trying to figure out
-> which of the three z-copy solutions intersect and how much
-> >>And what about hyper-dmabuf?
-
-xen z-copy solution is pretty similar fundamentally to hyper_dmabuf
-in terms of these core sharing feature:
-
-1. the sharing process - import prime/dmabuf from the producer -> extract
-underlying pages and get those shared -> return references for shared pages
-
-2. the page sharing mechanism - it uses Xen-grant-table.
-
-And to give you a quick summary of differences as far as I understand
-between two implementations (please correct me if I am wrong, Oleksandr.)
-
-1. xen-zcopy is DRM specific - can import only DRM prime buffer
-while hyper_dmabuf can export any dmabuf regardless of originator
-
-2. xen-zcopy doesn't seem to have dma-buf synchronization between two VMs
-while (as danvet called it as remote dmabuf api sharing) hyper_dmabuf sends
-out synchronization message to the exporting VM for synchronization.
-
-3. 1-level references - when using grant-table for sharing pages, there will
-be same # of refs (each 8 byte) as # of shared pages, which is passed to
-the userspace to be shared with importing VM in case of xen-zcopy. Compared
-to this, hyper_dmabuf does multiple level addressing to generate only one
-reference id that represents all shared pages.
-
-4. inter VM messaging (hype_dmabuf only) - hyper_dmabuf has inter-vm msg
-communication defined for dmabuf synchronization and private data (meta
-info that Matt Roper mentioned) exchange.
-
-5. driver-to-driver notification (hyper_dmabuf only) - importing VM gets
-notified when newdmabuf is exported from other VM - uevent can be optionally
-generated when this happens.
-
-6. structure - hyper_dmabuf is targetting to provide a generic solution for
-inter-domain dmabuf sharing for most hypervisors, which is why it has two
-layers as mattrope mentioned, front-end that contains standard API and backend
-that is specific to hypervisor.
-
-> >No idea, didn't look at it in detail.
-> >
-> >Looks pretty complex from a distant view.  Maybe because it tries to
-> >build a communication framework using dma-bufs instead of a simple
-> >dma-buf passing mechanism.
-
-we started with simple dma-buf sharing but realized there are many
-things we need to consider in real use-case, so we added communication
-, notification and dma-buf synchronization then re-structured it to 
-front-end and back-end (this made things more compicated..) since Xen
-was not our only target. Also, we thought passing the reference for the
-buffer (hyper_dmabuf_id) is not secure so added uvent mechanism later.
-
-> Yes, I am looking at it now, trying to figure out the full story
-> and its implementation. BTW, Intel guys were about to share some
-> test application for hyper-dmabuf, maybe I have missed one.
-> It could probably better explain the use-cases and the complexity
-> they have in hyper-dmabuf.
-
-One example is actually in github. If you want take a look at it, please
-visit:
-
-https://github.com/downor/linux_hyper_dmabuf_test/tree/xen/simple_export
-
-> >
-> >Like xen-zcopy it seems to depend on the idea that the hypervisor
-> >manages all memory it is easy for guests to share pages with the help of
-> >the hypervisor.
-> So, for xen-zcopy we were not trying to make it generic,
-> it just solves display (dumb) zero-copying use-cases for Xen.
-> We implemented it as a DRM helper driver because we can't see any
-> other use-cases as of now.
-> For example, we also have Xen para-virtualized sound driver, but
-> its buffer memory usage is not comparable to what display wants
-> and it works somewhat differently (e.g. there is no "frame done"
-> event, so one can't tell when the sound buffer can be "flipped").
-> At the same time, we do not use virtio-gpu, so this could probably
-> be one more candidate for shared dma-bufs some day.
-> >   Which simply isn't the case on kvm.
-> >
-> >hyper-dmabuf and xen-zcopy could maybe share code, or hyper-dmabuf build
-> >on top of xen-zcopy.
-> Hm, I can imagine that: xen-zcopy could be a library code for hyper-dmabuf
-> in terms of implementing all that page sharing fun in multiple directions,
-> e.g. Host->Guest, Guest->Host, Guest<->Guest.
-> But I'll let Matt and Dongwon to comment on that.
-
-I think we can definitely collaborate. Especially, maybe we are using some
-outdated sharing mechanism/grant-table mechanism in our Xen backend (thanks
-for bringing that up Oleksandr). However, the question is once we collaborate
-somehow, can xen-zcopy's usecase use the standard API that hyper_dmabuf
-provides? I don't think we need different IOCTLs that do the same in the final
-solution.
-
-> 
-> >
-> >cheers,
-> >   Gerd
-> >
-> Thank you,
-> Oleksandr
-> 
-> P.S. Sorry for making your original mail thread to discuss things much
-> broader than your RFC...
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjMwMzg4MDAtMjQ5NC0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3Jn
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTddIFRyYW5zbGF0aW9uIGxvb3Ag
+Y29udmVyc2lvbiBmb3Igc2g0L3NwYXJjL21pcHMvczM5MHgvb3BlbnJpc2MvcmlzY3YgdGFyZ2V0
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICAgZDdmYTdmYjUwNC4uMDhlMTczZjI5NCAgbWFzdGVyICAgICAt
+PiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTIzMDM4ODAwLTI0
+OTQtMS1naXQtc2VuZC1lbWFpbC1jb3RhQGJyYWFwLm9yZyAtPiBwYXRjaGV3LzE1MjMwMzg4MDAt
+MjQ5NC0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKM2JmMGMxYzZkNCB0YXJnZXQvcmlzY3Y6IGNvbnZlcnQgdG8gVHJhbnNsYXRv
+ck9wcwo4YzhjZjcxM2VhIHRhcmdldC9yaXNjdjogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNl
+CmNkYTY1ZGM5MjMgdGFyZ2V0L3Jpc2N2OiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUKYjk1OWUy
+MDM5NiB0YXJnZXQvb3BlbnJpc2M6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcwo4YTFmNWFkMmNk
+IHRhcmdldC9vcGVucmlzYzogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNlCmY2ZWYzYjc1M2Eg
+dGFyZ2V0L3MzOTB4OiBjb252ZXJ0IHRvIFRyYW5zbGF0b3JPcHMKOGRhZDZmYzgyOSB0YXJnZXQv
+czM5MHg6IGNvbnZlcnQgdG8gRGlzYXNDb250ZXh0QmFzZQphZmM5YWFjNTUwIHRhcmdldC9zMzkw
+eDogY29udmVydCB0byBEaXNhc0p1bXBUeXBlCmY1ODhmZmJkMGMgdGFyZ2V0L21pcHM6IGNvbnZl
+cnQgdG8gVHJhbnNsYXRvck9wcwpiODc5N2FhNWMyIHRhcmdldC9taXBzOiB1c2UgKmN0eCBmb3Ig
+RGlzYXNDb250ZXh0CmJmNGY4MzUzNzMgdGFyZ2V0L21pcHM6IGNvbnZlcnQgdG8gRGlzYXNDb250
+ZXh0QmFzZQphNDIyODcwODk0IHRhcmdldC9taXBzOiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUK
+ZmRjOTdlNjIwZiB0YXJnZXQvc3BhcmM6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcwo4ODBjMjE0
+YmQwIHRhcmdldC9zcGFyYzogY29udmVydCB0byBEaXNhc0NvbnRleHRCYXNlCmZlZWM4N2RlZjEg
+dGFyZ2V0L3NwYXJjOiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUKNWQwMjE3ZWUyOSB0YXJnZXQv
+c2g0OiBjb252ZXJ0IHRvIFRyYW5zbGF0b3JPcHMKYzFmZmZkYWJhNSB0cmFuc2xhdG9yOiBtZXJn
+ZSBtYXhfaW5zbnMgaW50byBEaXNhc0NvbnRleHRCYXNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzE3OiB0cmFuc2xhdG9yOiBtZXJnZSBtYXhfaW5zbnMgaW50byBEaXNh
+c0NvbnRleHRCYXNlLi4uCkNoZWNraW5nIFBBVENIIDIvMTc6IHRhcmdldC9zaDQ6IGNvbnZlcnQg
+dG8gVHJhbnNsYXRvck9wcy4uLgpDaGVja2luZyBQQVRDSCAzLzE3OiB0YXJnZXQvc3BhcmM6IGNv
+bnZlcnQgdG8gRGlzYXNKdW1wVHlwZS4uLgpDaGVja2luZyBQQVRDSCA0LzE3OiB0YXJnZXQvc3Bh
+cmM6IGNvbnZlcnQgdG8gRGlzYXNDb250ZXh0QmFzZS4uLgpDaGVja2luZyBQQVRDSCA1LzE3OiB0
+YXJnZXQvc3BhcmM6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcy4uLgpDaGVja2luZyBQQVRDSCA2
+LzE3OiB0YXJnZXQvbWlwczogY29udmVydCB0byBEaXNhc0p1bXBUeXBlLi4uCkNoZWNraW5nIFBB
+VENIIDcvMTc6IHRhcmdldC9taXBzOiBjb252ZXJ0IHRvIERpc2FzQ29udGV4dEJhc2UuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggOC8xNzogdGFyZ2V0L21pcHM6IHVzZSAqY3R4IGZvciBEaXNhc0NvbnRleHQu
+Li4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM4MTog
+RklMRTogdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmM6MjAyMjA6CisgICAgY3R4LT5rc2NyZXhpc3Qg
+PSAoZW52LT5DUDBfQ29uZmlnNCA+PiBDUDBDNF9LU2NyRXhpc3QpICYgMHhmZjsKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8xNzogdGFyZ2V0L21p
+cHM6IGNvbnZlcnQgdG8gVHJhbnNsYXRvck9wcy4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogdGFy
+Z2V0L3MzOTB4OiBjb252ZXJ0IHRvIERpc2FzSnVtcFR5cGUuLi4KRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzQ2NDogRklMRTog
+dGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5jOjYyMjU6CisgICAgfSB3aGlsZSAoc3RhdHVzID09IERJ
+U0FTX05FWFQpOwpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzQwIGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDExLzE3OiB0YXJnZXQvczM5MHg6IGNvbnZlcnQgdG8gRGlzYXNDb250ZXh0QmFzZS4u
+LgpDaGVja2luZyBQQVRDSCAxMi8xNzogdGFyZ2V0L3MzOTB4OiBjb252ZXJ0IHRvIFRyYW5zbGF0
+b3JPcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTc6IHRhcmdldC9vcGVucmlzYzogY29udmVydCB0
+byBEaXNhc0NvbnRleHRCYXNlLi4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
+YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIyMzogRklMRTogdGFyZ2V0L29wZW5yaXNjL3Ry
+YW5zbGF0ZS5jOjE2MDU6CisgICAgfSB3aGlsZSAoIWRjLT5iYXNlLmlzX2ptcApbLi4uXQoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNDYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTQvMTc6IHRhcmdldC9v
+cGVucmlzYzogY29udmVydCB0byBUcmFuc2xhdG9yT3BzLi4uCkNoZWNraW5nIFBBVENIIDE1LzE3
+OiB0YXJnZXQvcmlzY3Y6IGNvbnZlcnQgdG8gRGlzYXNKdW1wVHlwZS4uLgpDaGVja2luZyBQQVRD
+SCAxNi8xNzogdGFyZ2V0L3Jpc2N2OiBjb252ZXJ0IHRvIERpc2FzQ29udGV4dEJhc2UuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTcvMTc6IHRhcmdldC9yaXNjdjogY29udmVydCB0byBUcmFuc2xhdG9yT3Bz
+Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
