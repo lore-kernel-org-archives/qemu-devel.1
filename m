@@ -1,25 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f4TXK-00041c-Ka
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:44:23 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1f4TuO-0000zA-2e
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:08:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f4TXH-0001B8-Hq
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:44:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35298 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f4TXH-0001AN-CX
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:44:19 -0400
-References: <20180406120356.24757-1-brijesh.singh@amd.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <18da2a0b-bb37-a3bf-d9ca-220835df7ae2@redhat.com>
-Date: Fri, 6 Apr 2018 10:44:08 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1f4TuK-0007ba-SP
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:08:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1f4TuK-0007ao-Jt
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:08:08 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w36G2lO8036880
+	for <qemu-devel@nongnu.org>; Fri, 6 Apr 2018 12:08:06 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h6bx88nt9-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 12:08:05 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 6 Apr 2018 17:08:03 +0100
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
+	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
+	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
+	<20180403113619.54ff1e18.cohuck@redhat.com>
+	<dd4fceac-818f-14a2-62b4-94ae73e21796@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 6 Apr 2018 18:07:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180406120356.24757-1-brijesh.singh@amd.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qIOJTz6B62cehioFWQIyFE7NcPpfPfhP9"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] tap: set vhostfd passed from qemu
- cli to non-blocking
+In-Reply-To: <dd4fceac-818f-14a2-62b4-94ae73e21796@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Message-Id: <3cb8a831-325e-2e1a-3dae-30864df27a75@linux.vnet.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +48,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: Thomas.Lendacky@amd.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: mjrosato@linux.vnet.ibm.com, alex.williamson@redhat.com, eskultet@redhat.com, David Hildenbrand <david@redhat.com>, peter.maydell@linaro.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, alifm@linux.vnet.ibm.com, heiko.carstens@de.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qIOJTz6B62cehioFWQIyFE7NcPpfPfhP9
-From: Eric Blake <eblake@redhat.com>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: Thomas.Lendacky@amd.com, Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
-Message-ID: <18da2a0b-bb37-a3bf-d9ca-220835df7ae2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] tap: set vhostfd passed from qemu
- cli to non-blocking
-References: <20180406120356.24757-1-brijesh.singh@amd.com>
-In-Reply-To: <20180406120356.24757-1-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/06/2018 07:03 AM, Brijesh Singh wrote:
-> A guest boot hangs while probing the network interface when
-> iommu_platform=3Don is used.
->=20
-> The following qemu cli hangs without this patch:
->=20
-> # $QEMU \
->   -netdev tap,fd=3D3,id=3Dhostnet0,vhost=3Don,vhostfd=3D4 3<>/dev/tap67=
- 4<>/dev/host-net \
->   -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,iommu_platform=3Do=
-n,disable-legacy=3Don \
->   ...
->=20
-> Commit: c471ad0e9bd46 (vhost_net: device IOTLB support) took care of
-> setting vhostfd to non-blocking when QEMU opens /dev/host-net but if
-> the fd is passed from qemu cli then we need to ensure that fd is set
-> to non-blocking.
->=20
-> Fixes: c471ad0e9bd46 "vhost_net: device IOTLB support"
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  net/tap.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/net/tap.c b/net/tap.c
-> index 2b3a36f9b50d..8c026fbf95cd 100644
-> --- a/net/tap.c
-> +++ b/net/tap.c
-> @@ -693,6 +693,7 @@ static void net_init_tap_one(const NetdevTapOptions=
- *tap, NetClientState *peer,
->                  }
->                  return;
->              }
-> +            fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-
-Please use qemu_set_nonblock() instead.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---qIOJTz6B62cehioFWQIyFE7NcPpfPfhP9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrHlcgACgkQp6FrSiUn
-Q2q4Mgf/Sn6uqRh7AmsN2v9bc5z0jjkz0QOFy/ALsIJUWXEYK9bHC0+RcnGjQaRR
-l18O5+jnq5k/ZFQUP7xCzMIyYkkIsSiPHPJOl8WRovLQ9jX3K4IXuyJgCXZG5XLH
-q9cDzFbZQB3DFvZpSw7BFbYHei32AhBQm7KneCM+Uuf5RxTxvwX+Jm6ZWKyzKv7b
-XI+v9y9TFEwVvBGih9kEiwMwmpH4m9PYlCdFnsSuYFe3YNW8TvgJtAmJJTqojb6s
-3lm/wyPI3mm1s3fP2/buVG9P1feW/o/fjVWN4nb8JvbLYhArLiKBaC5cMxYy7ZC6
-RGiEAnV6zZOYn8TmR/Pz539CbWfvrg==
-=GXpR
------END PGP SIGNATURE-----
-
---qIOJTz6B62cehioFWQIyFE7NcPpfPfhP9--
+DQoNCk9uIDA0LzA1LzIwMTggMDY6MzggUE0sIFRvbnkgS3Jvd2lhayB3cm90ZToNCj4gT27C
+oDA0LzAzLzIwMTjCoDA1OjM2wqBBTSzCoENvcm5lbGlhwqBIdWNrwqB3cm90ZToNCj4+IE9u
+wqBNb24swqAywqBBcHLCoDIwMTjCoDEyOjM2OjI3wqAtMDQwMA0KPj4gVG9uecKgS3Jvd2lh
+a8KgPGFrcm93aWFrQGxpbnV4LnZuZXQuaWJtLmNvbT7CoHdyb3RlOg0KPj4NCj4+PiBPbsKg
+MDMvMjYvMjAxOMKgMDU6MDPCoEFNLMKgUGllcnJlwqBNb3JlbMKgd3JvdGU6DQo+Pj4+IE9u
+wqAyNi8wMy8yMDE4wqAxMDozMizCoERhdmlkwqBIaWxkZW5icmFuZMKgd3JvdGU6DQo+Pj4+
+PiBPbsKgMTYuMDMuMjAxOMKgMDA6MjQswqBUb255wqBLcm93aWFrwqB3cm90ZToNCj4+Pj4+
+PiArwqDCoMKgwqAvKg0KPj4+Pj4+ICvCoMKgwqDCoMKgKsKgVGhlwqBRdWVyecKgQ29uZmln
+dXJhdGlvbsKgSW5mb3JtYXRpb27CoChRQ0kpwqBmdW5jdGlvbsKgKGZjwqA9PcKgNCkNCj4+
+Pj4+PiBkb2VzwqBub3QNCj4+Pj4+PiArwqDCoMKgwqDCoCrCoHNldMKgYcKgcmVzcG9uc2XC
+oGNvZGXCoGluwqByZWfCoDEswqBzb8KgY2hlY2vCoGZvcsKgdGhhdMKgYWxvbmfCoHdpdGjC
+oHRoZQ0KPj4+Pj4+ICvCoMKgwqDCoMKgKsKgQVDCoGZlYXR1cmUuDQo+Pj4+Pj4gK8KgwqDC
+oMKgwqAqLw0KPj4+Pj4+ICvCoMKgwqDCoGlmwqAoKGZjwqAhPcKgNCnCoCYmwqBzMzkwX2hh
+c19mZWF0KFMzOTBfRkVBVF9BUCkpwqB7DQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqBlbnYt
+PnJlZ3NbMV3CoD3CoDB4MTAwMDA7DQo+Pj4+Pj4gKw0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDC
+oMKgcmV0dXJuwqAwOw0KPj4+Pj4+ICvCoMKgwqDCoH0NCj4+Pj4+IFRoaXPCoHdvdWxkwqBp
+bXBsecKgYW7CoG9wZXJhdGlvbsKgZXhjZXB0aW9uwqBpbsKgY2FzZcKgZmM9PTQswqB3aGlj
+aMKgc291bmRzwqB2ZXJ5DQo+Pj4+PiB3cm9uZy4NCj4+Pj4gSXTCoGRlcGVuZHPCoGJ1dMKg
+ScKgdGhpbmvCoHRoYXTCoHRoZcKgUzM5MF9GRUFUX0FQX1FVRVJZX0NPTkZJR19JTkZPwqBt
+dXN0wqBiZQ0KPj4+PiB0ZXN0ZWQNCj4+Pj4gdG/CoGtub3fCoHdoYXTCoHRvwqBhbnN3ZXIu
+DQo+Pj4+IElmwqB0aGXCoGZlYXR1cmXCoGlzwqB0aGVyZSzCoFFDScKgbXVzdMKgYmXCoGFu
+c3dlcmVkwqBjb3JyZWN0bHkuDQo+Pj4gVGhpc8KgaXPCoGFuwqBpbnRlcmVzdGluZ8KgcHJv
+cG9zaXRpb27CoHdoaWNowqByYWlzZXPCoHNldmVyYWzCoGlzc3Vlc8KgdGhhdMKgd2lsbA0K
+Pj4+IG5lZWTCoHRvDQo+Pj4gYmXCoGFkZHJlc3NlZC7CoFRoZcKgb25secKgdGltZcKgdGhl
+wqBQUUFQKFFDSSnCoGluc3RydWN0aW9uwqBpc8KgaW50ZXJjZXB0ZWTCoGlzDQo+Pj4gd2hl
+bjoNCj4+PiAqwqBBwqB2ZmlvLWFwwqBkZXZpY2XCoGlzwqBOT1TCoGRlZmluZWTCoGZvcsKg
+dGhlwqBndWVzdMKgYmVjYXVzZcKgdGhlwqB2ZmlvX2FwDQo+Pj4gZGV2aWNlwqBkcml2ZXIN
+Cj4+PiDCoMKgwqDCoHdpbGzCoHNldMKgRUNBLjI4wqBhbmTCoHRoZcKgUFFBUChRQ0kpwqBp
+bnN0cnVjdGlvbsKgd2lsbMKgYmXCoGludGVycHJldGVkDQo+Pj4gKsKgU1RGTEUuMTLCoGlz
+wqBzZXTCoGZvcsKgdGhlwqBndWVzdA0KPj4+DQo+Pj4gWW91wqBzYXnCoHRoYXTCoHRoZcKg
+UUNJwqBtdXN0wqBiZcKgYW5zd2VyZWTCoGNvcnJlY3RseSzCoGJ1dMKgd2hhdMKgaXPCoHRo
+ZcKgY29ycmVjdA0KPj4+IHJlc3BvbnNlPw0KPj4+IElmwqB3ZcKgcmV0dXJuwqB0aGXCoG1h
+dHJpeMKgLcKgaS5lLizCoEFQTSzCoEFETcKgYW5kwqBBUU3CoC3CoGNvbmZpZ3VyZWTCoHZp
+YcKgdGhlDQo+Pj4gbWVkaWF0ZWQNCj4+PiBtYXRyaXjCoGRldmljZSdzwqBzeXNmc8KgYXR0
+cmlidXRlc8KgZmlsZXMswqB0aGVuwqBpZsKgYW55wqBBUFFOc8KgYXJlwqBkZWZpbmVkwqBp
+bg0KPj4+IHRoZcKgbWF0cml4LA0KPj4+IHdlwqB3aWxswqBoYXZlwqB0b8KgaGFuZGxlwqAq
+QUxMKsKgQVDCoGluc3RydWN0aW9uc8KgYnnCoGV4ZWN1dGluZ8KgdGhlbcKgb27CoGJlaGFs
+Zg0KPj4+IG9mwqB0aGUNCj4+PiBndWVzdC7CoEnCoHN1cHBvc2XCoHdlwqBjb3VsZMKgcmV0
+dXJuwqBhbsKgZW1wdHnCoG1hdHJpeMKgaW7CoHdoaWNowqBjYXNlwqB0aGXCoEFQDQo+Pj4g
+YnVzwqB3aWxswqBjb21lDQo+Pj4gdXDCoHdpdGhvdXTCoGFuecKgZGV2aWNlc8Kgb27CoHRo
+ZcKgZ3Vlc3QswqBidXTCoHdoYXTCoGlzwqB0aGXCoGV4cGVjdGF0aW9uwqBvZsKgYW4NCj4+
+PiBhZG1pbsKgd2hvDQo+Pj4gZGVsaWJlcmF0ZWx5wqBjb25maWd1cmVzwqB0aGXCoG1lZGlh
+dGVkwqBtYXRyaXjCoGRldmljZT/CoFNob3VsZMKgd2XCoGZvcmVnbw0KPj4+IGhhbmRsaW5n
+wqBpbnRlcmNlcHRpb24NCj4+PiBvZsKgQVDCoGluc3RydWN0aW9uc8KgYW5kwqBjb25zaWRl
+csKgYcKgZ3Vlc3TCoGNvbmZpZ3VyYXRpb27CoHRoYXTCoHR1cm5zwqBvbg0KPj4+IFMzOTBf
+RkVBVF9BUMKgYnV0DQo+Pj4gZG9lc8Kgbm90wqBkZWZpbmXCoGHCoHZmaW8tYXDCoGRldmlj
+ZcKgdG/CoGJlwqBlcnJvbmVvdXPCoGFuZMKgdGVybWluYXRlwqBzdGFydGluZw0KPj4+IG9m
+wqB0aGXCoGd1ZXN0Pw0KPj4+IEFueWJvZHnCoGhhdmXCoGFuecKgdGhvdWdodHM/DQo+PiBI
+YXJkwqB0b8KgcmVhbGx5wqBnaXZlwqBnb29kwqBhZHZpY2XCoHdpdGhvdXTCoGFjY2Vzc8Kg
+dG/CoHRoZcKgZG9jdW1lbnRhdGlvbizCoGJ1dDoNCj4+IC3CoElmwqB3ZcKgdGVsbMKgdGhl
+wqBndWVzdMKgdGhhdMKgdGhlwqBmZWF0dXJlwqBpc8KgYXZhaWxhYmxlLMKgYnV0wqBpdMKg
+ZG9lc8Kgbm90DQo+PiDCoMKgwqBnZXTCoGFuecKgY2FyZHPCoHRvwqB1c2UswqByZXR1cm5p
+bmfCoGFuwqBlbXB0ecKgbWF0cml4wqBtYWtlc8KgdGhlwqBtb3N0wqBzZW5zZQ0KPj4gwqDC
+oMKgdG/CoG1lLg0KPj4gLcKgScKgd291bGTCoG5vdMKgdGllwqBzdGFydGluZ8KgdGhlwqBn
+dWVzdMKgdG/CoHRoZcKgcHJlc2VuY2XCoG9mwqBhwqB2ZmlvLWFwDQo+PiDCoMKgwqBkZXZp
+Y2UuwqBIYXZpbmfCoHRoZcKgZmVhdHVyZcKgYXZhaWxhYmxlwqBpbsKgdGhlb3J5wqBidXTC
+oHdpdGhvdXTCoGFueQ0KPj4gwqDCoMKgZGV2aWNlc8KgYWN0dWFsbHnCoGJlaW5nwqB1c2Fi
+bGXCoGJ5wqB0aGXCoGd1ZXN0wqBkb2VzwqBub3TCoHJlYWxsecKgc291bmQNCj4+IMKgwqDC
+oHdyb25nwqAoY2FuwqB3ZcKgaG90cGx1Z8KgdGhpc8KgbGF0ZXI/KQ0KPiBGb3IgdGhpcyBw
+aGFzZSBvZiBkZXZlbG9wbWVudCwgaXQgaXMgbXkgb3BpbmlvbiB0aGF0IGludHJvZHVjaW5n
+IEFQIGluc3RydWN0aW9uDQo+IGludGVyY2VwdGlvbsKgaGFuZGxlcnPCoGlzwqBzdXBlcmZs
+dW91c8KgZm9ywqB0aGXCoGZvbGxvd2luZ8KgcmVhc29uczoNCj4gDQo+IDEuIEludGVyY2Vw
+dGlvbiBoYW5kbGluZyB3YXMgaW50cm9kdWNlZCBzb2xlbHkgdG8gZW5zdXJlIGFuIG9wZXJh
+dGlvbiBleGNlcHRpb27CoHdvdWxkDQo+IMKgwqAgbm90IGJlIGluamVjdGVkIGludG8gdGhl
+IGd1ZXN0IHdoZW4gQ1BVIG1vZGVsIGZlYXR1cmUgZm9yIEFQIChpLmUuLCBhcD1vbikNCj4g
+wqDCoCBpcyBzcGVjaWZpZWQgYnV0IGEgVkZJTyBBUCBkZXZpY2UgKGkuZS4sIC1kZXZpY2Ug
+dmZpby1hcCxzeXNmc2Rldj0kcGF0aCkNCj4gwqDCoMKgaXPCoG5vdC4NCg0KV2UgY2FuIGtp
+bmQgb2YgKGkuZS4gbW9kdWxvIEVFQ0EuMjgpIGVuc3VyZSB0aGlzIGluIGEgZGlmZmVyZW50
+IGZhc2hpb24gSSB0aGluay4gSG93DQphYm91dCBwcm9jbGFpbWluZyBhICdoYXMgYXAgaW5z
+dHJ1Y3Rpb25zLCBidXQgbm90aGluZyB0byBzZWUgaGVyZScgaW4gdGhlDQpTSUUgaW50ZXJw
+cmV0ZWQgZmxhdm9yIChFQ0EuMjggc2V0KSB0aGUgZGVmYXVsdCB3YXkgb2YgaGF2aW5nIGFw
+IGluc3RydWN0aW9ucw0KdW5kZXIgS1ZNLiBUaGlzIHNob3VsZCBiZSBlYXNpbHkgYWNjb21w
+bGlzaGVkIHdpdGggYW4gYWxsIHplcm8gQ1JZQ0IgYW5kIGVjYS4yOA0Kc2V0LiBUaGUgZm9y
+IHRoZSBndWVzdCB0byBhY3R1YWxseSBnZXQgcmVhbCB3b3JrIGRvbmUgd2l0aCBBUCB3ZSB3
+b3VsZA0Kc3RpbGwgcmVxdWlyZSBzb21lIHNvcnQgb2YgZHJpdmVyIHRvIGVpdGhlciBwcm92
+aWRlIGEgbm9uLXplcm8gbWF0cml4IGJ5DQphbHRlcmluZyB0aGUgQ1JZQ0Igb3IgdW5zZXR0
+bGluZyBFQ0EuMjggYW5kIGRvaW5nIHRoZSBpbnRlcmNlcHRlZCBmbGF2b3IuDQoNClBsZWFz
+ZSBub3RpY2UsIHRoZSBjcHUgZmFjaWxpdHkgYXAgd291bGQgc3RpbGwga2VlcCBpdCdzIHNl
+bWFudGljDQonaGFzIGFwIGluc3RydWN0aW9ucycgKG9wcG9zZWQgdG8gJ2hhcyBhcCBpbnN0
+cnVjdGlvbnMgaW1wbGVtZW50ZWQgaW4NClNJRSBpbnRlcnByZXRlZCBmbGF2b3IpLiBBbmQg
+Z2l2ZSB1cyBhbGwgdGhlIGZsZXhpYmlsaXR5Lg0KDQpZZXQgaW1wbGVtZW50aW5nIHdoYXQg
+d2Ugd2FudCB0byBoYXZlIGluIGFic2VuY2Ugb2YgYSBkcml2ZXIgd291bGQgYmVjb21lDQpt
+dWNoIGVhc2llciAodW5kZXIgdGhlIGFzc3VtcHRpb24gdGhhdCBFQ0EuMjggZXF1YWxzIEVF
+Q0EuMjgpLg0KDQpIb3cgYWJvdXQgdGhpcz8NCg0K
