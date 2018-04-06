@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4GsL-0002GW-UJ
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:16 -0400
+	(envelope-from <cota@braap.org>) id 1f4GsL-0002G9-5D
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4GsJ-0003Vn-UJ
+	(envelope-from <cota@braap.org>) id 1f4GsI-0003TC-Ct
 	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:13 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:35083)
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:50247)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4GsJ-0003VI-QN
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:11 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4GsI-0003SQ-6k
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 22:13:10 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  5 Apr 2018 22:13:02 -0400
-Message-Id: <1522980788-1252-12-git-send-email-cota@braap.org>
+Date: Thu,  5 Apr 2018 22:12:53 -0400
+Message-Id: <1522980788-1252-3-git-send-email-cota@braap.org>
 In-Reply-To: <1522980788-1252-1-git-send-email-cota@braap.org>
 References: <1522980788-1252-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 11/17] translate-all: add page_locked
- assertions
+Subject: [Qemu-devel] [PATCH v2 02/17] qht: return existing entry when
+ qht_insert fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,184 +27,177 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is only compiled under CONFIG_DEBUG_TCG to avoid
-bloating the binary.
+The meaning of "existing" is now changed to "matches in hash and
+ht->cmp result". This is saner than just checking the pointer value.
 
-In user-mode, assert_page_locked is equivalent to assert_mmap_lock.
-
-Note: There are some tb_lock assertions left that will be
-removed by later patches.
-
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by:  Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 90 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 87 insertions(+), 3 deletions(-)
+ include/qemu/qht.h        |  7 +++++--
+ accel/tcg/translate-all.c |  2 +-
+ tests/qht-bench.c         |  4 ++--
+ tests/test-qht.c          |  8 +++++++-
+ util/qht.c                | 27 +++++++++++++++++----------
+ 5 files changed, 32 insertions(+), 16 deletions(-)
 
+diff --git a/include/qemu/qht.h b/include/qemu/qht.h
+index 5f03a0f..1fb9116 100644
+--- a/include/qemu/qht.h
++++ b/include/qemu/qht.h
+@@ -70,6 +70,7 @@ void qht_destroy(struct qht *ht);
+  * @ht: QHT to insert to
+  * @p: pointer to be inserted
+  * @hash: hash corresponding to @p
++ * @existing: address where the pointer to an existing entry can be copied to
+  *
+  * Attempting to insert a NULL @p is a bug.
+  * Inserting the same pointer @p with different @hash values is a bug.
+@@ -78,9 +79,11 @@ void qht_destroy(struct qht *ht);
+  * inserted into the hash table.
+  *
+  * Returns true on success.
+- * Returns false if the @p-@hash pair already exists in the hash table.
++ * Returns false if there is an existing entry in the table that is equivalent
++ * (i.e. ht->cmp matches and the hash is the same) to @p-@h. If @existing
++ * is !NULL, a pointer to this existing entry is copied to it.
+  */
+-bool qht_insert(struct qht *ht, void *p, uint32_t hash);
++bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing);
+ 
+ /**
+  * qht_lookup_custom - Look up a pointer using a custom comparison function.
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 042378a..29bc1da 100644
+index 7af5f36..d16e094 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -580,6 +580,9 @@ static inline PageDesc *page_find(tb_page_addr_t index)
+@@ -1245,7 +1245,7 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+     /* add in the hash table */
+     h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
+                      tb->trace_vcpu_dstate);
+-    qht_insert(&tb_ctx.htable, tb, h);
++    qht_insert(&tb_ctx.htable, tb, h, NULL);
  
- /* In user-mode page locks aren't used; mmap_lock is enough */
  #ifdef CONFIG_USER_ONLY
-+
-+#define assert_page_locked(pd) tcg_debug_assert(have_mmap_lock())
-+
- static inline void page_lock(PageDesc *pd)
- { }
+     if (DEBUG_TB_CHECK_GATE) {
+diff --git a/tests/qht-bench.c b/tests/qht-bench.c
+index c94ac25..f492b3a 100644
+--- a/tests/qht-bench.c
++++ b/tests/qht-bench.c
+@@ -163,7 +163,7 @@ static void do_rw(struct thread_info *info)
+             bool written = false;
  
-@@ -602,14 +605,91 @@ void page_collection_unlock(struct page_collection *set)
- { }
- #else /* !CONFIG_USER_ONLY */
+             if (qht_lookup(&ht, p, hash) == NULL) {
+-                written = qht_insert(&ht, p, hash);
++                written = qht_insert(&ht, p, hash, NULL);
+             }
+             if (written) {
+                 stats->in++;
+@@ -322,7 +322,7 @@ static void htable_init(void)
+             r = xorshift64star(r);
+             p = &keys[r & (init_range - 1)];
+             hash = h(*p);
+-            if (qht_insert(&ht, p, hash)) {
++            if (qht_insert(&ht, p, hash, NULL)) {
+                 break;
+             }
+             retries++;
+diff --git a/tests/test-qht.c b/tests/test-qht.c
+index b069881..dda6a06 100644
+--- a/tests/test-qht.c
++++ b/tests/test-qht.c
+@@ -27,11 +27,17 @@ static void insert(int a, int b)
  
-+#ifdef CONFIG_DEBUG_TCG
-+
-+struct page_lock_debug {
-+    const PageDesc *pd;
-+    QLIST_ENTRY(page_lock_debug) entry;
-+};
-+
-+static __thread QLIST_HEAD(, page_lock_debug) page_lock_debug_head;
-+
-+static struct page_lock_debug *get_page_lock_debug(const PageDesc *pd)
-+{
-+    struct page_lock_debug *pld;
-+
-+    QLIST_FOREACH(pld, &page_lock_debug_head, entry) {
-+        if (pld->pd == pd) {
-+            return pld;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static bool page_is_locked(const PageDesc *pd)
-+{
-+    struct page_lock_debug *pld;
-+
-+    pld = get_page_lock_debug(pd);
-+    return pld != NULL;
-+}
-+
-+static void page_lock__debug(const PageDesc *pd)
-+{
-+    struct page_lock_debug *pld;
-+
-+    g_assert(!page_is_locked(pd));
-+    pld = g_new(struct page_lock_debug, 1);
-+    pld->pd = pd;
-+    QLIST_INSERT_HEAD(&page_lock_debug_head, pld, entry);
-+}
-+
-+static void page_unlock__debug(const PageDesc *pd)
-+{
-+    struct page_lock_debug *pld;
-+
-+    pld = get_page_lock_debug(pd);
-+    g_assert(pld);
-+    QLIST_REMOVE(pld, entry);
-+    g_free(pld);
-+}
-+
-+static void
-+do_assert_page_locked(const PageDesc *pd, const char *file, int line)
-+{
-+    if (unlikely(!page_is_locked(pd))) {
-+        error_report("assert_page_lock: PageDesc %p not locked @ %s:%d",
-+                     pd, file, line);
-+        abort();
-+    }
-+}
-+
-+#define assert_page_locked(pd) do_assert_page_locked(pd, __FILE__, __LINE__)
-+
-+#else /* !CONFIG_DEBUG_TCG */
-+
-+#define assert_page_locked(pd)
-+
-+static inline void page_lock__debug(const PageDesc *pd)
-+{
-+}
-+
-+static inline void page_unlock__debug(const PageDesc *pd)
-+{
-+}
-+
-+#endif /* CONFIG_DEBUG_TCG */
-+
- static inline void page_lock(PageDesc *pd)
- {
-+    page_lock__debug(pd);
-     qemu_spin_lock(&pd->lock);
- }
+     for (i = a; i < b; i++) {
+         uint32_t hash;
++        void *existing;
++        bool inserted;
  
- static inline void page_unlock(PageDesc *pd)
- {
-     qemu_spin_unlock(&pd->lock);
-+    page_unlock__debug(pd);
- }
+         arr[i] = i;
+         hash = i;
  
- /* lock the page(s) of a TB in the correct acquisition order */
-@@ -1091,6 +1171,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- /* call with @p->lock held */
- static inline void invalidate_page_bitmap(PageDesc *p)
- {
-+    assert_page_locked(p);
- #ifdef CONFIG_SOFTMMU
-     g_free(p->code_bitmap);
-     p->code_bitmap = NULL;
-@@ -1247,6 +1328,7 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
-     uintptr_t *pprev;
-     unsigned int n1;
- 
-+    assert_page_locked(pd);
-     pprev = &pd->first_tb;
-     PAGE_FOR_EACH_TB(pd, tb1, n1) {
-         if (tb1 == tb) {
-@@ -1395,6 +1477,7 @@ static void build_page_bitmap(PageDesc *p)
-     int n, tb_start, tb_end;
-     TranslationBlock *tb;
- 
-+    assert_page_locked(p);
-     p->code_bitmap = bitmap_new(TARGET_PAGE_SIZE);
- 
-     PAGE_FOR_EACH_TB(p, tb, n) {
-@@ -1428,7 +1511,7 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
-     bool page_already_protected;
- #endif
- 
--    assert_memory_lock();
-+    assert_page_locked(p);
- 
-     tb->page_addr[n] = page_addr;
-     tb->page_next[n] = p->first_tb;
-@@ -1710,8 +1793,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-     uint32_t current_flags = 0;
- #endif /* TARGET_HAS_PRECISE_SMC */
- 
--    assert_memory_lock();
--    assert_tb_locked();
-+    assert_page_locked(p);
- 
- #if defined(TARGET_HAS_PRECISE_SMC)
-     if (cpu != NULL) {
-@@ -1723,6 +1805,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-     /* XXX: see if in some cases it could be faster to invalidate all
-        the code */
-     PAGE_FOR_EACH_TB(p, tb, n) {
-+        assert_page_locked(p);
-         /* NOTE: this is subtle as a TB may span two physical pages */
-         if (n == 0) {
-             /* NOTE: tb_end may be after the end of the page, but
-@@ -1879,6 +1962,7 @@ void tb_invalidate_phys_page_fast(tb_page_addr_t start, int len)
+-        qht_insert(&ht, &arr[i], hash);
++        inserted = qht_insert(&ht, &arr[i], hash, NULL);
++        g_assert_true(inserted);
++        inserted = qht_insert(&ht, &arr[i], hash, &existing);
++        g_assert_false(inserted);
++        g_assert_true(existing == &arr[i]);
      }
+ }
  
-     pages = page_collection_lock(start, start + len);
-+    assert_page_locked(p);
-     if (!p->code_bitmap &&
-         ++p->code_write_count >= SMC_BITMAP_USE_THRESHOLD) {
-         build_page_bitmap(p);
+diff --git a/util/qht.c b/util/qht.c
+index 8610ce3..9d030e7 100644
+--- a/util/qht.c
++++ b/util/qht.c
+@@ -511,9 +511,9 @@ void *qht_lookup(struct qht *ht, const void *userp, uint32_t hash)
+ }
+ 
+ /* call with head->lock held */
+-static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
+-                               struct qht_bucket *head, void *p, uint32_t hash,
+-                               bool *needs_resize)
++static void *qht_insert__locked(struct qht *ht, struct qht_map *map,
++                                struct qht_bucket *head, void *p, uint32_t hash,
++                                bool *needs_resize)
+ {
+     struct qht_bucket *b = head;
+     struct qht_bucket *prev = NULL;
+@@ -523,8 +523,9 @@ static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
+     do {
+         for (i = 0; i < QHT_BUCKET_ENTRIES; i++) {
+             if (b->pointers[i]) {
+-                if (unlikely(b->pointers[i] == p)) {
+-                    return false;
++                if (unlikely(b->hashes[i] == hash &&
++                             ht->cmp(b->pointers[i], p))) {
++                    return b->pointers[i];
+                 }
+             } else {
+                 goto found;
+@@ -553,7 +554,7 @@ static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
+     atomic_set(&b->hashes[i], hash);
+     atomic_set(&b->pointers[i], p);
+     seqlock_write_end(&head->sequence);
+-    return true;
++    return NULL;
+ }
+ 
+ static __attribute__((noinline)) void qht_grow_maybe(struct qht *ht)
+@@ -577,25 +578,31 @@ static __attribute__((noinline)) void qht_grow_maybe(struct qht *ht)
+     qemu_mutex_unlock(&ht->lock);
+ }
+ 
+-bool qht_insert(struct qht *ht, void *p, uint32_t hash)
++bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing)
+ {
+     struct qht_bucket *b;
+     struct qht_map *map;
+     bool needs_resize = false;
+-    bool ret;
++    void *prev;
+ 
+     /* NULL pointers are not supported */
+     qht_debug_assert(p);
+ 
+     b = qht_bucket_lock__no_stale(ht, hash, &map);
+-    ret = qht_insert__locked(ht, map, b, p, hash, &needs_resize);
++    prev = qht_insert__locked(ht, map, b, p, hash, &needs_resize);
+     qht_bucket_debug__locked(b);
+     qemu_spin_unlock(&b->lock);
+ 
+     if (unlikely(needs_resize) && ht->mode & QHT_MODE_AUTO_RESIZE) {
+         qht_grow_maybe(ht);
+     }
+-    return ret;
++    if (likely(prev == NULL)) {
++        return true;
++    }
++    if (existing) {
++        *existing = prev;
++    }
++    return false;
+ }
+ 
+ static inline bool qht_entry_is_last(struct qht_bucket *b, int pos)
 -- 
 2.7.4
