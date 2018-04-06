@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f4GAM-0003o6-Ep
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:27:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f4GDD-0005FR-Ve
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f4GAL-0001I3-I4
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:27:46 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:33489)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f4GAL-0001Gl-BZ
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:27:45 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id f15so9752786pfn.0
-	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 18:27:45 -0700 (PDT)
-References: <20180217182323.25885-1-richard.henderson@linaro.org>
-	<20180217182323.25885-7-richard.henderson@linaro.org>
-	<87zi2kd4zf.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fd60ffee-7a2e-9815-c8ae-d7bcc355cdc8@linaro.org>
-Date: Fri, 6 Apr 2018 11:27:38 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1f4GDC-0003Cw-Ta
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:30:43 -0400
+Date: Fri, 6 Apr 2018 11:09:03 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180406010903.GB3212@umbus.fritz.box>
+References: <20180405021437.16761-1-david@gibson.dropbear.id.au>
+	<20180405021437.16761-14-david@gibson.dropbear.id.au>
+	<20180405151255.63da677e@bahia.lan>
+	<20180405152734.2e984bc5.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zi2kd4zf.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 06/67] target/arm: Implement
- SVE predicate test
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vGgW1X5XWziG23Ko"
+Content-Disposition: inline
+In-Reply-To: <20180405152734.2e984bc5.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.13 13/13] target/ppc: Fold slb_nr
+ into PPCHash64Options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-
-On 04/03/2018 07:16 PM, Alex Bennée wrote:
->> +/* Set the cpu flags as per a return from an SVE helper.  */
->> +static void do_pred_flags(TCGv_i32 t)
->> +{
->> +    tcg_gen_mov_i32(cpu_NF, t);
->> +    tcg_gen_andi_i32(cpu_ZF, t, 2);
->> +    tcg_gen_andi_i32(cpu_CF, t, 1);
->> +    tcg_gen_movi_i32(cpu_VF, 0);
->> +}
-> 
-> Why bother returning a value from the helper to then spend time
-> shuffling it into env->cpu_FLAG when we could do this directly? Does
-> this aid code generation when flag values are queried?
-
-It means that the helper itself clobbers no TCG global temps, and so does not
-invalidate any of the guest integer registers that might be live in host registers.
-
-The arithmetic above is approximately as efficient as plain moves, so I don't
-see this as "spending time shuffling" per se.
-
-> Also from above:
-> 
->> + * The return value has bit 31 set if N is set, bit 1 set if Z is clear,
->> + * and bit 0 set if C is set.
-> 
-> So there is assumed knowledge in the encoding of cpu_NF here - maybe a
-> reference to cpu.h where this is codified.
-
-I suppose, sure.
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com
 
 
-r~
+--vGgW1X5XWziG23Ko
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 05, 2018 at 03:27:34PM +0200, Cornelia Huck wrote:
+> On Thu, 5 Apr 2018 15:12:55 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+> > On Thu,  5 Apr 2018 12:14:37 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > > @@ -4000,7 +4000,12 @@ DEFINE_SPAPR_MACHINE(2_13, "2.13", true);
+> > >   * pseries-2.12
+> > >   */
+> > >  #define SPAPR_COMPAT_2_12                                           =
+   \
+> > > -    HW_COMPAT_2_12 =20
+> >=20
+> > This hunk doesn't apply on master, nor on your ppc-for-2.13 branch...
+> >=20
+> > It looks like a patch to introduce the 2.13 machine type is missing.
+> >=20
+> > FWIW, Connie has already queued a patch to do so for s390x, that also
+> > introduces HW_COMPAT_2_12.
+> >=20
+> > https://github.com/cohuck/qemu/commit/b54cde7350b6681b4349b904e0f9a8a8d=
+58c0951
+> >=20
+> > Maybe the HW_COMPAT_ macros should be added in a standalone patch ?
+> >=20
+> > Cc'ing Connie for insights.
+> >=20
+> > > +    HW_COMPAT_2_12                                                  =
+   \
+> > > +    {                                                               =
+   \
+> > > +        .driver =3D TYPE_POWERPC_CPU,                               =
+     \
+> > > +            .property =3D "pre-2.13-migration",                     =
+     \
+> > > +            .value    =3D "on",                                     =
+     \ =20
+>=20
+> I think the usual procedure is
+>=20
+> - every arch that uses compat machines queues a patch that creates the
+>   new compat machine(s) and adds an empty HW_COMPAT_<version>
+> - whoever has their queue pulled first wins wrt hw_compat
+
+That's my understanding as well.  It's an easy conflict to resolve.
+
+> So, I'm happy with anyone adding the empty HW_COMPAT_2_12 -- it needn't
+> be me :)
+
+Likewise.  I'm planning to keep it in my tree for the time being, so
+as not to rely on external patches, but when the 2.13 tree opens, who
+wins the race is mostly chance, and that's fine.
+
+> [We could also introduce the 2.13 machines for all architectures in one
+> sweep, but I think that would be generating needless churn for arch
+> maintainers.]
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--vGgW1X5XWziG23Ko
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrGyK0ACgkQbDjKyiDZ
+s5IdORAAoOqqbVbV+wfJs4A0HZIw8I3eti/2W4D0h6hXtG0FwNf+Ln0gR8ArOowF
+ZJtgHRKrtt2AAMgFp+EcTO5alLESIRRE/1e4HjVoPdnVB/x4wluasvt1nDZhD2zj
+u5c+SQygHYrxZT3I3cbA7kihwj/D8YFPo/YkWejYdoMOEWobndqJ95dq/Yda+XcH
+IKbfhP/kQod6wxIPXyOFcLnkTNSBh7tbnsWda1iwCDFAOZI0K3Qq68mreGllo0KK
+aU5bHa/NJUvrRtQuKB/+AXW39UC+GlZKhPxXqkNY+/3CuUUoXq80JZF97bTHIaIY
+HJgLtHJJGiq+dnKGM9pyI9jxK1edvnaH5zSi1f8ijtj5dpfAka/JTowyEbe2CRoI
+ce5UD4sLn22sjk+KeHdWJ+z1ys1MwWtOm3d941bb+6zSXy41HG/5FBG2C6PAGxYL
+tnVOcL6Y0Vou8GDAv8zHi/sn8FA0J8ISq1kmqPCCMS9FOhqHPXUw9S5StRpEzl03
+1sy/yh/XOtIbSvVJTXgDJ9CyC4M0c2EzMQwBs0vgJJz8cW739MdkCmv0bArtA/9Z
+QXOdKp3fQHBMxq2Ic6jZo559vnhhvaC6E1NSlyiNH3WpRFT+o0OgOBpX4sQXpNLk
+UJy438GDwxGblY7AlBT+EUdQVectm/MUi0TbTbea9SLVqqLWpbE=
+=3LJ7
+-----END PGP SIGNATURE-----
+
+--vGgW1X5XWziG23Ko--
