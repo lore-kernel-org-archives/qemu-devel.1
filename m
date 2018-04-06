@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4G6S-0001r0-ER
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:23:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f4GAM-0003o6-Ep
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4G6O-0006KB-Cf
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:23:44 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:48213)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4G6O-0006JD-4n
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:23:40 -0400
-Date: Thu, 5 Apr 2018 21:23:38 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180406012338.GB25706@flamenco>
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-13-git-send-email-cota@braap.org>
-	<87po3m7vuc.fsf@linaro.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1f4GAL-0001I3-I4
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:27:46 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:33489)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f4GAL-0001Gl-BZ
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 21:27:45 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id f15so9752786pfn.0
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 18:27:45 -0700 (PDT)
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-7-richard.henderson@linaro.org>
+	<87zi2kd4zf.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fd60ffee-7a2e-9815-c8ae-d7bcc355cdc8@linaro.org>
+Date: Fri, 6 Apr 2018 11:27:38 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <87zi2kd4zf.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87po3m7vuc.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 12/16] translate-all: discard TB when
- tb_link_page returns an existing matching TB
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 06/67] target/arm: Implement
+ SVE predicate test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On Thu, Mar 29, 2018 at 16:19:39 +0100, Alex Bennée wrote:
+On 04/03/2018 07:16 PM, Alex BennÃ©e wrote:
+>> +/* Set the cpu flags as per a return from an SVE helper.  */
+>> +static void do_pred_flags(TCGv_i32 t)
+>> +{
+>> +    tcg_gen_mov_i32(cpu_NF, t);
+>> +    tcg_gen_andi_i32(cpu_ZF, t, 2);
+>> +    tcg_gen_andi_i32(cpu_CF, t, 1);
+>> +    tcg_gen_movi_i32(cpu_VF, 0);
+>> +}
 > 
-> Emilio G. Cota <cota@braap.org> writes:
+> Why bother returning a value from the helper to then spend time
+> shuffling it into env->cpu_FLAG when we could do this directly? Does
+> this aid code generation when flag values are queried?
+
+It means that the helper itself clobbers no TCG global temps, and so does not
+invalidate any of the guest integer registers that might be live in host registers.
+
+The arithmetic above is approximately as efficient as plain moves, so I don't
+see this as "spending time shuffling" per se.
+
+> Also from above:
 > 
-> > Use the recently-gained QHT feature of returning the matching TB if it
-> > already exists. This allows us to get rid of the lookup we perform
-> > right after acquiring tb_lock.
-> >
-> > Suggested-by: Richard Henderson <rth@twiddle.net>
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> > ---
-> >  accel/tcg/cpu-exec.c      | 14 ++------------
-> >  accel/tcg/translate-all.c | 47 ++++++++++++++++++++++++++++++++++++++---------
-> >  2 files changed, 40 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> > index 7c83887..8aed38c 100644
-> > --- a/accel/tcg/cpu-exec.c
-> > +++ b/accel/tcg/cpu-exec.c
-> > @@ -243,10 +243,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
-> >          if (tb == NULL) {
-> >              mmap_lock();
-> >              tb_lock();
-> > -            tb = tb_htable_lookup(cpu, pc, cs_base, flags, cf_mask);
-> > -            if (likely(tb == NULL)) {
-> > -                tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
-> > -            }
-> > +            tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
+>> + * The return value has bit 31 set if N is set, bit 1 set if Z is clear,
+>> + * and bit 0 set if C is set.
 > 
-> tb_gen_code needs to be renamed to reflect it's semantics.
-> tb_get_or_gen_code? Or maybe tb_get_code with a sub-helper to do the
-> generation.
+> So there is assumed knowledge in the encoding of cpu_NF here - maybe a
+> reference to cpu.h where this is codified.
 
-I think it can remain as tb_gen_code. The caller still gets
-a TB, and whether that TB has been generated by this thread or
-any other thread is irrelevant.
+I suppose, sure.
 
-(snip)
-> > --- a/accel/tcg/translate-all.c
-> > +++ b/accel/tcg/translate-all.c
-> > @@ -1503,12 +1503,16 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
-> >   * (-1) to indicate that only one page contains the TB.
-> >   *
-> >   * Called with mmap_lock held for user-mode emulation.
-> > + *
-> > + * Returns @tb or an existing TB that matches @tb.
-> 
-> That's just confusing to read. So this returns a TB like the @tb we
-> passed in but actually a different one matching the same conditions?
 
-Good point. Here tb_link_page is not a great name, but instead
-of adding a long name such as tb_link_page_or_get_existing, in
-v2 I've expanded the above comment. It now looks as follows:
-
- * Returns a pointer @tb, or a pointer to an existing TB that matches @tb.
- * Note that in !user-mode, another thread might have already added a TB
- * for the same block of guest code that @tb corresponds to. In that case,
- * the caller should discard the original @tb, and use instead the returned TB.
- 
-> > @@ -1706,7 +1727,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-> >       * memory barrier is required before tb_link_page() makes the TB visible
-> >       * through the physical hash table and physical page list.
-> >       */
-> > -    tb_link_page(tb, phys_pc, phys_page2);
-> > +    existing_tb = tb_link_page(tb, phys_pc, phys_page2);
-> > +    /* if the TB already exists, discard what we just translated */
-> 
-> So are we in the position now that we could potentially do a translation
-> but be beaten by another thread generating the same code?
-
-Exactly.
-
-> I suspect we could
-> do with a bit of explanatory commentary for the tb_gen_code functions.
-
-As I said above I don't think tb_gen_code changes at all
-to its callers, since the caller still gets a TB pointer that it
-did not have before.
-
-tb_link_page is the key here -- I hope the updated comment
-I quoted above is enough to make things clear.
-
-> Also I think the "Translation Blocks" section needs updating in the
-> MTTCG design document to make this clear.
-
-I've added a comment at the bottom of that section:
-
-Parallel code generation is supported. QHT is used at insertion time
-as the synchronization point across threads, thereby ensuring that we only
-keep track of a single TranslationBlock for each guest code block.
-
-> I'm curious if we should be counting unused translations somewhere in
-> the JIT stats. I'm guessing you need to work at a pathalogical case to
-> hit this much?
-
-This should be extremely rare on most workloads. Given that and the
-fact that we won't have unused translated code (we discard it by
-resetting code_gen_ptr), I wouldn't worry too much about this.
-In the unlikely case that it ever became a problem, TCG profiling
-time would account for it, and on a perf profile we'd see the slow
-path in tb_link_page being taken.
-
-Thanks,
-
-		Emilio
+r~
