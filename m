@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f4SBh-0006dC-Ag
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:17:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1f4SER-0000Ko-Ba
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f4SBe-0003GN-5z
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:17:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59524 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f4SBe-0003Dq-0P
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:17:54 -0400
-References: <1523021879-25807-1-git-send-email-thuth@redhat.com>
-	<1523021879-25807-2-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <53b776ad-a1c9-29a3-e5de-6cf4528b49f4@redhat.com>
-Date: Fri, 6 Apr 2018 16:17:40 +0200
+	(envelope-from <bounces@canonical.com>) id 1f4SEO-0004hy-75
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f4SEO-0004hd-1J
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 10:20:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f4SEM-0007GW-EA
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 14:20:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 692BD2E80CC
+	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 14:20:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1523021879-25807-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.13 1/3] net: Remove the deprecated
- "vlan" parameter
+Date: Fri, 06 Apr 2018 14:13:31 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
+Message-Id: <152302401186.30129.14038316564472893961.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1761535] Re: qemu-aarch64-static docker
+ arm64v8/openjdk coredump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +37,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 06/04/2018 15:37, Thomas Huth wrote:
-> It's been marked as deprecated since QEMU v2.9.0, so that should have
-> been enough time for everybody to switch to the modern -device + -netde=
-v
-> syntax for connecting guest NICs with host network backends, or to swit=
-ch
-> to the "hubport" netdev in case hubs are really wanted instead.
+Could you provide a binary that we can use to reproduce, please?
+(preferably a setup that doesn't require me to figure out how to install
+and use docker...)
 
-... or to just drop unnecessary "vlan=3D0", which is the really common ca=
-se.
+-- =
 
->=20
->  # @NetdevL2TPv3Options:
->  #
-> -# Connect the VLAN to Ethernet over L2TPv3 Static tunnel
-> +# Configure an Ethernet over L2TPv3 Static tunnel.
->  #
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1761535
 
-Since you are at it, probably remove "Static"?  I don't see the point
-really.
+Title:
+  qemu-aarch64-static docker arm64v8/openjdk coredump
 
-> or the netdev 'nd' (for pluggable\n"
-> "                NICs please use '-device devtype,netdev=3Dnd' instead)=
-\n"
+Status in QEMU:
+  New
 
-Maybe remove this if -net is prominently marked deprecated?  And mention
-using -nic instead of "-net nic,netdev=3D...".
+Bug description:
+  I am using qemu-aarch64-static to run the arm64v8/openjdk official
+  image on my x86 machine. Using QEMU master, I immediately hit a bug
+  which hangs the container. With Ubuntu default version qemu-aarch64
+  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
+  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
 
-Paolo
+  To reproduce (and get to the core dump):
 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/658904
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
+  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
+rch64-static arm64v8/openjdk /bin/bash
+  root@bf75cf45d311:/# javac
+  Usage: javac <options> <source files>
+  where possible options include:
+    -g                         Generate all debugging info
+  <...snip...>
+    @<filename>                Read options and filenames from file
+
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  ...TERMINAL HANGS...
+
+  =
+
+  To get the core dump, In a separate terminal:
+
+  # snapshot the file system of the hung image
+  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
+
+  # connect with known working qemu
+  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
+tic  -i qemu_coredump /bin/bash
+
+  $$ ls -lat
+  total 10608
+  <snip>
+  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
+1.core
+  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
+  <snip>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
