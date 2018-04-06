@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f4Qz9-0004VU-89
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:00:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f4R1t-0006G5-0q
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:03:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f4Qz5-0002VF-Kt
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:00:55 -0400
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:35111)
+	(envelope-from <alex.bennee@linaro.org>) id 1f4R1n-0003lM-FG
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:03:45 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:54573)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f4Qz5-0002VB-FZ
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:00:51 -0400
-Received: by mail-ot0-x22a.google.com with SMTP id f47-v6so1071272oth.2
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 06:00:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f4R1n-0003kK-9e
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:03:39 -0400
+Received: by mail-wm0-x231.google.com with SMTP id r191so3370556wmg.4
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 06:03:39 -0700 (PDT)
+References: <20180217182323.25885-1-richard.henderson@linaro.org>
+	<20180217182323.25885-6-richard.henderson@linaro.org>
+	<87y3i4d4jv.fsf@linaro.org>
+	<abef9b59-9f7e-8871-7d36-67c7612457ed@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <abef9b59-9f7e-8871-7d36-67c7612457ed@linaro.org>
+Date: Fri, 06 Apr 2018 14:03:36 +0100
+Message-ID: <876054cwrb.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <877epkcwz8.fsf@linaro.org>
-References: <20180406123838.21249-1-peter.maydell@linaro.org>
-	<877epkcwz8.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Apr 2018 14:00:29 +0100
-Message-ID: <CAFEAcA9sWOD2OauodzS3iAQFuXSS4Ji9K0x5Ki8f4cygqq97hA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12] cpus.c: ensure running CPU
- recalculates icount deadlines on timer expiry
+Subject: Re: [Qemu-devel] [PATCH v2 05/67] target/arm: Implement SVE load
+ vector/predicate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On 6 April 2018 at 13:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> On 04/03/2018 07:26 PM, Alex Benn=C3=A9e wrote:
+>> You don't use it yet but probably worth a:
+>>
+>> static inline int ffr_full_reg_offset(DisasContext *s)
+>> {
+>>     return pred_full_reg_offset(s, 16);
+>> }
+>>
+>> here when you get to it to avoid the magic 16 appearing in the main code.
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
->> -    if (!qemu_in_vcpu_thread() && first_cpu) {
->> +    if (qemu_in_vcpu_thread()) {
->> +        /* A CPU is currently running; kick it back out to the
->> +         * tcg_cpu_exec() loop so it will recalculate its
->> +         * icount deadline immediately.
->> +         */
->> +        qemu_cpu_kick(current_cpu);
+> Hum.  Most of the places that ffr is touched is in sve.decode.
+> I could certainly enhance the grammar there to allow a symbol
+> there instead of a number.
 >
-> This is only totally true if whatever has caused the re-calculation has
-> ended the Translation Block, otherwise we won't finish until we've run a
-> few more instructions.
+> But I don't think treating ffr differently from a regular pr
+> register, as above, is a good idea.  At best I would use
+>
+>   pred_full_reg_offset(s, FFR_PRED_NUM)
 
-That should always be true, because it will be an IO instruction,
-which we enforce is always the last insn in a TB.
+That would a fine alternative ;-)
 
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
