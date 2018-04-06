@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1f4UsF-0006gI-GT
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:10:04 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utg-0007lQ-WD
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1f4UsA-0004n1-DL
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:10:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35120 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f4UsA-0004bX-90
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:09:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B03940006E6
-	for <qemu-devel@nongnu.org>; Fri,  6 Apr 2018 17:09:41 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180316175719.GF3066@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
-	=?utf-8?Q?ang=C3=A9=22's?=
-	message of "Fri, 16 Mar 2018 17:57:19 +0000")
-References: <20180316115403.4148-1-quintela@redhat.com>
-	<20180316115403.4148-2-quintela@redhat.com>
-	<20180316174907.GZ3066@redhat.com> <20180316175719.GF3066@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Fri, 06 Apr 2018 19:10:58 +0200
-Message-ID: <876054ntul.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 01/15] migration: Set error state in
- case of error
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Ute-0007IM-ML
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:32 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1f4Ute-0007Ee-G5
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:30 -0400
+Received: by mail-wm0-x242.google.com with SMTP id i3so4561703wmf.3
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:30 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  6 Apr 2018 19:11:04 +0200
+Message-Id: <1523034681-33787-4-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
+References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 03/20] scripts/checkpatch.pl: Bug fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,48 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Su Hang <suhang16@mails.ucas.ac.cn>
 
-Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Fri, Mar 16, 2018 at 05:49:07PM +0000, Daniel P. Berrang=C3=A9 wrote:
->> On Fri, Mar 16, 2018 at 12:53:49PM +0100, Juan Quintela wrote:
->> > Signed-off-by: Juan Quintela <quintela@redhat.com>
->> > ---
->> >  migration/ram.c | 20 ++++++++++++++++++++
->> >  1 file changed, 20 insertions(+)
->> >=20
->> > diff --git a/migration/ram.c b/migration/ram.c
->> > index 7266351fd0..1b8095a358 100644
->> > --- a/migration/ram.c
->> > +++ b/migration/ram.c
->> > @@ -414,6 +414,16 @@ static void terminate_multifd_send_threads(Error =
-*errp)
->> >  {
->> >      int i;
->> >=20=20
->> > +    if (errp) {
->> > +        MigrationState *s =3D migrate_get_current();
->> > +        migrate_set_error(s, errp);
->>=20
->> This doesn't look quiet right. You're checking if 'errp' is a non-NULL,
->> which just tells you if the caller wants to collect the error, not
->> whether an error has happened. For the latter you need
->>=20
->>   if (errp && *errp)
->>=20
->> seems a little strange though for the caller to pass an error into this
->> method for reporting.
->
-> Oh wait, I'm being mislead by the unusual parameter name.
->
-> An "errp" name should only ever be used for a "Error **", but we
-> only have an "Error *" here.
+From: Su Hang <suhang16@mails.ucas.ac.cn>
 
-Copy & Paste O:-)
+Commit 2b9aef6fcd96ba7ed8c1ee723e391901852d344c introduced a regression:
+checkpatch.pl started complaining about the following valid pattern:
+do {
+     /* something */
+} while (condition);
 
-> So just fix the parameter name to be "err" instead of "errp".
+Fix the script to once again permit this pattern.
 
-Done.
+Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+Message-Id: <1522029982-4650-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/checkpatch.pl | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-Thanks,
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 57daae0..d52207a 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2356,6 +2356,18 @@ sub process {
+ # check for missing bracing around if etc
+ 		if ($line =~ /(^.*)\b(?:if|while|for)\b/ &&
+ 			$line !~ /\#\s*if/) {
++			my $allowed = 0;
++
++			# Check the pre-context.
++			if ($line =~ /(\}.*?)$/) {
++				my $pre = $1;
++
++				if ($line !~ /else/) {
++					print "APW: ALLOWED: pre<$pre> line<$line>\n"
++						if $dbg_adv_apw;
++					$allowed = 1;
++				}
++			}
+ 			my ($level, $endln, @chunks) =
+ 				ctx_statement_full($linenr, $realcnt, 1);
+                         if ($dbg_adv_apw) {
+@@ -2364,7 +2376,6 @@ sub process {
+                                 if $#chunks >= 1;
+                         }
+ 			if ($#chunks >= 0 && $level == 0) {
+-				my $allowed = 0;
+ 				my $seen = 0;
+ 				my $herectx = $here . "\n";
+ 				my $ln = $linenr - 1;
+@@ -2408,7 +2419,7 @@ sub process {
+                                             $allowed = 1;
+ 					}
+ 				}
+-				if ($seen != ($#chunks + 1)) {
++				if ($seen != ($#chunks + 1) && !$allowed) {
+ 					ERROR("braces {} are necessary for all arms of this statement\n" . $herectx);
+ 				}
+ 			}
+-- 
+1.8.3.1
