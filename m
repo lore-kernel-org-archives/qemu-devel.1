@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f4Nso-0007Ne-6F
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:42:11 -0400
+	(envelope-from <david@redhat.com>) id 1f4Nx5-000257-Ut
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f4Nsk-0008PP-4W
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:42:10 -0400
-Date: Fri, 6 Apr 2018 11:42:02 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180406114202.2cf34236.cohuck@redhat.com>
-In-Reply-To: <8080442a-bd0b-6231-630c-39b48f910c7a@redhat.com>
-References: <1522940844-12336-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1522940844-12336-4-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<8080442a-bd0b-6231-630c-39b48f910c7a@redhat.com>
+	(envelope-from <david@redhat.com>) id 1f4Nx2-0003eY-Op
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:46:36 -0400
+References: <20180406093552.13016-1-david@redhat.com>
+	<02023ca6-bdab-5cf0-a882-b4c1e8c9e95b@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0bef659c-1f6f-9f81-ba3b-1f0d8577cee8@redhat.com>
+Date: Fri, 6 Apr 2018 11:46:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <02023ca6-bdab-5cf0-a882-b4c1e8c9e95b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390: Do not pass inofficial IPL type
- to the guest
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12] s390x/kvm: call
+ cpu_synchronize_state() on every kvm_arch_handle_exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Fri, 6 Apr 2018 11:28:31 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 05.04.2018 17:07, Viktor Mihajlovski wrote:
-> > IPL over a virtio-scsi device requires special handling not
-> > available in the real architecture. For this purpose the IPL
-> > type 0xFF has been chosen as means of communication between
-> > QEMU and the pc-bios. However, a guest OS could be confused
-> > by seeing an unknown IPL type.
-> > 
-> > This change sets the IPL parameter type to 0x02 (CCW) to prevent
-> > this. Pre-existing Linux has looked up the IPL parameters only in
-> > the case of FCP IPL. This means that the behavior should stay
-> > the same even if Linux checks for the IPL type unconditionally.
-> > 
-> > Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-> > ---
-> >  pc-bios/s390-ccw/bootmap.c |  7 +++++++
-> >  pc-bios/s390-ccw/iplb.h    | 15 +++++++++++++--
-> >  2 files changed, 20 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-> > index fc2a9fe..9287b7a 100644
-> > --- a/pc-bios/s390-ccw/bootmap.c
-> > +++ b/pc-bios/s390-ccw/bootmap.c
-> > @@ -70,6 +70,13 @@ static void jump_to_IPL_code(uint64_t address)
-> >  {
-> >      /* store the subsystem information _after_ the bootmap was loaded */
-> >      write_subsystem_identification();
-> > +
-> > +    /* prevent unknown IPL types in the guest */
-> > +    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
-> > +        iplb.pbt = S390_IPL_TYPE_CCW;
-> > +        set_iplb(&iplb);
-> > +    }
-> > +
-> >      /*
-> >       * The IPL PSW is at address 0. We also must not overwrite the
-> >       * content of non-BIOS memory after we loaded the guest, so we
-> > diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-> > index 7dfce4f..5357a36 100644
-> > --- a/pc-bios/s390-ccw/iplb.h
-> > +++ b/pc-bios/s390-ccw/iplb.h
-> > @@ -97,16 +97,27 @@ extern QemuIplParameters qipl;
-> >  #define S390_IPL_TYPE_CCW 0x02
-> >  #define S390_IPL_TYPE_QEMU_SCSI 0xff
-> >  
-> > -static inline bool store_iplb(IplParameterBlock *iplb)
-> > +static inline bool manage_iplb(IplParameterBlock *iplb, bool store)
-> >  {
-> >      register unsigned long addr asm("0") = (unsigned long) iplb;
-> >      register unsigned long rc asm("1") = 0;
-> >  
-> >      asm volatile ("diag %0,%2,0x308\n"
-> >                    : "+d" (addr), "+d" (rc)
-> > -                  : "d" (6)
-> > +                  : "d" (store ? 6 : 5)
-> >                    : "memory", "cc");  
+On 06.04.2018 11:40, Thomas Huth wrote:
+> On 06.04.2018 11:35, David Hildenbrand wrote:
+>> Manually having to use cpu_synchronize_state() is error prone. And as
+>> Christian Borntraeger discovered, e.g. handle_diag() is currently
+>> missing a cpu_synchronize_state(), as decode_basedisp_s() uses a
+>> general purpose register value internally.
+>>
+>> So let's do an overall cpu_synchronize_state(), which fixes at least the
+>> one mentioned BUG. We will clean up the superfluous cpu_synchronize_state()
+>> calls later.
+>>
+>> We now also call it (although maybe not neded) for
+>> - KVM_EXIT_S390_RESET -> s390_reipl_request()
+>> - KVM_EXIT_DEBUG -> kvm_arch_handle_debug_exit()
+>> - unmanagable/unimplemented intercepts
+>> - ICPT_CPU_STOP -> do_stop_interrupt() -> cpu gets halted
+>> - Scenarios where we inject an operation exception
+>> - handle_stsi()
+>>
+>> I don't think any of these are performance critical. Especially as we
+>> have all information directly contained in kvm_run, there are no
+>> additional IOCTLs to issue on modern kernels.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/kvm.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index f570896dc1..fb59d92def 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -1778,6 +1778,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>>  
+>>      qemu_mutex_lock_iothread();
+>>  
+>> +    cpu_synchronize_state(cs);
 > 
-> I can't find a proper public specification for diag 308, so no clue how
-> to review this properly. Christian, could you please have a look?
+> Since we're in kvm.c here, maybe rather call kvm_cpu_synchronize_state()
+> directly to avoid the wrapper function?
+> 
+>  Thomas
+> 
 
-It does match the diag 308 store/load implementation in
-target/s390x/diag.c... but a pointer to an official spec (if public)
-would still be appreciated :)
+No strong opinion. I can see that kvm_cpu_synchronize_state()
+- is not used in target/s390x/kvm.c yet
+- is very rarely used in kvm code in general
+
+-- 
+
+Thanks,
+
+David / dhildenb
