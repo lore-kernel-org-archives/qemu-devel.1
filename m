@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1f4Q1M-0001lz-IU
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 07:59:09 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f4Q3s-0003Ys-IP
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1f4Q1J-0006vn-HA
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 07:59:08 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:23923)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1f4Q1J-0006ul-5U
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 07:59:05 -0400
-Date: Fri, 6 Apr 2018 13:59:03 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <95d8655f-9956-6d7b-1419-efae9893784f@msgid.tls.msk.ru>
-Message-ID: <alpine.BSF.2.21.1804061352030.50304@zero.eik.bme.hu>
-References: <6c7ac1ff-b375-f1f7-094e-7fb603c5e40b@msgid.tls.msk.ru>
-	<alpine.BSF.2.21.1804021607010.6023@zero.eik.bme.hu>
-	<95d8655f-9956-6d7b-1419-efae9893784f@msgid.tls.msk.ru>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f4Q3l-0000BX-Tp
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:01:44 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:34062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1f4Q3l-0000AS-Eu
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 08:01:37 -0400
+References: <1522883475-27858-1-git-send-email-cota@braap.org>
+	<1522883475-27858-5-git-send-email-cota@braap.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <eb51406e-c966-76de-fb84-e53e1d28a524@mail.uni-paderborn.de>
+Date: Fri, 6 Apr 2018 14:01:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] some ROMs questions
+In-Reply-To: <1522883475-27858-5-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 04/15] softfloat: add float{32,
+ 64}_is_{de, }normal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, 6 Apr 2018, Michael Tokarev wrote:
-> 02.04.2018 17:30, BALATON Zoltan wrote:
->> On Mon, 2 Apr 2018, Michael Tokarev wrote:
->>> roms/u-boot-sam460ex/tools/updater/stubs.c -
->>> it is some strange symlink pointing to a strange place, probably should be removed?
->>
->> This does not seem to matter for building the rom image but this can be fixed by converting it to a relative path. I've done that and will send a patch to update the submodule as well to use the QEMU repo now that we have a mirror there. Thanks for finding this.
->
-> Hmm, I've no idea how to pull a submodule change.. :)
+On 04/05/2018 01:11 AM, Emilio G. Cota wrote:
+> This paves the way for upcoming work.
+> 
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  include/fpu/softfloat.h | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 
-git submodule update? But it's not in master yet only in 
-David's ppc-for-2.12 branch I think.
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-> But I've one more question about this rom.  When I'm trying to build it,
-> the build fails:
->
-> roms/u-boot-sam460ex$ make Sam460ex_config CROSS_COMPILE=powerpc64-linux-gnu-
-> Generating include/autoconf.mk
-> cc1: error: -mcall not supported in this configuration
-> cc1: error: -mrelocatable not supported in this configuration
-> cc1: error: -meabi not supported in this configuration
-> cc1: error: -m64 requires a PowerPC64 cpu
-> Generating include/autoconf.mk.dep
-> cc1: error: -mcall not supported in this configuration
-> cc1: error: -mrelocatable not supported in this configuration
-> cc1: error: -meabi not supported in this configuration
-> cc1: error: -m64 requires a PowerPC64 cpu
-> Configuring for Sam460ex board...
->
-> roms/u-boot-sam460ex$ make CROSS_COMPILE=powerpc64-linux-gnu-
-> ...
-> make -C arch/powerpc/cpu/ppc4xx start.o
-> make[1]: Entering directory '/build/qemu/debian-qemu/roms/u-boot-sam460ex/arch/powerpc/cpu/ppc4xx'
-> powerpc64-linux-gnu-gcc   -D__ASSEMBLY__ -g  -Os   -mrelocatable -fPIC -meabi -ffunction-sections -fdata-sections -D__KERNEL__ -DTEXT_BASE=0xFFF80000 -I/build/qemu/debian-qemu/roms/u-boot-sam460ex/include -fno-builtin -ffreestanding -nostdinc -isystem /usr/lib/gcc-cross/powerpc64-linux-gnu/6/include -pipe  -DCONFIG_PPC -D__powerpc__ -DCONFIG_4xx -ffixed-r2 -mstring -msoft-float -Wa,-m440 -mcpu=440 -DCONFIG_440=1 -I../bios_emulator/scitech/include -I../bios_emulator/scitech/src/x86emu -Dprintk=printf   \
->        -o start.o start.S -c
-> start.S:1:0: error: -mcall not supported in this configuration
-> /*
->
-> start.S:1:0: error: -mrelocatable not supported in this configuration
-> start.S:1:0: error: -meabi not supported in this configuration
-> start.S:1:0: error: -m64 requires a PowerPC64 cpu
-> /build/qemu/debian-qemu/roms/u-boot-sam460ex/config.mk:249: recipe for target 'start.o' failed
-> make[1]: *** [start.o] Error 1
-> make[1]: Leaving directory '/build/qemu/debian-qemu/roms/u-boot-sam460ex/arch/powerpc/cpu/ppc4xx'
-> Makefile:353: recipe for target 'arch/powerpc/cpu/ppc4xx/start.o' failed
-> make: *** [arch/powerpc/cpu/ppc4xx/start.o] Error 2
->
-> What I'm doing wrong?
->
-> $ powerpc64-linux-gnu-gcc --version
-> powerpc64-linux-gnu-gcc (Debian 6.3.0-18) 6.3.0 20170516
-
-Note sure, maybe building it with ppc64 compiler or a too new one? This 
-board is 32bit and the source is from 2011 so I'm not sure what it does 
-with recent compilers. I have powerpc-elf-gcc 4.9.3 which works.
-
-Regards,
-BALATON Zoltan
+Cheers,
+Bastian
