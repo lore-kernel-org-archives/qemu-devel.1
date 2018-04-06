@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Uu2-00089h-1f
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:55 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Uu2-00089g-1Q
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utz-00083V-B2
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Uty-00081O-AS
 	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:53 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:41200)
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:38948)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1f4Utz-00081n-3D
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:51 -0400
-Received: by mail-wr0-x244.google.com with SMTP id s12so2403476wrc.8
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:51 -0700 (PDT)
+	id 1f4Uty-0007zK-3Z
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:50 -0400
+Received: by mail-wr0-x242.google.com with SMTP id c24so2415704wrc.6
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:50 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Apr 2018 19:11:21 +0200
-Message-Id: <1523034681-33787-21-git-send-email-pbonzini@redhat.com>
+Date: Fri,  6 Apr 2018 19:11:20 +0200
+Message-Id: <1523034681-33787-20-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
 References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 20/20] Add missing bit for SSE instr in VEX
- decoding
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 19/20] maint: Add .mailmap entries for patches
+ claiming list authorship
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +32,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eugene Minibaev <mail@kitsu.me>
 
-From: Eugene Minibaev <mail@kitsu.me>
+From: Eric Blake <eblake@redhat.com>
 
-The 2-byte VEX prefix imples a leading 0Fh opcode byte.
+The list did not author any patches, but it does rewrite the
+'From:' header of messages sent from any domain with restrictive
+SPF policies that would otherwise prevent the message from reaching
+all list recipients.  If a maintainer is not careful to undo the
+list header rewrite, and the author did not include a manual
+'From:' line in the body to fix the munged header, then 'git am'
+happily attributes the patch to the list.  Add some mailmap
+entries to correct the few that have escaped our attention; while
+we also work on improving the tooling to catch the problem in
+the future before a merge is even made.
 
-Signed-off-by: Eugene Minibaev <mail@kitsu.me>
+Also improve the comments occurring in the file, including line
+length improvements.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/translate.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ .mailmap | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 3b7ce92..c9ed8dc 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4563,9 +4563,11 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
- #endif
-             rex_r = (~vex2 >> 4) & 8;
-             if (b == 0xc5) {
-+                /* 2-byte VEX prefix: RVVVVlpp, implied 0f leading opcode byte */
-                 vex3 = vex2;
--                b = x86_ldub_code(env, s);
-+                b = x86_ldub_code(env, s) | 0x100;
-             } else {
-+                /* 3-byte VEX prefix: RXBmmmmm wVVVVlpp */
- #ifdef TARGET_X86_64
-                 s->rex_x = (~vex2 >> 3) & 8;
-                 s->rex_b = (~vex2 >> 2) & 8;
+diff --git a/.mailmap b/.mailmap
+index cf689b9..778a4d4 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -1,6 +1,7 @@
+-# This mailmap just translates the weird addresses from the original import into git
+-# into proper addresses so that they are counted properly in git shortlog output.
+-#
++# This mailmap fixes up author names/addresses.
++
++# The first section translates weird addresses from the original git import
++# into proper addresses so that they are counted properly by git shortlog.
+ Andrzej Zaborowski <balrogg@gmail.com> balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Anthony Liguori <anthony@codemonkey.ws> aliguori <aliguori@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
+@@ -15,10 +16,19 @@ Paul Burton <paul.burton@mips.com> <paul.burton@imgtec.com>
+ Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
+ malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
++
+ # There is also a:
+ #    (no author) <(no author)@c046a42c-6fe2-441c-8c8c-71466251a162>
+ # for the cvs2svn initialization commit e63c3dc74bf.
+-#
++
++# Next, translate a few commits where mailman rewrote the From: line due
++# to strict SPF, although we prefer to avoid adding more entries like that.
++Ed Swierk <eswierk@skyportsystems.com> Ed Swierk via Qemu-devel <qemu-devel@nongnu.org>
++Ian McKellar <ianloic@google.com> Ian McKellar via Qemu-devel <qemu-devel@nongnu.org>
++Julia Suvorova <jusual@mail.ru> Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org>
++Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-devel <qemu-devel@nongnu.org>
++
++
+ # Also list preferred name forms where people have changed their
+ # git author config
+ Daniel P. Berrangé <berrange@redhat.com>
 -- 
 1.8.3.1
