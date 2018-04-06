@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4FTV-0003d3-JP
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 20:43:30 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f4Fgj-0008SV-9v
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 20:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f4FTS-0005nH-Cf
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 20:43:29 -0400
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:34165)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f4FTS-0005lp-6u
-	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 20:43:26 -0400
-Date: Thu, 5 Apr 2018 20:43:24 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180406004324.GA25706@flamenco>
-References: <1519709965-29833-1-git-send-email-cota@braap.org>
-	<1519709965-29833-11-git-send-email-cota@braap.org>
-	<87sh8j6iem.fsf@linaro.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1f4Fgi-0006Da-AY
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 20:57:09 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:46786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f4Fgi-0006Cs-3O
+	for qemu-devel@nongnu.org; Thu, 05 Apr 2018 20:57:08 -0400
+Received: by mail-pl0-x241.google.com with SMTP id 59-v6so18923837plc.13
+	for <qemu-devel@nongnu.org>; Thu, 05 Apr 2018 17:57:07 -0700 (PDT)
+References: <20180207225540.31698-1-richard.henderson@linaro.org>
+	<20180207225540.31698-17-richard.henderson@linaro.org>
+	<20180404164908.GA7582@flamenco>
+	<330b4559-52a5-50d6-3a85-da7bb0850107@linaro.org>
+	<0f10b5a5-2be0-4b6b-3c58-e718a062f07d@linaro.org>
+	<84a25fa4-d1a6-0e9c-a28f-770baeff0ce4@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2ea63966-1599-5bdd-3a31-d4a644c7bec1@linaro.org>
+Date: Fri, 6 Apr 2018 10:56:58 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87sh8j6iem.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 10/16] translate-all: use per-page locking
- in !user-mode
+In-Reply-To: <84a25fa4-d1a6-0e9c-a28f-770baeff0ce4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 16/20] target/arm: Use vector infrastructure
+ for aa64 compares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +36,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, "Emilio G. Cota" <cota@braap.org>
+Cc: peter.maydell@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-On Thu, Mar 29, 2018 at 15:55:13 +0100, Alex Bennée wrote:
+On 04/05/2018 03:06 PM, Thomas Huth wrote:
+> On 05.04.2018 02:54, Richard Henderson wrote:
+>> On 04/05/2018 10:07 AM, Richard Henderson wrote:
+>>> On 04/05/2018 02:49 AM, Emilio G. Cota wrote:
+>>>> 1. grab this binary:
+>>>>   http://cs.columbia.edu/~cota/qemu/nbench-aarch64
+>>>> 2. run it on a PowerPC host with:
+>>>>   $ aarch64-linux-user/qemu-aarch64 nbench-aarch64 -V
+>>>>
+>>>> Note: the "-V" (or "-v") flag is important! Without it, there's no segfault.
+>>>
+>>> How quickly?  I did not see one up until it exited for lack of NNET.DAT.
+>>>
+>>> I will note that I am using gcc 7.2 on gcc112 (/opt/cfarm/gcc-latest/bin/gcc).
+>>>
+>>> Are you using gcc 4.8.5, and is commit 74912f6dad in your tree?
+>>> That commit might have made a difference...
+>>
+>> Bah.  I confirm that it doesn't, and that the test still fails.
+>>
+>> Since qemu does work on the same host when built with gcc 7.2, I can only blame
+>> this failure on a compiler bug wrt gcc 4.8 on ppc64.
+>>
+>> I have not tracked down exactly what's going wrong, and probably won't unless
+>> someone feels that it's worthwhile.  This only begs the question of whether we
+>> should blacklist this compiler entirely.  Certainly it's old enough that it's
+>> probably not worth fixing.
 > 
-> Emilio G. Cota <cota@braap.org> writes:
-(snip)
-> > +/* lock the page(s) of a TB in the correct acquisition order */
-> > +static inline void page_lock_tb(const TranslationBlock *tb)
-> > +{
-> > +    if (likely(tb->page_addr[1] == -1)) {
-> > +        page_lock(page_find(tb->page_addr[0] >> TARGET_PAGE_BITS));
-> > +        return;
-> > +    }
-> > +    if (tb->page_addr[0] < tb->page_addr[1]) {
-> > +        page_lock(page_find(tb->page_addr[0] >> TARGET_PAGE_BITS));
-> > +        page_lock(page_find(tb->page_addr[1] >> TARGET_PAGE_BITS));
-> > +    } else {
-> > +        page_lock(page_find(tb->page_addr[1] >> TARGET_PAGE_BITS));
-> > +        page_lock(page_find(tb->page_addr[0] >> TARGET_PAGE_BITS));
-> > +    }
-> > +}
-(snip)
-> > +    /*
-> > +     * Add the TB to the page list.
-> > +     * To avoid deadlock, acquire first the lock of the lower-addressed page.
-> > +     */
-> > +    p = page_find_alloc(phys_pc >> TARGET_PAGE_BITS, 1);
-> > +    if (likely(phys_page2 == -1)) {
-> >          tb->page_addr[1] = -1;
-> > +        page_lock(p);
-> > +        tb_page_add(p, tb, 0, phys_pc & TARGET_PAGE_MASK);
-> > +    } else {
-> > +        p2 = page_find_alloc(phys_page2 >> TARGET_PAGE_BITS, 1);
-> > +        if (phys_pc < phys_page2) {
-> > +            page_lock(p);
-> > +            page_lock(p2);
-> > +        } else {
-> > +            page_lock(p2);
-> > +            page_lock(p);
-> > +        }
-> 
-> Give we repeat this check further up perhaps a:
-> 
->   page_lock_pair(PageDesc *p1, th_page_addr_t phys1, PageDesc *p2,  tb_page_addr_t phys2)
+> GCC 4.8 is still used in enterprise distros like RHEL7 and AFAIK also in
+> SLES 12 ... so blacklisting this compiler does not sound like a good
+> idea to me.
 
-After trying, I don't think it's worth the trouble.
+I have now tracked down this failure and it turns out not to be a compiler bug
+at all; patch to follow.
 
-Note that page_lock_tb expands to nothing in user-mode,
-whereas the latter snippet is shared by user-mode and
-!user-mode. Dealing with that gets ugly quickly;
-besides, we'd have to optionally return *p1 and *p2,
-plus choose whether to use page_find or page_find_alloc..
 
-(snip)
-> The diff is a little messy around tb_page_add but I think we need an
-> assert_page_lock(p) which compiles to check mmap_lock in CONFIG_USER
-> instead of the assert_memory_lock().
-> 
-> Then we can be clear about tb, memory and page locks.
-
-I've added an extra patch to v2 to do this, since this patch is
-already huge.
-
-Thanks,
-
-		Emilio
+r~
