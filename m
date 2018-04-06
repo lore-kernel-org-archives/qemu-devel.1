@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f4Nk8-00005x-TT
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:33:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f4NlX-000181-Vf
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f4Nk5-0003cL-0q
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:33:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47424 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f4Nk4-0003cF-TT
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:33:08 -0400
-Date: Fri, 6 Apr 2018 11:33:07 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180406093307.s7wkhpmddd5d4r7a@sirius.home.kraxel.org>
-References: <20180316074650.5415-1-kraxel@redhat.com>
-	<7547e99b-0e3c-264e-e52b-40ad5d52b49a@gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1f4NlU-00042k-RW
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 05:34:40 -0400
+Date: Fri, 6 Apr 2018 11:34:24 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180406113424.05b82448.cohuck@redhat.com>
+In-Reply-To: <ad080c45-9bbe-43e3-1482-b291dd249a75@redhat.com>
+References: <1522940844-12336-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<1522940844-12336-2-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<ad080c45-9bbe-43e3-1482-b291dd249a75@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7547e99b-0e3c-264e-e52b-40ad5d52b49a@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] Add udmabuf misc device
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] s390: Refactor IPL parameter block
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: christian.koenig@amd.com
-Cc: dri-devel@lists.freedesktop.org, Daniel Vetter <daniel.vetter@ffwll.ch>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-  Hi,
+On Fri, 6 Apr 2018 09:52:35 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> The pages backing a DMA-buf are not allowed to move (at least not without a
-> patch set I'm currently working on), but for certain MM operations to work
-> correctly you must be able to modify the page tables entries and move the
-> pages backing them around.
+> On 05.04.2018 17:07, Viktor Mihajlovski wrote:
+> > Splitting out the the CCW device extraction allows reuse.
+> > 
+> > Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> > ---
+> >  hw/s390x/ipl.c | 81 ++++++++++++++++++++++++++++++++++++----------------------
+> >  1 file changed, 51 insertions(+), 30 deletions(-)
+> > 
+> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> > index fdeaec3..58e33c5 100644
+> > --- a/hw/s390x/ipl.c
+> > +++ b/hw/s390x/ipl.c
+> > @@ -279,44 +279,52 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+> >      *timeout = cpu_to_be32(splash_time);
+> >  }
+> >  
+> > +static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
+> > +{
+> > +    CcwDevice *ccw_dev = NULL;
+> > +
+> > +    if (dev_st) {
+> > +        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
+> > +            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
+> > +                                TYPE_VIRTIO_CCW_DEVICE);
+> > +        if (virtio_ccw_dev) {
+> > +            ccw_dev = CCW_DEVICE(virtio_ccw_dev);
+> > +        } else {
+> > +            SCSIDevice *sd = (SCSIDevice *)
+> > +                object_dynamic_cast(OBJECT(dev_st),
+> > +                                    TYPE_SCSI_DEVICE);
+> > +            if (sd) {
+> > +                SCSIBus *bus = scsi_bus_from_device(sd);
+> > +                VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
+> > +                VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw,
+> > +                                                       vdev);
+> > +
+> > +                ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
+> > +                                                           TYPE_CCW_DEVICE);
+> > +            }
+> > +        }
+> > +    }
+> > +    return ccw_dev;
+> > +}
+> > +
+> >  static bool s390_gen_initial_iplb(S390IPLState *ipl)
+> >  {
+> >      DeviceState *dev_st;
+> > +    CcwDevice *ccw_dev = NULL;
+> >  
+> >      dev_st = get_boot_device(0);
+> >      if (dev_st) {
+> > -        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
+> > -            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
+> > -                TYPE_VIRTIO_CCW_DEVICE);
+> > +        ccw_dev = s390_get_ccw_device(dev_st);
+> > +    }
+> > +
+> > +    /*
+> > +     * Currently allow IPL only from CCW devices.
+> > +     */
+> > +    if (ccw_dev) {
+> >          SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
+> >                                                              TYPE_SCSI_DEVICE);  
 > 
-> For example try to use fork() with some copy on write pages with this
-> approach. You will find that you have only two options to correctly handle
-> this.
+> The SCSIDevice dynamic cast now has to be done twice ... but I guess
+> that's ok (we're only doing this for the boot device, so it this should
+> not be time-critical, right?).
 
-The fork() issue should go away with shared memory pages (no cow).
-I guess this is the reason why vgem is internally backed by shmem.
+Agreed, that does not matter.
 
-Hmm.  So I could try to limit the udmabuf driver to shmem too (i.e.
-have the ioctl take a shmem filehandle and offset instead of a virtual
-address).
-
-But maybe it is better then to just extend vgem, i.e. add support to
-create gem objects from existing shmem.
-
-Comments?
-
-cheers,
-  Gerd
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
