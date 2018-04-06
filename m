@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christophe.lyon@st.com>) id 1f4T7u-0003Yk-VD
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:08 -0400
+	(envelope-from <christophe.lyon@st.com>) id 1f4T8C-0003mj-Ah
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christophe.lyon@st.com>) id 1f4T7r-0004GJ-KT
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:06 -0400
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:64645)
+	(envelope-from <christophe.lyon@st.com>) id 1f4T89-0004V2-3R
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:24 -0400
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:43962)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <christophe.lyon@st.com>)
-	id 1f4T7r-0004C4-Aa
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:03 -0400
+	id 1f4T88-0004Ua-PW
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:21 -0400
 From: Christophe Lyon <christophe.lyon@st.com>
-Date: Fri, 6 Apr 2018 17:17:28 +0200
-Message-ID: <20180406151752.10854-1-christophe.lyon@st.com>
+Date: Fri, 6 Apr 2018 17:17:29 +0200
+Message-ID: <20180406151752.10854-2-christophe.lyon@st.com>
+In-Reply-To: <20180406151752.10854-1-christophe.lyon@st.com>
+References: <20180406151752.10854-1-christophe.lyon@st.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [ARM/FDPIC 0/4] FDPIC ABI for ARM
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [ARM/FDPIC 1/4] linux-user: ARM-FDPIC: Add configure
+ option to support loading of FDPIC binaries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +30,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, christophe.lyon@linaro.org, peter.maydell@linaro.org
 
-Hello,
+Adds --enable-fdpic and --disable-fdpic configure options.  This
+feature is disabled by default, that's why it is not described in the
+"Optional features" help section (which are enabled by default if
+possible).
 
-This patch series implements the QEMU contribution of the FDPIC
-ABI for ARM targets.
+FDPIC ELF objects are identified with e_ident[EI_OSABI] =3D=3D
+ELFOSABI_ARM_FDPIC.
 
-This ABI enables to run Linux on ARM MMU-less cores and supports
-shared libraries to reduce the memory footprint.
+Co-Authored-By: Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
+Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
 
-Without MMU, text and data segment relative distances are different
-from one process to another, hence the need for a dedicated FDPIC
-register holding the start address of the data segment. One of the
-side effects is that function pointers require two words to be
-represented: the address of the code, and the data segment start
-address. These two words are designated as "Function Descriptor",
-hence the "FD PIC" name.
-
-On ARM, the FDPIC register is r9 [3].
-
-This work was developed some time ago by STMicroelectronics, and was
-presented during Linaro Connect SFO15 (September 2015). You can watch
-the discussion and read the slides [1].
-This presentation was related to the toolchain published on github [2],
-which is based on binutils-2.22, gcc-4.7, uclibc-0.9.33.2, gdb-7.5.1
-and qemu-2.3.0, and for which pre-built binaries are available [2].
-
-The ABI itself is described in details in [3].
-
-Our Linux kernel patches have been updated and committed by Nicolas
-Pitre (Linaro) in July 2017. They are required so that the loader is
-able to handle this new file type. Indeed, the ELF files are tagged
-with ELFOSABI_ARM_FDPIC. This new tag has been allocated by ARM, as
-well as the new relocations involved.
-
-This patch series has been rebased on top of QEMU from 2018-03-28.
-
-I have also rebased the GCC patch series, but it is still WIP as
-cleanup is still needed before I can request a review. It can be
-useful to build a preview toolchain though, so my WIP branch is
-available at [4].
-To build such a toolchain, you'd also need to use my uClibc
-branch [5].
-
-I am currently working on updating the patches for the other toolchain
-components, and will upstream them soon. This includes gcc, uclibc,
-and gdb.
-
-This series provides support for ARM v7 and later architectures and
-has been used to run the GCC tests on arm-linux-gnueabi without
-regression, as well as arm-linux-uclibceabi.
-
-Are the QEMU patches OK for inclusion in master?
-
-Thanks,
-
-Christophe.
-
-
-[1] http://connect.linaro.org/resource/sfo15/sfo15-406-arm-fdpic-toolset-kernel-libraries-for-cortex-m-cortex-r-mmuless-cores/
-[2] https://github.com/mickael-guene/fdpic_manifest
-[3] https://github.com/mickael-guene/fdpic_doc/blob/master/abi.txt
-[4] https://git.linaro.org/people/christophe.lyon/gcc.git/log/?h=fdpic-upstream
-[5] https://git.linaro.org/people/christophe.lyon/uclibc.git/log/?h=uClibc-0.9.33.2-fdpic-upstream
-
-Christophe Lyon (4):
-  linux-user: ARM-FDPIC: Add configure option to support loading of
-    FDPIC binaries
-  linux-user: ARM-FDPIC: Add support of FDPIC for ARM.
-  linux-user: ARM-FDPIC: Add support for signals for FDPIC targets
-  linux-user: ARM-FDPIC: Add arm get tls syscall support
-
- configure                       | 10 +++++
- include/elf.h                   |  1 +
- linux-user/arm/target_syscall.h |  1 +
- linux-user/elfload.c            | 35 ++++++++++++++++
- linux-user/main.c               |  8 ++++
- linux-user/qemu.h               |  3 ++
- linux-user/signal.c             | 91 +++++++++++++++++++++++++++++++++++++----
- target/arm/cpu.h                |  6 +++
- 8 files changed, 147 insertions(+), 8 deletions(-)
-
--- 
+diff --git a/configure b/configure
+index 4d0e92c..af4c14b 100755
+--- a/configure
++++ b/configure
+@@ -451,6 +451,7 @@ jemalloc=3D"no"
+ replication=3D"yes"
+ vxhs=3D""
+ libxml2=3D""
++fdpic=3D"no"
+=20
+ supported_cpu=3D"no"
+ supported_os=3D"no"
+@@ -1374,6 +1375,10 @@ for opt do
+   ;;
+   --disable-git-update) git_update=3Dno
+   ;;
++  --disable-fdpic) fdpic=3D"no"
++  ;;
++  --enable-fdpic) fdpic=3D"yes"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1544,6 +1549,8 @@ Advanced options (experts only):
+                            xen pv domain builder
+   --enable-debug-stack-usage
+                            track the maximum stack usage of stacks creat=
+ed by qemu_alloc_stack
++  --disable-fdpic          disable loading of FDPIC binary (default)
++  --enable-fdpic           enable loading of FDPIC binary
+=20
+ Optional features, enabled with --enable-FEATURE and
+ disabled with --disable-FEATURE, default is enabled if available:
+@@ -7085,6 +7092,9 @@ fi
+=20
+ echo "LDFLAGS+=3D$ldflags" >> $config_target_mak
+ echo "QEMU_CFLAGS+=3D$cflags" >> $config_target_mak
++if [ "$fdpic" =3D "yes" ]; then
++    echo "CONFIG_USE_FDPIC=3Dy" >> $config_target_mak
++fi
+=20
+ done # for target in $targets
+=20
+diff --git a/include/elf.h b/include/elf.h
+index c0dc9bb..934dbbd 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -1483,6 +1483,7 @@ typedef struct elf64_shdr {
+ #define ELFOSABI_TRU64          10      /* Compaq TRU64 UNIX.  */
+ #define ELFOSABI_MODESTO        11      /* Novell Modesto.  */
+ #define ELFOSABI_OPENBSD        12      /* OpenBSD.  */
++#define ELFOSABI_ARM_FDPIC      65      /* ARM FDPIC */
+ #define ELFOSABI_ARM            97      /* ARM */
+ #define ELFOSABI_STANDALONE     255     /* Standalone (embedded) applica=
+tion */
+=20
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 23e3495..7ba3795 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1658,6 +1658,14 @@ static void zero_bss(abi_ulong elf_bss, abi_ulong =
+last_bss, int prot)
+ }
+=20
+ #ifdef CONFIG_USE_FDPIC
++
++#ifdef TARGET_ARM
++static int elf_is_fdpic(struct elfhdr *exec)
++{
++    return exec->e_ident[EI_OSABI] =3D=3D ELFOSABI_ARM_FDPIC;
++}
++#endif
++
+ static abi_ulong loader_build_fdpic_loadmap(struct image_info *info, abi=
+_ulong sp)
+ {
+     uint16_t n;
+--=20
 2.6.3
