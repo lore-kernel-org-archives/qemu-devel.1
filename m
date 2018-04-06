@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f4MB0-0003OX-H5
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 03:52:51 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f4MMA-0008MV-D0
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 04:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f4MAx-0006Kp-CJ
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 03:52:50 -0400
-References: <1522940844-12336-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<1522940844-12336-2-git-send-email-mihajlov@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ad080c45-9bbe-43e3-1482-b291dd249a75@redhat.com>
-Date: Fri, 6 Apr 2018 09:52:35 +0200
+	(envelope-from <kwolf@redhat.com>) id 1f4MM9-0005kI-5o
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 04:04:22 -0400
+Date: Fri, 6 Apr 2018 10:04:06 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180406080406.GA4850@localhost.localdomain>
+References: <20180405170619.20480-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1522940844-12336-2-git-send-email-mihajlov@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] s390: Refactor IPL parameter block
- generation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180405170619.20480-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
+ authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+To: qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jdurgin@redhat.com, jcody@redhat.com, eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 05.04.2018 17:07, Viktor Mihajlovski wrote:
-> Splitting out the the CCW device extraction allows reuse.
+Am 05.04.2018 um 19:06 hat Kevin Wolf geschrieben:
+> The legacy command line syntax supports a "password-secret" option that
+> allows to pass an authentication key to Ceph. This was not supported in
+> QMP so far.
 > 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> This patch introduces authentication options in the QAPI schema, makes
+> them do the corresponding rados_conf_set() calls and adds compatibility
+> code that translates the old "password-secret" option both for opening
+> and creating images to the new set of options.
+> 
+> Note that the old option didn't allow to explicitly specify the set of
+> allowed authentication schemes. The compatibility code assumes that if
+> "password-secret" is given, only the cephx scheme is allowed. If it's
+> missing, both none and cephx are allowed because the configuration file
+> could still provide a key.
+
+There is another problem here that suggests that maybe this is not the
+right QAPI schema after all: The defaults needed for command line
+compatibility and those promised in the QAPI schema are conflicting.
+
+The required command line behaviour is as described above:
+
+* password-secret given: only cephx
+* no options given: cephx, none
+
+The desired QMP default behaviour is:
+
+* auth-cephx given: allow cephx
+* auth-none given: allow none
+* both given: allow both
+* no options given: error
+
+In .bdrv_open() there is no way to distinguish the "no options given" of
+the command line from that of QMP. The current implementation allows
+everything if no options are given, i.e. it keeps existing command lines
+working, but it doesn't correctly implement the behaviour described in
+the QAPI schema.
+
+I don't think changing the description of the QAPI schema would be a
+good idea, it would be a rather surprising interface.
+
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  hw/s390x/ipl.c | 81 ++++++++++++++++++++++++++++++++++++----------------------
->  1 file changed, 51 insertions(+), 30 deletions(-)
 > 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index fdeaec3..58e33c5 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -279,44 +279,52 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
->      *timeout = cpu_to_be32(splash_time);
->  }
->  
-> +static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
-> +{
-> +    CcwDevice *ccw_dev = NULL;
-> +
-> +    if (dev_st) {
-> +        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
-> +            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
-> +                                TYPE_VIRTIO_CCW_DEVICE);
-> +        if (virtio_ccw_dev) {
-> +            ccw_dev = CCW_DEVICE(virtio_ccw_dev);
-> +        } else {
-> +            SCSIDevice *sd = (SCSIDevice *)
-> +                object_dynamic_cast(OBJECT(dev_st),
-> +                                    TYPE_SCSI_DEVICE);
-> +            if (sd) {
-> +                SCSIBus *bus = scsi_bus_from_device(sd);
-> +                VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
-> +                VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw,
-> +                                                       vdev);
-> +
-> +                ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
-> +                                                           TYPE_CCW_DEVICE);
-> +            }
-> +        }
-> +    }
-> +    return ccw_dev;
-> +}
-> +
->  static bool s390_gen_initial_iplb(S390IPLState *ipl)
->  {
->      DeviceState *dev_st;
-> +    CcwDevice *ccw_dev = NULL;
->  
->      dev_st = get_boot_device(0);
->      if (dev_st) {
-> -        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
-> -            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
-> -                TYPE_VIRTIO_CCW_DEVICE);
-> +        ccw_dev = s390_get_ccw_device(dev_st);
-> +    }
-> +
-> +    /*
-> +     * Currently allow IPL only from CCW devices.
-> +     */
-> +    if (ccw_dev) {
->          SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
->                                                              TYPE_SCSI_DEVICE);
+> This doesn't actually work correctly yet because the way that options
+> are passed through the block layer (QAPI -> QemuOpts -> QDict). Before
+> we fix or hack around this, let's make sure this is the schema that we
+> want.
+> 
+> The two known problems are:
+> 
+> 1. QDict *options in qemu_rbd_open() may contain options either in their
+>    proper QObject types (if passed from blockdev-add) or as strings
+>    (-drive). Both forms can be mixed in the same options QDict.
+> 
+>    rbd uses the keyval visitor to convert the options into a QAPI
+>    object. This means that it requires all options to be strings. This
+>    patch, however, introduces a bool property, so the visitor breaks
+>    when it gets its input from blockdev-add.
+> 
+>    Options to hack around the problem:
+> 
+>    a. Do an extra conversion step or two and go through QemuOpts like
+>       some other block drivers. When I offered something like this to
+>       Markus a while ago in a similar case, he rejected the idea.
+> 
+>    b. Introduce a qdict_stringify_entries() that just does what its name
+>       says. It would be called before the running keyval visitor so that
+>       only strings will be present in the QDict.
+> 
+>    c. Do a local one-off hack that checks if the entry with the key
+>       "auth-none" is a QBool, and if so, overwrite it with a string. The
+>       problem will reappear with the next non-string option.
+> 
+>    (d. Get rid of the QDict detour and work only with QAPI objects
+>        everywhere. Support rbd authentication only in QEMU 4.0.)
+> 
+> 2. The proposed schema allows 'auth-cephx': {} as a valid option with
+>    the meaning that the cephx authentication scheme is enabled, but no
+>    key is given (e.g. it is taken from the config file).
+> 
+>    However, an empty dict cannot currently be represented by flattened
+>    QDicts. We need to find a way to enable this. I think this will be
+>    externally visible because it directly translates into the dotted
+>    syntax of -blockdev, so we may want to be careful.
+> 
+> Any thoughts on the proposed QAPI schema or the two implementation
+> problems are welcome.
 
-The SCSIDevice dynamic cast now has to be done twice ... but I guess
-that's ok (we're only doing this for the boot device, so it this should
-not be time-critical, right?).
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Kevin
