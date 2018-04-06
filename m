@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f4RCU-0005nB-2b
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:14:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f4RCU-0005nG-AB
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:14:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f4RCP-0001ns-OW
+	(envelope-from <richard.henderson@linaro.org>) id 1f4RCT-0001qU-Ei
 	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:14:42 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:57176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1f4RCP-0001nF-A6
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:14:37 -0400
-References: <20180217203132.31780-1-richard.henderson@linaro.org>
-	<20180217203132.31780-4-richard.henderson@linaro.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <0f27ac43-be6c-089d-5089-4eb08023f221@mail.uni-paderborn.de>
-Date: Fri, 6 Apr 2018 15:14:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180217203132.31780-4-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/19] target/hppa: Convert move to/from
- system registers
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40605)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f4RCT-0001qD-A5
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 09:14:41 -0400
+Received: by mail-pf0-x242.google.com with SMTP id y66so701118pfi.7
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 06:14:41 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri,  6 Apr 2018 23:14:30 +1000
+Message-Id: <20180406131430.23432-2-richard.henderson@linaro.org>
+In-Reply-To: <20180406131430.23432-1-richard.henderson@linaro.org>
+References: <20180406131430.23432-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL for-2.12 1/1] tcg: Fix out-of-line generic
+ vector compares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 02/17/2018 09:31 PM, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/hppa/translate.c  | 57 +++++++++++++++++++++---------------------------
->  target/hppa/insns.decode | 15 +++++++++++++
->  2 files changed, 40 insertions(+), 32 deletions(-)
-> 
-[...]
-> @@ -2267,24 +2265,26 @@ static void trans_ssm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
->      ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
->      nullify_end(ctx);
->  }
-> +#endif /* !CONFIG_USER_ONLY */
+A mistake in the type passed to sizeof, that happens to work
+when the out-of-line fallback itself is using host vectors,
+but fails when using only the base types.
 
-This seems to not belong to this patch.
+Tested-by: Emilio G. Cota <cota@braap.org>
+Reported-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ accel/tcg/tcg-runtime-gvec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->  
-> -static void trans_mtsm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-> +static void trans_mtsm(DisasContext *ctx, arg_mtsm *a, uint32_t insn)
->  {
-> -    unsigned rr = extract32(insn, 16, 5);
-> -    TCGv_reg tmp, reg;
-> -
->      CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-> +#ifndef CONFIG_USER_ONLY
-
-Why do you need to make this softmmu only in a simple convert patch?
-This makes it at least confusing for the reviewer.
-
-Otherwise it looks good to me.
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-
-Cheers,
-Bastian
+diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
+index 8bf8d63912..90340e56e0 100644
+--- a/accel/tcg/tcg-runtime-gvec.c
++++ b/accel/tcg/tcg-runtime-gvec.c
+@@ -705,7 +705,7 @@ void HELPER(NAME)(void *d, void *a, void *b, uint32_t desc)                \
+ {                                                                          \
+     intptr_t oprsz = simd_oprsz(desc);                                     \
+     intptr_t i;                                                            \
+-    for (i = 0; i < oprsz; i += sizeof(vec64)) {                           \
++    for (i = 0; i < oprsz; i += sizeof(TYPE)) {                            \
+         *(TYPE *)(d + i) = DO_CMP0(*(TYPE *)(a + i) OP *(TYPE *)(b + i));  \
+     }                                                                      \
+     clear_high(d, oprsz, desc);                                            \
+-- 
+2.14.3
