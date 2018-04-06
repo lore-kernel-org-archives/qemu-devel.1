@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utr-0007x0-Q4
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utr-0007wT-8P
 	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utq-0007lS-Jc
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Uto-0007h1-6g
 	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:43 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:38626)
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36699)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1f4Utq-0007jr-CF
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:42 -0400
-Received: by mail-wr0-x234.google.com with SMTP id m13so2405575wrj.5
-	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:42 -0700 (PDT)
+	id 1f4Utn-0007fy-T3
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:40 -0400
+Received: by mail-wm0-x235.google.com with SMTP id x82so4588113wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:39 -0700 (PDT)
+Received: from 640k.lan (94-36-194-48.adsl-ull.clienti.tiscali.it.
+	[94.36.194.48]) by smtp.gmail.com with ESMTPSA id
+	24sm16286180wrt.60.2018.04.06.10.11.37 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 06 Apr 2018 10:11:37 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Apr 2018 19:11:13 +0200
-Message-Id: <1523034681-33787-13-git-send-email-pbonzini@redhat.com>
+Date: Fri,  6 Apr 2018 19:11:11 +0200
+Message-Id: <1523034681-33787-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
 References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/20] hw/dma/i82374: Avoid double creation of
- the 82374 controller
+Subject: [Qemu-devel] [PULL 10/20] scsi-disk: allow customizing the SCSI
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +34,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+We would like to have different behavior for passthrough devices
+depending on the SCSI version they expose.  To prepare for that,
+allow the user of emulated devices to specify the desired SCSI
+level, and adjust the emulation according to the property value.
+The next patch will set the level for scsi-block and scsi-generic
+devices.
 
-QEMU fails when used with the following command line:
+Based on a patch by Daniel Henrique Barboza
+<danielhb@linux.vnet.ibm.com>.
 
-    ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p -device i82374
-    qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
-
-The 40p machine type already creates the device i82374. If specified in the
-command line, it will try to create it again, hence generating the error. The
-function isa_bus_dma() isn't supposed to be called twice for the same bus.
-Check the bus doesn't already have a DMA controller registered before creating
-the device.
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1721224
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180326153441.32641-2-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/dma/i82374.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/scsi/scsi-disk.c    | 29 ++++++++++++++++++++++++-----
+ hw/scsi/scsi-generic.c |  1 +
+ include/hw/scsi/scsi.h |  2 ++
+ 3 files changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
-index 83c87d9..892f655 100644
---- a/hw/dma/i82374.c
-+++ b/hw/dma/i82374.c
-@@ -23,6 +23,7 @@
-  */
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index f8ed8cf..9400b97 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -825,7 +825,7 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
+      * block characteristics VPD page by default.  Not all of SPC-3
+      * is actually implemented, but we're good enough.
+      */
+-    outbuf[2] = 5;
++    outbuf[2] = s->qdev.default_scsi_version;
+     outbuf[3] = 2 | 0x10; /* Format 2, HiSup */
  
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "hw/isa/isa.h"
- #include "hw/dma/i8257.h"
- 
-@@ -118,13 +119,19 @@ static const MemoryRegionPortio i82374_portio_list[] = {
- static void i82374_realize(DeviceState *dev, Error **errp)
- {
-     I82374State *s = I82374(dev);
-+    ISABus *isa_bus = isa_bus_from_device(ISA_DEVICE(dev));
+     if (buflen > 36) {
+@@ -2193,7 +2193,11 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+     case READ_12:
+     case READ_16:
+         DPRINTF("Read (sector %" PRId64 ", count %u)\n", r->req.cmd.lba, len);
+-        if (r->req.cmd.buf[1] & 0xe0) {
++        /* Protection information is not supported.  For SCSI versions 2 and
++         * older (as determined by snooping the guest's INQUIRY commands),
++         * there is no RD/WR/VRPROTECT, so skip this check in these versions.
++         */
++        if (s->qdev.scsi_version > 2 && (r->req.cmd.buf[1] & 0xe0)) {
+             goto illegal_request;
+         }
+         if (!check_lba_range(s, r->req.cmd.lba, len)) {
+@@ -2224,7 +2228,7 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+          * As far as DMA is concerned, we can treat it the same as a write;
+          * scsi_block_do_sgio will send VERIFY commands.
+          */
+-        if (r->req.cmd.buf[1] & 0xe0) {
++        if (s->qdev.scsi_version > 2 && (r->req.cmd.buf[1] & 0xe0)) {
+             goto illegal_request;
+         }
+         if (!check_lba_range(s, r->req.cmd.lba, len)) {
+@@ -2270,6 +2274,8 @@ static void scsi_disk_reset(DeviceState *dev)
+     /* reset tray statuses */
+     s->tray_locked = 0;
+     s->tray_open = 0;
 +
-+    if (isa_get_dma(isa_bus, 0)) {
-+        error_setg(errp, "DMA already initialized on ISA bus");
-+        return;
-+    }
-+    i8257_dma_init(isa_bus, true);
- 
-     portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
-                      "i82374");
-     portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
-                     s->iobase);
- 
--    i8257_dma_init(isa_bus_from_device(ISA_DEVICE(dev)), true);
-     memset(s->commands, 0, sizeof(s->commands));
++    s->qdev.scsi_version = s->qdev.default_scsi_version;
  }
  
+ static void scsi_disk_resize_cb(void *opaque)
+@@ -2814,6 +2820,8 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
+ static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
+ {
+     SCSIBlockReq *r = (SCSIBlockReq *)req;
++    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, req->dev);
++
+     r->cmd = req->cmd.buf[0];
+     switch (r->cmd >> 5) {
+     case 0:
+@@ -2839,8 +2847,11 @@ static int32_t scsi_block_dma_command(SCSIRequest *req, uint8_t *buf)
+         abort();
+     }
+ 
+-    if (r->cdb1 & 0xe0) {
+-        /* Protection information is not supported.  */
++    /* Protection information is not supported.  For SCSI versions 2 and
++     * older (as determined by snooping the guest's INQUIRY commands),
++     * there is no RD/WR/VRPROTECT, so skip this check in these versions.
++     */
++    if (s->qdev.scsi_version > 2 && (req->cmd.buf[1] & 0xe0)) {
+         scsi_check_condition(&r->req, SENSE_CODE(INVALID_FIELD));
+         return 0;
+     }
+@@ -2952,6 +2963,8 @@ static Property scsi_hd_properties[] = {
+     DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
+                        DEFAULT_MAX_IO_SIZE),
+     DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
++    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
++                      5),
+     DEFINE_BLOCK_CHS_PROPERTIES(SCSIDiskState, qdev.conf),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -2997,6 +3010,8 @@ static Property scsi_cd_properties[] = {
+     DEFINE_PROP_UINT16("port_index", SCSIDiskState, port_index, 0),
+     DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
+                        DEFAULT_MAX_IO_SIZE),
++    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
++                      5),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -3025,6 +3040,8 @@ static Property scsi_block_properties[] = {
+     DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
+     DEFINE_PROP_BOOL("share-rw", SCSIDiskState, qdev.conf.share_rw, false),
+     DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
++    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
++                      5),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -3065,6 +3082,8 @@ static Property scsi_disk_properties[] = {
+                        DEFAULT_MAX_UNMAP_SIZE),
+     DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
+                        DEFAULT_MAX_IO_SIZE),
++    DEFINE_PROP_INT32("scsi_version", SCSIDiskState, qdev.default_scsi_version,
++                      5),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 4753f87..1870085 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -474,6 +474,7 @@ static void scsi_generic_reset(DeviceState *dev)
+ {
+     SCSIDevice *s = SCSI_DEVICE(dev);
+ 
++    s->scsi_version = s->default_scsi_version;
+     scsi_device_purge_requests(s, SENSE_CODE(RESET));
+ }
+ 
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 7ecadda..e35137e 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -85,6 +85,8 @@ struct SCSIDevice
+     uint64_t max_lba;
+     uint64_t wwn;
+     uint64_t port_wwn;
++    int scsi_version;
++    int default_scsi_version;
+ };
+ 
+ extern const VMStateDescription vmstate_scsi_device;
 -- 
 1.8.3.1
