@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f4P3Q-0002Kn-SH
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:57:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f4P58-0003VS-Vt
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f4P3M-0005nf-04
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:57:12 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:53679)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f4P3L-0005nM-N4
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:57:07 -0400
-References: <6c7ac1ff-b375-f1f7-094e-7fb603c5e40b@msgid.tls.msk.ru>
-	<alpine.BSF.2.21.1804021607010.6023@zero.eik.bme.hu>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <5954994b-20c6-3844-cf0e-577a4277720d@msgid.tls.msk.ru>
-Date: Fri, 6 Apr 2018 13:57:05 +0300
+	(envelope-from <cohuck@redhat.com>) id 1f4P54-0006pN-2r
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:58:59 -0400
+Date: Fri, 6 Apr 2018 12:58:50 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180406125850.64f2ff58.cohuck@redhat.com>
+In-Reply-To: <20180406093552.13016-1-david@redhat.com>
+References: <20180406093552.13016-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1804021607010.6023@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: ru-RU
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] some ROMs questions
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12] s390x/kvm: call
+ cpu_synchronize_state() on every kvm_arch_handle_exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-02.04.2018 17:30, BALATON Zoltan wrote:
-> On Mon, 2 Apr 2018, Michael Tokarev wrote:
->> roms/u-boot-sam460ex/tools/updater/stubs.c -
->> it is some strange symlink pointing to a strange place, probably should be removed?
+On Fri,  6 Apr 2018 11:35:52 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Manually having to use cpu_synchronize_state() is error prone. And as
+> Christian Borntraeger discovered, e.g. handle_diag() is currently
+> missing a cpu_synchronize_state(), as decode_basedisp_s() uses a
+> general purpose register value internally.
 > 
-> This does not seem to matter for building the rom image but this can be fixed by converting it to a relative path. I've done that and will send a patch to update the submodule as well to use the QEMU repo now that we have a mirror there. Thanks for finding this.
+> So let's do an overall cpu_synchronize_state(), which fixes at least the
+> one mentioned BUG. We will clean up the superfluous cpu_synchronize_state()
+> calls later.
+> 
+> We now also call it (although maybe not neded) for
+> - KVM_EXIT_S390_RESET -> s390_reipl_request()
+> - KVM_EXIT_DEBUG -> kvm_arch_handle_debug_exit()
+> - unmanagable/unimplemented intercepts
+> - ICPT_CPU_STOP -> do_stop_interrupt() -> cpu gets halted
+> - Scenarios where we inject an operation exception
+> - handle_stsi()
+> 
+> I don't think any of these are performance critical. Especially as we
+> have all information directly contained in kvm_run, there are no
+> additional IOCTLs to issue on modern kernels.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/kvm.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index f570896dc1..fb59d92def 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -1778,6 +1778,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>  
+>      qemu_mutex_lock_iothread();
+>  
+> +    cpu_synchronize_state(cs);
+> +
+>      switch (run->exit_reason) {
+>          case KVM_EXIT_S390_SIEIC:
+>              ret = handle_intercept(cpu);
 
-There are 2 more files which we might want to remove:
- tools/multiplier/multiplier.image
- tools/multiplier/multiplier
-
-FWIW.
-
-Thanks,
-
-/mjt
+Thanks, queued to s390-fixes.
