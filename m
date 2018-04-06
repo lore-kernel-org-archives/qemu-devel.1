@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f4OLv-00064q-Ms
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:12:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f4OMV-0006RX-Jt
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:12:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f4OLr-0007Dr-KN
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:12:15 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:51425)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1f4OLr-0007AU-Aj
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:12:11 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <a16f0636-9a13-f4fd-1b4c-34f7bf6b1b36@msgid.tls.msk.ru>
-Date: Fri, 6 Apr 2018 13:12:02 +0300
+	(envelope-from <pbonzini@redhat.com>) id 1f4OMR-0007vg-I5
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:12:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51616 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f4OMR-0007uQ-Dq
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:12:47 -0400
+References: <20180405162347.5623-1-pbonzini@redhat.com>
+	<5a3d6ece-e68b-5eae-3808-510c4eed4d68@linux.vnet.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a94422e9-833f-db3a-fc38-39fab45f1850@redhat.com>
+Date: Fri, 6 Apr 2018 12:12:36 +0200
 MIME-Version: 1.0
+In-Reply-To: <5a3d6ece-e68b-5eae-3808-510c4eed4d68@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: ru-RU
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] roms/skiboot: .version
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] hw/scsi: support SCSI-2 passthrough
+ without PI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-Hello!
+On 06/04/2018 01:10, Daniel Henrique Barboza wrote:
+> Yet another fix is to fully prohibit the user to set scsi_version
+> scsi-block and scsi-generic cases, returning an error message right off
+> the start. Not sure how hard this would be - perhaps the above
+> alternatives are cleaner.
+>=20
+> Another fix is ... no fix. I am not sure how far the design philosophy
+> of passthrough devices allows the user to overwrite device parameters i=
+n
+> despite of their real values, but ....=C2=A0 what if the user wants to
+> enforce a scsi_version when using a scsi-block device? The device will
+> surely behave badly, but the user explicitly enforced it via command
+> line, so perhaps let him/her have at it?
 
-In the qemu source tarball, roms/skiboot/ can't be built due to a trivial
-error: the directory lacks expected-to-be-there .version file, which can
-be built using roms/skiboot/make_version.sh script (which actually just
-runs git --describe). However it is impossible to create from the
-tarball since there's no .git/ directory in there.
+Yeah, that was the idea.  Removing it is as easy as dropping the
+DEFINE_PROP_INT32 and initializing to -1 in scsi_block_realize (just
+like for scsi_generic_realize), but for now we can keep it.  My usecase
+was more to downgrade scsi_version from newer to 2.
 
-Please include roms/skiboot/.version file in the distribution tarball.
-
-Thanks,
-
-/mjt
+Paolo
