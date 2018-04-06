@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f4P58-0003VS-Vt
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:58:59 -0400
+	(envelope-from <andr2000@gmail.com>) id 1f4PMq-0001yO-N0
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 07:17:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f4P54-0006pN-2r
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 06:58:59 -0400
-Date: Fri, 6 Apr 2018 12:58:50 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180406125850.64f2ff58.cohuck@redhat.com>
-In-Reply-To: <20180406093552.13016-1-david@redhat.com>
-References: <20180406093552.13016-1-david@redhat.com>
+	(envelope-from <andr2000@gmail.com>) id 1f4PMm-0000Gr-OQ
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 07:17:16 -0400
+Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:40700)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <andr2000@gmail.com>) id 1f4PMm-0000GR-FY
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 07:17:12 -0400
+Received: by mail-lf0-x22f.google.com with SMTP id e5-v6so21560lfb.7
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 04:17:12 -0700 (PDT)
+References: <20180313154826.20436-1-kraxel@redhat.com>
+	<20180313161035.GL4788@phenom.ffwll.local>
+	<20180314080301.366zycak3whqvvqx@sirius.home.kraxel.org>
+	<CAKMK7uGG6Z6XLc6GuKv7-3grCNg+EK2Lh6XWpavjsbZWF_L5Wg@mail.gmail.com>
+	<20180406001117.GD31612@mdroper-desk.amr.corp.intel.com>
+	<2411d2c1-33c0-2ba5-67ea-3bb9af5d5ec9@epam.com>
+	<20180406090747.gwiegu22z4noj23i@sirius.home.kraxel.org>
+From: Oleksandr Andrushchenko <andr2000@gmail.com>
+Message-ID: <9a085854-3758-1500-9971-806c611cb54f@gmail.com>
+Date: Fri, 6 Apr 2018 14:17:04 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180406090747.gwiegu22z4noj23i@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12] s390x/kvm: call
- cpu_synchronize_state() on every kvm_arch_handle_exit()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RfC PATCH] Add udmabuf misc device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Oleksandr Andrushchenko <Oleksandr_Andrushchenko@epam.com>
+Cc: Dongwon Kim <dongwon.kim@intel.com>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
 
-On Fri,  6 Apr 2018 11:35:52 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 04/06/2018 12:07 PM, Gerd Hoffmann wrote:
+> I'm not sure we can create something which works on both kvm and xen.
+> The memory management model is quite different ...
+>
+>
+> On xen the hypervisor manages all memory.  Guests can allow other guests
+> to access specific pages (using grant tables).  In theory any guest <=>
+> guest communication is possible.  In practice is mostly guest <=> dom0
+> because guests access their virtual hardware that way.  dom0 is the
+> priviledged guest which owns any hardware not managed by xen itself.
+>
+> Xen guests can ask the hypervisor to update the mapping of guest
+> physical pages.  They can ballon down (unmap and free pages).  They can
+> ballon up (ask the hypervisor to map fresh pages).  They can map pages
+> exported by other guests using grant tables.  xen-zcopy makes heavy use
+> of this.  It balloons down, to make room in the guest physical address
+> space, then goes map the exported pages there, finally composes a
+> dma-buf.
+>
+>
+> On kvm qemu manages all guest memory.  qemu also has all guest memory
+> mapped, so a grant-table like mechanism isn't needed to implement
+> virtual devices.  qemu can decide how it backs memory for the guest.
+> qemu propagates the guest memory map to the kvm driver in the linux
+> kernel.  kvm guests have some control over the guest memory map, for
+> example they can map pci bars wherever they want in their guest physical
+> address space by programming the base registers accordingly, but unlike
+> xen guests they can't ask the host to remap individual pages.
+>
+> Due to qemu having all guest memory mapped virtual devices are typically
+> designed to have the guest allocate resources, then notify the host
+> where they are located.  This is where the udmabuf idea comes from:
+> Guest tells the host (qemu) where the gem object is, and qemu then can
+> create a dmabuf backed by those pages to pass it on to other processes
+> such as the wayland display server.  Possibly even without the guest
+> explicitly asking for it, i.e. export the framebuffer placed by the
+> guest in the (virtual) vga pci memory bar as dma-buf.  And I can imagine
+> that this is useful outsize virtualization too.
+>
+>
+> I fail to see any common ground for xen-zcopy and udmabuf ...
+Does the above mean you can assume that xen-zcopy and udmabuf
+can co-exist as two different solutions?
+And what about hyper-dmabuf?
 
-> Manually having to use cpu_synchronize_state() is error prone. And as
-> Christian Borntraeger discovered, e.g. handle_diag() is currently
-> missing a cpu_synchronize_state(), as decode_basedisp_s() uses a
-> general purpose register value internally.
-> 
-> So let's do an overall cpu_synchronize_state(), which fixes at least the
-> one mentioned BUG. We will clean up the superfluous cpu_synchronize_state()
-> calls later.
-> 
-> We now also call it (although maybe not neded) for
-> - KVM_EXIT_S390_RESET -> s390_reipl_request()
-> - KVM_EXIT_DEBUG -> kvm_arch_handle_debug_exit()
-> - unmanagable/unimplemented intercepts
-> - ICPT_CPU_STOP -> do_stop_interrupt() -> cpu gets halted
-> - Scenarios where we inject an operation exception
-> - handle_stsi()
-> 
-> I don't think any of these are performance critical. Especially as we
-> have all information directly contained in kvm_run, there are no
-> additional IOCTLs to issue on modern kernels.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/kvm.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index f570896dc1..fb59d92def 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1778,6 +1778,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->  
->      qemu_mutex_lock_iothread();
->  
-> +    cpu_synchronize_state(cs);
-> +
->      switch (run->exit_reason) {
->          case KVM_EXIT_S390_SIEIC:
->              ret = handle_intercept(cpu);
-
-Thanks, queued to s390-fixes.
+Thank you,
+Oleksandr
