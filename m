@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f4T7a-0003I5-5C
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:17:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f4T7w-0003Zy-O6
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f4T7Z-0003u2-48
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:17:46 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f4T7v-0004L5-UA
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 11:18:08 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri,  6 Apr 2018 17:17:31 +0200
-Message-Id: <20180406151731.4285-3-mreitz@redhat.com>
-In-Reply-To: <20180406151731.4285-1-mreitz@redhat.com>
-References: <20180406151731.4285-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Skip 181 and 201 without
- userfaultfd
+Date: Fri,  6 Apr 2018 17:17:59 +0200
+Message-Id: <20180406151759.11223-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: 122 needs at least two refcount bits
+ now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +21,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-userfaultfd support depends on the host kernel, so it may not be
-available.  If so, 181 and 201 should be skipped.
+The new test case for compressed clusters (added in commit
+abd3622cc03cf41ed542126a540385f30a4c0175) requires two refcount bits to
+succeed, so we need to skip the test when refcount_bits=1 was requested.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/181 | 13 +++++++++++++
- tests/qemu-iotests/201 | 13 +++++++++++++
- 2 files changed, 26 insertions(+)
+ tests/qemu-iotests/122 | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 5e767c6195..e02979378d 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -96,6 +96,19 @@ echo
- # Enable postcopy-ram capability both on source and destination
- silent=yes
- _send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
-+
-+qemu_error_no_exit=yes success_or_failure=yes \
-+    _send_qemu_cmd $dest '' "(qemu)" "Postcopy is not supported"
-+if [ ${QEMU_STATUS[$dest]} -lt 0 ]; then
-+    _send_qemu_cmd $dest '' "(qemu)"
-+
-+    _send_qemu_cmd $src 'quit' ""
-+    _send_qemu_cmd $dest 'quit' ""
-+    wait=1 _cleanup_qemu
-+
-+    _notrun 'Postcopy is not supported'
-+fi
-+
- _send_qemu_cmd $src 'migrate_set_speed 4k' "(qemu)"
- _send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
- _send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
-diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-index 11f640f5df..c1a1e00077 100755
---- a/tests/qemu-iotests/201
-+++ b/tests/qemu-iotests/201
-@@ -82,6 +82,19 @@ echo
+diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
+index 6cf4fcb866..95e7c51e72 100755
+--- a/tests/qemu-iotests/122
++++ b/tests/qemu-iotests/122
+@@ -42,6 +42,10 @@ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
  
- silent=yes
- _send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
++# Repairing the compressed image requires qemu-img check to store a
++# refcount up to 3, which requires at least two refcount bits.
++_unsupported_imgopts 'refcount_bits=1[^0-9]'
 +
-+qemu_error_no_exit=yes success_or_failure=yes \
-+    _send_qemu_cmd $dest '' "(qemu)" "Postcopy is not supported"
-+if [ ${QEMU_STATUS[$dest]} -lt 0 ]; then
-+    _send_qemu_cmd $dest '' "(qemu)"
-+
-+    _send_qemu_cmd $src 'quit' ""
-+    _send_qemu_cmd $dest 'quit' ""
-+    wait=1 _cleanup_qemu
-+
-+    _notrun 'Postcopy is not supported'
-+fi
-+
- _send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
- _send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
  
+ TEST_IMG="$TEST_IMG".base _make_test_img 64M
+ $QEMU_IO -c "write -P 0x11 0 64M" "$TEST_IMG".base 2>&1 | _filter_qemu_io | _filter_testdir
 -- 
 2.14.3
