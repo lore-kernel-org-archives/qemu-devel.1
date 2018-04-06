@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f4UWe-0001tp-B5
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:47:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f4UaL-0003wC-2x
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f4UWa-0005wF-Ed
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:47:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52008 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f4UWa-0005w4-8u
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:47:40 -0400
-References: <20180404025201.11921-1-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a9d557d7-b6d3-3137-69d0-cd0f63e9b107@redhat.com>
-Date: Fri, 6 Apr 2018 18:47:26 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f4UaK-0000vy-Cp
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:51:33 -0400
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:34538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f4UaK-0000vp-6I
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 12:51:32 -0400
+Received: by mail-ot0-x234.google.com with SMTP id m7-v6so1873472otd.1
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 09:51:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180404025201.11921-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add a CentOS test image to run docker
- tests
+In-Reply-To: <20180406131832.23901-1-richard.henderson@linaro.org>
+References: <20180406131832.23901-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Apr 2018 17:51:10 +0100
+Message-ID: <CAFEAcA8+E9L_NnYUUqnUckto5YB3q728nH=JO5kiy34md14UpQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-2.12 0/1] target/hppa: seabios-hppa
+ update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, deller@gmx.de
 
-On 04/04/2018 04:51, Fam Zheng wrote:
-> Docker testing on patchew has long suffered from 'make check' hangings. The
-> cleanness of VM testing is the cure. Now let's add a CentOS 7 image to run the
-> tests.  It's purely ad-hoc, but hopefully still easy to understand and use for
-> everyone.
-> 
-> The first patch makes passing source code from host to the container in VM
-> working, and is a nice clean up.
-> 
-> The second patch makes caches work, to speed up repetitive runs like on
-> patchew.
-> 
-> The last patch adds the new image that does the job. Two out of three docker
-> tests running on patchew.org are added to the image. I'll wait for Peter to fix
-> the 'docker-test-quick@centos6' hanging (oob test) before adding it too.
+On 6 April 2018 at 14:18, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Helge Deller has fixed some bios bugs and has asked
+> that I update qemu thus.
+>
+>
+> r~
+>
+>
+> The following changes since commit 0e87fdc966d05f4e5ad868034fcd8ee2a08ca62d:
+>
+>   Update version for v2.12.0-rc2 release (2018-04-04 20:37:20 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-hppa-20180407
+>
+> for you to fetch changes up to 5aa48600823a1fc2f5c8c3ec3e93227d4638e3a4:
+>
+>   Update seabios-hppa (2018-04-06 23:14:51 +1000)
+>
+> ----------------------------------------------------------------
+> Update hppa-softmmu bios
+>
+> ----------------------------------------------------------------
+> Richard Henderson (1):
+>       Update seabios-hppa
+>
+>  pc-bios/hppa-firmware.img | Bin 215696 -> 215936 bytes
+>  roms/seabios-hppa         |   2 +-
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 
-I think it's a good idea.  The tests are the same as before, only the
-environment is more self-contained.
+Applied, thanks.
 
-Paolo
-
-> Fam
-> 
-> Fam Zheng (3):
->   archive-source.sh: Drop submodule code
->   tests: Add an option for snapshot (default: off)
->   tests: Add centos VM testing
-> 
->  scripts/archive-source.sh | 47 +++------------------------
->  tests/vm/basevm.py        |  7 +++-
->  tests/vm/centos           | 82 +++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 92 insertions(+), 44 deletions(-)
->  create mode 100755 tests/vm/centos
-> 
+-- PMM
