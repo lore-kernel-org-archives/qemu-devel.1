@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utg-0007l6-Lx
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:33 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utk-0007o6-2x
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Utd-0007DL-KV
-	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:32 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f4Uti-0007YN-L7
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:36 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1f4Uti-0007WZ-Dg
+	for qemu-devel@nongnu.org; Fri, 06 Apr 2018 13:11:34 -0400
+Received: by mail-wm0-x242.google.com with SMTP id f125so4560482wme.4
+	for <qemu-devel@nongnu.org>; Fri, 06 Apr 2018 10:11:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Apr 2018 19:11:03 +0200
-Message-Id: <1523034681-33787-3-git-send-email-pbonzini@redhat.com>
+Date: Fri,  6 Apr 2018 19:11:07 +0200
+Message-Id: <1523034681-33787-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
 References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 02/20] target/i386: Fix andn instruction
+Subject: [Qemu-devel] [PULL 06/20] i386/hyperv: add hv-frequencies cpu
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,56 +29,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexandro Sanchez Bach <alexandro@phi.nz>, qemu-stable@nongnu.org
+Cc: Roman Kagan <rkagan@virtuozzo.com>
 
-From: Alexandro Sanchez Bach <alexandro@phi.nz>
+From: Roman Kagan <rkagan@virtuozzo.com>
 
-In commit 7073fbada733c8d10992f00772c9b9299d740e9b, the `andn` instruction
-was implemented via `tcg_gen_andc` but passes the operands in the wrong
-order:
-- X86 defines `andn dest,src1,src2` as: dest = ~src1 & src2
-- TCG defines `andc dest,src1,src2` as: dest = src1 & ~src2
+In order to guarantee compatibility on migration, QEMU should have
+complete control over the features it announces to the guest via CPUID.
 
-The following simple test shows the issue:
+However, the availability of Hyper-V frequency MSRs
+(HV_X64_MSR_TSC_FREQUENCY and HV_X64_MSR_APIC_FREQUENCY) depends solely
+on the support for them in the underlying KVM.
 
-    #include <stdio.h>
-    #include <stdint.h>
+Introduce "hv-frequencies" cpu property (off by default) which gives
+QEMU full control over whether these MSRs are announced.
 
-    int main(void) {
-        uint32_t ret = 0;
-        __asm (
-            "mov $0xFF00, %%ecx\n"
-            "mov $0x0F0F, %%eax\n"
-            "andn %%ecx, %%eax, %%ecx\n"
-            "mov %%ecx, %0\n"
-          : "=r" (ret));
-        printf("%08X\n", ret);
-        return 0;
-    }
+While at this, drop the redundant check of the cpu tsc frequency, and
+decouple this feature from hv-time.
 
-This patch fixes the problem by simply swapping the order of the two last
-arguments in `tcg_gen_andc_tl`.
-
-Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
-Signed-off-by: Alexandro Sanchez Bach <alexandro@phi.nz>
-Cc: qemu-stable@nongnu.org
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20180330170209.20627-2-rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/cpu.c |  1 +
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 13 +++++++++----
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 0135415..3b7ce92 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -3802,7 +3802,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
-                 }
-                 ot = mo_64_32(s->dflag);
-                 gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
--                tcg_gen_andc_tl(cpu_T0, cpu_regs[s->vex_v], cpu_T0);
-+                tcg_gen_andc_tl(cpu_T0, cpu_T0, cpu_regs[s->vex_v]);
-                 gen_op_mov_reg_v(ot, reg, cpu_T0);
-                 gen_op_update1_cc();
-                 set_cc_op(s, CC_OP_LOGICB + ot);
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 555ae79..1a6b082 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4761,6 +4761,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("hv-runtime", X86CPU, hyperv_runtime, false),
+     DEFINE_PROP_BOOL("hv-synic", X86CPU, hyperv_synic, false),
+     DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
++    DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 78db1b8..1b219fa 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1296,6 +1296,7 @@ struct X86CPU {
+     bool hyperv_runtime;
+     bool hyperv_synic;
+     bool hyperv_stimer;
++    bool hyperv_frequencies;
+     bool check_cpuid;
+     bool enforce_cpuid;
+     bool expose_kvm;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index d23fff1..b35623a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -648,11 +648,16 @@ static int hyperv_handle_properties(CPUState *cs)
+         env->features[FEAT_HYPERV_EAX] |= HV_HYPERCALL_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
+-
+-        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
+-            env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
+-            env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
++    }
++    if (cpu->hyperv_frequencies) {
++        if (!has_msr_hv_frequencies) {
++            fprintf(stderr, "Hyper-V frequency MSRs "
++                    "(requested by 'hv-frequencies' cpu flag) "
++                    "are not supported by kernel\n");
++            return -ENOSYS;
+         }
++        env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
++        env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
+     }
+     if (cpu->hyperv_crash && has_msr_hv_crash) {
+         env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
 -- 
 1.8.3.1
