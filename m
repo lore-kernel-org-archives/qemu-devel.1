@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wsa-dev@sang-engineering.com>) id 1f54vW-000731-6J
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 03:39:50 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1f565R-0006GI-5S
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 04:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wsa-dev@sang-engineering.com>) id 1f54vS-00056U-8l
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 03:39:50 -0400
-Received: from www.zeus03.de ([194.117.254.33]:34074 helo=mail.zeus03.de)
+	(envelope-from <changpeng.liu@intel.com>) id 1f565O-0006N4-1g
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 04:54:09 -0400
+Received: from mga03.intel.com ([134.134.136.65]:28559)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wsa-dev@sang-engineering.com>)
-	id 1f54vR-00055u-Vr
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 03:39:46 -0400
-Date: Sun, 8 Apr 2018 09:39:42 +0200
-From: Wolfram Sang <wsa@the-dreams.de>
-Message-ID: <20180408073942.lktkq4gqn6ofvjwf@katana>
-References: <20180320161850.2104-1-wsa+renesas@sang-engineering.com>
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1f565N-0006IT-Ox
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 04:54:05 -0400
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+Date: Sun, 8 Apr 2018 08:53:55 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B63E14D@SHSMSX103.ccr.corp.intel.com>
+References: <20180329075233.524-1-maxime.coquelin@redhat.com>
+	<20180329075233.524-2-maxime.coquelin@redhat.com>
+In-Reply-To: <20180329075233.524-2-maxime.coquelin@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="buikjcctq7qeoo2h"
-Content-Disposition: inline
-In-Reply-To: <20180320161850.2104-1-wsa+renesas@sang-engineering.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] nvram: at24c: fix problems related
- to "rom-size"
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] vhost-user-blk: set config ops
+ before vhost-user init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, linux-renesas-soc@vger.kernel.org
+To: Maxime Coquelin <maxime.coquelin@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
---buikjcctq7qeoo2h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 20, 2018 at 05:18:47PM +0100, Wolfram Sang wrote:
-> I used this driver as a template for a custom one. While hacking on my ow=
-n, I
-> noticed some problems in this driver, too. This series fixes the first se=
-t of
-> them, related to the "rom-size" parameter. It fixes a segfault.
+> -----Original Message-----
+> From: Maxime Coquelin [mailto:maxime.coquelin@redhat.com]
+> Sent: Thursday, March 29, 2018 3:53 PM
+> To: mst@redhat.com; Liu, Changpeng <changpeng.liu@intel.com>;
+> marcandre.lureau@redhat.com; qemu-devel@nongnu.org
+> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Subject: [PATCH v3 1/2] vhost-user-blk: set config ops before vhost-user =
+init
 >=20
-> I think the first patch is clearly suitable for stable. I think the secon=
-d one,
-> too, but not as clearly. The third one is a cleanup and not for stable. S=
-till,
-> I am open for opinions about these thoughts.
-
-Through which tree should these patches go? get_maintainer doesn't list
-a person specifically. Anything else I could do?
-
+> As soon as vhost-user init is done, the backend may send
+> VHOST_USER_SLAVE_CONFIG_CHANGE_MSG, so let's set the
+> notification callback before it.
 >=20
-> Thanks,
+> Also, it will be used to know whether the device supports
+> the config feature to advertize it or not.
 >=20
->    Wolfram
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Acked-by: Changpeng Liu <changpeng.liu@intel.com>
+> ---
+>  hw/block/vhost-user-blk.c | 4 ++--
+>  hw/virtio/vhost.c         | 1 -
+>  2 files changed, 2 insertions(+), 3 deletions(-)
 >=20
-> Changes since v2:
+> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> index f840f07dfe..262baca432 100644
+> --- a/hw/block/vhost-user-blk.c
+> +++ b/hw/block/vhost-user-blk.c
+> @@ -259,6 +259,8 @@ static void vhost_user_blk_device_realize(DeviceState
+> *dev, Error **errp)
+>      s->dev.vq_index =3D 0;
+>      s->dev.backend_features =3D 0;
 >=20
-> * removed '\n' from error_report-strings
-> * made sure checkpatch is happy
-> * added tags from Philippe (thanks!)
+> +    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+> +
+>      ret =3D vhost_dev_init(&s->dev, &s->chardev, VHOST_BACKEND_TYPE_USER=
+, 0);
+>      if (ret < 0) {
+>          error_setg(errp, "vhost-user-blk: vhost initialization failed: %=
+s",
+> @@ -277,8 +279,6 @@ static void vhost_user_blk_device_realize(DeviceState
+> *dev, Error **errp)
+>          s->blkcfg.num_queues =3D s->num_queues;
+>      }
 >=20
-> Changes since v1:
+> -    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+> -
+>      return;
 >=20
-> * reordered patches according to significance for stable
-> * use AT24C_ROMSIZE_DEFAULT instead of magic value
-> * patch 3 doesn't improve the ERR macro anymore but replaces
->   it completely with error_report().
+>  vhost_err:
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 250f886acb..b6c314e350 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -1451,7 +1451,6 @@ int vhost_dev_set_config(struct vhost_dev *hdev,
+> const uint8_t *data,
+>  void vhost_dev_set_config_notifier(struct vhost_dev *hdev,
+>                                     const VhostDevConfigOps *ops)
+>  {
+> -    assert(hdev->vhost_ops);
+>      hdev->config_ops =3D ops;
+>  }
 >=20
->=20
-> Wolfram Sang (3):
->   nvram: at24c: prevent segfault by checking "rom-size"
->   nvram: at24c: use a sane default for "rom-size"
->   nvram: at24c: use standard error reporting
->=20
->  hw/nvram/eeprom_at24c.c | 25 ++++++++++++++-----------
->  1 file changed, 14 insertions(+), 11 deletions(-)
->=20
-> --=20
-> 2.11.0
->=20
-
---buikjcctq7qeoo2h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAlrJxz4ACgkQFA3kzBSg
-KbZHyQ//ZkGZuVhmHH7+iPHMtlL66tg3bF3DImVFKQgHwq7dhgsCx3cJFSs/ixtI
-fezPy4dqF9xSD46K2maueLLbW8QGIa+ukEwe74OP8j07yMjCiPtmtvB2Lj6G89da
-QyfxBsxOkUuicx1MrUUN42MTHCFa2gvoZgdHD6hgs4mXqWiAHCIX3LMigkHZ327b
-K92bJhGvZmAu6MUhMp+vJ8x7QLnreADATItZATp1NBQH4OGZ+Kp1Vo9fKDwTwMDm
-N7xuEqNEPmg5bGnVa3de0XUY6/au4Ywu5oECwr6bH0yDVLueegOONzw7VaFKl7Ao
-Vcxk2rheo2is/RKPcgGCnZBwyG3mxP2pxSUv0o4tEl9VbChc7HGNIRZcMLXWGTCg
-A/lJASUs10CcGXNaAtnZ4ObrRsWkAZdp1MswilSnh0xzNAJw+04nXRPuqGimrcv8
-UnY4hpYIWdfHxQKVdH9sDU6DXB/n2K/pCm5u/4xCtfrK+R/zIXrxJvz+cbSmhee7
-ZZu3Gxnk+WwAIHMYaSoq7mrILz3a4WqrNZahfmkO3CYOb/ufUvztQQyxdXuUnR2H
-VyY+VEioZyl3NMJm4+Sig19Mx1G/SJxH0/a/f0XaVLUNtgxwv427uu+rKHBELCua
-YWqLYg0qF5pYF3ebwIhmwEAfWbhn3xhDF7iCmnxBAl36MX5xFbk=
-=bYzH
------END PGP SIGNATURE-----
-
---buikjcctq7qeoo2h--
+> --
+> 2.14.3
