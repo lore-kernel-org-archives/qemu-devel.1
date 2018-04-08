@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f50T6-00063r-59
-	for qemu-devel@nongnu.org; Sat, 07 Apr 2018 22:54:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1f50bV-0001tV-5E
+	for qemu-devel@nongnu.org; Sat, 07 Apr 2018 23:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f50T3-0004fs-Cp
-	for qemu-devel@nongnu.org; Sat, 07 Apr 2018 22:54:12 -0400
-Received: from smtp20.cstnet.cn ([159.226.251.20]:54971 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f50T2-0004e4-GK
-	for qemu-devel@nongnu.org; Sat, 07 Apr 2018 22:54:09 -0400
-From: Su Hang <suhang16@mails.ucas.ac.cn>
-Date: Sun,  8 Apr 2018 10:54:05 +0800
-Message-Id: <1523156046-5586-2-git-send-email-suhang16@mails.ucas.ac.cn>
-In-Reply-To: <1523156046-5586-1-git-send-email-suhang16@mails.ucas.ac.cn>
-References: <1523156046-5586-1-git-send-email-suhang16@mails.ucas.ac.cn>
-Subject: [Qemu-devel]  [PATCH v3 1/2] Implement .hex file loader
+	(envelope-from <peterx@redhat.com>) id 1f50bR-0002Rr-W0
+	for qemu-devel@nongnu.org; Sat, 07 Apr 2018 23:02:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41854 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f50bR-0002RE-QT
+	for qemu-devel@nongnu.org; Sat, 07 Apr 2018 23:02:49 -0400
+Date: Sun, 8 Apr 2018 11:02:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180408030236.GC10540@xz-mi>
+References: <20180309090006.10018-1-peterx@redhat.com>
+	<20180309090006.10018-15-peterx@redhat.com>
+	<CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
+	<20180326080738.GA17789@xz-mi>
+	<CAJ+F1C+t9kvCq-h1JogM+cm=vP8jx=ZvZVma1niHD_X3GkwiyQ@mail.gmail.com>
+	<20180326090822.GC17789@xz-mi>
+	<CAJ+F1CJ5KKfATgp2dOUhuRCcwV8V95nbebhd_fcqJgbMejc1-A@mail.gmail.com>
+	<20180328040209.GA29554@xz-mi>
+	<CAJ+F1CJj+V30nGcUWvFntEiPu-D=PDuczHSZAxAmYiJwJVpc7A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJj+V30nGcUWvFntEiPu-D=PDuczHSZAxAmYiJwJVpc7A@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,366 +36,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@gmail.com, eblake@redhat.com, jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This patch adds Intel Hexadecimal Object File format support to
-the loader.  The file format specification is available here:
-http://www.piclist.com/techref/fileext/hex/intel.htm
+On Wed, Apr 04, 2018 at 03:58:56PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi Peter
+>=20
+> On Wed, Mar 28, 2018 at 6:02 AM, Peter Xu <peterx@redhat.com> wrote:
+> > On Mon, Mar 26, 2018 at 11:46:13AM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> >> Hi
+> >>
+> >> On Mon, Mar 26, 2018 at 11:08 AM, Peter Xu <peterx@redhat.com> wrote=
+:
+> >> > On Mon, Mar 26, 2018 at 10:33:27AM +0200, Marc-Andr=C3=A9 Lureau w=
+rote:
+> >> >> Hi
+> >> >>
+> >> >> On Mon, Mar 26, 2018 at 10:07 AM, Peter Xu <peterx@redhat.com> wr=
+ote:
+> >> >> > On Fri, Mar 23, 2018 at 05:18:53PM +0100, Marc-Andr=C3=A9 Lurea=
+u wrote:
+> >> >> >
+> >> >> > [...]
+> >> >> >
+> >> >> >> > +/*
+> >> >> >> > + * Dispatch one single QMP request. The function will free =
+the req_obj
+> >> >> >> > + * and objects inside it before return.
+> >> >> >> > + */
+> >> >> >> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+> >> >> >> >  {
+> >> >> >> > -    QObject *req, *rsp =3D NULL, *id =3D NULL;
+> >> >> >> > +    Monitor *mon, *old_mon;
+> >> >> >> > +    QObject *req, *rsp =3D NULL, *id;
+> >> >> >> >      QDict *qdict =3D NULL;
+> >> >> >> > -    MonitorQMP *mon_qmp =3D container_of(parser, MonitorQMP=
+, parser);
+> >> >> >> > -    Monitor *old_mon, *mon =3D container_of(mon_qmp, Monito=
+r, qmp);
+> >> >> >> > -
+> >> >> >> > -    Error *err =3D NULL;
+> >> >> >> > +    bool need_resume;
+> >> >> >> >
+> >> >> >> > -    req =3D json_parser_parse_err(tokens, NULL, &err);
+> >> >> >> > -    if (!req && !err) {
+> >> >> >> > -        /* json_parser_parse_err() sucks: can fail without =
+setting @err */
+> >> >> >> > -        error_setg(&err, QERR_JSON_PARSING);
+> >> >> >> > -    }
+> >> >> >> > -    if (err) {
+> >> >> >> > -        goto err_out;
+> >> >> >> > -    }
+> >> >> >> > +    req =3D req_obj->req;
+> >> >> >> > +    mon =3D req_obj->mon;
+> >> >> >> > +    id =3D req_obj->id;
+> >> >> >> > +    need_resume =3D req_obj->need_resume;
+> >> >> >> >
+> >> >> >> > -    qdict =3D qobject_to_qdict(req);
+> >> >> >> > -    if (qdict) {
+> >> >> >> > -        id =3D qdict_get(qdict, "id");
+> >> >> >> > -        qobject_incref(id);
+> >> >> >> > -        qdict_del(qdict, "id");
+> >> >> >> > -    } /* else will fail qmp_dispatch() */
+> >> >> >> > +    g_free(req_obj);
+> >> >> >> >
+> >> >> >> >      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COM=
+MAND)) {
+> >> >> >> >          QString *req_json =3D qobject_to_json(req);
+> >> >> >> > @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JSONMes=
+sageParser *parser, GQueue *tokens)
+> >> >> >> >      old_mon =3D cur_mon;
+> >> >> >> >      cur_mon =3D mon;
+> >> >> >>
+> >> >> >> There is another issue with this series, since cur_mon is glob=
+al (and
+> >> >> >> not protected), an oob command may change the cur_mon while an=
+other
+> >> >> >> command is running in the main thread with unexpected conseque=
+nces. I
+> >> >> >> don't have a clear idea what is the best way to solve it. Maki=
+ng the
+> >> >> >> variable per-thread, or going all the way to get rid of cur_mo=
+n (my
+> >> >> >> preference, but much harder)
+> >> >> >
+> >> >> > IMHO it is fine too.
+> >> >> >
+> >> >> > Note that this cur_mon operation is in monitor_qmp_dispatch_one=
+() now,
+> >> >> > which is still running in main thread.  So AFAICT all the cur_m=
+on
+> >> >> > references are in main thread, and monitor IOThread does not mo=
+dify
+> >> >> > that variable at all.  Then we should probably be safe.
+> >> >>
+> >> >> But monitor_qmp_dispatch_one() is called from iothread if the com=
+mand
+> >> >> is oob, so cur_mon may be updated while another command is runnin=
+g in
+> >> >> main thread, or am I wrong?
+> >> >
+> >> > You are right. I missed that, sorry...
+> >> >
+> >> > Would this be a simple workaround (but hopefully efficient) soluti=
+on?
+> >> >
+> >> > diff --git a/monitor.c b/monitor.c
+> >> > index 77f4c41cfa..99641c0c6d 100644
+> >> > --- a/monitor.c
+> >> > +++ b/monitor.c
+> >> > @@ -4023,7 +4023,7 @@ typedef struct QMPRequest QMPRequest;
+> >> >   * Dispatch one single QMP request. The function will free the re=
+q_obj
+> >> >   * and objects inside it before return.
+> >> >   */
+> >> > -static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+> >> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj, bool ha=
+ck_curmon)
+> >> >  {
+> >> >      Monitor *mon, *old_mon;
+> >> >      QObject *req, *rsp =3D NULL, *id;
+> >> > @@ -4043,12 +4043,16 @@ static void monitor_qmp_dispatch_one(QMPRe=
+quest *req_obj)
+> >> >          QDECREF(req_json);
+> >> >      }
+> >> >
+> >> > -    old_mon =3D cur_mon;
+> >> > -    cur_mon =3D mon;
+> >> > +    if (hack_curmon) {
+> >> > +        old_mon =3D cur_mon;
+> >> > +        cur_mon =3D mon;
+> >> > +    }
+> >> >
+> >> >      rsp =3D qmp_dispatch(mon->qmp.commands, req);
+> >> >
+> >> > -    cur_mon =3D old_mon;
+> >> > +    if (hack_curmon) {
+> >> > +        cur_mon =3D old_mon;
+> >> > +    }
+> >> >
+> >> >      if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
+> >> >          qdict =3D qdict_get_qdict(qobject_to(QDict, rsp), "error"=
+);
+> >> > @@ -4116,7 +4120,7 @@ static void monitor_qmp_bh_dispatcher(void *=
+data)
+> >> >
+> >> >      if (req_obj) {
+> >> >          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj=
+->id) ?: "");
+> >> > -        monitor_qmp_dispatch_one(req_obj);
+> >> > +        monitor_qmp_dispatch_one(req_obj, true);
+> >> >          /* Reschedule instead of looping so the main loop stays r=
+esponsive */
+> >> >          qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+> >> >      }
+> >> > @@ -4175,7 +4179,7 @@ static void handle_qmp_command(JSONMessagePa=
+rser *parser, GQueue *tokens)
+> >> >          /* Out-Of-Band (OOB) requests are executed directly in pa=
+rser. */
+> >> >          trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req=
+_obj->id)
+> >> >                                            ?: "");
+> >> > -        monitor_qmp_dispatch_one(req_obj);
+> >> > +        monitor_qmp_dispatch_one(req_obj, false);
+> >> >          return;
+> >> >      }
+> >> >
+> >> > Then we forbit touching that evil cur_mon in OOB-capable command
+> >> > handlers.  Thanks,
+> >>
+> >> That's not easy to enforce though, afaict it is being used for:
+> >> - error reporting decision
+> >
+> > IMO this should not be a problem, since any QMP handler (including
+> > OOB-capable ones) will be with an Error** there, so logically speakin=
+g
+> > people should never call things like error_report() in that.
+> >
+> >> - file & socket lookup (fd: & /dev/fdset etc)
+> >
+> > I suppose only very rare commands will use it?  It'll be a big proble=
+m
+> > to solve when we want to completely remove cur_mon though.
+> >
+> >> - the current state of the monitor / list of commands, cpu_path, cap=
+abilities..
+> >
+> > This is very rare to be used too?  Most commands should not use them =
+AFAIU.
+> >
+> >>
+> >> Wouldn't it be simpler to make it per-thread? I think it could also
+> >> use helpers to push/pop the current monitor.
+> >
+> > Anyway I think yes this is still a good option (though the cur_mon
+> > logic will be a bit more complicated).
+> >
+> > Do you plan to post some patch about this, or do you want me to do
+> > this?  I suppose we'll change the qemu_thread_create() a bit to pass
+> > the cur_mon inside, and I suppose this might be better material after
+> > 2.12 release if OOB is off now.
+>=20
+> Have you looked at making cur_mon per-thread?
 
-The file format is mainly intended for embedded systems
-and microcontrollers, such as Arduino, ARM, STM32, etc.
+Above was my idea, nothing else has been done.
 
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
----
- hw/arm/boot.c       |   9 +-
- hw/core/loader.c    | 280 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/loader.h |  17 ++++
- 3 files changed, 305 insertions(+), 1 deletion(-)
+Please feel free to post a patch for this, or I'll do this after 2.12
+release.
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 9319b12fcd2a..07ce54e5936d 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -1060,8 +1060,15 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
-         kernel_size = load_aarch64_image(info->kernel_filename,
-                                          info->loader_start, &entry, as);
-         is_linux = 1;
-+    } else if (kernel_size < 0 && strstr(info->kernel_filename, ".hex")) {
-+        /* 32-bit ARM .hex file */
-+        entry = info->loader_start + KERNEL_LOAD_ADDR;
-+        kernel_size = load_targphys_hex_as(info->kernel_filename, entry,
-+                                           info->ram_size - KERNEL_LOAD_ADDR,
-+                                           as);
-+        is_linux = 1;
-     } else if (kernel_size < 0) {
--        /* 32-bit ARM */
-+        /* 32-bit ARM binary file */
-         entry = info->loader_start + KERNEL_LOAD_ADDR;
-         kernel_size = load_image_targphys_as(info->kernel_filename, entry,
-                                              info->ram_size - KERNEL_LOAD_ADDR,
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 06bdbca53709..41d714520be4 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1286,3 +1286,283 @@ void hmp_info_roms(Monitor *mon, const QDict *qdict)
-         }
-     }
- }
-+
-+typedef enum HexRecord HexRecord;
-+enum HexRecord {
-+    DATA_RECORD = 0,
-+    EOF_RECORD,
-+    EXT_SEG_ADDR_RECORD,
-+    START_SEG_ADDR_RECORD,
-+    EXT_LINEAR_ADDR_RECORD,
-+    START_LINEAR_ADDR_RECORD,
-+};
-+
-+typedef union HexLine HexLine;
-+union HexLine {
-+    uint8_t buf[0x25];
-+    struct __attribute__((packed)) {
-+        uint8_t byte_count;
-+        uint16_t address;
-+        uint8_t record_type;
-+        uint8_t data[0x25 - 0x5];
-+        uint8_t checksum;
-+    };
-+};
-+
-+static uint8_t ctoh(char c)
-+{
-+    return (c & 0x10) ? /*0-9*/ c & 0xf : /*A-F, a-f*/ (c & 0xf) + 9;
-+}
-+
-+static uint8_t validate_checksum(HexLine *record)
-+{
-+    uint8_t result = 0, i = 0;
-+
-+    for (; i < (record->byte_count + 5); ++i) {
-+        result += record->buf[i];
-+    }
-+
-+    return result == 0;
-+}
-+
-+/* return pointer of bin_blob or NULL if error */
-+static uint8_t *parse_hex_blob(char *filename, size_t *p_size)
-+{
-+    int fd;
-+    off_t hex_blob_size;
-+    uint8_t *p_data = NULL;
-+    uint8_t *hex_blob;
-+    uint8_t *hex_blob_ori;         /* used to free temporary memory */
-+    uint8_t *bin_buf;
-+    uint8_t *end;
-+    uint8_t idx = 0;
-+    uint8_t in_process = 0;        /* avoid re-enter */
-+    uint8_t low_nibble = 0;        /* process two hex char into 8-bits */
-+    uint8_t ext_linear_record = 0; /* record non-constitutes block */
-+    uint32_t next_address_to_write = 0;
-+    uint32_t current_address = 0;
-+    uint32_t last_address = 0;
-+    HexLine line = {0};
-+
-+    fd = open(filename, O_RDONLY);
-+    if (fd < 0) {
-+        return NULL;
-+    }
-+    hex_blob_size = lseek(fd, 0, SEEK_END);
-+    if (hex_blob_size < 0) {
-+        close(fd);
-+        return NULL;
-+    }
-+    hex_blob = g_malloc(hex_blob_size);
-+    hex_blob_ori = hex_blob;
-+    bin_buf = g_malloc(hex_blob_size * 2);
-+    lseek(fd, 0, SEEK_SET);
-+    if (read(fd, hex_blob, hex_blob_size) != hex_blob_size) {
-+        close(fd);
-+        goto hex_parser_exit;
-+    }
-+    close(fd);
-+
-+    memset(line.buf, 0, sizeof(HexLine));
-+    end = (uint8_t *)hex_blob + hex_blob_size;
-+
-+    for (; hex_blob != end; ++hex_blob) {
-+        switch ((uint8_t)(*hex_blob)) {
-+        case '\r':
-+        case '\n':
-+            if (!in_process) {
-+                break;
-+            }
-+
-+            in_process = 0;
-+            if (validate_checksum(&line) == 0) {
-+                p_data = NULL;
-+                goto hex_parser_exit;
-+            }
-+
-+            line.address = bswap16(line.address);
-+            switch (line.record_type) {
-+            case DATA_RECORD:
-+                current_address =
-+                    (next_address_to_write & 0xffff0000) | line.address;
-+                /* verify this is a continous block of memory */
-+                if (current_address != next_address_to_write ||
-+                    ext_linear_record) {
-+                    if (!ext_linear_record) {
-+                        /* Store next address to write */
-+                        last_address = next_address_to_write;
-+                        next_address_to_write = current_address;
-+                    }
-+                    ext_linear_record = 0;
-+                    memset(bin_buf + last_address, 0x0,
-+                           current_address - last_address);
-+                }
-+
-+                /* copy from line buffer to output bin_buf */
-+                memcpy((uint8_t *)bin_buf + current_address,
-+                       (uint8_t *)line.data, line.byte_count);
-+                /* Save next address to write */
-+                last_address = current_address;
-+                next_address_to_write = current_address + line.byte_count;
-+                break;
-+
-+            case EOF_RECORD:
-+                /* nothing to do */
-+                break;
-+            case EXT_SEG_ADDR_RECORD:
-+                /* save next address to write,
-+                 * in case of non-continous block of memory */
-+                ext_linear_record = 1;
-+                last_address = next_address_to_write;
-+                next_address_to_write =
-+                    ((line.data[0] << 12) | (line.data[1] << 4));
-+                break;
-+            case START_SEG_ADDR_RECORD:
-+                /* TODO */
-+                break;
-+
-+            case EXT_LINEAR_ADDR_RECORD:
-+                /* save next address to write,
-+                 * in case of non-continous block of memory */
-+                ext_linear_record = 1;
-+                last_address = next_address_to_write;
-+                next_address_to_write =
-+                    ((line.data[0] << 24) | (line.data[1] << 16));
-+                break;
-+            case START_LINEAR_ADDR_RECORD:
-+                /* TODO */
-+                break;
-+
-+            default:
-+                p_data = NULL;
-+                goto hex_parser_exit;
-+            }
-+            break;
-+
-+        /* start of a new record. */
-+        case ':':
-+            memset(line.buf, 0, sizeof(HexLine));
-+            in_process = 1;
-+            low_nibble = 0;
-+            idx = 0;
-+            break;
-+
-+        /* decoding lines */
-+        default:
-+            if (low_nibble) {
-+                line.buf[idx] |= ctoh((uint8_t)(*hex_blob)) & 0xf;
-+                ++idx;
-+            } else {
-+                line.buf[idx] = ctoh((uint8_t)(*hex_blob)) << 4;
-+            }
-+
-+            low_nibble = !low_nibble;
-+            break;
-+        }
-+
-+    }
-+
-+    *p_size = (size_t)next_address_to_write;
-+    p_data = g_malloc(next_address_to_write);
-+
-+    memcpy(p_data, bin_buf, next_address_to_write);
-+hex_parser_exit:
-+    g_free(hex_blob_ori);
-+    g_free(bin_buf);
-+    return p_data;
-+}
-+
-+/* return size or -1 if error */
-+int load_targphys_hex_as(const char *filename, hwaddr addr, uint64_t max_sz,
-+                         AddressSpace *as)
-+{
-+    return rom_add_hex_file(filename, NULL, addr, -1, false, NULL, as);
-+}
-+
-+/* return size -1 if error */
-+int rom_add_hex_file(const char *file, const char *fw_dir, hwaddr addr,
-+                     int32_t bootindex, bool option_rom, MemoryRegion *mr,
-+                     AddressSpace *as)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
-+    Rom *rom;
-+    char devpath[100];
-+    size_t datasize = 0;
-+
-+    if (as && mr) {
-+        fprintf(stderr, "Specifying an Address Space and Memory Region is "
-+                        "not valid when loading a rom\n");
-+        /* We haven't allocated anything so we don't need any cleanup */
-+        return -1;
-+    }
-+
-+    rom = g_malloc0(sizeof(*rom));
-+    rom->name = g_strdup(file);
-+    rom->path = qemu_find_file(QEMU_FILE_TYPE_BIOS, rom->name);
-+    rom->as = as;
-+    if (rom->path == NULL) {
-+        rom->path = g_strdup(file);
-+    }
-+
-+    rom->data = parse_hex_blob(rom->path, &datasize);
-+    if (rom->data == NULL) {
-+        fprintf(stderr, "failed to parse hex file '%s': %s\n", rom->path,
-+                strerror(errno));
-+        goto err;
-+    }
-+    rom->datasize = datasize;
-+
-+    if (fw_dir) {
-+        rom->fw_dir = g_strdup(fw_dir);
-+        rom->fw_file = g_strdup(file);
-+    }
-+    rom->addr = addr;
-+    rom->romsize = rom->datasize;
-+
-+    rom_insert(rom);
-+
-+    if (rom->fw_file && fw_cfg) {
-+        const char *basename;
-+        char fw_file_name[FW_CFG_MAX_FILE_PATH];
-+        void *data;
-+
-+        basename = strrchr(rom->fw_file, '/');
-+        if (basename) {
-+            ++basename;
-+        } else {
-+            basename = rom->fw_file;
-+        }
-+        snprintf(fw_file_name, sizeof(fw_file_name), "%s/%s", rom->fw_dir,
-+                 basename);
-+        snprintf(devpath, sizeof(devpath), "/rom@%s", fw_file_name);
-+
-+        if ((!option_rom || mc->option_rom_has_mr) && mc->rom_file_has_mr) {
-+            data = rom_set_mr(rom, OBJECT(fw_cfg), devpath, true);
-+        } else {
-+            data = rom->data;
-+        }
-+
-+        fw_cfg_add_file(fw_cfg, fw_file_name, data, rom->romsize);
-+    } else {
-+        if (mr) {
-+            rom->mr = mr;
-+            snprintf(devpath, sizeof(devpath), "/rom@%s", file);
-+        } else {
-+            snprintf(devpath, sizeof(devpath), "/rom@" TARGET_FMT_plx, addr);
-+        }
-+    }
-+
-+    add_boot_device_path(bootindex, NULL, devpath);
-+    return rom->datasize;
-+
-+err:
-+    g_free(rom->path);
-+    g_free(rom->name);
-+    if (fw_dir) {
-+        g_free(rom->fw_dir);
-+        g_free(rom->fw_file);
-+    }
-+    g_free(rom);
-+
-+    return -1;
-+}
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 5ed3fd8ae67a..176b11221a27 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -28,6 +28,20 @@ ssize_t load_image_size(const char *filename, void *addr, size_t size);
- int load_image_targphys_as(const char *filename,
-                            hwaddr addr, uint64_t max_sz, AddressSpace *as);
- 
-+/**load_image_targphys_hex_as:
-+ * @filename: Path to the .hex file
-+ * @addr: Address to load the .hex file to
-+ * @max_sz: The maximum size of the .hex file to load
-+ * @as: The AddressSpace to load the .hex file to. The value of
-+ *      address_space_memory is used if nothing is supplied here.
-+ *
-+ * Load a fixed .hex file into memory.
-+ *
-+ * Returns the size of the loaded .hex file on success, -1 otherwise.
-+ */
-+int load_targphys_hex_as(const char *filename,
-+                         hwaddr addr, uint64_t max_sz, AddressSpace *as);
-+
- /** load_image_targphys:
-  * Same as load_image_targphys_as(), but doesn't allow the caller to specify
-  * an AddressSpace.
-@@ -210,6 +224,9 @@ void pstrcpy_targphys(const char *name,
- extern bool option_rom_has_mr;
- extern bool rom_file_has_mr;
- 
-+int rom_add_hex_file(const char *file, const char *fw_dir,
-+                 hwaddr addr, int32_t bootindex,
-+                 bool option_rom, MemoryRegion *mr, AddressSpace *as);
- int rom_add_file(const char *file, const char *fw_dir,
-                  hwaddr addr, int32_t bootindex,
-                  bool option_rom, MemoryRegion *mr, AddressSpace *as);
--- 
-2.7.4
+--=20
+Peter Xu
