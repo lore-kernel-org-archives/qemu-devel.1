@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f57NM-0002R3-2i
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 06:16:45 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1f57lA-0003Hw-39
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 06:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f57NH-00057E-Ml
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 06:16:44 -0400
-Date: Sun, 8 Apr 2018 18:16:32 +0800 (GMT+08:00)
-From: "Su Hang" <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <2cc2bda7-aeb9-f632-f658-06273fd70311@redhat.com>
-References: <1522029982-4650-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<2cc2bda7-aeb9-f632-f658-06273fd70311@redhat.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
-MIME-Version: 1.0
-Message-ID: <6c0a5eba.72cc.162a4c1e16b.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH RFC v3 for-2.12?]
- scripts/checkpatch.pl: Bug fix
+	(envelope-from <balaton@eik.bme.hu>) id 1f57l7-0003Pv-0N
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 06:41:20 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Sun, 8 Apr 2018 12:31:24 +0200
+Message-Id: <20180408104108.158997456D8@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH v2 for-2.12] roms/u-boot-sam460ex: Change to
+ qemu git mirror and update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +18,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric blake <eblake@redhat.com>
-Cc: vsementsov@virtuozzo.com, qemu-trivial <qemu-trivial@nongnu.org>, paolo bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 
-U29ycnkgZm9yIHJlcGx5aW5nIGxhdGUsIGl0J3MgdW50aWwgdG9kYXkgdGhhdCBJIHNhdyB5b3Vy
-IG1haWwuCgpJbiBvcmRlciB0byBmaW5kIG91dCB3aHkgdGhlIGZvcm1lciBlZGl0aW9uIGRvZXNu
-J3QgY29tcGxhaW4gYWJvdXQKYGRve313aGlsZShjb25kKTtgIHBhdHRlcm4sIEkgcmVncmVzcyBi
-YWNrIHRvCmVkMjc5YTA2YzUzNzg0YzhjNmM5YjQxYWEwMzg4YTRjZThhNzA0MTAsIG9uZSBiZWZv
-cmUgdGhlIGJ1ZyB3YXMgaW50cm9kdWNlZC4KVGhlbiBJIGZvdW5kIGluIExpbmUgMjQzNSB0byBM
-aW5lIDI0NDMgZGlkIHNwZWNpYWwganVkZ21lbnQgZm9yCmBkb3t9d2hpbGUoY29uZCk7YCBwYXR0
-ZXJuLgoKQXMgZm9yIHdoeSBJIHVzZSBgaWYgKCRsaW5lICF+IC9lbHNlLylgIGluc3RlYWQgb2Yg
-YGlmICgkbGluZSA9fiAvd2hpbGUvKWAsCkFuZCB3aHkgSSB1c2UgYCgkbGluZSAgPX4gLyhcfS4q
-KSQvKWAsIGluc3RlYWQgb2YgYChzdWJzdHIoJGxpbmUsIDAsICQtWzBdKSA9fiAvKFx9XHMqKSQv
-KWAuClNpbmNlIHRoZXkgd29yayB0aGUgc2FtZSwgc28gSSdtIHRyeWluZyB0byBtaW5pbWl6ZSB0
-aGUgbW9kaWZpY2F0aW9uCnRvIGN1cnJlbnQgY29kZSBhbmQgbm90IHRvIGludHJvZHVjZSBuZXcg
-Y29kZSBsb2dpYywgSSByZXVzZSBtb3N0IG9mCjI0MzUgLSAyNDQzIExpbmVzIGZyb20gZWQyNzlh
-MDZjNTM3ODRjOGM2YzliNDFhYTAzODhhNGNlOGE3MDQxMCBpbiBteSBwYXRjaC4KCj4gV2h5IGFy
-ZSB5b3UgdXNpbmcgbWluaW1hbCBtYXRjaCBjb3VwbGVkIHdpdGggYW4gYW5jaG9yZWQgZXhwcmVz
-c2lvbj8KPiBJc24ndCAnKCRsaW5lICA9fiAvKFx9LiopJC8pJyBnb2luZyB0byBtYXRjaCB0aGUg
-c2FtZSBzdWJleHByZXNzaW9uCj4gKG5hbWVseSwgYW55IGxpbmUgY29udGFpbmluZyB9IGJ1dCBu
-b3QgYXMgdGhlIGxhc3QgY2hhcmFjdGVyKT8KCicoJGxpbmUgID1+IC8oXH0uKikkLyknIHdvbid0
-IG1hdGNoICJhbnkgbGluZSBjb250YWluaW5nIH0gYnV0IG5vdCBhcwp0aGUgbGFzdCBjaGFyYWN0
-ZXIiLCBiZWN1YXNlCmBgYAppZiAoJGxpbmUgPX4gLyheLiopXGIoPzppZnx3aGlsZXxmb3IpXGIv
-ICYmCgkJCSRsaW5lICF+IC9cI1xzKmlmLykgewpgYGAgdGhhdCB3cmFwcyAnKCRsaW5lICA9fiAv
-KFx9LiopJC8pJyBsaW1pdHMgdGhlIHNjb3BlIG9mIHRoZSBtYXRjaC4KCkJlc3QsClN1IEhhbmcK
-CgoKPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiRXJpYyBCbGFrZSIgPGVi
-bGFrZUByZWRoYXQuY29tPgo+IFNlbnQgVGltZTogMjAxOC0wNC0wNSAwMjoyODoxMyAoVGh1cnNk
-YXkpCj4gVG86ICJTdSBIYW5nIiA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5jbj4sIHZzZW1lbnRz
-b3ZAdmlydHVvenpvLmNvbQo+IENjOiBxZW11LXRyaXZpYWwgPHFlbXUtdHJpdmlhbEBub25nbnUu
-b3JnPiwgIlBhb2xvIEJvbnppbmkiIDxwYm9uemluaUByZWRoYXQuY29tPiwgcWVtdS1kZXZlbEBu
-b25nbnUub3JnCj4gU3ViamVjdDogUmU6IFtRZW11LXRyaXZpYWxdIFtRZW11LWRldmVsXSBbUEFU
-Q0ggUkZDIHYzIGZvci0yLjEyP10gc2NyaXB0cy9jaGVja3BhdGNoLnBsOiBCdWcgZml4Cj4gCj4g
-W2FkZGluZyBhIGZldyBtb3JlIGNjJ3NdCj4gCj4gT24gMDMvMjUvMjAxOCAwOTowNiBQTSwgU3Ug
-SGFuZyB3cm90ZToKPiA+IENvbW1pdCAyYjlhZWY2ZmNkOTZiYTdlZDhjMWVlNzIzZTM5MTkwMTg1
-MmQzNDRjIGludHJvZHVjZWQgYSByZWdyZXNzaW9uOgo+ID4gY2hlY2twYXRjaC5wbCBzdGFydGVk
-IGNvbXBsYWluaW5nIGFib3V0IHRoZSBmb2xsb3dpbmcgdmFsaWQgcGF0dGVybjoKPiA+IGRvIHsK
-PiA+ICAgICAgLyogc29tZXRoaW5nICovCj4gPiB9IHdoaWxlIChjb25kaXRpb24pOwo+ID4gCj4g
-PiBGaXggdGhlIHNjcmlwdCB0byBvbmNlIGFnYWluIHBlcm1pdCB0aGlzIHBhdHRlcm4uCj4gCj4g
-V2UgY2FuIHByb2JhYmx5IGRyb3AgdGhlIFJGQyBmcm9tIHRoZSB0aXRsZSAoUkZDIG1lYW5zIHlv
-dSBhcmUgdW5zdXJlIGlmCj4gdGhlIHBhdGNoIGlzIGluIGl0cyBmaW5hbCBmb3JtKSwgYW5kIHBy
-b2JhYmx5IHdhbnQgdGhpcyBwYXRjaCBpbmNsdWRlZAo+IGluIDIuMTIgYXMgd2UgYXJlIHN0aWxs
-IGdldHRpbmcgZW1haWxzIHRoYXQgaGl0IHRoZSBmYWxzZSBwb3NpdGl2ZToKPiAKPiBodHRwczov
-L2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOC0wNC9tc2cwMDQwMy5o
-dG1sCj4gCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IFN1IEhhbmcgPHN1aGFuZzE2QG1haWxzLnVj
-YXMuYWMuY24+Cj4gPiAtLS0KPiA+IHYxOiBmaXggYnVnLgo+ID4gdjI6IGNvcnJlY3QgaW5hcHBy
-b3ByaWF0ZSBwYXRjaCBkZXNjcmlwdGlvbi4KPiA+IHYzOiBwdXQgdmVyc2lvbiBkZXNjcmlwdGlv
-biB1bmRlciBTaWduZWQtb2ZmLWJ5IGxpbmUuCj4gPiAKPiA+ICBzY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgfCAxNSArKysrKysrKysrKysrLS0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0aW9u
-cygrKSwgMiBkZWxldGlvbnMoLSkKPiAKPiBQZXJsIGlzIG5vdCBteSBzdHJvbmdlc3QgcG9pbnQs
-IHNvIHRha2UgbXkgcmV2aWV3IHdpdGggYSBncmFpbiBvZiBzYWx0Lgo+IEhvd2V2ZXIsIHNpbmNl
-IEkgYWxyZWFkeSBoYXZlIGEgY291cGxlIG9mIG90aGVyIHJhbmRvbSBwYXRjaGVzIHRoYXQgbWF5
-Cj4gc3RpbGwgYmUgYXBwcm9wcmlhdGUgZm9yIC1yYzMsIEkgY2FuIHBpY2sgdGhpcyB1cCBpbiBh
-IHB1bGwgcmVxdWVzdCBpZiBJCj4gZ2V0IGF0IGxlYXN0IG9uZSBtb3JlIHJldmlldyAoYW5kIGlm
-IG5vIG9uZSBlbHNlIHBpY2tzIGl0IHVwIGZpcnN0LCBzdWNoCj4gYXMgdGhlIHFlbXUtdHJpdmlh
-bCBwcm9jZXNzIG9yIFBhb2xvJ3MgbWlzYyB0cmVlKQo+IAo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEv
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIGIvc2NyaXB0cy9jaGVja3BhdGNoLnBsCj4gPiBpbmRleCA1
-N2RhYWUwNWVhMTguLmQ1MjIwN2EzY2M5ZCAxMDA3NTUKPiA+IC0tLSBhL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbAo+ID4gKysrIGIvc2NyaXB0cy9jaGVja3BhdGNoLnBsCj4gPiBAQCAtMjM1Niw2ICsy
-MzU2LDE4IEBAIHN1YiBwcm9jZXNzIHsKPiA+ICAjIGNoZWNrIGZvciBtaXNzaW5nIGJyYWNpbmcg
-YXJvdW5kIGlmIGV0Ywo+ID4gIAkJaWYgKCRsaW5lID1+IC8oXi4qKVxiKD86aWZ8d2hpbGV8Zm9y
-KVxiLyAmJgo+ID4gIAkJCSRsaW5lICF+IC9cI1xzKmlmLykgewo+ID4gKwkJCW15ICRhbGxvd2Vk
-ID0gMDsKPiA+ICsKPiA+ICsJCQkjIENoZWNrIHRoZSBwcmUtY29udGV4dC4KPiA+ICsJCQlpZiAo
-JGxpbmUgPX4gLyhcfS4qPykkLykgewo+IAo+IFdoeSBhcmUgeW91IHVzaW5nIG1pbmltYWwgbWF0
-Y2ggY291cGxlZCB3aXRoIGFuIGFuY2hvcmVkIGV4cHJlc3Npb24/Cj4gSXNuJ3QgJygkbGluZSAg
-PX4gLyhcfS4qKSQvKScgZ29pbmcgdG8gbWF0Y2ggdGhlIHNhbWUgc3ViZXhwcmVzc2lvbgo+IChu
-YW1lbHksIGFueSBsaW5lIGNvbnRhaW5pbmcgfSBidXQgbm90IGFzIHRoZSBsYXN0IGNoYXJhY3Rl
-cik/Cj4gCj4gT3RoZXJ3aXNlLAo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVk
-aGF0LmNvbT4KPiAKPiAtLSAKPiBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5naW5l
-ZXIKPiBSZWQgSGF0LCBJbmMuICAgICAgICAgICArMS05MTktMzAxLTMyNjYKPiBWaXJ0dWFsaXph
-dGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcKPiAK
+Now that we have a mirror of this repo on git.qemu.org change the
+submodule to use that and update it to latest commit which fixes a
+dangling symlink and removes two big binaries that are not needed.
+
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+David, you can drop previous version of this patch and replace it with
+this one which updates to the latest commit. Thank you.
+
+.gitmodules          | 2 +-
+ roms/u-boot-sam460ex | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.gitmodules b/.gitmodules
+index c613722..49e9c2e 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -45,4 +45,4 @@
+ 	url = git://github.com/hdeller/seabios-hppa.git
+ [submodule "roms/u-boot-sam460ex"]
+ 	path = roms/u-boot-sam460ex
+-	url = git://github.com/zbalaton/u-boot-sam460ex
++	url = git://git.qemu.org/u-boot-sam460ex.git
+diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
+index 119aa27..8ee007c 160000
+--- a/roms/u-boot-sam460ex
++++ b/roms/u-boot-sam460ex
+@@ -1 +1 @@
+-Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
++Subproject commit 8ee007c4216fd6a0d760589e8405ce4494497aa0
+-- 
+2.7.6
