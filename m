@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5AYC-0001vf-Dy
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 09:40:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5AiO-0006Cc-Pa
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 09:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5AYB-0002ty-Cf
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 09:40:08 -0400
-Date: Sun, 8 Apr 2018 23:34:15 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180408133415.GC20816@umbus.fritz.box>
-References: <20180408104108.158997456D8@zero.eik.bme.hu>
+	(envelope-from <bounces@canonical.com>) id 1f5AiK-0005IU-RH
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 09:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55564)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5AiK-0005HK-Gu
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 09:50:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5AiJ-00049J-9X
+	for <qemu-devel@nongnu.org>; Sun, 08 Apr 2018 13:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 456B72E8070
+	for <qemu-devel@nongnu.org>; Sun,  8 Apr 2018 13:50:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bAmEntskrkuBymla"
-Content-Disposition: inline
-In-Reply-To: <20180408104108.158997456D8@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12] roms/u-boot-sam460ex: Change
- to qemu git mirror and update
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 08 Apr 2018 13:42:59 -0000
+From: =?utf-8?b?Q2lybyBTYW50aWxsaSDlha3lm5vkuovku7Yg5rOV6L2u5Yqf?=
+	<ciro.santilli@gmail.com>
+Reply-To: Bug 1762179 <1762179@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152319497960.30219.9338727401860906105.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762179] [NEW] Record and replay replay fails
+ with: "ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +37,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+QEMU master at 08e173f29461396575c85510eb41474b993cb1fb
+
+QEMU commands:
 
 
---bAmEntskrkuBymla
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+```
+#!/usr/bin/env bash
+cmd=3D"\
+time \
+./out/x86_64/buildroot/host/usr/bin/qemu-system-x86_64 \
+-M pc \
+-append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_eva=
+l=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
+-kernel 'out/x86_64/buildroot/images/bzImage' \
+-nographic \
+\
+-drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=3D=
+img-direct,format=3Dqcow2 \
+-drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay \
+-device ide-hd,drive=3Dimg-blkreplay \
+\
+-netdev user,id=3Dnet1 \
+-device rtl8139,netdev=3Dnet1 \
+-object filter-replay,id=3Dreplay,netdev=3Dnet1 \
+"
+echo "$cmd"
+eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
+eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
+```
 
-On Sun, Apr 08, 2018 at 12:31:24PM +0200, BALATON Zoltan wrote:
-> Now that we have a mirror of this repo on git.qemu.org change the
-> submodule to use that and update it to latest commit which fixes a
-> dangling symlink and removes two big binaries that are not needed.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
-> David, you can drop previous version of this patch and replace it with
-> this one which updates to the latest commit. Thank you.
+Images uploaded to: https://github.com/cirosantilli/linux-kernel-module-
+cheat/releases/download/test-replay-arm/images4.zip
 
-Done.
+The replay failed straight out with:
 
->=20
-> .gitmodules          | 2 +-
->  roms/u-boot-sam460ex | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/.gitmodules b/.gitmodules
-> index c613722..49e9c2e 100644
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -45,4 +45,4 @@
->  	url =3D git://github.com/hdeller/seabios-hppa.git
->  [submodule "roms/u-boot-sam460ex"]
->  	path =3D roms/u-boot-sam460ex
-> -	url =3D git://github.com/zbalaton/u-boot-sam460ex
-> +	url =3D git://git.qemu.org/u-boot-sam460ex.git
-> diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
-> index 119aa27..8ee007c 160000
-> --- a/roms/u-boot-sam460ex
-> +++ b/roms/u-boot-sam460ex
-> @@ -1 +1 @@
-> -Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
-> +Subproject commit 8ee007c4216fd6a0d760589e8405ce4494497aa0
+```
+ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (replay_=
+file && replay_mutex_locked())
+```
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Images generated with: https://github.com/cirosantilli/linux-kernel-
+module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
 
---bAmEntskrkuBymla
-Content-Type: application/pgp-signature; name="signature.asc"
+QEMU configure:
 
------BEGIN PGP SIGNATURE-----
+```
+cd /home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/build/=
+host-qemu-custom; PATH=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/=
+x86_64/buildroot/host/bin:/home/ciro/bak/git/linux-kernel-modul
+e-cheat/out/x86_64/buildroot/host/sbin:./node_modules/.bin:/usr/local/herok=
+u/bin:/home/ciro/android-sdk/platform-tools:/home/ciro/android-sdk/tools:/h=
+ome/ciro/android-studio//bin:/home/ciro/android-sdk/ndk-bundl
+e:/home/ciro/android-sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/pr=
+ebuilt/linux-x86_64/bin:/home/ciro/bak/git/devbin:/home/ciro/bin:/usr/local=
+/texlive/2013/bin/x86_64-linux:/home/ciro/.rvm/gems/ruby-2.4.
+1/bin:/home/ciro/.rvm/gems/ruby-2.4.1@global/bin:/home/ciro/.rvm/rubies/rub=
+y-2.4.1/bin:./node_modules/.bin:/usr/local/heroku/bin:/home/ciro/android-sd=
+k/platform-tools:/home/ciro/android-sdk/tools:/home/ciro/andr
+oid-studio//bin:/home/ciro/android-sdk/ndk-bundle:/home/ciro/android-sdk/nd=
+k-bundle/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin:/ho=
+me/ciro/bak/git/devbin:/home/ciro/bin:/usr/local/texlive/2013
+/bin/x86_64-linux:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/=
+bin:/usr/games:/usr/local/games:/usr/bin:/snap/bin:/home/ciro/bak/git/latex=
+:/home/ciro/.rvm/bin:/home/ciro/anaconda2/bin:/home/ciro/.cab
+al/bin:/bin:/home/ciro/.go/bin:/home/ciro/.local/bin/:/home/ciro/bak/git/ru=
+nlinux:/usr/bin:/home/ciro/bak/git/latex:/home/ciro/.rvm/bin:/home/ciro/ana=
+conda2/bin:/home/ciro/.cabal/bin:/bin:/home/ciro/.go/bin:/home/ciro/.local/=
+bin/:/home/ciro/bak/git/runlinux" PKG_CONFIG=3D"/home/ciro/bak/git/linux-ke=
+rnel-module-cheat/out/x86_64/buildroot/host/bin/pkg-config" PKG_CONFIG_SYSR=
+OOT_DIR=3D"/" PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=3D1 PKG_
+CONFIG_ALLOW_SYSTEM_LIBS=3D1 PKG_CONFIG_LIBDIR=3D"/home/ciro/bak/git/linux-=
+kernel-module-cheat/out/x86_64/buildroot/host/lib/pkgconfig:/home/ciro/bak/=
+git/linux-kernel-module-cheat/out/x86_64/buildroot/host/share/pkg
+config" AR=3D"/usr/bin/ar" AS=3D"/usr/bin/as" LD=3D"/usr/bin/ld" NM=3D"/usr=
+/bin/nm" CC=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buil=
+droot/host/bin/ccache /usr/bin/gcc" GCC=3D"/home/ciro/bak/git/linux-kerne
+l-module-cheat/out/x86_64/buildroot/host/bin/ccache /usr/bin/gcc" CXX=3D"/h=
+ome/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/bin/cc=
+ache /usr/bin/g++" CPP=3D"/usr/bin/cpp" OBJCOPY=3D"/usr/bin/objcopy
+" RANLIB=3D"/usr/bin/ranlib" CPPFLAGS=3D"-I/home/ciro/bak/git/linux-kernel-=
+module-cheat/out/x86_64/buildroot/host/include" CFLAGS=3D"-O2 -I/home/ciro/=
+bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/include
+" CXXFLAGS=3D"-O2 -I/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64=
+/buildroot/host/include" LDFLAGS=3D"-L/home/ciro/bak/git/linux-kernel-modul=
+e-cheat/out/x86_64/buildroot/host/lib -Wl,-rpath,/home/ciro/bak/g
+it/linux-kernel-module-cheat/out/x86_64/buildroot/host/lib" INTLTOOL_PERL=
+=3D/usr/bin/perl CPP=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/x8=
+6_64/buildroot/host/bin/ccache /usr/bin/gcc -E" ./configure --targe
+t-list=3D"x86_64-softmmu" --prefix=3D"/home/ciro/bak/git/linux-kernel-modul=
+e-cheat/out/x86_64/buildroot/host" --interp-prefix=3D/home/ciro/bak/git/lin=
+ux-kernel-module-cheat/out/x86_64/buildroot/host/x86_64-buildroot-l
+inux-uclibc/sysroot --cc=3D"/home/ciro/bak/git/linux-kernel-module-cheat/ou=
+t/x86_64/buildroot/host/bin/ccache /usr/bin/gcc" --host-cc=3D"/home/ciro/ba=
+k/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/bin/cca
+che /usr/bin/gcc" --python=3D/home/ciro/bak/git/linux-kernel-module-cheat/o=
+ut/x86_64/buildroot/host/bin/python2 --extra-cflags=3D"-O2 -I/home/ciro/bak=
+/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/include"
+ --extra-ldflags=3D"-L/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_=
+64/buildroot/host/lib -Wl,-rpath,/home/ciro/bak/git/linux-kernel-module-che=
+at/out/x86_64/buildroot/host/lib" --enable-debug --extra-cflags
+=3D-DDEBUG_PL061=3D1 --enable-trace-backends=3Dsimple --enable-sdl --with-s=
+dlabi=3D2.0
+```
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrKGlQACgkQbDjKyiDZ
-s5J9mQ//YlP25NzuiNOVME3oYrHKSWtTrjkIbus9DSXvTVDKt4Yv83UieSQ2HSPo
-GCSIHkpuBBeMnFpQugEqcmcb83kGZ2NTbUg2lxT75+pWFQzco1qNmMzmijxsXric
-TQXox6/BRP4vWFe4vmOMJ9ksO+brhFf9CEj3R2pC2jsOhT3E2ClrULNh8mTac/L0
-k1cUMbF9aMMyKomjzztezpN2K9Ps9uWS3Px6Y3TPHULisAji3qEQhna+3XM8FYap
-NBdy8Z5gKn0dzQDYQlq5V8r5+0DBW6AXOL+lJxqsB8P/mfU96qdgTV2NLEf50ZuK
-2yYKDvKXAi3HOS80bljsH3COB1xPe2JxrzwVId5+/uq6yuypNUpuqaq0KmGGWTX9
-JVIQ66erWEQVjFSUiN/MXQ9xgvwMrfFiAYtNkymmJ49W4OdqVngiGgtFItnh830V
-newXAkMuxymYPBV5hP8JsgMUtEzh8PB/MAfQz+GbSRZPFbIWowdVohlKx5crDdJP
-WhiqxZUoECs1vYGp+F/4UNK9MoRLvXaL0YshWxArX6pH1Zo3JhVEeIp3gtCwY991
-IbycLNPgySWDJi5ekfPnc+gDGMNYPjHyZxt9SP2tzDpLwSHHhcVzVqPoH5xTeQxX
-t3l3YFSj10XEnTyiBbpfsEMdTeFQkyhUBooQCq/BOy7RYH+MPHQ=
-=uO9v
------END PGP SIGNATURE-----
+QEMU build:
 
---bAmEntskrkuBymla--
+```
+PATH=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/h=
+ost/bin:/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/h=
+ost/sbin:./node_modules/.bin:/usr/local/heroku/bin:/home/ciro/a
+ndroid-sdk/platform-tools:/home/ciro/android-sdk/tools:/home/ciro/android-s=
+tudio//bin:/home/ciro/android-sdk/ndk-bundle:/home/ciro/android-sdk/ndk-bun=
+dle/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_6
+4/bin:/home/ciro/bak/git/devbin:/home/ciro/bin:/usr/local/texlive/2013/bin/=
+x86_64-linux:/home/ciro/.rvm/gems/ruby-2.4.1/bin:/home/ciro/.rvm/gems/ruby-=
+2.4.1@global/bin:/home/ciro/.rvm/rubies/ruby-2.4.1/bin:./node
+_modules/.bin:/usr/local/heroku/bin:/home/ciro/android-sdk/platform-tools:/=
+home/ciro/android-sdk/tools:/home/ciro/android-studio//bin:/home/ciro/andro=
+id-sdk/ndk-bundle:/home/ciro/android-sdk/ndk-bundle/toolchain
+s/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin:/home/ciro/bak/git/de=
+vbin:/home/ciro/bin:/usr/local/texlive/2013/bin/x86_64-linux:/usr/local/sbi=
+n:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
+r/local/games:/usr/bin:/snap/bin:/home/ciro/bak/git/latex:/home/ciro/.rvm/b=
+in:/home/ciro/anaconda2/bin:/home/ciro/.cabal/bin:/bin:/home/ciro/.go/bin:/=
+home/ciro/.local/bin/:/home/ciro/bak/git/runlinux:/usr/bin:/h
+ome/ciro/bak/git/latex:/home/ciro/.rvm/bin:/home/ciro/anaconda2/bin:/home/c=
+iro/.cabal/bin:/bin:/home/ciro/.go/bin:/home/ciro/.local/bin/:/home/ciro/ba=
+k/git/runlinux" PKG_CONFIG=3D"/home/ciro/bak/git/linux-kernel-m
+odule-cheat/out/x86_64/buildroot/host/bin/pkg-config" PKG_CONFIG_SYSROOT_DI=
+R=3D"/" PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=3D1 PKG_CONFIG_ALLOW_SYSTEM_LIBS=3D1=
+ PKG_CONFIG_LIBDIR=3D"/home/ciro/bak/git/linux-kernel-module-cheat/ou
+t/x86_64/buildroot/host/lib/pkgconfig:/home/ciro/bak/git/linux-kernel-modul=
+e-cheat/out/x86_64/buildroot/host/share/pkgconfig" /usr/bin/make -j8 -C /ho=
+me/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroo
+t/build/host-qemu-custom
+```
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762179
+
+Title:
+  Record and replay replay fails with: "ERROR:replay/replay-
+  time.c:49:replay_read_clock: assertion failed"
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU master at 08e173f29461396575c85510eb41474b993cb1fb
+
+  QEMU commands:
+
+  =
+
+  ```
+  #!/usr/bin/env bash
+  cmd=3D"\
+  time \
+  ./out/x86_64/buildroot/host/usr/bin/qemu-system-x86_64 \
+  -M pc \
+  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
+val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
+  -kernel 'out/x86_64/buildroot/images/bzImage' \
+  -nographic \
+  \
+  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
+=3Dimg-direct,format=3Dqcow2 \
+  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
+ \
+  -device ide-hd,drive=3Dimg-blkreplay \
+  \
+  -netdev user,id=3Dnet1 \
+  -device rtl8139,netdev=3Dnet1 \
+  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
+  "
+  echo "$cmd"
+  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
+  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
+  ```
+
+  Images uploaded to: https://github.com/cirosantilli/linux-kernel-
+  module-cheat/releases/download/test-replay-arm/images4.zip
+
+  The replay failed straight out with:
+
+  ```
+  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
+y_file && replay_mutex_locked())
+  ```
+
+  Images generated with: https://github.com/cirosantilli/linux-kernel-
+  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
+
+  QEMU configure:
+
+  ```
+  cd /home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/buil=
+d/host-qemu-custom; PATH=3D"/home/ciro/bak/git/linux-kernel-module-cheat/ou=
+t/x86_64/buildroot/host/bin:/home/ciro/bak/git/linux-kernel-modul
+  e-cheat/out/x86_64/buildroot/host/sbin:./node_modules/.bin:/usr/local/her=
+oku/bin:/home/ciro/android-sdk/platform-tools:/home/ciro/android-sdk/tools:=
+/home/ciro/android-studio//bin:/home/ciro/android-sdk/ndk-bundl
+  e:/home/ciro/android-sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/=
+prebuilt/linux-x86_64/bin:/home/ciro/bak/git/devbin:/home/ciro/bin:/usr/loc=
+al/texlive/2013/bin/x86_64-linux:/home/ciro/.rvm/gems/ruby-2.4.
+  1/bin:/home/ciro/.rvm/gems/ruby-2.4.1@global/bin:/home/ciro/.rvm/rubies/r=
+uby-2.4.1/bin:./node_modules/.bin:/usr/local/heroku/bin:/home/ciro/android-=
+sdk/platform-tools:/home/ciro/android-sdk/tools:/home/ciro/andr
+  oid-studio//bin:/home/ciro/android-sdk/ndk-bundle:/home/ciro/android-sdk/=
+ndk-bundle/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin:/=
+home/ciro/bak/git/devbin:/home/ciro/bin:/usr/local/texlive/2013
+  /bin/x86_64-linux:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin=
+:/bin:/usr/games:/usr/local/games:/usr/bin:/snap/bin:/home/ciro/bak/git/lat=
+ex:/home/ciro/.rvm/bin:/home/ciro/anaconda2/bin:/home/ciro/.cab
+  al/bin:/bin:/home/ciro/.go/bin:/home/ciro/.local/bin/:/home/ciro/bak/git/=
+runlinux:/usr/bin:/home/ciro/bak/git/latex:/home/ciro/.rvm/bin:/home/ciro/a=
+naconda2/bin:/home/ciro/.cabal/bin:/bin:/home/ciro/.go/bin:/home/ciro/.loca=
+l/bin/:/home/ciro/bak/git/runlinux" PKG_CONFIG=3D"/home/ciro/bak/git/linux-=
+kernel-module-cheat/out/x86_64/buildroot/host/bin/pkg-config" PKG_CONFIG_SY=
+SROOT_DIR=3D"/" PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=3D1 PKG_
+  CONFIG_ALLOW_SYSTEM_LIBS=3D1 PKG_CONFIG_LIBDIR=3D"/home/ciro/bak/git/linu=
+x-kernel-module-cheat/out/x86_64/buildroot/host/lib/pkgconfig:/home/ciro/ba=
+k/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/share/pkg
+  config" AR=3D"/usr/bin/ar" AS=3D"/usr/bin/as" LD=3D"/usr/bin/ld" NM=3D"/u=
+sr/bin/nm" CC=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/bu=
+ildroot/host/bin/ccache /usr/bin/gcc" GCC=3D"/home/ciro/bak/git/linux-kerne
+  l-module-cheat/out/x86_64/buildroot/host/bin/ccache /usr/bin/gcc" CXX=3D"=
+/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/bin/=
+ccache /usr/bin/g++" CPP=3D"/usr/bin/cpp" OBJCOPY=3D"/usr/bin/objcopy
+  " RANLIB=3D"/usr/bin/ranlib" CPPFLAGS=3D"-I/home/ciro/bak/git/linux-kerne=
+l-module-cheat/out/x86_64/buildroot/host/include" CFLAGS=3D"-O2 -I/home/cir=
+o/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/include
+  " CXXFLAGS=3D"-O2 -I/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_=
+64/buildroot/host/include" LDFLAGS=3D"-L/home/ciro/bak/git/linux-kernel-mod=
+ule-cheat/out/x86_64/buildroot/host/lib -Wl,-rpath,/home/ciro/bak/g
+  it/linux-kernel-module-cheat/out/x86_64/buildroot/host/lib" INTLTOOL_PERL=
+=3D/usr/bin/perl CPP=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/x8=
+6_64/buildroot/host/bin/ccache /usr/bin/gcc -E" ./configure --targe
+  t-list=3D"x86_64-softmmu" --prefix=3D"/home/ciro/bak/git/linux-kernel-mod=
+ule-cheat/out/x86_64/buildroot/host" --interp-prefix=3D/home/ciro/bak/git/l=
+inux-kernel-module-cheat/out/x86_64/buildroot/host/x86_64-buildroot-l
+  inux-uclibc/sysroot --cc=3D"/home/ciro/bak/git/linux-kernel-module-cheat/=
+out/x86_64/buildroot/host/bin/ccache /usr/bin/gcc" --host-cc=3D"/home/ciro/=
+bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/bin/cca
+  che /usr/bin/gcc" --python=3D/home/ciro/bak/git/linux-kernel-module-cheat=
+/out/x86_64/buildroot/host/bin/python2 --extra-cflags=3D"-O2 -I/home/ciro/b=
+ak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/include"
+   --extra-ldflags=3D"-L/home/ciro/bak/git/linux-kernel-module-cheat/out/x8=
+6_64/buildroot/host/lib -Wl,-rpath,/home/ciro/bak/git/linux-kernel-module-c=
+heat/out/x86_64/buildroot/host/lib" --enable-debug --extra-cflags
+  =3D-DDEBUG_PL061=3D1 --enable-trace-backends=3Dsimple --enable-sdl --with=
+-sdlabi=3D2.0
+  ```
+
+  QEMU build:
+
+  ```
+  PATH=3D"/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot=
+/host/bin:/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot=
+/host/sbin:./node_modules/.bin:/usr/local/heroku/bin:/home/ciro/a
+  ndroid-sdk/platform-tools:/home/ciro/android-sdk/tools:/home/ciro/android=
+-studio//bin:/home/ciro/android-sdk/ndk-bundle:/home/ciro/android-sdk/ndk-b=
+undle/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_6
+  4/bin:/home/ciro/bak/git/devbin:/home/ciro/bin:/usr/local/texlive/2013/bi=
+n/x86_64-linux:/home/ciro/.rvm/gems/ruby-2.4.1/bin:/home/ciro/.rvm/gems/rub=
+y-2.4.1@global/bin:/home/ciro/.rvm/rubies/ruby-2.4.1/bin:./node
+  _modules/.bin:/usr/local/heroku/bin:/home/ciro/android-sdk/platform-tools=
+:/home/ciro/android-sdk/tools:/home/ciro/android-studio//bin:/home/ciro/and=
+roid-sdk/ndk-bundle:/home/ciro/android-sdk/ndk-bundle/toolchain
+  s/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin:/home/ciro/bak/git/=
+devbin:/home/ciro/bin:/usr/local/texlive/2013/bin/x86_64-linux:/usr/local/s=
+bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
+  r/local/games:/usr/bin:/snap/bin:/home/ciro/bak/git/latex:/home/ciro/.rvm=
+/bin:/home/ciro/anaconda2/bin:/home/ciro/.cabal/bin:/bin:/home/ciro/.go/bin=
+:/home/ciro/.local/bin/:/home/ciro/bak/git/runlinux:/usr/bin:/h
+  ome/ciro/bak/git/latex:/home/ciro/.rvm/bin:/home/ciro/anaconda2/bin:/home=
+/ciro/.cabal/bin:/bin:/home/ciro/.go/bin:/home/ciro/.local/bin/:/home/ciro/=
+bak/git/runlinux" PKG_CONFIG=3D"/home/ciro/bak/git/linux-kernel-m
+  odule-cheat/out/x86_64/buildroot/host/bin/pkg-config" PKG_CONFIG_SYSROOT_=
+DIR=3D"/" PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=3D1 PKG_CONFIG_ALLOW_SYSTEM_LIBS=
+=3D1 PKG_CONFIG_LIBDIR=3D"/home/ciro/bak/git/linux-kernel-module-cheat/ou
+  t/x86_64/buildroot/host/lib/pkgconfig:/home/ciro/bak/git/linux-kernel-mod=
+ule-cheat/out/x86_64/buildroot/host/share/pkgconfig" /usr/bin/make -j8 -C /=
+home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroo
+  t/build/host-qemu-custom
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762179/+subscriptions
