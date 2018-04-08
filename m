@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1f565g-0006Tb-BO
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 04:54:25 -0400
+	(envelope-from <famz@redhat.com>) id 1f56Eg-0001hR-4b
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 05:03:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1f565d-00072v-84
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 04:54:24 -0400
-Received: from mga12.intel.com ([192.55.52.136]:20663)
+	(envelope-from <famz@redhat.com>) id 1f56Eb-0001ti-5Q
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 05:03:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56268 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1f565c-00071O-TG
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 04:54:21 -0400
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Sun, 8 Apr 2018 08:54:15 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B63E15A@SHSMSX103.ccr.corp.intel.com>
-References: <20180329075233.524-1-maxime.coquelin@redhat.com>
-	<20180329075233.524-3-maxime.coquelin@redhat.com>
-In-Reply-To: <20180329075233.524-3-maxime.coquelin@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f56Eb-0001rT-0K
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 05:03:37 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EEB6C81A88A1
+	for <qemu-devel@nongnu.org>; Sun,  8 Apr 2018 09:03:31 +0000 (UTC)
+Date: Sun, 8 Apr 2018 17:03:21 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180408090321.GA2862@lemon.usersys.redhat.com>
+References: <20180408030542.17855-1-peterx@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] vhost-user: back SET/GET_CONFIG
- requests with a protocol feature
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180408030542.17855-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: fix wait_until_completed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,167 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-
-
-> -----Original Message-----
-> From: Maxime Coquelin [mailto:maxime.coquelin@redhat.com]
-> Sent: Thursday, March 29, 2018 3:53 PM
-> To: mst@redhat.com; Liu, Changpeng <changpeng.liu@intel.com>;
-> marcandre.lureau@redhat.com; qemu-devel@nongnu.org
-> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> Subject: [PATCH v3 2/2] vhost-user: back SET/GET_CONFIG requests with a
-> protocol feature
->=20
-> Without a dedicated protocol feature, QEMU cannot know whether
-> the backend can handle VHOST_USER_SET_CONFIG and
-> VHOST_USER_GET_CONFIG messages.
->=20
-> This patch adds a protocol feature that is only advertised by
-> QEMU if the device implements the config ops. Vhost user init
-> fails if the device support the feature but the backend doesn't.
->=20
-> The backend should only send VHOST_USER_SLAVE_CONFIG_CHANGE_MSG
-> requests if the protocol feature has been negotiated.
->=20
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Acked-by: Changpeng Liu <changpeng.liu@intel.com>
+On Sun, 04/08 11:05, Peter Xu wrote:
+> If there are more than one events, wait_until_completed() might return
+> the 2nd event even if the 1st event is JOB_COMPLETED, since the for loop
+> will continue to run even if completed is set to True.
+> 
+> It never happened before, but it can be triggered when OOB is enabled
+> due to the RESUME startup message. Fix that up.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  docs/interop/vhost-user.txt | 21 ++++++++++++---------
->  hw/virtio/vhost-user.c      | 22 ++++++++++++++++++++++
->  2 files changed, 34 insertions(+), 9 deletions(-)
->=20
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index c058c407df..534caab18a 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -379,6 +379,7 @@ Protocol features
->  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
->  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
->  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
-> +#define VHOST_USER_PROTOCOL_F_CONFIG         9
->=20
->  Master message types
->  --------------------
-> @@ -664,7 +665,8 @@ Master message types
->        Master payload: virtio device config space
->        Slave payload: virtio device config space
->=20
-> -      Submitted by the vhost-user master to fetch the contents of the vi=
-rtio
-> +      When VHOST_USER_PROTOCOL_F_CONFIG is negotiated, this message is
-> +      submitted by the vhost-user master to fetch the contents of the vi=
-rtio
->        device configuration space, vhost-user slave's payload size MUST m=
-atch
->        master's request, vhost-user slave uses zero length of payload to
->        indicate an error to vhost-user master. The vhost-user master may
-> @@ -677,7 +679,8 @@ Master message types
->        Master payload: virtio device config space
->        Slave payload: N/A
->=20
-> -      Submitted by the vhost-user master when the Guest changes the virt=
-io
-> +      When VHOST_USER_PROTOCOL_F_CONFIG is negotiated, this message is
-> +      submitted by the vhost-user master when the Guest changes the virt=
-io
->        device configuration space and also can be used for live migration
->        on the destination host. The vhost-user slave must check the flags
->        field, and slaves MUST NOT accept SET_CONFIG for read-only
-> @@ -766,13 +769,13 @@ Slave message types
->       Slave payload: N/A
->       Master payload: N/A
->=20
-> -     Vhost-user slave sends such messages to notify that the virtio devi=
-ce's
-> -     configuration space has changed, for those host devices which can s=
-upport
-> -     such feature, host driver can send VHOST_USER_GET_CONFIG message to
-> slave
-> -     to get the latest content. If VHOST_USER_PROTOCOL_F_REPLY_ACK is
-> -     negotiated, and slave set the VHOST_USER_NEED_REPLY flag, master mu=
-st
-> -     respond with zero when operation is successfully completed, or non-=
-zero
-> -     otherwise.
-> +     When VHOST_USER_PROTOCOL_F_CONFIG is negotiated, vhost-user slave
-> sends
-> +     such messages to notify that the virtio device's configuration spac=
-e has
-> +     changed, for those host devices which can support such feature, hos=
-t
-> +     driver can send VHOST_USER_GET_CONFIG message to slave to get the l=
-atest
-> +     content. If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, and slav=
-e
-> set
-> +     the VHOST_USER_NEED_REPLY flag, master must respond with zero when
-> +     operation is successfully completed, or non-zero otherwise.
->=20
->  VHOST_USER_PROTOCOL_F_REPLY_ACK:
->  -------------------------------
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 44aea5c0a8..38da8692bb 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -46,6 +46,7 @@ enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_CROSS_ENDIAN =3D 6,
->      VHOST_USER_PROTOCOL_F_CRYPTO_SESSION =3D 7,
->      VHOST_USER_PROTOCOL_F_PAGEFAULT =3D 8,
-> +    VHOST_USER_PROTOCOL_F_CONFIG =3D 9,
->      VHOST_USER_PROTOCOL_F_MAX
->  };
->=20
-> @@ -1211,6 +1212,17 @@ static int vhost_user_init(struct vhost_dev *dev, =
-void
-> *opaque)
->=20
->          dev->protocol_features =3D
->              protocol_features & VHOST_USER_PROTOCOL_FEATURE_MASK;
-> +
-> +        if (!dev->config_ops || !dev->config_ops->vhost_dev_config_notif=
-ier) {
-> +            /* Don't acknowledge CONFIG feature if device doesn't suppor=
-t it */
-> +            dev->protocol_features &=3D ~(1ULL <<
-> VHOST_USER_PROTOCOL_F_CONFIG);
-> +        } else if (!(protocol_features &
-> +                    (1ULL << VHOST_USER_PROTOCOL_F_CONFIG))) {
-> +            error_report("Device expects VHOST_USER_PROTOCOL_F_CONFIG "
-> +                    "but backend does not support it.");
-> +            return -1;
-> +        }
-> +
->          err =3D vhost_user_set_protocol_features(dev, dev->protocol_feat=
-ures);
->          if (err < 0) {
->              return err;
-> @@ -1405,6 +1417,11 @@ static int vhost_user_get_config(struct vhost_dev
-> *dev, uint8_t *config,
->          .hdr.size =3D VHOST_USER_CONFIG_HDR_SIZE + config_len,
->      };
->=20
-> +    if (!virtio_has_feature(dev->protocol_features,
-> +                VHOST_USER_PROTOCOL_F_CONFIG)) {
-> +        return -1;
-> +    }
-> +
->      if (config_len > VHOST_USER_MAX_CONFIG_SIZE) {
->          return -1;
->      }
-> @@ -1448,6 +1465,11 @@ static int vhost_user_set_config(struct vhost_dev
-> *dev, const uint8_t *data,
->          .hdr.size =3D VHOST_USER_CONFIG_HDR_SIZE + size,
->      };
->=20
-> +    if (!virtio_has_feature(dev->protocol_features,
-> +                VHOST_USER_PROTOCOL_F_CONFIG)) {
-> +        return -1;
-> +    }
-> +
->      if (reply_supported) {
->          msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
->      }
-> --
+>  tests/qemu-iotests/iotests.py | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index b5d7945af8..119c8e270a 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -470,18 +470,15 @@ class QMPTestCase(unittest.TestCase):
+>  
+>      def wait_until_completed(self, drive='drive0', check_offset=True):
+>          '''Wait for a block job to finish, returning the event'''
+> -        completed = False
+> -        while not completed:
+> +        while True:
+>              for event in self.vm.get_qmp_events(wait=True):
+>                  if event['event'] == 'BLOCK_JOB_COMPLETED':
+>                      self.assert_qmp(event, 'data/device', drive)
+>                      self.assert_qmp_absent(event, 'data/error')
+>                      if check_offset:
+>                          self.assert_qmp(event, 'data/offset', event['data']['len'])
+> -                    completed = True
+> -
+> -        self.assert_no_active_block_jobs()
+> -        return event
+> +                    self.assert_no_active_block_jobs()
+> +                    return event
+>  
+>      def wait_ready(self, drive='drive0'):
+>          '''Wait until a block job BLOCK_JOB_READY event'''
+> -- 
 > 2.14.3
+> 
+> 
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
