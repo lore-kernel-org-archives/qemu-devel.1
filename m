@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f5Sg6-0002zH-1P
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:01:33 -0400
+	(envelope-from <kchamart@redhat.com>) id 1f5ShU-0003lx-5D
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f5Sg2-0003wV-2K
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:01:30 -0400
-Date: Mon, 9 Apr 2018 11:01:12 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180409110112.3c6324e7.cohuck@redhat.com>
-In-Reply-To: <152311224179.203086.10603697792860546407.stgit@bahia>
-References: <152311221072.203086.16767398863033055271.stgit@bahia>
-	<152311224179.203086.10603697792860546407.stgit@bahia>
+	(envelope-from <kchamart@redhat.com>) id 1f5ShQ-00050F-Ut
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:02:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38660 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1f5ShQ-0004yN-Q1
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:02:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C40EE82FC482
+	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 09:02:51 +0000 (UTC)
+Date: Mon, 9 Apr 2018 11:02:44 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180409090244.GP9903@paraplu>
+References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
+	<20180307151836.GK20201@redhat.com>
+	<20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>
+	<20180308101728.GG4718@redhat.com>
+	<f30635f1-5773-2046-1efd-fc37a0a49753@redhat.com>
+	<85d1416c-c442-eaf2-c4a5-3308fd63de3a@redhat.com>
+	<721a331e-0ba9-58e2-8659-81b725a0ddff@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vfio-ccw: introduce
- vfio_ccw_get_device()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <721a331e-0ba9-58e2-8659-81b725a0ddff@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
+ et al) metadata format & file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +39,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
 
-On Sat, 07 Apr 2018 16:44:01 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Fri, Apr 06, 2018 at 08:21:00PM +0200, Laszlo Ersek wrote:
+> On 04/06/18 20:10, Eric Blake wrote:
 
-> A recent patch fixed leaks of the dynamically allocated vcdev->vdev.name
-> field in vfio_ccw_realize(), but we now have three freeing sites for it.
-> This is unfortunate and seems to indicate something is wrong with its
-> life cycle.
-> 
-> The root issue is that vcdev->vdev.name is set before vfio_get_device()
-> is called, which theoretically prevents to call vfio_put_device() to
-> do the freeing. Well actually, we could call it anyway  because
-> vfio_put_base_device() is a nop if the device isn't attached, but this
-> would be confusing.
-> 
-> This patch hence moves all the logic of attaching the device, including
-> the "already attached" check, to a separate vfio_ccw_get_device() function,
-> counterpart of vfio_put_device(). While here, vfio_put_device() is renamed
-> to vfio_ccw_put_device() for consistency.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/vfio/ccw.c |   56 ++++++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 36 insertions(+), 20 deletions(-)
-> 
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index fe34b507699f..49ae986d288d 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -292,12 +292,44 @@ static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
->      g_free(vcdev->io_region);
->  }
->  
-> -static void vfio_put_device(VFIOCCWDevice *vcdev)
-> +static void vfio_ccw_put_device(VFIOCCWDevice *vcdev)
->  {
->      g_free(vcdev->vdev.name);
->      vfio_put_base_device(&vcdev->vdev);
->  }
->  
-> +static int vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
-> +                               Error **errp)
+[...]
 
-Make this one void, as you already pass an error object?
+> # key=value pairs also support Python or JSON object literal subset notations,
+> # without spaces. Dictionaries/objects {} are supported as are arrays [].
+> #
+> #    example-command arg-name1={'key':'value','obj'={'prop':"value"}}
+> #
+> # Both JSON and Python formatting should work, including both styles of
+> # string literal quotes. Both paradigms of literal values should work,
+> # including null/true/false for JSON and None/True/False for Python.
 
-> +{
-> +    char *name = g_strdup_printf("%x.%x.%04x", vcdev->cdev.hostid.cssid,
-> +                                 vcdev->cdev.hostid.ssid,
-> +                                 vcdev->cdev.hostid.devid);
-> +    VFIODevice *vbasedev;
-> +
-> +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> +        if (strcmp(vbasedev->name, name) == 0) {
-> +            error_setg(errp, "vfio: subchannel %s has already been attached",
-> +                       name);
-> +            goto out_err;
-> +        }
-> +    }
-> +
-> +    if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
-> +        goto out_err;
-> +    }
-> +
-> +    vcdev->vdev.ops = &vfio_ccw_ops;
-> +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-> +    vcdev->vdev.name = name;
-> +    vcdev->vdev.dev = &vcdev->cdev.parent_obj.parent_obj;
-> +
-> +    return 0;
-> +
-> +out_err:
-> +    g_free(name);
-> +    return -1;
+A couple of examples of the the key-value pairs and using JSON dicts
+with 'qmp-shell'.
 
-That -1 return code looks artificial, so I really think this should be
-void :) The only caller already defines a local error object anyway, so
-it can just check for err.
+Key-value pairs:
 
-> +}
-> +
->  static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
->  {
->      char *tmp, group_path[PATH_MAX];
+  (QEMU) blockdev-snapshot node=node-Base snapshot-file=./overlay1.qcow2 overlay=node-Overlay1
+  [...]
+
+A combination key-value pairs and JSON dicts:
+
+   (QEMU) blockdev-add driver=qcow2 node-name=node-overlay1 file={"driver":"file","filename":"overlay1.qcow2"}
+   [...]
+
+> This looks awesome, because it should let me provide messy nested input
+> (which I'll obviously compose in my $EDITOR and then paste it), and then
+> the QMP shell will both validate and pretty print that. I'm going to try
+> this.
+
+A couple of notes when using the 'qmp-shell':
+
+  - Assuming you started QEMU with: `[...] -qmp
+    unix:/tmp/qmp-sock,server,nowait`, you might want to use the '-p'
+    command-line option to prett-print the JSON:
+    
+        $ qmp-shell -v -p /tmp/qmp-sock
+
+  - It also provides a persistent command history in a convenient file:
+    '~/.qmp-shell_history'
+
+-- 
+/kashyap
