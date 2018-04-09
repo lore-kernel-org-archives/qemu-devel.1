@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5X1u-0005Nq-FX
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:40:20 -0400
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5X5H-0006oP-0T
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:43:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5X1r-0007kT-0h
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:40:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45000 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1f5X1q-0007jX-KV
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:40:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ADFDD40201A1
-	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 13:40:09 +0000 (UTC)
-Date: Mon, 9 Apr 2018 15:40:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180409134003.GG5294@localhost.localdomain>
-References: <20180328170207.49512-1-dgilbert@redhat.com>
-	<20180403143857.GF11070@localhost.localdomain>
-	<20180403205237.GA2501@work-vm>
-	<20180404100303.GE4482@localhost.localdomain>
-	<20180409102744.GC2449@work-vm>
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5X5G-00022y-5M
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:43:47 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180409102744.GC2449@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] migration: Don't activate block devices if
- using -S
+In-Reply-To: <CAFEAcA9stTjg3Wpq5x_vj63jm1DrxAQREk4XPeFWb5rff-Uofg@mail.gmail.com>
+References: <CAHP4M8VVWyNqi4yLS3S0GXaDz3j8QvUiC=aoJ_DfZLtZBaFwqg@mail.gmail.com>
+	<CAFEAcA9stTjg3Wpq5x_vj63jm1DrxAQREk4XPeFWb5rff-Uofg@mail.gmail.com>
+From: Ajay Garg <ajaygargnsit@gmail.com>
+Date: Mon, 9 Apr 2018 19:13:41 +0530
+Message-ID: <CAHP4M8X-Dus1Z8UegDTaab5LvaiDAgQa8upsx_KdnPO+A-XoTQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Use of -machine when running via
+ qemu-system-arm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,113 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, jdenemar@redhat.com, peterx@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 09.04.2018 um 12:27 hat Dr. David Alan Gilbert geschrieben:
-> * Kevin Wolf (kwolf@redhat.com) wrote:
-> > Am 03.04.2018 um 22:52 hat Dr. David Alan Gilbert geschrieben:
-> > > * Kevin Wolf (kwolf@redhat.com) wrote:
-> > > > Am 28.03.2018 um 19:02 hat Dr. David Alan Gilbert (git) geschrieben:
-> > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > > 
-> > > > > Activating the block devices causes the locks to be taken on
-> > > > > the backing file.  If we're running with -S and the destination libvirt
-> > > > > hasn't started the destination with 'cont', it's expecting the locks are
-> > > > > still untaken.
-> > > > > 
-> > > > > Don't activate the block devices if we're not going to autostart the VM;
-> > > > > 'cont' already will do that anyway.
-> > > > > 
-> > > > > bz: https://bugzilla.redhat.com/show_bug.cgi?id=1560854
-> > > > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > 
-> > > > I'm not sure that this is a good idea. Going back to my old writeup of
-> > > > the migration phases...
-> > > > 
-> > > > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07917.html
-> > > > 
-> > > > ...the phase between migration completion and 'cont' is described like
-> > > > this:
-> > > > 
-> > > >     b) Migration converges:
-> > > >        Both VMs are stopped (assuming -S is given on the destination,
-> > > >        otherwise this phase is skipped), the destination is in control of
-> > > >        the resources
-> > > > 
-> > > > This patch changes the definition of the phase so that neither side is
-> > > > in control of the resources. We lose the phase where the destination is
-> > > > in control, but the VM isn't running yet. This feels like a problem to
-> > > > me.
-> > > 
-> > > But see Jiri's writeup on that bz;  libvirt is hitting the opposite
-> > > problem;   in this corner case they can't have the destination taking
-> > > control yet.
-> > 
-> > I wonder if they can't already grant the destination QEMU the necessary
-> > permission in the pre-switchover phase. Just a thought, I don't know how
-> > this works in detail, so it might not possible after all.
-> 
-> It's a fairly hairy failure case they had; if I remember correctly it's:
->   a) Start migration
->   b) Migration gets to completion point
->   c) Destination is still paused
->   d) Libvirt is restarted on the source
->   e) Since libvirt was restarted it fails the migration (and hence knows
->      the destination won't be started)
->   f) It now tries to resume the qemu on the source
-> 
-> (f) fails because (b) caused the locks to be taken on the destination;
-> hence this patch stops doing that.  It's a case we don't really think
-> about - i.e. that the migration has actually completed and all the data
-> is on the destination, but libvirt decides for some other reason to
-> abandon migration.
+Hi Peter,
 
-If you do remember correctly, that scenario doesn't feel tricky at all.
-libvirt needs to quit the destination qemu, which will inactivate the
-images on the destination and release the lock, and then it can continue
-the source.
+Thanks for the reply ..
 
-In fact, this is so straightforward that I wonder what else libvirt is
-doing. Is the destination qemu only shut down after trying to continue
-the source? That would be libvirt using the wrong order of steps.
+On Mon, Apr 9, 2018 at 7:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 9 April 2018 at 14:35, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>> Hi All.
+>>
+>> Not sure if this is purely an ARM-related question, but I will be
+>> grateful if someone could point to some literature that explains what
+>> difference choosing a  machine makes (when we don't need to have any
+>> such flag for qemu-system-i386 or qemu-system-x86_64).
+>
+> Hi; this is a pretty common question, which we talk about on our
+> wiki page here:
+>  https://wiki.qemu.org/Documentation/Platforms/ARM
 
-> > > > Consider a case where the management tool keeps a mirror job with
-> > > > sync=none running to expose all I/O requests to some external process.
-> > > > It needs to shut down the old block job on the source in the
-> > > > 'pre-switchover' state, and start a new block job on the destination
-> > > > when the destination controls the images, but the VM doesn't run yet (so
-> > > > that it doesn't miss an I/O request). This patch removes the migration
-> > > > phase that the management tool needs to implement this correctly.
-> > > > 
-> > > > If we need a "neither side has control" phase, we might need to
-> > > > introduce it in addition to the existing phases rather than replacing a
-> > > > phase that is still needed in other cases.
-> > > 
-> > > This is yet another phase to be added.
-> > > IMHO this needs the managment tool to explicitly take control in the
-> > > case you're talking about.
-> > 
-> > What kind of mechanism do you have in mind there?
-> > 
-> > Maybe what could work would be separate QMP commands to inactivate (and
-> > possibly for symmetry activate) all block nodes. Then the management
-> > tool could use the pre-switchover phase to shut down its block jobs
-> > etc., inactivate all block nodes, transfer its own locks and then call
-> > migrate-continue.
-> 
-> Yes it was a 'block-activate' that I'd wondered about.  One complication
-> is that if this now under the control of the management layer then we
-> should stop asserting when the block devices aren't in the expected
-> state and just cleanly fail the command instead.
+Yep, had already been through it :)
 
-Requiring an explicit 'block-activate' on the destination would be an
-incompatible change, so you would have to introduce a new option for
-that. 'block-inactivate' on the source feels a bit simpler.
+>
+> The underlying reason why you need this on Arm but not on x86
+> is that for x86 every single piece of x86 hardware is pretty
+> much identical. For Arm (as part of its history in the embedded
+> space) the general rule is that every board is different.
 
-And yes, you're probably right that we would have to be more careful to
-catch inactive images without crashing. On the other hand, it would
-become a state that is easier to test because it can be directly
-influenced via QMP rather than being only a side effect of migration.
+Yep, perhaps I am needing a more layman-kinda example-cum-explanation
+for this, so would be grateful for some help in this regard.
 
-Kevin
+
+>
+> thanks
+> -- PMM
+
+
+
+-- 
+Regards,
+Ajay
