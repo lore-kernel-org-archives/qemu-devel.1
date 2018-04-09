@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f5M5V-0006gy-2x
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:59:18 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1f5N0l-0004jX-VV
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 22:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f5M5R-00015x-7Z
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:59:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40470)
+	(envelope-from <Babu.Moger@amd.com>) id 1f5N0i-0007On-Ba
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 22:58:28 -0400
+Received: from mail-sn1nam01on0044.outbound.protection.outlook.com
+	([104.47.32.44]:27968
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1f5M5Q-00015V-Uz
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:59:13 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w391s0YM066477
-	for <qemu-devel@nongnu.org>; Sun, 8 Apr 2018 21:59:11 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h7j4wndq2-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 08 Apr 2018 21:59:10 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Sun, 8 Apr 2018 21:59:09 -0400
-References: <20180404150146.23281-1-stefanha@redhat.com>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Mon, 9 Apr 2018 09:58:54 +0800
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f5N0i-0007NZ-0V
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 22:58:24 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Mon, 9 Apr 2018 02:58:20 +0000
+Message-ID: <CY4PR12MB176833F4D367C19854D2278F95BF0@CY4PR12MB1768.namprd12.prod.outlook.com>
+References: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
+In-Reply-To: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180404150146.23281-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=gbk
-Message-Id: <5e62d846-903e-c352-7a70-91214d34204c@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] i386: Enable TOPOEXT to support
+ hyperthreading on AMD CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,84 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>
 
-
-
-=D4=DA 2018/4/4 23:01, Stefan Hajnoczi =D0=B4=B5=C0:
-> Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
-> vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
-> drain operation the block job iterates one more time than before.  The
-> 185 output no longer matches and the test is failing now.
->=20
-> It may be possible to avoid the superfluous block job iteration, but
-> that type of patch is not suitable late in the QEMU 2.12 release cycle.
->=20
-> This patch simply updates the 185 output file.  The new behavior is
-> correct, just not optimal, so make the test pass again.
->=20
-> Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shut=
-down()")
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/185     | 10 ++++++----
->  tests/qemu-iotests/185.out | 12 +++++++-----
->  2 files changed, 13 insertions(+), 9 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-> index f5b47e4c1a..298d88d04e 100755
-> --- a/tests/qemu-iotests/185
-> +++ b/tests/qemu-iotests/185
-> @@ -92,9 +92,8 @@ echo =3D=3D=3D Start commit job and exit qemu =3D=3D=3D
->  echo
->=20
->  # Note that the reference output intentionally includes the 'offset' f=
-ield in
-> -# BLOCK_JOB_CANCELLED events for all of the following block jobs. They=
- are
-> -# predictable and any change in the offsets would hint at a bug in the=
- job
-> -# throttling code.
-> +# BLOCK_JOB_* events for all of the following block jobs. They are pre=
-dictable
-> +# and any change in the offsets would hint at a bug in the job throttl=
-ing code.
->  #
->  # In order to achieve these predictable offsets, all of the following =
-tests
->  # use speed=3D65536. Each job will perform exactly one iteration befor=
-e it has
-> @@ -102,11 +101,14 @@ echo
->  # command to be received (after receiving the command, the rest runs
->  # synchronously, so jobs can arbitrarily continue or complete).
->  #
-> +# Jobs present while QEMU is terminating iterate once more due to
-> +# bdrv_drain_all().
-> +#
->  # The buffer size for commit and streaming is 512k (waiting for 8 seco=
-nds after
->  # the first request), for active commit and mirror it's large enough t=
-o cover
->  # the full 4M, and for backup it's the qcow2 cluster size, which we kn=
-ow is
->  # 64k. As all of these are at least as large as the speed, we are sure=
- that the
-> -# offset doesn't advance after the first iteration before qemu exits.
-> +# offset advances exactly twice before qemu exits.
->=20
->  _send_qemu_cmd $h \
->      "{ 'execute': 'block-commit',
-Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-
-> diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-> index 57eaf8d699..2c4b04de73 100644
-
-[...]
->=20
-
---=20
-Regards
-QingFeng Hao
+UGluZy4uLg0KQ2hlY2tpbmcgdG8gc2VlIGlmIHRoZXJlIGFyZSBhbnkgZnVydGhlciBjb21tZW50
+cyBvbiB0aGVzZSBwYXRjaCBzZXJpZXMuDQpUaGFua3MNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3Nh
+Z2UtLS0tLQ0KPiBGcm9tOiBNb2dlciwgQmFidQ0KPiBTZW50OiBUdWVzZGF5LCBNYXJjaCAyNywg
+MjAxOCA0OjMxIFBNDQo+IFRvOiBtc3RAcmVkaGF0LmNvbTsgbWFyY2VsQHJlZGhhdC5jb207IHBi
+b256aW5pQHJlZGhhdC5jb207DQo+IHJ0aEB0d2lkZGxlLm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNv
+bTsgbXRvc2F0dGlAcmVkaGF0LmNvbQ0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBrdm1A
+dmdlci5rZXJuZWwub3JnOyBrYXNoQHRyaXBsZWJhY2submV0Ow0KPiBNb2dlciwgQmFidSA8QmFi
+dS5Nb2dlckBhbWQuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjUgMC85XSBpMzg2OiBFbmFibGUg
+VE9QT0VYVCB0byBzdXBwb3J0IGh5cGVydGhyZWFkaW5nIG9uDQo+IEFNRCBDUFUNCj4gDQo+IFRo
+aXMgc2VyaWVzIGVuYWJsZXMgdGhlIFRPUE9FWFQgZmVhdHVyZSBmb3IgQU1EIENQVXMuIFRoaXMg
+aXMgcmVxdWlyZWQgdG8NCj4gc3VwcG9ydCBoeXBlcnRocmVhZGluZyBvbiBrdm0gZ3Vlc3RzLg0K
+PiANCj4gVGhpcyBhZGRyZXNzZXMgdGhlIGlzc3VlcyByZXBvcnRlZCBpbiB0aGVzZSBidWdzOg0K
+PiBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTE0ODEyNTMNCj4g
+aHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvcWVtdS8rYnVnLzE3MDM1MDYNCj4gDQo+IA0KPiB2
+NToNCj4gSW4gdGhpcyBzZXJpZXMgSSB0cmllZCB0byBhZGRyZXNzIHRoZSBmZWVkYmFjayBmcm9t
+IEVkdWFyZG8gSGFia29zdC4NCj4gVGhlIGRpc2N1c3Npb24gdGhyZWFkIGlzIGhlcmUuDQo+IGh0
+dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcGF0Y2gvMTAyOTk3NDUvDQo+IFRoZSBwcmV2aW91
+cyB0aHJlYWQgaXMgaGVyZS4NCj4gaHR0cDovL3BhdGNod29yay5vemxhYnMub3JnL2NvdmVyLzg4
+NDg4NS8NCj4gDQo+IFJlYXNvbiBmb3IgdGhlc2UgY2hhbmdlcw0KPiBUaGUgY2FjaGUgcHJvcGVy
+dGllcyBmb3IgQU1EIGZhbWlseSBvZiBwcm9jZXNzb3JzIGhhdmUgY2hhbmdlZCBmcm9tDQo+IHBy
+ZXZpb3VzIHJlbGVhc2VzLiBXZSBkb24ndCB3YW50IHRvIGRpc3BsYXkgdGhlIG5ldyBpbmZvcm1h
+dGlvbiBvbiB0aGUNCj4gb2xkIGZhbWlseSBvZiBwcm9jZXNzb3JzIGFzIHRoaXMgbWlnaHQgY2F1
+c2UgY29tcGF0aWJpbGl0eSBpc3N1ZXMuDQo+IA0KPiBDaGFuZ2VzOg0KPiAgMS4gQmFzZWQgdGhl
+IHBhdGNoZXMgb24gdG9wIG9mIEVkdWFyZG8ncyhwYXRjaCMxKSBwYXRjaC4NCj4gICAgIENoYW5n
+ZWQgZmV3IHRoaW5ncy4NCj4gICAgIE1vdmVkIHRoZSBDYWNoZSBkZWZpbml0aW9ucyB0byBjcHUu
+aCBmaWxlLg0KPiAgICAgQ2hhbmdlZCB0aGUgQ1BVSURfNCBuYW1lcyB0byBnZW5lcmljIG5hbWVz
+Lg0KPiAyLiBBZGRlZCBhIG5ldyBwcm9wZXJ5ICJsZWdhY3ktY2FjaGUiIGluIGNwdSBvYmplY3Qo
+cGF0Y2gjMikuIFRoaXMgY2FuIGJlDQo+ICAgIHVzZWQgdG8gZGlzcGxheSB0aGUgb2xkIHByb3Bl
+cnR5IGV2ZW4gaWYgdGhlIGhvc3Qgc3VwcG9ydHMgdGhlIG5ldyBjYWNoZQ0KPiAgICBwcm9wZXJ0
+aWVzLg0KPiAzLiBBZGRlZCBjYWNoZSBpbmZvcm1hdGlvbiBpbiBYODZDUFVEZWZpbml0aW9uIGFu
+ZCBDUFVYODZTdGF0ZQ0KPiA0LiBQYXRjaCA2LTcgY2hhbmdlZCBxdWl0ZSBhIGJpdCBmcm9tIHBy
+ZXZpb3VzIHZlcnNpb24gZG9lcyB0byBuZXcgYXBwcm9hY2guDQo+IDUuIEFkZHJlc3NlZCBmZXcg
+aXNzdWVzIHdpdGggQ1BVSURfODAwMF8wMDFkIGFuZCBDUFVJRF84MDAwXzAwMUUuDQo+IA0KPiAN
+Cj4gdjQ6DQo+IDEuUmVtb3ZlZCB0aGUgY2hlY2tzIHVuZGVyIGNwdWlkIDB4ODAwMDAwMUQgbGVh
+ZihwYXRjaCAjMikuIFRoZXNlIGNoZWNrDQo+IGFyZQ0KPiAgIG5vdCBuZWNlc3NhcnkuIEZvdW5k
+IHRoaXMgZHVyaW5nIGludGVybmFsIHJldmlldy4NCj4gMi5BZGRlZCBDUFVJRF9FWFQzX1RPUE9F
+WFQgZmVhdHVyZSBmb3IgYWxsIHRoZSAxNyBmYW1pbHkocGF0Y2ggIzQpLiBUaGlzDQo+IHdhcw0K
+PiAgIGZvdW5kIGJ5IEthc2ggUGFuZGUgZHVyaW5nIGhpcyB0ZXN0aW5nLg0KPiAzLlJlbW92ZWQg
+dGggaGFyZGNvZGVkIGNwdWlkIHhsZXZlbCBhbmQgZHluYW1pY2FsbHkgZXh0ZW5kZWQgaWYNCj4g
+Q1BVSURfRVhUM19UT1BPRVhUDQo+ICAgaXMgc3VwcG9ydGVkKFN1Z2dlc3RlZCBieSBCcmlqZXNo
+IFNpbmdoKS4NCj4gDQo+IHYzOg0KPiAxLlJlbW92ZWQgdGhlIHBhdGNoICMxLiBSYWRpbSBtZW50
+aW9uZWQgdGhhdCBvcmlnaW5hbCB0eXBvIHByb2JsZW0gaXMgaW4NCj4gICBsaW51eCBrZXJuZWwg
+aGVhZGVyLiBxZW11IGlzIGp1c3QgY29weWluZyB0aG9zZSBmaWxlcy4NCj4gMi5JbiBwcmV2aW91
+cyB2ZXJzaW9uLCBJIHVzZWQgdGhlIGNwdWlkIDQgZGVmaW5pdGlvbnMgZm9yIEFNRHMgY3B1aWQg
+bGVhZg0KPiAgIDB4ODAwMDAwMUQuIENQVUlEIDQgaXMgdmVyeSBpbnRlbCBzcGVjaWZpYyBhbmQg
+d2UgZG9udCB3YW50IHRvIGV4cG9zZSB0aG9zZQ0KPiAgIGRldGFpbHMgdW5kZXIgQU1ELiBJIGhh
+dmUgcmVuYW1lZCBzb21lIG9mIHRoZXNlIGRlZmluaXRpb25zIGFzIGdlbmVyaWMuDQo+ICAgVGhl
+c2UgY2hhbmdlcyBhcmUgaW4gcGF0Y2gjMS4gUmFkaW0sIGxldCBtZSBrbm93IGlmIHRoaXMgaXMg
+d2hhdCB5b3UNCj4gaW50ZW5kZWQuDQo+IDMuQWRkZWQgYXNzZXJ0IHRvIGZvciBjb3JlX2lkKFN1
+Z2dlc3RlZCBieSBSYWRpbSBLcsSNbcOhxZkpLg0KPiA0LkNoYW5nZWQgdGhlIGlmIGNvbmRpdGlv
+biB1bmRlciAiTDMgY2FjaGUgaW5mbyIoU3VnZ2VzdGVkIGJ5IEdhcnkgSG9vaykuDQo+IDUuQWRk
+cmVzc2VkIGZldyBtb3JlIHRleHQgY29ycmVjdGlvbiBhbmQgY29kZSBjbGVhbnVwKFN1Z2dlc3Rl
+ZCBieQ0KPiBUaG9tYXMgTGVuZGFja3kpLg0KPiANCj4gdjI6DQo+ICAgRml4ZWQgZmV3IG1vcmUg
+bWlub3IgaXNzdWVzIHBlciBHYXJ5IEhvb2sncyBjb21tZW50cy4gVGhhbmsgeW91IEdhcnkuDQo+
+ICAgUmVtb3ZlZCB0aGUgcGF0Y2gjMS4gV2UgbmVlZCB0byBoYW5kbGUgdGhlIGluc3RydWN0aW9u
+IGNhY2hlDQo+IGFzc29jaWF0aXZpdHkNCj4gICBzZXBlcmF0ZWx5LiBJdCB2YXJpZXMgYmFzZWQg
+b24gdGhlIGNwdSBmYW1pbHkuIEkgd2lsbCBjb21lYmFjayB0byB0aGF0IGxhdGVyLg0KPiAgIEFk
+ZGVkIHR3byBtb3JlIHR5cG8gY29ycmVjdGlvbnMgaW4gcGF0Y2gjMSBhbmQgcGF0Y2gjNS4NCj4g
+DQo+IHYxOg0KPiAgIFN0YW5pc2xhdiBMYW5jaSBwb3N0ZWQgZmV3IHBhdGNoZXMgZWFybGllci4N
+Cj4gICBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3BhdGNoLzEwMDQwOTAzLw0KPiANCj4g
+UmViYXNlZCBoaXMgcGF0Y2hlcyB3aXRoIGZldyBjaGFuZ2VzLg0KPiAxLlNwaXQgdGhlIHBhdGNo
+ZXMgaW50byB0d28sIHNlcGFyYXRpbmcgY3B1aWQgZnVuY3Rpb25zDQo+ICAgMHg4MDAwMDAxRCBh
+bmQgMHg4MDAwMDAxRSAoUGF0Y2ggMiBhbmQgMykuDQo+IDIuUmVtb3ZlZCB0aGUgZ2VuZXJpYyBu
+b24taW50ZWwgY2hlY2sgYW5kIG1hZGUgYSBzZXBhcmF0ZSBwYXRjaA0KPiAgIHdpdGggc29tZSBj
+aGFuZ2VzKFBhdGNoIDUpLg0KPiAzLkZpeGVkIEwzX05fU0VUU19BTUQoZnJvbSA0MDk2IHRvIDgx
+OTIpIGJhc2VkIG9uDQo+IENQVUlEX0ZuODAwMDAwMURfRUNYX3gwMy4NCj4gDQo+IEFkZGVkIDIg
+bW9yZSBwYXRjaGVzLg0KPiBQYXRjaCAxLiBGaXhlcyBjYWNoZSBhc3NvY2lhdGl2aXR5Lg0KPiBQ
+YXRjaCA0LiBBZGRzIFRPUE9FWFQgZmVhdHVyZSBvbiBBTUQgRVBZQyBDUFUuDQo+IA0KPiANCj4g
+QmFidSBNb2dlciAoOCk6DQo+ICAgaTM4NjogQWRkIGNhY2hlIGluZm9ybWF0aW9uIGluIFg4NkNQ
+VURlZmluaXRpb24NCj4gICBpMzg2OiBJbml0aWFsaXplIGNhY2hlIGluZm9ybWF0aW9uIGZvciBF
+UFlDIGZhbWlseSBwcm9jZXNzb3JzDQo+ICAgaTM4NjogQWRkIG5ldyBwcm9wZXJ0eSB0byBjb250
+cm9sIGNhY2hlIGluZm8NCj4gICBpMzg2OiBVc2UgdGhlIHN0YXRpY2FsbHkgbG9hZGVkIGNhY2hl
+IGRlZmluaXRpb25zDQo+ICAgaTM4NjogUG9wdWxhdGUgQU1EIFByb2Nlc3NvciBDYWNoZSBJbmZv
+cm1hdGlvbiBmb3IgY3B1aWQgMHg4MDAwMDAxRA0KPiAgIGkzODY6IEFkZCBzdXBwb3J0IGZvciBD
+UFVJRF84MDAwXzAwMUUgZm9yIEFNRA0KPiAgIGkzODY6IEVuYWJsZSBUT1BPRVhUIGZlYXR1cmUg
+b24gQU1EIEVQWUMgQ1BVDQo+ICAgaTM4NjogUmVtb3ZlIGdlbmVyaWMgU01UIHRocmVhZCBjaGVj
+aw0KPiANCj4gRWR1YXJkbyBIYWJrb3N0ICgxKToNCj4gICBpMzg2OiBIZWxwZXJzIHRvIGVuY29k
+ZSBjYWNoZSBpbmZvcm1hdGlvbiBjb25zaXN0ZW50bHkNCj4gDQo+ICBpbmNsdWRlL2h3L2kzODYv
+cGMuaCB8ICAgNiArLQ0KPiAgdGFyZ2V0L2kzODYvY3B1LmMgICAgfCA3MzUNCj4gKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tDQo+ICB0YXJnZXQvaTM4
+Ni9jcHUuaCAgICB8ICA2NiArKysrKw0KPiAgdGFyZ2V0L2kzODYva3ZtLmMgICAgfCAgMjkgKy0N
+Cj4gIDQgZmlsZXMgY2hhbmdlZCwgNzAyIGluc2VydGlvbnMoKyksIDEzNCBkZWxldGlvbnMoLSkN
+Cj4gDQo+IC0tDQo+IDEuOC4zLjENCg0K
