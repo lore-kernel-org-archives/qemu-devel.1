@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f5b8A-0000nF-Fk
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 14:03:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5bQ5-00086f-Qi
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 14:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f5b89-0002S3-RC
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 14:03:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5bQ1-0005Ny-Oj
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 14:21:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5bQ1-0005NE-J0
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 14:21:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5bPy-0003xH-LG
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 18:21:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 41E302E81AA
+	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 18:21:24 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_WOvTLnyOTWdO-PhoXsOWkUbayutxLr0jthowOfNgaVw@mail.gmail.com>
-References: <CAHP4M8VVWyNqi4yLS3S0GXaDz3j8QvUiC=aoJ_DfZLtZBaFwqg@mail.gmail.com>
-	<CAFEAcA9stTjg3Wpq5x_vj63jm1DrxAQREk4XPeFWb5rff-Uofg@mail.gmail.com>
-	<CAHP4M8X-Dus1Z8UegDTaab5LvaiDAgQa8upsx_KdnPO+A-XoTQ@mail.gmail.com>
-	<CAFEAcA_1X1AQ6j9pZQ8fEHmQCxRNK7EhGkohuLbTMpoPONe5PA@mail.gmail.com>
-	<CAHP4M8WUd9QKTCETaKNa+VQ6hMLcND8dfdDAZ3QutieDaE1WKQ@mail.gmail.com>
-	<CAFEAcA_WOvTLnyOTWdO-PhoXsOWkUbayutxLr0jthowOfNgaVw@mail.gmail.com>
-From: Ajay Garg <ajaygargnsit@gmail.com>
-Date: Mon, 9 Apr 2018 23:32:57 +0530
-Message-ID: <CAHP4M8WLXqvCVGxVyaTiCQbwcJVXEPCnRL1DTzzNZq1Cbu0v1w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] Use of -machine when running via
- qemu-system-arm
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Apr 2018 18:07:50 -0000
+From: Launchpad Bug Tracker <1740219@bugs.launchpad.net>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <152329727635.2269.15905175836552485596.malone@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Thanks a ton Peter, that cleared things up a great deal !!!
-Thanks again for the quick help !!
+This bug was fixed in the package qemu - 1:2.11+dfsg-1ubuntu6
 
+---------------
+qemu (1:2.11+dfsg-1ubuntu6) bionic; urgency=3Dmedium
 
-Thanks and Regards,
-Ajay
+  * Remove LP: 1752026 changes to d/p/ubuntu/define-ubuntu-machine-types.pa=
+tch.
+    The Kernel fixes are preferred and already committed to the kernel.
+    Therefore remove the default disabling of the HTM feature (LP: #1761175)
+  * d/p/ubuntu/lp1739665-SSE-AVX-AVX512-cpu-features.patch: Enable new
+    SSE/AVX/AVX512 cpu features (LP: #1739665)
+  * d/p/ubuntu/lp1740219-continuous-space-commpage.patch: make Arm
+    space+commpage continuous which avoids long startup times on
+    qemu-user-static (LP: #1740219)
+  * d/p/ubuntu/lp-1761372-*: provide pseries-bionic-2.11-sxxm type as
+    convenience with all meltdown/spectre workarounds enabled by default.
+    This is not the default type following upstream and x86 on that.
+    (LP: #1761372).
+  * d/p/ubuntu/lp-1704312-1-* provide means to manually handle filesystem-d=
+ax
+    with pmem by backporting align and unarmed options (LP: #1704312).
+  * d/p/ubuntu/lp-1762315-slirp-Add-domainname.patch: slirp: Add domainname
+    option to slirp's DHCP server (LP: #1762315)
 
-On Mon, Apr 9, 2018 at 11:17 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 9 April 2018 at 18:41, Ajay Garg <ajaygargnsit@gmail.com> wrote:
->> Hi Peter.
->>
->> The link is pretty good, just that I am a complete noob.
->>
->> Maybe a more concrete example on the following, clearly specifying why
->> things work on x86 without the need of -machine flag, will make things
->> crystal clear :
->>
->> Because ARM systems differ so much and in fundamental ways, typically
->> operating system or firmware images intended to run on one machine
->> will not run at all on any other. This is often surprising for new
->> users who are used to the x86 world where every system looks like a
->> standard PC. (Once the kernel has booted, most userspace software
->> cares much less about the detail of the hardware.)
->
-> For instance, on x86 you can always find the UART for serial
-> output at IO port 0x3f8, and it's always an 8250 or compatible.
-> On Arm, the memory address where the UART is will be likely
-> different for every board. And once you know the address of the
-> UART, each SoC likely may well have its own implementation,
-> which has different registers that do different things.
-> And there's no way to probe for what's there -- you have to
-> know in advance. So you can't even usefully print bootup
-> messages without knowing what you're running on.
->
-> thanks
-> -- PMM
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 04 Apr
+2018 15:16:07 +0200
+
+** Changed in: qemu (Ubuntu)
+       Status: In Progress =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
+
+Title:
+  static linux-user ARM emulation has several-second startup time
+
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+
+Bug description:
+  static linux-user emulation has several-second startup time
+
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
+
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
+
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
+
+  ----
+
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
+
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
+
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
+
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
+
+  ----
+
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
