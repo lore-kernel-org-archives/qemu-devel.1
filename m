@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f5acY-0001fY-8k
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:30:24 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f5ajS-0004D3-8U
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f5acU-0004PL-Fg
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:30:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34274 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f5acU-0004Or-7e
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:30:18 -0400
-Date: Mon, 9 Apr 2018 18:30:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180409173003.GI2449@work-vm>
-References: <20180401084848.36725-1-jiangshanlai@gmail.com>
-	<20180404114709.45118-1-jiangshanlai@gmail.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1f5ajO-0000uQ-BP
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:37:30 -0400
+Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:37837)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1f5ajO-0000u8-5s
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:37:26 -0400
+Received: by mail-pl0-x230.google.com with SMTP id v5-v6so5592660plo.4
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 10:37:26 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20180409082323.29575-1-peterx@redhat.com>
+	<20180409083154.GD18283@redhat.com>
+	<CAFEAcA-VS=b31Z=WZEO3sDLntA97px81ErVRZbHcSTxRe1YNEA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5ff4301b-ffda-1b03-ef64-ec107572260f@redhat.com>
+Date: Mon, 9 Apr 2018 19:37:11 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-VS=b31Z=WZEO3sDLntA97px81ErVRZbHcSTxRe1YNEA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180404114709.45118-1-jiangshanlai@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V4] migration: add capability to bypass the
- shared memory
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] configure: don't warn GTK if disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,296 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, "James O . D . Hunt" <james.o.hunt@intel.com>, Xu Wang <gnawux@gmail.com>, Peng Tao <bergwolf@gmail.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi,
+On 09/04/2018 11:24, Peter Maydell wrote:
+> On 9 April 2018 at 09:31, Daniel P. Berrangé <berrange@redhat.com> wrote:
+>> Feels to me that since we've deprecated 2.0, we could just *never* auto
+>> detect - just do     test -z "$gtkabi" && gtkabi=3.0
+>>
+>> Anyone who wants gtk2 should have to use an explicit --with-gtkabi=2.0
+>
+> I think if we still work with gtk2 then we should go ahead and
+> warn-but-use it.
 
-* Lai Jiangshan (jiangshanlai@gmail.com) wrote:
-> 1) What's this
->=20
-> When the migration capability 'bypass-shared-memory'
-> is set, the shared memory will be bypassed when migration.
->=20
-> It is the key feature to enable several excellent features for
-> the qemu, such as qemu-local-migration, qemu-live-update,
-> extremely-fast-save-restore, vm-template, vm-fast-live-clone,
-> yet-another-post-copy-migration, etc..
->=20
-> The philosophy behind this key feature, including the resulting
-> advanced key features, is that a part of the memory management
-> is separated out from the qemu, and let the other toolkits
-> such as libvirt, kata-containers (https://github.com/kata-containers)
-> runv(https://github.com/hyperhq/runv/) or some multiple cooperative
-> qemu commands directly access to it, manage it, provide features on it.
->=20
-> 2) Status in real world
->=20
-> The hyperhq(http://hyper.sh  http://hypercontainer.io/)
-> introduced the feature vm-template(vm-fast-live-clone)
-> to the hyper container for several years, it works perfect.
-> (see https://github.com/hyperhq/runv/pull/297).
->=20
-> The feature vm-template makes the containers(VMs) can
-> be started in 130ms and save 80M memory for every
-> container(VM). So that the hyper containers are fast
-> and high-density as normal containers.
->=20
-> kata-containers project (https://github.com/kata-containers)
-> which was launched by hyper, intel and friends and which descended
-> from runv (and clear-container) should have this feature enabled.
-> Unfortunately, due to the code confliction between runv&cc,
-> this feature was temporary disabled and it is being brought
-> back by hyper and intel team.
->=20
-> 3) How to use and bring up advanced features.
->=20
-> In current qemu command line, shared memory has
-> to be configured via memory-object.
->=20
-> a) feature: qemu-local-migration, qemu-live-update
-> Set the mem-path on the tmpfs and set share=3Don for it when
-> start the vm. example:
-> -object \
-> memory-backend-file,id=3Dmem,size=3D128M,mem-path=3D/dev/shm/memory,sha=
-re=3Don \
-> -numa node,nodeid=3D0,cpus=3D0-7,memdev=3Dmem
->=20
-> when you want to migrate the vm locally (after fixed a security bug
-> of the qemu-binary, or other reason), you can start a new qemu with
-> the same command line and -incoming, then you can migrate the
-> vm from the old qemu to the new qemu with the migration capability
-> 'bypass-shared-memory' set. The migration will migrate the device-state
-> *ONLY*, the memory is the origin memory backed by tmpfs file.
->=20
-> b) feature: extremely-fast-save-restore
-> the same above, but the mem-path is on the persistent file system.
->=20
-> c)  feature: vm-template, vm-fast-live-clone
-> the template vm is started as 1), and paused when the guest reaches
-> the template point(example: the guest app is ready), then the template
-> vm is saved. (the qemu process of the template can be killed now, becau=
-se
-> we need only the memory and the device state files (in tmpfs)).
->=20
-> Then we can launch one or multiple VMs base on the template vm states,
-> the new VMs are started without the =E2=80=9Cshare=3Don=E2=80=9D, all t=
-he new VMs share
-> the initial memory from the memory file, they save a lot of memory.
-> all the new VMs start from the template point, the guest app can go to
-> work quickly.
+Both are valid choices of course.  Since we have Peter (Xu)'s patch, I
+think we should go for that and revisit in 2.13 whether to remove GTK+
+2.0 support altogether, require an explicit configure argument, or leave
+things as they are.
 
-How do you handle the storage in this case, or giving each VM it's own
-MAC address?
-
-> The new VM booted from template vm can=E2=80=99t become template again,
-> if you need this unusual chained-template feature, you can write
-> a cloneable-tmpfs kernel module for it.
->=20
-> The libvirt toolkit can=E2=80=99t manage vm-template currently, in the
-> hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
-> =E2=80=9Clibvrit managed template=E2=80=9D feature to libvirt.
-
-> d) feature: yet-another-post-copy-migration
-> It is a possible feature, no toolkit can do it well now.
-> Using nbd server/client on the memory file is reluctantly Ok but
-> inconvenient. A special feature for tmpfs might be needed to
-> fully complete this feature.
-> No one need yet another post copy migration method,
-> but it is possible when some crazy man need it.
-
-As the crazy person who did the existing postcopy; one is enough!
-
-Some minor fix requests below, but this looks nice and simple.
-
-Shared memory is interesting because tehre are lots of different uses;
-e.g. your uses, but also vhost-user which is sharing for a completely
-different reason.
-
-> Cc: Samuel Ortiz <sameo@linux.intel.com>
-> Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Cc: James O. D. Hunt <james.o.hunt@intel.com>
-> Cc: Xu Wang <gnawux@gmail.com>
-> Cc: Peng Tao <bergwolf@gmail.com>
-> Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-> Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-> Signed-off-by: Lai Jiangshan <jiangshanlai@gmail.com>
-> ---
->=20
-> Changes in V4:
->  fixes checkpatch.pl errors
->=20
-> Changes in V3:
->  rebased on upstream master
->  update the available version of the capability to
->  v2.13
->=20
-> Changes in V2:
->  rebased on 2.11.1
->=20
->  migration/migration.c | 14 ++++++++++++++
->  migration/migration.h |  1 +
->  migration/ram.c       | 27 ++++++++++++++++++---------
->  qapi/migration.json   |  6 +++++-
->  4 files changed, 38 insertions(+), 10 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 52a5092add..6a63102d7f 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1509,6 +1509,20 @@ bool migrate_release_ram(void)
->      return s->enabled_capabilities[MIGRATION_CAPABILITY_RELEASE_RAM];
->  }
-> =20
-> +bool migrate_bypass_shared_memory(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    /* it is not workable with postcopy yet. */
-> +    if (migrate_postcopy_ram()) {
-> +        return false;
-> +    }
-
-Please change this to work in the same way as the check for
-postcopy+compress in migration.c migrate_caps_check.
-
-> +    s =3D migrate_get_current();
-> +
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_BYPASS_SHARED_=
-MEMORY];
-> +}
-> +
->  bool migrate_postcopy_ram(void)
->  {
->      MigrationState *s;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 8d2f320c48..cfd2513ef0 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -206,6 +206,7 @@ MigrationState *migrate_get_current(void);
-> =20
->  bool migrate_postcopy(void);
-> =20
-> +bool migrate_bypass_shared_memory(void);
->  bool migrate_release_ram(void);
->  bool migrate_postcopy_ram(void);
->  bool migrate_zero_blocks(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 0e90efa092..bca170c386 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -780,6 +780,11 @@ unsigned long migration_bitmap_find_dirty(RAMState=
- *rs, RAMBlock *rb,
->      unsigned long *bitmap =3D rb->bmap;
->      unsigned long next;
-> =20
-> +    /* when this ramblock is requested bypassing */
-> +    if (!bitmap) {
-> +        return size;
-> +    }
-> +
->      if (rs->ram_bulk_stage && start > 0) {
->          next =3D start + 1;
->      } else {
-> @@ -850,7 +855,9 @@ static void migration_bitmap_sync(RAMState *rs)
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
->      RAMBLOCK_FOREACH(block) {
-> -        migration_bitmap_sync_range(rs, block, 0, block->used_length);
-> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(blo=
-ck)) {
-> +            migration_bitmap_sync_range(rs, block, 0, block->used_leng=
-th);
-> +        }
->      }
->      rcu_read_unlock();
->      qemu_mutex_unlock(&rs->bitmap_mutex);
-> @@ -2132,18 +2139,12 @@ static int ram_state_init(RAMState **rsp)
->      qemu_mutex_init(&(*rsp)->src_page_req_mutex);
->      QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
-> =20
-> -    /*
-> -     * Count the total number of pages used by ram blocks not includin=
-g any
-> -     * gaps due to alignment or unplugs.
-> -     */
-> -    (*rsp)->migration_dirty_pages =3D ram_bytes_total() >> TARGET_PAGE=
-_BITS;
-> -
->      ram_state_reset(*rsp);
-> =20
->      return 0;
->  }
-> =20
-> -static void ram_list_init_bitmaps(void)
-> +static void ram_list_init_bitmaps(RAMState *rs)
->  {
->      RAMBlock *block;
->      unsigned long pages;
-> @@ -2151,9 +2152,17 @@ static void ram_list_init_bitmaps(void)
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
-
-I think you need to add here a :
-   rs->migration_dirty_pages =3D 0;
-
-I don't see anywhere else that initialises it, and there is the case of
-a migration that fails, followed by a 2nd attempt.
-
->          QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +            if (migrate_bypass_shared_memory() && qemu_ram_is_shared(b=
-lock)) {
-> +                continue;
-> +            }
->              pages =3D block->max_length >> TARGET_PAGE_BITS;
->              block->bmap =3D bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
-> +            /*
-> +             * Count the total number of pages used by ram blocks not
-> +             * including any gaps due to alignment or unplugs.
-> +             */
-> +            rs->migration_dirty_pages +=3D pages;
->              if (migrate_postcopy_ram()) {
->                  block->unsentmap =3D bitmap_new(pages);
->                  bitmap_set(block->unsentmap, 0, pages);
-> @@ -2169,7 +2178,7 @@ static void ram_init_bitmaps(RAMState *rs)
->      qemu_mutex_lock_ramlist();
->      rcu_read_lock();
-> =20
-> -    ram_list_init_bitmaps();
-> +    ram_list_init_bitmaps(rs);
->      memory_global_dirty_log_start();
->      migration_bitmap_sync(rs);
-> =20
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 9d0bf82cf4..45326480bd 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -357,13 +357,17 @@
->  # @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
->  #                 (since 2.12)
->  #
-> +# @bypass-shared-memory: the shared memory region will be bypassed on =
-migration.
-> +#          This feature allows the memory region to be reused by new q=
-emu(s)
-> +#          or be migrated separately. (since 2.13)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m',
->             'block', 'return-path', 'pause-before-switchover', 'x-multi=
-fd',
-> -           'dirty-bitmaps' ] }
-> +           'dirty-bitmaps', 'bypass-shared-memory' ] }
-> =20
->  ##
->  # @MigrationCapabilityStatus:
-> --=20
-> 2.14.3 (Apple Git-98)
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
