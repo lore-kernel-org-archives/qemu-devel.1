@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f5V0L-0005ES-0t
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:30:33 -0400
+	(envelope-from <david@redhat.com>) id 1f5V0N-0005FZ-LK
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f5V0H-0007SG-SB
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:30:33 -0400
+	(envelope-from <david@redhat.com>) id 1f5V0H-0007SO-T3
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:30:35 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  9 Apr 2018 13:30:19 +0200
-Message-Id: <20180409113019.14568-3-david@redhat.com>
+Date: Mon,  9 Apr 2018 13:30:18 +0200
+Message-Id: <20180409113019.14568-2-david@redhat.com>
 In-Reply-To: <20180409113019.14568-1-david@redhat.com>
 References: <20180409113019.14568-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 2/2] s390x: load_psw() should only
- exchange the PSW for KVM
+Subject: [Qemu-devel] [PATCH v1 for-2.12 1/2] s390x/mmu: don't overwrite
+ pending exception in mmu translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Let's simplify it a bit. On some weird circumstances we would have tried
-to recompute watchpoints when running under KVM.
+If we already triggered another exception, don't overwrite it with a
+protection exception.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ target/s390x/mmu_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 615fa24ab9..e8548f340a 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -103,16 +103,18 @@ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr)
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 1deeb6e6e4..a25deef5dd 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -325,7 +325,7 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
  
-     env->psw.addr = addr;
-     env->psw.mask = mask;
--    if (tcg_enabled()) {
--        env->cc_op = (mask >> 44) & 3;
-+
-+    /* KVM will handle all WAITs and trigger a WAIT exit on disabled_wait */
-+    if (!tcg_enabled()) {
-+        return;
+     r = mmu_translate_region(env, vaddr, asc, asce, level, raddr, flags, rw,
+                              exc);
+-    if (rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
++    if (!r && rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
+         trigger_prot_fault(env, vaddr, asc, rw, exc);
+         return -1;
      }
-+    env->cc_op = (mask >> 44) & 3;
- 
-     if ((old_mask ^ mask) & PSW_MASK_PER) {
-         s390_cpu_recompute_watchpoints(CPU(s390_env_get_cpu(env)));
-     }
- 
--    /* KVM will handle all WAITs and trigger a WAIT exit on disabled_wait */
--    if (tcg_enabled() && (mask & PSW_MASK_WAIT)) {
-+    if (mask & PSW_MASK_WAIT) {
-         s390_handle_wait(s390_env_get_cpu(env));
-     }
- }
 -- 
 2.14.3
