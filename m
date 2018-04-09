@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5WAr-0002O2-Jz
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:45:30 -0400
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5WMh-0006m5-Jy
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5WAo-0000Vs-Et
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:45:29 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f5WAo-0000Un-4P
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:45:26 -0400
-Received: by mail-wm0-x243.google.com with SMTP id 66so12562907wmd.3
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 05:45:25 -0700 (PDT)
-References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
-Date: Mon, 09 Apr 2018 13:45:22 +0100
-Message-ID: <87efjov999.fsf@linaro.org>
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5WMg-0007Yp-Iw
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:57:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87efjov999.fsf@linaro.org>
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+From: Ajay Garg <ajaygargnsit@gmail.com>
+Date: Mon, 9 Apr 2018 18:27:37 +0530
+Message-ID: <CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] Crash when running hello-world unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,41 +22,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ajay Garg <ajaygargnsit@gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, rumpkernel-users@freelists.org
 
+>
+> qemu-system-x86_64 is expecting an x86 binary blob. I assume you need
+> qemu-system-arm. More importantly you need to specify a -M machine type
+> that matches whatever rumprun is expecting.
+>
 
-Ajay Garg <ajaygargnsit@gmail.com> writes:
+Oops, sorry my bad.
+Here is the updated status :
 
-> Hi All.
->
-> We did the following :
->
-> a)
-> Cross-compile rumprun for ARM on a linux x86_64 :
->
-> ajay@latitude-3480:~/rumprun-arm-hw/rumprun$
-> CC=3Darm-linux-gnueabihf-gcc ./build-rr.sh hw
-<snip>
->
-> c)
-> Tried running on x86_64, via qemu, but got the crash :
->
-> ######################################################################
-> ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ qemu-system-x86_64
-> -nographic -kernel helloer.bin
-> warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
-> qemu: fatal: Trying to execute code outside RAM or ROM at 0x00000000000a0=
-1f1
->
-<snip>
->
->
-> Where should we be looking to start to fix?
+ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ qemu-system-arm -machine
+virt -nographic -nographic -kernel helloer.bin
+Bad ram pointer 0x1e8
+Aborted (core dumped)
 
-qemu-system-x86_64 is expecting an x86 binary blob. I assume you need
-qemu-system-arm. More importantly you need to specify a -M machine type
-that matches whatever rumprun is expecting.
 
---
-Alex Benn=C3=A9e
+ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ gdb --args
+qemu-system-arm -machine virt -nographic -nographic -kernel
+helloer.bin
+GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
+Copyright (C) 2016 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from qemu-system-arm...(no debugging symbols found)...done.
+(gdb) r
+Starting program: /usr/bin/qemu-system-arm -machine virt -nographic
+-nographic -kernel helloer.bin
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffecc88700 (LWP 14033)]
+[New Thread 0x7fffd21fc700 (LWP 14034)]
+Bad ram pointer 0x1e8
+
+Thread 3 "qemu-system-arm" received signal SIGABRT, Aborted.
+[Switching to Thread 0x7fffd21fc700 (LWP 14034)]
+0x00007ffff2a1b428 in __GI_raise (sig=sig@entry=6) at
+../sysdeps/unix/sysv/linux/raise.c:54
+54    ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) bt
+#0  0x00007ffff2a1b428 in __GI_raise (sig=sig@entry=6) at
+../sysdeps/unix/sysv/linux/raise.c:54
+#1  0x00007ffff2a1d02a in __GI_abort () at abort.c:89
+#2  0x00005555557687f1 in get_page_addr_code ()
+#3  0x000055555572d50c in ?? ()
+#4  0x000055555572e11b in cpu_arm_exec ()
+#5  0x0000555555750252 in ?? ()
+#6  0x00007ffff2db76ba in start_thread (arg=0x7fffd21fc700) at
+pthread_create.c:333
+#7  0x00007ffff2aed41d in clone () at
+../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+(gdb)
+
+
+Thanks and Regards,
+Ajay
