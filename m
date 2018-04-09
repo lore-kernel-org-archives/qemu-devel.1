@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f5cVb-0000zH-T4
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 15:31:21 -0400
+	(envelope-from <alexandr.iarygin@profitbricks.com>)
+	id 1f5a9H-0004Oq-Ah
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f5cVY-00021m-Ip
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 15:31:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39666 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f5cVY-000216-BR
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 15:31:16 -0400
-Date: Mon, 9 Apr 2018 20:30:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180409193052.GM2449@work-vm>
-References: <20180330075128.26919-1-xiaoguangrong@tencent.com>
-	<c7f35243-3357-579b-3e68-40b0369dd1c7@gmail.com>
-	<b8ec9404-b34f-bd4f-df02-8227683f0ef8@redhat.com>
+	(envelope-from <alexandr.iarygin@profitbricks.com>)
+	id 1f5a9D-0003Lt-8D
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:00:07 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alexandr.iarygin@profitbricks.com>)
+	id 1f5a9D-0003Jg-0Y
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:00:03 -0400
+Received: by mail-wm0-x243.google.com with SMTP id w2so18475547wmw.1
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 10:00:01 -0700 (PDT)
+From: Alexandr Iarygin <alexandr.iarygin@profitbricks.com>
+In-Reply-To: <1522186271-27743-5-git-send-email-babu.moger@amd.com>
+References: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
+	<1522186271-27743-5-git-send-email-babu.moger@amd.com>
+Date: Mon, 09 Apr 2018 18:59:58 +0200
+Message-ID: <867epg48oh.fsf@profitbricks.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b8ec9404-b34f-bd4f-df02-8227683f0ef8@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] migration: improve and cleanup
- compression
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 4/9] i386: Add new property to control
+ cache info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,266 +32,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Babu Moger <babu.moger@amd.com>, mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, Alexandr Iarygin <alexandr.iarygin@profitbricks.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 08/04/2018 05:19, Xiao Guangrong wrote:
-> >=20
-> > Hi Paolo, Michael, Stefan and others,
-> >=20
-> > Could anyone merge this patchset if it is okay to you guys?
->=20
-> Hi Guangrong,
->=20
-> Dave and Juan will take care of merging it.  However, right now QEMU is
-> in freeze so they may wait a week or two.  If they have reviewed it,
-> it's certainly on their radar!
+Hello,
 
-Yep, one of us will get it at the start of 2.13.
+Babu Moger <babu.moger@amd.com> writes:
 
-Dave
+> This will be used to control the cache information.
+> By default new information will be displayed. If user
+> passes "-cpu legacy-cache" then older information will
+> be displayed even if the hardware supports new information.
+>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  include/hw/i386/pc.h | 6 +++++-
+>  target/i386/cpu.c    | 1 +
+>  target/i386/cpu.h    | 5 +++++
+>  3 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index ffee841..9cda1ab 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -327,7 +327,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>          .driver   = "q35-pcihost",\
+>          .property = "x-pci-hole64-fix",\
+>          .value    = "off",\
+> -    },
+> +    },{\
+> +        .driver   = TYPE_X86_CPU,\
+> +        .property = "legacy-cache",\
+> +        .value    = "off",\
+> +    },\
 
-> Thanks,
->=20
-> Paolo
->=20
-> > On 03/30/2018 03:51 PM, guangrong.xiao@gmail.com wrote:
-> >> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> >>
-> >> Changelog in v3:
-> >> Following changes are from Peter's review:
-> >> 1) use comp_param[i].file and decomp_param[i].compbuf to indicate if
-> >> =C2=A0=C2=A0=C2=A0 the thread is properly init'd or not
-> >> 2) save the file which is used by ram loader to the global variable
-> >> =C2=A0=C2=A0=C2=A0 instead it is cached per decompression thread
-> >>
-> >> Changelog in v2:
-> >> Thanks to the review from Dave, Peter, Wei and Jiang Biao, the chang=
-es
-> >> in this version are:
-> >> 1) include the performance number in the cover letter
-> >> 2=EF=BC=89add some comments to explain how to use z_stream->opaque i=
-n the
-> >> =C2=A0=C2=A0=C2=A0 patchset
-> >> 3) allocate a internal buffer for per thread to store the data to
-> >> =C2=A0=C2=A0=C2=A0 be compressed
-> >> 4) add a new patch that moves some code to ram_save_host_page() so
-> >> =C2=A0=C2=A0=C2=A0 that 'goto' can be omitted gracefully
-> >> 5) split the optimization of compression and decompress into two
-> >> =C2=A0=C2=A0=C2=A0 separated patches
-> >> 6) refine and correct code styles
-> >>
-> >>
-> >> This is the first part of our work to improve compression to make it
-> >> be more useful in the production.
-> >>
-> >> The first patch resolves the problem that the migration thread spend=
-s
-> >> too much CPU resource to compression memory if it jumps to a new blo=
-ck
-> >> that causes the network is used very deficient.
-> >>
-> >> The second patch fixes the performance issue that too many VM-exits
-> >> happen during live migration if compression is being used, it is cau=
-sed
-> >> by huge memory returned to kernel frequently as the memory is alloca=
-ted
-> >> and freed for every signal call to compress2()
-> >>
-> >> The remaining patches clean the code up dramatically
-> >>
-> >> Performance numbers:
-> >> We have tested it on my desktop, i7-4790 + 16G, by locally live migr=
-ate
-> >> the VM which has 8 vCPUs + 6G memory and the max-bandwidth is limite=
-d to
-> >> 350. During the migration, a workload which has 8 threads repeatedly
-> >> written total 6G memory in the VM.
-> >>
-> >> Before this patchset, its bandwidth is ~25 mbps, after applying, the
-> >> bandwidth is ~50 mbp.
-> >>
-> >> We also collected the perf data for patch 2 and 3 on our production,
-> >> before the patchset:
-> >> +=C2=A0 57.88%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 [k] queued_spin_lock_slowpath
-> >> +=C2=A0 10.55%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 [k] __lock_acquire
-> >> +=C2=A0=C2=A0 4.83%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 [k] flush_tlb_func_common
-> >>
-> >> -=C2=A0=C2=A0 1.16%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 [k]
-> >> lock_acquire=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0 -
-> >> lock_acquire=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - 15.68%
-> >> _raw_spin_lock=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 29.42%
-> >> __schedule=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 29.14%
-> >> perf_event_context_sched_out=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 23.60%
-> >> tdp_page_fault=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 10.54%
-> >> do_anonymous_page=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 2.07%
-> >> kvm_mmu_notifier_invalidate_range_start=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 1.83%
-> >> zap_pte_range=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 + 1.44% kvm_m=
-mu_notifier_invalidate_range_end
-> >>
-> >>
-> >> apply our work:
-> >> +=C2=A0 51.92%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 [k] queued_spin_lock_slowpath
-> >> +=C2=A0 14.82%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 [k] __lock_acquire
-> >> +=C2=A0=C2=A0 1.47%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 [k] mark_lock.clone.0
-> >> +=C2=A0=C2=A0 1.46%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 [k] native_sched_clock
-> >> +=C2=A0=C2=A0 1.31%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 [k] lock_acquire
-> >> +=C2=A0=C2=A0 1.24%=C2=A0 kqemu=C2=A0 libc-2.12.so=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [.] __memset_sse2
-> >>
-> >> -=C2=A0 14.82%=C2=A0 kqemu=C2=A0 [kernel.kallsyms]=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 [k]
-> >> __lock_acquire=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0 -
-> >> __lock_acquire=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - 99.75%
-> >> lock_acquire=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - 18.38%
-> >> _raw_spin_lock=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 + 39.62%
-> >> tdp_page_fault=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 + 31.32%
-> >> __schedule=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 + 27.53%
-> >> perf_event_context_sched_out=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0
-> >> =E2=96=92
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 + 0.58% hrtimer_interrupt
-> >>
-> >>
-> >> We can see the TLB flush and mmu-lock contention have gone.
-> >>
-> >> Xiao Guangrong (10):
-> >> =C2=A0=C2=A0 migration: stop compressing page in migration thread
-> >> =C2=A0=C2=A0 migration: stop compression to allocate and free memory=
- frequently
-> >> =C2=A0=C2=A0 migration: stop decompression to allocate and free memo=
-ry frequently
-> >> =C2=A0=C2=A0 migration: detect compression and decompression errors
-> >> =C2=A0=C2=A0 migration: introduce control_save_page()
-> >> =C2=A0=C2=A0 migration: move some code to ram_save_host_page
-> >> =C2=A0=C2=A0 migration: move calling control_save_page to the common=
- place
-> >> =C2=A0=C2=A0 migration: move calling save_zero_page to the common pl=
-ace
-> >> =C2=A0=C2=A0 migration: introduce save_normal_page()
-> >> =C2=A0=C2=A0 migration: remove ram_save_compressed_page()
-> >>
-> >> =C2=A0 migration/qemu-file.c |=C2=A0 43 ++++-
-> >> =C2=A0 migration/qemu-file.h |=C2=A0=C2=A0 6 +-
-> >> =C2=A0 migration/ram.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 482
-> >> ++++++++++++++++++++++++++++++--------------------
-> >> =C2=A0 3 files changed, 324 insertions(+), 207 deletions(-)
-> >>
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Should be "on". Also note that this introduces extra '\' at the end.
+
+>  
+>  #define PC_COMPAT_2_9 \
+>      HW_COMPAT_2_9 \
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 67faa53..f4fbe3a 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5132,6 +5132,7 @@ static Property x86_cpu_properties[] = {
+>                       false),
+>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+>      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+> +    DEFINE_PROP_BOOL("legacy-cache", X86CPU, legacy_cache, false),
+
+I'm wondering the reason why Intel L1 caches aren't shared per threads,
+L2 not shared per threads/cores etc? I mean, changing that will also
+require new compat flag with very similar name.
+
+>  
+>      /*
+>       * From "Requirements for Implementing the Microsoft
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 806c34b..bbe13f2 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1394,6 +1394,11 @@ struct X86CPU {
+>       */
+>      bool enable_l3_cache;
+>  
+> +    /* Compatibility bits for old machine types.
+> +     * If true present the old cache topology information
+> +     */
+> +    bool legacy_cache;
+> +
+>      /* Compatibility bits for old machine types: */
+>      bool enable_cpuid_0xb;
+>  
+> -- 
+> 1.8.3.1
