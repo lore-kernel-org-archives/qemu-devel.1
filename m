@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <daniel@ffwll.ch>) id 1f5S3U-0001tN-Ev
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:21:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1f5S5T-0003CU-Nj
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:23:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <daniel@ffwll.ch>) id 1f5S3T-0000S1-GZ
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:21:36 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:40525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <daniel@ffwll.ch>) id 1f5S3T-0000Qn-8y
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:21:35 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id x4so14713931wmh.5
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 01:21:35 -0700 (PDT)
-Sender: Daniel Vetter <daniel.vetter@ffwll.ch>
-Date: Mon, 9 Apr 2018 10:21:31 +0200
-From: Daniel Vetter <daniel@ffwll.ch>
-Message-ID: <20180409082131.GF31310@phenom.ffwll.local>
-References: <20180316074650.5415-1-kraxel@redhat.com>
-	<7547e99b-0e3c-264e-e52b-40ad5d52b49a@gmail.com>
-	<20180406093307.s7wkhpmddd5d4r7a@sirius.home.kraxel.org>
-	<5d88baad-a956-6bd5-e0d6-aabae6647f3e@amd.com>
+	(envelope-from <peterx@redhat.com>) id 1f5S5Q-0003mY-Ga
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:23:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37074 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f5S5Q-0003kG-Ao
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:23:36 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Mon,  9 Apr 2018 16:23:23 +0800
+Message-Id: <20180409082323.29575-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5d88baad-a956-6bd5-e0d6-aabae6647f3e@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v2] Add udmabuf misc device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] configure: don't warn GTK if disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, dri-devel@lists.freedesktop.org, Daniel Vetter <daniel.vetter@ffwll.ch>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Fri, Apr 06, 2018 at 02:24:46PM +0200, Christian König wrote:
-> Am 06.04.2018 um 11:33 schrieb Gerd Hoffmann:
-> >    Hi,
-> > 
-> > > The pages backing a DMA-buf are not allowed to move (at least not without a
-> > > patch set I'm currently working on), but for certain MM operations to work
-> > > correctly you must be able to modify the page tables entries and move the
-> > > pages backing them around.
-> > > 
-> > > For example try to use fork() with some copy on write pages with this
-> > > approach. You will find that you have only two options to correctly handle
-> > > this.
-> > The fork() issue should go away with shared memory pages (no cow).
-> > I guess this is the reason why vgem is internally backed by shmem.
-> 
-> Yes, exactly that is also an approach which should work fine. Just don't try
-> to get this working with get_user_pages().
-> 
-> > 
-> > Hmm.  So I could try to limit the udmabuf driver to shmem too (i.e.
-> > have the ioctl take a shmem filehandle and offset instead of a virtual
-> > address).
-> > 
-> > But maybe it is better then to just extend vgem, i.e. add support to
-> > create gem objects from existing shmem.
-> > 
-> > Comments?
-> 
-> Yes, extending vgem instead of creating something new sounds like a good
-> idea to me as well.
+We don't need to detect GTK ABI if GTK is disabled in general.
+Otherwise we could get this warning (when host is installed with GTK ABI
+version 2) even when configure with "--disable-gtk":
 
-+1 on adding a vgem "import from shmem/memfd" ioctl. Sounds like a good
-idea, and generally useful.
+    WARNING: Use of GTK 2.0 is deprecated and will be removed in
+    WARNING: future releases. Please switch to using GTK 3.0
 
-We might want to limit to memfd though for semantic reasons: dma-buf have
-invariant size, shmem not so much. memfd can be locked down to not change
-their size anymore. And iirc the core mm page invalidation protocol around
-truncate() is about as bad as get_user_pages vs cow :-)
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Gerd Hoffmann <kraxel@redhat.com>
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Fam Zheng <famz@redhat.com>
+CC: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ configure | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/configure b/configure
+index 4d0e92c96c..ce67ad050e 100755
+--- a/configure
++++ b/configure
+@@ -2537,19 +2537,18 @@ fi
+ ##########################################
+ # GTK probe
+=20
+-if test "$gtkabi" =3D ""; then
+-    # The GTK ABI was not specified explicitly, so try whether 3.0 is av=
+ailable.
+-    # Use 2.0 as a fallback if that is available.
+-    if $pkg_config --exists "gtk+-3.0 >=3D 3.0.0"; then
+-        gtkabi=3D3.0
+-    elif $pkg_config --exists "gtk+-2.0 >=3D 2.18.0"; then
+-        gtkabi=3D2.0
+-    else
+-        gtkabi=3D3.0
+-    fi
+-fi
+-
+ if test "$gtk" !=3D "no"; then
++    if test "$gtkabi" =3D ""; then
++        # The GTK ABI was not specified explicitly, so try whether 3.0 i=
+s available.
++        # Use 2.0 as a fallback if that is available.
++        if $pkg_config --exists "gtk+-3.0 >=3D 3.0.0"; then
++            gtkabi=3D3.0
++        elif $pkg_config --exists "gtk+-2.0 >=3D 2.18.0"; then
++            gtkabi=3D2.0
++        else
++            gtkabi=3D3.0
++        fi
++    fi
+     gtkpackage=3D"gtk+-$gtkabi"
+     gtkx11package=3D"gtk+-x11-$gtkabi"
+     if test "$gtkabi" =3D "3.0" ; then
+--=20
+2.14.3
