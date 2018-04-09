@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f5R5p-0007m0-D0
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 03:20:00 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f5RAY-0003sX-IL
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 03:24:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f5R5o-0002lf-Ec
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 03:19:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34076 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f5R5o-0002ks-AF
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 03:19:56 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon,  9 Apr 2018 15:19:34 +0800
-Message-Id: <20180409071934.20845-5-famz@redhat.com>
-In-Reply-To: <20180409071934.20845-1-famz@redhat.com>
-References: <20180409071934.20845-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] docker: fedora: test more components
+	(envelope-from <stefanha@gmail.com>) id 1f5RAV-0000HC-9h
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 03:24:50 -0400
+Date: Mon, 9 Apr 2018 15:24:42 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180409072442.GA26563@stefanha-x1.localdomain>
+References: <20180404150146.23281-1-stefanha@redhat.com>
+	<5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="HcAYCG3uE/tztfnV"
+Content-Disposition: inline
+In-Reply-To: <5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12 v2] qemu-iotests:
+ update 185 output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
 
-Install optional dependencies of QEMU to get better coverage.
+--HcAYCG3uE/tztfnV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1520942752-19449-1-git-send-email-pbonzini@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/dockerfiles/fedora.docker | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+On Wed, Apr 04, 2018 at 06:16:12PM +0200, Max Reitz wrote:
+> On 2018-04-04 17:01, Stefan Hajnoczi wrote:
+> > Commit 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce
+> > vm_shutdown()") added a bdrv_drain_all() call.  As a side-effect of the
+> > drain operation the block job iterates one more time than before.  The
+> > 185 output no longer matches and the test is failing now.
+> >=20
+> > It may be possible to avoid the superfluous block job iteration, but
+> > that type of patch is not suitable late in the QEMU 2.12 release cycle.
+> >=20
+> > This patch simply updates the 185 output file.  The new behavior is
+> > correct, just not optimal, so make the test pass again.
+> >=20
+> > Fixes: 4486e89c219c0d1b9bd8dfa0b1dd5b0d51ff2268 ("vl: introduce vm_shut=
+down()")
+> > Cc: Kevin Wolf <kwolf@redhat.com>
+> > Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  tests/qemu-iotests/185     | 10 ++++++----
+> >  tests/qemu-iotests/185.out | 12 +++++++-----
+> >  2 files changed, 13 insertions(+), 9 deletions(-)
+>=20
+> On tmpfs, this isn't enough to let the test pass.  There, the active
+> commit job finishes before the quit is sent, resulting in this diff:
+>=20
+> --- tests/qemu-iotests/185.out      2018-04-04 18:10:02.015935435 +0200
+> +++ tests/qemu-iotests/185.out.bad  2018-04-04 18:10:21.045473817 +0200
+> @@ -26,9 +26,9 @@
+>=20
+>  {"return": {}}
+>  {"return": {}}
+> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+> "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304,
+> "offset": 4194304, "speed": 65536, "type": "commit"}}
+>  {"return": {}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+> "event": "SHUTDOWN", "data": {"guest": false}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+> "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304,
+> "offset": 4194304, "speed": 65536, "type": "commit"}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
+> "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len":
+> 4194304, "offset": 4194304, "speed": 65536, "type": "commit"}}
+>=20
+>  =3D=3D=3D Start mirror job and exit qemu =3D=3D=3D
+>=20
+> This seems to be independent of whether there is actually data on
+> TEST_IMG (the commit source), so something doesn't seem quite right with
+> the block job throttling here...?
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index a00004319e..b706f42405 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,9 +1,16 @@
- FROM fedora:27
- ENV PACKAGES \
-     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
--    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
--    gcc gcc-c++ llvm clang make perl which bc findutils libaio-devel \
--    nettle-devel libasan libubsan \
-+    gcc gcc-c++ llvm clang make perl which bc findutils glib2-devel \
-+    libaio-devel pixman-devel zlib-devel libfdt-devel libasan libubsan \
-+    bluez-libs-devel brlapi-devel bzip2-devel \
-+    device-mapper-multipath-devel glusterfs-api-devel gnutls-devel \
-+    gtk3-devel libattr-devel libcap-devel libcap-ng-devel libcurl-devel \
-+    libjpeg-devel libpng-devel librbd-devel libssh2-devel libusbx-devel \
-+    libxml2-devel lzo-devel ncurses-devel nettle-devel nss-devel \
-+    numactl-devel SDL2-devel snappy-devel spice-server-devel \
-+    systemtap-sdt-devel usbredir-devel virglrenderer-devel vte3-devel \
-+    xen-devel \
-     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
-     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
-     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
--- 
-2.14.3
+That is a race condition.  I can reproduce it on XFS too.
+
+Will see if I can figure it out...
+
+Stefan
+
+--HcAYCG3uE/tztfnV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJayxU6AAoJEJykq7OBq3PIakEIAI2FEpFXH0txjdM9cLC0XluI
+Aek3YjNTykmjqHJ0a112qhsh/0O6tzkgeT6hhqt8PSaygYCWJ6UPKbQRTyW1x7Ub
+Twvqb7J05AKX5YEJVhH94/2waRFoYlUdw3kxgBEYgvrMehlxXoBBkbSnME6Qur7W
+z1Gsqsw5WJO2OqyqSIDU9tgxBpfK8tmt5M9miyU0iP4w6hApd4edZdD70lNjVwJr
+g6MU0o7aqKtTe69J06mL9xSiiNsXWggBKwZKmpxp1Qdrf8SWtYCtncufragcFqx3
+3bf5d48shVwr1wgIx84lMUqcHcaRUvga7CMi3M9dQ4fQojQT6FZSGVo9Eu8rwq0=
+=wW4y
+-----END PGP SIGNATURE-----
+
+--HcAYCG3uE/tztfnV--
