@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5T2S-0005CA-8R
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:24:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f5T6J-0006ey-MZ
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:28:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5T2R-00066n-Ee
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:24:36 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:45642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f5T2R-00066c-9n
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:24:35 -0400
-Received: by mail-oi0-x233.google.com with SMTP id 71-v6so6922860oie.12
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 02:24:35 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1f5T6F-0000oA-Kp
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:28:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55456 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f5T6F-0000nf-Dc
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:28:31 -0400
+References: <20180327164141.19075-1-famz@redhat.com>
+	<b00ba0ab-538f-a6f1-3b99-1a0d9adb6eab@redhat.com>
+	<20180409110844.0a5188af@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8d16e553-d0ae-81ac-26f9-95fd1619f8a2@redhat.com>
+Date: Mon, 9 Apr 2018 11:28:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180409083154.GD18283@redhat.com>
-References: <20180409082323.29575-1-peterx@redhat.com>
-	<20180409083154.GD18283@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Apr 2018 10:24:14 +0100
-Message-ID: <CAFEAcA-VS=b31Z=WZEO3sDLntA97px81ErVRZbHcSTxRe1YNEA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: don't warn GTK if disabled
+In-Reply-To: <20180409110844.0a5188af@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aMUKiT8CMU6M15HRT7Xm4jwvSkryvkPYY"
+Subject: Re: [Qemu-devel] [PATCH v2] scsi-disk: Don't enlarge min_io_size to
+ max_io_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,18 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <dgibson@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, danielhb@linux.vnet.ibm.com, eblake@redhat.com
 
-On 9 April 2018 at 09:31, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
-te:
-> Feels to me that since we've deprecated 2.0, we could just *never* auto
-> detect - just do     test -z "$gtkabi" && gtkabi=3D3.0
->
-> Anyone who wants gtk2 should have to use an explicit --with-gtkabi=3D2.0
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aMUKiT8CMU6M15HRT7Xm4jwvSkryvkPYY
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <dgibson@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org,
+ danielhb@linux.vnet.ibm.com, eblake@redhat.com
+Message-ID: <8d16e553-d0ae-81ac-26f9-95fd1619f8a2@redhat.com>
+Subject: Re: [PATCH v2] scsi-disk: Don't enlarge min_io_size to max_io_size
+References: <20180327164141.19075-1-famz@redhat.com>
+ <b00ba0ab-538f-a6f1-3b99-1a0d9adb6eab@redhat.com>
+ <20180409110844.0a5188af@umbus.fritz.box>
+In-Reply-To: <20180409110844.0a5188af@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-I think if we still work with gtk2 then we should go ahead and
-warn-but-use it.
+On 09/04/2018 03:08, David Gibson wrote:
+> On Thu, 5 Apr 2018 17:54:00 +0200 Paolo Bonzini <pbonzini@redhat.com> w=
+rote:
+>> On 27/03/2018 18:41, Fam Zheng wrote:
+>>> Some backends report big max_io_sectors. Making min_io_size the same
+>>> value in this case will make it impossible for guest to align memory,=
 
-thanks
--- PMM
+>>> therefore the disk may not be usable at all.
+>>>
+>>> Do not enlarge them when they are zero.
+>>
+>> Queued, thanks.
+>>
+>> Paolo
+>=20
+> Any ETA on going from queued to actually merged?  This is holding up a
+> handful of Power bugfixes for 2.12, because I can't complete my usual
+> testing cycle.
+
+Hi David,
+
+it's already included in my pull request from Friday.
+
+Paolo
+
+
+--aMUKiT8CMU6M15HRT7Xm4jwvSkryvkPYY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlrLMjAACgkQv/vSX3jH
+roOj5gf+MvOIjorT4aU2WAtOsTNKoXnksOEfze3rwK2L0Qa7BsU0SLt6a9kklILc
+WYU56E0wjWXSi/TLq14ij/crvN1LE2uQwjN+vvSsNHsx3v8/f4cbi2KVwyYasNoK
+YBh9v9juMxUYbLuR1JcB9ZEnpG6rutDen9niRE7XirL2768aJJnz4rKIxch760sG
+9nRMODjqCxhnz1qTC6BQeAdYY9zUr6+M+bmHg1tdt3WS2Vq1goUCMgw2QpmEvU2e
+S266mdgtrvyiAJ06KdhXTIXOlTo0RAAdt72m6IKplUIoFPDZdu4iz4sjKBbju6MY
+k4o1ThzUu7eKOv5aL+sdycHXgU6gnw==
+=b3ZL
+-----END PGP SIGNATURE-----
+
+--aMUKiT8CMU6M15HRT7Xm4jwvSkryvkPYY--
