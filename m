@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f5XMu-0006av-8e
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:02:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5XNG-0006ki-MO
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:02:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f5XMp-00084c-0G
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:02:00 -0400
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <cbad2760-7a64-7602-5734-eea0747c620f@mail.uni-paderborn.de>
-Date: Mon, 9 Apr 2018 16:01:36 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f5XN7-0008FI-Db
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:02:22 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:38626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5XN7-0008Ey-8F
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:02:13 -0400
+Received: by mail-oi0-x243.google.com with SMTP id c3-v6so7693340oib.5
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 07:02:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1523038800-2494-1-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc/riscv targets
+In-Reply-To: <CAHP4M8X-Dus1Z8UegDTaab5LvaiDAgQa8upsx_KdnPO+A-XoTQ@mail.gmail.com>
+References: <CAHP4M8VVWyNqi4yLS3S0GXaDz3j8QvUiC=aoJ_DfZLtZBaFwqg@mail.gmail.com>
+	<CAFEAcA9stTjg3Wpq5x_vj63jm1DrxAQREk4XPeFWb5rff-Uofg@mail.gmail.com>
+	<CAHP4M8X-Dus1Z8UegDTaab5LvaiDAgQa8upsx_KdnPO+A-XoTQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Apr 2018 15:01:51 +0100
+Message-ID: <CAFEAcA_1X1AQ6j9pZQ8fEHmQCxRNK7EhGkohuLbTMpoPONe5PA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Use of -machine when running via
+ qemu-system-arm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Ajay Garg <ajaygargnsit@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Emilio,
+On 9 April 2018 at 14:43, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+> On Mon, Apr 9, 2018 at 7:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 9 April 2018 at 14:35, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>>> Hi All.
+>>>
+>>> Not sure if this is purely an ARM-related question, but I will be
+>>> grateful if someone could point to some literature that explains what
+>>> difference choosing a  machine makes (when we don't need to have any
+>>> such flag for qemu-system-i386 or qemu-system-x86_64).
+>>
+>> Hi; this is a pretty common question, which we talk about on our
+>> wiki page here:
+>>  https://wiki.qemu.org/Documentation/Platforms/ARM
+>
+> Yep, had already been through it :)
+>
+>>
+>> The underlying reason why you need this on Arm but not on x86
+>> is that for x86 every single piece of x86 hardware is pretty
+>> much identical. For Arm (as part of its history in the embedded
+>> space) the general rule is that every board is different.
+>
+> Yep, perhaps I am needing a more layman-kinda example-cum-explanation
+> for this, so would be grateful for some help in this regard.
 
-On 04/06/2018 08:19 PM, Emilio G. Cota wrote:
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00445.html
-> 
-> Changes since v1:
-> 
-> - Rebase onto master
-> 
-> - Add R-b's
-> 
-> - Add riscv conversion
+Well, the wiki text is the best explanation I have; perhaps
+you could suggest what part of it is confusing, and we could
+improve it?
 
-Thanks for doing this grunt work. Me and a colleague were planning to do
-this as well after converting the RISC-V frontend to decodetree. Do you
-have any plans to do this for the TriCore frontend as well? I have the
-same plan for Tricore: Convert it to decodetree, then to translation loop.
-
-Cheers,
-Bastian
+thanks
+-- PMM
