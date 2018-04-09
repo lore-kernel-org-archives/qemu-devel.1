@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1f5LFq-0005bJ-Bi
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:05:55 -0400
+	(envelope-from <dgibson@redhat.com>) id 1f5LIr-00073u-QY
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:09:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1f5LFp-0007Uu-Gd
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:05:54 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:44775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1f5LFp-0007TN-9q
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:05:53 -0400
-Received: by mail-io0-x243.google.com with SMTP id d7so7652129ioc.11
-	for <qemu-devel@nongnu.org>; Sun, 08 Apr 2018 18:05:52 -0700 (PDT)
+	(envelope-from <dgibson@redhat.com>) id 1f5LIn-0000lP-Gl
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:09:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54912 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@redhat.com>) id 1f5LIn-0000kp-BD
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 21:08:57 -0400
+Date: Mon, 9 Apr 2018 11:08:44 +1000
+From: David Gibson <dgibson@redhat.com>
+Message-ID: <20180409110844.0a5188af@umbus.fritz.box>
+In-Reply-To: <b00ba0ab-538f-a6f1-3b99-1a0d9adb6eab@redhat.com>
+References: <20180327164141.19075-1-famz@redhat.com>
+	<b00ba0ab-538f-a6f1-3b99-1a0d9adb6eab@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Mon, 9 Apr 2018 09:05:51 +0800
-Message-ID: <CAOGPPbeuVrgGxoyoFvY_v_zHDh1O1GvLdy1WSR+31Au374NVyQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/5] Enable postcopy RDMA live migration
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/Tgr==jJcsU3tA1C2xyYSsfP";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2] scsi-disk: Don't enlarge min_io_size to
+ max_io_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, licq@mellanox.com, Aviad Yehezkel <aviadye@mellanox.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>, adido@mellanox.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, danielhb@linux.vnet.ibm.com, eblake@redhat.com
 
-ping.
+--Sig_/Tgr==jJcsU3tA1C2xyYSsfP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Apr 7, 2018 at 4:26 PM, Lidong Chen <jemmy858585@gmail.com> wrote:
-> Current Qemu RDMA communication does not support send and receive
-> data at the same time, so when RDMA live migration with postcopy
-> enabled, the source qemu return path thread get qemu file error.
->
-> Those patch add the postcopy support for RDMA live migration.
->
-> Lidong Chen (5):
->   migration: create a dedicated connection for rdma return path
->   migration: add the interface to set get_return_path
->   migration: implement the get_return_path for RDMA iochannel
->   migration: fix qemu carsh when RDMA live migration
->   migration: disable RDMA WRITR after postcopy started.
->
->  migration/qemu-file-channel.c |  12 ++--
->  migration/qemu-file.c         |  13 +++-
->  migration/qemu-file.h         |   2 +-
->  migration/rdma.c              | 148 ++++++++++++++++++++++++++++++++++++++++--
->  4 files changed, 163 insertions(+), 12 deletions(-)
->
-> --
-> 1.8.3.1
->
+On Thu, 5 Apr 2018 17:54:00 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 27/03/2018 18:41, Fam Zheng wrote:
+> > Some backends report big max_io_sectors. Making min_io_size the same
+> > value in this case will make it impossible for guest to align memory,
+> > therefore the disk may not be usable at all.
+> >=20
+> > Do not enlarge them when they are zero.
+> >=20
+> > Reported-by: David Gibson <dgibson@redhat.com>
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+[snip]
+> Queued, thanks.
+>=20
+> Paolo
+
+Any ETA on going from queued to actually merged?  This is holding up a
+handful of Power bugfixes for 2.12, because I can't complete my usual
+testing cycle.
+
+--=20
+David Gibson <dgibson@redhat.com>
+Principal Software Engineer, Virtualization, Red Hat
+
+--Sig_/Tgr==jJcsU3tA1C2xyYSsfP
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrKvRwACgkQbDjKyiDZ
+s5I+BA//UxcLAu7V/M+0R6ag2LoE8EyL5nywTpY374ZveIzWYzib3Ay813PtkE+s
+FmQnTMkZGA3sHV1+pkJMmRT1QJPX3Q96PN60s5sD4XtbP/JJua/kCiRCmwohoy3j
+PxJykW0Iu5xqsS3yqScXMcDMF0Khc1s5QsKPyMf0LwauOg0Xjp9vZzosA463dLFQ
+kNkMAjNFAm77Sj3wTpX4Vb2PfcMFQ0Pamp1Gc3P9dtfCEOmsqyOZsn4PO+hVjGO6
+banQlGzroyNo7beT7tVtj6Wkq+r4McJ9o1rMZbacmfwJzh8Z1VixgR7jo3R7TZ+x
+JkaPFSyeHBOlW37LlrtmJT0WnrSubqAtJqdELOV+o4IcJMNAdMYaG4DzlR5vINWC
+Sm9hicI9JL06GLy9UoHqDruNvrviRyTiHq4JHmG2TNeK6/3PdoiXjZG5ywhKXOfE
+bVq2SCnwqN4gBiX/zFhV2PgaiUBZOWD6UchoKibD5xuEMWAnKke6GzSzR/+7jWO5
+3lnYm8sM1qOlYk2sYQi8HTKQgiKlI8OUsclP4x/XGRqJ+OAqBV1C8qM0sLxAof/9
+b/xxWUSBL8NGKOWW2ttJX847NgIVO2P4rpjRZD42IRCaaXOijGZz0f5SUhx2nWl1
+xdqqDIx6+z4MYvOf/EhBJGmUmWCHiUe4I3XgqdUCHk7P17h5wBQ=
+=ZivO
+-----END PGP SIGNATURE-----
+
+--Sig_/Tgr==jJcsU3tA1C2xyYSsfP--
