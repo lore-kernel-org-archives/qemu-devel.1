@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f5WQV-0000Jy-Qt
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:01:43 -0400
+	(envelope-from <david@redhat.com>) id 1f5WVy-0002ac-49
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f5WQN-0002fe-W7
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:01:39 -0400
-Received: from mail-eopbgr30130.outbound.protection.outlook.com
-	([40.107.3.130]:30164
-	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1f5WQN-0002dq-B9
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:01:31 -0400
-References: <20180404103440.19546-1-stefanha@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <008ac6e8-1e68-b0f6-7e75-77453721d031@virtuozzo.com>
-Date: Mon, 9 Apr 2018 16:01:24 +0300
-MIME-Version: 1.0
-In-Reply-To: <20180404103440.19546-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] scripts/qemugdb: support coroutine
- backtrace in coredumps
+	(envelope-from <david@redhat.com>) id 1f5WVt-0008CB-16
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:07:18 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon,  9 Apr 2018 15:07:00 +0200
+Message-Id: <20180409130700.5692-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] cpus: track calls to
+ resume/pause_all_vcpus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +18,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, David Hildenbrand <david@redhat.com>
 
-04.04.2018 13:34, Stefan Hajnoczi wrote:
-> Use the 'select-frame' GDB command to switch stacks instead of manually
-> setting the debugged thread's registers (this only works when debugging
-> a live process, not in a coredump).
->
-> Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> Vladimir: Does this work for you?
->
->   scripts/qemugdb/coroutine.py | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
-> index ab699794ab..ed96434aee 100644
-> --- a/scripts/qemugdb/coroutine.py
-> +++ b/scripts/qemugdb/coroutine.py
-> @@ -77,13 +77,11 @@ def bt_jmpbuf(jmpbuf):
->       for i in regs:
->           old[i] = gdb.parse_and_eval('(uint64_t)$%s' % i)
->   
-> -    for i in regs:
-> -        gdb.execute('set $%s = %s' % (i, regs[i]))
-> +    gdb.execute('select-frame %s %s' % (regs['rsp'], regs['rip']))
->   
->       gdb.execute('bt')
->   
-> -    for i in regs:
-> -        gdb.execute('set $%s = %s' % (i, old[i]))
-> +    gdb.execute('select-frame %s %s' % (old['rsp'], old['rip']))
->   
->   def coroutine_to_jmpbuf(co):
->       coroutine_pointer = co.cast(gdb.lookup_type('CoroutineUContext').pointer())
+If we have parallel calls to resume/pause_all_vcpus() we can get
+into trouble because the qemu mutex is temporarily dropped while
+waiting for all threads to stop. This can happen e.g. for s390x, where
+resume/pause_all_vcpus() can be triggered by a VCPU.
 
-strange, but it doesn't work. it prints the same backtrace, as if I just 
-call bt.
-(I applied it onto "[PATCH 2/4] scripts/qemugdb: improve "qemu 
-coroutine" command")
+Pause/Resume exactly once, when we leave/hit "0".
 
-also, I can just call select-frame with zeros or any garbage in gdb, 
-with same effect:
-(gdb) select-frame 0 0
-(gdb) bt
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ cpus.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-and get same backtrace.
-
-so, bt command not related to selected frame. also, up and down commands 
-don't help too, they go to frames in current bt, instead of moving 
-relatively to selected frame.
-
+diff --git a/cpus.c b/cpus.c
+index 2e6701795b..7c7e0245c5 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1778,17 +1778,26 @@ static bool all_vcpus_paused(void)
+     return true;
+ }
+ 
++/* wait for the initial vm_start() call */
++static int vcpus_paused = 1;
++
+ void pause_all_vcpus(void)
+ {
+     CPUState *cpu;
+ 
+-    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, false);
+-    CPU_FOREACH(cpu) {
+-        if (qemu_cpu_is_self(cpu)) {
+-            qemu_cpu_stop(cpu, true);
+-        } else {
+-            cpu->stop = true;
+-            qemu_cpu_kick(cpu);
++    assert(qemu_mutex_iothread_locked());
++    assert(vcpus_paused >= 0);
++
++    vcpus_paused++;
++    if (vcpus_paused == 1) {
++        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, false);
++        CPU_FOREACH(cpu) {
++            if (qemu_cpu_is_self(cpu)) {
++                qemu_cpu_stop(cpu, true);
++            } else {
++                cpu->stop = true;
++                qemu_cpu_kick(cpu);
++            }
+         }
+     }
+ 
+@@ -1820,6 +1829,14 @@ void resume_all_vcpus(void)
+ {
+     CPUState *cpu;
+ 
++    assert(vcpus_paused >= 0);
++    assert(qemu_mutex_iothread_locked());
++
++    vcpus_paused--;
++    if (vcpus_paused > 0) {
++        return;
++    }
++
+     qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+     CPU_FOREACH(cpu) {
+         cpu_resume(cpu);
 -- 
-Best regards,
-Vladimir
+2.14.3
