@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f5VDk-00067q-SV
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:44:25 -0400
+	(envelope-from <david@redhat.com>) id 1f5VE3-0006N7-J0
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f5VDh-0001Cc-RV
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:44:24 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  9 Apr 2018 14:44:17 +0300
-Message-Id: <20180409114418.16615-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20180409114418.16615-1-vsementsov@virtuozzo.com>
-References: <20180409114418.16615-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] iotests.py: improve verify_image_format
- helper
+	(envelope-from <david@redhat.com>) id 1f5VE0-0001LS-HI
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:44:43 -0400
+References: <20180409113019.14568-1-david@redhat.com>
+	<20180409113019.14568-3-david@redhat.com>
+	<a82acbd9-3023-8f3a-c5a6-3fb5b5a0832c@de.ibm.com>
+	<e6ee002c-373f-d619-a3e4-a3a6f56b2bda@redhat.com>
+	<92f20c1c-5510-3e17-d186-be416635d1da@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b387527b-2851-5cb6-d9a5-65020d8800f6@redhat.com>
+Date: Mon, 9 Apr 2018 13:44:30 +0200
+MIME-Version: 1.0
+In-Reply-To: <92f20c1c-5510-3e17-d186-be416635d1da@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 2/2] s390x: load_psw() should
+ only exchange the PSW for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,48 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, jsnow@redhat.com, eblake@redhat.com, stefanha@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Support "generic" formats like in bash tests with their
-   _supported_fmt generic
-The test, supporting "generic" formats will run if IMGFMT_GENERIC =
-true, which is default, except for bochs and cloop. However, you can
-use verify_image_format(['generic', 'bochs']), which will run for all
-except cloop (for this moment).
+On 09.04.2018 13:40, Christian Borntraeger wrote:
+> 
+> 
+> On 04/09/2018 01:36 PM, David Hildenbrand wrote:
+>> On 09.04.2018 13:35, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 04/09/2018 01:30 PM, David Hildenbrand wrote:
+>>>> Let's simplify it a bit. On some weird circumstances we would have tried
+>>>> to recompute watchpoints when running under KVM.
 
-Also, add an assert (we don't want set both arguments) and remove
-duplication.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/iotests.py | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index b5d7945af8..1a2b83893c 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -532,9 +532,17 @@ def notrun(reason):
-     sys.exit(0)
- 
- def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
--    if supported_fmts and (imgfmt not in supported_fmts):
--        notrun('not suitable for this image format: %s' % imgfmt)
--    if unsupported_fmts and (imgfmt in unsupported_fmts):
-+    assert not (supported_fmts and unsupported_fmts)
-+
-+    if 'generic' in supported_fmts and \
-+            os.environ.get('IMGFMT_GENERIC', 'true') == 'true':
-+        # similar to
-+        #   _supported_fmt generic
-+        # for bash tests
-+        return
-+
-+    not_sup = supported_fmts and (imgfmt not in supported_fmts)
-+    if not_sup or (imgfmt in unsupported_fmts):
-         notrun('not suitable for this image format: %s' % imgfmt)
- 
- def verify_platform(supported_oses=['linux']):
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  target/s390x/helper.c | 10 ++++++----
+>>>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+>>>> index 615fa24ab9..e8548f340a 100644
+>>>> --- a/target/s390x/helper.c
+>>>> +++ b/target/s390x/helper.c
+>>>> @@ -103,16 +103,18 @@ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr)
+>>>>
+>>>>      env->psw.addr = addr;
+>>>>      env->psw.mask = mask;
+>>>> -    if (tcg_enabled()) {
+>>>> -        env->cc_op = (mask >> 44) & 3;
+>>>> +
+>>>> +    /* KVM will handle all WAITs and trigger a WAIT exit on disabled_wait */
+>>>> +    if (!tcg_enabled()) {
+>>>> +        return;
+>>>>      }
+>>>> +    env->cc_op = (mask >> 44) & 3;
+>>>
+>>> Do we have any call path were KVM could call load_psw?
+>>
+>> do_restart_interrupt()
+>>
+>> SIGP while the target CPU is stopped.
+> 
+> makes sense. Can you add that to the patch description? that makes it easier to understand
+> what can really go wrong without this patch.
+
+Sure!
+
+Conny, when (and if ;) ) picking this up, can you change the description to
+
+"Let's simplify it a bit. On some weird circumstances we would have
+tried to recompute watchpoints when running under KVM. load_psw() is
+called from do_restart_interrupt() during a SIGP RESTART if the target
+CPU is STOPPED. Let's touch watchpoints only in the TCG case - where
+they are used for PER emulation."
+
+
 -- 
-2.11.1
+
+Thanks,
+
+David / dhildenb
