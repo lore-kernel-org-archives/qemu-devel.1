@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <daniel@ffwll.ch>) id 1f5RjV-0000Xv-6H
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:01:03 -0400
+	(envelope-from <thuth@redhat.com>) id 1f5Rr8-0004Ha-2M
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:08:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <daniel@ffwll.ch>) id 1f5RjT-0004PS-QI
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:00:57 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <daniel@ffwll.ch>) id 1f5RjT-0004Ma-EN
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:00:55 -0400
-Received: by mail-wm0-x233.google.com with SMTP id r82so14702315wme.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 01:00:54 -0700 (PDT)
-Sender: Daniel Vetter <daniel.vetter@ffwll.ch>
-Date: Mon, 9 Apr 2018 10:00:51 +0200
-From: Daniel Vetter <daniel@ffwll.ch>
-Message-ID: <20180409080051.GD31310@phenom.ffwll.local>
-References: <20180313154826.20436-1-kraxel@redhat.com>
-	<20180313161035.GL4788@phenom.ffwll.local>
-	<20180314080301.366zycak3whqvvqx@sirius.home.kraxel.org>
-	<CAPj87rPKtuQ4SZePYDUesWY9VSSGR=1p-LO=yByY_6Q8=BfoyA@mail.gmail.com>
-	<20180406105422.6tewkkciwerud3tm@sirius.home.kraxel.org>
+	(envelope-from <thuth@redhat.com>) id 1f5Rr4-00034T-2t
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:08:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35828 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f5Rr3-000347-Sl
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:08:45 -0400
+References: <20180407000117.25640-1-lersek@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <979bd720-cdb3-6468-1fbd-e8ec1c6c6c8d@redhat.com>
+Date: Mon, 9 Apr 2018 10:08:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20180406105422.6tewkkciwerud3tm@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [RfC PATCH] Add udmabuf misc device
+In-Reply-To: <20180407000117.25640-1-lersek@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +27,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Daniel Stone <daniel@fooishbar.org>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, qemu-devel@nongnu.org, dri-devel <dri-devel@lists.freedesktop.org>, open list <linux-kernel@vger.kernel.org>, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Apr 06, 2018 at 12:54:22PM +0200, Gerd Hoffmann wrote:
-> On Fri, Apr 06, 2018 at 10:52:21AM +0100, Daniel Stone wrote:
-> > Hi Gerd,
-> > 
-> > On 14 March 2018 at 08:03, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > >> Either mlock account (because it's mlocked defacto), and get_user_pages
-> > >> won't do that for you.
-> > >>
-> > >> Or you write the full-blown userptr implementation, including mmu_notifier
-> > >> support (see i915 or amdgpu), but that also requires Christian Königs
-> > >> latest ->invalidate_mapping RFC for dma-buf (since atm exporting userptr
-> > >> buffers is a no-go).
-> > >
-> > > I guess I'll look at mlock accounting for starters then.  Easier for
-> > > now, and leaves the door open to switch to userptr later as this should
-> > > be transparent to userspace.
-> > 
-> > Out of interest, do you have usecases for full userptr support? Maybe
-> > another way would be to allow creation of dmabufs from memfds.
-> 
-> I have two things in mind.
-> 
-> One is vga emulation.  I have virtual pci memory bar for the virtual
-> vga.  qemu backs vga memory with anonymous pages right now, switching
-> that to shmem should be easy though if that makes things easier.  Guest
-> places the framebuffer somewhere in the pci bar, and I want export the
-> chunk which represents the framebuffer as dma-buf to display it on the
-> host without copying around data.  Framebuffer is linear in guest
-> physical memory, so a single block only.  That is the simpler case.
-> 
-> The more difficuilt one is virtio-gpu ressources.  virtio-gpu resources
-> live in host memory (guest has no direct access).  The guest can
-> optionally specify guest memory pages as backing storage for the
-> resource.  Guest backing storage is allowed to be scattered.  Commands
-> exist to copy both ways between host storage and guest backing.
-> 
-> With virgl (opengl acceleration) enabled the guest will send rendering
-> commands to fill the framebuffer ressource, so there is no need to copy
-> content to the framebuffer ressource.  The guest may fill other
-> resources such as textures used for rendering with copy commands.
-> 
-> Without acceleration the guest does software-rendering to the backing
-> storage, then sends a command to copy the framebuffer content from guest
-> backing storage to host ressource.
-> 
-> Now it would be useful to allow a shared mapping, so no copying between
-> guest backing storage and host resource is needed, especially for the
-> software rendering case (i.e. dumb gem buffers).  Being able to export
-> guest dumb buffers to other host processes would be useful too, for
-> example to display guest windows seamlessly on the host wayland server.
-> 
-> So getting a dma-buf for the guest backing storage via udmabuf looked
-> like a useful approach.  We can export the guest gem buffers to other
-> host processes that way.  qemu itself could map it too, to get a linear
-> representation of the scattered guest backing storage.
-> 
-> The other obvious approach would be to do it the other way around and
-> allow the guest map the host resource somehow.  On the host side qemu
-> could use vgem to allocate resource memory, so it'll be a gem object
-> already.  Mapping that into the guest isn't that straight-forward
-> though.  The guest manages its physical address space, so the guest
-> would need to find a free spot and ask the host to place the resource
-> there.  Then the guest needs page structs covering the mapped resource,
-> so it can work with it.  Didn't investigate how difficuilt that is.  Use
-> memory hotplug maybe?  Can we easily unmap the resource then?  Also I
-> think updating the guests physical memory layout (which we would need to
-> do on every resource map/unmap) isn't an exactly cheap operation ...
+On 07.04.2018 02:01, Laszlo Ersek wrote:
+> Add a schema that describes the properties of virtual machine firmware.
+[...]
+> +##
+> +# @SystemFirmware:
+> +#
+> +# Describes a system firmware binary and any NVRAM slots that it requires.
+> +#
+> +# @executable: Identifies the platform firmware executable.
+> +#
+> +# @type: The type by which the system firmware is commonly known. This is the
+> +#        main search key by which management software looks up a system
+> +#        firmware image for a new domain.
+> +#
+> +# @targets: a non-empty list of target architectures that are capable of
+> +#           executing the system firmware
+> +#
+> +# @sysfw-map: the mapping requirements of the system firmware binary
+> +#
+> +# @nvram-slots: A list of NVRAM slots that are required by the system firmware.
+> +#               The @slot-id field must be unique across the list. Importantly,
+> +#               if any @FirmwareAccess is @restricted-to-secure-context in
+> +#               @sysfw-map or in any @nvram-map in @nvram-slots, then (a) the
+> +#               virtual machine configuration is required to emulate the secure
+> +#               code execution context (as defined for @targets), and (b) the
+> +#               virtual machine configuration is required to actually restrict
+> +#               the access in question to the secure execution context.
+> +#
+> +# @supports-uefi-secure-boot: Whether the system firmware implements the
+> +#                             software interfaces for UEFI Secure Boot, as
+> +#                             defined in the UEFI specification. If the field
+> +#                             is missing, its assumed value is 'false'.
+> +#
+> +# @supports-amd-sev: Whether the system firmware supports running under AMD
+> +#                    Secure Encrypted Virtualization, as specified in the AMD64
+> +#                    Architecture Programmer's Manual. If the field is missing,
+> +#                    its assumed value is 'false'.
+> +#
+> +# @supports-acpi-s3: Whether the system firmware supports S3 sleep (suspend to
+> +#                    RAM), as defined in the ACPI specification. If the field
+> +#                    is missing, its assumed value is 'false'.
+> +#
+> +# @supports-acpi-s4: Whether the system firmware supports S4 hibernation
+> +#                    (suspend to disk), as defined in the ACPI specification.
+> +#                    If the field is missing, its assumed value is 'false'.
+> +#
+> +# Since: 2.13
+> +#
+> +# Examples:
+> +#
+> +# {
+> +#     "executable": {
+> +#         "pathname": "/usr/share/seabios/bios-256k.bin",
+> +#         "description": "SeaBIOS",
+> +#         "tags": [
+> +#             "CONFIG_ROM_SIZE=256"
+> +#         ]
+> +#     },
+> +#     "type": "bios",
+> +#     "targets": [
+> +#         "i386",
+> +#         "x86_64"
+> +#     ],
+> +#     "sysfw-map": {
+> +#         "device": "memory",
+> +#         "write": "denied"
+> +#     },
+> +#     "supports-acpi-s3": true,
+> +#     "supports-acpi-s4": true
+> +# }
+> +#
+> +# {
+> +#     "executable": {
+> +#         "pathname": "/usr/share/OVMF/OVMF_CODE.secboot.fd",
+> +#         "description": "OVMF with Secure Boot and SMM-protected varstore",
+> +#         "tags": [
+> +#             "FD_SIZE_4MB",
+> +#             "IA32X64",
+> +#             "SECURE_BOOT_ENABLE",
+> +#             "SMM_REQUIRE"
+> +#         ]
+> +#     },
+> +#     "type": "uefi",
+> +#     "targets": [
+> +#         "x86_64"
+> +#     ],
+> +#     "sysfw-map": {
+> +#         "device": "flash",
+> +#         "write": "denied"
+> +#     },
+> +#     "nvram-slots": [
+> +#         {
+> +#             "slot-id": 1,
+> +#             "nvram-map" : {
+> +#                 "device": "flash",
+> +#                 "write": "restricted-to-secure-context"
+> +#             },
+> +#             "templates": [
+> +#                 {
+> +#                     "pathname": "/usr/share/OVMF/OVMF_VARS.fd",
+> +#                     "description": "empty varstore template"
+> +#                 },
+> +#                 {
+> +#                     "pathname": "/usr/share/OVMF/OVMF_VARS.secboot.fd",
+> +#                     "description": "varstore template with the Microsoft certificates enrolled for Secure Boot",
+> +#                     "tags": [
+> +#                         "mscerts"
+> +#                     ]
+> +#                 }
+> +#             ]
+> +#         }
+> +#     ],
+> +#     "supports-uefi-secure-boot": true,
+> +#     "supports-amd-sev": true,
+> +#     "supports-acpi-s3": true
+> +# }
+> +#
+> +# {
+> +#     "executable": {
+> +#         "pathname": "/usr/share/AAVMF/AAVMF_CODE.fd",
+> +#         "description": "ARM64 UEFI firmware",
+> +#         "tags": [
+> +#             "AARCH64"
+> +#         ]
+> +#     },
+> +#     "type": "uefi",
+> +#     "targets": [
+> +#         "aarch64"
+> +#     ],
 
-Generally we try to cache mappings as much as possible. And wrt finding a
-slot: Create a sufficiently sized BAR on the virgl device, just for that?
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Another thought: I think that "targets" field is not enough. You also
+need to map firmware images to certain machines. For example, on
+aarch64, the AAVMF firmware only works on the "virt" machine, but not on
+"raspi2" (I guess). On ppc64, SLOF only works for "pseries", but not for
+the other machines like "mac99" or "g3beige". And on x86_64, EDK2 only
+works for "q35" and "pc-i440fx", but not for "isapc".
+
+ Thomas
