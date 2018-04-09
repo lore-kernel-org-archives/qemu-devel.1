@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5TIP-0005d6-34
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:41:05 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f5TIP-0005dI-Ae
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:41:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5TIM-0003bw-RA
+	(envelope-from <kraxel@redhat.com>) id 1f5TIO-0003cv-8l
 	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:41:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39752 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55958 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5TIM-0003bc-Mn
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:41:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5TIO-0003cT-34
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:41:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4CB748011462
-	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 09:41:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A963F76FB9
+	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 09:41:03 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  9 Apr 2018 11:41:00 +0200
-Message-Id: <20180409094100.27650-7-kraxel@redhat.com>
+Date: Mon,  9 Apr 2018 11:40:56 +0200
+Message-Id: <20180409094100.27650-3-kraxel@redhat.com>
 In-Reply-To: <20180409094100.27650-1-kraxel@redhat.com>
 References: <20180409094100.27650-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] sdl2: drop dead code
+Subject: [Qemu-devel] [PULL 2/6] ui: add ctrl modifier support to
+ kbd_put_qcode_console()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +33,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Leftover from sdl1 -> sdl2 port.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180321135041.15768-6-kraxel@redhat.com
+Message-id: 20180321135041.15768-2-kraxel@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/sdl2-input.c | 8 --------
- 1 file changed, 8 deletions(-)
+ include/ui/console.h |  2 +-
+ ui/console.c         | 15 +++++++++++++--
+ ui/gtk.c             |  4 ++--
+ ui/sdl2-input.c      |  2 +-
+ 4 files changed, 17 insertions(+), 6 deletions(-)
 
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 6d2c052068..37a8d68d29 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -99,7 +99,7 @@ void hmp_mouse_set(Monitor *mon, const QDict *qdict);
+ #define QEMU_KEY_CTRL_PAGEDOWN   0xe407
+ 
+ void kbd_put_keysym_console(QemuConsole *s, int keysym);
+-bool kbd_put_qcode_console(QemuConsole *s, int qcode);
++bool kbd_put_qcode_console(QemuConsole *s, int qcode, bool ctrl);
+ void kbd_put_string_console(QemuConsole *s, const char *str, int len);
+ void kbd_put_keysym(int keysym);
+ 
+diff --git a/ui/console.c b/ui/console.c
+index 530a491987..3fb2f4e09f 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1191,11 +1191,22 @@ static const int qcode_to_keysym[Q_KEY_CODE__MAX] = {
+     [Q_KEY_CODE_BACKSPACE] = QEMU_KEY_BACKSPACE,
+ };
+ 
+-bool kbd_put_qcode_console(QemuConsole *s, int qcode)
++static const int ctrl_qcode_to_keysym[Q_KEY_CODE__MAX] = {
++    [Q_KEY_CODE_UP]     = QEMU_KEY_CTRL_UP,
++    [Q_KEY_CODE_DOWN]   = QEMU_KEY_CTRL_DOWN,
++    [Q_KEY_CODE_RIGHT]  = QEMU_KEY_CTRL_RIGHT,
++    [Q_KEY_CODE_LEFT]   = QEMU_KEY_CTRL_LEFT,
++    [Q_KEY_CODE_HOME]   = QEMU_KEY_CTRL_HOME,
++    [Q_KEY_CODE_END]    = QEMU_KEY_CTRL_END,
++    [Q_KEY_CODE_PGUP]   = QEMU_KEY_CTRL_PAGEUP,
++    [Q_KEY_CODE_PGDN]   = QEMU_KEY_CTRL_PAGEDOWN,
++};
++
++bool kbd_put_qcode_console(QemuConsole *s, int qcode, bool ctrl)
+ {
+     int keysym;
+ 
+-    keysym = qcode_to_keysym[qcode];
++    keysym = ctrl ? ctrl_qcode_to_keysym[qcode] : qcode_to_keysym[qcode];
+     if (keysym == 0) {
+         return false;
+     }
+diff --git a/ui/gtk.c b/ui/gtk.c
+index ef5bc42094..e98ac4d2fc 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1197,12 +1197,12 @@ static gboolean gd_text_key_down(GtkWidget *widget,
+     QemuConsole *con = vc->gfx.dcl.con;
+ 
+     if (key->keyval == GDK_KEY_Delete) {
+-        kbd_put_qcode_console(con, Q_KEY_CODE_DELETE);
++        kbd_put_qcode_console(con, Q_KEY_CODE_DELETE, false);
+     } else if (key->length) {
+         kbd_put_string_console(con, key->string, key->length);
+     } else {
+         int qcode = gd_map_keycode(key->hardware_keycode);
+-        kbd_put_qcode_console(con, qcode);
++        kbd_put_qcode_console(con, qcode, false);
+     }
+     return TRUE;
+ }
 diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index d46411c474..1378b63dd9 100644
+index 605d781971..35d35c14c4 100644
 --- a/ui/sdl2-input.c
 +++ b/ui/sdl2-input.c
-@@ -62,14 +62,6 @@ void sdl2_process_key(struct sdl2_console *scon,
- 
-     /* modifier state tracking */
-     switch (ev->keysym.scancode) {
--#if 0
--    case SDL_SCANCODE_NUMLOCKCLEAR:
--    case SDL_SCANCODE_CAPSLOCK:
--        /* SDL does not send the key up event, so we generate it */
--        qemu_input_event_send_key_qcode(con, qcode, true);
--        qemu_input_event_send_key_qcode(con, qcode, false);
--        return;
--#endif
-     case SDL_SCANCODE_LCTRL:
-     case SDL_SCANCODE_LSHIFT:
-     case SDL_SCANCODE_LALT:
+@@ -70,7 +70,7 @@ void sdl2_process_key(struct sdl2_console *scon,
+                 kbd_put_keysym_console(con, QEMU_KEY_BACKSPACE);
+                 break;
+             default:
+-                kbd_put_qcode_console(con, qcode);
++                kbd_put_qcode_console(con, qcode, false);
+                 break;
+             }
+         }
 -- 
 2.9.3
