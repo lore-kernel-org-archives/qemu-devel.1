@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f5akv-0005Qj-Qw
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:39:03 -0400
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5ana-0007Bo-Rv
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:41:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f5akr-0001vD-Ts
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:39:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34612 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f5akr-0001uz-OQ
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:38:57 -0400
-References: <1523285990-37457-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA_uDg+7U=5++9MVU1WXz6V28Tb-c-bi2UK4cgOHMOts1g@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cff268ec-b55a-3bcc-0ced-a4feca36dd37@redhat.com>
-Date: Mon, 9 Apr 2018 19:38:47 +0200
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5anZ-0005MN-ON
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 13:41:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_uDg+7U=5++9MVU1WXz6V28Tb-c-bi2UK4cgOHMOts1g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 00/20] Miscellaneous patches for QEMU
- 2.12-rc
+In-Reply-To: <CAFEAcA_1X1AQ6j9pZQ8fEHmQCxRNK7EhGkohuLbTMpoPONe5PA@mail.gmail.com>
+References: <CAHP4M8VVWyNqi4yLS3S0GXaDz3j8QvUiC=aoJ_DfZLtZBaFwqg@mail.gmail.com>
+	<CAFEAcA9stTjg3Wpq5x_vj63jm1DrxAQREk4XPeFWb5rff-Uofg@mail.gmail.com>
+	<CAHP4M8X-Dus1Z8UegDTaab5LvaiDAgQa8upsx_KdnPO+A-XoTQ@mail.gmail.com>
+	<CAFEAcA_1X1AQ6j9pZQ8fEHmQCxRNK7EhGkohuLbTMpoPONe5PA@mail.gmail.com>
+From: Ajay Garg <ajaygargnsit@gmail.com>
+Date: Mon, 9 Apr 2018 23:11:40 +0530
+Message-ID: <CAHP4M8WUd9QKTCETaKNa+VQ6hMLcND8dfdDAZ3QutieDaE1WKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Use of -machine when running via
+ qemu-system-arm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +26,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 09/04/2018 19:21, Peter Maydell wrote:
-> On 9 April 2018 at 15:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> The following changes since commit 0e87fdc966d05f4e5ad868034fcd8ee2a08ca62d:
->>
->>   Update version for v2.12.0-rc2 release (2018-04-04 20:37:20 +0100)
->>
->> are available in the git repository at:
->>
->>   git://github.com/bonzini/qemu.git tags/for-upstream
->>
->> for you to fetch changes up to e0014d4b3a955cfd8d517674703bfa87f340290a:
->>
->>   Add missing bit for SSE instr in VEX decoding (2018-04-09 16:36:40 +0200)
->>
->> ----------------------------------------------------------------
->> Miscellaneous bugfixes, including crash fixes from Alexey, Peter M. and
->> Thomas.
->>
->> ----------------------------------------------------------------
-> 
-> SPARC guest boottest, SPARC host:
-> 
-> TEST: tests/boot-serial-test... (pid=99658)
->   /sparc/boot-serial/LX:                                               **
-> ERROR:/srv/pm215/qemu/tests/boot-serial-test.c:139:check_guest_output:
-> assertion failed: (output_ok)
-> FAIL
-> GTester: last random seed: R02Sec8351c4b01f899a24e5f71f6615a712
-> (pid=100565)
->   /sparc/boot-serial/SS-4:                                             **
-> ERROR:/srv/pm215/qemu/tests/boot-serial-test.c:139:check_guest_output:
-> assertion failed: (output_ok)
-> FAIL
-> GTester: last random seed: R02Scdc4c1568274a87c76f6e37e7c72f44b
-> (pid=101395)
->   /sparc/boot-serial/SS-600MP:                                         OK
-> FAIL: tests/boot-serial-test
-> 
-> Apparently intermittent, I did a couple of by-hand reruns of
-> that test case and they were fine...
+Hi Peter.
 
-What about before my patch?
+The link is pretty good, just that I am a complete noob.
 
-Paolo
+Maybe a more concrete example on the following, clearly specifying why
+things work on x86 without the need of -machine flag, will make things
+crystal clear :
+
+Because ARM systems differ so much and in fundamental ways, typically
+operating system or firmware images intended to run on one machine
+will not run at all on any other. This is often surprising for new
+users who are used to the x86 world where every system looks like a
+standard PC. (Once the kernel has booted, most userspace software
+cares much less about the detail of the hardware.)
+
+
+Sorry again for my zero knowledge on the ARM world.
+
+
+
+
+On Mon, Apr 9, 2018 at 7:31 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 9 April 2018 at 14:43, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>> On Mon, Apr 9, 2018 at 7:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> On 9 April 2018 at 14:35, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>>>> Hi All.
+>>>>
+>>>> Not sure if this is purely an ARM-related question, but I will be
+>>>> grateful if someone could point to some literature that explains what
+>>>> difference choosing a  machine makes (when we don't need to have any
+>>>> such flag for qemu-system-i386 or qemu-system-x86_64).
+>>>
+>>> Hi; this is a pretty common question, which we talk about on our
+>>> wiki page here:
+>>>  https://wiki.qemu.org/Documentation/Platforms/ARM
+>>
+>> Yep, had already been through it :)
+>>
+>>>
+>>> The underlying reason why you need this on Arm but not on x86
+>>> is that for x86 every single piece of x86 hardware is pretty
+>>> much identical. For Arm (as part of its history in the embedded
+>>> space) the general rule is that every board is different.
+>>
+>> Yep, perhaps I am needing a more layman-kinda example-cum-explanation
+>> for this, so would be grateful for some help in this regard.
+>
+> Well, the wiki text is the best explanation I have; perhaps
+> you could suggest what part of it is confusing, and we could
+> improve it?
+>
+> thanks
+> -- PMM
+
+
+
+-- 
+Regards,
+Ajay
