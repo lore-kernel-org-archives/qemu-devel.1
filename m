@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f5YH0-00005L-Ve
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 11:00:00 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f5YWI-00061Z-Vq
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 11:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1f5YGx-0003dp-Ry
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:59:59 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35632)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1f5YGx-0003dQ-KP
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:59:55 -0400
-Received: by mail-wm0-x233.google.com with SMTP id r82so17527998wme.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 07:59:55 -0700 (PDT)
-Received: from 640k.lan (94-36-194-48.adsl-ull.clienti.tiscali.it.
-	[94.36.194.48]) by smtp.gmail.com with ESMTPSA id
-	134sm1195166wmt.29.2018.04.09.07.59.52 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 09 Apr 2018 07:59:53 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  9 Apr 2018 16:59:50 +0200
-Message-Id: <1523285990-37457-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/20] Miscellaneous patches for QEMU 2.12-rc
+	(envelope-from <cohuck@redhat.com>) id 1f5YWF-0005Nj-TH
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 11:15:46 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon,  9 Apr 2018 17:15:27 +0200
+Message-Id: <20180409151533.2253-3-cohuck@redhat.com>
+In-Reply-To: <20180409151533.2253-1-cohuck@redhat.com>
+References: <20180409151533.2253-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.12 2/8] s390: Refactor IPL parameter block
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,119 +20,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit 0e87fdc966d05f4e5ad868034fcd8ee2a08ca62d:
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-  Update version for v2.12.0-rc2 release (2018-04-04 20:37:20 +0100)
+Splitting out the the CCW device extraction allows reuse.
 
-are available in the git repository at:
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Message-Id: <1522940844-12336-2-git-send-email-mihajlov@linux.vnet.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/ipl.c | 81 ++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 51 insertions(+), 30 deletions(-)
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to e0014d4b3a955cfd8d517674703bfa87f340290a:
-
-  Add missing bit for SSE instr in VEX decoding (2018-04-09 16:36:40 +0200)
-
-----------------------------------------------------------------
-Miscellaneous bugfixes, including crash fixes from Alexey, Peter M. and
-Thomas.
-
-----------------------------------------------------------------
-Alexandro Sanchez Bach (1):
-      target/i386: Fix andn instruction
-
-Bruce Rogers (1):
-      sys_membarrier: fix up include directives
-
-Daniel Henrique Barboza (1):
-      hw/scsi: support SCSI-2 passthrough without PI
-
-Eric Blake (2):
-      dump: Fix build with newer gcc
-      maint: Add .mailmap entries for patches claiming list authorship
-
-Eugene Minibaev (1):
-      Add missing bit for SSE instr in VEX decoding
-
-Fam Zheng (1):
-      scsi-disk: Don't enlarge min_io_size to max_io_size
-
-Justin Terry (VM) (1):
-      target/i386: WHPX: set CPUID_EXT_HYPERVISOR bit
-
-Marc-André Lureau (1):
-      memfd: fix vhost-user-test on non-memfd capable host
-
-Michael Chapman (1):
-      kvmclock: fix clock_is_reliable on migration from QEMU < 2.9
-
-Michal Privoznik (2):
-      qemu-pr-helper: Daemonize before dropping privileges
-      qemu-pr-helper: Write pidfile more often
-
-Paolo Bonzini (1):
-      scsi-disk: allow customizing the SCSI version
-
-Philippe Mathieu-Daudé (1):
-      hw/dma/i82374: Avoid double creation of the 82374 controller
-
-Roman Kagan (2):
-      i386/hyperv: add hv-frequencies cpu property
-      i386/hyperv: error out if features requested but unsupported
-
-Su Hang (1):
-      scripts/checkpatch.pl: Bug fix
-
-Thomas Huth (2):
-      configure: Add missing configure options to help text
-      device-crash-test: Remove fixed isa-fdc entry
-
-linzhecheng (1):
-      virtio-serial: fix heapover-flow
-
- .mailmap                    | 18 ++++++++---
- configure                   |  3 ++
- dump.c                      |  4 +--
- hw/char/virtio-serial-bus.c |  7 ++--
- hw/dma/i82374.c             |  9 +++++-
- hw/i386/kvm/clock.c         | 14 ++++++++
- hw/scsi/scsi-disk.c         | 39 ++++++++++++++++------
- hw/scsi/scsi-generic.c      | 48 ++++++++++++++++++++-------
- hw/virtio/vhost.c           |  2 +-
- include/hw/scsi/scsi.h      |  2 ++
- include/qemu/memfd.h        |  1 +
- scripts/checkpatch.pl       | 15 +++++++--
- scripts/device-crash-test   |  1 -
- scsi/qemu-pr-helper.c       | 18 +++++++----
- target/i386/cpu.c           |  1 +
- target/i386/cpu.h           |  1 +
- target/i386/kvm.c           | 56 ++++++++++++++++++++++++--------
- target/i386/translate.c     |  6 ++--
- target/i386/whpx-all.c      | 79 ++++++++++++++++++++++++++++++++++++++++++++-
- util/memfd.c                | 34 ++++++++++++++++++-
- util/sys_membarrier.c       |  6 ++--
- 21 files changed, 304 insertions(+), 60 deletions(-)
--- 
-1.8.3.1
-
-diff --git a/util/memfd.c b/util/memfd.c
-index 277f721..b3ecbac 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -202,6 +202,7 @@ bool qemu_memfd_alloc_check(void)
-  */
- bool qemu_memfd_check(void)
- {
-+#ifdef CONFIG_LINUX
-     static int memfd_check = MEMFD_TODO;
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index fdeaec3a58..58e33c5446 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -279,44 +279,52 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
+     *timeout = cpu_to_be32(splash_time);
+ }
  
-     if (memfd_check == MEMFD_TODO) {
-@@ -215,4 +216,7 @@ bool qemu_memfd_check(void)
++static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
++{
++    CcwDevice *ccw_dev = NULL;
++
++    if (dev_st) {
++        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
++            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
++                                TYPE_VIRTIO_CCW_DEVICE);
++        if (virtio_ccw_dev) {
++            ccw_dev = CCW_DEVICE(virtio_ccw_dev);
++        } else {
++            SCSIDevice *sd = (SCSIDevice *)
++                object_dynamic_cast(OBJECT(dev_st),
++                                    TYPE_SCSI_DEVICE);
++            if (sd) {
++                SCSIBus *bus = scsi_bus_from_device(sd);
++                VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
++                VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw,
++                                                       vdev);
++
++                ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
++                                                           TYPE_CCW_DEVICE);
++            }
++        }
++    }
++    return ccw_dev;
++}
++
+ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+ {
+     DeviceState *dev_st;
++    CcwDevice *ccw_dev = NULL;
+ 
+     dev_st = get_boot_device(0);
+     if (dev_st) {
+-        VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
+-            object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
+-                TYPE_VIRTIO_CCW_DEVICE);
++        ccw_dev = s390_get_ccw_device(dev_st);
++    }
++
++    /*
++     * Currently allow IPL only from CCW devices.
++     */
++    if (ccw_dev) {
+         SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
+                                                             TYPE_SCSI_DEVICE);
+-        VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
+-                                                          TYPE_VIRTIO_NET);
+-
+-        if (vn) {
+-            ipl->netboot = true;
+-        }
+-        if (virtio_ccw_dev) {
+-            CcwDevice *ccw_dev = CCW_DEVICE(virtio_ccw_dev);
+-
+-            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
+-            ipl->iplb.blk0_len =
+-                cpu_to_be32(S390_IPLB_MIN_CCW_LEN - S390_IPLB_HEADER_LEN);
+-            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
+-            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
+-            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
+-        } else if (sd) {
+-            SCSIBus *bus = scsi_bus_from_device(sd);
+-            VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
+-            VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
+-            CcwDevice *ccw_dev;
+-
+-            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
+-                                                       TYPE_CCW_DEVICE);
+-            if (!ccw_dev) {       /* It might be a PCI device instead */
+-                return false;
+-            }
+ 
++        if (sd) {
+             ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
+             ipl->iplb.blk0_len =
+                 cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN - S390_IPLB_HEADER_LEN);
+@@ -327,12 +335,25 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+             ipl->iplb.scsi.devno = cpu_to_be16(ccw_dev->sch->devno);
+             ipl->iplb.scsi.ssid = ccw_dev->sch->ssid & 3;
+         } else {
+-            return false; /* unknown device */
++            VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
++                                                              TYPE_VIRTIO_NET);
++
++            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
++            ipl->iplb.blk0_len =
++                cpu_to_be32(S390_IPLB_MIN_CCW_LEN - S390_IPLB_HEADER_LEN);
++            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
++            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
++            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
++
++            if (vn) {
++                ipl->netboot = true;
++            }
+         }
+ 
+         if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
+             ipl->iplb.flags |= DIAG308_FLAGS_LP_VALID;
+         }
++
+         return true;
      }
  
-     return memfd_check == MEMFD_OK;
-+#else
-+    return false;
-+#endif
- }
+-- 
+2.14.3
