@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f5Xzx-00068G-H5
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:42:25 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f5Y6q-0003hV-Rc
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:49:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f5Xzw-00089a-Jw
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:42:21 -0400
-Date: Mon, 9 Apr 2018 17:42:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1523284856-251254-2-git-send-email-mst@redhat.com>
-References: <1523284856-251254-1-git-send-email-mst@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1f5Y6p-0003yL-SR
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:49:28 -0400
+References: <20180409140714.26841-1-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <0df7ebc7-421b-3ee7-bc45-4aafa3801009@vivier.eu>
+Date: Mon, 9 Apr 2018 16:48:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1523284856-251254-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 1/5] vhost-user-blk: set config ops before
- vhost-user init
+In-Reply-To: <20180409140714.26841-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12] linux-user/signal.c: Ensure
+ AArch64 signal frame isn't too small
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Richard Henwood <richard.henwood@arm.com>, Riku Voipio <riku.voipio@iki.fi>
 
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Le 09/04/2018 à 16:07, Peter Maydell a écrit :
+> The AArch64 signal frame design was extended for SVE in commit
+> 8c5931de0ac77388096d79ceb, so that instead of having a fixed setup we
+> now add various records to the frame, with some of them possibly
+> overflowing into an extra space outside the original 4K reserved
+> block in the target_sigcontext.  However, we failed to ensure that we
+> always at least allocate the 4K reserved block.  This is ABI, and
+> some userspace programs rely on it.  In particular the dash shell
+> would segfault if the frame wasn't as big enough.
+> 
+> (Compare the kernel's sigframe_size() function in
+> arch/arm64/kernel/signal.c.)
+> 
+> Reported-by: Richard Henwood <richard.henwood@arm.com>
+> Fixes: https://bugs.launchpad.net/bugs/1761535
+> Fixes: 8c5931de0ac77388096d79ceb
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  linux-user/signal.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 046d4c8aa0..8d9e6e8410 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -1850,6 +1850,12 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
+>      fr_ofs = layout.total_size;
+>      layout.total_size += sizeof(struct target_rt_frame_record);
+>  
+> +    /* We must always provide at least the standard 4K reserved space,
+> +     * even if we don't use all of it (this is part of the ABI)
+> +     */
+> +    layout.total_size = MAX(layout.total_size,
+> +                            sizeof(struct target_rt_sigframe));
+> +
+>      frame_addr = get_sigframe(ka, env, layout.total_size);
+>      trace_user_setup_frame(env, frame_addr);
+>      if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+> 
 
-As soon as vhost-user init is done, the backend may send
-VHOST_USER_SLAVE_CONFIG_CHANGE_MSG, so let's set the
-notification callback before it.
-
-Also, it will be used to know whether the device supports
-the config feature to advertize it or not.
-
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Changpeng Liu <changpeng.liu@intel.com>
----
- hw/block/vhost-user-blk.c | 4 ++--
- hw/virtio/vhost.c         | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index f840f07..262baca 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -259,6 +259,8 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-     s->dev.vq_index = 0;
-     s->dev.backend_features = 0;
- 
-+    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-+
-     ret = vhost_dev_init(&s->dev, &s->chardev, VHOST_BACKEND_TYPE_USER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
-@@ -277,8 +279,6 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-         s->blkcfg.num_queues = s->num_queues;
-     }
- 
--    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
--
-     return;
- 
- vhost_err:
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 250f886..b6c314e 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1451,7 +1451,6 @@ int vhost_dev_set_config(struct vhost_dev *hdev, const uint8_t *data,
- void vhost_dev_set_config_notifier(struct vhost_dev *hdev,
-                                    const VhostDevConfigOps *ops)
- {
--    assert(hdev->vhost_ops);
-     hdev->config_ops = ops;
- }
- 
--- 
-MST
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
