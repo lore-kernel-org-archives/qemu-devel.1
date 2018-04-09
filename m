@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f5YWJ-00063e-ST
+	(envelope-from <cohuck@redhat.com>) id 1f5YWI-00061a-W0
 	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 11:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f5YWI-0005PV-Ru
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 11:15:47 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f5YWF-0005NY-Pv
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 11:15:46 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  9 Apr 2018 17:15:29 +0200
-Message-Id: <20180409151533.2253-5-cohuck@redhat.com>
+Date: Mon,  9 Apr 2018 17:15:26 +0200
+Message-Id: <20180409151533.2253-2-cohuck@redhat.com>
 In-Reply-To: <20180409151533.2253-1-cohuck@redhat.com>
 References: <20180409151533.2253-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.12 4/8] s390: Do not pass inofficial IPL
- type to the guest
+Subject: [Qemu-devel] [PULL for-2.12 1/8] s390x/kvm: call
+ cpu_synchronize_state() on every kvm_arch_handle_exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,81 +21,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 
-IPL over a virtio-scsi device requires special handling not
-available in the real architecture. For this purpose the IPL
-type 0xFF has been chosen as means of communication between
-QEMU and the pc-bios. However, a guest OS could be confused
-by seeing an unknown IPL type.
+Manually having to use cpu_synchronize_state() is error prone. And as
+Christian Borntraeger discovered, e.g. handle_diag() is currently
+missing a cpu_synchronize_state(), as decode_basedisp_s() uses a
+general purpose register value internally.
 
-This change sets the IPL parameter type to 0x02 (CCW) to prevent
-this. Pre-existing Linux has looked up the IPL parameters only in
-the case of FCP IPL. This means that the behavior should stay
-the same even if Linux checks for the IPL type unconditionally.
+So let's do an overall cpu_synchronize_state(), which fixes at least the
+one mentioned BUG. We will clean up the superfluous cpu_synchronize_state()
+calls later.
 
-Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Message-Id: <1522940844-12336-4-git-send-email-mihajlov@linux.vnet.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+We now also call it (although maybe not neded) for
+- KVM_EXIT_S390_RESET -> s390_reipl_request()
+- KVM_EXIT_DEBUG -> kvm_arch_handle_debug_exit()
+- unmanagable/unimplemented intercepts
+- ICPT_CPU_STOP -> do_stop_interrupt() -> cpu gets halted
+- Scenarios where we inject an operation exception
+- handle_stsi()
+
+I don't think any of these are performance critical. Especially as we
+have all information directly contained in kvm_run, there are no
+additional IOCTLs to issue on modern kernels.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20180406093552.13016-1-david@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c |  7 +++++++
- pc-bios/s390-ccw/iplb.h    | 15 +++++++++++++--
- 2 files changed, 20 insertions(+), 2 deletions(-)
+ target/s390x/kvm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index fc2a9fe33b..9287b7a70f 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -70,6 +70,13 @@ static void jump_to_IPL_code(uint64_t address)
- {
-     /* store the subsystem information _after_ the bootmap was loaded */
-     write_subsystem_identification();
-+
-+    /* prevent unknown IPL types in the guest */
-+    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
-+        iplb.pbt = S390_IPL_TYPE_CCW;
-+        set_iplb(&iplb);
-+    }
-+
-     /*
-      * The IPL PSW is at address 0. We also must not overwrite the
-      * content of non-BIOS memory after we loaded the guest, so we
-diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-index 7dfce4fbcf..5357a36d51 100644
---- a/pc-bios/s390-ccw/iplb.h
-+++ b/pc-bios/s390-ccw/iplb.h
-@@ -97,16 +97,27 @@ extern QemuIplParameters qipl;
- #define S390_IPL_TYPE_CCW 0x02
- #define S390_IPL_TYPE_QEMU_SCSI 0xff
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index f570896dc1..fb59d92def 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1778,6 +1778,8 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
  
--static inline bool store_iplb(IplParameterBlock *iplb)
-+static inline bool manage_iplb(IplParameterBlock *iplb, bool store)
- {
-     register unsigned long addr asm("0") = (unsigned long) iplb;
-     register unsigned long rc asm("1") = 0;
+     qemu_mutex_lock_iothread();
  
-     asm volatile ("diag %0,%2,0x308\n"
-                   : "+d" (addr), "+d" (rc)
--                  : "d" (6)
-+                  : "d" (store ? 6 : 5)
-                   : "memory", "cc");
-     return rc == 0x01;
- }
- 
++    cpu_synchronize_state(cs);
 +
-+static inline bool store_iplb(IplParameterBlock *iplb)
-+{
-+    return manage_iplb(iplb, true);
-+}
-+
-+static inline bool set_iplb(IplParameterBlock *iplb)
-+{
-+    return manage_iplb(iplb, false);
-+}
-+
- #endif /* IPLB_H */
+     switch (run->exit_reason) {
+         case KVM_EXIT_S390_SIEIC:
+             ret = handle_intercept(cpu);
 -- 
 2.14.3
