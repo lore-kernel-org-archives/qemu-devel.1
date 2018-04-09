@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45356)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5fJM-0006jg-Iw
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 18:30:53 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46528)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1f5gDn-00022N-Ck
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 19:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5fJJ-00062M-CU
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 18:30:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f5fJJ-00060w-6J
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 18:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f5fJH-0002cs-8c
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 22:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D511A2E80C9
-	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 22:30:46 +0000 (UTC)
+	(envelope-from <n54@gmx.com>) id 1f5gDk-0003pg-5d
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 19:29:11 -0400
+Received: from mout.gmx.net ([212.227.15.19]:42593)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1f5gDj-0003p2-Qm
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 19:29:08 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+References: <CAFEAcA8+gJg4O-ys-KjEVXSEsgd0CZaGXJ=o6nFx4Dv8ccNn0A@mail.gmail.com>
+	<ed5e0354-11e9-5778-128b-680bab83cbca@gmx.com>
+Message-ID: <03fbcc73-c41b-e968-315a-d16cb99c55bb@gmx.com>
+Date: Tue, 10 Apr 2018 01:31:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Apr 2018 22:24:19 -0000
-From: =?utf-8?b?Q2lybyBTYW50aWxsaSDlha3lm5vkuovku7Yg5rOV6L2u5Yqf?=
-	<ciro.santilli@gmail.com>
-Reply-To: Bug 1762179 <1762179@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152319497960.30219.9338727401860906105.malonedeb@gac.canonical.com>
-Message-Id: <152331266025.9302.7854324506833251353.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1762179] Re: Record and replay replay fails with:
- "ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed"
+In-Reply-To: <ed5e0354-11e9-5778-128b-680bab83cbca@gmx.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GrIh1SQfhKwpdOILQ6E7rV7t3pmBVwXgd"
+Subject: Re: [Qemu-devel] qom-test on netbsd can be very slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,141 +28,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>
 
-** Description changed:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GrIh1SQfhKwpdOILQ6E7rV7t3pmBVwXgd
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>
+Message-ID: <03fbcc73-c41b-e968-315a-d16cb99c55bb@gmx.com>
+Subject: Re: [Qemu-devel] qom-test on netbsd can be very slow
+References: <CAFEAcA8+gJg4O-ys-KjEVXSEsgd0CZaGXJ=o6nFx4Dv8ccNn0A@mail.gmail.com>
+ <ed5e0354-11e9-5778-128b-680bab83cbca@gmx.com>
+In-Reply-To: <ed5e0354-11e9-5778-128b-680bab83cbca@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-- QEMU master at 08e173f29461396575c85510eb41474b993cb1fb Ubuntu 17.10
-+ QEMU master at 915d34c5f99b0ab91517c69f54272bfdb6ca2b32 Ubuntu 17.10
-  host.
-  =
+On 09.04.2018 22:51, Kamil Rytarowski wrote:
+> On 09.04.2018 19:10, Peter Maydell wrote:
+>> My NetBSD build system recently seems to have taken a nosedive
+>> in how long it takes to finish "make check". This seems to be
+>> because qom-test (and probably other things where the test interacts
+>> with the QEMU process) can run very slowly.
+>>
+>> netbsdvm# for i in 1 2 3 4 5 6 7 8 9 10; do
+>> (QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 time
+>> tests/qom-test -p /x86_64/qom/pc-i440fx-2.0); done
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>         8.49 real         1.18 user         7.34 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>        10.41 real         1.32 user         9.09 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>         8.45 real         1.24 user         7.24 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>         9.88 real         1.10 user         8.31 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>        11.60 real         1.47 user         9.90 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>        10.94 real         1.28 user         9.68 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>        10.06 real         1.32 user         8.76 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>        13.38 real         1.37 user        12.04 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>        16.19 real         1.46 user        14.29 sys
+>> /x86_64/qom/pc-i440fx-2.0: OK
+>>         9.70 real         1.17 user         8.51 sys
+>>
+>> Admittedly this is running in a (KVM) VM, but still, there seems
+>> something wrong with how long each of these is taking. On Linux
+>> each run is less than a second, so there's an order-of-magnitude
+>> slowdown here. Further, I've occasionally seen a run take 100 seconds!=
 
-  QEMU commands:
-  =
+>>
+>> Does anybody else see this, and any ideas why it might be running slow=
+?
+>> I'm not very familiar with debugging on netbsd; I had a look at
+>> ktrace output, and the QEMU process seems to sometimes spend
+>> quite a lot of time in a poll() loop not actually doing anything.
+>> I couldn't figure out how to get the ktrace logs to annotate
+>> which thread was making which syscall though, so they weren't
+>> easy to interpret. If anybody's more experienced at debugging
+>> things in the BSDs that would also be helpful.
+>>
+>> On OpenBSD, for comparison, each test run seems to fairly reliably
+>> take 5 seconds give-or-take, there's much less run-to-run
+>> variation, though it's still much slower than Linux is.
+>> The OpenBSD and FreeBSD build VMs seem to complete more
+>> reasonably quickly than the NetBSD one.
+>>
+>> One thing I noticed looking at ktrace output is that we do
+>> all our reading of QMP input and output with a read syscall
+>> per character. I don't think that's the cause of this slowness,
+>> though.
+>>
+>> thanks
+>> -- PMM
+>>
+>=20
+> I'm running these tests natively and get apparently expected results:
+>=20
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         2,05 real         1,36 user         0,71 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,92 real         1,17 user         0,79 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,84 real         1,14 user         0,77 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,85 real         1,16 user         0,76 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,79 real         1,04 user         0,82 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,84 real         1,00 user         0,91 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,86 real         1,18 user         0,75 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,85 real         1,27 user         0,64 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,84 real         1,27 user         0,64 sys
+> /x86_64/qom/pc-i440fx-2.0: OK
+>         1,82 real         1,18 user         0,71 sys
+>=20
 
-  ```
-  #!/usr/bin/env bash
-  cmd=3D"\
-  time \
-  ./x86_64-softmmu/qemu-system-x86_64 \
-  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
-val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
-  -kernel 'out/x86_64/buildroot/images/bzImage' \
-  -nographic \
-  \
-  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
-=3Dimg-direct,format=3Dqcow2 \
-  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
- \
-  -device ide-hd,drive=3Dimg-blkreplay \
-  \
-  -netdev user,id=3Dnet1 \
-  -device rtl8139,netdev=3Dnet1 \
-  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
-  "
-  echo "$cmd"
-  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
-  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
-  ```
-  =
+There is a registered bug in the NetBSD database:
 
-  This tries to stay as close as possible to the documented commands:
-  https://github.com/qemu/qemu/blob/08e173f29461396575c85510eb41474b993cb1f=
-b/docs/replay.txt#L28
-  =
+https://gnats.netbsd.org/52184
+"Recent qemu performs badly on NetBSD hosts under load"
 
-  Images uploaded to: https://github.com/cirosantilli/linux-kernel-module-
-  cheat/releases/download/test-replay-arm/images4.zip
-  =
+Could you please try to check if the following commit is culprit using
+the reproducer in gnats or running qom-test?
 
-  Images generated with: https://github.com/cirosantilli/linux-kernel-
-  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
-  =
 
-  The replay failed straight out with:
-  =
+commit 05e514b1d4d5bd4209e2c8bbc76ff05c85a235f3
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue Jul 21 16:07:53 2015 +0200
 
-  ```
-  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
-y_file && replay_mutex_locked())
-  ```
-  =
+    AioContext: optimize clearing the EventNotifier
 
-  QEMU configure:
-  =
+    It is pretty rare for aio_notify to actually set the EventNotifier.  =
+It
+    can happen with worker threads such as thread-pool.c's, but otherwise=
+ it
+    should never be set thanks to the ctx->notify_me optimization.  The
+    previous patch, unfortunately, added an unconditional call to
+    event_notifier_test_and_clear; now add a userspace fast path that
+    avoids the call.
 
-  ```
-  ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
-=3D"x86_64-softmmu"
-  ```
+    Note that it is not possible to do the same with event_notifier_set;
+    it would break, as proved (again) by the included formal model.
 
--- =
+    This patch survived over 3000 reboots on aarch64 KVM.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1762179
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Reviewed-by: Fam Zheng <famz@redhat.com>
+    Tested-by: Richard W.M. Jones <rjones@redhat.com>
+    Message-id: 1437487673-23740-7-git-send-email-pbonzini@redhat.com
+    Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Title:
-  Record and replay replay fails with: "ERROR:replay/replay-
-  time.c:49:replay_read_clock: assertion failed"
 
-Status in QEMU:
-  New
+--GrIh1SQfhKwpdOILQ6E7rV7t3pmBVwXgd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Bug description:
-  QEMU master at 915d34c5f99b0ab91517c69f54272bfdb6ca2b32 Ubuntu 17.10
-  host.
+-----BEGIN PGP SIGNATURE-----
 
-  QEMU commands:
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlrL97kMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsM+cQAJvch4Bns6rcfW1erKyy+T6ofnJoHCMwC4lfUy53
+eKvXKCnmGj+QYyRGlB6+XmpjhR/U++0zzHFCSSeQQKhj9CHBskdXLm6uJn+Jiamc
+rvCvcSj4a2Z2jjHUeq2xskRQuC0QEmiJk2VQdCPsxtBCQFF0kECiFndwzEENS2nB
+IBnpVk1EFra7l+cTi0wm6LXpTFtUwF8TejiHGIvwFmGow70VURuieKdAvDKqiHdK
+X49NyOpEbgDfHT2U/xsIrBNCGXCF5kKHrMoLNE0ppXR4pBzhFAqnX+0latXaS5Cs
+v/NkI+ZyufV9uI+FeIUJPf8wIPLY9CMWmcbzyV4tiPlPh8wvBuTSscxHcRdxAefS
+U30lVcmZPJqHArvTQ0lrGBW16ZaPoDI/5q/AYHdOGvzZDhwpiROnm1OlJtpWKgDs
+rmukX9h3v1svQxCB/CsriOs5jvd1AC7mUJxetn1HowrOhnuSwsjAg0ms3kLNFwpS
+jpMGLcXK4A7XvdeMyB1Etf/MyaO5fp85+dGpS9xGL4+lhXG9X/I4Nz7j/RJ9AVSX
+u0LpHXfgsUK6fZuP12HjVTVg9wHdKNc3V7ZSRMtuse01Zfstvhj4DwU8GEOW/31p
+dh2JzpSGVfd8QutdrsGbOpydnEhvjlhJBoOJlP3EdMVn9LTuq/XpPR17729n3E/G
+CoaT
+=z7pc
+-----END PGP SIGNATURE-----
 
-  ```
-  #!/usr/bin/env bash
-  cmd=3D"\
-  time \
-  ./x86_64-softmmu/qemu-system-x86_64 \
-  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
-val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
-  -kernel 'out/x86_64/buildroot/images/bzImage' \
-  -nographic \
-  \
-  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
-=3Dimg-direct,format=3Dqcow2 \
-  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
- \
-  -device ide-hd,drive=3Dimg-blkreplay \
-  \
-  -netdev user,id=3Dnet1 \
-  -device rtl8139,netdev=3Dnet1 \
-  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
-  "
-  echo "$cmd"
-  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
-  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
-  ```
-
-  This tries to stay as close as possible to the documented commands:
-  https://github.com/qemu/qemu/blob/08e173f29461396575c85510eb41474b993cb1f=
-b/docs/replay.txt#L28
-
-  Images uploaded to: https://github.com/cirosantilli/linux-kernel-
-  module-cheat/releases/download/test-replay-arm/images4.zip
-
-  Images generated with: https://github.com/cirosantilli/linux-kernel-
-  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
-
-  The replay failed straight out with:
-
-  ```
-  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
-y_file && replay_mutex_locked())
-  ```
-
-  QEMU configure:
-
-  ```
-  ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
-=3D"x86_64-softmmu"
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1762179/+subscriptions
+--GrIh1SQfhKwpdOILQ6E7rV7t3pmBVwXgd--
