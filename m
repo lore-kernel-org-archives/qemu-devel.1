@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f5W1Y-0007XI-1G
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:35:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f5WAr-0002O2-Jz
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f5W1U-0000R2-Va
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:35:52 -0400
-Date: Mon, 9 Apr 2018 14:35:41 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180409143541.5b2bc2d8.cohuck@redhat.com>
-In-Reply-To: <20180409113019.14568-1-david@redhat.com>
-References: <20180409113019.14568-1-david@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1f5WAo-0000Vs-Et
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:45:29 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f5WAo-0000Un-4P
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 08:45:26 -0400
+Received: by mail-wm0-x243.google.com with SMTP id 66so12562907wmd.3
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 05:45:25 -0700 (PDT)
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+Date: Mon, 09 Apr 2018 13:45:22 +0100
+Message-ID: <87efjov999.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 0/2] s390x/kvm: last minute
- fixes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Crash when running hello-world unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Ajay Garg <ajaygargnsit@gmail.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, rumpkernel-users@freelists.org
 
-On Mon,  9 Apr 2018 13:30:17 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> Patch 1 only applies to old KVM instances without the virtual memory access
-> IOCTL in KVM.
-> 
-> Patch 2 could be problematic when toggling PER in a restart interrupt.
-> Watchpoint recomputation only applies to TCG.
-> 
-> David Hildenbrand (2):
->   s390x/mmu: don't overwrite pending exception in mmu translate
->   s390x: load_psw() should only exchange the PSW for KVM
-> 
->  target/s390x/helper.c     | 10 ++++++----
->  target/s390x/mmu_helper.c |  2 +-
->  2 files changed, 7 insertions(+), 5 deletions(-)
-> 
+Ajay Garg <ajaygargnsit@gmail.com> writes:
 
-Thanks, queued to s390-fixes.
+> Hi All.
+>
+> We did the following :
+>
+> a)
+> Cross-compile rumprun for ARM on a linux x86_64 :
+>
+> ajay@latitude-3480:~/rumprun-arm-hw/rumprun$
+> CC=3Darm-linux-gnueabihf-gcc ./build-rr.sh hw
+<snip>
+>
+> c)
+> Tried running on x86_64, via qemu, but got the crash :
+>
+> ######################################################################
+> ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ qemu-system-x86_64
+> -nographic -kernel helloer.bin
+> warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+> qemu: fatal: Trying to execute code outside RAM or ROM at 0x00000000000a0=
+1f1
+>
+<snip>
+>
+>
+> Where should we be looking to start to fix?
+
+qemu-system-x86_64 is expecting an x86 binary blob. I assume you need
+qemu-system-arm. More importantly you need to specify a -M machine type
+that matches whatever rumprun is expecting.
+
+--
+Alex Benn=C3=A9e
