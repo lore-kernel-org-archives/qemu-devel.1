@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1f5ShU-0003lx-5D
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:02:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f5SqG-0007BT-NF
+	for Qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:12:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1f5ShQ-00050F-Ut
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:02:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38660 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1f5ShQ-0004yN-Q1
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:02:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C40EE82FC482
-	for <qemu-devel@nongnu.org>; Mon,  9 Apr 2018 09:02:51 +0000 (UTC)
-Date: Mon, 9 Apr 2018 11:02:44 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180409090244.GP9903@paraplu>
-References: <20180307144951.d75lo5rgzi2vf27z@eukaryote>
-	<20180307151836.GK20201@redhat.com>
-	<20180308075245.lgzredyhn2paawg4@sirius.home.kraxel.org>
-	<20180308101728.GG4718@redhat.com>
-	<f30635f1-5773-2046-1efd-fc37a0a49753@redhat.com>
-	<85d1416c-c442-eaf2-c4a5-3308fd63de3a@redhat.com>
-	<721a331e-0ba9-58e2-8659-81b725a0ddff@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1f5SqB-0004rj-P0
+	for Qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:12:00 -0400
+Date: Mon, 9 Apr 2018 11:11:46 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180409091146.GC5294@localhost.localdomain>
+References: <9b490d71-4f3e-9069-9c92-89d27e107f57@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
 Content-Disposition: inline
-In-Reply-To: <721a331e-0ba9-58e2-8659-81b725a0ddff@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] Defining firmware (OVMF,
- et al) metadata format & file
+In-Reply-To: <9b490d71-4f3e-9069-9c92-89d27e107f57@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] block-stream/commit and mixing
+ internal and external snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,51 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Fri, Apr 06, 2018 at 08:21:00PM +0200, Laszlo Ersek wrote:
-> On 04/06/18 20:10, Eric Blake wrote:
 
-[...]
+--C7zPtVaVf+AK4Oqc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> # key=value pairs also support Python or JSON object literal subset notations,
-> # without spaces. Dictionaries/objects {} are supported as are arrays [].
-> #
-> #    example-command arg-name1={'key':'value','obj'={'prop':"value"}}
-> #
-> # Both JSON and Python formatting should work, including both styles of
-> # string literal quotes. Both paradigms of literal values should work,
-> # including null/true/false for JSON and None/True/False for Python.
+Am 07.04.2018 um 00:16 hat Eric Blake geschrieben:
+> Perhaps others have already known this, but I just realized that if you
+> mix internal and external snapshots, you can set yourself up for massive
+> failures when trying to use block-stream or block-commit to consolidate
+> data across the external backing chain, without also thinking about the
+> internal snapshots.
 
-A couple of examples of the the key-value pairs and using JSON dicts
-with 'qmp-shell'.
+Yeah, internal and external snapshots don't mix well. Basically, the
+only thing that will work reliably is having a qcow2 image with internal
+snapshots at the top, and then an immutable backing chain without
+internal snapshots below it.
 
-Key-value pairs:
+> Here's a quick demonstration:
+> [...]
+>=20
+> The root cause to all of this is that right now, ALL internal snapshots
+> share the same backing file information in the file header; but
+> block-stream operations only modify the active snapshot.  The actions of
+> changing the backing file or of rewriting the clusters in the backing
+> file don't break the active snapshot, but DO bleed through to the
+> internal snapshots, for any cluster where the internal snapshot was
+> relying on the backing file.
+>=20
+> Does this mean we should make it harder to perform external block
+> operations on a qcow2 file that has internal snapshots (either refuse
+> outright, or at least require a 'force' flag to let the user acknowledge
+> the risk)?  Similarly, should it be harder to create an internal
+> snapshot when an image already has an external backing file, and/or
+> should we improve the qcow2 specification of internal snapshot
+> descriptors to record a per-snapshot backing file rather than the
+> current approach that all snapshots share the same backing file?
+> Whether or not we track a per-snapshot backing file, should the presence
+> of internal snapshots be used to request op-blockers for read
+> consistency on backing files?
 
-  (QEMU) blockdev-snapshot node=node-Base snapshot-file=./overlay1.qcow2 overlay=node-Overlay1
-  [...]
+Op blockers can't really protect a node against itself. As far as the
+backing file node is concerned, nothing bad has happened. It is still
+fully consistent and it hasn't been written to. It just isn't used any
+more by its parent node.
 
-A combination key-value pairs and JSON dicts:
+Possibly we can use a blocker to enforce that the backing file child
+isn't changed, but that would be something like a BLK_PERM_GRAPH_MOD
+permission that we failed to define precisely so far.
 
-   (QEMU) blockdev-add driver=qcow2 node-name=node-overlay1 file={"driver":"file","filename":"overlay1.qcow2"}
-   [...]
+Other than that, if you want to make the merge of the external snapshots
+fail, maybe the only thing you could do is returning an error in when
+trying to change the backing file link in qcow2_change_backing_file()
+while there are internal snapshots. I'm not sure that this will result
+in a good state, though, and it is only called at the very end of the
+block job (i.e. all data is already copied), so it's not a nice failure
+mode.
 
-> This looks awesome, because it should let me provide messy nested input
-> (which I'll obviously compose in my $EDITOR and then paste it), and then
-> the QMP shell will both validate and pretty print that. I'm going to try
-> this.
+Kevin
 
-A couple of notes when using the 'qmp-shell':
+--C7zPtVaVf+AK4Oqc
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  - Assuming you started QEMU with: `[...] -qmp
-    unix:/tmp/qmp-sock,server,nowait`, you might want to use the '-p'
-    command-line option to prett-print the JSON:
-    
-        $ qmp-shell -v -p /tmp/qmp-sock
+-----BEGIN PGP SIGNATURE-----
 
-  - It also provides a persistent command history in a convenient file:
-    '~/.qmp-shell_history'
+iQIcBAEBAgAGBQJayy5SAAoJEH8JsnLIjy/WHfoP/RU4w9776cCOKhbG3nIVFkQW
+srMOIsxGYLou2KnL1fqgTr8qQcmmyC775Ou6Mnmz0pmjMpT7dRIX3t7q4Y4w5CdP
+i9a6A0jJ+rmgCT3KutushHKfaiQwZ7UFzRh60GJpBDmyK28bq9x+fdXMs/frbMkp
+fOjVRsv13iecVQUcClVD3HgQbmD/ux+R8Jz7umk1wSI/VSdAXf8b7CkmytJdCaTF
+Rpk5FqK8J4S10twZ99jtETYQrqCYgKKIS7JAKAstY7W69JXNapCCBfOoN6wphi/6
+X7EljXCi4fFY7IOMCirv4yWg/xkyS/itOTfKjnZZp7O9ACLAIkTqRx7MAe8WZp9C
+1M7oCYFUYUxbuWWEOzLkYgNNxrzbJtRBLy6P4xzawJmVbQ2uO5n+6XSZfLKDQFXe
+aaRlGxUhEboroG2OKN62/qQRjSgGuL3tMVkaQX8dUBk7aVobrKOcsZEG7p6HyM8z
+qIxl1yOA1w8XIbr+F8h/2Ywyrni1k0SDW3tpgUGEKoSJGeHIvLRNCo9AoZA1P+YA
+F3O/sL3pAM65yy1pQIztTsgST4oEtrCkn5TmsVNscExbOJ5t/XXRQY8Zpjz+nYmJ
+i+8nrZzPcWEInolSic7X/s6cOCEXc3CK5xJjhaIwDTLQcrd2yrzn1fHy3xd7j6G6
+OXmzl6m+bnDx6XRC5AgI
+=oRIr
+-----END PGP SIGNATURE-----
 
--- 
-/kashyap
+--C7zPtVaVf+AK4Oqc--
