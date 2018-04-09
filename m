@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f5N0l-0004jX-VV
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 22:58:29 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f5NRb-00075p-Sg
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 23:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f5N0i-0007On-Ba
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 22:58:28 -0400
-Received: from mail-sn1nam01on0044.outbound.protection.outlook.com
-	([104.47.32.44]:27968
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f5N0i-0007NZ-0V
-	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 22:58:24 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Mon, 9 Apr 2018 02:58:20 +0000
-Message-ID: <CY4PR12MB176833F4D367C19854D2278F95BF0@CY4PR12MB1768.namprd12.prod.outlook.com>
-References: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
-In-Reply-To: <1522186271-27743-1-git-send-email-babu.moger@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@gmail.com>) id 1f5NRY-00086H-NZ
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 23:26:11 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36679)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f5NRY-00084u-Gq
+	for qemu-devel@nongnu.org; Sun, 08 Apr 2018 23:26:08 -0400
+Received: by mail-pf0-x244.google.com with SMTP id g14so5025641pfh.3
+	for <qemu-devel@nongnu.org>; Sun, 08 Apr 2018 20:26:08 -0700 (PDT)
+Date: Mon, 9 Apr 2018 11:26:01 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180409032601.GA1648@stefanha-x1.localdomain>
+References: <20180405104834.10457-1-pagupta@redhat.com>
+	<20180405104834.10457-4-pagupta@redhat.com>
+	<ad08ca09-71ee-08d5-3479-8b3d06380a03@redhat.com>
+	<416823501.16310251.1522930166070.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 0/9] i386: Enable TOPOEXT to support
- hyperthreading on AMD CPU
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="cWoXeonUoKmBZSoM"
+Content-Disposition: inline
+In-Reply-To: <416823501.16310251.1522930166070.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] qemu: Add virtio pmem device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, mst@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, pbonzini@redhat.com, stefanha@redhat.com, niteshnarayanlal@hotmail.com, marcel@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-UGluZy4uLg0KQ2hlY2tpbmcgdG8gc2VlIGlmIHRoZXJlIGFyZSBhbnkgZnVydGhlciBjb21tZW50
-cyBvbiB0aGVzZSBwYXRjaCBzZXJpZXMuDQpUaGFua3MNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3Nh
-Z2UtLS0tLQ0KPiBGcm9tOiBNb2dlciwgQmFidQ0KPiBTZW50OiBUdWVzZGF5LCBNYXJjaCAyNywg
-MjAxOCA0OjMxIFBNDQo+IFRvOiBtc3RAcmVkaGF0LmNvbTsgbWFyY2VsQHJlZGhhdC5jb207IHBi
-b256aW5pQHJlZGhhdC5jb207DQo+IHJ0aEB0d2lkZGxlLm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNv
-bTsgbXRvc2F0dGlAcmVkaGF0LmNvbQ0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBrdm1A
-dmdlci5rZXJuZWwub3JnOyBrYXNoQHRyaXBsZWJhY2submV0Ow0KPiBNb2dlciwgQmFidSA8QmFi
-dS5Nb2dlckBhbWQuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjUgMC85XSBpMzg2OiBFbmFibGUg
-VE9QT0VYVCB0byBzdXBwb3J0IGh5cGVydGhyZWFkaW5nIG9uDQo+IEFNRCBDUFUNCj4gDQo+IFRo
-aXMgc2VyaWVzIGVuYWJsZXMgdGhlIFRPUE9FWFQgZmVhdHVyZSBmb3IgQU1EIENQVXMuIFRoaXMg
-aXMgcmVxdWlyZWQgdG8NCj4gc3VwcG9ydCBoeXBlcnRocmVhZGluZyBvbiBrdm0gZ3Vlc3RzLg0K
-PiANCj4gVGhpcyBhZGRyZXNzZXMgdGhlIGlzc3VlcyByZXBvcnRlZCBpbiB0aGVzZSBidWdzOg0K
-PiBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTE0ODEyNTMNCj4g
-aHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvcWVtdS8rYnVnLzE3MDM1MDYNCj4gDQo+IA0KPiB2
-NToNCj4gSW4gdGhpcyBzZXJpZXMgSSB0cmllZCB0byBhZGRyZXNzIHRoZSBmZWVkYmFjayBmcm9t
-IEVkdWFyZG8gSGFia29zdC4NCj4gVGhlIGRpc2N1c3Npb24gdGhyZWFkIGlzIGhlcmUuDQo+IGh0
-dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcGF0Y2gvMTAyOTk3NDUvDQo+IFRoZSBwcmV2aW91
-cyB0aHJlYWQgaXMgaGVyZS4NCj4gaHR0cDovL3BhdGNod29yay5vemxhYnMub3JnL2NvdmVyLzg4
-NDg4NS8NCj4gDQo+IFJlYXNvbiBmb3IgdGhlc2UgY2hhbmdlcw0KPiBUaGUgY2FjaGUgcHJvcGVy
-dGllcyBmb3IgQU1EIGZhbWlseSBvZiBwcm9jZXNzb3JzIGhhdmUgY2hhbmdlZCBmcm9tDQo+IHBy
-ZXZpb3VzIHJlbGVhc2VzLiBXZSBkb24ndCB3YW50IHRvIGRpc3BsYXkgdGhlIG5ldyBpbmZvcm1h
-dGlvbiBvbiB0aGUNCj4gb2xkIGZhbWlseSBvZiBwcm9jZXNzb3JzIGFzIHRoaXMgbWlnaHQgY2F1
-c2UgY29tcGF0aWJpbGl0eSBpc3N1ZXMuDQo+IA0KPiBDaGFuZ2VzOg0KPiAgMS4gQmFzZWQgdGhl
-IHBhdGNoZXMgb24gdG9wIG9mIEVkdWFyZG8ncyhwYXRjaCMxKSBwYXRjaC4NCj4gICAgIENoYW5n
-ZWQgZmV3IHRoaW5ncy4NCj4gICAgIE1vdmVkIHRoZSBDYWNoZSBkZWZpbml0aW9ucyB0byBjcHUu
-aCBmaWxlLg0KPiAgICAgQ2hhbmdlZCB0aGUgQ1BVSURfNCBuYW1lcyB0byBnZW5lcmljIG5hbWVz
-Lg0KPiAyLiBBZGRlZCBhIG5ldyBwcm9wZXJ5ICJsZWdhY3ktY2FjaGUiIGluIGNwdSBvYmplY3Qo
-cGF0Y2gjMikuIFRoaXMgY2FuIGJlDQo+ICAgIHVzZWQgdG8gZGlzcGxheSB0aGUgb2xkIHByb3Bl
-cnR5IGV2ZW4gaWYgdGhlIGhvc3Qgc3VwcG9ydHMgdGhlIG5ldyBjYWNoZQ0KPiAgICBwcm9wZXJ0
-aWVzLg0KPiAzLiBBZGRlZCBjYWNoZSBpbmZvcm1hdGlvbiBpbiBYODZDUFVEZWZpbml0aW9uIGFu
-ZCBDUFVYODZTdGF0ZQ0KPiA0LiBQYXRjaCA2LTcgY2hhbmdlZCBxdWl0ZSBhIGJpdCBmcm9tIHBy
-ZXZpb3VzIHZlcnNpb24gZG9lcyB0byBuZXcgYXBwcm9hY2guDQo+IDUuIEFkZHJlc3NlZCBmZXcg
-aXNzdWVzIHdpdGggQ1BVSURfODAwMF8wMDFkIGFuZCBDUFVJRF84MDAwXzAwMUUuDQo+IA0KPiAN
-Cj4gdjQ6DQo+IDEuUmVtb3ZlZCB0aGUgY2hlY2tzIHVuZGVyIGNwdWlkIDB4ODAwMDAwMUQgbGVh
-ZihwYXRjaCAjMikuIFRoZXNlIGNoZWNrDQo+IGFyZQ0KPiAgIG5vdCBuZWNlc3NhcnkuIEZvdW5k
-IHRoaXMgZHVyaW5nIGludGVybmFsIHJldmlldy4NCj4gMi5BZGRlZCBDUFVJRF9FWFQzX1RPUE9F
-WFQgZmVhdHVyZSBmb3IgYWxsIHRoZSAxNyBmYW1pbHkocGF0Y2ggIzQpLiBUaGlzDQo+IHdhcw0K
-PiAgIGZvdW5kIGJ5IEthc2ggUGFuZGUgZHVyaW5nIGhpcyB0ZXN0aW5nLg0KPiAzLlJlbW92ZWQg
-dGggaGFyZGNvZGVkIGNwdWlkIHhsZXZlbCBhbmQgZHluYW1pY2FsbHkgZXh0ZW5kZWQgaWYNCj4g
-Q1BVSURfRVhUM19UT1BPRVhUDQo+ICAgaXMgc3VwcG9ydGVkKFN1Z2dlc3RlZCBieSBCcmlqZXNo
-IFNpbmdoKS4NCj4gDQo+IHYzOg0KPiAxLlJlbW92ZWQgdGhlIHBhdGNoICMxLiBSYWRpbSBtZW50
-aW9uZWQgdGhhdCBvcmlnaW5hbCB0eXBvIHByb2JsZW0gaXMgaW4NCj4gICBsaW51eCBrZXJuZWwg
-aGVhZGVyLiBxZW11IGlzIGp1c3QgY29weWluZyB0aG9zZSBmaWxlcy4NCj4gMi5JbiBwcmV2aW91
-cyB2ZXJzaW9uLCBJIHVzZWQgdGhlIGNwdWlkIDQgZGVmaW5pdGlvbnMgZm9yIEFNRHMgY3B1aWQg
-bGVhZg0KPiAgIDB4ODAwMDAwMUQuIENQVUlEIDQgaXMgdmVyeSBpbnRlbCBzcGVjaWZpYyBhbmQg
-d2UgZG9udCB3YW50IHRvIGV4cG9zZSB0aG9zZQ0KPiAgIGRldGFpbHMgdW5kZXIgQU1ELiBJIGhh
-dmUgcmVuYW1lZCBzb21lIG9mIHRoZXNlIGRlZmluaXRpb25zIGFzIGdlbmVyaWMuDQo+ICAgVGhl
-c2UgY2hhbmdlcyBhcmUgaW4gcGF0Y2gjMS4gUmFkaW0sIGxldCBtZSBrbm93IGlmIHRoaXMgaXMg
-d2hhdCB5b3UNCj4gaW50ZW5kZWQuDQo+IDMuQWRkZWQgYXNzZXJ0IHRvIGZvciBjb3JlX2lkKFN1
-Z2dlc3RlZCBieSBSYWRpbSBLcsSNbcOhxZkpLg0KPiA0LkNoYW5nZWQgdGhlIGlmIGNvbmRpdGlv
-biB1bmRlciAiTDMgY2FjaGUgaW5mbyIoU3VnZ2VzdGVkIGJ5IEdhcnkgSG9vaykuDQo+IDUuQWRk
-cmVzc2VkIGZldyBtb3JlIHRleHQgY29ycmVjdGlvbiBhbmQgY29kZSBjbGVhbnVwKFN1Z2dlc3Rl
-ZCBieQ0KPiBUaG9tYXMgTGVuZGFja3kpLg0KPiANCj4gdjI6DQo+ICAgRml4ZWQgZmV3IG1vcmUg
-bWlub3IgaXNzdWVzIHBlciBHYXJ5IEhvb2sncyBjb21tZW50cy4gVGhhbmsgeW91IEdhcnkuDQo+
-ICAgUmVtb3ZlZCB0aGUgcGF0Y2gjMS4gV2UgbmVlZCB0byBoYW5kbGUgdGhlIGluc3RydWN0aW9u
-IGNhY2hlDQo+IGFzc29jaWF0aXZpdHkNCj4gICBzZXBlcmF0ZWx5LiBJdCB2YXJpZXMgYmFzZWQg
-b24gdGhlIGNwdSBmYW1pbHkuIEkgd2lsbCBjb21lYmFjayB0byB0aGF0IGxhdGVyLg0KPiAgIEFk
-ZGVkIHR3byBtb3JlIHR5cG8gY29ycmVjdGlvbnMgaW4gcGF0Y2gjMSBhbmQgcGF0Y2gjNS4NCj4g
-DQo+IHYxOg0KPiAgIFN0YW5pc2xhdiBMYW5jaSBwb3N0ZWQgZmV3IHBhdGNoZXMgZWFybGllci4N
-Cj4gICBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3BhdGNoLzEwMDQwOTAzLw0KPiANCj4g
-UmViYXNlZCBoaXMgcGF0Y2hlcyB3aXRoIGZldyBjaGFuZ2VzLg0KPiAxLlNwaXQgdGhlIHBhdGNo
-ZXMgaW50byB0d28sIHNlcGFyYXRpbmcgY3B1aWQgZnVuY3Rpb25zDQo+ICAgMHg4MDAwMDAxRCBh
-bmQgMHg4MDAwMDAxRSAoUGF0Y2ggMiBhbmQgMykuDQo+IDIuUmVtb3ZlZCB0aGUgZ2VuZXJpYyBu
-b24taW50ZWwgY2hlY2sgYW5kIG1hZGUgYSBzZXBhcmF0ZSBwYXRjaA0KPiAgIHdpdGggc29tZSBj
-aGFuZ2VzKFBhdGNoIDUpLg0KPiAzLkZpeGVkIEwzX05fU0VUU19BTUQoZnJvbSA0MDk2IHRvIDgx
-OTIpIGJhc2VkIG9uDQo+IENQVUlEX0ZuODAwMDAwMURfRUNYX3gwMy4NCj4gDQo+IEFkZGVkIDIg
-bW9yZSBwYXRjaGVzLg0KPiBQYXRjaCAxLiBGaXhlcyBjYWNoZSBhc3NvY2lhdGl2aXR5Lg0KPiBQ
-YXRjaCA0LiBBZGRzIFRPUE9FWFQgZmVhdHVyZSBvbiBBTUQgRVBZQyBDUFUuDQo+IA0KPiANCj4g
-QmFidSBNb2dlciAoOCk6DQo+ICAgaTM4NjogQWRkIGNhY2hlIGluZm9ybWF0aW9uIGluIFg4NkNQ
-VURlZmluaXRpb24NCj4gICBpMzg2OiBJbml0aWFsaXplIGNhY2hlIGluZm9ybWF0aW9uIGZvciBF
-UFlDIGZhbWlseSBwcm9jZXNzb3JzDQo+ICAgaTM4NjogQWRkIG5ldyBwcm9wZXJ0eSB0byBjb250
-cm9sIGNhY2hlIGluZm8NCj4gICBpMzg2OiBVc2UgdGhlIHN0YXRpY2FsbHkgbG9hZGVkIGNhY2hl
-IGRlZmluaXRpb25zDQo+ICAgaTM4NjogUG9wdWxhdGUgQU1EIFByb2Nlc3NvciBDYWNoZSBJbmZv
-cm1hdGlvbiBmb3IgY3B1aWQgMHg4MDAwMDAxRA0KPiAgIGkzODY6IEFkZCBzdXBwb3J0IGZvciBD
-UFVJRF84MDAwXzAwMUUgZm9yIEFNRA0KPiAgIGkzODY6IEVuYWJsZSBUT1BPRVhUIGZlYXR1cmUg
-b24gQU1EIEVQWUMgQ1BVDQo+ICAgaTM4NjogUmVtb3ZlIGdlbmVyaWMgU01UIHRocmVhZCBjaGVj
-aw0KPiANCj4gRWR1YXJkbyBIYWJrb3N0ICgxKToNCj4gICBpMzg2OiBIZWxwZXJzIHRvIGVuY29k
-ZSBjYWNoZSBpbmZvcm1hdGlvbiBjb25zaXN0ZW50bHkNCj4gDQo+ICBpbmNsdWRlL2h3L2kzODYv
-cGMuaCB8ICAgNiArLQ0KPiAgdGFyZ2V0L2kzODYvY3B1LmMgICAgfCA3MzUNCj4gKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tDQo+ICB0YXJnZXQvaTM4
-Ni9jcHUuaCAgICB8ICA2NiArKysrKw0KPiAgdGFyZ2V0L2kzODYva3ZtLmMgICAgfCAgMjkgKy0N
-Cj4gIDQgZmlsZXMgY2hhbmdlZCwgNzAyIGluc2VydGlvbnMoKyksIDEzNCBkZWxldGlvbnMoLSkN
-Cj4gDQo+IC0tDQo+IDEuOC4zLjENCg0K
+
+--cWoXeonUoKmBZSoM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 05, 2018 at 08:09:26AM -0400, Pankaj Gupta wrote:
+> > Will this raw file already have the "disk information header" (no idea
+> > how that stuff is called) encoded? Are there any plans/possible ways to
+> >=20
+> > a) automatically create the headers? (if that's even possible)
+>=20
+> Its raw. Right now we are just supporting raw format. =20
+>=20
+> As this is direct mapping of memory into guest address space, I don't
+> think we can have an abstraction of headers for block specific features.
+> Or may be we can get opinion of others(Qemu block people) it is at all po=
+ssible?
+
+memdev and the block layer are completely separate.  The block layer
+isn't designed for memory-mapped access.
+
+I think it makes sense to use memdev here.  If the user wants a block
+device, they should use an emulated block device, not virtio-pmem,
+because buffering is necessary anyway when an image file format is used.
+
+Stefan
+
+--cWoXeonUoKmBZSoM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJayt1JAAoJEJykq7OBq3PI+GkH/1E+ci/o0GU4EORh4j1KOyFX
+JtWmDNcdJfKLdUonRX6ZCns34at7dTNf0U6nFlqzDB5bkMdh3H8Tid/8u57Q9MdI
+Y2e1Xr/IxugahIok4g5c9bN43zNWnKzGF+G/OMuCDe76oLpAm9GccKl/M2EaiXo3
+rLACtHLAv+t8FNmFHw4BTz2Nt5zW6D3YiAj/M/wdk9N/z/QnbN4glWWbI8ukmNMc
++e7n/yZH4TmJikN6BAvRvCrT4EemU9LpXloM5z5qXGJkJaNn+9ZQQCjwaJXdyOKt
+OTKLvVMdOt3x+0JxnSnisMkPtmIJtuHJY0bmjYfnrn9fh1blM9SQ8Q3nXVHQv9E=
+=9Dfp
+-----END PGP SIGNATURE-----
+
+--cWoXeonUoKmBZSoM--
