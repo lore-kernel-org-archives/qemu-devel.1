@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f5XhG-0005sp-7W
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:23:03 -0400
+	(envelope-from <mst@redhat.com>) id 1f5Xzr-00062N-UR
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f5XhB-0003v4-Cm
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:23:02 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:60956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1f5XhA-0003u6-Un
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:22:57 -0400
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-	<1523038800-2494-17-git-send-email-cota@braap.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <ffd8876e-ea9a-5d4c-b9af-e6595c54e766@mail.uni-paderborn.de>
-Date: Mon, 9 Apr 2018 16:22:53 +0200
+	(envelope-from <mst@redhat.com>) id 1f5Xzo-00082x-2f
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:42:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48536 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f5Xzn-00082S-Ud
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 10:42:12 -0400
+Date: Mon, 9 Apr 2018 17:42:07 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1523284856-251254-4-git-send-email-mst@redhat.com>
+References: <1523284856-251254-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1523038800-2494-17-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 16/17] target/riscv: convert to
- DisasContextBase
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1523284856-251254-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 3/5] contrib/libvhost-user: add the protocol
+ feature used for SET/GET message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,18 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Changpeng Liu <changpeng.liu@intel.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>
 
-On 04/06/2018 08:19 PM, Emilio G. Cota wrote:
-> Notes:
-> 
-> - Did not convert {num,max}_insns, since the corresponding code
->   will go away in the next patch.
-> 
-> - ctx->pc becomes ctx->base.pc_next, and ctx->next_pc becomes ctx->pc_tmp.
+From: Changpeng Liu <changpeng.liu@intel.com>
 
-Please call pc_tmp something meaningful, like pc_succ_insn, or pc_next_next.
+Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Cheers,
-Bastian
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 79f7a53..b27075e 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -50,6 +50,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
+     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+     VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
++    VHOST_USER_PROTOCOL_F_CONFIG = 9,
+ 
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+-- 
+MST
