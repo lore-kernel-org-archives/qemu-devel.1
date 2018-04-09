@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f5Wqk-0006es-4V
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:28:47 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f5Wr9-0006zL-Tm
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:29:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f5Wqg-0006kL-5g
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:28:46 -0400
-References: <20180409130700.5692-1-david@redhat.com>
-	<7688fe59-e20a-2de6-d805-6dc53893a326@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <dbb9acdd-71ad-1fd6-e6c4-d964cb28f763@redhat.com>
-Date: Mon, 9 Apr 2018 15:28:31 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1f5Wr5-00075p-Vl
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:29:11 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:39654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f5Wr5-00075E-Ot
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 09:29:07 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id c24so9583624wrc.6
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 06:29:07 -0700 (PDT)
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+Date: Mon, 09 Apr 2018 14:29:05 +0100
+Message-ID: <87d0z8v78e.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <7688fe59-e20a-2de6-d805-6dc53893a326@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] cpus: track calls to
- resume/pause_all_vcpus()
+Subject: Re: [Qemu-devel] Crash when running hello-world unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-
-On 09.04.2018 15:12, Paolo Bonzini wrote:
-> On 09/04/2018 15:07, David Hildenbrand wrote:
->> If we have parallel calls to resume/pause_all_vcpus() we can get
->> into trouble because the qemu mutex is temporarily dropped while
->> waiting for all threads to stop. This can happen e.g. for s390x, where
->> resume/pause_all_vcpus() can be triggered by a VCPU.
->=20
-
-I'm also using it resume/pause_all_vcpus() now in a prototype to
-temporarily get all VCPUs out of KVM, that's how I noticed that this is
-shaky :)
-
-> Why does s390 need to do pause_all_vcpus()/resume_all_vcpus() instead o=
-f
-> just asking the main thread to do it (similar to qemu_system_reset), is
-> it because diag 308 must be synchronous?
-
-Christian implemented it back than to (quoting from another mail)
-
-"I did this to prevent a "still running CPU to restart an already
-stopped one"."
-
-The problem is that another VCPU could just be about to send a SIGP
-START/RESTART to a VCPU. Without the pause_all_vcpus(), the SIGP could
-be delayed and executed just after the "soft reset", therefore resulting
-in more than 1 VCPU running.
-
->=20
-> One disadvantage of the current approach is that diag 308 does not obey
-> -no-reboot.
-
-Both calls are used for kdump+kexec. "kdump on s390 uses a load normal
-reset to bring the system in a defined state by doing a subsystem
-reset", so like a "soft reboot". I don't think that we want to apply
-"-no-reboot" here.
-
->=20
-> Paolo
->=20
+To: Ajay Garg <ajaygargnsit@gmail.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, rumpkernel-users@freelists.org
 
 
---=20
+Ajay Garg <ajaygargnsit@gmail.com> writes:
 
-Thanks,
+>>
+>> qemu-system-x86_64 is expecting an x86 binary blob. I assume you need
+>> qemu-system-arm. More importantly you need to specify a -M machine type
+>> that matches whatever rumprun is expecting.
+>>
+>
+> Oops, sorry my bad.
+> Here is the updated status :
+>
+> ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ qemu-system-arm -machine
+> virt -nographic -nographic -kernel helloer.bin
+> Bad ram pointer 0x1e8
+> Aborted (core dumped)
 
-David / dhildenb
+Can you run under -s -S and gdb step the *guest* and see where it ends
+up. The above error is usually indicative of the guest going off into
+the weeds somewhere because the hardware isn't what it expects.
+
+>
+>
+> ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ gdb --args
+> qemu-system-arm -machine virt -nographic -nographic -kernel
+> helloer.bin
+> GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
+> Copyright (C) 2016 Free Software Foundation, Inc.
+> License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+> This is free software: you are free to change and redistribute it.
+> There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+> and "show warranty" for details.
+> This GDB was configured as "x86_64-linux-gnu".
+> Type "show configuration" for configuration details.
+> For bug reporting instructions, please see:
+> <http://www.gnu.org/software/gdb/bugs/>.
+> Find the GDB manual and other documentation resources online at:
+> <http://www.gnu.org/software/gdb/documentation/>.
+> For help, type "help".
+> Type "apropos word" to search for commands related to "word"...
+> Reading symbols from qemu-system-arm...(no debugging symbols found)...don=
+e.
+> (gdb) r
+> Starting program: /usr/bin/qemu-system-arm -machine virt -nographic
+> -nographic -kernel helloer.bin
+> [Thread debugging using libthread_db enabled]
+> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+> [New Thread 0x7fffecc88700 (LWP 14033)]
+> [New Thread 0x7fffd21fc700 (LWP 14034)]
+> Bad ram pointer 0x1e8
+>
+> Thread 3 "qemu-system-arm" received signal SIGABRT, Aborted.
+> [Switching to Thread 0x7fffd21fc700 (LWP 14034)]
+> 0x00007ffff2a1b428 in __GI_raise (sig=3Dsig@entry=3D6) at
+> ../sysdeps/unix/sysv/linux/raise.c:54
+> 54    ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+> (gdb) bt
+> #0  0x00007ffff2a1b428 in __GI_raise (sig=3Dsig@entry=3D6) at
+> ../sysdeps/unix/sysv/linux/raise.c:54
+> #1  0x00007ffff2a1d02a in __GI_abort () at abort.c:89
+> #2  0x00005555557687f1 in get_page_addr_code ()
+> #3  0x000055555572d50c in ?? ()
+> #4  0x000055555572e11b in cpu_arm_exec ()
+> #5  0x0000555555750252 in ?? ()
+> #6  0x00007ffff2db76ba in start_thread (arg=3D0x7fffd21fc700) at
+> pthread_create.c:333
+> #7  0x00007ffff2aed41d in clone () at
+> ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> (gdb)
+>
+>
+> Thanks and Regards,
+> Ajay
+
+
+--
+Alex Benn=C3=A9e
