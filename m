@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5VM8-0004ie-Rk
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:53:05 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f5VOi-0006Ux-6k
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5VM3-0007Ib-WB
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:53:04 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:53247)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5VM3-0007Hl-MP
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:52:59 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  9 Apr 2018 13:52:12 +0200
-Message-Id: <20180409115212.875-2-laurent@vivier.eu>
-In-Reply-To: <20180409115212.875-1-laurent@vivier.eu>
-References: <20180409115212.875-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 2/2] linux-user: add microblaze/microblazeel
- magic numbers in qemu-binfmt-conf.sh
+	(envelope-from <cohuck@redhat.com>) id 1f5VOd-0000XQ-BU
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:55:44 -0400
+Date: Mon, 9 Apr 2018 13:55:29 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180409135529.308fa637.cohuck@redhat.com>
+In-Reply-To: <8d2a6da1-f45c-ba59-38cd-5e66db2bfd69@de.ibm.com>
+References: <20180409113019.14568-1-david@redhat.com>
+	<20180409113019.14568-2-david@redhat.com>
+	<8d2a6da1-f45c-ba59-38cd-5e66db2bfd69@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.12 1/2] s390x/mmu:
+ don't overwrite pending exception in mmu translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+On Mon, 9 Apr 2018 13:50:03 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index f39ad344fc..7ab7435fbd 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -1,10 +1,10 @@
- #!/bin/sh
--# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa
-+# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa/microblaze
- # program execution by the kernel
- 
- qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb"
-+sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb microblaze microblazeel"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -116,6 +116,14 @@ xtensaeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\
- xtensaeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- xtensaeb_family=xtensaeb
- 
-+microblaze_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xba\xab'
-+microblaze_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+microblaze_family=microblaze
-+
-+microblazeel_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xab\xba'
-+microblazeel_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+microblazeel_family=microblazeel
-+
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
--- 
-2.14.3
+> On 04/09/2018 01:30 PM, David Hildenbrand wrote:
+> > If we already triggered another exception, don't overwrite it with a
+> > protection exception.
+> > 
+> > Signed-off-by: David Hildenbrand <david@redhat.com>  
+> 
+> 
+> Can you add your description from the cover letter regarding
+> "only applies to old KVM instances without the virtual memory access
+> IOCTL in KVM."
+
+Will add that.
+
+> 
+> with that
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > ---
+> >  target/s390x/mmu_helper.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> > index 1deeb6e6e4..a25deef5dd 100644
+> > --- a/target/s390x/mmu_helper.c
+> > +++ b/target/s390x/mmu_helper.c
+> > @@ -325,7 +325,7 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
+> >  
+> >      r = mmu_translate_region(env, vaddr, asc, asce, level, raddr, flags, rw,
+> >                               exc);
+> > -    if (rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
+> > +    if (!r && rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
+> >          trigger_prot_fault(env, vaddr, asc, rw, exc);
+> >          return -1;
+> >      }
+> >   
+> 
