@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f5UUh-000803-O5
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 06:57:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5UZ9-0002A6-Rx
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f5UUc-00070K-Tj
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 06:57:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57262 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f5UUc-0006zP-O6
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 06:57:46 -0400
-References: <1523034681-33787-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA87K832wY7t_17CBEYb2p7rso_4XES08yo_C=rSt37VBQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd5b88f3-2b62-c2b9-c6fb-cfd42a50d95c@redhat.com>
-Date: Mon, 9 Apr 2018 12:57:35 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f5UZ9-0003Cn-6m
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:02:27 -0400
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:36665)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5UZ9-0003CS-1v
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 07:02:27 -0400
+Received: by mail-ot0-x235.google.com with SMTP id n40-v6so8088980otd.3
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 04:02:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA87K832wY7t_17CBEYb2p7rso_4XES08yo_C=rSt37VBQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/20] Miscellaneous patches for QEMU 2.12-rc
+In-Reply-To: <20180409071934.20845-1-famz@redhat.com>
+References: <20180409071934.20845-1-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Apr 2018 12:02:04 +0100
+Message-ID: <CAFEAcA8xNmy0fn7oGs0DFFdbd=H=vYuHF-2Yr_VuuNwobK_HJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Testing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Fam Zheng <famz@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 09/04/2018 11:20, Peter Maydell wrote:
-> This fails to compile on OSX and the BSDs:
-> /Users/pm215/src/qemu-for-merges/util/memfd.c:208:19: error: implicit
-> declaration of function 'memfd_create' is invalid in C99
-> [-Werror,-Wimplicit-function-declaration]
->         int mfd = memfd_create("test", 0);
->                   ^
+On 9 April 2018 at 08:19, Fam Zheng <famz@redhat.com> wrote:
+> The following changes since commit 08e173f29461396575c85510eb41474b993cb1fb:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-request' into staging (2018-04-06 17:51:21 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/famz/qemu.git tags/testing-pull-request
+>
+> for you to fetch changes up to 07fed474177a4566052ea81b1563d53a37083e84:
+>
+>   docker: fedora: test more components (2018-04-09 15:13:02 +0800)
+>
+> ----------------------------------------------------------------
+> Testing patches
+>
+> ----------------------------------------------------------------
+>
 
-Will fix like this in v2:
+Applied, thanks.
 
-diff --git a/util/memfd.c b/util/memfd.c
-index 277f721..b3ecbac 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -202,6 +202,7 @@ bool qemu_memfd_alloc_check(void)
-  */
- bool qemu_memfd_check(void)
- {
-+#ifdef CONFIG_LINUX
-     static int memfd_check = MEMFD_TODO;
-
-     if (memfd_check == MEMFD_TODO) {
-Stage this hunk [y,n,q,a,d,/,j,J,g,e,?]? y
-@@ -215,4 +216,7 @@ bool qemu_memfd_check(void)
-     }
-
-     return memfd_check == MEMFD_OK;
-+#else
-+    return false;
-+#endif
- }
-
-> 
-> I also got
-> TEST: tests/boot-serial-test... (pid=15159)
->   /sparc64/boot-serial/sun4u:                                          **
-> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/boot-serial-test.c:139:check_guest_output:
-> assertion failed: (output_ok)
-> FAIL
-> 
-> on an x86-64/linux host, but I have a feeling that's one of
-> our intermittents rather than anything in this patch.
+-- PMM
