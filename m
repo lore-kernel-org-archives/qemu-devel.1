@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f5TCT-000231-6R
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:34:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f5THP-0004lp-VN
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:40:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f5TCR-0006dw-Qs
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:34:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f5THM-0002dT-Ql
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:40:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42040 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f5THM-0002d3-KR
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 05:40:00 -0400
+References: <20180408145933.1149-1-f4bug@amsat.org>
+	<20180409055825.GB4848@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cdc75c37-85ab-3218-423d-4f50f895b4fc@redhat.com>
+Date: Mon, 9 Apr 2018 11:39:44 +0200
 MIME-Version: 1.0
-From: Ajay Garg <ajaygargnsit@gmail.com>
-Date: Mon, 9 Apr 2018 15:04:50 +0530
-Message-ID: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Crash when running hello-world unikernel for ARM
+In-Reply-To: <20180409055825.GB4848@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ajI2psex5bT2GNV2Z78Dxzztts4KwqYCL"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] gdbstub: fix off-by-one in
+ gdb_handle_packet()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,169 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org, rumpkernel-users@freelists.org
+To: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Hi All.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ajI2psex5bT2GNV2Z78Dxzztts4KwqYCL
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <cdc75c37-85ab-3218-423d-4f50f895b4fc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12] gdbstub: fix off-by-one in
+ gdb_handle_packet()
+References: <20180408145933.1149-1-f4bug@amsat.org>
+ <20180409055825.GB4848@stefanha-x1.localdomain>
+In-Reply-To: <20180409055825.GB4848@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-We did the following :
+On 09/04/2018 07:58, Stefan Hajnoczi wrote:
+> On Sun, Apr 08, 2018 at 11:59:33AM -0300, Philippe Mathieu-Daud=E9 wrot=
+e:
+>> memtohex() adds an extra trailing NUL character.
+>>
+>> Reported-by: AddressSanitizer
+>> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>> ---
+>> (gdb) dump binary memory /tmp/dram.bin 0x94000000 0x94100000
+>> Remote connection closed
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> =3D=3D22732=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on add=
+ress 0x7ffe43018340 at pc 0x55f2655fde81 bp 0x7ffe43017210 sp 0x7ffe43017=
+208
+>> WRITE of size 1 at 0x7ffe43018340 thread T0
+>>
+>> ---
+>>  gdbstub.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-a)
-Cross-compile rumprun for ARM on a linux x86_64 :
+Peter, can you apply this directly to master?
 
-ajay@latitude-3480:~/rumprun-arm-hw/rumprun$
-CC=arm-linux-gnueabihf-gcc ./build-rr.sh hw
+Thanks,
 
-b)
-Compile and bake the hello-world binary
-
-ajay@latitude-3480:~/rumprun-arm-hw/rumprun$
-arm-rumprun-netbsdelf-eabihf-gcc helloer.c -o helloer
-ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ rumprun-bake hw_virtio
-helloer.bin helloer
-
-The second step required changing
-
-conf hw_virtio
-    create      "virtio targets (e.g. QEMU/KVM)"
-    assimilate  _miconf                      \
-    _virtio
-fnoc
-
-to
-
-conf hw_virtio
-    create      "virtio targets (e.g. QEMU/KVM)"
-    assimilate  _miconf
-fnoc
-
-in /home/ajay/rumprun-arm-hw/rumprun/./rumprun/etc/rumprun-bake.conf
-
-c)
-Tried running on x86_64, via qemu, but got the crash :
-
-######################################################################
-ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ qemu-system-x86_64
--nographic -kernel helloer.bin
-warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
-qemu: fatal: Trying to execute code outside RAM or ROM at 0x00000000000a01f1
-
-EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000001
-ESI=00000000 EDI=00000000 EBP=00000000 ESP=00009fde
-EIP=0000fff1 EFL=00000086 [--S--P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =9000 00090000 ffffffff 00cf9300
-CS =9020 00090200 0000ffff 00009b00
-SS =9000 00090000 0000ffff 00009300
-DS =9000 00090000 0000ffff 00009300
-FS =9000 00090000 0000ffff 00009300
-GS =9000 00090000 0000ffff 00009300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008b00
-GDT=     000cab0c 00000017
-IDT=     00000000 000003ff
-CR0=00000010 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
-DR3=0000000000000000
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=00000044 CCD=000000b4 CCO=SUBB
-EFER=0000000000000000
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
-XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
-XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
-Aborted (core dumped)
-######################################################################
+Paolo
 
 
-d)
-Also find below when tried with gdb :
+--ajI2psex5bT2GNV2Z78Dxzztts4KwqYCL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-######################################################################
-ajay@latitude-3480:~/rumprun-arm-hw/rumprun$ gdb --args
-qemu-system-x86_64 -nographic -nographic -kernel helloer.bin
-GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
-Copyright (C) 2016 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-and "show warranty" for details.
-This GDB was configured as "x86_64-linux-gnu".
-Type "show configuration" for configuration details.
-For bug reporting instructions, please see:
-<http://www.gnu.org/software/gdb/bugs/>.
-Find the GDB manual and other documentation resources online at:
-<http://www.gnu.org/software/gdb/documentation/>.
-For help, type "help".
-Type "apropos word" to search for commands related to "word"...
-Reading symbols from qemu-system-x86_64...(no debugging symbols found)...done.
-(gdb) r
-Starting program: /usr/bin/qemu-system-x86_64 -nographic -nographic
--kernel helloer.bin
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-[New Thread 0x7fffecde1700 (LWP 30356)]
-warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
-[New Thread 0x7fffd1f2f700 (LWP 30357)]
-qemu: fatal: Trying to execute code outside RAM or ROM at 0x00000000000a01f1
+-----BEGIN PGP SIGNATURE-----
 
-EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000001
-ESI=00000000 EDI=00000000 EBP=00000000 ESP=00009fde
-EIP=0000fff1 EFL=00000086 [--S--P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =9000 00090000 ffffffff 00cf9300
-CS =9020 00090200 0000ffff 00009b00
-SS =9000 00090000 0000ffff 00009300
-DS =9000 00090000 0000ffff 00009300
-FS =9000 00090000 0000ffff 00009300
-GS =9000 00090000 0000ffff 00009300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008b00
-GDT=     000cab0c 00000017
-IDT=     00000000 000003ff
-CR0=00000010 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
-DR3=0000000000000000
-DR6=00000000ffff0ff0 DR7=0000000000000400
-CCS=00000044 CCD=000000b4 CCO=SUBB
-EFER=0000000000000000
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
-XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
-XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlrLNOAACgkQv/vSX3jH
+roNgxgf+KVAI1/H2O3JhfUmUWEFfp657fKuEc9ru/BazpyDp5YwHaSTg9INah2Gk
+7yp5Do0puF/ZlybKmBPK+f408XN+Ttzw9TFj0DzsRowj/zm/dcmFPyGJ1fvvqhlf
+sb0wa6fRRE2/2C7AXo5WhHBUNTgEikW5WUULC0w2Xu+O5Q17/3ESuX0/IFQ46h7m
+1BKQCHdOmBZqYd3nH8VbN5RCZrEPKhSuo2dRkWIxt+39mmIpjA4xePcqg8Q4gx1Y
+zKnDHPPf9Fx+FT7wOqonzbO82QKCVQLEiNV+Mgr4BEhtcwvWABwps5+CornQs9dy
+rmhT3X4UeyKNY2haEzIcnESZZII2zQ==
+=0Gq1
+-----END PGP SIGNATURE-----
 
-Thread 3 "qemu-system-x86" received signal SIGABRT, Aborted.
-[Switching to Thread 0x7fffd1f2f700 (LWP 30357)]
-0x00007ffff2b74428 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-54    ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-(gdb) bt
-#0  0x00007ffff2b74428 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-#1  0x00007ffff2b7602a in __GI_abort () at abort.c:89
-#2  0x000055555573d33d in cpu_abort ()
-#3  0x0000555555781fdd in get_page_addr_code ()
-#4  0x0000555555743d63 in ?? ()
-#5  0x000055555574485b in cpu_x86_exec ()
-#6  0x0000555555765fb2 in ?? ()
-#7  0x00007ffff2f106ba in start_thread (arg=0x7fffd1f2f700) at
-pthread_create.c:333
-#8  0x00007ffff2c4641d in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:109
-(gdb)
-######################################################################
-
-
-Where should we be looking to start to fix?
-
-
-
-Thanks and Regards,
-Ajay
+--ajI2psex5bT2GNV2Z78Dxzztts4KwqYCL--
