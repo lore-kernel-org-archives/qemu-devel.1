@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5S1c-0000M7-9A
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:19:41 -0400
+	(envelope-from <daniel@ffwll.ch>) id 1f5S3U-0001tN-Ev
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5S1Z-0005PM-3k
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:19:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34660 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5S1Y-0005O8-Uv
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:19:37 -0400
-Date: Mon, 9 Apr 2018 10:19:23 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180409081923.n2ktwrp2jp7xpoon@sirius.home.kraxel.org>
-References: <20180407000117.25640-1-lersek@redhat.com>
-	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
+	(envelope-from <daniel@ffwll.ch>) id 1f5S3T-0000S1-GZ
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:21:36 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:40525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <daniel@ffwll.ch>) id 1f5S3T-0000Qn-8y
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 04:21:35 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id x4so14713931wmh.5
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 01:21:35 -0700 (PDT)
+Sender: Daniel Vetter <daniel.vetter@ffwll.ch>
+Date: Mon, 9 Apr 2018 10:21:31 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
+Message-ID: <20180409082131.GF31310@phenom.ffwll.local>
+References: <20180316074650.5415-1-kraxel@redhat.com>
+	<7547e99b-0e3c-264e-e52b-40ad5d52b49a@gmail.com>
+	<20180406093307.s7wkhpmddd5d4r7a@sirius.home.kraxel.org>
+	<5d88baad-a956-6bd5-e0d6-aabae6647f3e@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
-Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5d88baad-a956-6bd5-e0d6-aabae6647f3e@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Add udmabuf misc device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, dri-devel@lists.freedesktop.org, Daniel Vetter <daniel.vetter@ffwll.ch>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>
 
-> > +{ 'enum' : 'SystemFirmwareType',
-> > +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }
+On Fri, Apr 06, 2018 at 02:24:46PM +0200, Christian König wrote:
+> Am 06.04.2018 um 11:33 schrieb Gerd Hoffmann:
+> >    Hi,
+> > 
+> > > The pages backing a DMA-buf are not allowed to move (at least not without a
+> > > patch set I'm currently working on), but for certain MM operations to work
+> > > correctly you must be able to modify the page tables entries and move the
+> > > pages backing them around.
+> > > 
+> > > For example try to use fork() with some copy on write pages with this
+> > > approach. You will find that you have only two options to correctly handle
+> > > this.
+> > The fork() issue should go away with shared memory pages (no cow).
+> > I guess this is the reason why vgem is internally backed by shmem.
 > 
-> The naming here is quite a bad mixture between firmware interface
-> ('bios', 'uefi') and firmware implementations ('slof', 'uboot'). There
-> could be other implementations of BIOS or UEFI than SeaBIOS and EDK2 ...
-> so I'd suggest to rather name them 'seabios' and 'edk2' here instead.
+> Yes, exactly that is also an approach which should work fine. Just don't try
+> to get this working with get_user_pages().
+> 
+> > 
+> > Hmm.  So I could try to limit the udmabuf driver to shmem too (i.e.
+> > have the ioctl take a shmem filehandle and offset instead of a virtual
+> > address).
+> > 
+> > But maybe it is better then to just extend vgem, i.e. add support to
+> > create gem objects from existing shmem.
+> > 
+> > Comments?
+> 
+> Yes, extending vgem instead of creating something new sounds like a good
+> idea to me as well.
 
-uboot for example implements uefi unterfaces too (dunno how complete,
-but reportly recent versions can run uefi shell and grub just fine).
++1 on adding a vgem "import from shmem/memfd" ioctl. Sounds like a good
+idea, and generally useful.
 
-cheers,
-  Gerd
+We might want to limit to memfd though for semantic reasons: dma-buf have
+invariant size, shmem not so much. memfd can be locked down to not change
+their size anymore. And iirc the core mm page invalidation protocol around
+truncate() is about as bad as get_user_pages vs cow :-)
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
