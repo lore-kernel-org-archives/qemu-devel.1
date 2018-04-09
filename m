@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f5Pp3-0003Rk-TZ
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 01:58:35 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f5Q9A-0002Lb-2y
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 02:19:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f5Pp0-0002Sd-Q4
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 01:58:33 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:45331)
+	(envelope-from <stefanha@gmail.com>) id 1f5Q96-0007c9-Vi
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 02:19:20 -0400
+Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:38197)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f5Pp0-0002SG-GB
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 01:58:30 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id l27so5247419pfk.12
-	for <qemu-devel@nongnu.org>; Sun, 08 Apr 2018 22:58:30 -0700 (PDT)
-Date: Mon, 9 Apr 2018 13:58:25 +0800
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f5Q96-0007at-Nl
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 02:19:16 -0400
+Received: by mail-pl0-x22a.google.com with SMTP id c7-v6so1281701plr.5
+	for <qemu-devel@nongnu.org>; Sun, 08 Apr 2018 23:19:16 -0700 (PDT)
+Date: Mon, 9 Apr 2018 14:19:10 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180409055825.GB4848@stefanha-x1.localdomain>
-References: <20180408145933.1149-1-f4bug@amsat.org>
+Message-ID: <20180409061910.GD4848@stefanha-x1.localdomain>
+References: <CAEMkAmGoPm8p0MKumctDPodaD4PCUYi4X=ovs+kMO9xTKGkLeQ@mail.gmail.com>
+	<20180403031147.GC6839@lemon.usersys.redhat.com>
+	<CAEMkAmGrW=h5Z1YncOQ4v2nmHt99-0Wg6aP6yCTd2p-ooToA4A@mail.gmail.com>
+	<20180403033033.GD6839@lemon.usersys.redhat.com>
+	<20180404134122.GS4467@stefanha-x1.localdomain>
+	<CAEMkAmETfoekTw=VP1K5c=z1P9uSb7pm7VNkrJjgEdd1NLjAnA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="jho1yZJdad60DJr+"
+	protocol="application/pgp-signature"; boundary="7DO5AaGCk89r4vaK"
 Content-Disposition: inline
-In-Reply-To: <20180408145933.1149-1-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] gdbstub: fix off-by-one in
- gdb_handle_packet()
+In-Reply-To: <CAEMkAmETfoekTw=VP1K5c=z1P9uSb7pm7VNkrJjgEdd1NLjAnA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Loadable block drivers?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Lindsay Mathieson <lindsay.mathieson@gmail.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
 
---jho1yZJdad60DJr+
-Content-Type: text/plain; charset=iso-8859-1
+--7DO5AaGCk89r4vaK
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 08, 2018 at 11:59:33AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> memtohex() adds an extra trailing NUL character.
->=20
-> Reported-by: AddressSanitizer
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> (gdb) dump binary memory /tmp/dram.bin 0x94000000 0x94100000
-> Remote connection closed
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D22732=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addres=
-s 0x7ffe43018340 at pc 0x55f2655fde81 bp 0x7ffe43017210 sp 0x7ffe43017208
-> WRITE of size 1 at 0x7ffe43018340 thread T0
->     #0 0x55f2655fde80 in memtohex /source/qemu/gdbstub.c:520
->     #1 0x55f26560254d in gdb_handle_packet /source/qemu/gdbstub.c:1140
->     #2 0x55f2656073c3 in gdb_read_byte /source/qemu/gdbstub.c:1703
->     #3 0x55f2656076a7 in gdb_chr_receive /source/qemu/gdbstub.c:1909
->     #4 0x55f266457656 in qemu_chr_be_write_impl /source/qemu/chardev/char=
-=2Ec:175
->     #5 0x55f2664576f9 in qemu_chr_be_write /source/qemu/chardev/char.c:187
->     #6 0x55f26646f6f0 in tcp_chr_read /source/qemu/chardev/char-socket.c:=
-470
->     #7 0x55f2664bc9e3 in qio_channel_fd_source_dispatch /source/qemu/io/c=
-hannel-watch.c:84
->     #8 0x7f17d01b30f4 in g_main_context_dispatch (/usr/lib/x86_64-linux-g=
-nu/libglib-2.0.so.0+0x4c0f4)
->     #9 0x55f2665c7f10 in glib_pollfds_poll /source/qemu/util/main-loop.c:=
-215
->     #10 0x55f2665c8100 in os_host_main_loop_wait /source/qemu/util/main-l=
-oop.c:263
->     #11 0x55f2665c82d6 in main_loop_wait /source/qemu/util/main-loop.c:522
->     #12 0x55f26599e13b in main_loop /source/qemu/vl.c:1943
->     #13 0x55f2659b0869 in main /source/qemu/vl.c:4734
->=20
-> Address 0x7ffe43018340 is located in stack of thread T0 at offset 4192 in=
- frame
->     #0 0x55f265601266 in gdb_handle_packet /source/qemu/gdbstub.c:996
->=20
->   This frame has 3 object(s):
->     [32, 40) 'p'
->     [96, 4192) 'buf' <=3D=3D Memory access at offset 4192 overflows this =
-variable
->     [4224, 8320) 'mem_buf'
-> SUMMARY: AddressSanitizer: stack-buffer-overflow /source/qemu/gdbstub.c:5=
-20 in memtohex
-> Shadow bytes around the buggy address:
->   0x1000485fb010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb040: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> =3D>0x1000485fb060: 00 00 00 00 00 00 00 00[f2]f2 f2 f2 00 00 00 00
->   0x1000485fb070: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb090: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb0a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x1000485fb0b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> Shadow byte legend (one shadow byte represents 8 application bytes):
->   Addressable:           00
->   Partially addressable: 01 02 03 04 05 06 07
->   Heap left redzone:       fa
->   Freed heap region:       fd
->   Stack left redzone:      f1
->   Stack mid redzone:       f2
->   Stack right redzone:     f3
->   Stack after return:      f5
->   Stack use after scope:   f8
->   Global redzone:          f9
->   Global init order:       f6
->   Poisoned by user:        f7
->   Container overflow:      fc
->   Array cookie:            ac
->   Intra object redzone:    bb
->   ASan internal:           fe
->   Left alloca redzone:     ca
->   Right alloca redzone:    cb
-> =3D=3D22732=3D=3DABORTING
-> ---
->  gdbstub.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+On Thu, Apr 05, 2018 at 11:40:31AM +1000, Lindsay Mathieson wrote:
+> Thanks Stefan, looking to develop a lizardfs block driver. A process that
+> only involved building a module rather than the entire qemu tree would mike
+> life easier, especially if I could test it on a live system (proxmox
+> cluster). A custom qemu install is not an option for that.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Since your final goal is to create a native LizardFS block driver, it is
+necessary to build a full QEMU.
 
---jho1yZJdad60DJr+
+With libvirt you can edit the domain XML to point
+<emulator>/usr/bin/qemu-kvm</emulator> at your custom binary for just
+that VM.
+
+In the worst case you can put a little shell script in place of the
+system QEMU binary that checks the command-line arguments to detect your
+test VM.  It can exec your custom QEMU binary for the test VM, and the
+system QEMU binary for all other VMs:
+
+  # mv /usr/bin/qemu-kvm /usr/bin/qemu-kvm.orig
+  # cat >/usr/bin/qemu-kvm
+  #!/bin/sh
+  if echo "$*" | grep -q -- '-name testvm'; then
+      exec /path/to/custom/qemu "$@"
+  else
+      exec /usr/bin/qemu-kvm.orig "$@"
+  fi
+  ^D
+  # chmod 755 /usr/bin/qemu-kvm
+
+I recommend using qemu.git/master and not an old source tree to avoid
+extra work if you want to contribute your code or if you need to ask for
+help (the first question will be "does it work on qemu.git/master?" :)).
+
+QEMU does not have stable APIs or out-of-tree modules.  Development is
+most convenient when done upstream as part of the community.  Anything
+else requires you to maintain a fork and community support will be very
+limited.
+
+Stefan
+
+--7DO5AaGCk89r4vaK
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaywEBAAoJEJykq7OBq3PIBeAIAJLHHZviBYamO2wlyBehHSD2
-6SNm+kDGfauQj2KKgTEW3hl1Smvfpa+E2NScnp3mY8EDB6KjL7Fe8F5pYwbJ6olM
-6jPIR6Vwa7qU9egXFXimJjmX1ZP+K/S/hRQMnTHL1bV9Jr9w6hxqheeFmexaFjsj
-AIw6qgFnA/pZplU/IAAkKwVh8xULwDrINr9nA/zCO81gk+Otx7Ca8DsL8kZZLZKc
-DoBqN6TV2SLayX0u2snhk+bBXLedciypDnHzH5D5x8olZvwy69M8jT8cE+/FYTdR
-zBsyqRaAsHjlzA/u4liz7qFaoaQ8bk/pkmxFANhzghF0AxLJlEypIRuZRFe9hL8=
-=9YXe
+iQEcBAEBAgAGBQJaywXeAAoJEJykq7OBq3PIJm8H/26Zp/Go57R9dDRl+fUSlsyg
+rMBOxQxh9zhTc5EUx/7pyI5ck4IQRxZHuJh7v+ky2GK9EsQi5cNTJ6AAlBI1Ud9n
+TTxIWN3JiT6bcVvN76puBHxRVs6IO/WT+kLWoSLY/Kt2l/z+4ETbxRB8774lDFN5
+ORTzes3UN1DW5MDxt963T6JJqgt6eMmj9TrLWQNS4CZwu5NRzmKlN6nueVlZi4po
+GDk5dai/IfwL9lL7zNPm3hJtJbGCx7x4nsSj7uxHYU7qHwpWpZ6QHFLR7WH1gGgn
+6dtC97IrQaM5yXwPMrTXmoC0sAi34Y2/6gFLyIZmgsjz6kFohaVxE43PZFTSLBM=
+=GYi7
 -----END PGP SIGNATURE-----
 
---jho1yZJdad60DJr+--
+--7DO5AaGCk89r4vaK--
