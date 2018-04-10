@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5nkU-0000E1-RA
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:31:30 -0400
+	(envelope-from <jasowang@redhat.com>) id 1f5nmO-0001Xq-73
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5nkT-0003vb-Lq
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:31:26 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f5nkT-0003vL-GH
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:31:25 -0400
-Received: by mail-ot0-x244.google.com with SMTP id j8-v6so11658071ota.7
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 00:31:25 -0700 (PDT)
+	(envelope-from <jasowang@redhat.com>) id 1f5nmI-000525-Bc
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:33:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53532 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f5nmI-00051n-6U
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:33:18 -0400
+References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
+	<1522846444-31725-5-git-send-email-wexu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <61ac2a50-5583-2932-cac1-f661fd49e89b@redhat.com>
+Date: Tue, 10 Apr 2018 15:32:53 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180410005724.10059-1-mdroth@linux.vnet.ibm.com>
-References: <20180410005724.10059-1-mdroth@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 08:31:04 +0100
-Message-ID: <CAFEAcA-_CW1w+XXAxWo93t8L+5zAcBRM6v7wF9xw1_EBd5FibA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] make-release: add skiboot
- .version file
+In-Reply-To: <1522846444-31725-5-git-send-email-wexu@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/8] virtio: add detach element for packed
+ ring(1.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, qemu-stable <qemu-stable@nongnu.org>
+To: wexu@redhat.com, mst@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com, qemu-devel@nongnu.org
 
-On 10 April 2018 at 01:57, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> This is needed to build skiboot from tarball-distributed sources
-> since the git data the make_release.sh script relies on to generate
-> it is not available.
+
+
+On 2018=E5=B9=B404=E6=9C=8804=E6=97=A5 20:54, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
 >
-> Cc: qemu-stable@nongnu.org
-> Reported-by: Michael Tokarev <mjt@tls.msk.ru>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> helper for packed ring
+
+It's odd and hard to review if you put detach patch first. I think this=20
+patch needs to be reordered after the implementation of pop/map.
+
+Thanks
+
+> Signed-off-by: Wei Xu <wexu@redhat.com>
 > ---
->  scripts/make-release | 1 +
->  1 file changed, 1 insertion(+)
+>   hw/virtio/virtio.c | 21 +++++++++++++++++++--
+>   1 file changed, 19 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/make-release b/scripts/make-release
-> index 04fa9defdc..c14f75b12c 100755
-> --- a/scripts/make-release
-> +++ b/scripts/make-release
-> @@ -19,6 +19,7 @@ pushd ${destination}
->  git checkout "v${version}"
->  git submodule update --init
->  (cd roms/seabios && git describe --tags --long --dirty > .version)
-> +(cd roms/skiboot && ./make_version.sh > .version)
->  # FIXME: The following line is a workaround for avoiding filename collisions
->  # when unpacking u-boot sources on case-insensitive filesystems. Once we
->  # update to something with u-boot commit 610eec7f0 we can drop this line.
-
-Seeing this comment in the context part of this patch reminds me:
-have we updated to a u-boot that lets us drop the workaround yet?
-
-thanks
--- PMM
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 478df3d..fdee40f 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -561,6 +561,20 @@ static void virtqueue_unmap_sg(VirtQueue *vq, cons=
+t VirtQueueElement *elem,
+>                            elem->out_sg[i].iov_len);
+>   }
+>  =20
+> +static void virtqueue_detach_element_split(VirtQueue *vq,
+> +                            const VirtQueueElement *elem, unsigned int=
+ len)
+> +{
+> +    vq->inuse--;
+> +    virtqueue_unmap_sg(vq, elem, len);
+> +}
+> +
+> +static void virtqueue_detach_element_packed(VirtQueue *vq,
+> +                            const VirtQueueElement *elem, unsigned int=
+ len)
+> +{
+> +    vq->inuse -=3D elem->count;
+> +    virtqueue_unmap_sg(vq, elem, len);
+> +}
+> +
+>   /* virtqueue_detach_element:
+>    * @vq: The #VirtQueue
+>    * @elem: The #VirtQueueElement
+> @@ -573,8 +587,11 @@ static void virtqueue_unmap_sg(VirtQueue *vq, cons=
+t VirtQueueElement *elem,
+>   void virtqueue_detach_element(VirtQueue *vq, const VirtQueueElement *=
+elem,
+>                                 unsigned int len)
+>   {
+> -    vq->inuse--;
+> -    virtqueue_unmap_sg(vq, elem, len);
+> +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> +        virtqueue_detach_element_packed(vq, elem, len);
+> +    } else {
+> +        virtqueue_detach_element_split(vq, elem, len);
+> +    }
+>   }
+>  =20
+>   /* virtqueue_unpop:
