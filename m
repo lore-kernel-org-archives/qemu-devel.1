@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5vVd-0002e5-Mm
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:48:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5vhi-0006z3-9V
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5vVc-0003BV-Qb
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:48:37 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36441)
+	(envelope-from <bounces@canonical.com>) id 1f5vhe-0001SI-8X
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40102)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f5vVc-0003BL-Kf
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:48:36 -0400
-Received: by mail-oi0-x242.google.com with SMTP id t16-v6so11620568oih.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 08:48:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5vhe-0001Rh-1C
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5vhc-0002B8-4A
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:01:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1E0B82E8DEA
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:01:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180410121724.8549-1-peter.maydell@linaro.org>
-References: <20180410121724.8549-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 15:49:53 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 16:48:15 +0100
-Message-ID: <CAFEAcA_=b_=y0Q-Go2x1Q87=pquB4qAzAegdZTBYuEPUmVst8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] target-arm queue
+Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
+Message-Id: <152337539317.5923.5989671357903184039.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1761535] Re: qemu-aarch64-static docker
+ arm64v8/openjdk coredump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 10 April 2018 at 13:17, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Arm patch queue for 2.12 -- a miscellaneous collection
-> of bug fixes.
->
-> thanks
-> -- PMM
->
->
-> The following changes since commit fb4fe32d5b6290deabe752b51cc1cc2a9e8573db:
->
->   Merge remote-tracking branch 'remotes/xtensa/tags/20180409-xtensa' into staging (2018-04-10 10:22:45 +0100)
->
-> are available in the Git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180410
->
-> for you to fetch changes up to bd49e6027cbc207c87633c7add3ebd7d3474cd35:
->
->   fpu: Fix rounding mode for floatN_to_uintM_round_to_zero (2018-04-10 13:02:26 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * fpu: Fix rounding mode for floatN_to_uintM_round_to_zero
->  * tcg: Fix guest state corruption when running 64-bit Arm
->    guests on a 32-bit host (especially when using icount)
->  * linux-user/signal.c: Ensure AArch64 signal frame isn't too small
->  * cpus.c: ensure running CPU recalculates icount deadlines on timer expiry
->  * target/arm: Report unsupported MPU region sizes more clearly
->  * hw/arm/fsl-imx: Fix introspection problem with fsl-imx6 and fsl-imx7
->  * hw/arm/allwinner-a10: Do not use nd_table in instance_init function
->  * hw/sd/bcm2835_sdhost: Don't raise spurious interrupts
->  * hw/sd/bcm2835_sdhost: Add tracepoints
->  * target-arm: Check undefined opcodes for SWP in A32 decoder
->  * hw/arm/integratorcp: Don't do things that could be fatal in the instance_init
->  * hw/arm: Allow manually specified /psci node
->
-> ----------------------------------------------------------------
+Now fixed in master, commit 7f0f4208b3a96, and will be in 2.12.0.
 
-Applied, thanks.
 
--- PMM
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1761535
+
+Title:
+  qemu-aarch64-static docker arm64v8/openjdk coredump
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  I am using qemu-aarch64-static to run the arm64v8/openjdk official
+  image on my x86 machine. Using QEMU master, I immediately hit a bug
+  which hangs the container. With Ubuntu default version qemu-aarch64
+  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
+  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
+
+  To reproduce (and get to the core dump):
+
+  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
+  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
+rch64-static arm64v8/openjdk /bin/bash
+  root@bf75cf45d311:/# javac
+  Usage: javac <options> <source files>
+  where possible options include:
+    -g                         Generate all debugging info
+  <...snip...>
+    @<filename>                Read options and filenames from file
+
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  ...TERMINAL HANGS...
+
+  =
+
+  To get the core dump, In a separate terminal:
+
+  # snapshot the file system of the hung image
+  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
+
+  # connect with known working qemu
+  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
+tic  -i qemu_coredump /bin/bash
+
+  $$ ls -lat
+  total 10608
+  <snip>
+  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
+1.core
+  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
+  <snip>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
