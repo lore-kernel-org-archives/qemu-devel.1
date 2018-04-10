@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f5m1U-0003wV-A9
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:40:53 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1f5mFY-0000rL-MD
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f5m1P-0005iP-SW
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:40:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37486 helo=mx1.redhat.com)
+	(envelope-from <yulei.zhang@intel.com>) id 1f5mFU-0004eO-FA
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:24 -0400
+Received: from mga11.intel.com ([192.55.52.93]:61815)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f5m1P-0005i3-Me
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:40:47 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Tue, 10 Apr 2018 13:40:34 +0800
-Message-Id: <20180410054034.20479-1-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] configure: don't warn SDL abi if disabled
+	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
+	id 1f5mFU-0004dL-5N
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:20 -0400
+From: Yulei Zhang <yulei.zhang@intel.com>
+Date: Tue, 10 Apr 2018 14:02:04 +0800
+Message-Id: <1523340124-8881-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [RFC V4 PATCH 0/4] vfio: Introduce live migation
+ capability to
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,136 +24,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-SDL has the same problem as GTK that we might get warnings on SDL ABI
-version even if SDL is disabled.  Fix that by only probing SDL if SDL is
-enabled.  Also this should let configure be a little bit faster since we
-don't really need to probe SDL stuff when it's off.
+Summary
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Daniel P. Berrange <berrange@redhat.com>
-CC: Fam Zheng <famz@redhat.com>
-CC: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- configure | 83 ++++++++++++++++++++++++++++++++++-----------------------=
-------
- 1 file changed, 45 insertions(+), 38 deletions(-)
+This series RFC would like to resume the discussion about how to
+introduce the live migration capability to vfio mdev device. 
 
-diff --git a/configure b/configure
-index 752dd9ef32..f647026b8d 100755
---- a/configure
-+++ b/configure
-@@ -2836,49 +2836,52 @@ fi
- # Look for sdl configuration program (pkg-config or sdl-config).  Try
- # sdl-config even without cross prefix, and favour pkg-config over sdl-c=
-onfig.
-=20
--if test "$sdlabi" =3D ""; then
--    if $pkg_config --exists "sdl2"; then
--        sdlabi=3D2.0
--    elif $pkg_config --exists "sdl"; then
--        sdlabi=3D1.2
--    else
--        sdlabi=3D2.0
--    fi
--fi
-+sdl_probe ()
-+{
-+  sdl_too_old=3Dno
-+  if test "$sdlabi" =3D ""; then
-+      if $pkg_config --exists "sdl2"; then
-+          sdlabi=3D2.0
-+      elif $pkg_config --exists "sdl"; then
-+          sdlabi=3D1.2
-+      else
-+          sdlabi=3D2.0
-+      fi
-+  fi
-=20
--if test $sdlabi =3D "2.0"; then
--    sdl_config=3D$sdl2_config
--    sdlname=3Dsdl2
--    sdlconfigname=3Dsdl2_config
--elif test $sdlabi =3D "1.2"; then
--    sdlname=3Dsdl
--    sdlconfigname=3Dsdl_config
--else
--    error_exit "Unknown sdlabi $sdlabi, must be 1.2 or 2.0"
--fi
-+  if test $sdlabi =3D "2.0"; then
-+      sdl_config=3D$sdl2_config
-+      sdlname=3Dsdl2
-+      sdlconfigname=3Dsdl2_config
-+  elif test $sdlabi =3D "1.2"; then
-+      sdlname=3Dsdl
-+      sdlconfigname=3Dsdl_config
-+  else
-+      error_exit "Unknown sdlabi $sdlabi, must be 1.2 or 2.0"
-+  fi
-=20
--if test "$(basename $sdl_config)" !=3D $sdlconfigname && ! has ${sdl_con=
-fig}; then
--  sdl_config=3D$sdlconfigname
--fi
-+  if test "$(basename $sdl_config)" !=3D $sdlconfigname && ! has ${sdl_c=
-onfig}; then
-+    sdl_config=3D$sdlconfigname
-+  fi
-=20
--if $pkg_config $sdlname --exists; then
--  sdlconfig=3D"$pkg_config $sdlname"
--  sdlversion=3D$($sdlconfig --modversion 2>/dev/null)
--elif has ${sdl_config}; then
--  sdlconfig=3D"$sdl_config"
--  sdlversion=3D$($sdlconfig --version)
--else
--  if test "$sdl" =3D "yes" ; then
--    feature_not_found "sdl" "Install SDL2-devel"
-+  if $pkg_config $sdlname --exists; then
-+    sdlconfig=3D"$pkg_config $sdlname"
-+    sdlversion=3D$($sdlconfig --modversion 2>/dev/null)
-+  elif has ${sdl_config}; then
-+    sdlconfig=3D"$sdl_config"
-+    sdlversion=3D$($sdlconfig --version)
-+  else
-+    if test "$sdl" =3D "yes" ; then
-+      feature_not_found "sdl" "Install SDL2-devel"
-+    fi
-+    sdl=3Dno
-+    # no need to do the rest
-+    return
-+  fi
-+  if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" =3D sdl-=
-config; then
-+    echo warning: using "\"$sdlconfig\"" to detect cross-compiled sdl >&=
-2
-   fi
--  sdl=3Dno
--fi
--if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" =3D sdl-co=
-nfig; then
--  echo warning: using "\"$sdlconfig\"" to detect cross-compiled sdl >&2
--fi
-=20
--sdl_too_old=3Dno
--if test "$sdl" !=3D "no" ; then
-   cat > $TMPC << EOF
- #include <SDL.h>
- #undef main /* We don't want SDL to override our main() */
-@@ -2920,6 +2923,10 @@ EOF
-     fi
-     sdl=3Dno
-   fi # sdl compile test
-+}
-+
-+if test "$sdl" !=3D "no" ; then
-+  sdl_probe
- fi
-=20
- if test "$sdl" =3D "yes" ; then
---=20
-2.14.3
+A new subtype region VFIO_REGION_SUBTYPE_DEVICE_STATE is introduced
+for vfio device status migrate, during the initialization it will
+check if the region is supported by the vfio device, otherwise it 
+will remain non-migratable.
+
+The intention to add the new region is using it for mdev device status
+save and restore during the migration. The access to this region
+will be trapped and forward to the mdev device driver, it also uses 
+the first byte in the new region to control the running state of mdev
+device, so during the migration after stop the mdev driver, qemu could
+retrieve the specific device status from this region and transfer to 
+the target VM side for the mdev device restore.
+
+In addition, during the pre-copy period, it will be able to fetch the
+dirty bitmap of vfio device through ioctl VFIO_DEVICE_GET_DIRTY_BITMAP
+iteratively, which will be able to shorten the system downtime during
+the static copy.
+
+Below is the vfio mdev device migration sequence
+Source VM side:
+			start migration
+				|
+				V
+                 in pre-copy stage, fetch the device dirty bitmap
+                 and add into qemu dirty list for migrate iteratively.
+                                |
+                                V
+        	 get the cpu state change callback, write to the
+        	 subregion's first byte to stop the mdev device
+				|
+				V
+		 quary the dirty page bitmap from iommu container 
+		 and add into qemu dirty list for last synchronization
+				|
+				V
+		 save the deivce status into Qemufile which is 
+                 read from the vfio device subregion
+
+Target VM side:
+		 restore the mdev device after get the
+		 saved status context from Qemufile
+				|
+				V
+		  get the cpu state change callback write to 
+                  subregion's first byte to start the mdev device
+                  to put it in running status
+				|
+				V
+			finish migration
+
+V3->V4:
+1. add migration_blocker if device state region isnot supported.
+2. instead of using vmsd, register SaveVMHandlers for VFIO device
+   to leverage the pro-copy facility, and add new ioctl for VFIO
+   device to fetch dirty bitmap during pro-copy.
+3. remove the intel vendor ID dependence for the device state 
+   subregion.
+
+V2->V3:
+1. rebase the patch to Qemu stable 2.10 branch.
+2. use a common name for the subregion instead of specific for 
+   intel IGD.
+
+V1->V2:
+Per Alex's suggestion:
+1. use device subtype region instead of VFIO PCI fixed region.
+2. remove unnecessary ioctl, use the first byte of subregion to 
+   control the running state of mdev device.  
+3. for dirty page synchronization, implement the interface with
+   VFIOContainer instead of vfio pci device.
+
+Yulei Zhang (4):
+  vfio: introduce a new VFIO subregion for mdev device migration support
+  vfio: Add vm status change callback to stop/restart the mdev device
+  vfio: Add SaveVMHanlders for VFIO device to support live migration
+  vifo: introduce new VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP
+
+ hw/vfio/common.c              |  34 ++++++
+ hw/vfio/pci.c                 | 240 ++++++++++++++++++++++++++++++++++++++++--
+ hw/vfio/pci.h                 |   2 +
+ include/hw/vfio/vfio-common.h |   1 +
+ linux-headers/linux/vfio.h    |  43 +++++++-
+ roms/seabios                  |   2 +-
+ 6 files changed, 312 insertions(+), 10 deletions(-)
+
+-- 
+2.7.4
