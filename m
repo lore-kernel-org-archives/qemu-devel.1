@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f5kX0-0000W8-Bt
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:05:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f5kZe-0001yi-3X
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:08:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f5kWz-0005ih-Iq
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:05:18 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36792)
+	(envelope-from <richard.henderson@linaro.org>) id 1f5kZd-000868-6p
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:08:02 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f5kWz-0005iJ-Dj
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:05:17 -0400
-Received: by mail-pf0-x243.google.com with SMTP id g14so7151710pfh.3
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 21:05:17 -0700 (PDT)
-References: <20180410021745.32378-1-jcmvbkbc@gmail.com>
-	<20180410021745.32378-2-jcmvbkbc@gmail.com>
-	<a59566f6-2423-cd50-9ff4-cf8ec227dbde@linaro.org>
-	<CAMo8Bf+SZd_df4j47VKe+QhCR-tgza=RCL1GKdus+S3+Kv1bTg@mail.gmail.com>
+	id 1f5kZc-00085G-Uv
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:08:01 -0400
+Received: by mail-pf0-x242.google.com with SMTP id c78so7160746pfj.6
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 21:08:00 -0700 (PDT)
+References: <1523038800-2494-1-git-send-email-cota@braap.org>
+	<1523038800-2494-12-git-send-email-cota@braap.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3a28ef7f-72b1-65c5-ba90-d2fe7cd112dc@linaro.org>
-Date: Tue, 10 Apr 2018 14:05:10 +1000
+Message-ID: <8a83af62-d376-c26c-8ce9-510f0039d010@linaro.org>
+Date: Tue, 10 Apr 2018 14:07:53 +1000
 MIME-Version: 1.0
-In-Reply-To: <CAMo8Bf+SZd_df4j47VKe+QhCR-tgza=RCL1GKdus+S3+Kv1bTg@mail.gmail.com>
+In-Reply-To: <1523038800-2494-12-git-send-email-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 1/1] linux-user: fix preadv/pwritev offsets
+Subject: Re: [Qemu-devel] [PATCH v2 11/17] target/s390x: convert to
+ DisasContextBase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org
 
-On 04/10/2018 01:29 PM, Max Filippov wrote:
-> On Mon, Apr 9, 2018 at 8:20 PM, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> On 04/10/2018 12:17 PM, Max Filippov wrote:
->>> +    uint64_t off = tlow |
->>> +        ((unsigned long long)thigh << TARGET_LONG_BITS / 2) <<
->>
->> There's a second instance of long long here; needs uint64_t.
+On 04/07/2018 04:19 AM, Emilio G. Cota wrote:
+> Notes:
 > 
-> Ehh, will fix.
-> BTW, why is uint64_t here better than unsigned long long? Just
-> shorter?
+> - Did not convert {num,max}_insns and is_jmp, since the corresponding
+>   code will go away in the next patch.
+> 
+> - Avoided a checkpatch error in use_exit_tb.
+> 
+> - As suggested by David, (1) Drop ctx.pc and use
+>   ctx.base.pc_next instead, and (2) Rename ctx.next_pc to
+>   ctx.pc_tmp and add a comment about it.
+> 
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by:  David Hildenbrand <david@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  target/s390x/translate.c | 148 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 76 insertions(+), 72 deletions(-)
 
-Because it's more explicit about the number of bits we're talking about.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
