@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5qyn-00061o-Ok
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:58:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f5r2K-00008H-9c
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5qyn-0008W5-1i
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:58:25 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:33731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f5qym-0008Vl-Sj
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:58:24 -0400
-Received: by mail-oi0-x230.google.com with SMTP id 126-v6so10717388oig.0
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 03:58:24 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1f5r2D-0002Ql-Es
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:02:04 -0400
+Resent-Message-Id: <E1f5r2D-0002Ql-Es@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f5r2D-0002Oq-4k
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:01:57 -0400
+In-Reply-To: <20180410105606.16413-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152335808234.1800.1185905942260438244@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <20180410055912.934-1-richard.henderson@linaro.org>
-References: <20180410055912.934-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 11:58:03 +0100
-Message-ID: <CAFEAcA9vx+Log3m+gesr=8ALuARit=8x468iQOzX44z6LmwG+Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] fpu: Fix rounding mode for
- floatN_to_uintM_round_to_zero
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 10 Apr 2018 04:01:23 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/2] linux-user fixes for -rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
 
-On 10 April 2018 at 06:59, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> We incorrectly passed in the current rounding mode
-> instead of float_round_to_zero.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->
-> Found while runnning SVE RISU tests; it should be visible with the
-> right set of inputs to AdvSIMD RISU tests.
-
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDEwMTA1NjA2LjE2NDEzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvMl0gbGludXgtdXNlciBmaXhlcyBmb3IgLXJjMwoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
+KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1p
+dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
+b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
+LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
+YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
+ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
+YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
+cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQxMDEw
+NTYwNi4xNjQxMy0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxODA0MTAxMDU2MDYu
+MTY0MTMtMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjkxMjIxN2I1NzYgbGludXgtdXNlcjogYWRkIG1pY3JvYmxhemUvbWljcm9ibGF6ZWVsIG1hZ2lj
+IG51bWJlcnMgaW4gcWVtdS1iaW5mbXQtY29uZi5zaAo4OGIxMzFhNjU4IGxpbnV4LXVzZXI6IGZp
+eCBtaWNyb2JsYXplIGdldF9zcF9mcm9tX2NwdXN0YXRlKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvMjogbGludXgtdXNlcjogZml4IG1pY3JvYmxhemUgZ2V0X3NwX2Zy
+b21fY3B1c3RhdGUoKS4uLgpDaGVja2luZyBQQVRDSCAyLzI6IGxpbnV4LXVzZXI6IGFkZCBtaWNy
+b2JsYXplL21pY3JvYmxhemVlbCBtYWdpYyBudW1iZXJzIGluIHFlbXUtYmluZm10LWNvbmYuc2gu
+Li4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyNDogRklMRTogc2NyaXB0cy9xZW11
+LWJpbmZtdC1jb25mLnNoOjc6CitzaDQgc2g0ZWIgczM5MHggYWFyY2g2NCBhYXJjaDY0X2JlIGhw
+cGEgcmlzY3YzMiByaXNjdjY0IHh0ZW5zYSB4dGVuc2FlYiBtaWNyb2JsYXplIG1pY3JvYmxhemVl
+bCIKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogc2NyaXB0cy9x
+ZW11LWJpbmZtdC1jb25mLnNoOjExOToKK21pY3JvYmxhemVfbWFnaWM9J1x4N2ZFTEZceDAxXHgw
+Mlx4MDFceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAyXHgwMFx4YmFceGFi
+JwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMzogRklMRTogc2NyaXB0cy9xZW11
+LWJpbmZtdC1jb25mLnNoOjEyMDoKK21pY3JvYmxhemVfbWFzaz0nXHhmZlx4ZmZceGZmXHhmZlx4
+ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhm
+Zlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM2OiBGSUxFOiBzY3JpcHRz
+L3FlbXUtYmluZm10LWNvbmYuc2g6MTIzOgorbWljcm9ibGF6ZWVsX21hZ2ljPSdceDdmRUxGXHgw
+MVx4MDFceDAxXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceGFi
+XHhiYScKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc6IEZJTEU6IHNjcmlwdHMv
+cWVtdS1iaW5mbXQtY29uZi5zaDoxMjQ6CittaWNyb2JsYXplZWxfbWFzaz0nXHhmZlx4ZmZceGZm
+XHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVc
+eGZmXHhmZlx4ZmYnCgp0b3RhbDogNCBlcnJvcnMsIDEgd2FybmluZ3MsIDI2IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
