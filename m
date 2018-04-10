@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5vLX-0002Xk-Ef
+	(envelope-from <kwolf@redhat.com>) id 1f5vLY-0002Yz-GI
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5vLR-0006G5-Ik
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:38:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f5vLU-0006IE-KG
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:38:12 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 10 Apr 2018 17:37:46 +0200
-Message-Id: <20180410153748.22505-6-kwolf@redhat.com>
+Date: Tue, 10 Apr 2018 17:37:42 +0200
+Message-Id: <20180410153748.22505-2-kwolf@redhat.com>
 In-Reply-To: <20180410153748.22505-1-kwolf@redhat.com>
 References: <20180410153748.22505-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 5/7] qemu-iotests: Remove _supported_fmt dmg
+Subject: [Qemu-devel] [PULL 1/7] iotests.py: support unsupported_fmts in
+ main()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +23,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-qemu-iotests doesn't support dmg, and the dmg block driver doesn't
-support image creation. Two test cases declare dmg as supported, but
-that's obviously wrong for both reasons. Remove the declaration.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/183 | 2 +-
- tests/qemu-iotests/194 | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/iotests.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index 20268ff7a1..c49e1ad6ef 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -43,7 +43,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.filter
- . ./common.qemu
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index b5d7945af8..1623257e32 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -553,7 +553,8 @@ def verify_quorum():
+     if not supports_quorum():
+         notrun('quorum support missing')
  
--_supported_fmt qcow2 raw qed dmg quorum
-+_supported_fmt qcow2 raw qed quorum
- _supported_proto file
- _supported_os Linux
+-def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
++def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
++         unsupported_fmts=[]):
+     '''Run tests'''
  
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 1d4214aca3..d746ab1e21 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -21,7 +21,7 @@
+     global debug
+@@ -568,7 +569,7 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
  
- import iotests
+     debug = '-d' in sys.argv
+     verbosity = 1
+-    verify_image_format(supported_fmts)
++    verify_image_format(supported_fmts, unsupported_fmts)
+     verify_platform(supported_oses)
+     verify_cache_mode(supported_cache_modes)
  
--iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw', 'dmg'])
-+iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw'])
- iotests.verify_platform(['linux'])
- 
- with iotests.FilePath('source.img') as source_img_path, \
 -- 
 2.13.6
