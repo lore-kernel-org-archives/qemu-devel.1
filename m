@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f5vmZ-0002Tm-49
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:06:13 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f5vxK-0005gr-It
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f5vmU-0003vM-Vg
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:06:07 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 10 Apr 2018 18:05:04 +0200
-Message-Id: <74552e1d6e858d3159cb0c0e188e80bc9248e337.1523376013.git.berto@igalia.com>
-In-Reply-To: <cover.1523376013.git.berto@igalia.com>
-References: <cover.1523376013.git.berto@igalia.com>
-In-Reply-To: <cover.1523376013.git.berto@igalia.com>
-References: <cover.1523376013.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 2/2] specs/qcow2: Clarify that compressed
- clusters have the COPIED bit reset
+	(envelope-from <no-reply@patchew.org>) id 1f5vxH-0001os-6v
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:17:14 -0400
+Resent-Message-Id: <E1f5vxH-0001os-6v@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21025)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f5vxH-0001oD-03
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:17:11 -0400
+In-Reply-To: <20180410160142.21096-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152337698111.1845.16504074692830984118@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 10 Apr 2018 09:16:22 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL v2 0/3] linux-user fixes for -rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
 
-Compressed clusters are not supposed to have the COPIED bit set, but
-this is not made explicit in the specs, so let's document it.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- docs/interop/qcow2.txt | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index feb711fb6a..8e1547ded2 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -400,10 +400,10 @@ L2 table entry:
-               62:   0 for standard clusters
-                     1 for compressed clusters
- 
--              63:   0 for a cluster that is unused or requires COW, 1 if its
--                    refcount is exactly one. This information is only accurate
--                    in L2 tables that are reachable from the active L1
--                    table.
-+              63:   0 for clusters that are unused, compressed or require COW.
-+                    1 for standard clusters whose refcount is exactly one.
-+                    This information is only accurate in L2 tables
-+                    that are reachable from the active L1 table.
- 
- Standard Cluster Descriptor:
- 
--- 
-2.11.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDEwMTYwMTQyLjIxMDk2LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIHYyIDAvM10gbGludXgtdXNlciBmaXhlcyBmb3IgLXJjMwoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
+bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
+ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
+b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
+PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
+ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
+ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
+dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQx
+MDE2MDE0Mi4yMTA5Ni0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxODA0MTAxNjAx
+NDIuMjEwOTYtMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjNkNjNjMDFhYzkgbGludXgtdXNlcjogaW1wbGVtZW50IEhXQ0FQIGJpdHMgb24gTUlQUwo1
+MzA1OGJhZDU2IGxpbnV4LXVzZXI6IGFkZCBtaWNyb2JsYXplL21pY3JvYmxhemVlbCBtYWdpYyBu
+dW1iZXJzIGluIHFlbXUtYmluZm10LWNvbmYuc2gKODcxMzA0ZWRjMyBsaW51eC11c2VyOiBmaXgg
+bWljcm9ibGF6ZSBnZXRfc3BfZnJvbV9jcHVzdGF0ZSgpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzM6IGxpbnV4LXVzZXI6IGZpeCBtaWNyb2JsYXplIGdldF9zcF9mcm9t
+X2NwdXN0YXRlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8zOiBsaW51eC11c2VyOiBhZGQgbWljcm9i
+bGF6ZS9taWNyb2JsYXplZWwgbWFnaWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoLi4u
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
+aW5mbXQtY29uZi5zaDo3Ogorc2g0IHNoNGViIHMzOTB4IGFhcmNoNjQgYWFyY2g2NF9iZSBocHBh
+IHJpc2N2MzIgcmlzY3Y2NCB4dGVuc2EgeHRlbnNhZWIgbWljcm9ibGF6ZSBtaWNyb2JsYXplZWwi
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IHNjcmlwdHMvcWVt
+dS1iaW5mbXQtY29uZi5zaDoxMTk6CittaWNyb2JsYXplX21hZ2ljPSdceDdmRUxGXHgwMVx4MDJc
+eDAxXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceGJhXHhhYicK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzM6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
+aW5mbXQtY29uZi5zaDoxMjA6CittaWNyb2JsYXplX21hc2s9J1x4ZmZceGZmXHhmZlx4ZmZceGZm
+XHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhmZlx4ZmZc
+eGZmJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogc2NyaXB0cy9x
+ZW11LWJpbmZtdC1jb25mLnNoOjEyMzoKK21pY3JvYmxhemVlbF9tYWdpYz0nXHg3ZkVMRlx4MDFc
+eDAxXHgwMVx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDJceDAwXHhhYlx4
+YmEnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM3OiBGSUxFOiBzY3JpcHRzL3Fl
+bXUtYmluZm10LWNvbmYuc2g6MTI0OgorbWljcm9ibGF6ZWVsX21hc2s9J1x4ZmZceGZmXHhmZlx4
+ZmZceGZmXHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhm
+Zlx4ZmZceGZmJwoKdG90YWw6IDQgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNiBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAz
+LzM6IGxpbnV4LXVzZXI6IGltcGxlbWVudCBIV0NBUCBiaXRzIG9uIE1JUFMuLi4KPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
