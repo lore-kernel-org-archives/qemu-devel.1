@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f5t8d-0008LT-0o
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:16:44 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f5tC0-00022b-AM
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f5t8c-0007Vo-3p
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:16:42 -0400
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-	<cbad2760-7a64-7602-5734-eea0747c620f@mail.uni-paderborn.de>
-	<20180409161101.GB18168@flamenco>
-	<565df28d-2f24-1065-c00a-4cceaf5428b4@linaro.org>
-	<20180410130318.GB22304@flamenco>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <17f92de0-f659-7770-8d78-92535cadb232@mail.uni-paderborn.de>
-Date: Tue, 10 Apr 2018 15:16:19 +0200
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f5tBv-0001MV-Tu
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:20:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41400)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1f5tBv-0001Lq-LN
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:20:07 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3ADJUOt005081
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:20:05 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h8w4835bu-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:20:04 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Tue, 10 Apr 2018 09:20:03 -0400
+References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1521156300-19296-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<b1c6873c-ca28-3835-c149-096e70a00512@linux.vnet.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Tue, 10 Apr 2018 09:19:57 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180410130318.GB22304@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <b1c6873c-ca28-3835-c149-096e70a00512@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc/riscv targets
+Content-Language: en-US
+Message-Id: <6fc787e0-d779-15bf-abe8-973f28393d2c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] s390x/cpumodel: Set up CPU model
+ for AP device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +44,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-On 04/10/2018 03:03 PM, Emilio G. Cota wrote:
-> On Tue, Apr 10, 2018 at 14:24:23 +1000, Richard Henderson wrote:
->> On 04/10/2018 02:11 AM, Emilio G. Cota wrote:
->>> On Mon, Apr 09, 2018 at 16:01:36 +0200, Bastian Koppelmann wrote:
->>>> Thanks for doing this grunt work. Me and a colleague were planning to do
->>>> this as well after converting the RISC-V frontend to decodetree. Do you
->>>> have any plans to do this for the TriCore frontend as well? I have the
->>>> same plan for Tricore: Convert it to decodetree, then to translation loop.
->>>
->>> I won't do any further conversions in the near future, so please go
->>> ahead with your plans :-)
+On 04/06/2018 10:51 AM, Pierre Morel wrote:
+> On 16/03/2018 00:24, Tony Krowiak wrote:
+>> A new CPU model feature and two new CPU model facilities are
+>> introduced to support AP devices for a KVM guest.
 >>
->> In which case I won't review Emilio's final two patches for risc-v.
+>> CPU model features:
+>>
+>> 1. The KVM_S390_VM_CPU_FEAT_AP CPU model feature indicates that
+>>     AP facilities are installed. This feature will be enabled by
+>>     the kernel only if the AP facilities are installed on the linux
+>>     host. This feature must be turned on from userspace to access
+>>     AP devices from the KVM guest. The QEMU command line to turn
+>>     this feature looks something like this:
+>>
+>>     qemu-system-s390x ... -cpu xxx,ap=on
+>>
+>> CPU model facilities:
+>>
+>> 1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates the AP Query
+>>     Configuration Information (QCI) facility is installed. This feature
+>>     will be enabled by the kernel only if the QCI is installed on
+>>     the host.
+>>
+>> 2. The S390_FEAT_AP_FACILITY_TEST feature indicates that the AP
+>>     Facility Test (APFT) facility is installed. This feature will
+>>     be enabled by the kernel only if the APFT facility is installed
+>>     on the host.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>> ---
+>>   target/s390x/cpu_features.c     |    3 +++
+>>   target/s390x/cpu_features_def.h |    3 +++
+>>   target/s390x/cpu_models.c       |    2 ++
+>>   target/s390x/gen-features.c     |    3 +++
+>>   target/s390x/kvm.c              |    1 +
+>>   5 files changed, 12 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+>> index a5619f2..1abe987 100644
+>> --- a/target/s390x/cpu_features.c
+>> +++ b/target/s390x/cpu_features.c
+>> @@ -36,8 +36,10 @@ static const S390FeatDef s390_features[] = {
+>>       FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status 
+>> facility"),
+>>       FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE 
+>> facility"),
+>>       FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, 
+>> "Configuration-topology facility"),
+>> +    FEAT_INIT("qci", S390_FEAT_TYPE_STFL, 12, "Query AP 
+>> Configuration facility"),
+>>       FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range 
+>> facility"),
+>>       FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing 
+>> key-setting facility"),
+>> +    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "Adjunct Processor 
+>> Facilities Test facility"),
+>>       FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, 
+>> "Extended-translation facility 2"),
+>>       FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, 
+>> "Message-security-assist facility (excluding subfunctions)"),
+>>       FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement 
+>> facility"),
+>> @@ -125,6 +127,7 @@ static const S390FeatDef s390_features[] = {
+>>
+>>       FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement 
+>> facility 2"),
+>>       FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, 
+>> "Collaborative-memory-management facility"),
+>> +    FEAT_INIT("ap", S390_FEAT_TYPE_MISC, 0, "AP facilities installed"),
+>>
+>>       FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and 
+>> load (32 bit in general registers)"),
+>>       FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and 
+>> load (64 bit in parameter list)"),
+>> diff --git a/target/s390x/cpu_features_def.h 
+>> b/target/s390x/cpu_features_def.h
+>> index 7c5915c..8998b65 100644
+>> --- a/target/s390x/cpu_features_def.h
+>> +++ b/target/s390x/cpu_features_def.h
+>> @@ -27,8 +27,10 @@ typedef enum {
+>>       S390_FEAT_SENSE_RUNNING_STATUS,
+>>       S390_FEAT_CONDITIONAL_SSKE,
+>>       S390_FEAT_CONFIGURATION_TOPOLOGY,
+>> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
+>>       S390_FEAT_IPTE_RANGE,
+>>       S390_FEAT_NONQ_KEY_SETTING,
+>> +    S390_FEAT_AP_FACILITIES_TEST,
+>>       S390_FEAT_EXTENDED_TRANSLATION_2,
+>>       S390_FEAT_MSA,
+>>       S390_FEAT_LONG_DISPLACEMENT,
+>> @@ -118,6 +120,7 @@ typedef enum {
+>>       /* Misc */
+>>       S390_FEAT_DAT_ENH_2,
+>>       S390_FEAT_CMM,
+>> +    S390_FEAT_AP,
+>>
+>>       /* PLO */
+>>       S390_FEAT_PLO_CL,
+>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>> index cf82589..7e2af09 100644
+>> --- a/target/s390x/cpu_models.c
+>> +++ b/target/s390x/cpu_models.c
+>> @@ -769,6 +769,8 @@ static void check_consistency(const S390CPUModel 
+>> *model)
+>>           { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
+>>           { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
+>>           { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
+>> +        { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
+>> +        { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
+>>       };
+>>       int i;
+>>
+>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+>> index 0cdbc15..0d5b0f7 100644
+>> --- a/target/s390x/gen-features.c
+>> +++ b/target/s390x/gen-features.c
+>> @@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
+>>       S390_FEAT_ADAPTER_INT_SUPPRESSION,
+>>       S390_FEAT_EDAT_2,
+>>       S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
+>> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
+>
+> Placing QCI feature in the full feature for z13 has for effect that:
+>
+> 1)  it must be on the qemu command line.
+> Do we really want this?
+> QCI is always available when AP is available in the real hardware
+> before z13.
 
-I'm confused as well :). I don't understand why Richard is not reviewing
-the last two patch. Maybe you can clarify as well, Richard.
+Are you suggesting we always set STFLE.12 for the guest whenever
+AP is available and get rid of this feature? This feature maps
+to what the architecture requires, i.e., that STFLE.12 indicates
+whether QCI is available. I think we should keep it. This was
+discussed and decided upon during v1 review.
 
-> 
-> I might be mistaken but my impression is that Bastian would be happy taking
-> these risc-v patches (w/ a minor correction, already noted) since he
-> has not yet started the TranslatorOps conversion he planned.
-> 
-> Bastian, can you please clarify?
+>
+>
+> 2) AP exist since z10 and QCI since EC12 AFAIK
 
-Sure, I can take the three RISC-V patches into my tree and send a pull
-as soon as the next development cycle start.
+This seems to conflict with what you stated above concerning QCI
+availability.
 
-Cheers,
-Bastian
+> Do we enable both only beginning with z13?
+
+If I am not mistaken, GEN12_GA1 is EC12 .... or is that not true?
+I queried the team architects and there was unanimous agreement
+that AP virtualization should start with EC12 regardless of when
+it was available in the real hardware.
+
+>
+>> +    S390_FEAT_AP_FACILITIES_TEST,
+>> +    S390_FEAT_AP,
+>>   };
+>>
+>>   static uint16_t full_GEN12_GA2[] = {
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index fbc887e..33e5ec3 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -2178,6 +2178,7 @@ static int kvm_to_feat[][2] = {
+>>       { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
+>>       { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
+>>       { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
+>> +    { KVM_S390_VM_CPU_FEAT_AP, S390_FEAT_AP},
+>>   };
+>>
+>>   static int query_cpu_feat(S390FeatBitmap features)
+>
+>
