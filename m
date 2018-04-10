@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f5sWA-0004PZ-P7
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:36:59 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f5sY8-0005e6-T1
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f5sW9-0002k9-SM
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:36:58 -0400
-References: <20180410084210.11737-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d5ca9c3f-3116-5a8d-e416-78bb6bfc0a0b@redhat.com>
-Date: Tue, 10 Apr 2018 07:36:34 -0500
+	(envelope-from <kraxel@redhat.com>) id 1f5sY5-0003jY-ME
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:39:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55752 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5sY5-0003jH-Hp
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:38:57 -0400
+Date: Tue, 10 Apr 2018 14:38:55 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180410123855.wefgye4j6sznxp5y@sirius.home.kraxel.org>
+References: <20180410120222.31845-1-tournier.elie@gmail.com>
+	<20180410120222.31845-2-tournier.elie@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180410084210.11737-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LkmBBJHh4e2JHir1cFKtkloswJYF3K2aw"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Remove _supported_fmt dmg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180410120222.31845-2-tournier.elie@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qapi: Parameter gl of DisplayType
+ now accept an enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +28,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Elie Tournier <tournier.elie@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LkmBBJHh4e2JHir1cFKtkloswJYF3K2aw
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <d5ca9c3f-3116-5a8d-e416-78bb6bfc0a0b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Remove _supported_fmt dmg
-References: <20180410084210.11737-1-kwolf@redhat.com>
-In-Reply-To: <20180410084210.11737-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+> -    if (dpy.has_gl && dpy.gl && display_opengl == 0) {
+> +    if (dpy.has_gl && !dpy.gl == DISPLAYGL_MODE_OFF && display_opengl == 0) {
 
-On 04/10/2018 03:42 AM, Kevin Wolf wrote:
-> qemu-iotests doesn't support dmg, and the dmg block driver doesn't
-> support image creation. Two test cases declare dmg as supported, but
-> that's obviously wrong for both reasons. Remove the declaration.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/183 | 2 +-
->  tests/qemu-iotests/194 | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+That should be "... && !(dpy.gl == DISPLAYGL_MODE_OFF) && ..." to work
+correctly.  Or just "dpy.gl != DISPLAYGL_MODE_OFF" ...
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---LkmBBJHh4e2JHir1cFKtkloswJYF3K2aw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrMr9IACgkQp6FrSiUn
-Q2pEKQf+Jo0xe7Zz/jGiQpjjnwfyt/lHK1KrlHu/3ZxsrL2MxhFz9vWsx985b8bL
-O1e9dDH2ASoo/veb1N8X0CadkrE/7TlNQpiesAcfQDDiT3LH45a8XExSXhECoZlA
-t1o0BL5Ut7MvEc5ONPRWXieo8HpZXDvMjS2NlO5AYGLIvkgmqeyFjfJ14x6QHdro
-djFaZRewFINUZp2cs2eIynkswUuWBHwb7OCnbGR37HBrlY0NKzDqHRn5EmT5yiGg
-MtBvAUi2tWCCE4Jx3dgj52uWHnU3wiHFcX90ulND9WLvwEIu/1shHTIobQL/ekQy
-NlRwcRzMH0a2Y45T6ithlD/MHp0JdA==
-=sE8X
------END PGP SIGNATURE-----
-
---LkmBBJHh4e2JHir1cFKtkloswJYF3K2aw--
+cheers,
+  Gerd
