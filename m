@@ -1,42 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f5qrF-0001Jh-3p
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:50:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5qrz-0001uq-Uo
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f5qrB-000419-SA
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:50:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37640
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
-	id 1f5qrB-000410-Ml
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:50:33 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3AAnsbL147141
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:50:32 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2h8rac9t8x-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:50:32 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
-	Tue, 10 Apr 2018 06:50:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5qrw-0004Ys-OF
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:51:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5qrw-0004Xv-Io
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:51:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5qrs-00017g-Tm
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 10:51:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1323B2E82AE
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 10:50:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 10 Apr 2018 16:22:18 +0530
-From: Balamuruhan S <bala24@linux.vnet.ibm.com>
-In-Reply-To: <20180410095233.GA11713@localhost.localdomain>
-References: <20180331185536.4835-1-bala24@linux.vnet.ibm.com>
-	<87sh8bz6is.fsf@secure.mitica>
-	<20180410095233.GA11713@localhost.localdomain>
-Message-Id: <13ace01d09a7c869572669db763de115@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: calculate expected_downtime
- with ram_bytes_remaining()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 10:40:33 -0000
+From: "Pixel, Ding" <1762707@bugs.launchpad.net>
+Reply-To: Bug 1762707 <1762707@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152335683378.30174.9724305388945769166.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762707] [NEW] VFIO device gets DMA failures when
+ virtio-balloon leak from highmem to lowmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,56 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Qemu-devel <qemu-devel-bounces+bala24=linux.vnet.ibm.com@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 2018-04-10 15:22, Balamuruhan S wrote:
-> On Wed, Apr 04, 2018 at 11:04:59AM +0200, Juan Quintela wrote:
->> Balamuruhan S <bala24@linux.vnet.ibm.com> wrote:
->> > expected_downtime value is not accurate with dirty_pages_rate * page_size,
->> > using ram_bytes_remaining would yeild it correct.
->> >
->> > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> 
->> Reviewed-by: Juan Quintela <quintela@redhat.com>
->> 
->> See my other mail on the thread, my understanding is that your change 
->> is
->> corret (TM).
-> 
-> Juan, Please help to merge it.
+Public bug reported:
 
-Sorry for asking it as during discussion going on, but the reason is 
-currently
-postcopy migration for HP backed P8 guest from P8 -> P9 is broken and to 
-use
-precopy with appropriate downtime value we need this patch to be 
-backported
-to distros that is to be released soon.
+Is there any known conflict between VFIO passthrough device and virtio-
+balloon?
 
-> 
-> Regards,
-> Bala
-> 
->> 
->> Thanks, Juan.
->> 
->> > ---
->> >  migration/migration.c | 3 +--
->> >  1 file changed, 1 insertion(+), 2 deletions(-)
->> >
->> > diff --git a/migration/migration.c b/migration/migration.c
->> > index 58bd382730..4e43dc4f92 100644
->> > --- a/migration/migration.c
->> > +++ b/migration/migration.c
->> > @@ -2245,8 +2245,7 @@ static void migration_update_counters(MigrationState *s,
->> >       * recalculate. 10000 is a small enough number for our purposes
->> >       */
->> >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
->> > -        s->expected_downtime = ram_counters.dirty_pages_rate *
->> > -            qemu_target_page_size() / bandwidth;
->> > +        s->expected_downtime = ram_bytes_remaining() / bandwidth;
->> >      }
->> >
->> >      qemu_file_reset_rate_limit(s->to_dst_file);
->> 
+The VM has:
+1. 4GB system memory
+2. one VFIO passthrough device which supports high address memory DMA and u=
+ses GFP_HIGHUSER pages.
+3. Memory balloon device with 4GB target.
+
+When setting the memory balloon target to 1GB and 4GB in loop during
+runtime (I used the command "virsh qemu-monitor-command debian --hmp
+--cmd balloon 1024"), the VFIO device DMA randomly gets failure.
+
+More clues:
+1. configure 2GB system memory (no highmem) VM, no issue with similar opera=
+tions
+2. setting the memory balloon to higher like 8GB, no issue with similar ope=
+rations
+
+I'm also trying to narrow down this issue. It's appreciated for that you
+guys may share some thoughts.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762707
+
+Title:
+  VFIO device gets DMA failures when virtio-balloon leak from highmem to
+  lowmem
+
+Status in QEMU:
+  New
+
+Bug description:
+  Is there any known conflict between VFIO passthrough device and
+  virtio-balloon?
+
+  The VM has:
+  1. 4GB system memory
+  2. one VFIO passthrough device which supports high address memory DMA and=
+ uses GFP_HIGHUSER pages.
+  3. Memory balloon device with 4GB target.
+
+  When setting the memory balloon target to 1GB and 4GB in loop during
+  runtime (I used the command "virsh qemu-monitor-command debian --hmp
+  --cmd balloon 1024"), the VFIO device DMA randomly gets failure.
+
+  More clues:
+  1. configure 2GB system memory (no highmem) VM, no issue with similar ope=
+rations
+  2. setting the memory balloon to higher like 8GB, no issue with similar o=
+perations
+
+  I'm also trying to narrow down this issue. It's appreciated for that
+  you guys may share some thoughts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762707/+subscriptions
