@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5z79-0000Hh-4P
+	(envelope-from <alex.bennee@linaro.org>) id 1f5z79-0000Hc-47
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5z77-0006OB-CB
+	(envelope-from <alex.bennee@linaro.org>) id 1f5z76-0006NT-J1
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:35 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:56051)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f5z77-0006NN-2X
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:33 -0400
-Received: by mail-wm0-x242.google.com with SMTP id b127so28589796wmf.5
+	id 1f5z76-0006My-8R
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:32 -0400
+Received: by mail-wr0-x241.google.com with SMTP id z73so13954459wrb.0
 	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 12:39:32 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 10 Apr 2018 20:39:08 +0100
-Message-Id: <20180410193919.28026-14-alex.bennee@linaro.org>
+Date: Tue, 10 Apr 2018 20:39:05 +0100
+Message-Id: <20180410193919.28026-11-alex.bennee@linaro.org>
 In-Reply-To: <20180410193919.28026-1-alex.bennee@linaro.org>
 References: <20180410193919.28026-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 13/24] tests/tcg/i386: move test-i386-sse.c
- to tests/tcg/x86_64/test-sse.c
+Subject: [Qemu-devel] [PATCH v1 10/24] tests/tcg/multiarch: Build fix for
+ linux-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +33,224 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The test mixes up 32bit and 64 bit code. It should probably be split
-into two distinct test cases. However for now just move it out of the
-way of the i386 build.
+From: Fam Zheng <famz@redhat.com>
 
+To keep the compiler happy, and to fit in our buildsys flags:
+
+- Make local functions "static"
+- #ifdef out unused functions
+- drop cutils/osdep dependencies
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+[AJB: drop cutils/osdep dependencies]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/{i386/test-i386-ssse3.c => x86_64/test-sse.c} | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
- rename tests/tcg/{i386/test-i386-ssse3.c => x86_64/test-sse.c} (93%)
+ tests/tcg/multiarch/linux-test.c | 68 +++++++++++++---------------------------
+ 1 file changed, 21 insertions(+), 47 deletions(-)
 
-diff --git a/tests/tcg/i386/test-i386-ssse3.c b/tests/tcg/x86_64/test-sse.c
-similarity index 93%
-rename from tests/tcg/i386/test-i386-ssse3.c
-rename to tests/tcg/x86_64/test-sse.c
-index 0a42bd03e2..196ec7f32f 100644
---- a/tests/tcg/i386/test-i386-ssse3.c
-+++ b/tests/tcg/x86_64/test-sse.c
-@@ -1,4 +1,4 @@
--/* See if various MMX/SSE SSSE3 instructions give expected results */
-+/* See if various MMX/SSE SSSE3/4 instructions give expected results */
+diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+index 5070d31446..4457bd04ba 100644
+--- a/tests/tcg/multiarch/linux-test.c
++++ b/tests/tcg/multiarch/linux-test.c
+@@ -16,7 +16,6 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+-#define _GNU_SOURCE
+ #include <stdarg.h>
+ #include <stdlib.h>
  #include <stdio.h>
- #include <string.h>
- #include <stdint.h>
-@@ -41,8 +41,7 @@ int main(int argc, char *argv[]) {
- 	asm volatile ("movdqa  %%xmm0, (%0)" : : "r" (hello));
- 	printf("%5.5s\n", hello);
+@@ -31,6 +30,7 @@
+ #include <utime.h>
+ #include <time.h>
+ #include <sys/time.h>
++#include <sys/resource.h>
+ #include <sys/uio.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+@@ -39,13 +39,12 @@
+ #include <dirent.h>
+ #include <setjmp.h>
+ #include <sys/shm.h>
+-#include "qemu/cutils.h"
  
--#if 1 /* SSE4 */
--	/* popcnt r64, r/m64 */
-+	/* SSE4 popcnt r64, r/m64 */
- 	asm volatile ("movq    $0x8421000010009c63, %%rax" : : : "rax");
- 	asm volatile ("popcnt  %%ax, %%dx" : : : "dx");
- 	asm volatile ("popcnt  %%eax, %%ecx" : : : "ecx");
-@@ -51,7 +50,6 @@ int main(int argc, char *argv[]) {
- 	asm volatile ("movl    %%ecx, %0" : "=m" (c));
- 	asm volatile ("movw    %%dx, %0" : "=m" (d));
- 	printf("%i = %i\n%i = %i = %i\n", 13, (int) a, 9, c, d + 1);
--#endif
+ #define TESTPATH "/tmp/linux-test.tmp"
+ #define TESTPORT 7654
+ #define STACK_SIZE 16384
  
- 	return 0;
+-void error1(const char *filename, int line, const char *fmt, ...)
++static void error1(const char *filename, int line, const char *fmt, ...)
+ {
+     va_list ap;
+     va_start(ap, fmt);
+@@ -56,7 +55,7 @@ void error1(const char *filename, int line, const char *fmt, ...)
+     exit(1);
  }
+ 
+-int __chk_error(const char *filename, int line, int ret)
++static int __chk_error(const char *filename, int line, int ret)
+ {
+     if (ret < 0) {
+         error1(filename, line, "%m (ret=%d, errno=%d)",
+@@ -73,7 +72,7 @@ int __chk_error(const char *filename, int line, int ret)
+ 
+ #define FILE_BUF_SIZE 300
+ 
+-void test_file(void)
++static void test_file(void)
+ {
+     int fd, i, len, ret;
+     uint8_t buf[FILE_BUF_SIZE];
+@@ -210,7 +209,7 @@ void test_file(void)
+     chk_error(rmdir(TESTPATH));
+ }
+ 
+-void test_fork(void)
++static void test_fork(void)
+ {
+     int pid, status;
+ 
+@@ -224,7 +223,7 @@ void test_fork(void)
+         error("waitpid status=0x%x", status);
+ }
+ 
+-void test_time(void)
++static void test_time(void)
+ {
+     struct timeval tv, tv2;
+     struct timespec ts, rem;
+@@ -251,34 +250,7 @@ void test_time(void)
+         error("getrusage");
+ }
+ 
+-void pstrcpy(char *buf, int buf_size, const char *str)
+-{
+-    int c;
+-    char *q = buf;
+-
+-    if (buf_size <= 0)
+-        return;
+-
+-    for(;;) {
+-        c = *str++;
+-        if (c == 0 || q >= buf + buf_size - 1)
+-            break;
+-        *q++ = c;
+-    }
+-    *q = '\0';
+-}
+-
+-/* strcat and truncate. */
+-char *pstrcat(char *buf, int buf_size, const char *s)
+-{
+-    int len;
+-    len = strlen(buf);
+-    if (len < buf_size)
+-        pstrcpy(buf + len, buf_size - len, s);
+-    return buf;
+-}
+-
+-int server_socket(void)
++static int server_socket(void)
+ {
+     int val, fd;
+     struct sockaddr_in sockaddr;
+@@ -298,7 +270,7 @@ int server_socket(void)
+ 
+ }
+ 
+-int client_socket(void)
++static int client_socket(void)
+ {
+     int fd;
+     struct sockaddr_in sockaddr;
+@@ -312,9 +284,9 @@ int client_socket(void)
+     return fd;
+ }
+ 
+-const char socket_msg[] = "hello socket\n";
++static const char socket_msg[] = "hello socket\n";
+ 
+-void test_socket(void)
++static void test_socket(void)
+ {
+     int server_fd, client_fd, fd, pid, ret, val;
+     struct sockaddr_in sockaddr;
+@@ -348,9 +320,10 @@ void test_socket(void)
+     chk_error(close(server_fd));
+ }
+ 
++#if 0
+ #define WCOUNT_MAX 512
+ 
+-void test_pipe(void)
++static void test_pipe(void)
+ {
+     fd_set rfds, wfds;
+     int fds[2], fd_max, ret;
+@@ -391,10 +364,10 @@ void test_pipe(void)
+     chk_error(close(fds[1]));
+ }
+ 
+-int thread1_res;
+-int thread2_res;
++static int thread1_res;
++static int thread2_res;
+ 
+-int thread1_func(void *arg)
++static int thread1_func(void *arg)
+ {
+     int i;
+     for(i=0;i<5;i++) {
+@@ -404,7 +377,7 @@ int thread1_func(void *arg)
+     return 0;
+ }
+ 
+-int thread2_func(void *arg)
++static int thread2_func(void *arg)
+ {
+     int i;
+     for(i=0;i<6;i++) {
+@@ -435,27 +408,28 @@ void test_clone(void)
+         thread2_res != 6)
+         error("clone");
+ }
++#endif
+ 
+ /***********************************/
+ 
+ volatile int alarm_count;
+ jmp_buf jmp_env;
+ 
+-void sig_alarm(int sig)
++static void sig_alarm(int sig)
+ {
+     if (sig != SIGALRM)
+         error("signal");
+     alarm_count++;
+ }
+ 
+-void sig_segv(int sig, siginfo_t *info, void *puc)
++static void sig_segv(int sig, siginfo_t *info, void *puc)
+ {
+     if (sig != SIGSEGV)
+         error("signal");
+     longjmp(jmp_env, 1);
+ }
+ 
+-void test_signal(void)
++static void test_signal(void)
+ {
+     struct sigaction act;
+     struct itimerval it, oit;
+@@ -510,7 +484,7 @@ void test_signal(void)
+ 
+ #define SHM_SIZE 32768
+ 
+-void test_shm(void)
++static void test_shm(void)
+ {
+     void *ptr;
+     int shmid;
 -- 
 2.16.2
