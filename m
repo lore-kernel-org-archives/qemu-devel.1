@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5slY-0007Ae-IB
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:53 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5slX-0002hS-3U
+	(envelope-from <dgibson@ozlabs.org>) id 1f5slX-00079W-5o
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:52 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1f5slW-0002gJ-5d
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:51 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 10 Apr 2018 22:52:32 +1000
-Message-Id: <20180410125233.31618-7-david@gibson.dropbear.id.au>
+Date: Tue, 10 Apr 2018 22:52:33 +1000
+Message-Id: <20180410125233.31618-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180410125233.31618-1-david@gibson.dropbear.id.au>
 References: <20180410125233.31618-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 6/7] sam460ex: Fix timer frequency and clock
- multipliers
+Subject: [Qemu-devel] [PULL 7/7] roms/u-boot-sam460ex: Change to qemu git
+ mirror and update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,33 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <
 
 From: BALATON Zoltan <balaton@eik.bme.hu>
 
-We only emulate timer running at CPU frequency which is what most
-guests expect so set the frequency to match real hardware. This also
-allows setting clock multipliers which caused slowdown previously due
-to wrong timer frequency.
+Now that we have a mirror of this repo on git.qemu.org change the
+submodule to use that and update it to latest commit which fixes a
+dangling symlink and removes two big binaries that are not needed.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc440_uc.c | 3 +--
- hw/ppc/sam460ex.c  | 7 ++++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ .gitmodules          | 2 +-
+ roms/u-boot-sam460ex | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-index 976ab2b5d8..e312fdba70 100644
---- a/hw/ppc/ppc440_uc.c
-+++ b/hw/ppc/ppc440_uc.c
-@@ -392,8 +392,7 @@ static uint32_t dcr_read_sdr(void *opaque, int dcrn)
-     case SDR0_CFGDATA:
-         switch (sdr->addr) {
-         case SDR0_STRP0:
--            /* FIXME: Is this correct? This breaks timing in U-Boot */
--            ret = 0; /*(0xb5 << 8) | (1 << 4) | 9 */
-+            ret = (0xb5 << 8) | (1 << 4) | 9;
-             break;
-         case SDR0_STRP1:
-             ret = (5 << 29) | (2 << 26) | (1 << 24);
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 70b8e76d9c..dfff262f96 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -67,6 +67,7 @@
-    IRQ12 = SM502_INT
- */
- 
-+#define CPU_FREQ 1150000000
- #define SDRAM_NR_BANKS 4
- 
- /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
-@@ -253,8 +254,8 @@ static int sam460ex_load_device_tree(hwaddr addr,
-     char *filename;
-     int fdt_size;
-     void *fdt;
--    uint32_t tb_freq = 50000000;
--    uint32_t clock_freq = 50000000;
-+    uint32_t tb_freq = CPU_FREQ;
-+    uint32_t clock_freq = CPU_FREQ;
- 
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
-     if (!filename) {
-@@ -416,7 +417,7 @@ static void sam460ex_init(MachineState *machine)
-     boot_info = g_malloc0(sizeof(*boot_info));
-     env->load_info = boot_info;
- 
--    ppc_booke_timers_init(cpu, 50000000, 0);
-+    ppc_booke_timers_init(cpu, CPU_FREQ, 0);
-     ppc_dcr_init(env, NULL, NULL);
- 
-     /* PLB arbitrer */
+diff --git a/.gitmodules b/.gitmodules
+index c613722e3c..49e9c2e3f4 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -45,4 +45,4 @@
+ 	url = git://github.com/hdeller/seabios-hppa.git
+ [submodule "roms/u-boot-sam460ex"]
+ 	path = roms/u-boot-sam460ex
+-	url = git://github.com/zbalaton/u-boot-sam460ex
++	url = git://git.qemu.org/u-boot-sam460ex.git
+diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
+index 119aa277f7..8ee007c421 160000
+--- a/roms/u-boot-sam460ex
++++ b/roms/u-boot-sam460ex
+@@ -1 +1 @@
+-Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
++Subproject commit 8ee007c4216fd6a0d760589e8405ce4494497aa0
 -- 
 2.14.3
