@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f5k8v-0003de-EY
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:28 -0400
+	(envelope-from <jasowang@redhat.com>) id 1f5k8y-0003gZ-MN
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f5k8u-0005wo-0n
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43694 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1f5k8w-0005y7-PG
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45172 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f5k8t-0005wO-PM
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:23 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f5k8w-0005xz-Jq
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:26 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 10 Apr 2018 11:40:00 +0800
-Message-Id: <1523331602-18781-5-git-send-email-jasowang@redhat.com>
+Date: Tue, 10 Apr 2018 11:40:01 +0800
+Message-Id: <1523331602-18781-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1523331602-18781-1-git-send-email-jasowang@redhat.com>
 References: <1523331602-18781-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 4/6] e1000: Migrate props via a temporary
- structure
+Subject: [Qemu-devel] [PULL 5/6] e1000: Choose which set of props to migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +28,66 @@ Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Swing the tx.props out via a temporary structure, so in future patches
-we can select what we're going to send.
+When we're using the subsection we migrate both
+the 'props' and 'tso_props' data; when we're not using
+the subsection (to migrate to 2.11 or old machine types) we've
+got to choose what to migrate in the main structure.
+
+If we're using the subsection migrate 'props' in the main structure.
+If we're not using the subsection then migrate the last one
+that changed, which gives behaviour similar to the old behaviour.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/e1000.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ hw/net/e1000.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index bb8ee2a..4e606d4 100644
+index 4e606d4..13a9494 100644
 --- a/hw/net/e1000.c
 +++ b/hw/net/e1000.c
 @@ -130,6 +130,7 @@ typedef struct E1000State_st {
  #define E1000_FLAG_TSO (1 << E1000_FLAG_TSO_BIT)
      uint32_t compat_flags;
      bool received_tx_tso;
-+    e1000x_txd_props mig_props;
++    bool use_tso_for_migration;
+     e1000x_txd_props mig_props;
  } E1000State;
  
- #define chkflag(x)     (s->compat_flags & E1000_FLAG_##x)
-@@ -1365,6 +1366,7 @@ static int e1000_pre_save(void *opaque)
+@@ -622,9 +623,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+     if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
+         if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
+             e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
++            s->use_tso_for_migration = 1;
+             tp->tso_frames = 0;
+         } else {
+             e1000x_read_tx_ctx_descr(xp, &tp->props);
++            s->use_tso_for_migration = 0;
+         }
+         return;
+     } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
+@@ -1366,7 +1369,20 @@ static int e1000_pre_save(void *opaque)
          s->phy_reg[PHY_STATUS] |= MII_SR_AUTONEG_COMPLETE;
      }
  
-+    s->mig_props = s->tx.props;
+-    s->mig_props = s->tx.props;
++    /* Decide which set of props to migrate in the main structure */
++    if (chkflag(TSO) || !s->use_tso_for_migration) {
++        /* Either we're migrating with the extra subsection, in which
++         * case the mig_props is always 'props' OR
++         * we've not got the subsection, but 'props' was the last
++         * updated.
++         */
++        s->mig_props = s->tx.props;
++    } else {
++        /* We're not using the subsection, and 'tso_props' was
++         * the last updated.
++         */
++        s->mig_props = s->tx.tso_props;
++    }
      return 0;
  }
  
-@@ -1393,12 +1395,13 @@ static int e1000_post_load(void *opaque, int version_id)
-                   qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 500);
-     }
- 
-+    s->tx.props = s->mig_props;
-     if (!s->received_tx_tso) {
-         /* We received only one set of offload data (tx.props)
-          * and haven't got tx.tso_props.  The best we can do
-          * is dupe the data.
-          */
--        s->tx.tso_props = s->tx.props;
-+        s->tx.tso_props = s->mig_props;
-     }
-     return 0;
- }
-@@ -1496,20 +1499,20 @@ static const VMStateDescription vmstate_e1000 = {
-         VMSTATE_UINT16(eecd_state.bitnum_out, E1000State),
-         VMSTATE_UINT16(eecd_state.reading, E1000State),
-         VMSTATE_UINT32(eecd_state.old_eecd, E1000State),
--        VMSTATE_UINT8(tx.props.ipcss, E1000State),
--        VMSTATE_UINT8(tx.props.ipcso, E1000State),
--        VMSTATE_UINT16(tx.props.ipcse, E1000State),
--        VMSTATE_UINT8(tx.props.tucss, E1000State),
--        VMSTATE_UINT8(tx.props.tucso, E1000State),
--        VMSTATE_UINT16(tx.props.tucse, E1000State),
--        VMSTATE_UINT32(tx.props.paylen, E1000State),
--        VMSTATE_UINT8(tx.props.hdr_len, E1000State),
--        VMSTATE_UINT16(tx.props.mss, E1000State),
-+        VMSTATE_UINT8(mig_props.ipcss, E1000State),
-+        VMSTATE_UINT8(mig_props.ipcso, E1000State),
-+        VMSTATE_UINT16(mig_props.ipcse, E1000State),
-+        VMSTATE_UINT8(mig_props.tucss, E1000State),
-+        VMSTATE_UINT8(mig_props.tucso, E1000State),
-+        VMSTATE_UINT16(mig_props.tucse, E1000State),
-+        VMSTATE_UINT32(mig_props.paylen, E1000State),
-+        VMSTATE_UINT8(mig_props.hdr_len, E1000State),
-+        VMSTATE_UINT16(mig_props.mss, E1000State),
-         VMSTATE_UINT16(tx.size, E1000State),
-         VMSTATE_UINT16(tx.tso_frames, E1000State),
-         VMSTATE_UINT8(tx.sum_needed, E1000State),
--        VMSTATE_INT8(tx.props.ip, E1000State),
--        VMSTATE_INT8(tx.props.tcp, E1000State),
-+        VMSTATE_INT8(mig_props.ip, E1000State),
-+        VMSTATE_INT8(mig_props.tcp, E1000State),
-         VMSTATE_BUFFER(tx.header, E1000State),
-         VMSTATE_BUFFER(tx.data, E1000State),
-         VMSTATE_UINT16_ARRAY(eeprom_data, E1000State, 64),
 -- 
 2.7.4
