@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5pWD-0004jX-Tw
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:50 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f5pWD-0004ja-Ur
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5pWC-0006VS-UT
+	(envelope-from <kraxel@redhat.com>) id 1f5pWD-0006Ve-0F
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32778 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46880 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5pWC-0006U5-QL
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5pWC-0006UA-SU
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:48 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 247F27C6DC
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:24:48 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 10 Apr 2018 11:24:45 +0200
-Message-Id: <20180410092446.26903-4-kraxel@redhat.com>
+Date: Tue, 10 Apr 2018 11:24:43 +0200
+Message-Id: <20180410092446.26903-2-kraxel@redhat.com>
 In-Reply-To: <20180410092446.26903-1-kraxel@redhat.com>
 References: <20180410092446.26903-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/4] configure: don't warn GTK if disabled
+Subject: [Qemu-devel] [PULL 1/4] ui: fix keymap detection under Xwayland
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +33,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-We don't need to detect GTK ABI if GTK is disabled in general.
-Otherwise we could get this warning (when host is installed with GTK ABI
-version 2) even when configure with "--disable-gtk":
+The X11 code currently detects the keymap by looking for the keycode
+name property. Unfortunately due to the way Xwayland handles keyboards,
+this property gets unset almost immediately after the first application
+starts using Xwayland resulting in
 
-    WARNING: Use of GTK 2.0 is deprecated and will be removed in
-    WARNING: future releases. Please switch to using GTK 3.0
+  ** (qemu-system-x86_64:19644): WARNING **: Unknown X11 keycode mapping =
+'(unnamed)'.
+  Please report to qemu-devel@nongnu.org
+  including the following information:
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Fam Zheng <famz@redhat.com>
-CC: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-id: 20180409082323.29575-1-peterx@redhat.com
+    - Operating system
+    - X11 Server
+    - xprop -root
+    - xdpyinfo
+
+Fortunately people will only see this problem if they built QEMU with
+GTK2, or have told GTK3 to prefer X11 by setting the GDK_BACKEND=3Dx11
+env variable.
+
+To workaround the problem, we add a heuristic that looks at what
+scancode the XK_Page_Up keysymbol maps to, to determine if we've
+likely got the X11 kbd or evdev driver.
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-Id: <20180313104235.20725-1-berrange@redhat.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ ui/x_keymap.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 752dd9ef32..931d2a07cc 100755
---- a/configure
-+++ b/configure
-@@ -2540,19 +2540,18 @@ fi
- ##########################################
- # GTK probe
+diff --git a/ui/x_keymap.c b/ui/x_keymap.c
+index 22e0e77c4d..2bc01432e5 100644
+--- a/ui/x_keymap.c
++++ b/ui/x_keymap.c
+@@ -17,6 +17,7 @@
+ #include "ui/input.h"
 =20
--if test "$gtkabi" =3D ""; then
--    # The GTK ABI was not specified explicitly, so try whether 3.0 is av=
-ailable.
--    # Use 2.0 as a fallback if that is available.
--    if $pkg_config --exists "gtk+-3.0 >=3D 3.0.0"; then
--        gtkabi=3D3.0
--    elif $pkg_config --exists "gtk+-2.0 >=3D 2.18.0"; then
--        gtkabi=3D2.0
--    else
--        gtkabi=3D3.0
--    fi
--fi
--
- if test "$gtk" !=3D "no"; then
-+    if test "$gtkabi" =3D ""; then
-+        # The GTK ABI was not specified explicitly, so try whether 3.0 i=
-s available.
-+        # Use 2.0 as a fallback if that is available.
-+        if $pkg_config --exists "gtk+-3.0 >=3D 3.0.0"; then
-+            gtkabi=3D3.0
-+        elif $pkg_config --exists "gtk+-2.0 >=3D 2.18.0"; then
-+            gtkabi=3D2.0
-+        else
-+            gtkabi=3D3.0
-+        fi
-+    fi
-     gtkpackage=3D"gtk+-$gtkabi"
-     gtkx11package=3D"gtk+-x11-$gtkabi"
-     if test "$gtkabi" =3D "3.0" ; then
+ #include <X11/XKBlib.h>
++#include <X11/Xutil.h>
+=20
+ static gboolean check_for_xwin(Display *dpy)
+ {
+@@ -87,11 +88,13 @@ const guint16 *qemu_xkeymap_mapping_table(Display *dp=
+y, size_t *maplen)
+         trace_xkeymap_keymap("xquartz");
+         *maplen =3D qemu_input_map_xorgxquartz_to_qcode_len;
+         return qemu_input_map_xorgxquartz_to_qcode;
+-    } else if (keycodes && g_str_has_prefix(keycodes, "evdev")) {
++    } else if ((keycodes && g_str_has_prefix(keycodes, "evdev")) ||
++               (XKeysymToKeycode(dpy, XK_Page_Up) =3D=3D 0x70)) {
+         trace_xkeymap_keymap("evdev");
+         *maplen =3D qemu_input_map_xorgevdev_to_qcode_len;
+         return qemu_input_map_xorgevdev_to_qcode;
+-    } else if (keycodes && g_str_has_prefix(keycodes, "xfree86")) {
++    } else if ((keycodes && g_str_has_prefix(keycodes, "xfree86")) ||
++               (XKeysymToKeycode(dpy, XK_Page_Up) =3D=3D 0x63)) {
+         trace_xkeymap_keymap("kbd");
+         *maplen =3D qemu_input_map_xorgkbd_to_qcode_len;
+         return qemu_input_map_xorgkbd_to_qcode;
 --=20
 2.9.3
