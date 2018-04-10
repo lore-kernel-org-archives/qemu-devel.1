@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f5qK4-0000X7-V4
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:16:21 -0400
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5qN2-0002A6-7S
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f5qK4-0000ZQ-9S
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:16:20 -0400
-Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:43809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f5qK4-0000Y0-44
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:16:20 -0400
-Received: by mail-pf0-x22d.google.com with SMTP id j2so7890821pff.10
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 03:16:20 -0700 (PDT)
-References: <20180410055912.934-1-richard.henderson@linaro.org>
-	<CAFEAcA-UQhSMe4p8zDqXgW6qS6sadrrZaJFP9W0bVaimgTi0vw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3c5613ed-12bd-fe6d-a950-9128bf41bf3b@linaro.org>
-Date: Tue, 10 Apr 2018 20:16:14 +1000
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5qN1-0002UB-B7
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:19:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-UQhSMe4p8zDqXgW6qS6sadrrZaJFP9W0bVaimgTi0vw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12] fpu: Fix rounding mode for
- floatN_to_uintM_round_to_zero
+In-Reply-To: <CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+	<87d0z8v78e.fsf@linaro.org>
+	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
+	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
+	<CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
+	<CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
+From: Ajay Garg <ajaygargnsit@gmail.com>
+Date: Tue, 10 Apr 2018 15:49:17 +0530
+Message-ID: <CAHP4M8WEuR5JJTV_KggwJok0Pzbu8=4BifLuFOjhv3T9hfjUUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
+ unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,14 +30,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/10/2018 05:40 PM, Peter Maydell wrote:
-> Would this be likely the fix for
-> https://bugs.launchpad.net/qemu/+bug/1761401
-> ?
-
-Yes indeed.
+Thanks Peter .. my sincere gratitude.
+You pin-pointed the real issue ..
 
 
-r~
+
+On Tue, Apr 10, 2018 at 2:50 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 10 April 2018 at 09:16, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>> On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> What hardware (what CPU, board, etc) is this "rumprun" software
+>>> expecting to run on?
+>>
+>> Yep, just to ensure that there are no cross-compiling issues, I am
+>> building rumprun on the pseudo-real hardware itself.
+>> In our case, the pseudo-real hardware are :
+>>
+>> a)
+>> An ARM32 "virt" hardware/machine in a qemu environment
+>> (https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+>>
+>> Once I start  this machine, all environment is arm32, and I compile
+>> rumprun within this environemnt without any cross-compiling.
+>>
+>> b)
+>> A beaglebone-green-wireless.
+>> This is a arm32 machine bottoms-up, so no question of cross-compiling
+>> whatsoever here :)
+>>
+>> In both cases, I then use qemu-system-arm (on the "virt" machine, and
+>> beaglebone-green-wireless itself).
+>
+> That's telling me what setups you're trying to compile in,
+> which doesn't correspond necessarily to what the guest
+> OS is built to run on.
+>
+>> One query : It is apparent that there is nested qemu-virtualization in
+>> step a), could that be an issue?
+>
+> Why are you running this in a nested setup? I don't understand
+> the purpose of doing that. It would be simpler and faster to
+> just run the guest on a QEMU running in your native host system.
+>
+> Assuming this is the source for the guest you're trying to run:
+>
+> https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch
+>
+> that suggests that the only Arm board it supports is "integrator"
+> (which is an absolutely ancient devboard with very little memory,
+> no PCI and no virtio support). You need to confirm what Arm hardware
+> this 'rumpkernel' is actually intended to run on, and then give QEMU
+> the right command line arguments to emulate that hardware. I can't
+> really help any further, I'm afraid -- you need somebody who knows
+> about this guest OS.
+>
+> thanks
+> -- PMM
+
+
+
+-- 
+Regards,
+Ajay
