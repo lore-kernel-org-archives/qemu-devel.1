@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f5umJ-00018A-Py
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:53 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f5uo8-0002Rp-Tm
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f5umE-0000QR-Do
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34670
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1f5umE-0000Q9-7g
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:42 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3AEpi9e125704
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 11:01:41 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h8wfn73jy-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 11:01:40 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Tue, 10 Apr 2018 09:01:38 -0600
-From: Collin Walling <walling@linux.ibm.com>
-Date: Tue, 10 Apr 2018 11:01:26 -0400
-In-Reply-To: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
-References: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
-Message-Id: <1523372486-13190-5-git-send-email-walling@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 4/4] pc-bios/s390-ccw: fix non-sequential boot
- entries (enum)
+	(envelope-from <dgilbert@redhat.com>) id 1f5uo3-0001PF-AT
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:03:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56548 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f5uo3-0001P1-6N
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:03:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C0A4E406E96B
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 15:03:34 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue, 10 Apr 2018 16:03:29 +0100
+Message-Id: <20180410150329.47586-2-dgilbert@redhat.com>
+In-Reply-To: <20180410150329.47586-1-dgilbert@redhat.com>
+References: <20180410150329.47586-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] Revert "migration: Don't activate block
+ devices if using -S"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,131 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, borntraeger@de.ibm.com
-Cc: gor@linux.ibm.com, frankja@linux.ibm.com
+To: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com
+Cc: quintela@redhat.com, peterx@redhat.com
 
-zIPL boot menu entries can be non-sequential. Let's account
-for this issue for the s390 enumerated boot menu. Since we
-can no longer print a range of available entries to the
-user, we have to present a list of each available entry.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-An example of this menu:
+This reverts commit 0746a92612276aee69e66dfe6782b0f882d221d5.
+Discussion with kwolf suggests this is actually an API change that
+we need to gate on a capability.  Push to 2.13.
 
-  s390-ccw Enumerated Boot Menu.
-
-   [0] default
-
-   [1]
-   [2]
-   [7]
-   [8]
-   [9]
-  [11]
-  [12]
-
-  Please choose:
-
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Reported-by: Vasily Gorbik <gor@linux.ibm.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c  | 12 +++++++-----
- pc-bios/s390-ccw/menu.c     | 29 ++++++++++++++++++++---------
- pc-bios/s390-ccw/s390-ccw.h |  2 +-
- 3 files changed, 28 insertions(+), 15 deletions(-)
+ migration/migration.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 2f79346..f9a2fb3 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -558,6 +558,8 @@ static void ipl_scsi(void)
-     int program_table_entries = 0;
-     BootMapTable *prog_table = (void *)sec;
-     unsigned int loadparm = get_loadparm_index();
-+    bool valid_entries[MAX_BOOT_ENTRIES] = {false};
-+    size_t i;
+diff --git a/migration/migration.c b/migration/migration.c
+index 58bd382730..52a5092add 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -306,21 +306,13 @@ static void process_incoming_migration_bh(void *opaque)
+     Error *local_err = NULL;
+     MigrationIncomingState *mis = opaque;
  
-     /* Grab the MBR */
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-@@ -578,18 +580,18 @@ static void ipl_scsi(void)
-     read_block(mbr->pt.blockno, sec, "Error reading Program Table");
-     IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
- 
--    while (program_table_entries < MAX_BOOT_ENTRIES) {
--        if (!prog_table->entry[program_table_entries].scsi.blockno) {
--            break;
-+    for (i = 0; i < MAX_BOOT_ENTRIES; i++) {
-+        if (prog_table->entry[i].scsi.blockno) {
-+            valid_entries[i] = true;
-+            program_table_entries++;
-         }
--        program_table_entries++;
+-    /* Only fire up the block code now if we're going to restart the
+-     * VM, else 'cont' will do it.
+-     * This causes file locking to happen; so we don't want it to happen
+-     * unless we really are starting the VM.
+-     */
+-    if (autostart && (!global_state_received() ||
+-        global_state_get_runstate() == RUN_STATE_RUNNING)) {
+-        /* Make sure all file formats flush their mutable metadata.
+-         * If we get an error here, just don't restart the VM yet. */
+-        bdrv_invalidate_cache_all(&local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-            local_err = NULL;
+-            autostart = false;
+-        }
++    /* Make sure all file formats flush their mutable metadata.
++     * If we get an error here, just don't restart the VM yet. */
++    bdrv_invalidate_cache_all(&local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        local_err = NULL;
++        autostart = false;
      }
  
-     debug_print_int("program table entries", program_table_entries);
-     IPL_assert(program_table_entries != 0, "Empty Program Table");
- 
-     if (menu_is_enabled_enum()) {
--        loadparm = menu_get_enum_boot_index(program_table_entries);
-+        loadparm = menu_get_enum_boot_index(valid_entries);
-     }
- 
-     debug_print_int("loadparm", loadparm);
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 083405f..2f11a51 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -225,19 +225,30 @@ int menu_get_zipl_boot_index(const char *menu_data)
-     return get_boot_index(valid_entries);
- }
- 
--
--int menu_get_enum_boot_index(int entries)
-+int menu_get_enum_boot_index(bool *valid_entries)
- {
--    char tmp[4];
-+    char tmp[3];
-+    int i;
- 
--    sclp_print("s390x Enumerated Boot Menu.\n\n");
-+    sclp_print("s390-ccw Enumerated Boot Menu.\n\n");
- 
--    sclp_print(uitoa(entries, tmp, sizeof(tmp)));
--    sclp_print(" entries detected. Select from boot index 0 to ");
--    sclp_print(uitoa(entries - 1, tmp, sizeof(tmp)));
--    sclp_print(".\n\n");
-+    for (i = 0; i < MAX_BOOT_ENTRIES; i++) {
-+        if (valid_entries[i]) {
-+            if (i < 10) {
-+                sclp_print(" ");
-+            }
-+            sclp_print("[");
-+            sclp_print(uitoa(i, tmp, sizeof(tmp)));
-+            sclp_print("]");
-+            if (i == 0) {
-+                sclp_print(" default\n");
-+            }
-+            sclp_print("\n");
-+        }
-+    }
- 
--    return get_boot_index(entries);
-+    sclp_print("\n");
-+    return get_boot_index(valid_entries);
- }
- 
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 2c9e601..a1bdb4c 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -91,7 +91,7 @@ void zipl_load(void);
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
- int menu_get_zipl_boot_index(const char *menu_data);
- bool menu_is_enabled_zipl(void);
--int menu_get_enum_boot_index(int entries);
-+int menu_get_enum_boot_index(bool *valid_entries);
- bool menu_is_enabled_enum(void);
- 
- #define MAX_BOOT_ENTRIES  31
+     /*
 -- 
-2.7.4
+2.16.2
