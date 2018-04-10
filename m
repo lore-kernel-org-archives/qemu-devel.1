@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDY-0007zI-5S
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f5sMo-0008Po-BQ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDS-0000jr-1G
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:44 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f5sDR-0000er-Pw
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:37 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDK-0007bi-Vj
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 13:17:30 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 13:17:18 +0100
-Message-Id: <20180410121724.8549-7-peter.maydell@linaro.org>
-In-Reply-To: <20180410121724.8549-1-peter.maydell@linaro.org>
-References: <20180410121724.8549-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 06/12] hw/arm/allwinner-a10: Do not use nd_table
- in instance_init function
+	(envelope-from <kwolf@redhat.com>) id 1f5sMk-0006NJ-9h
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:27:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34198 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1f5sMk-0006Mv-36
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:27:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 62A1D40201A1
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 12:27:03 +0000 (UTC)
+Date: Tue, 10 Apr 2018 14:26:52 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180410122652.GD7026@localhost.localdomain>
+References: <20180403143857.GF11070@localhost.localdomain>
+	<20180403205237.GA2501@work-vm>
+	<20180404100303.GE4482@localhost.localdomain>
+	<20180409102744.GC2449@work-vm>
+	<20180409134003.GG5294@localhost.localdomain>
+	<20180410073635.GA91107@orkuz.home>
+	<20180410081848.GA7026@localhost.localdomain>
+	<20180410084524.GB2559@work-vm>
+	<20180410091437.GC7026@localhost.localdomain>
+	<20180410104047.GD2559@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180410104047.GD2559@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] migration: Don't activate block devices if
+ using -S
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +42,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, peterx@redhat.com
 
-From: Thomas Huth <thuth@redhat.com>
+Am 10.04.2018 um 12:40 hat Dr. David Alan Gilbert geschrieben:
+> * Kevin Wolf (kwolf@redhat.com) wrote:
+> > Am 10.04.2018 um 10:45 hat Dr. David Alan Gilbert geschrieben:
+> > > * Kevin Wolf (kwolf@redhat.com) wrote:
+> > > > Am 10.04.2018 um 09:36 hat Jiri Denemark geschrieben:
+> > > > > On Mon, Apr 09, 2018 at 15:40:03 +0200, Kevin Wolf wrote:
+> > > > > > Am 09.04.2018 um 12:27 hat Dr. David Alan Gilbert geschrieben:
+> > > > > > > It's a fairly hairy failure case they had; if I remember correctly it's:
+> > > > > > >   a) Start migration
+> > > > > > >   b) Migration gets to completion point
+> > > > > > >   c) Destination is still paused
+> > > > > > >   d) Libvirt is restarted on the source
+> > > > > > >   e) Since libvirt was restarted it fails the migration (and hence knows
+> > > > > > >      the destination won't be started)
+> > > > > > >   f) It now tries to resume the qemu on the source
+> > > > > > > 
+> > > > > > > (f) fails because (b) caused the locks to be taken on the destination;
+> > > > > > > hence this patch stops doing that.  It's a case we don't really think
+> > > > > > > about - i.e. that the migration has actually completed and all the data
+> > > > > > > is on the destination, but libvirt decides for some other reason to
+> > > > > > > abandon migration.
+> > > > > > 
+> > > > > > If you do remember correctly, that scenario doesn't feel tricky at all.
+> > > > > > libvirt needs to quit the destination qemu, which will inactivate the
+> > > > > > images on the destination and release the lock, and then it can continue
+> > > > > > the source.
+> > > > > > 
+> > > > > > In fact, this is so straightforward that I wonder what else libvirt is
+> > > > > > doing. Is the destination qemu only shut down after trying to continue
+> > > > > > the source? That would be libvirt using the wrong order of steps.
+> > > > > 
+> > > > > There's no connection between the two libvirt daemons in the case we're
+> > > > > talking about so they can't really synchronize the actions. The
+> > > > > destination daemon will kill the new QEMU process and the source will
+> > > > > resume the old one, but the order is completely random.
+> > > > 
+> > > > Hm, okay...
+> > > > 
+> > > > > > > Yes it was a 'block-activate' that I'd wondered about.  One complication
+> > > > > > > is that if this now under the control of the management layer then we
+> > > > > > > should stop asserting when the block devices aren't in the expected
+> > > > > > > state and just cleanly fail the command instead.
+> > > > > > 
+> > > > > > Requiring an explicit 'block-activate' on the destination would be an
+> > > > > > incompatible change, so you would have to introduce a new option for
+> > > > > > that. 'block-inactivate' on the source feels a bit simpler.
+> > > > > 
+> > > > > As I said in another email, the explicit block-activate command could
+> > > > > depend on a migration capability similarly to how pre-switchover state
+> > > > > works.
+> > > > 
+> > > > Yeah, that's exactly the thing that we wouldn't need if we could use
+> > > > 'block-inactivate' on the source instead. It feels a bit wrong to
+> > > > design a more involved QEMU interface around the libvirt internals,
+> > > 
+> > > It's not necessarily 'libvirt internals' - it's a case of them having to
+> > > cope with recovering from failures that happen around migration; it's
+> > > not an easy problem, and if they've got a way to stop both sides running
+> > > at the same time that's pretty important.
+> > 
+> > The 'libvirt internals' isn't that it needs an additional state where
+> > neither source nor destination QEMU own the images, but that it has to
+> > be between migration completion and image activation on the destination
+> > rather than between image inactivation on the source and migration
+> > completion. The latter would be much easier for qemu, but apparently it
+> > doesn't work for libvirt because of how it works internally.
+> 
+> I suspect this is actually a fundamental requirement to ensuring that we
+> don't end up with a QEMU running on both sides rather than how libvirt is
+> structured.
 
-The instance_init function of a device can be called at any time, even
-if the device is not going to be used (i.e. not going to be realized).
-So a instance_init function must not do things that could cause QEMU
-to exit, like calling qemu_check_nic_model(&nd_table[0], ...) for example.
-But this is what the instance_init function of the allwinner-a10 device
-is currently doing - and this causes QEMU to quit unexpectedly when
-you run the 'device-list-properties' QMP command for example:
+I don't think so. In theory, both options can provide the same. If
+anything, it's related specifically to the phases that Jirka described
+that libvirt uses to implement migration.
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'allwinner-a10'}}" \
-       | arm-softmmu/qemu-system-arm -M mps2-an505,accel=qtest -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-Unsupported NIC model: lan9118
+> > But as I said, I'd just implement both for symmetry and then management
+> > tools can pick whatever makes their life easier.
+> > 
+> > > > but
+> > > > as long as we implement both sides for symmetry and libvirt just happens
+> > > > to pick the destination side for now, I think it's okay.
+> > > > 
+> > > > By the way, are block devices the only thing that need to be explicitly
+> > > > activated? For example, what about qemu_announce_self() for network
+> > > > cards, do we need to delay that, too?
+> > > > 
+> > > > In any case, I think this patch needs to be reverted for 2.12 because
+> > > > it's wrong, and then we can create the proper solution in the 2.13
+> > > > timefrage.
+> > > 
+> > > what case does this break?
+> > > I'm a bit wary of reverting this, which fixes a known problem, on the
+> > > basis that it causes a theoretical problem.
+> > 
+> > It breaks the API. And the final design we're having in mind now is
+> > compatible with the old API, not with the new one exposed by this patch,
+> > so that switch would break the API again to get back to the old state.
+> > 
+> > Do you know all the scripts that people are using around QEMU? I don't,
+> > but I know that plenty of them exist, so I don't think we can declare
+> > this API breakage purely theoretical.
+> > 
+> > Yes, the patch fixes a known problem, but also a problem that is a rare
+> > corner case error that you can only hit with really bad timing. Do we
+> > really want to risk unconditionally breaking success cases for fixing a
+> > mostly theoretical corner case error path (with the failure mode that
+> > the guest is paused when it shouldn't be)?
+> 
+> Hmm; having chatted to Jiri I'm OK with reverting it, on the condition
+> that I actually understand how this alternative would work first.
+> 
+> I can't currently see how a block-inactivate would be used.
+> I also can't see how a block-activate unless it's also with the
+> change that you're asking to revert.
+> 
+> Can you explain the way you see it working?
 
-... and QEMU quits after printing the last line (which should not happen
-just because of running 'device-list-properties' here).
+The key is making the delayed activation of block devices (and probably
+delayed announcement of NICs? - you didn't answer that part) optional
+instead of making it the default.
 
-And with the cubieboard, this even causes QEMU to abort():
+We can use Jirka's suggestion of adding a migration capability that
+enables it, or I suppose a new option to -incoming could work, too. It
+doesn't really matter what the syntax is, but the management tool must
+request it explicitly.
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'allwinner-a10'}}" \
-       | arm-softmmu/qemu-system-arm -M cubieboard,accel=qtest -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-Unexpected error in error_set_from_qdev_prop_error() at hw/core/qdev-properties.c:1095:
-Property 'allwinner-emac.netdev' can't take value 'hub0port0', it's in use
-Aborted (core dumped)
-
-To fix the problem we've got to move the offending code to the realize
-function instead.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1522862420-7484-1-git-send-email-thuth@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/allwinner-a10.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 43a3f01f45..5dbbacb7e8 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -38,11 +38,6 @@ static void aw_a10_init(Object *obj)
- 
-     object_initialize(&s->emac, sizeof(s->emac), TYPE_AW_EMAC);
-     qdev_set_parent_bus(DEVICE(&s->emac), sysbus_get_default());
--    /* FIXME use qdev NIC properties instead of nd_table[] */
--    if (nd_table[0].used) {
--        qemu_check_nic_model(&nd_table[0], TYPE_AW_EMAC);
--        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
--    }
- 
-     object_initialize(&s->sata, sizeof(s->sata), TYPE_ALLWINNER_AHCI);
-     qdev_set_parent_bus(DEVICE(&s->sata), sysbus_get_default());
-@@ -91,6 +86,11 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(sysbusdev, 4, s->irq[67]);
-     sysbus_connect_irq(sysbusdev, 5, s->irq[68]);
- 
-+    /* FIXME use qdev NIC properties instead of nd_table[] */
-+    if (nd_table[0].used) {
-+        qemu_check_nic_model(&nd_table[0], TYPE_AW_EMAC);
-+        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
-+    }
-     object_property_set_bool(OBJECT(&s->emac), true, "realized", &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-@@ -118,7 +118,7 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     dc->realize = aw_a10_realize;
--    /* Reason: Uses serial_hds in realize and nd_table in instance_init */
-+    /* Reason: Uses serial_hds and nd_table in realize function */
-     dc->user_creatable = false;
- }
- 
--- 
-2.16.2
+Kevin
