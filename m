@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f5rul-0004SK-Ft
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:58:20 -0400
+	(envelope-from <lersek@redhat.com>) id 1f5s0b-0000C5-UN
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f5ruj-0005yu-Qc
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:58:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53816 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1f5s0W-0001KU-8L
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:04:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35206 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5ruj-0005ya-LN
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:58:17 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5s0W-0001KK-3B
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:04:16 -0400
 References: <20180407000117.25640-1-lersek@redhat.com>
-	<979bd720-cdb3-6468-1fbd-e8ec1c6c6c8d@redhat.com>
-	<8ddd0a2f-b9b1-08c0-0f4d-62e7aea7e96a@redhat.com>
-	<20180410062754.eohou7i7chf6w65j@sirius.home.kraxel.org>
-	<dc439111-4161-96e6-5b45-4dcee886427d@redhat.com>
-	<20180410093412.GI5155@redhat.com>
+	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
+	<6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
+	<20180410055914.3ak6niwxjkpph26u@sirius.home.kraxel.org>
+	<52191fc3-e4d1-e780-47a1-311df2a2f99e@redhat.com>
+	<20180410095131.ynii6t3om753vl2t@sirius.home.kraxel.org>
+	<20180410095500.GK5155@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <61da7cb7-cc07-4dd0-a290-bb18d1a76918@redhat.com>
-Date: Tue, 10 Apr 2018 13:57:53 +0200
+Message-ID: <f5635db3-4dbe-d1b5-1f2b-ffcb66f17243@redhat.com>
+Date: Tue, 10 Apr 2018 14:04:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180410093412.GI5155@redhat.com>
+In-Reply-To: <20180410095500.GK5155@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -32,74 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 04/10/18 11:34, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Apr 10, 2018 at 11:16:01AM +0200, Laszlo Ersek wrote:
->> On 04/10/18 08:27, Gerd Hoffmann wrote:
->>>   Hi,
->>>
->>>> - I considered adding wildcards (say, blacklist "all" i440fx machtyp=
-es,
->>>> present and future, for SMM-requiring OVMF builds), but then you get
->>>> into version sorting and similar mess. I considered fnmatch() --
->>>> basically simple ? and * wildcards -- but that's not expressive enou=
-gh.
->>>
->>> I'd suggest whitelist with wildcards.  So the smm builds would get
->>> "pc-q35-*".
->>>
->>> libvirt knows about aliases, so it should be able to handle the "q35"
->>> shortcut like "pc-q35-${latest}".
->>>
->>> Or do you see another issue?
->>
->> Well, one issue I see is version sorting; I should say "Q35 but no
->> earlier than 2.4", and lexicographically, "2.11" sorts before "2.4".
->>
->> Anyway (also asking for Thomas's input here): if we run with your idea
->> to refer to exact mapping methods / firmware *implementation* types th=
-at
->> we know libvirt implements / supports as a "white box", do we still de=
-em
->> machine type identification necessary? Because, libvirt already knows
->> (for example) that "ovmf_smm" requires pc-q35-2.4 or later. So we just
->> have to make a *reference* to that knowledge in the JSON file.
->=20
-> BTW, that's not quite correct - when libvirt handles the "smm" arg it
-> checks if machine type =3D=3D q35, and  QEMU version >=3D 2.4.
->=20
-> It is *not* checking the version of the machine type. ie it will happil=
-y
-> use smm with  pc-q35-2.0, as long as QEMU version is 2.4. Perhaps this =
-is
-> not quite right,
-
-(it's not)
-
-> but we don't try to parse the version number out of the
-> machine type, because we can't assume a specific format for the machine
-> type version part. eg version can be "2.4", or it can be "rhel-7.0.0"
-> or something else again on Ubuntu.
-
-Indeed, that's exactly why I'm troubled about expressing a "minimum"
-machine type version.
-
->=20
-> IMHO it would be valid to just keep life simple and only record the bas=
+On 04/10/18 11:55, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Apr 10, 2018 at 11:51:31AM +0200, Gerd Hoffmann wrote:
+>>>> Hmm, I'm wondering whenever it is useful to model things this way.  =
+It's
+>>>> not like you can actually configure things for -bios seabios.rom or
+>>>> -kernel uboot.elf.  Only pflash allows to actually configure things,=
+ and
+>>>> there are not that many useful combinations.  The code needs
+>>>> Read+Execute.  Allowing Write could be useful in theory, to allow th=
 e
-> machine type name that can use the firmware ie "pc", "q35", and ignore
-> the fact that in some cases the firmware might require a specific versi=
-on
-> of the machine type.
+>>>> guest doing firmware updates.  But I think nobody actually does that=
+, so
+>>>> in practice it is fixed.  The varstore can have different permission=
+s,
+>>>> but it's only two useful combinations.  Either allow access
+>>>> unconditionally, or allow access in secure contect (aka smm) only.
+>>>
+>>> (I hope I understand your point right:)
+>>>
+>>> I'm also fine if we simply define a fixed (but extensible) set of
+>>> mapping methods, basically a new enum type, that simply tells libvirt=
+d
+>>> what this firmware *is*. IOW, directly reference a mapping method we
+>>> know libvirt implements, rather than give vague hints.
+>>>
+>>> This could repurpose SystemFirmwareType, but it should become more
+>>> detailed. I'm thinking like:
+>>> - ovmf: split files without requiring SMM
+>>> - ovmf_smm: split files with SMM requirement
+>>> - seabios: exactly that
+>>> - ... other things others suggest.
+>>
+>> I wouldn't name them by firmware, that is misleading.  Basically we ha=
+ve
+>> three cases:
+>>
+>>   (1) single firmware image (seabios, OVMF.fd, ...).
+>>   (2) split firmware image (OVMF_{CODE,VARS}.fd), where vars can be
+>>       writable unconditinally.
+>>   (3) split firmware image, where access to vars should be restricted
+>>       to smm mode.
+>>
+>> (2) + (3) requires pflash.  (1) works with both pflash and -bios.
+>=20
+> A big chunk of the data in the schema looks specific to the pflash
+> case, but this is not expressed except in the docs. Most of the time
+> with QAPI when we have data that is only relevant in certain types,
+> we use a discriminated union to describe it. It feels like a unioon
+> approach could be better suited to this
 
-Esp. with regard to SMM, there have been quite big jumps in usability /
-stability across Q35 machtype versions. But, if it works for you, it
-works for me.
+I used a discriminated union specifically for pflash options in RFCv0,
+which I didn't post. I felt that it wasn't flexible enough. :)
 
-(I double-checked Thomas's recent example about U-Boot, and he mentioned
-the "ppce500" and "sam460ex" machine types, not machine type versions.)
-
-Thanks,
 Laszlo
