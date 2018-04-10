@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f5xl2-0007mT-CJ
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 14:12:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f5z6z-000056-A8
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f5xkz-0000ss-6s
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 14:12:40 -0400
-From: Serhii Popovych <spopovyc@redhat.com>
-Date: Tue, 10 Apr 2018 14:12:26 -0400
-Message-Id: <1523383946-37373-3-git-send-email-spopovyc@redhat.com>
-In-Reply-To: <1523383946-37373-1-git-send-email-spopovyc@redhat.com>
-References: <1523383946-37373-1-git-send-email-spopovyc@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 2/2] Revert "spapr: Don't allow
- memory hotplug to memory less nodes"
+	(envelope-from <alex.bennee@linaro.org>) id 1f5z6w-0006F5-MA
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:25 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38559)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f5z6w-0006EK-Fb
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:22 -0400
+Received: by mail-wr0-x244.google.com with SMTP id m13so13941980wrj.5
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 12:39:22 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 10 Apr 2018 20:38:56 +0100
+Message-Id: <20180410193919.28026-2-alex.bennee@linaro.org>
+In-Reply-To: <20180410193919.28026-1-alex.bennee@linaro.org>
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 01/24] configure: add test for docker
+ availability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This reverts commit b556854bd8524c26b8be98ab1bfdf0826831e793.
+This tests for a working docker installation without sudo and sets up
+config-host.mak accordingly. This will be useful from cross compiling
+things in the future.
 
-Leave change @node type from uint32_t to to int from reverted commit
-because node < 0 is always false.
-
-Note that implementing capability or some trick to detect if guest
-kernel does not support hot-add to memory: this returns previous
-behavour where memory added to first non-empty node.
-
-Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/ppc/spapr.c | 22 ----------------------
- 1 file changed, 22 deletions(-)
+ configure | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3f61785..cd7a347 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3488,28 +3488,6 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-             return;
-         }
+diff --git a/configure b/configure
+index 4d0e92c96c..b402befe94 100755
+--- a/configure
++++ b/configure
+@@ -451,6 +451,7 @@ jemalloc="no"
+ replication="yes"
+ vxhs=""
+ libxml2=""
++docker="no"
  
--        /*
--         * Currently PowerPC kernel doesn't allow hot-adding memory to
--         * memory-less node, but instead will silently add the memory
--         * to the first node that has some memory. This causes two
--         * unexpected behaviours for the user.
--         *
--         * - Memory gets hotplugged to a different node than what the user
--         *   specified.
--         * - Since pc-dimm subsystem in QEMU still thinks that memory belongs
--         *   to memory-less node, a reboot will set things accordingly
--         *   and the previously hotplugged memory now ends in the right node.
--         *   This appears as if some memory moved from one node to another.
--         *
--         * So until kernel starts supporting memory hotplug to memory-less
--         * nodes, just prevent such attempts upfront in QEMU.
--         */
--        if (nb_numa_nodes && !numa_info[node].node_mem) {
--            error_setg(errp, "Can't hotplug memory to memory-less node %d",
--                       node);
--            return;
--        }
--
-         spapr_memory_plug(hotplug_dev, dev, node, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
-         spapr_core_plug(hotplug_dev, dev, errp);
+ supported_cpu="no"
+ supported_os="no"
+@@ -5396,6 +5397,23 @@ EOF
+   fi
+ fi
+ 
++##########################################
++# Docker and cross-compiler support
++#
++# This is specifically for building test
++# cases for foreign architectures, not
++# cross-compiling QEMU itself.
++
++if has "docker"; then
++    if docker images  >/dev/null 2>&1 ; then
++        docker="yes"
++    else
++        # docker may be available but using sudo
++        # so we won't use it for cross-building
++        docker="maybe"
++    fi
++fi
++
+ ##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+@@ -5857,6 +5875,7 @@ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
+ echo "capstone          $capstone"
++echo "docker            $docker"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6680,6 +6699,10 @@ if test "$gcov" = "yes" ; then
+   echo "GCOV=$gcov_tool" >> $config_host_mak
+ fi
+ 
++if test "$docker" = "yes"; then
++    echo "HAVE_USER_DOCKER=y" >> $config_host_mak
++fi
++
+ # use included Linux headers
+ if test "$linux" = "yes" ; then
+   mkdir -p linux-headers
 -- 
-1.8.3.1
+2.16.2
