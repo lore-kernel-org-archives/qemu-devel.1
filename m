@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f5mkA-0008Ky-8N
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:27:03 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f5ml5-0000SV-Tu
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f5mk7-0003AE-4K
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:27:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51474 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1f5ml2-0003kf-Ql
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:27:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39470 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f5mk7-0003A4-0M
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:26:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B7C04068059
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:26:50 +0000 (UTC)
-Date: Tue, 10 Apr 2018 14:26:39 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180410062639.GD27604@xz-mi>
-References: <20180408030542.17855-1-peterx@redhat.com>
-	<888b356e-284b-54a5-0646-b6999e0e2c89@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5ml2-0003kN-Lp
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:27:56 -0400
+Date: Tue, 10 Apr 2018 08:27:54 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180410062754.eohou7i7chf6w65j@sirius.home.kraxel.org>
+References: <20180407000117.25640-1-lersek@redhat.com>
+	<979bd720-cdb3-6468-1fbd-e8ec1c6c6c8d@redhat.com>
+	<8ddd0a2f-b9b1-08c0-0f4d-62e7aea7e96a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <888b356e-284b-54a5-0646-b6999e0e2c89@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: fix wait_until_completed()
+In-Reply-To: <8ddd0a2f-b9b1-08c0-0f4d-62e7aea7e96a@redhat.com>
+Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Apr 09, 2018 at 09:06:59AM -0500, Eric Blake wrote:
-> On 04/07/2018 10:05 PM, Peter Xu wrote:
-> > If there are more than one events, wait_until_completed() might return
-> > the 2nd event even if the 1st event is JOB_COMPLETED, since the for loop
-> > will continue to run even if completed is set to True.
-> > 
-> > It never happened before, but it can be triggered when OOB is enabled
-> > due to the RESUME startup message. Fix that up.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  tests/qemu-iotests/iotests.py | 9 +++------
-> >  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> If you get the other OOB-related bug fixes working, I can include this
-> along with those for -rc3 through the qapi tree.  Otherwise, I'm fine
-> waiting for this until 2.13.
+  Hi,
 
-Hi, Eric,
+> - I considered adding wildcards (say, blacklist "all" i440fx machtypes,
+> present and future, for SMM-requiring OVMF builds), but then you get
+> into version sorting and similar mess. I considered fnmatch() --
+> basically simple ? and * wildcards -- but that's not expressive enough.
 
-I think we have settled on the other two fix patches with Stefan,
-it'll be good we can include those two patches for 2.12 now (maybe
-also together with this one since it's pretty safe).
+I'd suggest whitelist with wildcards.  So the smm builds would get
+"pc-q35-*".
 
-> 
-> 
-> > +++ b/tests/qemu-iotests/iotests.py
-> > @@ -470,18 +470,15 @@ class QMPTestCase(unittest.TestCase):
-> >  
-> >      def wait_until_completed(self, drive='drive0', check_offset=True):
-> >          '''Wait for a block job to finish, returning the event'''
-> > -        completed = False
-> > -        while not completed:
-> > +        while True:
-> >              for event in self.vm.get_qmp_events(wait=True):
-> 
-> Do we really need two loops?  Or can you eliminate the 'while True:'
-> loop and rely on just the 'for event...' loop?
+libvirt knows about aliases, so it should be able to handle the "q35"
+shortcut like "pc-q35-${latest}".
 
-Seems not; the old wait_until_completed() will block here if haven't
-received the JOB_COMPETE event yet until this point.  Removing the
-while loop will let the function return immediately with a None, which
-might break the old semantics.  Thanks,
+Or do you see another issue?
 
--- 
-Peter Xu
+cheers,
+  Gerd
