@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5kue-0006WP-5d
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:29:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f5kug-0006XW-2D
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5kuc-0003tL-U4
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:29:44 -0400
-Date: Tue, 10 Apr 2018 14:29:29 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1f5kuc-0003tR-Vb
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:29:46 -0400
+Date: Tue, 10 Apr 2018 14:23:55 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180410042929.GJ3361@umbus.fritz.box>
+Message-ID: <20180410042355.GH3361@umbus.fritz.box>
 References: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
-	<1522938923-96058-3-git-send-email-spopovyc@redhat.com>
+	<1522938923-96058-2-git-send-email-spopovyc@redhat.com>
+	<20180406035249.GA10482@in.ibm.com>
+	<1d1893fc-1484-86e0-ed1b-f9cf7b35fbb5@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="huG+SbfbdD6eblZQ"
+	protocol="application/pgp-signature"; boundary="cfJ13FhsvNR/yOpm"
 Content-Disposition: inline
-In-Reply-To: <1522938923-96058-3-git-send-email-spopovyc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.13 2/2] spapr: Add ibm,
- max-associativity-domains property
+In-Reply-To: <1d1893fc-1484-86e0-ed1b-f9cf7b35fbb5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.13 1/2] Revert "spapr: Don't allow
+ memory hotplug to memory less nodes"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Serhii Popovych <spopovyc@redhat.com>
-Cc: qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org
+Cc: bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---huG+SbfbdD6eblZQ
+--cfJ13FhsvNR/yOpm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 05, 2018 at 10:35:23AM -0400, Serhii Popovych wrote:
-> Now recent kernels (i.e. since linux-stable commit a346137e9142
-> ("powerpc/numa: Use ibm,max-associativity-domains to discover possible no=
-des")
-> support this property to mark initially memory-less NUMA nodes as "possib=
-le"
-> to allow further memory hot-add to them.
+On Fri, Apr 06, 2018 at 08:48:55AM +0300, Serhii Popovych wrote:
+> Bharata B Rao wrote:
+> > On Thu, Apr 05, 2018 at 10:35:22AM -0400, Serhii Popovych wrote:
+> >> This reverts commit b556854bd8524c26b8be98ab1bfdf0826831e793.
+> >>
+> >> Leave change @node type from uint32_t to to int from reverted commit
+> >> because node < 0 is always false.
+> >>
+> >> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+> >> ---
+> >>  hw/ppc/spapr.c | 22 ----------------------
+> >>  1 file changed, 22 deletions(-)
+> >>
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index 2c0be8c..3ad4545 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -3477,28 +3477,6 @@ static void spapr_machine_device_plug(HotplugHa=
+ndler *hotplug_dev,
+> >>              return;
+> >>          }
+> >>
+> >> -        /*
+> >> -         * Currently PowerPC kernel doesn't allow hot-adding memory to
+> >> -         * memory-less node, but instead will silently add the memory
+> >> -         * to the first node that has some memory. This causes two
+> >> -         * unexpected behaviours for the user.
+> >> -         *
+> >> -         * - Memory gets hotplugged to a different node than what the=
+ user
+> >> -         *   specified.
+> >> -         * - Since pc-dimm subsystem in QEMU still thinks that memory=
+ belongs
+> >> -         *   to memory-less node, a reboot will set things accordingly
+> >> -         *   and the previously hotplugged memory now ends in the rig=
+ht node.
+> >> -         *   This appears as if some memory moved from one node to an=
+other.
+> >> -         *
+> >> -         * So until kernel starts supporting memory hotplug to memory=
+-less
+> >> -         * nodes, just prevent such attempts upfront in QEMU.
+> >> -         */
+> >> -        if (nb_numa_nodes && !numa_info[node].node_mem) {
+> >> -            error_setg(errp, "Can't hotplug memory to memory-less nod=
+e %d",
+> >> -                       node);
+> >> -            return;
+> >> -        }
+> >> -
+> >=20
+> > If you remove this unconditionally, wouldn't it be a problem in case
+> > of newer QEMU with older guest kernels ?
 >=20
-> Advertise this property for pSeries machines to let guest kernels detect
-> maximum supported node configuration and benefit from kernel side change
-> when hot-add memory to specific, possibly empty before, NUMA node.
->=20
-> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
-> ---
->  hw/ppc/spapr.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3ad4545..e02fc94 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -909,6 +909,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, =
-void *fdt)
->          0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
->          cpu_to_be32(max_cpus / smp_threads),
->      };
-> +    uint32_t maxdomains[] =3D {
-> +        cpu_to_be32(5),
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(nb_numa_nodes - 1),
-> +        cpu_to_be32(max_cpus - 1),
-> +    };
+> Yes, that definitely would affect guest kernels without such support. We
+> probably need to add some capability to test for guest kernel
+> functionality presence.
 
-There's a minor problem here, which I didn't think of when I was
-discussing this with you earlier.
+Hm, maybe.
 
-(max_cpus - 1) in the last slot isn't quite right, because we need the
-maximum vcpu id here.  Because of (complicated, historical) reasons we
-don't allocate the vcpu ids contiguously in all cases, so it could be
-larger than max_cpus - 1.
+So first, we should check when the guest side support came in.  If
+it's old enough we might not care.
 
-But, we don't actually need to handle that case.  We give 5 levels of
-associativity on cpus, but only 4 on memory.  Having a quick look at
-the NUMA code on the guest side, I'm pretty sure it's ok if we only
-give maximum values to depth 4 here, so we can just drop the last cell
-here.
+PAPR does include a mechanism for negotiating guest/host
+capabilities.  However, I don't think it has a bit for this specific
+feature, so I can't really see a way to do this cleanly.
 
-> =20
->      _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
-> =20
-> @@ -945,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, v=
-oid *fdt)
->      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
->                       refpoints, sizeof(refpoints)));
-> =20
-> +    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-> +                     maxdomains, sizeof(maxdomains)));
-> +
->      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
->                            RTAS_ERROR_LOG_MAX));
->      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
+I don't think we necessarily have to handle that case: it's not like
+we can reasonably workaround *every* possible guest bug/limitation
+=66rom the host side.  If you want to create a system with a memory-less
+node you need an OS that can handle that, nothing really special there.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -104,24 +114,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---huG+SbfbdD6eblZQ
+--cfJ13FhsvNR/yOpm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrMPakACgkQbDjKyiDZ
-s5JptRAAudARq+YkqiWhYgM0DbmxfXL7fuyX9EfDdT5DBcnpdfW4X3ulOHH4IFzj
-ceToBme4PZBNqcypvTqYoz4ouQuKZG2WMR3VFv64Xt7zwcGCbuxZcta+rEDXr0+S
-lGmqKFWtNhRVvS/cR1bJ6c22J0QB/ry2LiAbUcgN4l1/wFav9CpdL7+aY6zoW75u
-Y4Er2YN/OT/PF13ozQvp6KxaNonQKCq9sUZBmJvKtgWYEPPJ7S7j3hq3DmXV0pEO
-z6b7JSBHfbM4MR2n86XfoE3GrlS7NTkhy/edwhTP1Mop5/Qsf/J6nkCtYKaDR1Lb
-8BgEC1MmStIYjYXn+VE580GSuinONtqWt0M0NYXxl9SPkn4M4sJoqrREIqHKayyH
-NeKpNX6BlxJDozFoxpKy8yA+lyPyLiUcMQgu9iL4VG7bwYfFRjGp3pMQd9kYtY7O
-c1Xszq15D/9NdZ3zF4C4RK2+hYDduS3Y39xC0fFhhNyTctQ/g8pbjMlkZ60MHBd7
-xL5NICwnD2qm44iQbOeIzQTL85WknnGmenvUZ7kvOakn9nbnTO5FP4e35hFIbvSV
-QkuWtNlDg+U8vnAGF6IQo6V0Vm45axmz+zXItsyfoysUK8zTHDOhFtIXaXndw6kt
-m6rPgBb0URZIlEoSPAayxRWoCQqIk8WXF9mAQCKSnEOqm9BsHjI=
-=TSP4
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrMPFsACgkQbDjKyiDZ
+s5JR0xAAuv3NjUp1trvpBCNPzFNQJKFw9yVbPfyUbDxVDMqCFme4NknrNgvUPfWJ
+nKpXaxvSLdtwGCMH1AkHyv6iFoIIBcj4Ea9NUdGilyiueTXUiyWpLxCJ/pZnnDMu
+0aSR1oPYrOWK+7WIO5ldiphmaDN0sTQ+Ed42kDLGxCTynsiLnRy6BUM5m8PhS01h
+Dc8eWgH5Miz6QyAj54kdH3WFJa5xqAkyutiJLYTKFXlxB9TGRPbtZHuAX9t0d7vG
+CUS3+fGEAbo+UEIAsn0wn7b7CJ2biDsLw+BngacPlaQw/EvrBm+MM8XLnxxftzWQ
+Q7XWbiE4z9JmgI82FXUjoc2Xu46mSwpbjq1M8krGnLbvWRJKCH5XxWGoJaU90ccQ
+sMr5rksP8DwPfGsHJi8jetkbx5ka+iKqCS45uPrDHBO3tMfBA/sPfpTnuPKJCQ9r
+drvzxTG31OwyGR3Jk7S3va3EzKXC7+HGTad2Rdn7FYJVosK+55WL1tWbMsTPTaWX
+t8XhOwD2wkhSdShKIPUyOXEB8YNHZewSxz2gddUruK/TFF2DzKXXXG3fQrWyrYv9
+mE0DUqP9pywGvdiN4ey2jGThEhLt3ubPs8145tzMWqHXmcWTISw2d2sfBp65KfkC
+7fQBAxbj8ndT6XsvLHOXiawbPpB9zaSbd/ltQf02rKCbJ/Mpj10=
+=jH1R
 -----END PGP SIGNATURE-----
 
---huG+SbfbdD6eblZQ--
+--cfJ13FhsvNR/yOpm--
