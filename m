@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5z6z-00005T-OO
+	(envelope-from <alex.bennee@linaro.org>) id 1f5z6z-000057-AL
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5z6y-0006GW-KD
+	(envelope-from <alex.bennee@linaro.org>) id 1f5z6x-0006Fv-Md
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:25 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44350)
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:44429)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f5z6y-0006G0-BM
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:24 -0400
-Received: by mail-wr0-x244.google.com with SMTP id u46so13917303wrc.11
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 12:39:24 -0700 (PDT)
+	id 1f5z6x-0006FB-Fs
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:39:23 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id u46so13917259wrc.11
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 12:39:23 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 10 Apr 2018 20:38:59 +0100
-Message-Id: <20180410193919.28026-5-alex.bennee@linaro.org>
+Date: Tue, 10 Apr 2018 20:38:57 +0100
+Message-Id: <20180410193919.28026-3-alex.bennee@linaro.org>
 In-Reply-To: <20180410193919.28026-1-alex.bennee@linaro.org>
 References: <20180410193919.28026-1-alex.bennee@linaro.org>
-Subject: [Qemu-devel] [PATCH v1 04/24] Makefile: Rename TARGET_DIRS to
- TARGET_LIST
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 02/24] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +31,155 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org
+Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
+This allows us to specify cross compilers for our guests. This is
+useful for building test images/programs. Currently we re-run the
+compile test for each target. I couldn't think of a way to cache the
+value for a given arch without getting messier configure code.
 
-To be more accurate on its purpose and make code that looks for a certain
-target out of this variable more readable.
+The cross compiler for the guest is visible to each target as
+CROSS_CC_GUEST in config-target.mak.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- Makefile               | 20 ++++++++++----------
- configure              |  2 +-
- scripts/create_config  |  2 +-
- tests/Makefile.include |  2 +-
- 4 files changed, 13 insertions(+), 13 deletions(-)
+ configure | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 727ef118f3..2c54cd8345 100644
---- a/Makefile
-+++ b/Makefile
-@@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can fix this by running \
- endif
- endif
- 
--CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
--CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
-+CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
-+CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
- CONFIG_XEN := $(CONFIG_XEN_BACKEND)
- CONFIG_ALL=y
- -include config-all-devices.mak
-@@ -362,8 +362,8 @@ DOCS=
- endif
- 
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
--SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
--SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
-+SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
-+SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
- 
- ifeq ($(SUBDIR_DEVICES_MAK),)
- config-all-devices.mak:
-@@ -466,7 +466,7 @@ config-host.h-timestamp: config-host.mak
- qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
--SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
-+SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
- SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
- 
- $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
-@@ -510,7 +510,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
- romsubdir-%:
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
- 
--ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
-+ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
- 
- recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
- 
-@@ -763,7 +763,7 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- 	rm -f docs/qemu-block-drivers.7
--	for d in $(TARGET_DIRS); do \
-+	for d in $(TARGET_LIST); do \
- 	rm -rf $$d || exit 1 ; \
-         done
- 	rm -Rf .sdk
-@@ -864,7 +864,7 @@ endif
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
- 	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
--	for d in $(TARGET_DIRS); do \
-+	for d in $(TARGET_LIST); do \
- 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
-         done
- 
-@@ -1062,9 +1062,9 @@ endif
- 	@echo  '  ctags/TAGS      - Generate tags file for editors'
- 	@echo  '  cscope          - Generate cscope index'
- 	@echo  ''
--	@$(if $(TARGET_DIRS), \
-+	@$(if $(TARGET_LIST), \
- 		echo 'Architecture specific targets:'; \
--		$(foreach t, $(TARGET_DIRS), \
-+		$(foreach t, $(TARGET_LIST), \
- 		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
- 		echo '')
- 	@echo  'Cleaning targets:'
 diff --git a/configure b/configure
-index add87ff4d4..5a41c87cc3 100755
+index b402befe94..b5f3b3fe29 100755
 --- a/configure
 +++ b/configure
-@@ -6094,7 +6094,7 @@ qemu_version=$(head $source_path/VERSION)
- echo "VERSION=$qemu_version" >>$config_host_mak
- echo "PKGVERSION=$pkgversion" >>$config_host_mak
- echo "SRC_PATH=$source_path" >> $config_host_mak
--echo "TARGET_DIRS=$target_list" >> $config_host_mak
-+echo "TARGET_LIST=$target_list" >> $config_host_mak
- if [ "$docs" = "yes" ] ; then
-   echo "BUILD_DOCS=yes" >> $config_host_mak
+@@ -453,6 +453,13 @@ vxhs=""
+ libxml2=""
+ docker="no"
+ 
++# cross compilers defaults, can be overridden with --cross-cc-ARCH
++cross_cc_aarch64="aarch64-linux-gnu-gcc"
++cross_cc_arm="arm-linux-gnueabihf-gcc"
++cross_cc_powerpc="powerpc-linux-gnu-gcc"
++
++enabled_cross_compilers=""
++
+ supported_cpu="no"
+ supported_os="no"
+ bogus_os="no"
+@@ -483,6 +490,11 @@ for opt do
+   ;;
+   --disable-debug-info) debug_info="no"
+   ;;
++  --cross-cc-*[!a-zA-Z0-9_0]=*) error_exit "Passed bad --cross-cc-FOO option"
++  ;;
++  --cross-cc-*) cc_arch=${opt#--cross-cc-}
++                eval "cross_cc_${cc_arch}=\$optarg"
++  ;;
+   esac
+ done
+ # OS specific
+@@ -675,10 +687,12 @@ case "$cpu" in
+   i386|i486|i586|i686|i86pc|BePC)
+     cpu="i386"
+     supported_cpu="yes"
++    cross_cc_i386=gcc
+   ;;
+   x86_64|amd64)
+     cpu="x86_64"
+     supported_cpu="yes"
++    cross_cc_x86_64=gcc
+   ;;
+   armv*b|armv*l|arm)
+     cpu="arm"
+@@ -912,6 +926,8 @@ for opt do
+   ;;
+   --disable-debug-info)
+   ;;
++  --cross-cc-*)
++  ;;
+   --enable-modules)
+       modules="yes"
+   ;;
+@@ -6766,6 +6782,8 @@ case "$target" in
+     ;;
+ esac
+ 
++target_compiler=""
++
+ mkdir -p $target_dir
+ echo "# Automatically generated by configure - do not modify" > $config_target_mak
+ 
+@@ -6794,6 +6812,7 @@ case "$target_name" in
+     bflt="yes"
+     mttcg="yes"
+     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
++    target_compiler=$cross_cc_arm
+   ;;
+   aarch64|aarch64_be)
+     TARGET_ARCH=aarch64
+@@ -6801,6 +6820,7 @@ case "$target_name" in
+     bflt="yes"
+     mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
++    target_compiler=$cross_cc_aarch64
+   ;;
+   cris)
+   ;;
+@@ -6842,6 +6862,7 @@ case "$target_name" in
+   ;;
+   ppc)
+     gdb_xml_files="power-core.xml power-fpu.xml power-altivec.xml power-spe.xml"
++    target_compiler=$cross_cc_powerpc
+   ;;
+   ppcemb)
+     TARGET_BASE_ARCH=ppc
+@@ -6916,6 +6937,25 @@ if [ "$TARGET_BASE_ARCH" = "" ]; then
+   TARGET_BASE_ARCH=$TARGET_ARCH
  fi
-diff --git a/scripts/create_config b/scripts/create_config
-index d727e5e36e..58948a67a4 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -107,7 +107,7 @@ case $line in
-     target_name=${line#*=}
-     echo "#define TARGET_NAME \"$target_name\""
-     ;;
-- TARGET_DIRS=*)
-+ TARGET_LIST=*)
-     # do nothing
-     ;;
-  TARGET_*=y) # configuration
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e31a2..3d2f0458ab 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -854,7 +854,7 @@ endif
  
- # QTest rules
++# Do we have a cross compiler for this target?
++if has $target_compiler; then
++
++    cat > $TMPC << EOF
++#include <stdio.h>
++int main(void) {
++    printf("Hello World!\n");
++}
++EOF
++
++    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
++        target_compiler=""
++    else
++        enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
++    fi
++else
++    target_compiler=""
++fi
++
+ symlink "$source_path/Makefile.target" "$target_dir/Makefile"
  
--TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
-+TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
- ifeq ($(CONFIG_POSIX),y)
- QTEST_TARGETS = $(TARGETS)
- check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
+ upper() {
+@@ -6989,6 +7029,10 @@ if test "$target_bsd_user" = "yes" ; then
+   echo "CONFIG_BSD_USER=y" >> $config_target_mak
+ fi
+ 
++if test -n "$target_compiler"; then
++  echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
++fi
++
+ # generate QEMU_CFLAGS/LDFLAGS for targets
+ 
+ cflags=""
+@@ -7111,6 +7155,12 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
+ 
+ done # for target in $targets
+ 
++if test -n "$enabled_cross_compilers"; then
++    echo
++    echo "NOTE: cross-compilers enabled:"
++    printf '%s\n' $enabled_cross_compilers | sort -u
++fi
++
+ if [ "$dtc_internal" = "yes" ]; then
+   echo "config-host.h: subdir-dtc" >> $config_host_mak
+ fi
 -- 
 2.16.2
