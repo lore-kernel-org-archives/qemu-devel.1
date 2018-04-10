@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5qww-0004c6-G8
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5qyn-00061o-Ok
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5qwv-0007aR-Jl
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:51585)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5qwv-0007Zp-A1
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:29 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 10 Apr 2018 12:56:06 +0200
-Message-Id: <20180410105606.16413-3-laurent@vivier.eu>
-In-Reply-To: <20180410105606.16413-1-laurent@vivier.eu>
-References: <20180410105606.16413-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 2/2] linux-user: add microblaze/microblazeel
- magic numbers in qemu-binfmt-conf.sh
+	(envelope-from <peter.maydell@linaro.org>) id 1f5qyn-0008W5-1i
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:58:25 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:33731)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5qym-0008Vl-Sj
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:58:24 -0400
+Received: by mail-oi0-x230.google.com with SMTP id 126-v6so10717388oig.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 03:58:24 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180410055912.934-1-richard.henderson@linaro.org>
+References: <20180410055912.934-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 11:58:03 +0100
+Message-ID: <CAFEAcA9vx+Log3m+gesr=8ALuARit=8x468iQOzX44z6LmwG+Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] fpu: Fix rounding mode for
+ floatN_to_uintM_round_to_zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180409115212.875-2-laurent@vivier.eu>
----
- scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+On 10 April 2018 at 06:59, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> We incorrectly passed in the current rounding mode
+> instead of float_round_to_zero.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>
+> Found while runnning SVE RISU tests; it should be visible with the
+> right set of inputs to AdvSIMD RISU tests.
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index f39ad344fc..7ab7435fbd 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -1,10 +1,10 @@
- #!/bin/sh
--# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa
-+# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa/microblaze
- # program execution by the kernel
- 
- qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb"
-+sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb microblaze microblazeel"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -116,6 +116,14 @@ xtensaeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\
- xtensaeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- xtensaeb_family=xtensaeb
- 
-+microblaze_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xba\xab'
-+microblaze_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+microblaze_family=microblaze
-+
-+microblazeel_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xab\xba'
-+microblazeel_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+microblazeel_family=microblazeel
-+
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
--- 
-2.14.3
+
+
+Applied to target-arm.next, thanks.
+
+-- PMM
