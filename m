@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5slX-00079W-5o
+	(envelope-from <dgibson@ozlabs.org>) id 1f5slX-00079t-Hh
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5slW-0002gJ-5d
+	(envelope-from <dgibson@ozlabs.org>) id 1f5slW-0002h3-QJ
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:51 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 10 Apr 2018 22:52:33 +1000
-Message-Id: <20180410125233.31618-8-david@gibson.dropbear.id.au>
+Date: Tue, 10 Apr 2018 22:52:31 +1000
+Message-Id: <20180410125233.31618-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180410125233.31618-1-david@gibson.dropbear.id.au>
 References: <20180410125233.31618-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 7/7] roms/u-boot-sam460ex: Change to qemu git
- mirror and update
+Subject: [Qemu-devel] [PULL 5/7] tests/boot-serial: Test the sam460ex board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,37 +20,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Thomas Huth <thuth@redhat.com>
 
-Now that we have a mirror of this repo on git.qemu.org change the
-submodule to use that and update it to latest commit which fixes a
-dangling symlink and removes two big binaries that are not needed.
+We've got a U-Boot firmware for this board in our repository, and
+the firmware prints some output to the serial console, so we can
+check this board in the boot-serial tester, too.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- .gitmodules          | 2 +-
- roms/u-boot-sam460ex | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/boot-serial-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/.gitmodules b/.gitmodules
-index c613722e3c..49e9c2e3f4 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -45,4 +45,4 @@
- 	url = git://github.com/hdeller/seabios-hppa.git
- [submodule "roms/u-boot-sam460ex"]
- 	path = roms/u-boot-sam460ex
--	url = git://github.com/zbalaton/u-boot-sam460ex
-+	url = git://git.qemu.org/u-boot-sam460ex.git
-diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
-index 119aa277f7..8ee007c421 160000
---- a/roms/u-boot-sam460ex
-+++ b/roms/u-boot-sam460ex
-@@ -1 +1 @@
--Subproject commit 119aa277f74a4a2d3f7ab6c9471292308eba14e4
-+Subproject commit 8ee007c4216fd6a0d760589e8405ce4494497aa0
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index 5b24cd26c1..011525d8cf 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -79,12 +79,14 @@ static testdef_t tests[] = {
+     { "ppc", "40p", "-boot d", "Booting from device d" },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+     { "ppc", "mac99", "", "PowerPC,G4" },
++    { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+     { "ppc64", "ppce500", "", "U-Boot" },
+     { "ppc64", "prep", "-boot e", "Booting from device e" },
+     { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+     { "ppc64", "mac99", "", "PowerPC,970FX" },
+     { "ppc64", "pseries", "", "Open Firmware" },
+     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
++    { "ppc64", "sam460ex", "-device e1000", "8086  100e" },
+     { "i386", "isapc", "-cpu qemu32 -device sga", "SGABIOS" },
+     { "i386", "pc", "-device sga", "SGABIOS" },
+     { "i386", "q35", "-device sga", "SGABIOS" },
 -- 
 2.14.3
