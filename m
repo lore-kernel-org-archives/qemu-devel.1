@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5zC8-0004yZ-RZ
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:44:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5zlA-0006GI-0U
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 16:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f5zC7-0001Hv-US
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:44:44 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33859)
+	(envelope-from <bounces@canonical.com>) id 1f5zl6-0002OS-0E
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 16:20:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f5zC7-0001H6-Nu
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 15:44:43 -0400
-Received: by mail-wr0-x244.google.com with SMTP id d19so10043137wre.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 12:44:43 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 10 Apr 2018 20:39:14 +0100
-Message-Id: <20180410193919.28026-20-alex.bennee@linaro.org>
-In-Reply-To: <20180410193919.28026-1-alex.bennee@linaro.org>
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5zl5-0002O9-QZ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 16:20:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5zl4-0006hO-HH
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 20:20:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 800962E80CD
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 20:20:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 19/24] tests/tcg: move MIPS specific tests
- into subdir
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 20:07:08 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1759264 <1759264@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152215564388.18893.1601223531883570946.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152339082825.12513.17266713653673903879.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1759264] Re: fpu/softfloat: round_to_int_and_pack
+ refactor broke TriCore ftoi insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +38,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-These only need to be built for MIPS guests.
+Yeah it looks like it was missed, the round_to_uint code does it.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/tcg/README                  | 11 -----------
- tests/tcg/mips/README             |  7 +++++++
- tests/tcg/{ => mips}/hello-mips.c |  0
- 3 files changed, 7 insertions(+), 11 deletions(-)
- create mode 100644 tests/tcg/mips/README
- rename tests/tcg/{ => mips}/hello-mips.c (100%)
+Do you have a test case I can verify?
 
-diff --git a/tests/tcg/README b/tests/tcg/README
-index 625f2326e6..a5643d33e7 100644
---- a/tests/tcg/README
-+++ b/tests/tcg/README
-@@ -3,17 +3,6 @@ regression testing. Tests are either multi-arch, meaning they can be
- built for all guest architectures that support linux-user executable,
- or they are architecture specific.
- 
--
--
--MIPS
--====
--
--hello-mips
------------
--
--hello-mipsel
--------------
--
- CRIS
- ====
- The testsuite for CRIS is in tests/tcg/cris.  You can run it
-diff --git a/tests/tcg/mips/README b/tests/tcg/mips/README
-new file mode 100644
-index 0000000000..e5bbc58ec5
---- /dev/null
-+++ b/tests/tcg/mips/README
-@@ -0,0 +1,7 @@
-+MIPS
-+====
-+
-+hello-mips
-+----------
-+
-+A very simple inline assembly, write syscall based hello world
-diff --git a/tests/tcg/hello-mips.c b/tests/tcg/mips/hello-mips.c
-similarity index 100%
-rename from tests/tcg/hello-mips.c
-rename to tests/tcg/mips/hello-mips.c
--- 
-2.16.2
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1759264
+
+Title:
+  fpu/softfloat: round_to_int_and_pack refactor broke TriCore ftoi insns
+
+Status in QEMU:
+  New
+
+Bug description:
+  After the refactor from ab52f973a504f8de0c5df64631ba4caea70a7d9e the
+  bahaviour of int32_to_float32() was altered.
+
+  helper_ftoi() in target/tricore/fpu_helper.c relied on
+  int32_to_float32 to raise the invalid flag if the input was NaN to
+  properly return 0. Likewise if the input is infinity.
+
+  The obvious fix for softfloat would be to raise this flag in round_to_int=
+_and_pack(). However,
+  I'm not sure if this breaks other targets and I have no easy way to test =
+it.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1759264/+subscriptions
