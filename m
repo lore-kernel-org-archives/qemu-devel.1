@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5w1M-0000M1-Jg
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:21:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5wBD-0000tW-Pc
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5w1J-0003mV-3X
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:21:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52264)
+	(envelope-from <bounces@canonical.com>) id 1f5wBB-00015z-2y
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57856)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f5w1I-0003m8-TG
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:21:21 -0400
+	id 1f5wBA-00013i-SV
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:33 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f5w1H-0008Uw-I8
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:21:19 +0000
+	id 1f5wB8-00033m-A4
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:31:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6638F2E80CE
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:21:19 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C8E0F2E80D8
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:31:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Apr 2018 16:05:55 -0000
-From: Adam Williamson <awilliam@redhat.com>
-Reply-To: Bug 1762558 <1762558@bugs.launchpad.net>
+Date: Tue, 10 Apr 2018 16:16:35 -0000
+From: Richard Henwood <richard.henwood@arm.com>
+Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152330957721.2718.12035311068510492278.malonedeb@wampee.canonical.com>
-Message-Id: <152337635567.14973.14924058616464773059.malone@soybean.canonical.com>
+References: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
+Message-Id: <152337699533.20953.15096940596358969141.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1762558] Re: Many crashes with "memslot_get_virt:
- slot_id 170 too big"-type errors in 2.12.0 rc2
+Subject: [Qemu-devel] [Bug 1761535] Re: qemu-aarch64-static docker
+ arm64v8/openjdk coredump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,92 +39,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Nothing about SPICE changed in the affected time frame. This started
-happening between 2018-04-02 and 2018-04-07. The last time SPICE was
-changed in Rawhide was on 2018-02-09. However, qemu was bumped from rc1
-to rc2 on 2018-04-05.
+Many thanks!
 
-It's possible that https://bugzilla.redhat.com/show_bug.cgi?id=3D1564210
-is involved; the offending mesa for that bug was built on 2018-04-03, so
-it also fits the time frame. However, the bug is not happening in Fedora
-28 tests, and that same mesa change was sent to Fedora 28, so this seems
-less likely. The only related thing I've yet found that changed in
-Rawhide but not Fedora 28 during the time in which this bug started
-happening on Rawhide but not Fedora 28 is qemu.
-
-** Bug watch added: Red Hat Bugzilla #1564210
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1564210
+I've just compiled master, and docker/aarch64/openjdk image now works as
+expected on my x86 machine.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1762558
+https://bugs.launchpad.net/bugs/1761535
 
 Title:
-  Many crashes with "memslot_get_virt: slot_id 170 too big"-type errors
-  in 2.12.0 rc2
+  qemu-aarch64-static docker arm64v8/openjdk coredump
 
 Status in QEMU:
-  New
+  Fix Committed
 
 Bug description:
-  Since qemu 2.12.0 rc2 - qemu-2.12.0-0.6.rc2.fc29 - landed in Fedora
-  Rawhide, just about all of our openQA-automated tests of Rawhide
-  guests which run with qxl / SPICE graphics in the guest have died
-  partway in, always shortly after the test switches from the installer
-  (an X environment) to a console on a tty. qemu is, I think, hanging.
-  There are always some errors like this right around the time of the
-  hang:
+  I am using qemu-aarch64-static to run the arm64v8/openjdk official
+  image on my x86 machine. Using QEMU master, I immediately hit a bug
+  which hangs the container. With Ubuntu default version qemu-aarch64
+  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
+  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
 
-  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
- virt end ffffffffffffffff, generation 0, delta 0
-  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
-42dbc00000, virt end 7f42dfbfe000, generation 0, delta 7f42dbc00000
-  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
-42d7a00000, virt end 7f42dba00000, generation 0, delta 7f42d7a00000
-  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: =
+  To reproduce (and get to the core dump):
 
-  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: (process:45812): Spice-CRITI=
-CAL **: memslot.c:111:memslot_get_virt: slot_id 218 too big, addr=3Dda8e21f=
-bda8e21fb
+  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
+  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-  or occasionally like this:
+  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
+rch64-static arm64v8/openjdk /bin/bash
+  root@bf75cf45d311:/# javac
+  Usage: javac <options> <source files>
+  where possible options include:
+    -g                         Generate all debugging info
+  <...snip...>
+    @<filename>                Read options and filenames from file
 
-  [2018-04-09T20:13:58.0717 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
- virt end ffffffffffffffff, generation 0, delta 0
-  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
-f093c00000, virt end 7ff097bfe000, generation 0, delta 7ff093c00000
-  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
-f08fa00000, virt end 7ff093a00000, generation 0, delta 7ff08fa00000
-  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: =
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  ...TERMINAL HANGS...
 
-  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: (process:25622): Spice-WARNI=
-NG **: memslot.c:68:memslot_validate_virt: virtual address out of range
-  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU:     virt=3D0x0+0x18 slot_id=
-=3D0 group_id=3D1
-  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU:     slot=3D0x0-0x0 delta=3D0=
-x0
-  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU: =
+  =
 
-  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU: (process:25622): Spice-WARNI=
-NG **: display-channel.c:2426:display_channel_validate_surface: invalid sur=
-face_id 1048576
-  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
- virt end ffffffffffffffff, generation 0, delta 0
-  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
-f093c00000, virt end 7ff097bfe000, generation 0, delta 7ff093c00000
-  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
-f08fa00000, virt end 7ff093a00000, generation 0, delta 7ff08fa00000
-  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: =
+  To get the core dump, In a separate terminal:
 
-  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: (process:25622): Spice-CRITI=
-CAL **: memslot.c:122:memslot_get_virt: address generation is not valid, gr=
-oup_id 1, slot_id 0, gen 110, slot_gen 0
+  # snapshot the file system of the hung image
+  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
 
-  The same tests running on Fedora 28 guests on the same hosts are not
-  hanging, and the same tests were not hanging right before the qemu
-  package got updated, so this seems very strongly tied to the new qemu.
+  # connect with known working qemu
+  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
+tic  -i qemu_coredump /bin/bash
+
+  $$ ls -lat
+  total 10608
+  <snip>
+  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
+1.core
+  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
+  <snip>
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1762558/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
