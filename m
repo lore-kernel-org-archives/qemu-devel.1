@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5mJY-0004GD-GH
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5mLG-0005n5-Uo
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5mJU-0006Lq-LI
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50760 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5mJU-0006LU-HE
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:28 -0400
-Date: Tue, 10 Apr 2018 07:59:14 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180410055914.3ak6niwxjkpph26u@sirius.home.kraxel.org>
-References: <20180407000117.25640-1-lersek@redhat.com>
-	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
-	<6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1f5mLB-00084T-2i
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:01:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40378)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5mLA-000844-TA
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 02:01:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5mL9-0003wa-Nh
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:01:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AD9A62E8070
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:01:11 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
-Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 05:55:08 -0000
+From: Thomas Huth <1762558@bugs.launchpad.net>
+Reply-To: Bug 1762558 <1762558@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152330957721.2718.12035311068510492278.malonedeb@wampee.canonical.com>
+Message-Id: <152333970873.30312.11544902540045307331.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762558] Re: Many crashes with "memslot_get_virt:
+ slot_id 170 too big"-type errors in 2.12.0 rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org
 
-  Hi,
+These error messages ("memslot_get_virt") do not come from QEMU, but
+from spice, so please report this problem to the Spice project first
+(see https://www.spice-space.org/support.html for how to file a bug
+there).
 
-> I threw in "-kernel" because, although it also (usually?) means
-> "memory", I expected people would want it separate.
-> 
-> Regarding memory vs. pflash, I thought that these two, combined with the
-> access permissions, could cover all of RAM, ROM, and read-only and
-> read-write pflash too.
-> 
-> So, "-bios" (-> ROM) boils down to "memory", with write access denied --
-> please see the SeaBIOS example near the end.
+-- =
 
-Hmm, I'm wondering whenever it is useful to model things this way.  It's
-not like you can actually configure things for -bios seabios.rom or
--kernel uboot.elf.  Only pflash allows to actually configure things, and
-there are not that many useful combinations.  The code needs
-Read+Execute.  Allowing Write could be useful in theory, to allow the
-guest doing firmware updates.  But I think nobody actually does that, so
-in practice it is fixed.  The varstore can have different permissions,
-but it's only two useful combinations.  Either allow access
-unconditionally, or allow access in secure contect (aka smm) only.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762558
 
-cheers,
-  Gerd
+Title:
+  Many crashes with "memslot_get_virt: slot_id 170 too big"-type errors
+  in 2.12.0 rc2
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since qemu 2.12.0 rc2 - qemu-2.12.0-0.6.rc2.fc29 - landed in Fedora
+  Rawhide, just about all of our openQA-automated tests of Rawhide
+  guests which run with qxl / SPICE graphics in the guest have died
+  partway in, always shortly after the test switches from the installer
+  (an X environment) to a console on a tty. qemu is, I think, hanging.
+  There are always some errors like this right around the time of the
+  hang:
+
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
+ virt end ffffffffffffffff, generation 0, delta 0
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
+42dbc00000, virt end 7f42dfbfe000, generation 0, delta 7f42dbc00000
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
+42d7a00000, virt end 7f42dba00000, generation 0, delta 7f42d7a00000
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: (process:45812): Spice-CRITI=
+CAL **: memslot.c:111:memslot_get_virt: slot_id 218 too big, addr=3Dda8e21f=
+bda8e21fb
+
+  or occasionally like this:
+
+  [2018-04-09T20:13:58.0717 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
+ virt end ffffffffffffffff, generation 0, delta 0
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
+f093c00000, virt end 7ff097bfe000, generation 0, delta 7ff093c00000
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
+f08fa00000, virt end 7ff093a00000, generation 0, delta 7ff08fa00000
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: (process:25622): Spice-WARNI=
+NG **: memslot.c:68:memslot_validate_virt: virtual address out of range
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU:     virt=3D0x0+0x18 slot_id=
+=3D0 group_id=3D1
+  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU:     slot=3D0x0-0x0 delta=3D0=
+x0
+  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU: (process:25622): Spice-WARNI=
+NG **: display-channel.c:2426:display_channel_validate_surface: invalid sur=
+face_id 1048576
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
+ virt end ffffffffffffffff, generation 0, delta 0
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
+f093c00000, virt end 7ff097bfe000, generation 0, delta 7ff093c00000
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
+f08fa00000, virt end 7ff093a00000, generation 0, delta 7ff08fa00000
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: (process:25622): Spice-CRITI=
+CAL **: memslot.c:122:memslot_get_virt: address generation is not valid, gr=
+oup_id 1, slot_id 0, gen 110, slot_gen 0
+
+  The same tests running on Fedora 28 guests on the same hosts are not
+  hanging, and the same tests were not hanging right before the qemu
+  package got updated, so this seems very strongly tied to the new qemu.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762558/+subscriptions
