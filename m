@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f5oyR-000639-3R
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:49:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1f5p0y-0007wm-Sj
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f5oyQ-0001dk-0Z
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:49:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59282 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f5oyP-0001dC-R3
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:49:53 -0400
-Date: Tue, 10 Apr 2018 16:49:50 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180410084950.GB2785@lemon.usersys.redhat.com>
-References: <20180410054034.20479-1-peterx@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1f5p0u-0002yz-UZ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:52:32 -0400
+Date: Tue, 10 Apr 2018 09:52:00 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180410085200.GD5155@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180409154921.29906-1-wei@redhat.com>
+	<20180409155634.GO18283@redhat.com>
+	<6bb12858-3b4e-e92f-93ea-b8708c8be870@redhat.com>
+	<1523346093.16671.23.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180410054034.20479-1-peterx@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: don't warn SDL abi if disabled
+In-Reply-To: <1523346093.16671.23.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] mach-virt: Change default cpu and
+ gic-version setting to "max"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,168 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org
 
-On Tue, 04/10 13:40, Peter Xu wrote:
-> SDL has the same problem as GTK that we might get warnings on SDL ABI
-> version even if SDL is disabled.  Fix that by only probing SDL if SDL i=
-s
-> enabled.  Also this should let configure be a little bit faster since w=
-e
-> don't really need to probe SDL stuff when it's off.
->=20
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Gerd Hoffmann <kraxel@redhat.com>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Daniel P. Berrange <berrange@redhat.com>
-> CC: Fam Zheng <famz@redhat.com>
-> CC: "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  configure | 83 ++++++++++++++++++++++++++++++++++---------------------=
---------
->  1 file changed, 45 insertions(+), 38 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index 752dd9ef32..f647026b8d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2836,49 +2836,52 @@ fi
->  # Look for sdl configuration program (pkg-config or sdl-config).  Try
->  # sdl-config even without cross prefix, and favour pkg-config over sdl=
--config.
-> =20
-> -if test "$sdlabi" =3D ""; then
-> -    if $pkg_config --exists "sdl2"; then
-> -        sdlabi=3D2.0
-> -    elif $pkg_config --exists "sdl"; then
-> -        sdlabi=3D1.2
-> -    else
-> -        sdlabi=3D2.0
-> -    fi
-> -fi
-> +sdl_probe ()
-> +{
+On Tue, Apr 10, 2018 at 09:41:33AM +0200, Andrea Bolognani wrote:
+> On Mon, 2018-04-09 at 11:29 -0500, Wei Huang wrote:
+> > > > Running mach-virt machine types (i.e. "-M virt") on different systems can
+> > > > result in various misleading warnings if -cpu and/or gic-version not specified.
+> > > > For KVM, this can be solved mostly by using "host" type. But the "host" type
+> > > > doesn't work for TCG. Compared with "host", the "max" type not only supports
+> > > > auto detection under KVM mode, but also works with TCG. So this patch set
+> > > > "max" as the default types for both -cpu and gic-version.
+> > > 
+> > > Hmm, generally we aim for the config provided by a machine type to be stable
+> > > across QEMU versions.
+> > 
+> > I understand this principle. But in reality, under KVM mode, the default
+> > config most time doesn't work. If end users specify cpu type manually,
+> > it still doesn't work because the host CPU is vendor-specific design
+> > (e.g. "cortex-a57" doesn't work on QCOM's machine). So we end up with
+> > using "-cpu host" all the time. My argument for this patch is that "-cpu
+> > max" isn't worse than "-cpu host".
+> 
+> I figure the people not explicitly specifying a CPU model on the
+> command line will probably also use '-M virt' instead of versioned
+> machine types, which means they will get a different guest behavior
+> after upgrading QEMU regardless.
 
-We have had
+Libvirt uses versioned machine types and does not specify -cpu unless the
+user has added <cpu> to their XML. IOW libvirt assumes the default CPU
+model is stable because that's what QEMU has promised in the past.
 
-    function_name()
-    {
-    ...
+> Defaulting to 'max' for '-cpu' and 'gic-version' makes it convenient
+> to quickly and concisely start a guest; if you care about guest ABI
+> at all, then you are already specifying everything explicitly on the
+> command line instead of relying on defaults - or using libvirt ;)
 
-and
-
-    function_name() {
-    ...
-
-and
-
-    function_name () {
-    ...
-
-finally you invent the last in the family:
-
-    function_name ()
-    {
-
-:)
-.
-> +  sdl_too_old=3Dno
-> +  if test "$sdlabi" =3D ""; then
-> +      if $pkg_config --exists "sdl2"; then
-> +          sdlabi=3D2.0
-> +      elif $pkg_config --exists "sdl"; then
-> +          sdlabi=3D1.2
-> +      else
-> +          sdlabi=3D2.0
-> +      fi
-> +  fi
-> =20
-> -if test $sdlabi =3D "2.0"; then
-> -    sdl_config=3D$sdl2_config
-> -    sdlname=3Dsdl2
-> -    sdlconfigname=3Dsdl2_config
-> -elif test $sdlabi =3D "1.2"; then
-> -    sdlname=3Dsdl
-> -    sdlconfigname=3Dsdl_config
-> -else
-> -    error_exit "Unknown sdlabi $sdlabi, must be 1.2 or 2.0"
-> -fi
-> +  if test $sdlabi =3D "2.0"; then
-> +      sdl_config=3D$sdl2_config
-> +      sdlname=3Dsdl2
-> +      sdlconfigname=3Dsdl2_config
-> +  elif test $sdlabi =3D "1.2"; then
-> +      sdlname=3Dsdl
-> +      sdlconfigname=3Dsdl_config
-> +  else
-> +      error_exit "Unknown sdlabi $sdlabi, must be 1.2 or 2.0"
-> +  fi
-> =20
-> -if test "$(basename $sdl_config)" !=3D $sdlconfigname && ! has ${sdl_c=
-onfig}; then
-> -  sdl_config=3D$sdlconfigname
-> -fi
-> +  if test "$(basename $sdl_config)" !=3D $sdlconfigname && ! has ${sdl=
-_config}; then
-> +    sdl_config=3D$sdlconfigname
-> +  fi
-> =20
-> -if $pkg_config $sdlname --exists; then
-> -  sdlconfig=3D"$pkg_config $sdlname"
-> -  sdlversion=3D$($sdlconfig --modversion 2>/dev/null)
-> -elif has ${sdl_config}; then
-> -  sdlconfig=3D"$sdl_config"
-> -  sdlversion=3D$($sdlconfig --version)
-> -else
-> -  if test "$sdl" =3D "yes" ; then
-> -    feature_not_found "sdl" "Install SDL2-devel"
-> +  if $pkg_config $sdlname --exists; then
-> +    sdlconfig=3D"$pkg_config $sdlname"
-> +    sdlversion=3D$($sdlconfig --modversion 2>/dev/null)
-> +  elif has ${sdl_config}; then
-> +    sdlconfig=3D"$sdl_config"
-> +    sdlversion=3D$($sdlconfig --version)
-> +  else
-> +    if test "$sdl" =3D "yes" ; then
-> +      feature_not_found "sdl" "Install SDL2-devel"
-> +    fi
-> +    sdl=3Dno
-> +    # no need to do the rest
-> +    return
-> +  fi
-> +  if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" =3D sd=
-l-config; then
-> +    echo warning: using "\"$sdlconfig\"" to detect cross-compiled sdl =
->&2
->    fi
-> -  sdl=3Dno
-> -fi
-> -if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" =3D sdl-=
-config; then
-> -  echo warning: using "\"$sdlconfig\"" to detect cross-compiled sdl >&=
-2
-> -fi
-> =20
-> -sdl_too_old=3Dno
-> -if test "$sdl" !=3D "no" ; then
->    cat > $TMPC << EOF
->  #include <SDL.h>
->  #undef main /* We don't want SDL to override our main() */
-> @@ -2920,6 +2923,10 @@ EOF
->      fi
->      sdl=3Dno
->    fi # sdl compile test
-> +}
-> +
-> +if test "$sdl" !=3D "no" ; then
-> +  sdl_probe
->  fi
-> =20
->  if test "$sdl" =3D "yes" ; then
-> --=20
-> 2.14.3
->=20
-
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
