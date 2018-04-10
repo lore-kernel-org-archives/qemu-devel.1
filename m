@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f5tjQ-00058I-Ca
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:45 -0400
+	(envelope-from <tournier.elie@gmail.com>) id 1f5tjV-0005EK-51
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f5tjN-00053j-AW
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54288 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f5tjN-00053Q-4Y
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:41 -0400
-References: <20180410124913.10832-1-peterx@redhat.com>
-	<20180410124913.10832-3-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8fe4adb8-3f4a-9f2f-59a9-ea6a5468332c@redhat.com>
-Date: Tue, 10 Apr 2018 08:54:31 -0500
+	(envelope-from <tournier.elie@gmail.com>) id 1f5tjS-00057r-26
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:49 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39632)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
+	id 1f5tjR-00057M-RF
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:45 -0400
+Received: by mail-wm0-x242.google.com with SMTP id f125so23511921wme.4
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:54:45 -0700 (PDT)
+Date: Tue, 10 Apr 2018 14:49:01 +0100
+From: Elie Tournier <tournier.elie@gmail.com>
+Message-ID: <20180410134901.GA6818@Nikki.localdomain>
+References: <20180410120222.31845-1-tournier.elie@gmail.com>
+	<20180410120222.31845-2-tournier.elie@gmail.com>
+	<c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180410124913.10832-3-peterx@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cofNL1klLD9N2EaHh14JhBIaMHdej6Tvm"
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-thread: let cur_mon be per-thread
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2 for-2.12?] qapi: Parameter gl of
+ DisplayType now accept an enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +32,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>, kraxel@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cofNL1klLD9N2EaHh14JhBIaMHdej6Tvm
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <8fe4adb8-3f4a-9f2f-59a9-ea6a5468332c@redhat.com>
-Subject: Re: [PATCH 2/2] qemu-thread: let cur_mon be per-thread
-References: <20180410124913.10832-1-peterx@redhat.com>
- <20180410124913.10832-3-peterx@redhat.com>
-In-Reply-To: <20180410124913.10832-3-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 10, 2018 at 08:13:00AM -0500, Eric Blake wrote:
+> On 04/10/2018 07:02 AM, Elie Tournier wrote:
+> > Signed-off-by: Elie Tournier <elie.tournier@collabora.com>
+> > ---
+> >  qapi/ui.json | 21 ++++++++++++++++++++-
+> >  vl.c         | 10 +++++-----
+> >  2 files changed, 25 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/qapi/ui.json b/qapi/ui.json
+> > index 5d01ad4304..c8005867e5 100644
+> > --- a/qapi/ui.json
+> > +++ b/qapi/ui.json
+> > @@ -1019,6 +1019,25 @@
+> >  { 'struct'  : 'DisplayGTK',
+> >    'data'    : { '*grab-on-hover' : 'bool' } }
+> >  
+> > + ##
+> > + # @DisplayGLMode:
+> > + #
+> > + # Display OpenGL mode.
+> > + #
+> > + # 'off'   Disable OpenGL (default).
+> 
+> Wrong format; this should be:
+> 
+> # @off: Disable OpenGL (default).
 
-On 04/10/2018 07:49 AM, Peter Xu wrote:
-> cur_mon was only used in main loop so we don't really need that to be
-> per-thread variable.  Now it's possible that we have more than one
-> thread to operate on it.  Let's start to let it be per-thread variable.=
+Fix locally
+> 
+> > + # 'on'    Use OpenGL, pick context type automatically.
+> > + #         Would better be named 'auto' but is called 'on' for backward
+> > + #         compatibility with bool type.
+> 
+> See below...
+> 
+> > + # 'core'  Use OpenGL with Core (desktop) Context.
+> > + # 'es'    Use OpenGL with ES (embedded systems) Context.
+> > + #
+> > + # Since: 2.13
+> > + #
+> > + ##
+> > + { 'enum'    : 'DisplayGLMode',
+> > +   'data'    : [ 'off', 'on', 'core', 'es' ] }
+> > +
+> > +
+> >  ##
+> >  # @DisplayType:
+> >  #
+> > @@ -1048,7 +1067,7 @@
+> >    'base'    : { 'type'           : 'DisplayType',
+> >                  '*full-screen'   : 'bool',
+> >                  '*window-close'  : 'bool',
+> > -                '*gl'            : 'bool' },
+> > +                '*gl'            : 'DisplayGLMode' },
+> 
+> DisplayOptions was added in 2.12.  This is a backwards-incompatible
+> change in QMP (you CANNOT change 'bool' to 'DisplayGLMode' across
+> releases, because the on-the-wire representation differs; pre-patch it
+> would be "gl":true, post-patch it is "gl":"on").  So if it affects QMP,
+> and we want it, this patch either HAS to go in 2.12, or we have to have
+> more finesse (perhaps by using an 'alternate' type in the QAPI) so that
+> it remains backwards-compatible.
+> 
+> /me goes and looks at introspection output...
+> 
+> You may be in luck - there is no instance of 'window-close' in the
+> introspection output, which means 'DisplayType' exists only for ease of
+> command-line parsing and is not currently used by QMP, so tweaks here
+> are not affecting the command line.
+> 
+> That said, you can STILL name the enum value something smarter than 'on'
+> IF you make the change now, for 2.12, given that the QAPI type was only
+> introduced in 2.12 (you only have to worry about backwards compatibility
+> if 2.11 already parsed gl=on).
 
->=20
-> In case we'll create threads within a valid cur_mon setup, we'd better
-> let the child threads to inherit the cur_mon from parent thread too.  D=
-o
-> that for both posix and win32 threads.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/monitor/monitor.h   | 2 +-
->  include/qemu/thread-win32.h | 1 +
->  monitor.c                   | 2 +-
->  stubs/monitor.c             | 2 +-
->  tests/test-util-sockets.c   | 2 +-
->  util/qemu-thread-posix.c    | 6 ++++++
->  util/qemu-thread-win32.c    | 6 ++++++
->  7 files changed, 17 insertions(+), 4 deletions(-)
->=20
-
-> @@ -494,6 +496,9 @@ static void *qemu_thread_start(void *args)
->      void *(*start_routine)(void *) =3D qemu_thread_args->start_routine=
-;
->      void *arg =3D qemu_thread_args->arg;
-> =20
-> +    /* Inherit the cur_mon pointer from father thread */
-
-More typical as s/father/parent/
-
-> +++ b/util/qemu-thread-win32.c
-
-> @@ -339,6 +341,9 @@ static unsigned __stdcall win32_start_routine(void =
-*arg)
->      void *(*start_routine)(void *) =3D data->start_routine;
->      void *thread_arg =3D data->arg;
-> =20
-> +    /* Inherit the cur_mon pointer from father thread */
-> +    cur_mon =3D data->current_monitor;
-
-Otherwise makes sense to me.
-
-I agree with your analysis that the set of existing OOB commands (just
-'x-oob-test') has no direct use of cur_mon.  I'm a little fuzzier on
-whether the OOB changes can cause cur_mon to be modified by two threads
-in parallel (monitor_qmp_dispatch_one() is futzing around with 'cur_mon'
-around the call to qmp_dispatch(), and at least
-qmp_human_monitor_command() is also futzing around with it; is there a
-case where handling qmp_human_monitor_command() in the dispatch thread
-in parallel with more input on the main thread could break?)  Thus I'm
-not sure whether this is needed for 2.12 to avoid a regression.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---cofNL1klLD9N2EaHh14JhBIaMHdej6Tvm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrMwhcACgkQp6FrSiUn
-Q2pIQwf8CDCR60kFBYj1TF/wrrI7+uddBNAkyUICIZbByXhi8lectXBjiavEZ/TZ
-DEYjlWBLnaO1JRWHOqgzsN62gLP4msARJ87arHPevWch3yZqDajzDF7VD4l6M0DM
-t1nRJh0JhJeVVcPXsZIXf3nRcnFuvXiFTTJk2x9ibZlTZRKS+0/dAjEBWoo5xnJN
-OrRb1ltYMn/mhoxe/g6pD9tfeB8EgPvjBgPs6vMgTRxmDJnYUaLAcUWpK85bXe3S
-e/+pR9pPTwdvunzY39rBkbG5mOTpHK6BCmaSpE9FgbCpwwW8GgIgg1uL9SX31UBu
-5nSpNWFMeiGqPptsljjAQlTU9leVNQ==
-=3sGB
------END PGP SIGNATURE-----
-
---cofNL1klLD9N2EaHh14JhBIaMHdej6Tvm--
+It sounds like making the change now is the best option.
+So, is 'auto' a better choice than 'on' in the enum?
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
