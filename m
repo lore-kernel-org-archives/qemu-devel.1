@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f60an-0005Oj-3y
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 17:14:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f60c7-0006TA-SW
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 17:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f60aj-0001GT-Sj
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 17:14:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41296)
+	(envelope-from <ehabkost@redhat.com>) id 1f60c4-00025f-Ll
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 17:15:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f60aj-0001Fi-NP
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 17:14:13 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f60c4-000252-Gm
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 17:15:36 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 10 Apr 2018 18:14:09 -0300
-Message-Id: <20180410211409.25133-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] i386: Don't automatically enable
+Date: Tue, 10 Apr 2018 18:15:34 -0300
+Message-Id: <20180410211534.26079-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12] i386: Don't automatically enable
  FEAT_KVM_HINTS bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
