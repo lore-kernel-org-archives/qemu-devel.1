@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5qwu-0004bn-RI
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f5qww-0004c6-G8
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5qws-0007Z5-9k
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:55029)
+	(envelope-from <laurent@vivier.eu>) id 1f5qwv-0007aR-Jl
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:30 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:51585)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5qwr-0007Y9-Vr
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:26 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5qwv-0007Zp-A1
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:56:29 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 10 Apr 2018 12:56:04 +0200
-Message-Id: <20180410105606.16413-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 0/2] linux-user fixes for -rc3
+Date: Tue, 10 Apr 2018 12:56:06 +0200
+Message-Id: <20180410105606.16413-3-laurent@vivier.eu>
+In-Reply-To: <20180410105606.16413-1-laurent@vivier.eu>
+References: <20180410105606.16413-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 2/2] linux-user: add microblaze/microblazeel
+ magic numbers in qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +27,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-The following changes since commit 1e7e92e2ef874aa3a235d59b2be1da7a29b6fd29:
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180409115212.875-2-laurent@vivier.eu>
+---
+ scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180409' into staging (2018-04-09 18:21:23 +0100)
-
-are available in the Git repository at:
-
-  git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
-
-for you to fetch changes up to f5d29f9074c4cd62dfb7b229b9ad208639217a35:
-
-  linux-user: add microblaze/microblazeel magic numbers in qemu-binfmt-conf.sh (2018-04-10 12:18:40 +0200)
-
-----------------------------------------------------------------
-Trivial fixes for microblaze
-----------------------------------------------------------------
-
-Laurent Vivier (2):
-  linux-user: fix microblaze get_sp_from_cpustate()
-  linux-user: add microblaze/microblazeel magic numbers in
-    qemu-binfmt-conf.sh
-
- linux-user/microblaze/target_signal.h |  2 +-
- scripts/qemu-binfmt-conf.sh           | 12 ++++++++++--
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index f39ad344fc..7ab7435fbd 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -1,10 +1,10 @@
+ #!/bin/sh
+-# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa
++# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa/microblaze
+ # program execution by the kernel
+ 
+ qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
+ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+-sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb"
++sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb microblaze microblazeel"
+ 
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+@@ -116,6 +116,14 @@ xtensaeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\
+ xtensaeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ xtensaeb_family=xtensaeb
+ 
++microblaze_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xba\xab'
++microblaze_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++microblaze_family=microblaze
++
++microblazeel_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xab\xba'
++microblazeel_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++microblazeel_family=microblazeel
++
+ qemu_get_family() {
+     cpu=${HOST_ARCH:-$(uname -m)}
+     case "$cpu" in
 -- 
 2.14.3
