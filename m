@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f5wFi-0005uM-9V
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:36:15 -0400
+	(envelope-from <berto@igalia.com>) id 1f5wOe-0002Op-Uk
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:45:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1f5wFh-0003f3-Gk
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:36:14 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:37479)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1f5wFh-0003et-Bp
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:36:13 -0400
-Received: by mail-yw0-x242.google.com with SMTP id y23so4223297ywy.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:36:13 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1f5wOa-0008Cw-PA
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:45:29 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <d48c55a6-3405-3ab7-0bb9-96a2238874da@redhat.com>
+References: <cover.1523376013.git.berto@igalia.com>
+	<0f687957feb72e80c740403191a47e607c2463fe.1523376013.git.berto@igalia.com>
+	<d48c55a6-3405-3ab7-0bb9-96a2238874da@redhat.com>
+Date: Tue, 10 Apr 2018 18:45:21 +0200
+Message-ID: <w51woxfhuxq.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1523377186-32578-5-git-send-email-cota@braap.org>
-References: <1523377186-32578-1-git-send-email-cota@braap.org>
-	<1523377186-32578-5-git-send-email-cota@braap.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 10 Apr 2018 09:36:12 -0700
-Message-ID: <CAMo8BfJ1xvZRq_Ue7uC=86URrH43fJ6qW5vykhD7VRVPcTbM2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 04/10] target/xtensa: avoid integer
- overflow in next_page PC check
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] Fix error message about compressed
+ clusters with OFLAG_COPIED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Apr 10, 2018 at 9:19 AM, Emilio G. Cota <cota@braap.org> wrote:
-> If the PC is in the last page of the address space, next_page_start
-> overflows to 0. Fix it.
+On Tue 10 Apr 2018 06:18:28 PM CEST, Eric Blake wrote:
+> On 04/10/2018 11:05 AM, Alberto Garcia wrote:
+>> Compressed clusters are not supposed to have the COPIED bit set.
+>> "qemu-img check" detects that and prints an error message reporting
+>> the number of the affected host cluster. This doesn't make much sense
+>> because compressed clusters are not aligned to host clusters, so it
+>> would be better to report the offset instead. Plus, the calculation is
+>> wrong and it uses the raw L2 entry as if it was simply an offset.
+>> 
+>> This patch fixes the error message and reports the offset of the
+>> compressed cluster.
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block/qcow2-refcount.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>> 
 >
-> Cc: Max Filippov <jcmvbkbc@gmail.com>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/xtensa/translate.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+> Do we have iotests coverage of this?
 
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+I have one half-written, but I was thinking to put it in 214, so I'll
+wait until Max's patch is merged.
 
--- 
-Thanks.
--- Max
+Berto
