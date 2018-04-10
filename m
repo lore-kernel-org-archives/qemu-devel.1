@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5vhi-0006z3-9V
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5vhj-00070e-Tm
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5vhe-0001SI-8X
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40102)
+	(envelope-from <bounces@canonical.com>) id 1f5vhe-0001SP-CQ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40120)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f5vhe-0001Rh-1C
+	id 1f5vhe-0001Rw-6q
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:01:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f5vhc-0002B8-4A
+	id 1f5vhc-00028H-Sq
 	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:01:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1E0B82E8DEA
+	by loganberry.canonical.com (Postfix) with ESMTP id C00372E8DEB
 	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:01:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Apr 2018 15:49:53 -0000
+Date: Tue, 10 Apr 2018 15:50:51 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
+Reply-To: Bug 1761401 <1761401@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
-Message-Id: <152337539317.5923.5989671357903184039.malone@wampee.canonical.com>
+References: <152291524524.10021.7220810119975025094.malonedeb@soybean.canonical.com>
+Message-Id: <152337545188.13510.3508781639351092805.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1761535] Re: qemu-aarch64-static docker
- arm64v8/openjdk coredump
+Subject: [Qemu-devel] [Bug 1761401] Re: ARM/Neon: vcvt rounding error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,67 +38,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Now fixed in master, commit 7f0f4208b3a96, and will be in 2.12.0.
-
-
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+Hi Christophe -- we think that commit bd49e6027cbc207c, now in master,
+should have fixed this bug. Could you retry your testcase with a QEMU
+build including that fix?
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1761535
+https://bugs.launchpad.net/bugs/1761401
 
 Title:
-  qemu-aarch64-static docker arm64v8/openjdk coredump
+  ARM/Neon: vcvt rounding error
 
 Status in QEMU:
-  Fix Committed
+  New
 
 Bug description:
-  I am using qemu-aarch64-static to run the arm64v8/openjdk official
-  image on my x86 machine. Using QEMU master, I immediately hit a bug
-  which hangs the container. With Ubuntu default version qemu-aarch64
-  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
-  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
+  Hello,
 
-  To reproduce (and get to the core dump):
+  While using QEMU commit 47d3b60858d90ac8a0cc3a72af7f95c96781125a
+  (March 28, 2018), I've noticed failures in one of the GCC ARM/Neon
+  tests. The test passes on hardware, and with QEMU-2.11.0, so it looks
+  like a recent regression.
 
-  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
-  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  The test builds a vector of 4 float32 with "125.9" as value, then convert=
+s them to 4 uint32_t.
+  The expected result is 125, but we get 126 instead.
 
-  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
-rch64-static arm64v8/openjdk /bin/bash
-  root@bf75cf45d311:/# javac
-  Usage: javac <options> <source files>
-  where possible options include:
-    -g                         Generate all debugging info
-  <...snip...>
-    @<filename>                Read options and filenames from file
-
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  ...TERMINAL HANGS...
-
-  =
-
-  To get the core dump, In a separate terminal:
-
-  # snapshot the file system of the hung image
-  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
-
-  # connect with known working qemu
-  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
-tic  -i qemu_coredump /bin/bash
-
-  $$ ls -lat
-  total 10608
-  <snip>
-  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
-1.core
-  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
-  <snip>
+  Maybe it's just a matter of default rounding mode?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1761401/+subscriptions
