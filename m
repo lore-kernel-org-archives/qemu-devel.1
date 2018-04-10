@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f5pR7-0000Ou-5q
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:19:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5pSU-0001bo-5m
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f5pR4-00031n-2D
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:19:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57802 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f5pR3-00031e-TC
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:19:29 -0400
-References: <20180407000117.25640-1-lersek@redhat.com>
-	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
-	<6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
-	<20180410090550.GE5155@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7c9bf892-95e9-ae5d-8308-a7575265d4af@redhat.com>
-Date: Tue, 10 Apr 2018 11:19:21 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f5pSS-00040c-UR
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:20:58 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5pSS-000403-Od
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:20:56 -0400
+Received: by mail-oi0-x243.google.com with SMTP id x9-v6so10470620oig.7
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 02:20:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180410090550.GE5155@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
+In-Reply-To: <CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+	<87d0z8v78e.fsf@linaro.org>
+	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
+	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
+	<CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 10:20:35 +0100
+Message-ID: <CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
+ unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Ajay Garg <ajaygargnsit@gmail.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 10.04.2018 11:05, Daniel P. Berrang=C3=A9 wrote:
-> On Mon, Apr 09, 2018 at 06:34:41PM +0200, Laszlo Ersek wrote:
->> On 04/09/18 09:26, Thomas Huth wrote:
->>>  Hi Laszlo,
->>>
->>> On 07.04.2018 02:01, Laszlo Ersek wrote:
->>>> Add a schema that describes the properties of virtual machine firmwa=
-re.
->>>>
->>>> Each firmware executable installed on a host system should come with=
- a
->>>> JSON file that conforms to this schema, and informs the management
->>>> applications about the firmware's properties.
->>>>
->>>> In addition, a configuration directory with symlinks to the JSON fil=
-es
->>>> should exist, with the symlinks carefully named to reflect a priorit=
-y
->>>> order. Management applications can then search this directory in pri=
-ority
->>>> order for the first firmware executable that satisfies their search
->>>> criteria. The found JSON file provides the management layer with dom=
-ain
->>>> configuration bits that are required to run the firmware binary.
->>> [...]
->>>> +##
->>>> +# @FirmwareDevice:
->>>> +#
->>>> +# Defines the device types that a firmware file can be mapped into.
->>>> +#
->>>> +# @memory: The firmware file is to be mapped into memory.
->>>> +#
->>>> +# @kernel: The firmware file is to be loaded like a Linux kernel. T=
-his is
->>>> +#          similar to @memory but may imply additional processing t=
-hat is
->>>> +#          specific to the target architecture.
->>>> +#
->>>> +# @flash: The firmware file is to be mapped into a pflash chip.
->>>> +#
->>>> +# Since: 2.13
->>>> +##
->>>> +{ 'enum' : 'FirmwareDevice',
->>>> +  'data' : [ 'memory', 'kernel', 'flash' ] }
->>>
->>> This is not fully clear to me... what is this exactly good for? Is th=
-is
->>> a way to say how the firmware should be loaded, i.e. via "-bios",
->>> "-kernel" or "-pflash" parameter? If so, the term "memory" is quite
->>> misleading since files that are loaded via -bios can also end up in a=
-n
->>> emulated ROM chip.
->>
->> I threw in "-kernel" because, although it also (usually?) means
->> "memory", I expected people would want it separate.
->=20
-> What platform / scenario actually uses -kernel to load firmware.
+On 10 April 2018 at 09:16, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+> On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> What hardware (what CPU, board, etc) is this "rumprun" software
+>> expecting to run on?
+>
+> Yep, just to ensure that there are no cross-compiling issues, I am
+> building rumprun on the pseudo-real hardware itself.
+> In our case, the pseudo-real hardware are :
+>
+> a)
+> An ARM32 "virt" hardware/machine in a qemu environment
+> (https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+>
+> Once I start  this machine, all environment is arm32, and I compile
+> rumprun within this environemnt without any cross-compiling.
+>
+> b)
+> A beaglebone-green-wireless.
+> This is a arm32 machine bottoms-up, so no question of cross-compiling
+> whatsoever here :)
+>
+> In both cases, I then use qemu-system-arm (on the "virt" machine, and
+> beaglebone-green-wireless itself).
 
-I think uboot uses -kernel in certain cases, see e.g.:
+That's telling me what setups you're trying to compile in,
+which doesn't correspond necessarily to what the guest
+OS is built to run on.
 
-https://balau82.wordpress.com/2010/03/10/u-boot-for-arm-on-qemu/
+> One query : It is apparent that there is nested qemu-virtualization in
+> step a), could that be an issue?
 
-> If you
-> have loaded firmware using -kernel, how do you then load the actual
-> kernel ?
+Why are you running this in a nested setup? I don't understand
+the purpose of doing that. It would be simpler and faster to
+just run the guest on a QEMU running in your native host system.
 
-The kernel is then loaded from disk or network or another boot device.
+Assuming this is the source for the guest you're trying to run:
 
- Thomas
+https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch
+
+that suggests that the only Arm board it supports is "integrator"
+(which is an absolutely ancient devboard with very little memory,
+no PCI and no virtio support). You need to confirm what Arm hardware
+this 'rumpkernel' is actually intended to run on, and then give QEMU
+the right command line arguments to emulate that hardware. I can't
+really help any further, I'm afraid -- you need somebody who knows
+about this guest OS.
+
+thanks
+-- PMM
