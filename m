@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f5mG2-0001AR-DB
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:55 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1f5mGI-0001Kd-6m
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f5mFy-0004s5-H2
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:54 -0400
-Received: from mga05.intel.com ([192.55.52.43]:56980)
+	(envelope-from <yulei.zhang@intel.com>) id 1f5mGE-0004yc-Am
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:56:10 -0400
+Received: from mga01.intel.com ([192.55.52.88]:10729)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1f5mFy-0004pt-7K
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:50 -0400
+	id 1f5mGE-0004y2-2w
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:56:06 -0400
 From: Yulei Zhang <yulei.zhang@intel.com>
-Date: Tue, 10 Apr 2018 14:02:41 +0800
-Message-Id: <1523340161-8928-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC PATCH V4 1/4] vfio: introduce a new VFIO
- subregion for mdev device migration support
+Date: Tue, 10 Apr 2018 14:02:57 +0800
+Message-Id: <1523340177-8975-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [RFC PATCH V4 2/4] vfio: Add vm status change callback
+ to stop/restart the mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +26,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added
-to fetch and restore the status of mdev device vGPU during the
-live migration.
+VM status change handler is added to change the vfio pci device
+status during the migration, write the demanded device status
+to the DEVICE STATUS subregion to stop the device on the source side
+before fetch its status and start the deivce on the target side
+after restore its status.
 
 Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 ---
- hw/vfio/pci.c              | 25 ++++++++++++++++++++++++-
- hw/vfio/pci.h              |  2 ++
- linux-headers/linux/vfio.h |  9 ++++++---
- 3 files changed, 32 insertions(+), 4 deletions(-)
+ hw/vfio/pci.c                 | 20 ++++++++++++++++++++
+ include/hw/vfio/vfio-common.h |  1 +
+ linux-headers/linux/vfio.h    |  6 ++++++
+ roms/seabios                  |  2 +-
+ 4 files changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c977ee3..f98a9dd 100644
+index f98a9dd..13d8c73 100644
 --- a/hw/vfio/pci.c
 +++ b/hw/vfio/pci.c
-@@ -32,6 +32,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "migration/blocker.h"
+@@ -38,6 +38,7 @@
  
- #define MSIX_CAP_LENGTH 12
+ static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+ static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
++static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
  
-@@ -2821,6 +2822,25 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-         vfio_vga_quirk_setup(vdev);
-     }
+ /*
+  * Disabling BAR mmaping can be slow, but toggling it around INTx can
+@@ -2896,6 +2897,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
++    qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
  
-+    struct vfio_region_info *device_state;
-+    /* device state region setup */
-+    if (!vfio_get_dev_region_info(&vdev->vbasedev,
-+                VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
-+                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
-+        memcpy(&vdev->device_state, device_state,
-+               sizeof(struct vfio_region_info));
-+        g_free(device_state);
-+    } else {
-+        error_setg(&vdev->migration_blocker,
-+                "Migration disabled: cannot support device state region");
-+        migrate_add_blocker(vdev->migration_blocker, &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            error_free(vdev->migration_blocker);
-+            goto error;
-+        }
-+    }
-+
-     for (i = 0; i < PCI_ROM_SLOT; i++) {
-         vfio_bar_quirk_setup(vdev, i);
-     }
-@@ -2884,6 +2904,10 @@ out_teardown:
-     vfio_teardown_msi(vdev);
-     vfio_bars_exit(vdev);
- error:
-+    if (vdev->migration_blocker) {
-+        migrate_del_blocker(vdev->migration_blocker);
-+        error_free(vdev->migration_blocker);
-+    }
-     error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
+     return;
+ 
+@@ -2982,6 +2984,24 @@ post_reset:
+     vfio_pci_post_reset(vdev);
  }
  
-@@ -3009,7 +3033,6 @@ static Property vfio_pci_dev_properties[] = {
++static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
++{
++    VFIOPCIDevice *vdev = pv;
++    VFIODevice *vbasedev = &vdev->vbasedev;
++    uint8_t dev_state;
++    uint8_t sz = 1;
++
++    dev_state = running ? VFIO_DEVICE_START : VFIO_DEVICE_STOP;
++
++    if (pwrite(vdev->vbasedev.fd, &dev_state,
++               sz, vdev->device_state.offset) != sz) {
++        error_report("vfio: Failed to %s device", running ? "start" : "stop");
++        return;
++    }
++
++    vbasedev->device_state = dev_state;
++}
++
+ static void vfio_instance_init(Object *obj)
+ {
+     PCIDevice *pci_dev = PCI_DEVICE(obj);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f3a2ac9..9c14a8f 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -125,6 +125,7 @@ typedef struct VFIODevice {
+     unsigned int num_irqs;
+     unsigned int num_regions;
+     unsigned int flags;
++    bool device_state;
+ } VFIODevice;
  
- static const VMStateDescription vfio_pci_vmstate = {
-     .name = "vfio-pci",
--    .unmigratable = 1,
- };
- 
- static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 502a575..0ee1724 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -116,6 +116,8 @@ typedef struct VFIOPCIDevice {
-     VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
-     VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
-     void *igd_opregion;
-+    struct vfio_region_info device_state;
-+    Error *migration_blocker;
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-     EventNotifier req_notifier;
+ struct VFIODeviceOps {
 diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 4312e96..e3380ad 100644
+index e3380ad..8f02f2f 100644
 --- a/linux-headers/linux/vfio.h
 +++ b/linux-headers/linux/vfio.h
-@@ -297,9 +297,12 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+@@ -304,6 +304,12 @@ struct vfio_region_info_cap_type {
+ /* Mdev sub-type for device state save and restore */
+ #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
  
- /* 8086 Vendor sub-types */
--#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
--#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
--#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
++/* Offset in region to save device state */
++#define VFIO_DEVICE_STATE_OFFSET	1
 +
-+/* Mdev sub-type for device state save and restore */
-+#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
- 
++#define VFIO_DEVICE_START	0
++#define VFIO_DEVICE_STOP	1
++
  /**
   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+  *				    struct vfio_irq_info)
+diff --git a/roms/seabios b/roms/seabios
+index 63451fc..5f4c7b1 160000
+--- a/roms/seabios
++++ b/roms/seabios
+@@ -1 +1 @@
+-Subproject commit 63451fca13c75870e1703eb3e20584d91179aebc
++Subproject commit 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
 -- 
 2.7.4
