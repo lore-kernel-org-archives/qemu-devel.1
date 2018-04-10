@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f5oOA-0003xU-EZ
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:12:27 -0400
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5oSE-0006bN-HD
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f5oO9-00046L-EE
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:12:26 -0400
-Date: Tue, 10 Apr 2018 16:11:58 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180410081158.GA20090@stefanha-x1.localdomain>
-References: <20180404150146.23281-1-stefanha@redhat.com>
-	<5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f5oS8-0006bR-Og
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:16:38 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7JfCtLOvnd9MIVvH"
-Content-Disposition: inline
-In-Reply-To: <5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
+In-Reply-To: <CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+	<87d0z8v78e.fsf@linaro.org>
+	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
+	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
+From: Ajay Garg <ajaygargnsit@gmail.com>
+Date: Tue, 10 Apr 2018 13:46:28 +0530
+Message-ID: <CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
+ unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+
+Hi Peter.
+
+Thanks for the reply.
+
+On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 10 April 2018 at 05:14, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>> Thanks Alex for the reply ..
+>>
+>>>
+>>> Can you run under -s -S and gdb step the *guest* and see where it ends
+>>> up. The above error is usually indicative of the guest going off into
+>>> the weeds somewhere because the hardware isn't what it expects.
+>>>
+>>
+>> So, after your reply that it might be because of the
+>> hardware-mismatch, I kinda took a detour, and installed a arm32 "virt"
+>> machine on qemu on a x86_64 host, as per the steps at
+>> https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/
+>>
+>> All went fine, and then I compiled rumprun on this "virt" guest.
+>
+> The host system hardware doesn't matter (except that if you're
+> running suitable matching host and guest hardware you might be
+> able to use hardware acceleration with KVM, but for the moment
+> I would recommend concentrating on getting it working). What
+> matters is that the guest software you run must match the
+> hardware that you are asking QEMU to emulate. (I guess if
+> rumprun automatically configures itself based on the system
+> you're compiling it on then you're running a different binary,
+> but surely it has a setup for manually configuring it when you're
+> cross-compiling it?)
+>
+> What hardware (what CPU, board, etc) is this "rumprun" software
+> expecting to run on?
+
+Yep, just to ensure that there are no cross-compiling issues, I am
+building rumprun on the pseudo-real hardware itself.
+In our case, the pseudo-real hardware are :
+
+a)
+An ARM32 "virt" hardware/machine in a qemu environment
+(https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+
+Once I start  this machine, all environment is arm32, and I compile
+rumprun within this environemnt without any cross-compiling.
+
+b)
+A beaglebone-green-wireless.
+This is a arm32 machine bottoms-up, so no question of cross-compiling
+whatsoever here :)
+
+In both cases, I then use qemu-system-arm (on the "virt" machine, and
+beaglebone-green-wireless itself).
 
 
---7JfCtLOvnd9MIVvH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+One query : It is apparent that there is nested qemu-virtualization in
+step a), could that be an issue?
 
-On Wed, Apr 04, 2018 at 06:16:12PM +0200, Max Reitz wrote:
-> On 2018-04-04 17:01, Stefan Hajnoczi wrote:
->  =3D=3D=3D Start mirror job and exit qemu =3D=3D=3D
->=20
-> This seems to be independent of whether there is actually data on
-> TEST_IMG (the commit source), so something doesn't seem quite right with
-> the block job throttling here...?
 
-I've been playing around with this test failure.  Let's leave it broken
-(!) in QEMU 2.12 because this test has uncovered a block job ratelimit
-issue that's not a regression.  The fix shouldn't be rushed.
+>
+> (The "Trying to execute code outside RAM or ROM at 0x00100000"
+> symptoms very frequently mean "guest binary was not built
+> to run on this emulated hardware".)
+>
+> thanks
+> -- PMM
 
-block/mirror.c calculates delay_ns but then discards it:
 
-  static void coroutine_fn mirror_run(void *opaque)
-  {
-      ...
 
-      for (;;) {
-          ...delay_ns is calculated based on job speed...
-
-          ret =3D 0;
-          trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
-          if (block_job_is_cancelled(&s->common) && s->common.force) {
-              break;
-          } else if (!should_complete) {
-              delay_ns =3D (s->in_flight =3D=3D 0 && cnt =3D=3D 0 ? SLICE_T=
-IME : 0);
-	        ^--- we discard it!
-              block_job_sleep_ns(&s->common, delay_ns);
-          }
-          s->last_pause_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-      }
-
-      ...
-  }
-
-This is why the mirror-based tests are completing even though we'd
-expect them to only reach the "next" iteration due to the job speed.
-
-Increasing the 4 MB write operation in the test to >16 MB (the mirror
-buffer size) doesn't solve the problem because the next QMP command will
-race with the job's 0 ns sleep.  It would just make the test unreliable.
-
-I'll work on the following for QEMU 2.13:
-
-1. Avoid spurious block_job_enter() from block_job_drain().  This
-   eliminates the extra block job iteration that changed the output in
-   the first place.
-
-2. Honor the job speed in block/mirror.c.
-
-The end result will be that the test output will not require changes.
-
-Stefan
-
---7JfCtLOvnd9MIVvH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJazHHOAAoJEJykq7OBq3PIrkQH/iDIJCIJEaC5Zqd+ztuXVmDV
-sdtd7y1CTrPi2riZIOeB+w+20je+YJ12cc0Qz5JP6/zYaC14u3DHQfkIYRyL47Wq
-HxNdR5lbUL48wrB3pByacOTrJRavnzSowEMyP1rhm5FLCVlnNL+f4bnefrfbhTvG
-HulYvNO5dXAhxjCc+dH9yWjW2PmHx4NppK05qiM2WasEDzN7N2186fUZEVVuC0k/
-+PTLAjDIQgbU9Nv6Wz/Z4cwkf+bHMMkON7KkuwidBXJPOnGXzW921FK+djjG3pTT
-w0HvRPafDaFSJE3SBtthFEvMpRoi0J/HxmlPahJY56OaTkinChln75SdtGYvW/Q=
-=gtd9
------END PGP SIGNATURE-----
-
---7JfCtLOvnd9MIVvH--
+-- 
+Regards,
+Ajay
