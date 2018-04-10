@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f5nqG-0004Us-6d
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:37:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5nru-0005Ub-Lp
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f5nqC-0007iP-5l
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:37:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54378 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f5nqC-0007iD-0s
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:37:20 -0400
-References: <20180409091320.12504.35329.stgit@pasha-VirtualBox>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3c1eeffa-6fbb-1edf-296a-6bc7fabab26d@redhat.com>
-Date: Tue, 10 Apr 2018 09:35:41 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f5nro-000072-TF
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:39:06 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:44512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5nro-00006m-Mu
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:39:00 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id j143-v6so10214676oih.11
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 00:39:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180409091320.12504.35329.stgit@pasha-VirtualBox>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] icount: fix cpu_restore_state_from_tb for
- non-tb-exit cases
+In-Reply-To: <CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+	<87d0z8v78e.fsf@linaro.org>
+	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 08:38:39 +0100
+Message-ID: <CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
+ unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, crosthwaite.peter@gmail.com, kbastian@mail.uni-paderborn.de, green@moxielogic.com, laurent@vivier.eu, jcmvbkbc@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, edgar.iglesias@gmail.com, shorne@gmail.com, yongbok.kim@mips.com, aurelien@aurel32.net, rth@twiddle.net
+To: Ajay Garg <ajaygargnsit@gmail.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 09/04/2018 11:13, Pavel Dovgalyuk wrote:
-> @@ -29,6 +29,7 @@ void cpu_loop_exit_noexc(CPUState *cpu)
->  {
->      /* XXX: restore cpu registers saved in host registers */
->  
-> +    cpu->can_do_io = !use_icount;
->      cpu->exception_index = -1;
->      siglongjmp(cpu->jmp_env, 1);
->  }
-> @@ -65,14 +66,16 @@ void cpu_reloading_memory_map(void)
->  
->  void cpu_loop_exit(CPUState *cpu)
->  {
-> +    cpu->can_do_io = !use_icount;
->      siglongjmp(cpu->jmp_env, 1);
->  }
->  
->  void cpu_loop_exit_restore(CPUState *cpu, uintptr_t pc)
->  {
->      if (pc) {
-> -        cpu_restore_state(cpu, pc);
-> +        cpu_restore_state(cpu, pc, true);
->      }
-> +    cpu->can_do_io = !use_icount;
->      siglongjmp(cpu->jmp_env, 1);
->  }
+On 10 April 2018 at 05:14, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+> Thanks Alex for the reply ..
+>
+>>
+>> Can you run under -s -S and gdb step the *guest* and see where it ends
+>> up. The above error is usually indicative of the guest going off into
+>> the weeds somewhere because the hardware isn't what it expects.
+>>
+>
+> So, after your reply that it might be because of the
+> hardware-mismatch, I kinda took a detour, and installed a arm32 "virt"
+> machine on qemu on a x86_64 host, as per the steps at
+> https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/
+>
+> All went fine, and then I compiled rumprun on this "virt" guest.
 
-This is incorrect, "cpu->can_do_io" is 1 when not in tcg_qemu_tb_exec.
-In fact, in cpu_exec we have "cpu->can_do_io = 1;" immediately after
-siglongjmp, so I propose adding the same "cpu->can_do_io = 1;"
-assignment to cpu_exec_step_atomic.
+The host system hardware doesn't matter (except that if you're
+running suitable matching host and guest hardware you might be
+able to use hardware acceleration with KVM, but for the moment
+I would recommend concentrating on getting it working). What
+matters is that the guest software you run must match the
+hardware that you are asking QEMU to emulate. (I guess if
+rumprun automatically configures itself based on the system
+you're compiling it on then you're running a different binary,
+but surely it has a setup for manually configuring it when you're
+cross-compiling it?)
 
-In any case, please change the two siglongjmp of
-cpu_loop_exit_{noexc,restore} to cpu_loop_exit, instead of duplicating
-that cpu->can_do_io assignment.
+What hardware (what CPU, board, etc) is this "rumprun" software
+expecting to run on?
 
-Thanks,
+(The "Trying to execute code outside RAM or ROM at 0x00100000"
+symptoms very frequently mean "guest binary was not built
+to run on this emulated hardware".)
 
-Paolo
+thanks
+-- PMM
