@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f5tC0-00022b-AM
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:20:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1f5tE1-0003Ga-Np
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:22:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f5tBv-0001MV-Tu
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:20:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41400)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1f5tBv-0001Lq-LN
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:20:07 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3ADJUOt005081
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:20:05 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h8w4835bu-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:20:04 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Tue, 10 Apr 2018 09:20:03 -0400
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-4-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<b1c6873c-ca28-3835-c149-096e70a00512@linux.vnet.ibm.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Tue, 10 Apr 2018 09:19:57 -0400
-MIME-Version: 1.0
-In-Reply-To: <b1c6873c-ca28-3835-c149-096e70a00512@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <6fc787e0-d779-15bf-abe8-973f28393d2c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] s390x/cpumodel: Set up CPU model
- for AP device support
+	(envelope-from <eblake@redhat.com>) id 1f5tDz-0002Ww-9P
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:22:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43264 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f5tDz-0002Wn-3o
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:22:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BF3447705F
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 13:22:14 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 10 Apr 2018 08:22:00 -0500
+Message-Id: <20180410132200.187832-4-eblake@redhat.com>
+In-Reply-To: <20180410132200.187832-1-eblake@redhat.com>
+References: <20180410132200.187832-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 3/3] monitor: bind dispatch bh to iohandler
+ context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,175 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 04/06/2018 10:51 AM, Pierre Morel wrote:
-> On 16/03/2018 00:24, Tony Krowiak wrote:
->> A new CPU model feature and two new CPU model facilities are
->> introduced to support AP devices for a KVM guest.
->>
->> CPU model features:
->>
->> 1. The KVM_S390_VM_CPU_FEAT_AP CPU model feature indicates that
->>     AP facilities are installed. This feature will be enabled by
->>     the kernel only if the AP facilities are installed on the linux
->>     host. This feature must be turned on from userspace to access
->>     AP devices from the KVM guest. The QEMU command line to turn
->>     this feature looks something like this:
->>
->>     qemu-system-s390x ... -cpu xxx,ap=on
->>
->> CPU model facilities:
->>
->> 1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates the AP Query
->>     Configuration Information (QCI) facility is installed. This feature
->>     will be enabled by the kernel only if the QCI is installed on
->>     the host.
->>
->> 2. The S390_FEAT_AP_FACILITY_TEST feature indicates that the AP
->>     Facility Test (APFT) facility is installed. This feature will
->>     be enabled by the kernel only if the APFT facility is installed
->>     on the host.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
->> ---
->>   target/s390x/cpu_features.c     |    3 +++
->>   target/s390x/cpu_features_def.h |    3 +++
->>   target/s390x/cpu_models.c       |    2 ++
->>   target/s390x/gen-features.c     |    3 +++
->>   target/s390x/kvm.c              |    1 +
->>   5 files changed, 12 insertions(+), 0 deletions(-)
->>
->> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
->> index a5619f2..1abe987 100644
->> --- a/target/s390x/cpu_features.c
->> +++ b/target/s390x/cpu_features.c
->> @@ -36,8 +36,10 @@ static const S390FeatDef s390_features[] = {
->>       FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status 
->> facility"),
->>       FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE 
->> facility"),
->>       FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, 
->> "Configuration-topology facility"),
->> +    FEAT_INIT("qci", S390_FEAT_TYPE_STFL, 12, "Query AP 
->> Configuration facility"),
->>       FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range 
->> facility"),
->>       FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing 
->> key-setting facility"),
->> +    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "Adjunct Processor 
->> Facilities Test facility"),
->>       FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, 
->> "Extended-translation facility 2"),
->>       FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, 
->> "Message-security-assist facility (excluding subfunctions)"),
->>       FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement 
->> facility"),
->> @@ -125,6 +127,7 @@ static const S390FeatDef s390_features[] = {
->>
->>       FEAT_INIT("dateh2", S390_FEAT_TYPE_MISC, 0, "DAT-enhancement 
->> facility 2"),
->>       FEAT_INIT("cmm", S390_FEAT_TYPE_MISC, 0, 
->> "Collaborative-memory-management facility"),
->> +    FEAT_INIT("ap", S390_FEAT_TYPE_MISC, 0, "AP facilities installed"),
->>
->>       FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and 
->> load (32 bit in general registers)"),
->>       FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and 
->> load (64 bit in parameter list)"),
->> diff --git a/target/s390x/cpu_features_def.h 
->> b/target/s390x/cpu_features_def.h
->> index 7c5915c..8998b65 100644
->> --- a/target/s390x/cpu_features_def.h
->> +++ b/target/s390x/cpu_features_def.h
->> @@ -27,8 +27,10 @@ typedef enum {
->>       S390_FEAT_SENSE_RUNNING_STATUS,
->>       S390_FEAT_CONDITIONAL_SSKE,
->>       S390_FEAT_CONFIGURATION_TOPOLOGY,
->> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
->>       S390_FEAT_IPTE_RANGE,
->>       S390_FEAT_NONQ_KEY_SETTING,
->> +    S390_FEAT_AP_FACILITIES_TEST,
->>       S390_FEAT_EXTENDED_TRANSLATION_2,
->>       S390_FEAT_MSA,
->>       S390_FEAT_LONG_DISPLACEMENT,
->> @@ -118,6 +120,7 @@ typedef enum {
->>       /* Misc */
->>       S390_FEAT_DAT_ENH_2,
->>       S390_FEAT_CMM,
->> +    S390_FEAT_AP,
->>
->>       /* PLO */
->>       S390_FEAT_PLO_CL,
->> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->> index cf82589..7e2af09 100644
->> --- a/target/s390x/cpu_models.c
->> +++ b/target/s390x/cpu_models.c
->> @@ -769,6 +769,8 @@ static void check_consistency(const S390CPUModel 
->> *model)
->>           { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
->>           { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
->>           { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
->> +        { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
->> +        { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
->>       };
->>       int i;
->>
->> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->> index 0cdbc15..0d5b0f7 100644
->> --- a/target/s390x/gen-features.c
->> +++ b/target/s390x/gen-features.c
->> @@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
->>       S390_FEAT_ADAPTER_INT_SUPPRESSION,
->>       S390_FEAT_EDAT_2,
->>       S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
->> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
->
-> Placing QCI feature in the full feature for z13 has for effect that:
->
-> 1)  it must be on the qemu command line.
-> Do we really want this?
-> QCI is always available when AP is available in the real hardware
-> before z13.
+From: Peter Xu <peterx@redhat.com>
 
-Are you suggesting we always set STFLE.12 for the guest whenever
-AP is available and get rid of this feature? This feature maps
-to what the architecture requires, i.e., that STFLE.12 indicates
-whether QCI is available. I think we should keep it. This was
-discussed and decided upon during v1 review.
+Eric Auger reported the problem days ago that OOB broke ARM when running
+with libvirt:
 
->
->
-> 2) AP exist since z10 and QCI since EC12 AFAIK
+http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
 
-This seems to conflict with what you stated above concerning QCI
-availability.
+The problem was that the monitor dispatcher bottom half was bound to
+qemu_aio_context now, which could be polled unexpectedly in block code.
+We should keep the dispatchers run in iohandler_ctx just like what we
+did before the Out-Of-Band series (chardev uses qio, and qio binds
+everything with iohandler_ctx).
 
-> Do we enable both only beginning with z13?
+If without this change, QMP dispatcher might be run even before reaching
+main loop in block IO path, for example, in a stack like (the ARM case,
+"cont" command handler run even during machine init phase):
 
-If I am not mistaken, GEN12_GA1 is EC12 .... or is that not true?
-I queried the team architects and there was unanimous agreement
-that AP virtualization should start with EC12 regardless of when
-it was available in the real hardware.
+        #0  qmp_cont ()
+        #1  0x00000000006bd210 in qmp_marshal_cont ()
+        #2  0x0000000000ac05c4 in do_qmp_dispatch ()
+        #3  0x0000000000ac07a0 in qmp_dispatch ()
+        #4  0x0000000000472d60 in monitor_qmp_dispatch_one ()
+        #5  0x000000000047302c in monitor_qmp_bh_dispatcher ()
+        #6  0x0000000000acf374 in aio_bh_call ()
+        #7  0x0000000000acf428 in aio_bh_poll ()
+        #8  0x0000000000ad5110 in aio_poll ()
+        #9  0x0000000000a08ab8 in blk_prw ()
+        #10 0x0000000000a091c4 in blk_pread ()
+        #11 0x0000000000734f94 in pflash_cfi01_realize ()
+        #12 0x000000000075a3a4 in device_set_realized ()
+        #13 0x00000000009a26cc in property_set_bool ()
+        #14 0x00000000009a0a40 in object_property_set ()
+        #15 0x00000000009a3a08 in object_property_set_qobject ()
+        #16 0x00000000009a0c8c in object_property_set_bool ()
+        #17 0x0000000000758f94 in qdev_init_nofail ()
+        #18 0x000000000058e190 in create_one_flash ()
+        #19 0x000000000058e2f4 in create_flash ()
+        #20 0x00000000005902f0 in machvirt_init ()
+        #21 0x00000000007635cc in machine_run_board_init ()
+        #22 0x00000000006b135c in main ()
 
->
->> +    S390_FEAT_AP_FACILITIES_TEST,
->> +    S390_FEAT_AP,
->>   };
->>
->>   static uint16_t full_GEN12_GA2[] = {
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index fbc887e..33e5ec3 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -2178,6 +2178,7 @@ static int kvm_to_feat[][2] = {
->>       { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
->>       { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
->>       { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
->> +    { KVM_S390_VM_CPU_FEAT_AP, S390_FEAT_AP},
->>   };
->>
->>   static int query_cpu_feat(S390FeatBitmap features)
->
->
+Actually the problem is more severe than that.  After we switched to the
+qemu AIO handler it means the monitor dispatcher code can even be called
+with nested aio_poll(), then it can be an explicit aio_poll() inside
+another main loop aio_poll() which could be racy too; breaking code
+like TPM and 9p that use nested event loops.
+
+Switch to use the iohandler_ctx for monitor dispatchers.
+
+My sincere thanks to Eric Auger who offered great help during both
+debugging and verifying the problem.  The ARM test was carried out by
+applying this patch upon QEMU 2.12.0-rc0 and problem is gone after the
+patch.
+
+A quick test of mine shows that after this patch applied we can pass all
+raw iotests even with OOB on by default.
+
+CC: Eric Blake <eblake@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Fam Zheng <famz@redhat.com>
+Reported-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180410044942.17059-1-peterx@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/monitor.c b/monitor.c
+index 51f4cf480f8..39f8ee17ba7 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4467,7 +4467,7 @@ static void monitor_iothread_init(void)
+      * have assumption to be run on main loop thread.  It would be
+      * nice that one day we can remove this assumption in the future.
+      */
+-    mon_global.qmp_dispatcher_bh = aio_bh_new(qemu_get_aio_context(),
++    mon_global.qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
+                                               monitor_qmp_bh_dispatcher,
+                                               NULL);
+
+-- 
+2.14.3
