@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDX-0007yL-CF
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDV-0007w9-2W
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDR-0000jg-Jc
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:43 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40762)
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDT-0000lI-UL
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:41 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40760)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f5sDR-0000iH-CD
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:37 -0400
+	id 1f5sDT-0000er-Mh
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:39 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDL-0007cA-N7
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 13:17:31 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDH-0007Zr-TM
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 13:17:27 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 13:17:19 +0100
-Message-Id: <20180410121724.8549-8-peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 13:17:14 +0100
+Message-Id: <20180410121724.8549-3-peter.maydell@linaro.org>
 In-Reply-To: <20180410121724.8549-1-peter.maydell@linaro.org>
 References: <20180410121724.8549-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/12] hw/arm/fsl-imx: Fix introspection problem
- with fsl-imx6 and fsl-imx7
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 02/12] hw/arm/integratorcp: Don't do things that
+ could be fatal in the instance_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,106 +35,79 @@ To: qemu-devel@nongnu.org
 
 From: Thomas Huth <thuth@redhat.com>
 
-QEMU currently exits unexpectedly when trying to introspect the fsl-imx6
-and fsl-imx7 devices on systems with many SMP CPUs:
+An instance_init function must not fail - and might be called multiple times,
+e.g. during device introspection with the 'device-list-properties' QMP
+command. Since the integratorcm device ignores this rule, QEMU currently
+aborts in this case (though it really should not):
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'fsl,imx6'}}" \
-       | arm-softmmu/qemu-system-arm -M virt,accel=qtest -qmp stdio -smp 8
+echo "{'execute':'qmp_capabilities'}"\
+     "{'execute':'device-list-properties',"\
+     "'arguments':{'typename':'integrator_core'}}" \
+     | arm-softmmu/qemu-system-arm -M integratorcp,accel=qtest -qmp stdio
 {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
  "package": "build-all"}, "capabilities": []}}
 {"return": {}}
-fsl,imx6: Only 4 CPUs are supported (8 requested)
+RAMBlock "integrator.flash" already registered, abort!
+Aborted (core dumped)
 
-And:
+Move the problematic code to the realize() function instead to fix this
+problem.
 
-$ echo "{'execute':'qmp_capabilities'}"\
-       "{'execute':'device-list-properties',"\
-       " 'arguments':{'typename':'fsl,imx7'}}" \
-       | arm-softmmu/qemu-system-arm -M raspi2,accel=qtest -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-fsl,imx7: Only 2 CPUs are supported (4 requested)
-
-This happens because these devices are doing an exit() from their
-instance_init function - which should never be done since instance_init
-can be called at any time for device introspection! Fix it by moving
-the deadly check into the realize() function instead.
-
+Reviewed-by: Philippe Mathieu-DaudÃ© <f4bug@amsat.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1522908551-14885-1-git-send-email-thuth@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1522906473-11252-1-git-send-email-thuth@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/fsl-imx6.c | 14 +++++++-------
- hw/arm/fsl-imx7.c | 13 +++++++------
- 2 files changed, 14 insertions(+), 13 deletions(-)
+ hw/arm/integratorcp.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index b6ac72de27..9dfbc9a8c4 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -37,13 +37,7 @@ static void fsl_imx6_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
+diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+index e8303b83be..58b40efc19 100644
+--- a/hw/arm/integratorcp.c
++++ b/hw/arm/integratorcp.c
+@@ -266,7 +266,6 @@ static const MemoryRegionOps integratorcm_ops = {
+ static void integratorcm_init(Object *obj)
+ {
+     IntegratorCMState *s = INTEGRATOR_CM(obj);
+-    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
  
--    if (smp_cpus > FSL_IMX6_NUM_CPUS) {
--        error_report("%s: Only %d CPUs are supported (%d requested)",
--                     TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
--        exit(1);
--    }
+     s->cm_osc = 0x01000048;
+     /* ??? What should the high bits of this value be?  */
+@@ -276,20 +275,28 @@ static void integratorcm_init(Object *obj)
+     s->cm_init = 0x00000112;
+     s->cm_refcnt_offset = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), 24,
+                                    1000);
+-    memory_region_init_ram(&s->flash, obj, "integrator.flash", 0x100000,
+-                           &error_fatal);
+ 
+-    memory_region_init_io(&s->iomem, obj, &integratorcm_ops, s,
+-                          "integratorcm", 0x00800000);
+-    sysbus_init_mmio(dev, &s->iomem);
 -
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX6_NUM_CPUS); i++) {
-         object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
-                           "cortex-a9-" TYPE_ARM_CPU);
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-@@ -119,6 +113,12 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-     uint16_t i;
-     Error *err = NULL;
+-    integratorcm_do_remap(s);
+     /* ??? Save/restore.  */
+ }
  
-+    if (smp_cpus > FSL_IMX6_NUM_CPUS) {
-+        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-+                   TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
+ static void integratorcm_realize(DeviceState *d, Error **errp)
+ {
+     IntegratorCMState *s = INTEGRATOR_CM(d);
++    SysBusDevice *dev = SYS_BUS_DEVICE(d);
++    Error *local_err = NULL;
++
++    memory_region_init_ram(&s->flash, OBJECT(d), "integrator.flash", 0x100000,
++                           &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
 +        return;
 +    }
 +
-     for (i = 0; i < smp_cpus; i++) {
- 
-         /* On uniprocessor, the CBAR is set to 0 */
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 26ef36c79a..390b4310e6 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -35,13 +35,8 @@ static void fsl_imx7_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
- 
--    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
--        error_report("%s: Only %d CPUs are supported (%d requested)",
--                     TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
--        exit(1);
--    }
- 
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
-         object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
-                           ARM_CPU_TYPE_NAME("cortex-a7"));
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-@@ -197,6 +192,12 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-     qemu_irq irq;
-     char name[NAME_SIZE];
- 
-+    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
-+        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
-+                   TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
-+        return;
-+    }
++    memory_region_init_io(&s->iomem, OBJECT(d), &integratorcm_ops, s,
++                          "integratorcm", 0x00800000);
++    sysbus_init_mmio(dev, &s->iomem);
 +
-     for (i = 0; i < smp_cpus; i++) {
-         o = OBJECT(&s->cpu[i]);
++    integratorcm_do_remap(s);
  
+     if (s->memsz >= 256) {
+         integrator_spd[31] = 64;
 -- 
 2.16.2
