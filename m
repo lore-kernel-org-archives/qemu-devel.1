@@ -1,40 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f5uBd-0007Ul-HZ
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:23:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5uIT-0003kb-FC
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f5uBZ-0007ju-Ij
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:23:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37098
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1f5uBZ-0007jT-EF
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:23:49 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3AEH7DL078705
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 10:23:48 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2h8vxnxgfc-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 10:23:47 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 10 Apr 2018 10:23:46 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <bounces@canonical.com>) id 1f5uIP-0003Dd-G4
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:30:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5uIP-0003CL-A5
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:30:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5uIN-0002Pe-3g
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 14:30:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 00AF62E80D2
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 14:30:51 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <CAFEAcA-_CW1w+XXAxWo93t8L+5zAcBRM6v7wF9xw1_EBd5FibA@mail.gmail.com>
-References: <20180410005724.10059-1-mdroth@linux.vnet.ibm.com>
-	<CAFEAcA-_CW1w+XXAxWo93t8L+5zAcBRM6v7wF9xw1_EBd5FibA@mail.gmail.com>
-Date: Tue, 10 Apr 2018 09:23:31 -0500
-Message-Id: <152337021185.15508.13282518954009351050@sif>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] make-release: add skiboot
- .version file
+Date: Tue, 10 Apr 2018 14:22:20 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+Reply-To: Bug 1762707 <1762707@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152335683378.30174.9724305388945769166.malonedeb@gac.canonical.com>
+Message-Id: <152337014060.3132.12339064203280458513.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762707] Re: VFIO device gets DMA failures when
+ virtio-balloon leak from highmem to lowmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,53 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Quoting Peter Maydell (2018-04-10 02:31:04)
-> On 10 April 2018 at 01:57, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> > This is needed to build skiboot from tarball-distributed sources
-> > since the git data the make_release.sh script relies on to generate
-> > it is not available.
-> >
-> > Cc: qemu-stable@nongnu.org
-> > Reported-by: Michael Tokarev <mjt@tls.msk.ru>
-> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > ---
-> >  scripts/make-release | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/scripts/make-release b/scripts/make-release
-> > index 04fa9defdc..c14f75b12c 100755
-> > --- a/scripts/make-release
-> > +++ b/scripts/make-release
-> > @@ -19,6 +19,7 @@ pushd ${destination}
-> >  git checkout "v${version}"
-> >  git submodule update --init
-> >  (cd roms/seabios && git describe --tags --long --dirty > .version)
-> > +(cd roms/skiboot && ./make_version.sh > .version)
-> >  # FIXME: The following line is a workaround for avoiding filename coll=
-isions
-> >  # when unpacking u-boot sources on case-insensitive filesystems. Once =
-we
-> >  # update to something with u-boot commit 610eec7f0 we can drop this li=
-ne.
-> =
+Ballooning is currently incompatible with device assignment.  When the
+balloon is inflated (memory removed from the VM), the pages are zapped
+from the process without actually removing them from the vfio DMA
+mapping.  The pages are still pinned from the previous mapping, making
+the balloon inflation ineffective (pages are not available for re-use).
+When the balloon is deflated, new (different) pages are faulted in for
+the previously zapped pages, but these are again not DMA mapped for the
+IOMMU, so now the physical memory backing a given address in the VM are
+different for processor and assigned device access and DMA will fail.
+In order to support this, QEMU would need to do more than simply zap
+pages from the process address space, they'd need to be unmapped from
+the IOMMU, but we can only do that using the original mapping size.
+Effectively, memory hotplug is a better solution when device assignment
+is involved.
 
-> Seeing this comment in the context part of this patch reminds me:
-> have we updated to a u-boot that lets us drop the workaround yet?
+-- =
 
-Not yet, we need:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762707
 
-  https://github.com/u-boot/u-boot/commit/610eec7f0
+Title:
+  VFIO device gets DMA failures when virtio-balloon leak from highmem to
+  lowmem
 
-which was committed Oct 2017, but QEMU master is still using the
-v2017.07 July release, via:
+Status in QEMU:
+  New
 
-  https://github.com/qemu/qemu/commit/73663d71
+Bug description:
+  Is there any known conflict between VFIO passthrough device and
+  virtio-balloon?
 
-> =
+  The VM has:
+  1. 4GB system memory
+  2. one VFIO passthrough device which supports high address memory DMA and=
+ uses GFP_HIGHUSER pages.
+  3. Memory balloon device with 4GB target.
 
-> thanks
-> -- PMM
->=20
+  When setting the memory balloon target to 1GB and 4GB in loop during
+  runtime (I used the command "virsh qemu-monitor-command debian --hmp
+  --cmd balloon 1024"), the VFIO device DMA randomly gets failure.
+
+  More clues:
+  1. configure 2GB system memory (no highmem) VM, no issue with similar ope=
+rations
+  2. setting the memory balloon to higher like 8GB, no issue with similar o=
+perations
+
+  I'm also trying to narrow down this issue. It's appreciated for that
+  you guys may share some thoughts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762707/+subscriptions
