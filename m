@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5pSU-0001bo-5m
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:21:00 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f5pTJ-0002JA-Bk
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5pSS-00040c-UR
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:20:58 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f5pSS-000403-Od
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:20:56 -0400
-Received: by mail-oi0-x243.google.com with SMTP id x9-v6so10470620oig.7
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 02:20:56 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1f5pTG-0004P9-6H
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:21:49 -0400
+Date: Tue, 10 Apr 2018 11:21:34 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180410112134.2082edbf.cohuck@redhat.com>
+In-Reply-To: <152326891065.266543.9487977590811413472.stgit@bahia.lan>
+References: <152326891065.266543.9487977590811413472.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
-References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
-	<87efjov999.fsf@linaro.org>
-	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
-	<87d0z8v78e.fsf@linaro.org>
-	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
-	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
-	<CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 10:20:35 +0100
-Message-ID: <CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
- unikernel for ARM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.13] vfio-ccw: introduce
+ vfio_ccw_get_device()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ajay Garg <ajaygargnsit@gmail.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-On 10 April 2018 at 09:16, Ajay Garg <ajaygargnsit@gmail.com> wrote:
-> On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> What hardware (what CPU, board, etc) is this "rumprun" software
->> expecting to run on?
->
-> Yep, just to ensure that there are no cross-compiling issues, I am
-> building rumprun on the pseudo-real hardware itself.
-> In our case, the pseudo-real hardware are :
->
-> a)
-> An ARM32 "virt" hardware/machine in a qemu environment
-> (https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
->
-> Once I start  this machine, all environment is arm32, and I compile
-> rumprun within this environemnt without any cross-compiling.
->
-> b)
-> A beaglebone-green-wireless.
-> This is a arm32 machine bottoms-up, so no question of cross-compiling
-> whatsoever here :)
->
-> In both cases, I then use qemu-system-arm (on the "virt" machine, and
-> beaglebone-green-wireless itself).
+On Mon, 09 Apr 2018 12:15:10 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-That's telling me what setups you're trying to compile in,
-which doesn't correspond necessarily to what the guest
-OS is built to run on.
+> A recent patch fixed leaks of the dynamically allocated vcdev->vdev.name
+> field in vfio_ccw_realize(), but we now have three freeing sites for it.
+> This is unfortunate and seems to indicate something is wrong with its
+> life cycle.
+> 
+> The root issue is that vcdev->vdev.name is set before vfio_get_device()
+> is called, which theoretically prevents to call vfio_put_device() to
+> do the freeing. Well actually, we could call it anyway  because
+> vfio_put_base_device() is a nop if the device isn't attached, but this
+> would be confusing.
+> 
+> This patch hence moves all the logic of attaching the device, including
+> the "already attached" check, to a separate vfio_ccw_get_device() function,
+> counterpart of vfio_put_device(). While here, vfio_put_device() is renamed
+> to vfio_ccw_put_device() for consistency.
+> 
+> Based-on: <152311222681.203086.8874800175539040298.stgit@bahia>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v3: - make vfio_ccw_get_device() void and check err in caller
+> ---
+>  hw/vfio/ccw.c |   56 ++++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 36 insertions(+), 20 deletions(-)
 
-> One query : It is apparent that there is nested qemu-virtualization in
-> step a), could that be an issue?
-
-Why are you running this in a nested setup? I don't understand
-the purpose of doing that. It would be simpler and faster to
-just run the guest on a QEMU running in your native host system.
-
-Assuming this is the source for the guest you're trying to run:
-
-https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch
-
-that suggests that the only Arm board it supports is "integrator"
-(which is an absolutely ancient devboard with very little memory,
-no PCI and no virtio support). You need to confirm what Arm hardware
-this 'rumpkernel' is actually intended to run on, and then give QEMU
-the right command line arguments to emulate that hardware. I can't
-really help any further, I'm afraid -- you need somebody who knows
-about this guest OS.
-
-thanks
--- PMM
+Thanks, applied.
