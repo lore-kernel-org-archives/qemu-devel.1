@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f5k8q-0003ZH-37
+	(envelope-from <jasowang@redhat.com>) id 1f5k8q-0003ZG-32
 	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f5k8o-0005tE-B6
+	(envelope-from <jasowang@redhat.com>) id 1f5k8m-0005sQ-IW
 	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45142 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60724 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f5k8o-0005sy-37
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:18 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f5k8m-0005rp-96
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 23:40:16 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 10 Apr 2018 11:39:58 +0800
-Message-Id: <1523331602-18781-3-git-send-email-jasowang@redhat.com>
+Date: Tue, 10 Apr 2018 11:39:57 +0800
+Message-Id: <1523331602-18781-2-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1523331602-18781-1-git-send-email-jasowang@redhat.com>
 References: <1523331602-18781-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 2/6] e1000: Dupe offload data on reading old
- stream
+Subject: [Qemu-devel] [PULL 1/6] e1000: Convert v3 fields to subsection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +28,80 @@ Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Old QEMUs only had one set of offload data;  when we only receive
-one lot, dupe the received data - that should give us about the
-same bug level as the old version.
+A bunch of new TSO fields were introduced by d62644b4 and this bumped
+the VMState version; however it's easier for those trying to keep
+backwards migration compatibility if these fields are added in a
+subsection instead.
+
+Move the new fields to a subsection.
+
+Since this was added after 2.11, this change will only affect
+compatbility with 2.12-rc0.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/e1000.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ hw/net/e1000.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 24e9a4a..d399ce3 100644
+index c7f1695..24e9a4a 100644
 --- a/hw/net/e1000.c
 +++ b/hw/net/e1000.c
-@@ -127,6 +127,7 @@ typedef struct E1000State_st {
- #define E1000_FLAG_MIT (1 << E1000_FLAG_MIT_BIT)
- #define E1000_FLAG_MAC (1 << E1000_FLAG_MAC_BIT)
-     uint32_t compat_flags;
-+    bool received_tx_tso;
- } E1000State;
- 
- #define chkflag(x)     (s->compat_flags & E1000_FLAG_##x)
-@@ -1390,6 +1391,20 @@ static int e1000_post_load(void *opaque, int version_id)
-                   qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 500);
+@@ -1433,9 +1433,29 @@ static const VMStateDescription vmstate_e1000_full_mac_state = {
      }
+ };
  
-+    if (!s->received_tx_tso) {
-+        /* We received only one set of offload data (tx.props)
-+         * and haven't got tx.tso_props.  The best we can do
-+         * is dupe the data.
-+         */
-+        s->tx.tso_props = s->tx.props;
++static const VMStateDescription vmstate_e1000_tx_tso_state = {
++    .name = "e1000/tx_tso_state",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.ipcso, E1000State),
++        VMSTATE_UINT16(tx.tso_props.ipcse, E1000State),
++        VMSTATE_UINT8(tx.tso_props.tucss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.tucso, E1000State),
++        VMSTATE_UINT16(tx.tso_props.tucse, E1000State),
++        VMSTATE_UINT32(tx.tso_props.paylen, E1000State),
++        VMSTATE_UINT8(tx.tso_props.hdr_len, E1000State),
++        VMSTATE_UINT16(tx.tso_props.mss, E1000State),
++        VMSTATE_INT8(tx.tso_props.ip, E1000State),
++        VMSTATE_INT8(tx.tso_props.tcp, E1000State),
++        VMSTATE_END_OF_LIST()
 +    }
-+    return 0;
-+}
++};
 +
-+static int e1000_tx_tso_post_load(void *opaque, int version_id)
-+{
-+    E1000State *s = opaque;
-+    s->received_tx_tso = true;
-     return 0;
- }
- 
-@@ -1437,6 +1452,7 @@ static const VMStateDescription vmstate_e1000_tx_tso_state = {
-     .name = "e1000/tx_tso_state",
-     .version_id = 1,
+ static const VMStateDescription vmstate_e1000 = {
+     .name = "e1000",
+-    .version_id = 3,
++    .version_id = 2,
      .minimum_version_id = 1,
-+    .post_load = e1000_tx_tso_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
-         VMSTATE_UINT8(tx.tso_props.ipcso, E1000State),
+     .pre_save = e1000_pre_save,
+     .post_load = e1000_post_load,
+@@ -1508,22 +1528,12 @@ static const VMStateDescription vmstate_e1000 = {
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, RA, 32),
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, MTA, 128),
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, VFTA, 128),
+-        VMSTATE_UINT8_V(tx.tso_props.ipcss, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.ipcso, E1000State, 3),
+-        VMSTATE_UINT16_V(tx.tso_props.ipcse, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.tucss, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.tucso, E1000State, 3),
+-        VMSTATE_UINT16_V(tx.tso_props.tucse, E1000State, 3),
+-        VMSTATE_UINT32_V(tx.tso_props.paylen, E1000State, 3),
+-        VMSTATE_UINT8_V(tx.tso_props.hdr_len, E1000State, 3),
+-        VMSTATE_UINT16_V(tx.tso_props.mss, E1000State, 3),
+-        VMSTATE_INT8_V(tx.tso_props.ip, E1000State, 3),
+-        VMSTATE_INT8_V(tx.tso_props.tcp, E1000State, 3),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_e1000_mit_state,
+         &vmstate_e1000_full_mac_state,
++        &vmstate_e1000_tx_tso_state,
+         NULL
+     }
+ };
 -- 
 2.7.4
