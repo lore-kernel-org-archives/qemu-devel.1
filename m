@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f62V1-0003Bw-H9
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:28 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1f62V1-0003Bz-IV
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f62Uy-0005gH-Vo
+	(envelope-from <Babu.Moger@amd.com>) id 1f62Uy-0005fu-Kh
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:27 -0400
 Received: from mail-bn3nam01on0065.outbound.protection.outlook.com
 	([104.47.33.65]:27472
 	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f62Uy-0005et-OJ
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f62Uy-0005et-Ck
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:24 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Tue, 10 Apr 2018 19:16:02 -0400
-Message-Id: <1523402169-113351-3-git-send-email-babu.moger@amd.com>
-In-Reply-To: <1523402169-113351-1-git-send-email-babu.moger@amd.com>
-References: <1523402169-113351-1-git-send-email-babu.moger@amd.com>
+Date: Tue, 10 Apr 2018 19:16:00 -0400
+Message-ID: <1523402169-113351-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 2/9] i386: Add cache information in
- X86CPUDefinition
+Content-Type: text/plain; charset=yes
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 0/9] i386: Enable TOPOEXT to support
+ hyperthreading on AMD CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +30,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com, babu.moger@amd.com
 
-Add cache information in X86CPUDefinition and CPUX86State.
+This series enables the TOPOEXT feature for AMD CPUs. This is required to
+support hyperthreading on kvm guests.
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Tested-by: Geoffrey McRae <geoff@hostfission.com>
----
- target/i386/cpu.c | 4 ++++
- target/i386/cpu.h | 8 ++++++++
- 2 files changed, 12 insertions(+)
+This addresses the issues reported in these bugs:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
+https://bugs.launchpad.net/qemu/+bug/1703506=20
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 2d3d7d8..8c84fa2 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1098,6 +1098,7 @@ struct X86CPUDefinition {
-     int stepping;
-     FeatureWordArray features;
-     const char *model_id;
-+    CPUCaches cache_info;
- };
- 
- static X86CPUDefinition builtin_x86_defs[] = {
-@@ -3235,6 +3236,9 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-         env->features[w] = def->features[w];
-     }
- 
-+    /* Load Cache information from the X86CPUDefinition */
-+    memcpy(&env->cache_info, &def->cache_info, sizeof(CPUCaches));
-+
-     /* Special cases not set in the X86CPUDefinition structs: */
-     /* TODO: in-kernel irqchip for hvf */
-     if (kvm_enabled()) {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index eaed287..aff8396 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1096,6 +1096,13 @@ typedef struct CPUCacheInfo {
- } CPUCacheInfo;
- 
- 
-+typedef struct CPUCaches {
-+        bool valid;
-+        CPUCacheInfo l1d_cache;
-+        CPUCacheInfo l1i_cache;
-+        CPUCacheInfo l2_cache;
-+        CPUCacheInfo l3_cache;
-+} CPUCaches;
- 
- typedef struct CPUX86State {
-     /* standard registers */
-@@ -1282,6 +1289,7 @@ typedef struct CPUX86State {
-     /* Features that were explicitly enabled/disabled */
-     FeatureWordArray user_features;
-     uint32_t cpuid_model[12];
-+    CPUCaches cache_info;
- 
-     /* MTRRs */
-     uint64_t mtrr_fixed[11];
--- 
+v6:
+1.Fixed problem with patch#4(Add new property to control cache info). The p=
+arameter
+ legacy_cache should be "on" by default on machine type "pc-q35-2.10". This=
+ was
+ found by Alexandr Iarygin.
+2.Fixed the l3 cache size for EPYC based machines(patch#3). Also, fixed the=
+ number of
+ logical processors sharing the cache(patch#6). Only L3 cache is shared by =
+multiple
+ cores but not L1 or L2. This was a bug while decoding. This was found by G=
+eoffrey McRae
+ and he verified the fix.=20
+
+v5:
+ In this series I tried to address the feedback from Eduardo Habkost.
+ The discussion thread is here.
+ https://patchwork.kernel.org/patch/10299745/
+ The previous thread is here.
+ http://patchwork.ozlabs.org/cover/884885/
+
+Reason for these changes.
+ The cache properties for AMD family of processors have changed from
+ previous releases. We don't want to display the new information on the
+ old family of processors as this might cause compatibility issues.
+
+Changes:
+1.Based the patches on top of Eduardo's(patch#1) patch.
+  Changed few things.
+  Moved the Cache definitions to cpu.h file.
+  Changed the CPUID_4 names to generic names.
+2.Added a new propery "legacy-cache" in cpu object(patch#2). This can be
+  used to display the old property even if the host supports the new cache
+  properties.
+3.Added cache information in X86CPUDefinition and CPUX86State
+4.Patch 6-7 changed quite a bit from previous version does to new approach.
+5.Addressed few issues with CPUID_8000_001d and CPUID_8000_001E.
+
+v4:
+1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
+  not necessary. Found this during internal review.
+2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
+s
+  found by Kash Pande during his testing.
+3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
+TOPOEXT
+  is supported(Suggested by Brijesh Singh).=20
+
+v3:
+1.Removed the patch #1. Radim mentioned that original typo problem is in=20
+  linux kernel header. qemu is just copying those files.
+2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
+  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
+se
+  details under AMD. I have renamed some of these definitions as generic.
+  These changes are in patch#1. Radim, let me know if this is what you inte=
+nded.
+3.Added assert to for core_id(Suggested by Radim Kr=C4=8Dm=C3=A1=C5=99).
+4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
+5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
+endacky).
+
+v2:
+  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
+  Removed the patch#1. We need to handle the instruction cache associativit=
+y=20
+  seperately. It varies based on the cpu family. I will comeback to that la=
+ter.
+  Added two more typo corrections in patch#1 and patch#5.
+
+v1:
+  Stanislav Lanci posted few patches earlier.=20
+  https://patchwork.kernel.org/patch/10040903/
+
+Rebased his patches with few changes.
+1.Spit the patches into two, separating cpuid functions=20
+  0x8000001D and 0x8000001E (Patch 2 and 3).
+2.Removed the generic non-intel check and made a separate patch
+  with some changes(Patch 5).
+3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
+
+Added 2 more patches.
+Patch 1. Fixes cache associativity.
+Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
+
+
+Babu Moger (8):
+  i386: Add cache information in X86CPUDefinition
+  i386: Initialize cache information for EPYC family processors
+  i386: Add new property to control cache info
+  i386: Use the statically loaded cache definitions
+  i386: Populate AMD Processor Cache Information for cpuid 0x8000001D
+  i386: Add support for CPUID_8000_001E for AMD
+  i386: Enable TOPOEXT feature on AMD EPYC CPU
+  i386: Remove generic SMT thread check
+
+Eduardo Habkost (1):
+  i386: Helpers to encode cache information consistently
+
+ include/hw/i386/pc.h |   4 +
+ target/i386/cpu.c    | 736 ++++++++++++++++++++++++++++++++++++++++++-----=
+----
+ target/i386/cpu.h    |  66 +++++
+ target/i386/kvm.c    |  29 +-
+ 4 files changed, 702 insertions(+), 133 deletions(-)
+
+--=20
 1.8.3.1
