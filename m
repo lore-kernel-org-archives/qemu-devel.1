@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5slV-00078R-H0
+	(envelope-from <dgibson@ozlabs.org>) id 1f5slV-00078S-Gx
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5slT-0002eU-0H
+	(envelope-from <dgibson@ozlabs.org>) id 1f5slS-0002eO-Vf
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:52:49 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 10 Apr 2018 22:52:26 +1000
-Message-Id: <20180410125233.31618-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/7] ppc-for-2.12 queue 20180410
+Date: Tue, 10 Apr 2018 22:52:27 +1000
+Message-Id: <20180410125233.31618-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20180410125233.31618-1-david@gibson.dropbear.id.au>
+References: <20180410125233.31618-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 1/7] target/ppc: Initialize lazy_tlb_flush
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit 915d34c5f99b0ab91517c69f54272bfdb6ca2b=
-32:
+ppc_tr_init_disas_context() correctly sets lazy_tlb_flush to true on
+certain CPU models.  However, it leaves it uninitialized, instead of
+setting it to false on all others.
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2018-04-09 17:29:10 +0100)
+It wasn't caught before now because we didn't have examples in the tests
+that exercised this path.  However it can now be caught using clang's
+undefined behaviour sanitizer and the sam460ex board.
 
-are available in the Git repository at:
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/translate.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180410
-
-for you to fetch changes up to 6b3913e0858488ef3358c1683605d6894a6cadb0:
-
-  roms/u-boot-sam460ex: Change to qemu git mirror and update (2018-04-10 =
-10:05:38 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2018-04-10
-
-Here's a rather late pull request with a handful of fixes for 2.12.
-These have been blocked for some time, because I wasn't able to
-complete my usual test set due to the SCSI problem fixed in 37c5174
-"scsi-disk: Don't enlarge min_io_size to max_io_size".
-
-Since we're in hard freeze, these are all bugfixes.  Most are also
-regressions, although in one case it's only a "regression" because a
-longstanding bug has been exposed by a new machine type (sam460ex) in
-the testcases.  There are also a couple of sam460ex fixes that aren't
-regressions since the board didn't exist before.  On the flipside
-though, they're low risk because they only touch board specific code
-for a board that doesn't exist in any released version.
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      spapr: Initialize reserved areas list in FDT in H_CAS handler
-
-BALATON Zoltan (2):
-      sam460ex: Fix timer frequency and clock multipliers
-      roms/u-boot-sam460ex: Change to qemu git mirror and update
-
-David Gibson (2):
-      target/ppc: Initialize lazy_tlb_flush correctly
-      target/ppc: Fix backwards migration of msr_mask
-
-Thomas Huth (2):
-      hw/misc/macio: Fix crash when listing device properties of macio de=
-vice
-      tests/boot-serial: Test the sam460ex board
-
- .gitmodules              |  2 +-
- hw/misc/macio/macio.c    | 14 +++++++-------
- hw/ppc/ppc440_uc.c       |  3 +--
- hw/ppc/sam460ex.c        |  7 ++++---
- hw/ppc/spapr.c           |  1 +
- roms/u-boot-sam460ex     |  2 +-
- target/ppc/machine.c     | 10 +++++++++-
- target/ppc/translate.c   |  7 +++----
- tests/boot-serial-test.c |  2 ++
- 9 files changed, 29 insertions(+), 19 deletions(-)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 218665b408..3457d29f8e 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7237,10 +7237,9 @@ static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
+     ctx->sf_mode = msr_is_64bit(env, env->msr);
+     ctx->has_cfar = !!(env->flags & POWERPC_FLAG_CFAR);
+ #endif
+-    if (env->mmu_model == POWERPC_MMU_32B ||
+-        env->mmu_model == POWERPC_MMU_601 ||
+-        (env->mmu_model & POWERPC_MMU_64B))
+-            ctx->lazy_tlb_flush = true;
++    ctx->lazy_tlb_flush = env->mmu_model == POWERPC_MMU_32B
++        || env->mmu_model == POWERPC_MMU_601
++        || (env->mmu_model & POWERPC_MMU_64B);
+ 
+     ctx->fpu_enabled = !!msr_fp;
+     if ((env->flags & POWERPC_FLAG_SPE) && msr_spe)
+-- 
+2.14.3
