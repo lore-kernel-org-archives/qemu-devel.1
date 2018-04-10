@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f5tjV-0005EK-51
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5tq7-0001sT-S5
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f5tjS-00057r-26
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:49 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39632)
+	(envelope-from <bounces@canonical.com>) id 1f5tq4-0002Xq-Qr
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:01:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59156)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
-	id 1f5tjR-00057M-RF
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:54:45 -0400
-Received: by mail-wm0-x242.google.com with SMTP id f125so23511921wme.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:54:45 -0700 (PDT)
-Date: Tue, 10 Apr 2018 14:49:01 +0100
-From: Elie Tournier <tournier.elie@gmail.com>
-Message-ID: <20180410134901.GA6818@Nikki.localdomain>
-References: <20180410120222.31845-1-tournier.elie@gmail.com>
-	<20180410120222.31845-2-tournier.elie@gmail.com>
-	<c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5tq4-0002Wy-KL
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:01:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5tq1-0006Fw-LW
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 14:01:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B65F02E80E8
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 14:01:30 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2 for-2.12?] qapi: Parameter gl of
- DisplayType now accept an enum
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 13:48:56 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1756519 <1756519@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152127850171.4068.8714943507984957739.malonedeb@gac.canonical.com>
+Message-Id: <152336813654.29528.17474718087753362843.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1756519] Re: qemu linux-user crash in QOM path
+ canonicalization during do_fork() call to cpu_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +37,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>, kraxel@redhat.com
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 10, 2018 at 08:13:00AM -0500, Eric Blake wrote:
-> On 04/10/2018 07:02 AM, Elie Tournier wrote:
-> > Signed-off-by: Elie Tournier <elie.tournier@collabora.com>
-> > ---
-> >  qapi/ui.json | 21 ++++++++++++++++++++-
-> >  vl.c         | 10 +++++-----
-> >  2 files changed, 25 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/qapi/ui.json b/qapi/ui.json
-> > index 5d01ad4304..c8005867e5 100644
-> > --- a/qapi/ui.json
-> > +++ b/qapi/ui.json
-> > @@ -1019,6 +1019,25 @@
-> >  { 'struct'  : 'DisplayGTK',
-> >    'data'    : { '*grab-on-hover' : 'bool' } }
-> >  
-> > + ##
-> > + # @DisplayGLMode:
-> > + #
-> > + # Display OpenGL mode.
-> > + #
-> > + # 'off'   Disable OpenGL (default).
-> 
-> Wrong format; this should be:
-> 
-> # @off: Disable OpenGL (default).
+Should be fixed by 73a988d957b9142e0 (which is the patch jcmvbkbc
+mentions in comment #4), now in master and will be in 2.12.0.
 
-Fix locally
-> 
-> > + # 'on'    Use OpenGL, pick context type automatically.
-> > + #         Would better be named 'auto' but is called 'on' for backward
-> > + #         compatibility with bool type.
-> 
-> See below...
-> 
-> > + # 'core'  Use OpenGL with Core (desktop) Context.
-> > + # 'es'    Use OpenGL with ES (embedded systems) Context.
-> > + #
-> > + # Since: 2.13
-> > + #
-> > + ##
-> > + { 'enum'    : 'DisplayGLMode',
-> > +   'data'    : [ 'off', 'on', 'core', 'es' ] }
-> > +
-> > +
-> >  ##
-> >  # @DisplayType:
-> >  #
-> > @@ -1048,7 +1067,7 @@
-> >    'base'    : { 'type'           : 'DisplayType',
-> >                  '*full-screen'   : 'bool',
-> >                  '*window-close'  : 'bool',
-> > -                '*gl'            : 'bool' },
-> > +                '*gl'            : 'DisplayGLMode' },
-> 
-> DisplayOptions was added in 2.12.  This is a backwards-incompatible
-> change in QMP (you CANNOT change 'bool' to 'DisplayGLMode' across
-> releases, because the on-the-wire representation differs; pre-patch it
-> would be "gl":true, post-patch it is "gl":"on").  So if it affects QMP,
-> and we want it, this patch either HAS to go in 2.12, or we have to have
-> more finesse (perhaps by using an 'alternate' type in the QAPI) so that
-> it remains backwards-compatible.
-> 
-> /me goes and looks at introspection output...
-> 
-> You may be in luck - there is no instance of 'window-close' in the
-> introspection output, which means 'DisplayType' exists only for ease of
-> command-line parsing and is not currently used by QMP, so tweaks here
-> are not affecting the command line.
-> 
-> That said, you can STILL name the enum value something smarter than 'on'
-> IF you make the change now, for 2.12, given that the QAPI type was only
-> introduced in 2.12 (you only have to worry about backwards compatibility
-> if 2.11 already parsed gl=on).
 
-It sounds like making the change now is the best option.
-So, is 'auto' a better choice than 'on' in the enum?
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+** Changed in: qemu
+       Status: New =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1756519
+
+Title:
+  qemu linux-user crash in QOM path canonicalization during do_fork()
+  call to cpu_create
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  qemu-riscv64 version 2.11.50 (v2.11.0-2491-g2bb39a657a)  crashes
+  running gcc libgomp.c/sort-1.c testsuite test case with the following
+  message:
+
+  (process:11683): GLib-CRITICAL **: g_hash_table_iter_next: assertion 'ri-=
+>version =3D=3D ri->hash_table->version' failed
+  **
+  ERROR:qom/object.c:1665:object_get_canonical_path_component: code should =
+not be reached
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6013=
+9c16
+
+  =
+
+  Backtrace obtained via gdb:
+
+  #0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
+  #1  0x0000000060139b21 in abort () at abort.c:79
+  #2  0x0000000060100505 in g_assertion_message (domain=3Ddomain@entry=3D0x=
+0, file=3Dfile@entry=3D0x60213ca1 "qom/object.c", line=3Dline@entry=3D1665, =
+
+      func=3Dfunc@entry=3D0x60214420 <__func__.18106> "object_get_canonical=
+_path_component", message=3Dmessage@entry=3D0x7fffe8000cd0 "code should not=
+ be reached")
+      at gtestutils.c:2430
+  #3  0x0000000060100586 in g_assertion_message_expr (domain=3D0x0, file=3D=
+0x60213ca1 "qom/object.c", line=3D1665, =
+
+      func=3D0x60214420 <__func__.18106> "object_get_canonical_path_compone=
+nt", expr=3D<optimized out>) at gtestutils.c:2453
+  #4  0x0000000060098334 in object_get_canonical_path_component (obj=3D0x7f=
+ffe81340b0) at qom/object.c:1665
+  #5  0x0000000060098366 in object_get_canonical_path (obj=3D0x7fffe81340b0=
+) at qom/object.c:1675
+  #6  0x000000006008e152 in device_set_realized (obj=3D0x7fffe81340b0, valu=
+e=3Dtrue, errp=3D0x7ffff762fe68) at hw/core/qdev.c:874
+  #7  0x0000000060098bf4 in property_set_bool (obj=3D0x7fffe81340b0, v=3D0x=
+7fffe80fd3c0, name=3D0x60213694 "realized", opaque=3D0x7fffe80fd140, errp=
+=3D0x7ffff762fe68)
+      at qom/object.c:1926
+  #8  0x0000000060096fee in object_property_set (obj=3D0x7fffe81340b0, v=3D=
+0x7fffe80fd3c0, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom=
+/object.c:1122
+  #9  0x0000000060099ebd in object_property_set_qobject (obj=3D0x7fffe81340=
+b0, value=3D0x7fffe80fd310, name=3D0x60213694 "realized", errp=3D0x7ffff762=
+fe68)
+      at qom/qom-qobject.c:27
+  #10 0x0000000060097274 in object_property_set_bool (obj=3D0x7fffe81340b0,=
+ value=3Dtrue, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom/=
+object.c:1191
+  #11 0x0000000060092ec5 in cpu_create (typename=3D0x6250e1a0 "any-riscv-cp=
+u") at qom/cpu.c:61
+  #12 0x000000006009301a in cpu_generic_init (typename=3D0x601dd58f "riscv-=
+cpu", cpu_model=3D0x601dd527 "any") at qom/cpu.c:98
+  #13 0x000000006004cb61 in cpu_copy (env=3D0x7ffff008cd60) at /opt/qemu/li=
+nux-user/main.c:3881
+  #14 0x000000006005b79a in do_fork (env=3D0x7ffff008cd60, flags=3D4001536,=
+ newsp=3D275531880704, parent_tidptr=3D275531882704, newtls=3D275531884288, =
+
+      child_tidptr=3D275531882704) at /opt/qemu/linux-user/syscall.c:6348
+  #15 0x0000000060063e56 in do_syscall (cpu_env=3D0x7ffff008cd60, num=3D220=
+, arg1=3D4001536, arg2=3D275531880704, arg3=3D275531882704, arg4=3D27553188=
+4288, =
+
+      arg5=3D275531882704, arg6=3D275531884288, arg7=3D0, arg8=3D0) at /opt=
+/qemu/linux-user/syscall.c:10001
+  #16 0x000000006004c89f in cpu_loop (env=3D0x7ffff008cd60) at /opt/qemu/li=
+nux-user/main.c:3600
+  #17 0x000000006005b68f in clone_func (arg=3D0x7ffff7775050) at /opt/qemu/=
+linux-user/syscall.c:6311
+  #18 0x0000000060121797 in start_thread (arg=3D0x7ffff7632700) at pthread_=
+create.c:463
+  #19 0x000000006019b4fb in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:95
+
+  =
+
+  Attached is a test case source code extracted from libgomp test suite.
+
+  Note that it is a multi-threaded and requires 5 or more threads to
+  fail. Number of launched threads is controlled by OMP_NUM_THREADS
+  evironment variable, defaulting to number of hardware threads.
+  Changing constants in the test case makes it fail with different
+  numbers of threads.
+
+  I will attach statically linked riscv64 binary executable if size
+  limits permit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1756519/+subscriptions
