@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5vim-0007r1-JF
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:02:19 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f5vis-0007vA-3h
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f5vii-0002Hb-IH
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:02:12 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:35041)
+	(envelope-from <laurent@vivier.eu>) id 1f5vin-0002ME-7s
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:02:18 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:55049)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5vii-0002FU-9B
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:02:08 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5vim-0002L3-Uw
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:02:13 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 10 Apr 2018 18:01:41 +0200
-Message-Id: <20180410160142.21096-3-laurent@vivier.eu>
+Date: Tue, 10 Apr 2018 18:01:42 +0200
+Message-Id: <20180410160142.21096-4-laurent@vivier.eu>
 In-Reply-To: <20180410160142.21096-1-laurent@vivier.eu>
 References: <20180410160142.21096-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 2/3] linux-user: add microblaze/microblazeel
- magic numbers in qemu-binfmt-conf.sh
+Subject: [Qemu-devel] [PULL v2 3/3] linux-user: implement HWCAP bits on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +24,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, James Cowgill <james.cowgill@mips.com>
 
+From: James Cowgill <james.cowgill@mips.com>
+
+Add support for the two currently defined HWCAP bits on MIPS - R6 and
+MSA.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
+Signed-off-by: James Cowgill <james.cowgill@mips.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180315151348.6451-1-james.cowgill@mips.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180409115212.875-2-laurent@vivier.eu>
 ---
- scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ linux-user/elfload.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index f39ad344fc..7ab7435fbd 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -1,10 +1,10 @@
- #!/bin/sh
--# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa
-+# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA/Xtensa/microblaze
- # program execution by the kernel
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 23e34957f9..c77ed1bb01 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -882,6 +882,30 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMIPSState *e
+ #define USE_ELF_CORE_DUMP
+ #define ELF_EXEC_PAGESIZE        4096
  
- qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb"
-+sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb microblaze microblazeel"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -116,6 +116,14 @@ xtensaeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\
- xtensaeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- xtensaeb_family=xtensaeb
- 
-+microblaze_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xba\xab'
-+microblaze_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+microblaze_family=microblaze
++/* See arch/mips/include/uapi/asm/hwcap.h.  */
++enum {
++    HWCAP_MIPS_R6           = (1 << 0),
++    HWCAP_MIPS_MSA          = (1 << 1),
++};
 +
-+microblazeel_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xab\xba'
-+microblazeel_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+microblazeel_family=microblazeel
++#define ELF_HWCAP get_elf_hwcap()
 +
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
++static uint32_t get_elf_hwcap(void)
++{
++    MIPSCPU *cpu = MIPS_CPU(thread_cpu);
++    uint32_t hwcaps = 0;
++
++#define GET_FEATURE(flag, hwcap) \
++    do { if (cpu->env.insn_flags & (flag)) { hwcaps |= hwcap; } } while (0)
++
++    GET_FEATURE(ISA_MIPS32R6 | ISA_MIPS64R6, HWCAP_MIPS_R6);
++    GET_FEATURE(ASE_MSA, HWCAP_MIPS_MSA);
++
++#undef GET_FEATURE
++
++    return hwcaps;
++}
++
+ #endif /* TARGET_MIPS */
+ 
+ #ifdef TARGET_MICROBLAZE
 -- 
 2.14.3
