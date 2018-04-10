@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f5nmy-0002Dn-Hi
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:34:01 -0400
+	(envelope-from <jdenemar@redhat.com>) id 1f5npf-0004Ac-5B
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f5nmt-0005Kt-GY
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:34:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52604 helo=mx1.redhat.com)
+	(envelope-from <jdenemar@redhat.com>) id 1f5npa-0007Bj-4V
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:36:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54332 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f5nmt-0005KW-Cq
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:33:55 -0400
-References: <20180407000117.25640-1-lersek@redhat.com>
-	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
-	<20180409081923.n2ktwrp2jp7xpoon@sirius.home.kraxel.org>
-	<43fbc488-20d6-f5de-0a56-6c28355cc4d4@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aa289441-f606-d073-3d29-682555c4e9c5@redhat.com>
-Date: Tue, 10 Apr 2018 09:33:42 +0200
+	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1f5npZ-0007BV-Va
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:36:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8FF49818AAEB
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 07:36:41 +0000 (UTC)
+Date: Tue, 10 Apr 2018 09:36:35 +0200
+From: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20180410073635.GA91107@orkuz.home>
+References: <20180328170207.49512-1-dgilbert@redhat.com>
+	<20180403143857.GF11070@localhost.localdomain>
+	<20180403205237.GA2501@work-vm>
+	<20180404100303.GE4482@localhost.localdomain>
+	<20180409102744.GC2449@work-vm>
+	<20180409134003.GG5294@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <43fbc488-20d6-f5de-0a56-6c28355cc4d4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180409134003.GG5294@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] migration: Don't activate block devices if
+ using -S
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +38,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, peterx@redhat.com
 
-On 09.04.2018 18:50, Laszlo Ersek wrote:
-> On 04/09/18 10:19, Gerd Hoffmann wrote:
->>>> +{ 'enum' : 'SystemFirmwareType',
->>>> +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }
->>>
->>> The naming here is quite a bad mixture between firmware interface
->>> ('bios', 'uefi') and firmware implementations ('slof', 'uboot'). There
->>> could be other implementations of BIOS or UEFI than SeaBIOS and EDK2 ...
->>> so I'd suggest to rather name them 'seabios' and 'edk2' here instead.
->>
->> uboot for example implements uefi unterfaces too (dunno how complete,
->> but reportly recent versions can run uefi shell and grub just fine).
+On Mon, Apr 09, 2018 at 15:40:03 +0200, Kevin Wolf wrote:
+> Am 09.04.2018 um 12:27 hat Dr. David Alan Gilbert geschrieben:
+> > It's a fairly hairy failure case they had; if I remember correctly it's:
+> >   a) Start migration
+> >   b) Migration gets to completion point
+> >   c) Destination is still paused
+> >   d) Libvirt is restarted on the source
+> >   e) Since libvirt was restarted it fails the migration (and hence knows
+> >      the destination won't be started)
+> >   f) It now tries to resume the qemu on the source
+> > 
+> > (f) fails because (b) caused the locks to be taken on the destination;
+> > hence this patch stops doing that.  It's a case we don't really think
+> > about - i.e. that the migration has actually completed and all the data
+> > is on the destination, but libvirt decides for some other reason to
+> > abandon migration.
 > 
-> Indeed: when I was struggling with this enum type and tried to look for
-> more firmware types to add, my googling turned up the "UEFI on Top of
-> U-Boot" whitepaper, from Alex and Andreas :)
+> If you do remember correctly, that scenario doesn't feel tricky at all.
+> libvirt needs to quit the destination qemu, which will inactivate the
+> images on the destination and release the lock, and then it can continue
+> the source.
 > 
-> Again, this reaches to the root of the problem: when a user creates a
-> new domain, using high-level tools, they just want to tick "UEFI". (Dan
-> has emphasized this to me several times, so I think I get the idea by
-> now, if not the full environment.) We cannot ask the user, "please be
-> more specific, do you want UEFI from edk2, or UEFI on top of U-Boot?"
+> In fact, this is so straightforward that I wonder what else libvirt is
+> doing. Is the destination qemu only shut down after trying to continue
+> the source? That would be libvirt using the wrong order of steps.
 
-But you are designing a rather low-level interface here, which should
-IMHO rather be precise than fuzzy. So should this "just want to tick
-UEFI" rather be handled in the high-level tools instead?
+There's no connection between the two libvirt daemons in the case we're
+talking about so they can't really synchronize the actions. The
+destination daemon will kill the new QEMU process and the source will
+resume the old one, but the order is completely random.
 
-Alternatively, what about providing some kind of "alias" or "nickname"
-setting here, too? So the EDK2 builds would get
-SystemFirmwareType="edk2" and "SystemFirmwareAlias="uefi" for example.
+...
+> > Yes it was a 'block-activate' that I'd wondered about.  One complication
+> > is that if this now under the control of the management layer then we
+> > should stop asserting when the block devices aren't in the expected
+> > state and just cleanly fail the command instead.
+> 
+> Requiring an explicit 'block-activate' on the destination would be an
+> incompatible change, so you would have to introduce a new option for
+> that. 'block-inactivate' on the source feels a bit simpler.
 
- Thomas
+As I said in another email, the explicit block-activate command could
+depend on a migration capability similarly to how pre-switchover state
+works.
+
+Jirka
