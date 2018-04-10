@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5pWF-0004l4-MW
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1f5pYV-0007UB-II
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5pWE-0006YC-Ne
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32782 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1f5pYU-0008Sc-JB
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:27:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57260 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5pWE-0006Xd-IU
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:24:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 31330EAEB2
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 09:24:50 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 10 Apr 2018 11:24:44 +0200
-Message-Id: <20180410092446.26903-3-kraxel@redhat.com>
-In-Reply-To: <20180410092446.26903-1-kraxel@redhat.com>
-References: <20180410092446.26903-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] gtk: drop pointless code from
- gd_window_close
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f5pYU-0008SJ-ET
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:27:10 -0400
+References: <20180407000117.25640-1-lersek@redhat.com>
+	<979bd720-cdb3-6468-1fbd-e8ec1c6c6c8d@redhat.com>
+	<8ddd0a2f-b9b1-08c0-0f4d-62e7aea7e96a@redhat.com>
+	<20180410062754.eohou7i7chf6w65j@sirius.home.kraxel.org>
+	<dc439111-4161-96e6-5b45-4dcee886427d@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <74f1de8d-d1b0-fe55-5809-29e133279c37@redhat.com>
+Date: Tue, 10 Apr 2018 11:26:54 +0200
+MIME-Version: 1.0
+In-Reply-To: <dc439111-4161-96e6-5b45-4dcee886427d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Unregistering the display change listener looks like a pointless
-excercise given we'll exit in a moment.  When exiting qemu via
-menu/file/quit this will not happen either.  Just drop the code.
+On 10.04.2018 11:16, Laszlo Ersek wrote:
+> On 04/10/18 08:27, Gerd Hoffmann wrote:
+>>   Hi,
+>>
+>>> - I considered adding wildcards (say, blacklist "all" i440fx machtypes,
+>>> present and future, for SMM-requiring OVMF builds), but then you get
+>>> into version sorting and similar mess. I considered fnmatch() --
+>>> basically simple ? and * wildcards -- but that's not expressive enough.
+>>
+>> I'd suggest whitelist with wildcards.  So the smm builds would get
+>> "pc-q35-*".
+>>
+>> libvirt knows about aliases, so it should be able to handle the "q35"
+>> shortcut like "pc-q35-${latest}".
+>>
+>> Or do you see another issue?
+> 
+> Well, one issue I see is version sorting; I should say "Q35 but no
+> earlier than 2.4", and lexicographically, "2.11" sorts before "2.4".
+> 
+> Anyway (also asking for Thomas's input here): if we run with your idea
+> to refer to exact mapping methods / firmware *implementation* types that
+> we know libvirt implements / supports as a "white box", do we still deem
+> machine type identification necessary? Because, libvirt already knows
+> (for example) that "ovmf_smm" requires pc-q35-2.4 or later. So we just
+> have to make a *reference* to that knowledge in the JSON file.
 
-Also return TRUE unconditionally.  This will tell gtk to ignore the
-close request, so gtk will not start destroying widgets and causing
-warnings due to UI code trying to talk to widgets which are gone.
-Just depend on qmp_quit() doing it's job instead.
+I think you really need a way to specify the machine there. Latest
+example from QEMU 2.12: We've now got two uboot binaries in the tree,
+pc-bios/u-boot.e500 and pc-bios/u-boot-sam460-20100605.bin. Both are
+uboot, both are for ppc, but u-boot.e500 only works with the "ppce500"
+machine and the other one only works with the "sam460ex" machine. How
+would you teach libvirt such a relationship without an explicit machine
+type identification field there?
 
-Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-Id: <20180314080439.4229-1-kraxel@redhat.com>
----
- ui/gtk.c | 8 --------
- 1 file changed, 8 deletions(-)
-
-diff --git a/ui/gtk.c b/ui/gtk.c
-index e98ac4d2fc..bb3214cffb 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -786,21 +786,13 @@ static gboolean gd_window_close(GtkWidget *widget, GdkEvent *event,
- {
-     GtkDisplayState *s = opaque;
-     bool allow_close = true;
--    int i;
- 
-     if (s->opts->has_window_close && !s->opts->window_close) {
-         allow_close = false;
-     }
- 
-     if (allow_close) {
--        for (i = 0; i < s->nb_vcs; i++) {
--            if (s->vc[i].type != GD_VC_GFX) {
--                continue;
--            }
--            unregister_displaychangelistener(&s->vc[i].gfx.dcl);
--        }
-         qmp_quit(NULL);
--        return FALSE;
-     }
- 
-     return TRUE;
--- 
-2.9.3
+ Thomas
