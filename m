@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@redhat.com>) id 1f5hVo-0007jv-Sd
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 20:51:53 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f5hkZ-00062s-H4
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 21:07:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@redhat.com>) id 1f5hVk-0001am-CL
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 20:51:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56540 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@redhat.com>) id 1f5hVk-0001aA-70
-	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 20:51:48 -0400
-Date: Tue, 10 Apr 2018 10:51:34 +1000
-From: David Gibson <dgibson@redhat.com>
-Message-ID: <20180410105134.2b274724@umbus.fritz.box>
-In-Reply-To: <8d16e553-d0ae-81ac-26f9-95fd1619f8a2@redhat.com>
-References: <20180327164141.19075-1-famz@redhat.com>
-	<b00ba0ab-538f-a6f1-3b99-1a0d9adb6eab@redhat.com>
-	<20180409110844.0a5188af@umbus.fritz.box>
-	<8d16e553-d0ae-81ac-26f9-95fd1619f8a2@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/K_RPaNfvaep2CvSmJMq6NcT";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2] scsi-disk: Don't enlarge min_io_size to
- max_io_size
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f5hkU-0004fT-H7
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 21:07:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42468
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1f5hkU-0004ed-Bd
+	for qemu-devel@nongnu.org; Mon, 09 Apr 2018 21:07:02 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3A145sY015815
+	for <qemu-devel@nongnu.org>; Mon, 9 Apr 2018 21:07:01 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2h8jqg17he-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 21:07:00 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 9 Apr 2018 21:06:59 -0400
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Mon,  9 Apr 2018 19:57:24 -0500
+Message-Id: <20180410005724.10059-1-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH for-2.12] make-release: add skiboot .version
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +37,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, danielhb@linux.vnet.ibm.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, mjt@tls.msk.ru, qemu-stable@nongnu.org
 
---Sig_/K_RPaNfvaep2CvSmJMq6NcT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This is needed to build skiboot from tarball-distributed sources
+since the git data the make_release.sh script relies on to generate
+it is not available.
 
-On Mon, 9 Apr 2018 11:28:16 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Cc: qemu-stable@nongnu.org
+Reported-by: Michael Tokarev <mjt@tls.msk.ru>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ scripts/make-release | 1 +
+ 1 file changed, 1 insertion(+)
 
-> On 09/04/2018 03:08, David Gibson wrote:
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->=20
-> Hi David,
->=20
-> it's already included in my pull request from Friday.
-
-And I see it in master now.  Thanks!
-
---=20
-David Gibson <dgibson@redhat.com>
-Principal Software Engineer, Virtualization, Red Hat
-
---Sig_/K_RPaNfvaep2CvSmJMq6NcT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrMCpYACgkQbDjKyiDZ
-s5LKRA//VOHnjKiLqY7BePMH9Mr1tkKiLyWSnPgkVzG5mxE3P8AVRjS6Sdibbwx8
-JUCSwdSn1fijCG1JlHYz/G4FRZednG8gr1X8lh9+T+o87z/WuUE4wj5y+y6i9p7T
-rfRk99XZpkj0oy2ydbD4TFNV3lHRtZj+OwDGNwf/5meau2v2UxpSyQZPmCHworKw
-A4jehBYMIB/2SHyYwFnkRMDDgvzGrUD0LcDpuEsvkZWTOQoDg/gpuM/TV0X71Gzm
-0195y+tv8teLj6+ZDutAiRQLMDpxcI4IfnjmM76bTg5l0gkLpMCMRxptkSAJGeB9
-nWil1QIL9eTQFunbmgHO4DNJS3KRg7n30HZuf2Y9mFjsPg2PKC/AvfiMUST/9p8f
-DhnMTuJAKpHJnU2cBu7BAKQ3Rw814oWB+pl5ge1UITCIEuWIwqGhTQXdfJBsNrNi
-ecJnqaiQSsrw4Xq1YEgjt2oLpLTjVn1DQwnGT6YZo1e85CJxduj2MrMxG8m3fXR4
-fuYgZcv+eZt7FHqv+TLf0i5pxLnlWeXt/8tIb/7Coaw03yCEVdW4QO8J+q00P+4i
-PLibUm3r2WXQLKsmDrY8a/Gusz6gzKT8zBBuUPXXM3O860b5P+RKrXwPYN9P7k2e
-AYfie/yCVBtWpdmkd2KOjl+QrbCLoB1JymmERU5sH8uDMH5RoKc=
-=G6Kh
------END PGP SIGNATURE-----
-
---Sig_/K_RPaNfvaep2CvSmJMq6NcT--
+diff --git a/scripts/make-release b/scripts/make-release
+index 04fa9defdc..c14f75b12c 100755
+--- a/scripts/make-release
++++ b/scripts/make-release
+@@ -19,6 +19,7 @@ pushd ${destination}
+ git checkout "v${version}"
+ git submodule update --init
+ (cd roms/seabios && git describe --tags --long --dirty > .version)
++(cd roms/skiboot && ./make_version.sh > .version)
+ # FIXME: The following line is a workaround for avoiding filename collisions
+ # when unpacking u-boot sources on case-insensitive filesystems. Once we
+ # update to something with u-boot commit 610eec7f0 we can drop this line.
+-- 
+2.11.0
