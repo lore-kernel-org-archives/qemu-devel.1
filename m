@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f5pH6-00019M-9l
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:09:13 -0400
+	(envelope-from <lersek@redhat.com>) id 1f5pH9-0001CC-Eg
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f5pH2-0005VA-1c
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:09:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57474 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1f5pH8-0005Z0-Ao
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:09:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44530 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f5pH1-0005Uv-RZ
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:09:07 -0400
-Date: Tue, 10 Apr 2018 10:09:02 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180410090902.GF5155@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5pH8-0005Ym-5k
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:09:14 -0400
 References: <20180407000117.25640-1-lersek@redhat.com>
 	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
 	<20180409081923.n2ktwrp2jp7xpoon@sirius.home.kraxel.org>
 	<43fbc488-20d6-f5de-0a56-6c28355cc4d4@redhat.com>
+	<20180410061840.k263ac2b2lgnwi5c@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6059acbf-90be-d888-bbb2-67cadda33ae0@redhat.com>
+Date: Tue, 10 Apr 2018 11:09:05 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180410061840.k263ac2b2lgnwi5c@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <43fbc488-20d6-f5de-0a56-6c28355cc4d4@redhat.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,53 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On Mon, Apr 09, 2018 at 06:50:12PM +0200, Laszlo Ersek wrote:
-> On 04/09/18 10:19, Gerd Hoffmann wrote:
-> >>> +{ 'enum' : 'SystemFirmwareType',
-> >>> +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }
-> >>
-> >> The naming here is quite a bad mixture between firmware interface
-> >> ('bios', 'uefi') and firmware implementations ('slof', 'uboot'). There
-> >> could be other implementations of BIOS or UEFI than SeaBIOS and EDK2 ...
-> >> so I'd suggest to rather name them 'seabios' and 'edk2' here instead.
-> > 
-> > uboot for example implements uefi unterfaces too (dunno how complete,
-> > but reportly recent versions can run uefi shell and grub just fine).
+On 04/10/18 08:18, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> Indeed: when I was struggling with this enum type and tried to look for
-> more firmware types to add, my googling turned up the "UEFI on Top of
-> U-Boot" whitepaper, from Alex and Andreas :)
+>>> uboot for example implements uefi unterfaces too (dunno how complete,
+>>> but reportly recent versions can run uefi shell and grub just fine).
+>>
+>> Indeed: when I was struggling with this enum type and tried to look for
+>> more firmware types to add, my googling turned up the "UEFI on Top of
+>> U-Boot" whitepaper, from Alex and Andreas :)
 > 
-> Again, this reaches to the root of the problem: when a user creates a
-> new domain, using high-level tools, they just want to tick "UEFI". (Dan
-> has emphasized this to me several times, so I think I get the idea by
-> now, if not the full environment.) We cannot ask the user, "please be
-> more specific, do you want UEFI from edk2, or UEFI on top of U-Boot?"
+> In case you wanna play: uboot supports x86 qemu meanwhile, so you can
+> try install u-boot.git-x86 from my firmware repo, then run
+> "qemu-system-x86_64 -bios /usr/share/u-boot.git/x86/qemu-pc/u-boot.rom".
 > 
-> Instead, each of those firmware images will have to come with a JSON
-> document that states "uefi" in SystemFirmware.type, and the host admin
-> will be responsible for establishing a priority order between them.
-> Then, when the user asks for "UEFI" (and no more details), they'll get
-> (compatibly with the target architecture) whichever firmware the host
-> admin marked as "higher priority".
+> It certainly isn't a useful edk2 replacement atm.  It has no virtio
+> drivers.  And even when using ide storage its not like it would happily
+> boot a fedora live iso.  So I certainly wouldn't tag that as uefi today.
+> That might change at some point in the future though.
+> 
+>> Again, this reaches to the root of the problem: when a user creates a
+>> new domain, using high-level tools, they just want to tick "UEFI". (Dan
+>> has emphasized this to me several times, so I think I get the idea by
+>> now, if not the full environment.) We cannot ask the user, "please be
+>> more specific, do you want UEFI from edk2, or UEFI on top of U-Boot?"
+> 
+> Well, in case the uefi support in u-boot is good enough some day then it
+> doesn't matter to the user whenever uboot or edk2 boots the efi guest
+> from disk/iso, right?
 
-Yep, I don't think there's any problem here. If they have asked for
-"uefi", they'll get whichever UEFI implementation is the default for
-that host. Today it'll be an EDK2 impl, but if there's a uboot impl
-of UEFI available instead, that's fine too. If both are available
-we'll have some deterministic manner in which we pick one, even if it
-as simple as which has alphabetically first filename.
+I believe that's correct.
 
-This is really only about getting good default choices. If the user
-really badly wants to have a specific firmware, they can still provide
-a path to it themselves instead of having libvirt choose it.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Laszlo
