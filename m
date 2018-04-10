@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f5mFY-0000rL-MD
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:25 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1f5mG2-0001AR-DB
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f5mFU-0004eO-FA
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:24 -0400
-Received: from mga11.intel.com ([192.55.52.93]:61815)
+	(envelope-from <yulei.zhang@intel.com>) id 1f5mFy-0004s5-H2
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:54 -0400
+Received: from mga05.intel.com ([192.55.52.43]:56980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1f5mFU-0004dL-5N
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:20 -0400
+	id 1f5mFy-0004pt-7K
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:55:50 -0400
 From: Yulei Zhang <yulei.zhang@intel.com>
-Date: Tue, 10 Apr 2018 14:02:04 +0800
-Message-Id: <1523340124-8881-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC V4 PATCH 0/4] vfio: Introduce live migation
- capability to
+Date: Tue, 10 Apr 2018 14:02:41 +0800
+Message-Id: <1523340161-8928-1-git-send-email-yulei.zhang@intel.com>
+Subject: [Qemu-devel] [RFC PATCH V4 1/4] vfio: introduce a new VFIO
+ subregion for mdev device migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +26,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-Summary
+New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added
+to fetch and restore the status of mdev device vGPU during the
+live migration.
 
-This series RFC would like to resume the discussion about how to
-introduce the live migration capability to vfio mdev device. 
+Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+---
+ hw/vfio/pci.c              | 25 ++++++++++++++++++++++++-
+ hw/vfio/pci.h              |  2 ++
+ linux-headers/linux/vfio.h |  9 ++++++---
+ 3 files changed, 32 insertions(+), 4 deletions(-)
 
-A new subtype region VFIO_REGION_SUBTYPE_DEVICE_STATE is introduced
-for vfio device status migrate, during the initialization it will
-check if the region is supported by the vfio device, otherwise it 
-will remain non-migratable.
-
-The intention to add the new region is using it for mdev device status
-save and restore during the migration. The access to this region
-will be trapped and forward to the mdev device driver, it also uses 
-the first byte in the new region to control the running state of mdev
-device, so during the migration after stop the mdev driver, qemu could
-retrieve the specific device status from this region and transfer to 
-the target VM side for the mdev device restore.
-
-In addition, during the pre-copy period, it will be able to fetch the
-dirty bitmap of vfio device through ioctl VFIO_DEVICE_GET_DIRTY_BITMAP
-iteratively, which will be able to shorten the system downtime during
-the static copy.
-
-Below is the vfio mdev device migration sequence
-Source VM side:
-			start migration
-				|
-				V
-                 in pre-copy stage, fetch the device dirty bitmap
-                 and add into qemu dirty list for migrate iteratively.
-                                |
-                                V
-        	 get the cpu state change callback, write to the
-        	 subregion's first byte to stop the mdev device
-				|
-				V
-		 quary the dirty page bitmap from iommu container 
-		 and add into qemu dirty list for last synchronization
-				|
-				V
-		 save the deivce status into Qemufile which is 
-                 read from the vfio device subregion
-
-Target VM side:
-		 restore the mdev device after get the
-		 saved status context from Qemufile
-				|
-				V
-		  get the cpu state change callback write to 
-                  subregion's first byte to start the mdev device
-                  to put it in running status
-				|
-				V
-			finish migration
-
-V3->V4:
-1. add migration_blocker if device state region isnot supported.
-2. instead of using vmsd, register SaveVMHandlers for VFIO device
-   to leverage the pro-copy facility, and add new ioctl for VFIO
-   device to fetch dirty bitmap during pro-copy.
-3. remove the intel vendor ID dependence for the device state 
-   subregion.
-
-V2->V3:
-1. rebase the patch to Qemu stable 2.10 branch.
-2. use a common name for the subregion instead of specific for 
-   intel IGD.
-
-V1->V2:
-Per Alex's suggestion:
-1. use device subtype region instead of VFIO PCI fixed region.
-2. remove unnecessary ioctl, use the first byte of subregion to 
-   control the running state of mdev device.  
-3. for dirty page synchronization, implement the interface with
-   VFIOContainer instead of vfio pci device.
-
-Yulei Zhang (4):
-  vfio: introduce a new VFIO subregion for mdev device migration support
-  vfio: Add vm status change callback to stop/restart the mdev device
-  vfio: Add SaveVMHanlders for VFIO device to support live migration
-  vifo: introduce new VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP
-
- hw/vfio/common.c              |  34 ++++++
- hw/vfio/pci.c                 | 240 ++++++++++++++++++++++++++++++++++++++++--
- hw/vfio/pci.h                 |   2 +
- include/hw/vfio/vfio-common.h |   1 +
- linux-headers/linux/vfio.h    |  43 +++++++-
- roms/seabios                  |   2 +-
- 6 files changed, 312 insertions(+), 10 deletions(-)
-
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c977ee3..f98a9dd 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -32,6 +32,7 @@
+ #include "pci.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "migration/blocker.h"
+ 
+ #define MSIX_CAP_LENGTH 12
+ 
+@@ -2821,6 +2822,25 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         vfio_vga_quirk_setup(vdev);
+     }
+ 
++    struct vfio_region_info *device_state;
++    /* device state region setup */
++    if (!vfio_get_dev_region_info(&vdev->vbasedev,
++                VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
++                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
++        memcpy(&vdev->device_state, device_state,
++               sizeof(struct vfio_region_info));
++        g_free(device_state);
++    } else {
++        error_setg(&vdev->migration_blocker,
++                "Migration disabled: cannot support device state region");
++        migrate_add_blocker(vdev->migration_blocker, &err);
++        if (err) {
++            error_propagate(errp, err);
++            error_free(vdev->migration_blocker);
++            goto error;
++        }
++    }
++
+     for (i = 0; i < PCI_ROM_SLOT; i++) {
+         vfio_bar_quirk_setup(vdev, i);
+     }
+@@ -2884,6 +2904,10 @@ out_teardown:
+     vfio_teardown_msi(vdev);
+     vfio_bars_exit(vdev);
+ error:
++    if (vdev->migration_blocker) {
++        migrate_del_blocker(vdev->migration_blocker);
++        error_free(vdev->migration_blocker);
++    }
+     error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
+ }
+ 
+@@ -3009,7 +3033,6 @@ static Property vfio_pci_dev_properties[] = {
+ 
+ static const VMStateDescription vfio_pci_vmstate = {
+     .name = "vfio-pci",
+-    .unmigratable = 1,
+ };
+ 
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 502a575..0ee1724 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -116,6 +116,8 @@ typedef struct VFIOPCIDevice {
+     VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
+     VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
+     void *igd_opregion;
++    struct vfio_region_info device_state;
++    Error *migration_blocker;
+     PCIHostDeviceAddress host;
+     EventNotifier err_notifier;
+     EventNotifier req_notifier;
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 4312e96..e3380ad 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -297,9 +297,12 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+ 
+ /* 8086 Vendor sub-types */
+-#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+-#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+-#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
++#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
++#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
++#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
++
++/* Mdev sub-type for device state save and restore */
++#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+ 
+ /**
+  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
 -- 
 2.7.4
