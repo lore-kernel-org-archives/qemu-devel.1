@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f62V7-0003GR-KF
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1f62VD-0003Mc-Ie
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1f62V4-0005iy-Dz
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:33 -0400
-Received: from mail-bn3nam01on0078.outbound.protection.outlook.com
-	([104.47.33.78]:48576
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1f62V4-0005id-0e
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:30 -0400
-From: Babu Moger <babu.moger@amd.com>
-Date: Tue, 10 Apr 2018 19:16:07 -0400
-Message-Id: <1523402169-113351-8-git-send-email-babu.moger@amd.com>
-In-Reply-To: <1523402169-113351-1-git-send-email-babu.moger@amd.com>
-References: <1523402169-113351-1-git-send-email-babu.moger@amd.com>
+	(envelope-from <bounces@canonical.com>) id 1f62VA-0005lQ-Cq
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f62VA-0005kn-6e
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:16:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f62V7-0005q5-W3
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 23:16:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4504F2E8193
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 23:16:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 7/9] i386: Add support for CPUID_8000_001E
- for AMD
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 23:03:04 -0000
+From: Patrick Oppenlander <patrick.oppenlander@gmail.com>
+Reply-To: Bug 1760262 <1760262@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152246970464.28900.5033274314150943057.malonedeb@chaenomeles.canonical.com>
+	<152336793910.29767.12550515606452232759.malone@chaenomeles.canonical.com>
+Message-Id: <CAEg67G=XmPK09NRDmMAki2KG8tUK+-GHtopaS3=ACEQD=HnUHg@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1760262] Re: cmsdk-apb-uart doesn't appear to
+ clear interrupt flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +38,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com, babu.moger@amd.com
+To: qemu-devel@nongnu.org
 
-Populate threads/core_id/apic_ids/socket_id when CPUID_EXT3_TOPOEXT
-feature is supported. This is required to support hyperthreading feature
-on AMD CPUs. This is supported via CPUID_8000_001E extended functions.
+On Tue, Apr 10, 2018 at 11:45 PM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+>
+> Thanks for the bug report; I've submitted this patch (which is similar to=
+ but not quite the same as your fix):
+> https://patchwork.ozlabs.org/patch/896715/
+>
+> Hopefully this will get into 2.12, but we're quite close to release now
+> so it will depend on whether we need to spin an extra release candidate
+> for some other reason.
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Tested-by: Geoffrey McRae <geoff@hostfission.com>
----
- target/i386/cpu.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Thanks for looking into it.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 63f2d31..24b39c6 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -315,6 +315,12 @@ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
-                          (((CORES_IN_CMPLX - 1) * 2) + 1)  : \
-                          (CORES_IN_CMPLX - 1))
- 
-+/* Definitions used on CPUID Leaf 0x8000001E */
-+#define EXTENDED_APIC_ID(threads, socket_id, core_id, thread_id) \
-+                        ((threads) ? \
-+                         ((socket_id << 6) | (core_id << 1) | thread_id) : \
-+                         ((socket_id << 6) | core_id))
-+
- /*
-  * Encode cache info for CPUID[0x80000006].ECX and CPUID[0x80000006].EDX
-  * @l3 can be NULL.
-@@ -4098,6 +4104,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             break;
-         }
-         break;
-+    case 0x8000001E:
-+        assert(cpu->core_id <= 255);
-+        *eax = EXTENDED_APIC_ID((cs->nr_threads - 1),
-+               cpu->socket_id, cpu->core_id, cpu->thread_id);
-+        *ebx = (cs->nr_threads - 1) << 8 | cpu->core_id;
-+        *ecx = cpu->socket_id;
-+        *edx = 0;
-+        break;
-     case 0xC0000000:
-         *eax = env->cpuid_xlevel2;
-         *ebx = 0;
--- 
-1.8.3.1
+Patrick
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1760262
+
+Title:
+  cmsdk-apb-uart doesn't appear to clear interrupt flags
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I have been writing a small operating system and using QEMU emulating
+  the mps2-an385 board for some of my testing.
+
+  During development of the uart driver I observed some odd behaviour
+  with the TX interrupt -- writing a '1' to bit 0 of the INTCLEAR
+  register doesn't clear the TX interrupt flag, and the interrupt fires
+  continuously.
+
+  It's possible that I have an error somewhere in my code, but after
+  inspecting the QEMU source it does appear to be a QEMU bug. I applied
+  the following patch and it solved my issue:
+
+  From 9875839c144fa60a3772f16ae44d32685f9328aa Mon Sep 17 00:00:00 2001
+  From: Patrick Oppenlander <patrick.oppenlander@gmail.com>
+  Date: Sat, 31 Mar 2018 15:10:28 +1100
+  Subject: [PATCH] hw/char/cmsdk-apb-uart: fix clearing of interrupt flags
+
+  ---
+   hw/char/cmsdk-apb-uart.c | 1 +
+   1 file changed, 1 insertion(+)
+
+  diff --git a/hw/char/cmsdk-apb-uart.c b/hw/char/cmsdk-apb-uart.c
+  index 1ad1e14295..64991bd9d7 100644
+  --- a/hw/char/cmsdk-apb-uart.c
+  +++ b/hw/char/cmsdk-apb-uart.c
+  @@ -274,6 +274,7 @@ static void uart_write(void *opaque, hwaddr offset, u=
+int64_t value,
+            * is then reflected into the intstatus value by the update func=
+tion).
+            */
+           s->state &=3D ~(value & (R_INTSTATUS_TXO_MASK | R_INTSTATUS_RXO_=
+MASK));
+  +        s->intstatus &=3D ~(value & ~(R_INTSTATUS_TXO_MASK | R_INTSTATUS=
+_RXO_MASK));
+           cmsdk_apb_uart_update(s);
+           break;
+       case A_BAUDDIV:
+  -- =
+
+  2.16.2
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1760262/+subscriptions
