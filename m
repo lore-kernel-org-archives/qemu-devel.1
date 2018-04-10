@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5uJ6-00045o-4x
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:31:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f5uNS-0006b7-72
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f5uJ5-0003pl-AD
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:31:36 -0400
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:38383)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f5uJ5-0003pM-3p
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:31:35 -0400
-Received: by mail-ot0-x231.google.com with SMTP id o9-v6so12965137otj.5
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 07:31:35 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1f5uNO-0007Ia-BE
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:36:06 -0400
+Date: Tue, 10 Apr 2018 16:35:51 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180410143551.GF7026@localhost.localdomain>
+References: <20180404150146.23281-1-stefanha@redhat.com>
+	<5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
+	<20180410081158.GA20090@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <152337021185.15508.13282518954009351050@sif>
-References: <20180410005724.10059-1-mdroth@linux.vnet.ibm.com>
-	<CAFEAcA-_CW1w+XXAxWo93t8L+5zAcBRM6v7wF9xw1_EBd5FibA@mail.gmail.com>
-	<152337021185.15508.13282518954009351050@sif>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 15:31:13 +0100
-Message-ID: <CAFEAcA8KS2rVuMakDjW9buCG4=4pmL7J1_kfsF9P9PpbV-tzdQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] make-release: add skiboot
- .version file
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="7AUc2qLy4jB3hD7Z"
+Content-Disposition: inline
+In-Reply-To: <20180410081158.GA20090@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, qemu-stable <qemu-stable@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, QingFeng Hao <haoqf@linux.vnet.ibm.com>
 
-On 10 April 2018 at 15:23, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> Quoting Peter Maydell (2018-04-10 02:31:04)
->> On 10 April 2018 at 01:57, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
->> >  # FIXME: The following line is a workaround for avoiding filename collisions
->> >  # when unpacking u-boot sources on case-insensitive filesystems. Once we
->> >  # update to something with u-boot commit 610eec7f0 we can drop this line.
->>
->> Seeing this comment in the context part of this patch reminds me:
->> have we updated to a u-boot that lets us drop the workaround yet?
->
-> Not yet, we need:
->
->   https://github.com/u-boot/u-boot/commit/610eec7f0
->
-> which was committed Oct 2017, but QEMU master is still using the
-> v2017.07 July release, via:
->
->   https://github.com/qemu/qemu/commit/73663d71
 
-I guess it's too late in the 2.12 release cycle to update our
-u-boot binary, but we should remember to do it at the start of 2.13...
+--7AUc2qLy4jB3hD7Z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+Am 10.04.2018 um 10:11 hat Stefan Hajnoczi geschrieben:
+> On Wed, Apr 04, 2018 at 06:16:12PM +0200, Max Reitz wrote:
+> > On 2018-04-04 17:01, Stefan Hajnoczi wrote:
+> >  =3D=3D=3D Start mirror job and exit qemu =3D=3D=3D
+> >=20
+> > This seems to be independent of whether there is actually data on
+> > TEST_IMG (the commit source), so something doesn't seem quite right with
+> > the block job throttling here...?
+>=20
+> I've been playing around with this test failure.  Let's leave it broken
+> (!) in QEMU 2.12 because this test has uncovered a block job ratelimit
+> issue that's not a regression.  The fix shouldn't be rushed.
+
+Makes sense.
+
+Thanks, applied to the block branch.
+
+Kevin
+
+--7AUc2qLy4jB3hD7Z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJazMvGAAoJEH8JsnLIjy/WvSsP/3M/hBYJLgMVP32URO3j4a0k
+z1prcYVo915QlrLs8RC9q7fyyJ/tmLxdr22c3bQV6EK7nwM2svGhCSE+tOtJlnwe
+tyJMQ6oeUvx/NTxMla4olUMsd/xEHSrC/cMmSPs3k/FseSwu/dC5GohHbbaKxwN/
+DWvHpwzfm2/58v9ZKULiJYBcNI3iJwOG/zgIInIAIumpmg9esubo9mwFksdZCllN
+nfEuotjPVZsxq5+w3CdWLpr4sWTlFA/7lw8aOk9ns96b1MSx0dae1GpaLma00fB1
+/OJAUZtba3OQWKft1PD07jMCHHLFyZMKYuH9LUqAnMO0nrvmkzYFHmJVXI8++CRH
+YCqlmWEfYkq03f4QS3ij/MQecg5vFW3Q/hY/llfGw6X4LLBLk5e9r0aXIdC4tLZB
+ZsCG/8rqVcjoMEmV0gAhu5JQT2UVveJhugOAYtqQKcsRBn+eqJoYnfMOs/+OyrJz
+sQ3Qd+Byf6PsQdA7UeTTjsl+lYnlrB2sjwl/UOSguURRCMizHh2nRZR+SBNQIiWw
+vTptfWEWoMrPPlbYPE9fJnQsYdZDaDJfNgzQy3P0pQIDWKYxGsB8Xe+kDeHVG1vK
+Wj5DFakSp8X1OjbfdBg6Ge3+P+7fi4rAHXPiPoE1cakVZiH0Pn2CM1gVgSFgpHYt
+BsBM7O4aH5j7uXxCUrC9
+=Cre6
+-----END PGP SIGNATURE-----
+
+--7AUc2qLy4jB3hD7Z--
