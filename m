@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5ooC-0000AS-BO
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:39:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f5or5-0002Gx-Hs
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5oo9-0004hR-7k
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:39:20 -0400
-Date: Tue, 10 Apr 2018 10:38:48 +0200
+	(envelope-from <kwolf@redhat.com>) id 1f5or4-0006Ap-QP
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 04:42:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180410083848.GB7026@localhost.localdomain>
-References: <20180409114418.16615-1-vsementsov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180409114418.16615-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] iotests: blacklist bochs and cloop
- for 205 and 208
+Date: Tue, 10 Apr 2018 10:42:10 +0200
+Message-Id: <20180410084210.11737-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests: Remove _supported_fmt dmg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,12 +17,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com, eblake@redhat.com, stefanha@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Am 09.04.2018 um 13:44 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> v2: move from unsupported_fmts to support "generic", like in bash tests.
+qemu-iotests doesn't support dmg, and the dmg block driver doesn't
+support image creation. Two test cases declare dmg as supported, but
+that's obviously wrong for both reasons. Remove the declaration.
 
-Thanks, applied to the block branch.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/183 | 2 +-
+ tests/qemu-iotests/194 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Kevin
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index 20268ff7a1..c49e1ad6ef 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -43,7 +43,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.filter
+ . ./common.qemu
+ 
+-_supported_fmt qcow2 raw qed dmg quorum
++_supported_fmt qcow2 raw qed quorum
+ _supported_proto file
+ _supported_os Linux
+ 
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+index 1d4214aca3..d746ab1e21 100755
+--- a/tests/qemu-iotests/194
++++ b/tests/qemu-iotests/194
+@@ -21,7 +21,7 @@
+ 
+ import iotests
+ 
+-iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw', 'dmg'])
++iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw'])
+ iotests.verify_platform(['linux'])
+ 
+ with iotests.FilePath('source.img') as source_img_path, \
+-- 
+2.13.6
