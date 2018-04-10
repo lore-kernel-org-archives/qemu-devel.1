@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f5s9D-0004on-V3
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:13:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDQ-0007uU-Ke
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f5s98-0006Zo-Sj
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:13:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50878 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5s98-0006ZU-Nc
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:13:10 -0400
-References: <20180407000117.25640-1-lersek@redhat.com>
-	<20180410102033.GL5155@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e91a7d90-7f15-d72e-f5dc-04925c9890dc@redhat.com>
-Date: Tue, 10 Apr 2018 14:12:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180410102033.GL5155@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDP-0000iS-B5
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:36 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40760)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1f5sDP-0000er-2d
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:35 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDN-0007dW-U3
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 13:17:33 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 13:17:22 +0100
+Message-Id: <20180410121724.8549-11-peter.maydell@linaro.org>
+In-Reply-To: <20180410121724.8549-1-peter.maydell@linaro.org>
+References: <20180410121724.8549-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 10/12] linux-user/signal.c: Ensure AArch64
+ signal frame isn't too small
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 04/10/18 12:20, Daniel P. Berrang=C3=A9 wrote:
-> On Sat, Apr 07, 2018 at 02:01:17AM +0200, Laszlo Ersek wrote:
+The AArch64 signal frame design was extended for SVE in commit
+8c5931de0ac77388096d79ceb, so that instead of having a fixed setup we
+now add various records to the frame, with some of them possibly
+overflowing into an extra space outside the original 4K reserved
+block in the target_sigcontext.  However, we failed to ensure that we
+always at least allocate the 4K reserved block.  This is ABI, and
+some userspace programs rely on it.  In particular the dash shell
+would segfault if the frame wasn't as big enough.
 
->> +{ 'struct' : 'SystemFirmware',
->> +  'data'   : { 'executable'                 : 'FirmwareFile',
->> +               'type'                       : 'SystemFirmwareType',
->> +               'targets'                    : [ 'str' ],
->> +               'sysfw-map'                  : 'FirmwareMapping',
->> +               '*nvram-slots'               : [ 'NVRAMSlot' ],
->> +               '*supports-uefi-secure-boot' : 'bool',
->> +               '*supports-amd-sev'          : 'bool',
->> +               '*supports-acpi-s3'          : 'bool',
->> +               '*supports-acpi-s4'          : 'bool' } }
->=20
-> Elsewhere in the thread I mentioned that I think we should try to use a
-> union approach to isolate which information is relevant to "flash" load=
-er
-> format and which is relevant to "memory" and "kernel". To try to illust=
-rate
-> what I mean by that I've knocked up an alternative structure. I also
-> incorporated the points about features & target/machine types.  I've le=
-ft
-> out the read/write/etc fields, but they could be put back in at the
-> relevant position
+(Compare the kernel's sigframe_size() function in
+arch/arm64/kernel/signal.c.)
 
-I think this looks very nice; with the addition of
+Reported-by: Richard Henwood <richard.henwood@arm.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180409140714.26841-1-peter.maydell@linaro.org
+Fixes: https://bugs.launchpad.net/bugs/1761535
+Fixes: 8c5931de0ac77388096d79ceb
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/signal.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-- "requires-smm" to "SystemFirmwareFeature":
-
-> { 'enum' : 'SystemFirmwareFeature',
->   'data': ['acpi-s3', 'acpi-s5', 'secure-boot', 'amd-sev' ]}
-
-- and another feature flag (perhaps in SystemFirmwareFeature, perhaps in
-SystemFirmwareBinaryFlashVars) for the cmdline option "-global
-driver=3Dcfi.pflash01,property=3Dsecure,value=3Don",
-
-this could be called a day as far as SeaBIOS and OVMF are concerned.
-
-Thanks
-Laszlo
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 046d4c8aa0..8d9e6e8410 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -1850,6 +1850,12 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
+     fr_ofs = layout.total_size;
+     layout.total_size += sizeof(struct target_rt_frame_record);
+ 
++    /* We must always provide at least the standard 4K reserved space,
++     * even if we don't use all of it (this is part of the ABI)
++     */
++    layout.total_size = MAX(layout.total_size,
++                            sizeof(struct target_rt_sigframe));
++
+     frame_addr = get_sigframe(ka, env, layout.total_size);
+     trace_user_setup_frame(env, frame_addr);
+     if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-- 
+2.16.2
