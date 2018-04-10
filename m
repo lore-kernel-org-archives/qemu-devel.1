@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f5rpO-0000ER-3v
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:52:47 -0400
+	(envelope-from <lersek@redhat.com>) id 1f5rpu-0000f7-QJ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:53:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f5rpL-0001dq-00
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:52:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33948 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1f5rpr-0001ya-M4
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:53:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53618 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f5rpK-0001dP-OW
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:52:42 -0400
-Date: Tue, 10 Apr 2018 12:52:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180410115218.GT5155@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5rpr-0001yM-Gc
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:53:15 -0400
 References: <20180407000117.25640-1-lersek@redhat.com>
-	<20180409084940.GE18283@redhat.com>
-	<3381bdf1-62ea-9da7-c654-032c0c11fb4e@redhat.com>
-	<20180410091832.GG5155@redhat.com>
-	<dbb6c144-d8ce-3525-1c9c-7d45b47cc7bc@redhat.com>
-	<20180410113444.GR5155@redhat.com>
-	<CAFEAcA8pOM=Ck+vek1Ww7juWF_Y-N0LQ-YChsYUr2BUgKj29Ng@mail.gmail.com>
+	<979bd720-cdb3-6468-1fbd-e8ec1c6c6c8d@redhat.com>
+	<8ddd0a2f-b9b1-08c0-0f4d-62e7aea7e96a@redhat.com>
+	<20180410062754.eohou7i7chf6w65j@sirius.home.kraxel.org>
+	<dc439111-4161-96e6-5b45-4dcee886427d@redhat.com>
+	<74f1de8d-d1b0-fe55-5809-29e133279c37@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <be948f6f-5296-cc8d-059d-21a7f68bc847@redhat.com>
+Date: Tue, 10 Apr 2018 13:53:06 +0200
 MIME-Version: 1.0
+In-Reply-To: <74f1de8d-d1b0-fe55-5809-29e133279c37@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8pOM=Ck+vek1Ww7juWF_Y-N0LQ-YChsYUr2BUgKj29Ng@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,57 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Tue, Apr 10, 2018 at 12:48:28PM +0100, Peter Maydell wrote:
-> On 10 April 2018 at 12:34, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
-> > On Tue, Apr 10, 2018 at 01:27:18PM +0200, Laszlo Ersek wrote:
-> >
-> >> Please go through the rest of the emails in this thread, and advise:
-> >> - if the firmware descriptor schema may perhaps live in the libvirt =
-tree,
-> >> - accordingly, if the schema could be expressed as an XSD (and firmw=
-are
-> >> packages should provide the descriptor documents as XMLs)
-> >> - if you agree that the descriptor document can uniquely reference
-> >> mapping methods implemented in libvirtd by simple enum constants (wi=
-th
-> >> necessary parameters provided).
-> >
-> > No to all three. This is the responsibility of QEMU to define, becaus=
-e
-> > this information is relevant to anything managing QEMU not just libvi=
-rt.
->=20
-> (Please consider this as more of a grenade lobbed into the conversation
-> rather than a carefully thought out proposal...)
->=20
-> My inclination is to say that it's not really the responsibility
-> of QEMU to define either -- we provide emulated models of hardware,
-> and it's up to the user or the management layer or the provider
-> of the firmware to specify what guest code they want to run and how
-> it needs to run on that emulated hardware...
->=20
-> Where the QEMU upstream itself is providing firmware blobs
-> (in tarballs etc) it's probably our job to specify how they work,
-> but if the firmware is compiled and provided by the distro (as eg happe=
-ns
-> for Arm UEFI blobs at the moment) then I don't see how upstream QEMU
-> can reliably define how that firmware needs to be loaded.
+On 04/10/18 11:26, Thomas Huth wrote:
+> On 10.04.2018 11:16, Laszlo Ersek wrote:
+>> On 04/10/18 08:27, Gerd Hoffmann wrote:
+>>>   Hi,
+>>>
+>>>> - I considered adding wildcards (say, blacklist "all" i440fx machtypes,
+>>>> present and future, for SMM-requiring OVMF builds), but then you get
+>>>> into version sorting and similar mess. I considered fnmatch() --
+>>>> basically simple ? and * wildcards -- but that's not expressive enough.
+>>>
+>>> I'd suggest whitelist with wildcards.  So the smm builds would get
+>>> "pc-q35-*".
+>>>
+>>> libvirt knows about aliases, so it should be able to handle the "q35"
+>>> shortcut like "pc-q35-${latest}".
+>>>
+>>> Or do you see another issue?
+>>
+>> Well, one issue I see is version sorting; I should say "Q35 but no
+>> earlier than 2.4", and lexicographically, "2.11" sorts before "2.4".
+>>
+>> Anyway (also asking for Thomas's input here): if we run with your idea
+>> to refer to exact mapping methods / firmware *implementation* types that
+>> we know libvirt implements / supports as a "white box", do we still deem
+>> machine type identification necessary? Because, libvirt already knows
+>> (for example) that "ovmf_smm" requires pc-q35-2.4 or later. So we just
+>> have to make a *reference* to that knowledge in the JSON file.
+> 
+> I think you really need a way to specify the machine there. Latest
+> example from QEMU 2.12: We've now got two uboot binaries in the tree,
+> pc-bios/u-boot.e500 and pc-bios/u-boot-sam460-20100605.bin. Both are
+> uboot, both are for ppc, but u-boot.e500 only works with the "ppce500"
+> machine and the other one only works with the "sam460ex" machine. How
+> would you teach libvirt such a relationship without an explicit machine
+> type identification field there?
 
-QEMU should not provide the actual metadata files themselves - it just
-has to the define the file format. The relevant firmware upstreams and
-or distros, can provide the metadata files for the blobs they choose
-to ship for use with QEMU.
+My idea was to assign different "map method" enumeration constants to
+them, and libvirtd would associate those with different machtype
+requirements.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+But, as Daniel explained, we cannot reference libvirtd features, so I
+agree we have to express machine types somehow. I don't know how though.
+
+For example, can we take it for granted that a machtype version number,
+if it exists in the first place, always follows the last hyphen in the
+machtype identifier? Say, "virt-2.11" / aarch64 conforms, "pc-q35-2.4"
+and "pc-i440fx-2.12" conform too. But, is that a guarantee that covers
+all arches and all boards?
+
+Because, I don't think:
+- machine-type-family = q35
+- minimum-machine-type = 2.4
+
+will work. Will every application that manages QEMU learn that "q35" is
+short-hand for "pc-q35-XXX", and (again) that 2.12 sorts *after* 2.4?
+
+Thanks,
+Laszlo
