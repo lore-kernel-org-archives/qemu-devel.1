@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f5svj-000892-0k
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:03:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5swr-0000gC-QJ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f5svg-0007xE-Dw
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:03:23 -0400
-Date: Tue, 10 Apr 2018 09:03:18 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180410130318.GB22304@flamenco>
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-	<cbad2760-7a64-7602-5734-eea0747c620f@mail.uni-paderborn.de>
-	<20180409161101.GB18168@flamenco>
-	<565df28d-2f24-1065-c00a-4cceaf5428b4@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1f5swn-0008Lt-RO
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:04:33 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:46983)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5swn-0008Lj-MY
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:04:29 -0400
+Received: by mail-ot0-x242.google.com with SMTP id v64-v6so12597202otb.13
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 06:04:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <565df28d-2f24-1065-c00a-4cceaf5428b4@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc/riscv targets
+In-Reply-To: <1523331602-18781-1-git-send-email-jasowang@redhat.com>
+References: <1523331602-18781-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 14:04:08 +0100
+Message-ID: <CAFEAcA_a3fHAcMJfckd3GiTg+cvuosh1EDisqViFmRNBpWAS_Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/6] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Apr 10, 2018 at 14:24:23 +1000, Richard Henderson wrote:
-> On 04/10/2018 02:11 AM, Emilio G. Cota wrote:
-> > On Mon, Apr 09, 2018 at 16:01:36 +0200, Bastian Koppelmann wrote:
-> >> Thanks for doing this grunt work. Me and a colleague were planning to do
-> >> this as well after converting the RISC-V frontend to decodetree. Do you
-> >> have any plans to do this for the TriCore frontend as well? I have the
-> >> same plan for Tricore: Convert it to decodetree, then to translation loop.
-> > 
-> > I won't do any further conversions in the near future, so please go
-> > ahead with your plans :-)
-> 
-> In which case I won't review Emilio's final two patches for risc-v.
+On 10 April 2018 at 04:39, Jason Wang <jasowang@redhat.com> wrote:
+> The following changes since commit 915d34c5f99b0ab91517c69f54272bfdb6ca2b32:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-04-09 17:29:10 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 5f523530915e57a14ffb8c00e22252bfa557441c:
+>
+>   e1000: Old machine types, turn new subsection off (2018-04-10 11:30:04 +0800)
+>
+> ----------------------------------------------------------------
+>
+> A series from David that switches to use subsection instead of version
+> bumping for e1000 to keep migration compatibility for old
+> versions. This will ease the downstream maintaining.
+>
+> Please merge.
+>
+> Thanks
+>
+> ----------------------------------------------------------------
+> Dr. David Alan Gilbert (6):
+>       e1000: Convert v3 fields to subsection
+>       e1000: Dupe offload data on reading old stream
+>       e1000: wire new subsection to property
+>       e1000: Migrate props via a temporary structure
+>       e1000: Choose which set of props to migrate
+>       e1000: Old machine types, turn new subsection off
+>
+>  hw/net/e1000.c      | 103 ++++++++++++++++++++++++++++++++++++++++------------
+>  include/hw/compat.h |   4 ++
+>  2 files changed, 84 insertions(+), 23 deletions(-)
 
-I might be mistaken but my impression is that Bastian would be happy taking
-these risc-v patches (w/ a minor correction, already noted) since he
-has not yet started the TranslatorOps conversion he planned.
+Applied, thanks.
 
-Bastian, can you please clarify?
-
-Thanks,
-
-		E.
+-- PMM
