@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f5rhJ-0002SQ-TN
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:44:26 -0400
+	(envelope-from <lersek@redhat.com>) id 1f5rk6-0004QC-2R
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:47:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f5rhF-0004TS-W4
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:44:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34626 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1f5rk1-0006Vj-PA
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:47:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33792 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5rhF-0004TA-Rg
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:44:21 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f5rk1-0006VP-Jx
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 07:47:13 -0400
 References: <20180407000117.25640-1-lersek@redhat.com>
-	<20180409084940.GE18283@redhat.com>
-	<3381bdf1-62ea-9da7-c654-032c0c11fb4e@redhat.com>
-	<20180410091832.GG5155@redhat.com>
-	<dbb6c144-d8ce-3525-1c9c-7d45b47cc7bc@redhat.com>
-	<20180410113444.GR5155@redhat.com>
+	<979bd720-cdb3-6468-1fbd-e8ec1c6c6c8d@redhat.com>
+	<8ddd0a2f-b9b1-08c0-0f4d-62e7aea7e96a@redhat.com>
+	<20180410062754.eohou7i7chf6w65j@sirius.home.kraxel.org>
+	<dc439111-4161-96e6-5b45-4dcee886427d@redhat.com>
+	<20180410092342.GH5155@redhat.com>
+	<a552c213-4d89-fc17-b89c-8cbaf1e0331a@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ef36367f-0a5c-2982-ded8-dfa6234f453d@redhat.com>
-Date: Tue, 10 Apr 2018 13:44:13 +0200
+Message-ID: <9d6b3e23-ed02-0079-50d0-15de8b11810f@redhat.com>
+Date: Tue, 10 Apr 2018 13:46:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180410113444.GR5155@redhat.com>
+In-Reply-To: <a552c213-4d89-fc17-b89c-8cbaf1e0331a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -32,31 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, David Gibson <dgibson@redhat.com>
 
-On 04/10/18 13:34, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Apr 10, 2018 at 01:27:18PM +0200, Laszlo Ersek wrote:
+On 04/10/18 12:09, Paolo Bonzini wrote:
+> On 10/04/2018 11:23, Daniel P. Berrang=C3=A9 wrote:
+>>> And, really, this seems to reinforce my point that the schema should
+>>> live in the libvirtd tree, not in the QEMU tree. In that case, perhap=
+s
+>>> it would be a better fit to work with an XSD, and firmware packages
+>>> should install XML files? Personally I'm a lot more attracted to
+>>> XML/XSD; I think the tooling is better too. I just don't see how QEMU=
+ is
+>>> involved.
+>>
+>> This is defining a set of metadata that is required to use various fir=
+mware
+>> files in combination with QEMU, along with defining a mapping to QEMU =
+command
+>> line arguments and/or features. Essentially, while I wish everyone use=
+d
+>> libvirt, libvirt is not the only thing that manages QEMU. This informa=
+tion is
+>> relevant to anyone managing QEMU, so it doesn't belong in libvirt's re=
+alm,
+>> it is clear QEMU is best placed to declare this information.
 >=20
->> Please go through the rest of the emails in this thread, and advise:
->> - if the firmware descriptor schema may perhaps live in the libvirt tr=
-ee,
->> - accordingly, if the schema could be expressed as an XSD (and firmwar=
-e
->> packages should provide the descriptor documents as XMLs)
->> - if you agree that the descriptor document can uniquely reference
->> mapping methods implemented in libvirtd by simple enum constants (with
->> necessary parameters provided).
+> QEMU is best placed to _standardize_ how to provide this information
+> (and where in the file system to place it), but really it's up to
+> firmware packages to provide it.
 >=20
-> No to all three. This is the responsibility of QEMU to define, because
-> this information is relevant to anything managing QEMU not just libvirt=
-.
+> We can of course define the schema in QAPI terms for ease of validation
+> (machine-readable specs are nice to have), but really this should just
+> be a file in docs/interop/.  No code is needed in QEMU.
 
-In that case, how do you suggest we describe the QEMU command line
-options that are (a) necessary, (b) "discoverable" to the management
-application? Should we provide verbatim command line fragments (option
-templates)? Is this feature meant to replace the cmdline generation
-logic that already exists in libvirtd?
+OK -- while we're figuring out the schema, I guess I'll keep posting
+RFCs that change source code / json, but finally we can move it to
+docs/interop.
 
-Thanks
+Thanks!
 Laszlo
