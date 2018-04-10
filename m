@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <antonynpavlov@gmail.com>) id 1f5o0u-0003Fd-3H
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:48:26 -0400
+	(envelope-from <peterx@redhat.com>) id 1f5o8g-0006To-8i
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:56:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <antonynpavlov@gmail.com>) id 1f5o0q-0005w7-5i
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:48:24 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:41736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <antonynpavlov@gmail.com>)
-	id 1f5o0p-0005vF-QI
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:48:20 -0400
-Received: by mail-lf0-x244.google.com with SMTP id o102-v6so10260115lfg.8
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 00:48:19 -0700 (PDT)
-Date: Tue, 10 Apr 2018 11:04:17 +0300
-From: Antony Pavlov <antonynpavlov@gmail.com>
-Message-Id: <20180410110417.554bc8911fb2e2f0a3d99b2d@gmail.com>
-In-Reply-To: <949f3787-7899-73ba-6c80-d3c20af68fda@redhat.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-20-git-send-email-mjc@sifive.com>
-	<20180410062157.0f5876180d0ff5c89dd80393@gmail.com>
-	<949f3787-7899-73ba-6c80-d3c20af68fda@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 19/23] SiFive RISC-V UART Device
+	(envelope-from <peterx@redhat.com>) id 1f5o8d-000490-44
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:56:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54308 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f5o8c-00048h-TS
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 03:56:23 -0400
+Date: Tue, 10 Apr 2018 15:56:01 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180410075601.GF27604@xz-mi>
+References: <CAJ+F1C+EuOA56p932r8gS_sgYfnqaqdRykFwxX-qt0U-arXS2A@mail.gmail.com>
+	<20180326080738.GA17789@xz-mi>
+	<CAJ+F1C+t9kvCq-h1JogM+cm=vP8jx=ZvZVma1niHD_X3GkwiyQ@mail.gmail.com>
+	<20180326090822.GC17789@xz-mi>
+	<CAJ+F1CJ5KKfATgp2dOUhuRCcwV8V95nbebhd_fcqJgbMejc1-A@mail.gmail.com>
+	<20180328040209.GA29554@xz-mi>
+	<CAJ+F1CJj+V30nGcUWvFntEiPu-D=PDuczHSZAxAmYiJwJVpc7A@mail.gmail.com>
+	<20180408030236.GC10540@xz-mi>
+	<CAJ+F1CJqqH6Opsf6TNUKRcsfgPws0xJyaHNLbB+4MrBVY2Wdog@mail.gmail.com>
+	<20180410071557.GE27604@xz-mi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180410071557.GE27604@xz-mi>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 14/23] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,314 +37,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Michael Clark <mjc@sifive.com>, Stefan O'Rear <sorear2@gmail.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, RISC-V Patches <patches@groups.riscv.org>, Eric Blake <eblake@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 10 Apr 2018 08:17:32 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Tue, Apr 10, 2018 at 03:15:57PM +0800, Peter Xu wrote:
+> On Mon, Apr 09, 2018 at 11:19:43AM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >=20
+> > On Sun, Apr 8, 2018 at 5:02 AM, Peter Xu <peterx@redhat.com> wrote:
+> > > On Wed, Apr 04, 2018 at 03:58:56PM +0200, Marc-Andr=C3=A9 Lureau wr=
+ote:
+> > >> Hi Peter
+> > >>
+> > >> On Wed, Mar 28, 2018 at 6:02 AM, Peter Xu <peterx@redhat.com> wrot=
+e:
+> > >> > On Mon, Mar 26, 2018 at 11:46:13AM +0200, Marc-Andr=C3=A9 Lureau=
+ wrote:
+> > >> >> Hi
+> > >> >>
+> > >> >> On Mon, Mar 26, 2018 at 11:08 AM, Peter Xu <peterx@redhat.com> =
+wrote:
+> > >> >> > On Mon, Mar 26, 2018 at 10:33:27AM +0200, Marc-Andr=C3=A9 Lur=
+eau wrote:
+> > >> >> >> Hi
+> > >> >> >>
+> > >> >> >> On Mon, Mar 26, 2018 at 10:07 AM, Peter Xu <peterx@redhat.co=
+m> wrote:
+> > >> >> >> > On Fri, Mar 23, 2018 at 05:18:53PM +0100, Marc-Andr=C3=A9 =
+Lureau wrote:
+> > >> >> >> >
+> > >> >> >> > [...]
+> > >> >> >> >
+> > >> >> >> >> > +/*
+> > >> >> >> >> > + * Dispatch one single QMP request. The function will =
+free the req_obj
+> > >> >> >> >> > + * and objects inside it before return.
+> > >> >> >> >> > + */
+> > >> >> >> >> > +static void monitor_qmp_dispatch_one(QMPRequest *req_o=
+bj)
+> > >> >> >> >> >  {
+> > >> >> >> >> > -    QObject *req, *rsp =3D NULL, *id =3D NULL;
+> > >> >> >> >> > +    Monitor *mon, *old_mon;
+> > >> >> >> >> > +    QObject *req, *rsp =3D NULL, *id;
+> > >> >> >> >> >      QDict *qdict =3D NULL;
+> > >> >> >> >> > -    MonitorQMP *mon_qmp =3D container_of(parser, Monit=
+orQMP, parser);
+> > >> >> >> >> > -    Monitor *old_mon, *mon =3D container_of(mon_qmp, M=
+onitor, qmp);
+> > >> >> >> >> > -
+> > >> >> >> >> > -    Error *err =3D NULL;
+> > >> >> >> >> > +    bool need_resume;
+> > >> >> >> >> >
+> > >> >> >> >> > -    req =3D json_parser_parse_err(tokens, NULL, &err);
+> > >> >> >> >> > -    if (!req && !err) {
+> > >> >> >> >> > -        /* json_parser_parse_err() sucks: can fail wit=
+hout setting @err */
+> > >> >> >> >> > -        error_setg(&err, QERR_JSON_PARSING);
+> > >> >> >> >> > -    }
+> > >> >> >> >> > -    if (err) {
+> > >> >> >> >> > -        goto err_out;
+> > >> >> >> >> > -    }
+> > >> >> >> >> > +    req =3D req_obj->req;
+> > >> >> >> >> > +    mon =3D req_obj->mon;
+> > >> >> >> >> > +    id =3D req_obj->id;
+> > >> >> >> >> > +    need_resume =3D req_obj->need_resume;
+> > >> >> >> >> >
+> > >> >> >> >> > -    qdict =3D qobject_to_qdict(req);
+> > >> >> >> >> > -    if (qdict) {
+> > >> >> >> >> > -        id =3D qdict_get(qdict, "id");
+> > >> >> >> >> > -        qobject_incref(id);
+> > >> >> >> >> > -        qdict_del(qdict, "id");
+> > >> >> >> >> > -    } /* else will fail qmp_dispatch() */
+> > >> >> >> >> > +    g_free(req_obj);
+> > >> >> >> >> >
+> > >> >> >> >> >      if (trace_event_get_state_backends(TRACE_HANDLE_QM=
+P_COMMAND)) {
+> > >> >> >> >> >          QString *req_json =3D qobject_to_json(req);
+> > >> >> >> >> > @@ -3900,7 +3932,7 @@ static void handle_qmp_command(JS=
+ONMessageParser *parser, GQueue *tokens)
+> > >> >> >> >> >      old_mon =3D cur_mon;
+> > >> >> >> >> >      cur_mon =3D mon;
+> > >> >> >> >>
+> > >> >> >> >> There is another issue with this series, since cur_mon is=
+ global (and
+> > >> >> >> >> not protected), an oob command may change the cur_mon whi=
+le another
+> > >> >> >> >> command is running in the main thread with unexpected con=
+sequences. I
+> > >> >> >> >> don't have a clear idea what is the best way to solve it.=
+ Making the
+> > >> >> >> >> variable per-thread, or going all the way to get rid of c=
+ur_mon (my
+> > >> >> >> >> preference, but much harder)
+> > >> >> >> >
+> > >> >> >> > IMHO it is fine too.
+> > >> >> >> >
+> > >> >> >> > Note that this cur_mon operation is in monitor_qmp_dispatc=
+h_one() now,
+> > >> >> >> > which is still running in main thread.  So AFAICT all the =
+cur_mon
+> > >> >> >> > references are in main thread, and monitor IOThread does n=
+ot modify
+> > >> >> >> > that variable at all.  Then we should probably be safe.
+> > >> >> >>
+> > >> >> >> But monitor_qmp_dispatch_one() is called from iothread if th=
+e command
+> > >> >> >> is oob, so cur_mon may be updated while another command is r=
+unning in
+> > >> >> >> main thread, or am I wrong?
+> > >> >> >
+> > >> >> > You are right. I missed that, sorry...
+> > >> >> >
+> > >> >> > Would this be a simple workaround (but hopefully efficient) s=
+olution?
+> > >> >> >
+> > >> >> > diff --git a/monitor.c b/monitor.c
+> > >> >> > index 77f4c41cfa..99641c0c6d 100644
+> > >> >> > --- a/monitor.c
+> > >> >> > +++ b/monitor.c
+> > >> >> > @@ -4023,7 +4023,7 @@ typedef struct QMPRequest QMPRequest;
+> > >> >> >   * Dispatch one single QMP request. The function will free t=
+he req_obj
+> > >> >> >   * and objects inside it before return.
+> > >> >> >   */
+> > >> >> > -static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+> > >> >> > +static void monitor_qmp_dispatch_one(QMPRequest *req_obj, bo=
+ol hack_curmon)
+> > >> >> >  {
+> > >> >> >      Monitor *mon, *old_mon;
+> > >> >> >      QObject *req, *rsp =3D NULL, *id;
+> > >> >> > @@ -4043,12 +4043,16 @@ static void monitor_qmp_dispatch_one(=
+QMPRequest *req_obj)
+> > >> >> >          QDECREF(req_json);
+> > >> >> >      }
+> > >> >> >
+> > >> >> > -    old_mon =3D cur_mon;
+> > >> >> > -    cur_mon =3D mon;
+> > >> >> > +    if (hack_curmon) {
+> > >> >> > +        old_mon =3D cur_mon;
+> > >> >> > +        cur_mon =3D mon;
+> > >> >> > +    }
+> > >> >> >
+> > >> >> >      rsp =3D qmp_dispatch(mon->qmp.commands, req);
+> > >> >> >
+> > >> >> > -    cur_mon =3D old_mon;
+> > >> >> > +    if (hack_curmon) {
+> > >> >> > +        cur_mon =3D old_mon;
+> > >> >> > +    }
+> > >> >> >
+> > >> >> >      if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_comman=
+ds) {
+> > >> >> >          qdict =3D qdict_get_qdict(qobject_to(QDict, rsp), "e=
+rror");
+> > >> >> > @@ -4116,7 +4120,7 @@ static void monitor_qmp_bh_dispatcher(v=
+oid *data)
+> > >> >> >
+> > >> >> >      if (req_obj) {
+> > >> >> >          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(re=
+q_obj->id) ?: "");
+> > >> >> > -        monitor_qmp_dispatch_one(req_obj);
+> > >> >> > +        monitor_qmp_dispatch_one(req_obj, true);
+> > >> >> >          /* Reschedule instead of looping so the main loop st=
+ays responsive */
+> > >> >> >          qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+> > >> >> >      }
+> > >> >> > @@ -4175,7 +4179,7 @@ static void handle_qmp_command(JSONMess=
+ageParser *parser, GQueue *tokens)
+> > >> >> >          /* Out-Of-Band (OOB) requests are executed directly =
+in parser. */
+> > >> >> >          trace_monitor_qmp_cmd_out_of_band(qobject_get_try_st=
+r(req_obj->id)
+> > >> >> >                                            ?: "");
+> > >> >> > -        monitor_qmp_dispatch_one(req_obj);
+> > >> >> > +        monitor_qmp_dispatch_one(req_obj, false);
+> > >> >> >          return;
+> > >> >> >      }
+> > >> >> >
+> > >> >> > Then we forbit touching that evil cur_mon in OOB-capable comm=
+and
+> > >> >> > handlers.  Thanks,
+> > >> >>
+> > >> >> That's not easy to enforce though, afaict it is being used for:
+> > >> >> - error reporting decision
+> > >> >
+> > >> > IMO this should not be a problem, since any QMP handler (includi=
+ng
+> > >> > OOB-capable ones) will be with an Error** there, so logically sp=
+eaking
+> > >> > people should never call things like error_report() in that.
+> > >> >
+> > >> >> - file & socket lookup (fd: & /dev/fdset etc)
+> > >> >
+> > >> > I suppose only very rare commands will use it?  It'll be a big p=
+roblem
+> > >> > to solve when we want to completely remove cur_mon though.
+> > >> >
+> > >> >> - the current state of the monitor / list of commands, cpu_path=
+, capabilities..
+> > >> >
+> > >> > This is very rare to be used too?  Most commands should not use =
+them AFAIU.
+> > >> >
+> > >> >>
+> > >> >> Wouldn't it be simpler to make it per-thread? I think it could =
+also
+> > >> >> use helpers to push/pop the current monitor.
+> > >> >
+> > >> > Anyway I think yes this is still a good option (though the cur_m=
+on
+> > >> > logic will be a bit more complicated).
+> > >> >
+> > >> > Do you plan to post some patch about this, or do you want me to =
+do
+> > >> > this?  I suppose we'll change the qemu_thread_create() a bit to =
+pass
+> > >> > the cur_mon inside, and I suppose this might be better material =
+after
+> > >> > 2.12 release if OOB is off now.
+> > >>
+> > >> Have you looked at making cur_mon per-thread?
+> > >
+> > > Above was my idea, nothing else has been done.
+> > >
+> > > Please feel free to post a patch for this, or I'll do this after 2.=
+12
+> > > release.
+> >=20
+> > If it's fixed after 2.12, I think we should document the race as a kn=
+own issue.
+>=20
+> Do you mean this page?
+>=20
+> https://wiki.qemu.org/Planning/2.12
+>=20
+> To be simpler, I'll see whether I can post the patches soon, and
+> whether that can be accepted as 2.12 material.
 
-> On 10.04.2018 05:21, Antony Pavlov wrote:
-> > On Sat,  3 Mar 2018 02:51:47 +1300
-> > Michael Clark <mjc@sifive.com> wrote:
-> > 
-> >> QEMU model of the UART on the SiFive E300 and U500 series SOCs.
-> >> BBL supports the SiFive UART for early console access via the SBI
-> >> (Supervisor Binary Interface) and the linux kernel SBI console.
-> >>
-> >> The SiFive UART implements the pre qom legacy interface consistent
-> >> with the 16550a UART in 'hw/char/serial.c'.
-> >>
-> >> Acked-by: Richard Henderson <richard.henderson@linaro.org>
-> >> Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
-> >> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> >> Signed-off-by: Michael Clark <mjc@sifive.com>
-> >> ---
-> >>  hw/riscv/sifive_uart.c         | 176 +++++++++++++++++++++++++++++++++++++++++
-> >>  include/hw/riscv/sifive_uart.h |  71 +++++++++++++++++
-> >>  2 files changed, 247 insertions(+)
-> >>  create mode 100644 hw/riscv/sifive_uart.c
-> >>  create mode 100644 include/hw/riscv/sifive_uart.h
-> >>
-> >> diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
-> >> new file mode 100644
-> >> index 0000000..b0c3798
-> >> --- /dev/null
-> >> +++ b/hw/riscv/sifive_uart.c
-> >> @@ -0,0 +1,176 @@
-> >> +/*
-> >> + * QEMU model of the UART on the SiFive E300 and U500 series SOCs.
-> >> + *
-> >> + * Copyright (c) 2016 Stefan O'Rear
-> >> + *
-> >> + * This program is free software; you can redistribute it and/or modify it
-> >> + * under the terms and conditions of the GNU General Public License,
-> >> + * version 2 or later, as published by the Free Software Foundation.
-> >> + *
-> >> + * This program is distributed in the hope it will be useful, but WITHOUT
-> >> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> >> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> >> + * more details.
-> >> + *
-> >> + * You should have received a copy of the GNU General Public License along with
-> >> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> >> + */
-> >> +
-> >> +#include "qemu/osdep.h"
-> >> +#include "qapi/error.h"
-> >> +#include "hw/sysbus.h"
-> >> +#include "chardev/char.h"
-> >> +#include "chardev/char-fe.h"
-> >> +#include "target/riscv/cpu.h"
-> >> +#include "hw/riscv/sifive_uart.h"
-> >>
-> >> +/*
-> >> + * Not yet implemented:
-> >> + *
-> >> + * Transmit FIFO using "qemu/fifo8.h"
-> >> + * SIFIVE_UART_IE_TXWM interrupts
-> >> + * SIFIVE_UART_IE_RXWM interrupts must honor fifo watermark
-> >> + * Rx FIFO watermark interrupt trigger threshold
-> >> + * Tx FIFO watermark interrupt trigger threshold.
-> >> + */
-> >> +
-> >> +static void update_irq(SiFiveUARTState *s)
-> >> +{
-> >> +    int cond = 0;
-> >> +    if ((s->ie & SIFIVE_UART_IE_RXWM) && s->rx_fifo_len) {
-> >> +        cond = 1;
-> >> +    }
-> >> +    if (cond) {
-> >> +        qemu_irq_raise(s->irq);
-> >> +    } else {
-> >> +        qemu_irq_lower(s->irq);
-> >> +    }
-> >> +}
-> >> +
-> >> +static uint64_t
-> >> +uart_read(void *opaque, hwaddr addr, unsigned int size)
-> >> +{
-> >> +    SiFiveUARTState *s = opaque;
-> >> +    unsigned char r;
-> >> +    switch (addr) {
-> >> +    case SIFIVE_UART_RXFIFO:
-> >> +        if (s->rx_fifo_len) {
-> >> +            r = s->rx_fifo[0];
-> >> +            memmove(s->rx_fifo, s->rx_fifo + 1, s->rx_fifo_len - 1);
-> >> +            s->rx_fifo_len--;
-> >> +            qemu_chr_fe_accept_input(&s->chr);
-> >> +            update_irq(s);
-> >> +            return r;
-> >> +        }
-> >> +        return 0x80000000;
-> >> +
-> >> +    case SIFIVE_UART_TXFIFO:
-> >> +        return 0; /* Should check tx fifo */
-> >> +    case SIFIVE_UART_IE:
-> >> +        return s->ie;
-> >> +    case SIFIVE_UART_IP:
-> >> +        return s->rx_fifo_len ? SIFIVE_UART_IP_RXWM : 0;
-> >> +    case SIFIVE_UART_TXCTRL:
-> >> +        return s->txctrl;
-> >> +    case SIFIVE_UART_RXCTRL:
-> >> +        return s->rxctrl;
-> >> +    case SIFIVE_UART_DIV:
-> >> +        return s->div;
-> >> +    }
-> >> +
-> >> +    hw_error("%s: bad read: addr=0x%x\n",
-> >> +        __func__, (int)addr);
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static void
-> >> +uart_write(void *opaque, hwaddr addr,
-> >> +           uint64_t val64, unsigned int size)
-> >> +{
-> >> +    SiFiveUARTState *s = opaque;
-> >> +    uint32_t value = val64;
-> >> +    unsigned char ch = value;
-> >> +
-> >> +    switch (addr) {
-> >> +    case SIFIVE_UART_TXFIFO:
-> >> +        qemu_chr_fe_write(&s->chr, &ch, 1);
-> >> +        return;
-> >> +    case SIFIVE_UART_IE:
-> >> +        s->ie = val64;
-> >> +        update_irq(s);
-> >> +        return;
-> >> +    case SIFIVE_UART_TXCTRL:
-> >> +        s->txctrl = val64;
-> >> +        return;
-> >> +    case SIFIVE_UART_RXCTRL:
-> >> +        s->rxctrl = val64;
-> >> +        return;
-> >> +    case SIFIVE_UART_DIV:
-> >> +        s->div = val64;
-> >> +        return;
-> >> +    }
-> >> +    hw_error("%s: bad write: addr=0x%x v=0x%x\n",
-> >> +        __func__, (int)addr, (int)value);
-> >> +}
-> >> +
-> >> +static const MemoryRegionOps uart_ops = {
-> >> +    .read = uart_read,
-> >> +    .write = uart_write,
-> >> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> >> +    .valid = {
-> >> +        .min_access_size = 4,
-> >> +        .max_access_size = 4
-> >> +    }
-> >> +};
-> >> +
-> >> +static void uart_rx(void *opaque, const uint8_t *buf, int size)
-> >> +{
-> >> +    SiFiveUARTState *s = opaque;
-> >> +
-> >> +    /* Got a byte.  */
-> >> +    if (s->rx_fifo_len >= sizeof(s->rx_fifo)) {
-> >> +        printf("WARNING: UART dropped char.\n");
-> >> +        return;
-> >> +    }
-> >> +    s->rx_fifo[s->rx_fifo_len++] = *buf;
-> >> +
-> >> +    update_irq(s);
-> >> +}
-> >> +
-> >> +static int uart_can_rx(void *opaque)
-> >> +{
-> >> +    SiFiveUARTState *s = opaque;
-> >> +
-> >> +    return s->rx_fifo_len < sizeof(s->rx_fifo);
-> >> +}
-> >> +
-> >> +static void uart_event(void *opaque, int event)
-> >> +{
-> >> +}
-> >> +
-> >> +static int uart_be_change(void *opaque)
-> >> +{
-> >> +    SiFiveUARTState *s = opaque;
-> >> +
-> >> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
-> >> +        uart_be_change, s, NULL, true);
-> >> +
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +/*
-> >> + * Create UART device.
-> >> + */
-> >> +SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
-> >> +    Chardev *chr, qemu_irq irq)
-> >> +{
-> >> +    SiFiveUARTState *s = g_malloc0(sizeof(SiFiveUARTState));
-> >> +    s->irq = irq;
-> >> +    qemu_chr_fe_init(&s->chr, chr, &error_abort);
-> >> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
-> >> +        uart_be_change, s, NULL, true);
-> >> +    memory_region_init_io(&s->mmio, NULL, &uart_ops, s,
-> >> +                          TYPE_SIFIVE_UART, SIFIVE_UART_MAX);
-> >> +    memory_region_add_subregion(address_space, base, &s->mmio);
-> >> +    return s;
-> >> +}
-> >> diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uart.h
-> >> new file mode 100644
-> >> index 0000000..504f18a
-> >> --- /dev/null
-> >> +++ b/include/hw/riscv/sifive_uart.h
-> >> @@ -0,0 +1,71 @@
-> >> +/*
-> >> + * SiFive UART interface
-> >> + *
-> >> + * Copyright (c) 2016 Stefan O'Rear
-> >> + * Copyright (c) 2017 SiFive, Inc.
-> >> + *
-> >> + * This program is free software; you can redistribute it and/or modify it
-> >> + * under the terms and conditions of the GNU General Public License,
-> >> + * version 2 or later, as published by the Free Software Foundation.
-> >> + *
-> >> + * This program is distributed in the hope it will be useful, but WITHOUT
-> >> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> >> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> >> + * more details.
-> >> + *
-> >> + * You should have received a copy of the GNU General Public License along with
-> >> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> >> + */
-> >> +
-> >> +#ifndef HW_SIFIVE_UART_H
-> >> +#define HW_SIFIVE_UART_H
-> >> +
-> >> +enum {
-> >> +    SIFIVE_UART_TXFIFO        = 0,
-> >> +    SIFIVE_UART_RXFIFO        = 4,
-> >> +    SIFIVE_UART_TXCTRL        = 8,
-> >> +    SIFIVE_UART_TXMARK        = 10,
-> >> +    SIFIVE_UART_RXCTRL        = 12,
-> >> +    SIFIVE_UART_RXMARK        = 14,
-> >> +    SIFIVE_UART_IE            = 16,
-> >> +    SIFIVE_UART_IP            = 20,
-> >> +    SIFIVE_UART_DIV           = 24,
-> >> +    SIFIVE_UART_MAX           = 32
-> >> +};
-> >> +
-> >> +enum {
-> >> +    SIFIVE_UART_IE_TXWM       = 1, /* Transmit watermark interrupt enable */
-> >> +    SIFIVE_UART_IE_RXWM       = 2  /* Receive watermark interrupt enable */
-> >> +};
-> >> +
-> >> +enum {
-> >> +    SIFIVE_UART_IP_TXWM       = 1, /* Transmit watermark interrupt pending */
-> >> +    SIFIVE_UART_IP_RXWM       = 2  /* Receive watermark interrupt pending */
-> >> +};
-> >> +
-> >> +#define TYPE_SIFIVE_UART "riscv.sifive.uart"
-> >> +
-> >> +#define SIFIVE_UART(obj) \
-> >> +    OBJECT_CHECK(SiFiveUARTState, (obj), TYPE_SIFIVE_UART)
-> >> +
-> >> +typedef struct SiFiveUARTState {
-> >> +    /*< private >*/
-> >> +    SysBusDevice parent_obj;
-> > 
-> > 
-> > You use SysBusDevive in this header file but there is no 'include "hw/sysbus.h"' in the header file itself.
-> > 
-> > Please see my comment https://github.com/riscv/riscv-qemu/pull/130#issuecomment-379640538
-> > 
-> > 
-> >> +    /*< public >*/
-> >> +    qemu_irq irq;
-> >> +    MemoryRegion mmio;
-> >> +    CharBackend chr;
-> > 
-> > Just the same thing. CharBackend is defined in "chardev/char-fe.h" please include it.
-> 
-> Honestly, I rather prefer to *not* add more includes to header files
-> than we already have. We already have got lots of "touch this header and
-> you have to recompile almost the whole QEMU" conditions, so to avoid
-> that this situation gets worse, we should rather avoid including headers
-> from headers if it is not necessary. Thus if the current sources build
-> fine, no need to change anything here. Just my 0.02 €.
+Btw I think it's not a 2.12 "known issue" - IMHO now it's not an issue
+at all.  Because we don't have any real command support OOB (let's
+ignore the x-oob-test command since it never touches cur_mon).  So
+cur_mon will still only be accessed by the main thread but never
+anything else.
 
-Adding ONLY NECESSARY header files inclusions to header file __can't produce__
-additional recompile efforts.
-Moreover this can decrease number of include directives in c-files.
+I'll post the patch as usual in case further OOB commands will touch
+cur_mon, but I suppose that'll be for after the release.
 
-I __rebased__ my RISC-V board in my out-of tree qemu branch (https://github.com/miet-riscv-workgroup/riscv-qemu/tree/20180409.erizo). I faced with problem: I have to track dependencies of
-header files from include/hw/riscv/ which I use.
-
-So your "not-add-more-includes-to-header-files" approach has an disadvantage:
-if a header file required header list changes, each c-file that includes that header file
-must be edited to update the #include statement list.
-
-RISC-V is a very promising architecture. It is possible that we will have many RISC-V-related
-c-files in the future in qemu. It will be very painful to change these c-files on every RISC-V header
-files requirements change.
-
-To Eric Blake:
-I have added you to CC because of your comment in the conversation https://patchwork.kernel.org/patch/10147099/
-
--- 
-Best regards,
-  Antony Pavlov
+--=20
+Peter Xu
