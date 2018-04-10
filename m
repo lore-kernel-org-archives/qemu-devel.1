@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f62gH-0005Gs-90
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:28:06 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f62jQ-00078J-52
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f62gG-0003nq-JU
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:28:05 -0400
-Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:36502)
+	(envelope-from <richard.henderson@linaro.org>) id 1f62jP-0005XP-6E
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:31:20 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:46722)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f62gG-0003nb-C1
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:28:04 -0400
-Received: by mail-pf0-x234.google.com with SMTP id g14so9516845pfh.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:28:04 -0700 (PDT)
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-	<1523038800-2494-7-git-send-email-cota@braap.org>
-	<a95ec4d4-72f7-486d-4123-a7bd4740cf03@linaro.org>
-	<20180410142332.GA22989@flamenco>
+	id 1f62jP-0005Vg-00
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:31:19 -0400
+Received: by mail-pf0-x243.google.com with SMTP id h69so9527248pfe.13
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:31:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c6a08977-5340-1aa3-9ae1-0656a5240507@linaro.org>
-Date: Wed, 11 Apr 2018 09:27:57 +1000
-MIME-Version: 1.0
-In-Reply-To: <20180410142332.GA22989@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/17] target/mips: convert to
- DisasJumpType
+Date: Wed, 11 Apr 2018 09:31:09 +1000
+Message-Id: <20180410233110.2573-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL for-2.12 0/1] tcg patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,18 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 04/11/2018 12:23 AM, Emilio G. Cota wrote:
->          case DISAS_STOP:
-> -            gen_goto_tb(&ctx, 0, ctx.pc);
-> +            tcg_gen_lookup_and_goto_ptr();
+The following changes since commit 26d6a7c87b05017ffabffb5e16837a0fccf67e90:
 
-You need to write ctx.pc back to the pc first, e.g.
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-qapi-2018-04-10' into staging (2018-04-10 22:16:19 +0100)
 
-    gen_save_pc(ctx.pc);
-    tcg_gen_lookup_and_goto_ptr();
+are available in the Git repository at:
 
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20180411
 
-r~
+for you to fetch changes up to afd46fcad2dceffda35c0586f5723c127b6e09d8:
+
+  icount: fix cpu_restore_state_from_tb for non-tb-exit cases (2018-04-11 09:05:22 +1000)
+
+----------------------------------------------------------------
+Handle read-modify-write i/o with icount
+
+----------------------------------------------------------------
+Pavel Dovgalyuk (1):
+      icount: fix cpu_restore_state_from_tb for non-tb-exit cases
+
+ include/exec/exec-all.h      |  5 ++++-
+ accel/tcg/cpu-exec-common.c  | 10 +++++-----
+ accel/tcg/cpu-exec.c         |  1 -
+ accel/tcg/translate-all.c    | 27 ++++++++++++++-------------
+ accel/tcg/user-exec.c        |  2 +-
+ hw/misc/mips_itu.c           |  3 +--
+ target/alpha/helper.c        |  2 +-
+ target/alpha/mem_helper.c    |  6 ++----
+ target/arm/op_helper.c       |  6 +++---
+ target/cris/op_helper.c      |  4 ++--
+ target/i386/helper.c         |  2 +-
+ target/i386/svm_helper.c     |  2 +-
+ target/m68k/op_helper.c      |  4 ++--
+ target/moxie/helper.c        |  2 +-
+ target/openrisc/sys_helper.c |  8 ++++----
+ target/tricore/op_helper.c   |  2 +-
+ target/xtensa/op_helper.c    |  4 ++--
+ 17 files changed, 45 insertions(+), 45 deletions(-)
