@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f5mJO-00046Q-Ls
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:23 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f5mJY-0004GD-GH
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f5mJN-0006J9-Ub
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:22 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:44248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f5mJN-0006Ip-Bc
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:21 -0400
-Received: by mail-pf0-x244.google.com with SMTP id p15so7356372pff.11
-	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 22:59:21 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 10 Apr 2018 15:59:12 +1000
-Message-Id: <20180410055912.934-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.12] fpu: Fix rounding mode for
- floatN_to_uintM_round_to_zero
+	(envelope-from <kraxel@redhat.com>) id 1f5mJU-0006Lq-LI
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50760 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5mJU-0006LU-HE
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:28 -0400
+Date: Tue, 10 Apr 2018 07:59:14 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180410055914.3ak6niwxjkpph26u@sirius.home.kraxel.org>
+References: <20180407000117.25640-1-lersek@redhat.com>
+	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
+	<6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
+Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, peter.maydell@linaro.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-We incorrectly passed in the current rounding mode
-instead of float_round_to_zero.
+  Hi,
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
+> I threw in "-kernel" because, although it also (usually?) means
+> "memory", I expected people would want it separate.
+> 
+> Regarding memory vs. pflash, I thought that these two, combined with the
+> access permissions, could cover all of RAM, ROM, and read-only and
+> read-write pflash too.
+> 
+> So, "-bios" (-> ROM) boils down to "memory", with write access denied --
+> please see the SeaBIOS example near the end.
 
-Found while runnning SVE RISU tests; it should be visible with the
-right set of inputs to AdvSIMD RISU tests.
+Hmm, I'm wondering whenever it is useful to model things this way.  It's
+not like you can actually configure things for -bios seabios.rom or
+-kernel uboot.elf.  Only pflash allows to actually configure things, and
+there are not that many useful combinations.  The code needs
+Read+Execute.  Allowing Write could be useful in theory, to allow the
+guest doing firmware updates.  But I think nobody actually does that, so
+in practice it is fixed.  The varstore can have different permissions,
+but it's only two useful combinations.  Either allow access
+unconditionally, or allow access in secure contect (aka smm) only.
 
-
-r~
-
----
- fpu/softfloat.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 6e16284e66..b46dccc63e 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1486,8 +1486,8 @@ uint ## isz ## _t float ## fsz ## _to_uint ## isz ## _round_to_zero     \
-  (float ## fsz a, float_status *s)                                      \
- {                                                                       \
-     FloatParts p = float ## fsz ## _unpack_canonical(a, s);             \
--    return round_to_uint_and_pack(p, s->float_rounding_mode,            \
--                                 UINT ## isz ## _MAX, s);               \
-+    return round_to_uint_and_pack(p, float_round_to_zero,               \
-+                                  UINT ## isz ## _MAX, s);              \
- }
- 
- FLOAT_TO_UINT(16, 16)
--- 
-2.14.3
+cheers,
+  Gerd
