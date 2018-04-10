@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f5umF-000140-Ej
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:49 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1f5umJ-00018A-Py
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f5um9-0000M4-P0
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22619)
+	(envelope-from <walling@linux.ibm.com>) id 1f5umE-0000QR-Do
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34670
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1f5um9-0000LG-GM
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:37 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1f5umE-0000Q9-7g
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:01:42 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3AEwdu5060692
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 11:01:36 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h8ts16y9v-1
+	w3AEpi9e125704
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 11:01:41 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h8wfn73jy-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 11:01:34 -0400
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 11:01:40 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Tue, 10 Apr 2018 09:01:33 -0600
+	Tue, 10 Apr 2018 09:01:38 -0600
 From: Collin Walling <walling@linux.ibm.com>
-Date: Tue, 10 Apr 2018 11:01:23 -0400
+Date: Tue, 10 Apr 2018 11:01:26 -0400
 In-Reply-To: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
 References: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
-Message-Id: <1523372486-13190-2-git-send-email-walling@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/4] pc-bios/s390-ccw: rename MAX_TABLE_ENTRIES
- to MAX_BOOT_ENTRIES
+Message-Id: <1523372486-13190-5-git-send-email-walling@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 4/4] pc-bios/s390-ccw: fix non-sequential boot
+ entries (enum)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,75 +42,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, borntraeger@de.ibm.com
 Cc: gor@linux.ibm.com, frankja@linux.ibm.com
 
-The MAX_TABLE_ENTRIES constant has a name that is too generic. As we
-want to declare a limit for boot menu entries, let's rename it to a more
-fitting MAX_BOOT_ENTRIES and set its value to 31 (30 boot entries and
-1 default entry). Also we move it from bootmap.h to s390-ccw.h to make
-it available for menu.c in a later patch.
+zIPL boot menu entries can be non-sequential. Let's account
+for this issue for the s390 enumerated boot menu. Since we
+can no longer print a range of available entries to the
+user, we have to present a list of each available entry.
+
+An example of this menu:
+
+  s390-ccw Enumerated Boot Menu.
+
+   [0] default
+
+   [1]
+   [2]
+   [7]
+   [8]
+   [9]
+  [11]
+  [12]
+
+  Please choose:
 
 Signed-off-by: Collin Walling <walling@linux.ibm.com>
+Reported-by: Vasily Gorbik <gor@linux.ibm.com>
 ---
- pc-bios/s390-ccw/bootmap.c  | 6 +++---
- pc-bios/s390-ccw/bootmap.h  | 2 --
- pc-bios/s390-ccw/s390-ccw.h | 2 ++
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ pc-bios/s390-ccw/bootmap.c  | 12 +++++++-----
+ pc-bios/s390-ccw/menu.c     | 29 ++++++++++++++++++++---------
+ pc-bios/s390-ccw/s390-ccw.h |  2 +-
+ 3 files changed, 28 insertions(+), 15 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index fc2a9fe..2f79346 100644
+index 2f79346..f9a2fb3 100644
 --- a/pc-bios/s390-ccw/bootmap.c
 +++ b/pc-bios/s390-ccw/bootmap.c
-@@ -290,7 +290,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
-     }
+@@ -558,6 +558,8 @@ static void ipl_scsi(void)
+     int program_table_entries = 0;
+     BootMapTable *prog_table = (void *)sec;
+     unsigned int loadparm = get_loadparm_index();
++    bool valid_entries[MAX_BOOT_ENTRIES] = {false};
++    size_t i;
  
-     debug_print_int("loadparm", loadparm);
--    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-+    IPL_assert(loadparm < MAX_BOOT_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
- 
+     /* Grab the MBR */
      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-@@ -578,7 +578,7 @@ static void ipl_scsi(void)
+@@ -578,18 +580,18 @@ static void ipl_scsi(void)
      read_block(mbr->pt.blockno, sec, "Error reading Program Table");
      IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
  
--    while (program_table_entries <= MAX_TABLE_ENTRIES) {
-+    while (program_table_entries < MAX_BOOT_ENTRIES) {
-         if (!prog_table->entry[program_table_entries].scsi.blockno) {
-             break;
+-    while (program_table_entries < MAX_BOOT_ENTRIES) {
+-        if (!prog_table->entry[program_table_entries].scsi.blockno) {
+-            break;
++    for (i = 0; i < MAX_BOOT_ENTRIES; i++) {
++        if (prog_table->entry[i].scsi.blockno) {
++            valid_entries[i] = true;
++            program_table_entries++;
          }
-@@ -593,7 +593,7 @@ static void ipl_scsi(void)
+-        program_table_entries++;
+     }
+ 
+     debug_print_int("program table entries", program_table_entries);
+     IPL_assert(program_table_entries != 0, "Empty Program Table");
+ 
+     if (menu_is_enabled_enum()) {
+-        loadparm = menu_get_enum_boot_index(program_table_entries);
++        loadparm = menu_get_enum_boot_index(valid_entries);
      }
  
      debug_print_int("loadparm", loadparm);
--    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
-+    IPL_assert(loadparm < MAX_BOOT_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+index 083405f..2f11a51 100644
+--- a/pc-bios/s390-ccw/menu.c
++++ b/pc-bios/s390-ccw/menu.c
+@@ -225,19 +225,30 @@ int menu_get_zipl_boot_index(const char *menu_data)
+     return get_boot_index(valid_entries);
+ }
  
-     zipl_run(&prog_table->entry[loadparm].scsi); /* no return */
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 07eb600..732c111 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -57,8 +57,6 @@ typedef union BootMapPointer {
-     ExtEckdBlockPtr xeckd;
- } __attribute__ ((packed)) BootMapPointer;
- 
--#define MAX_TABLE_ENTRIES  30
 -
- /* aka Program Table */
- typedef struct BootMapTable {
-     uint8_t magic[4];
+-int menu_get_enum_boot_index(int entries)
++int menu_get_enum_boot_index(bool *valid_entries)
+ {
+-    char tmp[4];
++    char tmp[3];
++    int i;
+ 
+-    sclp_print("s390x Enumerated Boot Menu.\n\n");
++    sclp_print("s390-ccw Enumerated Boot Menu.\n\n");
+ 
+-    sclp_print(uitoa(entries, tmp, sizeof(tmp)));
+-    sclp_print(" entries detected. Select from boot index 0 to ");
+-    sclp_print(uitoa(entries - 1, tmp, sizeof(tmp)));
+-    sclp_print(".\n\n");
++    for (i = 0; i < MAX_BOOT_ENTRIES; i++) {
++        if (valid_entries[i]) {
++            if (i < 10) {
++                sclp_print(" ");
++            }
++            sclp_print("[");
++            sclp_print(uitoa(i, tmp, sizeof(tmp)));
++            sclp_print("]");
++            if (i == 0) {
++                sclp_print(" default\n");
++            }
++            sclp_print("\n");
++        }
++    }
+ 
+-    return get_boot_index(entries);
++    sclp_print("\n");
++    return get_boot_index(valid_entries);
+ }
+ 
+ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout)
 diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index fd18da2..2c9e601 100644
+index 2c9e601..a1bdb4c 100644
 --- a/pc-bios/s390-ccw/s390-ccw.h
 +++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -94,6 +94,8 @@ bool menu_is_enabled_zipl(void);
- int menu_get_enum_boot_index(int entries);
+@@ -91,7 +91,7 @@ void zipl_load(void);
+ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
+ int menu_get_zipl_boot_index(const char *menu_data);
+ bool menu_is_enabled_zipl(void);
+-int menu_get_enum_boot_index(int entries);
++int menu_get_enum_boot_index(bool *valid_entries);
  bool menu_is_enabled_enum(void);
  
-+#define MAX_BOOT_ENTRIES  31
-+
- static inline void fill_hex(char *out, unsigned char val)
- {
-     const char hex[] = "0123456789abcdef";
+ #define MAX_BOOT_ENTRIES  31
 -- 
 2.7.4
