@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5pwI-0004im-M8
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:51:47 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f5pxI-0005LF-Kr
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f5pwE-0007Sa-PZ
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:51:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59108 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5pwE-0007S6-J7
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:51:42 -0400
-Date: Tue, 10 Apr 2018 11:51:31 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180410095131.ynii6t3om753vl2t@sirius.home.kraxel.org>
-References: <20180407000117.25640-1-lersek@redhat.com>
-	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
-	<6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
-	<20180410055914.3ak6niwxjkpph26u@sirius.home.kraxel.org>
-	<52191fc3-e4d1-e780-47a1-311df2a2f99e@redhat.com>
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f5pxF-00087T-Eo
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:52:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58454
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1f5pxF-00086m-9I
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:52:45 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3A9p9a4033621
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 05:52:43 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2h8sq6kq5x-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 05:52:43 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Tue, 10 Apr 2018 10:52:41 +0100
+Date: Tue, 10 Apr 2018 15:22:33 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20180331185536.4835-1-bala24@linux.vnet.ibm.com>
+	<87sh8bz6is.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <52191fc3-e4d1-e780-47a1-311df2a2f99e@redhat.com>
-Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
+In-Reply-To: <87sh8bz6is.fsf@secure.mitica>
+Message-Id: <20180410095233.GA11713@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] migration: calculate expected_downtime
+ with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +43,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-> > Hmm, I'm wondering whenever it is useful to model things this way.  It's
-> > not like you can actually configure things for -bios seabios.rom or
-> > -kernel uboot.elf.  Only pflash allows to actually configure things, and
-> > there are not that many useful combinations.  The code needs
-> > Read+Execute.  Allowing Write could be useful in theory, to allow the
-> > guest doing firmware updates.  But I think nobody actually does that, so
-> > in practice it is fixed.  The varstore can have different permissions,
-> > but it's only two useful combinations.  Either allow access
-> > unconditionally, or allow access in secure contect (aka smm) only.
+On Wed, Apr 04, 2018 at 11:04:59AM +0200, Juan Quintela wrote:
+> Balamuruhan S <bala24@linux.vnet.ibm.com> wrote:
+> > expected_downtime value is not accurate with dirty_pages_rate * page_size,
+> > using ram_bytes_remaining would yeild it correct.
+> >
+> > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
 > 
-> (I hope I understand your point right:)
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 > 
-> I'm also fine if we simply define a fixed (but extensible) set of
-> mapping methods, basically a new enum type, that simply tells libvirtd
-> what this firmware *is*. IOW, directly reference a mapping method we
-> know libvirt implements, rather than give vague hints.
+> See my other mail on the thread, my understanding is that your change is
+> corret (TM).
+
+Juan, Please help to merge it.
+
+Regards,
+Bala
+
 > 
-> This could repurpose SystemFirmwareType, but it should become more
-> detailed. I'm thinking like:
-> - ovmf: split files without requiring SMM
-> - ovmf_smm: split files with SMM requirement
-> - seabios: exactly that
-> - ... other things others suggest.
-
-I wouldn't name them by firmware, that is misleading.  Basically we have
-three cases:
-
-  (1) single firmware image (seabios, OVMF.fd, ...).
-  (2) split firmware image (OVMF_{CODE,VARS}.fd), where vars can be
-      writable unconditinally.
-  (3) split firmware image, where access to vars should be restricted
-      to smm mode.
-
-(2) + (3) requires pflash.  (1) works with both pflash and -bios.
-
-There also is (4) elf binary loadable with -kernel.  Not sure we should
-include that case.  u-boot can be loaded that way.  The elf binary seems
-to be more a side product of the build proccess, I always have both
-u-boot (elf binary) and u-boot.bin (binary blob loadable with -bios).
-So maybe we should put aside -kernel for now, and maybe reconsider once
-a real need for it shows up.
-
-So maybe Firmware{Device,Access,Mapping} should be replaced with a
-FirmwareImageType [ 'single', 'code+vars', 'code+protectedvars' ] ?
-
-cheers,
-  Gerd
+> Thanks, Juan.
+> 
+> > ---
+> >  migration/migration.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 58bd382730..4e43dc4f92 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -2245,8 +2245,7 @@ static void migration_update_counters(MigrationState *s,
+> >       * recalculate. 10000 is a small enough number for our purposes
+> >       */
+> >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
+> > -        s->expected_downtime = ram_counters.dirty_pages_rate *
+> > -            qemu_target_page_size() / bandwidth;
+> > +        s->expected_downtime = ram_bytes_remaining() / bandwidth;
+> >      }
+> >  
+> >      qemu_file_reset_rate_limit(s->to_dst_file);
+> 
