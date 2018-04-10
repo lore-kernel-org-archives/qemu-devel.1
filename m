@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1f5poY-0001I4-0X
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:43:47 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f5pwI-0004im-M8
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1f5poW-0002aG-Ky
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:43:46 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:41611)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1f5poW-0002a1-FN
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:43:44 -0400
-Received: by mail-ot0-x241.google.com with SMTP id m22-v6so8959066otf.8
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 02:43:44 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1f5pwE-0007Sa-PZ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:51:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59108 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f5pwE-0007S6-J7
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 05:51:42 -0400
+Date: Tue, 10 Apr 2018 11:51:31 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180410095131.ynii6t3om753vl2t@sirius.home.kraxel.org>
+References: <20180407000117.25640-1-lersek@redhat.com>
+	<bf5fc85b-0695-3bd0-117d-759d5dbd4546@redhat.com>
+	<6bfdae78-909f-e7ad-b0f0-25f76dfd81f7@redhat.com>
+	<20180410055914.3ak6niwxjkpph26u@sirius.home.kraxel.org>
+	<52191fc3-e4d1-e780-47a1-311df2a2f99e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180326194330.GB5046@localhost.localdomain>
-References: <1521211002-4529-1-git-send-email-wanpengli@tencent.com>
-	<20180323201852.GB1396@localhost.localdomain>
-	<CANRm+CwCyMzCkqs3J27tq32xg4bBsh1V4fh-MJBWCStVyLY2sA@mail.gmail.com>
-	<20180326194330.GB5046@localhost.localdomain>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Tue, 10 Apr 2018 17:43:43 +0800
-Message-ID: <CANRm+CwkdvE+0q99CtmyVGBGngsKtdiP62KKrMD1njasT7WFJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] i386/kvm: add support for
- KVM_CAP_X86_DISABLE_EXITS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <52191fc3-e4d1-e780-47a1-311df2a2f99e@redhat.com>
+Subject: Re: [Qemu-devel] [qemu RFC] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Hi Paolo,
-2018-03-27 3:43 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
-> On Sun, Mar 25, 2018 at 11:33:01AM +0800, Wanpeng Li wrote:
->> 2018-03-24 4:18 GMT+08:00 Eduardo Habkost <ehabkost@redhat.com>:
->> > On Fri, Mar 16, 2018 at 07:36:42AM -0700, Wanpeng Li wrote:
->> >> From: Wanpeng Li <wanpengli@tencent.com>
->> >>
->> >> This patch adds support for KVM_CAP_X86_DISABLE_EXITS. Provides users=
-pace with
->> >> per-VM capability(KVM_CAP_X86_DISABLE_EXITS) to not intercept MWAIT/H=
-LT/PAUSE
->> >> in order that to improve latency in some workloads.
->> >>
->> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> >> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> >> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> >
->> >
->> > Thanks.
->> >
->> > Patch looks good (except for comment below), but I would like to
->> > see QEMU documentation mentioning what exactly are the practical
->> > consequences of setting "+kvm-hint-dedicated" (especially what
->> > could happen if people enable the flag without properly
->> > configuring vCPU pinning).
->> >
->> >
->> > [...]
->> >> +    if (env->features[FEAT_KVM_HINTS] & KVM_HINTS_DEDICATED) {
->> >> +        int disable_exits =3D kvm_check_extension(cs->kvm_state, KVM=
-_CAP_X86_DISABLE_EXITS);
->> >> +        if (disable_exits) {
->> >> +            disable_exits &=3D (KVM_X86_DISABLE_EXITS_MWAIT |
->> >> +                              KVM_X86_DISABLE_EXITS_HLT |
->> >> +                              KVM_X86_DISABLE_EXITS_PAUSE);
->> >> +        }
->> >
->> > Documentation/virtual/kvm/api.txt says that KVM_FEATURE_PV_UNHALT
->> > shouldn't be enabled if disabling HLT exits.  This needs to be
->> > handled by QEMU.
->>
->> This is handled by KVM(in kvm_update_cpuid()) currently to avoid kvm
->> userspace doing something crazy.
->> https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?h=3Dqueue&id=3Dc=
-aa057a2cad647fb368a12c8e6c410ac4c28e063
->
-> This seems to disable kvm-pv-unhalt silently if
-> KVM_X86_DISABLE_EXITS_HLT is enabled.  We shouldn't do that if
-> the user explicitly requested +kvm-pv-unhalt in the command-line.
->
->>
->> >
->> > Probably the simplest solution is to not allow kvm-hint-dedicated
->> > to be enabled if kvm-pv-unhalt is.  This should be mentioned in
->> > QEMU documentation, also, especially considering that we might
->> > enable kvm-pv-unhalt by default in future QEMU versions.
->>
->> As Locking guy Waiman mentioned before:
->> > Generally speaking, unfair lock performs well for VMs with a small num=
-ber of vCPUs. Native qspinlock may perform better than pvqspinlock if there=
- is vCPU pinning and there is no vCPU over-commitment.
->> I think +kvm-hint-dedicated, -kvm-pv-unhalt is more suitable for vCPU
->> pinning and there is no vCPU over-commitment, on the contrary,
->> -kvm-hint-dedicated, +kvm-pv-unhalt is more prefer.
->
-> Disabling kvm-pv-unhalt by default if only "-cpu
-> ...,+kvm-hint-dedicated" is used makes sense.  But we still need
-> the system to not silently ignore options if
-> "-cpu ...,+kvm-pv-unhalt,+kvm-hint-dedicated" is specified.
+> > Hmm, I'm wondering whenever it is useful to model things this way.  It's
+> > not like you can actually configure things for -bios seabios.rom or
+> > -kernel uboot.elf.  Only pflash allows to actually configure things, and
+> > there are not that many useful combinations.  The code needs
+> > Read+Execute.  Allowing Write could be useful in theory, to allow the
+> > guest doing firmware updates.  But I think nobody actually does that, so
+> > in practice it is fixed.  The varstore can have different permissions,
+> > but it's only two useful combinations.  Either allow access
+> > unconditionally, or allow access in secure contect (aka smm) only.
+> 
+> (I hope I understand your point right:)
+> 
+> I'm also fine if we simply define a fixed (but extensible) set of
+> mapping methods, basically a new enum type, that simply tells libvirtd
+> what this firmware *is*. IOW, directly reference a mapping method we
+> know libvirt implements, rather than give vague hints.
+> 
+> This could repurpose SystemFirmwareType, but it should become more
+> detailed. I'm thinking like:
+> - ovmf: split files without requiring SMM
+> - ovmf_smm: split files with SMM requirement
+> - seabios: exactly that
+> - ... other things others suggest.
 
-What's your opinion for these two comments from Eduardo?
+I wouldn't name them by firmware, that is misleading.  Basically we have
+three cases:
 
-Regards,
-Wanpeng Li
+  (1) single firmware image (seabios, OVMF.fd, ...).
+  (2) split firmware image (OVMF_{CODE,VARS}.fd), where vars can be
+      writable unconditinally.
+  (3) split firmware image, where access to vars should be restricted
+      to smm mode.
+
+(2) + (3) requires pflash.  (1) works with both pflash and -bios.
+
+There also is (4) elf binary loadable with -kernel.  Not sure we should
+include that case.  u-boot can be loaded that way.  The elf binary seems
+to be more a side product of the build proccess, I always have both
+u-boot (elf binary) and u-boot.bin (binary blob loadable with -bios).
+So maybe we should put aside -kernel for now, and maybe reconsider once
+a real need for it shows up.
+
+So maybe Firmware{Device,Access,Mapping} should be replaced with a
+FirmwareImageType [ 'single', 'code+vars', 'code+protectedvars' ] ?
+
+cheers,
+  Gerd
