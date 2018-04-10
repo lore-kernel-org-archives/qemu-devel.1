@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f5qje-0006FY-Rq
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:42:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f5qqN-0000dx-79
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f5qje-0007mI-2l
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:42:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59636 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f5qjd-0007mE-Uu
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:42:46 -0400
-References: <1523021879-25807-1-git-send-email-thuth@redhat.com>
-	<1523021879-25807-2-git-send-email-thuth@redhat.com>
-	<53b776ad-a1c9-29a3-e5de-6cf4528b49f4@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9e604c9d-2933-9da2-7019-172d30dc8568@redhat.com>
-Date: Tue, 10 Apr 2018 12:42:40 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f5qqJ-0003VL-B4
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:49:40 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:38566)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f5qqJ-0003Up-4q
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 06:49:39 -0400
+Received: by mail-ot0-x242.google.com with SMTP id o9-v6so12190532otj.5
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 03:49:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <53b776ad-a1c9-29a3-e5de-6cf4528b49f4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.13 1/3] net: Remove the deprecated
- "vlan" parameter
+In-Reply-To: <20180410003558.2470-1-richard.henderson@linaro.org>
+References: <20180410003558.2470-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 11:49:17 +0100
+Message-ID: <CAFEAcA-tq3+iqDpTN17SB_urEuZcqL2TRYWUEQ7VRy2SwnQ6Uw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] tcg: Introduce
+ tcg_set_insn_start_param
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On 06.04.2018 16:17, Paolo Bonzini wrote:
-> On 06/04/2018 15:37, Thomas Huth wrote:
->> It's been marked as deprecated since QEMU v2.9.0, so that should have
->> been enough time for everybody to switch to the modern -device + -netdev
->> syntax for connecting guest NICs with host network backends, or to switch
->> to the "hubport" netdev in case hubs are really wanted instead.
-> 
-> ... or to just drop unnecessary "vlan=0", which is the really common case.
-> 
->>
->>  # @NetdevL2TPv3Options:
->>  #
->> -# Connect the VLAN to Ethernet over L2TPv3 Static tunnel
->> +# Configure an Ethernet over L2TPv3 Static tunnel.
->>  #
-> 
-> Since you are at it, probably remove "Static"?  I don't see the point
-> really.
+On 10 April 2018 at 01:35, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The parameters for tcg_gen_insn_start are target_ulong, which may be split
+> into two TCGArg parameters for storage in the opcode on 32-bit hosts.
+>
+> Fixes the ARM target and its direct use of tcg_set_insn_param, which would
+> set the wrong argument in the 64-on-32 case.
+>
+> Cc: qemu-stable@nongnu.org
+> Reported-by: alarson@ddci.com
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>
+> Peter, I'm not sure what the reproducer is for this reported problem.
 
-Sure, will do.
+It's a standalone binary, which was attached to this email:
+https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg05995.html
 
->> or the netdev 'nd' (for pluggable\n"
->> "                NICs please use '-device devtype,netdev=nd' instead)\n"
-> 
-> Maybe remove this if -net is prominently marked deprecated?  And mention
-> using -nic instead of "-net nic,netdev=...".
+I've checked and this patch does indeed fix it.
 
-Yes, "-net nic,netdev=..." does indeed not make much sense anymore now
-that we've got "-nic". I'll remove it from the documentation in the next
-version of the patch.
+Applied to target-arm.next, thanks.
 
- Thomas
+-- PMM
