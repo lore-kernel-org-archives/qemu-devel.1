@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f5ss3-000509-7f
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:59:36 -0400
+	(envelope-from <cota@braap.org>) id 1f5svj-000892-0k
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:03:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f5ss0-0005wB-Lc
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:59:35 -0400
-Resent-Message-Id: <E1f5ss0-0005wB-Lc@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f5ss0-0005vr-Ep
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:59:32 -0400
-In-Reply-To: <20180410120222.31845-1-tournier.elie@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152336243827.1842.5093376282042922494@71c20359a636>
+	(envelope-from <cota@braap.org>) id 1f5svg-0007xE-Dw
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 09:03:23 -0400
+Date: Tue, 10 Apr 2018 09:03:18 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180410130318.GB22304@flamenco>
+References: <1523038800-2494-1-git-send-email-cota@braap.org>
+	<cbad2760-7a64-7602-5734-eea0747c620f@mail.uni-paderborn.de>
+	<20180409161101.GB18168@flamenco>
+	<565df28d-2f24-1065-c00a-4cceaf5428b4@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 10 Apr 2018 05:13:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Use SDL to create an OpenGL ES
- context for virglrenderer.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <565df28d-2f24-1065-c00a-4cceaf5428b4@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
+ sh4/sparc/mips/s390x/openrisc/riscv targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +26,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tournier.elie@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDEwMTIwMjIyLjMxODQ1LTEtdG91cm5pZXIuZWxpZUBnbWFpbC5jb20K
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzJdIFVzZSBTREwgdG8gY3JlYXRlIGFu
-IE9wZW5HTCBFUyBjb250ZXh0IGZvciB2aXJnbHJlbmRlcmVyLgoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
-aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
-LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
-ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
-cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
-ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
-ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAg
-MWU3ZTkyZTJlZi4uZmI0ZmUzMmQ1YiAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQxMDEyMDIyMi4zMTg0NS0xLXRvdXJuaWVyLmVs
-aWVAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAxODA0MTAxMjAyMjIuMzE4NDUtMS10b3Vybmllci5l
-bGllQGdtYWlsLmNvbQpBdXRvIHBhY2tpbmcgdGhlIHJlcG9zaXRvcnkgaW4gYmFja2dyb3VuZCBm
-b3Igb3B0aW11bSBwZXJmb3JtYW5jZS4KU2VlICJnaXQgaGVscCBnYyIgZm9yIG1hbnVhbCBob3Vz
-ZWtlZXBpbmcuClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmE4OTExYjcxYiBzZGw6
-IEFsbG93IE9wZW5HTCBFUyBjb250ZXh0IGNyZWF0aW9uCjZiYmU2YWQ0NjggcWFwaTogUGFyYW1l
-dGVyIGdsIG9mIERpc3BsYXlUeXBlIG5vdyBhY2NlcHQgYW4gZW51bQoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yOiBxYXBpOiBQYXJhbWV0ZXIgZ2wgb2YgRGlzcGxheVR5
-cGUgbm93IGFjY2VwdCBhbiBlbnVtLi4uCkNoZWNraW5nIFBBVENIIDIvMjogc2RsOiBBbGxvdyBP
-cGVuR0wgRVMgY29udGV4dCBjcmVhdGlvbi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNDQ6IEZJTEU6IHVpL3NkbDItZ2wuYzoxNDM6CisgICAgaWYgKHNjb24tPmdsX21vZGUg
-PT0gIERJU1BMQVlHTF9NT0RFX09OIHx8IHNjb24tPmdsX21vZGUgPT0gRElTUExBWUdMX01PREVf
-Q09SRSkKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1l
-bnRzICg0LCA3KQojNDQ6IEZJTEU6IHVpL3NkbDItZ2wuYzoxNDM6CisgICAgaWYgKHNjb24tPmds
-X21vZGUgPT0gIERJU1BMQVlHTF9NT0RFX09OIHx8IHNjb24tPmdsX21vZGUgPT0gRElTUExBWUdM
-X01PREVfQ09SRSkKKyAgICAgICBTRExfR0xfU2V0QXR0cmlidXRlKFNETF9HTF9DT05URVhUX1BS
-T0ZJTEVfTUFTSywKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBz
-dGF0ZW1lbnRzICg0LCA3KQojNDc6IEZJTEU6IHVpL3NkbDItZ2wuYzoxNDY6CisgICAgZWxzZSBp
-ZiAoc2Nvbi0+Z2xfbW9kZSA9PSBESVNQTEFZR0xfTU9ERV9FUykKKyAgICAgICBTRExfR0xfU2V0
-QXR0cmlidXRlKFNETF9HTF9DT05URVhUX1BST0ZJTEVfTUFTSywKCkVSUk9SOiBzdXNwZWN0IGNv
-ZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA3KQojNTg6IEZJTEU6IHVp
-L3NkbDItZ2wuYzoxNTc6CisgICAgaWYgKCFjdHggJiYgc2Nvbi0+Z2xfbW9kZSA9PSBESVNQTEFZ
-R0xfTU9ERV9PTikgeworICAgICAgIFNETF9HTF9TZXRBdHRyaWJ1dGUoU0RMX0dMX0NPTlRFWFRf
-UFJPRklMRV9NQVNLLAoKdG90YWw6IDMgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OSBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue, Apr 10, 2018 at 14:24:23 +1000, Richard Henderson wrote:
+> On 04/10/2018 02:11 AM, Emilio G. Cota wrote:
+> > On Mon, Apr 09, 2018 at 16:01:36 +0200, Bastian Koppelmann wrote:
+> >> Thanks for doing this grunt work. Me and a colleague were planning to do
+> >> this as well after converting the RISC-V frontend to decodetree. Do you
+> >> have any plans to do this for the TriCore frontend as well? I have the
+> >> same plan for Tricore: Convert it to decodetree, then to translation loop.
+> > 
+> > I won't do any further conversions in the near future, so please go
+> > ahead with your plans :-)
+> 
+> In which case I won't review Emilio's final two patches for risc-v.
+
+I might be mistaken but my impression is that Bastian would be happy taking
+these risc-v patches (w/ a minor correction, already noted) since he
+has not yet started the TranslatorOps conversion he planned.
+
+Bastian, can you please clarify?
+
+Thanks,
+
+		E.
