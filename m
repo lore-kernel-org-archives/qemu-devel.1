@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f5vxK-0005gr-It
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:17:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1f5vys-0006i8-Il
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f5vxH-0001os-6v
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:17:14 -0400
-Resent-Message-Id: <E1f5vxH-0001os-6v@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f5vxH-0001oD-03
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:17:11 -0400
-In-Reply-To: <20180410160142.21096-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152337698111.1845.16504074692830984118@71c20359a636>
+	(envelope-from <eblake@redhat.com>) id 1f5vyo-0002Vi-3k
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:18:50 -0400
+References: <cover.1523376013.git.berto@igalia.com>
+	<0f687957feb72e80c740403191a47e607c2463fe.1523376013.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d48c55a6-3405-3ab7-0bb9-96a2238874da@redhat.com>
+Date: Tue, 10 Apr 2018 11:18:28 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 10 Apr 2018 09:16:22 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL v2 0/3] linux-user fixes for -rc3
+In-Reply-To: <0f687957feb72e80c740403191a47e607c2463fe.1523376013.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TNWte9HuQ7B6xGflLFZNUtjD2sJQH1n9p"
+Subject: Re: [Qemu-devel] [PATCH 1/2] Fix error message about compressed
+ clusters with OFLAG_COPIED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDEwMTYwMTQyLjIxMDk2LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQVUxMIHYyIDAvM10gbGludXgtdXNlciBmaXhlcyBmb3IgLXJjMwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
-bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
-ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
-b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
-PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
-ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
-ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
-dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQx
-MDE2MDE0Mi4yMTA5Ni0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxODA0MTAxNjAx
-NDIuMjEwOTYtMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjNkNjNjMDFhYzkgbGludXgtdXNlcjogaW1wbGVtZW50IEhXQ0FQIGJpdHMgb24gTUlQUwo1
-MzA1OGJhZDU2IGxpbnV4LXVzZXI6IGFkZCBtaWNyb2JsYXplL21pY3JvYmxhemVlbCBtYWdpYyBu
-dW1iZXJzIGluIHFlbXUtYmluZm10LWNvbmYuc2gKODcxMzA0ZWRjMyBsaW51eC11c2VyOiBmaXgg
-bWljcm9ibGF6ZSBnZXRfc3BfZnJvbV9jcHVzdGF0ZSgpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzM6IGxpbnV4LXVzZXI6IGZpeCBtaWNyb2JsYXplIGdldF9zcF9mcm9t
-X2NwdXN0YXRlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8zOiBsaW51eC11c2VyOiBhZGQgbWljcm9i
-bGF6ZS9taWNyb2JsYXplZWwgbWFnaWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoLi4u
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
-aW5mbXQtY29uZi5zaDo3Ogorc2g0IHNoNGViIHMzOTB4IGFhcmNoNjQgYWFyY2g2NF9iZSBocHBh
-IHJpc2N2MzIgcmlzY3Y2NCB4dGVuc2EgeHRlbnNhZWIgbWljcm9ibGF6ZSBtaWNyb2JsYXplZWwi
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IHNjcmlwdHMvcWVt
-dS1iaW5mbXQtY29uZi5zaDoxMTk6CittaWNyb2JsYXplX21hZ2ljPSdceDdmRUxGXHgwMVx4MDJc
-eDAxXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceGJhXHhhYicK
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzM6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
-aW5mbXQtY29uZi5zaDoxMjA6CittaWNyb2JsYXplX21hc2s9J1x4ZmZceGZmXHhmZlx4ZmZceGZm
-XHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhmZlx4ZmZc
-eGZmJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogc2NyaXB0cy9x
-ZW11LWJpbmZtdC1jb25mLnNoOjEyMzoKK21pY3JvYmxhemVlbF9tYWdpYz0nXHg3ZkVMRlx4MDFc
-eDAxXHgwMVx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDJceDAwXHhhYlx4
-YmEnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM3OiBGSUxFOiBzY3JpcHRzL3Fl
-bXUtYmluZm10LWNvbmYuc2g6MTI0OgorbWljcm9ibGF6ZWVsX21hc2s9J1x4ZmZceGZmXHhmZlx4
-ZmZceGZmXHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhm
-Zlx4ZmZceGZmJwoKdG90YWw6IDQgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNiBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAz
-LzM6IGxpbnV4LXVzZXI6IGltcGxlbWVudCBIV0NBUCBiaXRzIG9uIE1JUFMuLi4KPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TNWte9HuQ7B6xGflLFZNUtjD2sJQH1n9p
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <d48c55a6-3405-3ab7-0bb9-96a2238874da@redhat.com>
+Subject: Re: [PATCH 1/2] Fix error message about compressed clusters with
+ OFLAG_COPIED
+References: <cover.1523376013.git.berto@igalia.com>
+ <0f687957feb72e80c740403191a47e607c2463fe.1523376013.git.berto@igalia.com>
+In-Reply-To: <0f687957feb72e80c740403191a47e607c2463fe.1523376013.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/10/2018 11:05 AM, Alberto Garcia wrote:
+> Compressed clusters are not supposed to have the COPIED bit set.
+> "qemu-img check" detects that and prints an error message reporting
+> the number of the affected host cluster. This doesn't make much sense
+> because compressed clusters are not aligned to host clusters, so it
+> would be better to report the offset instead. Plus, the calculation is
+> wrong and it uses the raw L2 entry as if it was simply an offset.
+>=20
+> This patch fixes the error message and reports the offset of the
+> compressed cluster.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-refcount.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+
+Do we have iotests coverage of this?
+
+Should the qcow2 spec be explicit that OFLAG_COPIED should never be set
+on a compressed cluster? The current documentation for L2 table entry
+mentions that bit 63 is '1' for a cluster with a refcount of exactly 1
+if it is an L2 table reachable from the active L1 table, with no mention
+of a restriction that it must not be set when bit 62 is set.  Or is it
+feasible that although qemu itself (should) never set OFLAG_COPIED on a
+compressed cluster, that some third-party tool could still validly set
+the bit for a compressed cluster that happens to occupy a host cluster
+with a refcount of exactly 1 (and where writing to that cluster could be
+done by replacing the cluster in-place with uncompressed data, or by
+again writing compressed data - compression is rather wasteful in that
+sense as the tail of the host cluster is unused, and the only way to use
+the tail of the cluster is with another compressed cluster at which
+point the refcount is no longer 1).
+
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 6b8b63514a..2dc23005b7 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -1577,9 +1577,9 @@ static int check_refcounts_l2(BlockDriverState *b=
+s, BdrvCheckResult *res,
+>          case QCOW2_CLUSTER_COMPRESSED:
+>              /* Compressed clusters don't have QCOW_OFLAG_COPIED */
+>              if (l2_entry & QCOW_OFLAG_COPIED) {
+> -                fprintf(stderr, "ERROR: cluster %" PRId64 ": "
+> +                fprintf(stderr, "ERROR: coffset=3D0x%" PRIx64 ": "
+>                      "copied flag must never be set for compressed "
+> -                    "clusters\n", l2_entry >> s->cluster_bits);
+> +                    "clusters\n", l2_entry & s->cluster_offset_mask);
+>                  l2_entry &=3D ~QCOW_OFLAG_COPIED;
+
+At any rate, regardless of the answers to my questions, the error
+message cleanup makes sense.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TNWte9HuQ7B6xGflLFZNUtjD2sJQH1n9p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrM49QACgkQp6FrSiUn
+Q2rcyQf+JfUVeN7ui7U0z8S74Vgk+Wax5e3ksOHQZqYwpCCoY14uPwpQBnPaiGiE
+jaahQo4ck54fKBhHdwsj/QHReG+eZi1dg4r2L/RNOOZ+MNrlU1bEBK29jEN7enl4
+cm+y9XC/s2LqPelbtZoJbC0MNrF5zu2s44FBNYBjrP4LdsVv8XsY0qhRnsFPGS58
+BLRdz6z/615rrGvOUF2gqn9gBOlqZVQLR+VJZiWb9o2hFyYQOGPhKFELpesQzB0J
+MPaehuoNWvYfnoWRa6aMvEdn2ETbAOC3XgOQLFh54AZMfYSF5Lr5JvN+gNjucbQx
+kNtLANXRokvGf8NrjucEL3uzBwMUIQ==
+=/2I5
+-----END PGP SIGNATURE-----
+
+--TNWte9HuQ7B6xGflLFZNUtjD2sJQH1n9p--
