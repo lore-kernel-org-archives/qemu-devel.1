@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f5mGq-0001ls-KR
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:56:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f5mJO-00046Q-Ls
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f5mGm-00059w-N7
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:56:44 -0400
-Received: from mga02.intel.com ([134.134.136.20]:20828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1f5mGm-00058W-Dq
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:56:40 -0400
-From: Yulei Zhang <yulei.zhang@intel.com>
-Date: Tue, 10 Apr 2018 14:03:30 +0800
-Message-Id: <1523340210-9070-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC PATCH V4 4/4] vifo: introduce new VFIO ioctl
- VFIO_IOMMU_GET_DIRTY_BITMAP
+	(envelope-from <richard.henderson@linaro.org>) id 1f5mJN-0006J9-Ub
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:22 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:44248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f5mJN-0006Ip-Bc
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 01:59:21 -0400
+Received: by mail-pf0-x244.google.com with SMTP id p15so7356372pff.11
+	for <qemu-devel@nongnu.org>; Mon, 09 Apr 2018 22:59:21 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 10 Apr 2018 15:59:12 +1000
+Message-Id: <20180410055912.934-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.12] fpu: Fix rounding mode for
+ floatN_to_uintM_round_to_zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +26,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
+Cc: alex.bennee@linaro.org, peter.maydell@linaro.org
 
-New VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP is used to fetch the
-bitmap of pinned memory in iommu container, we need copy those
-memory to the target during the migration as they are dirtied by
-mdev devices.
+We incorrectly passed in the current rounding mode
+instead of float_round_to_zero.
 
-Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/vfio/common.c           | 34 ++++++++++++++++++++++++++++++++++
- linux-headers/linux/vfio.h | 14 ++++++++++++++
- 2 files changed, 48 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7007878..460b186 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -35,6 +35,7 @@
- #include "sysemu/kvm.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "exec/ram_addr.h"
- 
- struct vfio_group_head vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
-@@ -624,9 +625,42 @@ static void vfio_listener_region_del(MemoryListener *listener,
-     }
+Found while runnning SVE RISU tests; it should be visible with the
+right set of inputs to AdvSIMD RISU tests.
+
+
+r~
+
+---
+ fpu/softfloat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 6e16284e66..b46dccc63e 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1486,8 +1486,8 @@ uint ## isz ## _t float ## fsz ## _to_uint ## isz ## _round_to_zero     \
+  (float ## fsz a, float_status *s)                                      \
+ {                                                                       \
+     FloatParts p = float ## fsz ## _unpack_canonical(a, s);             \
+-    return round_to_uint_and_pack(p, s->float_rounding_mode,            \
+-                                 UINT ## isz ## _MAX, s);               \
++    return round_to_uint_and_pack(p, float_round_to_zero,               \
++                                  UINT ## isz ## _MAX, s);              \
  }
  
-+static void vfio_log_sync(MemoryListener *listener,
-+                          MemoryRegionSection *section)
-+{
-+    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
-+    VFIOGroup *group = QLIST_FIRST(&container->group_list);
-+    VFIODevice *vbasedev;
-+    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+        if (vbasedev->device_state == VFIO_DEVICE_START) {
-+            return;
-+        }
-+    }
-+
-+    struct vfio_iommu_get_dirty_bitmap *d;
-+    ram_addr_t size = int128_get64(section->size);
-+    unsigned long page_nr = size >> TARGET_PAGE_BITS;
-+    unsigned long bitmap_size =
-+                    (BITS_TO_LONGS(page_nr) + 1) * sizeof(unsigned long);
-+    d = g_malloc0(sizeof(*d) + bitmap_size);
-+    d->start_addr = section->offset_within_address_space;
-+    d->page_nr = page_nr;
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_GET_DIRTY_BITMAP, d)) {
-+        error_report("vfio: Failed to fetch dirty pages for migration");
-+        goto exit;
-+    }
-+
-+    cpu_physical_memory_set_dirty_lebitmap((unsigned long *)&d->dirty_bitmap,
-+                                           d->start_addr, d->page_nr);
-+exit:
-+    g_free(d);
-+}
-+
- static const MemoryListener vfio_memory_listener = {
-     .region_add = vfio_listener_region_add,
-     .region_del = vfio_listener_region_del,
-+    .log_sync = vfio_log_sync,
- };
- 
- static void vfio_listener_release(VFIOContainer *container)
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 2c911d9..56bf76f 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -589,6 +589,20 @@ struct vfio_iommu_type1_dma_unmap {
- #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
- #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
- 
-+/**
-+ * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE, VFIO_BASE + 17,
-+ *				    struct vfio_iommu_get_dirty_bitmap)
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_iommu_get_dirty_bitmap {
-+	__u64	       start_addr;
-+	__u64	       page_nr;
-+	__u8           dirty_bitmap[];
-+};
-+
-+#define VFIO_IOMMU_GET_DIRTY_BITMAP _IO(VFIO_TYPE, VFIO_BASE + 17)
-+
- /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
- 
- /*
+ FLOAT_TO_UINT(16, 16)
 -- 
-2.7.4
+2.14.3
