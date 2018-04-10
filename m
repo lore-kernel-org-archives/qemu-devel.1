@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5kug-0006XW-2D
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:29:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1f5kvu-0007nE-AC
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f5kuc-0003tR-Vb
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:29:46 -0400
-Date: Tue, 10 Apr 2018 14:23:55 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180410042355.GH3361@umbus.fritz.box>
-References: <1522938923-96058-1-git-send-email-spopovyc@redhat.com>
-	<1522938923-96058-2-git-send-email-spopovyc@redhat.com>
-	<20180406035249.GA10482@in.ibm.com>
-	<1d1893fc-1484-86e0-ed1b-f9cf7b35fbb5@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1f5kvr-0004db-6H
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:31:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f5kvq-0004cy-Vl
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 00:30:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f5kvo-00012y-Nj
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 04:30:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A09C2E80D9
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 04:30:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cfJ13FhsvNR/yOpm"
-Content-Disposition: inline
-In-Reply-To: <1d1893fc-1484-86e0-ed1b-f9cf7b35fbb5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.13 1/2] Revert "spapr: Don't allow
- memory hotplug to memory less nodes"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Apr 2018 04:17:44 -0000
+From: Launchpad Bug Tracker <1354167@bugs.launchpad.net>
+Reply-To: Bug 1354167 <1354167@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140807211622.24181.42179.malonedeb@wampee.canonical.com>
+Message-Id: <152333386493.1655.12174109366959279854.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1354167] Re: On VM restart: Could not open
+ 'poppy.qcow2': Could not read snapshots: File too large
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,111 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Serhii Popovych <spopovyc@redhat.com>
-Cc: bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+[Expired for QEMU because there has been no activity for 60 days.]
+
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1354167
+
+Title:
+  On VM restart: Could not open 'poppy.qcow2': Could not read snapshots:
+  File too large
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  I'm unable to restart a VM.   virt-manager is giving me:
+
+  Error starting domain: internal error: process exited while connecting
+  to monitor: qemu-system-x86_64: -drive
+  file=3D/var/lib/libvirt/images/poppy.qcow2,if=3Dnone,id=3Ddrive-virtio-
+  disk0,format=3Dqcow2: could not open disk image
+  /var/lib/libvirt/images/poppy.qcow2: Could not read snapshots: File
+  too large
+
+  =
+
+  From the command line trying to check the image also gives me:
+  qemu-img check poppy.qcow2
+  qemu-img: Could not open 'poppy.qcow2': Could not read snapshots: File to=
+o large
+
+  =
+
+  This bug appears with both the default install of qemu for ubuntu 14.04:
+  qemu-img version 2.0.0, Copyright (c) 2004-2008 Fabrice Bellard
+
+  And the latest version.
+  qemu-img version 2.1.50, Copyright (c) 2004-2008 Fabrice Bellard
+
+  =
+
+  Host: =
+
+  Dual E5-2650 v2 @ 2.60GHz
+  32GB Memory
+  4TB Disk space (2.1TB Free) =
 
 
---cfJ13FhsvNR/yOpm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Host OS: Ubuntu 14.04.1 LTS 64bit
 
-On Fri, Apr 06, 2018 at 08:48:55AM +0300, Serhii Popovych wrote:
-> Bharata B Rao wrote:
-> > On Thu, Apr 05, 2018 at 10:35:22AM -0400, Serhii Popovych wrote:
-> >> This reverts commit b556854bd8524c26b8be98ab1bfdf0826831e793.
-> >>
-> >> Leave change @node type from uint32_t to to int from reverted commit
-> >> because node < 0 is always false.
-> >>
-> >> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
-> >> ---
-> >>  hw/ppc/spapr.c | 22 ----------------------
-> >>  1 file changed, 22 deletions(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 2c0be8c..3ad4545 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -3477,28 +3477,6 @@ static void spapr_machine_device_plug(HotplugHa=
-ndler *hotplug_dev,
-> >>              return;
-> >>          }
-> >>
-> >> -        /*
-> >> -         * Currently PowerPC kernel doesn't allow hot-adding memory to
-> >> -         * memory-less node, but instead will silently add the memory
-> >> -         * to the first node that has some memory. This causes two
-> >> -         * unexpected behaviours for the user.
-> >> -         *
-> >> -         * - Memory gets hotplugged to a different node than what the=
- user
-> >> -         *   specified.
-> >> -         * - Since pc-dimm subsystem in QEMU still thinks that memory=
- belongs
-> >> -         *   to memory-less node, a reboot will set things accordingly
-> >> -         *   and the previously hotplugged memory now ends in the rig=
-ht node.
-> >> -         *   This appears as if some memory moved from one node to an=
-other.
-> >> -         *
-> >> -         * So until kernel starts supporting memory hotplug to memory=
--less
-> >> -         * nodes, just prevent such attempts upfront in QEMU.
-> >> -         */
-> >> -        if (nb_numa_nodes && !numa_info[node].node_mem) {
-> >> -            error_setg(errp, "Can't hotplug memory to memory-less nod=
-e %d",
-> >> -                       node);
-> >> -            return;
-> >> -        }
-> >> -
-> >=20
-> > If you remove this unconditionally, wouldn't it be a problem in case
-> > of newer QEMU with older guest kernels ?
->=20
-> Yes, that definitely would affect guest kernels without such support. We
-> probably need to add some capability to test for guest kernel
-> functionality presence.
+  Guest:
+  Ubuntu 14.04 64bit
+  Storage Size: 500gb
 
-Hm, maybe.
-
-So first, we should check when the guest side support came in.  If
-it's old enough we might not care.
-
-PAPR does include a mechanism for negotiating guest/host
-capabilities.  However, I don't think it has a bit for this specific
-feature, so I can't really see a way to do this cleanly.
-
-I don't think we necessarily have to handle that case: it's not like
-we can reasonably workaround *every* possible guest bug/limitation
-=66rom the host side.  If you want to create a system with a memory-less
-node you need an OS that can handle that, nothing really special there.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---cfJ13FhsvNR/yOpm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrMPFsACgkQbDjKyiDZ
-s5JR0xAAuv3NjUp1trvpBCNPzFNQJKFw9yVbPfyUbDxVDMqCFme4NknrNgvUPfWJ
-nKpXaxvSLdtwGCMH1AkHyv6iFoIIBcj4Ea9NUdGilyiueTXUiyWpLxCJ/pZnnDMu
-0aSR1oPYrOWK+7WIO5ldiphmaDN0sTQ+Ed42kDLGxCTynsiLnRy6BUM5m8PhS01h
-Dc8eWgH5Miz6QyAj54kdH3WFJa5xqAkyutiJLYTKFXlxB9TGRPbtZHuAX9t0d7vG
-CUS3+fGEAbo+UEIAsn0wn7b7CJ2biDsLw+BngacPlaQw/EvrBm+MM8XLnxxftzWQ
-Q7XWbiE4z9JmgI82FXUjoc2Xu46mSwpbjq1M8krGnLbvWRJKCH5XxWGoJaU90ccQ
-sMr5rksP8DwPfGsHJi8jetkbx5ka+iKqCS45uPrDHBO3tMfBA/sPfpTnuPKJCQ9r
-drvzxTG31OwyGR3Jk7S3va3EzKXC7+HGTad2Rdn7FYJVosK+55WL1tWbMsTPTaWX
-t8XhOwD2wkhSdShKIPUyOXEB8YNHZewSxz2gddUruK/TFF2DzKXXXG3fQrWyrYv9
-mE0DUqP9pywGvdiN4ey2jGThEhLt3ubPs8145tzMWqHXmcWTISw2d2sfBp65KfkC
-7fQBAxbj8ndT6XsvLHOXiawbPpB9zaSbd/ltQf02rKCbJ/Mpj10=
-=jH1R
------END PGP SIGNATURE-----
-
---cfJ13FhsvNR/yOpm--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1354167/+subscriptions
