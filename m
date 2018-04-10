@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5uNS-0006b7-72
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:36:07 -0400
+	(envelope-from <cota@braap.org>) id 1f5uQK-00082W-Kq
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f5uNO-0007Ia-BE
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:36:06 -0400
-Date: Tue, 10 Apr 2018 16:35:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180410143551.GF7026@localhost.localdomain>
-References: <20180404150146.23281-1-stefanha@redhat.com>
-	<5c93e912-9d6a-214c-e4fb-8a4e6fc6e7f9@redhat.com>
-	<20180410081158.GA20090@stefanha-x1.localdomain>
+	(envelope-from <cota@braap.org>) id 1f5uQH-0000WN-Fs
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:39:04 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:53937)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f5uQH-0000Vo-A1
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 10:39:01 -0400
+Date: Tue, 10 Apr 2018 10:38:58 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180410143858.GB22989@flamenco>
+References: <1523038800-2494-1-git-send-email-cota@braap.org>
+	<1523038800-2494-18-git-send-email-cota@braap.org>
+	<37e6c5c3-dc83-c557-658a-901485e20e19@linaro.org>
+	<20180410125904.GA22304@flamenco>
+	<af72f45e-f6e5-9c29-4325-bc1fdfc37987@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7AUc2qLy4jB3hD7Z"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180410081158.GA20090@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v2] qemu-iotests: update 185 output
+In-Reply-To: <af72f45e-f6e5-9c29-4325-bc1fdfc37987@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 17/17] target/riscv: convert to
+ TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
+On Tue, Apr 10, 2018 at 09:05:06 -0500, Eric Blake wrote:
+> On 04/10/2018 07:59 AM, Emilio G. Cota wrote:
+> > On Tue, Apr 10, 2018 at 11:24:37 +1000, Richard Henderson wrote:
+> >> On 04/07/2018 04:20 AM, Emilio G. Cota wrote:
+> >>> +        next_page = (ctx->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+> >>> +        if (ctx->base.pc_next >= next_page) {
+> >>
+> >> This fails for the last page of the address space.
+> >> Better is
+> >>
+> >>   page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
+> >>   if (ctx->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
+> > 
+> > Apart from the variable name change, I fail to see how this (A - B >= C)
+> > is not equivalent to the above (A => B + C). What am I missing?
+> 
+> Integer overflow.  Adding TARGET_PAGE_SIZE might wrap next_page to 0,
+> which changes the semantics of the conditional; while performing the
+> subtraction avoids the case of overflow.
 
---7AUc2qLy4jB3hD7Z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah indeed. Thanks.
 
-Am 10.04.2018 um 10:11 hat Stefan Hajnoczi geschrieben:
-> On Wed, Apr 04, 2018 at 06:16:12PM +0200, Max Reitz wrote:
-> > On 2018-04-04 17:01, Stefan Hajnoczi wrote:
-> >  =3D=3D=3D Start mirror job and exit qemu =3D=3D=3D
-> >=20
-> > This seems to be independent of whether there is actually data on
-> > TEST_IMG (the commit source), so something doesn't seem quite right with
-> > the block job throttling here...?
->=20
-> I've been playing around with this test failure.  Let's leave it broken
-> (!) in QEMU 2.12 because this test has uncovered a block job ratelimit
-> issue that's not a regression.  The fix shouldn't be rushed.
+Turns out we have this problem in other targets as well -- will fix.
 
-Makes sense.
-
-Thanks, applied to the block branch.
-
-Kevin
-
---7AUc2qLy4jB3hD7Z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJazMvGAAoJEH8JsnLIjy/WvSsP/3M/hBYJLgMVP32URO3j4a0k
-z1prcYVo915QlrLs8RC9q7fyyJ/tmLxdr22c3bQV6EK7nwM2svGhCSE+tOtJlnwe
-tyJMQ6oeUvx/NTxMla4olUMsd/xEHSrC/cMmSPs3k/FseSwu/dC5GohHbbaKxwN/
-DWvHpwzfm2/58v9ZKULiJYBcNI3iJwOG/zgIInIAIumpmg9esubo9mwFksdZCllN
-nfEuotjPVZsxq5+w3CdWLpr4sWTlFA/7lw8aOk9ns96b1MSx0dae1GpaLma00fB1
-/OJAUZtba3OQWKft1PD07jMCHHLFyZMKYuH9LUqAnMO0nrvmkzYFHmJVXI8++CRH
-YCqlmWEfYkq03f4QS3ij/MQecg5vFW3Q/hY/llfGw6X4LLBLk5e9r0aXIdC4tLZB
-ZsCG/8rqVcjoMEmV0gAhu5JQT2UVveJhugOAYtqQKcsRBn+eqJoYnfMOs/+OyrJz
-sQ3Qd+Byf6PsQdA7UeTTjsl+lYnlrB2sjwl/UOSguURRCMizHh2nRZR+SBNQIiWw
-vTptfWEWoMrPPlbYPE9fJnQsYdZDaDJfNgzQy3P0pQIDWKYxGsB8Xe+kDeHVG1vK
-Wj5DFakSp8X1OjbfdBg6Ge3+P+7fi4rAHXPiPoE1cakVZiH0Pn2CM1gVgSFgpHYt
-BsBM7O4aH5j7uXxCUrC9
-=Cre6
------END PGP SIGNATURE-----
-
---7AUc2qLy4jB3hD7Z--
+		E.
