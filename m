@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDU-0007vc-Bs
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDT-0007v9-MM
 	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDT-0000kr-GY
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:40 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDS-0000kB-Iq
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:39 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40762)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f5sDT-0000iH-9X
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:39 -0400
+	id 1f5sDS-0000iH-Av
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 08:17:38 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1f5sDI-0007aN-PO
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 13:17:28 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1f5sDK-0007bH-7T
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 13:17:30 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Apr 2018 13:17:15 +0100
-Message-Id: <20180410121724.8549-4-peter.maydell@linaro.org>
+Date: Tue, 10 Apr 2018 13:17:17 +0100
+Message-Id: <20180410121724.8549-6-peter.maydell@linaro.org>
 In-Reply-To: <20180410121724.8549-1-peter.maydell@linaro.org>
 References: <20180410121724.8549-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 03/12] target-arm: Check undefined opcodes for
- SWP in A32 decoder
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 05/12] hw/sd/bcm2835_sdhost: Don't raise
+ spurious interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +33,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Onur Sahin <onursahin08@gmail.com>
+The Linux bcm2835_sdhost driver doesn't work on QEMU, because our
+model raises spurious data interrupts.  Our function
+bcm2835_sdhost_fifo_run() will flag an interrupt any time it is
+called with s->datacnt == 0, even if the host hasn't actually issued
+a data read or write command yet.  This means that the driver gets a
+spurious data interrupt as soon as it enables IRQs and then does
+something else that causes us to call the fifo_run routine, like
+writing to SDHCFG, and before it does the write to SDCMD to issue the
+read.  The driver's IRQ handler then spins forever complaining that
+there's no data and the SD controller isn't in a state where there's
+going to be any data:
 
-Make sure we are not treating architecturally Undefined instructions
-as a SWP, by verifying the opcodes as per section A8.8.229 of ARMv7-A
-specification. Bits [21:20] must be zero for this to be a SWP or SWPB.
-We also choose to UNDEF for the architecturally UNPREDICTABLE case of
-bits [11:8] not being zero.
+[   41.040738] sdhost-bcm2835 3f202000.mmc: fsm 1, hsts 00000000
+[   41.042059] sdhost-bcm2835 3f202000.mmc: fsm 1, hsts 00000000
+(continues forever).
 
-Signed-off-by: Onur Sahin <onursahin08@gmail.com>
-[PMM: tweaked commit message]
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Move the interrupt flag setting to more plausible places:
+ * for BUSY, raise this as soon as a BUSYWAIT command has executed
+ * for DATA, raise this when the FIFO has any space free (for a write)
+   or any data in it (for a read)
+ * for BLOCK, raise this when the data count is 0 and we've
+   actually done some reading or writing
+
+This is pure guesswork since the documentation for this hardware is
+not public, but it is sufficient to get the Linux bcm2835_sdhost
+driver to work.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20180319161556.16446-3-peter.maydell@linaro.org
 ---
- target/arm/translate.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/sd/bcm2835_sdhost.c | 46 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index fc03b5b8c8..db1ce6510a 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -9237,11 +9237,14 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                             }
-                         }
-                         tcg_temp_free_i32(addr);
--                    } else {
-+                    } else if ((insn & 0x00300f00) == 0) {
-+                        /* 0bcccc_0001_0x00_xxxx_xxxx_0000_1001_xxxx
-+                        *  - SWP, SWPB
-+                        */
-+
-                         TCGv taddr;
-                         TCGMemOp opc = s->be_data;
+diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
+index 79f3c5ceeb..ebf3b926c2 100644
+--- a/hw/sd/bcm2835_sdhost.c
++++ b/hw/sd/bcm2835_sdhost.c
+@@ -137,6 +137,12 @@ static void bcm2835_sdhost_send_command(BCM2835SDHostState *s)
+         }
+ #undef RWORD
+     }
++    /* We never really delay commands, so if this was a 'busywait' command
++     * then we've completed it now and can raise the interrupt.
++     */
++    if ((s->cmd & SDCMD_BUSYWAIT) && (s->config & SDHCFG_BUSY_IRPT_EN)) {
++        s->status |= SDHSTS_BUSY_IRPT;
++    }
+     return;
  
--                        /* SWP instruction */
-                         rm = (insn) & 0xf;
- 
-                         if (insn & (1 << 22)) {
-@@ -9259,6 +9262,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                                                 get_mem_index(s), opc);
-                         tcg_temp_free(taddr);
-                         store_reg(s, rd, tmp);
-+                    } else {
-+                        goto illegal_op;
-                     }
+ error:
+@@ -187,18 +193,27 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+                 n++;
+                 if (n == 4) {
+                     bcm2835_sdhost_fifo_push(s, value);
++                    s->status |= SDHSTS_DATA_FLAG;
++                    if (s->config & SDHCFG_DATA_IRPT_EN) {
++                        s->status |= SDHSTS_SDIO_IRPT;
++                    }
+                     n = 0;
+                     value = 0;
                  }
-             } else {
+             }
+             if (n != 0) {
+                 bcm2835_sdhost_fifo_push(s, value);
++                s->status |= SDHSTS_DATA_FLAG;
+             }
+         } else { /* write */
+             n = 0;
+             while (s->datacnt > 0 && (s->fifo_len > 0 || n > 0)) {
+                 if (n == 0) {
+                     value = bcm2835_sdhost_fifo_pop(s);
++                    s->status |= SDHSTS_DATA_FLAG;
++                    if (s->config & SDHCFG_DATA_IRPT_EN) {
++                        s->status |= SDHSTS_SDIO_IRPT;
++                    }
+                     n = 4;
+                 }
+                 n--;
+@@ -207,28 +222,19 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+                 value >>= 8;
+             }
+         }
++        if (s->datacnt == 0) {
++            s->edm &= ~SDEDM_FSM_MASK;
++            s->edm |= SDEDM_FSM_DATAMODE;
++            trace_bcm2835_sdhost_edm_change("datacnt 0", s->edm);
++
++            if ((s->cmd & SDCMD_WRITE_CMD) &&
++                (s->config & SDHCFG_BLOCK_IRPT_EN)) {
++                s->status |= SDHSTS_BLOCK_IRPT;
++            }
++        }
+     }
+-    if (s->datacnt == 0) {
+-        s->status |= SDHSTS_DATA_FLAG;
+ 
+-        s->edm &= ~0xf;
+-        s->edm |= SDEDM_FSM_DATAMODE;
+-        trace_bcm2835_sdhost_edm_change("datacnt 0", s->edm);
+-
+-        if (s->config & SDHCFG_DATA_IRPT_EN) {
+-            s->status |= SDHSTS_SDIO_IRPT;
+-        }
+-
+-        if ((s->cmd & SDCMD_BUSYWAIT) && (s->config & SDHCFG_BUSY_IRPT_EN)) {
+-            s->status |= SDHSTS_BUSY_IRPT;
+-        }
+-
+-        if ((s->cmd & SDCMD_WRITE_CMD) && (s->config & SDHCFG_BLOCK_IRPT_EN)) {
+-            s->status |= SDHSTS_BLOCK_IRPT;
+-        }
+-
+-        bcm2835_sdhost_update_irq(s);
+-    }
++    bcm2835_sdhost_update_irq(s);
+ 
+     s->edm &= ~(0x1f << 4);
+     s->edm |= ((s->fifo_len & 0x1f) << 4);
 -- 
 2.16.2
