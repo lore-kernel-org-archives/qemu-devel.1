@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5wBD-0000tW-Pc
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1f5wBR-00017G-3u
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f5wBB-00015z-2y
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f5wBA-00013i-SV
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f5wB8-00033m-A4
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:31:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C8E0F2E80D8
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:31:29 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1f5wBP-0001F0-U0
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 12:31:49 -0400
+References: <cover.1523376013.git.berto@igalia.com>
+	<74552e1d6e858d3159cb0c0e188e80bc9248e337.1523376013.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <271b88fe-6d19-fee3-cdc7-f76c046958dc@redhat.com>
+Date: Tue, 10 Apr 2018 11:31:33 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Apr 2018 16:16:35 -0000
-From: Richard Henwood <richard.henwood@arm.com>
-Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
-Message-Id: <152337699533.20953.15096940596358969141.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1761535] Re: qemu-aarch64-static docker
- arm64v8/openjdk coredump
+In-Reply-To: <74552e1d6e858d3159cb0c0e188e80bc9248e337.1523376013.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ByhBF8k0UahiGhfaKp3fW93MlIbu6xqHZ"
+Subject: Re: [Qemu-devel] [PATCH 2/2] specs/qcow2: Clarify that compressed
+ clusters have the COPIED bit reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Many thanks!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ByhBF8k0UahiGhfaKp3fW93MlIbu6xqHZ
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <271b88fe-6d19-fee3-cdc7-f76c046958dc@redhat.com>
+Subject: Re: [PATCH 2/2] specs/qcow2: Clarify that compressed clusters have
+ the COPIED bit reset
+References: <cover.1523376013.git.berto@igalia.com>
+ <74552e1d6e858d3159cb0c0e188e80bc9248e337.1523376013.git.berto@igalia.com>
+In-Reply-To: <74552e1d6e858d3159cb0c0e188e80bc9248e337.1523376013.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I've just compiled master, and docker/aarch64/openjdk image now works as
-expected on my x86 machine.
+On 04/10/2018 11:05 AM, Alberto Garcia wrote:
+> Compressed clusters are not supposed to have the COPIED bit set, but
+> this is not made explicit in the specs, so let's document it.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  docs/interop/qcow2.txt | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+> index feb711fb6a..8e1547ded2 100644
+> --- a/docs/interop/qcow2.txt
+> +++ b/docs/interop/qcow2.txt
+> @@ -400,10 +400,10 @@ L2 table entry:
+>                62:   0 for standard clusters
+>                      1 for compressed clusters
+> =20
+> -              63:   0 for a cluster that is unused or requires COW, 1 =
+if its
+> -                    refcount is exactly one. This information is only =
+accurate
+> -                    in L2 tables that are reachable from the active L1=
 
--- =
+> -                    table.
+> +              63:   0 for clusters that are unused, compressed or requ=
+ire COW.
+> +                    1 for standard clusters whose refcount is exactly =
+one.
+> +                    This information is only accurate in L2 tables
+> +                    that are reachable from the active L1 table.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1761535
+This matches what qemu outputs, so the question becomes whether it is
+technically necessary to make this requirement mandatory for 3rd-party
+implementations.  But I'm in favor of the tighter wording, as it gets
+rather hairy to check whether exactly one compressed cluster is
+occupying a host cluster, plus I don't want to think about what happens
+if a compressed cluster with the bit set crosses a host cluster boundary
+(does it mean that compressed cluster is the only [remaining] source of
+data for BOTH host clusters at once, where both the head of the first
+host cluster and tail of the second host cluster is unused?)
 
-Title:
-  qemu-aarch64-static docker arm64v8/openjdk coredump
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  Fix Committed
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  I am using qemu-aarch64-static to run the arm64v8/openjdk official
-  image on my x86 machine. Using QEMU master, I immediately hit a bug
-  which hangs the container. With Ubuntu default version qemu-aarch64
-  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
-  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
 
-  To reproduce (and get to the core dump):
+--ByhBF8k0UahiGhfaKp3fW93MlIbu6xqHZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
-  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
-rch64-static arm64v8/openjdk /bin/bash
-  root@bf75cf45d311:/# javac
-  Usage: javac <options> <source files>
-  where possible options include:
-    -g                         Generate all debugging info
-  <...snip...>
-    @<filename>                Read options and filenames from file
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrM5uUACgkQp6FrSiUn
+Q2rBYgf8DHlAmtubqd5mSq5g8QWQwFkO35psY5oU4ueMj7p9KQzMWKt5grEi5FHu
++XccY54d3DLbeKF5hV1rCStuqjc/p88bNnoav/bT6E/821fNkTDojAccQsDXp2Kf
+Ev3dmKSYRTKsUhTYb+0HZrgHTzGv7VuOWKd0fLMrI2JGRgGDqIAEGbV55+Epm1zZ
+pPMx2gwaw3Arn4UegONunAIYui0Wrh6vyGajCYtxlnSLQexiZiXmquI0o4Wtehmj
+JdwD/GxdJJppdhGBCsfiWnNbyWxcGKSXDRlK2Q9Bpno6icXWUkQ/99FMN/fyn1Pb
+QcCCNXz6zpKXVJwI++mFcFgJFzYfQw==
+=+lqc
+-----END PGP SIGNATURE-----
 
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  ...TERMINAL HANGS...
-
-  =
-
-  To get the core dump, In a separate terminal:
-
-  # snapshot the file system of the hung image
-  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
-
-  # connect with known working qemu
-  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
-tic  -i qemu_coredump /bin/bash
-
-  $$ ls -lat
-  total 10608
-  <snip>
-  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
-1.core
-  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
-  <snip>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
+--ByhBF8k0UahiGhfaKp3fW93MlIbu6xqHZ--
