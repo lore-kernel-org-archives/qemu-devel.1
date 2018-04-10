@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f5uo7-0002RV-TL
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:03:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f5vJg-0001XI-Nl
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f5uo2-0001OO-4r
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:03:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47890 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f5uo2-0001OC-0z
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:03:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 938D6F8FD4
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 15:03:33 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 10 Apr 2018 16:03:28 +0100
-Message-Id: <20180410150329.47586-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] migration queue
+	(envelope-from <laurent@vivier.eu>) id 1f5vJa-00059I-OY
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:36:16 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:59315)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f5vJa-00058S-E3
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 11:36:10 -0400
+References: <20180314153121.23838-1-james.cowgill@mips.com>
+	<20180315151348.6451-1-james.cowgill@mips.com>
+	<67a47930-6e97-296a-e918-beb3d75b7a87@vivier.eu>
+	<CAFEAcA8wrCH5PpPdCbD-5zBZjAHFMbArsAQ6r=dZ6HjseyfMDg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <81fef02e-c73b-d422-73b4-67371bdda8bb@vivier.eu>
+Date: Tue, 10 Apr 2018 17:34:50 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8wrCH5PpPdCbD-5zBZjAHFMbArsAQ6r=dZ6HjseyfMDg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: implement HWCAP bits on MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com
-Cc: quintela@redhat.com, peterx@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, James Cowgill <james.cowgill@mips.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Le 10/04/2018 à 15:53, Peter Maydell a écrit :
+> On 15 March 2018 at 15:25, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Le 15/03/2018 à 16:13, James Cowgill a écrit :
+>>> Add support for the two currently defined HWCAP bits on MIPS - R6 and
+>>> MSA.
+>>>
+>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1754372
+>>> Signed-off-by: James Cowgill <james.cowgill@mips.com>
+>>> ---
+>>> v2 changes:
+>>>  - Fix kernel hwcap.h path.
+>>>
+>>>  linux-user/elfload.c | 24 ++++++++++++++++++++++++
+>>>  1 file changed, 24 insertions(+)
+>>>
+>>
+>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-The following changes since commit df6378eb0e6cfd58a22a1c3ff8fa4a9039f1eaa8:
+Hi Peter,
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180410-pull-request' into staging (2018-04-10 14:04:27 +0100)
+> Hi Laurent -- did this MIPS HWCAP fix get lost somewhere? I can't
+> see it in master or your latest pullreq.
 
-are available in the Git repository at:
+yes, I've missed it. I add it to my pull request.
 
-  git://github.com/dagrh/qemu.git tags/pull-migration-20180410a
-
-for you to fetch changes up to a18a73d7472e6ff5bc1e5f7fb9f7a42464295d03:
-
-  Revert "migration: Don't activate block devices if using -S" (2018-04-10 15:28:42 +0100)
-
-----------------------------------------------------------------
-Migration reversion pull for 2.12
-
-One to revert after we decided it needs some more thinking.
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (1):
-      Revert "migration: Don't activate block devices if using -S"
-
- migration/migration.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+Thank you,
+Laurent
