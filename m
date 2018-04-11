@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6InT-0002yc-BR
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:36 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f6IoH-0003iy-Jr
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6InP-0004fs-AQ
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:35 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 11 Apr 2018 18:39:37 +0200
-Message-Id: <20180411163940.2523-17-kwolf@redhat.com>
-In-Reply-To: <20180411163940.2523-1-kwolf@redhat.com>
-References: <20180411163940.2523-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/19] block: Allow AIO_WAIT_WHILE with NULL ctx
+	(envelope-from <mreitz@redhat.com>) id 1f6IoG-0005MP-OS
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:41:25 -0400
+References: <20180411122606.367301-1-vsementsov@virtuozzo.com>
+	<20180411122606.367301-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <75ae7684-99fb-6b8e-2fbf-0e5528c78165@redhat.com>
+Date: Wed, 11 Apr 2018 18:41:14 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180411122606.367301-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,62 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com
 
-bdrv_drain_all() wants to have a single polling loop for draining the
-in-flight requests of all nodes. This means that the AIO_WAIT_WHILE()
-condition relies on activity in multiple AioContexts, which is polled
-from the mainloop context. We must therefore call AIO_WAIT_WHILE() from
-the mainloop thread and use the AioWait notification mechanism.
+On 2018-04-11 14:26, Vladimir Sementsov-Ogievskiy wrote:
+> Improve and fix 169:
+>     - use MIGRATION events instead of RESUME
+>     - make a TODO: enable dirty-bitmaps capability for offline case
+>     - recreate vm_b without -incoming near test end
+> 
+> This (likely) fixes racy faults at least of the following types:
+> 
+>     - timeout on waiting for RESUME event
+>     - sha256 mismatch on line 136 (142 after this patch)
+>     - fail to self.vm_b.launch() on line 135 (141 now after this patch)
+> 
+> And surely fixes cat processes, left after test finish.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/169 | 48 +++++++++++++++++++++++++++---------------------
+>  1 file changed, 27 insertions(+), 21 deletions(-)
 
-Just randomly picking the AioContext of any non-mainloop thread would
-work, but instead of bothering to find such a context in the caller, we
-can just as well accept NULL for ctx.
+Looks good, makes the test pass reliably (here) and doesn't result in
+overly loud meowing due to an abundance of orphaned cats.  Thanks!
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/aio-wait.h | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-index 783d3678dd..c85a62f798 100644
---- a/include/block/aio-wait.h
-+++ b/include/block/aio-wait.h
-@@ -57,7 +57,8 @@ typedef struct {
- /**
-  * AIO_WAIT_WHILE:
-  * @wait: the aio wait object
-- * @ctx: the aio context
-+ * @ctx: the aio context, or NULL if multiple aio contexts (for which the
-+ *       caller does not hold a lock) are involved in the polling condition.
-  * @cond: wait while this conditional expression is true
-  *
-  * Wait while a condition is true.  Use this to implement synchronous
-@@ -75,7 +76,7 @@ typedef struct {
-     bool waited_ = false;                                          \
-     AioWait *wait_ = (wait);                                       \
-     AioContext *ctx_ = (ctx);                                      \
--    if (in_aio_context_home_thread(ctx_)) {                        \
-+    if (ctx_ && in_aio_context_home_thread(ctx_)) {                \
-         while ((cond)) {                                           \
-             aio_poll(ctx_, true);                                  \
-             waited_ = true;                                        \
-@@ -86,9 +87,13 @@ typedef struct {
-         /* Increment wait_->num_waiters before evaluating cond. */ \
-         atomic_inc(&wait_->num_waiters);                           \
-         while ((cond)) {                                           \
--            aio_context_release(ctx_);                             \
-+            if (ctx_) {                                            \
-+                aio_context_release(ctx_);                         \
-+            }                                                      \
-             aio_poll(qemu_get_aio_context(), true);                \
--            aio_context_acquire(ctx_);                             \
-+            if (ctx_) {                                            \
-+                aio_context_acquire(ctx_);                         \
-+            }                                                      \
-             waited_ = true;                                        \
-         }                                                          \
-         atomic_dec(&wait_->num_waiters);                           \
--- 
-2.13.6
+Reviewed-by: Max Reitz <mreitz@redhat.com>
