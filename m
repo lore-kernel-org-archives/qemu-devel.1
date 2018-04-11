@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f6IxR-000412-A9
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:50:54 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f6J4B-00029x-3l
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:57:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f6IxQ-0003Ep-9y
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:50:53 -0400
-References: <20180411122606.367301-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4aa0f5d3-8d32-3b44-3997-f8ba91625772@redhat.com>
-Date: Wed, 11 Apr 2018 18:50:39 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1f6J49-0007lm-Pe
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:57:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35610 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6J49-0007lP-Ia
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:57:49 -0400
+Date: Wed, 11 Apr 2018 17:57:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180411165742.GI2667@work-vm>
+References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
+	<1523089594-1422-2-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180411122606.367301-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] bitmaps persistent and migration
- fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1523089594-1422-2-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] migration: create a dedicated
+ connection for rdma return path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +28,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-On 2018-04-11 14:26, Vladimir Sementsov-Ogievskiy wrote:
-> v2:
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> If start a RDMA migration with postcopy enabled, the source qemu
+> establish a dedicated connection for return path.
 > 
-> 01: new, proposed by Max
-> 02: fix leaving cat processes
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+
+
+OK, I think that'll work.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/rdma.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 91 insertions(+), 3 deletions(-)
 > 
-> Vladimir Sementsov-Ogievskiy (2):
->   qcow2: try load bitmaps only once
->   iotests: fix 169
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index da474fc..230bd97 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -387,6 +387,10 @@ typedef struct RDMAContext {
+>      uint64_t unregistrations[RDMA_SIGNALED_SEND_MAX];
+>  
+>      GHashTable *blockmap;
+> +
+> +    /* the RDMAContext for return path */
+> +    struct RDMAContext *return_path;
+> +    bool is_return_path;
+>  } RDMAContext;
+>  
+>  #define TYPE_QIO_CHANNEL_RDMA "qio-channel-rdma"
+> @@ -2329,10 +2333,22 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+>          rdma_destroy_id(rdma->cm_id);
+>          rdma->cm_id = NULL;
+>      }
+> +
+> +    /* the destination side, listen_id and channel is shared */
+>      if (rdma->listen_id) {
+> -        rdma_destroy_id(rdma->listen_id);
+> +        if (!rdma->is_return_path) {
+> +            rdma_destroy_id(rdma->listen_id);
+> +        }
+>          rdma->listen_id = NULL;
+> +
+> +        if (rdma->channel) {
+> +            if (!rdma->is_return_path) {
+> +                rdma_destroy_event_channel(rdma->channel);
+> +            }
+> +            rdma->channel = NULL;
+> +        }
+>      }
+> +
+>      if (rdma->channel) {
+>          rdma_destroy_event_channel(rdma->channel);
+>          rdma->channel = NULL;
+> @@ -2561,6 +2577,25 @@ err_dest_init_create_listen_id:
+>  
+>  }
+>  
+> +static void qemu_rdma_return_path_dest_init(RDMAContext *rdma_return_path,
+> +                                            RDMAContext *rdma)
+> +{
+> +    int idx;
+> +
+> +    for (idx = 0; idx < RDMA_WRID_MAX; idx++) {
+> +        rdma_return_path->wr_data[idx].control_len = 0;
+> +        rdma_return_path->wr_data[idx].control_curr = NULL;
+> +    }
+> +
+> +    /*the CM channel and CM id is shared*/
+> +    rdma_return_path->channel = rdma->channel;
+> +    rdma_return_path->listen_id = rdma->listen_id;
+> +
+> +    rdma->return_path = rdma_return_path;
+> +    rdma_return_path->return_path = rdma;
+> +    rdma_return_path->is_return_path = true;
+> +}
+> +
+>  static void *qemu_rdma_data_init(const char *host_port, Error **errp)
+>  {
+>      RDMAContext *rdma = NULL;
+> @@ -3014,6 +3049,8 @@ err:
+>      return ret;
+>  }
+>  
+> +static void rdma_accept_incoming_migration(void *opaque);
+> +
+>  static int qemu_rdma_accept(RDMAContext *rdma)
+>  {
+>      RDMACapabilities cap;
+> @@ -3108,7 +3145,14 @@ static int qemu_rdma_accept(RDMAContext *rdma)
+>          }
+>      }
+>  
+> -    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
+> +    /* Accept the second connection request for return path */
+> +    if (migrate_postcopy() && !rdma->is_return_path) {
+> +        qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
+> +                            NULL,
+> +                            (void *)(intptr_t)rdma->return_path);
+> +    } else {
+> +        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
+> +    }
+>  
+>      ret = rdma_accept(rdma->cm_id, &conn_param);
+>      if (ret) {
+> @@ -3681,6 +3725,10 @@ static void rdma_accept_incoming_migration(void *opaque)
+>  
+>      trace_qemu_rdma_accept_incoming_migration_accepted();
+>  
+> +    if (rdma->is_return_path) {
+> +        return;
+> +    }
+> +
+>      f = qemu_fopen_rdma(rdma, "rb");
+>      if (f == NULL) {
+>          ERROR(errp, "could not qemu_fopen_rdma!");
+> @@ -3695,7 +3743,7 @@ static void rdma_accept_incoming_migration(void *opaque)
+>  void rdma_start_incoming_migration(const char *host_port, Error **errp)
+>  {
+>      int ret;
+> -    RDMAContext *rdma;
+> +    RDMAContext *rdma, *rdma_return_path;
+>      Error *local_err = NULL;
+>  
+>      trace_rdma_start_incoming_migration();
+> @@ -3722,12 +3770,24 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+>  
+>      trace_rdma_start_incoming_migration_after_rdma_listen();
+>  
+> +    /* initialize the RDMAContext for return path */
+> +    if (migrate_postcopy()) {
+> +        rdma_return_path = qemu_rdma_data_init(host_port, &local_err);
+> +
+> +        if (rdma_return_path == NULL) {
+> +            goto err;
+> +        }
+> +
+> +        qemu_rdma_return_path_dest_init(rdma_return_path, rdma);
+> +    }
+> +
+>      qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
+>                          NULL, (void *)(intptr_t)rdma);
+>      return;
+>  err:
+>      error_propagate(errp, local_err);
+>      g_free(rdma);
+> +    g_free(rdma_return_path);
+>  }
+>  
+>  void rdma_start_outgoing_migration(void *opaque,
+> @@ -3735,6 +3795,7 @@ void rdma_start_outgoing_migration(void *opaque,
+>  {
+>      MigrationState *s = opaque;
+>      RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
+> +    RDMAContext *rdma_return_path = NULL;
+>      int ret = 0;
+>  
+>      if (rdma == NULL) {
+> @@ -3755,6 +3816,32 @@ void rdma_start_outgoing_migration(void *opaque,
+>          goto err;
+>      }
+>  
+> +    /* RDMA postcopy need a seprate queue pair for return path */
+> +    if (migrate_postcopy()) {
+> +        rdma_return_path = qemu_rdma_data_init(host_port, errp);
+> +
+> +        if (rdma_return_path == NULL) {
+> +            goto err;
+> +        }
+> +
+> +        ret = qemu_rdma_source_init(rdma_return_path,
+> +            s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL], errp);
+> +
+> +        if (ret) {
+> +            goto err;
+> +        }
+> +
+> +        ret = qemu_rdma_connect(rdma_return_path, errp);
+> +
+> +        if (ret) {
+> +            goto err;
+> +        }
+> +
+> +        rdma->return_path = rdma_return_path;
+> +        rdma_return_path->return_path = rdma;
+> +        rdma_return_path->is_return_path = true;
+> +    }
+> +
+>      trace_rdma_start_outgoing_migration_after_rdma_connect();
+>  
+>      s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
+> @@ -3762,4 +3849,5 @@ void rdma_start_outgoing_migration(void *opaque,
+>      return;
+>  err:
+>      g_free(rdma);
+> +    g_free(rdma_return_path);
+>  }
+> -- 
+> 1.8.3.1
 > 
->  block/qcow2.h          |  1 +
->  block/qcow2.c          | 16 ++++++++--------
->  tests/qemu-iotests/169 | 48 +++++++++++++++++++++++++++---------------------
->  3 files changed, 36 insertions(+), 29 deletions(-)
-
-Thanks, changed the comment wording in patch 1 according to Eric's
-suggestion and applied to my block branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-I left the commit wording unchanged because as you said there might be
-more cases where we have bitmaps at the node although we haven't yet
-loaded any from the file.  I certainly don't want to have to think too
-much about those cases and that to me is the main use of patch 1.
-
-If there is going to be an rc4 (it appears there is), I will send a pull
-request with these patches for it.  If not, I probably won't.  Then I'll
-just add a qemu-stable CC and get them into 2.13 -- unless you disagree
-and you think that this series should indeed be in 2.12.
-
-Max
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
