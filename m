@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6O0m-0004Ao-6t
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:14:41 -0400
+	(envelope-from <cota@braap.org>) id 1f6O3m-0005cC-9R
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6O0l-0001GJ-9E
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:14:40 -0400
-References: <20180411185425.2461-1-mreitz@redhat.com>
-	<20180411185425.2461-12-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fec5bd7d-74e8-a3f7-f885-df0fb0d3b9bf@redhat.com>
-Date: Wed, 11 Apr 2018 17:14:24 -0500
+	(envelope-from <cota@braap.org>) id 1f6O3j-0002hp-6A
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:17:46 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:60831)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f6O3i-0002hQ-V1
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:17:43 -0400
+Date: Wed, 11 Apr 2018 18:17:42 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180411221742.GA27538@flamenco>
+References: <222EDB99-2ED5-4CCB-B550-7A02BC4BDC7F@psware.com>
 MIME-Version: 1.0
-In-Reply-To: <20180411185425.2461-12-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF"
-Subject: Re: [Qemu-devel] [PATCH v4 11/13] block/mirror: Add active mirroring
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <222EDB99-2ED5-4CCB-B550-7A02BC4BDC7F@psware.com>
+Subject: Re: [Qemu-devel] Bad icount read when running qemu-system-ppc64 and
+ mfspr atbu guest instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Darrell Leinwand <darrell.leinwand@psware.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <fec5bd7d-74e8-a3f7-f885-df0fb0d3b9bf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 11/13] block/mirror: Add active mirroring
-References: <20180411185425.2461-1-mreitz@redhat.com>
- <20180411185425.2461-12-mreitz@redhat.com>
-In-Reply-To: <20180411185425.2461-12-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Apr 11, 2018 at 18:18:18 +0000, Darrell Leinwand wrote:
+> Hi,
+> 
+> When I enable icount using an e5500 core I get an exit with “Bad icount read” when the guest software executes a load atbu command.
+> 
+> It looks like in qemu/accel/tcg/cpu_exec.c:166 sets can_do_io false when using icount.
+>     cpu->can_do_io = !use_icount;
+>     ret = tcg_qemu_tb_exec(env, tb_ptr);
+>     cpu->can_do_io = 1;
+> 
+> Since can_do_io is set to false there and the cpu_get_icount_raw() function checks that flag qemu/cpus.c:260:
+>         if (!cpu->can_do_io) {
+>             fprintf(stderr, "Bad icount read\n");
+>             exit(1);
+>         }
+> 
+> The load_atbu function will always fail. I commented out the !use_icount and set it to a 1 in cpu_exec.c and it continues and seems to run normally, but I am not sure what side effects while running icount that could have since it may allow actual IO to occur while translation is happening.
 
-On 04/11/2018 01:54 PM, Max Reitz wrote:
-> This patch implements active synchronous mirroring.  In active mode, th=
-e
-> passive mechanism will still be in place and is used to copy all
-> initially dirty clusters off the source disk; but every write request
-> will write data both to the source and the target disk, so the source
-> cannot be dirtied faster than data is mirrored to the target.  Also,
-> once the block job has converged (BLOCK_JOB_READY sent), source and
-> target are guaranteed to stay in sync (unless an error occurs).
->=20
-> Active mode is completely optional and currently disabled at runtime.  =
-A
-> later patch will add a way for users to enable it.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->  qapi/block-core.json |  18 ++++
->  block/mirror.c       | 252 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++-
->  2 files changed, 265 insertions(+), 5 deletions(-)
->=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index c50517bff3..8210d601f4 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1049,6 +1049,24 @@
->  { 'enum': 'MirrorSyncMode',
->    'data': ['top', 'full', 'none', 'incremental'] }
-> =20
-> +##
-> +# @MirrorCopyMode:
-> +#
-> +# An enumeration whose values tell the mirror block job when to
-> +# trigger writes to the target.
-> +#
-> +# @background: copy data in background only.
-> +#
-> +# @write-blocking: when data is written to the source, write it
-> +#                  (synchronously) to the target as well.  In
-> +#                  addition, data is copied in background just like in=
+Can you reproduce with the current master, i.e. 38e83a71d02 ?
+A few patches have very recently been merged that might fix
+your problem.
 
-> +#                  @background mode.
-> +#
-> +# Since: 2.12
+If master is still broken and it used to work in the past for you,
+it would be useful if you could bisect this to point out the commit
+that broke this.
 
-Missed an instance of 2.13
+Thanks,
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrOiMAACgkQp6FrSiUn
-Q2p/GQf9HRsuDrWP3B2fqimsv3sYRtA+z+tEc6n2485FeVtIbSdBKuA3uYjBz7Sy
-udt6As9Ed0l3UrciGlrJISN5tu3WsSplOg8nriQUmYZJK8JsRPG1078pJO/cVBI7
-cngtWVuBGp/4PJTFzSYNLKVIaHmUHpuE0gaz4aRPnKjgWPqmKAjn4YNBCGbTHh32
-OEnPKrRLaTMb0dberRwqDfnYJRjSjq2loUJ5EkKsz4e+sActokH31I0b9QDqoYW/
-XjPub/2WqnEBWarEJf3J+f17kgyu+sL8VNhSrycs10aY/AoAoJfo+zEAXH0HFLCL
-eRQwrwa+mgyeB2me9+Q6KMz3qHjuVQ==
-=q18q
------END PGP SIGNATURE-----
-
---lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF--
+		Emilio
