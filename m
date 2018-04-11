@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1f6AXA-0003e3-3D
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:51:15 -0400
+	(envelope-from <peterx@redhat.com>) id 1f6Agl-000809-8W
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1f6AX6-000187-Sh
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:51:12 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36722)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1f6AX6-00017l-KB
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:51:08 -0400
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 11 Apr 2018 10:51:10 +0300
-Message-ID: <20180411075109.5065.88256.stgit@pasha-VirtualBox>
+	(envelope-from <peterx@redhat.com>) id 1f6AgW-0007CC-H9
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:01:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60246 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f6AgW-00079A-8L
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:00:52 -0400
+Date: Wed, 11 Apr 2018 16:00:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180411080036.GD13887@xz-mi>
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2] timer: remove replay clock probe in
- deadline calculation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180411072027.5656-1-tiwei.bie@intel.com>
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
-Ciro Santilli reported that commit a5ed352596a8b7eb2f9acce34371b944ac3056c4
-breaks the execution replay. It happens due to the probing the clock
-for the new instances of iothread.
-However, this probing was made in replay mode for the timer lists that
-are empty.
-This patch removes clock probing in replay mode.
-It is an artifact of the old version with another thread model.
+On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- util/qemu-timer.c |   11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+[...]
 
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 2ed1bf2..86bfe84 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -578,17 +578,10 @@ int64_t timerlistgroup_deadline_ns(QEMUTimerListGroup *tlg)
- {
-     int64_t deadline = -1;
-     QEMUClockType type;
--    bool play = replay_mode == REPLAY_MODE_PLAY;
-     for (type = 0; type < QEMU_CLOCK_MAX; type++) {
-         if (qemu_clock_use_for_deadline(type)) {
--            if (!play || type == QEMU_CLOCK_REALTIME) {
--                deadline = qemu_soonest_timeout(deadline,
--                                                timerlist_deadline_ns(tlg->tl[type]));
--            } else {
--                /* Read clock from the replay file and
--                   do not calculate the deadline, based on virtual clock. */
--                qemu_clock_get_ns(type);
--            }
-+            deadline = qemu_soonest_timeout(deadline,
-+                                            timerlist_deadline_ns(tlg->tl[type]));
-         }
-     }
-     return deadline;
+> This is just a RFC for now. It seems that, it doesn't work
+> as expected when guest is using kernel driver (To handle
+> this case, it seems that some RAM regions' events also need
+> to be listened). Any comments would be appreciated! Thanks!
+
+Hi, Tiwei,
+
+What's your kernel command line in the guest?  Is iommu=pt there?
+
+-- 
+Peter Xu
