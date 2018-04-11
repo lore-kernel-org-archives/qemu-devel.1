@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6InE-0002nC-VY
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f6InN-0002uo-6n
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6InD-0004Zz-Lz
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f6InL-0004dy-KJ
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:29 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 11 Apr 2018 18:39:31 +0200
-Message-Id: <20180411163940.2523-11-kwolf@redhat.com>
+Date: Wed, 11 Apr 2018 18:39:36 +0200
+Message-Id: <20180411163940.2523-16-kwolf@redhat.com>
 In-Reply-To: <20180411163940.2523-1-kwolf@redhat.com>
 References: <20180411163940.2523-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/19] block: Drain recursively with a single
- BDRV_POLL_WHILE()
+Subject: [Qemu-devel] [PATCH 15/19] test-bdrv-drain: Test that
+ bdrv_drain_invoke() doesn't poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,208 +23,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Anything can happen inside BDRV_POLL_WHILE(), including graph
-changes that may interfere with its callers (e.g. child list iteration
-in recursive callers of bdrv_do_drained_begin).
-
-Switch to a single BDRV_POLL_WHILE() call for the whole subtree at the
-end of bdrv_do_drained_begin() to avoid such effects. The recursion
-happens now inside the loop condition. As the graph can only change
-between bdrv_drain_poll() calls, but not inside of it, doing the
-recursion here is safe.
+This adds a test case that goes wrong if bdrv_drain_invoke() calls
+aio_poll().
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block.h |  2 +-
- block.c               |  2 +-
- block/io.c            | 58 +++++++++++++++++++++++++++++++++++++--------------
- 3 files changed, 44 insertions(+), 18 deletions(-)
+ tests/test-bdrv-drain.c | 102 +++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 88 insertions(+), 14 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 23dee3c114..91bf3b4e36 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -563,7 +563,7 @@ void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore);
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index fdf3ce19ea..79d845ecbb 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -34,12 +34,16 @@ static QemuEvent done_event;
+ typedef struct BDRVTestState {
+     int drain_count;
+     AioContext *bh_indirection_ctx;
++    bool sleep_in_drain_begin;
+ } BDRVTestState;
+ 
+ static void coroutine_fn bdrv_test_co_drain_begin(BlockDriverState *bs)
+ {
+     BDRVTestState *s = bs->opaque;
+     s->drain_count++;
++    if (s->sleep_in_drain_begin) {
++        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
++    }
+ }
+ 
+ static void coroutine_fn bdrv_test_co_drain_end(BlockDriverState *bs)
+@@ -80,6 +84,22 @@ static int coroutine_fn bdrv_test_co_preadv(BlockDriverState *bs,
+     return 0;
+ }
+ 
++static void bdrv_test_child_perm(BlockDriverState *bs, BdrvChild *c,
++                                 const BdrvChildRole *role,
++                                 BlockReopenQueue *reopen_queue,
++                                 uint64_t perm, uint64_t shared,
++                                 uint64_t *nperm, uint64_t *nshared)
++{
++    /* bdrv_format_default_perms() accepts only these two, so disguise
++     * detach_by_driver_cb_role as one of them. */
++    if (role != &child_file && role != &child_backing) {
++        role = &child_file;
++    }
++
++    bdrv_format_default_perms(bs, c, role, reopen_queue, perm, shared,
++                              nperm, nshared);
++}
++
+ static BlockDriver bdrv_test = {
+     .format_name            = "test",
+     .instance_size          = sizeof(BDRVTestState),
+@@ -90,7 +110,7 @@ static BlockDriver bdrv_test = {
+     .bdrv_co_drain_begin    = bdrv_test_co_drain_begin,
+     .bdrv_co_drain_end      = bdrv_test_co_drain_end,
+ 
+-    .bdrv_child_perm        = bdrv_format_default_perms,
++    .bdrv_child_perm        = bdrv_test_child_perm,
+ };
+ 
+ static void aio_ret_cb(void *opaque, int ret)
+@@ -982,13 +1002,14 @@ struct detach_by_parent_data {
+     BdrvChild *child_b;
+     BlockDriverState *c;
+     BdrvChild *child_c;
++    bool by_parent_cb;
+ };
++static struct detach_by_parent_data detach_by_parent_data;
+ 
+-static void detach_by_parent_aio_cb(void *opaque, int ret)
++static void detach_indirect_bh(void *opaque)
+ {
+     struct detach_by_parent_data *data = opaque;
+ 
+-    g_assert_cmpint(ret, ==, 0);
+     bdrv_unref_child(data->parent_b, data->child_b);
+ 
+     bdrv_ref(data->c);
+@@ -996,6 +1017,25 @@ static void detach_by_parent_aio_cb(void *opaque, int ret)
+                                       &child_file, &error_abort);
+ }
+ 
++static void detach_by_parent_aio_cb(void *opaque, int ret)
++{
++    struct detach_by_parent_data *data = &detach_by_parent_data;
++
++    g_assert_cmpint(ret, ==, 0);
++    if (data->by_parent_cb) {
++        detach_indirect_bh(data);
++    }
++}
++
++static void detach_by_driver_cb_drained_begin(BdrvChild *child)
++{
++    aio_bh_schedule_oneshot(qemu_get_current_aio_context(),
++                            detach_indirect_bh, &detach_by_parent_data);
++    child_file.drained_begin(child);
++}
++
++static BdrvChildRole detach_by_driver_cb_role;
++
+ /*
+  * Initial graph:
   *
-  * Poll for pending requests in @bs. This is part of bdrv_drained_begin.
+@@ -1003,17 +1043,25 @@ static void detach_by_parent_aio_cb(void *opaque, int ret)
+  *    \ /   \
+  *     A     B     C
+  *
+- * PA has a pending write request whose callback changes the child nodes of PB:
+- * It removes B and adds C instead. The subtree of PB is drained, which will
+- * indirectly drain the write request, too.
++ * by_parent_cb == true:  Test that parent callbacks don't poll
++ *
++ *     PA has a pending write request whose callback changes the child nodes of
++ *     PB: It removes B and adds C instead. The subtree of PB is drained, which
++ *     will indirectly drain the write request, too.
++ *
++ * by_parent_cb == false: Test that bdrv_drain_invoke() doesn't poll
++ *
++ *     PA's BdrvChildRole has a .drained_begin callback that schedules a BH
++ *     that does the same graph change. If bdrv_drain_invoke() calls it, the
++ *     state is messed up, but if it is only polled in the single
++ *     BDRV_POLL_WHILE() at the end of the drain, this should work fine.
   */
--bool bdrv_drain_poll(BlockDriverState *bs, bool top_level);
-+bool bdrv_drain_poll(BlockDriverState *bs, bool top_level, bool recursive);
- 
- /**
-  * bdrv_drained_begin:
-diff --git a/block.c b/block.c
-index 462287bdfb..9fe39ac8c1 100644
---- a/block.c
-+++ b/block.c
-@@ -823,7 +823,7 @@ static void bdrv_child_cb_drained_begin(BdrvChild *child)
- static bool bdrv_child_cb_drained_poll(BdrvChild *child)
+-static void test_detach_by_parent_cb(void)
++static void test_detach_indirect(bool by_parent_cb)
  {
-     BlockDriverState *bs = child->opaque;
--    return bdrv_drain_poll(bs, false);
-+    return bdrv_drain_poll(bs, false, false);
- }
+     BlockBackend *blk;
+     BlockDriverState *parent_a, *parent_b, *a, *b, *c;
+     BdrvChild *child_a, *child_b;
+     BlockAIOCB *acb;
+-    struct detach_by_parent_data data;
  
- static void bdrv_child_cb_drained_end(BdrvChild *child)
-diff --git a/block/io.c b/block/io.c
-index f24f39c278..1287630c58 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -161,6 +161,7 @@ typedef struct {
-     bool done;
-     bool begin;
-     bool recursive;
-+    bool poll;
-     BdrvChild *parent;
- } BdrvCoDrainData;
- 
-@@ -196,8 +197,10 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
- }
- 
- /* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll() */
--bool bdrv_drain_poll(BlockDriverState *bs, bool top_level)
-+bool bdrv_drain_poll(BlockDriverState *bs, bool top_level, bool recursive)
- {
-+    BdrvChild *child, *next;
-+
-     /* Execute pending BHs first and check everything else only after the BHs
-      * have executed. */
-     if (top_level) {
-@@ -208,11 +211,23 @@ bool bdrv_drain_poll(BlockDriverState *bs, bool top_level)
-         return true;
-     }
- 
--    return atomic_read(&bs->in_flight);
-+    if (atomic_read(&bs->in_flight)) {
-+        return true;
-+    }
-+
-+    if (recursive) {
-+        QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
-+            if (bdrv_drain_poll(child->bs, false, recursive)) {
-+                return true;
-+            }
-+        }
-+    }
-+
-+    return false;
- }
- 
- static void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
--                                  BdrvChild *parent);
-+                                  BdrvChild *parent, bool poll);
- static void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
-                                 BdrvChild *parent);
- 
-@@ -224,7 +239,7 @@ static void bdrv_co_drain_bh_cb(void *opaque)
- 
-     bdrv_dec_in_flight(bs);
-     if (data->begin) {
--        bdrv_do_drained_begin(bs, data->recursive, data->parent);
-+        bdrv_do_drained_begin(bs, data->recursive, data->parent, data->poll);
-     } else {
-         bdrv_do_drained_end(bs, data->recursive, data->parent);
-     }
-@@ -235,7 +250,7 @@ static void bdrv_co_drain_bh_cb(void *opaque)
- 
- static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
-                                                 bool begin, bool recursive,
--                                                BdrvChild *parent)
-+                                                BdrvChild *parent, bool poll)
- {
-     BdrvCoDrainData data;
- 
-@@ -250,6 +265,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
-         .begin = begin,
-         .recursive = recursive,
-         .parent = parent,
-+        .poll = poll,
+     QEMUIOVector qiov;
+     struct iovec iov = {
+@@ -1022,6 +1070,12 @@ static void test_detach_by_parent_cb(void)
      };
-     bdrv_inc_in_flight(bs);
-     aio_bh_schedule_oneshot(bdrv_get_aio_context(bs),
-@@ -262,12 +278,12 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
- }
+     qemu_iovec_init_external(&qiov, &iov, 1);
  
- void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
--                           BdrvChild *parent)
-+                           BdrvChild *parent, bool poll)
- {
-     BdrvChild *child, *next;
- 
-     if (qemu_in_coroutine()) {
--        bdrv_co_yield_to_drain(bs, true, recursive, parent);
-+        bdrv_co_yield_to_drain(bs, true, recursive, parent, poll);
-         return;
-     }
- 
-@@ -279,25 +295,35 @@ void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
-     bdrv_parent_drained_begin(bs, parent);
-     bdrv_drain_invoke(bs, true);
- 
--    /* Wait for drained requests to finish */
--    BDRV_POLL_WHILE(bs, bdrv_drain_poll(bs, true));
--
-     if (recursive) {
-         bs->recursive_quiesce_counter++;
-         QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
--            bdrv_do_drained_begin(child->bs, true, child);
-+            bdrv_do_drained_begin(child->bs, true, child, false);
-         }
-     }
-+
-+    /*
-+     * Wait for drained requests to finish.
-+     *
-+     * Calling BDRV_POLL_WHILE() only once for the top-level node is okay: The
-+     * call is needed so things in this AioContext can make progress even
-+     * though we don't return to the main AioContext loop - this automatically
-+     * includes other nodes in the same AioContext and therefore all child
-+     * nodes.
-+     */
-+    if (poll) {
-+        BDRV_POLL_WHILE(bs, bdrv_drain_poll(bs, true, recursive));
++    if (!by_parent_cb) {
++        detach_by_driver_cb_role = child_file;
++        detach_by_driver_cb_role.drained_begin =
++            detach_by_driver_cb_drained_begin;
 +    }
++
+     /* Create all involved nodes */
+     parent_a = bdrv_new_open_driver(&bdrv_test, "parent-a", BDRV_O_RDWR,
+                                     &error_abort);
+@@ -1037,6 +1091,13 @@ static void test_detach_by_parent_cb(void)
+     blk_insert_bs(blk, parent_a, &error_abort);
+     bdrv_unref(parent_a);
+ 
++    /* If we want to get bdrv_drain_invoke() to call aio_poll(), the driver
++     * callback must not return immediately. */
++    if (!by_parent_cb) {
++        BDRVTestState *s = parent_a->opaque;
++        s->sleep_in_drain_begin = true;
++    }
++
+     /* Set child relationships */
+     bdrv_ref(b);
+     bdrv_ref(a);
+@@ -1044,7 +1105,9 @@ static void test_detach_by_parent_cb(void)
+     child_a = bdrv_attach_child(parent_b, a, "PB-A", &child_backing, &error_abort);
+ 
+     bdrv_ref(a);
+-    bdrv_attach_child(parent_a, a, "PA-A", &child_file, &error_abort);
++    bdrv_attach_child(parent_a, a, "PA-A",
++                      by_parent_cb ? &child_file : &detach_by_driver_cb_role,
++                      &error_abort);
+ 
+     g_assert_cmpint(parent_a->refcnt, ==, 1);
+     g_assert_cmpint(parent_b->refcnt, ==, 1);
+@@ -1057,18 +1120,19 @@ static void test_detach_by_parent_cb(void)
+     g_assert(QLIST_NEXT(child_b, next) == NULL);
+ 
+     /* Start the evil write request */
+-    data = (struct detach_by_parent_data) {
++    detach_by_parent_data = (struct detach_by_parent_data) {
+         .parent_b = parent_b,
+         .child_b = child_b,
+         .c = c,
++        .by_parent_cb = by_parent_cb,
+     };
+-    acb = blk_aio_preadv(blk, 0, &qiov, 0, detach_by_parent_aio_cb, &data);
++    acb = blk_aio_preadv(blk, 0, &qiov, 0, detach_by_parent_aio_cb, NULL);
+     g_assert(acb != NULL);
+ 
+     /* Drain and check the expected result */
+     bdrv_subtree_drained_begin(parent_b);
+ 
+-    g_assert(data.child_c != NULL);
++    g_assert(detach_by_parent_data.child_c != NULL);
+ 
+     g_assert_cmpint(parent_a->refcnt, ==, 1);
+     g_assert_cmpint(parent_b->refcnt, ==, 1);
+@@ -1076,8 +1140,8 @@ static void test_detach_by_parent_cb(void)
+     g_assert_cmpint(b->refcnt, ==, 1);
+     g_assert_cmpint(c->refcnt, ==, 2);
+ 
+-    g_assert(QLIST_FIRST(&parent_b->children) == data.child_c);
+-    g_assert(QLIST_NEXT(data.child_c, next) == child_a);
++    g_assert(QLIST_FIRST(&parent_b->children) == detach_by_parent_data.child_c);
++    g_assert(QLIST_NEXT(detach_by_parent_data.child_c, next) == child_a);
+     g_assert(QLIST_NEXT(child_a, next) == NULL);
+ 
+     g_assert_cmpint(parent_a->quiesce_counter, ==, 1);
+@@ -1105,6 +1169,15 @@ static void test_detach_by_parent_cb(void)
+     bdrv_unref(c);
  }
  
- void bdrv_drained_begin(BlockDriverState *bs)
++static void test_detach_by_parent_cb(void)
++{
++    test_detach_indirect(true);
++}
++
++static void test_detach_by_driver_cb(void)
++{
++    test_detach_indirect(false);
++}
+ 
+ int main(int argc, char **argv)
  {
--    bdrv_do_drained_begin(bs, false, NULL);
-+    bdrv_do_drained_begin(bs, false, NULL, true);
- }
+@@ -1157,6 +1230,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/bdrv-drain/detach/drain", test_detach_by_drain);
+     g_test_add_func("/bdrv-drain/detach/drain_subtree", test_detach_by_drain_subtree);
+     g_test_add_func("/bdrv-drain/detach/parent_cb", test_detach_by_parent_cb);
++    g_test_add_func("/bdrv-drain/detach/driver_cb", test_detach_by_driver_cb);
  
- void bdrv_subtree_drained_begin(BlockDriverState *bs)
- {
--    bdrv_do_drained_begin(bs, true, NULL);
-+    bdrv_do_drained_begin(bs, true, NULL, true);
- }
- 
- void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
-@@ -307,7 +333,7 @@ void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
-     int old_quiesce_counter;
- 
-     if (qemu_in_coroutine()) {
--        bdrv_co_yield_to_drain(bs, false, recursive, parent);
-+        bdrv_co_yield_to_drain(bs, false, recursive, parent, false);
-         return;
-     }
-     assert(bs->quiesce_counter > 0);
-@@ -343,7 +369,7 @@ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_parent)
-     int i;
- 
-     for (i = 0; i < new_parent->recursive_quiesce_counter; i++) {
--        bdrv_do_drained_begin(child->bs, true, child);
-+        bdrv_do_drained_begin(child->bs, true, child, true);
-     }
- }
- 
-@@ -413,7 +439,7 @@ void bdrv_drain_all_begin(void)
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-         aio_context_acquire(aio_context);
--        bdrv_do_drained_begin(bs, true, NULL);
-+        bdrv_do_drained_begin(bs, true, NULL, true);
-         aio_context_release(aio_context);
-     }
- 
+     ret = g_test_run();
+     qemu_event_destroy(&done_event);
 -- 
 2.13.6
