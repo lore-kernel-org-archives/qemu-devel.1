@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f6BTA-0005at-Pj
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:51:09 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1f6BZS-00086V-5U
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:57:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f6BT7-0003AA-IR
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:51:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44526 helo=mx1.redhat.com)
+	(envelope-from <tiwei.bie@intel.com>) id 1f6BZN-0005pa-BO
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:57:38 -0400
+Received: from mga03.intel.com ([134.134.136.65]:28504)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f6BT7-00039V-E9
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:51:05 -0400
-Date: Wed, 11 Apr 2018 16:50:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180411085054.GC2785@lemon.usersys.redhat.com>
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-2-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f6BZN-0005om-0U
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 04:57:33 -0400
+Date: Wed, 11 Apr 2018 16:55:25 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180411085525.ius2cj2z2e2j6vs7@debian>
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
+	<20180411080036.GD13887@xz-mi>
+	<20180411082556.3hjaubnnw3hbpnp3@debian>
+	<20180411083716.GE13887@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180410193919.28026-2-alex.bennee@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 01/24] configure: add test for docker
- availability
+In-Reply-To: <20180411083716.GE13887@xz-mi>
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, cota@braap.org
+To: Peter Xu <peterx@redhat.com>
+Cc: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
-On Tue, 04/10 20:38, Alex Benn=E9e wrote:
-> This tests for a working docker installation without sudo and sets up
-> config-host.mak accordingly. This will be useful from cross compiling
-> things in the future.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> ---
->  configure | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
->=20
-> diff --git a/configure b/configure
-> index 4d0e92c96c..b402befe94 100755
-> --- a/configure
-> +++ b/configure
-> @@ -451,6 +451,7 @@ jemalloc=3D"no"
->  replication=3D"yes"
->  vxhs=3D""
->  libxml2=3D""
-> +docker=3D"no"
-> =20
->  supported_cpu=3D"no"
->  supported_os=3D"no"
-> @@ -5396,6 +5397,23 @@ EOF
->    fi
->  fi
-> =20
-> +##########################################
-> +# Docker and cross-compiler support
-> +#
-> +# This is specifically for building test
-> +# cases for foreign architectures, not
-> +# cross-compiling QEMU itself.
-> +
-> +if has "docker"; then
-> +    if docker images  >/dev/null 2>&1 ; then
-> +        docker=3D"yes"
-> +    else
-> +        # docker may be available but using sudo
-> +        # so we won't use it for cross-building
-> +        docker=3D"maybe"
+On Wed, Apr 11, 2018 at 04:37:16PM +0800, Peter Xu wrote:
+> On Wed, Apr 11, 2018 at 04:25:56PM +0800, Tiwei Bie wrote:
+> > On Wed, Apr 11, 2018 at 04:00:36PM +0800, Peter Xu wrote:
+> > > On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > This is just a RFC for now. It seems that, it doesn't work
+> > > > as expected when guest is using kernel driver (To handle
+> > > > this case, it seems that some RAM regions' events also need
+> > > > to be listened). Any comments would be appreciated! Thanks!
+> > > 
+> > > Hi, Tiwei,
+> > > 
+> > > What's your kernel command line in the guest?  Is iommu=pt there?
+> > 
+> > Yeah, you are right! The related things in kernel command line are:
+> > 
+> > iommu=pt intel_iommu=on
+> > 
+> > Hmm, how will this param affect vIOMMU's behaviour?..
+> 
+> If iommu=pt is there, guest kernel will try to bypass IOMMU, the IOMMU
+> regions will be disabled completely in that case, hence it's very
+> possible that your IOMMU memory listeners won't get anything useful.
+> 
+> Maybe you can consider removing iommu=pt in the guest parameter to see
+> whether the guest kernel driver could work.
 
-What is the problem with using sudo for cross-building?
+Cool. I'll give it a try! Considering we may also need to
+handle the iommu=pt case, is there any event in QEMU can
+be used to know whether the IOMMU regions are disabled
+or enabled by the guest?
 
-Fam
+Best regards,
+Tiwei Bie
 
-> +    fi
-> +fi
-> +
->  ##########################################
->  # End of CC checks
->  # After here, no more $cc or $ld runs
-> @@ -5857,6 +5875,7 @@ echo "avx2 optimization $avx2_opt"
->  echo "replication support $replication"
->  echo "VxHS block device $vxhs"
->  echo "capstone          $capstone"
-> +echo "docker            $docker"
-> =20
->  if test "$sdl_too_old" =3D "yes"; then
->  echo "-> Your SDL version is too old - please upgrade to have SDL supp=
-ort"
-> @@ -6680,6 +6699,10 @@ if test "$gcov" =3D "yes" ; then
->    echo "GCOV=3D$gcov_tool" >> $config_host_mak
->  fi
-> =20
-> +if test "$docker" =3D "yes"; then
-> +    echo "HAVE_USER_DOCKER=3Dy" >> $config_host_mak
-> +fi
-> +
->  # use included Linux headers
->  if test "$linux" =3D "yes" ; then
->    mkdir -p linux-headers
-> --=20
-> 2.16.2
->=20
+> 
+> -- 
+> Peter Xu
