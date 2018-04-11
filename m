@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f6JQQ-000191-Ng
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:20:51 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f6JcP-0007dA-OR
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f6JQM-0005IP-Ia
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:20:50 -0400
-Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:35303)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f6JQM-0005E5-7d
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:20:46 -0400
-Received: from player687.ha.ovh.net (unknown [10.109.120.111])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 127331535D0
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 19:20:37 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 11 Apr 2018 19:20:14 +0200
-Message-Id: <20180411172014.24711-1-clg@kaod.org>
-MIME-Version: 1.0
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f6JcL-0006Ee-8x
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:33:13 -0400
+Date: Thu, 12 Apr 2018 01:33:01 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <20180411163940.2523-7-kwolf@redhat.com>
+References: <20180411163940.2523-1-kwolf@redhat.com>
+	<20180411163940.2523-7-kwolf@redhat.com>
+Content-Transfer-Encoding: base64
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH] migration: discard RAMBlocks of type
- ram_device
+MIME-Version: 1.0
+Message-ID: <6f8b15b5.15a6a.162b5c4947d.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH 06/19] block: Avoid unnecessary aio_poll()
+ in AIO_WAIT_WHILE()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,170 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-Here is some context for this strange change request.
-
-On the POWER9 processor, the XIVE interrupt controller can control
-interrupt sources using MMIO to trigger events, to EOI or to turn off
-the sources. Priority management and interrupt acknowledgment is also
-controlled by MMIO in the presenter subengine.
-
-These MMIO regions are exposed to guests in QEMU with a set of 'ram
-device' memory mappings, similarly to VFIO, and the VMAs are populated
-dynamically with the appropriate pages using a fault handler.
-
-But, these regions are an issue for migration. We need to discard the
-associated RAMBlocks from the RAM state on the source VM and let the
-destination VM rebuild the memory mappings on the new host in the
-post_load() operation just before resuming the system.
-
-This is the goal of the following proposal. Does it make sense ? It
-seems to be working enough to migrate a running guest but there might
-be a better, more subtle, approach.
-
-Thanks,
-
-C.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- migration/ram.c | 42 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 40 insertions(+), 2 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 0e90efa09236..6404ccd046d8 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -780,6 +780,10 @@ unsigned long migration_bitmap_find_dirty(RAMState *=
-rs, RAMBlock *rb,
-     unsigned long *bitmap =3D rb->bmap;
-     unsigned long next;
-=20
-+    if (memory_region_is_ram_device(rb->mr)) {
-+        return size;
-+    }
-+
-     if (rs->ram_bulk_stage && start > 0) {
-         next =3D start + 1;
-     } else {
-@@ -826,6 +830,9 @@ uint64_t ram_pagesize_summary(void)
-     uint64_t summary =3D 0;
-=20
-     RAMBLOCK_FOREACH(block) {
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-         summary |=3D block->page_size;
-     }
-=20
-@@ -850,6 +857,9 @@ static void migration_bitmap_sync(RAMState *rs)
-     qemu_mutex_lock(&rs->bitmap_mutex);
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-         migration_bitmap_sync_range(rs, block, 0, block->used_length);
-     }
-     rcu_read_unlock();
-@@ -1499,6 +1509,10 @@ static int ram_save_host_page(RAMState *rs, PageSe=
-archStatus *pss,
-     size_t pagesize_bits =3D
-         qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
-=20
-+    if (memory_region_is_ram_device(pss->block->mr)) {
-+        return 0;
-+    }
-+
-     do {
-         tmppages =3D ram_save_target_page(rs, pss, last_stage);
-         if (tmppages < 0) {
-@@ -1588,6 +1602,9 @@ uint64_t ram_bytes_total(void)
-=20
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-         total +=3D block->used_length;
-     }
-     rcu_read_unlock();
-@@ -1643,6 +1660,9 @@ static void ram_save_cleanup(void *opaque)
-     memory_global_dirty_log_stop();
-=20
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-         g_free(block->bmap);
-         block->bmap =3D NULL;
-         g_free(block->unsentmap);
-@@ -1710,6 +1730,9 @@ void ram_postcopy_migrated_memory_release(Migration=
-State *ms)
-         unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
-         unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0)=
-;
-=20
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-         while (run_start < range) {
-             unsigned long run_end =3D find_next_bit(bitmap, range, run_s=
-tart + 1);
-             ram_discard_range(block->idstr, run_start << TARGET_PAGE_BIT=
-S,
-@@ -1784,8 +1807,13 @@ static int postcopy_each_ram_send_discard(Migratio=
-nState *ms)
-     int ret;
-=20
-     RAMBLOCK_FOREACH(block) {
--        PostcopyDiscardState *pds =3D
--            postcopy_discard_send_init(ms, block->idstr);
-+        PostcopyDiscardState *pds;
-+
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-+
-+        pds =3D postcopy_discard_send_init(ms, block->idstr);
-=20
-         /*
-          * Postcopy sends chunks of bitmap over the wire, but it
-@@ -1996,6 +2024,10 @@ int ram_postcopy_send_discard_bitmap(MigrationStat=
-e *ms)
-         unsigned long *bitmap =3D block->bmap;
-         unsigned long *unsentmap =3D block->unsentmap;
-=20
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-+
-         if (!unsentmap) {
-             /* We don't have a safe way to resize the sentmap, so
-              * if the bitmap was resized it will be NULL at this
-@@ -2151,6 +2183,9 @@ static void ram_list_init_bitmaps(void)
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
-         QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+            if (memory_region_is_ram_device(block->mr)) {
-+                continue;
-+            }
-             pages =3D block->max_length >> TARGET_PAGE_BITS;
-             block->bmap =3D bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-@@ -2227,6 +2262,9 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
-)
-     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-=20
-     RAMBLOCK_FOREACH(block) {
-+        if (memory_region_is_ram_device(block->mr)) {
-+            continue;
-+        }
-         qemu_put_byte(f, strlen(block->idstr));
-         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr)=
-);
-         qemu_put_be64(f, block->used_length);
---=20
-2.13.6
+RGVhciBLZXZpbjoKSSBub3RpY2UgY2hlY2twYXRjaC5wbCBjb21wbGFpbmVkIGFib3V0IGNvZGUg
+c3R5bGUgcHJvYmxlbXMsCnlvdSBtYXkgd2FudCB0byByZXBsYWNlIGB3aGlsZSAoYWlvX3BvbGwo
+YnMtPmFpb19jb250ZXh0LCBmYWxzZSkpO2AKd2l0aApgYGAKd2hpbGUgKGFpb19wb2xsKGJzLT5h
+aW9fY29udGV4dCwgZmFsc2UpKSB7CiAgICAvKiBObyBmdXJ0aGVyIHdvcmsgKi8KfQpgYGAKdG8g
+c3VwcHJlc3MgdGhlIGNvbXBsYWludHMuCgpCZXN0LApTdSBIYW5nCgoiS2V2aW4gV29sZiIgPGt3
+b2xmQHJlZGhhdC5jb20+d3JvdGU6Cj4gQ29tbWl0IDkxYWYwOTFmOTIzIGFkZGVkIGFuIGFkZGl0
+aW9uYWwgYWlvX3BvbGwoKSB0byBCRFJWX1BPTExfV0hJTEUoKQ0KPiBpbiBvcmRlciB0byBtYWtl
+IHN1cmUgdGhhdCBhbGwgcGVuZGluZyBCSHMgYXJlIGV4ZWN1dGVkIG9uIGRyYWluLiBUaGlzDQo+
+IHdhcyB0aGUgd3JvbmcgcGxhY2UgdG8gbWFrZSB0aGUgZml4LCBhcyBpdCBpcyB1c2VsZXNzIG92
+ZXJoZWFkIGZvciBhbGwNCj4gb3RoZXIgdXNlcnMgb2YgdGhlIG1hY3JvIGFuZCB1bm5lY2Vzc2Fy
+aWx5IGNvbXBsaWNhdGVzIHRoZSBtZWNoYW5pc20uDQo+IA0KPiBUaGlzIHBhdGNoIGVmZmVjdGl2
+ZWx5IHJldmVydHMgc2FpZCBjb21taXQgKHRoZSBjb250ZXh0IGhhcyBjaGFuZ2VkIGENCj4gYml0
+IGFuZCB0aGUgY29kZSBoYXMgbW92ZWQgdG8gQUlPX1dBSVRfV0hJTEUoKSkgYW5kIGluc3RlYWQg
+cG9sbHMgaW4gdGhlDQo+IGxvb3AgY29uZGl0aW9uIGZvciBkcmFpbi4NCj4gDQo+IFRoZSBlZmZl
+Y3QgaXMgcHJvYmFibHkgaGFyZCB0byBtZWFzdXJlIGluIGFueSByZWFsLXdvcmxkIHVzZSBjYXNl
+DQo+IGJlY2F1c2UgYWN0dWFsIEkvTyB3aWxsIGRvbWluYXRlLCBidXQgaWYgSSBydW4gb25seSB0
+aGUgaW5pdGlhbGlzYXRpb24NCj4gcGFydCBvZiAncWVtdS1pbWcgY29udmVydCcgd2hlcmUgaXQg
+Y2FsbHMgYmRydl9ibG9ja19zdGF0dXMoKSBmb3IgdGhlDQo+IHdob2xlIGltYWdlIHRvIGZpbmQg
+b3V0IGhvdyBtdWNoIGRhdGEgdGhlcmUgaXMgY29weSwgdGhpcyBwaGFzZSBhY3R1YWxseQ0KPiBu
+ZWVkcyBvbmx5IHJvdWdobHkgaGFsZiB0aGUgdGltZSBhZnRlciB0aGlzIHBhdGNoLg0KPiANCj4g
+U2lnbmVkLW9mZi1ieTogS2V2aW4gV29sZiA8a3dvbGZAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICBp
+bmNsdWRlL2Jsb2NrL2Fpby13YWl0LmggfCAyMiArKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+ICBi
+bG9jay9pby5jICAgICAgICAgICAgICAgfCAxMSArKysrKysrKysrLQ0KPiAgMiBmaWxlcyBjaGFu
+Z2VkLCAxOCBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQg
+YS9pbmNsdWRlL2Jsb2NrL2Fpby13YWl0LmggYi9pbmNsdWRlL2Jsb2NrL2Fpby13YWl0LmgNCj4g
+aW5kZXggOGM5MGEyZTY2ZS4uNzgzZDM2NzhkZCAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9j
+ay9haW8td2FpdC5oDQo+ICsrKyBiL2luY2x1ZGUvYmxvY2svYWlvLXdhaXQuaA0KPiBAQCAtNzMs
+MjkgKzczLDIzIEBAIHR5cGVkZWYgc3RydWN0IHsNCj4gICAqLw0KPiAgI2RlZmluZSBBSU9fV0FJ
+VF9XSElMRSh3YWl0LCBjdHgsIGNvbmQpICh7ICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4g
+ICAgICBib29sIHdhaXRlZF8gPSBmYWxzZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcDQo+IC0gICAgYm9vbCBidXN5XyA9IHRydWU7ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAgICAgIEFpb1dhaXQgKndhaXRfID0gKHdh
+aXQpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gICAgICBBaW9D
+b250ZXh0ICpjdHhfID0gKGN0eCk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcDQo+ICAgICAgaWYgKGluX2Fpb19jb250ZXh0X2hvbWVfdGhyZWFkKGN0eF8pKSB7ICAgICAg
+ICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICB3aGlsZSAoKGNvbmQpIHx8IGJ1c3lfKSB7
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gLSAgICAgICAgICAgIGJ1c3lf
+ID0gYWlvX3BvbGwoY3R4XywgKGNvbmQpKTsgICAgICAgICAgICAgICAgICAgICAgICBcDQo+IC0g
+ICAgICAgICAgICB3YWl0ZWRfIHw9ICEhKGNvbmQpIHwgYnVzeV87ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXA0KPiArICAgICAgICB3aGlsZSAoKGNvbmQpKSB7ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gKyAgICAgICAgICAgIGFpb19wb2xsKGN0eF8s
+IHRydWUpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICsgICAgICAgICAg
+ICB3YWl0ZWRfID0gdHJ1ZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XA0KPiAgICAgICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFwNCj4gICAgICB9IGVsc2UgeyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICAgICAgICAgIGFzc2VydChxZW11
+X2dldF9jdXJyZW50X2Fpb19jb250ZXh0KCkgPT0gICAgICAgICAgICAgICAgICAgXA0KPiAgICAg
+ICAgICAgICAgICAgcWVtdV9nZXRfYWlvX2NvbnRleHQoKSk7ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFwNCj4gICAgICAgICAgLyogSW5jcmVtZW50IHdhaXRfLT5udW1fd2FpdGVycyBiZWZv
+cmUgZXZhbHVhdGluZyBjb25kLiAqLyBcDQo+ICAgICAgICAgIGF0b21pY19pbmMoJndhaXRfLT5u
+dW1fd2FpdGVycyk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICB3aGls
+ZSAoYnVzeV8pIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwN
+Cj4gLSAgICAgICAgICAgIGlmICgoY29uZCkpIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBcDQo+IC0gICAgICAgICAgICAgICAgd2FpdGVkXyA9IGJ1c3lfID0gdHJ1
+ZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICAgICAgICAgIGFpb19j
+b250ZXh0X3JlbGVhc2UoY3R4Xyk7ICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gLSAgICAg
+ICAgICAgICAgICBhaW9fcG9sbChxZW11X2dldF9haW9fY29udGV4dCgpLCB0cnVlKTsgICAgICAg
+ICAgICBcDQo+IC0gICAgICAgICAgICAgICAgYWlvX2NvbnRleHRfYWNxdWlyZShjdHhfKTsgICAg
+ICAgICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICAgICAgfSBlbHNlIHsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gLSAgICAgICAgICAgICAg
+ICBidXN5XyA9IGFpb19wb2xsKGN0eF8sIGZhbHNlKTsgICAgICAgICAgICAgICAgICAgICBcDQo+
+IC0gICAgICAgICAgICAgICAgd2FpdGVkXyB8PSBidXN5XzsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXA0KPiAtICAgICAgICAgICAgfSAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gKyAgICAgICAgd2hpbGUgKChjb25kKSkg
+eyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICsgICAgICAg
+ICAgICBhaW9fY29udGV4dF9yZWxlYXNlKGN0eF8pOyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXA0KPiArICAgICAgICAgICAgYWlvX3BvbGwocWVtdV9nZXRfYWlvX2NvbnRleHQoKSwgdHJ1
+ZSk7ICAgICAgICAgICAgICAgIFwNCj4gKyAgICAgICAgICAgIGFpb19jb250ZXh0X2FjcXVpcmUo
+Y3R4Xyk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICsgICAgICAgICAgICB3YWl0
+ZWRfID0gdHJ1ZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAg
+ICAgICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFwNCj4gICAgICAgICAgYXRvbWljX2RlYygmd2FpdF8tPm51bV93YWl0ZXJzKTsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICAgICAgfSAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiBkaWZmIC0tZ2l0
+IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMNCj4gaW5kZXggZWE2ZjlmMDIzYS4uNmY1ODBmNDlm
+ZiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svaW8uYw0KPiArKysgYi9ibG9jay9pby5jDQo+IEBAIC0x
+ODEsMTMgKzE4MSwyMiBAQCBzdGF0aWMgdm9pZCBiZHJ2X2RyYWluX2ludm9rZShCbG9ja0RyaXZl
+clN0YXRlICpicywgYm9vbCBiZWdpbikNCj4gICAgICBCRFJWX1BPTExfV0hJTEUoYnMsICFkYXRh
+LmRvbmUpOw0KPiAgfQ0KPiAgDQo+ICsvKiBSZXR1cm5zIHRydWUgaWYgQkRSVl9QT0xMX1dISUxF
+KCkgc2hvdWxkIGdvIGludG8gYSBibG9ja2luZyBhaW9fcG9sbCgpICovDQo+ICtzdGF0aWMgYm9v
+bCBiZHJ2X2RyYWluX3BvbGwoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICt7DQo+ICsgICAgLyog
+RXhlY3V0ZSBwZW5kaW5nIEJIcyBmaXJzdCBhbmQgY2hlY2sgZXZlcnl0aGluZyBlbHNlIG9ubHkg
+YWZ0ZXIgdGhlIEJIcw0KPiArICAgICAqIGhhdmUgZXhlY3V0ZWQuICovDQo+ICsgICAgd2hpbGUg
+KGFpb19wb2xsKGJzLT5haW9fY29udGV4dCwgZmFsc2UpKTsNCj4gKyAgICByZXR1cm4gYXRvbWlj
+X3JlYWQoJmJzLT5pbl9mbGlnaHQpOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgYm9vbCBiZHJ2X2Ry
+YWluX3JlY3Vyc2UoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICB7DQo+ICAgICAgQmRydkNoaWxk
+ICpjaGlsZCwgKnRtcDsNCj4gICAgICBib29sIHdhaXRlZDsNCj4gIA0KPiAgICAgIC8qIFdhaXQg
+Zm9yIGRyYWluZWQgcmVxdWVzdHMgdG8gZmluaXNoICovDQo+IC0gICAgd2FpdGVkID0gQkRSVl9Q
+T0xMX1dISUxFKGJzLCBhdG9taWNfcmVhZCgmYnMtPmluX2ZsaWdodCkgPiAwKTsNCj4gKyAgICB3
+YWl0ZWQgPSBCRFJWX1BPTExfV0hJTEUoYnMsIGJkcnZfZHJhaW5fcG9sbChicykpOw0KPiAgDQo+
+ICAgICAgUUxJU1RfRk9SRUFDSF9TQUZFKGNoaWxkLCAmYnMtPmNoaWxkcmVuLCBuZXh0LCB0bXAp
+IHsNCj4gICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBjaGlsZC0+YnM7DQo+IC0tIA0K
+PiAyLjEzLjYNCj4gDQo=
