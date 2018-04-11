@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f6G1N-000447-DK
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:42:49 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6G4g-000629-0z
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f6G1K-0000aI-8O
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:42:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37380 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f6G1K-0000a0-3t
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:42:42 -0400
-References: <20180411072027.5656-1-tiwei.bie@intel.com>
-	<20180411161926-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b8e19751-9cb8-331d-a464-35babdfb9ca2@redhat.com>
-Date: Wed, 11 Apr 2018 21:42:36 +0800
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6G4a-0002Un-3k
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:46:10 -0400
+References: <20180411122606.367301-1-vsementsov@virtuozzo.com>
+	<20180411122606.367301-2-vsementsov@virtuozzo.com>
+	<b763ca01-d906-dbf8-2eb6-48e4140d2efe@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e1534f1b-3c4f-b03b-8375-d1e9f468c460@virtuozzo.com>
+Date: Wed, 11 Apr 2018 16:45:51 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180411161926-mutt-send-email-mst@kernel.org>
+In-Reply-To: <b763ca01-d906-dbf8-2eb6-48e4140d2efe@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
- protocol feature
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qcow2: try load bitmaps only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
-Cc: peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, mreitz@redhat.com
 
+11.04.2018 16:22, Eric Blake wrote:
+> On 04/11/2018 07:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Checking reopen by existence of some bitmaps is wrong, as it may be
+>> some other bitmaps, or on the other hand, user may remove bitmaps. This
+>> criteria is bad. To simplify things and make behavior more predictable
+>> let's just add a flag to remember, that we've already tried to load
+>> bitmaps on open and do not want do it again.
+> Wording suggestion:
+>
+> Checking whether we are reopening an image based on the existence of
+> some bitmaps is wrong, as the set of bitmaps may have changed (for
+> example, the user may have added or removed bitmaps in the meantime).
+> To simplify things and make behavior more predictable, let's just add a
+> flag to remember whether we've already tried to load bitmaps, so that we
+> only attempt it on the initial open.
 
+You've dropped an idea supposed by Max, about migration related bitmaps,
+I said "some other bitmaps", because now I doubt is it possible: we have 
+migration related
+bitmaps on source, not on target..
 
-On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 21:22, Michael S. Tsirkin wrote:
-> On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
->> This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
->> feature for vhost-user. By default, vhost-user backend needs
->> to query the IOTLBs from QEMU after meeting unknown IOVAs.
->> With this protocol feature negotiated, QEMU will provide all
->> the IOTLBs to vhost-user backend without waiting for the
->> queries from backend. This is helpful when using a hardware
->> accelerator which is not able to handle unknown IOVAs at the
->> vhost-user backend.
+Anyway, I'm ok with all your suggestions, thank you. I can respin, or 
+they may be squashed-in inflight.
+
+>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2.h |  1 +
+>>   block/qcow2.c | 16 ++++++++--------
+>>   2 files changed, 9 insertions(+), 8 deletions(-)
 >>
->> Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
-> This is potentially a large amount of data to be sent
-> on a socket.
+>> @@ -1480,10 +1481,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>>           s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+>>       }
+>>   
+>> -    if (bdrv_dirty_bitmap_next(bs, NULL)) {
+>> -        /* It's some kind of reopen with already existing dirty bitmaps. There
+>> -         * are no known cases where we need loading bitmaps in such situation,
+>> -         * so it's safer don't load them.
+>> +    if (s->dirty_bitmaps_loaded) {
+>> +        /* It's some kind of reopen. There are no known cases where we need
+>> +         * loading bitmaps in such situation, so it's safer don't load them.
+> Pre-existing wording, but sounds better as:
 >
-> I had an impression that a hardware accelerator was using
-> VFIO anyway. Given this, can't we have QEMU program
-> the shadow IOMMU tables into VFIO directly?
+> There are no known cases where we need to reload bitmaps in such a
+> situation, so it's safer to skip them.
 >
+>>            *
+>>            * Moreover, if we have some readonly bitmaps and we are reopening for
+>>            * rw we should reopen bitmaps correspondingly.
+>> @@ -1491,13 +1491,13 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>>           if (bdrv_has_readonly_bitmaps(bs) &&
+>>               !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
+>>           {
+>> -            bool header_updated = false;
+>>               qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+>> -            update_header = update_header && !header_updated;
+>>           }
+>> -    } else if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+>> -        update_header = false;
+>> +    } else {
+>> +        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
+>> +        s->dirty_bitmaps_loaded = true;
+>>       }
+>> +    update_header = update_header && !header_updated;
+> Could write this as 'update_header &= !header_updated;'
 >
 
-So if we want to do this, my understanding is we need to implement the=20
-driver inside qemu (or link it to qemu).
 
-Thanks
+-- 
+Best regards,
+Vladimir
