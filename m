@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f69nv-0008LC-A2
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:04:33 -0400
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f6A2Z-0007Ry-BM
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:19:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f69nu-0002xG-J9
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:04:27 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 11 Apr 2018 17:04:16 +1000
-Message-Id: <20180411070418.6304-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv3 for-2.13 0/2] Helpers to obtain host page
- sizes for guest RAM
+	(envelope-from <ajaygargnsit@gmail.com>) id 1f6A2X-0002ZD-Te
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:19:35 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAHP4M8WEuR5JJTV_KggwJok0Pzbu8=4BifLuFOjhv3T9hfjUUg@mail.gmail.com>
+References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
+	<87efjov999.fsf@linaro.org>
+	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
+	<87d0z8v78e.fsf@linaro.org>
+	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
+	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
+	<CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
+	<CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
+	<CAHP4M8WEuR5JJTV_KggwJok0Pzbu8=4BifLuFOjhv3T9hfjUUg@mail.gmail.com>
+From: Ajay Garg <ajaygargnsit@gmail.com>
+Date: Wed, 11 Apr 2018 12:49:27 +0530
+Message-ID: <CAHP4M8UESYxeJOd5Y+Hj1K26QUb2D1UJJoBTh9SYCsvuwBP95w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
+ unikernel for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,35 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com, imammedo@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This series makes some small changes to make it easier to obtain the
-host page size backing given portions of guest RAM.  We use this in a
-couple of places currently, and I have one or two more to add in some
-upcoming code.
+Hi All.
 
-Assuming there are no objections, what should be the procedure for
-staging this?  Can I put it in my for-2.13 ppc tree, even though it's
-technically generic code, or should it go through someone else's tree?
+Just wondering if there is something specific that needs to changed at
+https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch/arm/integrator
+in order to get a hello-world app run on "virt" machine?
 
-Changes since v2:
-  * Corrected grammar error in commit message
-  * Correct build error on non-linux hosts
-Changes since v1:
-  * Reworked design based on Eduardo's feedback
-  * Split into two patches
+If so, I would request the rumprun-guys to kindly throw in some light,
+on what needs to be done in order to have something run on a "virt"
+machine in qemu-context.
 
-David Gibson (2):
-  Make qemu_mempath_getpagesize() accept NULL
-  Add host_memory_backend_pagesize() helper
 
- backends/hostmem.c       | 18 ++++++++++++++++++
- exec.c                   | 20 +++++---------------
- include/sysemu/hostmem.h |  2 ++
- target/ppc/kvm.c         | 10 +---------
- util/mmap-alloc.c        | 26 ++++++++++++++------------
- 5 files changed, 40 insertions(+), 36 deletions(-)
+Thanks and Regards,
+Ajay
+
+On Tue, Apr 10, 2018 at 3:49 PM, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+> Thanks Peter .. my sincere gratitude.
+> You pin-pointed the real issue ..
+>
+>
+>
+> On Tue, Apr 10, 2018 at 2:50 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 10 April 2018 at 09:16, Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>>> On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>> What hardware (what CPU, board, etc) is this "rumprun" software
+>>>> expecting to run on?
+>>>
+>>> Yep, just to ensure that there are no cross-compiling issues, I am
+>>> building rumprun on the pseudo-real hardware itself.
+>>> In our case, the pseudo-real hardware are :
+>>>
+>>> a)
+>>> An ARM32 "virt" hardware/machine in a qemu environment
+>>> (https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+>>>
+>>> Once I start  this machine, all environment is arm32, and I compile
+>>> rumprun within this environemnt without any cross-compiling.
+>>>
+>>> b)
+>>> A beaglebone-green-wireless.
+>>> This is a arm32 machine bottoms-up, so no question of cross-compiling
+>>> whatsoever here :)
+>>>
+>>> In both cases, I then use qemu-system-arm (on the "virt" machine, and
+>>> beaglebone-green-wireless itself).
+>>
+>> That's telling me what setups you're trying to compile in,
+>> which doesn't correspond necessarily to what the guest
+>> OS is built to run on.
+>>
+>>> One query : It is apparent that there is nested qemu-virtualization in
+>>> step a), could that be an issue?
+>>
+>> Why are you running this in a nested setup? I don't understand
+>> the purpose of doing that. It would be simpler and faster to
+>> just run the guest on a QEMU running in your native host system.
+>>
+>> Assuming this is the source for the guest you're trying to run:
+>>
+>> https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch
+>>
+>> that suggests that the only Arm board it supports is "integrator"
+>> (which is an absolutely ancient devboard with very little memory,
+>> no PCI and no virtio support). You need to confirm what Arm hardware
+>> this 'rumpkernel' is actually intended to run on, and then give QEMU
+>> the right command line arguments to emulate that hardware. I can't
+>> really help any further, I'm afraid -- you need somebody who knows
+>> about this guest OS.
+>>
+>> thanks
+>> -- PMM
+>
+>
+>
+> --
+> Regards,
+> Ajay
+
+
 
 -- 
-2.14.3
+Regards,
+Ajay
