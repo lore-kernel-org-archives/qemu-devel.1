@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darrell.leinwand@psware.com>) id 1f6KKA-0003g5-Qx
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:18:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1f6KXh-00031i-4p
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darrell.leinwand@psware.com>) id 1f6KK7-0008Ae-Hz
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:18:26 -0400
-Received: from mail-sn1nam02on0114.outbound.protection.outlook.com
-	([104.47.36.114]:55404
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <darrell.leinwand@psware.com>)
-	id 1f6KK7-00089b-6b
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:18:23 -0400
-From: Darrell Leinwand <darrell.leinwand@psware.com>
-Date: Wed, 11 Apr 2018 18:18:18 +0000
-Message-ID: <222EDB99-2ED5-4CCB-B550-7A02BC4BDC7F@psware.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <18383B3D1A5E4742AAF601C2F3DC6FAF@namprd20.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1f6KXg-00007M-Ao
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:32:25 -0400
+References: <20180411163940.2523-1-kwolf@redhat.com>
+	<20180411163940.2523-5-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <acbc503f-71bd-4eaf-fa7b-8e04c9b8ccf5@redhat.com>
+Date: Wed, 11 Apr 2018 13:32:08 -0500
 MIME-Version: 1.0
-Subject: [Qemu-devel] Bad icount read when running qemu-system-ppc64 and
- mfspr atbu guest instruction
+In-Reply-To: <20180411163940.2523-5-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY"
+Subject: Re: [Qemu-devel] [PATCH 04/19] block: Don't manually poll in
+ bdrv_drain_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-SGksDQoNCldoZW4gSSBlbmFibGUgaWNvdW50IHVzaW5nIGFuIGU1NTAwIGNvcmUgSSBnZXQgYW4g
-ZXhpdCB3aXRoIOKAnEJhZCBpY291bnQgcmVhZOKAnSB3aGVuIHRoZSBndWVzdCBzb2Z0d2FyZSBl
-eGVjdXRlcyBhIGxvYWQgYXRidSBjb21tYW5kLg0KDQpJdCBsb29rcyBsaWtlIGluIHFlbXUvYWNj
-ZWwvdGNnL2NwdV9leGVjLmM6MTY2IHNldHMgY2FuX2RvX2lvIGZhbHNlIHdoZW4gdXNpbmcgaWNv
-dW50Lg0KICAgIGNwdS0+Y2FuX2RvX2lvID0gIXVzZV9pY291bnQ7DQogICAgcmV0ID0gdGNnX3Fl
-bXVfdGJfZXhlYyhlbnYsIHRiX3B0cik7DQogICAgY3B1LT5jYW5fZG9faW8gPSAxOw0KDQpTaW5j
-ZSBjYW5fZG9faW8gaXMgc2V0IHRvIGZhbHNlIHRoZXJlIGFuZCB0aGUgY3B1X2dldF9pY291bnRf
-cmF3KCkgZnVuY3Rpb24gY2hlY2tzIHRoYXQgZmxhZyBxZW11L2NwdXMuYzoyNjA6DQogICAgICAg
-IGlmICghY3B1LT5jYW5fZG9faW8pIHsNCiAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiQmFk
-IGljb3VudCByZWFkXG4iKTsNCiAgICAgICAgICAgIGV4aXQoMSk7DQogICAgICAgIH0NCg0KVGhl
-IGxvYWRfYXRidSBmdW5jdGlvbiB3aWxsIGFsd2F5cyBmYWlsLiBJIGNvbW1lbnRlZCBvdXQgdGhl
-ICF1c2VfaWNvdW50IGFuZCBzZXQgaXQgdG8gYSAxIGluIGNwdV9leGVjLmMgYW5kIGl0IGNvbnRp
-bnVlcyBhbmQgc2VlbXMgdG8gcnVuIG5vcm1hbGx5LCBidXQgSSBhbSBub3Qgc3VyZSB3aGF0IHNp
-ZGUgZWZmZWN0cyB3aGlsZSBydW5uaW5nIGljb3VudCB0aGF0IGNvdWxkIGhhdmUgc2luY2UgaXQg
-bWF5IGFsbG93IGFjdHVhbCBJTyB0byBvY2N1ciB3aGlsZSB0cmFuc2xhdGlvbiBpcyBoYXBwZW5p
-bmcuDQoNCkkgaW5jbHVkZWQgdGhlIHN0YWNrIHRyYWNlIGJlbG93Og0KDQojMCAgY3B1X2dldF9p
-Y291bnRfcmF3ICgpIGF0IHFlbXUvY3B1cy5jOjI2MQ0KIzEgIDB4MDAwMDU1NTU1NTdmZGM0ZiBp
-biBjcHVfZ2V0X2ljb3VudF9sb2NrZWQgKCkgYXQgcWVtdS9jcHVzLmM6Mjc3DQojMiAgMHgwMDAw
-NTU1NTU1N2ZkYzhjIGluIGNwdV9nZXRfaWNvdW50ICgpIGF0IHFlbXUvY3B1cy5jOjI4OA0KIzMg
-IDB4MDAwMDU1NTU1NWQ0N2ExYiBpbiBxZW11X2Nsb2NrX2dldF9ucyAodHlwZT1RRU1VX0NMT0NL
-X1ZJUlRVQUwpIGF0IHFlbXUvdXRpbC9xZW11LXRpbWVyLmM6NjA4DQojNCAgMHgwMDAwNTU1NTU1
-OGE3YjYxIGluIGNwdV9wcGNfbG9hZF9hdGJ1IChlbnY9MHg1NTU1NTZjY2ZmZjApIGF0IHFlbXUv
-aHcvcHBjL3BwYy5jOjU3NA0KIzUgIDB4MDAwMDU1NTU1NTllZWMyYSBpbiBoZWxwZXJfbG9hZF9h
-dGJ1IChlbnY9MHg1NTU1NTZjY2ZmZjApIGF0IHFlbXUvdGFyZ2V0L3BwYy90aW1lYmFzZV9oZWxw
-ZXIuYzo0NQ0KIzYgIDB4MDAwMDdmZmZlYTBiYjkyYiBpbiBjb2RlX2dlbl9idWZmZXIgKCkNCiM3
-ICAweDAwMDA1NTU1NTU4M2MxZTUgaW4gY3B1X3RiX2V4ZWMgKGNwdT0weDU1NTU1NmNjN2Q0MCwg
-aXRiPTB4N2ZmZmVhMGJiODQwIDxjb2RlX2dlbl9idWZmZXIrMTQzMzgwNzA+KSBhdCBxZW11L2Fj
-Y2VsL3RjZy9jcHUtZXhlYy5jOjE2Nw0KIzggIDB4MDAwMDU1NTU1NTgzY2ZjNCBpbiBjcHVfbG9v
-cF9leGVjX3RiIChjcHU9MHg1NTU1NTZjYzdkNDAsIHRiPTB4N2ZmZmVhMGJiODQwIDxjb2RlX2dl
-bl9idWZmZXIrMTQzMzgwNzA+LCBsYXN0X3RiPTB4N2ZmZmUzNGQ4OTc4LCB0Yl9leGl0PTB4N2Zm
-ZmUzNGQ4OTcwKSBhdCBxZW11L2FjY2VsL3RjZy9jcHUtZXhlYy5jOjYyNw0KIzkgIDB4MDAwMDU1
-NTU1NTgzZDJkMyBpbiBjcHVfZXhlYyAoY3B1PTB4NTU1NTU2Y2M3ZDQwKSBhdCBxZW11L2FjY2Vs
-L3RjZy9jcHUtZXhlYy5jOjczNg0KIzEwIDB4MDAwMDU1NTU1NTdmZjZjMiBpbiB0Y2dfY3B1X2V4
-ZWMgKGNwdT0weDU1NTU1NmNjN2Q0MCkgYXQgcWVtdS9jcHVzLmM6MTI3MA0KIzExIDB4MDAwMDU1
-NTU1NTdmZjhmMSBpbiBxZW11X3RjZ19ycl9jcHVfdGhyZWFkX2ZuIChhcmc9MHg1NTU1NTZjYzdk
-NDApIGF0IHFlbXUvY3B1cy5jOjEzNjYNCiMxMiAweDAwMDA3ZmZmZjRmYWI2YmEgaW4gc3RhcnRf
-dGhyZWFkIChhcmc9MHg3ZmZmZTM0ZDk3MDApIGF0IHB0aHJlYWRfY3JlYXRlLmM6MzMzDQojMTMg
-MHgwMDAwN2ZmZmY0Y2UxNDFkIGluIGNsb25lICgpIGF0IC4uL3N5c2RlcHMvdW5peC9zeXN2L2xp
-bnV4L3g4Nl82NC9jbG9uZS5TOjEwOQ0KDQpUaGFua3MsDQpEYXJyZWxsDQoNCg0KX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18NCg0KQ09ORklERU5USUFMSVRZIE5PVElDRTogVGhlIGlu
-Zm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlzIGUtbWFpbCBhbmQgYW55IGFjY29tcGFueWluZyBk
-b2N1bWVudHMgbWF5IGNvbnRhaW4gaW5mb3JtYXRpb24gdGhhdCBpcyBjb25maWRlbnRpYWwsIHBy
-b3ByaWV0YXJ5IHRvIFBlcmZvcm1hbmNlIFNvZnR3YXJlLCBvciBvdGhlcndpc2UgcHJvdGVjdGVk
-IGZyb20gZGlzY2xvc3VyZS4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCBv
-ZiB0aGlzIG1lc3NhZ2UsIG9yIGlmIHRoaXMgbWVzc2FnZSBoYXMgYmVlbiBhZGRyZXNzZWQgdG8g
-eW91IGluIGVycm9yLCBwbGVhc2UgaW1tZWRpYXRlbHkgYWxlcnQgdGhlIHNlbmRlciBieSByZXBs
-eSBlLW1haWwgYW5kIHRoZW4gZGVsZXRlIHRoaXMgbWVzc2FnZSwgaW5jbHVkaW5nIGFueSBhdHRh
-Y2htZW50cy4gQW55IGRpc3NlbWluYXRpb24sIGRpc3RyaWJ1dGlvbiBvciBvdGhlciB1c2Ugb2Yg
-dGhlIGNvbnRlbnRzIG9mIHRoaXMgbWVzc2FnZSBieSBhbnlvbmUgb3RoZXIgdGhhbiB0aGUgaW50
-ZW5kZWQgcmVjaXBpZW50IGlzIHN0cmljdGx5IHByb2hpYml0ZWQuDQoNCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <acbc503f-71bd-4eaf-fa7b-8e04c9b8ccf5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/19] block: Don't manually poll in
+ bdrv_drain_all()
+References: <20180411163940.2523-1-kwolf@redhat.com>
+ <20180411163940.2523-5-kwolf@redhat.com>
+In-Reply-To: <20180411163940.2523-5-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/11/2018 11:39 AM, Kevin Wolf wrote:
+> All involved nodes are already idle, we called bdrv_do_draine_begin() o=
+n
+
+s/draine/drain/
+
+> them.
+>=20
+> The comment in the code suggested that this were not correct because th=
+e
+
+s/were/was/
+
+> completion of a request on one node could spawn a new request on a
+> different node (which might have been drained before, so we wouldn't
+> drain the new request). In reality, new requests to different nodes
+> aren't spawned out of nothing, but only in the context of a parent
+> request, and they aren't submitted to random nodes, but only to child
+> nodes. As long as we still poll for the completion of the parent reques=
+t
+> (which we do), draining each root node separately is good enough.
+>=20
+> Remove the additional polling code from bdrv_drain_all_begin() and
+> replace it with an assertion that all nodes are already idle after we
+> drained them separately.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/io.c | 41 ++++++++++++-----------------------------
+>  1 file changed, 12 insertions(+), 29 deletions(-)
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrOVKgACgkQp6FrSiUn
+Q2qaQAf/ROkf1wV/9V+AoNa94xXepYxpnbcGbejqYFTxtn6sczvjJggBxMioyOCx
+s45qpNt30mwJoM1wmRB/tMDI5r5CyZq5O/rNRXPs7NxGZvK+SMgy/OfqFshusSy7
+M9qB2Gxc/VEUS3QNiTrr+GRUmLEL5I5IVaSbX0PyjBvyeiU+J9QnCcmnoyZMkOFC
+zdx9LbGrdjs5ynsWRKahc8qreYY4GkZExFHxnkxOQccVg82+wnZzelzt0Ucm9OiE
+qe8o1EbYoQqxMCxa7IpV2Z/stbDgVNTNmKeKPvAM/0nxg0nQsq13JVi+Ei+nq5LG
+RnGD66L8YP24c4lDOsK0GXP0Cg8QbA==
+=4pcs
+-----END PGP SIGNATURE-----
+
+--XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY--
