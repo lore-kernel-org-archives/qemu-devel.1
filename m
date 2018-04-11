@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f6KtH-00032e-Iu
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:54:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f6KtN-0003CM-Co
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f6KtF-0005tC-Vd
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:54:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f6KtJ-0005w7-C4
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:54:49 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 11 Apr 2018 20:54:12 +0200
-Message-Id: <20180411185425.2461-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 for-2.13 00/13] block/mirror: Add
- active-sync mirroring
+Date: Wed, 11 Apr 2018 20:54:15 +0200
+Message-Id: <20180411185425.2461-4-mreitz@redhat.com>
+In-Reply-To: <20180411185425.2461-1-mreitz@redhat.com>
+References: <20180411185425.2461-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 03/13] block/mirror: Use CoQueue to wait on
+ in-flight ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,134 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This series implements an active and synchronous mirroring mode.
+Attach a CoQueue to each in-flight operation so if we need to wait for
+any we can use it to wait instead of just blindly yielding and hoping
+for some operation to wake us.
 
-Currently, the mirror block job is passive an asynchronous: Depending on
-your start conditions, some part of the source disk starts as "dirty".
-Then, the block job will (as a background operation) continuously copy
-dirty parts to the target disk until all of the source disk is clean.
-In the meantime, any write to the source disk dirties the affected area.
+A later patch will use this infrastructure to allow requests accessing
+the same area of the virtual disk to specifically wait for each other.
 
-One effect of this operational mode is that the job may never converge:
-If the writes to the source happen faster than the block job copies data
-to the target, the job can never finish.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+---
+ block/mirror.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
-When the active mode implemented in this series is enabled, every write
-request to the source will automatically trigger a synchronous write to
-the target right afterwards.  Therefore, the source can never get dirty
-faster than data is copied to the target.  Most importantly, once source
-and target are in sync (BLOCK_JOB_READY is emitted), they will not
-diverge (unless e.g. an I/O error occurs).
-
-Active mirroring also improves on a second issue of the passive mode: We
-do not have to read data from the source in order to write it to the
-target.  When new data is written to the source in active mode, it is
-automatically mirrored to the target, which saves us the superfluous
-read from the source.
-
-
-Things to do on top of this series:
-- Allow switching between active and passive mode at runtime: Mainly
-  hinges on the question of how to expose it to the user (ideally
-  through a generic block-job-set-option command)
-
-- Implement an asynchronous active mode (launch both write operations to
-  the source and the target at the same time, and do not wait for the
-  target operation to finish)
-
-- Integrate the mirror BDS more tightly into the BDS graph:  Both source
-  and target should be BdrvChildren (and the source should not be the
-  "backing" child).  I'm working on this in a follow-up.
-
-- Improve the mirror job coroutine use: Currently more of a hack, a
-  follow-up will make this nicer.
-
-- Add read-write-blocking mode: This series adds the write-blocking
-  mode, where every write blocks until the data has been mirrored to the
-  target.  read-write-blocking would also mirror data on reads from the
-  source, which saves some performance (because that data does not have
-  to be read twice) at the cost of latency on mirroring read operations.
-  (Will be in the same follow-up.)
-
-
-v4:
-- Dropped patches 1 through 3.  Kevin has taken the old patch 3 (a drain
-  test case) into his lastest drain series ("Drain fixes and cleanups,
-  part 3"), which to me implies that my preceding patches (the old 1 and
-  2) may not have been enough.  As I explained in some older cover
-  latter (it might have been v1...), all of those patches actually would
-  have been only necessary for the follow-up (that is going to come
-  along at some point...) where I plan to make the mirror target an
-  immediate BdrvChild of the mirror node.
-  This series does not make the mirror target such an immediate child,
-  thus the mirror node continues to only have a single child, which
-  means that those patches are actually not required for this series.  I
-  only included them because they still made sense.
-  However, now I am no longer convinced it makes sense to include them
-  (because that would create a dependency on Kevin's series), so I'll
-  push them off to the follow-up.
-
-- Patch 12 (was: 15): Replaced "2.12" by "2.13" [Eric]
-
-- Added Rb-s, rebased (with no effect, judging from
-  git-backport-diff...)
-
-
-git-backport-diff to v3:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/13:[----] [--] 'block/mirror: Pull out mirror_perform()'
-002/13:[----] [--] 'block/mirror: Convert to coroutines'
-003/13:[----] [--] 'block/mirror: Use CoQueue to wait on in-flight ops'
-004/13:[----] [--] 'block/mirror: Wait for in-flight op conflicts'
-005/13:[----] [--] 'block/mirror: Use source as a BdrvChild'
-006/13:[----] [--] 'block: Generalize should_update_child() rule'
-007/13:[----] [--] 'hbitmap: Add @advance param to hbitmap_iter_next()'
-008/13:[----] [--] 'test-hbitmap: Add non-advancing iter_next tests'
-009/13:[----] [--] 'block/dirty-bitmap: Add bdrv_dirty_iter_next_area'
-010/13:[----] [--] 'block/mirror: Add MirrorBDSOpaque'
-011/13:[----] [--] 'block/mirror: Add active mirroring'
-012/13:[0004] [FC] 'block/mirror: Add copy mode QAPI interface'
-013/13:[----] [--] 'iotests: Add test for active mirroring'
-
-
-Max Reitz (13):
-  block/mirror: Pull out mirror_perform()
-  block/mirror: Convert to coroutines
-  block/mirror: Use CoQueue to wait on in-flight ops
-  block/mirror: Wait for in-flight op conflicts
-  block/mirror: Use source as a BdrvChild
-  block: Generalize should_update_child() rule
-  hbitmap: Add @advance param to hbitmap_iter_next()
-  test-hbitmap: Add non-advancing iter_next tests
-  block/dirty-bitmap: Add bdrv_dirty_iter_next_area
-  block/mirror: Add MirrorBDSOpaque
-  block/mirror: Add active mirroring
-  block/mirror: Add copy mode QAPI interface
-  iotests: Add test for active mirroring
-
- qapi/block-core.json         |  29 ++-
- include/block/block_int.h    |   6 +-
- include/block/dirty-bitmap.h |   2 +
- include/qemu/hbitmap.h       |   5 +-
- block.c                      |  44 +++-
- block/backup.c               |   2 +-
- block/dirty-bitmap.c         |  57 +++-
- block/mirror.c               | 605 ++++++++++++++++++++++++++++++++++---------
- blockdev.c                   |   9 +-
- tests/test-hbitmap.c         |  38 ++-
- util/hbitmap.c               |  10 +-
- tests/qemu-iotests/151       | 120 +++++++++
- tests/qemu-iotests/151.out   |   5 +
- tests/qemu-iotests/group     |   1 +
- 14 files changed, 781 insertions(+), 152 deletions(-)
- create mode 100755 tests/qemu-iotests/151
- create mode 100644 tests/qemu-iotests/151.out
-
+diff --git a/block/mirror.c b/block/mirror.c
+index bd8ee7d92c..1af6481876 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -13,6 +13,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
++#include "qemu/coroutine.h"
+ #include "trace.h"
+ #include "block/blockjob_int.h"
+ #include "block/block_int.h"
+@@ -34,6 +35,8 @@ typedef struct MirrorBuffer {
+     QSIMPLEQ_ENTRY(MirrorBuffer) next;
+ } MirrorBuffer;
+ 
++typedef struct MirrorOp MirrorOp;
++
+ typedef struct MirrorBlockJob {
+     BlockJob common;
+     RateLimit limit;
+@@ -67,15 +70,15 @@ typedef struct MirrorBlockJob {
+     unsigned long *in_flight_bitmap;
+     int in_flight;
+     int64_t bytes_in_flight;
++    QTAILQ_HEAD(MirrorOpList, MirrorOp) ops_in_flight;
+     int ret;
+     bool unmap;
+-    bool waiting_for_io;
+     int target_cluster_size;
+     int max_iov;
+     bool initial_zeroing_ongoing;
+ } MirrorBlockJob;
+ 
+-typedef struct MirrorOp {
++struct MirrorOp {
+     MirrorBlockJob *s;
+     QEMUIOVector qiov;
+     int64_t offset;
+@@ -84,7 +87,11 @@ typedef struct MirrorOp {
+     /* The pointee is set by mirror_co_read(), mirror_co_zero(), and
+      * mirror_co_discard() before yielding for the first time */
+     int64_t *bytes_handled;
+-} MirrorOp;
++
++    CoQueue waiting_requests;
++
++    QTAILQ_ENTRY(MirrorOp) next;
++};
+ 
+ typedef enum MirrorMethod {
+     MIRROR_METHOD_COPY,
+@@ -125,7 +132,9 @@ static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
+ 
+     chunk_num = op->offset / s->granularity;
+     nb_chunks = DIV_ROUND_UP(op->bytes, s->granularity);
++
+     bitmap_clear(s->in_flight_bitmap, chunk_num, nb_chunks);
++    QTAILQ_REMOVE(&s->ops_in_flight, op, next);
+     if (ret >= 0) {
+         if (s->cow_bitmap) {
+             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
+@@ -135,11 +144,9 @@ static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
+         }
+     }
+     qemu_iovec_destroy(&op->qiov);
+-    g_free(op);
+ 
+-    if (s->waiting_for_io) {
+-        qemu_coroutine_enter(s->common.co);
+-    }
++    qemu_co_queue_restart_all(&op->waiting_requests);
++    g_free(op);
+ }
+ 
+ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
+@@ -229,10 +236,11 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
+ 
+ static inline void mirror_wait_for_io(MirrorBlockJob *s)
+ {
+-    assert(!s->waiting_for_io);
+-    s->waiting_for_io = true;
+-    qemu_coroutine_yield();
+-    s->waiting_for_io = false;
++    MirrorOp *op;
++
++    op = QTAILQ_FIRST(&s->ops_in_flight);
++    assert(op);
++    qemu_co_queue_wait(&op->waiting_requests, NULL);
+ }
+ 
+ /* Perform a mirror copy operation.
+@@ -342,6 +350,7 @@ static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
+         .bytes          = bytes,
+         .bytes_handled  = &bytes_handled,
+     };
++    qemu_co_queue_init(&op->waiting_requests);
+ 
+     switch (mirror_method) {
+     case MIRROR_METHOD_COPY:
+@@ -357,6 +366,7 @@ static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
+         abort();
+     }
+ 
++    QTAILQ_INSERT_TAIL(&s->ops_in_flight, op, next);
+     qemu_coroutine_enter(co);
+     /* At this point, ownership of op has been moved to the coroutine
+      * and the object may already be freed */
+@@ -1283,6 +1293,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+         }
+     }
+ 
++    QTAILQ_INIT(&s->ops_in_flight);
++
+     trace_mirror_start(bs, s, opaque);
+     block_job_start(&s->common);
+     return;
 -- 
 2.14.3
