@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f6A2Z-0007Ry-BM
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:19:36 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1f6A5g-0000lV-4W
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f6A2X-0002ZD-Te
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:19:35 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAHP4M8WEuR5JJTV_KggwJok0Pzbu8=4BifLuFOjhv3T9hfjUUg@mail.gmail.com>
-References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
-	<87efjov999.fsf@linaro.org>
-	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
-	<87d0z8v78e.fsf@linaro.org>
-	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
-	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
-	<CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
-	<CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
-	<CAHP4M8WEuR5JJTV_KggwJok0Pzbu8=4BifLuFOjhv3T9hfjUUg@mail.gmail.com>
-From: Ajay Garg <ajaygargnsit@gmail.com>
-Date: Wed, 11 Apr 2018 12:49:27 +0530
-Message-ID: <CAHP4M8UESYxeJOd5Y+Hj1K26QUb2D1UJJoBTh9SYCsvuwBP95w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
- unikernel for ARM
+	(envelope-from <tiwei.bie@intel.com>) id 1f6A5c-0004jZ-UG
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:22:48 -0400
+Received: from mga04.intel.com ([192.55.52.120]:6749)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f6A5c-0004it-Hq
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:22:44 -0400
+From: Tiwei Bie <tiwei.bie@intel.com>
+Date: Wed, 11 Apr 2018 15:20:27 +0800
+Message-Id: <20180411072027.5656-1-tiwei.bie@intel.com>
+Subject: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB protocol
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +22,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: mst@redhat.com, jasowang@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org
+Cc: dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
-Hi All.
+This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+feature for vhost-user. By default, vhost-user backend needs
+to query the IOTLBs from QEMU after meeting unknown IOVAs.
+With this protocol feature negotiated, QEMU will provide all
+the IOTLBs to vhost-user backend without waiting for the
+queries from backend. This is helpful when using a hardware
+accelerator which is not able to handle unknown IOVAs at the
+vhost-user backend.
 
-Just wondering if there is something specific that needs to changed at
-https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch/arm/integrator
-in order to get a hello-world app run on "virt" machine?
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+---
+The idea of this patch is to let QEMU push all the IOTLBs
+to vhost-user backend without waiting for the queries from
+the backend. Because hardware accelerator at the vhost-user
+backend may not be able to handle unknown IOVAs.
 
-If so, I would request the rumprun-guys to kindly throw in some light,
-on what needs to be done in order to have something run on a "virt"
-machine in qemu-context.
+This is just a RFC for now. It seems that, it doesn't work
+as expected when guest is using kernel driver (To handle
+this case, it seems that some RAM regions' events also need
+to be listened). Any comments would be appreciated! Thanks!
 
+ docs/interop/vhost-user.txt       |  9 ++++++++
+ hw/virtio/vhost-backend.c         |  7 ++++++
+ hw/virtio/vhost-user.c            |  8 +++++++
+ hw/virtio/vhost.c                 | 47 ++++++++++++++++++++++++++++++++++++---
+ include/hw/virtio/vhost-backend.h |  3 +++
+ 5 files changed, 71 insertions(+), 3 deletions(-)
 
-Thanks and Regards,
-Ajay
-
-On Tue, Apr 10, 2018 at 3:49 PM, Ajay Garg <ajaygargnsit@gmail.com> wrote:
-> Thanks Peter .. my sincere gratitude.
-> You pin-pointed the real issue ..
->
->
->
-> On Tue, Apr 10, 2018 at 2:50 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 10 April 2018 at 09:16, Ajay Garg <ajaygargnsit@gmail.com> wrote:
->>> On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> What hardware (what CPU, board, etc) is this "rumprun" software
->>>> expecting to run on?
->>>
->>> Yep, just to ensure that there are no cross-compiling issues, I am
->>> building rumprun on the pseudo-real hardware itself.
->>> In our case, the pseudo-real hardware are :
->>>
->>> a)
->>> An ARM32 "virt" hardware/machine in a qemu environment
->>> (https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
->>>
->>> Once I start  this machine, all environment is arm32, and I compile
->>> rumprun within this environemnt without any cross-compiling.
->>>
->>> b)
->>> A beaglebone-green-wireless.
->>> This is a arm32 machine bottoms-up, so no question of cross-compiling
->>> whatsoever here :)
->>>
->>> In both cases, I then use qemu-system-arm (on the "virt" machine, and
->>> beaglebone-green-wireless itself).
->>
->> That's telling me what setups you're trying to compile in,
->> which doesn't correspond necessarily to what the guest
->> OS is built to run on.
->>
->>> One query : It is apparent that there is nested qemu-virtualization in
->>> step a), could that be an issue?
->>
->> Why are you running this in a nested setup? I don't understand
->> the purpose of doing that. It would be simpler and faster to
->> just run the guest on a QEMU running in your native host system.
->>
->> Assuming this is the source for the guest you're trying to run:
->>
->> https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch
->>
->> that suggests that the only Arm board it supports is "integrator"
->> (which is an absolutely ancient devboard with very little memory,
->> no PCI and no virtio support). You need to confirm what Arm hardware
->> this 'rumpkernel' is actually intended to run on, and then give QEMU
->> the right command line arguments to emulate that hardware. I can't
->> really help any further, I'm afraid -- you need somebody who knows
->> about this guest OS.
->>
->> thanks
->> -- PMM
->
->
->
-> --
-> Regards,
-> Ajay
-
-
-
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 534caab18a..73e07f9dad 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -380,6 +380,7 @@ Protocol features
+ #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+ #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+ #define VHOST_USER_PROTOCOL_F_CONFIG         9
++#define VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB 10
+ 
+ Master message types
+ --------------------
+@@ -797,3 +798,11 @@ resilient for selective requests.
+ For the message types that already solicit a reply from the client, the
+ presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being set brings
+ no behavioural change. (See the 'Communication' section for details.)
++
++VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
++------------------------------------
++By default, vhost-user backend needs to query the IOTLBs from QEMU after
++meeting unknown IOVAs. With this protocol feature negotiated, QEMU will
++provide all the IOTLBs to vhost backend without waiting for the queries
++from backend. This is helpful when using a hardware accelerator which is
++not able to handle unknown IOVAs at the vhost-user backend.
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index 7f09efab8b..d72994e9a5 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -233,6 +233,11 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+         qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+ }
+ 
++static bool vhost_kernel_need_all_device_iotlb(struct vhost_dev *dev)
++{
++    return false;
++}
++
+ static const VhostOps kernel_ops = {
+         .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+         .vhost_backend_init = vhost_kernel_init,
+@@ -264,6 +269,8 @@ static const VhostOps kernel_ops = {
+ #endif /* CONFIG_VHOST_VSOCK */
+         .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+         .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
++        .vhost_backend_need_all_device_iotlb =
++                                vhost_kernel_need_all_device_iotlb,
+ };
+ 
+ int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 38da8692bb..30e0b1c13b 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -47,6 +47,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+     VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+     VHOST_USER_PROTOCOL_F_CONFIG = 9,
++    VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB = 10,
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+ 
+@@ -1581,6 +1582,12 @@ vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
+     return 0;
+ }
+ 
++static bool vhost_user_need_all_device_iotlb(struct vhost_dev *dev)
++{
++    return virtio_has_feature(dev->protocol_features,
++                              VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB);
++}
++
+ const VhostOps user_ops = {
+         .backend_type = VHOST_BACKEND_TYPE_USER,
+         .vhost_backend_init = vhost_user_init,
+@@ -1611,4 +1618,5 @@ const VhostOps user_ops = {
+         .vhost_set_config = vhost_user_set_config,
+         .vhost_crypto_create_session = vhost_user_crypto_create_session,
+         .vhost_crypto_close_session = vhost_user_crypto_close_session,
++        .vhost_backend_need_all_device_iotlb = vhost_user_need_all_device_iotlb,
+ };
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index f51bf573d5..70922ee998 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -48,6 +48,9 @@ static unsigned int used_memslots;
+ static QLIST_HEAD(, vhost_dev) vhost_devices =
+     QLIST_HEAD_INITIALIZER(vhost_devices);
+ 
++static int vhost_memory_region_lookup(struct vhost_dev *hdev, uint64_t gpa,
++                                      uint64_t *uaddr, uint64_t *len);
++
+ bool vhost_has_free_slot(void)
+ {
+     unsigned int slots_limit = ~0U;
+@@ -634,12 +637,39 @@ static void vhost_region_addnop(MemoryListener *listener,
+     vhost_region_add_section(dev, section);
+ }
+ 
+-static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++static void vhost_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+ {
+     struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
+     struct vhost_dev *hdev = iommu->hdev;
+     hwaddr iova = iotlb->iova + iommu->iommu_offset;
+ 
++    if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
++        uint64_t uaddr, len;
++
++        rcu_read_lock();
++
++        if (iotlb->target_as != NULL) {
++            if (vhost_memory_region_lookup(hdev, iotlb->translated_addr,
++                        &uaddr, &len)) {
++                error_report("Fail to lookup the translated address "
++                        "%"PRIx64, iotlb->translated_addr);
++                goto out;
++            }
++
++            len = MIN(iotlb->addr_mask + 1, len);
++            iova = iova & ~iotlb->addr_mask;
++
++            if (vhost_backend_update_device_iotlb(hdev, iova, uaddr,
++                                                  len, iotlb->perm)) {
++                error_report("Fail to update device iotlb");
++                goto out;
++            }
++        }
++out:
++        rcu_read_unlock();
++        return;
++    }
++
+     if (vhost_backend_invalidate_device_iotlb(hdev, iova,
+                                               iotlb->addr_mask + 1)) {
+         error_report("Fail to invalidate device iotlb");
+@@ -652,6 +682,7 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+                                          iommu_listener);
+     struct vhost_iommu *iommu;
++    IOMMUNotifierFlag flags;
+     Int128 end;
+ 
+     if (!memory_region_is_iommu(section->mr)) {
+@@ -662,8 +693,15 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+     end = int128_add(int128_make64(section->offset_within_region),
+                      section->size);
+     end = int128_sub(end, int128_one());
+-    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+-                        IOMMU_NOTIFIER_UNMAP,
++
++    if (dev->vhost_ops->vhost_backend_need_all_device_iotlb(dev)) {
++        flags = IOMMU_NOTIFIER_ALL;
++    } else {
++        flags = IOMMU_NOTIFIER_UNMAP;
++    }
++
++    iommu_notifier_init(&iommu->n, vhost_iommu_map_notify,
++                        flags,
+                         section->offset_within_region,
+                         int128_get64(end));
+     iommu->mr = section->mr;
+@@ -673,6 +711,9 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+     memory_region_register_iommu_notifier(section->mr, &iommu->n);
+     QLIST_INSERT_HEAD(&dev->iommu_list, iommu, iommu_next);
+     /* TODO: can replay help performance here? */
++    if (flags == IOMMU_NOTIFIER_ALL) {
++        memory_region_iommu_replay(IOMMU_MEMORY_REGION(iommu->mr), &iommu->n);
++    }
+ }
+ 
+ static void vhost_iommu_region_del(MemoryListener *listener,
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 5dac61f9ea..602fd987a4 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -101,6 +101,8 @@ typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
+ typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
+                                              uint64_t session_id);
+ 
++typedef bool (*vhost_backend_need_all_device_iotlb_op)(struct vhost_dev *dev);
++
+ typedef struct VhostOps {
+     VhostBackendType backend_type;
+     vhost_backend_init vhost_backend_init;
+@@ -138,6 +140,7 @@ typedef struct VhostOps {
+     vhost_set_config_op vhost_set_config;
+     vhost_crypto_create_session_op vhost_crypto_create_session;
+     vhost_crypto_close_session_op vhost_crypto_close_session;
++    vhost_backend_need_all_device_iotlb_op vhost_backend_need_all_device_iotlb;
+ } VhostOps;
+ 
+ extern const VhostOps user_ops;
 -- 
-Regards,
-Ajay
+2.11.0
