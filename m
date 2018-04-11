@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6Ctb-0001Xo-Fj
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:22:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1f6CwZ-0003i9-0C
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6CtW-0005mA-ND
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:22:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47476 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1f6CwU-0007Te-6n
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:25:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36664 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f6CtW-0005l0-Hw
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:22:26 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f6CwU-0007TK-2U
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:25:30 -0400
 References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-10-alex.bennee@linaro.org>
+	<20180410193919.28026-11-alex.bennee@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <150ad4ec-f324-3054-e6f0-2104eea357c9@redhat.com>
-Date: Wed, 11 Apr 2018 12:22:13 +0200
+Message-ID: <97e37d92-53f4-2456-e42f-2d569769dd16@redhat.com>
+Date: Wed, 11 Apr 2018 12:25:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-10-alex.bennee@linaro.org>
+In-Reply-To: <20180410193919.28026-11-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 09/24] tests/tcg: move architecture
- independent tests into subdir
+Subject: Re: [Qemu-devel] [PATCH v1 10/24] tests/tcg/multiarch: Build fix
+ for linux-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +33,20 @@ To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Cc: famz@redhat.com, cota@braap.org
 
 On 10.04.2018 21:39, Alex Benn=C3=A9e wrote:
-> We will want to build these for all supported guest architectures so
-> lets move them all into one place. We also drop test_path at this
-> point because it needs qemu utils and glib bits which is hard to
-> support for cross compiling.
+> From: Fam Zheng <famz@redhat.com>
 >=20
+> To keep the compiler happy, and to fit in our buildsys flags:
+>=20
+> - Make local functions "static"
+> - #ifdef out unused functions
+> - drop cutils/osdep dependencies
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> [AJB: drop cutils/osdep dependencies]
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  tests/tcg/README                       |  10 +--
->  tests/tcg/multiarch/README             |   1 +
->  tests/tcg/{ =3D> multiarch}/linux-test.c |   0
->  tests/tcg/{ =3D> multiarch}/sha1.c       |   0
->  tests/tcg/{ =3D> multiarch}/test-mmap.c  |   0
->  tests/tcg/{ =3D> multiarch}/testthread.c |   0
->  tests/tcg/test_path.c                  | 157 -------------------------=
+>  tests/tcg/multiarch/linux-test.c | 68 +++++++++++++-------------------=
 --------
->  7 files changed, 5 insertions(+), 163 deletions(-)
->  create mode 100644 tests/tcg/multiarch/README
->  rename tests/tcg/{ =3D> multiarch}/linux-test.c (100%)
->  rename tests/tcg/{ =3D> multiarch}/sha1.c (100%)
->  rename tests/tcg/{ =3D> multiarch}/test-mmap.c (100%)
->  rename tests/tcg/{ =3D> multiarch}/testthread.c (100%)
->  delete mode 100644 tests/tcg/test_path.c
+>  1 file changed, 21 insertions(+), 47 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
