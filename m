@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6InM-0002um-8o
+	(envelope-from <kwolf@redhat.com>) id 1f6InL-0002uj-Tq
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6InK-0004dG-Tx
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f6InL-0004dX-2I
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 11 Apr 2018 18:39:34 +0200
-Message-Id: <20180411163940.2523-14-kwolf@redhat.com>
+Date: Wed, 11 Apr 2018 18:39:35 +0200
+Message-Id: <20180411163940.2523-15-kwolf@redhat.com>
 In-Reply-To: <20180411163940.2523-1-kwolf@redhat.com>
 References: <20180411163940.2523-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/19] test-bdrv-drain: Graph change through
- parent callback
+Subject: [Qemu-devel] [PATCH 14/19] block: Defer .bdrv_drain_begin callback
+ to polling phase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,158 +23,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
+We cannot allow aio_poll() in bdrv_drain_invoke(begin=true) until we're
+done with propagating the drain through the graph and are doing the
+single final BDRV_POLL_WHILE().
+
+Just schedule the coroutine with the callback and increase bs->in_flight
+to make sure that the polling phase will wait for it.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 130 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+ block/io.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 4af6571ca3..fdf3ce19ea 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -977,6 +977,135 @@ static void test_detach_by_drain_subtree(void)
+diff --git a/block/io.c b/block/io.c
+index f372b9ffb0..fc26c1a2f8 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -178,22 +178,40 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
+ 
+     /* Set data->done before reading bs->wakeup.  */
+     atomic_mb_set(&data->done, true);
+-    bdrv_wakeup(bs);
++    bdrv_dec_in_flight(bs);
++
++    if (data->begin) {
++        g_free(data);
++    }
  }
  
- 
-+struct detach_by_parent_data {
-+    BlockDriverState *parent_b;
-+    BdrvChild *child_b;
-+    BlockDriverState *c;
-+    BdrvChild *child_c;
-+};
-+
-+static void detach_by_parent_aio_cb(void *opaque, int ret)
-+{
-+    struct detach_by_parent_data *data = opaque;
-+
-+    g_assert_cmpint(ret, ==, 0);
-+    bdrv_unref_child(data->parent_b, data->child_b);
-+
-+    bdrv_ref(data->c);
-+    data->child_c = bdrv_attach_child(data->parent_b, data->c, "PB-C",
-+                                      &child_file, &error_abort);
-+}
-+
-+/*
-+ * Initial graph:
-+ *
-+ * PA     PB
-+ *    \ /   \
-+ *     A     B     C
-+ *
-+ * PA has a pending write request whose callback changes the child nodes of PB:
-+ * It removes B and adds C instead. The subtree of PB is drained, which will
-+ * indirectly drain the write request, too.
-+ */
-+static void test_detach_by_parent_cb(void)
-+{
-+    BlockBackend *blk;
-+    BlockDriverState *parent_a, *parent_b, *a, *b, *c;
-+    BdrvChild *child_a, *child_b;
-+    BlockAIOCB *acb;
-+    struct detach_by_parent_data data;
-+
-+    QEMUIOVector qiov;
-+    struct iovec iov = {
-+        .iov_base = NULL,
-+        .iov_len = 0,
-+    };
-+    qemu_iovec_init_external(&qiov, &iov, 1);
-+
-+    /* Create all involved nodes */
-+    parent_a = bdrv_new_open_driver(&bdrv_test, "parent-a", BDRV_O_RDWR,
-+                                    &error_abort);
-+    parent_b = bdrv_new_open_driver(&bdrv_test, "parent-b", 0,
-+                                    &error_abort);
-+
-+    a = bdrv_new_open_driver(&bdrv_test, "a", BDRV_O_RDWR, &error_abort);
-+    b = bdrv_new_open_driver(&bdrv_test, "b", BDRV_O_RDWR, &error_abort);
-+    c = bdrv_new_open_driver(&bdrv_test, "c", BDRV_O_RDWR, &error_abort);
-+
-+    /* blk is a BB for parent-a */
-+    blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    blk_insert_bs(blk, parent_a, &error_abort);
-+    bdrv_unref(parent_a);
-+
-+    /* Set child relationships */
-+    bdrv_ref(b);
-+    bdrv_ref(a);
-+    child_b = bdrv_attach_child(parent_b, b, "PB-B", &child_file, &error_abort);
-+    child_a = bdrv_attach_child(parent_b, a, "PB-A", &child_backing, &error_abort);
-+
-+    bdrv_ref(a);
-+    bdrv_attach_child(parent_a, a, "PA-A", &child_file, &error_abort);
-+
-+    g_assert_cmpint(parent_a->refcnt, ==, 1);
-+    g_assert_cmpint(parent_b->refcnt, ==, 1);
-+    g_assert_cmpint(a->refcnt, ==, 3);
-+    g_assert_cmpint(b->refcnt, ==, 2);
-+    g_assert_cmpint(c->refcnt, ==, 1);
-+
-+    g_assert(QLIST_FIRST(&parent_b->children) == child_a);
-+    g_assert(QLIST_NEXT(child_a, next) == child_b);
-+    g_assert(QLIST_NEXT(child_b, next) == NULL);
-+
-+    /* Start the evil write request */
-+    data = (struct detach_by_parent_data) {
-+        .parent_b = parent_b,
-+        .child_b = child_b,
-+        .c = c,
-+    };
-+    acb = blk_aio_preadv(blk, 0, &qiov, 0, detach_by_parent_aio_cb, &data);
-+    g_assert(acb != NULL);
-+
-+    /* Drain and check the expected result */
-+    bdrv_subtree_drained_begin(parent_b);
-+
-+    g_assert(data.child_c != NULL);
-+
-+    g_assert_cmpint(parent_a->refcnt, ==, 1);
-+    g_assert_cmpint(parent_b->refcnt, ==, 1);
-+    g_assert_cmpint(a->refcnt, ==, 3);
-+    g_assert_cmpint(b->refcnt, ==, 1);
-+    g_assert_cmpint(c->refcnt, ==, 2);
-+
-+    g_assert(QLIST_FIRST(&parent_b->children) == data.child_c);
-+    g_assert(QLIST_NEXT(data.child_c, next) == child_a);
-+    g_assert(QLIST_NEXT(child_a, next) == NULL);
-+
-+    g_assert_cmpint(parent_a->quiesce_counter, ==, 1);
-+    g_assert_cmpint(parent_b->quiesce_counter, ==, 1);
-+    g_assert_cmpint(a->quiesce_counter, ==, 1);
-+    g_assert_cmpint(b->quiesce_counter, ==, 0);
-+    g_assert_cmpint(c->quiesce_counter, ==, 1);
-+
-+    bdrv_subtree_drained_end(parent_b);
-+
-+    bdrv_unref(parent_b);
-+    blk_unref(blk);
-+
-+    /* XXX Once bdrv_close() unref's children instead of just detaching them,
-+     * this won't be necessary any more. */
-+    bdrv_unref(a);
-+    bdrv_unref(a);
-+    bdrv_unref(c);
-+
-+    g_assert_cmpint(a->refcnt, ==, 1);
-+    g_assert_cmpint(b->refcnt, ==, 1);
-+    g_assert_cmpint(c->refcnt, ==, 1);
-+    bdrv_unref(a);
-+    bdrv_unref(b);
-+    bdrv_unref(c);
-+}
-+
-+
- int main(int argc, char **argv)
+ /* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
+ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
  {
-     int ret;
-@@ -1027,6 +1156,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/bdrv-drain/deletion/drain", test_delete_by_drain);
-     g_test_add_func("/bdrv-drain/detach/drain", test_detach_by_drain);
-     g_test_add_func("/bdrv-drain/detach/drain_subtree", test_detach_by_drain_subtree);
-+    g_test_add_func("/bdrv-drain/detach/parent_cb", test_detach_by_parent_cb);
+-    BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
++    BdrvCoDrainData *data;
  
-     ret = g_test_run();
-     qemu_event_destroy(&done_event);
+     if (!bs->drv || (begin && !bs->drv->bdrv_co_drain_begin) ||
+             (!begin && !bs->drv->bdrv_co_drain_end)) {
+         return;
+     }
+ 
+-    data.co = qemu_coroutine_create(bdrv_drain_invoke_entry, &data);
+-    bdrv_coroutine_enter(bs, data.co);
+-    BDRV_POLL_WHILE(bs, !data.done);
++    data = g_new(BdrvCoDrainData, 1);
++    *data = (BdrvCoDrainData) {
++        .bs = bs,
++        .done = false,
++        .begin = begin
++    };
++
++    /* Make sure the driver callback completes during the polling phase for
++     * drain_begin. */
++    bdrv_inc_in_flight(bs);
++    data->co = qemu_coroutine_create(bdrv_drain_invoke_entry, data);
++    aio_co_schedule(bdrv_get_aio_context(bs), data->co);
++
++    if (!begin) {
++        BDRV_POLL_WHILE(bs, !data->done);
++        g_free(data);
++    }
+ }
+ 
+ /* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll() */
 -- 
 2.13.6
