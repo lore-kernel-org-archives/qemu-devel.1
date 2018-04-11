@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f64jp-0006uG-Ao
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:39:54 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f64pe-0000t5-0l
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f64jm-00018U-7d
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:39:53 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:39267)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f64jl-000180-V4
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:39:50 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id b21so769687wme.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 18:39:49 -0700 (PDT)
-References: <1522883475-27858-1-git-send-email-cota@braap.org>
-	<1522883475-27858-2-git-send-email-cota@braap.org>
-	<874lki5yj2.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <874lki5yj2.fsf@linaro.org>
-Date: Wed, 11 Apr 2018 02:39:47 +0100
-Message-ID: <8737025xng.fsf@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1f64pa-0005e3-VA
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:45:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46228 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f64pa-0005dn-Pn
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:45:50 -0400
+Date: Wed, 11 Apr 2018 09:45:32 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180411014532.GB28698@stefanha-x1.localdomain>
+References: <20180410124913.10832-1-peterx@redhat.com>
+	<20180410124913.10832-3-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/15] tests: add fp-test,
- a floating point test suite
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="l76fUT7nc3MelDdI"
+Content-Disposition: inline
+In-Reply-To: <20180410124913.10832-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-thread: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+--l76fUT7nc3MelDdI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Emilio G. Cota <cota@braap.org> writes:
->
->> This will allow us to run correctness tests against our
->> FP implementation. The test can be run in two modes (called
->> "testers"): host and soft. With the former we check the results
->> and FP flags on the host machine against the model.
->> With the latter we check QEMU's fpu primitives against the
->> model. Note that in soft mode we are not instantiating any
->> particular CPU (hence the HW_POISON_H hack to avoid macro poisoning);
->> for that we need to run the test in host mode under QEMU.
-> <snip>
->
-> So with the attached patch and my proposed cross build we can now get:
->
-<snip>
-> --- a/tests/tcg/Makefile
-> +++ b/tests/tcg/Makefile
-> @@ -24,6 +24,9 @@
->  VPATH =3D $(SRC_PATH)/tests/tcg/multiarch
->  TEST_SRCS =3D $(wildcard $(SRC_PATH)/tests/tcg/multiarch/*.c)
->
-> +VPATH     +=3D $(SRC_PATH)/tests/fp
-> +TEST_SRCS +=3D $(wildcard $(SRC_PATH)/tests/fp/*.c)
-> +
->  VPATH     +=3D $(SRC_PATH)/tests/tcg/$(ARCH)
->  TEST_SRCS +=3D $(wildcard $(SRC_PATH)/tests/tcg/$(ARCH)/*.c)
+On Tue, Apr 10, 2018 at 08:49:13PM +0800, Peter Xu wrote:
+> cur_mon was only used in main loop so we don't really need that to be
+> per-thread variable.  Now it's possible that we have more than one
+> thread to operate on it.  Let's start to let it be per-thread variable.
 
-It also needs:
+Trying to understand the reason for this patch:
 
-fp-test: LDFLAGS+=3D-lm
+Are there any users of per-thread cur_mon?
 
---
-Alex Benn=C3=A9e
+or
+
+Does this patch fix a bug?
+
+> In case we'll create threads within a valid cur_mon setup, we'd better
+> let the child threads to inherit the cur_mon from parent thread too.  Do
+> that for both posix and win32 threads.
+
+Without actual users I don't like this.  It sounds like "let's make it
+global just in case something needs it some day".
+
+It's ugly for QEMU's thread API to know about the monitor - that's a
+layering violation.
+
+If there's a legitimate need I think this patch might be necessary, but
+I don't see enough justification to do this yet.
+
+Stefan
+
+--l76fUT7nc3MelDdI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJazWi7AAoJEJykq7OBq3PI+qkH/1VrA8IpjF+1RN0dg0q1f4v+
+L6G81XQ0QRvll/pDw6S4FfutIe6ukxo0bdVd77OSUyJcFxcgVgWCOp5vbcl9RLFo
+QVRAARySKMCk1XaJljblI7mu+/eTx2gN5BrH8lZFjkdDiv1vb9BqLtGMhMB97oaL
+z5D2g1gpdx0kJZuBE8p+6Ch+1vKfbVe1Z4O2UCMjB+kj75hoHN/Cbk/0wjwDS1OI
+fsVIdKsQcqtVDHd1H6XSMXdNK9dPsUWhBPDLrVsuYBXxYT8Hp53eU6vD2/JXzqL4
+cWaUcewXBiF3DpGIz3CdxmBaXdy6NQ1ep/bjGrAvZuCpqCaeW629J7wSVYCyX3w=
+=zBJ7
+-----END PGP SIGNATURE-----
+
+--l76fUT7nc3MelDdI--
