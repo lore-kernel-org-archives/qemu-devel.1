@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f6CMf-0003ZQ-Lo
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:48:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6CUi-0007oB-4J
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f6CMb-00014g-Pq
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:48:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35682 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f6CMb-00014C-Lp
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:48:25 -0400
-Date: Wed, 11 Apr 2018 17:48:12 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180411094812.GI13887@xz-mi>
-References: <20180410124913.10832-1-peterx@redhat.com>
-	<20180410124913.10832-3-peterx@redhat.com>
-	<20180411014532.GB28698@stefanha-x1.localdomain>
-	<20180411034954.GC13887@xz-mi>
-	<d2ab39a4-2ffc-ddee-299d-007e9850cebb@redhat.com>
-	<20180411093526.GH13887@xz-mi>
-	<4183b7d5-83c5-5401-3ac4-937bb40a14e8@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1f6CUe-0005dv-Vu
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:56:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f6CUe-0005bT-FL
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:56:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f6CUS-0003Bf-Io
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 09:56:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 638ED2E81AA
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 09:56:12 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4183b7d5-83c5-5401-3ac4-937bb40a14e8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-thread: let cur_mon be per-thread
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Apr 2018 09:42:49 -0000
+From: =?utf-8?b?Q2lybyBTYW50aWxsaSDlha3lm5vkuovku7Yg5rOV6L2u5Yqf?=
+	<ciro.santilli@gmail.com>
+Reply-To: Bug 1762179 <1762179@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152319497960.30219.9338727401860906105.malonedeb@gac.canonical.com>
+Message-Id: <152343976992.20451.7473218498159565196.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762179] Re: Record and replay replay fails with:
+ "ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +38,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Apr 11, 2018 at 11:38:58AM +0200, Paolo Bonzini wrote:
-> On 11/04/2018 11:35, Peter Xu wrote:
-> > Yeah, the inheritance will only make sure cur_mon be initialized
-> > always with correct value just like when we are without Out-Of-Band.
-> > For example, it's still possible a thread is created within a QMP
-> > handler.  If without current change, the cur_mon in the new thread
-> > would be NULL.
-> > 
-> > AFAIU even if cur_mon==NULL we should mostly be fine (e.g.,
-> > error_vprintf will handle that case well).  If any of you can help me
-> > confirm this, then I agree that this patch is not really needed.
-> 
-> Yes, though the solution is to not use error_vprintf from auxiliary
-> threads. :)  Just make sure all the communication happens through a
-> struct that's passed in the thread entry point, and possibly bottom
-> halves from the auxiliary thread to the monitor iothread.
+** Description changed:
 
-Okay. :) Thanks for confirming.  Then let me repost this patch without
-touching the qemu-threads.
+  QEMU master at 915d34c5f99b0ab91517c69f54272bfdb6ca2b32 Ubuntu 17.10
+  host.
+  =
 
-Btw, do you want me to repost the first patch separately too, or keep
-the code as is?  I believe it depends on whether you treat that one as
-a cleanup or not.  Thanks,
+  QEMU commands:
+  =
 
--- 
-Peter Xu
+  ```
+  #!/usr/bin/env bash
+  cmd=3D"\
+  time \
+  ./x86_64-softmmu/qemu-system-x86_64 \
+  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
+val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
+  -kernel 'out/x86_64/buildroot/images/bzImage' \
+  -nographic \
+  \
+  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
+=3Dimg-direct,format=3Dqcow2 \
+  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
+ \
+  -device ide-hd,drive=3Dimg-blkreplay \
+  \
+  -netdev user,id=3Dnet1 \
+  -device rtl8139,netdev=3Dnet1 \
+  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
+  "
+  echo "$cmd"
+  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
+  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
+  ```
+  =
+
+  This tries to stay as close as possible to the documented commands:
+  https://github.com/qemu/qemu/blob/08e173f29461396575c85510eb41474b993cb1f=
+b/docs/replay.txt#L28
+  =
+
+  Images uploaded to: https://github.com/cirosantilli/linux-kernel-module-
+  cheat/releases/download/test-replay-arm/images4.zip
+  =
+
+  Images generated with: https://github.com/cirosantilli/linux-kernel-
+  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
+  =
+
+  The replay failed straight out with:
+  =
+
+  ```
+  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
+y_file && replay_mutex_locked())
+  ```
+  =
+
+  QEMU configure:
+  =
+
+  ```
+- ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
+=3D"x86_64-softmmu"
++ ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
+=3Dx86_64-softmmu
+  ```
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762179
+
+Title:
+  Record and replay replay fails with: "ERROR:replay/replay-
+  time.c:49:replay_read_clock: assertion failed"
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU master at 915d34c5f99b0ab91517c69f54272bfdb6ca2b32 Ubuntu 17.10
+  host.
+
+  QEMU commands:
+
+  ```
+  #!/usr/bin/env bash
+  cmd=3D"\
+  time \
+  ./x86_64-softmmu/qemu-system-x86_64 \
+  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
+val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
+  -kernel 'out/x86_64/buildroot/images/bzImage' \
+  -nographic \
+  \
+  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
+=3Dimg-direct,format=3Dqcow2 \
+  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
+ \
+  -device ide-hd,drive=3Dimg-blkreplay \
+  \
+  -netdev user,id=3Dnet1 \
+  -device rtl8139,netdev=3Dnet1 \
+  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
+  "
+  echo "$cmd"
+  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
+  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
+  ```
+
+  This tries to stay as close as possible to the documented commands:
+  https://github.com/qemu/qemu/blob/08e173f29461396575c85510eb41474b993cb1f=
+b/docs/replay.txt#L28
+
+  Images uploaded to: https://github.com/cirosantilli/linux-kernel-
+  module-cheat/releases/download/test-replay-arm/images4.zip
+
+  Images generated with: https://github.com/cirosantilli/linux-kernel-
+  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
+
+  The replay failed straight out with:
+
+  ```
+  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
+y_file && replay_mutex_locked())
+  ```
+
+  QEMU configure:
+
+  ```
+  ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
+=3Dx86_64-softmmu
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762179/+subscriptions
