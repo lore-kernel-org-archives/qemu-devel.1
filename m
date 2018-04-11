@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f6G0B-0003GS-BO
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:41:33 -0400
+	(envelope-from <jasowang@redhat.com>) id 1f6G1N-000447-DK
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:42:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f6G07-0007oy-Cy
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:41:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37332 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1f6G1K-0000aI-8O
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:42:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37380 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f6G07-0007oT-8i
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:41:27 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f6G1K-0000a0-3t
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:42:42 -0400
 References: <20180411072027.5656-1-tiwei.bie@intel.com>
-	<fc66437c-ae8c-15fa-c8d3-6aa6bdb22a36@redhat.com>
-	<20180411083853.qa6y6zevjpvamrdx@debian>
+	<20180411161926-mutt-send-email-mst@kernel.org>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a6d0c105-5aa6-f578-a37f-39f1c2fed471@redhat.com>
-Date: Wed, 11 Apr 2018 21:41:05 +0800
+Message-ID: <b8e19751-9cb8-331d-a464-35babdfb9ca2@redhat.com>
+Date: Wed, 11 Apr 2018 21:42:36 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180411083853.qa6y6zevjpvamrdx@debian>
+In-Reply-To: <20180411161926-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -30,54 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: mst@redhat.com, cunming.liang@intel.com, qemu-devel@nongnu.org, peterx@redhat.com, zhihong.wang@intel.com, dan.daly@intel.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
+Cc: peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
 
 
-On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 16:38, Tiwei Bie wrote:
-> On Wed, Apr 11, 2018 at 04:01:19PM +0800, Jason Wang wrote:
->> On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 15:20, Tiwei Bie wrote:
->>> This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
->>> feature for vhost-user. By default, vhost-user backend needs
->>> to query the IOTLBs from QEMU after meeting unknown IOVAs.
->>> With this protocol feature negotiated, QEMU will provide all
->>> the IOTLBs to vhost-user backend without waiting for the
->>> queries from backend. This is helpful when using a hardware
->>> accelerator which is not able to handle unknown IOVAs at the
->>> vhost-user backend.
->>>
->>> Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
->>> ---
->>> The idea of this patch is to let QEMU push all the IOTLBs
->>> to vhost-user backend without waiting for the queries from
->>> the backend. Because hardware accelerator at the vhost-user
->>> backend may not be able to handle unknown IOVAs.
->>>
->>> This is just a RFC for now. It seems that, it doesn't work
->>> as expected when guest is using kernel driver (To handle
->>> this case, it seems that some RAM regions' events also need
->>> to be listened). Any comments would be appreciated! Thanks!
->> Interesting, a quick question is why this is needed? Can we just use e=
-xist
->> IOTLB update message?
-> Yeah, we are still using the existing IOTLB update messages
-> to send the IOTLB messages to backend. The only difference
-> is that, QEMU won't wait for the queries before sending the
-> IOTLB update messages.
+On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 21:22, Michael S. Tsirkin wrote:
+> On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
+>> This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+>> feature for vhost-user. By default, vhost-user backend needs
+>> to query the IOTLBs from QEMU after meeting unknown IOVAs.
+>> With this protocol feature negotiated, QEMU will provide all
+>> the IOTLBs to vhost-user backend without waiting for the
+>> queries from backend. This is helpful when using a hardware
+>> accelerator which is not able to handle unknown IOVAs at the
+>> vhost-user backend.
+>>
+>> Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
+> This is potentially a large amount of data to be sent
+> on a socket.
+>
+> I had an impression that a hardware accelerator was using
+> VFIO anyway. Given this, can't we have QEMU program
+> the shadow IOMMU tables into VFIO directly?
+>
+>
 
-Yes, my question is not very clear. I mean why must need a new feature=20
-bit? It looks to me qemu code can work without this.
+So if we want to do this, my understanding is we need to implement the=20
+driver inside qemu (or link it to qemu).
 
 Thanks
-
->
->> It looks to me at least kernel does not need this.
-> Something similar in kernel vhost is that, for kernel vhost,
-> QEMU needs to push the IOTLBs of some ring addrs to kernel
-> vhost backend without waiting for the queries.
->
-> Best regards,
-> Tiwei Bie
->
->> Thanks
