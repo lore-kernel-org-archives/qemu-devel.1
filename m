@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6Km3-0004qZ-0J
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:47:26 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6Km8-0004wc-Sz
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6Klr-0002JT-Dh
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:47:15 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6Kls-0002KQ-P5
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:47:20 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:45:41 +0200
-Message-Id: <20180411184556.17200-6-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:45:37 +0200
+Message-Id: <20180411184556.17200-2-laurent@vivier.eu>
 In-Reply-To: <20180411184556.17200-1-laurent@vivier.eu>
 References: <20180411184556.17200-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.13 v3 05/20] linux-user: move microblaze
- signal.c parts to microblaze directory
+Subject: [Qemu-devel] [PATCH for 2.13 v3 01/20] linux-user: create a dummy
+ per arch signal.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,509 +26,748 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-No code change, only move code from signal.c to
-microblaze/signal.c, except adding includes and
-exporting setup_frame() and setup_rt_frame().
+Create a signal-common.h for future use by these new files
+and use it in the existing signal.c
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/microblaze/signal.c        | 230 ++++++++++++++++++++++++++++++++++
- linux-user/microblaze/target_signal.h |   6 +-
- linux-user/signal.c                   | 227 ---------------------------------
- 3 files changed, 235 insertions(+), 228 deletions(-)
+ linux-user/Makefile.objs       |  2 +-
+ linux-user/aarch64/signal.c    | 18 +++++++++++++++
+ linux-user/alpha/signal.c      | 18 +++++++++++++++
+ linux-user/arm/signal.c        | 18 +++++++++++++++
+ linux-user/cris/signal.c       | 18 +++++++++++++++
+ linux-user/hppa/signal.c       | 18 +++++++++++++++
+ linux-user/i386/signal.c       | 18 +++++++++++++++
+ linux-user/m68k/signal.c       | 18 +++++++++++++++
+ linux-user/microblaze/signal.c | 18 +++++++++++++++
+ linux-user/mips/signal.c       | 18 +++++++++++++++
+ linux-user/mips64/signal.c     | 18 +++++++++++++++
+ linux-user/nios2/signal.c      | 18 +++++++++++++++
+ linux-user/openrisc/signal.c   | 18 +++++++++++++++
+ linux-user/ppc/signal.c        | 18 +++++++++++++++
+ linux-user/riscv/signal.c      | 18 +++++++++++++++
+ linux-user/s390x/signal.c      | 18 +++++++++++++++
+ linux-user/sh4/signal.c        | 18 +++++++++++++++
+ linux-user/signal-common.h     | 50 ++++++++++++++++++++++++++++++++++++++++++
+ linux-user/signal.c            | 41 ++++++++++------------------------
+ linux-user/sparc/signal.c      | 18 +++++++++++++++
+ linux-user/sparc64/signal.c    | 18 +++++++++++++++
+ linux-user/tilegx/signal.c     | 18 +++++++++++++++
+ linux-user/x86_64/signal.c     | 18 +++++++++++++++
+ linux-user/xtensa/signal.c     | 18 +++++++++++++++
+ 24 files changed, 440 insertions(+), 31 deletions(-)
+ create mode 100644 linux-user/aarch64/signal.c
+ create mode 100644 linux-user/alpha/signal.c
+ create mode 100644 linux-user/arm/signal.c
+ create mode 100644 linux-user/cris/signal.c
+ create mode 100644 linux-user/hppa/signal.c
+ create mode 100644 linux-user/i386/signal.c
+ create mode 100644 linux-user/m68k/signal.c
+ create mode 100644 linux-user/microblaze/signal.c
+ create mode 100644 linux-user/mips/signal.c
+ create mode 100644 linux-user/mips64/signal.c
+ create mode 100644 linux-user/nios2/signal.c
+ create mode 100644 linux-user/openrisc/signal.c
+ create mode 100644 linux-user/ppc/signal.c
+ create mode 100644 linux-user/riscv/signal.c
+ create mode 100644 linux-user/s390x/signal.c
+ create mode 100644 linux-user/sh4/signal.c
+ create mode 100644 linux-user/signal-common.h
+ create mode 100644 linux-user/sparc/signal.c
+ create mode 100644 linux-user/sparc64/signal.c
+ create mode 100644 linux-user/tilegx/signal.c
+ create mode 100644 linux-user/x86_64/signal.c
+ create mode 100644 linux-user/xtensa/signal.c
 
-diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
-index 02ca338b6c..5572baa7dc 100644
---- a/linux-user/microblaze/signal.c
-+++ b/linux-user/microblaze/signal.c
-@@ -16,3 +16,233 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "target_signal.h"
-+#include "signal-common.h"
-+#include "linux-user/trace.h"
-+
-+struct target_sigcontext {
-+    struct target_pt_regs regs;  /* needs to be first */
-+    uint32_t oldmask;
-+};
-+
-+struct target_stack_t {
-+    abi_ulong ss_sp;
-+    int ss_flags;
-+    unsigned int ss_size;
-+};
-+
-+struct target_ucontext {
-+    abi_ulong tuc_flags;
-+    abi_ulong tuc_link;
-+    struct target_stack_t tuc_stack;
-+    struct target_sigcontext tuc_mcontext;
-+    uint32_t tuc_extramask[TARGET_NSIG_WORDS - 1];
-+};
-+
-+/* Signal frames. */
-+struct target_signal_frame {
-+    struct target_ucontext uc;
-+    uint32_t extramask[TARGET_NSIG_WORDS - 1];
-+    uint32_t tramp[2];
-+};
-+
-+struct rt_signal_frame {
-+    siginfo_t info;
-+    ucontext_t uc;
-+    uint32_t tramp[2];
-+};
-+
-+static void setup_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
-+{
-+    __put_user(env->regs[0], &sc->regs.r0);
-+    __put_user(env->regs[1], &sc->regs.r1);
-+    __put_user(env->regs[2], &sc->regs.r2);
-+    __put_user(env->regs[3], &sc->regs.r3);
-+    __put_user(env->regs[4], &sc->regs.r4);
-+    __put_user(env->regs[5], &sc->regs.r5);
-+    __put_user(env->regs[6], &sc->regs.r6);
-+    __put_user(env->regs[7], &sc->regs.r7);
-+    __put_user(env->regs[8], &sc->regs.r8);
-+    __put_user(env->regs[9], &sc->regs.r9);
-+    __put_user(env->regs[10], &sc->regs.r10);
-+    __put_user(env->regs[11], &sc->regs.r11);
-+    __put_user(env->regs[12], &sc->regs.r12);
-+    __put_user(env->regs[13], &sc->regs.r13);
-+    __put_user(env->regs[14], &sc->regs.r14);
-+    __put_user(env->regs[15], &sc->regs.r15);
-+    __put_user(env->regs[16], &sc->regs.r16);
-+    __put_user(env->regs[17], &sc->regs.r17);
-+    __put_user(env->regs[18], &sc->regs.r18);
-+    __put_user(env->regs[19], &sc->regs.r19);
-+    __put_user(env->regs[20], &sc->regs.r20);
-+    __put_user(env->regs[21], &sc->regs.r21);
-+    __put_user(env->regs[22], &sc->regs.r22);
-+    __put_user(env->regs[23], &sc->regs.r23);
-+    __put_user(env->regs[24], &sc->regs.r24);
-+    __put_user(env->regs[25], &sc->regs.r25);
-+    __put_user(env->regs[26], &sc->regs.r26);
-+    __put_user(env->regs[27], &sc->regs.r27);
-+    __put_user(env->regs[28], &sc->regs.r28);
-+    __put_user(env->regs[29], &sc->regs.r29);
-+    __put_user(env->regs[30], &sc->regs.r30);
-+    __put_user(env->regs[31], &sc->regs.r31);
-+    __put_user(env->sregs[SR_PC], &sc->regs.pc);
-+}
-+
-+static void restore_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
-+{
-+    __get_user(env->regs[0], &sc->regs.r0);
-+    __get_user(env->regs[1], &sc->regs.r1);
-+    __get_user(env->regs[2], &sc->regs.r2);
-+    __get_user(env->regs[3], &sc->regs.r3);
-+    __get_user(env->regs[4], &sc->regs.r4);
-+    __get_user(env->regs[5], &sc->regs.r5);
-+    __get_user(env->regs[6], &sc->regs.r6);
-+    __get_user(env->regs[7], &sc->regs.r7);
-+    __get_user(env->regs[8], &sc->regs.r8);
-+    __get_user(env->regs[9], &sc->regs.r9);
-+    __get_user(env->regs[10], &sc->regs.r10);
-+    __get_user(env->regs[11], &sc->regs.r11);
-+    __get_user(env->regs[12], &sc->regs.r12);
-+    __get_user(env->regs[13], &sc->regs.r13);
-+    __get_user(env->regs[14], &sc->regs.r14);
-+    __get_user(env->regs[15], &sc->regs.r15);
-+    __get_user(env->regs[16], &sc->regs.r16);
-+    __get_user(env->regs[17], &sc->regs.r17);
-+    __get_user(env->regs[18], &sc->regs.r18);
-+    __get_user(env->regs[19], &sc->regs.r19);
-+    __get_user(env->regs[20], &sc->regs.r20);
-+    __get_user(env->regs[21], &sc->regs.r21);
-+    __get_user(env->regs[22], &sc->regs.r22);
-+    __get_user(env->regs[23], &sc->regs.r23);
-+    __get_user(env->regs[24], &sc->regs.r24);
-+    __get_user(env->regs[25], &sc->regs.r25);
-+    __get_user(env->regs[26], &sc->regs.r26);
-+    __get_user(env->regs[27], &sc->regs.r27);
-+    __get_user(env->regs[28], &sc->regs.r28);
-+    __get_user(env->regs[29], &sc->regs.r29);
-+    __get_user(env->regs[30], &sc->regs.r30);
-+    __get_user(env->regs[31], &sc->regs.r31);
-+    __get_user(env->sregs[SR_PC], &sc->regs.pc);
-+}
-+
-+static abi_ulong get_sigframe(struct target_sigaction *ka,
-+                              CPUMBState *env, int frame_size)
-+{
-+    abi_ulong sp = env->regs[1];
-+
-+    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !on_sig_stack(sp)) {
-+        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+    }
-+
-+    return ((sp - frame_size) & -8UL);
-+}
-+
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUMBState *env)
-+{
-+    struct target_signal_frame *frame;
-+    abi_ulong frame_addr;
-+    int i;
-+
-+    frame_addr = get_sigframe(ka, env, sizeof *frame);
-+    trace_user_setup_frame(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
-+        goto badframe;
-+
-+    /* Save the mask.  */
-+    __put_user(set->sig[0], &frame->uc.tuc_mcontext.oldmask);
-+
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user(set->sig[i], &frame->extramask[i - 1]);
-+    }
-+
-+    setup_sigcontext(&frame->uc.tuc_mcontext, env);
-+
-+    /* Set up to return from userspace. If provided, use a stub
-+       already in userspace. */
-+    /* minus 8 is offset to cater for "rtsd r15,8" offset */
-+    if (ka->sa_flags & TARGET_SA_RESTORER) {
-+        env->regs[15] = ((unsigned long)ka->sa_restorer)-8;
-+    } else {
-+        uint32_t t;
-+        /* Note, these encodings are _big endian_! */
-+        /* addi r12, r0, __NR_sigreturn */
-+        t = 0x31800000UL | TARGET_NR_sigreturn;
-+        __put_user(t, frame->tramp + 0);
-+        /* brki r14, 0x8 */
-+        t = 0xb9cc0008UL;
-+        __put_user(t, frame->tramp + 1);
-+
-+        /* Return from sighandler will jump to the tramp.
-+           Negative 8 offset because return is rtsd r15, 8 */
-+        env->regs[15] = frame_addr + offsetof(struct target_signal_frame, tramp)
-+                                   - 8;
-+    }
-+
-+    /* Set up registers for signal handler */
-+    env->regs[1] = frame_addr;
-+    /* Signal handler args: */
-+    env->regs[5] = sig; /* Arg 0: signum */
-+    env->regs[6] = 0;
-+    /* arg 1: sigcontext */
-+    env->regs[7] = frame_addr += offsetof(typeof(*frame), uc);
-+
-+    /* Offset of 4 to handle microblaze rtid r14, 0 */
-+    env->sregs[SR_PC] = (unsigned long)ka->_sa_handler;
-+
-+    unlock_user_struct(frame, frame_addr, 1);
-+    return;
-+badframe:
-+    force_sigsegv(sig);
-+}
-+
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUMBState *env)
-+{
-+    fprintf(stderr, "Microblaze setup_rt_frame: not implemented\n");
-+}
-+
-+long do_sigreturn(CPUMBState *env)
-+{
-+    struct target_signal_frame *frame;
-+    abi_ulong frame_addr;
-+    target_sigset_t target_set;
-+    sigset_t set;
-+    int i;
-+
-+    frame_addr = env->regs[R_SP];
-+    trace_user_do_sigreturn(env, frame_addr);
-+    /* Make sure the guest isn't playing games.  */
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1))
-+        goto badframe;
-+
-+    /* Restore blocked signals */
-+    __get_user(target_set.sig[0], &frame->uc.tuc_mcontext.oldmask);
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
-+    }
-+    target_to_host_sigset_internal(&set, &target_set);
-+    set_sigmask(&set);
-+
-+    restore_sigcontext(&frame->uc.tuc_mcontext, env);
-+    /* We got here through a sigreturn syscall, our path back is via an
-+       rtb insn so setup r14 for that.  */
-+    env->regs[14] = env->sregs[SR_PC];
-+
-+    unlock_user_struct(frame, frame_addr, 0);
-+    return -TARGET_QEMU_ESIGRETURN;
-+badframe:
-+    force_sig(TARGET_SIGSEGV);
-+    return -TARGET_QEMU_ESIGRETURN;
-+}
-+
-+long do_rt_sigreturn(CPUMBState *env)
-+{
-+    trace_user_do_rt_sigreturn(env, 0);
-+    fprintf(stderr, "Microblaze do_rt_sigreturn: not implemented\n");
-+    return -TARGET_ENOSYS;
-+}
-diff --git a/linux-user/microblaze/target_signal.h b/linux-user/microblaze/target_signal.h
-index 642865f12e..02c5cc56fa 100644
---- a/linux-user/microblaze/target_signal.h
-+++ b/linux-user/microblaze/target_signal.h
-@@ -26,5 +26,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUMBState *state)
-     return state->regs[1];
- }
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 8c93058100..811a7f5ce5 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,6 +1,6 @@
+ obj-y = main.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+-	safe-syscall.o
++	safe-syscall.o $(TARGET_ABI_DIR)/signal.o
  
--
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUMBState *env);
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUMBState *env);
- #endif /* MICROBLAZE_TARGET_SIGNAL_H */
+ obj-$(TARGET_HAS_BFLT) += flatload.o
+ obj-$(TARGET_I386) += vm86.o
+diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/aarch64/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/alpha/signal.c b/linux-user/alpha/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/alpha/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/arm/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/cris/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/hppa/signal.c b/linux-user/hppa/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/hppa/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/i386/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/m68k/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/microblaze/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/mips/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/mips64/signal.c b/linux-user/mips64/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/mips64/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/nios2/signal.c b/linux-user/nios2/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/nios2/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/openrisc/signal.c b/linux-user/openrisc/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/openrisc/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/ppc/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/riscv/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/s390x/signal.c b/linux-user/s390x/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/s390x/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/sh4/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/signal-common.h b/linux-user/signal-common.h
+new file mode 100644
+index 0000000000..838b6e9198
+--- /dev/null
++++ b/linux-user/signal-common.h
+@@ -0,0 +1,50 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef SIGNAL_COMMON_H
++#define SIGNAL_COMMON_H
++extern struct target_sigaltstack target_sigaltstack_used;
++
++static inline int on_sig_stack(unsigned long sp)
++{
++    return (sp - target_sigaltstack_used.ss_sp
++            < target_sigaltstack_used.ss_size);
++}
++
++static inline int sas_ss_flags(unsigned long sp)
++{
++    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
++            : on_sig_stack(sp) ? SS_ONSTACK : 0);
++}
++
++static inline void target_sigemptyset(target_sigset_t *set)
++{
++    memset(set, 0, sizeof(*set));
++}
++
++void host_to_target_sigset_internal(target_sigset_t *d,
++                                    const sigset_t *s);
++void target_to_host_sigset_internal(sigset_t *d,
++                                    const target_sigset_t *s);
++void tswap_siginfo(target_siginfo_t *tinfo,
++                   const target_siginfo_t *info);
++void set_sigmask(const sigset_t *set);
++void force_sig(int sig);
++void force_sigsegv(int oldsig);
++#endif
 diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 5429c9aa38..546311221b 100644
+index 8d9e6e8410..d2de2b6e54 100644
 --- a/linux-user/signal.c
 +++ b/linux-user/signal.c
-@@ -2364,233 +2364,6 @@ badframe:
-     return -TARGET_QEMU_ESIGRETURN;
+@@ -25,8 +25,9 @@
+ #include "qemu-common.h"
+ #include "target_signal.h"
+ #include "trace.h"
++#include "signal-common.h"
+ 
+-static struct target_sigaltstack target_sigaltstack_used = {
++struct target_sigaltstack target_sigaltstack_used = {
+     .ss_sp = 0,
+     .ss_size = 0,
+     .ss_flags = TARGET_SS_DISABLE,
+@@ -82,18 +83,6 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
+ };
+ static uint8_t target_to_host_signal_table[_NSIG];
+ 
+-static inline int on_sig_stack(unsigned long sp)
+-{
+-    return (sp - target_sigaltstack_used.ss_sp
+-            < target_sigaltstack_used.ss_size);
+-}
+-
+-static inline int sas_ss_flags(unsigned long sp)
+-{
+-    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
+-            : on_sig_stack(sp) ? SS_ONSTACK : 0);
+-}
+-
+ int host_to_target_signal(int sig)
+ {
+     if (sig < 0 || sig >= _NSIG)
+@@ -108,11 +97,6 @@ int target_to_host_signal(int sig)
+     return target_to_host_signal_table[sig];
  }
  
--#elif defined(TARGET_MICROBLAZE)
--
--struct target_sigcontext {
--    struct target_pt_regs regs;  /* needs to be first */
--    uint32_t oldmask;
--};
--
--struct target_stack_t {
--    abi_ulong ss_sp;
--    int ss_flags;
--    unsigned int ss_size;
--};
--
--struct target_ucontext {
--    abi_ulong tuc_flags;
--    abi_ulong tuc_link;
--    struct target_stack_t tuc_stack;
--    struct target_sigcontext tuc_mcontext;
--    uint32_t tuc_extramask[TARGET_NSIG_WORDS - 1];
--};
--
--/* Signal frames. */
--struct target_signal_frame {
--    struct target_ucontext uc;
--    uint32_t extramask[TARGET_NSIG_WORDS - 1];
--    uint32_t tramp[2];
--};
--
--struct rt_signal_frame {
--    siginfo_t info;
--    ucontext_t uc;
--    uint32_t tramp[2];
--};
--
--static void setup_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
+-static inline void target_sigemptyset(target_sigset_t *set)
 -{
--    __put_user(env->regs[0], &sc->regs.r0);
--    __put_user(env->regs[1], &sc->regs.r1);
--    __put_user(env->regs[2], &sc->regs.r2);
--    __put_user(env->regs[3], &sc->regs.r3);
--    __put_user(env->regs[4], &sc->regs.r4);
--    __put_user(env->regs[5], &sc->regs.r5);
--    __put_user(env->regs[6], &sc->regs.r6);
--    __put_user(env->regs[7], &sc->regs.r7);
--    __put_user(env->regs[8], &sc->regs.r8);
--    __put_user(env->regs[9], &sc->regs.r9);
--    __put_user(env->regs[10], &sc->regs.r10);
--    __put_user(env->regs[11], &sc->regs.r11);
--    __put_user(env->regs[12], &sc->regs.r12);
--    __put_user(env->regs[13], &sc->regs.r13);
--    __put_user(env->regs[14], &sc->regs.r14);
--    __put_user(env->regs[15], &sc->regs.r15);
--    __put_user(env->regs[16], &sc->regs.r16);
--    __put_user(env->regs[17], &sc->regs.r17);
--    __put_user(env->regs[18], &sc->regs.r18);
--    __put_user(env->regs[19], &sc->regs.r19);
--    __put_user(env->regs[20], &sc->regs.r20);
--    __put_user(env->regs[21], &sc->regs.r21);
--    __put_user(env->regs[22], &sc->regs.r22);
--    __put_user(env->regs[23], &sc->regs.r23);
--    __put_user(env->regs[24], &sc->regs.r24);
--    __put_user(env->regs[25], &sc->regs.r25);
--    __put_user(env->regs[26], &sc->regs.r26);
--    __put_user(env->regs[27], &sc->regs.r27);
--    __put_user(env->regs[28], &sc->regs.r28);
--    __put_user(env->regs[29], &sc->regs.r29);
--    __put_user(env->regs[30], &sc->regs.r30);
--    __put_user(env->regs[31], &sc->regs.r31);
--    __put_user(env->sregs[SR_PC], &sc->regs.pc);
+-    memset(set, 0, sizeof(*set));
 -}
 -
--static void restore_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
--{
--    __get_user(env->regs[0], &sc->regs.r0);
--    __get_user(env->regs[1], &sc->regs.r1);
--    __get_user(env->regs[2], &sc->regs.r2);
--    __get_user(env->regs[3], &sc->regs.r3);
--    __get_user(env->regs[4], &sc->regs.r4);
--    __get_user(env->regs[5], &sc->regs.r5);
--    __get_user(env->regs[6], &sc->regs.r6);
--    __get_user(env->regs[7], &sc->regs.r7);
--    __get_user(env->regs[8], &sc->regs.r8);
--    __get_user(env->regs[9], &sc->regs.r9);
--    __get_user(env->regs[10], &sc->regs.r10);
--    __get_user(env->regs[11], &sc->regs.r11);
--    __get_user(env->regs[12], &sc->regs.r12);
--    __get_user(env->regs[13], &sc->regs.r13);
--    __get_user(env->regs[14], &sc->regs.r14);
--    __get_user(env->regs[15], &sc->regs.r15);
--    __get_user(env->regs[16], &sc->regs.r16);
--    __get_user(env->regs[17], &sc->regs.r17);
--    __get_user(env->regs[18], &sc->regs.r18);
--    __get_user(env->regs[19], &sc->regs.r19);
--    __get_user(env->regs[20], &sc->regs.r20);
--    __get_user(env->regs[21], &sc->regs.r21);
--    __get_user(env->regs[22], &sc->regs.r22);
--    __get_user(env->regs[23], &sc->regs.r23);
--    __get_user(env->regs[24], &sc->regs.r24);
--    __get_user(env->regs[25], &sc->regs.r25);
--    __get_user(env->regs[26], &sc->regs.r26);
--    __get_user(env->regs[27], &sc->regs.r27);
--    __get_user(env->regs[28], &sc->regs.r28);
--    __get_user(env->regs[29], &sc->regs.r29);
--    __get_user(env->regs[30], &sc->regs.r30);
--    __get_user(env->regs[31], &sc->regs.r31);
--    __get_user(env->sregs[SR_PC], &sc->regs.pc);
--}
--
--static abi_ulong get_sigframe(struct target_sigaction *ka,
--                              CPUMBState *env, int frame_size)
--{
--    abi_ulong sp = env->regs[1];
--
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !on_sig_stack(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
--
--    return ((sp - frame_size) & -8UL);
--}
--
--static void setup_frame(int sig, struct target_sigaction *ka,
--                        target_sigset_t *set, CPUMBState *env)
--{
--    struct target_signal_frame *frame;
--    abi_ulong frame_addr;
--    int i;
--
--    frame_addr = get_sigframe(ka, env, sizeof *frame);
--    trace_user_setup_frame(env, frame_addr);
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
--        goto badframe;
--
--    /* Save the mask.  */
--    __put_user(set->sig[0], &frame->uc.tuc_mcontext.oldmask);
--
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __put_user(set->sig[i], &frame->extramask[i - 1]);
--    }
--
--    setup_sigcontext(&frame->uc.tuc_mcontext, env);
--
--    /* Set up to return from userspace. If provided, use a stub
--       already in userspace. */
--    /* minus 8 is offset to cater for "rtsd r15,8" offset */
--    if (ka->sa_flags & TARGET_SA_RESTORER) {
--        env->regs[15] = ((unsigned long)ka->sa_restorer)-8;
--    } else {
--        uint32_t t;
--        /* Note, these encodings are _big endian_! */
--        /* addi r12, r0, __NR_sigreturn */
--        t = 0x31800000UL | TARGET_NR_sigreturn;
--        __put_user(t, frame->tramp + 0);
--        /* brki r14, 0x8 */
--        t = 0xb9cc0008UL;
--        __put_user(t, frame->tramp + 1);
--
--        /* Return from sighandler will jump to the tramp.
--           Negative 8 offset because return is rtsd r15, 8 */
--        env->regs[15] = frame_addr + offsetof(struct target_signal_frame, tramp)
--                                   - 8;
--    }
--
--    /* Set up registers for signal handler */
--    env->regs[1] = frame_addr;
--    /* Signal handler args: */
--    env->regs[5] = sig; /* Arg 0: signum */
--    env->regs[6] = 0;
--    /* arg 1: sigcontext */
--    env->regs[7] = frame_addr += offsetof(typeof(*frame), uc);
--
--    /* Offset of 4 to handle microblaze rtid r14, 0 */
--    env->sregs[SR_PC] = (unsigned long)ka->_sa_handler;
--
--    unlock_user_struct(frame, frame_addr, 1);
--    return;
--badframe:
--    force_sigsegv(sig);
--}
--
--static void setup_rt_frame(int sig, struct target_sigaction *ka,
--                           target_siginfo_t *info,
--                           target_sigset_t *set, CPUMBState *env)
--{
--    fprintf(stderr, "Microblaze setup_rt_frame: not implemented\n");
--}
--
--long do_sigreturn(CPUMBState *env)
--{
--    struct target_signal_frame *frame;
--    abi_ulong frame_addr;
--    target_sigset_t target_set;
--    sigset_t set;
--    int i;
--
--    frame_addr = env->regs[R_SP];
--    trace_user_do_sigreturn(env, frame_addr);
--    /* Make sure the guest isn't playing games.  */
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1))
--        goto badframe;
--
--    /* Restore blocked signals */
--    __get_user(target_set.sig[0], &frame->uc.tuc_mcontext.oldmask);
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
--    }
--    target_to_host_sigset_internal(&set, &target_set);
--    set_sigmask(&set);
--
--    restore_sigcontext(&frame->uc.tuc_mcontext, env);
--    /* We got here through a sigreturn syscall, our path back is via an
--       rtb insn so setup r14 for that.  */
--    env->regs[14] = env->sregs[SR_PC];
--
--    unlock_user_struct(frame, frame_addr, 0);
--    return -TARGET_QEMU_ESIGRETURN;
--badframe:
--    force_sig(TARGET_SIGSEGV);
--    return -TARGET_QEMU_ESIGRETURN;
--}
--
--long do_rt_sigreturn(CPUMBState *env)
--{
--    trace_user_do_rt_sigreturn(env, 0);
--    fprintf(stderr, "Microblaze do_rt_sigreturn: not implemented\n");
--    return -TARGET_ENOSYS;
--}
--
- #elif defined(TARGET_CRIS)
+ static inline void target_sigaddset(target_sigset_t *set, int signum)
+ {
+     signum--;
+@@ -127,8 +111,8 @@ static inline int target_sigismember(const target_sigset_t *set, int signum)
+     return ((set->sig[signum / TARGET_NSIG_BPW] & mask) != 0);
+ }
  
- struct target_sigcontext {
+-static void host_to_target_sigset_internal(target_sigset_t *d,
+-                                           const sigset_t *s)
++void host_to_target_sigset_internal(target_sigset_t *d,
++                                    const sigset_t *s)
+ {
+     int i;
+     target_sigemptyset(d);
+@@ -149,8 +133,8 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
+         d->sig[i] = tswapal(d1.sig[i]);
+ }
+ 
+-static void target_to_host_sigset_internal(sigset_t *d,
+-                                           const target_sigset_t *s)
++void target_to_host_sigset_internal(sigset_t *d,
++                                    const target_sigset_t *s)
+ {
+     int i;
+     sigemptyset(d);
+@@ -257,7 +241,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+ /* Just set the guest's signal mask to the specified value; the
+  * caller is assumed to have called block_signals() already.
+  */
+-static void set_sigmask(const sigset_t *set)
++void set_sigmask(const sigset_t *set)
+ {
+     TaskState *ts = (TaskState *)thread_cpu->opaque;
+ 
+@@ -344,8 +328,8 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
+     tinfo->si_code = deposit32(si_code, 16, 16, si_type);
+ }
+ 
+-static void tswap_siginfo(target_siginfo_t *tinfo,
+-                          const target_siginfo_t *info)
++void tswap_siginfo(target_siginfo_t *tinfo,
++                   const target_siginfo_t *info)
+ {
+     int si_type = extract32(info->si_code, 16, 16);
+     int si_code = sextract32(info->si_code, 0, 16);
+@@ -515,7 +499,7 @@ void signal_init(void)
+  * also forces the signal to "not blocked, not ignored", but for QEMU
+  * that work is done in process_pending_signals().
+  */
+-static void force_sig(int sig)
++void force_sig(int sig)
+ {
+     CPUState *cpu = thread_cpu;
+     CPUArchState *env = cpu->env_ptr;
+@@ -534,7 +518,7 @@ static void force_sig(int sig)
+  * at the point of failure.
+  */
+ #if !defined(TARGET_RISCV)
+-static void force_sigsegv(int oldsig)
++void force_sigsegv(int oldsig)
+ {
+     if (oldsig == SIGSEGV) {
+         /* Make sure we don't try to deliver the signal again; this will
+@@ -7300,9 +7284,6 @@ badframe:
+     force_sig(TARGET_SIGSEGV);
+     return -TARGET_QEMU_ESIGRETURN;
+ }
+-
+-#else
+-#error Target needs to add support for signal handling
+ #endif
+ 
+ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/sparc/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/sparc64/signal.c b/linux-user/sparc64/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/sparc64/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/tilegx/signal.c b/linux-user/tilegx/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/tilegx/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/x86_64/signal.c b/linux-user/x86_64/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/x86_64/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
+diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
+new file mode 100644
+index 0000000000..02ca338b6c
+--- /dev/null
++++ b/linux-user/xtensa/signal.c
+@@ -0,0 +1,18 @@
++/*
++ *  Emulation of Linux signals
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 -- 
 2.14.3
