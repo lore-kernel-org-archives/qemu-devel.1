@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f6MM7-0007Ex-Tk
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 16:28:37 -0400
+	(envelope-from <mjc@sifive.com>) id 1f6N2K-0005tr-9C
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 17:12:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1f6MM2-0008LM-SS
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 16:28:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1f6MM2-0008Ko-J3
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 16:28:30 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3BKSIA0045723
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 16:28:27 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2h9n6j387w-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 16:28:27 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 11 Apr 2018 16:28:25 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <mjc@sifive.com>) id 1f6N2H-0000Fa-2o
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 17:12:12 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:40535)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f6N2G-0000F8-Pn
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 17:12:09 -0400
+Received: by mail-ot0-x242.google.com with SMTP id j8-v6so3617715ota.7
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 14:12:08 -0700 (PDT)
 MIME-Version: 1.0
+In-Reply-To: <20180410110417.554bc8911fb2e2f0a3d99b2d@gmail.com>
+References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
+	<1519998711-73430-20-git-send-email-mjc@sifive.com>
+	<20180410062157.0f5876180d0ff5c89dd80393@gmail.com>
+	<949f3787-7899-73ba-6c80-d3c20af68fda@redhat.com>
+	<20180410110417.554bc8911fb2e2f0a3d99b2d@gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Thu, 12 Apr 2018 09:12:07 +1200
+Message-ID: <CAHNT7NvEmf0ys6QXk5aLVGB73okjukNb9SoWVeuQu87a3XaTPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 11 Apr 2018 15:28:06 -0500
-Message-Id: <152347848670.15508.1646517335003672507@sif>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.12.0-rc3 is now available
+Subject: Re: [Qemu-devel] [PATCH v8 19/23] SiFive RISC-V UART Device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,187 +32,367 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Antony Pavlov <antonynpavlov@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, Stefan O'Rear <sorear2@gmail.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Eric Blake <eblake@redhat.com>
 
-Hello,
+On Tue, Apr 10, 2018 at 8:04 PM, Antony Pavlov <antonynpavlov@gmail.com>
+wrote:
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-fourth release candidate for the QEMU 2.12 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+> On Tue, 10 Apr 2018 08:17:32 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>
+> > On 10.04.2018 05:21, Antony Pavlov wrote:
+> > > On Sat,  3 Mar 2018 02:51:47 +1300
+> > > Michael Clark <mjc@sifive.com> wrote:
+> > >
+> > >> QEMU model of the UART on the SiFive E300 and U500 series SOCs.
+> > >> BBL supports the SiFive UART for early console access via the SBI
+> > >> (Supervisor Binary Interface) and the linux kernel SBI console.
+> > >>
+> > >> The SiFive UART implements the pre qom legacy interface consistent
+> > >> with the 16550a UART in 'hw/char/serial.c'.
+> > >>
+> > >> Acked-by: Richard Henderson <richard.henderson@linaro.org>
+> > >> Signed-off-by: Stefan O'Rear <sorear2@gmail.com>
+> > >> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> > >> Signed-off-by: Michael Clark <mjc@sifive.com>
+> > >> ---
+> > >>  hw/riscv/sifive_uart.c         | 176 ++++++++++++++++++++++++++++++
+> +++++++++++
+> > >>  include/hw/riscv/sifive_uart.h |  71 +++++++++++++++++
+> > >>  2 files changed, 247 insertions(+)
+> > >>  create mode 100644 hw/riscv/sifive_uart.c
+> > >>  create mode 100644 include/hw/riscv/sifive_uart.h
+> > >>
+> > >> diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
+> > >> new file mode 100644
+> > >> index 0000000..b0c3798
+> > >> --- /dev/null
+> > >> +++ b/hw/riscv/sifive_uart.c
+> > >> @@ -0,0 +1,176 @@
+> > >> +/*
+> > >> + * QEMU model of the UART on the SiFive E300 and U500 series SOCs.
+> > >> + *
+> > >> + * Copyright (c) 2016 Stefan O'Rear
+> > >> + *
+> > >> + * This program is free software; you can redistribute it and/or
+> modify it
+> > >> + * under the terms and conditions of the GNU General Public License=
+,
+> > >> + * version 2 or later, as published by the Free Software Foundation=
+.
+> > >> + *
+> > >> + * This program is distributed in the hope it will be useful, but
+> WITHOUT
+> > >> + * ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or
+> > >> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+> License for
+> > >> + * more details.
+> > >> + *
+> > >> + * You should have received a copy of the GNU General Public Licens=
+e
+> along with
+> > >> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > >> + */
+> > >> +
+> > >> +#include "qemu/osdep.h"
+> > >> +#include "qapi/error.h"
+> > >> +#include "hw/sysbus.h"
+> > >> +#include "chardev/char.h"
+> > >> +#include "chardev/char-fe.h"
+> > >> +#include "target/riscv/cpu.h"
+> > >> +#include "hw/riscv/sifive_uart.h"
+> > >>
+> > >> +/*
+> > >> + * Not yet implemented:
+> > >> + *
+> > >> + * Transmit FIFO using "qemu/fifo8.h"
+> > >> + * SIFIVE_UART_IE_TXWM interrupts
+> > >> + * SIFIVE_UART_IE_RXWM interrupts must honor fifo watermark
+> > >> + * Rx FIFO watermark interrupt trigger threshold
+> > >> + * Tx FIFO watermark interrupt trigger threshold.
+> > >> + */
+> > >> +
+> > >> +static void update_irq(SiFiveUARTState *s)
+> > >> +{
+> > >> +    int cond =3D 0;
+> > >> +    if ((s->ie & SIFIVE_UART_IE_RXWM) && s->rx_fifo_len) {
+> > >> +        cond =3D 1;
+> > >> +    }
+> > >> +    if (cond) {
+> > >> +        qemu_irq_raise(s->irq);
+> > >> +    } else {
+> > >> +        qemu_irq_lower(s->irq);
+> > >> +    }
+> > >> +}
+> > >> +
+> > >> +static uint64_t
+> > >> +uart_read(void *opaque, hwaddr addr, unsigned int size)
+> > >> +{
+> > >> +    SiFiveUARTState *s =3D opaque;
+> > >> +    unsigned char r;
+> > >> +    switch (addr) {
+> > >> +    case SIFIVE_UART_RXFIFO:
+> > >> +        if (s->rx_fifo_len) {
+> > >> +            r =3D s->rx_fifo[0];
+> > >> +            memmove(s->rx_fifo, s->rx_fifo + 1, s->rx_fifo_len - 1)=
+;
+> > >> +            s->rx_fifo_len--;
+> > >> +            qemu_chr_fe_accept_input(&s->chr);
+> > >> +            update_irq(s);
+> > >> +            return r;
+> > >> +        }
+> > >> +        return 0x80000000;
+> > >> +
+> > >> +    case SIFIVE_UART_TXFIFO:
+> > >> +        return 0; /* Should check tx fifo */
+> > >> +    case SIFIVE_UART_IE:
+> > >> +        return s->ie;
+> > >> +    case SIFIVE_UART_IP:
+> > >> +        return s->rx_fifo_len ? SIFIVE_UART_IP_RXWM : 0;
+> > >> +    case SIFIVE_UART_TXCTRL:
+> > >> +        return s->txctrl;
+> > >> +    case SIFIVE_UART_RXCTRL:
+> > >> +        return s->rxctrl;
+> > >> +    case SIFIVE_UART_DIV:
+> > >> +        return s->div;
+> > >> +    }
+> > >> +
+> > >> +    hw_error("%s: bad read: addr=3D0x%x\n",
+> > >> +        __func__, (int)addr);
+> > >> +    return 0;
+> > >> +}
+> > >> +
+> > >> +static void
+> > >> +uart_write(void *opaque, hwaddr addr,
+> > >> +           uint64_t val64, unsigned int size)
+> > >> +{
+> > >> +    SiFiveUARTState *s =3D opaque;
+> > >> +    uint32_t value =3D val64;
+> > >> +    unsigned char ch =3D value;
+> > >> +
+> > >> +    switch (addr) {
+> > >> +    case SIFIVE_UART_TXFIFO:
+> > >> +        qemu_chr_fe_write(&s->chr, &ch, 1);
+> > >> +        return;
+> > >> +    case SIFIVE_UART_IE:
+> > >> +        s->ie =3D val64;
+> > >> +        update_irq(s);
+> > >> +        return;
+> > >> +    case SIFIVE_UART_TXCTRL:
+> > >> +        s->txctrl =3D val64;
+> > >> +        return;
+> > >> +    case SIFIVE_UART_RXCTRL:
+> > >> +        s->rxctrl =3D val64;
+> > >> +        return;
+> > >> +    case SIFIVE_UART_DIV:
+> > >> +        s->div =3D val64;
+> > >> +        return;
+> > >> +    }
+> > >> +    hw_error("%s: bad write: addr=3D0x%x v=3D0x%x\n",
+> > >> +        __func__, (int)addr, (int)value);
+> > >> +}
+> > >> +
+> > >> +static const MemoryRegionOps uart_ops =3D {
+> > >> +    .read =3D uart_read,
+> > >> +    .write =3D uart_write,
+> > >> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> > >> +    .valid =3D {
+> > >> +        .min_access_size =3D 4,
+> > >> +        .max_access_size =3D 4
+> > >> +    }
+> > >> +};
+> > >> +
+> > >> +static void uart_rx(void *opaque, const uint8_t *buf, int size)
+> > >> +{
+> > >> +    SiFiveUARTState *s =3D opaque;
+> > >> +
+> > >> +    /* Got a byte.  */
+> > >> +    if (s->rx_fifo_len >=3D sizeof(s->rx_fifo)) {
+> > >> +        printf("WARNING: UART dropped char.\n");
+> > >> +        return;
+> > >> +    }
+> > >> +    s->rx_fifo[s->rx_fifo_len++] =3D *buf;
+> > >> +
+> > >> +    update_irq(s);
+> > >> +}
+> > >> +
+> > >> +static int uart_can_rx(void *opaque)
+> > >> +{
+> > >> +    SiFiveUARTState *s =3D opaque;
+> > >> +
+> > >> +    return s->rx_fifo_len < sizeof(s->rx_fifo);
+> > >> +}
+> > >> +
+> > >> +static void uart_event(void *opaque, int event)
+> > >> +{
+> > >> +}
+> > >> +
+> > >> +static int uart_be_change(void *opaque)
+> > >> +{
+> > >> +    SiFiveUARTState *s =3D opaque;
+> > >> +
+> > >> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx,
+> uart_event,
+> > >> +        uart_be_change, s, NULL, true);
+> > >> +
+> > >> +    return 0;
+> > >> +}
+> > >> +
+> > >> +/*
+> > >> + * Create UART device.
+> > >> + */
+> > >> +SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space,
+> hwaddr base,
+> > >> +    Chardev *chr, qemu_irq irq)
+> > >> +{
+> > >> +    SiFiveUARTState *s =3D g_malloc0(sizeof(SiFiveUARTState));
+> > >> +    s->irq =3D irq;
+> > >> +    qemu_chr_fe_init(&s->chr, chr, &error_abort);
+> > >> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx,
+> uart_event,
+> > >> +        uart_be_change, s, NULL, true);
+> > >> +    memory_region_init_io(&s->mmio, NULL, &uart_ops, s,
+> > >> +                          TYPE_SIFIVE_UART, SIFIVE_UART_MAX);
+> > >> +    memory_region_add_subregion(address_space, base, &s->mmio);
+> > >> +    return s;
+> > >> +}
+> > >> diff --git a/include/hw/riscv/sifive_uart.h
+> b/include/hw/riscv/sifive_uart.h
+> > >> new file mode 100644
+> > >> index 0000000..504f18a
+> > >> --- /dev/null
+> > >> +++ b/include/hw/riscv/sifive_uart.h
+> > >> @@ -0,0 +1,71 @@
+> > >> +/*
+> > >> + * SiFive UART interface
+> > >> + *
+> > >> + * Copyright (c) 2016 Stefan O'Rear
+> > >> + * Copyright (c) 2017 SiFive, Inc.
+> > >> + *
+> > >> + * This program is free software; you can redistribute it and/or
+> modify it
+> > >> + * under the terms and conditions of the GNU General Public License=
+,
+> > >> + * version 2 or later, as published by the Free Software Foundation=
+.
+> > >> + *
+> > >> + * This program is distributed in the hope it will be useful, but
+> WITHOUT
+> > >> + * ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or
+> > >> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+> License for
+> > >> + * more details.
+> > >> + *
+> > >> + * You should have received a copy of the GNU General Public Licens=
+e
+> along with
+> > >> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > >> + */
+> > >> +
+> > >> +#ifndef HW_SIFIVE_UART_H
+> > >> +#define HW_SIFIVE_UART_H
+> > >> +
+> > >> +enum {
+> > >> +    SIFIVE_UART_TXFIFO        =3D 0,
+> > >> +    SIFIVE_UART_RXFIFO        =3D 4,
+> > >> +    SIFIVE_UART_TXCTRL        =3D 8,
+> > >> +    SIFIVE_UART_TXMARK        =3D 10,
+> > >> +    SIFIVE_UART_RXCTRL        =3D 12,
+> > >> +    SIFIVE_UART_RXMARK        =3D 14,
+> > >> +    SIFIVE_UART_IE            =3D 16,
+> > >> +    SIFIVE_UART_IP            =3D 20,
+> > >> +    SIFIVE_UART_DIV           =3D 24,
+> > >> +    SIFIVE_UART_MAX           =3D 32
+> > >> +};
+> > >> +
+> > >> +enum {
+> > >> +    SIFIVE_UART_IE_TXWM       =3D 1, /* Transmit watermark interrup=
+t
+> enable */
+> > >> +    SIFIVE_UART_IE_RXWM       =3D 2  /* Receive watermark interrupt
+> enable */
+> > >> +};
+> > >> +
+> > >> +enum {
+> > >> +    SIFIVE_UART_IP_TXWM       =3D 1, /* Transmit watermark interrup=
+t
+> pending */
+> > >> +    SIFIVE_UART_IP_RXWM       =3D 2  /* Receive watermark interrupt
+> pending */
+> > >> +};
+> > >> +
+> > >> +#define TYPE_SIFIVE_UART "riscv.sifive.uart"
+> > >> +
+> > >> +#define SIFIVE_UART(obj) \
+> > >> +    OBJECT_CHECK(SiFiveUARTState, (obj), TYPE_SIFIVE_UART)
+> > >> +
+> > >> +typedef struct SiFiveUARTState {
+> > >> +    /*< private >*/
+> > >> +    SysBusDevice parent_obj;
+> > >
+> > >
+> > > You use SysBusDevive in this header file but there is no 'include
+> "hw/sysbus.h"' in the header file itself.
+> > >
+> > > Please see my comment https://github.com/riscv/riscv-qemu/pull/130#
+> issuecomment-379640538
+> > >
+> > >
+> > >> +    /*< public >*/
+> > >> +    qemu_irq irq;
+> > >> +    MemoryRegion mmio;
+> > >> +    CharBackend chr;
+> > >
+> > > Just the same thing. CharBackend is defined in "chardev/char-fe.h"
+> please include it.
+> >
+> > Honestly, I rather prefer to *not* add more includes to header files
+> > than we already have. We already have got lots of "touch this header an=
+d
+> > you have to recompile almost the whole QEMU" conditions, so to avoid
+> > that this situation gets worse, we should rather avoid including header=
+s
+> > from headers if it is not necessary. Thus if the current sources build
+> > fine, no need to change anything here. Just my 0.02 =E2=82=AC.
+>
+> Adding ONLY NECESSARY header files inclusions to header file __can't
+> produce__
+> additional recompile efforts.
+> Moreover this can decrease number of include directives in c-files.
+>
+> I __rebased__ my RISC-V board in my out-of tree qemu branch (
+> https://github.com/miet-riscv-workgroup/riscv-qemu/tree/20180409.erizo).
+> I faced with problem: I have to track dependencies of
+> header files from include/hw/riscv/ which I use.
+>
+> So your "not-add-more-includes-to-header-files" approach has an
+> disadvantage:
+> if a header file required header list changes, each c-file that includes
+> that header file
+> must be edited to update the #include statement list.
+>
+> RISC-V is a very promising architecture. It is possible that we will have
+> many RISC-V-related
+> c-files in the future in qemu. It will be very painful to change these
+> c-files on every RISC-V header
+> files requirements change.
+>
+> To Eric Blake:
+> I have added you to CC because of your comment in the conversation
+> https://patchwork.kernel.org/patch/10147099/
 
-  http://download.qemu-project.org/qemu-2.12.0-rc3.tar.xz
-  http://download.qemu-project.org/qemu-2.12.0-rc3.tar.xz.sig
 
-A note from the maintainer:
+Currently no headers in include/hw/riscv/*.h include any other headers and
+i'd like to keep it that way if possible.
 
-  If no further release critical bugs are found, we'll do the
-  final release next week on the 17th; otherwise we will likely
-  roll an rc4 on the 17th and do final release on the 24th.
+It's not painful if no headers include any other headers. On the contrary
+it keeps things simple. There are no implicit dependencies. Core QEMU
+header dependencies should not be brought in by riscv specific headers.
+That would lead to source modules that do not include their QEMU
+dependencies making the situation for managing source modules more opaque.
 
-You can help improve the quality of the QEMU 2.12 release by testing this
-release and reporting bugs on Launchpad:
-
-  https://bugs.launchpad.net/qemu/
-
-The release plan, as well a documented known issues for release
-candidates, are available at:
-
-  http://wiki.qemu.org/Planning/2.12
-
-Please add entries to the ChangeLog for the 2.12 release below:
-
-  http://wiki.qemu.org/ChangeLog/2.12
-
-Changes since rc2:
-
-38e83a71d0: Update version for v2.12.0-rc3 release (Peter Maydell)
-6670b494fd: hw/char/cmsdk-apb-uart.c: Correctly clear INTSTATUS bits on wri=
-tes (Peter Maydell)
-afd46fcad2: icount: fix cpu_restore_state_from_tb for non-tb-exit cases (Pa=
-vel Dovgalyuk)
-46a1ee4f39: linux-user: implement HWCAP bits on MIPS (James Cowgill)
-947aeab311: linux-user: add microblaze/microblazeel magic numbers in qemu-b=
-infmt-conf.sh (Laurent Vivier)
-a31e7605dd: linux-user: fix microblaze get_sp_from_cpustate() (Laurent Vivi=
-er)
-c1de5696d6: qemu-iotests: update 185 output (Stefan Hajnoczi)
-2fe4bba19b: commit/stream: Reset delay_ns (Kevin Wolf)
-ad53ea42fe: qemu-iotests: Remove _supported_fmt dmg (Kevin Wolf)
-e819edd090: iotests: blacklist bochs and cloop for 205 and 208 (Vladimir Se=
-mentsov-Ogievskiy)
-f48351d2f3: iotests.py: improve verify_image_format helper (Vladimir Sement=
-sov-Ogievskiy)
-07c13a7172: hw/block/pflash_cfi: fix off-by-one error (Philippe Mathieu-Dau=
-d=C3=A9)
-febc8c865f: iotests.py: support unsupported_fmts in main() (Vladimir Sement=
-sov-Ogievskiy)
-a18a73d747: Revert "migration: Don't activate block devices if using -S" (D=
-r. David Alan Gilbert)
-951702f39c: monitor: bind dispatch bh to iohandler context (Peter Xu)
-1554434927: iothread: workaround glib bug which hangs qmp-test (Peter Xu)
-c3988519c4: iotests: fix wait_until_completed() (Peter Xu)
-bd49e6027c: fpu: Fix rounding mode for floatN_to_uintM_round_to_zero (Richa=
-rd Henderson)
-9743cd5736: tcg: Introduce tcg_set_insn_start_param (Richard Henderson)
-7f0f4208b3: linux-user/signal.c: Ensure AArch64 signal frame isn't too smal=
-l (Peter Maydell)
-c52e7132d7: cpus.c: ensure running CPU recalculates icount deadlines on tim=
-er expiry (Peter Maydell)
-8aec759b45: target/arm: Report unsupported MPU region sizes more clearly (P=
-eter Maydell)
-f640a5914f: hw/arm/fsl-imx: Fix introspection problem with fsl-imx6 and fsl=
--imx7 (Thomas Huth)
-8aabc5437b: hw/arm/allwinner-a10: Do not use nd_table in instance_init func=
-tion (Thomas Huth)
-f3d9fe8f95: hw/sd/bcm2835_sdhost: Don't raise spurious interrupts (Peter Ma=
-ydell)
-b318f3265c: hw/sd/bcm2835_sdhost: Add tracepoints (Peter Maydell)
-c4869ca630: target-arm: Check undefined opcodes for SWP in A32 decoder (Onu=
-r Sahin)
-8720daad47: hw/arm/integratorcp: Don't do things that could be fatal in the=
- instance_init (Thomas Huth)
-c39770cd63: hw/arm: Allow manually specified /psci node (Andrey Smirnov)
-c6093a05d6: configure: don't warn SDL abi if disabled (Peter Xu)
-5a464e6ce8: configure: don't warn GTK if disabled (Peter Xu)
-fa2d039b2c: gtk: drop pointless code from gd_window_close (Gerd Hoffmann)
-1e70de679d: ui: fix keymap detection under Xwayland (Daniel P. Berrang=C3=
-=A9)
-5f52353091: e1000: Old machine types, turn new subsection off (Dr. David Al=
-an Gilbert)
-ff214d427e: e1000: Choose which set of props to migrate (Dr. David Alan Gil=
-bert)
-5935448478: e1000: Migrate props via a temporary structure (Dr. David Alan =
-Gilbert)
-46f2a9ec54: e1000: wire new subsection to property (Dr. David Alan Gilbert)
-3c4053c52c: e1000: Dupe offload data on reading old stream (Dr. David Alan =
-Gilbert)
-4ae4bf5bb1: e1000: Convert v3 fields to subsection (Dr. David Alan Gilbert)
-9ac225171c: linux-user: fix preadv/pwritev offsets (Max Filippov)
-6b3913e085: roms/u-boot-sam460ex: Change to qemu git mirror and update (BAL=
-ATON Zoltan)
-f8815532dc: sam460ex: Fix timer frequency and clock multipliers (BALATON Zo=
-ltan)
-99b336cdd9: tests/boot-serial: Test the sam460ex board (Thomas Huth)
-127f03e442: spapr: Initialize reserved areas list in FDT in H_CAS handler (=
-Alexey Kardashevskiy)
-efb7db250a: target/ppc: Fix backwards migration of msr_mask (David Gibson)
-ddd835f32a: hw/misc/macio: Fix crash when listing device properties of maci=
-o device (Thomas Huth)
-e69ba2b489: target/ppc: Initialize lazy_tlb_flush correctly (David Gibson)
-e0014d4b3a: Add missing bit for SSE instr in VEX decoding (Eugene Minibaev)
-3bd2608db7: maint: Add .mailmap entries for patches claiming list authorshi=
-p (Eric Blake)
-84c868f6b8: dump: Fix build with newer gcc (Eric Blake)
-01366ef9a4: device-crash-test: Remove fixed isa-fdc entry (Thomas Huth)
-bd6b1c8324: qemu-pr-helper: Write pidfile more often (Michal Privoznik)
-8dc0bf2647: qemu-pr-helper: Daemonize before dropping privileges (Michal Pr=
-ivoznik)
-9f91022f28: virtio-serial: fix heapover-flow (linzhecheng)
-c2b01cfec1: kvmclock: fix clock_is_reliable on migration from QEMU < 2.9 (M=
-ichael Chapman)
-4968a2c6ed: hw/dma/i82374: Avoid double creation of the 82374 controller (P=
-hilippe Mathieu-Daud=C3=A9)
-29e560f00e: hw/scsi: support SCSI-2 passthrough without PI (Daniel Henrique=
- Barboza)
-2343be0d7e: scsi-disk: allow customizing the SCSI version (Paolo Bonzini)
-37c5174189: scsi-disk: Don't enlarge min_io_size to max_io_size (Fam Zheng)
-db1b5f135c: configure: Add missing configure options to help text (Thomas H=
-uth)
-1221f15041: i386/hyperv: error out if features requested but unsupported (R=
-oman Kagan)
-9445597b6a: i386/hyperv: add hv-frequencies cpu property (Roman Kagan)
-7becac84fb: target/i386: WHPX: set CPUID_EXT_HYPERVISOR bit (Justin Terry (=
-VM))
-d434e5ac5d: virtio-serial: fix heap-over-flow (linzhecheng)
-e7b94a84b6: vhost: Allow adjoining regions (Dr. David Alan Gilbert)
-ea3e6f5a93: contrib/libvhost-user: add the protocol feature used for SET/GE=
-T message (Changpeng Liu)
-1c3e5a2617: vhost-user: back SET/GET_CONFIG requests with a protocol featur=
-e (Maxime Coquelin)
-bc6abcff7c: vhost-user-blk: set config ops before vhost-user init (Maxime C=
-oquelin)
-9005774b27: gdbstub: fix off-by-one in gdb_handle_packet() (Philippe Mathie=
-u-Daud=C3=A9)
-b3a184f51f: s390x: load_psw() should only exchange the PSW for KVM (David H=
-ildenbrand)
-61a17fea6d: s390x/mmu: don't overwrite pending exception in mmu translate (=
-David Hildenbrand)
-be4d026f64: vfio-ccw: fix memory leaks in vfio_ccw_realize() (Greg Kurz)
-c607bb8f8a: pc-bios/s390: update images (Cornelia Huck)
-e8c7ef288a: s390: Do not pass inofficial IPL type to the guest (Viktor Miha=
-jlovski)
-789b5a401b: s390: Ensure IPL from SCSI works as expected (Viktor Mihajlovsk=
-i)
-11ef6d50fc: s390: Refactor IPL parameter block generation (Viktor Mihajlovs=
-ki)
-eac53ac598: s390x/kvm: call cpu_synchronize_state() on every kvm_arch_handl=
-e_exit() (David Hildenbrand)
-648abbfbaa: memfd: fix vhost-user-test on non-memfd capable host (Marc-Andr=
-=C3=A9 Lureau)
-1458da9131: sdl2: drop dead code (Gerd Hoffmann)
-e7824db158: sdl2: drop QEMU_KEY_BACKSPACE special case (Gerd Hoffmann)
-3dd2ca54fb: sdl2: enable ctrl modifier keys for text consoles (Gerd Hoffman=
-n)
-34013c3793: sdl2: track kbd modifier state unconditionally (Gerd Hoffmann)
-da024b1ed2: ui: add ctrl modifier support to kbd_put_qcode_console() (Gerd =
-Hoffmann)
-07fed47417: docker: fedora: test more components (Paolo Bonzini)
-185809224a: docker: Inline "prep_fail" in run script (Fam Zheng)
-726c9a3b8c: tests: Fix ubuntu.i386 image initialization (Fam Zheng)
-0c153b4c6f: docker: dump 'config.log' if ./configure fails (Philippe Mathie=
-u-Daud=C3=A9)
-5aa4860082: Update seabios-hppa (Richard Henderson)
-6cb1d3b851: tcg: Fix out-of-line generic vector compares (Richard Henderson)
-057ad0b469: crypto: ensure we use a predictable TLS priority setting (Danie=
-l P. Berrang=C3=A9)
-00e5e9df29: docs: Document -object tls-creds-x509 priority=3Dxxx (Christoph=
-e Fergeau)
-5d19a6eae9: docs: update information for TLS certificate management (Daniel=
- P. Berrange)
-5c08600547: vfio: Use a trace point when a RAM section cannot be DMA mapped=
- (Eric Auger)
-053e45d2f3: scripts/checkpatch.pl: Bug fix (Su Hang)
-5cd10051c2: target/i386: Fix andn instruction (Alexandro Sanchez Bach)
-d69748463c: sys_membarrier: fix up include directives (Bruce Rogers)
-991f366b2f: sdl2: Remove unused epoxy include (Elie Tournier)
+We have followed the best practice that source files should explicitly
+include their header dependencies.
