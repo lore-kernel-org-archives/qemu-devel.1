@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f6Ide-0005jH-1A
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:30:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f6IhQ-0007Zc-Gb
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f6IdZ-0006vh-LA
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:30:25 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:60901)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f6IdZ-0006r8-AP
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:30:21 -0400
-Date: Wed, 11 Apr 2018 12:30:16 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180411163016.GB4480@flamenco>
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-	<1523038800-2494-7-git-send-email-cota@braap.org>
-	<a95ec4d4-72f7-486d-4123-a7bd4740cf03@linaro.org>
-	<20180410142332.GA22989@flamenco>
-	<c6a08977-5340-1aa3-9ae1-0656a5240507@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1f6IhP-0000sf-Pj
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:34:20 -0400
+References: <20180411122606.367301-1-vsementsov@virtuozzo.com>
+	<20180411122606.367301-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f053af10-6c4a-496e-77d9-e01d65eb2eac@redhat.com>
+Date: Wed, 11 Apr 2018 18:33:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6a08977-5340-1aa3-9ae1-0656a5240507@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 06/17] target/mips: convert to
- DisasJumpType
+In-Reply-To: <20180411122606.367301-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qcow2: try load bitmaps only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com
 
-On Wed, Apr 11, 2018 at 09:27:57 +1000, Richard Henderson wrote:
-> On 04/11/2018 12:23 AM, Emilio G. Cota wrote:
-> >          case DISAS_STOP:
-> > -            gen_goto_tb(&ctx, 0, ctx.pc);
-> > +            tcg_gen_lookup_and_goto_ptr();
+On 2018-04-11 14:26, Vladimir Sementsov-Ogievskiy wrote:
+> Checking reopen by existence of some bitmaps is wrong, as it may be
+> some other bitmaps, or on the other hand, user may remove bitmaps. This
+> criteria is bad. To simplify things and make behavior more predictable
+> let's just add a flag to remember, that we've already tried to load
+> bitmaps on open and do not want do it again.
 > 
-> You need to write ctx.pc back to the pc first, e.g.
-> 
->     gen_save_pc(ctx.pc);
->     tcg_gen_lookup_and_goto_ptr();
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2.h |  1 +
+>  block/qcow2.c | 16 ++++++++--------
+>  2 files changed, 9 insertions(+), 8 deletions(-)
 
-Thanks, fixed now.
-
-		Emilio
+Reviewed-by: Max Reitz <mreitz@redhat.com>
