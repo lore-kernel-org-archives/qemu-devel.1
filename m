@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwG-0006If-Si
+	(envelope-from <laurent@vivier.eu>) id 1f6KwF-0006GM-Sj
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwD-00082q-VF
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwA-0007zU-Ml
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:47 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:49 +0200
-Message-Id: <20180411185651.21351-18-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:56:51 +0200
+Message-Id: <20180411185651.21351-20-laurent@vivier.eu>
 In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 17/19] linux-user: move riscv cpu
- loop to riscv directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 19/19] linux-user: move xtensa cpu
+ loop to xtensa directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,237 +24,539 @@ To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
 No code change, only move code from main.c to
-riscv/cpu_loop.c.
+xtensa/cpu_loop.c.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Michael Clark <mjc@sifive.com>
 ---
- linux-user/main.c           | 101 +-------------------------------------------
- linux-user/riscv/cpu_loop.c |  92 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 93 insertions(+), 100 deletions(-)
+
+Notes:
+    v2: report changes introduced by
+        4a6bf7adb9 target/xtensa: linux-user: rewind pc for restarted syscall
+
+ linux-user/main.c            | 250 -------------------------------------------
+ linux-user/xtensa/cpu_loop.c | 241 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 241 insertions(+), 250 deletions(-)
 
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 32922110f1..834ec0bfe5 100644
+index aa48b048a7..32347545c9 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -149,100 +149,6 @@ void fork_end(int child)
+@@ -149,245 +149,6 @@ void fork_end(int child)
      }
  }
  
--#ifdef TARGET_RISCV
+-#ifdef TARGET_XTENSA
 -
--void cpu_loop(CPURISCVState *env)
+-static void xtensa_rfw(CPUXtensaState *env)
 -{
--    CPUState *cs = CPU(riscv_env_get_cpu(env));
--    int trapnr, signum, sigcode;
--    target_ulong sigaddr;
--    target_ulong ret;
+-    xtensa_restore_owb(env);
+-    env->pc = env->sregs[EPC1];
+-}
 -
--    for (;;) {
+-static void xtensa_rfwu(CPUXtensaState *env)
+-{
+-    env->sregs[WINDOW_START] |= (1 << env->sregs[WINDOW_BASE]);
+-    xtensa_rfw(env);
+-}
+-
+-static void xtensa_rfwo(CPUXtensaState *env)
+-{
+-    env->sregs[WINDOW_START] &= ~(1 << env->sregs[WINDOW_BASE]);
+-    xtensa_rfw(env);
+-}
+-
+-static void xtensa_overflow4(CPUXtensaState *env)
+-{
+-    put_user_ual(env->regs[0], env->regs[5] - 16);
+-    put_user_ual(env->regs[1], env->regs[5] - 12);
+-    put_user_ual(env->regs[2], env->regs[5] -  8);
+-    put_user_ual(env->regs[3], env->regs[5] -  4);
+-    xtensa_rfwo(env);
+-}
+-
+-static void xtensa_underflow4(CPUXtensaState *env)
+-{
+-    get_user_ual(env->regs[0], env->regs[5] - 16);
+-    get_user_ual(env->regs[1], env->regs[5] - 12);
+-    get_user_ual(env->regs[2], env->regs[5] -  8);
+-    get_user_ual(env->regs[3], env->regs[5] -  4);
+-    xtensa_rfwu(env);
+-}
+-
+-static void xtensa_overflow8(CPUXtensaState *env)
+-{
+-    put_user_ual(env->regs[0], env->regs[9] - 16);
+-    get_user_ual(env->regs[0], env->regs[1] - 12);
+-    put_user_ual(env->regs[1], env->regs[9] - 12);
+-    put_user_ual(env->regs[2], env->regs[9] -  8);
+-    put_user_ual(env->regs[3], env->regs[9] -  4);
+-    put_user_ual(env->regs[4], env->regs[0] - 32);
+-    put_user_ual(env->regs[5], env->regs[0] - 28);
+-    put_user_ual(env->regs[6], env->regs[0] - 24);
+-    put_user_ual(env->regs[7], env->regs[0] - 20);
+-    xtensa_rfwo(env);
+-}
+-
+-static void xtensa_underflow8(CPUXtensaState *env)
+-{
+-    get_user_ual(env->regs[0], env->regs[9] - 16);
+-    get_user_ual(env->regs[1], env->regs[9] - 12);
+-    get_user_ual(env->regs[2], env->regs[9] -  8);
+-    get_user_ual(env->regs[7], env->regs[1] - 12);
+-    get_user_ual(env->regs[3], env->regs[9] -  4);
+-    get_user_ual(env->regs[4], env->regs[7] - 32);
+-    get_user_ual(env->regs[5], env->regs[7] - 28);
+-    get_user_ual(env->regs[6], env->regs[7] - 24);
+-    get_user_ual(env->regs[7], env->regs[7] - 20);
+-    xtensa_rfwu(env);
+-}
+-
+-static void xtensa_overflow12(CPUXtensaState *env)
+-{
+-    put_user_ual(env->regs[0],  env->regs[13] - 16);
+-    get_user_ual(env->regs[0],  env->regs[1]  - 12);
+-    put_user_ual(env->regs[1],  env->regs[13] - 12);
+-    put_user_ual(env->regs[2],  env->regs[13] -  8);
+-    put_user_ual(env->regs[3],  env->regs[13] -  4);
+-    put_user_ual(env->regs[4],  env->regs[0]  - 48);
+-    put_user_ual(env->regs[5],  env->regs[0]  - 44);
+-    put_user_ual(env->regs[6],  env->regs[0]  - 40);
+-    put_user_ual(env->regs[7],  env->regs[0]  - 36);
+-    put_user_ual(env->regs[8],  env->regs[0]  - 32);
+-    put_user_ual(env->regs[9],  env->regs[0]  - 28);
+-    put_user_ual(env->regs[10], env->regs[0]  - 24);
+-    put_user_ual(env->regs[11], env->regs[0]  - 20);
+-    xtensa_rfwo(env);
+-}
+-
+-static void xtensa_underflow12(CPUXtensaState *env)
+-{
+-    get_user_ual(env->regs[0],  env->regs[13] - 16);
+-    get_user_ual(env->regs[1],  env->regs[13] - 12);
+-    get_user_ual(env->regs[2],  env->regs[13] -  8);
+-    get_user_ual(env->regs[11], env->regs[1]  - 12);
+-    get_user_ual(env->regs[3],  env->regs[13] -  4);
+-    get_user_ual(env->regs[4],  env->regs[11] - 48);
+-    get_user_ual(env->regs[5],  env->regs[11] - 44);
+-    get_user_ual(env->regs[6],  env->regs[11] - 40);
+-    get_user_ual(env->regs[7],  env->regs[11] - 36);
+-    get_user_ual(env->regs[8],  env->regs[11] - 32);
+-    get_user_ual(env->regs[9],  env->regs[11] - 28);
+-    get_user_ual(env->regs[10], env->regs[11] - 24);
+-    get_user_ual(env->regs[11], env->regs[11] - 20);
+-    xtensa_rfwu(env);
+-}
+-
+-void cpu_loop(CPUXtensaState *env)
+-{
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
+-    target_siginfo_t info;
+-    abi_ulong ret;
+-    int trapnr;
+-
+-    while (1) {
 -        cpu_exec_start(cs);
 -        trapnr = cpu_exec(cs);
 -        cpu_exec_end(cs);
 -        process_queued_cpu_work(cs);
 -
--        signum = 0;
--        sigcode = 0;
--        sigaddr = 0;
--
+-        env->sregs[PS] &= ~PS_EXCM;
 -        switch (trapnr) {
 -        case EXCP_INTERRUPT:
--            /* just indicate that signals should be handled asap */
 -            break;
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
+-
+-        case EXC_WINDOW_OVERFLOW4:
+-            xtensa_overflow4(env);
 -            break;
--        case RISCV_EXCP_U_ECALL:
--            env->pc += 4;
--            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
--                /* riscv_flush_icache_syscall is a no-op in QEMU as
--                   self-modifying code is automatically detected */
--                ret = 0;
--            } else {
--                ret = do_syscall(env,
--                                 env->gpr[xA7],
--                                 env->gpr[xA0],
--                                 env->gpr[xA1],
--                                 env->gpr[xA2],
--                                 env->gpr[xA3],
--                                 env->gpr[xA4],
--                                 env->gpr[xA5],
--                                 0, 0);
+-        case EXC_WINDOW_UNDERFLOW4:
+-            xtensa_underflow4(env);
+-            break;
+-        case EXC_WINDOW_OVERFLOW8:
+-            xtensa_overflow8(env);
+-            break;
+-        case EXC_WINDOW_UNDERFLOW8:
+-            xtensa_underflow8(env);
+-            break;
+-        case EXC_WINDOW_OVERFLOW12:
+-            xtensa_overflow12(env);
+-            break;
+-        case EXC_WINDOW_UNDERFLOW12:
+-            xtensa_underflow12(env);
+-            break;
+-
+-        case EXC_USER:
+-            switch (env->sregs[EXCCAUSE]) {
+-            case ILLEGAL_INSTRUCTION_CAUSE:
+-            case PRIVILEGED_CAUSE:
+-                info.si_signo = TARGET_SIGILL;
+-                info.si_errno = 0;
+-                info.si_code =
+-                    env->sregs[EXCCAUSE] == ILLEGAL_INSTRUCTION_CAUSE ?
+-                    TARGET_ILL_ILLOPC : TARGET_ILL_PRVOPC;
+-                info._sifields._sigfault._addr = env->sregs[EPC1];
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                break;
+-
+-            case SYSCALL_CAUSE:
+-                env->pc += 3;
+-                ret = do_syscall(env, env->regs[2],
+-                                 env->regs[6], env->regs[3],
+-                                 env->regs[4], env->regs[5],
+-                                 env->regs[8], env->regs[9], 0, 0);
+-                switch (ret) {
+-                default:
+-                    env->regs[2] = ret;
+-                    break;
+-
+-                case -TARGET_ERESTARTSYS:
+-                    env->pc -= 3;
+-                    break;
+-
+-                case -TARGET_QEMU_ESIGRETURN:
+-                    break;
+-                }
+-                break;
+-
+-            case ALLOCA_CAUSE:
+-                env->sregs[PS] = deposit32(env->sregs[PS],
+-                                           PS_OWB_SHIFT,
+-                                           PS_OWB_LEN,
+-                                           env->sregs[WINDOW_BASE]);
+-
+-                switch (env->regs[0] & 0xc0000000) {
+-                case 0x00000000:
+-                case 0x40000000:
+-                    xtensa_rotate_window(env, -1);
+-                    xtensa_underflow4(env);
+-                    break;
+-
+-                case 0x80000000:
+-                    xtensa_rotate_window(env, -2);
+-                    xtensa_underflow8(env);
+-                    break;
+-
+-                case 0xc0000000:
+-                    xtensa_rotate_window(env, -3);
+-                    xtensa_underflow12(env);
+-                    break;
+-                }
+-                break;
+-
+-            case INTEGER_DIVIDE_BY_ZERO_CAUSE:
+-                info.si_signo = TARGET_SIGFPE;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_FPE_INTDIV;
+-                info._sifields._sigfault._addr = env->sregs[EPC1];
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                break;
+-
+-            case LOAD_PROHIBITED_CAUSE:
+-            case STORE_PROHIBITED_CAUSE:
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SEGV_ACCERR;
+-                info._sifields._sigfault._addr = env->sregs[EXCVADDR];
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                break;
+-
+-            default:
+-                fprintf(stderr, "exccause = %d\n", env->sregs[EXCCAUSE]);
+-                g_assert_not_reached();
 -            }
--            if (ret == -TARGET_ERESTARTSYS) {
--                env->pc -= 4;
--            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
--                env->gpr[xA0] = ret;
--            }
--            if (cs->singlestep_enabled) {
--                goto gdbstep;
--            }
--            break;
--        case RISCV_EXCP_ILLEGAL_INST:
--            signum = TARGET_SIGILL;
--            sigcode = TARGET_ILL_ILLOPC;
--            break;
--        case RISCV_EXCP_BREAKPOINT:
--            signum = TARGET_SIGTRAP;
--            sigcode = TARGET_TRAP_BRKPT;
--            sigaddr = env->pc;
--            break;
--        case RISCV_EXCP_INST_PAGE_FAULT:
--        case RISCV_EXCP_LOAD_PAGE_FAULT:
--        case RISCV_EXCP_STORE_PAGE_FAULT:
--            signum = TARGET_SIGSEGV;
--            sigcode = TARGET_SEGV_MAPERR;
 -            break;
 -        case EXCP_DEBUG:
--        gdbstep:
--            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
--            sigcode = TARGET_TRAP_BRKPT;
+-            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
+-            if (trapnr) {
+-                info.si_signo = trapnr;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_TRAP_BRKPT;
+-                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
+-            }
 -            break;
+-        case EXC_DEBUG:
 -        default:
--            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
--                     trapnr);
--            exit(EXIT_FAILURE);
+-            fprintf(stderr, "trapnr = %d\n", trapnr);
+-            g_assert_not_reached();
 -        }
--
--        if (signum) {
--            target_siginfo_t info = {
--                .si_signo = signum,
--                .si_errno = 0,
--                .si_code = sigcode,
--                ._sifields._sigfault._addr = sigaddr
--            };
--            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
--        }
--
 -        process_pending_signals(env);
 -    }
 -}
 -
--#endif /* TARGET_RISCV */
+-#endif /* TARGET_XTENSA */
 -
- #ifdef TARGET_HPPA
+ __thread CPUState *thread_cpu;
  
- static abi_ulong hppa_lws(CPUHPPAState *env)
-@@ -1322,12 +1228,7 @@ int main(int argc, char **argv, char **envp)
+ bool qemu_cpu_is_self(CPUState *cpu)
+@@ -1045,17 +806,6 @@ int main(int argc, char **argv, char **envp)
  
      target_cpu_copy_regs(env, regs);
  
--#if defined(TARGET_RISCV)
+-#if defined(TARGET_XTENSA)
 -    {
--        env->pc = regs->sepc;
--        env->gpr[xSP] = regs->sp;
+-        int i;
+-        for (i = 0; i < 16; ++i) {
+-            env->regs[i] = regs->areg[i];
+-        }
+-        env->sregs[WINDOW_START] = regs->windowstart;
+-        env->pc = regs->pc;
 -    }
--#elif defined(TARGET_HPPA)
-+#if defined(TARGET_HPPA)
-     {
-         int i;
-         for (i = 1; i < 32; i++) {
-diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
-index b7700a5561..f137d39d7e 100644
---- a/linux-user/riscv/cpu_loop.c
-+++ b/linux-user/riscv/cpu_loop.c
-@@ -21,6 +21,98 @@
+-#endif
+-
+     if (gdbstub_port) {
+         if (gdbserver_start(gdbstub_port) < 0) {
+             fprintf(stderr, "qemu: could not open gdbserver on port %d\n",
+diff --git a/linux-user/xtensa/cpu_loop.c b/linux-user/xtensa/cpu_loop.c
+index b7700a5561..d142988ebe 100644
+--- a/linux-user/xtensa/cpu_loop.c
++++ b/linux-user/xtensa/cpu_loop.c
+@@ -21,6 +21,247 @@
  #include "qemu.h"
  #include "cpu_loop-common.h"
  
-+void cpu_loop(CPURISCVState *env)
++static void xtensa_rfw(CPUXtensaState *env)
 +{
-+    CPUState *cs = CPU(riscv_env_get_cpu(env));
-+    int trapnr, signum, sigcode;
-+    target_ulong sigaddr;
-+    target_ulong ret;
++    xtensa_restore_owb(env);
++    env->pc = env->sregs[EPC1];
++}
 +
-+    for (;;) {
++static void xtensa_rfwu(CPUXtensaState *env)
++{
++    env->sregs[WINDOW_START] |= (1 << env->sregs[WINDOW_BASE]);
++    xtensa_rfw(env);
++}
++
++static void xtensa_rfwo(CPUXtensaState *env)
++{
++    env->sregs[WINDOW_START] &= ~(1 << env->sregs[WINDOW_BASE]);
++    xtensa_rfw(env);
++}
++
++static void xtensa_overflow4(CPUXtensaState *env)
++{
++    put_user_ual(env->regs[0], env->regs[5] - 16);
++    put_user_ual(env->regs[1], env->regs[5] - 12);
++    put_user_ual(env->regs[2], env->regs[5] -  8);
++    put_user_ual(env->regs[3], env->regs[5] -  4);
++    xtensa_rfwo(env);
++}
++
++static void xtensa_underflow4(CPUXtensaState *env)
++{
++    get_user_ual(env->regs[0], env->regs[5] - 16);
++    get_user_ual(env->regs[1], env->regs[5] - 12);
++    get_user_ual(env->regs[2], env->regs[5] -  8);
++    get_user_ual(env->regs[3], env->regs[5] -  4);
++    xtensa_rfwu(env);
++}
++
++static void xtensa_overflow8(CPUXtensaState *env)
++{
++    put_user_ual(env->regs[0], env->regs[9] - 16);
++    get_user_ual(env->regs[0], env->regs[1] - 12);
++    put_user_ual(env->regs[1], env->regs[9] - 12);
++    put_user_ual(env->regs[2], env->regs[9] -  8);
++    put_user_ual(env->regs[3], env->regs[9] -  4);
++    put_user_ual(env->regs[4], env->regs[0] - 32);
++    put_user_ual(env->regs[5], env->regs[0] - 28);
++    put_user_ual(env->regs[6], env->regs[0] - 24);
++    put_user_ual(env->regs[7], env->regs[0] - 20);
++    xtensa_rfwo(env);
++}
++
++static void xtensa_underflow8(CPUXtensaState *env)
++{
++    get_user_ual(env->regs[0], env->regs[9] - 16);
++    get_user_ual(env->regs[1], env->regs[9] - 12);
++    get_user_ual(env->regs[2], env->regs[9] -  8);
++    get_user_ual(env->regs[7], env->regs[1] - 12);
++    get_user_ual(env->regs[3], env->regs[9] -  4);
++    get_user_ual(env->regs[4], env->regs[7] - 32);
++    get_user_ual(env->regs[5], env->regs[7] - 28);
++    get_user_ual(env->regs[6], env->regs[7] - 24);
++    get_user_ual(env->regs[7], env->regs[7] - 20);
++    xtensa_rfwu(env);
++}
++
++static void xtensa_overflow12(CPUXtensaState *env)
++{
++    put_user_ual(env->regs[0],  env->regs[13] - 16);
++    get_user_ual(env->regs[0],  env->regs[1]  - 12);
++    put_user_ual(env->regs[1],  env->regs[13] - 12);
++    put_user_ual(env->regs[2],  env->regs[13] -  8);
++    put_user_ual(env->regs[3],  env->regs[13] -  4);
++    put_user_ual(env->regs[4],  env->regs[0]  - 48);
++    put_user_ual(env->regs[5],  env->regs[0]  - 44);
++    put_user_ual(env->regs[6],  env->regs[0]  - 40);
++    put_user_ual(env->regs[7],  env->regs[0]  - 36);
++    put_user_ual(env->regs[8],  env->regs[0]  - 32);
++    put_user_ual(env->regs[9],  env->regs[0]  - 28);
++    put_user_ual(env->regs[10], env->regs[0]  - 24);
++    put_user_ual(env->regs[11], env->regs[0]  - 20);
++    xtensa_rfwo(env);
++}
++
++static void xtensa_underflow12(CPUXtensaState *env)
++{
++    get_user_ual(env->regs[0],  env->regs[13] - 16);
++    get_user_ual(env->regs[1],  env->regs[13] - 12);
++    get_user_ual(env->regs[2],  env->regs[13] -  8);
++    get_user_ual(env->regs[11], env->regs[1]  - 12);
++    get_user_ual(env->regs[3],  env->regs[13] -  4);
++    get_user_ual(env->regs[4],  env->regs[11] - 48);
++    get_user_ual(env->regs[5],  env->regs[11] - 44);
++    get_user_ual(env->regs[6],  env->regs[11] - 40);
++    get_user_ual(env->regs[7],  env->regs[11] - 36);
++    get_user_ual(env->regs[8],  env->regs[11] - 32);
++    get_user_ual(env->regs[9],  env->regs[11] - 28);
++    get_user_ual(env->regs[10], env->regs[11] - 24);
++    get_user_ual(env->regs[11], env->regs[11] - 20);
++    xtensa_rfwu(env);
++}
++
++void cpu_loop(CPUXtensaState *env)
++{
++    CPUState *cs = CPU(xtensa_env_get_cpu(env));
++    target_siginfo_t info;
++    abi_ulong ret;
++    int trapnr;
++
++    while (1) {
 +        cpu_exec_start(cs);
 +        trapnr = cpu_exec(cs);
 +        cpu_exec_end(cs);
 +        process_queued_cpu_work(cs);
 +
-+        signum = 0;
-+        sigcode = 0;
-+        sigaddr = 0;
-+
++        env->sregs[PS] &= ~PS_EXCM;
 +        switch (trapnr) {
 +        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
 +            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
++
++        case EXC_WINDOW_OVERFLOW4:
++            xtensa_overflow4(env);
 +            break;
-+        case RISCV_EXCP_U_ECALL:
-+            env->pc += 4;
-+            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
-+                /* riscv_flush_icache_syscall is a no-op in QEMU as
-+                   self-modifying code is automatically detected */
-+                ret = 0;
-+            } else {
-+                ret = do_syscall(env,
-+                                 env->gpr[xA7],
-+                                 env->gpr[xA0],
-+                                 env->gpr[xA1],
-+                                 env->gpr[xA2],
-+                                 env->gpr[xA3],
-+                                 env->gpr[xA4],
-+                                 env->gpr[xA5],
-+                                 0, 0);
++        case EXC_WINDOW_UNDERFLOW4:
++            xtensa_underflow4(env);
++            break;
++        case EXC_WINDOW_OVERFLOW8:
++            xtensa_overflow8(env);
++            break;
++        case EXC_WINDOW_UNDERFLOW8:
++            xtensa_underflow8(env);
++            break;
++        case EXC_WINDOW_OVERFLOW12:
++            xtensa_overflow12(env);
++            break;
++        case EXC_WINDOW_UNDERFLOW12:
++            xtensa_underflow12(env);
++            break;
++
++        case EXC_USER:
++            switch (env->sregs[EXCCAUSE]) {
++            case ILLEGAL_INSTRUCTION_CAUSE:
++            case PRIVILEGED_CAUSE:
++                info.si_signo = TARGET_SIGILL;
++                info.si_errno = 0;
++                info.si_code =
++                    env->sregs[EXCCAUSE] == ILLEGAL_INSTRUCTION_CAUSE ?
++                    TARGET_ILL_ILLOPC : TARGET_ILL_PRVOPC;
++                info._sifields._sigfault._addr = env->sregs[EPC1];
++                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
++
++            case SYSCALL_CAUSE:
++                env->pc += 3;
++                ret = do_syscall(env, env->regs[2],
++                                 env->regs[6], env->regs[3],
++                                 env->regs[4], env->regs[5],
++                                 env->regs[8], env->regs[9], 0, 0);
++                switch (ret) {
++                default:
++                    env->regs[2] = ret;
++                    break;
++
++                case -TARGET_ERESTARTSYS:
++                    env->pc -= 3;
++                    break;
++
++                case -TARGET_QEMU_ESIGRETURN:
++                    break;
++                }
++                break;
++
++            case ALLOCA_CAUSE:
++                env->sregs[PS] = deposit32(env->sregs[PS],
++                                           PS_OWB_SHIFT,
++                                           PS_OWB_LEN,
++                                           env->sregs[WINDOW_BASE]);
++
++                switch (env->regs[0] & 0xc0000000) {
++                case 0x00000000:
++                case 0x40000000:
++                    xtensa_rotate_window(env, -1);
++                    xtensa_underflow4(env);
++                    break;
++
++                case 0x80000000:
++                    xtensa_rotate_window(env, -2);
++                    xtensa_underflow8(env);
++                    break;
++
++                case 0xc0000000:
++                    xtensa_rotate_window(env, -3);
++                    xtensa_underflow12(env);
++                    break;
++                }
++                break;
++
++            case INTEGER_DIVIDE_BY_ZERO_CAUSE:
++                info.si_signo = TARGET_SIGFPE;
++                info.si_errno = 0;
++                info.si_code = TARGET_FPE_INTDIV;
++                info._sifields._sigfault._addr = env->sregs[EPC1];
++                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
++
++            case LOAD_PROHIBITED_CAUSE:
++            case STORE_PROHIBITED_CAUSE:
++                info.si_signo = TARGET_SIGSEGV;
++                info.si_errno = 0;
++                info.si_code = TARGET_SEGV_ACCERR;
++                info._sifields._sigfault._addr = env->sregs[EXCVADDR];
++                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
++
++            default:
++                fprintf(stderr, "exccause = %d\n", env->sregs[EXCCAUSE]);
++                g_assert_not_reached();
 +            }
-+            if (ret == -TARGET_ERESTARTSYS) {
-+                env->pc -= 4;
-+            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-+                env->gpr[xA0] = ret;
-+            }
-+            if (cs->singlestep_enabled) {
-+                goto gdbstep;
-+            }
-+            break;
-+        case RISCV_EXCP_ILLEGAL_INST:
-+            signum = TARGET_SIGILL;
-+            sigcode = TARGET_ILL_ILLOPC;
-+            break;
-+        case RISCV_EXCP_BREAKPOINT:
-+            signum = TARGET_SIGTRAP;
-+            sigcode = TARGET_TRAP_BRKPT;
-+            sigaddr = env->pc;
-+            break;
-+        case RISCV_EXCP_INST_PAGE_FAULT:
-+        case RISCV_EXCP_LOAD_PAGE_FAULT:
-+        case RISCV_EXCP_STORE_PAGE_FAULT:
-+            signum = TARGET_SIGSEGV;
-+            sigcode = TARGET_SEGV_MAPERR;
 +            break;
 +        case EXCP_DEBUG:
-+        gdbstep:
-+            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            sigcode = TARGET_TRAP_BRKPT;
++            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
++            if (trapnr) {
++                info.si_signo = trapnr;
++                info.si_errno = 0;
++                info.si_code = TARGET_TRAP_BRKPT;
++                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
++            }
 +            break;
++        case EXC_DEBUG:
 +        default:
-+            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
-+                     trapnr);
-+            exit(EXIT_FAILURE);
++            fprintf(stderr, "trapnr = %d\n", trapnr);
++            g_assert_not_reached();
 +        }
-+
-+        if (signum) {
-+            target_siginfo_t info = {
-+                .si_signo = signum,
-+                .si_errno = 0,
-+                .si_code = sigcode,
-+                ._sifields._sigfault._addr = sigaddr
-+            };
-+            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
-+        }
-+
 +        process_pending_signals(env);
 +    }
 +}
 +
  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
  {
-+    env->pc = regs->sepc;
-+    env->gpr[xSP] = regs->sp;
++    int i;
++    for (i = 0; i < 16; ++i) {
++        env->regs[i] = regs->areg[i];
++    }
++    env->sregs[WINDOW_START] = regs->windowstart;
++    env->pc = regs->pc;
  }
 -- 
 2.14.3
