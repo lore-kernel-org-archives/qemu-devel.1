@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f65k1-0007kI-9G
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 22:44:11 -0400
+	(envelope-from <jasowang@redhat.com>) id 1f65yJ-000593-Pn
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 22:58:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f65jy-0001uX-2J
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 22:44:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36798 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1f65yG-0003Re-Lw
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 22:58:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37318 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f65jx-0001td-U4
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 22:44:06 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f65yG-0003RH-GJ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 22:58:52 -0400
 References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
-	<1522846444-31725-9-git-send-email-wexu@redhat.com>
+	<1522846444-31725-7-git-send-email-wexu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f5b909a6-c72e-352a-cd5c-2871d82d0190@redhat.com>
-Date: Wed, 11 Apr 2018 10:43:40 +0800
+Message-ID: <7629facd-d005-6248-4cb8-12720ff248db@redhat.com>
+Date: Wed, 11 Apr 2018 10:58:30 +0800
 MIME-Version: 1.0
-In-Reply-To: <1522846444-31725-9-git-send-email-wexu@redhat.com>
+In-Reply-To: <1522846444-31725-7-git-send-email-wexu@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 8/8] virtio: queue pop support for packed
+Subject: Re: [Qemu-devel] [PATCH 6/8] virtio: flush/push support for packed
  ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,231 +36,190 @@ To: wexu@redhat.com, mst@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com, 
 On 2018=E5=B9=B404=E6=9C=8804=E6=97=A5 20:54, wexu@redhat.com wrote:
 > From: Wei Xu <wexu@redhat.com>
 >
-> cloned from split ring pop, a global static length array
-> and the inside-element length array are introduced to
-> easy prototype, this consumes more memory and it is valuable
-> to move to dynamic allocation as the out/in sg does.
-
-To ease the reviewer, I suggest to reorder this patch to patch 4.
-
->
 > Signed-off-by: Wei Xu <wexu@redhat.com>
 > ---
->   hw/virtio/virtio.c | 154 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++-
->   1 file changed, 153 insertions(+), 1 deletion(-)
+>   hw/virtio/virtio.c | 104 ++++++++++++++++++++++++++++++++++++++++++++=
++--------
+>   1 file changed, 90 insertions(+), 14 deletions(-)
 >
 > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index cf726f3..0eafb38 100644
+> index 95a4681..def07c6 100644
 > --- a/hw/virtio/virtio.c
 > +++ b/hw/virtio/virtio.c
-> @@ -1221,7 +1221,7 @@ static void *virtqueue_alloc_element(size_t sz, u=
-nsigned out_num, unsigned in_nu
->       return elem;
+> @@ -26,6 +26,7 @@
+>  =20
+>   #define AVAIL_DESC_PACKED(b) ((b) << 7)
+>   #define USED_DESC_PACKED(b)  ((b) << 15)
+> +#define VIRTQ_F_DESC_USED(w)  (AVAIL_DESC_PACKED(w) | USED_DESC_PACKED=
+(w))
+>  =20
+>   /*
+>    * The alignment to use between consumer and producer parts of vring.
+> @@ -636,19 +637,11 @@ bool virtqueue_rewind(VirtQueue *vq, unsigned int=
+ num)
 >   }
 >  =20
-> -void *virtqueue_pop(VirtQueue *vq, size_t sz)
-> +static void *virtqueue_pop_split(VirtQueue *vq, size_t sz)
+>   /* Called within rcu_read_lock().  */
+> -void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+> +static void virtqueue_fill_split(VirtQueue *vq, const VirtQueueElement=
+ *elem,
+>                       unsigned int len, unsigned int idx)
 >   {
->       unsigned int i, head, max;
->       VRingMemoryRegionCaches *caches;
-> @@ -1356,6 +1356,158 @@ err_undo_map:
->       goto done;
+>       VRingUsedElem uelem;
+>  =20
+> -    trace_virtqueue_fill(vq, elem, len, idx);
+> -
+> -    virtqueue_unmap_sg(vq, elem, len);
+> -
+> -    if (unlikely(vq->vdev->broken)) {
+> -        return;
+> -    }
+> -
+>       if (unlikely(!vq->vring.used)) {
+>           return;
+>       }
+> @@ -660,16 +653,66 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueu=
+eElement *elem,
+>       vring_used_write(vq, &uelem, idx);
 >   }
 >  =20
-> +static uint16_t dma_len[VIRTQUEUE_MAX_SIZE];
-
-This looks odd.
-
-> +static void *virtqueue_pop_packed(VirtQueue *vq, size_t sz)
-> +{
-> +    unsigned int i, head, max;
+> -/* Called within rcu_read_lock().  */
+> -void virtqueue_flush(VirtQueue *vq, unsigned int count)
+> +static void virtqueue_fill_packed(VirtQueue *vq, const VirtQueueElemen=
+t *elem)
+>   {
+> -    uint16_t old, new;
+> +    uint16_t i, w, head;
 > +    VRingMemoryRegionCaches *caches;
-> +    MemoryRegionCache indirect_desc_cache =3D MEMORY_REGION_CACHE_INVA=
-LID;
-> +    MemoryRegionCache *cache;
-> +    int64_t len;
-> +    VirtIODevice *vdev =3D vq->vdev;
-> +    VirtQueueElement *elem =3D NULL;
-> +    unsigned out_num, in_num, elem_entries;
-> +    hwaddr addr[VIRTQUEUE_MAX_SIZE];
-> +    struct iovec iov[VIRTQUEUE_MAX_SIZE];
-> +    VRingDescPacked desc;
-> +    uint8_t wrap_counter;
+> +    VRingDescPacked desc =3D {
+> +        .addr =3D 0,
+> +        .flags =3D 0,
+> +    };
 > +
-> +    if (unlikely(vdev->broken)) {
-> +        return NULL;
+> +    if (unlikely(!vq->packed.desc)) {
+> +        return;
 > +    }
 > +
-> +    vq->last_avail_idx %=3D vq->packed.num;
-
-Queue size could not be a power of 2.
-
-> +
-> +    rcu_read_lock();
-> +    if (virtio_queue_empty_packed_rcu(vq)) {
-> +        goto done;
-> +    }
-> +
-> +    /* When we start there are none of either input nor output. */
-> +    out_num =3D in_num =3D elem_entries =3D 0;
-> +
-> +    max =3D vq->vring.num;
-> +
-> +    if (vq->inuse >=3D vq->vring.num) {
-> +        virtio_error(vdev, "Virtqueue size exceeded");
-> +        goto done;
-> +    }
-> +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
-> +        /* FIXME: TBD */
-> +    }
-> +
-> +    head =3D vq->last_avail_idx;
-> +    i =3D head;
-> +
+> +    w =3D elem->wrap_counter;
 > +    caches =3D vring_get_region_caches(vq);
-> +    cache =3D &caches->desc_packed;
-> +    vring_desc_read_packed(vdev, &desc, cache, i);
-> +    if (desc.flags & VRING_DESC_F_INDIRECT) {
-> +        if (desc.len % sizeof(VRingDescPacked)) {
-> +            virtio_error(vdev, "Invalid size for indirect buffer table=
-");
-> +            goto done;
+> +    for (i =3D 0; i < elem->count; i++) {
+> +        head =3D (elem->index + i) % vq->packed.num;
+
+This looks strange, we should get the location from vq->used_idx.
+
+> +        /* Don't toggle the first one since it is the originally one *=
+/
+> +        if ((i > 0) && (!head)) {
+> +            w ^=3D 1;
 > +        }
 > +
-> +        /* loop over the indirect descriptor table */
-> +        len =3D address_space_cache_init(&indirect_desc_cache, vdev->d=
-ma_as,
-> +                                       desc.addr, desc.len, false);
-> +        cache =3D &indirect_desc_cache;
-> +        if (len < desc.len) {
-> +            virtio_error(vdev, "Cannot map indirect buffer");
-> +            goto done;
-> +        }
-> +
-> +        max =3D desc.len / sizeof(VRingDescPacked);
-> +        i =3D 0;
-> +        vring_desc_read_packed(vdev, &desc, cache, i);
+> +        desc.id =3D elem->index;
+> +        desc.flags =3D VIRTQ_F_DESC_USED(w);
+> +        desc.len =3D elem->len[i];
+
+This should be determined by the caller, especially for the WRITE=20
+descriptor.
+
+> +        virtio_tswap16s(vq->vdev, &desc.id);
+> +        virtio_tswap32s(vq->vdev, &desc.len);
+> +        virtio_tswap16s(vq->vdev, &desc.flags);
+> +        address_space_write_cached(&caches->desc,
+> +                                   sizeof(VRingDescPacked) * head, &de=
+sc,
+> +                                   sizeof(VRingDescPacked));
+
+We should make sure flags is written after other fileds. So need a wmb()=20
+between the two writes.
+
+> +        address_space_cache_invalidate(&caches->desc,
+> +                                       sizeof(VRingDescPacked) * head,
+> +                                       sizeof(VRingDescPacked));
 > +    }
-> +
-> +    wrap_counter =3D vq->wrap_counter;
-> +    /* Collect all the descriptors */
-> +    while (1) {
-> +        bool map_ok;
-> +
-> +        if (desc.flags & VRING_DESC_F_WRITE) {
-> +            map_ok =3D virtqueue_map_desc(vdev, &in_num, addr + out_nu=
-m,
-> +                                        iov + out_num,
-> +                                        VIRTQUEUE_MAX_SIZE - out_num, =
-true,
-> +                                        desc.addr, desc.len);
-> +        } else {
-> +            if (in_num) {
-> +                virtio_error(vdev, "Incorrect order for descriptors");
-> +                goto err_undo_map;
-> +            }
-> +            map_ok =3D virtqueue_map_desc(vdev, &out_num, addr, iov,
-> +                                        VIRTQUEUE_MAX_SIZE, false,
-> +                                        desc.addr, desc.len);
-> +        }
-> +        if (!map_ok) {
-> +            goto err_undo_map;
-> +        }
-> +
-> +        /* If we've got too many, that implies a descriptor loop. */
-> +        if (++elem_entries > max) {
-> +            virtio_error(vdev, "Looped descriptor");
-> +            goto err_undo_map;
-> +        }
-> +
-> +        dma_len[i++] =3D desc.len;
-> +        /* Toggle wrap_counter for non indirect desc */
-> +        if ((i =3D=3D vq->packed.num) && (cache !=3D &indirect_desc_ca=
-che)) {
-> +            vq->wrap_counter ^=3D 1;
-> +        }
-> +
-> +        if (desc.flags & VRING_DESC_F_NEXT) {
-> +            vring_desc_read_packed(vq->vdev, &desc, cache, i % vq->pac=
-ked.num);
-> +        } else {
-> +            break;
-> +        }
-> +    }
-> +
-> +    /* Now copy what we have collected and mapped */
-> +    elem =3D virtqueue_alloc_element(sz, out_num, in_num);
-> +    elem->index =3D head;
 
-This seems wrong, we could not assume buffer id is last_avail_idx.
-
-> +    elem->wrap_counter =3D wrap_counter;
-> +    elem->count =3D (cache =3D=3D &indirect_desc_cache) ? 1 : out_num =
-+ in_num;
-> +    for (i =3D 0; i < out_num; i++) {
-> +        /* DMA Done by marking the length as 0 */
-
-This seems unnecessary, spec said:
-
-"
-In a used descriptor, Element Address is unused. Element Length=20
-specifies the length of the buffer that has
-been initialized (written to) by the device.
-Element length is reserved for used descriptors without the=20
-VIRTQ_DESC_F_WRITE flag, and is ignored
-by drivers.
-"
-
-> +        elem->len[i] =3D 0;
-> +        elem->out_addr[i] =3D addr[i];
-> +        elem->out_sg[i] =3D iov[i];
-> +    }
-> +    for (i =3D 0; i < in_num; i++) {
-> +        elem->len[out_num + i] =3D dma_len[head + out_num + i];
-
-Shouldn't elem->len be determined by virtqueue_fill()?
-
-> +        elem->in_addr[i] =3D addr[out_num + i];
-> +        elem->in_sg[i] =3D iov[out_num + i];
-> +    }
-> +
-> +    vq->last_avail_idx +=3D elem->count;
-> +    vq->last_avail_idx %=3D vq->packed.num;
-
-Same here, num could not be a power of 2.
-
-> +    vq->inuse +=3D elem->count;
-> +
-> +    trace_virtqueue_pop(vq, elem, elem->in_num, elem->out_num);
-> +done:
-> +    address_space_cache_destroy(&indirect_desc_cache);
-> +    rcu_read_unlock();
-> +
-> +    return elem;
-> +
-> +err_undo_map:
-> +    virtqueue_undo_map_desc(out_num, in_num, iov);
-> +    g_free(elem);
-> +    goto done;
-
-Only few minors difference with split version, can we manage to unify the=
-m?
+Have you tested the case when elem->count is greater than one? According=20
+to the spec device only need to write a single used descriptor for the=20
+whole list.
 
 > +}
 > +
-> +void *virtqueue_pop(VirtQueue *vq, size_t sz)
+> +void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+> +                    unsigned int len, unsigned int idx)
 > +{
+> +    trace_virtqueue_fill(vq, elem, len, idx);
+> +
+> +    virtqueue_unmap_sg(vq, elem, len);
+>  =20
+>       if (unlikely(vq->vdev->broken)) {
+> -        vq->inuse -=3D count;
+>           return;
+>       }
+>  =20
 > +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-> +        return virtqueue_pop_packed(vq, sz);
+> +        virtqueue_fill_packed(vq, elem);
 > +    } else {
-> +        return virtqueue_pop_split(vq, sz);
+> +        virtqueue_fill_split(vq, elem, len, idx);
 > +    }
 > +}
 > +
->   /* virtqueue_drop_all:
->    * @vq: The #VirtQueue
->    * Drops all queued buffers and indicates them to the guest
+> +/* Called within rcu_read_lock().  */
+> +static void virtqueue_flush_split(VirtQueue *vq, unsigned int count)
+> +{
+> +    uint16_t old, new;
+> +
+>       if (unlikely(!vq->vring.used)) {
+>           return;
+>       }
+> @@ -685,12 +728,45 @@ void virtqueue_flush(VirtQueue *vq, unsigned int =
+count)
+>           vq->signalled_used_valid =3D false;
+>   }
+>  =20
+> +static void virtqueue_flush_packed(VirtQueue *vq, unsigned int count)
+> +{
+> +    if (unlikely(!vq->packed.desc)) {
+> +        return;
+> +    }
+> +
+> +    vq->inuse -=3D count;
+> +
+> +    /* FIXME: is this correct? */
+> +    if (vq->inuse) {
+> +        return;
+> +    }
+
+I think the semantics here is write flags here.
+
+> +}
+> +
+> +void virtqueue_flush(VirtQueue *vq, unsigned int count)
+> +{
+> +    if (unlikely(vq->vdev->broken)) {
+> +        vq->inuse -=3D count;
+> +        return;
+> +    }
+> +
+> +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> +        virtqueue_flush_packed(vq, count);
+> +    } else {
+> +        virtqueue_flush_split(vq, count);
+> +    }
+> +}
+> +
+>   void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+>                       unsigned int len)
+>   {
+>       rcu_read_lock();
+>       virtqueue_fill(vq, elem, len, 0);
+> -    virtqueue_flush(vq, 1);
+> +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> +        /* FIXME: How to deal with the length field for chained desc *=
+/
+> +        virtqueue_flush(vq, elem->count);
+> +    } else {
+> +        virtqueue_flush(vq, 1);
+> +    }
+>       rcu_read_unlock();
+>   }
+>  =20
 
 Thanks
