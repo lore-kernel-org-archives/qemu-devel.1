@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6D1D-0006Mo-MY
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:30:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6DQD-0001QG-NR
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6D18-0002OL-22
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:30:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49098 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f6D17-0002Nu-U3
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:30:17 -0400
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-12-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6b63e895-c7ad-af1c-8d3c-972643b05b24@redhat.com>
-Date: Wed, 11 Apr 2018 12:30:13 +0200
+	(envelope-from <bounces@canonical.com>) id 1f6DQB-0002tX-5O
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:56:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f6DQA-0002o1-Vo
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:56:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f6DQ5-0006Y2-5e
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 10:56:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E533F2E80D8
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 10:56:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-12-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 11/24] tests/tcg: move i386 specific
- tests into subdir
+Date: Wed, 11 Apr 2018 10:46:21 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1762558 <1762558@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152330957721.2718.12035311068510492278.malonedeb@wampee.canonical.com>
+Message-Id: <152344358114.14595.16713025043449822546.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762558] Re: Many crashes with "memslot_get_virt:
+ slot_id 170 too big"-type errors in 2.12.0 rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, cota@braap.org
+To: qemu-devel@nongnu.org
 
-On 10.04.2018 21:39, Alex Benn=C3=A9e wrote:
-> These only need to be built for i386 guests. This includes a stub
-> tests/tcg/i386/Makfile.target which absorbs some of what was in
-> tests/tcg/Makefile.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  tests/tcg/README                        |  39 ------------------------=
---------
->  tests/tcg/i386/Makefile.target          |  10 ++++++++
->  tests/tcg/i386/README                   |  38 ++++++++++++++++++++++++=
-+++++++
->  tests/tcg/{ =3D> i386}/hello-i386.c       |   0
->  tests/tcg/{ =3D> i386}/pi_10.com          | Bin
->  tests/tcg/{ =3D> i386}/runcom.c           |   0
->  tests/tcg/{ =3D> i386}/test-i386-code16.S |   0
->  tests/tcg/{ =3D> i386}/test-i386-fprem.c  |   0
->  tests/tcg/{ =3D> i386}/test-i386-muldiv.h |   0
->  tests/tcg/{ =3D> i386}/test-i386-shift.h  |   0
->  tests/tcg/{ =3D> i386}/test-i386-ssse3.c  |   0
->  tests/tcg/{ =3D> i386}/test-i386-vm86.S   |   0
+IMHO it's best to keep this open until we find out what's going on;
+it's not impossible it's something that's changed in qemu, and even if
+it isn't qemu's fault then you won't be the only person who ends up
+reporting it here, so it'll be good to get the answer.
 
-Maybe remove the "-i386-" part from the file name now?
+-- =
 
-Anyway:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762558
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Title:
+  Many crashes with "memslot_get_virt: slot_id 170 too big"-type errors
+  in 2.12.0 rc2
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since qemu 2.12.0 rc2 - qemu-2.12.0-0.6.rc2.fc29 - landed in Fedora
+  Rawhide, just about all of our openQA-automated tests of Rawhide
+  guests which run with qxl / SPICE graphics in the guest have died
+  partway in, always shortly after the test switches from the installer
+  (an X environment) to a console on a tty. qemu is, I think, hanging.
+  There are always some errors like this right around the time of the
+  hang:
+
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
+ virt end ffffffffffffffff, generation 0, delta 0
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
+42dbc00000, virt end 7f42dfbfe000, generation 0, delta 7f42dbc00000
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
+42d7a00000, virt end 7f42dba00000, generation 0, delta 7f42d7a00000
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:13:42.0736 UTC] [debug] QEMU: (process:45812): Spice-CRITI=
+CAL **: memslot.c:111:memslot_get_virt: slot_id 218 too big, addr=3Dda8e21f=
+bda8e21fb
+
+  or occasionally like this:
+
+  [2018-04-09T20:13:58.0717 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
+ virt end ffffffffffffffff, generation 0, delta 0
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
+f093c00000, virt end 7ff097bfe000, generation 0, delta 7ff093c00000
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
+f08fa00000, virt end 7ff093a00000, generation 0, delta 7ff08fa00000
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU: (process:25622): Spice-WARNI=
+NG **: memslot.c:68:memslot_validate_virt: virtual address out of range
+  [2018-04-09T20:13:58.0720 UTC] [debug] QEMU:     virt=3D0x0+0x18 slot_id=
+=3D0 group_id=3D1
+  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU:     slot=3D0x0-0x0 delta=3D0=
+x0
+  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:13:58.0721 UTC] [debug] QEMU: (process:25622): Spice-WARNI=
+NG **: display-channel.c:2426:display_channel_validate_surface: invalid sur=
+face_id 1048576
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 0, group 0, virt start 0,=
+ virt end ffffffffffffffff, generation 0, delta 0
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 1, group 1, virt start 7f=
+f093c00000, virt end 7ff097bfe000, generation 0, delta 7ff093c00000
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: id 2, group 1, virt start 7f=
+f08fa00000, virt end 7ff093a00000, generation 0, delta 7ff08fa00000
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: =
+
+  [2018-04-09T20:14:14.0728 UTC] [debug] QEMU: (process:25622): Spice-CRITI=
+CAL **: memslot.c:122:memslot_get_virt: address generation is not valid, gr=
+oup_id 1, slot_id 0, gen 110, slot_gen 0
+
+  The same tests running on Fedora 28 guests on the same hosts are not
+  hanging, and the same tests were not hanging right before the qemu
+  package got updated, so this seems very strongly tied to the new qemu.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762558/+subscriptions
