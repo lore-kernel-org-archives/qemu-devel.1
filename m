@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f63I5-00061s-AU
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:07:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f63K8-0007W1-RD
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:09:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f63Hg-0000Jm-BK
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:07:09 -0400
-Date: Wed, 11 Apr 2018 10:03:48 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180411000348.GL3361@umbus.fritz.box>
-References: <1523383946-37373-1-git-send-email-spopovyc@redhat.com>
-	<1523383946-37373-2-git-send-email-spopovyc@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1f63K7-0001lD-Oy
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:09:16 -0400
+Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:46228)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f63K7-0001ko-J2
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:09:15 -0400
+Received: by mail-pl0-x230.google.com with SMTP id 59-v6so36800plc.13
+	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 17:09:15 -0700 (PDT)
+References: <1523377186-32578-1-git-send-email-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e863cce3-d06e-f225-eb25-212729c5f05f@linaro.org>
+Date: Wed, 11 Apr 2018 10:08:58 +1000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dpynvXbW/eW9Tpc3"
-Content-Disposition: inline
-In-Reply-To: <1523383946-37373-2-git-send-email-spopovyc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 1/2] spapr: Add ibm,
- max-associativity-domains property
+In-Reply-To: <1523377186-32578-1-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/10] Avoid integer overflow in
+ next_page_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Serhii Popovych <spopovyc@redhat.com>
-Cc: qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+
+On 04/11/2018 02:19 AM, Emilio G. Cota wrote:
+> Richard pointed out in another thread that when computing
+> next_page_start we can break checks for the last page in the
+> address space due to integer overflow. This affects several targets;
+> the appended fixes them.
+> 
+> You can fetch the patches from:
+>   https://github.com/cota/qemu/tree/next_page_overflow
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---dpynvXbW/eW9Tpc3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Apr 10, 2018 at 02:12:25PM -0400, Serhii Popovych wrote:
-> Now recent kernels (i.e. since linux-stable commit a346137e9142
-> ("powerpc/numa: Use ibm,max-associativity-domains to discover possible no=
-des")
-> support this property to mark initially memory-less NUMA nodes as "possib=
-le"
-> to allow further memory hot-add to them.
->=20
-> Advertise this property for pSeries machines to let guest kernels detect
-> maximum supported node configuration and benefit from kernel side change
-> when hot-add memory to specific, possibly empty before, NUMA node.
->=20
-> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
-> ---
->  hw/ppc/spapr.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 2c0be8c..3f61785 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -909,6 +909,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, =
-void *fdt)
->          0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
->          cpu_to_be32(max_cpus / smp_threads),
->      };
-> +    uint32_t maxdomains[] =3D {
-> +        cpu_to_be32(5),
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(nb_numa_nodes - 1),
-> +        cpu_to_be32(0),
-> +    };
-
-Ah.. close, but not quite right.  This is saying that there's exactly
-one node at the bottom (cpu) level, which isn't what we want.  Instead
-of setting it to 0, we want to completely drop that layer, keeping it
-unspecified.
-
-To do that you need to change the first cell from 5 to 4 (since only 4
-levels will be listed) and drop the last cell entirely.
-
->      _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
-> =20
-> @@ -945,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, v=
-oid *fdt)
->      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
->                       refpoints, sizeof(refpoints)));
-> =20
-> +    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-> +                     maxdomains, sizeof(maxdomains)));
-> +
->      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
->                            RTAS_ERROR_LOG_MAX));
->      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---dpynvXbW/eW9Tpc3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrNUOEACgkQbDjKyiDZ
-s5I4qhAAojYEg6b/AeazRfE7r9W0ONLZtVSDfJspV35j85lFERYPQOufeTCnFNJ0
-UZeB3r4h7ky7RtlRgZe6qJZiK416rPYBzJ2l+ZP03ZIJzir9evjuJyk00SFGI6x2
-8eC41EwZCuMsflct4pGt8/TpIQUjk/lR6LSCwN9hMzkXEFlmM6GUILMEMI5A42Qr
-zHzT1LiWJA7b5js7UlbMELNS1XD+ycFNUXOBziuA0d2yeF6ZqMT/QqQAdPp0uPHq
-zbspAofPLcsG0VpDHrxJu6G/ay0lg7VPRCvipzYIMBob5BpH4tagBic8HFDLcIoF
-uiBBKQk3PLtAJofM7rsrBx6VmIkjUtNMQEP/yFbP7CS9e8pT8RG/yJobZ5IVC0zg
-YwSlRKk9qVAh03cEM19rOaM2k1W1enAGKzRlr2B1J5YWD8smQHEbQp3JTScBjYK3
-iElOdzIXVRrqldKDbY19p4mkIlsuqn+EFTjAP+45lIqtVo6MSGMB+5m7exQJ0kaX
-kzKuytG3hf+0/7pydx7kUoqF71a+74Qu+yu8kNEI0lt1u1X35MIxYJveYDiRHlok
-bWogJXNzuqYNelBU2PRoNAkWLJj0+ayENg0sjskYTSkPd6qDdwHwuzO193fnLmK2
-SFaN/IRLiFAQRIr/kN+0mmuU0oKUepKE3Kd3z0IYsQUn7Waf+8Q=
-=/QCD
------END PGP SIGNATURE-----
-
---dpynvXbW/eW9Tpc3--
+r~
