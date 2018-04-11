@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f63K8-0007W1-RD
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:09:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6491-00015A-0D
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f63K7-0001lD-Oy
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:09:16 -0400
-Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:46228)
+	(envelope-from <bounces@canonical.com>) id 1f648x-000333-4y
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:01:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f63K7-0001ko-J2
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:09:15 -0400
-Received: by mail-pl0-x230.google.com with SMTP id 59-v6so36800plc.13
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 17:09:15 -0700 (PDT)
-References: <1523377186-32578-1-git-send-email-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e863cce3-d06e-f225-eb25-212729c5f05f@linaro.org>
-Date: Wed, 11 Apr 2018 10:08:58 +1000
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f648w-00030c-VJ
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 21:01:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f648t-0007XX-BS
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 01:01:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EEADF2E819F
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 01:01:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1523377186-32578-1-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/10] Avoid integer overflow in
- next_page_start
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Apr 2018 00:53:45 -0000
+From: "Pixel, Ding" <1762707@bugs.launchpad.net>
+Reply-To: Bug 1762707 <1762707@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152335683378.30174.9724305388945769166.malonedeb@gac.canonical.com>
+Message-Id: <152340802505.20208.13370937969543035784.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1762707] Re: VFIO device gets DMA failures when
+ virtio-balloon leak from highmem to lowmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+To: qemu-devel@nongnu.org
 
-On 04/11/2018 02:19 AM, Emilio G. Cota wrote:
-> Richard pointed out in another thread that when computing
-> next_page_start we can break checks for the last page in the
-> address space due to integer overflow. This affects several targets;
-> the appended fixes them.
-> 
-> You can fetch the patches from:
->   https://github.com/cota/qemu/tree/next_page_overflow
+Hi Alex, Thanks for your confirming. change the status to invalid.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+** Changed in: qemu
+       Status: New =3D> Invalid
 
+-- =
 
-r~
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1762707
+
+Title:
+  VFIO device gets DMA failures when virtio-balloon leak from highmem to
+  lowmem
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Is there any known conflict between VFIO passthrough device and
+  virtio-balloon?
+
+  The VM has:
+  1. 4GB system memory
+  2. one VFIO passthrough device which supports high address memory DMA and=
+ uses GFP_HIGHUSER pages.
+  3. Memory balloon device with 4GB target.
+
+  When setting the memory balloon target to 1GB and 4GB in loop during
+  runtime (I used the command "virsh qemu-monitor-command debian --hmp
+  --cmd balloon 1024"), the VFIO device DMA randomly gets failure.
+
+  More clues:
+  1. configure 2GB system memory (no highmem) VM, no issue with similar ope=
+rations
+  2. setting the memory balloon to higher like 8GB, no issue with similar o=
+perations
+
+  I'm also trying to narrow down this issue. It's appreciated for that
+  you guys may share some thoughts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1762707/+subscriptions
