@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f6Byl-0005pb-8S
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:23:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f6BzB-0006Ee-50
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:24:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f6Byi-0003Sr-5M
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:23:47 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:45344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1f6Byh-0003SJ-No
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:23:44 -0400
-References: <152215564388.18893.1601223531883570946.malonedeb@chaenomeles.canonical.com>
-	<152339082825.12513.17266713653673903879.malone@wampee.canonical.com>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <924dbc89-fb1c-720d-9091-a5f5c16df4b9@mail.uni-paderborn.de>
-Date: Wed, 11 Apr 2018 11:23:42 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1f6Bz7-0003Zs-Sk
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:24:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46954 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f6Bz7-0003ZW-NL
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:24:09 -0400
+References: <20180410124913.10832-1-peterx@redhat.com>
+	<20180410124913.10832-3-peterx@redhat.com>
+	<20180411014532.GB28698@stefanha-x1.localdomain>
+	<20180411034954.GC13887@xz-mi>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d2ab39a4-2ffc-ddee-299d-007e9850cebb@redhat.com>
+Date: Wed, 11 Apr 2018 11:23:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <152339082825.12513.17266713653673903879.malone@wampee.canonical.com>
+In-Reply-To: <20180411034954.GC13887@xz-mi>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Bug 1759264] Re: fpu/softfloat:
- round_to_int_and_pack refactor broke TriCore ftoi insns
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-thread: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1759264 <1759264@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 04/10/2018 10:07 PM, Alex Bennée wrote:
-> Yeah it looks like it was missed, the round_to_uint code does it.
+On 11/04/2018 05:49, Peter Xu wrote:
+> On Wed, Apr 11, 2018 at 09:45:32AM +0800, Stefan Hajnoczi wrote:
+>> On Tue, Apr 10, 2018 at 08:49:13PM +0800, Peter Xu wrote:
+>>> cur_mon was only used in main loop so we don't really need that to be
+>>> per-thread variable.  Now it's possible that we have more than one
+>>> thread to operate on it.  Let's start to let it be per-thread variable.
+>> Trying to understand the reason for this patch:
+>>
+>> Are there any users of per-thread cur_mon?
 > 
-> Do you have a test case I can verify?
-> 
+> Currently no.  But if considering future OOB-capable commands, they
+> will modify cur_mon in monitor IOThread at least.
 
-For the NaN input 0xffffffff the expected result for the flags is that
-flag_invalid is raised.
+That's fine, but it shouldn't need the inheritance part.  The monitor
+IOThread can set cur_mon when it starts.
 
-I can provide you with some TriCore asm, but it is a bit of pain to get
-the gnu assembler to build, since the public version is a decade old.
+In general, relying on cur_mon should be avoided.
 
-Cheers,
-Bastian
+Paolo
