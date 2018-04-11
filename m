@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6BeD-0002Gq-TU
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:02:39 -0400
+	(envelope-from <groug@kaod.org>) id 1f6BeV-0002Sf-Qi
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6Be9-0000hI-0r
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:02:33 -0400
-References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
-	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
-	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
-Date: Wed, 11 Apr 2018 12:02:10 +0300
+	(envelope-from <groug@kaod.org>) id 1f6BeR-0000nl-Cq
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:02:51 -0400
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:42698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f6BeR-0000jx-6J
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:02:47 -0400
+Received: from player735.ha.ovh.net (unknown [10.109.108.91])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id CCAC7AAD02
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 11:02:35 +0200 (CEST)
+Date: Wed, 11 Apr 2018 11:02:27 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180411110203.50073321@bahia.lan>
+In-Reply-To: <20180411000348.GL3361@umbus.fritz.box>
+References: <1523383946-37373-1-git-send-email-spopovyc@redhat.com>
+	<1523383946-37373-2-git-send-email-spopovyc@redhat.com>
+	<20180411000348.GL3361@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 2.13 v2 1/2] spapr: Add ibm,
+ max-associativity-domains property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Serhii Popovych <spopovyc@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-03.04.2018 23:13, John Snow wrote:
->
-> On 04/03/2018 12:23 PM, Max Reitz wrote:
->> On 2018-03-30 18:10, Vladimir Sementsov-Ogievskiy wrote:
->>> Use MIGRATION events instead of RESUME. Also, make a TODO: enable
->>> dirty-bitmaps capability for offline case.
->>>
->>> This (likely) fixes racy faults at least of the following types:
->>>
->>>      - timeout on waiting for RESUME event
->>>      - sha256 mismatch on 136 (138 after this patch)
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>
->>> This patch is a true change for the test anyway. But I don't understand=
-,
->>> why (and do really) it fixes the things. And I'm not sure about do we
->>> really have a bug in bitmap migration or persistence. So, it's up to yo=
-u,
->>> take it into 2.12...
->>>
->>> It was already discussed, that "STOP" event is bad for tests. What abou=
-t
->>> "RESUME"? How can we miss it? And sha256 mismatch is really something
->>> strange.
->>>
->>> Max, please check, do it fix 169 for you.
->>>
->>>   tests/qemu-iotests/169 | 44 +++++++++++++++++++++++------------------=
----
->>>   1 file changed, 23 insertions(+), 21 deletions(-)
->> This makes the test pass (thanks!), but it still leaves behind five cats=
-...
->>
->> Max
->>
->>
-> Hmm:
->
-> jhuston  14772  0.0  0.0   4296   784 pts/3    S    16:12   0:00 cat
-> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
-> jhuston  14796  0.0  0.0   4296   764 pts/3    S    16:12   0:00 cat
-> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
-> jhuston  14940  0.0  0.0   4296   788 pts/3    S    16:12   0:00 cat
-> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
-> jhuston  14964  0.0  0.0   4296   720 pts/3    S    16:12   0:00 cat
-> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
-> jhuston  15052  0.0  0.0   4296   768 pts/3    S    16:12   0:00 cat
-> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
->
-> Why do these get left behind? Nothing to consume the data...?
+On Wed, 11 Apr 2018 10:03:48 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-aha, understand. it is due to last vm_b.shutdown() and vm_b.launch in=20
-case of should_migrate. So, at the end of the test I restart vm_b with=20
--incoming parameter. But it looks like=C2=A0 a bug anyway, If we start qemu=
-=20
-with -incoming "exec", should not we kill cat process, if there were no=20
-migration?
+> On Tue, Apr 10, 2018 at 02:12:25PM -0400, Serhii Popovych wrote:
+> > Now recent kernels (i.e. since linux-stable commit a346137e9142
+> > ("powerpc/numa: Use ibm,max-associativity-domains to discover possible nodes")
+> > support this property to mark initially memory-less NUMA nodes as "possible"
+> > to allow further memory hot-add to them.
+> > 
+> > Advertise this property for pSeries machines to let guest kernels detect
+> > maximum supported node configuration and benefit from kernel side change
+> > when hot-add memory to specific, possibly empty before, NUMA node.
+> > 
+> > Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+> > ---
+> >  hw/ppc/spapr.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 2c0be8c..3f61785 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -909,6 +909,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+> >          0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
+> >          cpu_to_be32(max_cpus / smp_threads),
+> >      };
+> > +    uint32_t maxdomains[] = {
+> > +        cpu_to_be32(5),
+> > +        cpu_to_be32(0),
+> > +        cpu_to_be32(0),
+> > +        cpu_to_be32(0),
+> > +        cpu_to_be32(nb_numa_nodes - 1),
+> > +        cpu_to_be32(0),
+> > +    };  
+> 
+> Ah.. close, but not quite right.  This is saying that there's exactly
+> one node at the bottom (cpu) level, which isn't what we want.  Instead
+> of setting it to 0, we want to completely drop that layer, keeping it
+> unspecified.
+> 
+> To do that you need to change the first cell from 5 to 4 (since only 4
+> levels will be listed) and drop the last cell entirely.
+> 
 
---=20
-Best regards,
-Vladimir
+Alternatively, if we don't want to do any assumptions on the guest
+expectations, it is possible to pass the right value in the 6th cell:
+
+	cpu_to_be32(spapr_vcpu_id(spapr, max_cpus - 1))
+
+> >      _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+> >  
+> > @@ -945,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+> >      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+> >                       refpoints, sizeof(refpoints)));
+> >  
+> > +    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
+> > +                     maxdomains, sizeof(maxdomains)));
+> > +
+> >      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
+> >                            RTAS_ERROR_LOG_MAX));
+> >      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",  
+> 
