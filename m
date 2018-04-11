@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f6Ncf-0007nq-8Y
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 17:49:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1f6O0m-0004Ao-6t
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:14:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f6Ncd-00080c-Uc
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 17:49:45 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f6Ncd-00080F-Ln
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 17:49:43 -0400
-Received: by mail-ot0-x244.google.com with SMTP id m22-v6so3711954otf.8
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 14:49:43 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1f6O0l-0001GJ-9E
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 18:14:40 -0400
+References: <20180411185425.2461-1-mreitz@redhat.com>
+	<20180411185425.2461-12-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fec5bd7d-74e8-a3f7-f885-df0fb0d3b9bf@redhat.com>
+Date: Wed, 11 Apr 2018 17:14:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <1523377186-32578-2-git-send-email-cota@braap.org>
-References: <1523377186-32578-1-git-send-email-cota@braap.org>
-	<1523377186-32578-2-git-send-email-cota@braap.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Thu, 12 Apr 2018 09:49:42 +1200
-Message-ID: <CAHNT7Ntqg_G21Wieh-AvV7fjvo0bcLTsJGwdJy0fYFU6qsmPfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 01/10] target/riscv: avoid integer overflow
- in next_page PC check
+In-Reply-To: <20180411185425.2461-12-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF"
+Subject: Re: [Qemu-devel] [PATCH v4 11/13] block/mirror: Add active mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Apr 11, 2018 at 4:19 AM, Emilio G. Cota <cota@braap.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <fec5bd7d-74e8-a3f7-f885-df0fb0d3b9bf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 11/13] block/mirror: Add active mirroring
+References: <20180411185425.2461-1-mreitz@redhat.com>
+ <20180411185425.2461-12-mreitz@redhat.com>
+In-Reply-To: <20180411185425.2461-12-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> If the PC is in the last page of the address space, next_page_start
-> overflows to 0. Fix it.
->
-> Reported-by: Richard Henderson <richard.henderson@linaro.org>
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Michael Clark <mjc@sifive.com>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
->
-
-Reviewed-by: Michael Clark <mjc@sifive.com>
-
-
+On 04/11/2018 01:54 PM, Max Reitz wrote:
+> This patch implements active synchronous mirroring.  In active mode, th=
+e
+> passive mechanism will still be in place and is used to copy all
+> initially dirty clusters off the source disk; but every write request
+> will write data both to the source and the target disk, so the source
+> cannot be dirtied faster than data is mirrored to the target.  Also,
+> once the block job has converged (BLOCK_JOB_READY sent), source and
+> target are guaranteed to stay in sync (unless an error occurs).
+>=20
+> Active mode is completely optional and currently disabled at runtime.  =
+A
+> later patch will add a way for users to enable it.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
 > ---
->  target/riscv/translate.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 808eab7..d2d2e5e 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -1849,11 +1849,11 @@ void gen_intermediate_code(CPUState *cs,
-> TranslationBlock *tb)
->      CPURISCVState *env = cs->env_ptr;
->      DisasContext ctx;
->      target_ulong pc_start;
-> -    target_ulong next_page_start;
-> +    target_ulong page_start;
->      int num_insns;
->      int max_insns;
->      pc_start = tb->pc;
-> -    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-> +    page_start = pc_start & TARGET_PAGE_MASK;
->      ctx.pc = pc_start;
->
->      /* once we have GDB, the rest of the translate.c implementation
-> should be
-> @@ -1903,7 +1903,7 @@ void gen_intermediate_code(CPUState *cs,
-> TranslationBlock *tb)
->          if (cs->singlestep_enabled) {
->              break;
->          }
-> -        if (ctx.pc >= next_page_start) {
-> +        if (ctx.pc - page_start >= TARGET_PAGE_SIZE) {
->              break;
->          }
->          if (tcg_op_buf_full()) {
-> --
-> 2.7.4
->
->
+>  qapi/block-core.json |  18 ++++
+>  block/mirror.c       | 252 +++++++++++++++++++++++++++++++++++++++++++=
++++++++-
+>  2 files changed, 265 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index c50517bff3..8210d601f4 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1049,6 +1049,24 @@
+>  { 'enum': 'MirrorSyncMode',
+>    'data': ['top', 'full', 'none', 'incremental'] }
+> =20
+> +##
+> +# @MirrorCopyMode:
+> +#
+> +# An enumeration whose values tell the mirror block job when to
+> +# trigger writes to the target.
+> +#
+> +# @background: copy data in background only.
+> +#
+> +# @write-blocking: when data is written to the source, write it
+> +#                  (synchronously) to the target as well.  In
+> +#                  addition, data is copied in background just like in=
+
+> +#                  @background mode.
+> +#
+> +# Since: 2.12
+
+Missed an instance of 2.13
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrOiMAACgkQp6FrSiUn
+Q2p/GQf9HRsuDrWP3B2fqimsv3sYRtA+z+tEc6n2485FeVtIbSdBKuA3uYjBz7Sy
+udt6As9Ed0l3UrciGlrJISN5tu3WsSplOg8nriQUmYZJK8JsRPG1078pJO/cVBI7
+cngtWVuBGp/4PJTFzSYNLKVIaHmUHpuE0gaz4aRPnKjgWPqmKAjn4YNBCGbTHh32
+OEnPKrRLaTMb0dberRwqDfnYJRjSjq2loUJ5EkKsz4e+sActokH31I0b9QDqoYW/
+XjPub/2WqnEBWarEJf3J+f17kgyu+sL8VNhSrycs10aY/AoAoJfo+zEAXH0HFLCL
+eRQwrwa+mgyeB2me9+Q6KMz3qHjuVQ==
+=q18q
+-----END PGP SIGNATURE-----
+
+--lb1zoUE9YYhPX91kKeie6CWHFzKS8taSF--
