@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwF-0006EP-20
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:49 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwF-0006GF-N7
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwA-0007zb-P7
+	(envelope-from <laurent@vivier.eu>) id 1f6KwD-00082N-5Q
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:47 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:45 +0200
-Message-Id: <20180411185651.21351-14-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:56:47 +0200
+Message-Id: <20180411185651.21351-16-laurent@vivier.eu>
 In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 13/19] linux-user: move m68k cpu
- loop to m68k directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 15/19] linux-user: move s390x cpu
+ loop to s390x directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,344 +24,329 @@ To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
 No code change, only move code from main.c to
-m68k/cpu_loop.c.
+s390x/cpu_loop.c.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 ---
- linux-user/m68k/cpu_loop.c | 144 +++++++++++++++++++++++++++++++++++++++++++
- linux-user/main.c          | 150 +--------------------------------------------
- 2 files changed, 145 insertions(+), 149 deletions(-)
+ linux-user/main.c           | 146 --------------------------------------------
+ linux-user/s390x/cpu_loop.c | 139 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 139 insertions(+), 146 deletions(-)
 
-diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
-index b7700a5561..b4d3d8af3d 100644
---- a/linux-user/m68k/cpu_loop.c
-+++ b/linux-user/m68k/cpu_loop.c
-@@ -21,6 +21,150 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
- 
-+void cpu_loop(CPUM68KState *env)
-+{
-+    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    int trapnr;
-+    unsigned int n;
-+    target_siginfo_t info;
-+    TaskState *ts = cs->opaque;
-+
-+    for(;;) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
-+
-+        switch(trapnr) {
-+        case EXCP_ILLEGAL:
-+            {
-+                if (ts->sim_syscalls) {
-+                    uint16_t nr;
-+                    get_user_u16(nr, env->pc + 2);
-+                    env->pc += 4;
-+                    do_m68k_simcall(env, nr);
-+                } else {
-+                    goto do_sigill;
-+                }
-+            }
-+            break;
-+        case EXCP_HALT_INSN:
-+            /* Semihosing syscall.  */
-+            env->pc += 4;
-+            do_m68k_semihosting(env, env->dregs[0]);
-+            break;
-+        case EXCP_LINEA:
-+        case EXCP_LINEF:
-+        case EXCP_UNSUPPORTED:
-+        do_sigill:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPN;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_CHK:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_FPE_INTOVF;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_DIV0:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_FPE_INTDIV;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_TRAP0:
-+            {
-+                abi_long ret;
-+                ts->sim_syscalls = 0;
-+                n = env->dregs[0];
-+                env->pc += 2;
-+                ret = do_syscall(env,
-+                                 n,
-+                                 env->dregs[1],
-+                                 env->dregs[2],
-+                                 env->dregs[3],
-+                                 env->dregs[4],
-+                                 env->dregs[5],
-+                                 env->aregs[0],
-+                                 0, 0);
-+                if (ret == -TARGET_ERESTARTSYS) {
-+                    env->pc -= 2;
-+                } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-+                    env->dregs[0] = ret;
-+                }
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
-+            break;
-+        case EXCP_ACCESS:
-+            {
-+                info.si_signo = TARGET_SIGSEGV;
-+                info.si_errno = 0;
-+                /* XXX: check env->error_code */
-+                info.si_code = TARGET_SEGV_MAPERR;
-+                info._sifields._sigfault._addr = env->mmu.ar;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+        case EXCP_DEBUG:
-+            {
-+                int sig;
-+
-+                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+                if (sig)
-+                  {
-+                    info.si_signo = sig;
-+                    info.si_errno = 0;
-+                    info.si_code = TARGET_TRAP_BRKPT;
-+                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                  }
-+            }
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            break;
-+        default:
-+            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
-+            abort();
-+        }
-+        process_pending_signals(env);
-+    }
-+}
-+
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    TaskState *ts = cpu->opaque;
-+    struct image_info *info = ts->info;
-+
-+    env->pc = regs->pc;
-+    env->dregs[0] = regs->d0;
-+    env->dregs[1] = regs->d1;
-+    env->dregs[2] = regs->d2;
-+    env->dregs[3] = regs->d3;
-+    env->dregs[4] = regs->d4;
-+    env->dregs[5] = regs->d5;
-+    env->dregs[6] = regs->d6;
-+    env->dregs[7] = regs->d7;
-+    env->aregs[0] = regs->a0;
-+    env->aregs[1] = regs->a1;
-+    env->aregs[2] = regs->a2;
-+    env->aregs[3] = regs->a3;
-+    env->aregs[4] = regs->a4;
-+    env->aregs[5] = regs->a5;
-+    env->aregs[6] = regs->a6;
-+    env->aregs[7] = regs->usp;
-+    env->sr = regs->sr;
-+
-+    ts->sim_syscalls = 1;
-+    ts->stack_base = info->start_stack;
-+    ts->heap_base = info->brk;
-+    /* This will be filled in on the first SYS_HEAPINFO call.  */
-+    ts->heap_limit = 0;
- }
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 9e49c8a30c..7c223a5629 100644
+index 37cf3a7d6f..7f6cfa5548 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -149,125 +149,6 @@ void fork_end(int child)
+@@ -149,143 +149,6 @@ void fork_end(int child)
      }
  }
  
--#ifdef TARGET_M68K
+-#ifdef TARGET_S390X
 -
--void cpu_loop(CPUM68KState *env)
+-/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
+-#define S390X_FAIL_ADDR_MASK -4096LL
+-
+-void cpu_loop(CPUS390XState *env)
 -{
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
--    int trapnr;
--    unsigned int n;
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
+-    int trapnr, n, sig;
 -    target_siginfo_t info;
--    TaskState *ts = cs->opaque;
+-    target_ulong addr;
+-    abi_long ret;
 -
--    for(;;) {
+-    while (1) {
 -        cpu_exec_start(cs);
 -        trapnr = cpu_exec(cs);
 -        cpu_exec_end(cs);
 -        process_queued_cpu_work(cs);
 -
--        switch(trapnr) {
--        case EXCP_ILLEGAL:
--            {
--                if (ts->sim_syscalls) {
--                    uint16_t nr;
--                    get_user_u16(nr, env->pc + 2);
--                    env->pc += 4;
--                    do_m68k_simcall(env, nr);
--                } else {
--                    goto do_sigill;
--                }
--            }
--            break;
--        case EXCP_HALT_INSN:
--            /* Semihosing syscall.  */
--            env->pc += 4;
--            do_m68k_semihosting(env, env->dregs[0]);
--            break;
--        case EXCP_LINEA:
--        case EXCP_LINEF:
--        case EXCP_UNSUPPORTED:
--        do_sigill:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPN;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_CHK:
--            info.si_signo = TARGET_SIGFPE;
--            info.si_errno = 0;
--            info.si_code = TARGET_FPE_INTOVF;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_DIV0:
--            info.si_signo = TARGET_SIGFPE;
--            info.si_errno = 0;
--            info.si_code = TARGET_FPE_INTDIV;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_TRAP0:
--            {
--                abi_long ret;
--                ts->sim_syscalls = 0;
--                n = env->dregs[0];
--                env->pc += 2;
--                ret = do_syscall(env,
--                                 n,
--                                 env->dregs[1],
--                                 env->dregs[2],
--                                 env->dregs[3],
--                                 env->dregs[4],
--                                 env->dregs[5],
--                                 env->aregs[0],
--                                 0, 0);
--                if (ret == -TARGET_ERESTARTSYS) {
--                    env->pc -= 2;
--                } else if (ret != -TARGET_QEMU_ESIGRETURN) {
--                    env->dregs[0] = ret;
--                }
--            }
--            break;
+-        switch (trapnr) {
 -        case EXCP_INTERRUPT:
--            /* just indicate that signals should be handled asap */
+-            /* Just indicate that signals should be handled asap.  */
 -            break;
--        case EXCP_ACCESS:
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                /* XXX: check env->error_code */
--                info.si_code = TARGET_SEGV_MAPERR;
--                info._sifields._sigfault._addr = env->mmu.ar;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
--            break;
--        case EXCP_DEBUG:
--            {
--                int sig;
 -
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
+-        case EXCP_SVC:
+-            n = env->int_svc_code;
+-            if (!n) {
+-                /* syscalls > 255 */
+-                n = env->regs[1];
+-            }
+-            env->psw.addr += env->int_svc_ilen;
+-            ret = do_syscall(env, n, env->regs[2], env->regs[3],
+-                             env->regs[4], env->regs[5],
+-                             env->regs[6], env->regs[7], 0, 0);
+-            if (ret == -TARGET_ERESTARTSYS) {
+-                env->psw.addr -= env->int_svc_ilen;
+-            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+-                env->regs[2] = ret;
 -            }
 -            break;
+-
+-        case EXCP_DEBUG:
+-            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+-            if (sig) {
+-                n = TARGET_TRAP_BRKPT;
+-                goto do_signal_pc;
+-            }
+-            break;
+-        case EXCP_PGM:
+-            n = env->int_pgm_code;
+-            switch (n) {
+-            case PGM_OPERATION:
+-            case PGM_PRIVILEGED:
+-                sig = TARGET_SIGILL;
+-                n = TARGET_ILL_ILLOPC;
+-                goto do_signal_pc;
+-            case PGM_PROTECTION:
+-            case PGM_ADDRESSING:
+-                sig = TARGET_SIGSEGV;
+-                /* XXX: check env->error_code */
+-                n = TARGET_SEGV_MAPERR;
+-                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
+-                goto do_signal;
+-            case PGM_EXECUTE:
+-            case PGM_SPECIFICATION:
+-            case PGM_SPECIAL_OP:
+-            case PGM_OPERAND:
+-            do_sigill_opn:
+-                sig = TARGET_SIGILL;
+-                n = TARGET_ILL_ILLOPN;
+-                goto do_signal_pc;
+-
+-            case PGM_FIXPT_OVERFLOW:
+-                sig = TARGET_SIGFPE;
+-                n = TARGET_FPE_INTOVF;
+-                goto do_signal_pc;
+-            case PGM_FIXPT_DIVIDE:
+-                sig = TARGET_SIGFPE;
+-                n = TARGET_FPE_INTDIV;
+-                goto do_signal_pc;
+-
+-            case PGM_DATA:
+-                n = (env->fpc >> 8) & 0xff;
+-                if (n == 0xff) {
+-                    /* compare-and-trap */
+-                    goto do_sigill_opn;
+-                } else {
+-                    /* An IEEE exception, simulated or otherwise.  */
+-                    if (n & 0x80) {
+-                        n = TARGET_FPE_FLTINV;
+-                    } else if (n & 0x40) {
+-                        n = TARGET_FPE_FLTDIV;
+-                    } else if (n & 0x20) {
+-                        n = TARGET_FPE_FLTOVF;
+-                    } else if (n & 0x10) {
+-                        n = TARGET_FPE_FLTUND;
+-                    } else if (n & 0x08) {
+-                        n = TARGET_FPE_FLTRES;
+-                    } else {
+-                        /* ??? Quantum exception; BFP, DFP error.  */
+-                        goto do_sigill_opn;
+-                    }
+-                    sig = TARGET_SIGFPE;
+-                    goto do_signal_pc;
+-                }
+-
+-            default:
+-                fprintf(stderr, "Unhandled program exception: %#x\n", n);
+-                cpu_dump_state(cs, stderr, fprintf, 0);
+-                exit(EXIT_FAILURE);
+-            }
+-            break;
+-
+-        do_signal_pc:
+-            addr = env->psw.addr;
+-        do_signal:
+-            info.si_signo = sig;
+-            info.si_errno = 0;
+-            info.si_code = n;
+-            info._sifields._sigfault._addr = addr;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-
 -        case EXCP_ATOMIC:
 -            cpu_exec_step_atomic(cs);
 -            break;
 -        default:
--            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
--            abort();
+-            fprintf(stderr, "Unhandled trap: 0x%x\n", trapnr);
+-            cpu_dump_state(cs, stderr, fprintf, 0);
+-            exit(EXIT_FAILURE);
 -        }
--        process_pending_signals(env);
+-        process_pending_signals (env);
 -    }
 -}
--#endif /* TARGET_M68K */
 -
- #ifdef TARGET_ALPHA
- void cpu_loop(CPUAlphaState *env)
- {
-@@ -2028,29 +1909,7 @@ int main(int argc, char **argv, char **envp)
+-#endif /* TARGET_S390X */
+-
+ #ifdef TARGET_TILEGX
  
-     target_cpu_copy_regs(env, regs);
- 
--#if defined(TARGET_M68K)
--    {
--        env->pc = regs->pc;
--        env->dregs[0] = regs->d0;
--        env->dregs[1] = regs->d1;
--        env->dregs[2] = regs->d2;
--        env->dregs[3] = regs->d3;
--        env->dregs[4] = regs->d4;
--        env->dregs[5] = regs->d5;
--        env->dregs[6] = regs->d6;
--        env->dregs[7] = regs->d7;
--        env->aregs[0] = regs->a0;
--        env->aregs[1] = regs->a1;
--        env->aregs[2] = regs->a2;
--        env->aregs[3] = regs->a3;
--        env->aregs[4] = regs->a4;
--        env->aregs[5] = regs->a5;
--        env->aregs[6] = regs->a6;
--        env->aregs[7] = regs->usp;
--        env->sr = regs->sr;
--        ts->sim_syscalls = 1;
--    }
--#elif defined(TARGET_RISCV)
-+#if defined(TARGET_RISCV)
-     {
+ static void gen_sigill_reg(CPUTLGState *env)
+@@ -1720,15 +1583,6 @@ int main(int argc, char **argv, char **envp)
          env->pc = regs->sepc;
          env->gpr[xSP] = regs->sp;
-@@ -2105,13 +1964,6 @@ int main(int argc, char **argv, char **envp)
      }
- #endif
+-#elif defined(TARGET_S390X)
+-    {
+-            int i;
+-            for (i = 0; i < 16; i++) {
+-                env->regs[i] = regs->gprs[i];
+-            }
+-            env->psw.mask = regs->psw.mask;
+-            env->psw.addr = regs->psw.addr;
+-    }
+ #elif defined(TARGET_TILEGX)
+     {
+         int i;
+diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
+index b7700a5561..99f5f1594f 100644
+--- a/linux-user/s390x/cpu_loop.c
++++ b/linux-user/s390x/cpu_loop.c
+@@ -21,6 +21,145 @@
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
  
--#if defined(TARGET_M68K)
--    ts->stack_base = info->start_stack;
--    ts->heap_base = info->brk;
--    /* This will be filled in on the first SYS_HEAPINFO call.  */
--    ts->heap_limit = 0;
--#endif
--
-     if (gdbstub_port) {
-         if (gdbserver_start(gdbstub_port) < 0) {
-             fprintf(stderr, "qemu: could not open gdbserver on port %d\n",
++/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
++#define S390X_FAIL_ADDR_MASK -4096LL
++
++void cpu_loop(CPUS390XState *env)
++{
++    CPUState *cs = CPU(s390_env_get_cpu(env));
++    int trapnr, n, sig;
++    target_siginfo_t info;
++    target_ulong addr;
++    abi_long ret;
++
++    while (1) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++        process_queued_cpu_work(cs);
++
++        switch (trapnr) {
++        case EXCP_INTERRUPT:
++            /* Just indicate that signals should be handled asap.  */
++            break;
++
++        case EXCP_SVC:
++            n = env->int_svc_code;
++            if (!n) {
++                /* syscalls > 255 */
++                n = env->regs[1];
++            }
++            env->psw.addr += env->int_svc_ilen;
++            ret = do_syscall(env, n, env->regs[2], env->regs[3],
++                             env->regs[4], env->regs[5],
++                             env->regs[6], env->regs[7], 0, 0);
++            if (ret == -TARGET_ERESTARTSYS) {
++                env->psw.addr -= env->int_svc_ilen;
++            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
++                env->regs[2] = ret;
++            }
++            break;
++
++        case EXCP_DEBUG:
++            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
++            if (sig) {
++                n = TARGET_TRAP_BRKPT;
++                goto do_signal_pc;
++            }
++            break;
++        case EXCP_PGM:
++            n = env->int_pgm_code;
++            switch (n) {
++            case PGM_OPERATION:
++            case PGM_PRIVILEGED:
++                sig = TARGET_SIGILL;
++                n = TARGET_ILL_ILLOPC;
++                goto do_signal_pc;
++            case PGM_PROTECTION:
++            case PGM_ADDRESSING:
++                sig = TARGET_SIGSEGV;
++                /* XXX: check env->error_code */
++                n = TARGET_SEGV_MAPERR;
++                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
++                goto do_signal;
++            case PGM_EXECUTE:
++            case PGM_SPECIFICATION:
++            case PGM_SPECIAL_OP:
++            case PGM_OPERAND:
++            do_sigill_opn:
++                sig = TARGET_SIGILL;
++                n = TARGET_ILL_ILLOPN;
++                goto do_signal_pc;
++
++            case PGM_FIXPT_OVERFLOW:
++                sig = TARGET_SIGFPE;
++                n = TARGET_FPE_INTOVF;
++                goto do_signal_pc;
++            case PGM_FIXPT_DIVIDE:
++                sig = TARGET_SIGFPE;
++                n = TARGET_FPE_INTDIV;
++                goto do_signal_pc;
++
++            case PGM_DATA:
++                n = (env->fpc >> 8) & 0xff;
++                if (n == 0xff) {
++                    /* compare-and-trap */
++                    goto do_sigill_opn;
++                } else {
++                    /* An IEEE exception, simulated or otherwise.  */
++                    if (n & 0x80) {
++                        n = TARGET_FPE_FLTINV;
++                    } else if (n & 0x40) {
++                        n = TARGET_FPE_FLTDIV;
++                    } else if (n & 0x20) {
++                        n = TARGET_FPE_FLTOVF;
++                    } else if (n & 0x10) {
++                        n = TARGET_FPE_FLTUND;
++                    } else if (n & 0x08) {
++                        n = TARGET_FPE_FLTRES;
++                    } else {
++                        /* ??? Quantum exception; BFP, DFP error.  */
++                        goto do_sigill_opn;
++                    }
++                    sig = TARGET_SIGFPE;
++                    goto do_signal_pc;
++                }
++
++            default:
++                fprintf(stderr, "Unhandled program exception: %#x\n", n);
++                cpu_dump_state(cs, stderr, fprintf, 0);
++                exit(EXIT_FAILURE);
++            }
++            break;
++
++        do_signal_pc:
++            addr = env->psw.addr;
++        do_signal:
++            info.si_signo = sig;
++            info.si_errno = 0;
++            info.si_code = n;
++            info._sifields._sigfault._addr = addr;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++
++        case EXCP_ATOMIC:
++            cpu_exec_step_atomic(cs);
++            break;
++        default:
++            fprintf(stderr, "Unhandled trap: 0x%x\n", trapnr);
++            cpu_dump_state(cs, stderr, fprintf, 0);
++            exit(EXIT_FAILURE);
++        }
++        process_pending_signals (env);
++    }
++}
++
+ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ {
++    int i;
++    for (i = 0; i < 16; i++) {
++        env->regs[i] = regs->gprs[i];
++    }
++    env->psw.mask = regs->psw.mask;
++    env->psw.addr = regs->psw.addr;
+ }
 -- 
 2.14.3
