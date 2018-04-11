@@ -1,50 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f6FgI-0008NS-9J
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:21:01 -0400
+	(envelope-from <mst@redhat.com>) id 1f6Fi1-0001Sx-B1
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f6FgD-0001p1-8U
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:20:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33930
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1f6FgD-0001kq-2s
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:20:53 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3BDIVqq138128
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 09:20:51 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2h9gwsev5r-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 09:20:50 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Wed, 11 Apr 2018 09:20:50 -0400
-References: <1521156300-19296-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1521156300-19296-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<4d76348b-e1de-7d92-3434-5213d092c6d0@redhat.com>
-	<ab945ab4-ee17-815b-2a59-b7608ff32eb6@linux.vnet.ibm.com>
-	<0b957a5c-1a87-7952-292d-f65052bb6c5a@linux.vnet.ibm.com>
-	<20180403113619.54ff1e18.cohuck@redhat.com>
-	<dd4fceac-818f-14a2-62b4-94ae73e21796@linux.vnet.ibm.com>
-	<3cb8a831-325e-2e1a-3dae-30864df27a75@linux.vnet.ibm.com>
-	<20180409113244.380a32c4.cohuck@redhat.com>
-	<1b0c08f8-c98c-c79c-574f-5c75229decf4@linux.vnet.ibm.com>
-	<20180409125104.1103d650.cohuck@redhat.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Wed, 11 Apr 2018 09:20:42 -0400
+	(envelope-from <mst@redhat.com>) id 1f6Fhx-0003EG-PI
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:22:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47704 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f6Fhx-0003DA-JA
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:22:41 -0400
+Date: Wed, 11 Apr 2018 16:22:21 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180411161926-mutt-send-email-mst@kernel.org>
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180409125104.1103d650.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <ab2f7f24-2c97-943e-ca36-cc2561ef9119@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] s390x/kvm: handle AP instruction
- interception
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180411072027.5656-1-tiwei.bie@intel.com>
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,103 +27,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: mjrosato@linux.vnet.ibm.com, alex.williamson@redhat.com, eskultet@redhat.com, David Hildenbrand <david@redhat.com>, peter.maydell@linaro.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, alifm@linux.vnet.ibm.com, heiko.carstens@de.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: jasowang@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
-On 04/09/2018 06:51 AM, Cornelia Huck wrote:
-> On Mon, 9 Apr 2018 12:37:42 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->
->> On 04/09/2018 11:32 AM, Cornelia Huck wrote:
->>>> We can kind of (i.e. modulo EECA.28) ensure this in a different fashion I think. How
->>>> about proclaiming a 'has ap instructions, but nothing to see here' in the
->>>> SIE interpreted flavor (ECA.28 set) the default way of having ap instructions
->>>> under KVM. This should be easily accomplished with an all zero CRYCB and eca.28
->>>> set. The for the guest to actually get real work done with AP we would
->>>> still require some sort of driver to either provide a non-zero matrix by
->>>> altering the CRYCB or unsettling ECA.28 and doing the intercepted flavor.
->>>>
->>>> Please notice, the cpu facility ap would still keep it's semantic
->>>> 'has ap instructions' (opposed to 'has ap instructions implemented in
->>>> SIE interpreted flavor). And give us all the flexibility.
->>>>
->>>> Yet implementing what we want to have in absence of a driver would become
->>>> much easier (under the assumption that ECA.28 equals EECA.28).
->>>>
->>>> How about this?
->>> Unfortunately, this is really hard to follow without the AR... let me
->>> summarize it to check whether I got the gist of it :)
->>>
->>> - If the "ap" cpu feature is specified, set a bit that indicates "hey,
->>>    we basically have have AP support" and create the basics, but don't
->>>    enable actual SIE handling. This means the guest gets exceptions from
->>>    the SIE already and we don't need to emulate them.
->> Kind of. The bit is ECA.28 and tells SIE 'hey SIE shall interpret ap
->> instructions for the guest (as specified)'. Then SIE has an SD satellite
->> called CRYCB that contains the which ap resources is the guest authorized
->> to use. These are the masks. If we set each mask to all zero, we will
->> effectively accomplish 'hey,we basically have have AP support but no
->> resources at the moment'. So, right, we don't have to emulate that.
->>
->> I don't know what do you mean by exceptions. For most legit requests the
->> SIE should say APQN invalid, with QCI being a notable exception. But
->> of course SIE would inject program exceptions (access, specification,
->> and privileged operation) accordingly I guess.
-> I meant "emulate exceptions"...
->
->>
->> In short, the SIE would do what we are trying to emulate in this patch.
-> ...so yes, exactly that.
->
->>> - Actually enable the missing pieces if a vfio device is created. This
->>>    would enable processing by the SIE, and we would not need to do
->>>    emulation, either (for most of it, IIRC).
->> Yes. It would actually assign resources to the guest. That would enable
->> doing real work with the AP instructions.
-> Ok.
->
->>> I may be all wrong, though... can we at least have a translation of
->>> ECA.28 and EECA.28 (the "ap is there" bit and the "ap instructions are
->>> interpreted" bit?)
->>>    
->> I think we have a misunderstanding here. I will wait for Tony. Maybe
->> he can understand this better or explain in more accessible way.
->  From what I get from your explanation, this approach sounds like a good
-> way forward. But let's wait for Tony.
+On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
+> This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+> feature for vhost-user. By default, vhost-user backend needs
+> to query the IOTLBs from QEMU after meeting unknown IOVAs.
+> With this protocol feature negotiated, QEMU will provide all
+> the IOTLBs to vhost-user backend without waiting for the
+> queries from backend. This is helpful when using a hardware
+> accelerator which is not able to handle unknown IOVAs at the
+> vhost-user backend.
+> 
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
 
-I agree, this solves the problem with specifying installing AP facilities
-on the guest (-cpu xxx,ap=on) and not configuring a vfio-ap device
-(-device vfio-ap,sysfsdev=$path-to-mediated-device).
+This is potentially a large amount of data to be sent
+on a socket.
 
-To recap:
-The realize() function for the vfio-ap device opens the mediated matrix
-device file descriptor to set up the communication pathway with the vfio_ap
-kernel driver. When the fd is opened, the vfio_ap driver sets ECA.28 for 
-the
-guest to instruct SIE to interpret AP instructions. The driver also
-configures the AP matrix for the guest in its SIE state description. 
-Consequently,
-if a vfio-ap device is not configured for the guest, but AP facilities are
-installed, all AP instructions will be intercepted and routed to QEMU. 
-If there
-are no interception handlers for the AP instructions, QEMU injects an 
-operation
-exception into the guest. This results in initialization of the AP bus 
-on the
-guest to terminate. This patch was intended to circumvent that problem.
+I had an impression that a hardware accelerator was using
+VFIO anyway. Given this, can't we have QEMU program
+the shadow IOMMU tables into VFIO directly?
 
-With Halil's suggestion, there is no need to provide these handlers. If 
-ECA.28
-is set for the guest by default when the AP facilities are installed, 
-then the AP
-instructions will be interpreted and the AP bus will get initialized on the
-guest. Since there is no vfio-ap device to provide the AP matrix 
-configuration
-for the guest, the AP bus will not detect any devices, but that's okay. AP
-instructions targeting at an APQN will execute successfully and set a 
-response
-code in the status block returned from the instruction indicating the
-APQN is invalid .... but there will be no exception unless there is truly
-an exception condition caused by the execution of the instruction.
 
->
+> ---
+> The idea of this patch is to let QEMU push all the IOTLBs
+> to vhost-user backend without waiting for the queries from
+> the backend. Because hardware accelerator at the vhost-user
+> backend may not be able to handle unknown IOVAs.
+> 
+> This is just a RFC for now. It seems that, it doesn't work
+> as expected when guest is using kernel driver (To handle
+> this case, it seems that some RAM regions' events also need
+> to be listened). Any comments would be appreciated! Thanks!
+> 
+>  docs/interop/vhost-user.txt       |  9 ++++++++
+>  hw/virtio/vhost-backend.c         |  7 ++++++
+>  hw/virtio/vhost-user.c            |  8 +++++++
+>  hw/virtio/vhost.c                 | 47 ++++++++++++++++++++++++++++++++++++---
+>  include/hw/virtio/vhost-backend.h |  3 +++
+>  5 files changed, 71 insertions(+), 3 deletions(-)
+> 
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index 534caab18a..73e07f9dad 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -380,6 +380,7 @@ Protocol features
+>  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+>  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+>  #define VHOST_USER_PROTOCOL_F_CONFIG         9
+> +#define VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB 10
+>  
+>  Master message types
+>  --------------------
+> @@ -797,3 +798,11 @@ resilient for selective requests.
+>  For the message types that already solicit a reply from the client, the
+>  presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being set brings
+>  no behavioural change. (See the 'Communication' section for details.)
+> +
+> +VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+> +------------------------------------
+> +By default, vhost-user backend needs to query the IOTLBs from QEMU after
+> +meeting unknown IOVAs. With this protocol feature negotiated, QEMU will
+> +provide all the IOTLBs to vhost backend without waiting for the queries
+> +from backend. This is helpful when using a hardware accelerator which is
+> +not able to handle unknown IOVAs at the vhost-user backend.
+> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> index 7f09efab8b..d72994e9a5 100644
+> --- a/hw/virtio/vhost-backend.c
+> +++ b/hw/virtio/vhost-backend.c
+> @@ -233,6 +233,11 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+>          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+>  }
+>  
+> +static bool vhost_kernel_need_all_device_iotlb(struct vhost_dev *dev)
+> +{
+> +    return false;
+> +}
+> +
+>  static const VhostOps kernel_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+>          .vhost_backend_init = vhost_kernel_init,
+> @@ -264,6 +269,8 @@ static const VhostOps kernel_ops = {
+>  #endif /* CONFIG_VHOST_VSOCK */
+>          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+> +        .vhost_backend_need_all_device_iotlb =
+> +                                vhost_kernel_need_all_device_iotlb,
+>  };
+>  
+>  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 38da8692bb..30e0b1c13b 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -47,6 +47,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+>      VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+>      VHOST_USER_PROTOCOL_F_CONFIG = 9,
+> +    VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB = 10,
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+>  
+> @@ -1581,6 +1582,12 @@ vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
+>      return 0;
+>  }
+>  
+> +static bool vhost_user_need_all_device_iotlb(struct vhost_dev *dev)
+> +{
+> +    return virtio_has_feature(dev->protocol_features,
+> +                              VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB);
+> +}
+> +
+>  const VhostOps user_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_USER,
+>          .vhost_backend_init = vhost_user_init,
+> @@ -1611,4 +1618,5 @@ const VhostOps user_ops = {
+>          .vhost_set_config = vhost_user_set_config,
+>          .vhost_crypto_create_session = vhost_user_crypto_create_session,
+>          .vhost_crypto_close_session = vhost_user_crypto_close_session,
+> +        .vhost_backend_need_all_device_iotlb = vhost_user_need_all_device_iotlb,
+>  };
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index f51bf573d5..70922ee998 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -48,6 +48,9 @@ static unsigned int used_memslots;
+>  static QLIST_HEAD(, vhost_dev) vhost_devices =
+>      QLIST_HEAD_INITIALIZER(vhost_devices);
+>  
+> +static int vhost_memory_region_lookup(struct vhost_dev *hdev, uint64_t gpa,
+> +                                      uint64_t *uaddr, uint64_t *len);
+> +
+>  bool vhost_has_free_slot(void)
+>  {
+>      unsigned int slots_limit = ~0U;
+> @@ -634,12 +637,39 @@ static void vhost_region_addnop(MemoryListener *listener,
+>      vhost_region_add_section(dev, section);
+>  }
+>  
+> -static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +static void vhost_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>  {
+>      struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
+>      struct vhost_dev *hdev = iommu->hdev;
+>      hwaddr iova = iotlb->iova + iommu->iommu_offset;
+>  
+> +    if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> +        uint64_t uaddr, len;
+> +
+> +        rcu_read_lock();
+> +
+> +        if (iotlb->target_as != NULL) {
+> +            if (vhost_memory_region_lookup(hdev, iotlb->translated_addr,
+> +                        &uaddr, &len)) {
+> +                error_report("Fail to lookup the translated address "
+> +                        "%"PRIx64, iotlb->translated_addr);
+> +                goto out;
+> +            }
+> +
+> +            len = MIN(iotlb->addr_mask + 1, len);
+> +            iova = iova & ~iotlb->addr_mask;
+> +
+> +            if (vhost_backend_update_device_iotlb(hdev, iova, uaddr,
+> +                                                  len, iotlb->perm)) {
+> +                error_report("Fail to update device iotlb");
+> +                goto out;
+> +            }
+> +        }
+> +out:
+> +        rcu_read_unlock();
+> +        return;
+> +    }
+> +
+>      if (vhost_backend_invalidate_device_iotlb(hdev, iova,
+>                                                iotlb->addr_mask + 1)) {
+>          error_report("Fail to invalidate device iotlb");
+> @@ -652,6 +682,7 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+>                                           iommu_listener);
+>      struct vhost_iommu *iommu;
+> +    IOMMUNotifierFlag flags;
+>      Int128 end;
+>  
+>      if (!memory_region_is_iommu(section->mr)) {
+> @@ -662,8 +693,15 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>      end = int128_add(int128_make64(section->offset_within_region),
+>                       section->size);
+>      end = int128_sub(end, int128_one());
+> -    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> -                        IOMMU_NOTIFIER_UNMAP,
+> +
+> +    if (dev->vhost_ops->vhost_backend_need_all_device_iotlb(dev)) {
+> +        flags = IOMMU_NOTIFIER_ALL;
+> +    } else {
+> +        flags = IOMMU_NOTIFIER_UNMAP;
+> +    }
+> +
+> +    iommu_notifier_init(&iommu->n, vhost_iommu_map_notify,
+> +                        flags,
+>                          section->offset_within_region,
+>                          int128_get64(end));
+>      iommu->mr = section->mr;
+> @@ -673,6 +711,9 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>      memory_region_register_iommu_notifier(section->mr, &iommu->n);
+>      QLIST_INSERT_HEAD(&dev->iommu_list, iommu, iommu_next);
+>      /* TODO: can replay help performance here? */
+> +    if (flags == IOMMU_NOTIFIER_ALL) {
+> +        memory_region_iommu_replay(IOMMU_MEMORY_REGION(iommu->mr), &iommu->n);
+> +    }
+>  }
+>  
+>  static void vhost_iommu_region_del(MemoryListener *listener,
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> index 5dac61f9ea..602fd987a4 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -101,6 +101,8 @@ typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
+>  typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
+>                                               uint64_t session_id);
+>  
+> +typedef bool (*vhost_backend_need_all_device_iotlb_op)(struct vhost_dev *dev);
+> +
+>  typedef struct VhostOps {
+>      VhostBackendType backend_type;
+>      vhost_backend_init vhost_backend_init;
+> @@ -138,6 +140,7 @@ typedef struct VhostOps {
+>      vhost_set_config_op vhost_set_config;
+>      vhost_crypto_create_session_op vhost_crypto_create_session;
+>      vhost_crypto_close_session_op vhost_crypto_close_session;
+> +    vhost_backend_need_all_device_iotlb_op vhost_backend_need_all_device_iotlb;
+>  } VhostOps;
+>  
+>  extern const VhostOps user_ops;
+> -- 
+> 2.11.0
