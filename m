@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6In9-0002hB-VC
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f6InB-0002jM-NA
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6In6-0004UL-6s
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f6InA-0004XS-4o
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:40:17 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 11 Apr 2018 18:39:27 +0200
-Message-Id: <20180411163940.2523-7-kwolf@redhat.com>
+Date: Wed, 11 Apr 2018 18:39:30 +0200
+Message-Id: <20180411163940.2523-10-kwolf@redhat.com>
 In-Reply-To: <20180411163940.2523-1-kwolf@redhat.com>
 References: <20180411163940.2523-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/19] block: Avoid unnecessary aio_poll() in
- AIO_WAIT_WHILE()
+Subject: [Qemu-devel] [PATCH 09/19] test-bdrv-drain: Add test for node
+ deletion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +23,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Commit 91af091f923 added an additional aio_poll() to BDRV_POLL_WHILE()
-in order to make sure that all pending BHs are executed on drain. This
-was the wrong place to make the fix, as it is useless overhead for all
-other users of the macro and unnecessarily complicates the mechanism.
+From: Max Reitz <mreitz@redhat.com>
 
-This patch effectively reverts said commit (the context has changed a
-bit and the code has moved to AIO_WAIT_WHILE()) and instead polls in the
-loop condition for drain.
+This patch adds two bdrv-drain tests for what happens if some BDS goes
+away during the drainage.
 
-The effect is probably hard to measure in any real-world use case
-because actual I/O will dominate, but if I run only the initialisation
-part of 'qemu-img convert' where it calls bdrv_block_status() for the
-whole image to find out how much data there is copy, this phase actually
-needs only roughly half the time after this patch.
+The basic idea is that you have a parent BDS with some child nodes.
+Then, you drain one of the children.  Because of that, the party who
+actually owns the parent decides to (A) delete it, or (B) detach all its
+children from it -- both while the child is still being drained.
 
+A real-world case where this can happen is the mirror block job, which
+may exit if you drain one of its children.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/aio-wait.h | 22 ++++++++--------------
- block/io.c               | 11 ++++++++++-
- 2 files changed, 18 insertions(+), 15 deletions(-)
+ tests/test-bdrv-drain.c | 169 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 169 insertions(+)
 
-diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-index 8c90a2e66e..783d3678dd 100644
---- a/include/block/aio-wait.h
-+++ b/include/block/aio-wait.h
-@@ -73,29 +73,23 @@ typedef struct {
-  */
- #define AIO_WAIT_WHILE(wait, ctx, cond) ({                         \
-     bool waited_ = false;                                          \
--    bool busy_ = true;                                             \
-     AioWait *wait_ = (wait);                                       \
-     AioContext *ctx_ = (ctx);                                      \
-     if (in_aio_context_home_thread(ctx_)) {                        \
--        while ((cond) || busy_) {                                  \
--            busy_ = aio_poll(ctx_, (cond));                        \
--            waited_ |= !!(cond) | busy_;                           \
-+        while ((cond)) {                                           \
-+            aio_poll(ctx_, true);                                  \
-+            waited_ = true;                                        \
-         }                                                          \
-     } else {                                                       \
-         assert(qemu_get_current_aio_context() ==                   \
-                qemu_get_aio_context());                            \
-         /* Increment wait_->num_waiters before evaluating cond. */ \
-         atomic_inc(&wait_->num_waiters);                           \
--        while (busy_) {                                            \
--            if ((cond)) {                                          \
--                waited_ = busy_ = true;                            \
--                aio_context_release(ctx_);                         \
--                aio_poll(qemu_get_aio_context(), true);            \
--                aio_context_acquire(ctx_);                         \
--            } else {                                               \
--                busy_ = aio_poll(ctx_, false);                     \
--                waited_ |= busy_;                                  \
--            }                                                      \
-+        while ((cond)) {                                           \
-+            aio_context_release(ctx_);                             \
-+            aio_poll(qemu_get_aio_context(), true);                \
-+            aio_context_acquire(ctx_);                             \
-+            waited_ = true;                                        \
-         }                                                          \
-         atomic_dec(&wait_->num_waiters);                           \
-     }                                                              \
-diff --git a/block/io.c b/block/io.c
-index ea6f9f023a..6f580f49ff 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -181,13 +181,22 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-     BDRV_POLL_WHILE(bs, !data.done);
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 37f2d6ac8c..05768213be 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -792,6 +792,172 @@ static void test_blockjob_drain_subtree(void)
+     test_blockjob_common(BDRV_SUBTREE_DRAIN);
  }
  
-+/* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll() */
-+static bool bdrv_drain_poll(BlockDriverState *bs)
++
++typedef struct BDRVTestTopState {
++    BdrvChild *wait_child;
++} BDRVTestTopState;
++
++static void bdrv_test_top_close(BlockDriverState *bs)
 +{
-+    /* Execute pending BHs first and check everything else only after the BHs
-+     * have executed. */
-+    while (aio_poll(bs->aio_context, false));
-+    return atomic_read(&bs->in_flight);
++    BdrvChild *c, *next_c;
++    QLIST_FOREACH_SAFE(c, &bs->children, next, next_c) {
++        bdrv_unref_child(bs, c);
++    }
 +}
 +
- static bool bdrv_drain_recurse(BlockDriverState *bs)
++static int coroutine_fn bdrv_test_top_co_preadv(BlockDriverState *bs,
++                                                uint64_t offset, uint64_t bytes,
++                                                QEMUIOVector *qiov, int flags)
++{
++    BDRVTestTopState *tts = bs->opaque;
++    return bdrv_co_preadv(tts->wait_child, offset, bytes, qiov, flags);
++}
++
++static BlockDriver bdrv_test_top_driver = {
++    .format_name            = "test_top_driver",
++    .instance_size          = sizeof(BDRVTestTopState),
++
++    .bdrv_close             = bdrv_test_top_close,
++    .bdrv_co_preadv         = bdrv_test_top_co_preadv,
++
++    .bdrv_child_perm        = bdrv_format_default_perms,
++};
++
++typedef struct TestCoDeleteByDrainData {
++    BlockBackend *blk;
++    bool detach_instead_of_delete;
++    bool done;
++} TestCoDeleteByDrainData;
++
++static void coroutine_fn test_co_delete_by_drain(void *opaque)
++{
++    TestCoDeleteByDrainData *dbdd = opaque;
++    BlockBackend *blk = dbdd->blk;
++    BlockDriverState *bs = blk_bs(blk);
++    BDRVTestTopState *tts = bs->opaque;
++    void *buffer = g_malloc(65536);
++    QEMUIOVector qiov;
++    struct iovec iov = {
++        .iov_base = buffer,
++        .iov_len  = 65536,
++    };
++
++    qemu_iovec_init_external(&qiov, &iov, 1);
++
++    /* Pretend some internal write operation from parent to child.
++     * Important: We have to read from the child, not from the parent!
++     * Draining works by first propagating it all up the tree to the
++     * root and then waiting for drainage from root to the leaves
++     * (protocol nodes).  If we have a request waiting on the root,
++     * everything will be drained before we go back down the tree, but
++     * we do not want that.  We want to be in the middle of draining
++     * when this following requests returns. */
++    bdrv_co_preadv(tts->wait_child, 0, 65536, &qiov, 0);
++
++    g_assert_cmpint(bs->refcnt, ==, 1);
++
++    if (!dbdd->detach_instead_of_delete) {
++        blk_unref(blk);
++    } else {
++        BdrvChild *c, *next_c;
++        QLIST_FOREACH_SAFE(c, &bs->children, next, next_c) {
++            bdrv_unref_child(bs, c);
++        }
++    }
++
++    dbdd->done = true;
++}
++
++/**
++ * Test what happens when some BDS has some children, you drain one of
++ * them and this results in the BDS being deleted.
++ *
++ * If @detach_instead_of_delete is set, the BDS is not going to be
++ * deleted but will only detach all of its children.
++ */
++static void do_test_delete_by_drain(bool detach_instead_of_delete)
++{
++    BlockBackend *blk;
++    BlockDriverState *bs, *child_bs, *null_bs;
++    BDRVTestTopState *tts;
++    TestCoDeleteByDrainData dbdd;
++    Coroutine *co;
++
++    bs = bdrv_new_open_driver(&bdrv_test_top_driver, "top", BDRV_O_RDWR,
++                              &error_abort);
++    bs->total_sectors = 65536 >> BDRV_SECTOR_BITS;
++    tts = bs->opaque;
++
++    null_bs = bdrv_open("null-co://", NULL, NULL, BDRV_O_RDWR | BDRV_O_PROTOCOL,
++                        &error_abort);
++    bdrv_attach_child(bs, null_bs, "null-child", &child_file, &error_abort);
++
++    /* This child will be the one to pass to requests through to, and
++     * it will stall until a drain occurs */
++    child_bs = bdrv_new_open_driver(&bdrv_test, "child", BDRV_O_RDWR,
++                                    &error_abort);
++    child_bs->total_sectors = 65536 >> BDRV_SECTOR_BITS;
++    /* Takes our reference to child_bs */
++    tts->wait_child = bdrv_attach_child(bs, child_bs, "wait-child", &child_file,
++                                        &error_abort);
++
++    /* This child is just there to be deleted
++     * (for detach_instead_of_delete == true) */
++    null_bs = bdrv_open("null-co://", NULL, NULL, BDRV_O_RDWR | BDRV_O_PROTOCOL,
++                        &error_abort);
++    bdrv_attach_child(bs, null_bs, "null-child", &child_file, &error_abort);
++
++    blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    blk_insert_bs(blk, bs, &error_abort);
++
++    /* Referenced by blk now */
++    bdrv_unref(bs);
++
++    g_assert_cmpint(bs->refcnt, ==, 1);
++    g_assert_cmpint(child_bs->refcnt, ==, 1);
++    g_assert_cmpint(null_bs->refcnt, ==, 1);
++
++
++    dbdd = (TestCoDeleteByDrainData){
++        .blk = blk,
++        .detach_instead_of_delete = detach_instead_of_delete,
++        .done = false,
++    };
++    co = qemu_coroutine_create(test_co_delete_by_drain, &dbdd);
++    qemu_coroutine_enter(co);
++
++    /* Drain the child while the read operation is still pending.
++     * This should result in the operation finishing and
++     * test_co_delete_by_drain() resuming.  Thus, @bs will be deleted
++     * and the coroutine will exit while this drain operation is still
++     * in progress. */
++    bdrv_ref(child_bs);
++    bdrv_drain(child_bs);
++    bdrv_unref(child_bs);
++
++    while (!dbdd.done) {
++        aio_poll(qemu_get_aio_context(), true);
++    }
++
++    if (detach_instead_of_delete) {
++        /* Here, the reference has not passed over to the coroutine,
++         * so we have to delete the BB ourselves */
++        blk_unref(blk);
++    }
++}
++
++
++static void test_delete_by_drain(void)
++{
++    do_test_delete_by_drain(false);
++}
++
++static void test_detach_by_drain(void)
++{
++    do_test_delete_by_drain(true);
++}
++
++
+ int main(int argc, char **argv)
  {
-     BdrvChild *child, *tmp;
-     bool waited;
+     int ret;
+@@ -839,6 +1005,9 @@ int main(int argc, char **argv)
+     g_test_add_func("/bdrv-drain/blockjob/drain_subtree",
+                     test_blockjob_drain_subtree);
  
-     /* Wait for drained requests to finish */
--    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-+    waited = BDRV_POLL_WHILE(bs, bdrv_drain_poll(bs));
- 
-     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-         BlockDriverState *bs = child->bs;
++    g_test_add_func("/bdrv-drain/deletion", test_delete_by_drain);
++    g_test_add_func("/bdrv-drain/detach", test_detach_by_drain);
++
+     ret = g_test_run();
+     qemu_event_destroy(&done_event);
+     return ret;
 -- 
 2.13.6
