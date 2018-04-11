@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6Kw5-00065L-Qu
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:42 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwC-0006BQ-E2
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6Kw2-0007rX-Os
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:37 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6Kw7-0007vP-QE
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:44 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:50 +0200
-Message-Id: <20180411185651.21351-19-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:56:35 +0200
+Message-Id: <20180411185651.21351-4-laurent@vivier.eu>
 In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.13 v2 18/19] linux-user: move hppa cpu
- loop to hppa directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 03/19] linux-user: move aarch64 cpu
+ loop to aarch64 directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,423 +24,316 @@ To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
 No code change, only move code from main.c to
-hppa/cpu_loop.c.
+aarch64/cpu_loop.c and duplicate some macro
+defined for both arm and aarch64.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- linux-user/hppa/cpu_loop.c | 185 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/main.c          | 194 +--------------------------------------------
- 2 files changed, 186 insertions(+), 193 deletions(-)
+ linux-user/aarch64/cpu_loop.c | 156 ++++++++++++++++++++++++++++++++++++++++++
+ linux-user/main.c             | 109 +----------------------------
+ 2 files changed, 158 insertions(+), 107 deletions(-)
 
-diff --git a/linux-user/hppa/cpu_loop.c b/linux-user/hppa/cpu_loop.c
-index b7700a5561..0301c766c6 100644
---- a/linux-user/hppa/cpu_loop.c
-+++ b/linux-user/hppa/cpu_loop.c
-@@ -21,6 +21,191 @@
+diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
+index b7700a5561..c97a646546 100644
+--- a/linux-user/aarch64/cpu_loop.c
++++ b/linux-user/aarch64/cpu_loop.c
+@@ -21,6 +21,162 @@
  #include "qemu.h"
  #include "cpu_loop-common.h"
  
-+static abi_ulong hppa_lws(CPUHPPAState *env)
++#define get_user_code_u32(x, gaddr, env)                \
++    ({ abi_long __r = get_user_u32((x), (gaddr));       \
++        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
++            (x) = bswap32(x);                           \
++        }                                               \
++        __r;                                            \
++    })
++
++#define get_user_code_u16(x, gaddr, env)                \
++    ({ abi_long __r = get_user_u16((x), (gaddr));       \
++        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
++            (x) = bswap16(x);                           \
++        }                                               \
++        __r;                                            \
++    })
++
++#define get_user_data_u32(x, gaddr, env)                \
++    ({ abi_long __r = get_user_u32((x), (gaddr));       \
++        if (!__r && arm_cpu_bswap_data(env)) {          \
++            (x) = bswap32(x);                           \
++        }                                               \
++        __r;                                            \
++    })
++
++#define get_user_data_u16(x, gaddr, env)                \
++    ({ abi_long __r = get_user_u16((x), (gaddr));       \
++        if (!__r && arm_cpu_bswap_data(env)) {          \
++            (x) = bswap16(x);                           \
++        }                                               \
++        __r;                                            \
++    })
++
++#define put_user_data_u32(x, gaddr, env)                \
++    ({ typeof(x) __x = (x);                             \
++        if (arm_cpu_bswap_data(env)) {                  \
++            __x = bswap32(__x);                         \
++        }                                               \
++        put_user_u32(__x, (gaddr));                     \
++    })
++
++#define put_user_data_u16(x, gaddr, env)                \
++    ({ typeof(x) __x = (x);                             \
++        if (arm_cpu_bswap_data(env)) {                  \
++            __x = bswap16(__x);                         \
++        }                                               \
++        put_user_u16(__x, (gaddr));                     \
++    })
++
++/* AArch64 main loop */
++void cpu_loop(CPUARMState *env)
 +{
-+    uint32_t which = env->gr[20];
-+    abi_ulong addr = env->gr[26];
-+    abi_ulong old = env->gr[25];
-+    abi_ulong new = env->gr[24];
-+    abi_ulong size, ret;
-+
-+    switch (which) {
-+    default:
-+        return -TARGET_ENOSYS;
-+
-+    case 0: /* elf32 atomic 32bit cmpxchg */
-+        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
-+            return -TARGET_EFAULT;
-+        }
-+        old = tswap32(old);
-+        new = tswap32(new);
-+        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
-+        ret = tswap32(ret);
-+        break;
-+
-+    case 2: /* elf32 atomic "new" cmpxchg */
-+        size = env->gr[23];
-+        if (size >= 4) {
-+            return -TARGET_ENOSYS;
-+        }
-+        if (((addr | old | new) & ((1 << size) - 1))
-+            || !access_ok(VERIFY_WRITE, addr, 1 << size)
-+            || !access_ok(VERIFY_READ, old, 1 << size)
-+            || !access_ok(VERIFY_READ, new, 1 << size)) {
-+            return -TARGET_EFAULT;
-+        }
-+        /* Note that below we use host-endian loads so that the cmpxchg
-+           can be host-endian as well.  */
-+        switch (size) {
-+        case 0:
-+            old = *(uint8_t *)g2h(old);
-+            new = *(uint8_t *)g2h(new);
-+            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
-+            ret = ret != old;
-+            break;
-+        case 1:
-+            old = *(uint16_t *)g2h(old);
-+            new = *(uint16_t *)g2h(new);
-+            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
-+            ret = ret != old;
-+            break;
-+        case 2:
-+            old = *(uint32_t *)g2h(old);
-+            new = *(uint32_t *)g2h(new);
-+            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
-+            ret = ret != old;
-+            break;
-+        case 3:
-+            {
-+                uint64_t o64, n64, r64;
-+                o64 = *(uint64_t *)g2h(old);
-+                n64 = *(uint64_t *)g2h(new);
-+#ifdef CONFIG_ATOMIC64
-+                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
-+                ret = r64 != o64;
-+#else
-+                start_exclusive();
-+                r64 = *(uint64_t *)g2h(addr);
-+                ret = 1;
-+                if (r64 == o64) {
-+                    *(uint64_t *)g2h(addr) = n64;
-+                    ret = 0;
-+                }
-+                end_exclusive();
-+#endif
-+            }
-+            break;
-+        }
-+        break;
-+    }
-+
-+    env->gr[28] = ret;
-+    return 0;
-+}
-+
-+void cpu_loop(CPUHPPAState *env)
-+{
-+    CPUState *cs = CPU(hppa_env_get_cpu(env));
++    CPUState *cs = CPU(arm_env_get_cpu(env));
++    int trapnr, sig;
++    abi_long ret;
 +    target_siginfo_t info;
-+    abi_ulong ret;
-+    int trapnr;
 +
-+    while (1) {
++    for (;;) {
 +        cpu_exec_start(cs);
 +        trapnr = cpu_exec(cs);
 +        cpu_exec_end(cs);
 +        process_queued_cpu_work(cs);
 +
 +        switch (trapnr) {
-+        case EXCP_SYSCALL:
-+            ret = do_syscall(env, env->gr[20],
-+                             env->gr[26], env->gr[25],
-+                             env->gr[24], env->gr[23],
-+                             env->gr[22], env->gr[21], 0, 0);
-+            switch (ret) {
-+            default:
-+                env->gr[28] = ret;
-+                /* We arrived here by faking the gateway page.  Return.  */
-+                env->iaoq_f = env->gr[31];
-+                env->iaoq_b = env->gr[31] + 4;
-+                break;
-+            case -TARGET_ERESTARTSYS:
-+            case -TARGET_QEMU_ESIGRETURN:
-+                break;
-+            }
-+            break;
-+        case EXCP_SYSCALL_LWS:
-+            env->gr[21] = hppa_lws(env);
-+            /* We arrived here by faking the gateway page.  Return.  */
-+            env->iaoq_f = env->gr[31];
-+            env->iaoq_b = env->gr[31] + 4;
-+            break;
-+        case EXCP_ITLB_MISS:
-+        case EXCP_DTLB_MISS:
-+        case EXCP_NA_ITLB_MISS:
-+        case EXCP_NA_DTLB_MISS:
-+        case EXCP_IMP:
-+        case EXCP_DMP:
-+        case EXCP_DMB:
-+        case EXCP_PAGE_REF:
-+        case EXCP_DMAR:
-+        case EXCP_DMPI:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_SEGV_ACCERR;
-+            info._sifields._sigfault._addr = env->cr[CR_IOR];
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_UNALIGN:
-+            info.si_signo = TARGET_SIGBUS;
-+            info.si_errno = 0;
-+            info.si_code = 0;
-+            info._sifields._sigfault._addr = env->cr[CR_IOR];
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ILL:
-+        case EXCP_PRIV_OPR:
-+        case EXCP_PRIV_REG:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPN;
-+            info._sifields._sigfault._addr = env->iaoq_f;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_OVERFLOW:
-+        case EXCP_COND:
-+        case EXCP_ASSIST:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = 0;
-+            info._sifields._sigfault._addr = env->iaoq_f;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_DEBUG:
-+            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (trapnr) {
-+                info.si_signo = trapnr;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
++        case EXCP_SWI:
++            ret = do_syscall(env,
++                             env->xregs[8],
++                             env->xregs[0],
++                             env->xregs[1],
++                             env->xregs[2],
++                             env->xregs[3],
++                             env->xregs[4],
++                             env->xregs[5],
++                             0, 0);
++            if (ret == -TARGET_ERESTARTSYS) {
++                env->pc -= 4;
++            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
++                env->xregs[0] = ret;
 +            }
 +            break;
 +        case EXCP_INTERRUPT:
 +            /* just indicate that signals should be handled asap */
 +            break;
++        case EXCP_UDEF:
++            info.si_signo = TARGET_SIGILL;
++            info.si_errno = 0;
++            info.si_code = TARGET_ILL_ILLOPN;
++            info._sifields._sigfault._addr = env->pc;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_PREFETCH_ABORT:
++        case EXCP_DATA_ABORT:
++            info.si_signo = TARGET_SIGSEGV;
++            info.si_errno = 0;
++            /* XXX: check env->error_code */
++            info.si_code = TARGET_SEGV_MAPERR;
++            info._sifields._sigfault._addr = env->exception.vaddress;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_DEBUG:
++        case EXCP_BKPT:
++            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
++            if (sig) {
++                info.si_signo = sig;
++                info.si_errno = 0;
++                info.si_code = TARGET_TRAP_BRKPT;
++                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            }
++            break;
++        case EXCP_SEMIHOST:
++            env->xregs[0] = do_arm_semihosting(env);
++            break;
++        case EXCP_YIELD:
++            /* nothing to do here for user-mode, just resume guest code */
++            break;
++        case EXCP_ATOMIC:
++            cpu_exec_step_atomic(cs);
++            break;
 +        default:
-+            g_assert_not_reached();
++            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
++            abort();
 +        }
 +        process_pending_signals(env);
++        /* Exception return on AArch64 always clears the exclusive monitor,
++         * so any return to running guest code implies this.
++         */
++        env->exclusive_addr = -1;
 +    }
 +}
 +
  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
  {
++    CPUState *cpu = ENV_GET_CPU(env);
++    TaskState *ts = cpu->opaque;
++    struct image_info *info = ts->info;
 +    int i;
-+    for (i = 1; i < 32; i++) {
-+        env->gr[i] = regs->gr[i];
++
++    if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
++        fprintf(stderr,
++                "The selected ARM CPU does not support 64 bit mode\n");
++        exit(EXIT_FAILURE);
 +    }
-+    env->iaoq_f = regs->iaoq[0];
-+    env->iaoq_b = regs->iaoq[1];
++
++    for (i = 0; i < 31; i++) {
++        env->xregs[i] = regs->regs[i];
++    }
++    env->pc = regs->pc;
++    env->xregs[31] = regs->sp;
++#ifdef TARGET_WORDS_BIGENDIAN
++    env->cp15.sctlr_el[1] |= SCTLR_E0E;
++    for (i = 1; i < 4; ++i) {
++        env->cp15.sctlr_el[i] |= SCTLR_EE;
++    }
++#endif
++
++    ts->stack_base = info->start_stack;
++    ts->heap_base = info->brk;
++    /* This will be filled in on the first SYS_HEAPINFO call.  */
++    ts->heap_limit = 0;
  }
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 834ec0bfe5..aa48b048a7 100644
+index 5271473d47..b4f08b226c 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -149,189 +149,6 @@ void fork_end(int child)
+@@ -555,89 +555,6 @@ void cpu_loop(CPUARMState *env)
+         process_pending_signals(env);
      }
  }
- 
--#ifdef TARGET_HPPA
 -
--static abi_ulong hppa_lws(CPUHPPAState *env)
--{
--    uint32_t which = env->gr[20];
--    abi_ulong addr = env->gr[26];
--    abi_ulong old = env->gr[25];
--    abi_ulong new = env->gr[24];
--    abi_ulong size, ret;
--
--    switch (which) {
--    default:
--        return -TARGET_ENOSYS;
--
--    case 0: /* elf32 atomic 32bit cmpxchg */
--        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
--            return -TARGET_EFAULT;
--        }
--        old = tswap32(old);
--        new = tswap32(new);
--        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
--        ret = tswap32(ret);
--        break;
--
--    case 2: /* elf32 atomic "new" cmpxchg */
--        size = env->gr[23];
--        if (size >= 4) {
--            return -TARGET_ENOSYS;
--        }
--        if (((addr | old | new) & ((1 << size) - 1))
--            || !access_ok(VERIFY_WRITE, addr, 1 << size)
--            || !access_ok(VERIFY_READ, old, 1 << size)
--            || !access_ok(VERIFY_READ, new, 1 << size)) {
--            return -TARGET_EFAULT;
--        }
--        /* Note that below we use host-endian loads so that the cmpxchg
--           can be host-endian as well.  */
--        switch (size) {
--        case 0:
--            old = *(uint8_t *)g2h(old);
--            new = *(uint8_t *)g2h(new);
--            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
--            ret = ret != old;
--            break;
--        case 1:
--            old = *(uint16_t *)g2h(old);
--            new = *(uint16_t *)g2h(new);
--            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
--            ret = ret != old;
--            break;
--        case 2:
--            old = *(uint32_t *)g2h(old);
--            new = *(uint32_t *)g2h(new);
--            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
--            ret = ret != old;
--            break;
--        case 3:
--            {
--                uint64_t o64, n64, r64;
--                o64 = *(uint64_t *)g2h(old);
--                n64 = *(uint64_t *)g2h(new);
--#ifdef CONFIG_ATOMIC64
--                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
--                ret = r64 != o64;
 -#else
--                start_exclusive();
--                r64 = *(uint64_t *)g2h(addr);
--                ret = 1;
--                if (r64 == o64) {
--                    *(uint64_t *)g2h(addr) = n64;
--                    ret = 0;
--                }
--                end_exclusive();
--#endif
--            }
--            break;
--        }
--        break;
--    }
 -
--    env->gr[28] = ret;
--    return 0;
--}
--
--void cpu_loop(CPUHPPAState *env)
+-/* AArch64 main loop */
+-void cpu_loop(CPUARMState *env)
 -{
--    CPUState *cs = CPU(hppa_env_get_cpu(env));
+-    CPUState *cs = CPU(arm_env_get_cpu(env));
+-    int trapnr, sig;
+-    abi_long ret;
 -    target_siginfo_t info;
--    abi_ulong ret;
--    int trapnr;
 -
--    while (1) {
+-    for (;;) {
 -        cpu_exec_start(cs);
 -        trapnr = cpu_exec(cs);
 -        cpu_exec_end(cs);
 -        process_queued_cpu_work(cs);
 -
 -        switch (trapnr) {
--        case EXCP_SYSCALL:
--            ret = do_syscall(env, env->gr[20],
--                             env->gr[26], env->gr[25],
--                             env->gr[24], env->gr[23],
--                             env->gr[22], env->gr[21], 0, 0);
--            switch (ret) {
--            default:
--                env->gr[28] = ret;
--                /* We arrived here by faking the gateway page.  Return.  */
--                env->iaoq_f = env->gr[31];
--                env->iaoq_b = env->gr[31] + 4;
--                break;
--            case -TARGET_ERESTARTSYS:
--            case -TARGET_QEMU_ESIGRETURN:
--                break;
--            }
--            break;
--        case EXCP_SYSCALL_LWS:
--            env->gr[21] = hppa_lws(env);
--            /* We arrived here by faking the gateway page.  Return.  */
--            env->iaoq_f = env->gr[31];
--            env->iaoq_b = env->gr[31] + 4;
--            break;
--        case EXCP_ITLB_MISS:
--        case EXCP_DTLB_MISS:
--        case EXCP_NA_ITLB_MISS:
--        case EXCP_NA_DTLB_MISS:
--        case EXCP_IMP:
--        case EXCP_DMP:
--        case EXCP_DMB:
--        case EXCP_PAGE_REF:
--        case EXCP_DMAR:
--        case EXCP_DMPI:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            info.si_code = TARGET_SEGV_ACCERR;
--            info._sifields._sigfault._addr = env->cr[CR_IOR];
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_UNALIGN:
--            info.si_signo = TARGET_SIGBUS;
--            info.si_errno = 0;
--            info.si_code = 0;
--            info._sifields._sigfault._addr = env->cr[CR_IOR];
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_ILL:
--        case EXCP_PRIV_OPR:
--        case EXCP_PRIV_REG:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPN;
--            info._sifields._sigfault._addr = env->iaoq_f;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_OVERFLOW:
--        case EXCP_COND:
--        case EXCP_ASSIST:
--            info.si_signo = TARGET_SIGFPE;
--            info.si_errno = 0;
--            info.si_code = 0;
--            info._sifields._sigfault._addr = env->iaoq_f;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_DEBUG:
--            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (trapnr) {
--                info.si_signo = trapnr;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
+-        case EXCP_SWI:
+-            ret = do_syscall(env,
+-                             env->xregs[8],
+-                             env->xregs[0],
+-                             env->xregs[1],
+-                             env->xregs[2],
+-                             env->xregs[3],
+-                             env->xregs[4],
+-                             env->xregs[5],
+-                             0, 0);
+-            if (ret == -TARGET_ERESTARTSYS) {
+-                env->pc -= 4;
+-            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+-                env->xregs[0] = ret;
 -            }
 -            break;
 -        case EXCP_INTERRUPT:
 -            /* just indicate that signals should be handled asap */
 -            break;
+-        case EXCP_UDEF:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPN;
+-            info._sifields._sigfault._addr = env->pc;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_PREFETCH_ABORT:
+-        case EXCP_DATA_ABORT:
+-            info.si_signo = TARGET_SIGSEGV;
+-            info.si_errno = 0;
+-            /* XXX: check env->error_code */
+-            info.si_code = TARGET_SEGV_MAPERR;
+-            info._sifields._sigfault._addr = env->exception.vaddress;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_DEBUG:
+-        case EXCP_BKPT:
+-            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+-            if (sig) {
+-                info.si_signo = sig;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_TRAP_BRKPT;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            }
+-            break;
+-        case EXCP_SEMIHOST:
+-            env->xregs[0] = do_arm_semihosting(env);
+-            break;
+-        case EXCP_YIELD:
+-            /* nothing to do here for user-mode, just resume guest code */
+-            break;
+-        case EXCP_ATOMIC:
+-            cpu_exec_step_atomic(cs);
+-            break;
 -        default:
--            g_assert_not_reached();
+-            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
+-            abort();
 -        }
 -        process_pending_signals(env);
+-        /* Exception return on AArch64 always clears the exclusive monitor,
+-         * so any return to running guest code implies this.
+-         */
+-        env->exclusive_addr = -1;
 -    }
 -}
--
--#endif /* TARGET_HPPA */
--
- #ifdef TARGET_XTENSA
+ #endif /* ndef TARGET_ABI32 */
  
- static void xtensa_rfw(CPUXtensaState *env)
-@@ -1228,16 +1045,7 @@ int main(int argc, char **argv, char **envp)
+ #endif
+@@ -4495,29 +4412,7 @@ int main(int argc, char **argv, char **envp)
  
      target_cpu_copy_regs(env, regs);
  
--#if defined(TARGET_HPPA)
+-#if defined(TARGET_AARCH64)
 -    {
 -        int i;
--        for (i = 1; i < 32; i++) {
--            env->gr[i] = regs->gr[i];
+-
+-        if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
+-            fprintf(stderr,
+-                    "The selected ARM CPU does not support 64 bit mode\n");
+-            exit(EXIT_FAILURE);
 -        }
--        env->iaoq_f = regs->iaoq[0];
--        env->iaoq_b = regs->iaoq[1];
+-
+-        for (i = 0; i < 31; i++) {
+-            env->xregs[i] = regs->regs[i];
+-        }
+-        env->pc = regs->pc;
+-        env->xregs[31] = regs->sp;
+-#ifdef TARGET_WORDS_BIGENDIAN
+-        env->cp15.sctlr_el[1] |= SCTLR_E0E;
+-        for (i = 1; i < 4; ++i) {
+-            env->cp15.sctlr_el[i] |= SCTLR_EE;
+-        }
+-#endif
 -    }
--#elif defined(TARGET_XTENSA)
-+#if defined(TARGET_XTENSA)
+-#elif defined(TARGET_ARM)
++#if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
      {
          int i;
-         for (i = 0; i < 16; ++i) {
+         cpsr_write(env, regs->uregs[16], CPSR_USER | CPSR_EXEC,
+@@ -4772,7 +4667,7 @@ int main(int argc, char **argv, char **envp)
+     }
+ #endif
+ 
+-#if defined(TARGET_ARM) || defined(TARGET_M68K)
++#if (defined(TARGET_ARM) && !defined(TARGET_AARCH64)) || defined(TARGET_M68K)
+     ts->stack_base = info->start_stack;
+     ts->heap_base = info->brk;
+     /* This will be filled in on the first SYS_HEAPINFO call.  */
 -- 
 2.14.3
