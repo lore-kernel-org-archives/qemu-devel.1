@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f6KhB-0000S7-NY
+	(envelope-from <spopovyc@redhat.com>) id 1f6KhB-0000S6-NK
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f6Kh7-0005Na-PQ
+	(envelope-from <spopovyc@redhat.com>) id 1f6Kh7-0005NS-OR
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:42:13 -0400
 From: Serhii Popovych <spopovyc@redhat.com>
-Date: Wed, 11 Apr 2018 14:41:59 -0400
-Message-Id: <1523472120-56496-2-git-send-email-spopovyc@redhat.com>
-In-Reply-To: <1523472120-56496-1-git-send-email-spopovyc@redhat.com>
-References: <1523472120-56496-1-git-send-email-spopovyc@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.13 v3 1/2] spapr: Add ibm,
- max-associativity-domains property
+Date: Wed, 11 Apr 2018 14:41:58 -0400
+Message-Id: <1523472120-56496-1-git-send-email-spopovyc@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.13 v3 0/2] target/ppc: Support adding
+ memory to initially memory-less NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +21,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Now recent kernels (i.e. since linux-stable commit a346137e9142
-("powerpc/numa: Use ibm,max-associativity-domains to discover possible nodes")
-support this property to mark initially memory-less NUMA nodes as "possible"
-to allow further memory hot-add to them.
+Now PowerPC Linux kernel supports hot-add to NUMA nodes not populated
+initially with memory we can enable such support in qemu. This requires
+two changes:
 
-Advertise this property for pSeries machines to let guest kernels detect
-maximum supported node configuration and benefit from kernel side change
-when hot-add memory to specific, possibly empty before, NUMA node.
+  o Add device tree property "ibm,max-associativity-domains" to let
+    guest kernel chance to find max possible NUMA node
 
-Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
----
- hw/ppc/spapr.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+  o Revert  commit b556854bd852 ("spapr: Don't allow memory hotplug to
+    memory less nodes") to remove check for hot-add to memory-less node.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a81570e..c05bbad 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -910,6 +910,13 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
-         0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
-         cpu_to_be32(max_cpus / smp_threads),
-     };
-+    uint32_t maxdomains[] = {
-+        cpu_to_be32(4),
-+        cpu_to_be32(0),
-+        cpu_to_be32(0),
-+        cpu_to_be32(0),
-+        cpu_to_be32(nb_numa_nodes - 1),
-+    };
- 
-     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
- 
-@@ -946,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
-     _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
-                      refpoints, sizeof(refpoints)));
- 
-+    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-+                     maxdomains, sizeof(maxdomains)));
-+
-     _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
-                           RTAS_ERROR_LOG_MAX));
-     _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
+See description messges for individual changes for more details.
+
+v3:
+  - Make layer for max_cpus unspecified instead of setting it to zero.
+    Not adding cpu_to_be32(spapr_vcpu_id(spapr, max_cpus - 1)) because
+    at the moment we only want max number for numa nodes to enable feat.
+  - Rebase to current state of master branch.
+
+v2:
+  - Reorder patches in series according to description above.
+  - Add extra coment to revert noticing return to previous behaviour for
+    guests without support for hot-add to empty node.
+  - Drop max_cpus from topology in property due to vcpu id discontiguous
+    allocations. Thanks to David Gibson for extra explanation.
+  - Rebase to current state of master branch.
+
+Serhii Popovych (2):
+  spapr: Add ibm,max-associativity-domains property
+  Revert "spapr: Don't allow memory hotplug to memory less nodes"
+
+ hw/ppc/spapr.c | 32 ++++++++++----------------------
+ 1 file changed, 10 insertions(+), 22 deletions(-)
+
 -- 
 1.8.3.1
