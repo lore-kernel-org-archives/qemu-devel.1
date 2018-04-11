@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f6Hqn-0000cx-IO
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:39:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f6HrW-0001Le-D5
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f6Hqj-0003CG-PH
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:39:57 -0400
-Date: Wed, 11 Apr 2018 17:39:46 +0200
+	(envelope-from <cohuck@redhat.com>) id 1f6HrS-0003Yj-D7
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:40:42 -0400
+Date: Wed, 11 Apr 2018 17:40:32 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180411173946.6e247d54.cohuck@redhat.com>
-In-Reply-To: <20180411152942.GA4480@flamenco>
+Message-ID: <20180411174032.6582481b.cohuck@redhat.com>
+In-Reply-To: <1523377186-32578-10-git-send-email-cota@braap.org>
 References: <1523377186-32578-1-git-send-email-cota@braap.org>
-	<e863cce3-d06e-f225-eb25-212729c5f05f@linaro.org>
-	<20180411152942.GA4480@flamenco>
+	<1523377186-32578-10-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/10] Avoid integer overflow in
- next_page_start
+Subject: Re: [Qemu-devel] [PATCH 09/10] target/s390x: avoid integer overflow
+ in next_page PC check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +25,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Emilio G. Cota" <cota@braap.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
 
-On Wed, 11 Apr 2018 11:29:42 -0400
+On Tue, 10 Apr 2018 12:19:45 -0400
 "Emilio G. Cota" <cota@braap.org> wrote:
 
-> On Wed, Apr 11, 2018 at 10:08:58 +1000, Richard Henderson wrote:
-> > On 04/11/2018 02:19 AM, Emilio G. Cota wrote:  
-> > > Richard pointed out in another thread that when computing
-> > > next_page_start we can break checks for the last page in the
-> > > address space due to integer overflow. This affects several targets;
-> > > the appended fixes them.
-> > > 
-> > > You can fetch the patches from:
-> > >   https://github.com/cota/qemu/tree/next_page_overflow  
-> > 
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>  
+> If the PC is in the last page of the address space, next_page_start
+> overflows to 0. Fix it.
 > 
-> Thanks!
-> 
-> To ease an eventual merge I'll be updating the patches' R-b tags as
-> they come in this branch:
->   https://github.com/cota/qemu/tree/next_page_overflow-r-b
-> 
-> BTW to avoid conflicts we should merge this before the translator loop
-> conversion series; I'll make that clear when I send a new version
-> of that patch set.
-> 
-> 		Emilio
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  target/s390x/translate.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-So, this series will be merged in one go, then? I'll ack the s390x
-patch.
+Acked-by: Cornelia Huck <cohuck@redhat.com>
