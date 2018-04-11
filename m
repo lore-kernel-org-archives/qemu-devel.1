@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f6Jxo-00019w-0f
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:55:21 -0400
+	(envelope-from <darrell.leinwand@psware.com>) id 1f6KKA-0003g5-Qx
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f6Jxi-0002g5-Re
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:55:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f6Jxi-0002fP-Ik
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:55:14 -0400
-Date: Wed, 11 Apr 2018 11:55:11 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180411115511.342c75b9@w520.home>
-In-Reply-To: <20180411172014.24711-1-clg@kaod.org>
-References: <20180411172014.24711-1-clg@kaod.org>
+	(envelope-from <darrell.leinwand@psware.com>) id 1f6KK7-0008Ae-Hz
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:18:26 -0400
+Received: from mail-sn1nam02on0114.outbound.protection.outlook.com
+	([104.47.36.114]:55404
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darrell.leinwand@psware.com>)
+	id 1f6KK7-00089b-6b
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:18:23 -0400
+From: Darrell Leinwand <darrell.leinwand@psware.com>
+Date: Wed, 11 Apr 2018 18:18:18 +0000
+Message-ID: <222EDB99-2ED5-4CCB-B550-7A02BC4BDC7F@psware.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <18383B3D1A5E4742AAF601C2F3DC6FAF@namprd20.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] migration: discard RAMBlocks of type
- ram_device
+Subject: [Qemu-devel] Bad icount read when running qemu-system-ppc64 and
+ mfspr atbu guest instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,175 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David
-	Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-[cc +folks working on vfio-mdev migration]
-
-On Wed, 11 Apr 2018 19:20:14 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-
-> Here is some context for this strange change request.
->=20
-> On the POWER9 processor, the XIVE interrupt controller can control
-> interrupt sources using MMIO to trigger events, to EOI or to turn off
-> the sources. Priority management and interrupt acknowledgment is also
-> controlled by MMIO in the presenter subengine.
->=20
-> These MMIO regions are exposed to guests in QEMU with a set of 'ram
-> device' memory mappings, similarly to VFIO, and the VMAs are populated
-> dynamically with the appropriate pages using a fault handler.
->=20
-> But, these regions are an issue for migration. We need to discard the
-> associated RAMBlocks from the RAM state on the source VM and let the
-> destination VM rebuild the memory mappings on the new host in the
-> post_load() operation just before resuming the system.
->=20
-> This is the goal of the following proposal. Does it make sense ? It
-> seems to be working enough to migrate a running guest but there might
-> be a better, more subtle, approach.
-
-Yulei, is this something you've run into with GVT-g migration?  I don't
-see how we can read from or write to ram_device regions in a useful way
-during migration anyway, so the change initially looks correct to me.
-Thanks,
-
-Alex
-
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  migration/ram.c | 42 ++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 40 insertions(+), 2 deletions(-)
->=20
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 0e90efa09236..6404ccd046d8 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -780,6 +780,10 @@ unsigned long migration_bitmap_find_dirty(RAMState *=
-rs, RAMBlock *rb,
->      unsigned long *bitmap =3D rb->bmap;
->      unsigned long next;
-> =20
-> +    if (memory_region_is_ram_device(rb->mr)) {
-> +        return size;
-> +    }
-> +
->      if (rs->ram_bulk_stage && start > 0) {
->          next =3D start + 1;
->      } else {
-> @@ -826,6 +830,9 @@ uint64_t ram_pagesize_summary(void)
->      uint64_t summary =3D 0;
-> =20
->      RAMBLOCK_FOREACH(block) {
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
->          summary |=3D block->page_size;
->      }
-> =20
-> @@ -850,6 +857,9 @@ static void migration_bitmap_sync(RAMState *rs)
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
->      RAMBLOCK_FOREACH(block) {
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
->          migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
->      rcu_read_unlock();
-> @@ -1499,6 +1509,10 @@ static int ram_save_host_page(RAMState *rs, PageSe=
-archStatus *pss,
->      size_t pagesize_bits =3D
->          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
-> =20
-> +    if (memory_region_is_ram_device(pss->block->mr)) {
-> +        return 0;
-> +    }
-> +
->      do {
->          tmppages =3D ram_save_target_page(rs, pss, last_stage);
->          if (tmppages < 0) {
-> @@ -1588,6 +1602,9 @@ uint64_t ram_bytes_total(void)
-> =20
->      rcu_read_lock();
->      RAMBLOCK_FOREACH(block) {
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
->          total +=3D block->used_length;
->      }
->      rcu_read_unlock();
-> @@ -1643,6 +1660,9 @@ static void ram_save_cleanup(void *opaque)
->      memory_global_dirty_log_stop();
-> =20
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
->          g_free(block->bmap);
->          block->bmap =3D NULL;
->          g_free(block->unsentmap);
-> @@ -1710,6 +1730,9 @@ void ram_postcopy_migrated_memory_release(Migration=
-State *ms)
->          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
->          unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0);
-> =20
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
->          while (run_start < range) {
->              unsigned long run_end =3D find_next_bit(bitmap, range, run_s=
-tart + 1);
->              ram_discard_range(block->idstr, run_start << TARGET_PAGE_BIT=
-S,
-> @@ -1784,8 +1807,13 @@ static int postcopy_each_ram_send_discard(Migratio=
-nState *ms)
->      int ret;
-> =20
->      RAMBLOCK_FOREACH(block) {
-> -        PostcopyDiscardState *pds =3D
-> -            postcopy_discard_send_init(ms, block->idstr);
-> +        PostcopyDiscardState *pds;
-> +
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
-> +
-> +        pds =3D postcopy_discard_send_init(ms, block->idstr);
-> =20
->          /*
->           * Postcopy sends chunks of bitmap over the wire, but it
-> @@ -1996,6 +2024,10 @@ int ram_postcopy_send_discard_bitmap(MigrationStat=
-e *ms)
->          unsigned long *bitmap =3D block->bmap;
->          unsigned long *unsentmap =3D block->unsentmap;
-> =20
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
-> +
->          if (!unsentmap) {
->              /* We don't have a safe way to resize the sentmap, so
->               * if the bitmap was resized it will be NULL at this
-> @@ -2151,6 +2183,9 @@ static void ram_list_init_bitmaps(void)
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
->          QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +            if (memory_region_is_ram_device(block->mr)) {
-> +                continue;
-> +            }
->              pages =3D block->max_length >> TARGET_PAGE_BITS;
->              block->bmap =3D bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
-> @@ -2227,6 +2262,9 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-> =20
->      RAMBLOCK_FOREACH(block) {
-> +        if (memory_region_is_ram_device(block->mr)) {
-> +            continue;
-> +        }
->          qemu_put_byte(f, strlen(block->idstr));
->          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr)=
-);
->          qemu_put_be64(f, block->used_length);
+SGksDQoNCldoZW4gSSBlbmFibGUgaWNvdW50IHVzaW5nIGFuIGU1NTAwIGNvcmUgSSBnZXQgYW4g
+ZXhpdCB3aXRoIOKAnEJhZCBpY291bnQgcmVhZOKAnSB3aGVuIHRoZSBndWVzdCBzb2Z0d2FyZSBl
+eGVjdXRlcyBhIGxvYWQgYXRidSBjb21tYW5kLg0KDQpJdCBsb29rcyBsaWtlIGluIHFlbXUvYWNj
+ZWwvdGNnL2NwdV9leGVjLmM6MTY2IHNldHMgY2FuX2RvX2lvIGZhbHNlIHdoZW4gdXNpbmcgaWNv
+dW50Lg0KICAgIGNwdS0+Y2FuX2RvX2lvID0gIXVzZV9pY291bnQ7DQogICAgcmV0ID0gdGNnX3Fl
+bXVfdGJfZXhlYyhlbnYsIHRiX3B0cik7DQogICAgY3B1LT5jYW5fZG9faW8gPSAxOw0KDQpTaW5j
+ZSBjYW5fZG9faW8gaXMgc2V0IHRvIGZhbHNlIHRoZXJlIGFuZCB0aGUgY3B1X2dldF9pY291bnRf
+cmF3KCkgZnVuY3Rpb24gY2hlY2tzIHRoYXQgZmxhZyBxZW11L2NwdXMuYzoyNjA6DQogICAgICAg
+IGlmICghY3B1LT5jYW5fZG9faW8pIHsNCiAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiQmFk
+IGljb3VudCByZWFkXG4iKTsNCiAgICAgICAgICAgIGV4aXQoMSk7DQogICAgICAgIH0NCg0KVGhl
+IGxvYWRfYXRidSBmdW5jdGlvbiB3aWxsIGFsd2F5cyBmYWlsLiBJIGNvbW1lbnRlZCBvdXQgdGhl
+ICF1c2VfaWNvdW50IGFuZCBzZXQgaXQgdG8gYSAxIGluIGNwdV9leGVjLmMgYW5kIGl0IGNvbnRp
+bnVlcyBhbmQgc2VlbXMgdG8gcnVuIG5vcm1hbGx5LCBidXQgSSBhbSBub3Qgc3VyZSB3aGF0IHNp
+ZGUgZWZmZWN0cyB3aGlsZSBydW5uaW5nIGljb3VudCB0aGF0IGNvdWxkIGhhdmUgc2luY2UgaXQg
+bWF5IGFsbG93IGFjdHVhbCBJTyB0byBvY2N1ciB3aGlsZSB0cmFuc2xhdGlvbiBpcyBoYXBwZW5p
+bmcuDQoNCkkgaW5jbHVkZWQgdGhlIHN0YWNrIHRyYWNlIGJlbG93Og0KDQojMCAgY3B1X2dldF9p
+Y291bnRfcmF3ICgpIGF0IHFlbXUvY3B1cy5jOjI2MQ0KIzEgIDB4MDAwMDU1NTU1NTdmZGM0ZiBp
+biBjcHVfZ2V0X2ljb3VudF9sb2NrZWQgKCkgYXQgcWVtdS9jcHVzLmM6Mjc3DQojMiAgMHgwMDAw
+NTU1NTU1N2ZkYzhjIGluIGNwdV9nZXRfaWNvdW50ICgpIGF0IHFlbXUvY3B1cy5jOjI4OA0KIzMg
+IDB4MDAwMDU1NTU1NWQ0N2ExYiBpbiBxZW11X2Nsb2NrX2dldF9ucyAodHlwZT1RRU1VX0NMT0NL
+X1ZJUlRVQUwpIGF0IHFlbXUvdXRpbC9xZW11LXRpbWVyLmM6NjA4DQojNCAgMHgwMDAwNTU1NTU1
+OGE3YjYxIGluIGNwdV9wcGNfbG9hZF9hdGJ1IChlbnY9MHg1NTU1NTZjY2ZmZjApIGF0IHFlbXUv
+aHcvcHBjL3BwYy5jOjU3NA0KIzUgIDB4MDAwMDU1NTU1NTllZWMyYSBpbiBoZWxwZXJfbG9hZF9h
+dGJ1IChlbnY9MHg1NTU1NTZjY2ZmZjApIGF0IHFlbXUvdGFyZ2V0L3BwYy90aW1lYmFzZV9oZWxw
+ZXIuYzo0NQ0KIzYgIDB4MDAwMDdmZmZlYTBiYjkyYiBpbiBjb2RlX2dlbl9idWZmZXIgKCkNCiM3
+ICAweDAwMDA1NTU1NTU4M2MxZTUgaW4gY3B1X3RiX2V4ZWMgKGNwdT0weDU1NTU1NmNjN2Q0MCwg
+aXRiPTB4N2ZmZmVhMGJiODQwIDxjb2RlX2dlbl9idWZmZXIrMTQzMzgwNzA+KSBhdCBxZW11L2Fj
+Y2VsL3RjZy9jcHUtZXhlYy5jOjE2Nw0KIzggIDB4MDAwMDU1NTU1NTgzY2ZjNCBpbiBjcHVfbG9v
+cF9leGVjX3RiIChjcHU9MHg1NTU1NTZjYzdkNDAsIHRiPTB4N2ZmZmVhMGJiODQwIDxjb2RlX2dl
+bl9idWZmZXIrMTQzMzgwNzA+LCBsYXN0X3RiPTB4N2ZmZmUzNGQ4OTc4LCB0Yl9leGl0PTB4N2Zm
+ZmUzNGQ4OTcwKSBhdCBxZW11L2FjY2VsL3RjZy9jcHUtZXhlYy5jOjYyNw0KIzkgIDB4MDAwMDU1
+NTU1NTgzZDJkMyBpbiBjcHVfZXhlYyAoY3B1PTB4NTU1NTU2Y2M3ZDQwKSBhdCBxZW11L2FjY2Vs
+L3RjZy9jcHUtZXhlYy5jOjczNg0KIzEwIDB4MDAwMDU1NTU1NTdmZjZjMiBpbiB0Y2dfY3B1X2V4
+ZWMgKGNwdT0weDU1NTU1NmNjN2Q0MCkgYXQgcWVtdS9jcHVzLmM6MTI3MA0KIzExIDB4MDAwMDU1
+NTU1NTdmZjhmMSBpbiBxZW11X3RjZ19ycl9jcHVfdGhyZWFkX2ZuIChhcmc9MHg1NTU1NTZjYzdk
+NDApIGF0IHFlbXUvY3B1cy5jOjEzNjYNCiMxMiAweDAwMDA3ZmZmZjRmYWI2YmEgaW4gc3RhcnRf
+dGhyZWFkIChhcmc9MHg3ZmZmZTM0ZDk3MDApIGF0IHB0aHJlYWRfY3JlYXRlLmM6MzMzDQojMTMg
+MHgwMDAwN2ZmZmY0Y2UxNDFkIGluIGNsb25lICgpIGF0IC4uL3N5c2RlcHMvdW5peC9zeXN2L2xp
+bnV4L3g4Nl82NC9jbG9uZS5TOjEwOQ0KDQpUaGFua3MsDQpEYXJyZWxsDQoNCg0KX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18NCg0KQ09ORklERU5USUFMSVRZIE5PVElDRTogVGhlIGlu
+Zm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlzIGUtbWFpbCBhbmQgYW55IGFjY29tcGFueWluZyBk
+b2N1bWVudHMgbWF5IGNvbnRhaW4gaW5mb3JtYXRpb24gdGhhdCBpcyBjb25maWRlbnRpYWwsIHBy
+b3ByaWV0YXJ5IHRvIFBlcmZvcm1hbmNlIFNvZnR3YXJlLCBvciBvdGhlcndpc2UgcHJvdGVjdGVk
+IGZyb20gZGlzY2xvc3VyZS4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCBv
+ZiB0aGlzIG1lc3NhZ2UsIG9yIGlmIHRoaXMgbWVzc2FnZSBoYXMgYmVlbiBhZGRyZXNzZWQgdG8g
+eW91IGluIGVycm9yLCBwbGVhc2UgaW1tZWRpYXRlbHkgYWxlcnQgdGhlIHNlbmRlciBieSByZXBs
+eSBlLW1haWwgYW5kIHRoZW4gZGVsZXRlIHRoaXMgbWVzc2FnZSwgaW5jbHVkaW5nIGFueSBhdHRh
+Y2htZW50cy4gQW55IGRpc3NlbWluYXRpb24sIGRpc3RyaWJ1dGlvbiBvciBvdGhlciB1c2Ugb2Yg
+dGhlIGNvbnRlbnRzIG9mIHRoaXMgbWVzc2FnZSBieSBhbnlvbmUgb3RoZXIgdGhhbiB0aGUgaW50
+ZW5kZWQgcmVjaXBpZW50IGlzIHN0cmljdGx5IHByb2hpYml0ZWQuDQoNCg==
