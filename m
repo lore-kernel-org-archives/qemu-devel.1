@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f6JcP-0007dA-OR
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:33:14 -0400
+	(envelope-from <mst@redhat.com>) id 1f6JgZ-0001fd-PM
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f6JcL-0006Ee-8x
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:33:13 -0400
-Date: Thu, 12 Apr 2018 01:33:01 +0800 (GMT+08:00)
-From: "Su Hang" <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <20180411163940.2523-7-kwolf@redhat.com>
-References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-7-kwolf@redhat.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <mst@redhat.com>) id 1f6JgW-0000K9-M5
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:37:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35892 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f6JgW-0000JZ-F7
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:37:28 -0400
+Date: Wed, 11 Apr 2018 20:37:17 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180411200127-mutt-send-email-mst@kernel.org>
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
+	<fc66437c-ae8c-15fa-c8d3-6aa6bdb22a36@redhat.com>
+	<20180411083853.qa6y6zevjpvamrdx@debian>
 MIME-Version: 1.0
-Message-ID: <6f8b15b5.15a6a.162b5c4947d.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [PATCH 06/19] block: Avoid unnecessary aio_poll()
- in AIO_WAIT_WHILE()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180411083853.qa6y6zevjpvamrdx@debian>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
-RGVhciBLZXZpbjoKSSBub3RpY2UgY2hlY2twYXRjaC5wbCBjb21wbGFpbmVkIGFib3V0IGNvZGUg
-c3R5bGUgcHJvYmxlbXMsCnlvdSBtYXkgd2FudCB0byByZXBsYWNlIGB3aGlsZSAoYWlvX3BvbGwo
-YnMtPmFpb19jb250ZXh0LCBmYWxzZSkpO2AKd2l0aApgYGAKd2hpbGUgKGFpb19wb2xsKGJzLT5h
-aW9fY29udGV4dCwgZmFsc2UpKSB7CiAgICAvKiBObyBmdXJ0aGVyIHdvcmsgKi8KfQpgYGAKdG8g
-c3VwcHJlc3MgdGhlIGNvbXBsYWludHMuCgpCZXN0LApTdSBIYW5nCgoiS2V2aW4gV29sZiIgPGt3
-b2xmQHJlZGhhdC5jb20+d3JvdGU6Cj4gQ29tbWl0IDkxYWYwOTFmOTIzIGFkZGVkIGFuIGFkZGl0
-aW9uYWwgYWlvX3BvbGwoKSB0byBCRFJWX1BPTExfV0hJTEUoKQ0KPiBpbiBvcmRlciB0byBtYWtl
-IHN1cmUgdGhhdCBhbGwgcGVuZGluZyBCSHMgYXJlIGV4ZWN1dGVkIG9uIGRyYWluLiBUaGlzDQo+
-IHdhcyB0aGUgd3JvbmcgcGxhY2UgdG8gbWFrZSB0aGUgZml4LCBhcyBpdCBpcyB1c2VsZXNzIG92
-ZXJoZWFkIGZvciBhbGwNCj4gb3RoZXIgdXNlcnMgb2YgdGhlIG1hY3JvIGFuZCB1bm5lY2Vzc2Fy
-aWx5IGNvbXBsaWNhdGVzIHRoZSBtZWNoYW5pc20uDQo+IA0KPiBUaGlzIHBhdGNoIGVmZmVjdGl2
-ZWx5IHJldmVydHMgc2FpZCBjb21taXQgKHRoZSBjb250ZXh0IGhhcyBjaGFuZ2VkIGENCj4gYml0
-IGFuZCB0aGUgY29kZSBoYXMgbW92ZWQgdG8gQUlPX1dBSVRfV0hJTEUoKSkgYW5kIGluc3RlYWQg
-cG9sbHMgaW4gdGhlDQo+IGxvb3AgY29uZGl0aW9uIGZvciBkcmFpbi4NCj4gDQo+IFRoZSBlZmZl
-Y3QgaXMgcHJvYmFibHkgaGFyZCB0byBtZWFzdXJlIGluIGFueSByZWFsLXdvcmxkIHVzZSBjYXNl
-DQo+IGJlY2F1c2UgYWN0dWFsIEkvTyB3aWxsIGRvbWluYXRlLCBidXQgaWYgSSBydW4gb25seSB0
-aGUgaW5pdGlhbGlzYXRpb24NCj4gcGFydCBvZiAncWVtdS1pbWcgY29udmVydCcgd2hlcmUgaXQg
-Y2FsbHMgYmRydl9ibG9ja19zdGF0dXMoKSBmb3IgdGhlDQo+IHdob2xlIGltYWdlIHRvIGZpbmQg
-b3V0IGhvdyBtdWNoIGRhdGEgdGhlcmUgaXMgY29weSwgdGhpcyBwaGFzZSBhY3R1YWxseQ0KPiBu
-ZWVkcyBvbmx5IHJvdWdobHkgaGFsZiB0aGUgdGltZSBhZnRlciB0aGlzIHBhdGNoLg0KPiANCj4g
-U2lnbmVkLW9mZi1ieTogS2V2aW4gV29sZiA8a3dvbGZAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICBp
-bmNsdWRlL2Jsb2NrL2Fpby13YWl0LmggfCAyMiArKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+ICBi
-bG9jay9pby5jICAgICAgICAgICAgICAgfCAxMSArKysrKysrKysrLQ0KPiAgMiBmaWxlcyBjaGFu
-Z2VkLCAxOCBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQg
-YS9pbmNsdWRlL2Jsb2NrL2Fpby13YWl0LmggYi9pbmNsdWRlL2Jsb2NrL2Fpby13YWl0LmgNCj4g
-aW5kZXggOGM5MGEyZTY2ZS4uNzgzZDM2NzhkZCAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9j
-ay9haW8td2FpdC5oDQo+ICsrKyBiL2luY2x1ZGUvYmxvY2svYWlvLXdhaXQuaA0KPiBAQCAtNzMs
-MjkgKzczLDIzIEBAIHR5cGVkZWYgc3RydWN0IHsNCj4gICAqLw0KPiAgI2RlZmluZSBBSU9fV0FJ
-VF9XSElMRSh3YWl0LCBjdHgsIGNvbmQpICh7ICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4g
-ICAgICBib29sIHdhaXRlZF8gPSBmYWxzZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBcDQo+IC0gICAgYm9vbCBidXN5XyA9IHRydWU7ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAgICAgIEFpb1dhaXQgKndhaXRfID0gKHdh
-aXQpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gICAgICBBaW9D
-b250ZXh0ICpjdHhfID0gKGN0eCk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBcDQo+ICAgICAgaWYgKGluX2Fpb19jb250ZXh0X2hvbWVfdGhyZWFkKGN0eF8pKSB7ICAgICAg
-ICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICB3aGlsZSAoKGNvbmQpIHx8IGJ1c3lfKSB7
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gLSAgICAgICAgICAgIGJ1c3lf
-ID0gYWlvX3BvbGwoY3R4XywgKGNvbmQpKTsgICAgICAgICAgICAgICAgICAgICAgICBcDQo+IC0g
-ICAgICAgICAgICB3YWl0ZWRfIHw9ICEhKGNvbmQpIHwgYnVzeV87ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXA0KPiArICAgICAgICB3aGlsZSAoKGNvbmQpKSB7ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gKyAgICAgICAgICAgIGFpb19wb2xsKGN0eF8s
-IHRydWUpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICsgICAgICAgICAg
-ICB3YWl0ZWRfID0gdHJ1ZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XA0KPiAgICAgICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwNCj4gICAgICB9IGVsc2UgeyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICAgICAgICAgIGFzc2VydChxZW11
-X2dldF9jdXJyZW50X2Fpb19jb250ZXh0KCkgPT0gICAgICAgICAgICAgICAgICAgXA0KPiAgICAg
-ICAgICAgICAgICAgcWVtdV9nZXRfYWlvX2NvbnRleHQoKSk7ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFwNCj4gICAgICAgICAgLyogSW5jcmVtZW50IHdhaXRfLT5udW1fd2FpdGVycyBiZWZv
-cmUgZXZhbHVhdGluZyBjb25kLiAqLyBcDQo+ICAgICAgICAgIGF0b21pY19pbmMoJndhaXRfLT5u
-dW1fd2FpdGVycyk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICB3aGls
-ZSAoYnVzeV8pIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwN
-Cj4gLSAgICAgICAgICAgIGlmICgoY29uZCkpIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBcDQo+IC0gICAgICAgICAgICAgICAgd2FpdGVkXyA9IGJ1c3lfID0gdHJ1
-ZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICAgICAgICAgIGFpb19j
-b250ZXh0X3JlbGVhc2UoY3R4Xyk7ICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gLSAgICAg
-ICAgICAgICAgICBhaW9fcG9sbChxZW11X2dldF9haW9fY29udGV4dCgpLCB0cnVlKTsgICAgICAg
-ICAgICBcDQo+IC0gICAgICAgICAgICAgICAgYWlvX2NvbnRleHRfYWNxdWlyZShjdHhfKTsgICAg
-ICAgICAgICAgICAgICAgICAgICAgXA0KPiAtICAgICAgICAgICAgfSBlbHNlIHsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gLSAgICAgICAgICAgICAg
-ICBidXN5XyA9IGFpb19wb2xsKGN0eF8sIGZhbHNlKTsgICAgICAgICAgICAgICAgICAgICBcDQo+
-IC0gICAgICAgICAgICAgICAgd2FpdGVkXyB8PSBidXN5XzsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXA0KPiAtICAgICAgICAgICAgfSAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCj4gKyAgICAgICAgd2hpbGUgKChjb25kKSkg
-eyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICsgICAgICAg
-ICAgICBhaW9fY29udGV4dF9yZWxlYXNlKGN0eF8pOyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXA0KPiArICAgICAgICAgICAgYWlvX3BvbGwocWVtdV9nZXRfYWlvX2NvbnRleHQoKSwgdHJ1
-ZSk7ICAgICAgICAgICAgICAgIFwNCj4gKyAgICAgICAgICAgIGFpb19jb250ZXh0X2FjcXVpcmUo
-Y3R4Xyk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICsgICAgICAgICAgICB3YWl0
-ZWRfID0gdHJ1ZTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiAg
-ICAgICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwNCj4gICAgICAgICAgYXRvbWljX2RlYygmd2FpdF8tPm51bV93YWl0ZXJzKTsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ICAgICAgfSAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiBkaWZmIC0tZ2l0
-IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMNCj4gaW5kZXggZWE2ZjlmMDIzYS4uNmY1ODBmNDlm
-ZiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svaW8uYw0KPiArKysgYi9ibG9jay9pby5jDQo+IEBAIC0x
-ODEsMTMgKzE4MSwyMiBAQCBzdGF0aWMgdm9pZCBiZHJ2X2RyYWluX2ludm9rZShCbG9ja0RyaXZl
-clN0YXRlICpicywgYm9vbCBiZWdpbikNCj4gICAgICBCRFJWX1BPTExfV0hJTEUoYnMsICFkYXRh
-LmRvbmUpOw0KPiAgfQ0KPiAgDQo+ICsvKiBSZXR1cm5zIHRydWUgaWYgQkRSVl9QT0xMX1dISUxF
-KCkgc2hvdWxkIGdvIGludG8gYSBibG9ja2luZyBhaW9fcG9sbCgpICovDQo+ICtzdGF0aWMgYm9v
-bCBiZHJ2X2RyYWluX3BvbGwoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICt7DQo+ICsgICAgLyog
-RXhlY3V0ZSBwZW5kaW5nIEJIcyBmaXJzdCBhbmQgY2hlY2sgZXZlcnl0aGluZyBlbHNlIG9ubHkg
-YWZ0ZXIgdGhlIEJIcw0KPiArICAgICAqIGhhdmUgZXhlY3V0ZWQuICovDQo+ICsgICAgd2hpbGUg
-KGFpb19wb2xsKGJzLT5haW9fY29udGV4dCwgZmFsc2UpKTsNCj4gKyAgICByZXR1cm4gYXRvbWlj
-X3JlYWQoJmJzLT5pbl9mbGlnaHQpOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgYm9vbCBiZHJ2X2Ry
-YWluX3JlY3Vyc2UoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICB7DQo+ICAgICAgQmRydkNoaWxk
-ICpjaGlsZCwgKnRtcDsNCj4gICAgICBib29sIHdhaXRlZDsNCj4gIA0KPiAgICAgIC8qIFdhaXQg
-Zm9yIGRyYWluZWQgcmVxdWVzdHMgdG8gZmluaXNoICovDQo+IC0gICAgd2FpdGVkID0gQkRSVl9Q
-T0xMX1dISUxFKGJzLCBhdG9taWNfcmVhZCgmYnMtPmluX2ZsaWdodCkgPiAwKTsNCj4gKyAgICB3
-YWl0ZWQgPSBCRFJWX1BPTExfV0hJTEUoYnMsIGJkcnZfZHJhaW5fcG9sbChicykpOw0KPiAgDQo+
-ICAgICAgUUxJU1RfRk9SRUFDSF9TQUZFKGNoaWxkLCAmYnMtPmNoaWxkcmVuLCBuZXh0LCB0bXAp
-IHsNCj4gICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBjaGlsZC0+YnM7DQo+IC0tIA0K
-PiAyLjEzLjYNCj4gDQo=
+On Wed, Apr 11, 2018 at 04:38:53PM +0800, Tiwei Bie wrote:
+> On Wed, Apr 11, 2018 at 04:01:19PM +0800, Jason Wang wrote:
+> > On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 15:20, Tiwei Bie wrote:
+> > > This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+> > > feature for vhost-user. By default, vhost-user backend needs
+> > > to query the IOTLBs from QEMU after meeting unknown IOVAs.
+> > > With this protocol feature negotiated, QEMU will provide all
+> > > the IOTLBs to vhost-user backend without waiting for the
+> > > queries from backend. This is helpful when using a hardware
+> > > accelerator which is not able to handle unknown IOVAs at the
+> > > vhost-user backend.
+> > >=20
+> > > Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
+> > > ---
+> > > The idea of this patch is to let QEMU push all the IOTLBs
+> > > to vhost-user backend without waiting for the queries from
+> > > the backend. Because hardware accelerator at the vhost-user
+> > > backend may not be able to handle unknown IOVAs.
+> > >=20
+> > > This is just a RFC for now. It seems that, it doesn't work
+> > > as expected when guest is using kernel driver (To handle
+> > > this case, it seems that some RAM regions' events also need
+> > > to be listened). Any comments would be appreciated! Thanks!
+> >=20
+> > Interesting, a quick question is why this is needed? Can we just use =
+exist
+> > IOTLB update message?
+>=20
+> Yeah, we are still using the existing IOTLB update messages
+> to send the IOTLB messages to backend. The only difference
+> is that, QEMU won't wait for the queries before sending the
+> IOTLB update messages.
+
+So I have a concern with that, in that without any flow
+control the socket buffer used by vhost-user might become
+full.
+
+We don't currently expect that.
+
+
+Again, my understanding is that the biggest benefit from use of a
+hardware accelerator is when notifications can be passed-through to the
+guest.
+
+And since that involves VFIO, and since VFIO already needs to support
+all kinds of IOMMUs, one wonders whether one can just pass that directly
+to the VFIO instead of shipping it to vhost-user.
+
+
+> >=20
+> > It looks to me at least kernel does not need this.
+>=20
+> Something similar in kernel vhost is that, for kernel vhost,
+> QEMU needs to push the IOTLBs of some ring addrs to kernel
+> vhost backend without waiting for the queries.
+>=20
+> Best regards,
+> Tiwei Bie
+
+That's really to work around a bug in kernel, we keep this around since
+we want to support old kernels.
+
+> >=20
+> > Thanks
