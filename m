@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6KXh-00031i-4p
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:32:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1f6KYi-0003Z5-Q8
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6KXg-00007M-Ao
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:32:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1f6KYh-0000W9-Q1
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:33:28 -0400
 References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-5-kwolf@redhat.com>
+	<20180411163940.2523-6-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <acbc503f-71bd-4eaf-fa7b-8e04c9b8ccf5@redhat.com>
-Date: Wed, 11 Apr 2018 13:32:08 -0500
+Message-ID: <c9af8d25-4a6e-ec69-6b2e-129f1603e8a4@redhat.com>
+Date: Wed, 11 Apr 2018 13:33:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180411163940.2523-5-kwolf@redhat.com>
+In-Reply-To: <20180411163940.2523-6-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY"
-Subject: Re: [Qemu-devel] [PATCH 04/19] block: Don't manually poll in
- bdrv_drain_all()
+	boundary="vxZOWlyPMGYPyi7rVo0kaEIV3Kc0eBeSK"
+Subject: Re: [Qemu-devel] [PATCH 05/19] tests/test-bdrv-drain:
+ bdrv_drain_all() works in coroutines now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +29,46 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY
+--vxZOWlyPMGYPyi7rVo0kaEIV3Kc0eBeSK
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
  stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <acbc503f-71bd-4eaf-fa7b-8e04c9b8ccf5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/19] block: Don't manually poll in
- bdrv_drain_all()
+Message-ID: <c9af8d25-4a6e-ec69-6b2e-129f1603e8a4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/19] tests/test-bdrv-drain:
+ bdrv_drain_all() works in coroutines now
 References: <20180411163940.2523-1-kwolf@redhat.com>
- <20180411163940.2523-5-kwolf@redhat.com>
-In-Reply-To: <20180411163940.2523-5-kwolf@redhat.com>
+ <20180411163940.2523-6-kwolf@redhat.com>
+In-Reply-To: <20180411163940.2523-6-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 04/11/2018 11:39 AM, Kevin Wolf wrote:
-> All involved nodes are already idle, we called bdrv_do_draine_begin() o=
-n
+> Since we use bdrv_do_drained_begin/end() for bdrv_drain_all_begin/end()=
+,
+> coroutine context is automatically left with a BH, preventing the
+> deadlocks that made bdrv_drain_all*() unsafe in coroutine context. We
+> can consider it compatible now the latest, after having removed the old=
 
-s/draine/drain/
 
-> them.
+s/the latest/at last/ ?
+
+> polling code as dead code.
 >=20
-> The comment in the code suggested that this were not correct because th=
-e
-
-s/were/was/
-
-> completion of a request on one node could spawn a new request on a
-> different node (which might have been drained before, so we wouldn't
-> drain the new request). In reality, new requests to different nodes
-> aren't spawned out of nothing, but only in the context of a parent
-> request, and they aren't submitted to random nodes, but only to child
-> nodes. As long as we still poll for the completion of the parent reques=
-t
-> (which we do), draining each root node separately is good enough.
->=20
-> Remove the additional polling code from bdrv_drain_all_begin() and
-> replace it with an assertion that all nodes are already idle after we
-> drained them separately.
+> Enable the coroutine test cases for bdrv_drain_all().
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/io.c | 41 ++++++++++++-----------------------------
->  1 file changed, 12 insertions(+), 29 deletions(-)
+>  tests/test-bdrv-drain.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
 >=20
-
 --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY
+--vxZOWlyPMGYPyi7rVo0kaEIV3Kc0eBeSK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -90,14 +77,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrOVKgACgkQp6FrSiUn
-Q2qaQAf/ROkf1wV/9V+AoNa94xXepYxpnbcGbejqYFTxtn6sczvjJggBxMioyOCx
-s45qpNt30mwJoM1wmRB/tMDI5r5CyZq5O/rNRXPs7NxGZvK+SMgy/OfqFshusSy7
-M9qB2Gxc/VEUS3QNiTrr+GRUmLEL5I5IVaSbX0PyjBvyeiU+J9QnCcmnoyZMkOFC
-zdx9LbGrdjs5ynsWRKahc8qreYY4GkZExFHxnkxOQccVg82+wnZzelzt0Ucm9OiE
-qe8o1EbYoQqxMCxa7IpV2Z/stbDgVNTNmKeKPvAM/0nxg0nQsq13JVi+Ei+nq5LG
-RnGD66L8YP24c4lDOsK0GXP0Cg8QbA==
-=4pcs
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrOVO4ACgkQp6FrSiUn
+Q2rQjQgAjrvV6orLl5OB+eFEZhy5kCvWFNhXQqfwY11k1otIEyqxvFHp1ScVDSb+
+uQ2CkncPs691sT5JUwvV2Lm+8KDFsuC98tC7Kp/p+RYZAaWUr+1Uo5QI3CMa0JPI
+YD31kFGpMOZh4Mk1qklUg54GTRMoHd2d6XdpeCIqcmjnkbbGf4rlBnX/GPgUFrGG
+ci/KqayQpXIfzFMmniDI0ZLA+eZ8EfI39/IPc8E7XI7bCvyqkD5dai3wlIPQ8Oi7
+pxlvHZwnjtuOfdxq7YWvdl2PZslmVFFscFF72MUdvkeetiz6ioqA5CmBirLV3hLA
+BOBbQoNyl9G82TF6kOevz7R3Cr8b8A==
+=f0Ik
 -----END PGP SIGNATURE-----
 
---XcSH5JeFdFp2VkTTALtAfm90X3wmtQDkY--
+--vxZOWlyPMGYPyi7rVo0kaEIV3Kc0eBeSK--
