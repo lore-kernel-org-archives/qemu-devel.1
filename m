@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6FP7-0006ye-5A
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:03:17 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6FRm-0000d4-VZ
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6FP1-0006yl-QB
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:03:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63269)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f6FP1-0006y4-Di
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:03:07 -0400
-References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
-	<0a960aa8-2a3f-8667-3d46-cecf8e65e482@redhat.com>
-	<20180411073638.GA10940@ruderich.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6e51f584-b850-9881-a8e1-3dafa85a11df@redhat.com>
-Date: Wed, 11 Apr 2018 08:02:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6FRj-0000Br-Ow
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 09:05:58 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
+	<47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
+	<ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
+Message-ID: <90b289f4-d976-1fb7-57e2-aa02d00947d1@virtuozzo.com>
+Date: Wed, 11 Apr 2018 16:05:32 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180411073638.GA10940@ruderich.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fvfFSstSY5oKicD7deRErzsPGiF8CdA9n"
-Subject: Re: [Qemu-devel] [PATCH] qmp: add pmemload command
+In-Reply-To: <ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +27,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon Ruderich <simon@ruderich.org>
-Cc: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fvfFSstSY5oKicD7deRErzsPGiF8CdA9n
-From: Eric Blake <eblake@redhat.com>
-To: Simon Ruderich <simon@ruderich.org>
-Cc: qemu-devel@nongnu.org
-Message-ID: <6e51f584-b850-9881-a8e1-3dafa85a11df@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qmp: add pmemload command
-References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
- <0a960aa8-2a3f-8667-3d46-cecf8e65e482@redhat.com>
- <20180411073638.GA10940@ruderich.org>
-In-Reply-To: <20180411073638.GA10940@ruderich.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/11/2018 02:36 AM, Simon Ruderich wrote:
-> On Tue, Apr 10, 2018 at 04:33:03PM -0500, Eric Blake wrote:
->>> +void qmp_pmemload(int64_t addr, int64_t size, const char *filename,
->>> +                  Error **errp)
->>> +{
->>> +    FILE *f;
->>> +    size_t l;
->>> +    uint8_t buf[1024];
->>> +
->>> +    f =3D fopen(filename, "rb");
+11.04.2018 12:36, Vladimir Sementsov-Ogievskiy wrote:
+> 11.04.2018 12:02, Vladimir Sementsov-Ogievskiy wrote:
+>> 03.04.2018 23:13, John Snow wrote:
+>>>
+>>> On 04/03/2018 12:23 PM, Max Reitz wrote:
+>>>> On 2018-03-30 18:10, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Use MIGRATION events instead of RESUME. Also, make a TODO: enable
+>>>>> dirty-bitmaps capability for offline case.
+>>>>>
+>>>>> This (likely) fixes racy faults at least of the following types:
+>>>>>
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0 - timeout on waiting for RESUME event
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0 - sha256 mismatch on 136 (138 after this pat=
+ch)
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy=20
+>>>>> <vsementsov@virtuozzo.com>
+>>>>> ---
+>>>>>
+>>>>> This patch is a true change for the test anyway. But I don't=20
+>>>>> understand,
+>>>>> why (and do really) it fixes the things. And I'm not sure about do we
+>>>>> really have a bug in bitmap migration or persistence. So, it's up=20
+>>>>> to you,
+>>>>> take it into 2.12...
+>>>>>
+>>>>> It was already discussed, that "STOP" event is bad for tests. What=20
+>>>>> about
+>>>>> "RESUME"? How can we miss it? And sha256 mismatch is really something
+>>>>> strange.
+>>>>>
+>>>>> Max, please check, do it fix 169 for you.
+>>>>>
+>>>>> =C2=A0 tests/qemu-iotests/169 | 44=20
+>>>>> +++++++++++++++++++++++---------------------
+>>>>> =C2=A0 1 file changed, 23 insertions(+), 21 deletions(-)
+>>>> This makes the test pass (thanks!), but it still leaves behind five=20
+>>>> cats...
+>>>>
+>>>> Max
+>>>>
+>>>>
+>>> Hmm:
+>>>
+>>> jhuston=C2=A0 14772=C2=A0 0.0=C2=A0 0.0=C2=A0=C2=A0 4296=C2=A0=C2=A0 78=
+4 pts/3=C2=A0=C2=A0=C2=A0 S=C2=A0=C2=A0=C2=A0 16:12 0:00 cat
+>>> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+>>> jhuston=C2=A0 14796=C2=A0 0.0=C2=A0 0.0=C2=A0=C2=A0 4296=C2=A0=C2=A0 76=
+4 pts/3=C2=A0=C2=A0=C2=A0 S=C2=A0=C2=A0=C2=A0 16:12 0:00 cat
+>>> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+>>> jhuston=C2=A0 14940=C2=A0 0.0=C2=A0 0.0=C2=A0=C2=A0 4296=C2=A0=C2=A0 78=
+8 pts/3=C2=A0=C2=A0=C2=A0 S=C2=A0=C2=A0=C2=A0 16:12 0:00 cat
+>>> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+>>> jhuston=C2=A0 14964=C2=A0 0.0=C2=A0 0.0=C2=A0=C2=A0 4296=C2=A0=C2=A0 72=
+0 pts/3=C2=A0=C2=A0=C2=A0 S=C2=A0=C2=A0=C2=A0 16:12 0:00 cat
+>>> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+>>> jhuston=C2=A0 15052=C2=A0 0.0=C2=A0 0.0=C2=A0=C2=A0 4296=C2=A0=C2=A0 76=
+8 pts/3=C2=A0=C2=A0=C2=A0 S=C2=A0=C2=A0=C2=A0 16:12 0:00 cat
+>>> /home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/mig_file
+>>>
+>>> Why do these get left behind? Nothing to consume the data...?
 >>
->> Use qemu_fopen() here, so that you can automagically support /dev/fdse=
-t/
->> magic filenames that work on file descriptors passed via SCM_RIGHTS.
->=20
-> Hello,
->=20
-> I can't find qemu_fopen() in the source. Did you mean
-> qemu_open()?
-
-Looks like you're right; we don't have an automatic FILE wrapper.
-
-> From reading qemu_close() I guess that I can't use
-> fdopen() (as there's no qemu_fclose()) but must work with the raw
-> fd. Or is there an easy way to fdopen? (I prefer the FILE *
-> interface which is easier to work with.)
-
-You could always add qemu_fopen/qemu_fclose to match the existing
-qemu_open/qemu_close.  But you do have a point that you can't call
-qemu_close/fclose (because fclose would be left with a stale fd that
-might spuriously close something that has been opened in another thread
-during the race window), nor fclose/qemu_close.
-
-The FILE interface may sometimes be easier to work with, but it also
-comes with buffering issues that you don't have to worry about when
-using the fd interface.
-
->=20
-> But I just copied the code from qmp_pmemsave. Should I change it
-> as well to use qemu_open()?
-
-Good point - but yes, ideally it should always be possible to pass in an
-fd instead of having qemu itself open a file, because there are
-execution environments where qemu is intentionally prohibited from
-directly calling open() for security reasons (where the management app,
-such as libvirt, opens and then passes fds to qemu instead).
-
-
->>> +##
->>> +# @pmemload:
->>> +#
->>> +# Load a portion of guest physical memory from a file.
->>> +#
->>> +# @val: the physical address of the guest to start from
+>> aha, understand. it is due to last vm_b.shutdown() and vm_b.launch in=20
+>> case of should_migrate. So, at the end of the test I restart vm_b=20
+>> with -incoming parameter. But it looks like a bug anyway, If we start=20
+>> qemu with -incoming "exec", should not we kill cat process, if there=20
+>> were no migration?
 >>
->> Is 'val' really the best name for this, or would 'phys-addr' or simila=
-r
->> be a more descriptive name?
->=20
-> I copied it from pmemsave to keep the argument names consistent.
-> Should I change it only for pmemload? Changing it for pmemsave is
-> problematic as it will break the existing API.
+>
+> third type of fail, without this patch:
+>
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +ERROR: test__persistent__migbitmap__offline_shared=20
+> (__main__.TestDirtyBitmapMigration)
+> +methodcaller(name, ...) --> methodcaller object
+> +----------------------------------------------------------------------
+> +Traceback (most recent call last):
+> +=C2=A0 File "169", line 135, in do_test_migration
+> +=C2=A0=C2=A0=C2=A0 self.vm_b.launch()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qemu.py", line=20
+> 221, in launch
+> +=C2=A0=C2=A0=C2=A0 self._launch()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qemu.py", line=20
+> 244, in _launch
+> +=C2=A0=C2=A0=C2=A0 self._post_launch()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qtest.py",=20
+> line 100, in _post_launch
+> +=C2=A0=C2=A0=C2=A0 super(QEMUQtestMachine, self)._post_launch()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qemu.py", line=20
+> 196, in _post_launch
+> +=C2=A0=C2=A0=C2=A0 self._qmp.accept()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qmp/qmp.py",=20
+> line 157, in accept
+> +=C2=A0=C2=A0=C2=A0 return self.__negotiate_capabilities()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qmp/qmp.py",=20
+> line 75, in __negotiate_capabilities
+> +=C2=A0=C2=A0=C2=A0 resp =3D self.cmd('qmp_capabilities')
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qmp/qmp.py",=20
+> line 191, in cmd
+> +=C2=A0=C2=A0=C2=A0 return self.cmd_obj(qmp_cmd)
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qmp/qmp.py",=20
+> line 174, in cmd_obj
+> +=C2=A0=C2=A0=C2=A0 resp =3D self.__json_read()
+> +=C2=A0 File=20
+> "/work/src/qemu/up-169/tests/qemu-iotests/../../scripts/qmp/qmp.py",=20
+> line 82, in __json_read
+> +=C2=A0=C2=A0=C2=A0 data =3D self.__sockfile.readline()
+> +=C2=A0 File "/usr/lib64/python2.7/socket.py", line 447, in readline
+> +=C2=A0=C2=A0=C2=A0 data =3D self._sock.recv(self._rbufsize)
+> +error: [Errno 104] Connection reset by peer
+> +
+>
+>
 
-You are correct that we can't really change the existing interface; so
-documenting in the commit message that your choice of names is for
-consistency reasons may be sufficient.
+Hmm, first type? I'm now not sure about, did I really see sha256=20
+mismatch, or something like this (should be error, but found bitmap):
+
+--- /work/src/qemu/up-169/tests/qemu-iotests/169.out=C2=A0=C2=A0=C2=A0 2018=
+-04-11=20
+15:35:10.055027392 +0300
++++ /work/src/qemu/up-169/tests/qemu-iotests/169.out.bad 2018-04-11=20
+15:58:09.300450045 +0300
+@@ -1,5 +1,20 @@
+-........
++F.......
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test__not_persistent__migbitmap__offline=20
+(__main__.TestDirtyBitmapMigration)
++methodcaller(name, ...) --> methodcaller object
++----------------------------------------------------------------------
++Traceback (most recent call last):
++=C2=A0 File "169", line 136, in do_test_migration
++=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persistent else =
+False)
++=C2=A0 File "169", line 77, in check_bitmap
++=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
++=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", line 38=
+9,=20
+in assert_qmp
++=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
++=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", line 34=
+8,=20
+in dictpath
++=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s"' % (p=
+ath, str(d)))
++AssertionError: failed path traversal for "error/desc" in "{u'return':=20
+{u'sha256':=20
+u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}}"
+
+
+Max, did you really seed sha256 mismatch or only something like this?
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---fvfFSstSY5oKicD7deRErzsPGiF8CdA9n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrOB4IACgkQp6FrSiUn
-Q2p22AgAnjg+dSaHlmmUGIdIXjV5xJSZm4ekIRe6YPR2FVYOUEqo8WL4Kq9bgDET
-vq0mBKXTVfkEbTjIBpXTAemDNrOmm9wDdN8RW4s/lo4oGChHmmGuibEyNPDZo3ui
-v3FfYb5jSwPucjbeDyEyYSJd0Dt/A4+NShChdpUj0GfZNtJS705kr3gpbXnGm8mc
-ndr6hc9GcW2VQfqCK6E57BJ7rNzOfQgp3GFXde2me5BJ7N3QS++8RZ0KQjVUnlcb
-XUSyEBZ+CSgpikuFno5BoH2kQy2F7qSJMOj6L3kg7gVIb6aRivogflOpYvWikO9q
-wdBjC2SPAlqSHLpNdoJ5xEnYPRVbOw==
-=boJj
------END PGP SIGNATURE-----
-
---fvfFSstSY5oKicD7deRErzsPGiF8CdA9n--
+Best regards,
+Vladimir
