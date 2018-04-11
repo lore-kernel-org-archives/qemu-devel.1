@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwC-0006BQ-E2
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwD-0006D7-Su
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6Kw7-0007vP-QE
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6Kw8-0007vX-29
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:45 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:35 +0200
-Message-Id: <20180411185651.21351-4-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:56:48 +0200
+Message-Id: <20180411185651.21351-17-laurent@vivier.eu>
 In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 03/19] linux-user: move aarch64 cpu
- loop to aarch64 directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 16/19] linux-user: move tilegx cpu
+ loop to tilegx directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,316 +24,570 @@ To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
 No code change, only move code from main.c to
-aarch64/cpu_loop.c and duplicate some macro
-defined for both arm and aarch64.
+tilegx/cpu_loop.c.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/aarch64/cpu_loop.c | 156 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/main.c             | 109 +----------------------------
- 2 files changed, 158 insertions(+), 107 deletions(-)
+ linux-user/main.c            | 267 -------------------------------------------
+ linux-user/tilegx/cpu_loop.c | 260 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 260 insertions(+), 267 deletions(-)
 
-diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
-index b7700a5561..c97a646546 100644
---- a/linux-user/aarch64/cpu_loop.c
-+++ b/linux-user/aarch64/cpu_loop.c
-@@ -21,6 +21,162 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
- 
-+#define get_user_code_u32(x, gaddr, env)                \
-+    ({ abi_long __r = get_user_u32((x), (gaddr));       \
-+        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
-+            (x) = bswap32(x);                           \
-+        }                                               \
-+        __r;                                            \
-+    })
-+
-+#define get_user_code_u16(x, gaddr, env)                \
-+    ({ abi_long __r = get_user_u16((x), (gaddr));       \
-+        if (!__r && bswap_code(arm_sctlr_b(env))) {     \
-+            (x) = bswap16(x);                           \
-+        }                                               \
-+        __r;                                            \
-+    })
-+
-+#define get_user_data_u32(x, gaddr, env)                \
-+    ({ abi_long __r = get_user_u32((x), (gaddr));       \
-+        if (!__r && arm_cpu_bswap_data(env)) {          \
-+            (x) = bswap32(x);                           \
-+        }                                               \
-+        __r;                                            \
-+    })
-+
-+#define get_user_data_u16(x, gaddr, env)                \
-+    ({ abi_long __r = get_user_u16((x), (gaddr));       \
-+        if (!__r && arm_cpu_bswap_data(env)) {          \
-+            (x) = bswap16(x);                           \
-+        }                                               \
-+        __r;                                            \
-+    })
-+
-+#define put_user_data_u32(x, gaddr, env)                \
-+    ({ typeof(x) __x = (x);                             \
-+        if (arm_cpu_bswap_data(env)) {                  \
-+            __x = bswap32(__x);                         \
-+        }                                               \
-+        put_user_u32(__x, (gaddr));                     \
-+    })
-+
-+#define put_user_data_u16(x, gaddr, env)                \
-+    ({ typeof(x) __x = (x);                             \
-+        if (arm_cpu_bswap_data(env)) {                  \
-+            __x = bswap16(__x);                         \
-+        }                                               \
-+        put_user_u16(__x, (gaddr));                     \
-+    })
-+
-+/* AArch64 main loop */
-+void cpu_loop(CPUARMState *env)
-+{
-+    CPUState *cs = CPU(arm_env_get_cpu(env));
-+    int trapnr, sig;
-+    abi_long ret;
-+    target_siginfo_t info;
-+
-+    for (;;) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
-+
-+        switch (trapnr) {
-+        case EXCP_SWI:
-+            ret = do_syscall(env,
-+                             env->xregs[8],
-+                             env->xregs[0],
-+                             env->xregs[1],
-+                             env->xregs[2],
-+                             env->xregs[3],
-+                             env->xregs[4],
-+                             env->xregs[5],
-+                             0, 0);
-+            if (ret == -TARGET_ERESTARTSYS) {
-+                env->pc -= 4;
-+            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-+                env->xregs[0] = ret;
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
-+            break;
-+        case EXCP_UDEF:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPN;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_PREFETCH_ABORT:
-+        case EXCP_DATA_ABORT:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            /* XXX: check env->error_code */
-+            info.si_code = TARGET_SEGV_MAPERR;
-+            info._sifields._sigfault._addr = env->exception.vaddress;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_DEBUG:
-+        case EXCP_BKPT:
-+            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (sig) {
-+                info.si_signo = sig;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+        case EXCP_SEMIHOST:
-+            env->xregs[0] = do_arm_semihosting(env);
-+            break;
-+        case EXCP_YIELD:
-+            /* nothing to do here for user-mode, just resume guest code */
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            break;
-+        default:
-+            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
-+            abort();
-+        }
-+        process_pending_signals(env);
-+        /* Exception return on AArch64 always clears the exclusive monitor,
-+         * so any return to running guest code implies this.
-+         */
-+        env->exclusive_addr = -1;
-+    }
-+}
-+
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    TaskState *ts = cpu->opaque;
-+    struct image_info *info = ts->info;
-+    int i;
-+
-+    if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
-+        fprintf(stderr,
-+                "The selected ARM CPU does not support 64 bit mode\n");
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    for (i = 0; i < 31; i++) {
-+        env->xregs[i] = regs->regs[i];
-+    }
-+    env->pc = regs->pc;
-+    env->xregs[31] = regs->sp;
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    env->cp15.sctlr_el[1] |= SCTLR_E0E;
-+    for (i = 1; i < 4; ++i) {
-+        env->cp15.sctlr_el[i] |= SCTLR_EE;
-+    }
-+#endif
-+
-+    ts->stack_base = info->start_stack;
-+    ts->heap_base = info->brk;
-+    /* This will be filled in on the first SYS_HEAPINFO call.  */
-+    ts->heap_limit = 0;
- }
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 5271473d47..b4f08b226c 100644
+index 7f6cfa5548..32922110f1 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -555,89 +555,6 @@ void cpu_loop(CPUARMState *env)
-         process_pending_signals(env);
+@@ -149,262 +149,6 @@ void fork_end(int child)
      }
  }
+ 
+-#ifdef TARGET_TILEGX
 -
--#else
--
--/* AArch64 main loop */
--void cpu_loop(CPUARMState *env)
+-static void gen_sigill_reg(CPUTLGState *env)
 -{
--    CPUState *cs = CPU(arm_env_get_cpu(env));
--    int trapnr, sig;
--    abi_long ret;
 -    target_siginfo_t info;
 -
--    for (;;) {
+-    info.si_signo = TARGET_SIGILL;
+-    info.si_errno = 0;
+-    info.si_code = TARGET_ILL_PRVREG;
+-    info._sifields._sigfault._addr = env->pc;
+-    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-}
+-
+-static void do_signal(CPUTLGState *env, int signo, int sigcode)
+-{
+-    target_siginfo_t info;
+-
+-    info.si_signo = signo;
+-    info.si_errno = 0;
+-    info._sifields._sigfault._addr = env->pc;
+-
+-    if (signo == TARGET_SIGSEGV) {
+-        /* The passed in sigcode is a dummy; check for a page mapping
+-           and pass either MAPERR or ACCERR.  */
+-        target_ulong addr = env->excaddr;
+-        info._sifields._sigfault._addr = addr;
+-        if (page_check_range(addr, 1, PAGE_VALID) < 0) {
+-            sigcode = TARGET_SEGV_MAPERR;
+-        } else {
+-            sigcode = TARGET_SEGV_ACCERR;
+-        }
+-    }
+-    info.si_code = sigcode;
+-
+-    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-}
+-
+-static void gen_sigsegv_maperr(CPUTLGState *env, target_ulong addr)
+-{
+-    env->excaddr = addr;
+-    do_signal(env, TARGET_SIGSEGV, 0);
+-}
+-
+-static void set_regval(CPUTLGState *env, uint8_t reg, uint64_t val)
+-{
+-    if (unlikely(reg >= TILEGX_R_COUNT)) {
+-        switch (reg) {
+-        case TILEGX_R_SN:
+-        case TILEGX_R_ZERO:
+-            return;
+-        case TILEGX_R_IDN0:
+-        case TILEGX_R_IDN1:
+-        case TILEGX_R_UDN0:
+-        case TILEGX_R_UDN1:
+-        case TILEGX_R_UDN2:
+-        case TILEGX_R_UDN3:
+-            gen_sigill_reg(env);
+-            return;
+-        default:
+-            g_assert_not_reached();
+-        }
+-    }
+-    env->regs[reg] = val;
+-}
+-
+-/*
+- * Compare the 8-byte contents of the CmpValue SPR with the 8-byte value in
+- * memory at the address held in the first source register. If the values are
+- * not equal, then no memory operation is performed. If the values are equal,
+- * the 8-byte quantity from the second source register is written into memory
+- * at the address held in the first source register. In either case, the result
+- * of the instruction is the value read from memory. The compare and write to
+- * memory are atomic and thus can be used for synchronization purposes. This
+- * instruction only operates for addresses aligned to a 8-byte boundary.
+- * Unaligned memory access causes an Unaligned Data Reference interrupt.
+- *
+- * Functional Description (64-bit)
+- *       uint64_t memVal = memoryReadDoubleWord (rf[SrcA]);
+- *       rf[Dest] = memVal;
+- *       if (memVal == SPR[CmpValueSPR])
+- *           memoryWriteDoubleWord (rf[SrcA], rf[SrcB]);
+- *
+- * Functional Description (32-bit)
+- *       uint64_t memVal = signExtend32 (memoryReadWord (rf[SrcA]));
+- *       rf[Dest] = memVal;
+- *       if (memVal == signExtend32 (SPR[CmpValueSPR]))
+- *           memoryWriteWord (rf[SrcA], rf[SrcB]);
+- *
+- *
+- * This function also processes exch and exch4 which need not process SPR.
+- */
+-static void do_exch(CPUTLGState *env, bool quad, bool cmp)
+-{
+-    target_ulong addr;
+-    target_long val, sprval;
+-
+-    start_exclusive();
+-
+-    addr = env->atomic_srca;
+-    if (quad ? get_user_s64(val, addr) : get_user_s32(val, addr)) {
+-        goto sigsegv_maperr;
+-    }
+-
+-    if (cmp) {
+-        if (quad) {
+-            sprval = env->spregs[TILEGX_SPR_CMPEXCH];
+-        } else {
+-            sprval = sextract64(env->spregs[TILEGX_SPR_CMPEXCH], 0, 32);
+-        }
+-    }
+-
+-    if (!cmp || val == sprval) {
+-        target_long valb = env->atomic_srcb;
+-        if (quad ? put_user_u64(valb, addr) : put_user_u32(valb, addr)) {
+-            goto sigsegv_maperr;
+-        }
+-    }
+-
+-    set_regval(env, env->atomic_dstr, val);
+-    end_exclusive();
+-    return;
+-
+- sigsegv_maperr:
+-    end_exclusive();
+-    gen_sigsegv_maperr(env, addr);
+-}
+-
+-static void do_fetch(CPUTLGState *env, int trapnr, bool quad)
+-{
+-    int8_t write = 1;
+-    target_ulong addr;
+-    target_long val, valb;
+-
+-    start_exclusive();
+-
+-    addr = env->atomic_srca;
+-    valb = env->atomic_srcb;
+-    if (quad ? get_user_s64(val, addr) : get_user_s32(val, addr)) {
+-        goto sigsegv_maperr;
+-    }
+-
+-    switch (trapnr) {
+-    case TILEGX_EXCP_OPCODE_FETCHADD:
+-    case TILEGX_EXCP_OPCODE_FETCHADD4:
+-        valb += val;
+-        break;
+-    case TILEGX_EXCP_OPCODE_FETCHADDGEZ:
+-        valb += val;
+-        if (valb < 0) {
+-            write = 0;
+-        }
+-        break;
+-    case TILEGX_EXCP_OPCODE_FETCHADDGEZ4:
+-        valb += val;
+-        if ((int32_t)valb < 0) {
+-            write = 0;
+-        }
+-        break;
+-    case TILEGX_EXCP_OPCODE_FETCHAND:
+-    case TILEGX_EXCP_OPCODE_FETCHAND4:
+-        valb &= val;
+-        break;
+-    case TILEGX_EXCP_OPCODE_FETCHOR:
+-    case TILEGX_EXCP_OPCODE_FETCHOR4:
+-        valb |= val;
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
+-
+-    if (write) {
+-        if (quad ? put_user_u64(valb, addr) : put_user_u32(valb, addr)) {
+-            goto sigsegv_maperr;
+-        }
+-    }
+-
+-    set_regval(env, env->atomic_dstr, val);
+-    end_exclusive();
+-    return;
+-
+- sigsegv_maperr:
+-    end_exclusive();
+-    gen_sigsegv_maperr(env, addr);
+-}
+-
+-void cpu_loop(CPUTLGState *env)
+-{
+-    CPUState *cs = CPU(tilegx_env_get_cpu(env));
+-    int trapnr;
+-
+-    while (1) {
 -        cpu_exec_start(cs);
 -        trapnr = cpu_exec(cs);
 -        cpu_exec_end(cs);
 -        process_queued_cpu_work(cs);
 -
 -        switch (trapnr) {
--        case EXCP_SWI:
--            ret = do_syscall(env,
--                             env->xregs[8],
--                             env->xregs[0],
--                             env->xregs[1],
--                             env->xregs[2],
--                             env->xregs[3],
--                             env->xregs[4],
--                             env->xregs[5],
--                             0, 0);
+-        case TILEGX_EXCP_SYSCALL:
+-        {
+-            abi_ulong ret = do_syscall(env, env->regs[TILEGX_R_NR],
+-                                       env->regs[0], env->regs[1],
+-                                       env->regs[2], env->regs[3],
+-                                       env->regs[4], env->regs[5],
+-                                       env->regs[6], env->regs[7]);
 -            if (ret == -TARGET_ERESTARTSYS) {
--                env->pc -= 4;
+-                env->pc -= 8;
 -            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
--                env->xregs[0] = ret;
+-                env->regs[TILEGX_R_RE] = ret;
+-                env->regs[TILEGX_R_ERR] = TILEGX_IS_ERRNO(ret) ? -ret : 0;
 -            }
 -            break;
--        case EXCP_INTERRUPT:
--            /* just indicate that signals should be handled asap */
+-        }
+-        case TILEGX_EXCP_OPCODE_EXCH:
+-            do_exch(env, true, false);
 -            break;
--        case EXCP_UDEF:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPN;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-        case TILEGX_EXCP_OPCODE_EXCH4:
+-            do_exch(env, false, false);
 -            break;
--        case EXCP_PREFETCH_ABORT:
--        case EXCP_DATA_ABORT:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            /* XXX: check env->error_code */
--            info.si_code = TARGET_SEGV_MAPERR;
--            info._sifields._sigfault._addr = env->exception.vaddress;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-        case TILEGX_EXCP_OPCODE_CMPEXCH:
+-            do_exch(env, true, true);
 -            break;
--        case EXCP_DEBUG:
--        case EXCP_BKPT:
--            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (sig) {
--                info.si_signo = sig;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
+-        case TILEGX_EXCP_OPCODE_CMPEXCH4:
+-            do_exch(env, false, true);
 -            break;
--        case EXCP_SEMIHOST:
--            env->xregs[0] = do_arm_semihosting(env);
+-        case TILEGX_EXCP_OPCODE_FETCHADD:
+-        case TILEGX_EXCP_OPCODE_FETCHADDGEZ:
+-        case TILEGX_EXCP_OPCODE_FETCHAND:
+-        case TILEGX_EXCP_OPCODE_FETCHOR:
+-            do_fetch(env, trapnr, true);
 -            break;
--        case EXCP_YIELD:
--            /* nothing to do here for user-mode, just resume guest code */
+-        case TILEGX_EXCP_OPCODE_FETCHADD4:
+-        case TILEGX_EXCP_OPCODE_FETCHADDGEZ4:
+-        case TILEGX_EXCP_OPCODE_FETCHAND4:
+-        case TILEGX_EXCP_OPCODE_FETCHOR4:
+-            do_fetch(env, trapnr, false);
+-            break;
+-        case TILEGX_EXCP_SIGNAL:
+-            do_signal(env, env->signo, env->sigcode);
+-            break;
+-        case TILEGX_EXCP_REG_IDN_ACCESS:
+-        case TILEGX_EXCP_REG_UDN_ACCESS:
+-            gen_sigill_reg(env);
 -            break;
 -        case EXCP_ATOMIC:
 -            cpu_exec_step_atomic(cs);
 -            break;
 -        default:
--            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
--            abort();
+-            fprintf(stderr, "trapnr is %d[0x%x].\n", trapnr, trapnr);
+-            g_assert_not_reached();
 -        }
 -        process_pending_signals(env);
--        /* Exception return on AArch64 always clears the exclusive monitor,
--         * so any return to running guest code implies this.
--         */
--        env->exclusive_addr = -1;
 -    }
 -}
- #endif /* ndef TARGET_ABI32 */
+-
+-#endif
+-
+ #ifdef TARGET_RISCV
  
- #endif
-@@ -4495,29 +4412,7 @@ int main(int argc, char **argv, char **envp)
- 
-     target_cpu_copy_regs(env, regs);
- 
--#if defined(TARGET_AARCH64)
+ void cpu_loop(CPURISCVState *env)
+@@ -1583,17 +1327,6 @@ int main(int argc, char **argv, char **envp)
+         env->pc = regs->sepc;
+         env->gpr[xSP] = regs->sp;
+     }
+-#elif defined(TARGET_TILEGX)
 -    {
 -        int i;
--
--        if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
--            fprintf(stderr,
--                    "The selected ARM CPU does not support 64 bit mode\n");
--            exit(EXIT_FAILURE);
+-        for (i = 0; i < TILEGX_R_COUNT; i++) {
+-            env->regs[i] = regs->regs[i];
 -        }
--
--        for (i = 0; i < 31; i++) {
--            env->xregs[i] = regs->regs[i];
+-        for (i = 0; i < TILEGX_SPR_COUNT; i++) {
+-            env->spregs[i] = 0;
 -        }
 -        env->pc = regs->pc;
--        env->xregs[31] = regs->sp;
--#ifdef TARGET_WORDS_BIGENDIAN
--        env->cp15.sctlr_el[1] |= SCTLR_E0E;
--        for (i = 1; i < 4; ++i) {
--            env->cp15.sctlr_el[i] |= SCTLR_EE;
--        }
--#endif
 -    }
--#elif defined(TARGET_ARM)
-+#if defined(TARGET_ARM) && !defined(TARGET_AARCH64)
+ #elif defined(TARGET_HPPA)
      {
          int i;
-         cpsr_write(env, regs->uregs[16], CPSR_USER | CPSR_EXEC,
-@@ -4772,7 +4667,7 @@ int main(int argc, char **argv, char **envp)
-     }
- #endif
+diff --git a/linux-user/tilegx/cpu_loop.c b/linux-user/tilegx/cpu_loop.c
+index b7700a5561..4f39eb9ad3 100644
+--- a/linux-user/tilegx/cpu_loop.c
++++ b/linux-user/tilegx/cpu_loop.c
+@@ -21,6 +21,266 @@
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
  
--#if defined(TARGET_ARM) || defined(TARGET_M68K)
-+#if (defined(TARGET_ARM) && !defined(TARGET_AARCH64)) || defined(TARGET_M68K)
-     ts->stack_base = info->start_stack;
-     ts->heap_base = info->brk;
-     /* This will be filled in on the first SYS_HEAPINFO call.  */
++static void gen_sigill_reg(CPUTLGState *env)
++{
++    target_siginfo_t info;
++
++    info.si_signo = TARGET_SIGILL;
++    info.si_errno = 0;
++    info.si_code = TARGET_ILL_PRVREG;
++    info._sifields._sigfault._addr = env->pc;
++    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++}
++
++static void do_signal(CPUTLGState *env, int signo, int sigcode)
++{
++    target_siginfo_t info;
++
++    info.si_signo = signo;
++    info.si_errno = 0;
++    info._sifields._sigfault._addr = env->pc;
++
++    if (signo == TARGET_SIGSEGV) {
++        /* The passed in sigcode is a dummy; check for a page mapping
++           and pass either MAPERR or ACCERR.  */
++        target_ulong addr = env->excaddr;
++        info._sifields._sigfault._addr = addr;
++        if (page_check_range(addr, 1, PAGE_VALID) < 0) {
++            sigcode = TARGET_SEGV_MAPERR;
++        } else {
++            sigcode = TARGET_SEGV_ACCERR;
++        }
++    }
++    info.si_code = sigcode;
++
++    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++}
++
++static void gen_sigsegv_maperr(CPUTLGState *env, target_ulong addr)
++{
++    env->excaddr = addr;
++    do_signal(env, TARGET_SIGSEGV, 0);
++}
++
++static void set_regval(CPUTLGState *env, uint8_t reg, uint64_t val)
++{
++    if (unlikely(reg >= TILEGX_R_COUNT)) {
++        switch (reg) {
++        case TILEGX_R_SN:
++        case TILEGX_R_ZERO:
++            return;
++        case TILEGX_R_IDN0:
++        case TILEGX_R_IDN1:
++        case TILEGX_R_UDN0:
++        case TILEGX_R_UDN1:
++        case TILEGX_R_UDN2:
++        case TILEGX_R_UDN3:
++            gen_sigill_reg(env);
++            return;
++        default:
++            g_assert_not_reached();
++        }
++    }
++    env->regs[reg] = val;
++}
++
++/*
++ * Compare the 8-byte contents of the CmpValue SPR with the 8-byte value in
++ * memory at the address held in the first source register. If the values are
++ * not equal, then no memory operation is performed. If the values are equal,
++ * the 8-byte quantity from the second source register is written into memory
++ * at the address held in the first source register. In either case, the result
++ * of the instruction is the value read from memory. The compare and write to
++ * memory are atomic and thus can be used for synchronization purposes. This
++ * instruction only operates for addresses aligned to a 8-byte boundary.
++ * Unaligned memory access causes an Unaligned Data Reference interrupt.
++ *
++ * Functional Description (64-bit)
++ *       uint64_t memVal = memoryReadDoubleWord (rf[SrcA]);
++ *       rf[Dest] = memVal;
++ *       if (memVal == SPR[CmpValueSPR])
++ *           memoryWriteDoubleWord (rf[SrcA], rf[SrcB]);
++ *
++ * Functional Description (32-bit)
++ *       uint64_t memVal = signExtend32 (memoryReadWord (rf[SrcA]));
++ *       rf[Dest] = memVal;
++ *       if (memVal == signExtend32 (SPR[CmpValueSPR]))
++ *           memoryWriteWord (rf[SrcA], rf[SrcB]);
++ *
++ *
++ * This function also processes exch and exch4 which need not process SPR.
++ */
++static void do_exch(CPUTLGState *env, bool quad, bool cmp)
++{
++    target_ulong addr;
++    target_long val, sprval;
++
++    start_exclusive();
++
++    addr = env->atomic_srca;
++    if (quad ? get_user_s64(val, addr) : get_user_s32(val, addr)) {
++        goto sigsegv_maperr;
++    }
++
++    if (cmp) {
++        if (quad) {
++            sprval = env->spregs[TILEGX_SPR_CMPEXCH];
++        } else {
++            sprval = sextract64(env->spregs[TILEGX_SPR_CMPEXCH], 0, 32);
++        }
++    }
++
++    if (!cmp || val == sprval) {
++        target_long valb = env->atomic_srcb;
++        if (quad ? put_user_u64(valb, addr) : put_user_u32(valb, addr)) {
++            goto sigsegv_maperr;
++        }
++    }
++
++    set_regval(env, env->atomic_dstr, val);
++    end_exclusive();
++    return;
++
++ sigsegv_maperr:
++    end_exclusive();
++    gen_sigsegv_maperr(env, addr);
++}
++
++static void do_fetch(CPUTLGState *env, int trapnr, bool quad)
++{
++    int8_t write = 1;
++    target_ulong addr;
++    target_long val, valb;
++
++    start_exclusive();
++
++    addr = env->atomic_srca;
++    valb = env->atomic_srcb;
++    if (quad ? get_user_s64(val, addr) : get_user_s32(val, addr)) {
++        goto sigsegv_maperr;
++    }
++
++    switch (trapnr) {
++    case TILEGX_EXCP_OPCODE_FETCHADD:
++    case TILEGX_EXCP_OPCODE_FETCHADD4:
++        valb += val;
++        break;
++    case TILEGX_EXCP_OPCODE_FETCHADDGEZ:
++        valb += val;
++        if (valb < 0) {
++            write = 0;
++        }
++        break;
++    case TILEGX_EXCP_OPCODE_FETCHADDGEZ4:
++        valb += val;
++        if ((int32_t)valb < 0) {
++            write = 0;
++        }
++        break;
++    case TILEGX_EXCP_OPCODE_FETCHAND:
++    case TILEGX_EXCP_OPCODE_FETCHAND4:
++        valb &= val;
++        break;
++    case TILEGX_EXCP_OPCODE_FETCHOR:
++    case TILEGX_EXCP_OPCODE_FETCHOR4:
++        valb |= val;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    if (write) {
++        if (quad ? put_user_u64(valb, addr) : put_user_u32(valb, addr)) {
++            goto sigsegv_maperr;
++        }
++    }
++
++    set_regval(env, env->atomic_dstr, val);
++    end_exclusive();
++    return;
++
++ sigsegv_maperr:
++    end_exclusive();
++    gen_sigsegv_maperr(env, addr);
++}
++
++void cpu_loop(CPUTLGState *env)
++{
++    CPUState *cs = CPU(tilegx_env_get_cpu(env));
++    int trapnr;
++
++    while (1) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++        process_queued_cpu_work(cs);
++
++        switch (trapnr) {
++        case TILEGX_EXCP_SYSCALL:
++        {
++            abi_ulong ret = do_syscall(env, env->regs[TILEGX_R_NR],
++                                       env->regs[0], env->regs[1],
++                                       env->regs[2], env->regs[3],
++                                       env->regs[4], env->regs[5],
++                                       env->regs[6], env->regs[7]);
++            if (ret == -TARGET_ERESTARTSYS) {
++                env->pc -= 8;
++            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
++                env->regs[TILEGX_R_RE] = ret;
++                env->regs[TILEGX_R_ERR] = TILEGX_IS_ERRNO(ret) ? -ret : 0;
++            }
++            break;
++        }
++        case TILEGX_EXCP_OPCODE_EXCH:
++            do_exch(env, true, false);
++            break;
++        case TILEGX_EXCP_OPCODE_EXCH4:
++            do_exch(env, false, false);
++            break;
++        case TILEGX_EXCP_OPCODE_CMPEXCH:
++            do_exch(env, true, true);
++            break;
++        case TILEGX_EXCP_OPCODE_CMPEXCH4:
++            do_exch(env, false, true);
++            break;
++        case TILEGX_EXCP_OPCODE_FETCHADD:
++        case TILEGX_EXCP_OPCODE_FETCHADDGEZ:
++        case TILEGX_EXCP_OPCODE_FETCHAND:
++        case TILEGX_EXCP_OPCODE_FETCHOR:
++            do_fetch(env, trapnr, true);
++            break;
++        case TILEGX_EXCP_OPCODE_FETCHADD4:
++        case TILEGX_EXCP_OPCODE_FETCHADDGEZ4:
++        case TILEGX_EXCP_OPCODE_FETCHAND4:
++        case TILEGX_EXCP_OPCODE_FETCHOR4:
++            do_fetch(env, trapnr, false);
++            break;
++        case TILEGX_EXCP_SIGNAL:
++            do_signal(env, env->signo, env->sigcode);
++            break;
++        case TILEGX_EXCP_REG_IDN_ACCESS:
++        case TILEGX_EXCP_REG_UDN_ACCESS:
++            gen_sigill_reg(env);
++            break;
++        case EXCP_ATOMIC:
++            cpu_exec_step_atomic(cs);
++            break;
++        default:
++            fprintf(stderr, "trapnr is %d[0x%x].\n", trapnr, trapnr);
++            g_assert_not_reached();
++        }
++        process_pending_signals(env);
++    }
++}
++
+ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ {
++    int i;
++    for (i = 0; i < TILEGX_R_COUNT; i++) {
++        env->regs[i] = regs->regs[i];
++    }
++    for (i = 0; i < TILEGX_SPR_COUNT; i++) {
++        env->spregs[i] = 0;
++    }
++    env->pc = regs->pc;
+ }
 -- 
 2.14.3
