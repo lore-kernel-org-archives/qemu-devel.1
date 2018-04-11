@@ -1,35 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6CUi-0007oB-4J
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:56:49 -0400
+	(envelope-from <jdenemar@redhat.com>) id 1f6CZL-0001W5-Ma
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:01:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6CUe-0005dv-Vu
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:56:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41906)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6CUe-0005bT-FL
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 05:56:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6CUS-0003Bf-Io
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 09:56:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 638ED2E81AA
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 09:56:12 +0000 (UTC)
+	(envelope-from <jdenemar@redhat.com>) id 1f6CZH-00087D-2u
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:01:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48166 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1f6CZG-00086i-Ub
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 06:01:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3EFDE40006E6
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 10:01:26 +0000 (UTC)
+Date: Wed, 11 Apr 2018 12:01:16 +0200
+From: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20180411100116.GA130486@orkuz.home>
+References: <20180409102744.GC2449@work-vm>
+	<20180409134003.GG5294@localhost.localdomain>
+	<20180410073635.GA91107@orkuz.home>
+	<20180410081848.GA7026@localhost.localdomain>
+	<20180410084524.GB2559@work-vm>
+	<20180410091437.GC7026@localhost.localdomain>
+	<20180410104047.GD2559@work-vm>
+	<20180410122652.GD7026@localhost.localdomain>
+	<20180410142253.GG2559@work-vm>
+	<20180410144756.GG7026@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Apr 2018 09:42:49 -0000
-From: =?utf-8?b?Q2lybyBTYW50aWxsaSDlha3lm5vkuovku7Yg5rOV6L2u5Yqf?=
-	<ciro.santilli@gmail.com>
-Reply-To: Bug 1762179 <1762179@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152319497960.30219.9338727401860906105.malonedeb@gac.canonical.com>
-Message-Id: <152343976992.20451.7473218498159565196.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1762179] Re: Record and replay replay fails with:
- "ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180410144756.GG7026@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] migration: Don't activate block devices if
+ using -S
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,142 +42,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, peterx@redhat.com
 
-** Description changed:
+On Tue, Apr 10, 2018 at 16:47:56 +0200, Kevin Wolf wrote:
+> Am 10.04.2018 um 16:22 hat Dr. David Alan Gilbert geschrieben:
+> > * Kevin Wolf (kwolf@redhat.com) wrote:
+> > > Am 10.04.2018 um 12:40 hat Dr. David Alan Gilbert geschrieben:
+> > > > Hmm; having chatted to Jiri I'm OK with reverting it, on the condition
+> > > > that I actually understand how this alternative would work first.
+> > > > 
+> > > > I can't currently see how a block-inactivate would be used.
+> > > > I also can't see how a block-activate unless it's also with the
+> > > > change that you're asking to revert.
+> > > > 
+> > > > Can you explain the way you see it working?
+> > > 
+> > > The key is making the delayed activation of block devices (and probably
+> > > delayed announcement of NICs? - you didn't answer that part) optional
+> > > instead of making it the default.
+> > 
+> > NIC announcments are broken in similar but slightly different ways;  we
+> > did have a series on list to help a while ago but it never got merged;
+> > I'd like to keep that mess separate.
+> 
+> Okay. I just thought that it would make sense to have clear migration
+> phases that are the same for all external resources that the QEMU
+> processes use.
 
-  QEMU master at 915d34c5f99b0ab91517c69f54272bfdb6ca2b32 Ubuntu 17.10
-  host.
-  =
+I don't think NIC announcements should be delayed in this specific case
+since we're dealing with a failure recovery which should be rare in
+comparison to successful migration when we want NIC announcements to be
+send early. In other words, any NIC issues should be solved separately
+and Laine would likely be a better person for discussing them since he
+has a broader knowledge of all the fancy network stuff which libvirt
+needs to coordinate with.
 
-  QEMU commands:
-  =
-
-  ```
-  #!/usr/bin/env bash
-  cmd=3D"\
-  time \
-  ./x86_64-softmmu/qemu-system-x86_64 \
-  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
-val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
-  -kernel 'out/x86_64/buildroot/images/bzImage' \
-  -nographic \
-  \
-  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
-=3Dimg-direct,format=3Dqcow2 \
-  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
- \
-  -device ide-hd,drive=3Dimg-blkreplay \
-  \
-  -netdev user,id=3Dnet1 \
-  -device rtl8139,netdev=3Dnet1 \
-  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
-  "
-  echo "$cmd"
-  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
-  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
-  ```
-  =
-
-  This tries to stay as close as possible to the documented commands:
-  https://github.com/qemu/qemu/blob/08e173f29461396575c85510eb41474b993cb1f=
-b/docs/replay.txt#L28
-  =
-
-  Images uploaded to: https://github.com/cirosantilli/linux-kernel-module-
-  cheat/releases/download/test-replay-arm/images4.zip
-  =
-
-  Images generated with: https://github.com/cirosantilli/linux-kernel-
-  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
-  =
-
-  The replay failed straight out with:
-  =
-
-  ```
-  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
-y_file && replay_mutex_locked())
-  ```
-  =
-
-  QEMU configure:
-  =
-
-  ```
-- ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
-=3D"x86_64-softmmu"
-+ ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
-=3Dx86_64-softmmu
-  ```
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1762179
-
-Title:
-  Record and replay replay fails with: "ERROR:replay/replay-
-  time.c:49:replay_read_clock: assertion failed"
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU master at 915d34c5f99b0ab91517c69f54272bfdb6ca2b32 Ubuntu 17.10
-  host.
-
-  QEMU commands:
-
-  ```
-  #!/usr/bin/env bash
-  cmd=3D"\
-  time \
-  ./x86_64-softmmu/qemu-system-x86_64 \
-  -append 'root=3D/dev/sda console=3DttyS0 nokaslr printk.time=3Dy - lkmc_e=
-val=3D\"/rand_check.out;/sbin/ifup -a;wget -S google.com;/poweroff.out;\"' \
-  -kernel 'out/x86_64/buildroot/images/bzImage' \
-  -nographic \
-  \
-  -drive file=3Dout/x86_64/buildroot/images/rootfs.ext2.qcow2,if=3Dnone,id=
-=3Dimg-direct,format=3Dqcow2 \
-  -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay=
- \
-  -device ide-hd,drive=3Dimg-blkreplay \
-  \
-  -netdev user,id=3Dnet1 \
-  -device rtl8139,netdev=3Dnet1 \
-  -object filter-replay,id=3Dreplay,netdev=3Dnet1 \
-  "
-  echo "$cmd"
-  eval "$cmd -icount 'shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin'"
-  eval "$cmd -icount 'shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin'"
-  ```
-
-  This tries to stay as close as possible to the documented commands:
-  https://github.com/qemu/qemu/blob/08e173f29461396575c85510eb41474b993cb1f=
-b/docs/replay.txt#L28
-
-  Images uploaded to: https://github.com/cirosantilli/linux-kernel-
-  module-cheat/releases/download/test-replay-arm/images4.zip
-
-  Images generated with: https://github.com/cirosantilli/linux-kernel-
-  module-cheat/tree/9513c162ef57e6cb70006dfe870856f94ee9a133
-
-  The replay failed straight out with:
-
-  ```
-  ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repla=
-y_file && replay_mutex_locked())
-  ```
-
-  QEMU configure:
-
-  ```
-  ./configure --enable-debug --enable-trace-backends=3Dsimple --target-list=
-=3Dx86_64-softmmu
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1762179/+subscriptions
+Jirka
