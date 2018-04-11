@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f62le-0000GF-IV
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:33:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f63I5-00061s-AU
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f62ld-0007N7-IT
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:33:38 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38971)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f62ld-0007MD-BU
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 19:33:37 -0400
-Received: by mail-pf0-x241.google.com with SMTP id c78so9535093pfj.6
-	for <qemu-devel@nongnu.org>; Tue, 10 Apr 2018 16:33:37 -0700 (PDT)
-References: <1523038800-2494-1-git-send-email-cota@braap.org>
-	<cbad2760-7a64-7602-5734-eea0747c620f@mail.uni-paderborn.de>
-	<20180409161101.GB18168@flamenco>
-	<565df28d-2f24-1065-c00a-4cceaf5428b4@linaro.org>
-	<20180410130318.GB22304@flamenco>
-	<17f92de0-f659-7770-8d78-92535cadb232@mail.uni-paderborn.de>
-	<20180410134004.GC22304@flamenco>
-	<09bfd09a-ae09-5f2e-6159-eb2c269c5f0d@mail.uni-paderborn.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3fb5bff5-128d-91d0-b0ab-2e22b03d51ad@linaro.org>
-Date: Wed, 11 Apr 2018 09:33:22 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1f63Hg-0000Jm-BK
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 20:07:09 -0400
+Date: Wed, 11 Apr 2018 10:03:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180411000348.GL3361@umbus.fritz.box>
+References: <1523383946-37373-1-git-send-email-spopovyc@redhat.com>
+	<1523383946-37373-2-git-send-email-spopovyc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <09bfd09a-ae09-5f2e-6159-eb2c269c5f0d@mail.uni-paderborn.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] Translation loop conversion for
- sh4/sparc/mips/s390x/openrisc/riscv targets
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dpynvXbW/eW9Tpc3"
+Content-Disposition: inline
+In-Reply-To: <1523383946-37373-2-git-send-email-spopovyc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 1/2] spapr: Add ibm,
+ max-associativity-domains property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,44 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
-
-On 04/10/2018 11:45 PM, Bastian Koppelmann wrote:
-> On 04/10/2018 03:40 PM, Emilio G. Cota wrote:
->> On Tue, Apr 10, 2018 at 15:16:19 +0200, Bastian Koppelmann wrote:
->>> On 04/10/2018 03:03 PM, Emilio G. Cota wrote:
->>>> On Tue, Apr 10, 2018 at 14:24:23 +1000, Richard Henderson wrote:
->>>>> On 04/10/2018 02:11 AM, Emilio G. Cota wrote:
->>>>>> On Mon, Apr 09, 2018 at 16:01:36 +0200, Bastian Koppelmann wrote:
->>>>>>> Thanks for doing this grunt work. Me and a colleague were planning to do
->>>>>>> this as well after converting the RISC-V frontend to decodetree. Do you
->>>>>>> have any plans to do this for the TriCore frontend as well? I have the
->>>>>>> same plan for Tricore: Convert it to decodetree, then to translation loop.
->>>>>>
->>>>>> I won't do any further conversions in the near future, so please go
->>>>>> ahead with your plans :-)
->>>>>
->>>>> In which case I won't review Emilio's final two patches for risc-v.
->>>
->>> I'm confused as well :). I don't understand why Richard is not reviewing
->>> the last two patch. Maybe you can clarify as well, Richard.
->>
->> I think he understood you already had patches (not yet on-list) to do the
->> trloop conversion for riscv, and therefore my patches should be discarded.
-> 
-> No, I don't have patches.
-
-Ah, right.  Misunderstanding on my part.
-I'll get back to the risc-v patches soon.
-
->> Note that the first patch in this series does change the TranslatorOps
->> interface, that's why I think the whole series should go
->> through the same tree (Richard's TCG tree, I presume).
-> 
-> Works for me.
-
-That's fine with me too.
+To: Serhii Popovych <spopovyc@redhat.com>
+Cc: qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
 
-r~
+--dpynvXbW/eW9Tpc3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 10, 2018 at 02:12:25PM -0400, Serhii Popovych wrote:
+> Now recent kernels (i.e. since linux-stable commit a346137e9142
+> ("powerpc/numa: Use ibm,max-associativity-domains to discover possible no=
+des")
+> support this property to mark initially memory-less NUMA nodes as "possib=
+le"
+> to allow further memory hot-add to them.
+>=20
+> Advertise this property for pSeries machines to let guest kernels detect
+> maximum supported node configuration and benefit from kernel side change
+> when hot-add memory to specific, possibly empty before, NUMA node.
+>=20
+> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+> ---
+>  hw/ppc/spapr.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2c0be8c..3f61785 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -909,6 +909,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, =
+void *fdt)
+>          0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
+>          cpu_to_be32(max_cpus / smp_threads),
+>      };
+> +    uint32_t maxdomains[] =3D {
+> +        cpu_to_be32(5),
+> +        cpu_to_be32(0),
+> +        cpu_to_be32(0),
+> +        cpu_to_be32(0),
+> +        cpu_to_be32(nb_numa_nodes - 1),
+> +        cpu_to_be32(0),
+> +    };
+
+Ah.. close, but not quite right.  This is saying that there's exactly
+one node at the bottom (cpu) level, which isn't what we want.  Instead
+of setting it to 0, we want to completely drop that layer, keeping it
+unspecified.
+
+To do that you need to change the first cell from 5 to 4 (since only 4
+levels will be listed) and drop the last cell entirely.
+
+>      _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
+> =20
+> @@ -945,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, v=
+oid *fdt)
+>      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+>                       refpoints, sizeof(refpoints)));
+> =20
+> +    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
+> +                     maxdomains, sizeof(maxdomains)));
+> +
+>      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
+>                            RTAS_ERROR_LOG_MAX));
+>      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--dpynvXbW/eW9Tpc3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrNUOEACgkQbDjKyiDZ
+s5I4qhAAojYEg6b/AeazRfE7r9W0ONLZtVSDfJspV35j85lFERYPQOufeTCnFNJ0
+UZeB3r4h7ky7RtlRgZe6qJZiK416rPYBzJ2l+ZP03ZIJzir9evjuJyk00SFGI6x2
+8eC41EwZCuMsflct4pGt8/TpIQUjk/lR6LSCwN9hMzkXEFlmM6GUILMEMI5A42Qr
+zHzT1LiWJA7b5js7UlbMELNS1XD+ycFNUXOBziuA0d2yeF6ZqMT/QqQAdPp0uPHq
+zbspAofPLcsG0VpDHrxJu6G/ay0lg7VPRCvipzYIMBob5BpH4tagBic8HFDLcIoF
+uiBBKQk3PLtAJofM7rsrBx6VmIkjUtNMQEP/yFbP7CS9e8pT8RG/yJobZ5IVC0zg
+YwSlRKk9qVAh03cEM19rOaM2k1W1enAGKzRlr2B1J5YWD8smQHEbQp3JTScBjYK3
+iElOdzIXVRrqldKDbY19p4mkIlsuqn+EFTjAP+45lIqtVo6MSGMB+5m7exQJ0kaX
+kzKuytG3hf+0/7pydx7kUoqF71a+74Qu+yu8kNEI0lt1u1X35MIxYJveYDiRHlok
+bWogJXNzuqYNelBU2PRoNAkWLJj0+ayENg0sjskYTSkPd6qDdwHwuzO193fnLmK2
+SFaN/IRLiFAQRIr/kN+0mmuU0oKUepKE3Kd3z0IYsQUn7Waf+8Q=
+=/QCD
+-----END PGP SIGNATURE-----
+
+--dpynvXbW/eW9Tpc3--
