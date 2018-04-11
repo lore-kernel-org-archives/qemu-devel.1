@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f6HFh-0006Az-QP
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:01:42 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f6HOB-0001hH-Gy
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f6HFb-0004tU-VQ
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:01:37 -0400
-Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:53633)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f6HFb-0004sZ-PT
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:01:31 -0400
-Received: from player758.ha.ovh.net (unknown [10.109.108.107])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A6C8EACD0F
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 17:01:29 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 11 Apr 2018 17:01:20 +0200
-Message-ID: <152345888086.82965.6686500865958674552.stgit@bahia.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f6HO7-0002Dd-B2
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:10:23 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f6HO7-0002CF-5l
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:10:19 -0400
+Received: by mail-qk0-x242.google.com with SMTP id g7so2198957qkm.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 08:10:17 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+	<20180410193919.28026-9-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f52515e3-9159-5c3c-d4e0-e3c7a117522d@amsat.org>
+Date: Wed, 11 Apr 2018 12:10:12 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-2.13] spapr: drop useless dynamic sysbus
- device sanity check
+In-Reply-To: <20180410193919.28026-9-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 08/24] docker: Makefile.include
+ introduce DOCKER_SCRIPT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org
 
-Since commit 7da79a167aa11, the machine class init function registers
-dynamic sysbus device types it supports. Passing an unsupported device
-type on the command line causes QEMU to exit with an error message
-just after machine init.
+On 04/10/2018 04:39 PM, Alex Bennée wrote:
+> Define this in one place to make it easy to re-use.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-It is hence not needed to do the same sanity check at machine reset.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |   18 ------------------
- 1 file changed, 18 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3ffadd6ac7ce..637e50e6d10b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1440,21 +1440,6 @@ void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
-     }
- }
- 
--static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
--{
--    bool matched = false;
--
--    if (object_dynamic_cast(OBJECT(sbdev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
--        matched = true;
--    }
--
--    if (!matched) {
--        error_report("Device %s is not supported by this machine yet.",
--                     qdev_fw_name(DEVICE(sbdev)));
--        exit(1);
--    }
--}
--
- static int spapr_reset_drcs(Object *child, void *opaque)
- {
-     sPAPRDRConnector *drc =
-@@ -1478,9 +1463,6 @@ static void spapr_machine_reset(void)
-     void *fdt;
-     int rc;
- 
--    /* Check for unknown sysbus devices */
--    foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
--
-     spapr_caps_reset(spapr);
- 
-     first_ppc_cpu = POWERPC_CPU(first_cpu);
+> ---
+>  tests/docker/Makefile.include | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index de87341528..6a5aa9ec71 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -14,6 +14,8 @@ DOCKER_TESTS := $(notdir $(shell \
+>  
+>  DOCKER_TOOLS := travis
+>  
+> +DOCKER_SCRIPT=$(SRC_PATH)/tests/docker/docker.py
+> +
+>  TESTS ?= %
+>  IMAGES ?= %
+>  
+> @@ -37,7 +39,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>  		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
+>  	fi
+>  	$(call quiet-command,\
+> -		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+> +		$(DOCKER_SCRIPT) build qemu:$* $< \
+>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+>  		$(if $(NOUSER),,--add-current-user) \
+>  		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+> @@ -129,11 +131,11 @@ docker-run: docker-qemu-src
+>  	fi
+>  	$(if $(EXECUTABLE),						\
+>  		$(call quiet-command,					\
+> -			$(SRC_PATH)/tests/docker/docker.py update 	\
+> +			$(DOCKER_SCRIPT) update 			\
+>  			$(IMAGE) $(EXECUTABLE),				\
+>  			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
+>  	$(call quiet-command,						\
+> -		$(SRC_PATH)/tests/docker/docker.py run 			\
+> +		$(DOCKER_SCRIPT) run 					\
+>  			$(if $(NOUSER),,-u $(shell id -u)) 		\
+>  			--security-opt seccomp=unconfined		\
+>  			$(if $V,,--rm) 					\
+> @@ -163,4 +165,4 @@ docker-run-%:
+>  	@$(MAKE) docker-run TEST=$(CMD) IMAGE=qemu:$(IMAGE)
+>  
+>  docker-clean:
+> -	$(call quiet-command, $(SRC_PATH)/tests/docker/docker.py clean)
+> +	$(call quiet-command, $(DOCKER_SCRIPT) clean)
+> 
