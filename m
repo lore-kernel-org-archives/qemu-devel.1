@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6Hpq-0008IT-Tz
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:38:59 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f6Hqn-0000cx-IO
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6Hpm-0002h8-5H
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:38:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43076 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f6Hpm-0002gp-0q
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:38:54 -0400
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-16-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fb07e36b-5438-c635-07fd-ccf51310994b@redhat.com>
-Date: Wed, 11 Apr 2018 17:38:43 +0200
+	(envelope-from <cohuck@redhat.com>) id 1f6Hqj-0003CG-PH
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:39:57 -0400
+Date: Wed, 11 Apr 2018 17:39:46 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180411173946.6e247d54.cohuck@redhat.com>
+In-Reply-To: <20180411152942.GA4480@flamenco>
+References: <1523377186-32578-1-git-send-email-cota@braap.org>
+	<e863cce3-d06e-f225-eb25-212729c5f05f@linaro.org>
+	<20180411152942.GA4480@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-16-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 15/24] tests/tcg/i368: fix hello-i386
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/10] Avoid integer overflow in
+ next_page_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, cota@braap.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-On 10.04.2018 21:39, Alex Benn=C3=A9e wrote:
-> This is a direct syscall test so needs additional CFLAGS and LDFLAGS.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  tests/tcg/i386/Makefile.target | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.t=
-arget
-> index 1df69e0dab..44803c0382 100644
-> --- a/tests/tcg/i386/Makefile.target
-> +++ b/tests/tcg/i386/Makefile.target
-> @@ -9,6 +9,12 @@ CFLAGS+=3D$(CROSS_CC_GUEST_CFLAGS)
->  endif
->  endif
-> =20
-> +#
-> +# hello-i386 is a barebones app
-> +#
-> +hello-i386: CFLAGS+=3D-ffreestanding
-> +hello-i386: LDFLAGS+=3D-nostdlib
-> +
->  #
->  # test-386 includes a couple of additional objects that need to be lin=
-ked together
->  #
->=20
+On Wed, 11 Apr 2018 11:29:42 -0400
+"Emilio G. Cota" <cota@braap.org> wrote:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On Wed, Apr 11, 2018 at 10:08:58 +1000, Richard Henderson wrote:
+> > On 04/11/2018 02:19 AM, Emilio G. Cota wrote:  
+> > > Richard pointed out in another thread that when computing
+> > > next_page_start we can break checks for the last page in the
+> > > address space due to integer overflow. This affects several targets;
+> > > the appended fixes them.
+> > > 
+> > > You can fetch the patches from:
+> > >   https://github.com/cota/qemu/tree/next_page_overflow  
+> > 
+> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>  
+> 
+> Thanks!
+> 
+> To ease an eventual merge I'll be updating the patches' R-b tags as
+> they come in this branch:
+>   https://github.com/cota/qemu/tree/next_page_overflow-r-b
+> 
+> BTW to avoid conflicts we should merge this before the translator loop
+> conversion series; I'll make that clear when I send a new version
+> of that patch set.
+> 
+> 		Emilio
+
+So, this series will be merged in one go, then? I'll ack the s390x
+patch.
