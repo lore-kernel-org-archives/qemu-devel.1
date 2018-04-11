@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1f69JB-0005Ph-Iu
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 02:32:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f69nw-0008LT-Ff
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1f69J7-0001tq-FD
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 02:32:41 -0400
-Received: from ssl.serverraum.org ([213.133.101.245]:55007)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1f69J7-0001mS-5H
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 02:32:37 -0400
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 11 Apr 2018 08:32:14 +0200
-From: Michael Walle <michael@walle.cc>
-In-Reply-To: <1523377186-32578-4-git-send-email-cota@braap.org>
-References: <1523377186-32578-1-git-send-email-cota@braap.org>
-	<1523377186-32578-4-git-send-email-cota@braap.org>
-Message-ID: <7bd247fa01ebf8667685b80242650dd7@walle.cc>
-Subject: Re: [Qemu-devel] [PATCH 03/10] target/lm32: avoid integer overflow
- in next_page PC check
+	(envelope-from <dgibson@ozlabs.org>) id 1f69nv-0002xd-5p
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 03:04:28 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 11 Apr 2018 17:04:18 +1000
+Message-Id: <20180411070418.6304-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20180411070418.6304-1-david@gibson.dropbear.id.au>
+References: <20180411070418.6304-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv3 for-2.13 2/2] Add
+ host_memory_backend_pagesize() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,14 +20,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: ehabkost@redhat.com, imammedo@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Am 2018-04-10 18:19, schrieb Emilio G. Cota:
-> If the PC is in the last page of the address space, next_page_start
-> overflows to 0. Fix it.
-> 
-> Cc: Michael Walle <michael@walle.cc>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+There are a couple places (one generic, one target specific) where we need
+to get the host page size associated with a particular memory backend.  I
+have some upcoming code which will add another place which wants this.  So,
+for convenience, add a helper function to calculate this.
 
-Acked-by: Michael Walle <michael@walle.cc>
+host_memory_backend_pagesize() returns the host pagesize for a given
+HostMemoryBackend object.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ backends/hostmem.c       | 18 ++++++++++++++++++
+ exec.c                   |  5 ++---
+ include/sysemu/hostmem.h |  2 ++
+ target/ppc/kvm.c         |  6 +-----
+ 4 files changed, 23 insertions(+), 8 deletions(-)
+
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index f61093654e..6a0c474222 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -18,6 +18,7 @@
+ #include "qapi/visitor.h"
+ #include "qemu/config-file.h"
+ #include "qom/object_interfaces.h"
++#include "qemu/mmap-alloc.h"
+ 
+ #ifdef CONFIG_NUMA
+ #include <numaif.h>
+@@ -262,6 +263,23 @@ bool host_memory_backend_is_mapped(HostMemoryBackend *backend)
+     return backend->is_mapped;
+ }
+ 
++#ifdef __linux__
++size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
++{
++    Object *obj = OBJECT(memdev);
++    char *path = object_property_get_str(obj, "mem-path", NULL);
++    size_t pagesize = qemu_mempath_getpagesize(path);
++
++    g_free(path);
++    return pagesize;
++}
++#else
++size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
++{
++    return getpagesize();
++}
++#endif
++
+ static void
+ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+ {
+diff --git a/exec.c b/exec.c
+index b38b004563..c7fcefa851 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1491,9 +1491,8 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
+     long *hpsize_min = opaque;
+ 
+     if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+-        char *mem_path = object_property_get_str(obj, "mem-path", NULL);
+-        long hpsize = qemu_mempath_getpagesize(mem_path);
+-        g_free(mem_path);
++        long hpsize = host_memory_backend_pagesize(MEMORY_BACKEND(obj));
++
+         if (hpsize < *hpsize_min) {
+             *hpsize_min = hpsize;
+         }
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 47bc9846ac..bc36899bb8 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -68,4 +68,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
+ 
+ void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool mapped);
+ bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
++size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
++
+ #endif
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index e24fa50dc9..f62f7ac288 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -496,11 +496,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     Object *mem_obj = object_resolve_path(obj_path, NULL);
+-    char *mempath = object_property_get_str(mem_obj, "mem-path", NULL);
+-    long pagesize;
+-
+-    pagesize = qemu_mempath_getpagesize(mempath);
+-    g_free(mempath);
++    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
+ 
+     return pagesize >= max_cpu_page_size;
+ }
+-- 
+2.14.3
