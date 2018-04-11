@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f66Tw-0002aH-IF
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 23:31:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1f66m7-0000w1-5M
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 23:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f66Tt-0007a0-Es
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 23:31:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35524 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f66m2-0004Ex-7z
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 23:50:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52256 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f66Tt-0007Zd-92
-	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 23:31:33 -0400
-Date: Wed, 11 Apr 2018 11:31:18 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f66m1-0004DM-Pc
+	for qemu-devel@nongnu.org; Tue, 10 Apr 2018 23:50:18 -0400
+Date: Wed, 11 Apr 2018 11:49:54 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180411033117.GB13887@xz-mi>
+Message-ID: <20180411034954.GC13887@xz-mi>
 References: <20180410124913.10832-1-peterx@redhat.com>
 	<20180410124913.10832-3-peterx@redhat.com>
-	<8fe4adb8-3f4a-9f2f-59a9-ea6a5468332c@redhat.com>
+	<20180411014532.GB28698@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8fe4adb8-3f4a-9f2f-59a9-ea6a5468332c@redhat.com>
+In-Reply-To: <20180411014532.GB28698@stefanha-x1.localdomain>
 Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-thread: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,78 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Apr 10, 2018 at 08:54:31AM -0500, Eric Blake wrote:
-> On 04/10/2018 07:49 AM, Peter Xu wrote:
+On Wed, Apr 11, 2018 at 09:45:32AM +0800, Stefan Hajnoczi wrote:
+> On Tue, Apr 10, 2018 at 08:49:13PM +0800, Peter Xu wrote:
 > > cur_mon was only used in main loop so we don't really need that to be
 > > per-thread variable.  Now it's possible that we have more than one
 > > thread to operate on it.  Let's start to let it be per-thread variable.
-> > 
+> 
+> Trying to understand the reason for this patch:
+> 
+> Are there any users of per-thread cur_mon?
+
+Currently no.  But if considering future OOB-capable commands, they
+will modify cur_mon in monitor IOThread at least.
+
+> 
+> or
+> 
+> Does this patch fix a bug?
+
+No; currently we have no bug.  But we have encounter the bug when we
+start to add more OOB commands.
+
+Here is the problem (Marc-Andre reported this, and I'll try to
+summarize): after we have valid OOB commands,
+monitor_qmp_dispatch_one() can be run not only in main thread, but
+also in monitor iothread.  When that happens, both of them (main
+thread, and monitor iothread) can be modifying the cur_mon variable at
+the same time. [1]
+
+Considering that cur_mon is only used "just like" a stack variable, it
+should be perfectly fine we just make it as a per thread variable,
+hence this patch.
+
+> 
 > > In case we'll create threads within a valid cur_mon setup, we'd better
 > > let the child threads to inherit the cur_mon from parent thread too.  Do
 > > that for both posix and win32 threads.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/monitor/monitor.h   | 2 +-
-> >  include/qemu/thread-win32.h | 1 +
-> >  monitor.c                   | 2 +-
-> >  stubs/monitor.c             | 2 +-
-> >  tests/test-util-sockets.c   | 2 +-
-> >  util/qemu-thread-posix.c    | 6 ++++++
-> >  util/qemu-thread-win32.c    | 6 ++++++
-> >  7 files changed, 17 insertions(+), 4 deletions(-)
-> > 
 > 
-> > @@ -494,6 +496,9 @@ static void *qemu_thread_start(void *args)
-> >      void *(*start_routine)(void *) = qemu_thread_args->start_routine;
-> >      void *arg = qemu_thread_args->arg;
-> >  
-> > +    /* Inherit the cur_mon pointer from father thread */
+> Without actual users I don't like this.  It sounds like "let's make it
+> global just in case something needs it some day".
 > 
-> More typical as s/father/parent/
+> It's ugly for QEMU's thread API to know about the monitor - that's a
+> layering violation.
 
-Fixed.
+Yes, I'm sorry about it.  Actually I don't like it too.  But that
+seems to be an efficient and simple solution to me now.  The ideal
+solution should be totally removing cur_mon, which is non-trivial.
+
+And for sure we can try to avoid layer violation.  For example, we can
+have something like qemu_thread_register_variable(pthread_key_t), then
+monitor code can register the cur_mon pthread_key to the qemu thread
+module.  That'll somehow achieve isolation between modules but I'm not
+sure whether that would be necessary for now, hence I chose the simple.
 
 > 
-> > +++ b/util/qemu-thread-win32.c
-> 
-> > @@ -339,6 +341,9 @@ static unsigned __stdcall win32_start_routine(void *arg)
-> >      void *(*start_routine)(void *) = data->start_routine;
-> >      void *thread_arg = data->arg;
-> >  
-> > +    /* Inherit the cur_mon pointer from father thread */
-> > +    cur_mon = data->current_monitor;
-> 
-> Otherwise makes sense to me.
-> 
-> I agree with your analysis that the set of existing OOB commands (just
-> 'x-oob-test') has no direct use of cur_mon.  I'm a little fuzzier on
-> whether the OOB changes can cause cur_mon to be modified by two threads
-> in parallel (monitor_qmp_dispatch_one() is futzing around with 'cur_mon'
-> around the call to qmp_dispatch(), and at least
-> qmp_human_monitor_command() is also futzing around with it; is there a
-> case where handling qmp_human_monitor_command() in the dispatch thread
-> in parallel with more input on the main thread could break?)  Thus I'm
-> not sure whether this is needed for 2.12 to avoid a regression.
+> If there's a legitimate need I think this patch might be necessary, but
+> I don't see enough justification to do this yet.
 
-Could I ask what's the "more input on the main thread"?
-
-AFAIU, if we don't take x-oob-test into account, then still only the
-main thread will touch (not only modify, even read) the cur_mon
-variable.  And as long as that's true, we are keeping the old behavior
-as when we are without Out-Of-Band, then IMHO we'll be fine.
-
-qmp_human_monitor_command() is only one QMP command handler, now it
-can only be run within main thread.  So even we can have the stack
-like monitor_qmp_dispatch_one (which modifies cur_mon) calls
-qmp_human_monitor_command (which modifies cur_mon again), still we'll
-be fine too as long as they are in the same thread, just like before.
-
-That's why I think it's not a 2.12 regression.  We just need to be
-prepared for what might come. Thanks,
+The problem was described at [1].  Thanks,
 
 -- 
 Peter Xu
