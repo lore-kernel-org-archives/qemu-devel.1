@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KlH-00049f-R0
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:46:30 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KlU-0004ME-Dj
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KlD-0001wt-E1
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:46:27 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KlO-000227-Hd
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:46:40 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:45:36 +0200
-Message-Id: <20180411184556.17200-1-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:45:49 +0200
+Message-Id: <20180411184556.17200-14-laurent@vivier.eu>
+In-Reply-To: <20180411184556.17200-1-laurent@vivier.eu>
+References: <20180411184556.17200-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.13 v3 00/20] move arch specific parts to
- arch directories
+Subject: [Qemu-devel] [PATCH for 2.13 v3 13/20] linux-user: move riscv
+ signal.c parts to riscv directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +26,447 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-Some files like signal.c are really hard to read
-because all architectures are mixed in the same
-file.
+No code change, only move code from signal.c to
+riscv/signal.c, except adding includes and
+exporting setup_rt_frame().
 
-This series moves from signal.c these parts to
-the architecture dedicated directories in linux-user.
-Moreover, this allows to compare easier functions
-between architectures (it helps to debug problems).
-Adding new functions for a new architecture will
-be facilitated too.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/riscv/signal.c        | 200 +++++++++++++++++++++++++++++++++++++++
+ linux-user/riscv/target_signal.h |   3 +
+ linux-user/signal.c              | 197 --------------------------------------
+ 3 files changed, 203 insertions(+), 197 deletions(-)
 
-checkpatch.pl is not happy... but I only want to
-move code from a file to another. I don't want
-to change the content of the parts I move.
-
-v3:
-  - rebase and add R-b (except on PATCH 20/20]
-  - expand tabs
-  - move declarations of functions to signal-common.h
-  - fix comment in handle_pending_signal()
-  - report changes introduced by
-      5de154e82f linux-user: define TARGET_ARCH_HAS_KA_RESTORER
-      20ef667060 target/xtensa: fix flush_window_regs
-      95a29a4e3e linux-user: fix alpha signal emulation
-      7f0f4208b3 linux-user/signal.c: Ensure AArch64 signal frame isn't too small
-
-v2:
-  - only move parts from signal.c
-  - link them instead of including them
-  - one patch by architecture
-  - add a first patch to prepare the change.
-
-The first patch adds signal-common.h to define
-what is needed by the signal.c of the architectures.
-It adds a "do-nothing" signal.c in each arch
-directory and the rule needed to build them
-in Makefile.objs.
-
-Then the process is simple...
-
-for each architecture:
-  - copy the arch specific code from signal.c
-    to <arch>/signal.c
-  - add includes (including signal-common.h)
-  - export setup_rt_frame() and setup_frame()
-    (remove static in <arch>/signal.c,
-     add the declaration in <arch>/target_signal.h)
-
-When the arch has 32bit and 64bit architectures,
-it's a little bit more complicated:
-  - ppc/ppc64: nothing special to do, all is in ppc/,
-    there is no ppc64 directory,
-  - arm/aarch64: one file for arm, one file for aarch64
-  - i386/x86_64, sparc/sparc64, mips/mips64:
-    update each target_signal.h,
-    include the 32bit signal.c file into the 64bit signal.c file
-    to avoid to duplicate code (and add a guard to not include
-    the 32bit target_signal.h)
-
-Laurent Vivier (20):
-  linux-user: create a dummy per arch signal.c
-  linux-user: move aarch64 signal.c parts to aarch64 directory
-  linux-user: move arm signal.c parts to arm directory
-  linux-user: move sh4 signal.c parts to sh4 directory
-  linux-user: move microblaze signal.c parts to microblaze directory
-  linux-user: move cris signal.c parts to cris directory
-  linux-user: move nios2 signal.c parts to nios2 directory
-  linux-user: move openrisc signal.c parts to openrisc directory
-  linux-user: move s390x signal.c parts to s390x directory
-  linux-user: move m68k signal.c parts to m68k directory
-  linux-user: move alpha signal.c parts to alpha directory
-  linux-user: move tilegx signal.c parts to tilegx directory
-  linux-user: move riscv signal.c parts to riscv directory
-  linux-user: move hppa signal.c parts to hppa directory
-  linux-user: move xtensa signal.c parts to xtensa directory
-  linux-user: move i386/x86_64 signal.c parts to i386 directory
-  linux-user: move sparc/sparc64 signal.c parts to sparc directory
-  linux-user: move mips/mips64 signal.c parts to mips directory
-  linux-user: move ppc/ppc64 signal.c parts to ppc directory
-  linux-user: define TARGET_ARCH_HAS_SETUP_FRAME
-
- linux-user/Makefile.objs              |    2 +-
- linux-user/aarch64/signal.c           |  585 +++
- linux-user/aarch64/target_signal.h    |    1 +
- linux-user/alpha/signal.c             |  280 ++
- linux-user/alpha/target_signal.h      |    1 +
- linux-user/arm/signal.c               |  772 ++++
- linux-user/arm/target_signal.h        |    2 +-
- linux-user/cris/signal.c              |  189 +
- linux-user/cris/target_signal.h       |    2 +-
- linux-user/hppa/signal.c              |  210 ++
- linux-user/hppa/target_signal.h       |    1 -
- linux-user/i386/signal.c              |  602 +++
- linux-user/i386/target_signal.h       |    1 +
- linux-user/m68k/signal.c              |  428 +++
- linux-user/m68k/target_signal.h       |    2 +-
- linux-user/microblaze/signal.c        |  248 ++
- linux-user/microblaze/target_signal.h |    2 +-
- linux-user/mips/signal.c              |  400 ++
- linux-user/mips/target_signal.h       |    5 +-
- linux-user/mips64/signal.c            |   20 +
- linux-user/mips64/target_signal.h     |    2 -
- linux-user/nios2/signal.c             |  254 ++
- linux-user/nios2/target_signal.h      |    1 -
- linux-user/openrisc/signal.c          |  231 ++
- linux-user/openrisc/target_signal.h   |    2 -
- linux-user/ppc/signal.c               |  689 ++++
- linux-user/ppc/target_signal.h        |    4 +-
- linux-user/riscv/signal.c             |  218 ++
- linux-user/riscv/target_signal.h      |    1 -
- linux-user/s390x/signal.c             |  327 ++
- linux-user/s390x/target_signal.h      |    2 +-
- linux-user/sh4/signal.c               |  350 ++
- linux-user/sh4/target_signal.h        |    2 +-
- linux-user/signal-common.h            |   57 +
- linux-user/signal.c                   | 6651 +--------------------------------
- linux-user/sparc/signal.c             |  624 ++++
- linux-user/sparc/target_signal.h      |    2 +-
- linux-user/sparc64/signal.c           |   20 +
- linux-user/sparc64/target_signal.h    |    2 +-
- linux-user/tilegx/signal.c            |  186 +
- linux-user/tilegx/target_signal.h     |    2 -
- linux-user/x86_64/signal.c            |   20 +
- linux-user/x86_64/target_signal.h     |    1 -
- linux-user/xtensa/signal.c            |  268 ++
- linux-user/xtensa/target_signal.h     |    1 -
- 45 files changed, 7070 insertions(+), 6600 deletions(-)
- create mode 100644 linux-user/aarch64/signal.c
- create mode 100644 linux-user/alpha/signal.c
- create mode 100644 linux-user/arm/signal.c
- create mode 100644 linux-user/cris/signal.c
- create mode 100644 linux-user/hppa/signal.c
- create mode 100644 linux-user/i386/signal.c
- create mode 100644 linux-user/m68k/signal.c
- create mode 100644 linux-user/microblaze/signal.c
- create mode 100644 linux-user/mips/signal.c
- create mode 100644 linux-user/mips64/signal.c
- create mode 100644 linux-user/nios2/signal.c
- create mode 100644 linux-user/openrisc/signal.c
- create mode 100644 linux-user/ppc/signal.c
- create mode 100644 linux-user/riscv/signal.c
- create mode 100644 linux-user/s390x/signal.c
- create mode 100644 linux-user/sh4/signal.c
- create mode 100644 linux-user/signal-common.h
- create mode 100644 linux-user/sparc/signal.c
- create mode 100644 linux-user/sparc64/signal.c
- create mode 100644 linux-user/tilegx/signal.c
- create mode 100644 linux-user/x86_64/signal.c
- create mode 100644 linux-user/xtensa/signal.c
-
+diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
+index 02ca338b6c..718f3a5679 100644
+--- a/linux-user/riscv/signal.c
++++ b/linux-user/riscv/signal.c
+@@ -16,3 +16,203 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "target_signal.h"
++#include "signal-common.h"
++#include "linux-user/trace.h"
++
++/* Signal handler invocation must be transparent for the code being
++   interrupted. Complete CPU (hart) state is saved on entry and restored
++   before returning from the handler. Process sigmask is also saved to block
++   signals while the handler is running. The handler gets its own stack,
++   which also doubles as storage for the CPU state and sigmask.
++
++   The code below is qemu re-implementation of arch/riscv/kernel/signal.c */
++
++struct target_sigcontext {
++    abi_long pc;
++    abi_long gpr[31]; /* x0 is not present, so all offsets must be -1 */
++    uint64_t fpr[32];
++    uint32_t fcsr;
++}; /* cf. riscv-linux:arch/riscv/include/uapi/asm/ptrace.h */
++
++struct target_ucontext {
++    unsigned long uc_flags;
++    struct target_ucontext *uc_link;
++    target_stack_t uc_stack;
++    struct target_sigcontext uc_mcontext;
++    target_sigset_t uc_sigmask;
++};
++
++struct target_rt_sigframe {
++    uint32_t tramp[2]; /* not in kernel, which uses VDSO instead */
++    struct target_siginfo info;
++    struct target_ucontext uc;
++};
++
++static abi_ulong get_sigframe(struct target_sigaction *ka,
++                              CPURISCVState *regs, size_t framesize)
++{
++    abi_ulong sp = regs->gpr[xSP];
++    int onsigstack = on_sig_stack(sp);
++
++    /* redzone */
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
++    }
++
++    sp -= framesize;
++    sp &= ~3UL; /* align sp on 4-byte boundary */
++
++    /* If we are on the alternate signal stack and would overflow it, don't.
++       Return an always-bogus address instead so we will die with SIGSEGV. */
++    if (onsigstack && !likely(on_sig_stack(sp))) {
++        return -1L;
++    }
++
++    return sp;
++}
++
++static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
++{
++    int i;
++
++    __put_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; i++) {
++        __put_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; i++) {
++        __put_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr = csr_read_helper(env, CSR_FCSR); /*riscv_get_fcsr(env);*/
++    __put_user(fcsr, &sc->fcsr);
++}
++
++static void setup_ucontext(struct target_ucontext *uc,
++                           CPURISCVState *env, target_sigset_t *set)
++{
++    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
++    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
++    abi_ulong ss_size = target_sigaltstack_used.ss_size;
++
++    __put_user(0,    &(uc->uc_flags));
++    __put_user(0,    &(uc->uc_link));
++
++    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
++    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
++    __put_user(ss_size,  &(uc->uc_stack.ss_size));
++
++    int i;
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    setup_sigcontext(&uc->uc_mcontext, env);
++}
++
++static inline void install_sigtramp(uint32_t *tramp)
++{
++    __put_user(0x08b00893, tramp + 0);  /* li a7, 139 = __NR_rt_sigreturn */
++    __put_user(0x00000073, tramp + 1);  /* ecall */
++}
++
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPURISCVState *env)
++{
++    abi_ulong frame_addr;
++    struct target_rt_sigframe *frame;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto badframe;
++    }
++
++    setup_ucontext(&frame->uc, env, set);
++    tswap_siginfo(&frame->info, info);
++    install_sigtramp(frame->tramp);
++
++    env->pc = ka->_sa_handler;
++    env->gpr[xSP] = frame_addr;
++    env->gpr[xA0] = sig;
++    env->gpr[xA1] = frame_addr + offsetof(struct target_rt_sigframe, info);
++    env->gpr[xA2] = frame_addr + offsetof(struct target_rt_sigframe, uc);
++    env->gpr[xRA] = frame_addr + offsetof(struct target_rt_sigframe, tramp);
++
++    return;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 1);
++    if (sig == TARGET_SIGSEGV) {
++        ka->_sa_handler = TARGET_SIG_DFL;
++    }
++    force_sig(TARGET_SIGSEGV);
++}
++
++static void restore_sigcontext(CPURISCVState *env, struct target_sigcontext *sc)
++{
++    int i;
++
++    __get_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; ++i) {
++        __get_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; ++i) {
++        __get_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr;
++    __get_user(fcsr, &sc->fcsr);
++    csr_write_helper(env, fcsr, CSR_FCSR);
++}
++
++static void restore_ucontext(CPURISCVState *env, struct target_ucontext *uc)
++{
++    sigset_t blocked;
++    target_sigset_t target_set;
++    int i;
++
++    target_sigemptyset(&target_set);
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(target_set.sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    target_to_host_sigset_internal(&blocked, &target_set);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(env, &uc->uc_mcontext);
++}
++
++long do_rt_sigreturn(CPURISCVState *env)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++
++    frame_addr = env->gpr[xSP];
++    trace_user_do_sigreturn(env, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    restore_ucontext(env, &frame->uc);
++
++    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
++            uc.uc_stack), 0, get_sp_from_cpustate(env)) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return 0;
++}
+diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+index ce77f752e3..6ac8a88de6 100644
+--- a/linux-user/riscv/target_signal.h
++++ b/linux-user/riscv/target_signal.h
+@@ -20,4 +20,7 @@ static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
+    return state->gpr[xSP];
+ }
+ 
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPURISCVState *env);
+ #endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 5a3e5bff5e..b42fe4ff93 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -3032,203 +3032,6 @@ sigsegv:
+     return -TARGET_QEMU_ESIGRETURN;
+ }
+ 
+-#elif defined(TARGET_RISCV)
+-
+-/* Signal handler invocation must be transparent for the code being
+-   interrupted. Complete CPU (hart) state is saved on entry and restored
+-   before returning from the handler. Process sigmask is also saved to block
+-   signals while the handler is running. The handler gets its own stack,
+-   which also doubles as storage for the CPU state and sigmask.
+-
+-   The code below is qemu re-implementation of arch/riscv/kernel/signal.c */
+-
+-struct target_sigcontext {
+-    abi_long pc;
+-    abi_long gpr[31]; /* x0 is not present, so all offsets must be -1 */
+-    uint64_t fpr[32];
+-    uint32_t fcsr;
+-}; /* cf. riscv-linux:arch/riscv/include/uapi/asm/ptrace.h */
+-
+-struct target_ucontext {
+-    unsigned long uc_flags;
+-    struct target_ucontext *uc_link;
+-    target_stack_t uc_stack;
+-    struct target_sigcontext uc_mcontext;
+-    target_sigset_t uc_sigmask;
+-};
+-
+-struct target_rt_sigframe {
+-    uint32_t tramp[2]; /* not in kernel, which uses VDSO instead */
+-    struct target_siginfo info;
+-    struct target_ucontext uc;
+-};
+-
+-static abi_ulong get_sigframe(struct target_sigaction *ka,
+-                              CPURISCVState *regs, size_t framesize)
+-{
+-    abi_ulong sp = regs->gpr[xSP];
+-    int onsigstack = on_sig_stack(sp);
+-
+-    /* redzone */
+-    /* This is the X/Open sanctioned signal stack switching.  */
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-
+-    sp -= framesize;
+-    sp &= ~3UL; /* align sp on 4-byte boundary */
+-
+-    /* If we are on the alternate signal stack and would overflow it, don't.
+-       Return an always-bogus address instead so we will die with SIGSEGV. */
+-    if (onsigstack && !likely(on_sig_stack(sp))) {
+-        return -1L;
+-    }
+-
+-    return sp;
+-}
+-
+-static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
+-{
+-    int i;
+-
+-    __put_user(env->pc, &sc->pc);
+-
+-    for (i = 1; i < 32; i++) {
+-        __put_user(env->gpr[i], &sc->gpr[i - 1]);
+-    }
+-    for (i = 0; i < 32; i++) {
+-        __put_user(env->fpr[i], &sc->fpr[i]);
+-    }
+-
+-    uint32_t fcsr = csr_read_helper(env, CSR_FCSR); /*riscv_get_fcsr(env);*/
+-    __put_user(fcsr, &sc->fcsr);
+-}
+-
+-static void setup_ucontext(struct target_ucontext *uc,
+-                           CPURISCVState *env, target_sigset_t *set)
+-{
+-    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
+-    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
+-    abi_ulong ss_size = target_sigaltstack_used.ss_size;
+-
+-    __put_user(0,    &(uc->uc_flags));
+-    __put_user(0,    &(uc->uc_link));
+-
+-    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
+-    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
+-    __put_user(ss_size,  &(uc->uc_stack.ss_size));
+-
+-    int i;
+-    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __put_user(set->sig[i], &(uc->uc_sigmask.sig[i]));
+-    }
+-
+-    setup_sigcontext(&uc->uc_mcontext, env);
+-}
+-
+-static inline void install_sigtramp(uint32_t *tramp)
+-{
+-    __put_user(0x08b00893, tramp + 0);  /* li a7, 139 = __NR_rt_sigreturn */
+-    __put_user(0x00000073, tramp + 1);  /* ecall */
+-}
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPURISCVState *env)
+-{
+-    abi_ulong frame_addr;
+-    struct target_rt_sigframe *frame;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_rt_frame(env, frame_addr);
+-
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto badframe;
+-    }
+-
+-    setup_ucontext(&frame->uc, env, set);
+-    tswap_siginfo(&frame->info, info);
+-    install_sigtramp(frame->tramp);
+-
+-    env->pc = ka->_sa_handler;
+-    env->gpr[xSP] = frame_addr;
+-    env->gpr[xA0] = sig;
+-    env->gpr[xA1] = frame_addr + offsetof(struct target_rt_sigframe, info);
+-    env->gpr[xA2] = frame_addr + offsetof(struct target_rt_sigframe, uc);
+-    env->gpr[xRA] = frame_addr + offsetof(struct target_rt_sigframe, tramp);
+-
+-    return;
+-
+-badframe:
+-    unlock_user_struct(frame, frame_addr, 1);
+-    if (sig == TARGET_SIGSEGV) {
+-        ka->_sa_handler = TARGET_SIG_DFL;
+-    }
+-    force_sig(TARGET_SIGSEGV);
+-}
+-
+-static void restore_sigcontext(CPURISCVState *env, struct target_sigcontext *sc)
+-{
+-    int i;
+-
+-    __get_user(env->pc, &sc->pc);
+-
+-    for (i = 1; i < 32; ++i) {
+-        __get_user(env->gpr[i], &sc->gpr[i - 1]);
+-    }
+-    for (i = 0; i < 32; ++i) {
+-        __get_user(env->fpr[i], &sc->fpr[i]);
+-    }
+-
+-    uint32_t fcsr;
+-    __get_user(fcsr, &sc->fcsr);
+-    csr_write_helper(env, fcsr, CSR_FCSR);
+-}
+-
+-static void restore_ucontext(CPURISCVState *env, struct target_ucontext *uc)
+-{
+-    sigset_t blocked;
+-    target_sigset_t target_set;
+-    int i;
+-
+-    target_sigemptyset(&target_set);
+-    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __get_user(target_set.sig[i], &(uc->uc_sigmask.sig[i]));
+-    }
+-
+-    target_to_host_sigset_internal(&blocked, &target_set);
+-    set_sigmask(&blocked);
+-
+-    restore_sigcontext(env, &uc->uc_mcontext);
+-}
+-
+-long do_rt_sigreturn(CPURISCVState *env)
+-{
+-    struct target_rt_sigframe *frame;
+-    abi_ulong frame_addr;
+-
+-    frame_addr = env->gpr[xSP];
+-    trace_user_do_sigreturn(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+-        goto badframe;
+-    }
+-
+-    restore_ucontext(env, &frame->uc);
+-
+-    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
+-            uc.uc_stack), 0, get_sp_from_cpustate(env)) == -EFAULT) {
+-        goto badframe;
+-    }
+-
+-    unlock_user_struct(frame, frame_addr, 0);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-badframe:
+-    unlock_user_struct(frame, frame_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-    return 0;
+-}
+-
+ #elif defined(TARGET_HPPA)
+ 
+ struct target_sigcontext {
 -- 
 2.14.3
