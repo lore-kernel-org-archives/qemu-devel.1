@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwD-0006CU-9o
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwF-0006EP-20
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6Kw9-0007ww-64
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwA-0007zb-P7
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:47 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:40 +0200
-Message-Id: <20180411185651.21351-9-laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:56:45 +0200
+Message-Id: <20180411185651.21351-14-laurent@vivier.eu>
 In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 08/19] linux-user: move nios2 cpu
- loop to nios2 directory
+Subject: [Qemu-devel] [PATCH for 2.13 v2 13/19] linux-user: move m68k cpu
+ loop to m68k directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,302 +24,344 @@ To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
 No code change, only move code from main.c to
-nios2/cpu_loop.c.
+m68k/cpu_loop.c.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/main.c           | 133 --------------------------------------------
- linux-user/nios2/cpu_loop.c | 126 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 126 insertions(+), 133 deletions(-)
+ linux-user/m68k/cpu_loop.c | 144 +++++++++++++++++++++++++++++++++++++++++++
+ linux-user/main.c          | 150 +--------------------------------------------
+ 2 files changed, 145 insertions(+), 149 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index a760c19379..88f807549f 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,109 +149,6 @@ void fork_end(int child)
-     }
- }
- 
--#ifdef TARGET_NIOS2
--
--void cpu_loop(CPUNios2State *env)
--{
--    CPUState *cs = ENV_GET_CPU(env);
--    Nios2CPU *cpu = NIOS2_CPU(cs);
--    target_siginfo_t info;
--    int trapnr, gdbsig, ret;
--
--    for (;;) {
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        gdbsig = 0;
--
--        switch (trapnr) {
--        case EXCP_INTERRUPT:
--            /* just indicate that signals should be handled asap */
--            break;
--        case EXCP_TRAP:
--            if (env->regs[R_AT] == 0) {
--                abi_long ret;
--                qemu_log_mask(CPU_LOG_INT, "\nSyscall\n");
--
--                ret = do_syscall(env, env->regs[2],
--                                 env->regs[4], env->regs[5], env->regs[6],
--                                 env->regs[7], env->regs[8], env->regs[9],
--                                 0, 0);
--
--                if (env->regs[2] == 0) {    /* FIXME: syscall 0 workaround */
--                    ret = 0;
--                }
--
--                env->regs[2] = abs(ret);
--                /* Return value is 0..4096 */
--                env->regs[7] = (ret > 0xfffffffffffff000ULL);
--                env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
--                env->regs[CR_STATUS] &= ~0x3;
--                env->regs[R_EA] = env->regs[R_PC] + 4;
--                env->regs[R_PC] += 4;
--                break;
--            } else {
--                qemu_log_mask(CPU_LOG_INT, "\nTrap\n");
--
--                env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
--                env->regs[CR_STATUS] &= ~0x3;
--                env->regs[R_EA] = env->regs[R_PC] + 4;
--                env->regs[R_PC] = cpu->exception_addr;
--
--                gdbsig = TARGET_SIGTRAP;
--                break;
--            }
--        case 0xaa:
--            switch (env->regs[R_PC]) {
--            /*case 0x1000:*/  /* TODO:__kuser_helper_version */
--            case 0x1004:      /* __kuser_cmpxchg */
--                start_exclusive();
--                if (env->regs[4] & 0x3) {
--                    goto kuser_fail;
--                }
--                ret = get_user_u32(env->regs[2], env->regs[4]);
--                if (ret) {
--                    end_exclusive();
--                    goto kuser_fail;
--                }
--                env->regs[2] -= env->regs[5];
--                if (env->regs[2] == 0) {
--                    put_user_u32(env->regs[6], env->regs[4]);
--                }
--                end_exclusive();
--                env->regs[R_PC] = env->regs[R_RA];
--                break;
--            /*case 0x1040:*/  /* TODO:__kuser_sigtramp */
--            default:
--                ;
--kuser_fail:
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                /* TODO: check env->error_code */
--                info.si_code = TARGET_SEGV_MAPERR;
--                info._sifields._sigfault._addr = env->regs[R_PC];
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
--            break;
--        default:
--            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
--                     trapnr);
--            gdbsig = TARGET_SIGILL;
--            break;
--        }
--        if (gdbsig) {
--            gdb_handlesig(cs, gdbsig);
--            if (gdbsig != TARGET_SIGTRAP) {
--                exit(EXIT_FAILURE);
--            }
--        }
--
--        process_pending_signals(env);
--    }
--}
--
--#endif /* TARGET_NIOS2 */
--
- #ifdef TARGET_OPENRISC
- 
- void cpu_loop(CPUOpenRISCState *env)
-@@ -2545,36 +2442,6 @@ int main(int argc, char **argv, char **envp)
-         env->regs[31] = regs->r31;	    
-         env->sregs[SR_PC] = regs->pc;
-     }
--#elif defined(TARGET_NIOS2)
--    {
--        env->regs[0] = 0;
--        env->regs[1] = regs->r1;
--        env->regs[2] = regs->r2;
--        env->regs[3] = regs->r3;
--        env->regs[4] = regs->r4;
--        env->regs[5] = regs->r5;
--        env->regs[6] = regs->r6;
--        env->regs[7] = regs->r7;
--        env->regs[8] = regs->r8;
--        env->regs[9] = regs->r9;
--        env->regs[10] = regs->r10;
--        env->regs[11] = regs->r11;
--        env->regs[12] = regs->r12;
--        env->regs[13] = regs->r13;
--        env->regs[14] = regs->r14;
--        env->regs[15] = regs->r15;
--        /* TODO: unsigned long  orig_r2; */
--        env->regs[R_RA] = regs->ra;
--        env->regs[R_FP] = regs->fp;
--        env->regs[R_SP] = regs->sp;
--        env->regs[R_GP] = regs->gp;
--        env->regs[CR_ESTATUS] = regs->estatus;
--        env->regs[R_EA] = regs->ea;
--        /* TODO: unsigned long  orig_r7; */
--
--        /* Emulate eret when starting thread. */
--        env->regs[R_PC] = regs->ea;
--    }
- #elif defined(TARGET_OPENRISC)
-     {
-         int i;
-diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
-index b7700a5561..dac7a06181 100644
---- a/linux-user/nios2/cpu_loop.c
-+++ b/linux-user/nios2/cpu_loop.c
-@@ -21,6 +21,132 @@
+diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
+index b7700a5561..b4d3d8af3d 100644
+--- a/linux-user/m68k/cpu_loop.c
++++ b/linux-user/m68k/cpu_loop.c
+@@ -21,6 +21,150 @@
  #include "qemu.h"
  #include "cpu_loop-common.h"
  
-+void cpu_loop(CPUNios2State *env)
++void cpu_loop(CPUM68KState *env)
 +{
-+    CPUState *cs = ENV_GET_CPU(env);
-+    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUState *cs = CPU(m68k_env_get_cpu(env));
++    int trapnr;
++    unsigned int n;
 +    target_siginfo_t info;
-+    int trapnr, gdbsig, ret;
++    TaskState *ts = cs->opaque;
 +
-+    for (;;) {
++    for(;;) {
 +        cpu_exec_start(cs);
 +        trapnr = cpu_exec(cs);
 +        cpu_exec_end(cs);
-+        gdbsig = 0;
++        process_queued_cpu_work(cs);
 +
-+        switch (trapnr) {
++        switch(trapnr) {
++        case EXCP_ILLEGAL:
++            {
++                if (ts->sim_syscalls) {
++                    uint16_t nr;
++                    get_user_u16(nr, env->pc + 2);
++                    env->pc += 4;
++                    do_m68k_simcall(env, nr);
++                } else {
++                    goto do_sigill;
++                }
++            }
++            break;
++        case EXCP_HALT_INSN:
++            /* Semihosing syscall.  */
++            env->pc += 4;
++            do_m68k_semihosting(env, env->dregs[0]);
++            break;
++        case EXCP_LINEA:
++        case EXCP_LINEF:
++        case EXCP_UNSUPPORTED:
++        do_sigill:
++            info.si_signo = TARGET_SIGILL;
++            info.si_errno = 0;
++            info.si_code = TARGET_ILL_ILLOPN;
++            info._sifields._sigfault._addr = env->pc;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_CHK:
++            info.si_signo = TARGET_SIGFPE;
++            info.si_errno = 0;
++            info.si_code = TARGET_FPE_INTOVF;
++            info._sifields._sigfault._addr = env->pc;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_DIV0:
++            info.si_signo = TARGET_SIGFPE;
++            info.si_errno = 0;
++            info.si_code = TARGET_FPE_INTDIV;
++            info._sifields._sigfault._addr = env->pc;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_TRAP0:
++            {
++                abi_long ret;
++                ts->sim_syscalls = 0;
++                n = env->dregs[0];
++                env->pc += 2;
++                ret = do_syscall(env,
++                                 n,
++                                 env->dregs[1],
++                                 env->dregs[2],
++                                 env->dregs[3],
++                                 env->dregs[4],
++                                 env->dregs[5],
++                                 env->aregs[0],
++                                 0, 0);
++                if (ret == -TARGET_ERESTARTSYS) {
++                    env->pc -= 2;
++                } else if (ret != -TARGET_QEMU_ESIGRETURN) {
++                    env->dregs[0] = ret;
++                }
++            }
++            break;
 +        case EXCP_INTERRUPT:
 +            /* just indicate that signals should be handled asap */
 +            break;
-+        case EXCP_TRAP:
-+            if (env->regs[R_AT] == 0) {
-+                abi_long ret;
-+                qemu_log_mask(CPU_LOG_INT, "\nSyscall\n");
-+
-+                ret = do_syscall(env, env->regs[2],
-+                                 env->regs[4], env->regs[5], env->regs[6],
-+                                 env->regs[7], env->regs[8], env->regs[9],
-+                                 0, 0);
-+
-+                if (env->regs[2] == 0) {    /* FIXME: syscall 0 workaround */
-+                    ret = 0;
-+                }
-+
-+                env->regs[2] = abs(ret);
-+                /* Return value is 0..4096 */
-+                env->regs[7] = (ret > 0xfffffffffffff000ULL);
-+                env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
-+                env->regs[CR_STATUS] &= ~0x3;
-+                env->regs[R_EA] = env->regs[R_PC] + 4;
-+                env->regs[R_PC] += 4;
-+                break;
-+            } else {
-+                qemu_log_mask(CPU_LOG_INT, "\nTrap\n");
-+
-+                env->regs[CR_ESTATUS] = env->regs[CR_STATUS];
-+                env->regs[CR_STATUS] &= ~0x3;
-+                env->regs[R_EA] = env->regs[R_PC] + 4;
-+                env->regs[R_PC] = cpu->exception_addr;
-+
-+                gdbsig = TARGET_SIGTRAP;
-+                break;
-+            }
-+        case 0xaa:
-+            switch (env->regs[R_PC]) {
-+            /*case 0x1000:*/  /* TODO:__kuser_helper_version */
-+            case 0x1004:      /* __kuser_cmpxchg */
-+                start_exclusive();
-+                if (env->regs[4] & 0x3) {
-+                    goto kuser_fail;
-+                }
-+                ret = get_user_u32(env->regs[2], env->regs[4]);
-+                if (ret) {
-+                    end_exclusive();
-+                    goto kuser_fail;
-+                }
-+                env->regs[2] -= env->regs[5];
-+                if (env->regs[2] == 0) {
-+                    put_user_u32(env->regs[6], env->regs[4]);
-+                }
-+                end_exclusive();
-+                env->regs[R_PC] = env->regs[R_RA];
-+                break;
-+            /*case 0x1040:*/  /* TODO:__kuser_sigtramp */
-+            default:
-+                ;
-+kuser_fail:
++        case EXCP_ACCESS:
++            {
 +                info.si_signo = TARGET_SIGSEGV;
 +                info.si_errno = 0;
-+                /* TODO: check env->error_code */
++                /* XXX: check env->error_code */
 +                info.si_code = TARGET_SEGV_MAPERR;
-+                info._sifields._sigfault._addr = env->regs[R_PC];
++                info._sifields._sigfault._addr = env->mmu.ar;
 +                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 +            }
 +            break;
-+        default:
-+            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
-+                     trapnr);
-+            gdbsig = TARGET_SIGILL;
-+            break;
-+        }
-+        if (gdbsig) {
-+            gdb_handlesig(cs, gdbsig);
-+            if (gdbsig != TARGET_SIGTRAP) {
-+                exit(EXIT_FAILURE);
-+            }
-+        }
++        case EXCP_DEBUG:
++            {
++                int sig;
 +
++                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
++                if (sig)
++                  {
++                    info.si_signo = sig;
++                    info.si_errno = 0;
++                    info.si_code = TARGET_TRAP_BRKPT;
++                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                  }
++            }
++            break;
++        case EXCP_ATOMIC:
++            cpu_exec_step_atomic(cs);
++            break;
++        default:
++            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
++            abort();
++        }
 +        process_pending_signals(env);
 +    }
 +}
 +
  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
  {
-+    env->regs[0] = 0;
-+    env->regs[1] = regs->r1;
-+    env->regs[2] = regs->r2;
-+    env->regs[3] = regs->r3;
-+    env->regs[4] = regs->r4;
-+    env->regs[5] = regs->r5;
-+    env->regs[6] = regs->r6;
-+    env->regs[7] = regs->r7;
-+    env->regs[8] = regs->r8;
-+    env->regs[9] = regs->r9;
-+    env->regs[10] = regs->r10;
-+    env->regs[11] = regs->r11;
-+    env->regs[12] = regs->r12;
-+    env->regs[13] = regs->r13;
-+    env->regs[14] = regs->r14;
-+    env->regs[15] = regs->r15;
-+    /* TODO: unsigned long  orig_r2; */
-+    env->regs[R_RA] = regs->ra;
-+    env->regs[R_FP] = regs->fp;
-+    env->regs[R_SP] = regs->sp;
-+    env->regs[R_GP] = regs->gp;
-+    env->regs[CR_ESTATUS] = regs->estatus;
-+    env->regs[R_EA] = regs->ea;
-+    /* TODO: unsigned long  orig_r7; */
++    CPUState *cpu = ENV_GET_CPU(env);
++    TaskState *ts = cpu->opaque;
++    struct image_info *info = ts->info;
 +
-+    /* Emulate eret when starting thread. */
-+    env->regs[R_PC] = regs->ea;
++    env->pc = regs->pc;
++    env->dregs[0] = regs->d0;
++    env->dregs[1] = regs->d1;
++    env->dregs[2] = regs->d2;
++    env->dregs[3] = regs->d3;
++    env->dregs[4] = regs->d4;
++    env->dregs[5] = regs->d5;
++    env->dregs[6] = regs->d6;
++    env->dregs[7] = regs->d7;
++    env->aregs[0] = regs->a0;
++    env->aregs[1] = regs->a1;
++    env->aregs[2] = regs->a2;
++    env->aregs[3] = regs->a3;
++    env->aregs[4] = regs->a4;
++    env->aregs[5] = regs->a5;
++    env->aregs[6] = regs->a6;
++    env->aregs[7] = regs->usp;
++    env->sr = regs->sr;
++
++    ts->sim_syscalls = 1;
++    ts->stack_base = info->start_stack;
++    ts->heap_base = info->brk;
++    /* This will be filled in on the first SYS_HEAPINFO call.  */
++    ts->heap_limit = 0;
  }
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 9e49c8a30c..7c223a5629 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -149,125 +149,6 @@ void fork_end(int child)
+     }
+ }
+ 
+-#ifdef TARGET_M68K
+-
+-void cpu_loop(CPUM68KState *env)
+-{
+-    CPUState *cs = CPU(m68k_env_get_cpu(env));
+-    int trapnr;
+-    unsigned int n;
+-    target_siginfo_t info;
+-    TaskState *ts = cs->opaque;
+-
+-    for(;;) {
+-        cpu_exec_start(cs);
+-        trapnr = cpu_exec(cs);
+-        cpu_exec_end(cs);
+-        process_queued_cpu_work(cs);
+-
+-        switch(trapnr) {
+-        case EXCP_ILLEGAL:
+-            {
+-                if (ts->sim_syscalls) {
+-                    uint16_t nr;
+-                    get_user_u16(nr, env->pc + 2);
+-                    env->pc += 4;
+-                    do_m68k_simcall(env, nr);
+-                } else {
+-                    goto do_sigill;
+-                }
+-            }
+-            break;
+-        case EXCP_HALT_INSN:
+-            /* Semihosing syscall.  */
+-            env->pc += 4;
+-            do_m68k_semihosting(env, env->dregs[0]);
+-            break;
+-        case EXCP_LINEA:
+-        case EXCP_LINEF:
+-        case EXCP_UNSUPPORTED:
+-        do_sigill:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPN;
+-            info._sifields._sigfault._addr = env->pc;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_CHK:
+-            info.si_signo = TARGET_SIGFPE;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_FPE_INTOVF;
+-            info._sifields._sigfault._addr = env->pc;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_DIV0:
+-            info.si_signo = TARGET_SIGFPE;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_FPE_INTDIV;
+-            info._sifields._sigfault._addr = env->pc;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_TRAP0:
+-            {
+-                abi_long ret;
+-                ts->sim_syscalls = 0;
+-                n = env->dregs[0];
+-                env->pc += 2;
+-                ret = do_syscall(env,
+-                                 n,
+-                                 env->dregs[1],
+-                                 env->dregs[2],
+-                                 env->dregs[3],
+-                                 env->dregs[4],
+-                                 env->dregs[5],
+-                                 env->aregs[0],
+-                                 0, 0);
+-                if (ret == -TARGET_ERESTARTSYS) {
+-                    env->pc -= 2;
+-                } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+-                    env->dregs[0] = ret;
+-                }
+-            }
+-            break;
+-        case EXCP_INTERRUPT:
+-            /* just indicate that signals should be handled asap */
+-            break;
+-        case EXCP_ACCESS:
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                /* XXX: check env->error_code */
+-                info.si_code = TARGET_SEGV_MAPERR;
+-                info._sifields._sigfault._addr = env->mmu.ar;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            }
+-            break;
+-        case EXCP_DEBUG:
+-            {
+-                int sig;
+-
+-                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+-                if (sig)
+-                  {
+-                    info.si_signo = sig;
+-                    info.si_errno = 0;
+-                    info.si_code = TARGET_TRAP_BRKPT;
+-                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                  }
+-            }
+-            break;
+-        case EXCP_ATOMIC:
+-            cpu_exec_step_atomic(cs);
+-            break;
+-        default:
+-            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
+-            abort();
+-        }
+-        process_pending_signals(env);
+-    }
+-}
+-#endif /* TARGET_M68K */
+-
+ #ifdef TARGET_ALPHA
+ void cpu_loop(CPUAlphaState *env)
+ {
+@@ -2028,29 +1909,7 @@ int main(int argc, char **argv, char **envp)
+ 
+     target_cpu_copy_regs(env, regs);
+ 
+-#if defined(TARGET_M68K)
+-    {
+-        env->pc = regs->pc;
+-        env->dregs[0] = regs->d0;
+-        env->dregs[1] = regs->d1;
+-        env->dregs[2] = regs->d2;
+-        env->dregs[3] = regs->d3;
+-        env->dregs[4] = regs->d4;
+-        env->dregs[5] = regs->d5;
+-        env->dregs[6] = regs->d6;
+-        env->dregs[7] = regs->d7;
+-        env->aregs[0] = regs->a0;
+-        env->aregs[1] = regs->a1;
+-        env->aregs[2] = regs->a2;
+-        env->aregs[3] = regs->a3;
+-        env->aregs[4] = regs->a4;
+-        env->aregs[5] = regs->a5;
+-        env->aregs[6] = regs->a6;
+-        env->aregs[7] = regs->usp;
+-        env->sr = regs->sr;
+-        ts->sim_syscalls = 1;
+-    }
+-#elif defined(TARGET_RISCV)
++#if defined(TARGET_RISCV)
+     {
+         env->pc = regs->sepc;
+         env->gpr[xSP] = regs->sp;
+@@ -2105,13 +1964,6 @@ int main(int argc, char **argv, char **envp)
+     }
+ #endif
+ 
+-#if defined(TARGET_M68K)
+-    ts->stack_base = info->start_stack;
+-    ts->heap_base = info->brk;
+-    /* This will be filled in on the first SYS_HEAPINFO call.  */
+-    ts->heap_limit = 0;
+-#endif
+-
+     if (gdbstub_port) {
+         if (gdbserver_start(gdbstub_port) < 0) {
+             fprintf(stderr, "qemu: could not open gdbserver on port %d\n",
 -- 
 2.14.3
