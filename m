@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6L15-0002YW-Ux
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:02:50 -0400
+	(envelope-from <kwankhede@nvidia.com>) id 1f6L2f-00042I-Nt
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6L14-00024s-7E
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:02:48 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:46 +0200
-Message-Id: <20180411185651.21351-15-laurent@vivier.eu>
-In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
-References: <20180411185651.21351-1-laurent@vivier.eu>
+	(envelope-from <kwankhede@nvidia.com>) id 1f6L2c-0002t9-Ft
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:04:25 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:14538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1f6L2c-0002ro-4U
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:04:22 -0400
+References: <20180411172014.24711-1-clg@kaod.org>
+	<20180411115511.342c75b9@w520.home>
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <0326be05-c25b-adab-c31d-b9e337a6247a@nvidia.com>
+Date: Thu, 12 Apr 2018 00:34:03 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.13 v2 14/19] linux-user: move alpha cpu
- loop to alpha directory
+In-Reply-To: <20180411115511.342c75b9@w520.home>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] migration: discard RAMBlocks of type
+ ram_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,451 +30,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David
+	Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com
 
-No code change, only move code from main.c to
-alpha/cpu_loop.c.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- linux-user/alpha/cpu_loop.c | 199 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/main.c           | 204 --------------------------------------------
- 2 files changed, 199 insertions(+), 204 deletions(-)
 
-diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
-index b7700a5561..b87fcaea87 100644
---- a/linux-user/alpha/cpu_loop.c
-+++ b/linux-user/alpha/cpu_loop.c
-@@ -21,6 +21,205 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
- 
-+void cpu_loop(CPUAlphaState *env)
-+{
-+    CPUState *cs = CPU(alpha_env_get_cpu(env));
-+    int trapnr;
-+    target_siginfo_t info;
-+    abi_long sysret;
-+
-+    while (1) {
-+        bool arch_interrupt = true;
-+
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
-+
-+        switch (trapnr) {
-+        case EXCP_RESET:
-+            fprintf(stderr, "Reset requested. Exit\n");
-+            exit(EXIT_FAILURE);
-+            break;
-+        case EXCP_MCHK:
-+            fprintf(stderr, "Machine check exception. Exit\n");
-+            exit(EXIT_FAILURE);
-+            break;
-+        case EXCP_SMP_INTERRUPT:
-+        case EXCP_CLK_INTERRUPT:
-+        case EXCP_DEV_INTERRUPT:
-+            fprintf(stderr, "External interrupt. Exit\n");
-+            exit(EXIT_FAILURE);
-+            break;
-+        case EXCP_MMFAULT:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = (page_get_flags(env->trap_arg0) & PAGE_VALID
-+                            ? TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR);
-+            info._sifields._sigfault._addr = env->trap_arg0;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_UNALIGN:
-+            info.si_signo = TARGET_SIGBUS;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_BUS_ADRALN;
-+            info._sifields._sigfault._addr = env->trap_arg0;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_OPCDEC:
-+        do_sigill:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPC;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ARITH:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_FPE_FLTINV;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_FEN:
-+            /* No-op.  Linux simply re-enables the FPU.  */
-+            break;
-+        case EXCP_CALL_PAL:
-+            switch (env->error_code) {
-+            case 0x80:
-+                /* BPT */
-+                info.si_signo = TARGET_SIGTRAP;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-+            case 0x81:
-+                /* BUGCHK */
-+                info.si_signo = TARGET_SIGTRAP;
-+                info.si_errno = 0;
-+                info.si_code = 0;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-+            case 0x83:
-+                /* CALLSYS */
-+                trapnr = env->ir[IR_V0];
-+                sysret = do_syscall(env, trapnr,
-+                                    env->ir[IR_A0], env->ir[IR_A1],
-+                                    env->ir[IR_A2], env->ir[IR_A3],
-+                                    env->ir[IR_A4], env->ir[IR_A5],
-+                                    0, 0);
-+                if (sysret == -TARGET_ERESTARTSYS) {
-+                    env->pc -= 4;
-+                    break;
-+                }
-+                if (sysret == -TARGET_QEMU_ESIGRETURN) {
-+                    break;
-+                }
-+                /* Syscall writes 0 to V0 to bypass error check, similar
-+                   to how this is handled internal to Linux kernel.
-+                   (Ab)use trapnr temporarily as boolean indicating error.  */
-+                trapnr = (env->ir[IR_V0] != 0 && sysret < 0);
-+                env->ir[IR_V0] = (trapnr ? -sysret : sysret);
-+                env->ir[IR_A3] = trapnr;
-+                break;
-+            case 0x86:
-+                /* IMB */
-+                /* ??? We can probably elide the code using page_unprotect
-+                   that is checking for self-modifying code.  Instead we
-+                   could simply call tb_flush here.  Until we work out the
-+                   changes required to turn off the extra write protection,
-+                   this can be a no-op.  */
-+                break;
-+            case 0x9E:
-+                /* RDUNIQUE */
-+                /* Handled in the translator for usermode.  */
-+                abort();
-+            case 0x9F:
-+                /* WRUNIQUE */
-+                /* Handled in the translator for usermode.  */
-+                abort();
-+            case 0xAA:
-+                /* GENTRAP */
-+                info.si_signo = TARGET_SIGFPE;
-+                switch (env->ir[IR_A0]) {
-+                case TARGET_GEN_INTOVF:
-+                    info.si_code = TARGET_FPE_INTOVF;
-+                    break;
-+                case TARGET_GEN_INTDIV:
-+                    info.si_code = TARGET_FPE_INTDIV;
-+                    break;
-+                case TARGET_GEN_FLTOVF:
-+                    info.si_code = TARGET_FPE_FLTOVF;
-+                    break;
-+                case TARGET_GEN_FLTUND:
-+                    info.si_code = TARGET_FPE_FLTUND;
-+                    break;
-+                case TARGET_GEN_FLTINV:
-+                    info.si_code = TARGET_FPE_FLTINV;
-+                    break;
-+                case TARGET_GEN_FLTINE:
-+                    info.si_code = TARGET_FPE_FLTRES;
-+                    break;
-+                case TARGET_GEN_ROPRAND:
-+                    info.si_code = 0;
-+                    break;
-+                default:
-+                    info.si_signo = TARGET_SIGTRAP;
-+                    info.si_code = 0;
-+                    break;
-+                }
-+                info.si_errno = 0;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-+            default:
-+                goto do_sigill;
-+            }
-+            break;
-+        case EXCP_DEBUG:
-+            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (info.si_signo) {
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            } else {
-+                arch_interrupt = false;
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+            /* Just indicate that signals should be handled asap.  */
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            arch_interrupt = false;
-+            break;
-+        default:
-+            printf ("Unhandled trap: 0x%x\n", trapnr);
-+            cpu_dump_state(cs, stderr, fprintf, 0);
-+            exit(EXIT_FAILURE);
-+        }
-+        process_pending_signals (env);
-+
-+        /* Most of the traps imply a transition through PALcode, which
-+           implies an REI instruction has been executed.  Which means
-+           that RX and LOCK_ADDR should be cleared.  But there are a
-+           few exceptions for traps internal to QEMU.  */
-+        if (arch_interrupt) {
-+            env->flags &= ~ENV_FLAG_RX_FLAG;
-+            env->lock_addr = -1;
-+        }
-+    }
-+}
-+
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
-+    int i;
-+
-+    for(i = 0; i < 28; i++) {
-+        env->ir[i] = ((abi_ulong *)regs)[i];
-+    }
-+    env->ir[IR_SP] = regs->usp;
-+    env->pc = regs->pc;
- }
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 7c223a5629..37cf3a7d6f 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,200 +149,6 @@ void fork_end(int child)
-     }
- }
- 
--#ifdef TARGET_ALPHA
--void cpu_loop(CPUAlphaState *env)
--{
--    CPUState *cs = CPU(alpha_env_get_cpu(env));
--    int trapnr;
--    target_siginfo_t info;
--    abi_long sysret;
--
--    while (1) {
--        bool arch_interrupt = true;
--
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        process_queued_cpu_work(cs);
--
--        switch (trapnr) {
--        case EXCP_RESET:
--            fprintf(stderr, "Reset requested. Exit\n");
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_MCHK:
--            fprintf(stderr, "Machine check exception. Exit\n");
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_SMP_INTERRUPT:
--        case EXCP_CLK_INTERRUPT:
--        case EXCP_DEV_INTERRUPT:
--            fprintf(stderr, "External interrupt. Exit\n");
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_MMFAULT:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            info.si_code = (page_get_flags(env->trap_arg0) & PAGE_VALID
--                            ? TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR);
--            info._sifields._sigfault._addr = env->trap_arg0;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_UNALIGN:
--            info.si_signo = TARGET_SIGBUS;
--            info.si_errno = 0;
--            info.si_code = TARGET_BUS_ADRALN;
--            info._sifields._sigfault._addr = env->trap_arg0;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_OPCDEC:
--        do_sigill:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPC;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_ARITH:
--            info.si_signo = TARGET_SIGFPE;
--            info.si_errno = 0;
--            info.si_code = TARGET_FPE_FLTINV;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_FEN:
--            /* No-op.  Linux simply re-enables the FPU.  */
--            break;
--        case EXCP_CALL_PAL:
--            switch (env->error_code) {
--            case 0x80:
--                /* BPT */
--                info.si_signo = TARGET_SIGTRAP;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                break;
--            case 0x81:
--                /* BUGCHK */
--                info.si_signo = TARGET_SIGTRAP;
--                info.si_errno = 0;
--                info.si_code = 0;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                break;
--            case 0x83:
--                /* CALLSYS */
--                trapnr = env->ir[IR_V0];
--                sysret = do_syscall(env, trapnr,
--                                    env->ir[IR_A0], env->ir[IR_A1],
--                                    env->ir[IR_A2], env->ir[IR_A3],
--                                    env->ir[IR_A4], env->ir[IR_A5],
--                                    0, 0);
--                if (sysret == -TARGET_ERESTARTSYS) {
--                    env->pc -= 4;
--                    break;
--                }
--                if (sysret == -TARGET_QEMU_ESIGRETURN) {
--                    break;
--                }
--                /* Syscall writes 0 to V0 to bypass error check, similar
--                   to how this is handled internal to Linux kernel.
--                   (Ab)use trapnr temporarily as boolean indicating error.  */
--                trapnr = (env->ir[IR_V0] != 0 && sysret < 0);
--                env->ir[IR_V0] = (trapnr ? -sysret : sysret);
--                env->ir[IR_A3] = trapnr;
--                break;
--            case 0x86:
--                /* IMB */
--                /* ??? We can probably elide the code using page_unprotect
--                   that is checking for self-modifying code.  Instead we
--                   could simply call tb_flush here.  Until we work out the
--                   changes required to turn off the extra write protection,
--                   this can be a no-op.  */
--                break;
--            case 0x9E:
--                /* RDUNIQUE */
--                /* Handled in the translator for usermode.  */
--                abort();
--            case 0x9F:
--                /* WRUNIQUE */
--                /* Handled in the translator for usermode.  */
--                abort();
--            case 0xAA:
--                /* GENTRAP */
--                info.si_signo = TARGET_SIGFPE;
--                switch (env->ir[IR_A0]) {
--                case TARGET_GEN_INTOVF:
--                    info.si_code = TARGET_FPE_INTOVF;
--                    break;
--                case TARGET_GEN_INTDIV:
--                    info.si_code = TARGET_FPE_INTDIV;
--                    break;
--                case TARGET_GEN_FLTOVF:
--                    info.si_code = TARGET_FPE_FLTOVF;
--                    break;
--                case TARGET_GEN_FLTUND:
--                    info.si_code = TARGET_FPE_FLTUND;
--                    break;
--                case TARGET_GEN_FLTINV:
--                    info.si_code = TARGET_FPE_FLTINV;
--                    break;
--                case TARGET_GEN_FLTINE:
--                    info.si_code = TARGET_FPE_FLTRES;
--                    break;
--                case TARGET_GEN_ROPRAND:
--                    info.si_code = 0;
--                    break;
--                default:
--                    info.si_signo = TARGET_SIGTRAP;
--                    info.si_code = 0;
--                    break;
--                }
--                info.si_errno = 0;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                break;
--            default:
--                goto do_sigill;
--            }
--            break;
--        case EXCP_DEBUG:
--            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (info.si_signo) {
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            } else {
--                arch_interrupt = false;
--            }
--            break;
--        case EXCP_INTERRUPT:
--            /* Just indicate that signals should be handled asap.  */
--            break;
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
--            arch_interrupt = false;
--            break;
--        default:
--            printf ("Unhandled trap: 0x%x\n", trapnr);
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            exit(EXIT_FAILURE);
--        }
--        process_pending_signals (env);
--
--        /* Most of the traps imply a transition through PALcode, which
--           implies an REI instruction has been executed.  Which means
--           that RX and LOCK_ADDR should be cleared.  But there are a
--           few exceptions for traps internal to QEMU.  */
--        if (arch_interrupt) {
--            env->flags &= ~ENV_FLAG_RX_FLAG;
--            env->lock_addr = -1;
--        }
--    }
--}
--#endif /* TARGET_ALPHA */
--
- #ifdef TARGET_S390X
- 
- /* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-@@ -1914,16 +1720,6 @@ int main(int argc, char **argv, char **envp)
-         env->pc = regs->sepc;
-         env->gpr[xSP] = regs->sp;
-     }
--#elif defined(TARGET_ALPHA)
--    {
--        int i;
--
--        for(i = 0; i < 28; i++) {
--            env->ir[i] = ((abi_ulong *)regs)[i];
--        }
--        env->ir[IR_SP] = regs->usp;
--        env->pc = regs->pc;
--    }
- #elif defined(TARGET_S390X)
-     {
-             int i;
--- 
-2.14.3
+On 4/11/2018 11:25 PM, Alex Williamson wrote:
+> [cc +folks working on vfio-mdev migration]
+>=20
+> On Wed, 11 Apr 2018 19:20:14 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> Here is some context for this strange change request.
+>>
+>> On the POWER9 processor, the XIVE interrupt controller can control
+>> interrupt sources using MMIO to trigger events, to EOI or to turn off
+>> the sources. Priority management and interrupt acknowledgment is also
+>> controlled by MMIO in the presenter subengine.
+>>
+>> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+>> device' memory mappings, similarly to VFIO, and the VMAs are populated
+>> dynamically with the appropriate pages using a fault handler.
+>>
+>> But, these regions are an issue for migration. We need to discard the
+>> associated RAMBlocks from the RAM state on the source VM and let the
+>> destination VM rebuild the memory mappings on the new host in the
+>> post_load() operation just before resuming the system.
+>>
+>> This is the goal of the following proposal. Does it make sense ? It
+>> seems to be working enough to migrate a running guest but there might
+>> be a better, more subtle, approach.
+>=20
+> Yulei, is this something you've run into with GVT-g migration?  I don't
+> see how we can read from or write to ram_device regions in a useful way
+> during migration anyway, so the change initially looks correct to me.
+> Thanks,
+>=20
+
+I ran into this problem with vGPU migration. I have very similar patch
+in my local branch to test vGPU migration. This patch looks good to me.
+
+Thanks,
+Kirti
+
+
+> Alex
+>=20
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  migration/ram.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 40 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 0e90efa09236..6404ccd046d8 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -780,6 +780,10 @@ unsigned long migration_bitmap_find_dirty(RAMState =
+*rs, RAMBlock *rb,
+>>      unsigned long *bitmap =3D rb->bmap;
+>>      unsigned long next;
+>> =20
+>> +    if (memory_region_is_ram_device(rb->mr)) {
+>> +        return size;
+>> +    }
+>> +
+>>      if (rs->ram_bulk_stage && start > 0) {
+>>          next =3D start + 1;
+>>      } else {
+>> @@ -826,6 +830,9 @@ uint64_t ram_pagesize_summary(void)
+>>      uint64_t summary =3D 0;
+>> =20
+>>      RAMBLOCK_FOREACH(block) {
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>>          summary |=3D block->page_size;
+>>      }
+>> =20
+>> @@ -850,6 +857,9 @@ static void migration_bitmap_sync(RAMState *rs)
+>>      qemu_mutex_lock(&rs->bitmap_mutex);
+>>      rcu_read_lock();
+>>      RAMBLOCK_FOREACH(block) {
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>>          migration_bitmap_sync_range(rs, block, 0, block->used_length);
+>>      }
+>>      rcu_read_unlock();
+>> @@ -1499,6 +1509,10 @@ static int ram_save_host_page(RAMState *rs, PageS=
+earchStatus *pss,
+>>      size_t pagesize_bits =3D
+>>          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+>> =20
+>> +    if (memory_region_is_ram_device(pss->block->mr)) {
+>> +        return 0;
+>> +    }
+>> +
+>>      do {
+>>          tmppages =3D ram_save_target_page(rs, pss, last_stage);
+>>          if (tmppages < 0) {
+>> @@ -1588,6 +1602,9 @@ uint64_t ram_bytes_total(void)
+>> =20
+>>      rcu_read_lock();
+>>      RAMBLOCK_FOREACH(block) {
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>>          total +=3D block->used_length;
+>>      }
+>>      rcu_read_unlock();
+>> @@ -1643,6 +1660,9 @@ static void ram_save_cleanup(void *opaque)
+>>      memory_global_dirty_log_stop();
+>> =20
+>>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>>          g_free(block->bmap);
+>>          block->bmap =3D NULL;
+>>          g_free(block->unsentmap);
+>> @@ -1710,6 +1730,9 @@ void ram_postcopy_migrated_memory_release(Migratio=
+nState *ms)
+>>          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
+>>          unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0=
+);
+>> =20
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>>          while (run_start < range) {
+>>              unsigned long run_end =3D find_next_bit(bitmap, range, run_=
+start + 1);
+>>              ram_discard_range(block->idstr, run_start << TARGET_PAGE_BI=
+TS,
+>> @@ -1784,8 +1807,13 @@ static int postcopy_each_ram_send_discard(Migrati=
+onState *ms)
+>>      int ret;
+>> =20
+>>      RAMBLOCK_FOREACH(block) {
+>> -        PostcopyDiscardState *pds =3D
+>> -            postcopy_discard_send_init(ms, block->idstr);
+>> +        PostcopyDiscardState *pds;
+>> +
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>> +
+>> +        pds =3D postcopy_discard_send_init(ms, block->idstr);
+>> =20
+>>          /*
+>>           * Postcopy sends chunks of bitmap over the wire, but it
+>> @@ -1996,6 +2024,10 @@ int ram_postcopy_send_discard_bitmap(MigrationSta=
+te *ms)
+>>          unsigned long *bitmap =3D block->bmap;
+>>          unsigned long *unsentmap =3D block->unsentmap;
+>> =20
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>> +
+>>          if (!unsentmap) {
+>>              /* We don't have a safe way to resize the sentmap, so
+>>               * if the bitmap was resized it will be NULL at this
+>> @@ -2151,6 +2183,9 @@ static void ram_list_init_bitmaps(void)
+>>      /* Skip setting bitmap if there is no RAM */
+>>      if (ram_bytes_total()) {
+>>          QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +            if (memory_region_is_ram_device(block->mr)) {
+>> +                continue;
+>> +            }
+>>              pages =3D block->max_length >> TARGET_PAGE_BITS;
+>>              block->bmap =3D bitmap_new(pages);
+>>              bitmap_set(block->bmap, 0, pages);
+>> @@ -2227,6 +2262,9 @@ static int ram_save_setup(QEMUFile *f, void *opaqu=
+e)
+>>      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+>> =20
+>>      RAMBLOCK_FOREACH(block) {
+>> +        if (memory_region_is_ram_device(block->mr)) {
+>> +            continue;
+>> +        }
+>>          qemu_put_byte(f, strlen(block->idstr));
+>>          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr=
+));
+>>          qemu_put_be64(f, block->used_length);
+>=20
