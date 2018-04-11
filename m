@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f6Hvc-0004ji-VL
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:44:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f6I53-0003SW-3J
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f6HvZ-0005MD-9q
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:44:57 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:33298)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1f6HvY-0005Lv-SQ
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:44:53 -0400
-References: <1523377186-32578-1-git-send-email-cota@braap.org>
-	<1523377186-32578-2-git-send-email-cota@braap.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <c5ea8d98-b594-ae2d-6524-40baae8f1763@mail.uni-paderborn.de>
-Date: Wed, 11 Apr 2018 17:44:50 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f6I52-0002l8-2i
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 11:54:41 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180410134203.17552-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c996f23e-b8cf-7c6d-5557-cb7b03df6bfc@amsat.org>
+Date: Wed, 11 Apr 2018 12:54:30 -0300
 MIME-Version: 1.0
-In-Reply-To: <1523377186-32578-2-git-send-email-cota@braap.org>
+In-Reply-To: <20180410134203.17552-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/10] target/riscv: avoid integer overflow
- in next_page PC check
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.12]
+ hw/char/cmsdk-apb-uart.c: Correctly clear INTSTATUS bits on writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, patches@linaro.org
 
-On 04/10/2018 06:19 PM, Emilio G. Cota wrote:
-> If the PC is in the last page of the address space, next_page_start
-> overflows to 0. Fix it.
+On 04/10/2018 10:42 AM, Peter Maydell wrote:
+> The CMSDK APB UART INTSTATUS register bits are all write-one-to-clear.
+> We were getting this correct for the TXO and RXO bits (which need
+> special casing because their state lives in the STATE register),
+> but had forgotten to handle the normal bits for RX and TX which
+> we do store in our s->intstatus field.
 > 
-> Reported-by: Richard Henderson <richard.henderson@linaro.org>
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Michael Clark <mjc@sifive.com>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Perform the W1C operation on the bits in s->intstatus too.
+> 
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1760262
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
+> Not a disaster if this doesn't get into 2.12, I guess. I think
+> it's missed the rc3 boat, so if we need an rc4 for some other
+> reason we can put it in.
+> 
+>  hw/char/cmsdk-apb-uart.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/char/cmsdk-apb-uart.c b/hw/char/cmsdk-apb-uart.c
+> index 1ad1e14295..9c0929d8a2 100644
+> --- a/hw/char/cmsdk-apb-uart.c
+> +++ b/hw/char/cmsdk-apb-uart.c
+> @@ -274,6 +274,7 @@ static void uart_write(void *opaque, hwaddr offset, uint64_t value,
+>           * is then reflected into the intstatus value by the update function).
 
-Acked-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+The comment was correct :)
 
-Cheers,
-Bastian
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>           */
+>          s->state &= ~(value & (R_INTSTATUS_TXO_MASK | R_INTSTATUS_RXO_MASK));
+> +        s->intstatus &= ~value;
+>          cmsdk_apb_uart_update(s);
+>          break;
+>      case A_BAUDDIV:
+> 
