@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6J4B-00029x-3l
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:57:52 -0400
+	(envelope-from <mst@redhat.com>) id 1f6J7G-0005jC-DA
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6J49-0007lm-Pe
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:57:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35610 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1f6J7A-0001Us-CV
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:01:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34428 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6J49-0007lP-Ia
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 12:57:49 -0400
-Date: Wed, 11 Apr 2018 17:57:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180411165742.GI2667@work-vm>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-	<1523089594-1422-2-git-send-email-lidongchen@tencent.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f6J7A-0001U4-7d
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:00:56 -0400
+Date: Wed, 11 Apr 2018 20:00:53 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180411195957-mutt-send-email-mst@kernel.org>
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
+	<fc66437c-ae8c-15fa-c8d3-6aa6bdb22a36@redhat.com>
+	<20180411083853.qa6y6zevjpvamrdx@debian>
+	<a6d0c105-5aa6-f578-a37f-39f1c2fed471@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1523089594-1422-2-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] migration: create a dedicated
- connection for rdma return path
+In-Reply-To: <a6d0c105-5aa6-f578-a37f-39f1c2fed471@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,207 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Tiwei Bie <tiwei.bie@intel.com>, cunming.liang@intel.com, qemu-devel@nongnu.org, peterx@redhat.com, zhihong.wang@intel.com, dan.daly@intel.com
 
-* Lidong Chen (jemmy858585@gmail.com) wrote:
-> If start a RDMA migration with postcopy enabled, the source qemu
-> establish a dedicated connection for return path.
-> 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+On Wed, Apr 11, 2018 at 09:41:05PM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 16:38, Tiwei Bie wrote:
+> > On Wed, Apr 11, 2018 at 04:01:19PM +0800, Jason Wang wrote:
+> > > On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 15:20, Tiwei Bie wrote:
+> > > > This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+> > > > feature for vhost-user. By default, vhost-user backend needs
+> > > > to query the IOTLBs from QEMU after meeting unknown IOVAs.
+> > > > With this protocol feature negotiated, QEMU will provide all
+> > > > the IOTLBs to vhost-user backend without waiting for the
+> > > > queries from backend. This is helpful when using a hardware
+> > > > accelerator which is not able to handle unknown IOVAs at the
+> > > > vhost-user backend.
+> > > >=20
+> > > > Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
+> > > > ---
+> > > > The idea of this patch is to let QEMU push all the IOTLBs
+> > > > to vhost-user backend without waiting for the queries from
+> > > > the backend. Because hardware accelerator at the vhost-user
+> > > > backend may not be able to handle unknown IOVAs.
+> > > >=20
+> > > > This is just a RFC for now. It seems that, it doesn't work
+> > > > as expected when guest is using kernel driver (To handle
+> > > > this case, it seems that some RAM regions' events also need
+> > > > to be listened). Any comments would be appreciated! Thanks!
+> > > Interesting, a quick question is why this is needed? Can we just us=
+e exist
+> > > IOTLB update message?
+> > Yeah, we are still using the existing IOTLB update messages
+> > to send the IOTLB messages to backend. The only difference
+> > is that, QEMU won't wait for the queries before sending the
+> > IOTLB update messages.
+>=20
+> Yes, my question is not very clear. I mean why must need a new feature =
+bit?
+> It looks to me qemu code can work without this.
+>=20
+> Thanks
 
+Generally we avoid adding new messages without a protocol feature bit.
+While careful analysis might sometimes prove it's not a strict
+requirement, it's just overall a clean and robust approach.
 
-OK, I think that'll work.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/rdma.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 91 insertions(+), 3 deletions(-)
-> 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index da474fc..230bd97 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -387,6 +387,10 @@ typedef struct RDMAContext {
->      uint64_t unregistrations[RDMA_SIGNALED_SEND_MAX];
->  
->      GHashTable *blockmap;
-> +
-> +    /* the RDMAContext for return path */
-> +    struct RDMAContext *return_path;
-> +    bool is_return_path;
->  } RDMAContext;
->  
->  #define TYPE_QIO_CHANNEL_RDMA "qio-channel-rdma"
-> @@ -2329,10 +2333,22 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
->          rdma_destroy_id(rdma->cm_id);
->          rdma->cm_id = NULL;
->      }
-> +
-> +    /* the destination side, listen_id and channel is shared */
->      if (rdma->listen_id) {
-> -        rdma_destroy_id(rdma->listen_id);
-> +        if (!rdma->is_return_path) {
-> +            rdma_destroy_id(rdma->listen_id);
-> +        }
->          rdma->listen_id = NULL;
-> +
-> +        if (rdma->channel) {
-> +            if (!rdma->is_return_path) {
-> +                rdma_destroy_event_channel(rdma->channel);
-> +            }
-> +            rdma->channel = NULL;
-> +        }
->      }
-> +
->      if (rdma->channel) {
->          rdma_destroy_event_channel(rdma->channel);
->          rdma->channel = NULL;
-> @@ -2561,6 +2577,25 @@ err_dest_init_create_listen_id:
->  
->  }
->  
-> +static void qemu_rdma_return_path_dest_init(RDMAContext *rdma_return_path,
-> +                                            RDMAContext *rdma)
-> +{
-> +    int idx;
-> +
-> +    for (idx = 0; idx < RDMA_WRID_MAX; idx++) {
-> +        rdma_return_path->wr_data[idx].control_len = 0;
-> +        rdma_return_path->wr_data[idx].control_curr = NULL;
-> +    }
-> +
-> +    /*the CM channel and CM id is shared*/
-> +    rdma_return_path->channel = rdma->channel;
-> +    rdma_return_path->listen_id = rdma->listen_id;
-> +
-> +    rdma->return_path = rdma_return_path;
-> +    rdma_return_path->return_path = rdma;
-> +    rdma_return_path->is_return_path = true;
-> +}
-> +
->  static void *qemu_rdma_data_init(const char *host_port, Error **errp)
->  {
->      RDMAContext *rdma = NULL;
-> @@ -3014,6 +3049,8 @@ err:
->      return ret;
->  }
->  
-> +static void rdma_accept_incoming_migration(void *opaque);
-> +
->  static int qemu_rdma_accept(RDMAContext *rdma)
->  {
->      RDMACapabilities cap;
-> @@ -3108,7 +3145,14 @@ static int qemu_rdma_accept(RDMAContext *rdma)
->          }
->      }
->  
-> -    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +    /* Accept the second connection request for return path */
-> +    if (migrate_postcopy() && !rdma->is_return_path) {
-> +        qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
-> +                            NULL,
-> +                            (void *)(intptr_t)rdma->return_path);
-> +    } else {
-> +        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +    }
->  
->      ret = rdma_accept(rdma->cm_id, &conn_param);
->      if (ret) {
-> @@ -3681,6 +3725,10 @@ static void rdma_accept_incoming_migration(void *opaque)
->  
->      trace_qemu_rdma_accept_incoming_migration_accepted();
->  
-> +    if (rdma->is_return_path) {
-> +        return;
-> +    }
-> +
->      f = qemu_fopen_rdma(rdma, "rb");
->      if (f == NULL) {
->          ERROR(errp, "could not qemu_fopen_rdma!");
-> @@ -3695,7 +3743,7 @@ static void rdma_accept_incoming_migration(void *opaque)
->  void rdma_start_incoming_migration(const char *host_port, Error **errp)
->  {
->      int ret;
-> -    RDMAContext *rdma;
-> +    RDMAContext *rdma, *rdma_return_path;
->      Error *local_err = NULL;
->  
->      trace_rdma_start_incoming_migration();
-> @@ -3722,12 +3770,24 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
->  
->      trace_rdma_start_incoming_migration_after_rdma_listen();
->  
-> +    /* initialize the RDMAContext for return path */
-> +    if (migrate_postcopy()) {
-> +        rdma_return_path = qemu_rdma_data_init(host_port, &local_err);
-> +
-> +        if (rdma_return_path == NULL) {
-> +            goto err;
-> +        }
-> +
-> +        qemu_rdma_return_path_dest_init(rdma_return_path, rdma);
-> +    }
-> +
->      qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
->                          NULL, (void *)(intptr_t)rdma);
->      return;
->  err:
->      error_propagate(errp, local_err);
->      g_free(rdma);
-> +    g_free(rdma_return_path);
->  }
->  
->  void rdma_start_outgoing_migration(void *opaque,
-> @@ -3735,6 +3795,7 @@ void rdma_start_outgoing_migration(void *opaque,
->  {
->      MigrationState *s = opaque;
->      RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
-> +    RDMAContext *rdma_return_path = NULL;
->      int ret = 0;
->  
->      if (rdma == NULL) {
-> @@ -3755,6 +3816,32 @@ void rdma_start_outgoing_migration(void *opaque,
->          goto err;
->      }
->  
-> +    /* RDMA postcopy need a seprate queue pair for return path */
-> +    if (migrate_postcopy()) {
-> +        rdma_return_path = qemu_rdma_data_init(host_port, errp);
-> +
-> +        if (rdma_return_path == NULL) {
-> +            goto err;
-> +        }
-> +
-> +        ret = qemu_rdma_source_init(rdma_return_path,
-> +            s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL], errp);
-> +
-> +        if (ret) {
-> +            goto err;
-> +        }
-> +
-> +        ret = qemu_rdma_connect(rdma_return_path, errp);
-> +
-> +        if (ret) {
-> +            goto err;
-> +        }
-> +
-> +        rdma->return_path = rdma_return_path;
-> +        rdma_return_path->return_path = rdma;
-> +        rdma_return_path->is_return_path = true;
-> +    }
-> +
->      trace_rdma_start_outgoing_migration_after_rdma_connect();
->  
->      s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
-> @@ -3762,4 +3849,5 @@ void rdma_start_outgoing_migration(void *opaque,
->      return;
->  err:
->      g_free(rdma);
-> +    g_free(rdma_return_path);
->  }
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+> > > It looks to me at least kernel does not need this.
+> > Something similar in kernel vhost is that, for kernel vhost,
+> > QEMU needs to push the IOTLBs of some ring addrs to kernel
+> > vhost backend without waiting for the queries.
+> >=20
+> > Best regards,
+> > Tiwei Bie
+> >=20
+> > > Thanks
