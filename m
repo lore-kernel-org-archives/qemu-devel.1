@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6LLq-0004Ub-HU
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:24:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f6LqD-0007lQ-2D
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6LLn-0000Nd-JI
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:24:14 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:39283)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f6LLn-0000N9-4l
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:24:11 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 21:23:47 +0200
-Message-Id: <20180411192347.30228-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13] linux-user: introduce target_sigsp()
- and target_save_altstack()
+	(envelope-from <no-reply@patchew.org>) id 1f6Lq8-00059S-J9
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 15:55:37 -0400
+Resent-Message-Id: <E1f6Lq8-00059S-J9@eggs.gnu.org>
+In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152347649804.1848.12604480592412380235@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 11 Apr 2018 12:54:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 00/19] linux-user: move arch
+ specific parts from main.c to arch directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,713 +24,502 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, cohuck@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org, f4bug@amsat.org, qemu-s390x@nongnu.org
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
-Based-on: <20180411185651.21351-1-laurent@vivier.eu>
-"[PATCH for 2.13 v2 00/19] linux-user: move arch specific parts from main.c to arch directories"
-
- linux-user/aarch64/signal.c    | 13 ++-----------
- linux-user/alpha/signal.c      | 17 ++++++-----------
- linux-user/arm/signal.c        | 17 ++++-------------
- linux-user/hppa/signal.c       | 14 ++++----------
- linux-user/i386/signal.c       | 12 +++---------
- linux-user/m68k/signal.c       | 15 +++------------
- linux-user/microblaze/signal.c |  4 +---
- linux-user/mips/signal.c       | 15 ++-------------
- linux-user/nios2/signal.c      | 21 ++-------------------
- linux-user/openrisc/signal.c   | 14 +++-----------
- linux-user/ppc/signal.c        | 15 ++-------------
- linux-user/riscv/signal.c      | 28 +++++++++-------------------
- linux-user/s390x/signal.c      | 12 +++---------
- linux-user/sh4/signal.c        | 11 ++---------
- linux-user/signal-common.h     | 15 ++++-----------
- linux-user/signal.c            | 32 ++++++++++++++++++++++++++++++++
- linux-user/sparc/signal.c      | 28 +++++++++++++++++++---------
- linux-user/tilegx/signal.c     | 13 +++----------
- linux-user/xtensa/signal.c     | 15 ++++-----------
- 19 files changed, 108 insertions(+), 203 deletions(-)
-
-diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-index 72d20975f3..dc6f1c6d2e 100644
---- a/linux-user/aarch64/signal.c
-+++ b/linux-user/aarch64/signal.c
-@@ -120,9 +120,7 @@ static void target_setup_general_frame(struct target_rt_sigframe *sf,
-     __put_user(0, &sf->uc.tuc_flags);
-     __put_user(0, &sf->uc.tuc_link);
- 
--    __put_user(target_sigaltstack_used.ss_sp, &sf->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->xregs[31]), &sf->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size, &sf->uc.tuc_stack.ss_size);
-+    target_save_altstack(&sf->uc.tuc_stack, env);
- 
-     for (i = 0; i < 31; i++) {
-         __put_user(env->xregs[i], &sf->uc.tuc_mcontext.regs[i]);
-@@ -372,14 +370,7 @@ static abi_ulong get_sigframe(struct target_sigaction *ka,
- {
-     abi_ulong sp;
- 
--    sp = env->xregs[31];
--
--    /*
--     * This is the X/Open sanctioned signal stack switching.
--     */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) && !sas_ss_flags(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-+    sp = target_sigsp(get_sp_from_cpustate(env), ka);
- 
-     sp = (sp - size) & ~15;
- 
-diff --git a/linux-user/alpha/signal.c b/linux-user/alpha/signal.c
-index a8c718f2c6..f24de02c6f 100644
---- a/linux-user/alpha/signal.c
-+++ b/linux-user/alpha/signal.c
-@@ -117,12 +117,10 @@ static inline abi_ulong get_sigframe(struct target_sigaction *sa,
-                                      CPUAlphaState *env,
-                                      unsigned long framesize)
- {
--    abi_ulong sp = env->ir[IR_SP];
-+    abi_ulong sp;
-+
-+    sp = target_sigsp(get_sp_from_cpustate(env), sa);
- 
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((sa->sa_flags & TARGET_SA_ONSTACK) != 0 && !sas_ss_flags(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-     return (sp - framesize) & -32;
- }
- 
-@@ -187,12 +185,9 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
-     __put_user(set->sig[0], &frame->uc.tuc_osf_sigmask);
--    __put_user(target_sigaltstack_used.ss_sp,
--               &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->ir[IR_SP]),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-+
-     setup_sigcontext(&frame->uc.tuc_mcontext, env, frame_addr, set);
-     for (i = 0; i < TARGET_NSIG_WORDS; ++i) {
-         __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
-diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
-index 0c1ec53025..0759b5dd8f 100644
---- a/linux-user/arm/signal.c
-+++ b/linux-user/arm/signal.c
-@@ -186,14 +186,9 @@ setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
- static inline abi_ulong
- get_sigframe(struct target_sigaction *ka, CPUARMState *regs, int framesize)
- {
--    unsigned long sp = regs->regs[13];
-+    unsigned long sp;
- 
--    /*
--     * This is the X/Open sanctioned signal stack switching.
--     */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) && !sas_ss_flags(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-+    sp = target_sigsp(get_sp_from_cpustate(regs), ka);
-     /*
-      * ATPCS B01 mandates 8-byte alignment
-      */
-@@ -285,9 +280,7 @@ static void setup_sigframe_v2(struct target_ucontext_v2 *uc,
-     memset(uc, 0, offsetof(struct target_ucontext_v2, tuc_mcontext));
- 
-     memset(&stack, 0, sizeof(stack));
--    __put_user(target_sigaltstack_used.ss_sp, &stack.ss_sp);
--    __put_user(target_sigaltstack_used.ss_size, &stack.ss_size);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)), &stack.ss_flags);
-+    target_save_altstack(&stack, env);
-     memcpy(&uc->tuc_stack, &stack, sizeof(stack));
- 
-     setup_sigcontext(&uc->tuc_mcontext, env, set->sig[0]);
-@@ -394,9 +387,7 @@ static void setup_rt_frame_v1(int usig, struct target_sigaction *ka,
-     memset(&frame->uc, 0, offsetof(struct target_ucontext_v1, tuc_mcontext));
- 
-     memset(&stack, 0, sizeof(stack));
--    __put_user(target_sigaltstack_used.ss_sp, &stack.ss_sp);
--    __put_user(target_sigaltstack_used.ss_size, &stack.ss_size);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)), &stack.ss_flags);
-+    target_save_altstack(&stack, env);
-     memcpy(&frame->uc.tuc_stack, &stack, sizeof(stack));
- 
-     setup_sigcontext(&frame->uc.tuc_mcontext, env, set->sig[0]);
-diff --git a/linux-user/hppa/signal.c b/linux-user/hppa/signal.c
-index 585af3a37f..6e7a295aee 100644
---- a/linux-user/hppa/signal.c
-+++ b/linux-user/hppa/signal.c
-@@ -113,11 +113,9 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     struct target_rt_sigframe *frame;
-     int i;
- 
--    sp = env->gr[30];
--    if (ka->sa_flags & TARGET_SA_ONSTACK) {
--        if (sas_ss_flags(sp) == 0) {
--            sp = (target_sigaltstack_used.ss_sp + 0x7f) & ~0x3f;
--        }
-+    sp = get_sp_from_cpustate(env);
-+    if ((ka->sa_flags & TARGET_SA_ONSTACK) && !sas_ss_flags(sp)) {
-+        sp = (target_sigaltstack_used.ss_sp + 0x7f) & ~0x3f;
-     }
-     frame_addr = QEMU_ALIGN_UP(sp, 64);
-     sp = frame_addr + PARISC_RT_SIGFRAME_SIZE32;
-@@ -132,11 +130,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     frame->uc.tuc_flags = 0;
-     frame->uc.tuc_link = 0;
- 
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
- 
-     for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-         __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
-diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
-index 4a190e6435..e9a23a2dec 100644
---- a/linux-user/i386/signal.c
-+++ b/linux-user/i386/signal.c
-@@ -283,16 +283,14 @@ get_sigframe(struct target_sigaction *ka, CPUX86State *env, size_t frame_size)
-     unsigned long esp;
- 
-     /* Default to using normal stack */
--    esp = env->regs[R_ESP];
-+    esp = get_sp_from_cpustate(env);
- #ifdef TARGET_X86_64
-     esp -= 128; /* this is the redzone */
- #endif
- 
-     /* This is the X/Open sanctioned signal stack switching.  */
-     if (ka->sa_flags & TARGET_SA_ONSTACK) {
--        if (sas_ss_flags(esp) == 0) {
--            esp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--        }
-+        esp = target_sigsp(esp, ka);
-     } else {
- #ifndef TARGET_X86_64
-         /* This is the legacy signal stack switching. */
-@@ -404,11 +402,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     /* Create the ucontext.  */
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     setup_sigcontext(&frame->uc.tuc_mcontext, &frame->fpstate, env,
-             set->sig[0], frame_addr + offsetof(struct rt_sigframe, fpstate));
- 
-diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
-index fc72468a81..5dd8bb5f99 100644
---- a/linux-user/m68k/signal.c
-+++ b/linux-user/m68k/signal.c
-@@ -117,14 +117,10 @@ static inline abi_ulong
- get_sigframe(struct target_sigaction *ka, CPUM68KState *regs,
-              size_t frame_size)
- {
--    unsigned long sp;
-+    abi_ulong sp;
- 
--    sp = regs->aregs[7];
-+    sp = target_sigsp(get_sp_from_cpustate(regs), ka);
- 
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags (sp) == 0)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
- 
-     return ((sp - frame_size) & -8UL);
- }
-@@ -318,12 +314,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
- 
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp,
--               &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->aregs[7]),
--            &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     err |= target_rt_setup_ucontext(&frame->uc, env);
- 
-     if (err)
-diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
-index 5572baa7dc..fada0f1495 100644
---- a/linux-user/microblaze/signal.c
-+++ b/linux-user/microblaze/signal.c
-@@ -133,9 +133,7 @@ static abi_ulong get_sigframe(struct target_sigaction *ka,
- {
-     abi_ulong sp = env->regs[1];
- 
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !on_sig_stack(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-+    sp = target_sigsp(sp, ka);
- 
-     return ((sp - frame_size) & -8UL);
- }
-diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
-index adeb5a4241..ed9849c7f6 100644
---- a/linux-user/mips/signal.c
-+++ b/linux-user/mips/signal.c
-@@ -179,20 +179,12 @@ get_sigframe(struct target_sigaction *ka, CPUMIPSState *regs, size_t frame_size)
- {
-     unsigned long sp;
- 
--    /* Default to using normal stack */
--    sp = regs->active_tc.gpr[29];
--
-     /*
-      * FPU emulator may have its own trampoline active just
-      * above the user stack, 16-bytes before the next lowest
-      * 16 byte boundary.  Try to avoid trashing it.
-      */
--    sp -= 32;
--
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags (sp) == 0)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-+    sp = target_sigsp(get_sp_from_cpustate(regs) - 32, ka);
- 
-     return (sp - frame_size) & ~7;
- }
-@@ -323,10 +315,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
- 
-     __put_user(0, &frame->rs_uc.tuc_flags);
-     __put_user(0, &frame->rs_uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->rs_uc.tuc_stack.ss_sp);
--    __put_user(target_sigaltstack_used.ss_size, &frame->rs_uc.tuc_stack.ss_size);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
--               &frame->rs_uc.tuc_stack.ss_flags);
-+    target_save_altstack(&frame->rs_uc.tuc_stack, env);
- 
-     setup_sigcontext(env, &frame->rs_uc.tuc_mcontext);
- 
-diff --git a/linux-user/nios2/signal.c b/linux-user/nios2/signal.c
-index 816eed90f1..9a0b36e5ad 100644
---- a/linux-user/nios2/signal.c
-+++ b/linux-user/nios2/signal.c
-@@ -42,18 +42,6 @@ struct target_rt_sigframe {
-     struct target_ucontext uc;
- };
- 
--static unsigned long sigsp(unsigned long sp, struct target_sigaction *ka)
--{
--    if (unlikely((ka->sa_flags & SA_ONSTACK)) && !sas_ss_flags(sp)) {
--#ifdef CONFIG_STACK_GROWSUP
--        return target_sigaltstack_used.ss_sp;
--#else
--        return target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--#endif
--    }
--    return sp;
--}
--
- static int rt_setup_ucontext(struct target_ucontext *uc, CPUNios2State *env)
- {
-     unsigned long *gregs = uc->tuc_mcontext.gregs;
-@@ -158,11 +146,8 @@ static void *get_sigframe(struct target_sigaction *ka, CPUNios2State *env,
- {
-     unsigned long usp;
- 
--    /* Default to using normal stack.  */
--    usp = env->regs[R_SP];
--
-     /* This is the X/Open sanctioned signal stack switching.  */
--    usp = sigsp(usp, ka);
-+    usp = target_sigsp(get_sp_from_cpustate(env), ka);
- 
-     /* Verify, is it 32 or 64 bit aligned */
-     return (void *)((usp - frame_size) & -8UL);
-@@ -185,9 +170,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     /* Create the ucontext.  */
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->regs[R_SP]), &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     err |= rt_setup_ucontext(&frame->uc, env);
-     for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-         __put_user((abi_ulong)set->sig[i],
-diff --git a/linux-user/openrisc/signal.c b/linux-user/openrisc/signal.c
-index 0276808b59..ecf2897ccd 100644
---- a/linux-user/openrisc/signal.c
-+++ b/linux-user/openrisc/signal.c
-@@ -124,14 +124,11 @@ static inline abi_ulong get_sigframe(struct target_sigaction *ka,
-                                      CPUOpenRISCState *regs,
-                                      size_t frame_size)
- {
--    unsigned long sp = cpu_get_gpr(regs, 1);
-+    unsigned long sp = get_sp_from_cpustate(regs);
-     int onsigstack = on_sig_stack(sp);
- 
-     /* redzone */
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-+    sp = target_sigsp(sp, ka);
- 
-     sp = align_sigframe(sp - frame_size);
- 
-@@ -175,12 +172,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     /*err |= __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontext));*/
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp,
--               &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(cpu_get_gpr(env, 1)),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     setup_sigcontext(&frame->sc, env, set->sig[0]);
- 
-     /*err |= copy_to_user(frame->uc.tuc_sigmask, set, sizeof(*set));*/
-diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-index 15148d54a9..cacc9afb5a 100644
---- a/linux-user/ppc/signal.c
-+++ b/linux-user/ppc/signal.c
-@@ -217,13 +217,7 @@ static target_ulong get_sigframe(struct target_sigaction *ka,
- {
-     target_ulong oldsp;
- 
--    oldsp = env->gpr[1];
--
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) &&
--            (sas_ss_flags(oldsp) == 0)) {
--        oldsp = (target_sigaltstack_used.ss_sp
--                 + target_sigaltstack_used.ss_size);
--    }
-+    oldsp = target_sigsp(get_sp_from_cpustate(env), ka);
- 
-     return (oldsp - frame_size) & ~0xFUL;
- }
-@@ -515,12 +509,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
- 
-     __put_user(0, &rt_sf->uc.tuc_flags);
-     __put_user(0, &rt_sf->uc.tuc_link);
--    __put_user((target_ulong)target_sigaltstack_used.ss_sp,
--               &rt_sf->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->gpr[1]),
--               &rt_sf->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &rt_sf->uc.tuc_stack.ss_size);
-+    target_save_altstack(&rt_sf->uc.tuc_stack, env);
- #if !defined(TARGET_PPC64)
-     __put_user(h2g (&rt_sf->uc.tuc_mcontext),
-                &rt_sf->uc.tuc_regs);
-diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
-index 718f3a5679..ef599e319a 100644
---- a/linux-user/riscv/signal.c
-+++ b/linux-user/riscv/signal.c
-@@ -54,24 +54,20 @@ struct target_rt_sigframe {
- static abi_ulong get_sigframe(struct target_sigaction *ka,
-                               CPURISCVState *regs, size_t framesize)
- {
--    abi_ulong sp = regs->gpr[xSP];
--    int onsigstack = on_sig_stack(sp);
--
--    /* redzone */
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
--
--    sp -= framesize;
--    sp &= ~3UL; /* align sp on 4-byte boundary */
-+    abi_ulong sp = get_sp_from_cpustate(regs);
- 
-     /* If we are on the alternate signal stack and would overflow it, don't.
-        Return an always-bogus address instead so we will die with SIGSEGV. */
--    if (onsigstack && !likely(on_sig_stack(sp))) {
-+    if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize))) {
-         return -1L;
-     }
- 
-+    /* This is the X/Open sanctioned signal stack switching.  */
-+    sp = target_sigsp(sp, ka) - framesize;
-+
-+    /* XXX: kernel aligns with 0xf ? */
-+    sp &= ~3UL; /* align sp on 4-byte boundary */
-+
-     return sp;
- }
- 
-@@ -95,16 +91,10 @@ static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
- static void setup_ucontext(struct target_ucontext *uc,
-                            CPURISCVState *env, target_sigset_t *set)
- {
--    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
--    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
--    abi_ulong ss_size = target_sigaltstack_used.ss_size;
--
-     __put_user(0,    &(uc->uc_flags));
-     __put_user(0,    &(uc->uc_link));
- 
--    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
--    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
--    __put_user(ss_size,  &(uc->uc_stack.ss_size));
-+    target_save_altstack(&uc->uc_stack, env);
- 
-     int i;
-     for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-diff --git a/linux-user/s390x/signal.c b/linux-user/s390x/signal.c
-index a204a85e4a..e35cbe6870 100644
---- a/linux-user/s390x/signal.c
-+++ b/linux-user/s390x/signal.c
-@@ -86,14 +86,11 @@ get_sigframe(struct target_sigaction *ka, CPUS390XState *env, size_t frame_size)
-     abi_ulong sp;
- 
-     /* Default to using normal stack */
--    sp = env->regs[15];
-+    sp = get_sp_from_cpustate(env);
- 
-     /* This is the X/Open sanctioned signal stack switching.  */
-     if (ka->sa_flags & TARGET_SA_ONSTACK) {
--        if (!sas_ss_flags(sp)) {
--            sp = target_sigaltstack_used.ss_sp +
--                 target_sigaltstack_used.ss_size;
--        }
-+        sp = target_sigsp(sp, ka);
-     }
- 
-     /* This is the legacy signal stack switching. */
-@@ -205,10 +202,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     /* Create the ucontext.  */
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user((abi_ulong)0, (abi_ulong *)&frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     save_sigregs(env, &frame->uc.tuc_mcontext);
-     for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-         __put_user((abi_ulong)set->sig[i],
-diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
-index 5ce182aff7..2a5378e16e 100644
---- a/linux-user/sh4/signal.c
-+++ b/linux-user/sh4/signal.c
-@@ -78,9 +78,7 @@ struct target_rt_sigframe
- static abi_ulong get_sigframe(struct target_sigaction *ka,
-                               unsigned long sp, size_t frame_size)
- {
--    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags(sp) == 0)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-+    sp = target_sigsp(sp, ka);
- 
-     return (sp - frame_size) & -8ul;
- }
-@@ -238,12 +236,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     /* Create the ucontext.  */
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, (unsigned long *)&frame->uc.tuc_link);
--    __put_user((unsigned long)target_sigaltstack_used.ss_sp,
--               &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(regs->gregs[15]),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, regs);
-     setup_sigcontext(&frame->uc.tuc_mcontext,
-                      regs, set->sig[0]);
-     for(i = 0; i < TARGET_NSIG_WORDS; i++) {
-diff --git a/linux-user/signal-common.h b/linux-user/signal-common.h
-index fbb8d4365c..51030a9306 100644
---- a/linux-user/signal-common.h
-+++ b/linux-user/signal-common.h
-@@ -21,17 +21,10 @@
- #define SIGNAL_COMMON_H
- extern struct target_sigaltstack target_sigaltstack_used;
- 
--static inline int on_sig_stack(unsigned long sp)
--{
--    return (sp - target_sigaltstack_used.ss_sp
--            < target_sigaltstack_used.ss_size);
--}
--
--static inline int sas_ss_flags(unsigned long sp)
--{
--    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
--            : on_sig_stack(sp) ? SS_ONSTACK : 0);
--}
-+int on_sig_stack(unsigned long sp);
-+int sas_ss_flags(unsigned long sp);
-+abi_ulong target_sigsp(abi_ulong sp, struct target_sigaction *ka);
-+void target_save_altstack(target_stack_t *uss, CPUArchState *env);
- 
- static inline void target_sigemptyset(target_sigset_t *set)
- {
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index a3022c2f04..01de433e3a 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -249,6 +249,38 @@ void set_sigmask(const sigset_t *set)
- }
- #endif
- 
-+/* sigaltstack management */
-+
-+int on_sig_stack(unsigned long sp)
-+{
-+    return (sp - target_sigaltstack_used.ss_sp
-+            < target_sigaltstack_used.ss_size);
-+}
-+
-+int sas_ss_flags(unsigned long sp)
-+{
-+    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
-+            : on_sig_stack(sp) ? SS_ONSTACK : 0);
-+}
-+
-+abi_ulong target_sigsp(abi_ulong sp, struct target_sigaction *ka)
-+{
-+    /*
-+     * This is the X/Open sanctioned signal stack switching.
-+     */
-+    if ((ka->sa_flags & TARGET_SA_ONSTACK) && !sas_ss_flags(sp)) {
-+        return target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+    }
-+    return sp;
-+}
-+
-+void target_save_altstack(target_stack_t *uss, CPUArchState *env)
-+{
-+    __put_user(target_sigaltstack_used.ss_sp, &uss->ss_sp);
-+    __put_user(sas_ss_flags(get_sp_from_cpustate(env)), &uss->ss_flags);
-+    __put_user(target_sigaltstack_used.ss_size, &uss->ss_size);
-+}
-+
- /* siginfo conversion */
- 
- static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index c823e61cee..45e922f328 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -123,18 +123,28 @@ static inline abi_ulong get_sigframe(struct target_sigaction *sa,
-                                      CPUSPARCState *env,
-                                      unsigned long framesize)
- {
--    abi_ulong sp;
-+    abi_ulong sp = get_sp_from_cpustate(env);
- 
--    sp = env->regwptr[UREG_FP];
-+    /*
-+     * If we are on the alternate signal stack and would overflow it, don't.
-+     * Return an always-bogus address instead so we will die with SIGSEGV.
-+         */
-+    if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize))) {
-+            return -1;
-+    }
- 
-     /* This is the X/Open sanctioned signal stack switching.  */
--    if (sa->sa_flags & TARGET_SA_ONSTACK) {
--        if (!on_sig_stack(sp)
--                && !((target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size) & 7)) {
--            sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--        }
--    }
--    return sp - framesize;
-+    sp = target_sigsp(sp, sa) - framesize;
-+
-+    /* Always align the stack frame.  This handles two cases.  First,
-+     * sigaltstack need not be mindful of platform specific stack
-+     * alignment.  Second, if we took this signal because the stack
-+     * is not aligned properly, we'd like to take the signal cleanly
-+     * and report that.
-+     */
-+    sp &= ~15UL;
-+
-+    return sp;
- }
- 
- static int
-diff --git a/linux-user/tilegx/signal.c b/linux-user/tilegx/signal.c
-index 8f54f54f95..d0ed3de569 100644
---- a/linux-user/tilegx/signal.c
-+++ b/linux-user/tilegx/signal.c
-@@ -86,17 +86,13 @@ static void restore_sigcontext(CPUTLGState *env, struct target_sigcontext *sc)
- static abi_ulong get_sigframe(struct target_sigaction *ka, CPUArchState *env,
-                               size_t frame_size)
- {
--    unsigned long sp = env->regs[TILEGX_R_SP];
-+    unsigned long sp = get_sp_from_cpustate(env);
- 
-     if (on_sig_stack(sp) && !likely(on_sig_stack(sp - frame_size))) {
-         return -1UL;
-     }
- 
--    if ((ka->sa_flags & SA_ONSTACK) && !sas_ss_flags(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
--
--    sp -= frame_size;
-+    sp = target_sigsp(sp, ka) - frame_size;
-     sp &= -16UL;
-     return sp;
- }
-@@ -127,10 +123,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     /* Create the ucontext.  */
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->regs[TILEGX_R_SP]),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     setup_sigcontext(&frame->uc.tuc_mcontext, env, info->si_signo);
- 
-     if (ka->sa_flags & TARGET_SA_RESTORER) {
-diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
-index 1e98910c1b..3e483efc61 100644
---- a/linux-user/xtensa/signal.c
-+++ b/linux-user/xtensa/signal.c
-@@ -55,12 +55,10 @@ static abi_ulong get_sigframe(struct target_sigaction *sa,
-                               CPUXtensaState *env,
-                               unsigned long framesize)
- {
--    abi_ulong sp = env->regs[1];
-+    abi_ulong sp;
-+
-+    sp = target_sigsp(get_sp_from_cpustate(env), sa);
- 
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if ((sa->sa_flags & TARGET_SA_ONSTACK) != 0 && !sas_ss_flags(sp)) {
--        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--    }
-     return (sp - framesize) & -16;
- }
- 
-@@ -152,12 +150,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
- 
-     __put_user(0, &frame->uc.tuc_flags);
-     __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp,
--               &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->regs[1]),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
-+    target_save_altstack(&frame->uc.tuc_stack, env);
-     if (!setup_sigcontext(frame, env)) {
-         unlock_user_struct(frame, frame_addr, 0);
-         goto give_sigsegv;
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDExMTg1NjUxLjIxMzUxLTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBmb3IgMi4xMyB2MiAwMC8xOV0gbGludXgtdXNlcjogbW92
+ZSBhcmNoIHNwZWNpZmljIHBhcnRzIGZyb20gbWFpbi5jIHRvIGFyY2ggZGlyZWN0b3JpZXMKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAzMjkw
+MzIxNDkuNDQ2ODUtMS1haWtAb3psYWJzLnJ1IC0+IHBhdGNoZXcvMjAxODAzMjkwMzIxNDkuNDQ2
+ODUtMS1haWtAb3psYWJzLnJ1CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODA0MTExODU2NTEuMjEzNTEtMS1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTgwNDEx
+MTg1NjUxLjIxMzUxLTEtbGF1cmVudEB2aXZpZXIuZXUKQXV0byBwYWNraW5nIHRoZSByZXBvc2l0
+b3J5IGluIGJhY2tncm91bmQgZm9yIG9wdGltdW0gcGVyZm9ybWFuY2UuClNlZSAiZ2l0IGhlbHAg
+Z2MiIGZvciBtYW51YWwgaG91c2VrZWVwaW5nLgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCmNlNTZjZjRkZGYgbGludXgtdXNlcjogbW92ZSB4dGVuc2EgY3B1IGxvb3AgdG8geHRlbnNh
+IGRpcmVjdG9yeQpmYmVhODQ5NmMwIGxpbnV4LXVzZXI6IG1vdmUgaHBwYSBjcHUgbG9vcCB0byBo
+cHBhIGRpcmVjdG9yeQpkNjA1MmZlYzk4IGxpbnV4LXVzZXI6IG1vdmUgcmlzY3YgY3B1IGxvb3Ag
+dG8gcmlzY3YgZGlyZWN0b3J5CjE4YzY0ZWU3NzIgbGludXgtdXNlcjogbW92ZSB0aWxlZ3ggY3B1
+IGxvb3AgdG8gdGlsZWd4IGRpcmVjdG9yeQpiYjczODU3NjEwIGxpbnV4LXVzZXI6IG1vdmUgczM5
+MHggY3B1IGxvb3AgdG8gczM5MHggZGlyZWN0b3J5CmRkNWJkYmQ1YTIgbGludXgtdXNlcjogbW92
+ZSBhbHBoYSBjcHUgbG9vcCB0byBhbHBoYSBkaXJlY3RvcnkKNmZkMzAyNzZiNCBsaW51eC11c2Vy
+OiBtb3ZlIG02OGsgY3B1IGxvb3AgdG8gbTY4ayBkaXJlY3RvcnkKMTU0YjcwYjQzYiBsaW51eC11
+c2VyOiBtb3ZlIG1pY3JvYmxhemUgY3B1IGxvb3AgdG8gbWljcm9ibGF6ZSBkaXJlY3RvcnkKM2M5
+NzZiMGE1YiBsaW51eC11c2VyOiBtb3ZlIGNyaXMgY3B1IGxvb3AgdG8gY3JpcyBkaXJlY3RvcnkK
+MTY4ZDE5ODk1NiBsaW51eC11c2VyOiBtb3ZlIHNoNCBjcHUgbG9vcCB0byBzaDQgZGlyZWN0b3J5
+CjM3MjdhZjI4YzQgbGludXgtdXNlcjogbW92ZSBvcGVucmlzYyBjcHUgbG9vcCB0byBvcGVucmlz
+YyBkaXJlY3RvcnkKMDIyYjZiZmJmZSBsaW51eC11c2VyOiBtb3ZlIG5pb3MyIGNwdSBsb29wIHRv
+IG5pb3MyIGRpcmVjdG9yeQphNzRjMWJkYzg3IGxpbnV4LXVzZXI6IG1vdmUgbWlwcy9taXBzNjQg
+Y3B1IGxvb3AgdG8gbWlwcyBkaXJlY3RvcnkKYmRiYTk5MjRmMCBsaW51eC11c2VyOiBtb3ZlIHBw
+Yy9wcGM2NCBjcHUgbG9vcCB0byBwcGMgZGlyZWN0b3J5CmY1NzQ5OTA3NjEgbGludXgtdXNlcjog
+bW92ZSBzcGFyYy9zcGFyYzY0IGNwdSBsb29wIHRvIHNwYXJjIGRpcmVjdG9yeQpiYTA2ZjQ5MmVk
+IGxpbnV4LXVzZXI6IG1vdmUgYXJtIGNwdSBsb29wIHRvIGFybSBkaXJlY3RvcnkKZTk3Mjk0MjIz
+MiBsaW51eC11c2VyOiBtb3ZlIGFhcmNoNjQgY3B1IGxvb3AgdG8gYWFyY2g2NCBkaXJlY3RvcnkK
+M2IwY2VhNDkzYSBsaW51eC11c2VyOiBtb3ZlIGkzODYveDg2XzY0IGNwdSBsb29wIHRvIGkzODYg
+ZGlyZWN0b3J5Cjk5NjA2Nzg4YTUgbGludXgtdXNlcjogY3JlYXRlIGEgZHVtbXkgcGVyIGFyY2gg
+Y3B1X2xvb3AuYwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOTogbGlu
+dXgtdXNlcjogY3JlYXRlIGEgZHVtbXkgcGVyIGFyY2ggY3B1X2xvb3AuYy4uLgpDaGVja2luZyBQ
+QVRDSCAyLzE5OiBsaW51eC11c2VyOiBtb3ZlIGkzODYveDg2XzY0IGNwdSBsb29wIHRvIGkzODYg
+ZGlyZWN0b3J5Li4uCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50
+aGVzaXMgJygnCiM5MjogRklMRTogbGludXgtdXNlci9pMzg2L2NwdV9sb29wLmM6OTE6CisgICAg
+Zm9yKDs7KSB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhl
+c2lzICcoJwojOTg6IEZJTEU6IGxpbnV4LXVzZXIvaTM4Ni9jcHVfbG9vcC5jOjk3OgorICAgICAg
+ICBzd2l0Y2godHJhcG5yKSB7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
+bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxNjE6IEZJTEU6IGxpbnV4LXVzZXIvaTM4Ni9jcHVf
+bG9vcC5jOjE2MDoKKyAgICAgICAgICAgIGlmICghKGVudi0+ZXJyb3JfY29kZSAmIDEpKQpbLi4u
+XQorICAgICAgICAgICAgZWxzZQpbLi4uXQoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3Vs
+ZCBiZSBvbiB0aGUgcHJldmlvdXMgbGluZQojMjMzOiBGSUxFOiBsaW51eC11c2VyL2kzODYvY3B1
+X2xvb3AuYzoyMzI6CisgICAgICAgICAgICAgICAgaWYgKHNpZykKKyAgICAgICAgICAgICAgICAg
+IHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNDc6IEZJTEU6IGxpbnV4LXVz
+ZXIvaTM4Ni9jcHVfbG9vcC5jOjI0NjoKKyAgICAgICAgICAgIEVYQ1BfRFVNUChlbnYsICJxZW11
+OiAweCUwOGx4OiB1bmhhbmRsZWQgQ1BVIGV4Y2VwdGlvbiAweCV4IC0gYWJvcnRpbmdcbiIsCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzMwNzogRklM
+RTogbGludXgtdXNlci9pMzg2L2NwdV9sb29wLmM6MzA2OgorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBQUk9UX1JFQUR8UFJPVF9XUklURSwKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
+fCcgKGN0eDpWeFYpCiMzMDg6IEZJTEU6IGxpbnV4LXVzZXIvaTM4Ni9jcHVfbG9vcC5jOjMwNzoK
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTUFQX0FOT05ZTU9VU3xNQVBfUFJJVkFU
+RSwgLTEsIDApOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiMzMzY6
+IEZJTEU6IGxpbnV4LXVzZXIvaTM4Ni9jcHVfbG9vcC5jOjMzNToKKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFBST1RfUkVBRHxQUk9UX1dSSVRFLAogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiMzMzc6IEZJTEU6IGxpbnV4LXVzZXIvaTM4Ni9jcHVf
+bG9vcC5jOjMzNjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1BUF9BTk9O
+WU1PVVN8TUFQX1BSSVZBVEUsIC0xLCAwKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogOCBlcnJvcnMsIDEgd2FybmluZ3MsIDcyMCBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCAzLzE5OiBsaW51eC11c2VyOiBtb3ZlIGFhcmNoNjQgY3B1IGxvb3AgdG8gYWFy
+Y2g2NCBkaXJlY3RvcnkuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0MTog
+RklMRTogbGludXgtdXNlci9hYXJjaDY0L2NwdV9sb29wLmM6MTQyOgorICAgICAgICAgICAgRVhD
+UF9EVU1QKGVudiwgInFlbXU6IHVuaGFuZGxlZCBDUFUgZXhjZXB0aW9uIDB4JXggLSBhYm9ydGlu
+Z1xuIiwgdHJhcG5yKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjg5IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
+Q0ggNC8xOTogbGludXgtdXNlcjogbW92ZSBhcm0gY3B1IGxvb3AgdG8gYXJtIGRpcmVjdG9yeS4u
+LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMxNzI6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29wLmM6MTcxOgorICAgICAg
+ICBpZiAoZ2V0X3VzZXJfdTMyKHZhbCwgYWRkcikpClsuLi5dCgpFUlJPUjogc3BhY2UgcmVxdWly
+ZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMjE3OiBGSUxFOiBsaW51eC11c2Vy
+L2FybS9jcHVfbG9vcC5jOjIxNjoKKyAgICBmb3IoOzspIHsKCkVSUk9SOiBzcGFjZSByZXF1aXJl
+ZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiMyMjM6IEZJTEU6IGxpbnV4LXVzZXIv
+YXJtL2NwdV9sb29wLmM6MjIyOgorICAgICAgICBzd2l0Y2godHJhcG5yKSB7CgpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9JyAoY3R4OlZ4VikKIzI0NTogRklMRTogbGludXgt
+dXNlci9hcm0vY3B1X2xvb3AuYzoyNDQ6CisgICAgICAgICAgICAgICAgICAgIGludCBhcm1fZnBl
+PTA7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHN1c3BlY3QgY29k
+ZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDIwLCAyMikKIzI0ODogRklMRTog
+bGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNDc6CisgICAgICAgICAgICAgICAgICAgIGlmICgt
+cmMgJiBmbG9hdF9mbGFnX2ludmFsaWQpCisgICAgICAgICAgICAgICAgICAgICAgYXJtX2ZwZSB8
+PSBCSVRfSU9DOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBv
+ZiB0aGlzIHN0YXRlbWVudAojMjQ4OiBGSUxFOiBsaW51eC11c2VyL2FybS9jcHVfbG9vcC5jOjI0
+NzoKKyAgICAgICAgICAgICAgICAgICAgaWYgKC1yYyAmIGZsb2F0X2ZsYWdfaW52YWxpZCkKWy4u
+Ll0KCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRz
+ICgyMCwgMjIpCiMyNTA6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29wLmM6MjQ5OgorICAg
+ICAgICAgICAgICAgICAgICBpZiAoLXJjICYgZmxvYXRfZmxhZ19kaXZieXplcm8pCisgICAgICAg
+ICAgICAgICAgICAgICAgYXJtX2ZwZSB8PSBCSVRfRFpDOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUg
+bmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjUwOiBGSUxFOiBsaW51
+eC11c2VyL2FybS9jcHVfbG9vcC5jOjI0OToKKyAgICAgICAgICAgICAgICAgICAgaWYgKC1yYyAm
+IGZsb2F0X2ZsYWdfZGl2Ynl6ZXJvKQpbLi4uXQoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQg
+Zm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDIwLCAyMikKIzI1MjogRklMRTogbGludXgtdXNl
+ci9hcm0vY3B1X2xvb3AuYzoyNTE6CisgICAgICAgICAgICAgICAgICAgIGlmICgtcmMgJiBmbG9h
+dF9mbGFnX292ZXJmbG93KQorICAgICAgICAgICAgICAgICAgICAgIGFybV9mcGUgfD0gQklUX09G
+QzsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzI1MjogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNTE6CisgICAg
+ICAgICAgICAgICAgICAgIGlmICgtcmMgJiBmbG9hdF9mbGFnX292ZXJmbG93KQpbLi4uXQoKRVJS
+T1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDIwLCAy
+MikKIzI1NDogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNTM6CisgICAgICAgICAg
+ICAgICAgICAgIGlmICgtcmMgJiBmbG9hdF9mbGFnX3VuZGVyZmxvdykKKyAgICAgICAgICAgICAg
+ICAgICAgICBhcm1fZnBlIHw9IEJJVF9VRkM7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nh
+cnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyNTQ6IEZJTEU6IGxpbnV4LXVzZXIv
+YXJtL2NwdV9sb29wLmM6MjUzOgorICAgICAgICAgICAgICAgICAgICBpZiAoLXJjICYgZmxvYXRf
+ZmxhZ191bmRlcmZsb3cpClsuLi5dCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29u
+ZGl0aW9uYWwgc3RhdGVtZW50cyAoMjAsIDIyKQojMjU2OiBGSUxFOiBsaW51eC11c2VyL2FybS9j
+cHVfbG9vcC5jOjI1NToKKyAgICAgICAgICAgICAgICAgICAgaWYgKC1yYyAmIGZsb2F0X2ZsYWdf
+aW5leGFjdCkKKyAgICAgICAgICAgICAgICAgICAgICBhcm1fZnBlIHw9IEJJVF9JWEM7CgpFUlJP
+UjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50
+CiMyNTY6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29wLmM6MjU1OgorICAgICAgICAgICAg
+ICAgICAgICBpZiAoLXJjICYgZmxvYXRfZmxhZ19pbmV4YWN0KQpbLi4uXQoKRVJST1I6IGRvIG5v
+dCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyNjA6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29w
+LmM6MjU5OgorICAgICAgICAgICAgICAgICAgICAvL3ByaW50ZigiZnBzciAweCV4LCBhcm1fZnBl
+IDB4JXhcbiIsZnBzcixhcm1fZnBlKTsKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3Vs
+ZCBiZSBvbiBuZXh0IGxpbmUKIzI2NzogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoy
+NjY6CisgICAgICAgICAgICAgICAgICAgICAgaWYgKGFybV9mcGUgJiBCSVRfSVhDKSBpbmZvLnNp
+X2NvZGUgPSBUQVJHRVRfRlBFX0ZMVFJFUzsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2Fy
+eSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI2NzogRklMRTogbGludXgtdXNlci9h
+cm0vY3B1X2xvb3AuYzoyNjY6CisgICAgICAgICAgICAgICAgICAgICAgaWYgKGFybV9mcGUgJiBC
+SVRfSVhDKSBpbmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBFX0ZMVFJFUzsKWy4uLl0KCkVSUk9SOiB0
+cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzI2ODogRklMRTogbGlu
+dXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNjc6CisgICAgICAgICAgICAgICAgICAgICAgaWYgKGFy
+bV9mcGUgJiBCSVRfVUZDKSBpbmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBFX0ZMVFVORDsKCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzI2ODogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNjc6CisgICAgICAgICAgICAg
+ICAgICAgICAgaWYgKGFybV9mcGUgJiBCSVRfVUZDKSBpbmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBF
+X0ZMVFVORDsKWy4uLl0KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBu
+ZXh0IGxpbmUKIzI2OTogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNjg6CisgICAg
+ICAgICAgICAgICAgICAgICAgaWYgKGFybV9mcGUgJiBCSVRfT0ZDKSBpbmZvLnNpX2NvZGUgPSBU
+QVJHRVRfRlBFX0ZMVE9WRjsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI2OTogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xv
+b3AuYzoyNjg6CisgICAgICAgICAgICAgICAgICAgICAgaWYgKGFybV9mcGUgJiBCSVRfT0ZDKSBp
+bmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBFX0ZMVE9WRjsKWy4uLl0KCkVSUk9SOiB0cmFpbGluZyBz
+dGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzI3MDogRklMRTogbGludXgtdXNlci9h
+cm0vY3B1X2xvb3AuYzoyNjk6CisgICAgICAgICAgICAgICAgICAgICAgaWYgKGFybV9mcGUgJiBC
+SVRfRFpDKSBpbmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBFX0ZMVERJVjsKCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI3MDogRklM
+RTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNjk6CisgICAgICAgICAgICAgICAgICAgICAg
+aWYgKGFybV9mcGUgJiBCSVRfRFpDKSBpbmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBFX0ZMVERJVjsK
+Wy4uLl0KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUK
+IzI3MTogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNzA6CisgICAgICAgICAgICAg
+ICAgICAgICAgaWYgKGFybV9mcGUgJiBCSVRfSU9DKSBpbmZvLnNpX2NvZGUgPSBUQVJHRVRfRlBF
+X0ZMVElOVjsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2Yg
+dGhpcyBzdGF0ZW1lbnQKIzI3MTogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoyNzA6
+CisgICAgICAgICAgICAgICAgICAgICAgaWYgKGFybV9mcGUgJiBCSVRfSU9DKSBpbmZvLnNpX2Nv
+ZGUgPSBUQVJHRVRfRlBFX0ZMVElOVjsKWy4uLl0KCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50
+IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICgyMCwgMjIpCiMyODA6IEZJTEU6IGxpbnV4LXVz
+ZXIvYXJtL2NwdV9sb29wLmM6Mjc5OgorICAgICAgICAgICAgICAgICAgICBpZiAoKCEoZnBzciAm
+IEJJVF9JWEUpKSAmJiAoYXJtX2ZwZSAmIEJJVF9JWEMpKQorICAgICAgICAgICAgICAgICAgICAg
+IGZwc3IgfD0gQklUX0lYQzsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI4MDogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xv
+b3AuYzoyNzk6CisgICAgICAgICAgICAgICAgICAgIGlmICgoIShmcHNyICYgQklUX0lYRSkpICYm
+IChhcm1fZnBlICYgQklUX0lYQykpClsuLi5dCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBm
+b3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoMjAsIDIyKQojMjgyOiBGSUxFOiBsaW51eC11c2Vy
+L2FybS9jcHVfbG9vcC5jOjI4MToKKyAgICAgICAgICAgICAgICAgICAgaWYgKCghKGZwc3IgJiBC
+SVRfVUZFKSkgJiYgKGFybV9mcGUgJiBCSVRfVUZDKSkKKyAgICAgICAgICAgICAgICAgICAgICBm
+cHNyIHw9IEJJVF9VRkM7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBh
+cm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyODI6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29w
+LmM6MjgxOgorICAgICAgICAgICAgICAgICAgICBpZiAoKCEoZnBzciAmIEJJVF9VRkUpKSAmJiAo
+YXJtX2ZwZSAmIEJJVF9VRkMpKQpbLi4uXQoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9y
+IGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDIwLCAyMikKIzI4NDogRklMRTogbGludXgtdXNlci9h
+cm0vY3B1X2xvb3AuYzoyODM6CisgICAgICAgICAgICAgICAgICAgIGlmICgoIShmcHNyICYgQklU
+X09GRSkpICYmIChhcm1fZnBlICYgQklUX09GQykpCisgICAgICAgICAgICAgICAgICAgICAgZnBz
+ciB8PSBCSVRfT0ZDOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMjg0OiBGSUxFOiBsaW51eC11c2VyL2FybS9jcHVfbG9vcC5j
+OjI4MzoKKyAgICAgICAgICAgICAgICAgICAgaWYgKCghKGZwc3IgJiBCSVRfT0ZFKSkgJiYgKGFy
+bV9mcGUgJiBCSVRfT0ZDKSkKWy4uLl0KCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBj
+b25kaXRpb25hbCBzdGF0ZW1lbnRzICgyMCwgMjIpCiMyODY6IEZJTEU6IGxpbnV4LXVzZXIvYXJt
+L2NwdV9sb29wLmM6Mjg1OgorICAgICAgICAgICAgICAgICAgICBpZiAoKCEoZnBzciAmIEJJVF9E
+WkUpKSAmJiAoYXJtX2ZwZSAmIEJJVF9EWkMpKQorICAgICAgICAgICAgICAgICAgICAgIGZwc3Ig
+fD0gQklUX0RaQzsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
+b2YgdGhpcyBzdGF0ZW1lbnQKIzI4NjogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzoy
+ODU6CisgICAgICAgICAgICAgICAgICAgIGlmICgoIShmcHNyICYgQklUX0RaRSkpICYmIChhcm1f
+ZnBlICYgQklUX0RaQykpClsuLi5dCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29u
+ZGl0aW9uYWwgc3RhdGVtZW50cyAoMjAsIDIyKQojMjg4OiBGSUxFOiBsaW51eC11c2VyL2FybS9j
+cHVfbG9vcC5jOjI4NzoKKyAgICAgICAgICAgICAgICAgICAgaWYgKCghKGZwc3IgJiBCSVRfSU9F
+KSkgJiYgKGFybV9mcGUgJiBCSVRfSU9DKSkKKyAgICAgICAgICAgICAgICAgICAgICBmcHNyIHw9
+IEJJVF9JT0M7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiMyODg6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29wLmM6Mjg3
+OgorICAgICAgICAgICAgICAgICAgICBpZiAoKCEoZnBzciAmIEJJVF9JT0UpKSAmJiAoYXJtX2Zw
+ZSAmIEJJVF9JT0MpKQpbLi4uXQoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
+PScgKGN0eDpWeFYpCiMyOTA6IEZJTEU6IGxpbnV4LXVzZXIvYXJtL2NwdV9sb29wLmM6Mjg5Ogor
+ICAgICAgICAgICAgICAgICAgICB0cy0+ZnBhLmZwc3I9ZnBzcjsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
+biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzMwOiBGSUxFOiBsaW51eC11c2VyL2Fy
+bS9jcHVfbG9vcC5jOjMyOToKKyAgICAgICAgICAgICAgICAgICAgZW52LT5yZWdzWzBdID0gZG9f
+YXJtX3NlbWlob3N0aW5nIChlbnYpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhh
+dCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzM5OiBGSUxFOiBsaW51eC11c2VyL2FybS9jcHVfbG9v
+cC5jOjMzODoKKyAgICAgICAgICAgICAgICAgICAgaWYgKCBuID4gQVJNX05SX0JBU0UpIHsKCkVS
+Uk9SOiB0aGF0IG9wZW4gYnJhY2UgeyBzaG91bGQgYmUgb24gdGhlIHByZXZpb3VzIGxpbmUKIzQw
+MjogRklMRTogbGludXgtdXNlci9hcm0vY3B1X2xvb3AuYzo0MDE6CisgICAgICAgICAgICAgICAg
+aWYgKHNpZykKKyAgICAgICAgICAgICAgICAgIHsKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50
+IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICgxMiwgMTQpCiM0MTI6IEZJTEU6IGxpbnV4LXVz
+ZXIvYXJtL2NwdV9sb29wLmM6NDExOgorICAgICAgICAgICAgaWYgKGRvX2tlcm5lbF90cmFwKGVu
+dikpCisgICAgICAgICAgICAgIGdvdG8gZXJyb3I7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
+c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0MTI6IEZJTEU6IGxpbnV4LXVz
+ZXIvYXJtL2NwdV9sb29wLmM6NDExOgorICAgICAgICAgICAgaWYgKGRvX2tlcm5lbF90cmFwKGVu
+dikpClsuLi5dCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDIzOiBGSUxFOiBs
+aW51eC11c2VyL2FybS9jcHVfbG9vcC5jOjQyMjoKKyAgICAgICAgICAgIEVYQ1BfRFVNUChlbnYs
+ICJxZW11OiB1bmhhbmRsZWQgQ1BVIGV4Y2VwdGlvbiAweCV4IC0gYWJvcnRpbmdcbiIsIHRyYXBu
+cik7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICco
+JwojNDM5OiBGSUxFOiBsaW51eC11c2VyL2FybS9jcHVfbG9vcC5jOjQzODoKKyAgICBmb3IoaSA9
+IDA7IGkgPCAxNjsgaSsrKSB7Cgp0b3RhbDogNDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA4ODkgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggNS8xOTogbGludXgtdXNlcjogbW92ZSBzcGFyYy9zcGFyYzY0IGNwdSBsb29wIHRv
+IHNwYXJjIGRpcmVjdG9yeS4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzMz
+MzogRklMRTogbGludXgtdXNlci9zcGFyYy9jcHVfbG9vcC5jOjI2OgorLy8jZGVmaW5lIERFQlVH
+X1dJTgoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlz
+IHN0YXRlbWVudAojMzQyOiBGSUxFOiBsaW51eC11c2VyL3NwYXJjL2NwdV9sb29wLmM6MzU6Cisg
+ICAgaWYgKGluZGV4IDwgOCAmJiBlbnYtPmN3cCA9PSBlbnYtPm53aW5kb3dzIC0gMSkKWy4uLl0K
+CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
+ZW1lbnQKIzM1NTogRklMRTogbGludXgtdXNlci9zcGFyYy9jcHVfbG9vcC5jOjQ4OgorICAgIGlm
+IChzcF9wdHIgJiAzKQpbLi4uXQoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzM2MjogRklMRTogbGludXgtdXNlci9zcGFyYy9jcHVfbG9vcC5j
+OjU1OgorICAgIGZvcihpID0gMDsgaSA8IDE2OyBpKyspIHsKCkVSUk9SOiBicmFjZXMge30gYXJl
+IG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzQwMTogRklMRTogbGlu
+dXgtdXNlci9zcGFyYy9jcHVfbG9vcC5jOjk0OgorICAgIGlmIChzcF9wdHIgJiAzKQpbLi4uXQoK
+RVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQw
+ODogRklMRTogbGludXgtdXNlci9zcGFyYy9jcHVfbG9vcC5jOjEwMToKKyAgICBmb3IoaSA9IDA7
+IGkgPCAxNjsgaSsrKSB7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBh
+cm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0MTU6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvY3B1X2xv
+b3AuYzoxMDg6CisgICAgaWYgKGVudi0+Y2xlYW53aW4gPCBlbnYtPm53aW5kb3dzIC0gMSkKWy4u
+Ll0KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygn
+CiM0Mjg6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvY3B1X2xvb3AuYzoxMjE6CisgICAgZm9yKDs7
+KSB7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiM0MzI6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvY3B1X2xvb3AuYzoxMjU6Cisg
+ICAgICAgIGlmIChlbnYtPndpbSAmICgxIDw8IGN3cDEpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
+fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDM1OiBGSUxF
+OiBsaW51eC11c2VyL3NwYXJjL2NwdV9sb29wLmM6MTI4OgorICAgICAgICBpZiAoZW52LT5jYW5y
+ZXN0b3JlID09IDApClsuLi5dCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0
+aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM0NTM6IEZJTEU6IGxpbnV4LXVzZXIv
+c3BhcmMvY3B1X2xvb3AuYzoxNDY6Cit2b2lkIGNwdV9sb29wIChDUFVTUEFSQ1N0YXRlICplbnYp
+CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4g
+cGFyZW50aGVzaXMgJygnCiM0Nzk6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvY3B1X2xvb3AuYzox
+NzI6CisgICAgICAgICAgICByZXQgPSBkb19zeXNjYWxsIChlbnYsIGVudi0+Z3JlZ3NbMV0sCgpF
+UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
+ZW50CiM1NDc6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvY3B1X2xvb3AuYzoyNDA6CisgICAgICAg
+ICAgICAgICAgaWYgKHRyYXBuciA9PSBUVF9ERkFVTFQpClsuLi5dCisgICAgICAgICAgICAgICAg
+ZWxzZQpbLi4uXQoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUgcHJl
+dmlvdXMgbGluZQojNTgyOiBGSUxFOiBsaW51eC11c2VyL3NwYXJjL2NwdV9sb29wLmM6Mjc1Ogor
+ICAgICAgICAgICAgICAgIGlmIChzaWcpCisgICAgICAgICAgICAgICAgICB7CgpFUlJPUjogc3Bh
+Y2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiM1OTU6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvY3B1X2xvb3AuYzoyODg6CisgICAgICAg
+ICAgICBwcmludGYgKCJVbmhhbmRsZWQgdHJhcDogMHgleFxuIiwgdHJhcG5yKTsKCkVSUk9SOiBz
+cGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNp
+cyAnKCcKIzU5OTogRklMRTogbGludXgtdXNlci9zcGFyYy9jcHVfbG9vcC5jOjI5MjoKKyAgICAg
+ICAgcHJvY2Vzc19wZW5kaW5nX3NpZ25hbHMgKGVudik7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQg
+YmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojNjA5OiBGSUxFOiBsaW51eC11c2VyL3Nw
+YXJjL2NwdV9sb29wLmM6MzAyOgorICAgIGZvcihpID0gMDsgaSA8IDg7IGkrKykKCkVSUk9SOiBi
+cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzYw
+OTogRklMRTogbGludXgtdXNlci9zcGFyYy9jcHVfbG9vcC5jOjMwMjoKKyAgICBmb3IoaSA9IDA7
+IGkgPCA4OyBpKyspClsuLi5dCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVu
+IHBhcmVudGhlc2lzICcoJwojNjExOiBGSUxFOiBsaW51eC11c2VyL3NwYXJjL2NwdV9sb29wLmM6
+MzA0OgorICAgIGZvcihpID0gMDsgaSA8IDg7IGkrKykKCkVSUk9SOiBicmFjZXMge30gYXJlIG5l
+Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzYxMTogRklMRTogbGludXgt
+dXNlci9zcGFyYy9jcHVfbG9vcC5jOjMwNDoKKyAgICBmb3IoaSA9IDA7IGkgPCA4OyBpKyspClsu
+Li5dCgp0b3RhbDogMjAgZXJyb3JzLCAwIHdhcm5pbmdzLCA1OTcgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi8xOTog
+bGludXgtdXNlcjogbW92ZSBwcGMvcHBjNjQgY3B1IGxvb3AgdG8gcHBjIGRpcmVjdG9yeS4uLgpF
+UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFy
+ZW50aGVzaXMgJygnCiM2MjY6IEZJTEU6IGxpbnV4LXVzZXIvcHBjL2NwdV9sb29wLmM6NTA6Citf
+X2F0dHJpYnV0ZV9fICgoIGFsaWFzICgiY3B1X3BwY19sb2FkX3RidSIpICkpOwoKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojNjI2OiBGSUxF
+OiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5jOjUwOgorX19hdHRyaWJ1dGVfXyAoKCBhbGlhcyAo
+ImNwdV9wcGNfbG9hZF90YnUiKSApKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0
+aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNjI2OiBGSUxFOiBsaW51eC11c2VyL3BwYy9jcHVf
+bG9vcC5jOjUwOgorX19hdHRyaWJ1dGVfXyAoKCBhbGlhcyAoImNwdV9wcGNfbG9hZF90YnUiKSAp
+KTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzYzNDogRklMRTogbGludXgtdXNlci9wcGMvY3B1X2xvb3AuYzo1
+ODoKK2ludCBwcGNfZGNyX3JlYWQgKHBwY19kY3JfdCAqZGNyX2VudiwgaW50IGRjcm4sIHVpbnQz
+Ml90ICp2YWxwKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1l
+IGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNjM5OiBGSUxFOiBsaW51eC11c2VyL3BwYy9jcHVf
+bG9vcC5jOjYzOgoraW50IHBwY19kY3Jfd3JpdGUgKHBwY19kY3JfdCAqZGNyX2VudiwgaW50IGRj
+cm4sIHVpbnQzMl90IHZhbCkKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBv
+biBuZXh0IGxpbmUKIzY2NjogRklMRTogbGludXgtdXNlci9wcGMvY3B1X2xvb3AuYzo5MDoKKyAg
+ICAgICAgICAgIGNhc2UgMTogc2VndiA9IGdldF91c2VyX3U4KHZhbCwgYWRkcik7IGJyZWFrOwoK
+RVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojNjY3OiBG
+SUxFOiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5jOjkxOgorICAgICAgICAgICAgY2FzZSAyOiBz
+ZWd2ID0gZ2V0X3VzZXJfdTE2KHZhbCwgYWRkcik7IGJyZWFrOwoKRVJST1I6IHRyYWlsaW5nIHN0
+YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojNjY4OiBGSUxFOiBsaW51eC11c2VyL3Bw
+Yy9jcHVfbG9vcC5jOjkyOgorICAgICAgICAgICAgY2FzZSA0OiBzZWd2ID0gZ2V0X3VzZXJfdTMy
+KHZhbCwgYWRkcik7IGJyZWFrOwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJl
+IG9uIG5leHQgbGluZQojNjcwOiBGSUxFOiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5jOjk0Ogor
+ICAgICAgICAgICAgY2FzZSA4OiBzZWd2ID0gZ2V0X3VzZXJfdTY0KHZhbCwgYWRkcik7IGJyZWFr
+OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojNjc5
+OiBGSUxFOiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5jOjEwMzoKKyAgICAgICAgICAgIGRlZmF1
+bHQ6IGFib3J0KCk7CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4
+dCBsaW5lCiM2ODQ6IEZJTEU6IGxpbnV4LXVzZXIvcHBjL2NwdV9sb29wLmM6MTA4OgorICAgICAg
+ICAgICAgICAgIGNhc2UgMTogc2VndiA9IHB1dF91c2VyX3U4KHZhbCwgYWRkcik7IGJyZWFrOwoK
+RVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojNjg1OiBG
+SUxFOiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5jOjEwOToKKyAgICAgICAgICAgICAgICBjYXNl
+IDI6IHNlZ3YgPSBwdXRfdXNlcl91MTYodmFsLCBhZGRyKTsgYnJlYWs7CgpFUlJPUjogdHJhaWxp
+bmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM2ODY6IEZJTEU6IGxpbnV4LXVz
+ZXIvcHBjL2NwdV9sb29wLmM6MTEwOgorICAgICAgICAgICAgICAgIGNhc2UgNDogc2VndiA9IHB1
+dF91c2VyX3UzMih2YWwsIGFkZHIpOyBicmVhazsKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRz
+IHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzY4ODogRklMRTogbGludXgtdXNlci9wcGMvY3B1X2xv
+b3AuYzoxMTI6CisgICAgICAgICAgICAgICAgY2FzZSA4OiBzZWd2ID0gcHV0X3VzZXJfdTY0KHZh
+bCwgYWRkcik7IGJyZWFrOwoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKycg
+KGN0eDpWeFYpCiM2OTM6IEZJTEU6IGxpbnV4LXVzZXIvcHBjL2NwdV9sb29wLmM6MTE3OgorICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHZhbCA9IGVudi0+Z3ByW3JlZysxXTsKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzY5NTogRklMRTogbGludXgtdXNlci9w
+cGMvY3B1X2xvb3AuYzoxMTk6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgdmFsMiA9IGVu
+di0+Z3ByW3JlZysxXTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGlu
+ZQojNzA1OiBGSUxFOiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5jOjEyOToKKyAgICAgICAgICAg
+ICAgICBkZWZhdWx0OiBhYm9ydCgpOwoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzczMDogRklMRTogbGludXgtdXNlci9wcGMvY3B1X2xvb3Au
+YzoxNTQ6CisgICAgZm9yKDs7KSB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBv
+cGVuIHBhcmVudGhlc2lzICcoJwojNzM2OiBGSUxFOiBsaW51eC11c2VyL3BwYy9jcHVfbG9vcC5j
+OjE2MDoKKyAgICAgICAgc3dpdGNoKHRyYXBucikgewoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJl
+Zm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzExNTI6IEZJTEU6IGxpbnV4LXVzZXIvcHBj
+L2NwdV9sb29wLmM6NTc2OgorICAgIGZvcihpID0gMDsgaSA8IDMyOyBpKyspIHsKCnRvdGFsOiAy
+MCBlcnJvcnMsIDAgd2FybmluZ3MsIDExMzEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy8xOTogbGludXgtdXNlcjog
+bW92ZSBtaXBzL21pcHM2NCBjcHUgbG9vcCB0byBtaXBzIGRpcmVjdG9yeS4uLgpFUlJPUjogTWFj
+cm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lz
+CiM3NzU6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9jcHVfbG9vcC5jOjI2OgorIyAgZGVmaW5lIE1J
+UFNfU1lTKG5hbWUsIGFyZ3MpIGFyZ3MsCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRo
+ZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTIzNDogRklMRTogbGludXgtdXNlci9taXBzL2NwdV9s
+b29wLmM6NDg1OgorICAgIGZvcig7OykgewoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0
+aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyNDA6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9jcHVf
+bG9vcC5jOjQ5MToKKyAgICAgICAgc3dpdGNoKHRyYXBucikgewoKRVJST1I6IGRvIG5vdCB1c2Ug
+YXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzEyNTc6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9j
+cHVfbG9vcC5jOjUwODoKKyAgICAgICAgICAgICAgICAgICAgaWYgKChyZXQgPSBnZXRfdXNlcl91
+YWwoYXJnOCwgc3BfcmVnICsgMjgpKSAhPSAwKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25t
+ZW50IGluIGlmIGNvbmRpdGlvbgojMTI2MTogRklMRTogbGludXgtdXNlci9taXBzL2NwdV9sb29w
+LmM6NTEyOgorICAgICAgICAgICAgICAgICAgICBpZiAoKHJldCA9IGdldF91c2VyX3VhbChhcmc3
+LCBzcF9yZWcgKyAyNCkpICE9IDApIHsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4g
+aWYgY29uZGl0aW9uCiMxMjY1OiBGSUxFOiBsaW51eC11c2VyL21pcHMvY3B1X2xvb3AuYzo1MTY6
+CisgICAgICAgICAgICAgICAgICAgIGlmICgocmV0ID0gZ2V0X3VzZXJfdWFsKGFyZzYsIHNwX3Jl
+ZyArIDIwKSkgIT0gMCkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25k
+aXRpb24KIzEyNjk6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9jcHVfbG9vcC5jOjUyMDoKKyAgICAg
+ICAgICAgICAgICAgICAgaWYgKChyZXQgPSBnZXRfdXNlcl91YWwoYXJnNSwgc3BfcmVnICsgMTYp
+KSAhPSAwKSB7CgpFUlJPUjogdGhhdCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2
+aW91cyBsaW5lCiMxMzMzOiBGSUxFOiBsaW51eC11c2VyL21pcHMvY3B1X2xvb3AuYzo1ODQ6Cisg
+ICAgICAgICAgICAgICAgaWYgKHNpZykKKyAgICAgICAgICAgICAgICAgIHsKCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDYzOiBGSUxFOiBsaW51eC11c2VyL21pcHMvY3B1X2xv
+b3AuYzo3MTQ6CisgICAgICAgICAgICBFWENQX0RVTVAoZW52LCAicWVtdTogdW5oYW5kbGVkIENQ
+VSBleGNlcHRpb24gMHgleCAtIGFib3J0aW5nXG4iLCB0cmFwbnIpOwoKRVJST1I6IHNwYWNlIHJl
+cXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE0Nzc6IEZJTEU6IGxpbnV4
+LXVzZXIvbWlwcy9jcHVfbG9vcC5jOjcyODoKKyAgICBmb3IoaSA9IDA7IGkgPCAzMjsgaSsrKSB7
+Cgp0b3RhbDogOSBlcnJvcnMsIDEgd2FybmluZ3MsIDE0NzggbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC8xOTogbGlu
+dXgtdXNlcjogbW92ZSBuaW9zMiBjcHUgbG9vcCB0byBuaW9zMiBkaXJlY3RvcnkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggOS8xOTogbGludXgtdXNlcjogbW92ZSBvcGVucmlzYyBjcHUgbG9vcCB0byBvcGVu
+cmlzYyBkaXJlY3RvcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTk6IGxpbnV4LXVzZXI6IG1vdmUg
+c2g0IGNwdSBsb29wIHRvIHNoNCBkaXJlY3RvcnkuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
+YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTkzOiBGSUxF
+OiBsaW51eC11c2VyL3NoNC9jcHVfbG9vcC5jOjg3OgorICAgICAgICAgICAgcHJpbnRmICgiVW5o
+YW5kbGVkIHRyYXA6IDB4JXhcbiIsIHRyYXBucik7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBi
+ZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxOTc6IEZJTEU6
+IGxpbnV4LXVzZXIvc2g0L2NwdV9sb29wLmM6OTE6CisgICAgICAgIHByb2Nlc3NfcGVuZGluZ19z
+aWduYWxzIChlbnYpOwoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJl
+bnRoZXNpcyAnKCcKIzIxMzogRklMRTogbGludXgtdXNlci9zaDQvY3B1X2xvb3AuYzoxMDc6Cisg
+ICAgZm9yKGkgPSAwOyBpIDwgMTY7IGkrKykgewoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdz
+LCAxOTMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMTk6IGxpbnV4LXVzZXI6IG1vdmUgY3JpcyBjcHUgbG9vcCB0
+byBjcmlzIGRpcmVjdG9yeS4uLgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjc6IEZJTEU6
+IGxpbnV4LXVzZXIvY3Jpcy9jcHVfbG9vcC5jOjI5OgorICAgICQKCkVSUk9SOiB0cmFpbGluZyB3
+aGl0ZXNwYWNlCiM0OTogRklMRTogbGludXgtdXNlci9jcmlzL2NwdV9sb29wLmM6NTE6CisgICAg
+ICAgICAgICByZXQgPSBkb19zeXNjYWxsKGVudiwgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3Bh
+Y2UKIzUwOiBGSUxFOiBsaW51eC11c2VyL2NyaXMvY3B1X2xvb3AuYzo1MjoKKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgZW52LT5yZWdzWzldLCAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVz
+cGFjZQojNTE6IEZJTEU6IGxpbnV4LXVzZXIvY3Jpcy9jcHVfbG9vcC5jOjUzOgorICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBlbnYtPnJlZ3NbMTBdLCAkCgpFUlJPUjogdHJhaWxpbmcgd2hp
+dGVzcGFjZQojNTI6IEZJTEU6IGxpbnV4LXVzZXIvY3Jpcy9jcHVfbG9vcC5jOjU0OgorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBlbnYtPnJlZ3NbMTFdLCAkCgpFUlJPUjogdHJhaWxpbmcg
+d2hpdGVzcGFjZQojNTM6IEZJTEU6IGxpbnV4LXVzZXIvY3Jpcy9jcHVfbG9vcC5jOjU1OgorICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBlbnYtPnJlZ3NbMTJdLCAkCgpFUlJPUjogdHJhaWxp
+bmcgd2hpdGVzcGFjZQojNTQ6IEZJTEU6IGxpbnV4LXVzZXIvY3Jpcy9jcHVfbG9vcC5jOjU2Ogor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbnYtPnJlZ3NbMTNdLCAkCgpFUlJPUjogdHJh
+aWxpbmcgd2hpdGVzcGFjZQojNTU6IEZJTEU6IGxpbnV4LXVzZXIvY3Jpcy9jcHVfbG9vcC5jOjU3
+OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbnYtPnByZWdzWzddLCAkCgpFUlJPUjog
+dGhhdCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2aW91cyBsaW5lCiM2OTogRklM
+RTogbGludXgtdXNlci9jcmlzL2NwdV9sb29wLmM6NzE6CisgICAgICAgICAgICAgICAgaWYgKHNp
+ZykKKyAgICAgICAgICAgICAgICAgIHsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4g
+ZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzgyOiBGSUxFOiBsaW51eC11
+c2VyL2NyaXMvY3B1X2xvb3AuYzo4NDoKKyAgICAgICAgICAgIHByaW50ZiAoIlVuaGFuZGxlZCB0
+cmFwOiAweCV4XG4iLCB0cmFwbnIpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojODY6IEZJTEU6IGxpbnV4LXVz
+ZXIvY3Jpcy9jcHVfbG9vcC5jOjg4OgorICAgICAgICBwcm9jZXNzX3BlbmRpbmdfc2lnbmFscyAo
+ZW52KTsKCnRvdGFsOiAxMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE5NyBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8x
+OTogbGludXgtdXNlcjogbW92ZSBtaWNyb2JsYXplIGNwdSBsb29wIHRvIG1pY3JvYmxhemUgZGly
+ZWN0b3J5Li4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyMDA6IEZJTEU6IGxpbnV4LXVz
+ZXIvbWljcm9ibGF6ZS9jcHVfbG9vcC5jOjI5OgorICAgICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0
+ZXNwYWNlCiMyMjU6IEZJTEU6IGxpbnV4LXVzZXIvbWljcm9ibGF6ZS9jcHVfbG9vcC5jOjU0Ogor
+ICAgICAgICAgICAgcmV0ID0gZG9fc3lzY2FsbChlbnYsICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0
+ZXNwYWNlCiMyMjY6IEZJTEU6IGxpbnV4LXVzZXIvbWljcm9ibGF6ZS9jcHVfbG9vcC5jOjU1Ogor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbnYtPnJlZ3NbMTJdLCAkCgpFUlJPUjogdHJh
+aWxpbmcgd2hpdGVzcGFjZQojMjI3OiBGSUxFOiBsaW51eC11c2VyL21pY3JvYmxhemUvY3B1X2xv
+b3AuYzo1NjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZW52LT5yZWdzWzVdLCAkCgpF
+UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjI4OiBGSUxFOiBsaW51eC11c2VyL21pY3JvYmxh
+emUvY3B1X2xvb3AuYzo1NzoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZW52LT5yZWdz
+WzZdLCAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjI5OiBGSUxFOiBsaW51eC11c2Vy
+L21pY3JvYmxhemUvY3B1X2xvb3AuYzo1ODoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ZW52LT5yZWdzWzddLCAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjMwOiBGSUxFOiBs
+aW51eC11c2VyL21pY3JvYmxhemUvY3B1X2xvb3AuYzo1OToKKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgZW52LT5yZWdzWzhdLCAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjMx
+OiBGSUxFOiBsaW51eC11c2VyL21pY3JvYmxhemUvY3B1X2xvb3AuYzo2MDoKKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgZW52LT5yZWdzWzldLCAkCgpFUlJPUjogc3dpdGNoIGFuZCBjYXNl
+IHNob3VsZCBiZSBhdCB0aGUgc2FtZSBpbmRlbnQKIzI1ODogRklMRTogbGludXgtdXNlci9taWNy
+b2JsYXplL2NwdV9sb29wLmM6ODc6CisgICAgICAgICAgICBzd2l0Y2ggKGVudi0+c3JlZ3NbU1Jf
+RVNSXSAmIDMxKSB7CisgICAgICAgICAgICAgICAgY2FzZSBFU1JfRUNfRElWWkVSTzoKWy4uLl0K
+KyAgICAgICAgICAgICAgICBjYXNlIEVTUl9FQ19GUFU6ClsuLi5dCisgICAgICAgICAgICAgICAg
+ZGVmYXVsdDoKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBh
+bmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzI3OTogRklMRTogbGludXgtdXNlci9taWNyb2JsYXpl
+L2NwdV9sb29wLmM6MTA4OgorICAgICAgICAgICAgICAgICAgICBwcmludGYgKCJVbmhhbmRsZWQg
+aHctZXhjZXB0aW9uOiAweCV4XG4iLAoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBi
+ZSBvbiB0aGUgcHJldmlvdXMgbGluZQojMjkxOiBGSUxFOiBsaW51eC11c2VyL21pY3JvYmxhemUv
+Y3B1X2xvb3AuYzoxMjA6CisgICAgICAgICAgICAgICAgaWYgKHNpZykKKyAgICAgICAgICAgICAg
+ICAgIHsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzMwNDogRklMRTogbGludXgtdXNlci9taWNyb2JsYXplL2Nw
+dV9sb29wLmM6MTMzOgorICAgICAgICAgICAgcHJpbnRmICgiVW5oYW5kbGVkIHRyYXA6IDB4JXhc
+biIsIHRyYXBucik7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5h
+bWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzMDg6IEZJTEU6IGxpbnV4LXVzZXIvbWljcm9i
+bGF6ZS9jcHVfbG9vcC5jOjEzNzoKKyAgICAgICAgcHJvY2Vzc19wZW5kaW5nX3NpZ25hbHMgKGVu
+dik7Cgp0b3RhbDogMTMgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMjMgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTMvMTk6
+IGxpbnV4LXVzZXI6IG1vdmUgbTY4ayBjcHUgbG9vcCB0byBtNjhrIGRpcmVjdG9yeS4uLgpFUlJP
+Ujogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMzA6IEZJ
+TEU6IGxpbnV4LXVzZXIvbTY4ay9jcHVfbG9vcC5jOjMyOgorICAgIGZvcig7OykgewoKRVJST1I6
+IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzM2OiBGSUxF
+OiBsaW51eC11c2VyL202OGsvY3B1X2xvb3AuYzozODoKKyAgICAgICAgc3dpdGNoKHRyYXBucikg
+ewoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUgcHJldmlvdXMgbGlu
+ZQojMTE4OiBGSUxFOiBsaW51eC11c2VyL202OGsvY3B1X2xvb3AuYzoxMjA6CisgICAgICAgICAg
+ICAgICAgaWYgKHNpZykKKyAgICAgICAgICAgICAgICAgIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxMzE6IEZJTEU6IGxpbnV4LXVzZXIvbTY4ay9jcHVfbG9vcC5jOjEzMzoK
+KyAgICAgICAgICAgIEVYQ1BfRFVNUChlbnYsICJxZW11OiB1bmhhbmRsZWQgQ1BVIGV4Y2VwdGlv
+biAweCV4IC0gYWJvcnRpbmdcbiIsIHRyYXBucik7Cgp0b3RhbDogMyBlcnJvcnMsIDEgd2Fybmlu
+Z3MsIDMxOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgpDaGVja2luZyBQQVRDSCAxNC8xOTogbGludXgtdXNlcjogbW92ZSBhbHBoYSBjcHUgbG9v
+cCB0byBhbHBoYSBkaXJlY3RvcnkuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjAxOiBGSUxFOiBsaW51eC11
+c2VyL2FscGhhL2NwdV9sb29wLmM6MTk5OgorICAgICAgICAgICAgcHJpbnRmICgiVW5oYW5kbGVk
+IHRyYXA6IDB4JXhcbiIsIHRyYXBucik7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVu
+IGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMyMDU6IEZJTEU6IGxpbnV4
+LXVzZXIvYWxwaGEvY3B1X2xvb3AuYzoyMDM6CisgICAgICAgIHByb2Nlc3NfcGVuZGluZ19zaWdu
+YWxzIChlbnYpOwoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRo
+ZXNpcyAnKCcKIzIyMjogRklMRTogbGludXgtdXNlci9hbHBoYS9jcHVfbG9vcC5jOjIyMDoKKyAg
+ICBmb3IoaSA9IDA7IGkgPCAyODsgaSsrKSB7Cgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDQyMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCAxNS8xOTogbGludXgtdXNlcjogbW92ZSBzMzkweCBjcHUgbG9vcCB0
+byBzMzkweCBkaXJlY3RvcnkuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5j
+dGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzE2OiBGSUxFOiBsaW51eC11c2Vy
+L3MzOTB4L2NwdV9sb29wLmM6MTUzOgorICAgICAgICBwcm9jZXNzX3BlbmRpbmdfc2lnbmFscyAo
+ZW52KTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzAzIGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE2LzE5
+OiBsaW51eC11c2VyOiBtb3ZlIHRpbGVneCBjcHUgbG9vcCB0byB0aWxlZ3ggZGlyZWN0b3J5Li4u
+CkNoZWNraW5nIFBBVENIIDE3LzE5OiBsaW51eC11c2VyOiBtb3ZlIHJpc2N2IGNwdSBsb29wIHRv
+IHJpc2N2IGRpcmVjdG9yeS4uLgpDaGVja2luZyBQQVRDSCAxOC8xOTogbGludXgtdXNlcjogbW92
+ZSBocHBhIGNwdSBsb29wIHRvIGhwcGEgZGlyZWN0b3J5Li4uCkNoZWNraW5nIFBBVENIIDE5LzE5
+OiBsaW51eC11c2VyOiBtb3ZlIHh0ZW5zYSBjcHUgbG9vcCB0byB4dGVuc2EgZGlyZWN0b3J5Li4u
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
