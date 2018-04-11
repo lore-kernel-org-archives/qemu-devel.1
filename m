@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f6JBm-0001XB-Sj
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:05:44 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f6JOD-00089x-I7
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:18:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f6JBk-0004iQ-6O
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:05:42 -0400
-Resent-Message-Id: <E1f6JBk-0004iQ-6O@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f6JBj-0004hW-VS
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:05:40 -0400
-In-Reply-To: <20180411163940.2523-1-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152346631194.1848.10338901700168174554@71c20359a636>
+	(envelope-from <dgilbert@redhat.com>) id 1f6JO8-0004F5-Rk
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:18:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47918 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6JO8-0004ED-M1
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:18:28 -0400
+Date: Wed, 11 Apr 2018 18:18:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180411171818.GJ2667@work-vm>
+References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
+	<1523089594-1422-3-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 11 Apr 2018 10:05:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/19] Drain fixes and cleanups, part 3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1523089594-1422-3-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] migration: add the interface to set
+ get_return_path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.orgfamz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Lidong Chen <jemmy858585@gmail.com>, berrange@redhat.com
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDExMTYzOTQwLjI1MjMtMS1rd29sZkByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTldIERyYWluIGZpeGVzIGFuZCBjbGVhbnVwcywgcGFy
-dCAzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogICA2NzU2MDhjYjg0Li42NTIzZWFjYTM3ICBtYXN0ZXIgICAg
-IC0+IG1hc3RlcgogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1MjMwODk1OTQt
-MTQyMi0xLWdpdC1zZW5kLWVtYWlsLWxpZG9uZ2NoZW5AdGVuY2VudC5jb20gLT4gcGF0Y2hldy8x
-NTIzMDg5NTk0LTE0MjItMS1naXQtc2VuZC1lbWFpbC1saWRvbmdjaGVuQHRlbmNlbnQuY29tCiB0
-IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyMzM3NzE4Ni0zMjU3OC0xLWdpdC1z
-ZW5kLWVtYWlsLWNvdGFAYnJhYXAub3JnIC0+IHBhdGNoZXcvMTUyMzM3NzE4Ni0zMjU3OC0xLWdp
-dC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBh
-dGNoZXcvMjAxODA0MTAxMzQyMDMuMTc1NTItMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4g
-cGF0Y2hldy8yMDE4MDQxMDEzNDIwMy4xNzU1Mi0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwog
-dCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDEwMTkzOTE5LjI4MDI2LTEt
-YWxleC5iZW5uZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwNDEwMTkzOTE5LjI4MDI2LTEt
-YWxleC5iZW5uZWVAbGluYXJvLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3
-LzIwMTgwNDExMTIyNjA2LjM2NzMwMS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbSAtPiBwYXRj
-aGV3LzIwMTgwNDExMTIyNjA2LjM2NzMwMS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQogKiBb
-bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDExMTYzOTQwLjI1MjMtMS1rd29s
-ZkByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA0MTExNjM5NDAuMjUyMy0xLWt3b2xmQHJlZGhh
-dC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0Yjc2OTBmMmQ3IHRlc3QtYmRy
-di1kcmFpbjogVGVzdCBncmFwaCBjaGFuZ2VzIGluIGRyYWluX2FsbCBzZWN0aW9uCmMzYjcxMmU4
-NTQgYmxvY2s6IEFsbG93IGdyYXBoIGNoYW5nZXMgaW4gYmRydl9kcmFpbl9hbGxfYmVnaW4vZW5k
-IHNlY3Rpb25zCmI0MmE3ZTBhN2QgYmxvY2s6IE1vdmUgYmRydl9kcmFpbl9hbGxfYmVnaW4oKSBv
-dXQgb2YgY29yb3V0aW5lIGNvbnRleHQKNzRiYjY5ZjM3YyBibG9jazogQWxsb3cgQUlPX1dBSVRf
-V0hJTEUgd2l0aCBOVUxMIGN0eAphNmU3OTBlMGJjIHRlc3QtYmRydi1kcmFpbjogVGVzdCB0aGF0
-IGJkcnZfZHJhaW5faW52b2tlKCkgZG9lc24ndCBwb2xsCjI2ZmM5ZjdhMmYgYmxvY2s6IERlZmVy
-IC5iZHJ2X2RyYWluX2JlZ2luIGNhbGxiYWNrIHRvIHBvbGxpbmcgcGhhc2UKNWRlMDZkZjFhYyB0
-ZXN0LWJkcnYtZHJhaW46IEdyYXBoIGNoYW5nZSB0aHJvdWdoIHBhcmVudCBjYWxsYmFjawoxM2Zi
-MmY1NjhiIGJsb2NrOiBEb24ndCBwb2xsIGluIHBhcmVudCBkcmFpbiBjYWxsYmFja3MKNDhjZmQ5
-YTY4YSB0ZXN0LWJkcnYtZHJhaW46IFRlc3Qgbm9kZSBkZWxldGlvbiBpbiBzdWJ0cmVlIHJlY3Vy
-c2lvbgo4MTE3NDc1MWEwIGJsb2NrOiBEcmFpbiByZWN1cnNpdmVseSB3aXRoIGEgc2luZ2xlIEJE
-UlZfUE9MTF9XSElMRSgpCjFmNGRhZjE3NDIgdGVzdC1iZHJ2LWRyYWluOiBBZGQgdGVzdCBmb3Ig
-bm9kZSBkZWxldGlvbgpkZjQyMTNmMjlhIGJsb2NrOiBSZW1vdmUgYmRydl9kcmFpbl9yZWN1cnNl
-KCkKNWJkZGY2MDYyOSBibG9jazogUmVhbGx5IHBhdXNlIGJsb2NrIGpvYnMgb24gZHJhaW4KYWVk
-OGQyOTkwMCBibG9jazogQXZvaWQgdW5uZWNlc3NhcnkgYWlvX3BvbGwoKSBpbiBBSU9fV0FJVF9X
-SElMRSgpCjY0Nzk2MzNiNDAgdGVzdHMvdGVzdC1iZHJ2LWRyYWluOiBiZHJ2X2RyYWluX2FsbCgp
-IHdvcmtzIGluIGNvcm91dGluZXMgbm93CmIwMmYyZTU5MTIgYmxvY2s6IERvbid0IG1hbnVhbGx5
-IHBvbGwgaW4gYmRydl9kcmFpbl9hbGwoKQpjM2ZjNjFhZGQxIGJsb2NrOiBSZW1vdmUgJ3JlY3Vy
-c2l2ZScgcGFyYW1ldGVyIGZyb20gYmRydl9kcmFpbl9pbnZva2UoKQpmMzM4NzM5NDlkIGJsb2Nr
-OiBVc2UgYmRydl9kb19kcmFpbl9iZWdpbi9lbmQgaW4gYmRydl9kcmFpbl9hbGwoKQo5ZWRiMDRk
-Zjg5IHRlc3QtYmRydi1kcmFpbjogYmRydl9kcmFpbigpIHdvcmtzIHdpdGggY3Jvc3MtQWlvQ29u
-dGV4dCBldmVudHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTk6IHRl
-c3QtYmRydi1kcmFpbjogYmRydl9kcmFpbigpIHdvcmtzIHdpdGggY3Jvc3MtQWlvQ29udGV4dCBl
-dmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xOTogYmxvY2s6IFVzZSBiZHJ2X2RvX2RyYWluX2Jl
-Z2luL2VuZCBpbiBiZHJ2X2RyYWluX2FsbCgpLi4uCkNoZWNraW5nIFBBVENIIDMvMTk6IGJsb2Nr
-OiBSZW1vdmUgJ3JlY3Vyc2l2ZScgcGFyYW1ldGVyIGZyb20gYmRydl9kcmFpbl9pbnZva2UoKS4u
-LgpDaGVja2luZyBQQVRDSCA0LzE5OiBibG9jazogRG9uJ3QgbWFudWFsbHkgcG9sbCBpbiBiZHJ2
-X2RyYWluX2FsbCgpLi4uCkNoZWNraW5nIFBBVENIIDUvMTk6IHRlc3RzL3Rlc3QtYmRydi1kcmFp
-bjogYmRydl9kcmFpbl9hbGwoKSB3b3JrcyBpbiBjb3JvdXRpbmVzIG5vdy4uLgpDaGVja2luZyBQ
-QVRDSCA2LzE5OiBibG9jazogQXZvaWQgdW5uZWNlc3NhcnkgYWlvX3BvbGwoKSBpbiBBSU9fV0FJ
-VF9XSElMRSgpLi4uCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0
-IGxpbmUKIzM3OiBGSUxFOiBibG9jay9pby5jOjE4OToKKyAgICB3aGlsZSAoYWlvX3BvbGwoYnMt
-PmFpb19jb250ZXh0LCBmYWxzZSkpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
-ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzc6IEZJTEU6IGJsb2NrL2lvLmM6MTg5Ogor
-ICAgIHdoaWxlIChhaW9fcG9sbChicy0+YWlvX2NvbnRleHQsIGZhbHNlKSk7ClsuLi5dCgp0b3Rh
-bDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDYwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDcvMTk6IGJsb2NrOiBSZWFs
-bHkgcGF1c2UgYmxvY2sgam9icyBvbiBkcmFpbi4uLgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50
-cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM5ODogRklMRTogYmxvY2svaW8uYzoyMDQ6CisgICAg
-ICAgIHdoaWxlIChhaW9fcG9sbChicy0+YWlvX2NvbnRleHQsIGZhbHNlKSk7CgpFUlJPUjogYnJh
-Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM5ODog
-RklMRTogYmxvY2svaW8uYzoyMDQ6CisgICAgICAgIHdoaWxlIChhaW9fcG9sbChicy0+YWlvX2Nv
-bnRleHQsIGZhbHNlKSk7ClsuLi5dCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIzNCBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCA4LzE5OiBibG9jazogUmVtb3ZlIGJkcnZfZHJhaW5fcmVjdXJzZSgpLi4uCkNo
-ZWNraW5nIFBBVENIIDkvMTk6IHRlc3QtYmRydi1kcmFpbjogQWRkIHRlc3QgZm9yIG5vZGUgZGVs
-ZXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTk6IGJsb2NrOiBEcmFpbiByZWN1cnNpdmVseSB3
-aXRoIGEgc2luZ2xlIEJEUlZfUE9MTF9XSElMRSgpLi4uCkNoZWNraW5nIFBBVENIIDExLzE5OiB0
-ZXN0LWJkcnYtZHJhaW46IFRlc3Qgbm9kZSBkZWxldGlvbiBpbiBzdWJ0cmVlIHJlY3Vyc2lvbi4u
-LgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODU6IEZJTEU6IHRlc3RzL3Rlc3Qt
-YmRydi1kcmFpbi5jOjEwMjk6CisgICAgZ190ZXN0X2FkZF9mdW5jKCIvYmRydi1kcmFpbi9kZXRh
-Y2gvZHJhaW5fc3VidHJlZSIsIHRlc3RfZGV0YWNoX2J5X2RyYWluX3N1YnRyZWUpOwoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEyLzE5OiBibG9jazogRG9uJ3Qg
-cG9sbCBpbiBwYXJlbnQgZHJhaW4gY2FsbGJhY2tzLi4uCkNoZWNraW5nIFBBVENIIDEzLzE5OiB0
-ZXN0LWJkcnYtZHJhaW46IEdyYXBoIGNoYW5nZSB0aHJvdWdoIHBhcmVudCBjYWxsYmFjay4uLgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODE6IEZJTEU6IHRlc3RzL3Rlc3QtYmRy
-di1kcmFpbi5jOjEwNDQ6CisgICAgY2hpbGRfYSA9IGJkcnZfYXR0YWNoX2NoaWxkKHBhcmVudF9i
-LCBhLCAiUEItQSIsICZjaGlsZF9iYWNraW5nLCAmZXJyb3JfYWJvcnQpOwoKdG90YWw6IDAgZXJy
-b3JzLCAxIHdhcm5pbmdzLCAxNDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNC8xOTogYmxvY2s6IERlZmVyIC5iZHJ2
-X2RyYWluX2JlZ2luIGNhbGxiYWNrIHRvIHBvbGxpbmcgcGhhc2UuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTUvMTk6IHRlc3QtYmRydi1kcmFpbjogVGVzdCB0aGF0IGJkcnZfZHJhaW5faW52b2tlKCkgZG9l
-c24ndCBwb2xsLi4uCkNoZWNraW5nIFBBVENIIDE2LzE5OiBibG9jazogQWxsb3cgQUlPX1dBSVRf
-V0hJTEUgd2l0aCBOVUxMIGN0eC4uLgpDaGVja2luZyBQQVRDSCAxNy8xOTogYmxvY2s6IE1vdmUg
-YmRydl9kcmFpbl9hbGxfYmVnaW4oKSBvdXQgb2YgY29yb3V0aW5lIGNvbnRleHQuLi4KV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3OiBGSUxFOiBibG9jay9pby5jOjI2MToKKyAg
-ICAgICAgICAgIGJkcnZfZG9fZHJhaW5lZF9iZWdpbihicywgZGF0YS0+cmVjdXJzaXZlLCBkYXRh
-LT5wYXJlbnQsIGRhdGEtPnBvbGwpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MSBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNr
-aW5nIFBBVENIIDE4LzE5OiBibG9jazogQWxsb3cgZ3JhcGggY2hhbmdlcyBpbiBiZHJ2X2RyYWlu
-X2FsbF9iZWdpbi9lbmQgc2VjdGlvbnMuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2Jh
-bHMgdG8gMCBvciBOVUxMCiMxMDU6IEZJTEU6IGJsb2NrL2lvLmM6NDUwOgordW5zaWduZWQgaW50
-IGJkcnZfZHJhaW5fYWxsX2NvdW50ID0gMDsKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNo
-b3VsZCBiZSBvbiBuZXh0IGxpbmUKIzExNDogRklMRTogYmxvY2svaW8uYzo0NTk6CisgICAgd2hp
-bGUgKGFpb19wb2xsKHFlbXVfZ2V0X2Fpb19jb250ZXh0KCksIGZhbHNlKSk7CgpFUlJPUjogYnJh
-Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMTQ6
-IEZJTEU6IGJsb2NrL2lvLmM6NDU5OgorICAgIHdoaWxlIChhaW9fcG9sbChxZW11X2dldF9haW9f
-Y29udGV4dCgpLCBmYWxzZSkpOwpbLi4uXQoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAy
-NzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMTkvMTk6IHRlc3QtYmRydi1kcmFpbjogVGVzdCBncmFwaCBjaGFuZ2Vz
-IGluIGRyYWluX2FsbCBzZWN0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> The default get_return_path function of iochannel does not work for
+> RDMA live migration. So add the interface to set get_return_path.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+
+Lets see how Dan wants this done, he knows the channel/file stuff;
+to me this feels like it should be adding a member to QIOChannelClass
+that gets used by QEMUFile's get_return_path.
+
+(Dan and see next patch)
+
+Dave
+> ---
+>  migration/qemu-file-channel.c | 12 ++++++++----
+>  migration/qemu-file.c         | 10 ++++++++--
+>  migration/qemu-file.h         |  2 +-
+>  3 files changed, 17 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
+> index e202d73..d4dd8c4 100644
+> --- a/migration/qemu-file-channel.c
+> +++ b/migration/qemu-file-channel.c
+> @@ -156,7 +156,6 @@ static const QEMUFileOps channel_input_ops = {
+>      .close = channel_close,
+>      .shut_down = channel_shutdown,
+>      .set_blocking = channel_set_blocking,
+> -    .get_return_path = channel_get_input_return_path,
+>  };
+>  
+>  
+> @@ -165,18 +164,23 @@ static const QEMUFileOps channel_output_ops = {
+>      .close = channel_close,
+>      .shut_down = channel_shutdown,
+>      .set_blocking = channel_set_blocking,
+> -    .get_return_path = channel_get_output_return_path,
+>  };
+>  
+>  
+>  QEMUFile *qemu_fopen_channel_input(QIOChannel *ioc)
+>  {
+> +    QEMUFile *f;
+>      object_ref(OBJECT(ioc));
+> -    return qemu_fopen_ops(ioc, &channel_input_ops);
+> +    f = qemu_fopen_ops(ioc, &channel_input_ops);
+> +    qemu_file_set_return_path(f, channel_get_input_return_path);
+> +    return f;
+>  }
+>  
+>  QEMUFile *qemu_fopen_channel_output(QIOChannel *ioc)
+>  {
+> +    QEMUFile *f;
+>      object_ref(OBJECT(ioc));
+> -    return qemu_fopen_ops(ioc, &channel_output_ops);
+> +    f = qemu_fopen_ops(ioc, &channel_output_ops);
+> +    qemu_file_set_return_path(f, channel_get_output_return_path);
+> +    return f;
+>  }
+> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> index bb63c77..8acb574 100644
+> --- a/migration/qemu-file.c
+> +++ b/migration/qemu-file.c
+> @@ -36,6 +36,7 @@
+>  struct QEMUFile {
+>      const QEMUFileOps *ops;
+>      const QEMUFileHooks *hooks;
+> +    QEMURetPathFunc *get_return_path;
+>      void *opaque;
+>  
+>      int64_t bytes_xfer;
+> @@ -72,10 +73,15 @@ int qemu_file_shutdown(QEMUFile *f)
+>   */
+>  QEMUFile *qemu_file_get_return_path(QEMUFile *f)
+>  {
+> -    if (!f->ops->get_return_path) {
+> +    if (!f->get_return_path) {
+>          return NULL;
+>      }
+> -    return f->ops->get_return_path(f->opaque);
+> +    return f->get_return_path(f->opaque);
+> +}
+> +
+> +void qemu_file_set_return_path(QEMUFile *f, QEMURetPathFunc *get_return_path)
+> +{
+> +    f->get_return_path = get_return_path;
+>  }
+>  
+>  bool qemu_file_mode_is_not_valid(const char *mode)
+> diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+> index f4f356a..74210b7 100644
+> --- a/migration/qemu-file.h
+> +++ b/migration/qemu-file.h
+> @@ -102,7 +102,6 @@ typedef struct QEMUFileOps {
+>      QEMUFileCloseFunc *close;
+>      QEMUFileSetBlocking *set_blocking;
+>      QEMUFileWritevBufferFunc *writev_buffer;
+> -    QEMURetPathFunc *get_return_path;
+>      QEMUFileShutdownFunc *shut_down;
+>  } QEMUFileOps;
+>  
+> @@ -114,6 +113,7 @@ typedef struct QEMUFileHooks {
+>  } QEMUFileHooks;
+>  
+>  QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops);
+> +void qemu_file_set_return_path(QEMUFile *f, QEMURetPathFunc *get_return_path);
+>  void qemu_file_set_hooks(QEMUFile *f, const QEMUFileHooks *hooks);
+>  int qemu_get_fd(QEMUFile *f);
+>  int qemu_fclose(QEMUFile *f);
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
