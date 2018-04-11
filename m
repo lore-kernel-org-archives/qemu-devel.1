@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6KwO-0006S5-Rn
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6KwS-0006Vh-4V
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:58:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6KwL-00086O-FL
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40000 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6KwL-00086E-4S
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:53 -0400
-Date: Wed, 11 Apr 2018 19:57:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180411185741.GK2667@work-vm>
-References: <20180329032149.44685-1-aik@ozlabs.ru>
+	(envelope-from <laurent@vivier.eu>) id 1f6KwN-000872-CK
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:58:00 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Wed, 11 Apr 2018 20:56:39 +0200
+Message-Id: <20180411185651.21351-8-laurent@vivier.eu>
+In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
+References: <20180411185651.21351-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20180329032149.44685-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for 2.13 v2 07/19] linux-user: move mips/mips64
+ cpu loop to mips directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,413 +23,1521 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-* Alexey Kardashevskiy (aik@ozlabs.ru) wrote:
-> This adds owners/parents (which are the same, just occasionally
-> owner=3D=3DNULL) printing for memory regions; a new '-o' flag
-> enabled new output.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+No code change, only move code from main.c to
+mips/cpu_loop.c.
 
-=46rom the HMP side this looks fine to me, and if it's making it clearer
-where mappings are coming from that's good.
-(It's a bit long/wordy, but that's the nature of the information).
+Include mips/cpu_loop.c in mips64/cpu_loop.c
+to avoid to duplicate code.
 
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
 
+Notes:
+    v2: expand tabs
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+ linux-user/main.c            | 725 -------------------------------------------
+ linux-user/mips/cpu_loop.c   | 723 ++++++++++++++++++++++++++++++++++++++++++
+ linux-user/mips64/cpu_loop.c |   8 +-
+ 3 files changed, 724 insertions(+), 732 deletions(-)
 
-> ---
->=20
-> Does this look anything useful?
->=20
-> There are cases ("msi", "msix-table", "msix-pba" and probably more) when
-> it is not clear what owns an MR while they all have an owner (always? mos=
-tly?).
->=20
->=20
-> "info mtree" example:
->=20
-> address-space: memory
->   0000000000000000-ffffffffffffffff (prio 0, i/o): system parent:{obj}
->     0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram parent=
-:{obj}
->     0000200000000000-000020000000ffff (prio 0, i/o): alias pci@8000000200=
-00000.io-alias @pci@800000020000000.io 0000000000000000-000000000000ffff ow=
-ner:{dev path=3D/machine/unattached/device[3]}
->     0000200080000000-00002000ffffffff (prio 0, i/o): alias pci@8000000200=
-00000.mmio32-alias @pci@800000020000000.mmio 0000000080000000-00000000fffff=
-fff owner:{dev path=3D/machine/unattached/device[3]}
->     0000210000000000-000021ffffffffff (prio 0, i/o): alias pci@8000000200=
-00000.mmio64-alias @pci@800000020000000.mmio 0000210000000000-000021fffffff=
-fff owner:{dev path=3D/machine/unattached/device[3]}
->=20
-> address-space: I/O
->   0000000000000000-000000000000ffff (prio 0, i/o): io parent:{obj}
->=20
-> address-space: cpu-memory-0
->   0000000000000000-ffffffffffffffff (prio 0, i/o): system parent:{obj}
->     0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram parent=
-:{obj}
->     0000200000000000-000020000000ffff (prio 0, i/o): alias pci@8000000200=
-00000.io-alias @pci@800000020000000.io 0000000000000000-000000000000ffff ow=
-ner:{dev path=3D/machine/unattached/device[3]}
->     0000200080000000-00002000ffffffff (prio 0, i/o): alias pci@8000000200=
-00000.mmio32-alias @pci@800000020000000.mmio 0000000080000000-00000000fffff=
-fff owner:{dev path=3D/machine/unattached/device[3]}
->     0000210000000000-000021ffffffffff (prio 0, i/o): alias pci@8000000200=
-00000.mmio64-alias @pci@800000020000000.mmio 0000210000000000-000021fffffff=
-fff owner:{dev path=3D/machine/unattached/device[3]}
->=20
-> address-space: pci@800000020000000
->   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.io=
-mmu-root owner:{dev path=3D/machine/unattached/device[3]}
->     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000001 ow=
-ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
->       0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001=
- owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
->     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000000 ow=
-ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
->       0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000=
- owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
->     0000040000000000-000004000000ffff (prio 0, i/o): msi owner:{dev path=
-=3D/machine/unattached/device[3]}
->=20
-> address-space: vfio-pci
->   0000000000000000-ffffffffffffffff (prio 0, i/o): bus master container o=
-wner:{dev id=3Dvfio0001_03_00_0}
->     0000000000000000-ffffffffffffffff (prio 0, i/o): alias bus master @pc=
-i@800000020000000.iommu-root 0000000000000000-ffffffffffffffff owner:{dev i=
-d=3Dvfio0001_03_00_0}
->=20
-> memory-region: pci@800000020000000.io
->   0000000000000000-000000000000ffff (prio 0, i/o): pci@800000020000000.io=
- owner:{dev path=3D/machine/unattached/device[3]}
->=20
-> memory-region: pci@800000020000000.mmio
->   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mm=
-io owner:{dev path=3D/machine/unattached/device[3]}
->     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 base BA=
-R 1 owner:{dev id=3Dvfio0001_03_00_0}
->       0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1=
- owner:{dev id=3Dvfio0001_03_00_0}
->       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table owner:{=
-dev id=3Dvfio0001_03_00_0}
->       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled=
-] owner:{dev id=3Dvfio0001_03_00_0}
->     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 base BA=
-R 3 owner:{dev id=3Dvfio0001_03_00_0}
->       0000210000040000-000021000007ffff (prio 0, i/o): 0001:03:00.0 BAR 3=
- owner:{dev id=3Dvfio0001_03_00_0}
->         0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BA=
-R 3 mmaps[0] owner:{dev id=3Dvfio0001_03_00_0}
->=20
-> memory-region: pci@800000020000000.iommu-root
->   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.io=
-mmu-root owner:{dev path=3D/machine/unattached/device[3]}
->     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000001 ow=
-ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
->       0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001=
- owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
->     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000000 ow=
-ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
->       0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000=
- owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
->     0000040000000000-000004000000ffff (prio 0, i/o): msi owner:{dev path=
-=3D/machine/unattached/device[3]}
->=20
->=20
->=20
-> Flatviews:
->=20
->=20
-> FlatView #0
->  AS "pci@800000020000000", root: pci@800000020000000.iommu-root
->  AS "vfio-pci", root: bus master container
->  Root memory region: pci@800000020000000.iommu-root
->   0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000 own=
-er:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
->   0000040000000000-000004000000ffff (prio 0, i/o): msi owner:{dev path=3D=
-/machine/unattached/device[3]}
->   0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001 own=
-er:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
->=20
-> FlatView #1
->  AS "memory", root: system
->  AS "cpu-memory-0", root: system
->  Root memory region: system
->   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram parent:{=
-obj}
->   0000210000000000-000021000000dfff (prio 0, i/o): 0001:03:00.0 BAR 1 own=
-er:{dev id=3Dvfio0001_03_00_0}
->   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table owner:{dev =
-id=3Dvfio0001_03_00_0}
->   000021000000e600-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1 @00=
-0000000000e600 owner:{dev id=3Dvfio0001_03_00_0}
->   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mm=
-aps[0] owner:{dev id=3Dvfio0001_03_00_0}
->=20
-> FlatView #2
->  AS "I/O", root: io
->  Root memory region: io
->   0000000000000000-000000000000ffff (prio 0, i/o): io parent:{obj}
-> ---
->  include/exec/memory.h |  2 +-
->  memory.c              | 80 ++++++++++++++++++++++++++++++++++++++++++++-=
-------
->  monitor.c             |  4 ++-
->  hmp-commands-info.hx  |  7 +++--
->  4 files changed, 78 insertions(+), 15 deletions(-)
->=20
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 31eae0a..3e9d67c 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1541,7 +1541,7 @@ void memory_global_dirty_log_start(void);
->  void memory_global_dirty_log_stop(void);
-> =20
->  void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-> -                bool dispatch_tree);
-> +                bool dispatch_tree, bool owner);
-> =20
->  /**
->   * memory_region_request_mmio_ptr: request a pointer to an mmio
-> diff --git a/memory.c b/memory.c
-> index e70b64b..538a57c 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2830,10 +2830,57 @@ typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) Me=
-moryRegionListHead;
->                             int128_sub((size), int128_one())) : 0)
->  #define MTREE_INDENT "  "
-> =20
-> +static void mtree_expand_owner(fprintf_function mon_printf, void *f,
-> +                               const char *label, Object *obj)
-> +{
-> +    DeviceState *dev =3D (DeviceState *) object_dynamic_cast(obj, TYPE_D=
-EVICE);
-> +    const char *id =3D object_property_print(obj, "id", true, NULL);
-> +    const char *name =3D object_property_print(obj, "name", true, NULL);
-> +
-> +    mon_printf(f, " %s:{", label);
-> +    if (dev) {
-> +        mon_printf(f, "dev");
-> +        if (dev->id) {
-> +            mon_printf(f, " id=3D%s", dev->id);
-> +        }
-> +    } else {
-> +        mon_printf(f, "obj");
-> +    }
-> +    if (name) {
-> +        mon_printf(f, " name=3D%s ", name);
-> +    }
-> +    if (id) {
-> +        mon_printf(f, " id=3D%s ", id);
-> +    }
-> +    if (dev && (!name && !id && !dev->id)) {
-> +        mon_printf(f, " path=3D%s", dev->canonical_path);
-> +    }
-> +    mon_printf(f, "}");
-> +}
-> +
-> +static void mtree_print_mr_owner(fprintf_function mon_printf, void *f,
-> +                                 const MemoryRegion *mr)
-> +{
-> +    Object *owner =3D mr->owner;
-> +    Object *parent =3D memory_region_owner((MemoryRegion *)mr);
-> +
-> +    if (!owner && !parent) {
-> +        mon_printf(f, " orphan");
-> +        return;
-> +    }
-> +    if (owner) {
-> +        mtree_expand_owner(mon_printf, f, "owner", owner);
-> +    }
-> +    if (parent && parent !=3D owner) {
-> +        mtree_expand_owner(mon_printf, f, "parent", parent);
-> +    }
-> +}
-> +
->  static void mtree_print_mr(fprintf_function mon_printf, void *f,
->                             const MemoryRegion *mr, unsigned int level,
->                             hwaddr base,
-> -                           MemoryRegionListHead *alias_print_queue)
-> +                           MemoryRegionListHead *alias_print_queue,
-> +                           bool owner)
->  {
->      MemoryRegionList *new_ml, *ml, *next_ml;
->      MemoryRegionListHead submr_print_queue;
-> @@ -2879,7 +2926,7 @@ static void mtree_print_mr(fprintf_function mon_pri=
-ntf, void *f,
->          }
->          mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
->                     " (prio %d, %s): alias %s @%s " TARGET_FMT_plx
-> -                   "-" TARGET_FMT_plx "%s\n",
-> +                   "-" TARGET_FMT_plx "%s",
->                     cur_start, cur_end,
->                     mr->priority,
->                     memory_region_type((MemoryRegion *)mr),
-> @@ -2888,15 +2935,22 @@ static void mtree_print_mr(fprintf_function mon_p=
-rintf, void *f,
->                     mr->alias_offset,
->                     mr->alias_offset + MR_SIZE(mr->size),
->                     mr->enabled ? "" : " [disabled]");
-> +        if (owner) {
-> +            mtree_print_mr_owner(mon_printf, f, mr);
-> +        }
->      } else {
->          mon_printf(f,
-> -                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s=
-%s\n",
-> +                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s=
-%s",
->                     cur_start, cur_end,
->                     mr->priority,
->                     memory_region_type((MemoryRegion *)mr),
->                     memory_region_name(mr),
->                     mr->enabled ? "" : " [disabled]");
-> +        if (owner) {
-> +            mtree_print_mr_owner(mon_printf, f, mr);
-> +        }
->      }
-> +    mon_printf(f, "\n");
-> =20
->      QTAILQ_INIT(&submr_print_queue);
-> =20
-> @@ -2919,7 +2973,7 @@ static void mtree_print_mr(fprintf_function mon_pri=
-ntf, void *f,
-> =20
->      QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
->          mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
-> -                       alias_print_queue);
-> +                       alias_print_queue, owner);
->      }
-> =20
->      QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, mrqueue, next_ml) {
-> @@ -2932,6 +2986,7 @@ struct FlatViewInfo {
->      void *f;
->      int counter;
->      bool dispatch_tree;
-> +    bool owner;
->  };
-> =20
->  static void mtree_print_flatview(gpointer key, gpointer value,
-> @@ -2972,7 +3027,7 @@ static void mtree_print_flatview(gpointer key, gpoi=
-nter value,
->          mr =3D range->mr;
->          if (range->offset_in_region) {
->              p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> -              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
-> +              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx,
->                int128_get64(range->addr.start),
->                int128_get64(range->addr.start) + MR_SIZE(range->addr.size=
-),
->                mr->priority,
-> @@ -2981,13 +3036,17 @@ static void mtree_print_flatview(gpointer key, gp=
-ointer value,
->                range->offset_in_region);
->          } else {
->              p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> -              TARGET_FMT_plx " (prio %d, %s): %s\n",
-> +              TARGET_FMT_plx " (prio %d, %s): %s",
->                int128_get64(range->addr.start),
->                int128_get64(range->addr.start) + MR_SIZE(range->addr.size=
-),
->                mr->priority,
->                range->readonly ? "rom" : memory_region_type(mr),
->                memory_region_name(mr));
->          }
-> +        if (fvi->owner) {
-> +            mtree_print_mr_owner(p, f, mr);
-> +        }
-> +        p(f, "\n");
->          range++;
->      }
-> =20
-> @@ -3013,7 +3072,7 @@ static gboolean mtree_info_flatview_free(gpointer k=
-ey, gpointer value,
->  }
-> =20
->  void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-> -                bool dispatch_tree)
-> +                bool dispatch_tree, bool owner)
->  {
->      MemoryRegionListHead ml_head;
->      MemoryRegionList *ml, *ml2;
-> @@ -3025,7 +3084,8 @@ void mtree_info(fprintf_function mon_printf, void *=
-f, bool flatview,
->              .mon_printf =3D mon_printf,
->              .f =3D f,
->              .counter =3D 0,
-> -            .dispatch_tree =3D dispatch_tree
-> +            .dispatch_tree =3D dispatch_tree,
-> +            .owner =3D owner,
->          };
->          GArray *fv_address_spaces;
->          GHashTable *views =3D g_hash_table_new(g_direct_hash, g_direct_e=
-qual);
-> @@ -3057,14 +3117,14 @@ void mtree_info(fprintf_function mon_printf, void=
- *f, bool flatview,
-> =20
->      QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
->          mon_printf(f, "address-space: %s\n", as->name);
-> -        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
-> +        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head, owner);
->          mon_printf(f, "\n");
->      }
-> =20
->      /* print aliased regions */
->      QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
->          mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
-> -        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head);
-> +        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head, owner);
->          mon_printf(f, "\n");
->      }
-> =20
-> diff --git a/monitor.c b/monitor.c
-> index 51f4cf4..9d304a5 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1969,8 +1969,10 @@ static void hmp_info_mtree(Monitor *mon, const QDi=
-ct *qdict)
->  {
->      bool flatview =3D qdict_get_try_bool(qdict, "flatview", false);
->      bool dispatch_tree =3D qdict_get_try_bool(qdict, "dispatch_tree", fa=
-lse);
-> +    bool owner =3D qdict_get_try_bool(qdict, "owner", false);
-> =20
-> -    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch=
-_tree);
-> +    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch=
-_tree,
-> +               owner);
->  }
-> =20
->  static void hmp_info_numa(Monitor *mon, const QDict *qdict)
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ddfcd5a..5956495 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -250,10 +250,11 @@ ETEXI
-> =20
->      {
->          .name       =3D "mtree",
-> -        .args_type  =3D "flatview:-f,dispatch_tree:-d",
-> -        .params     =3D "[-f][-d]",
-> +        .args_type  =3D "flatview:-f,dispatch_tree:-d,owner:-o",
-> +        .params     =3D "[-f][-d][-o]",
->          .help       =3D "show memory tree (-f: dump flat view for addres=
-s spaces;"
-> -                      "-d: dump dispatch tree, valid with -f only)",
-> +                      "-d: dump dispatch tree, valid with -f only);"
-> +                      "-o: dump region owners/parents",
->          .cmd        =3D hmp_info_mtree,
->      },
-> =20
-> --=20
-> 2.11.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 2340320818..a760c19379 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -149,705 +149,6 @@ void fork_end(int child)
+     }
+ }
+ 
+-#ifdef TARGET_MIPS
+-
+-# ifdef TARGET_ABI_MIPSO32
+-#  define MIPS_SYS(name, args) args,
+-static const uint8_t mips_syscall_args[] = {
+-	MIPS_SYS(sys_syscall	, 8)	/* 4000 */
+-	MIPS_SYS(sys_exit	, 1)
+-	MIPS_SYS(sys_fork	, 0)
+-	MIPS_SYS(sys_read	, 3)
+-	MIPS_SYS(sys_write	, 3)
+-	MIPS_SYS(sys_open	, 3)	/* 4005 */
+-	MIPS_SYS(sys_close	, 1)
+-	MIPS_SYS(sys_waitpid	, 3)
+-	MIPS_SYS(sys_creat	, 2)
+-	MIPS_SYS(sys_link	, 2)
+-	MIPS_SYS(sys_unlink	, 1)	/* 4010 */
+-	MIPS_SYS(sys_execve	, 0)
+-	MIPS_SYS(sys_chdir	, 1)
+-	MIPS_SYS(sys_time	, 1)
+-	MIPS_SYS(sys_mknod	, 3)
+-	MIPS_SYS(sys_chmod	, 2)	/* 4015 */
+-	MIPS_SYS(sys_lchown	, 3)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was sys_stat */
+-	MIPS_SYS(sys_lseek	, 3)
+-	MIPS_SYS(sys_getpid	, 0)	/* 4020 */
+-	MIPS_SYS(sys_mount	, 5)
+-	MIPS_SYS(sys_umount	, 1)
+-	MIPS_SYS(sys_setuid	, 1)
+-	MIPS_SYS(sys_getuid	, 0)
+-	MIPS_SYS(sys_stime	, 1)	/* 4025 */
+-	MIPS_SYS(sys_ptrace	, 4)
+-	MIPS_SYS(sys_alarm	, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was sys_fstat */
+-	MIPS_SYS(sys_pause	, 0)
+-	MIPS_SYS(sys_utime	, 2)	/* 4030 */
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_access	, 2)
+-	MIPS_SYS(sys_nice	, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* 4035 */
+-	MIPS_SYS(sys_sync	, 0)
+-	MIPS_SYS(sys_kill	, 2)
+-	MIPS_SYS(sys_rename	, 2)
+-	MIPS_SYS(sys_mkdir	, 2)
+-	MIPS_SYS(sys_rmdir	, 1)	/* 4040 */
+-	MIPS_SYS(sys_dup		, 1)
+-	MIPS_SYS(sys_pipe	, 0)
+-	MIPS_SYS(sys_times	, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_brk		, 1)	/* 4045 */
+-	MIPS_SYS(sys_setgid	, 1)
+-	MIPS_SYS(sys_getgid	, 0)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was signal(2) */
+-	MIPS_SYS(sys_geteuid	, 0)
+-	MIPS_SYS(sys_getegid	, 0)	/* 4050 */
+-	MIPS_SYS(sys_acct	, 0)
+-	MIPS_SYS(sys_umount2	, 2)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_ioctl	, 3)
+-	MIPS_SYS(sys_fcntl	, 3)	/* 4055 */
+-	MIPS_SYS(sys_ni_syscall	, 2)
+-	MIPS_SYS(sys_setpgid	, 2)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_olduname	, 1)
+-	MIPS_SYS(sys_umask	, 1)	/* 4060 */
+-	MIPS_SYS(sys_chroot	, 1)
+-	MIPS_SYS(sys_ustat	, 2)
+-	MIPS_SYS(sys_dup2	, 2)
+-	MIPS_SYS(sys_getppid	, 0)
+-	MIPS_SYS(sys_getpgrp	, 0)	/* 4065 */
+-	MIPS_SYS(sys_setsid	, 0)
+-	MIPS_SYS(sys_sigaction	, 3)
+-	MIPS_SYS(sys_sgetmask	, 0)
+-	MIPS_SYS(sys_ssetmask	, 1)
+-	MIPS_SYS(sys_setreuid	, 2)	/* 4070 */
+-	MIPS_SYS(sys_setregid	, 2)
+-	MIPS_SYS(sys_sigsuspend	, 0)
+-	MIPS_SYS(sys_sigpending	, 1)
+-	MIPS_SYS(sys_sethostname	, 2)
+-	MIPS_SYS(sys_setrlimit	, 2)	/* 4075 */
+-	MIPS_SYS(sys_getrlimit	, 2)
+-	MIPS_SYS(sys_getrusage	, 2)
+-	MIPS_SYS(sys_gettimeofday, 2)
+-	MIPS_SYS(sys_settimeofday, 2)
+-	MIPS_SYS(sys_getgroups	, 2)	/* 4080 */
+-	MIPS_SYS(sys_setgroups	, 2)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* old_select */
+-	MIPS_SYS(sys_symlink	, 2)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was sys_lstat */
+-	MIPS_SYS(sys_readlink	, 3)	/* 4085 */
+-	MIPS_SYS(sys_uselib	, 1)
+-	MIPS_SYS(sys_swapon	, 2)
+-	MIPS_SYS(sys_reboot	, 3)
+-	MIPS_SYS(old_readdir	, 3)
+-	MIPS_SYS(old_mmap	, 6)	/* 4090 */
+-	MIPS_SYS(sys_munmap	, 2)
+-	MIPS_SYS(sys_truncate	, 2)
+-	MIPS_SYS(sys_ftruncate	, 2)
+-	MIPS_SYS(sys_fchmod	, 2)
+-	MIPS_SYS(sys_fchown	, 3)	/* 4095 */
+-	MIPS_SYS(sys_getpriority	, 2)
+-	MIPS_SYS(sys_setpriority	, 3)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_statfs	, 2)
+-	MIPS_SYS(sys_fstatfs	, 2)	/* 4100 */
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was ioperm(2) */
+-	MIPS_SYS(sys_socketcall	, 2)
+-	MIPS_SYS(sys_syslog	, 3)
+-	MIPS_SYS(sys_setitimer	, 3)
+-	MIPS_SYS(sys_getitimer	, 2)	/* 4105 */
+-	MIPS_SYS(sys_newstat	, 2)
+-	MIPS_SYS(sys_newlstat	, 2)
+-	MIPS_SYS(sys_newfstat	, 2)
+-	MIPS_SYS(sys_uname	, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* 4110 was iopl(2) */
+-	MIPS_SYS(sys_vhangup	, 0)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was sys_idle() */
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was sys_vm86 */
+-	MIPS_SYS(sys_wait4	, 4)
+-	MIPS_SYS(sys_swapoff	, 1)	/* 4115 */
+-	MIPS_SYS(sys_sysinfo	, 1)
+-	MIPS_SYS(sys_ipc		, 6)
+-	MIPS_SYS(sys_fsync	, 1)
+-	MIPS_SYS(sys_sigreturn	, 0)
+-	MIPS_SYS(sys_clone	, 6)	/* 4120 */
+-	MIPS_SYS(sys_setdomainname, 2)
+-	MIPS_SYS(sys_newuname	, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* sys_modify_ldt */
+-	MIPS_SYS(sys_adjtimex	, 1)
+-	MIPS_SYS(sys_mprotect	, 3)	/* 4125 */
+-	MIPS_SYS(sys_sigprocmask	, 3)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was create_module */
+-	MIPS_SYS(sys_init_module	, 5)
+-	MIPS_SYS(sys_delete_module, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* 4130	was get_kernel_syms */
+-	MIPS_SYS(sys_quotactl	, 0)
+-	MIPS_SYS(sys_getpgid	, 1)
+-	MIPS_SYS(sys_fchdir	, 1)
+-	MIPS_SYS(sys_bdflush	, 2)
+-	MIPS_SYS(sys_sysfs	, 3)	/* 4135 */
+-	MIPS_SYS(sys_personality	, 1)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* for afs_syscall */
+-	MIPS_SYS(sys_setfsuid	, 1)
+-	MIPS_SYS(sys_setfsgid	, 1)
+-	MIPS_SYS(sys_llseek	, 5)	/* 4140 */
+-	MIPS_SYS(sys_getdents	, 3)
+-	MIPS_SYS(sys_select	, 5)
+-	MIPS_SYS(sys_flock	, 2)
+-	MIPS_SYS(sys_msync	, 3)
+-	MIPS_SYS(sys_readv	, 3)	/* 4145 */
+-	MIPS_SYS(sys_writev	, 3)
+-	MIPS_SYS(sys_cacheflush	, 3)
+-	MIPS_SYS(sys_cachectl	, 3)
+-	MIPS_SYS(sys_sysmips	, 4)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* 4150 */
+-	MIPS_SYS(sys_getsid	, 1)
+-	MIPS_SYS(sys_fdatasync	, 0)
+-	MIPS_SYS(sys_sysctl	, 1)
+-	MIPS_SYS(sys_mlock	, 2)
+-	MIPS_SYS(sys_munlock	, 2)	/* 4155 */
+-	MIPS_SYS(sys_mlockall	, 1)
+-	MIPS_SYS(sys_munlockall	, 0)
+-	MIPS_SYS(sys_sched_setparam, 2)
+-	MIPS_SYS(sys_sched_getparam, 2)
+-	MIPS_SYS(sys_sched_setscheduler, 3)	/* 4160 */
+-	MIPS_SYS(sys_sched_getscheduler, 1)
+-	MIPS_SYS(sys_sched_yield	, 0)
+-	MIPS_SYS(sys_sched_get_priority_max, 1)
+-	MIPS_SYS(sys_sched_get_priority_min, 1)
+-	MIPS_SYS(sys_sched_rr_get_interval, 2)	/* 4165 */
+-	MIPS_SYS(sys_nanosleep,	2)
+-	MIPS_SYS(sys_mremap	, 5)
+-	MIPS_SYS(sys_accept	, 3)
+-	MIPS_SYS(sys_bind	, 3)
+-	MIPS_SYS(sys_connect	, 3)	/* 4170 */
+-	MIPS_SYS(sys_getpeername	, 3)
+-	MIPS_SYS(sys_getsockname	, 3)
+-	MIPS_SYS(sys_getsockopt	, 5)
+-	MIPS_SYS(sys_listen	, 2)
+-	MIPS_SYS(sys_recv	, 4)	/* 4175 */
+-	MIPS_SYS(sys_recvfrom	, 6)
+-	MIPS_SYS(sys_recvmsg	, 3)
+-	MIPS_SYS(sys_send	, 4)
+-	MIPS_SYS(sys_sendmsg	, 3)
+-	MIPS_SYS(sys_sendto	, 6)	/* 4180 */
+-	MIPS_SYS(sys_setsockopt	, 5)
+-	MIPS_SYS(sys_shutdown	, 2)
+-	MIPS_SYS(sys_socket	, 3)
+-	MIPS_SYS(sys_socketpair	, 4)
+-	MIPS_SYS(sys_setresuid	, 3)	/* 4185 */
+-	MIPS_SYS(sys_getresuid	, 3)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* was sys_query_module */
+-	MIPS_SYS(sys_poll	, 3)
+-	MIPS_SYS(sys_nfsservctl	, 3)
+-	MIPS_SYS(sys_setresgid	, 3)	/* 4190 */
+-	MIPS_SYS(sys_getresgid	, 3)
+-	MIPS_SYS(sys_prctl	, 5)
+-	MIPS_SYS(sys_rt_sigreturn, 0)
+-	MIPS_SYS(sys_rt_sigaction, 4)
+-	MIPS_SYS(sys_rt_sigprocmask, 4)	/* 4195 */
+-	MIPS_SYS(sys_rt_sigpending, 2)
+-	MIPS_SYS(sys_rt_sigtimedwait, 4)
+-	MIPS_SYS(sys_rt_sigqueueinfo, 3)
+-	MIPS_SYS(sys_rt_sigsuspend, 0)
+-	MIPS_SYS(sys_pread64	, 6)	/* 4200 */
+-	MIPS_SYS(sys_pwrite64	, 6)
+-	MIPS_SYS(sys_chown	, 3)
+-	MIPS_SYS(sys_getcwd	, 2)
+-	MIPS_SYS(sys_capget	, 2)
+-	MIPS_SYS(sys_capset	, 2)	/* 4205 */
+-	MIPS_SYS(sys_sigaltstack	, 2)
+-	MIPS_SYS(sys_sendfile	, 4)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_mmap2	, 6)	/* 4210 */
+-	MIPS_SYS(sys_truncate64	, 4)
+-	MIPS_SYS(sys_ftruncate64	, 4)
+-	MIPS_SYS(sys_stat64	, 2)
+-	MIPS_SYS(sys_lstat64	, 2)
+-	MIPS_SYS(sys_fstat64	, 2)	/* 4215 */
+-	MIPS_SYS(sys_pivot_root	, 2)
+-	MIPS_SYS(sys_mincore	, 3)
+-	MIPS_SYS(sys_madvise	, 3)
+-	MIPS_SYS(sys_getdents64	, 3)
+-	MIPS_SYS(sys_fcntl64	, 3)	/* 4220 */
+-	MIPS_SYS(sys_ni_syscall	, 0)
+-	MIPS_SYS(sys_gettid	, 0)
+-	MIPS_SYS(sys_readahead	, 5)
+-	MIPS_SYS(sys_setxattr	, 5)
+-	MIPS_SYS(sys_lsetxattr	, 5)	/* 4225 */
+-	MIPS_SYS(sys_fsetxattr	, 5)
+-	MIPS_SYS(sys_getxattr	, 4)
+-	MIPS_SYS(sys_lgetxattr	, 4)
+-	MIPS_SYS(sys_fgetxattr	, 4)
+-	MIPS_SYS(sys_listxattr	, 3)	/* 4230 */
+-	MIPS_SYS(sys_llistxattr	, 3)
+-	MIPS_SYS(sys_flistxattr	, 3)
+-	MIPS_SYS(sys_removexattr	, 2)
+-	MIPS_SYS(sys_lremovexattr, 2)
+-	MIPS_SYS(sys_fremovexattr, 2)	/* 4235 */
+-	MIPS_SYS(sys_tkill	, 2)
+-	MIPS_SYS(sys_sendfile64	, 5)
+-	MIPS_SYS(sys_futex	, 6)
+-	MIPS_SYS(sys_sched_setaffinity, 3)
+-	MIPS_SYS(sys_sched_getaffinity, 3)	/* 4240 */
+-	MIPS_SYS(sys_io_setup	, 2)
+-	MIPS_SYS(sys_io_destroy	, 1)
+-	MIPS_SYS(sys_io_getevents, 5)
+-	MIPS_SYS(sys_io_submit	, 3)
+-	MIPS_SYS(sys_io_cancel	, 3)	/* 4245 */
+-	MIPS_SYS(sys_exit_group	, 1)
+-	MIPS_SYS(sys_lookup_dcookie, 3)
+-	MIPS_SYS(sys_epoll_create, 1)
+-	MIPS_SYS(sys_epoll_ctl	, 4)
+-	MIPS_SYS(sys_epoll_wait	, 3)	/* 4250 */
+-	MIPS_SYS(sys_remap_file_pages, 5)
+-	MIPS_SYS(sys_set_tid_address, 1)
+-	MIPS_SYS(sys_restart_syscall, 0)
+-	MIPS_SYS(sys_fadvise64_64, 7)
+-	MIPS_SYS(sys_statfs64	, 3)	/* 4255 */
+-	MIPS_SYS(sys_fstatfs64	, 2)
+-	MIPS_SYS(sys_timer_create, 3)
+-	MIPS_SYS(sys_timer_settime, 4)
+-	MIPS_SYS(sys_timer_gettime, 2)
+-	MIPS_SYS(sys_timer_getoverrun, 1)	/* 4260 */
+-	MIPS_SYS(sys_timer_delete, 1)
+-	MIPS_SYS(sys_clock_settime, 2)
+-	MIPS_SYS(sys_clock_gettime, 2)
+-	MIPS_SYS(sys_clock_getres, 2)
+-	MIPS_SYS(sys_clock_nanosleep, 4)	/* 4265 */
+-	MIPS_SYS(sys_tgkill	, 3)
+-	MIPS_SYS(sys_utimes	, 2)
+-	MIPS_SYS(sys_mbind	, 4)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* sys_get_mempolicy */
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* 4270 sys_set_mempolicy */
+-	MIPS_SYS(sys_mq_open	, 4)
+-	MIPS_SYS(sys_mq_unlink	, 1)
+-	MIPS_SYS(sys_mq_timedsend, 5)
+-	MIPS_SYS(sys_mq_timedreceive, 5)
+-	MIPS_SYS(sys_mq_notify	, 2)	/* 4275 */
+-	MIPS_SYS(sys_mq_getsetattr, 3)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* sys_vserver */
+-	MIPS_SYS(sys_waitid	, 4)
+-	MIPS_SYS(sys_ni_syscall	, 0)	/* available, was setaltroot */
+-	MIPS_SYS(sys_add_key	, 5)
+-	MIPS_SYS(sys_request_key, 4)
+-	MIPS_SYS(sys_keyctl	, 5)
+-	MIPS_SYS(sys_set_thread_area, 1)
+-	MIPS_SYS(sys_inotify_init, 0)
+-	MIPS_SYS(sys_inotify_add_watch, 3) /* 4285 */
+-	MIPS_SYS(sys_inotify_rm_watch, 2)
+-	MIPS_SYS(sys_migrate_pages, 4)
+-	MIPS_SYS(sys_openat, 4)
+-	MIPS_SYS(sys_mkdirat, 3)
+-	MIPS_SYS(sys_mknodat, 4)	/* 4290 */
+-	MIPS_SYS(sys_fchownat, 5)
+-	MIPS_SYS(sys_futimesat, 3)
+-	MIPS_SYS(sys_fstatat64, 4)
+-	MIPS_SYS(sys_unlinkat, 3)
+-	MIPS_SYS(sys_renameat, 4)	/* 4295 */
+-	MIPS_SYS(sys_linkat, 5)
+-	MIPS_SYS(sys_symlinkat, 3)
+-	MIPS_SYS(sys_readlinkat, 4)
+-	MIPS_SYS(sys_fchmodat, 3)
+-	MIPS_SYS(sys_faccessat, 3)	/* 4300 */
+-	MIPS_SYS(sys_pselect6, 6)
+-	MIPS_SYS(sys_ppoll, 5)
+-	MIPS_SYS(sys_unshare, 1)
+-	MIPS_SYS(sys_splice, 6)
+-	MIPS_SYS(sys_sync_file_range, 7) /* 4305 */
+-	MIPS_SYS(sys_tee, 4)
+-	MIPS_SYS(sys_vmsplice, 4)
+-	MIPS_SYS(sys_move_pages, 6)
+-	MIPS_SYS(sys_set_robust_list, 2)
+-	MIPS_SYS(sys_get_robust_list, 3) /* 4310 */
+-	MIPS_SYS(sys_kexec_load, 4)
+-	MIPS_SYS(sys_getcpu, 3)
+-	MIPS_SYS(sys_epoll_pwait, 6)
+-	MIPS_SYS(sys_ioprio_set, 3)
+-	MIPS_SYS(sys_ioprio_get, 2)
+-        MIPS_SYS(sys_utimensat, 4)
+-        MIPS_SYS(sys_signalfd, 3)
+-        MIPS_SYS(sys_ni_syscall, 0)     /* was timerfd */
+-        MIPS_SYS(sys_eventfd, 1)
+-        MIPS_SYS(sys_fallocate, 6)      /* 4320 */
+-        MIPS_SYS(sys_timerfd_create, 2)
+-        MIPS_SYS(sys_timerfd_gettime, 2)
+-        MIPS_SYS(sys_timerfd_settime, 4)
+-        MIPS_SYS(sys_signalfd4, 4)
+-        MIPS_SYS(sys_eventfd2, 2)       /* 4325 */
+-        MIPS_SYS(sys_epoll_create1, 1)
+-        MIPS_SYS(sys_dup3, 3)
+-        MIPS_SYS(sys_pipe2, 2)
+-        MIPS_SYS(sys_inotify_init1, 1)
+-        MIPS_SYS(sys_preadv, 5)         /* 4330 */
+-        MIPS_SYS(sys_pwritev, 5)
+-        MIPS_SYS(sys_rt_tgsigqueueinfo, 4)
+-        MIPS_SYS(sys_perf_event_open, 5)
+-        MIPS_SYS(sys_accept4, 4)
+-        MIPS_SYS(sys_recvmmsg, 5)       /* 4335 */
+-        MIPS_SYS(sys_fanotify_init, 2)
+-        MIPS_SYS(sys_fanotify_mark, 6)
+-        MIPS_SYS(sys_prlimit64, 4)
+-        MIPS_SYS(sys_name_to_handle_at, 5)
+-        MIPS_SYS(sys_open_by_handle_at, 3) /* 4340 */
+-        MIPS_SYS(sys_clock_adjtime, 2)
+-        MIPS_SYS(sys_syncfs, 1)
+-        MIPS_SYS(sys_sendmmsg, 4)
+-        MIPS_SYS(sys_setns, 2)
+-        MIPS_SYS(sys_process_vm_readv, 6) /* 345 */
+-        MIPS_SYS(sys_process_vm_writev, 6)
+-        MIPS_SYS(sys_kcmp, 5)
+-        MIPS_SYS(sys_finit_module, 3)
+-        MIPS_SYS(sys_sched_setattr, 2)
+-        MIPS_SYS(sys_sched_getattr, 3)  /* 350 */
+-        MIPS_SYS(sys_renameat2, 5)
+-        MIPS_SYS(sys_seccomp, 3)
+-        MIPS_SYS(sys_getrandom, 3)
+-        MIPS_SYS(sys_memfd_create, 2)
+-        MIPS_SYS(sys_bpf, 3)            /* 355 */
+-        MIPS_SYS(sys_execveat, 5)
+-        MIPS_SYS(sys_userfaultfd, 1)
+-        MIPS_SYS(sys_membarrier, 2)
+-        MIPS_SYS(sys_mlock2, 3)
+-        MIPS_SYS(sys_copy_file_range, 6) /* 360 */
+-        MIPS_SYS(sys_preadv2, 6)
+-        MIPS_SYS(sys_pwritev2, 6)
+-};
+-#  undef MIPS_SYS
+-# endif /* O32 */
+-
+-static int do_store_exclusive(CPUMIPSState *env)
+-{
+-    target_ulong addr;
+-    target_ulong page_addr;
+-    target_ulong val;
+-    int flags;
+-    int segv = 0;
+-    int reg;
+-    int d;
+-
+-    addr = env->lladdr;
+-    page_addr = addr & TARGET_PAGE_MASK;
+-    start_exclusive();
+-    mmap_lock();
+-    flags = page_get_flags(page_addr);
+-    if ((flags & PAGE_READ) == 0) {
+-        segv = 1;
+-    } else {
+-        reg = env->llreg & 0x1f;
+-        d = (env->llreg & 0x20) != 0;
+-        if (d) {
+-            segv = get_user_s64(val, addr);
+-        } else {
+-            segv = get_user_s32(val, addr);
+-        }
+-        if (!segv) {
+-            if (val != env->llval) {
+-                env->active_tc.gpr[reg] = 0;
+-            } else {
+-                if (d) {
+-                    segv = put_user_u64(env->llnewval, addr);
+-                } else {
+-                    segv = put_user_u32(env->llnewval, addr);
+-                }
+-                if (!segv) {
+-                    env->active_tc.gpr[reg] = 1;
+-                }
+-            }
+-        }
+-    }
+-    env->lladdr = -1;
+-    if (!segv) {
+-        env->active_tc.PC += 4;
+-    }
+-    mmap_unlock();
+-    end_exclusive();
+-    return segv;
+-}
+-
+-/* Break codes */
+-enum {
+-    BRK_OVERFLOW = 6,
+-    BRK_DIVZERO = 7
+-};
+-
+-static int do_break(CPUMIPSState *env, target_siginfo_t *info,
+-                    unsigned int code)
+-{
+-    int ret = -1;
+-
+-    switch (code) {
+-    case BRK_OVERFLOW:
+-    case BRK_DIVZERO:
+-        info->si_signo = TARGET_SIGFPE;
+-        info->si_errno = 0;
+-        info->si_code = (code == BRK_OVERFLOW) ? FPE_INTOVF : FPE_INTDIV;
+-        queue_signal(env, info->si_signo, QEMU_SI_FAULT, &*info);
+-        ret = 0;
+-        break;
+-    default:
+-        info->si_signo = TARGET_SIGTRAP;
+-        info->si_errno = 0;
+-        queue_signal(env, info->si_signo, QEMU_SI_FAULT, &*info);
+-        ret = 0;
+-        break;
+-    }
+-
+-    return ret;
+-}
+-
+-void cpu_loop(CPUMIPSState *env)
+-{
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
+-    target_siginfo_t info;
+-    int trapnr;
+-    abi_long ret;
+-# ifdef TARGET_ABI_MIPSO32
+-    unsigned int syscall_num;
+-# endif
+-
+-    for(;;) {
+-        cpu_exec_start(cs);
+-        trapnr = cpu_exec(cs);
+-        cpu_exec_end(cs);
+-        process_queued_cpu_work(cs);
+-
+-        switch(trapnr) {
+-        case EXCP_SYSCALL:
+-            env->active_tc.PC += 4;
+-# ifdef TARGET_ABI_MIPSO32
+-            syscall_num = env->active_tc.gpr[2] - 4000;
+-            if (syscall_num >= sizeof(mips_syscall_args)) {
+-                ret = -TARGET_ENOSYS;
+-            } else {
+-                int nb_args;
+-                abi_ulong sp_reg;
+-                abi_ulong arg5 = 0, arg6 = 0, arg7 = 0, arg8 = 0;
+-
+-                nb_args = mips_syscall_args[syscall_num];
+-                sp_reg = env->active_tc.gpr[29];
+-                switch (nb_args) {
+-                /* these arguments are taken from the stack */
+-                case 8:
+-                    if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
+-                        goto done_syscall;
+-                    }
+-                case 7:
+-                    if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
+-                        goto done_syscall;
+-                    }
+-                case 6:
+-                    if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
+-                        goto done_syscall;
+-                    }
+-                case 5:
+-                    if ((ret = get_user_ual(arg5, sp_reg + 16)) != 0) {
+-                        goto done_syscall;
+-                    }
+-                default:
+-                    break;
+-                }
+-                ret = do_syscall(env, env->active_tc.gpr[2],
+-                                 env->active_tc.gpr[4],
+-                                 env->active_tc.gpr[5],
+-                                 env->active_tc.gpr[6],
+-                                 env->active_tc.gpr[7],
+-                                 arg5, arg6, arg7, arg8);
+-            }
+-done_syscall:
+-# else
+-            ret = do_syscall(env, env->active_tc.gpr[2],
+-                             env->active_tc.gpr[4], env->active_tc.gpr[5],
+-                             env->active_tc.gpr[6], env->active_tc.gpr[7],
+-                             env->active_tc.gpr[8], env->active_tc.gpr[9],
+-                             env->active_tc.gpr[10], env->active_tc.gpr[11]);
+-# endif /* O32 */
+-            if (ret == -TARGET_ERESTARTSYS) {
+-                env->active_tc.PC -= 4;
+-                break;
+-            }
+-            if (ret == -TARGET_QEMU_ESIGRETURN) {
+-                /* Returning from a successful sigreturn syscall.
+-                   Avoid clobbering register state.  */
+-                break;
+-            }
+-            if ((abi_ulong)ret >= (abi_ulong)-1133) {
+-                env->active_tc.gpr[7] = 1; /* error flag */
+-                ret = -ret;
+-            } else {
+-                env->active_tc.gpr[7] = 0; /* error flag */
+-            }
+-            env->active_tc.gpr[2] = ret;
+-            break;
+-        case EXCP_TLBL:
+-        case EXCP_TLBS:
+-        case EXCP_AdEL:
+-        case EXCP_AdES:
+-            info.si_signo = TARGET_SIGSEGV;
+-            info.si_errno = 0;
+-            /* XXX: check env->error_code */
+-            info.si_code = TARGET_SEGV_MAPERR;
+-            info._sifields._sigfault._addr = env->CP0_BadVAddr;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_CpU:
+-        case EXCP_RI:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = 0;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_INTERRUPT:
+-            /* just indicate that signals should be handled asap */
+-            break;
+-        case EXCP_DEBUG:
+-            {
+-                int sig;
+-
+-                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+-                if (sig)
+-                  {
+-                    info.si_signo = sig;
+-                    info.si_errno = 0;
+-                    info.si_code = TARGET_TRAP_BRKPT;
+-                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                  }
+-            }
+-            break;
+-        case EXCP_SC:
+-            if (do_store_exclusive(env)) {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SEGV_MAPERR;
+-                info._sifields._sigfault._addr = env->active_tc.PC;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            }
+-            break;
+-        case EXCP_DSPDIS:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPC;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        /* The code below was inspired by the MIPS Linux kernel trap
+-         * handling code in arch/mips/kernel/traps.c.
+-         */
+-        case EXCP_BREAK:
+-            {
+-                abi_ulong trap_instr;
+-                unsigned int code;
+-
+-                if (env->hflags & MIPS_HFLAG_M16) {
+-                    if (env->insn_flags & ASE_MICROMIPS) {
+-                        /* microMIPS mode */
+-                        ret = get_user_u16(trap_instr, env->active_tc.PC);
+-                        if (ret != 0) {
+-                            goto error;
+-                        }
+-
+-                        if ((trap_instr >> 10) == 0x11) {
+-                            /* 16-bit instruction */
+-                            code = trap_instr & 0xf;
+-                        } else {
+-                            /* 32-bit instruction */
+-                            abi_ulong instr_lo;
+-
+-                            ret = get_user_u16(instr_lo,
+-                                               env->active_tc.PC + 2);
+-                            if (ret != 0) {
+-                                goto error;
+-                            }
+-                            trap_instr = (trap_instr << 16) | instr_lo;
+-                            code = ((trap_instr >> 6) & ((1 << 20) - 1));
+-                            /* Unfortunately, microMIPS also suffers from
+-                               the old assembler bug...  */
+-                            if (code >= (1 << 10)) {
+-                                code >>= 10;
+-                            }
+-                        }
+-                    } else {
+-                        /* MIPS16e mode */
+-                        ret = get_user_u16(trap_instr, env->active_tc.PC);
+-                        if (ret != 0) {
+-                            goto error;
+-                        }
+-                        code = (trap_instr >> 6) & 0x3f;
+-                    }
+-                } else {
+-                    ret = get_user_u32(trap_instr, env->active_tc.PC);
+-                    if (ret != 0) {
+-                        goto error;
+-                    }
+-
+-                    /* As described in the original Linux kernel code, the
+-                     * below checks on 'code' are to work around an old
+-                     * assembly bug.
+-                     */
+-                    code = ((trap_instr >> 6) & ((1 << 20) - 1));
+-                    if (code >= (1 << 10)) {
+-                        code >>= 10;
+-                    }
+-                }
+-
+-                if (do_break(env, &info, code) != 0) {
+-                    goto error;
+-                }
+-            }
+-            break;
+-        case EXCP_TRAP:
+-            {
+-                abi_ulong trap_instr;
+-                unsigned int code = 0;
+-
+-                if (env->hflags & MIPS_HFLAG_M16) {
+-                    /* microMIPS mode */
+-                    abi_ulong instr[2];
+-
+-                    ret = get_user_u16(instr[0], env->active_tc.PC) ||
+-                          get_user_u16(instr[1], env->active_tc.PC + 2);
+-
+-                    trap_instr = (instr[0] << 16) | instr[1];
+-                } else {
+-                    ret = get_user_u32(trap_instr, env->active_tc.PC);
+-                }
+-
+-                if (ret != 0) {
+-                    goto error;
+-                }
+-
+-                /* The immediate versions don't provide a code.  */
+-                if (!(trap_instr & 0xFC000000)) {
+-                    if (env->hflags & MIPS_HFLAG_M16) {
+-                        /* microMIPS mode */
+-                        code = ((trap_instr >> 12) & ((1 << 4) - 1));
+-                    } else {
+-                        code = ((trap_instr >> 6) & ((1 << 10) - 1));
+-                    }
+-                }
+-
+-                if (do_break(env, &info, code) != 0) {
+-                    goto error;
+-                }
+-            }
+-            break;
+-        case EXCP_ATOMIC:
+-            cpu_exec_step_atomic(cs);
+-            break;
+-        default:
+-error:
+-            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
+-            abort();
+-        }
+-        process_pending_signals(env);
+-    }
+-}
+-#endif
+-
+ #ifdef TARGET_NIOS2
+ 
+ void cpu_loop(CPUNios2State *env)
+@@ -3244,32 +2545,6 @@ int main(int argc, char **argv, char **envp)
+         env->regs[31] = regs->r31;	    
+         env->sregs[SR_PC] = regs->pc;
+     }
+-#elif defined(TARGET_MIPS)
+-    {
+-        int i;
+-
+-        for(i = 0; i < 32; i++) {
+-            env->active_tc.gpr[i] = regs->regs[i];
+-        }
+-        env->active_tc.PC = regs->cp0_epc & ~(target_ulong)1;
+-        if (regs->cp0_epc & 1) {
+-            env->hflags |= MIPS_HFLAG_M16;
+-        }
+-        if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
+-            ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
+-            if ((env->active_fpu.fcr31_rw_bitmask &
+-                  (1 << FCR31_NAN2008)) == 0) {
+-                fprintf(stderr, "ELF binary's NaN mode not supported by CPU\n");
+-                exit(1);
+-            }
+-            if ((info->elf_flags & EF_MIPS_NAN2008) != 0) {
+-                env->active_fpu.fcr31 |= (1 << FCR31_NAN2008);
+-            } else {
+-                env->active_fpu.fcr31 &= ~(1 << FCR31_NAN2008);
+-            }
+-            restore_snan_bit_mode(env);
+-        }
+-    }
+ #elif defined(TARGET_NIOS2)
+     {
+         env->regs[0] = 0;
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index b7700a5561..084ad6a041 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -20,7 +20,730 @@
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
++#include "elf.h"
++
++# ifdef TARGET_ABI_MIPSO32
++#  define MIPS_SYS(name, args) args,
++static const uint8_t mips_syscall_args[] = {
++        MIPS_SYS(sys_syscall    , 8)    /* 4000 */
++        MIPS_SYS(sys_exit       , 1)
++        MIPS_SYS(sys_fork       , 0)
++        MIPS_SYS(sys_read       , 3)
++        MIPS_SYS(sys_write      , 3)
++        MIPS_SYS(sys_open       , 3)    /* 4005 */
++        MIPS_SYS(sys_close      , 1)
++        MIPS_SYS(sys_waitpid    , 3)
++        MIPS_SYS(sys_creat      , 2)
++        MIPS_SYS(sys_link       , 2)
++        MIPS_SYS(sys_unlink     , 1)    /* 4010 */
++        MIPS_SYS(sys_execve     , 0)
++        MIPS_SYS(sys_chdir      , 1)
++        MIPS_SYS(sys_time       , 1)
++        MIPS_SYS(sys_mknod      , 3)
++        MIPS_SYS(sys_chmod      , 2)    /* 4015 */
++        MIPS_SYS(sys_lchown     , 3)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_stat */
++        MIPS_SYS(sys_lseek      , 3)
++        MIPS_SYS(sys_getpid     , 0)    /* 4020 */
++        MIPS_SYS(sys_mount      , 5)
++        MIPS_SYS(sys_umount     , 1)
++        MIPS_SYS(sys_setuid     , 1)
++        MIPS_SYS(sys_getuid     , 0)
++        MIPS_SYS(sys_stime      , 1)    /* 4025 */
++        MIPS_SYS(sys_ptrace     , 4)
++        MIPS_SYS(sys_alarm      , 1)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_fstat */
++        MIPS_SYS(sys_pause      , 0)
++        MIPS_SYS(sys_utime      , 2)    /* 4030 */
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_access     , 2)
++        MIPS_SYS(sys_nice       , 1)
++        MIPS_SYS(sys_ni_syscall , 0)    /* 4035 */
++        MIPS_SYS(sys_sync       , 0)
++        MIPS_SYS(sys_kill       , 2)
++        MIPS_SYS(sys_rename     , 2)
++        MIPS_SYS(sys_mkdir      , 2)
++        MIPS_SYS(sys_rmdir      , 1)    /* 4040 */
++        MIPS_SYS(sys_dup                , 1)
++        MIPS_SYS(sys_pipe       , 0)
++        MIPS_SYS(sys_times      , 1)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_brk                , 1)    /* 4045 */
++        MIPS_SYS(sys_setgid     , 1)
++        MIPS_SYS(sys_getgid     , 0)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was signal(2) */
++        MIPS_SYS(sys_geteuid    , 0)
++        MIPS_SYS(sys_getegid    , 0)    /* 4050 */
++        MIPS_SYS(sys_acct       , 0)
++        MIPS_SYS(sys_umount2    , 2)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_ioctl      , 3)
++        MIPS_SYS(sys_fcntl      , 3)    /* 4055 */
++        MIPS_SYS(sys_ni_syscall , 2)
++        MIPS_SYS(sys_setpgid    , 2)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_olduname   , 1)
++        MIPS_SYS(sys_umask      , 1)    /* 4060 */
++        MIPS_SYS(sys_chroot     , 1)
++        MIPS_SYS(sys_ustat      , 2)
++        MIPS_SYS(sys_dup2       , 2)
++        MIPS_SYS(sys_getppid    , 0)
++        MIPS_SYS(sys_getpgrp    , 0)    /* 4065 */
++        MIPS_SYS(sys_setsid     , 0)
++        MIPS_SYS(sys_sigaction  , 3)
++        MIPS_SYS(sys_sgetmask   , 0)
++        MIPS_SYS(sys_ssetmask   , 1)
++        MIPS_SYS(sys_setreuid   , 2)    /* 4070 */
++        MIPS_SYS(sys_setregid   , 2)
++        MIPS_SYS(sys_sigsuspend , 0)
++        MIPS_SYS(sys_sigpending , 1)
++        MIPS_SYS(sys_sethostname        , 2)
++        MIPS_SYS(sys_setrlimit  , 2)    /* 4075 */
++        MIPS_SYS(sys_getrlimit  , 2)
++        MIPS_SYS(sys_getrusage  , 2)
++        MIPS_SYS(sys_gettimeofday, 2)
++        MIPS_SYS(sys_settimeofday, 2)
++        MIPS_SYS(sys_getgroups  , 2)    /* 4080 */
++        MIPS_SYS(sys_setgroups  , 2)
++        MIPS_SYS(sys_ni_syscall , 0)    /* old_select */
++        MIPS_SYS(sys_symlink    , 2)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_lstat */
++        MIPS_SYS(sys_readlink   , 3)    /* 4085 */
++        MIPS_SYS(sys_uselib     , 1)
++        MIPS_SYS(sys_swapon     , 2)
++        MIPS_SYS(sys_reboot     , 3)
++        MIPS_SYS(old_readdir    , 3)
++        MIPS_SYS(old_mmap       , 6)    /* 4090 */
++        MIPS_SYS(sys_munmap     , 2)
++        MIPS_SYS(sys_truncate   , 2)
++        MIPS_SYS(sys_ftruncate  , 2)
++        MIPS_SYS(sys_fchmod     , 2)
++        MIPS_SYS(sys_fchown     , 3)    /* 4095 */
++        MIPS_SYS(sys_getpriority        , 2)
++        MIPS_SYS(sys_setpriority        , 3)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_statfs     , 2)
++        MIPS_SYS(sys_fstatfs    , 2)    /* 4100 */
++        MIPS_SYS(sys_ni_syscall , 0)    /* was ioperm(2) */
++        MIPS_SYS(sys_socketcall , 2)
++        MIPS_SYS(sys_syslog     , 3)
++        MIPS_SYS(sys_setitimer  , 3)
++        MIPS_SYS(sys_getitimer  , 2)    /* 4105 */
++        MIPS_SYS(sys_newstat    , 2)
++        MIPS_SYS(sys_newlstat   , 2)
++        MIPS_SYS(sys_newfstat   , 2)
++        MIPS_SYS(sys_uname      , 1)
++        MIPS_SYS(sys_ni_syscall , 0)    /* 4110 was iopl(2) */
++        MIPS_SYS(sys_vhangup    , 0)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_idle() */
++        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_vm86 */
++        MIPS_SYS(sys_wait4      , 4)
++        MIPS_SYS(sys_swapoff    , 1)    /* 4115 */
++        MIPS_SYS(sys_sysinfo    , 1)
++        MIPS_SYS(sys_ipc                , 6)
++        MIPS_SYS(sys_fsync      , 1)
++        MIPS_SYS(sys_sigreturn  , 0)
++        MIPS_SYS(sys_clone      , 6)    /* 4120 */
++        MIPS_SYS(sys_setdomainname, 2)
++        MIPS_SYS(sys_newuname   , 1)
++        MIPS_SYS(sys_ni_syscall , 0)    /* sys_modify_ldt */
++        MIPS_SYS(sys_adjtimex   , 1)
++        MIPS_SYS(sys_mprotect   , 3)    /* 4125 */
++        MIPS_SYS(sys_sigprocmask        , 3)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was create_module */
++        MIPS_SYS(sys_init_module        , 5)
++        MIPS_SYS(sys_delete_module, 1)
++        MIPS_SYS(sys_ni_syscall , 0)    /* 4130 was get_kernel_syms */
++        MIPS_SYS(sys_quotactl   , 0)
++        MIPS_SYS(sys_getpgid    , 1)
++        MIPS_SYS(sys_fchdir     , 1)
++        MIPS_SYS(sys_bdflush    , 2)
++        MIPS_SYS(sys_sysfs      , 3)    /* 4135 */
++        MIPS_SYS(sys_personality        , 1)
++        MIPS_SYS(sys_ni_syscall , 0)    /* for afs_syscall */
++        MIPS_SYS(sys_setfsuid   , 1)
++        MIPS_SYS(sys_setfsgid   , 1)
++        MIPS_SYS(sys_llseek     , 5)    /* 4140 */
++        MIPS_SYS(sys_getdents   , 3)
++        MIPS_SYS(sys_select     , 5)
++        MIPS_SYS(sys_flock      , 2)
++        MIPS_SYS(sys_msync      , 3)
++        MIPS_SYS(sys_readv      , 3)    /* 4145 */
++        MIPS_SYS(sys_writev     , 3)
++        MIPS_SYS(sys_cacheflush , 3)
++        MIPS_SYS(sys_cachectl   , 3)
++        MIPS_SYS(sys_sysmips    , 4)
++        MIPS_SYS(sys_ni_syscall , 0)    /* 4150 */
++        MIPS_SYS(sys_getsid     , 1)
++        MIPS_SYS(sys_fdatasync  , 0)
++        MIPS_SYS(sys_sysctl     , 1)
++        MIPS_SYS(sys_mlock      , 2)
++        MIPS_SYS(sys_munlock    , 2)    /* 4155 */
++        MIPS_SYS(sys_mlockall   , 1)
++        MIPS_SYS(sys_munlockall , 0)
++        MIPS_SYS(sys_sched_setparam, 2)
++        MIPS_SYS(sys_sched_getparam, 2)
++        MIPS_SYS(sys_sched_setscheduler, 3)     /* 4160 */
++        MIPS_SYS(sys_sched_getscheduler, 1)
++        MIPS_SYS(sys_sched_yield        , 0)
++        MIPS_SYS(sys_sched_get_priority_max, 1)
++        MIPS_SYS(sys_sched_get_priority_min, 1)
++        MIPS_SYS(sys_sched_rr_get_interval, 2)  /* 4165 */
++        MIPS_SYS(sys_nanosleep, 2)
++        MIPS_SYS(sys_mremap     , 5)
++        MIPS_SYS(sys_accept     , 3)
++        MIPS_SYS(sys_bind       , 3)
++        MIPS_SYS(sys_connect    , 3)    /* 4170 */
++        MIPS_SYS(sys_getpeername        , 3)
++        MIPS_SYS(sys_getsockname        , 3)
++        MIPS_SYS(sys_getsockopt , 5)
++        MIPS_SYS(sys_listen     , 2)
++        MIPS_SYS(sys_recv       , 4)    /* 4175 */
++        MIPS_SYS(sys_recvfrom   , 6)
++        MIPS_SYS(sys_recvmsg    , 3)
++        MIPS_SYS(sys_send       , 4)
++        MIPS_SYS(sys_sendmsg    , 3)
++        MIPS_SYS(sys_sendto     , 6)    /* 4180 */
++        MIPS_SYS(sys_setsockopt , 5)
++        MIPS_SYS(sys_shutdown   , 2)
++        MIPS_SYS(sys_socket     , 3)
++        MIPS_SYS(sys_socketpair , 4)
++        MIPS_SYS(sys_setresuid  , 3)    /* 4185 */
++        MIPS_SYS(sys_getresuid  , 3)
++        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_query_module */
++        MIPS_SYS(sys_poll       , 3)
++        MIPS_SYS(sys_nfsservctl , 3)
++        MIPS_SYS(sys_setresgid  , 3)    /* 4190 */
++        MIPS_SYS(sys_getresgid  , 3)
++        MIPS_SYS(sys_prctl      , 5)
++        MIPS_SYS(sys_rt_sigreturn, 0)
++        MIPS_SYS(sys_rt_sigaction, 4)
++        MIPS_SYS(sys_rt_sigprocmask, 4) /* 4195 */
++        MIPS_SYS(sys_rt_sigpending, 2)
++        MIPS_SYS(sys_rt_sigtimedwait, 4)
++        MIPS_SYS(sys_rt_sigqueueinfo, 3)
++        MIPS_SYS(sys_rt_sigsuspend, 0)
++        MIPS_SYS(sys_pread64    , 6)    /* 4200 */
++        MIPS_SYS(sys_pwrite64   , 6)
++        MIPS_SYS(sys_chown      , 3)
++        MIPS_SYS(sys_getcwd     , 2)
++        MIPS_SYS(sys_capget     , 2)
++        MIPS_SYS(sys_capset     , 2)    /* 4205 */
++        MIPS_SYS(sys_sigaltstack        , 2)
++        MIPS_SYS(sys_sendfile   , 4)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_mmap2      , 6)    /* 4210 */
++        MIPS_SYS(sys_truncate64 , 4)
++        MIPS_SYS(sys_ftruncate64        , 4)
++        MIPS_SYS(sys_stat64     , 2)
++        MIPS_SYS(sys_lstat64    , 2)
++        MIPS_SYS(sys_fstat64    , 2)    /* 4215 */
++        MIPS_SYS(sys_pivot_root , 2)
++        MIPS_SYS(sys_mincore    , 3)
++        MIPS_SYS(sys_madvise    , 3)
++        MIPS_SYS(sys_getdents64 , 3)
++        MIPS_SYS(sys_fcntl64    , 3)    /* 4220 */
++        MIPS_SYS(sys_ni_syscall , 0)
++        MIPS_SYS(sys_gettid     , 0)
++        MIPS_SYS(sys_readahead  , 5)
++        MIPS_SYS(sys_setxattr   , 5)
++        MIPS_SYS(sys_lsetxattr  , 5)    /* 4225 */
++        MIPS_SYS(sys_fsetxattr  , 5)
++        MIPS_SYS(sys_getxattr   , 4)
++        MIPS_SYS(sys_lgetxattr  , 4)
++        MIPS_SYS(sys_fgetxattr  , 4)
++        MIPS_SYS(sys_listxattr  , 3)    /* 4230 */
++        MIPS_SYS(sys_llistxattr , 3)
++        MIPS_SYS(sys_flistxattr , 3)
++        MIPS_SYS(sys_removexattr        , 2)
++        MIPS_SYS(sys_lremovexattr, 2)
++        MIPS_SYS(sys_fremovexattr, 2)   /* 4235 */
++        MIPS_SYS(sys_tkill      , 2)
++        MIPS_SYS(sys_sendfile64 , 5)
++        MIPS_SYS(sys_futex      , 6)
++        MIPS_SYS(sys_sched_setaffinity, 3)
++        MIPS_SYS(sys_sched_getaffinity, 3)      /* 4240 */
++        MIPS_SYS(sys_io_setup   , 2)
++        MIPS_SYS(sys_io_destroy , 1)
++        MIPS_SYS(sys_io_getevents, 5)
++        MIPS_SYS(sys_io_submit  , 3)
++        MIPS_SYS(sys_io_cancel  , 3)    /* 4245 */
++        MIPS_SYS(sys_exit_group , 1)
++        MIPS_SYS(sys_lookup_dcookie, 3)
++        MIPS_SYS(sys_epoll_create, 1)
++        MIPS_SYS(sys_epoll_ctl  , 4)
++        MIPS_SYS(sys_epoll_wait , 3)    /* 4250 */
++        MIPS_SYS(sys_remap_file_pages, 5)
++        MIPS_SYS(sys_set_tid_address, 1)
++        MIPS_SYS(sys_restart_syscall, 0)
++        MIPS_SYS(sys_fadvise64_64, 7)
++        MIPS_SYS(sys_statfs64   , 3)    /* 4255 */
++        MIPS_SYS(sys_fstatfs64  , 2)
++        MIPS_SYS(sys_timer_create, 3)
++        MIPS_SYS(sys_timer_settime, 4)
++        MIPS_SYS(sys_timer_gettime, 2)
++        MIPS_SYS(sys_timer_getoverrun, 1)       /* 4260 */
++        MIPS_SYS(sys_timer_delete, 1)
++        MIPS_SYS(sys_clock_settime, 2)
++        MIPS_SYS(sys_clock_gettime, 2)
++        MIPS_SYS(sys_clock_getres, 2)
++        MIPS_SYS(sys_clock_nanosleep, 4)        /* 4265 */
++        MIPS_SYS(sys_tgkill     , 3)
++        MIPS_SYS(sys_utimes     , 2)
++        MIPS_SYS(sys_mbind      , 4)
++        MIPS_SYS(sys_ni_syscall , 0)    /* sys_get_mempolicy */
++        MIPS_SYS(sys_ni_syscall , 0)    /* 4270 sys_set_mempolicy */
++        MIPS_SYS(sys_mq_open    , 4)
++        MIPS_SYS(sys_mq_unlink  , 1)
++        MIPS_SYS(sys_mq_timedsend, 5)
++        MIPS_SYS(sys_mq_timedreceive, 5)
++        MIPS_SYS(sys_mq_notify  , 2)    /* 4275 */
++        MIPS_SYS(sys_mq_getsetattr, 3)
++        MIPS_SYS(sys_ni_syscall , 0)    /* sys_vserver */
++        MIPS_SYS(sys_waitid     , 4)
++        MIPS_SYS(sys_ni_syscall , 0)    /* available, was setaltroot */
++        MIPS_SYS(sys_add_key    , 5)
++        MIPS_SYS(sys_request_key, 4)
++        MIPS_SYS(sys_keyctl     , 5)
++        MIPS_SYS(sys_set_thread_area, 1)
++        MIPS_SYS(sys_inotify_init, 0)
++        MIPS_SYS(sys_inotify_add_watch, 3) /* 4285 */
++        MIPS_SYS(sys_inotify_rm_watch, 2)
++        MIPS_SYS(sys_migrate_pages, 4)
++        MIPS_SYS(sys_openat, 4)
++        MIPS_SYS(sys_mkdirat, 3)
++        MIPS_SYS(sys_mknodat, 4)        /* 4290 */
++        MIPS_SYS(sys_fchownat, 5)
++        MIPS_SYS(sys_futimesat, 3)
++        MIPS_SYS(sys_fstatat64, 4)
++        MIPS_SYS(sys_unlinkat, 3)
++        MIPS_SYS(sys_renameat, 4)       /* 4295 */
++        MIPS_SYS(sys_linkat, 5)
++        MIPS_SYS(sys_symlinkat, 3)
++        MIPS_SYS(sys_readlinkat, 4)
++        MIPS_SYS(sys_fchmodat, 3)
++        MIPS_SYS(sys_faccessat, 3)      /* 4300 */
++        MIPS_SYS(sys_pselect6, 6)
++        MIPS_SYS(sys_ppoll, 5)
++        MIPS_SYS(sys_unshare, 1)
++        MIPS_SYS(sys_splice, 6)
++        MIPS_SYS(sys_sync_file_range, 7) /* 4305 */
++        MIPS_SYS(sys_tee, 4)
++        MIPS_SYS(sys_vmsplice, 4)
++        MIPS_SYS(sys_move_pages, 6)
++        MIPS_SYS(sys_set_robust_list, 2)
++        MIPS_SYS(sys_get_robust_list, 3) /* 4310 */
++        MIPS_SYS(sys_kexec_load, 4)
++        MIPS_SYS(sys_getcpu, 3)
++        MIPS_SYS(sys_epoll_pwait, 6)
++        MIPS_SYS(sys_ioprio_set, 3)
++        MIPS_SYS(sys_ioprio_get, 2)
++        MIPS_SYS(sys_utimensat, 4)
++        MIPS_SYS(sys_signalfd, 3)
++        MIPS_SYS(sys_ni_syscall, 0)     /* was timerfd */
++        MIPS_SYS(sys_eventfd, 1)
++        MIPS_SYS(sys_fallocate, 6)      /* 4320 */
++        MIPS_SYS(sys_timerfd_create, 2)
++        MIPS_SYS(sys_timerfd_gettime, 2)
++        MIPS_SYS(sys_timerfd_settime, 4)
++        MIPS_SYS(sys_signalfd4, 4)
++        MIPS_SYS(sys_eventfd2, 2)       /* 4325 */
++        MIPS_SYS(sys_epoll_create1, 1)
++        MIPS_SYS(sys_dup3, 3)
++        MIPS_SYS(sys_pipe2, 2)
++        MIPS_SYS(sys_inotify_init1, 1)
++        MIPS_SYS(sys_preadv, 5)         /* 4330 */
++        MIPS_SYS(sys_pwritev, 5)
++        MIPS_SYS(sys_rt_tgsigqueueinfo, 4)
++        MIPS_SYS(sys_perf_event_open, 5)
++        MIPS_SYS(sys_accept4, 4)
++        MIPS_SYS(sys_recvmmsg, 5)       /* 4335 */
++        MIPS_SYS(sys_fanotify_init, 2)
++        MIPS_SYS(sys_fanotify_mark, 6)
++        MIPS_SYS(sys_prlimit64, 4)
++        MIPS_SYS(sys_name_to_handle_at, 5)
++        MIPS_SYS(sys_open_by_handle_at, 3) /* 4340 */
++        MIPS_SYS(sys_clock_adjtime, 2)
++        MIPS_SYS(sys_syncfs, 1)
++        MIPS_SYS(sys_sendmmsg, 4)
++        MIPS_SYS(sys_setns, 2)
++        MIPS_SYS(sys_process_vm_readv, 6) /* 345 */
++        MIPS_SYS(sys_process_vm_writev, 6)
++        MIPS_SYS(sys_kcmp, 5)
++        MIPS_SYS(sys_finit_module, 3)
++        MIPS_SYS(sys_sched_setattr, 2)
++        MIPS_SYS(sys_sched_getattr, 3)  /* 350 */
++        MIPS_SYS(sys_renameat2, 5)
++        MIPS_SYS(sys_seccomp, 3)
++        MIPS_SYS(sys_getrandom, 3)
++        MIPS_SYS(sys_memfd_create, 2)
++        MIPS_SYS(sys_bpf, 3)            /* 355 */
++        MIPS_SYS(sys_execveat, 5)
++        MIPS_SYS(sys_userfaultfd, 1)
++        MIPS_SYS(sys_membarrier, 2)
++        MIPS_SYS(sys_mlock2, 3)
++        MIPS_SYS(sys_copy_file_range, 6) /* 360 */
++        MIPS_SYS(sys_preadv2, 6)
++        MIPS_SYS(sys_pwritev2, 6)
++};
++#  undef MIPS_SYS
++# endif /* O32 */
++
++static int do_store_exclusive(CPUMIPSState *env)
++{
++    target_ulong addr;
++    target_ulong page_addr;
++    target_ulong val;
++    int flags;
++    int segv = 0;
++    int reg;
++    int d;
++
++    addr = env->lladdr;
++    page_addr = addr & TARGET_PAGE_MASK;
++    start_exclusive();
++    mmap_lock();
++    flags = page_get_flags(page_addr);
++    if ((flags & PAGE_READ) == 0) {
++        segv = 1;
++    } else {
++        reg = env->llreg & 0x1f;
++        d = (env->llreg & 0x20) != 0;
++        if (d) {
++            segv = get_user_s64(val, addr);
++        } else {
++            segv = get_user_s32(val, addr);
++        }
++        if (!segv) {
++            if (val != env->llval) {
++                env->active_tc.gpr[reg] = 0;
++            } else {
++                if (d) {
++                    segv = put_user_u64(env->llnewval, addr);
++                } else {
++                    segv = put_user_u32(env->llnewval, addr);
++                }
++                if (!segv) {
++                    env->active_tc.gpr[reg] = 1;
++                }
++            }
++        }
++    }
++    env->lladdr = -1;
++    if (!segv) {
++        env->active_tc.PC += 4;
++    }
++    mmap_unlock();
++    end_exclusive();
++    return segv;
++}
++
++/* Break codes */
++enum {
++    BRK_OVERFLOW = 6,
++    BRK_DIVZERO = 7
++};
++
++static int do_break(CPUMIPSState *env, target_siginfo_t *info,
++                    unsigned int code)
++{
++    int ret = -1;
++
++    switch (code) {
++    case BRK_OVERFLOW:
++    case BRK_DIVZERO:
++        info->si_signo = TARGET_SIGFPE;
++        info->si_errno = 0;
++        info->si_code = (code == BRK_OVERFLOW) ? FPE_INTOVF : FPE_INTDIV;
++        queue_signal(env, info->si_signo, QEMU_SI_FAULT, &*info);
++        ret = 0;
++        break;
++    default:
++        info->si_signo = TARGET_SIGTRAP;
++        info->si_errno = 0;
++        queue_signal(env, info->si_signo, QEMU_SI_FAULT, &*info);
++        ret = 0;
++        break;
++    }
++
++    return ret;
++}
++
++void cpu_loop(CPUMIPSState *env)
++{
++    CPUState *cs = CPU(mips_env_get_cpu(env));
++    target_siginfo_t info;
++    int trapnr;
++    abi_long ret;
++# ifdef TARGET_ABI_MIPSO32
++    unsigned int syscall_num;
++# endif
++
++    for(;;) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++        process_queued_cpu_work(cs);
++
++        switch(trapnr) {
++        case EXCP_SYSCALL:
++            env->active_tc.PC += 4;
++# ifdef TARGET_ABI_MIPSO32
++            syscall_num = env->active_tc.gpr[2] - 4000;
++            if (syscall_num >= sizeof(mips_syscall_args)) {
++                ret = -TARGET_ENOSYS;
++            } else {
++                int nb_args;
++                abi_ulong sp_reg;
++                abi_ulong arg5 = 0, arg6 = 0, arg7 = 0, arg8 = 0;
++
++                nb_args = mips_syscall_args[syscall_num];
++                sp_reg = env->active_tc.gpr[29];
++                switch (nb_args) {
++                /* these arguments are taken from the stack */
++                case 8:
++                    if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
++                        goto done_syscall;
++                    }
++                case 7:
++                    if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
++                        goto done_syscall;
++                    }
++                case 6:
++                    if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
++                        goto done_syscall;
++                    }
++                case 5:
++                    if ((ret = get_user_ual(arg5, sp_reg + 16)) != 0) {
++                        goto done_syscall;
++                    }
++                default:
++                    break;
++                }
++                ret = do_syscall(env, env->active_tc.gpr[2],
++                                 env->active_tc.gpr[4],
++                                 env->active_tc.gpr[5],
++                                 env->active_tc.gpr[6],
++                                 env->active_tc.gpr[7],
++                                 arg5, arg6, arg7, arg8);
++            }
++done_syscall:
++# else
++            ret = do_syscall(env, env->active_tc.gpr[2],
++                             env->active_tc.gpr[4], env->active_tc.gpr[5],
++                             env->active_tc.gpr[6], env->active_tc.gpr[7],
++                             env->active_tc.gpr[8], env->active_tc.gpr[9],
++                             env->active_tc.gpr[10], env->active_tc.gpr[11]);
++# endif /* O32 */
++            if (ret == -TARGET_ERESTARTSYS) {
++                env->active_tc.PC -= 4;
++                break;
++            }
++            if (ret == -TARGET_QEMU_ESIGRETURN) {
++                /* Returning from a successful sigreturn syscall.
++                   Avoid clobbering register state.  */
++                break;
++            }
++            if ((abi_ulong)ret >= (abi_ulong)-1133) {
++                env->active_tc.gpr[7] = 1; /* error flag */
++                ret = -ret;
++            } else {
++                env->active_tc.gpr[7] = 0; /* error flag */
++            }
++            env->active_tc.gpr[2] = ret;
++            break;
++        case EXCP_TLBL:
++        case EXCP_TLBS:
++        case EXCP_AdEL:
++        case EXCP_AdES:
++            info.si_signo = TARGET_SIGSEGV;
++            info.si_errno = 0;
++            /* XXX: check env->error_code */
++            info.si_code = TARGET_SEGV_MAPERR;
++            info._sifields._sigfault._addr = env->CP0_BadVAddr;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_CpU:
++        case EXCP_RI:
++            info.si_signo = TARGET_SIGILL;
++            info.si_errno = 0;
++            info.si_code = 0;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_INTERRUPT:
++            /* just indicate that signals should be handled asap */
++            break;
++        case EXCP_DEBUG:
++            {
++                int sig;
++
++                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
++                if (sig)
++                  {
++                    info.si_signo = sig;
++                    info.si_errno = 0;
++                    info.si_code = TARGET_TRAP_BRKPT;
++                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                  }
++            }
++            break;
++        case EXCP_SC:
++            if (do_store_exclusive(env)) {
++                info.si_signo = TARGET_SIGSEGV;
++                info.si_errno = 0;
++                info.si_code = TARGET_SEGV_MAPERR;
++                info._sifields._sigfault._addr = env->active_tc.PC;
++                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            }
++            break;
++        case EXCP_DSPDIS:
++            info.si_signo = TARGET_SIGILL;
++            info.si_errno = 0;
++            info.si_code = TARGET_ILL_ILLOPC;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        /* The code below was inspired by the MIPS Linux kernel trap
++         * handling code in arch/mips/kernel/traps.c.
++         */
++        case EXCP_BREAK:
++            {
++                abi_ulong trap_instr;
++                unsigned int code;
++
++                if (env->hflags & MIPS_HFLAG_M16) {
++                    if (env->insn_flags & ASE_MICROMIPS) {
++                        /* microMIPS mode */
++                        ret = get_user_u16(trap_instr, env->active_tc.PC);
++                        if (ret != 0) {
++                            goto error;
++                        }
++
++                        if ((trap_instr >> 10) == 0x11) {
++                            /* 16-bit instruction */
++                            code = trap_instr & 0xf;
++                        } else {
++                            /* 32-bit instruction */
++                            abi_ulong instr_lo;
++
++                            ret = get_user_u16(instr_lo,
++                                               env->active_tc.PC + 2);
++                            if (ret != 0) {
++                                goto error;
++                            }
++                            trap_instr = (trap_instr << 16) | instr_lo;
++                            code = ((trap_instr >> 6) & ((1 << 20) - 1));
++                            /* Unfortunately, microMIPS also suffers from
++                               the old assembler bug...  */
++                            if (code >= (1 << 10)) {
++                                code >>= 10;
++                            }
++                        }
++                    } else {
++                        /* MIPS16e mode */
++                        ret = get_user_u16(trap_instr, env->active_tc.PC);
++                        if (ret != 0) {
++                            goto error;
++                        }
++                        code = (trap_instr >> 6) & 0x3f;
++                    }
++                } else {
++                    ret = get_user_u32(trap_instr, env->active_tc.PC);
++                    if (ret != 0) {
++                        goto error;
++                    }
++
++                    /* As described in the original Linux kernel code, the
++                     * below checks on 'code' are to work around an old
++                     * assembly bug.
++                     */
++                    code = ((trap_instr >> 6) & ((1 << 20) - 1));
++                    if (code >= (1 << 10)) {
++                        code >>= 10;
++                    }
++                }
++
++                if (do_break(env, &info, code) != 0) {
++                    goto error;
++                }
++            }
++            break;
++        case EXCP_TRAP:
++            {
++                abi_ulong trap_instr;
++                unsigned int code = 0;
++
++                if (env->hflags & MIPS_HFLAG_M16) {
++                    /* microMIPS mode */
++                    abi_ulong instr[2];
++
++                    ret = get_user_u16(instr[0], env->active_tc.PC) ||
++                          get_user_u16(instr[1], env->active_tc.PC + 2);
++
++                    trap_instr = (instr[0] << 16) | instr[1];
++                } else {
++                    ret = get_user_u32(trap_instr, env->active_tc.PC);
++                }
++
++                if (ret != 0) {
++                    goto error;
++                }
++
++                /* The immediate versions don't provide a code.  */
++                if (!(trap_instr & 0xFC000000)) {
++                    if (env->hflags & MIPS_HFLAG_M16) {
++                        /* microMIPS mode */
++                        code = ((trap_instr >> 12) & ((1 << 4) - 1));
++                    } else {
++                        code = ((trap_instr >> 6) & ((1 << 10) - 1));
++                    }
++                }
++
++                if (do_break(env, &info, code) != 0) {
++                    goto error;
++                }
++            }
++            break;
++        case EXCP_ATOMIC:
++            cpu_exec_step_atomic(cs);
++            break;
++        default:
++error:
++            EXCP_DUMP(env, "qemu: unhandled CPU exception 0x%x - aborting\n", trapnr);
++            abort();
++        }
++        process_pending_signals(env);
++    }
++}
+ 
+ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ {
++    CPUState *cpu = ENV_GET_CPU(env);
++    TaskState *ts = cpu->opaque;
++    struct image_info *info = ts->info;
++    int i;
++
++    for(i = 0; i < 32; i++) {
++        env->active_tc.gpr[i] = regs->regs[i];
++    }
++    env->active_tc.PC = regs->cp0_epc & ~(target_ulong)1;
++    if (regs->cp0_epc & 1) {
++        env->hflags |= MIPS_HFLAG_M16;
++    }
++    if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
++        ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
++        if ((env->active_fpu.fcr31_rw_bitmask &
++              (1 << FCR31_NAN2008)) == 0) {
++            fprintf(stderr, "ELF binary's NaN mode not supported by CPU\n");
++            exit(1);
++        }
++        if ((info->elf_flags & EF_MIPS_NAN2008) != 0) {
++            env->active_fpu.fcr31 |= (1 << FCR31_NAN2008);
++        } else {
++            env->active_fpu.fcr31 &= ~(1 << FCR31_NAN2008);
++        }
++        restore_snan_bit_mode(env);
++    }
+ }
+diff --git a/linux-user/mips64/cpu_loop.c b/linux-user/mips64/cpu_loop.c
+index b7700a5561..858bc5be78 100644
+--- a/linux-user/mips64/cpu_loop.c
++++ b/linux-user/mips64/cpu_loop.c
+@@ -17,10 +17,4 @@
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "qemu/osdep.h"
+-#include "qemu.h"
+-#include "cpu_loop-common.h"
+-
+-void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+-{
+-}
++#include "../mips/cpu_loop.c"
+-- 
+2.14.3
