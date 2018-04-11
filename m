@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f6JpA-0005dq-2g
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:46:26 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1f6Jxo-00019w-0f
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f6Jp5-0005RH-Cy
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:46:24 -0400
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:35768)
+	(envelope-from <alex.williamson@redhat.com>) id 1f6Jxi-0002g5-Re
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:55:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f6Jp5-0005QS-80
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:46:19 -0400
-Received: from player760.ha.ovh.net (unknown [10.109.122.33])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 295971A17FE
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 19:46:17 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 11 Apr 2018 19:46:06 +0200
-Message-ID: <152346876630.89534.10956847520017803741.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1f6Jxi-0002fP-Ik
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 13:55:14 -0400
+Date: Wed, 11 Apr 2018 11:55:11 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180411115511.342c75b9@w520.home>
+In-Reply-To: <20180411172014.24711-1-clg@kaod.org>
+References: <20180411172014.24711-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: drop useless sanity check in
- spapr_irq_alloc*()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] migration: discard RAMBlocks of type
+ ram_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +28,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David
+	Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com
 
-Both spapr_irq_alloc() and spapr_irq_alloc_block() have an errp
-parameter, but they don't use it if XICS hasn't been initialized
-yet.
+[cc +folks working on vfio-mdev migration]
 
-This is doubly wrong:
+On Wed, 11 Apr 2018 19:20:14 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-- all callers do pass a non-null Error **, ie, they expect an error
-  to be propagated in case of failure
+> Here is some context for this strange change request.
+>=20
+> On the POWER9 processor, the XIVE interrupt controller can control
+> interrupt sources using MMIO to trigger events, to EOI or to turn off
+> the sources. Priority management and interrupt acknowledgment is also
+> controlled by MMIO in the presenter subengine.
+>=20
+> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+> device' memory mappings, similarly to VFIO, and the VMAs are populated
+> dynamically with the appropriate pages using a fault handler.
+>=20
+> But, these regions are an issue for migration. We need to discard the
+> associated RAMBlocks from the RAM state on the source VM and let the
+> destination VM rebuild the memory mappings on the new host in the
+> post_load() operation just before resuming the system.
+>=20
+> This is the goal of the following proposal. Does it make sense ? It
+> seems to be working enough to migrate a running guest but there might
+> be a better, more subtle, approach.
 
-- XICS obviously needs to be initialized before anything starts allocating
-  IRQs
+Yulei, is this something you've run into with GVT-g migration?  I don't
+see how we can read from or write to ram_device regions in a useful way
+during migration anyway, so the change initially looks correct to me.
+Thanks,
 
-So this patch turns the check into an assert.
+Alex
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |    9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 4d27909fb152..799673319b06 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3707,9 +3707,8 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-     ICSState *ics = spapr->ics;
-     int irq;
- 
--    if (!ics) {
--        return -1;
--    }
-+    assert(ics);
-+
-     if (irq_hint) {
-         if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
-             error_setg(errp, "can't allocate IRQ %d: already in use", irq_hint);
-@@ -3741,9 +3740,7 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-     ICSState *ics = spapr->ics;
-     int i, first = -1;
- 
--    if (!ics) {
--        return -1;
--    }
-+    assert(ics);
- 
-     /*
-      * MSIMesage::data is used for storing VIRQ so
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  migration/ram.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 40 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 0e90efa09236..6404ccd046d8 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -780,6 +780,10 @@ unsigned long migration_bitmap_find_dirty(RAMState *=
+rs, RAMBlock *rb,
+>      unsigned long *bitmap =3D rb->bmap;
+>      unsigned long next;
+> =20
+> +    if (memory_region_is_ram_device(rb->mr)) {
+> +        return size;
+> +    }
+> +
+>      if (rs->ram_bulk_stage && start > 0) {
+>          next =3D start + 1;
+>      } else {
+> @@ -826,6 +830,9 @@ uint64_t ram_pagesize_summary(void)
+>      uint64_t summary =3D 0;
+> =20
+>      RAMBLOCK_FOREACH(block) {
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+>          summary |=3D block->page_size;
+>      }
+> =20
+> @@ -850,6 +857,9 @@ static void migration_bitmap_sync(RAMState *rs)
+>      qemu_mutex_lock(&rs->bitmap_mutex);
+>      rcu_read_lock();
+>      RAMBLOCK_FOREACH(block) {
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+>          migration_bitmap_sync_range(rs, block, 0, block->used_length);
+>      }
+>      rcu_read_unlock();
+> @@ -1499,6 +1509,10 @@ static int ram_save_host_page(RAMState *rs, PageSe=
+archStatus *pss,
+>      size_t pagesize_bits =3D
+>          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+> =20
+> +    if (memory_region_is_ram_device(pss->block->mr)) {
+> +        return 0;
+> +    }
+> +
+>      do {
+>          tmppages =3D ram_save_target_page(rs, pss, last_stage);
+>          if (tmppages < 0) {
+> @@ -1588,6 +1602,9 @@ uint64_t ram_bytes_total(void)
+> =20
+>      rcu_read_lock();
+>      RAMBLOCK_FOREACH(block) {
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+>          total +=3D block->used_length;
+>      }
+>      rcu_read_unlock();
+> @@ -1643,6 +1660,9 @@ static void ram_save_cleanup(void *opaque)
+>      memory_global_dirty_log_stop();
+> =20
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+>          g_free(block->bmap);
+>          block->bmap =3D NULL;
+>          g_free(block->unsentmap);
+> @@ -1710,6 +1730,9 @@ void ram_postcopy_migrated_memory_release(Migration=
+State *ms)
+>          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
+>          unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0);
+> =20
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+>          while (run_start < range) {
+>              unsigned long run_end =3D find_next_bit(bitmap, range, run_s=
+tart + 1);
+>              ram_discard_range(block->idstr, run_start << TARGET_PAGE_BIT=
+S,
+> @@ -1784,8 +1807,13 @@ static int postcopy_each_ram_send_discard(Migratio=
+nState *ms)
+>      int ret;
+> =20
+>      RAMBLOCK_FOREACH(block) {
+> -        PostcopyDiscardState *pds =3D
+> -            postcopy_discard_send_init(ms, block->idstr);
+> +        PostcopyDiscardState *pds;
+> +
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+> +
+> +        pds =3D postcopy_discard_send_init(ms, block->idstr);
+> =20
+>          /*
+>           * Postcopy sends chunks of bitmap over the wire, but it
+> @@ -1996,6 +2024,10 @@ int ram_postcopy_send_discard_bitmap(MigrationStat=
+e *ms)
+>          unsigned long *bitmap =3D block->bmap;
+>          unsigned long *unsentmap =3D block->unsentmap;
+> =20
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+> +
+>          if (!unsentmap) {
+>              /* We don't have a safe way to resize the sentmap, so
+>               * if the bitmap was resized it will be NULL at this
+> @@ -2151,6 +2183,9 @@ static void ram_list_init_bitmaps(void)
+>      /* Skip setting bitmap if there is no RAM */
+>      if (ram_bytes_total()) {
+>          QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +            if (memory_region_is_ram_device(block->mr)) {
+> +                continue;
+> +            }
+>              pages =3D block->max_length >> TARGET_PAGE_BITS;
+>              block->bmap =3D bitmap_new(pages);
+>              bitmap_set(block->bmap, 0, pages);
+> @@ -2227,6 +2262,9 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+>      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+> =20
+>      RAMBLOCK_FOREACH(block) {
+> +        if (memory_region_is_ram_device(block->mr)) {
+> +            continue;
+> +        }
+>          qemu_put_byte(f, strlen(block->idstr));
+>          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr)=
+);
+>          qemu_put_be64(f, block->used_length);
