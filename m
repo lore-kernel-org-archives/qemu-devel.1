@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6EpJ-0003kj-78
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6EpJ-0003kk-7e
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 08:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6EpG-0002vL-3q
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6EpG-0002vQ-46
 	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 08:26:13 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 11 Apr 2018 15:26:05 +0300
-Message-Id: <20180411122606.367301-2-vsementsov@virtuozzo.com>
+Date: Wed, 11 Apr 2018 15:26:06 +0300
+Message-Id: <20180411122606.367301-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20180411122606.367301-1-vsementsov@virtuozzo.com>
 References: <20180411122606.367301-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] qcow2: try load bitmaps only once
+Subject: [Qemu-devel] [PATCH v2 2/2] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +22,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, jsnow@redhat.com
 
-Checking reopen by existence of some bitmaps is wrong, as it may be
-some other bitmaps, or on the other hand, user may remove bitmaps. This
-criteria is bad. To simplify things and make behavior more predictable
-let's just add a flag to remember, that we've already tried to load
-bitmaps on open and do not want do it again.
+Improve and fix 169:
+    - use MIGRATION events instead of RESUME
+    - make a TODO: enable dirty-bitmaps capability for offline case
+    - recreate vm_b without -incoming near test end
+
+This (likely) fixes racy faults at least of the following types:
+
+    - timeout on waiting for RESUME event
+    - sha256 mismatch on line 136 (142 after this patch)
+    - fail to self.vm_b.launch() on line 135 (141 now after this patch)
+
+And surely fixes cat processes, left after test finish.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.h |  1 +
- block/qcow2.c | 16 ++++++++--------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/169 | 48 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 27 insertions(+), 21 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index d301f77cea..adf5c3950f 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -298,6 +298,7 @@ typedef struct BDRVQcow2State {
-     uint32_t nb_bitmaps;
-     uint64_t bitmap_directory_size;
-     uint64_t bitmap_directory_offset;
-+    bool dirty_bitmaps_loaded;
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index 153b10b6e7..f243db9955 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -31,6 +31,8 @@ disk_a = os.path.join(iotests.test_dir, 'disk_a')
+ disk_b = os.path.join(iotests.test_dir, 'disk_b')
+ size = '1M'
+ mig_file = os.path.join(iotests.test_dir, 'mig_file')
++mig_cmd = 'exec: cat > ' + mig_file
++incoming_cmd = 'exec: cat ' + mig_file
  
-     int flags;
-     int qcow_version;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 486f3e83b7..4242e99f1e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1142,6 +1142,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     uint64_t ext_end;
-     uint64_t l1_vm_state_index;
-     bool update_header = false;
-+    bool header_updated = false;
  
-     ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
-     if (ret < 0) {
-@@ -1480,10 +1481,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
-     }
+ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+@@ -49,7 +51,6 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+         self.vm_a.launch()
  
--    if (bdrv_dirty_bitmap_next(bs, NULL)) {
--        /* It's some kind of reopen with already existing dirty bitmaps. There
--         * are no known cases where we need loading bitmaps in such situation,
--         * so it's safer don't load them.
-+    if (s->dirty_bitmaps_loaded) {
-+        /* It's some kind of reopen. There are no known cases where we need
-+         * loading bitmaps in such situation, so it's safer don't load them.
-          *
-          * Moreover, if we have some readonly bitmaps and we are reopening for
-          * rw we should reopen bitmaps correspondingly.
-@@ -1491,13 +1491,13 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         if (bdrv_has_readonly_bitmaps(bs) &&
-             !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
-         {
--            bool header_updated = false;
-             qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
--            update_header = update_header && !header_updated;
-         }
--    } else if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
--        update_header = false;
-+    } else {
-+        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
-+        s->dirty_bitmaps_loaded = true;
-     }
-+    update_header = update_header && !header_updated;
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-         ret = -EINVAL;
+         self.vm_b = iotests.VM(path_suffix='b')
+-        self.vm_b.add_incoming("exec: cat '" + mig_file + "'")
+ 
+     def add_bitmap(self, vm, granularity, persistent):
+         params = {'node': 'drive0',
+@@ -86,36 +87,30 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+                    (0xa0201, 0x1000))
+ 
+         should_migrate = migrate_bitmaps or persistent and shared_storage
++        mig_caps = [{'capability': 'events', 'state': True}]
++        if migrate_bitmaps:
++            mig_caps.append({'capability': 'dirty-bitmaps', 'state': True})
+ 
++        result = self.vm_a.qmp('migrate-set-capabilities',
++                               capabilities=mig_caps)
++        self.assert_qmp(result, 'return', {})
++
++        self.vm_b.add_incoming(incoming_cmd if online else "defer")
+         self.vm_b.add_drive(disk_a if shared_storage else disk_b)
+ 
+         if online:
+             os.mkfifo(mig_file)
+             self.vm_b.launch()
++            result = self.vm_b.qmp('migrate-set-capabilities',
++                                   capabilities=mig_caps)
++            self.assert_qmp(result, 'return', {})
+ 
+         self.add_bitmap(self.vm_a, granularity, persistent)
+         for r in regions:
+             self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
+         sha256 = self.get_bitmap_hash(self.vm_a)
+ 
+-        if migrate_bitmaps:
+-            capabilities = [{'capability': 'dirty-bitmaps', 'state': True}]
+-
+-            result = self.vm_a.qmp('migrate-set-capabilities',
+-                                   capabilities=capabilities)
+-            self.assert_qmp(result, 'return', {})
+-
+-            if online:
+-                result = self.vm_b.qmp('migrate-set-capabilities',
+-                                       capabilities=capabilities)
+-                self.assert_qmp(result, 'return', {})
+-
+-        result = self.vm_a.qmp('migrate-set-capabilities',
+-                               capabilities=[{'capability': 'events',
+-                                              'state': True}])
+-        self.assert_qmp(result, 'return', {})
+-
+-        result = self.vm_a.qmp('migrate', uri='exec:cat>' + mig_file)
++        result = self.vm_a.qmp('migrate', uri=mig_cmd)
+         while True:
+             event = self.vm_a.event_wait('MIGRATION')
+             if event['data']['status'] == 'completed':
+@@ -124,14 +119,25 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+         if not online:
+             self.vm_a.shutdown()
+             self.vm_b.launch()
+-            # TODO enable bitmap capability for vm_b in this case
++            result = self.vm_b.qmp('migrate-set-capabilities',
++                                   capabilities=mig_caps)
++            self.assert_qmp(result, 'return', {})
++            result = self.vm_b.qmp('migrate-incoming', uri=incoming_cmd)
++            self.assert_qmp(result, 'return', {})
+ 
+-        self.vm_b.event_wait("RESUME", timeout=10.0)
++        while True:
++            event = self.vm_b.event_wait('MIGRATION')
++            if event['data']['status'] == 'completed':
++                break
+ 
+         self.check_bitmap(self.vm_b, sha256 if should_migrate else False)
+ 
+         if should_migrate:
+             self.vm_b.shutdown()
++            # recreate vm_b, as we don't want -incoming option (this will lead
++            # to "cat" process left alive after test finish)
++            self.vm_b = iotests.VM(path_suffix='b')
++            self.vm_b.add_drive(disk_a if shared_storage else disk_b)
+             self.vm_b.launch()
+             self.check_bitmap(self.vm_b, sha256 if persistent else False)
+ 
 -- 
 2.11.1
