@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwN-0006QT-GM
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1f6KwO-0006S5-Rn
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6KwJ-00085n-UL
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:55 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 11 Apr 2018 20:56:37 +0200
-Message-Id: <20180411185651.21351-6-laurent@vivier.eu>
-In-Reply-To: <20180411185651.21351-1-laurent@vivier.eu>
-References: <20180411185651.21351-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH for 2.13 v2 05/19] linux-user: move
- sparc/sparc64 cpu loop to sparc directory
+	(envelope-from <dgilbert@redhat.com>) id 1f6KwL-00086O-FL
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40000 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6KwL-00086E-4S
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 14:57:53 -0400
+Date: Wed, 11 Apr 2018 19:57:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180411185741.GK2667@work-vm>
+References: <20180329032149.44685-1-aik@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180329032149.44685-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
+ in "info mtree"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,635 +28,413 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-No code change, only move code from main.c to
-sparc/cpu_loop.c.
+* Alexey Kardashevskiy (aik@ozlabs.ru) wrote:
+> This adds owners/parents (which are the same, just occasionally
+> owner=3D=3DNULL) printing for memory regions; a new '-o' flag
+> enabled new output.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Include sparc/cpu_loop.c in sparc64/cpu_loop.c
-to avoid to duplicate code.
+=46rom the HMP side this looks fine to me, and if it's making it clearer
+where mappings are coming from that's good.
+(It's a bit long/wordy, but that's the nature of the information).
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/main.c             | 288 +-----------------------------------------
- linux-user/sparc/cpu_loop.c   | 280 ++++++++++++++++++++++++++++++++++++++++
- linux-user/sparc64/cpu_loop.c |   8 +-
- 3 files changed, 282 insertions(+), 294 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 45d1588958..4816ec54bb 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,281 +149,6 @@ void fork_end(int child)
-     }
- }
- 
--#ifdef TARGET_SPARC
--#define SPARC64_STACK_BIAS 2047
--
--//#define DEBUG_WIN
--
--/* WARNING: dealing with register windows _is_ complicated. More info
--   can be found at http://www.sics.se/~psm/sparcstack.html */
--static inline int get_reg_index(CPUSPARCState *env, int cwp, int index)
--{
--    index = (index + cwp * 16) % (16 * env->nwindows);
--    /* wrap handling : if cwp is on the last window, then we use the
--       registers 'after' the end */
--    if (index < 8 && env->cwp == env->nwindows - 1)
--        index += 16 * env->nwindows;
--    return index;
--}
--
--/* save the register window 'cwp1' */
--static inline void save_window_offset(CPUSPARCState *env, int cwp1)
--{
--    unsigned int i;
--    abi_ulong sp_ptr;
--
--    sp_ptr = env->regbase[get_reg_index(env, cwp1, 6)];
--#ifdef TARGET_SPARC64
--    if (sp_ptr & 3)
--        sp_ptr += SPARC64_STACK_BIAS;
--#endif
--#if defined(DEBUG_WIN)
--    printf("win_overflow: sp_ptr=0x" TARGET_ABI_FMT_lx " save_cwp=%d\n",
--           sp_ptr, cwp1);
--#endif
--    for(i = 0; i < 16; i++) {
--        /* FIXME - what to do if put_user() fails? */
--        put_user_ual(env->regbase[get_reg_index(env, cwp1, 8 + i)], sp_ptr);
--        sp_ptr += sizeof(abi_ulong);
--    }
--}
--
--static void save_window(CPUSPARCState *env)
--{
--#ifndef TARGET_SPARC64
--    unsigned int new_wim;
--    new_wim = ((env->wim >> 1) | (env->wim << (env->nwindows - 1))) &
--        ((1LL << env->nwindows) - 1);
--    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
--    env->wim = new_wim;
--#else
--    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
--    env->cansave++;
--    env->canrestore--;
--#endif
--}
--
--static void restore_window(CPUSPARCState *env)
--{
--#ifndef TARGET_SPARC64
--    unsigned int new_wim;
--#endif
--    unsigned int i, cwp1;
--    abi_ulong sp_ptr;
--
--#ifndef TARGET_SPARC64
--    new_wim = ((env->wim << 1) | (env->wim >> (env->nwindows - 1))) &
--        ((1LL << env->nwindows) - 1);
--#endif
--
--    /* restore the invalid window */
--    cwp1 = cpu_cwp_inc(env, env->cwp + 1);
--    sp_ptr = env->regbase[get_reg_index(env, cwp1, 6)];
--#ifdef TARGET_SPARC64
--    if (sp_ptr & 3)
--        sp_ptr += SPARC64_STACK_BIAS;
--#endif
--#if defined(DEBUG_WIN)
--    printf("win_underflow: sp_ptr=0x" TARGET_ABI_FMT_lx " load_cwp=%d\n",
--           sp_ptr, cwp1);
--#endif
--    for(i = 0; i < 16; i++) {
--        /* FIXME - what to do if get_user() fails? */
--        get_user_ual(env->regbase[get_reg_index(env, cwp1, 8 + i)], sp_ptr);
--        sp_ptr += sizeof(abi_ulong);
--    }
--#ifdef TARGET_SPARC64
--    env->canrestore++;
--    if (env->cleanwin < env->nwindows - 1)
--        env->cleanwin++;
--    env->cansave--;
--#else
--    env->wim = new_wim;
--#endif
--}
--
--static void flush_windows(CPUSPARCState *env)
--{
--    int offset, cwp1;
--
--    offset = 1;
--    for(;;) {
--        /* if restore would invoke restore_window(), then we can stop */
--        cwp1 = cpu_cwp_inc(env, env->cwp + offset);
--#ifndef TARGET_SPARC64
--        if (env->wim & (1 << cwp1))
--            break;
--#else
--        if (env->canrestore == 0)
--            break;
--        env->cansave++;
--        env->canrestore--;
--#endif
--        save_window_offset(env, cwp1);
--        offset++;
--    }
--    cwp1 = cpu_cwp_inc(env, env->cwp + 1);
--#ifndef TARGET_SPARC64
--    /* set wim so that restore will reload the registers */
--    env->wim = 1 << cwp1;
--#endif
--#if defined(DEBUG_WIN)
--    printf("flush_windows: nb=%d\n", offset - 1);
--#endif
--}
--
--void cpu_loop (CPUSPARCState *env)
--{
--    CPUState *cs = CPU(sparc_env_get_cpu(env));
--    int trapnr;
--    abi_long ret;
--    target_siginfo_t info;
--
--    while (1) {
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        process_queued_cpu_work(cs);
--
--        /* Compute PSR before exposing state.  */
--        if (env->cc_op != CC_OP_FLAGS) {
--            cpu_get_psr(env);
--        }
--
--        switch (trapnr) {
--#ifndef TARGET_SPARC64
--        case 0x88:
--        case 0x90:
--#else
--        case 0x110:
--        case 0x16d:
--#endif
--            ret = do_syscall (env, env->gregs[1],
--                              env->regwptr[0], env->regwptr[1],
--                              env->regwptr[2], env->regwptr[3],
--                              env->regwptr[4], env->regwptr[5],
--                              0, 0);
--            if (ret == -TARGET_ERESTARTSYS || ret == -TARGET_QEMU_ESIGRETURN) {
--                break;
--            }
--            if ((abi_ulong)ret >= (abi_ulong)(-515)) {
--#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
--                env->xcc |= PSR_CARRY;
--#else
--                env->psr |= PSR_CARRY;
--#endif
--                ret = -ret;
--            } else {
--#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
--                env->xcc &= ~PSR_CARRY;
--#else
--                env->psr &= ~PSR_CARRY;
--#endif
--            }
--            env->regwptr[0] = ret;
--            /* next instruction */
--            env->pc = env->npc;
--            env->npc = env->npc + 4;
--            break;
--        case 0x83: /* flush windows */
--#ifdef TARGET_ABI32
--        case 0x103:
--#endif
--            flush_windows(env);
--            /* next instruction */
--            env->pc = env->npc;
--            env->npc = env->npc + 4;
--            break;
--#ifndef TARGET_SPARC64
--        case TT_WIN_OVF: /* window overflow */
--            save_window(env);
--            break;
--        case TT_WIN_UNF: /* window underflow */
--            restore_window(env);
--            break;
--        case TT_TFAULT:
--        case TT_DFAULT:
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                /* XXX: check env->error_code */
--                info.si_code = TARGET_SEGV_MAPERR;
--                info._sifields._sigfault._addr = env->mmuregs[4];
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
--            break;
--#else
--        case TT_SPILL: /* window overflow */
--            save_window(env);
--            break;
--        case TT_FILL: /* window underflow */
--            restore_window(env);
--            break;
--        case TT_TFAULT:
--        case TT_DFAULT:
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                /* XXX: check env->error_code */
--                info.si_code = TARGET_SEGV_MAPERR;
--                if (trapnr == TT_DFAULT)
--                    info._sifields._sigfault._addr = env->dmmu.mmuregs[4];
--                else
--                    info._sifields._sigfault._addr = cpu_tsptr(env)->tpc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
--            break;
--#ifndef TARGET_ABI32
--        case 0x16e:
--            flush_windows(env);
--            sparc64_get_context(env);
--            break;
--        case 0x16f:
--            flush_windows(env);
--            sparc64_set_context(env);
--            break;
--#endif
--#endif
--        case EXCP_INTERRUPT:
--            /* just indicate that signals should be handled asap */
--            break;
--        case TT_ILL_INSN:
--            {
--                info.si_signo = TARGET_SIGILL;
--                info.si_errno = 0;
--                info.si_code = TARGET_ILL_ILLOPC;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
--            break;
--        case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
--            break;
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
--            break;
--        default:
--            printf ("Unhandled trap: 0x%x\n", trapnr);
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            exit(EXIT_FAILURE);
--        }
--        process_pending_signals (env);
--    }
--}
--
--#endif
--
- #ifdef TARGET_PPC
- static inline uint64_t cpu_ppc_get_tb(CPUPPCState *env)
- {
-@@ -4002,18 +3727,7 @@ int main(int argc, char **argv, char **envp)
- 
-     target_cpu_copy_regs(env, regs);
- 
--#if defined(TARGET_SPARC)
--    {
--        int i;
--	env->pc = regs->pc;
--	env->npc = regs->npc;
--        env->y = regs->y;
--        for(i = 0; i < 8; i++)
--            env->gregs[i] = regs->u_regs[i];
--        for(i = 0; i < 8; i++)
--            env->regwptr[i] = regs->u_regs[i + 8];
--    }
--#elif defined(TARGET_PPC)
-+#if defined(TARGET_PPC)
-     {
-         int i;
- 
-diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
-index b7700a5561..7c4796ca23 100644
---- a/linux-user/sparc/cpu_loop.c
-+++ b/linux-user/sparc/cpu_loop.c
-@@ -21,6 +21,286 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
- 
-+#define SPARC64_STACK_BIAS 2047
-+
-+//#define DEBUG_WIN
-+
-+/* WARNING: dealing with register windows _is_ complicated. More info
-+   can be found at http://www.sics.se/~psm/sparcstack.html */
-+static inline int get_reg_index(CPUSPARCState *env, int cwp, int index)
-+{
-+    index = (index + cwp * 16) % (16 * env->nwindows);
-+    /* wrap handling : if cwp is on the last window, then we use the
-+       registers 'after' the end */
-+    if (index < 8 && env->cwp == env->nwindows - 1)
-+        index += 16 * env->nwindows;
-+    return index;
-+}
-+
-+/* save the register window 'cwp1' */
-+static inline void save_window_offset(CPUSPARCState *env, int cwp1)
-+{
-+    unsigned int i;
-+    abi_ulong sp_ptr;
-+
-+    sp_ptr = env->regbase[get_reg_index(env, cwp1, 6)];
-+#ifdef TARGET_SPARC64
-+    if (sp_ptr & 3)
-+        sp_ptr += SPARC64_STACK_BIAS;
-+#endif
-+#if defined(DEBUG_WIN)
-+    printf("win_overflow: sp_ptr=0x" TARGET_ABI_FMT_lx " save_cwp=%d\n",
-+           sp_ptr, cwp1);
-+#endif
-+    for(i = 0; i < 16; i++) {
-+        /* FIXME - what to do if put_user() fails? */
-+        put_user_ual(env->regbase[get_reg_index(env, cwp1, 8 + i)], sp_ptr);
-+        sp_ptr += sizeof(abi_ulong);
-+    }
-+}
-+
-+static void save_window(CPUSPARCState *env)
-+{
-+#ifndef TARGET_SPARC64
-+    unsigned int new_wim;
-+    new_wim = ((env->wim >> 1) | (env->wim << (env->nwindows - 1))) &
-+        ((1LL << env->nwindows) - 1);
-+    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-+    env->wim = new_wim;
-+#else
-+    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-+    env->cansave++;
-+    env->canrestore--;
-+#endif
-+}
-+
-+static void restore_window(CPUSPARCState *env)
-+{
-+#ifndef TARGET_SPARC64
-+    unsigned int new_wim;
-+#endif
-+    unsigned int i, cwp1;
-+    abi_ulong sp_ptr;
-+
-+#ifndef TARGET_SPARC64
-+    new_wim = ((env->wim << 1) | (env->wim >> (env->nwindows - 1))) &
-+        ((1LL << env->nwindows) - 1);
-+#endif
-+
-+    /* restore the invalid window */
-+    cwp1 = cpu_cwp_inc(env, env->cwp + 1);
-+    sp_ptr = env->regbase[get_reg_index(env, cwp1, 6)];
-+#ifdef TARGET_SPARC64
-+    if (sp_ptr & 3)
-+        sp_ptr += SPARC64_STACK_BIAS;
-+#endif
-+#if defined(DEBUG_WIN)
-+    printf("win_underflow: sp_ptr=0x" TARGET_ABI_FMT_lx " load_cwp=%d\n",
-+           sp_ptr, cwp1);
-+#endif
-+    for(i = 0; i < 16; i++) {
-+        /* FIXME - what to do if get_user() fails? */
-+        get_user_ual(env->regbase[get_reg_index(env, cwp1, 8 + i)], sp_ptr);
-+        sp_ptr += sizeof(abi_ulong);
-+    }
-+#ifdef TARGET_SPARC64
-+    env->canrestore++;
-+    if (env->cleanwin < env->nwindows - 1)
-+        env->cleanwin++;
-+    env->cansave--;
-+#else
-+    env->wim = new_wim;
-+#endif
-+}
-+
-+static void flush_windows(CPUSPARCState *env)
-+{
-+    int offset, cwp1;
-+
-+    offset = 1;
-+    for(;;) {
-+        /* if restore would invoke restore_window(), then we can stop */
-+        cwp1 = cpu_cwp_inc(env, env->cwp + offset);
-+#ifndef TARGET_SPARC64
-+        if (env->wim & (1 << cwp1))
-+            break;
-+#else
-+        if (env->canrestore == 0)
-+            break;
-+        env->cansave++;
-+        env->canrestore--;
-+#endif
-+        save_window_offset(env, cwp1);
-+        offset++;
-+    }
-+    cwp1 = cpu_cwp_inc(env, env->cwp + 1);
-+#ifndef TARGET_SPARC64
-+    /* set wim so that restore will reload the registers */
-+    env->wim = 1 << cwp1;
-+#endif
-+#if defined(DEBUG_WIN)
-+    printf("flush_windows: nb=%d\n", offset - 1);
-+#endif
-+}
-+
-+void cpu_loop (CPUSPARCState *env)
-+{
-+    CPUState *cs = CPU(sparc_env_get_cpu(env));
-+    int trapnr;
-+    abi_long ret;
-+    target_siginfo_t info;
-+
-+    while (1) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
-+
-+        /* Compute PSR before exposing state.  */
-+        if (env->cc_op != CC_OP_FLAGS) {
-+            cpu_get_psr(env);
-+        }
-+
-+        switch (trapnr) {
-+#ifndef TARGET_SPARC64
-+        case 0x88:
-+        case 0x90:
-+#else
-+        case 0x110:
-+        case 0x16d:
-+#endif
-+            ret = do_syscall (env, env->gregs[1],
-+                              env->regwptr[0], env->regwptr[1],
-+                              env->regwptr[2], env->regwptr[3],
-+                              env->regwptr[4], env->regwptr[5],
-+                              0, 0);
-+            if (ret == -TARGET_ERESTARTSYS || ret == -TARGET_QEMU_ESIGRETURN) {
-+                break;
-+            }
-+            if ((abi_ulong)ret >= (abi_ulong)(-515)) {
-+#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-+                env->xcc |= PSR_CARRY;
-+#else
-+                env->psr |= PSR_CARRY;
-+#endif
-+                ret = -ret;
-+            } else {
-+#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-+                env->xcc &= ~PSR_CARRY;
-+#else
-+                env->psr &= ~PSR_CARRY;
-+#endif
-+            }
-+            env->regwptr[0] = ret;
-+            /* next instruction */
-+            env->pc = env->npc;
-+            env->npc = env->npc + 4;
-+            break;
-+        case 0x83: /* flush windows */
-+#ifdef TARGET_ABI32
-+        case 0x103:
-+#endif
-+            flush_windows(env);
-+            /* next instruction */
-+            env->pc = env->npc;
-+            env->npc = env->npc + 4;
-+            break;
-+#ifndef TARGET_SPARC64
-+        case TT_WIN_OVF: /* window overflow */
-+            save_window(env);
-+            break;
-+        case TT_WIN_UNF: /* window underflow */
-+            restore_window(env);
-+            break;
-+        case TT_TFAULT:
-+        case TT_DFAULT:
-+            {
-+                info.si_signo = TARGET_SIGSEGV;
-+                info.si_errno = 0;
-+                /* XXX: check env->error_code */
-+                info.si_code = TARGET_SEGV_MAPERR;
-+                info._sifields._sigfault._addr = env->mmuregs[4];
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+#else
-+        case TT_SPILL: /* window overflow */
-+            save_window(env);
-+            break;
-+        case TT_FILL: /* window underflow */
-+            restore_window(env);
-+            break;
-+        case TT_TFAULT:
-+        case TT_DFAULT:
-+            {
-+                info.si_signo = TARGET_SIGSEGV;
-+                info.si_errno = 0;
-+                /* XXX: check env->error_code */
-+                info.si_code = TARGET_SEGV_MAPERR;
-+                if (trapnr == TT_DFAULT)
-+                    info._sifields._sigfault._addr = env->dmmu.mmuregs[4];
-+                else
-+                    info._sifields._sigfault._addr = cpu_tsptr(env)->tpc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+#ifndef TARGET_ABI32
-+        case 0x16e:
-+            flush_windows(env);
-+            sparc64_get_context(env);
-+            break;
-+        case 0x16f:
-+            flush_windows(env);
-+            sparc64_set_context(env);
-+            break;
-+#endif
-+#endif
-+        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
-+            break;
-+        case TT_ILL_INSN:
-+            {
-+                info.si_signo = TARGET_SIGILL;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_ILL_ILLOPC;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+        case EXCP_DEBUG:
-+            {
-+                int sig;
-+
-+                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+                if (sig)
-+                  {
-+                    info.si_signo = sig;
-+                    info.si_errno = 0;
-+                    info.si_code = TARGET_TRAP_BRKPT;
-+                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                  }
-+            }
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            break;
-+        default:
-+            printf ("Unhandled trap: 0x%x\n", trapnr);
-+            cpu_dump_state(cs, stderr, fprintf, 0);
-+            exit(EXIT_FAILURE);
-+        }
-+        process_pending_signals (env);
-+    }
-+}
-+
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
-+    int i;
-+    env->pc = regs->pc;
-+    env->npc = regs->npc;
-+    env->y = regs->y;
-+    for(i = 0; i < 8; i++)
-+        env->gregs[i] = regs->u_regs[i];
-+    for(i = 0; i < 8; i++)
-+        env->regwptr[i] = regs->u_regs[i + 8];
- }
-diff --git a/linux-user/sparc64/cpu_loop.c b/linux-user/sparc64/cpu_loop.c
-index b7700a5561..4fd44e1b1e 100644
---- a/linux-user/sparc64/cpu_loop.c
-+++ b/linux-user/sparc64/cpu_loop.c
-@@ -17,10 +17,4 @@
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
--#include "qemu/osdep.h"
--#include "qemu.h"
--#include "cpu_loop-common.h"
--
--void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
--{
--}
-+#include "../sparc/cpu_loop.c"
--- 
-2.14.3
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>=20
+> Does this look anything useful?
+>=20
+> There are cases ("msi", "msix-table", "msix-pba" and probably more) when
+> it is not clear what owns an MR while they all have an owner (always? mos=
+tly?).
+>=20
+>=20
+> "info mtree" example:
+>=20
+> address-space: memory
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): system parent:{obj}
+>     0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram parent=
+:{obj}
+>     0000200000000000-000020000000ffff (prio 0, i/o): alias pci@8000000200=
+00000.io-alias @pci@800000020000000.io 0000000000000000-000000000000ffff ow=
+ner:{dev path=3D/machine/unattached/device[3]}
+>     0000200080000000-00002000ffffffff (prio 0, i/o): alias pci@8000000200=
+00000.mmio32-alias @pci@800000020000000.mmio 0000000080000000-00000000fffff=
+fff owner:{dev path=3D/machine/unattached/device[3]}
+>     0000210000000000-000021ffffffffff (prio 0, i/o): alias pci@8000000200=
+00000.mmio64-alias @pci@800000020000000.mmio 0000210000000000-000021fffffff=
+fff owner:{dev path=3D/machine/unattached/device[3]}
+>=20
+> address-space: I/O
+>   0000000000000000-000000000000ffff (prio 0, i/o): io parent:{obj}
+>=20
+> address-space: cpu-memory-0
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): system parent:{obj}
+>     0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram parent=
+:{obj}
+>     0000200000000000-000020000000ffff (prio 0, i/o): alias pci@8000000200=
+00000.io-alias @pci@800000020000000.io 0000000000000000-000000000000ffff ow=
+ner:{dev path=3D/machine/unattached/device[3]}
+>     0000200080000000-00002000ffffffff (prio 0, i/o): alias pci@8000000200=
+00000.mmio32-alias @pci@800000020000000.mmio 0000000080000000-00000000fffff=
+fff owner:{dev path=3D/machine/unattached/device[3]}
+>     0000210000000000-000021ffffffffff (prio 0, i/o): alias pci@8000000200=
+00000.mmio64-alias @pci@800000020000000.mmio 0000210000000000-000021fffffff=
+fff owner:{dev path=3D/machine/unattached/device[3]}
+>=20
+> address-space: pci@800000020000000
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.io=
+mmu-root owner:{dev path=3D/machine/unattached/device[3]}
+>     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000001 ow=
+ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
+>       0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001=
+ owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
+>     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000000 ow=
+ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
+>       0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000=
+ owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
+>     0000040000000000-000004000000ffff (prio 0, i/o): msi owner:{dev path=
+=3D/machine/unattached/device[3]}
+>=20
+> address-space: vfio-pci
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): bus master container o=
+wner:{dev id=3Dvfio0001_03_00_0}
+>     0000000000000000-ffffffffffffffff (prio 0, i/o): alias bus master @pc=
+i@800000020000000.iommu-root 0000000000000000-ffffffffffffffff owner:{dev i=
+d=3Dvfio0001_03_00_0}
+>=20
+> memory-region: pci@800000020000000.io
+>   0000000000000000-000000000000ffff (prio 0, i/o): pci@800000020000000.io=
+ owner:{dev path=3D/machine/unattached/device[3]}
+>=20
+> memory-region: pci@800000020000000.mmio
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mm=
+io owner:{dev path=3D/machine/unattached/device[3]}
+>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 base BA=
+R 1 owner:{dev id=3Dvfio0001_03_00_0}
+>       0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1=
+ owner:{dev id=3Dvfio0001_03_00_0}
+>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table owner:{=
+dev id=3Dvfio0001_03_00_0}
+>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled=
+] owner:{dev id=3Dvfio0001_03_00_0}
+>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 base BA=
+R 3 owner:{dev id=3Dvfio0001_03_00_0}
+>       0000210000040000-000021000007ffff (prio 0, i/o): 0001:03:00.0 BAR 3=
+ owner:{dev id=3Dvfio0001_03_00_0}
+>         0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BA=
+R 3 mmaps[0] owner:{dev id=3Dvfio0001_03_00_0}
+>=20
+> memory-region: pci@800000020000000.iommu-root
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.io=
+mmu-root owner:{dev path=3D/machine/unattached/device[3]}
+>     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000001 ow=
+ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
+>       0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001=
+ owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
+>     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000000 ow=
+ner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
+>       0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000=
+ owner:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
+>     0000040000000000-000004000000ffff (prio 0, i/o): msi owner:{dev path=
+=3D/machine/unattached/device[3]}
+>=20
+>=20
+>=20
+> Flatviews:
+>=20
+>=20
+> FlatView #0
+>  AS "pci@800000020000000", root: pci@800000020000000.iommu-root
+>  AS "vfio-pci", root: bus master container
+>  Root memory region: pci@800000020000000.iommu-root
+>   0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000 own=
+er:{dev path=3D/machine/unattached/device[3]/tce-table-80000000}
+>   0000040000000000-000004000000ffff (prio 0, i/o): msi owner:{dev path=3D=
+/machine/unattached/device[3]}
+>   0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001 own=
+er:{dev path=3D/machine/unattached/device[3]/tce-table-80000001}
+>=20
+> FlatView #1
+>  AS "memory", root: system
+>  AS "cpu-memory-0", root: system
+>  Root memory region: system
+>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram parent:{=
+obj}
+>   0000210000000000-000021000000dfff (prio 0, i/o): 0001:03:00.0 BAR 1 own=
+er:{dev id=3Dvfio0001_03_00_0}
+>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table owner:{dev =
+id=3Dvfio0001_03_00_0}
+>   000021000000e600-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1 @00=
+0000000000e600 owner:{dev id=3Dvfio0001_03_00_0}
+>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mm=
+aps[0] owner:{dev id=3Dvfio0001_03_00_0}
+>=20
+> FlatView #2
+>  AS "I/O", root: io
+>  Root memory region: io
+>   0000000000000000-000000000000ffff (prio 0, i/o): io parent:{obj}
+> ---
+>  include/exec/memory.h |  2 +-
+>  memory.c              | 80 ++++++++++++++++++++++++++++++++++++++++++++-=
+------
+>  monitor.c             |  4 ++-
+>  hmp-commands-info.hx  |  7 +++--
+>  4 files changed, 78 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 31eae0a..3e9d67c 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -1541,7 +1541,7 @@ void memory_global_dirty_log_start(void);
+>  void memory_global_dirty_log_stop(void);
+> =20
+>  void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
+> -                bool dispatch_tree);
+> +                bool dispatch_tree, bool owner);
+> =20
+>  /**
+>   * memory_region_request_mmio_ptr: request a pointer to an mmio
+> diff --git a/memory.c b/memory.c
+> index e70b64b..538a57c 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2830,10 +2830,57 @@ typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) Me=
+moryRegionListHead;
+>                             int128_sub((size), int128_one())) : 0)
+>  #define MTREE_INDENT "  "
+> =20
+> +static void mtree_expand_owner(fprintf_function mon_printf, void *f,
+> +                               const char *label, Object *obj)
+> +{
+> +    DeviceState *dev =3D (DeviceState *) object_dynamic_cast(obj, TYPE_D=
+EVICE);
+> +    const char *id =3D object_property_print(obj, "id", true, NULL);
+> +    const char *name =3D object_property_print(obj, "name", true, NULL);
+> +
+> +    mon_printf(f, " %s:{", label);
+> +    if (dev) {
+> +        mon_printf(f, "dev");
+> +        if (dev->id) {
+> +            mon_printf(f, " id=3D%s", dev->id);
+> +        }
+> +    } else {
+> +        mon_printf(f, "obj");
+> +    }
+> +    if (name) {
+> +        mon_printf(f, " name=3D%s ", name);
+> +    }
+> +    if (id) {
+> +        mon_printf(f, " id=3D%s ", id);
+> +    }
+> +    if (dev && (!name && !id && !dev->id)) {
+> +        mon_printf(f, " path=3D%s", dev->canonical_path);
+> +    }
+> +    mon_printf(f, "}");
+> +}
+> +
+> +static void mtree_print_mr_owner(fprintf_function mon_printf, void *f,
+> +                                 const MemoryRegion *mr)
+> +{
+> +    Object *owner =3D mr->owner;
+> +    Object *parent =3D memory_region_owner((MemoryRegion *)mr);
+> +
+> +    if (!owner && !parent) {
+> +        mon_printf(f, " orphan");
+> +        return;
+> +    }
+> +    if (owner) {
+> +        mtree_expand_owner(mon_printf, f, "owner", owner);
+> +    }
+> +    if (parent && parent !=3D owner) {
+> +        mtree_expand_owner(mon_printf, f, "parent", parent);
+> +    }
+> +}
+> +
+>  static void mtree_print_mr(fprintf_function mon_printf, void *f,
+>                             const MemoryRegion *mr, unsigned int level,
+>                             hwaddr base,
+> -                           MemoryRegionListHead *alias_print_queue)
+> +                           MemoryRegionListHead *alias_print_queue,
+> +                           bool owner)
+>  {
+>      MemoryRegionList *new_ml, *ml, *next_ml;
+>      MemoryRegionListHead submr_print_queue;
+> @@ -2879,7 +2926,7 @@ static void mtree_print_mr(fprintf_function mon_pri=
+ntf, void *f,
+>          }
+>          mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
+>                     " (prio %d, %s): alias %s @%s " TARGET_FMT_plx
+> -                   "-" TARGET_FMT_plx "%s\n",
+> +                   "-" TARGET_FMT_plx "%s",
+>                     cur_start, cur_end,
+>                     mr->priority,
+>                     memory_region_type((MemoryRegion *)mr),
+> @@ -2888,15 +2935,22 @@ static void mtree_print_mr(fprintf_function mon_p=
+rintf, void *f,
+>                     mr->alias_offset,
+>                     mr->alias_offset + MR_SIZE(mr->size),
+>                     mr->enabled ? "" : " [disabled]");
+> +        if (owner) {
+> +            mtree_print_mr_owner(mon_printf, f, mr);
+> +        }
+>      } else {
+>          mon_printf(f,
+> -                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s=
+%s\n",
+> +                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s=
+%s",
+>                     cur_start, cur_end,
+>                     mr->priority,
+>                     memory_region_type((MemoryRegion *)mr),
+>                     memory_region_name(mr),
+>                     mr->enabled ? "" : " [disabled]");
+> +        if (owner) {
+> +            mtree_print_mr_owner(mon_printf, f, mr);
+> +        }
+>      }
+> +    mon_printf(f, "\n");
+> =20
+>      QTAILQ_INIT(&submr_print_queue);
+> =20
+> @@ -2919,7 +2973,7 @@ static void mtree_print_mr(fprintf_function mon_pri=
+ntf, void *f,
+> =20
+>      QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
+>          mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
+> -                       alias_print_queue);
+> +                       alias_print_queue, owner);
+>      }
+> =20
+>      QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, mrqueue, next_ml) {
+> @@ -2932,6 +2986,7 @@ struct FlatViewInfo {
+>      void *f;
+>      int counter;
+>      bool dispatch_tree;
+> +    bool owner;
+>  };
+> =20
+>  static void mtree_print_flatview(gpointer key, gpointer value,
+> @@ -2972,7 +3027,7 @@ static void mtree_print_flatview(gpointer key, gpoi=
+nter value,
+>          mr =3D range->mr;
+>          if (range->offset_in_region) {
+>              p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> -              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
+> +              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx,
+>                int128_get64(range->addr.start),
+>                int128_get64(range->addr.start) + MR_SIZE(range->addr.size=
+),
+>                mr->priority,
+> @@ -2981,13 +3036,17 @@ static void mtree_print_flatview(gpointer key, gp=
+ointer value,
+>                range->offset_in_region);
+>          } else {
+>              p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> -              TARGET_FMT_plx " (prio %d, %s): %s\n",
+> +              TARGET_FMT_plx " (prio %d, %s): %s",
+>                int128_get64(range->addr.start),
+>                int128_get64(range->addr.start) + MR_SIZE(range->addr.size=
+),
+>                mr->priority,
+>                range->readonly ? "rom" : memory_region_type(mr),
+>                memory_region_name(mr));
+>          }
+> +        if (fvi->owner) {
+> +            mtree_print_mr_owner(p, f, mr);
+> +        }
+> +        p(f, "\n");
+>          range++;
+>      }
+> =20
+> @@ -3013,7 +3072,7 @@ static gboolean mtree_info_flatview_free(gpointer k=
+ey, gpointer value,
+>  }
+> =20
+>  void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
+> -                bool dispatch_tree)
+> +                bool dispatch_tree, bool owner)
+>  {
+>      MemoryRegionListHead ml_head;
+>      MemoryRegionList *ml, *ml2;
+> @@ -3025,7 +3084,8 @@ void mtree_info(fprintf_function mon_printf, void *=
+f, bool flatview,
+>              .mon_printf =3D mon_printf,
+>              .f =3D f,
+>              .counter =3D 0,
+> -            .dispatch_tree =3D dispatch_tree
+> +            .dispatch_tree =3D dispatch_tree,
+> +            .owner =3D owner,
+>          };
+>          GArray *fv_address_spaces;
+>          GHashTable *views =3D g_hash_table_new(g_direct_hash, g_direct_e=
+qual);
+> @@ -3057,14 +3117,14 @@ void mtree_info(fprintf_function mon_printf, void=
+ *f, bool flatview,
+> =20
+>      QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
+>          mon_printf(f, "address-space: %s\n", as->name);
+> -        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
+> +        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head, owner);
+>          mon_printf(f, "\n");
+>      }
+> =20
+>      /* print aliased regions */
+>      QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
+>          mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
+> -        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head);
+> +        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head, owner);
+>          mon_printf(f, "\n");
+>      }
+> =20
+> diff --git a/monitor.c b/monitor.c
+> index 51f4cf4..9d304a5 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1969,8 +1969,10 @@ static void hmp_info_mtree(Monitor *mon, const QDi=
+ct *qdict)
+>  {
+>      bool flatview =3D qdict_get_try_bool(qdict, "flatview", false);
+>      bool dispatch_tree =3D qdict_get_try_bool(qdict, "dispatch_tree", fa=
+lse);
+> +    bool owner =3D qdict_get_try_bool(qdict, "owner", false);
+> =20
+> -    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch=
+_tree);
+> +    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch=
+_tree,
+> +               owner);
+>  }
+> =20
+>  static void hmp_info_numa(Monitor *mon, const QDict *qdict)
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ddfcd5a..5956495 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -250,10 +250,11 @@ ETEXI
+> =20
+>      {
+>          .name       =3D "mtree",
+> -        .args_type  =3D "flatview:-f,dispatch_tree:-d",
+> -        .params     =3D "[-f][-d]",
+> +        .args_type  =3D "flatview:-f,dispatch_tree:-d,owner:-o",
+> +        .params     =3D "[-f][-d][-o]",
+>          .help       =3D "show memory tree (-f: dump flat view for addres=
+s spaces;"
+> -                      "-d: dump dispatch tree, valid with -f only)",
+> +                      "-d: dump dispatch tree, valid with -f only);"
+> +                      "-o: dump region owners/parents",
+>          .cmd        =3D hmp_info_mtree,
+>      },
+> =20
+> --=20
+> 2.11.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
