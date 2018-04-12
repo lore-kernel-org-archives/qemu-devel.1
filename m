@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6gMr-0007bb-GY
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:50:44 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1f6gOF-0008Q2-4Q
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:52:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6gMm-000430-GZ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:50:41 -0400
-References: <20180412093521.2469-1-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b8f49fad-da83-c93d-d3c7-88367e3a3c4d@redhat.com>
-Date: Thu, 12 Apr 2018 19:50:21 +0200
+	(envelope-from <yuval.shaia@oracle.com>) id 1f6gOA-0005YQ-8W
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:52:07 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1f6gO9-0005X6-UA
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:52:02 -0400
+Date: Thu, 12 Apr 2018 20:51:45 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180412175140.GA5406@yuvallap>
+References: <20180312183628.394722-9-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180412093521.2469-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/kvm: cleanup calls to
- cpu_synchronize_state()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180312183628.394722-9-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PULL, 08/36] qapi: Remove qobject_to_X() functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +27,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On 12.04.2018 11:35, David Hildenbrand wrote:
-> We have a call to cpu_synchronize_state() on every kvm_arch_handle_exit().
+Hi Eric,
+
+On Mon, Mar 12, 2018 at 01:35:59PM -0500, Eric Blake wrote:
+> From: Max Reitz <mreitz@redhat.com>
 > 
-> Let's remove the ones that are no longer needed.
+> They are no longer needed now.
+
+I'm doing some off-list development which use these functions.
+Unfortunately i'm not subscribed (yet) to qemu-devel so obviously missed
+this email.
+
+Is there any alternative to these functions?
+
+My code looks something like this:
+
+QObject *oid;
+unsigned long id;
+
+oid = qlist_pop(list);
+id = qnum_get_uint(qobject_to_qnum(oid));
+
+Since objects in the list are QObject type.
+
+Yuval
+
 > 
-> Remaining places (for s390x) are in
-> - target/s390x/sigp.c, on the target CPU
-> - target/s390x/cpu.c:s390_cpu_get_crash_info()
-> 
-> While at it, use kvm_cpu_synchronize_state() instead of
-> cpu_synchronize_state() in KVM code. (suggested by Thomas Huth)
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Message-Id: <20180224154033.29559-5-mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  hw/s390x/s390-pci-inst.c |  8 --------
->  target/s390x/kvm.c       | 20 +-------------------
->  2 files changed, 1 insertion(+), 27 deletions(-)
-
-Wow, that was really a mess, looking at which different "levels" the
-cpu_synchronize_state was done before. Good that you cleaned it up now.
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>  include/qapi/qmp/qbool.h   |  1 -
+>  include/qapi/qmp/qdict.h   |  1 -
+>  include/qapi/qmp/qlist.h   |  1 -
+>  include/qapi/qmp/qnum.h    |  1 -
+>  include/qapi/qmp/qstring.h |  1 -
+>  qobject/qbool.c            | 11 -----------
+>  qobject/qdict.c            | 11 -----------
+>  qobject/qlist.c            | 11 -----------
+>  qobject/qnum.c             | 11 -----------
+>  qobject/qstring.c          | 11 -----------
+>  10 files changed, 60 deletions(-)
+> 
+> diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
+> index 629c508d34f..b9a44a1bfe0 100644
+> --- a/include/qapi/qmp/qbool.h
+> +++ b/include/qapi/qmp/qbool.h
+> @@ -23,7 +23,6 @@ struct QBool {
+> 
+>  QBool *qbool_from_bool(bool value);
+>  bool qbool_get_bool(const QBool *qb);
+> -QBool *qobject_to_qbool(const QObject *obj);
+>  bool qbool_is_equal(const QObject *x, const QObject *y);
+>  void qbool_destroy_obj(QObject *obj);
+> 
+> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+> index 7c6d8445495..2cc3e906f7b 100644
+> --- a/include/qapi/qmp/qdict.h
+> +++ b/include/qapi/qmp/qdict.h
+> @@ -39,7 +39,6 @@ void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
+>  void qdict_del(QDict *qdict, const char *key);
+>  int qdict_haskey(const QDict *qdict, const char *key);
+>  QObject *qdict_get(const QDict *qdict, const char *key);
+> -QDict *qobject_to_qdict(const QObject *obj);
+>  bool qdict_is_equal(const QObject *x, const QObject *y);
+>  void qdict_iter(const QDict *qdict,
+>                  void (*iter)(const char *key, QObject *obj, void *opaque),
+> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+> index 5fd976a3981..5c673acb060 100644
+> --- a/include/qapi/qmp/qlist.h
+> +++ b/include/qapi/qmp/qlist.h
+> @@ -53,7 +53,6 @@ QObject *qlist_pop(QList *qlist);
+>  QObject *qlist_peek(QList *qlist);
+>  int qlist_empty(const QList *qlist);
+>  size_t qlist_size(const QList *qlist);
+> -QList *qobject_to_qlist(const QObject *obj);
+>  bool qlist_is_equal(const QObject *x, const QObject *y);
+>  void qlist_destroy_obj(QObject *obj);
+> 
+> diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+> index 15e3971c7f1..3e47475b2cb 100644
+> --- a/include/qapi/qmp/qnum.h
+> +++ b/include/qapi/qmp/qnum.h
+> @@ -68,7 +68,6 @@ double qnum_get_double(QNum *qn);
+> 
+>  char *qnum_to_string(QNum *qn);
+> 
+> -QNum *qobject_to_qnum(const QObject *obj);
+>  bool qnum_is_equal(const QObject *x, const QObject *y);
+>  void qnum_destroy_obj(QObject *obj);
+> 
+> diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+> index 98070ef3d6a..b72843fc1b0 100644
+> --- a/include/qapi/qmp/qstring.h
+> +++ b/include/qapi/qmp/qstring.h
+> @@ -30,7 +30,6 @@ const char *qstring_get_str(const QString *qstring);
+>  void qstring_append_int(QString *qstring, int64_t value);
+>  void qstring_append(QString *qstring, const char *str);
+>  void qstring_append_chr(QString *qstring, int c);
+> -QString *qobject_to_qstring(const QObject *obj);
+>  bool qstring_is_equal(const QObject *x, const QObject *y);
+>  void qstring_destroy_obj(QObject *obj);
+> 
+> diff --git a/qobject/qbool.c b/qobject/qbool.c
+> index 5be6277cca8..b58249925c2 100644
+> --- a/qobject/qbool.c
+> +++ b/qobject/qbool.c
+> @@ -39,17 +39,6 @@ bool qbool_get_bool(const QBool *qb)
+>      return qb->value;
+>  }
+> 
+> -/**
+> - * qobject_to_qbool(): Convert a QObject into a QBool
+> - */
+> -QBool *qobject_to_qbool(const QObject *obj)
+> -{
+> -    if (!obj || qobject_type(obj) != QTYPE_QBOOL) {
+> -        return NULL;
+> -    }
+> -    return container_of(obj, QBool, base);
+> -}
+> -
+>  /**
+>   * qbool_is_equal(): Test whether the two QBools are equal
+>   */
+> diff --git a/qobject/qdict.c b/qobject/qdict.c
+> index 1e588123d00..45c8b53361f 100644
+> --- a/qobject/qdict.c
+> +++ b/qobject/qdict.c
+> @@ -37,17 +37,6 @@ QDict *qdict_new(void)
+>      return qdict;
+>  }
+> 
+> -/**
+> - * qobject_to_qdict(): Convert a QObject into a QDict
+> - */
+> -QDict *qobject_to_qdict(const QObject *obj)
+> -{
+> -    if (!obj || qobject_type(obj) != QTYPE_QDICT) {
+> -        return NULL;
+> -    }
+> -    return container_of(obj, QDict, base);
+> -}
+> -
+>  /**
+>   * tdb_hash(): based on the hash agorithm from gdbm, via tdb
+>   * (from module-init-tools)
+> diff --git a/qobject/qlist.c b/qobject/qlist.c
+> index 77f19ffda78..954fe983751 100644
+> --- a/qobject/qlist.c
+> +++ b/qobject/qlist.c
+> @@ -151,17 +151,6 @@ size_t qlist_size(const QList *qlist)
+>      return count;
+>  }
+> 
+> -/**
+> - * qobject_to_qlist(): Convert a QObject into a QList
+> - */
+> -QList *qobject_to_qlist(const QObject *obj)
+> -{
+> -    if (!obj || qobject_type(obj) != QTYPE_QLIST) {
+> -        return NULL;
+> -    }
+> -    return container_of(obj, QList, base);
+> -}
+> -
+>  /**
+>   * qlist_is_equal(): Test whether the two QLists are equal
+>   *
+> diff --git a/qobject/qnum.c b/qobject/qnum.c
+> index ea091cfaa4b..1501c828323 100644
+> --- a/qobject/qnum.c
+> +++ b/qobject/qnum.c
+> @@ -199,17 +199,6 @@ char *qnum_to_string(QNum *qn)
+>      return NULL;
+>  }
+> 
+> -/**
+> - * qobject_to_qnum(): Convert a QObject into a QNum
+> - */
+> -QNum *qobject_to_qnum(const QObject *obj)
+> -{
+> -    if (!obj || qobject_type(obj) != QTYPE_QNUM) {
+> -        return NULL;
+> -    }
+> -    return container_of(obj, QNum, base);
+> -}
+> -
+>  /**
+>   * qnum_is_equal(): Test whether the two QNums are equal
+>   *
+> diff --git a/qobject/qstring.c b/qobject/qstring.c
+> index 2b2153206df..8bae529ef79 100644
+> --- a/qobject/qstring.c
+> +++ b/qobject/qstring.c
+> @@ -105,17 +105,6 @@ void qstring_append_chr(QString *qstring, int c)
+>      qstring->string[qstring->length] = 0;
+>  }
+> 
+> -/**
+> - * qobject_to_qstring(): Convert a QObject to a QString
+> - */
+> -QString *qobject_to_qstring(const QObject *obj)
+> -{
+> -    if (!obj || qobject_type(obj) != QTYPE_QSTRING) {
+> -        return NULL;
+> -    }
+> -    return container_of(obj, QString, base);
+> -}
+> -
+>  /**
+>   * qstring_get_str(): Return a pointer to the stored string
+>   *
