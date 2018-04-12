@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6ZDm-0008HN-5A
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:12:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6ZGD-0001bl-OW
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6ZDk-0008TN-Rn
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:12:50 -0400
-References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-8-kwolf@redhat.com>
-	<33c2ce2d-18d6-5479-19d4-3a1923cea3cb@redhat.com>
-	<20180412095157.GA5004@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
-Date: Thu, 12 Apr 2018 12:12:31 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f6ZG8-000182-Iq
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:15:21 -0400
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:40476)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f6ZG8-00017f-8z
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:15:16 -0400
+Received: by mail-oi0-x231.google.com with SMTP id x9-v6so4614378oig.7
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 03:15:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180412095157.GA5004@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/19] block: Really pause block jobs on
- drain
+In-Reply-To: <7a39d3f5-af2b-e21d-fa10-798b67fe4f63@lauterbach.com>
+References: <1521034084-17344-1-git-send-email-abdallah.bouassida@lauterbach.com>
+	<1521034084-17344-4-git-send-email-abdallah.bouassida@lauterbach.com>
+	<87h8orcg3a.fsf@linaro.org>
+	<7a39d3f5-af2b-e21d-fa10-798b67fe4f63@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Apr 2018 11:14:54 +0100
+Message-ID: <CAFEAcA-2uZ_=POrmuHiXirTchUoxoD92ZfctrcMVj2s31XQXdw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 3/3] target/arm: Add the XML
+ dynamic generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On 12/04/2018 11:51, Kevin Wolf wrote:
-> Am 12.04.2018 um 10:37 hat Paolo Bonzini geschrieben:
->> On 11/04/2018 18:39, Kevin Wolf wrote:
->>> +bool bdrv_drain_poll(BlockDriverState *bs, bool top_level)
->>>  {
->>>      /* Execute pending BHs first and check everything else only afte=
-r the BHs
->>>       * have executed. */
->>> -    while (aio_poll(bs->aio_context, false));
->>> +    if (top_level) {
->>> +        while (aio_poll(bs->aio_context, false));
->>> +    }
->>> +
->>> +    if (bdrv_parent_drained_poll(bs)) {
->>> +        return true;
->>> +    }
->>> +
->>>      return atomic_read(&bs->in_flight);
->>>  }
->>> =20
+On 6 April 2018 at 18:28, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> Alex wrote:
+>> There is something odd going on here because if I run a simple little
+>> features binary
+>> (https://github.com/stsquad/testcases/blob/master/aarch64/features.c) I
+>> get:
 >>
->> Up until now I liked very much this series, but I like this patch a bi=
-t
->> less for two reasons.
+>>   ID_AA64ISAR0_EL1    : 0x0000000000011120
+>>   ID_AA64ISAR1_EL1    : 0x0000000000000000
+>>   ID_AA64MMFR0_EL1    : 0x00000000ff000000
+>>   ID_AA64MMFR1_EL1    : 0x0000000000000000
+>>   ID_AA64PFR0_EL1     : 0x0000000000000011
+>>   ID_AA64PFR1_EL1     : 0x0000000000000000
+>>   ID_AA64DFR0_EL1     : 0x0000000000000006
+>>   ID_AA64DFR1_EL1     : 0x0000000000000000
+>>   MIDR_EL1            : 0x00000000411fd070
+>>   MPIDR_EL1           : 0x0000000080000000
+>>   REVIDR_EL1          : 0x0000000000000000
 >>
->> 1) I think I would prefer to have the !top_level case in a separate
->> function---making the API easier to use in the BdrvChildRole callback
->> because there is no need to pass false.
->=20
-> Basically just move the aio_poll() out to a different function that
-> calls bdrv_drain_poll afterwards? Maybe it's a bit cleaner, yes.
-> However, see below.
+>> However in the gdb output we see:
+>>
+>>   ID_AA64ISAR0_EL1           0x11120  69920
+>>   ID_AA64ISAR1_EL1           0x0      0
+>>   ID_AA64MMFR0_EL1           0x1124   4388  <-?
+>>   ID_AA64MMFR1_EL1           0x0      0
+>>   ID_PFR0                    0x131    305   <-name and value?
+>>   ID_AA64PFR1_EL1            0x0      0
+>>   ID_AA64DFR0_EL1            0x10305106       271601926 <-?
+>>   ID_AA64DFR1_EL1            0x0      0
+>>   REVIDR_EL1                 0x0      0
+>>
+>> So why the discrepancies?
+>
+>>  ID_AA64MMFR0_EL1           0x1124    4388  <-?
+>>  ID_AA64DFR0_EL1            0x10305106        271601926 <-?
+> I get the same value in x1 (= 0x1124) and x2 (= 0x10305106) when I execute
+> the following instructions on the guest:
+>   MRS x1, ID_AA64MMFR0_EL1
+>   MRS x2, ID_AA64DFR0_EL1
 
-Yes.
+Alex's test program looks like a Linux userspace one -- in
+which case it will be reading whatever faked-up values the
+guest kernel is providing, rather than directly accessing
+the registers (since they're not EL0-readable in hardware).
+That may be the cause of the discrepancies.
 
->> In addition, the callback is not really polling anything, but rather
->> returning whether the children are quiescent.  So a better name would
->> be bdrv_children_drained and c->role->drained.
->=20
-> Why isn't it polling? We're actively checking the state of the node, an=
-d
-> we keep calling the callback until it has the expected state. Would it
-> only become polling for you if the loop were in this function rather
-> than the its caller?
+(As an aside, we probably need to add support for userspace
+accessing of ID regs to our linux-user code at some point.)
 
-It's just checking the status, it's not invoking the event loop.  The
-polling (in the sense of aio_poll or AIO_POLL_WHILE) is done elsewhere,
-this function is just the condition.  It's just nomenclature I guess.
+>>  ID_PFR0                    0x131     305   <-name and value?
+> This is not ID_AA64PFR0_EL1 - the ID_AA64PFR0_EL1 is not registered in our
+> dynamic XML as it has "ARM_CP_NO_RAW" type.
+> So should we add some modifications to handle this special case?
 
->> 2) Worse, the main idea behind the first drain restructuring was that
->> draining could proceed in topological order: first drain the roots' I/=
-O,
->> then call bdrv_drain to send the last requests to their children, then
->> recurse.  It is not clear to me why you need to introduce this recursi=
-ve
->> step, which is also O(n^2) in the worst case.
->=20
-> I need to introduce it because it fixes the bug that we don't wait unti=
-l
-> the parents are actually quiesced and don't send new requests any more.
-> I don't see how this could be fixed without going to the parents.
+Hmm, this is an interesting case. I'm not entirely sure
+this register absolutely needs to be NO_RAW. Deciding
+whether we could drop the NO_RAW requires more thought than
+I have time for right now, though.
 
-Yes, you do need to go to the parents.  I don't understand however why
-you need more than a walk of the graph in parent-before-child order
-(which is a topological order, so it is reverse depth-first order and
-it's easy to do the walk in a recursive function).  If you're draining X
-below:
+In any case, it's quite plausible we may have registers
+which we want to be not migrated (so NO_RAW) but which we
+do want to allow the gdb stub to read (and perhaps write).
+I think that handling those special cases with a .gdbreadfn
+and .gdbwritefn as and when we need to would be the best
+approach.
 
-     A
-     |
-     B   C
-      \ /
-       X
+For the moment, this patchset is intended to be a "reasonable
+effort" reflection of the system registers into the gdbstub,
+so I don't think we need to do that now. If users have
+genuine need to read particular registers we can add the
+special casing code then.
 
-then you start by draining A/B/C in topological order (so A before B).
-If B happens to be already quiescent, you can skip not only B but A too.
- If the nodes disappear or move elsewhere in the graph it's okay, you've
-just done useless work.  When you're done you ensure that every parent
-is quiescent, and if so you're done.  If it's not, , a new parent
-appeared---drain that too, using the same parent-before-child order, and
-loop.
-
-Well, there is one gotcha: bdrv_ref protects against disappearance, but
-bdrv_ref/bdrv_unref are not thread-safe.  Am I missing something else?
-
-> Is the O(n=C2=B2) that you mean that we recursively iterate all childre=
-n in
-> bdrv_do_drained_begin() (or later in the series in bdrv_drain_poll()),
-> and then come back from the children when they poll their parents?
-
-Yes.
-
-Paolo
-
-> We could do the same thing as for bdrv_parent_drained_begin(), i.e. pas=
-s
-> the parent that we came from (BdrvChild *parent instead of bool
-> top_level, NULL instead of top_level=3Dtrue) and then skip that parent
-> while calling the BdrvChildRole .drain_poll callbacks. Would that
-> address your concerns?
->=20
-> In that solution, splitting the function by moving aio_poll() out
-> wouldn't get rid of a parameter and simplify the API any more. It might
-> still be cleaner, though?
->=20
-> Kevin
->=20
+thanks
+-- PMM
