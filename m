@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1f6W4H-0001W6-PM
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:50:52 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f6W66-0002YT-Jp
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:52:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1f6W4G-0005gU-Kb
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:50:49 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:39532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1f6W4G-0005fS-GJ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:50:48 -0400
-Received: by mail-it0-x243.google.com with SMTP id e98-v6so5732152itd.4
-	for <qemu-devel@nongnu.org>; Wed, 11 Apr 2018 23:50:48 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1f6W63-0007TT-I1
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:52:42 -0400
+Resent-Message-Id: <E1f6W63-0007TT-I1@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f6W63-0007So-8A
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:52:39 -0400
+In-Reply-To: <20180412060358.9118-1-peterx@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152351322708.1854.4413712485366884044@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <20180411155647.GG2667@work-vm>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-	<1523089594-1422-6-git-send-email-lidongchen@tencent.com>
-	<20180411155647.GG2667@work-vm>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Thu, 12 Apr 2018 14:50:47 +0800
-Message-ID: <CAOGPPbcF=Ln6U2UAxWFysMHAA-K08=whGQEL3FepZ+mzM4pmMg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 5/5] migration: disable RDMA WRITR after
- postcopy started.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 11 Apr 2018 23:07:08 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-On Wed, Apr 11, 2018 at 11:56 PM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
->> RDMA write operations are performed with no notification to the destination
->> qemu, then the destination qemu can not wakeup. So disable RDMA WRITE after
->> postcopy started.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->
-> This patch needs to be near the beginning of the series; at the moment a
-> bisect would lead you to the middle of the series which had return
-> paths, but then would fail to work properly because it would try and use
-> the RDMA code.
-
-I will fix this problem in next version.
-
->
->> ---
->>  migration/qemu-file.c |  3 ++-
->>  migration/rdma.c      | 12 ++++++++++++
->>  2 files changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
->> index 8acb574..a64ac3a 100644
->> --- a/migration/qemu-file.c
->> +++ b/migration/qemu-file.c
->> @@ -260,7 +260,8 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
->>          int ret = f->hooks->save_page(f, f->opaque, block_offset,
->>                                        offset, size, bytes_sent);
->>          f->bytes_xfer += size;
->> -        if (ret != RAM_SAVE_CONTROL_DELAYED) {
->> +        if (ret != RAM_SAVE_CONTROL_DELAYED &&
->> +            ret != RAM_SAVE_CONTROL_NOT_SUPP) {
->
-> What about f->bytes_xfer in this case?
-
-f->bytes_xfer should not update when RAM_SAVE_CONTROL_NOT_SUPP.
-I will fix this problem in next version.
-
->
-> Is there anything we have to do at the switchover into postcopy to make
-> sure that all pages have been received?
-
-ram_save_iterate invoke ram_control_after_iterate(f, RAM_CONTROL_ROUND),
-so before next iteration which switchover into postcopy, all the pages
-sent by previous
-iteration have been received.
-
->
-> Dave
->
->>              if (bytes_sent && *bytes_sent > 0) {
->>                  qemu_update_position(f, *bytes_sent);
->>              } else if (ret < 0) {
->> diff --git a/migration/rdma.c b/migration/rdma.c
->> index 81be482..8529ddd 100644
->> --- a/migration/rdma.c
->> +++ b/migration/rdma.c
->> @@ -2964,6 +2964,10 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
->>
->>      CHECK_ERROR_STATE();
->>
->> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
->> +        return RAM_SAVE_CONTROL_NOT_SUPP;
->> +    }
->> +
->>      qemu_fflush(f);
->>
->>      if (size > 0) {
->> @@ -3528,6 +3532,10 @@ static int qemu_rdma_registration_start(QEMUFile *f, void *opaque,
->>
->>      CHECK_ERROR_STATE();
->>
->> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
->> +        return 0;
->> +    }
->> +
->>      trace_qemu_rdma_registration_start(flags);
->>      qemu_put_be64(f, RAM_SAVE_FLAG_HOOK);
->>      qemu_fflush(f);
->> @@ -3550,6 +3558,10 @@ static int qemu_rdma_registration_stop(QEMUFile *f, void *opaque,
->>
->>      CHECK_ERROR_STATE();
->>
->> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
->> +        return 0;
->> +    }
->> +
->>      qemu_fflush(f);
->>      ret = qemu_rdma_drain_cq(f, rdma);
->>
->> --
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDEyMDYwMzU4LjkxMTgtMS1wZXRlcnhAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBtb25pdG9yOiBsZXQgY3VyX21vbiBiZSBwZXItdGhy
+ZWFkCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIw
+MTgwNDEyMDYwMzU4LjkxMTgtMS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNDEy
+MDYwMzU4LjkxMTgtMS1wZXRlcnhAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCmU4OThmYThkZTMgbW9uaXRvcjogbGV0IGN1cl9tb24gYmUgcGVyLXRocmVhZAoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBtb25pdG9yOiBsZXQgY3VyX21v
+biBiZSBwZXItdGhyZWFkLi4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAg
+b3IgTlVMTAojNjI6IEZJTEU6IHN0dWJzL21vbml0b3IuYzo2OgorX190aHJlYWQgTW9uaXRvciAq
+Y3VyX21vbiA9IE5VTEw7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMyIGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
