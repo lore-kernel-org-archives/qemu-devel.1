@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6XgS-0004hN-EN
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:34:24 -0400
+	(envelope-from <clg@kaod.org>) id 1f6XiP-00077X-CC
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6XgM-0000pC-5r
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:34:20 -0400
-References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
-	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
-	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
-	<47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
-	<ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
-	<90b289f4-d976-1fb7-57e2-aa02d00947d1@virtuozzo.com>
-	<e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
-Date: Thu, 12 Apr 2018 11:34:01 +0300
+	(envelope-from <clg@kaod.org>) id 1f6XiL-0002Qe-B2
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:36:21 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:36079)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f6XiL-0002PM-4Z
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:36:17 -0400
+Received: from player773.ha.ovh.net (unknown [10.109.122.114])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 7D6EE12D578
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 10:36:15 +0200 (CEST)
+References: <20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+	<1516224472.31850.193.camel@kernel.crashing.org>
+	<20180211080831.GC11634@umbus.fritz.box>
+	<1518389717.2312.245.camel@kernel.crashing.org>
+	<20180412051653.GO9425@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d5ed04f5-6b8e-6844-eadb-badfb7c6bd73@kaod.org>
+Date: Thu, 12 Apr 2018 10:36:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180412051653.GO9425@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +41,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
+To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-11.04.2018 19:11, Max Reitz wrote:
-> On 2018-04-11 15:05, Vladimir Sementsov-Ogievskiy wrote:
->
-> [...]
->
->> Hmm, first type? I'm now not sure about, did I really see sha256
->> mismatch, or something like this (should be error, but found bitmap):
+On 04/12/2018 07:16 AM, David Gibson wrote:
+> On Mon, Feb 12, 2018 at 09:55:17AM +1100, Benjamin Herrenschmidt wrote:
+>> On Sun, 2018-02-11 at 19:08 +1100, David Gibson wrote:
+>>> On Thu, Jan 18, 2018 at 08:27:52AM +1100, Benjamin Herrenschmidt wrot=
+e:
+>>>> On Wed, 2018-01-17 at 15:39 +0100, C=E9dric Le Goater wrote:
+>>>>> Migration is a problem. We will need both backend QEMU objects to b=
+e=20
+>>>>> available anyhow if we want to migrate. So we are back to the curre=
+nt=20
+>>>>> solution creating both QEMU objects but we can try to defer some of=
+ the=20
+>>>>> KVM inits and create the KVM device on demand at CAS time.
+>>>>
+>>>> Do we have a way to migrate a piece of info from the machine *first*
+>>>> that indicate what type of XICS/XIVE to instanciate ?
+>>>
+>>> Nope.  qemu migration doesn't work like that.  Yes, it should, and
+>>> everyone knows it, but changing it is a really long term project.
 >>
->> --- /work/src/qemu/up-169/tests/qemu-iotests/169.out=C2=A0=C2=A0=C2=A0 2=
-018-04-11
->> 15:35:10.055027392 +0300
->> +++ /work/src/qemu/up-169/tests/qemu-iotests/169.out.bad 2018-04-11
->> 15:58:09.300450045 +0300
->> @@ -1,5 +1,20 @@
->> -........
->> +F.......
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +FAIL: test__not_persistent__migbitmap__offline
->> (__main__.TestDirtyBitmapMigration)
->> +methodcaller(name, ...) --> methodcaller object
->> +----------------------------------------------------------------------
->> +Traceback (most recent call last):
->> +=C2=A0 File "169", line 136, in do_test_migration
->> +=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persistent el=
-se False)
->> +=C2=A0 File "169", line 77, in check_bitmap
->> +=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
->> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", line=
- 389,
->> in assert_qmp
->> +=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
->> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", line=
- 348,
->> in dictpath
->> +=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s"' %=
- (path, str(d)))
->> +AssertionError: failed path traversal for "error/desc" in "{u'return':
->> {u'sha256':
->> u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}}"
->>
->>
->> Max, did you really seed sha256 mismatch or only something like this?
-> I'm pretty sure I did see mismatches.
+>> Well, we have a problem then. It looks like Qemu broken migration is
+>> fundamentally incompatible with PAPR and CAS design...
+>=20
+> Hrm, the fit is very clunky certainly, but i think we can make it work.
+>=20
+>> I know we don't migrate the configuration, that's not exactly what I
+>> had in mind tho... Can we have some piece of *data* from the machine b=
+e
+>> migrated first, and use it on the target to reconfigure the interrupt
+>> controller before the stream arrives ?
+>=20
+> Sorta.. maybe.. but it would probably get really ugly if we don't
+> preserve the usual way object lifetimes work.
+>=20
+>> Otherwise, we have indeed no much choice but the horrible wart of
+>> creating both interrupt controllers with only one "active".
+>=20
+> I really think this is the way to go, warts and all.
+>=20
 
-hm, may be it possible too, because of not waiting for RESUME in this=20
-case, we can request sha256 in the intermediate state of bitmap loading
+Yes ... KVM makes it a little uglier.=20
 
->
-> Max
+A KVM_DEVICE_DESTROY device is needed to cleanup the VM and a=20
+DISABLE_CAP to disconnect the vpcu from the current KVM XIVE/XICS=20
+device. I have used an extra arg on ENABLE_CAP for the moment.   =20
 
+At the QEMU level, we need to connect/reconnect at reset time to
+handle possible changes in CAS, and at post_load.
 
---=20
-Best regards,
-Vladimir
+Destroying the MemoryRegion is a bit problematic, I have not
+found a common layout compatible with both the emulated mode=20
+(std IO regions) and the KVM mode (ram device regions)
+
+C.
