@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6YEV-0003wO-8X
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:09:32 -0400
+	(envelope-from <yu.ning@linux.intel.com>) id 1f6YEY-0003zc-P4
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6YER-0008KD-7z
+	(envelope-from <yu.ning@linux.intel.com>) id 1f6YEW-0008Mc-2r
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:09:34 -0400
+Received: from mga04.intel.com ([192.55.52.120]:12496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
+	id 1f6YEV-0008Ll-PQ
 	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:09:31 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
-	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
-	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
-	<47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
-	<ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
-	<90b289f4-d976-1fb7-57e2-aa02d00947d1@virtuozzo.com>
-	<e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
-	<44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
-Message-ID: <0ad6b9fc-59fd-3c32-43d3-1a4d433d9154@virtuozzo.com>
-Date: Thu, 12 Apr 2018 12:09:10 +0300
+References: <000001d3c9cf$19f0a190$4dd1e4b0$@gmail.com>
+	<29f1952e-325f-0a60-041c-fc651ae33fbb@redhat.com>
+From: Yu Ning <yu.ning@linux.intel.com>
+Message-ID: <9dee00f1-92bc-3789-f943-c56700e874d9@linux.intel.com>
+Date: Thu, 12 Apr 2018 17:09:25 +0800
 MIME-Version: 1.0
-In-Reply-To: <44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
+In-Reply-To: <29f1952e-325f-0a60-041c-fc651ae33fbb@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
+Subject: Re: [Qemu-devel] Debugging on HAXM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Alexandro Sanchez Bach <alexaltea123@gmail.com>, qemu-devel@nongnu.org
+Cc: 'Anthony Liguori' <aliguori@us.ibm.com>, 'Glauber Costa' <gcosta@redhat.com>, Yu Ning <yu.ning@intel.com>
 
-12.04.2018 11:34, Vladimir Sementsov-Ogievskiy wrote:
-> 11.04.2018 19:11, Max Reitz wrote:
->> On 2018-04-11 15:05, Vladimir Sementsov-Ogievskiy wrote:
->>
->> [...]
->>
->>> Hmm, first type? I'm now not sure about, did I really see sha256
->>> mismatch, or something like this (should be error, but found bitmap):
->>>
->>> --- /work/src/qemu/up-169/tests/qemu-iotests/169.out 2018-04-11
->>> 15:35:10.055027392 +0300
->>> +++ /work/src/qemu/up-169/tests/qemu-iotests/169.out.bad 2018-04-11
->>> 15:58:09.300450045 +0300
->>> @@ -1,5 +1,20 @@
->>> -........
->>> +F.......
->>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> +FAIL: test__not_persistent__migbitmap__offline
->>> (__main__.TestDirtyBitmapMigration)
->>> +methodcaller(name, ...) --> methodcaller object
->>> +----------------------------------------------------------------------
->>> +Traceback (most recent call last):
->>> +=C2=A0 File "169", line 136, in do_test_migration
->>> +=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persistent e=
-lse False)
->>> +=C2=A0 File "169", line 77, in check_bitmap
->>> +=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
->>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", lin=
-e=20
->>> 389,
->>> in assert_qmp
->>> +=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
->>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", lin=
-e=20
->>> 348,
->>> in dictpath
->>> +=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s"' =
-% (path,=20
->>> str(d)))
->>> +AssertionError: failed path traversal for "error/desc" in "{u'return':
->>> {u'sha256':
->>> u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}}"
->>>
->>>
->>> Max, did you really seed sha256 mismatch or only something like this?
->> I'm pretty sure I did see mismatches.
->
-> hm, may be it possible too, because of not waiting for RESUME in this=20
-> case, we can request sha256 in the intermediate state of bitmap loading
+Sorry for the very late response.  I completely forgot to check this 
+mailbox...  Adding my usual corporate email to the cc.
 
-no. if you see mismatch on first check after migration, then it is after=20
-RESUME event, so it means, migrated broken bitmap, it's a bug..
+On 4/2/2018 10:20, Paolo Bonzini wrote:
+> On 01/04/2018 17:35, Alexandro Sanchez Bach wrote:
+>> I've noticed that `gdb_breakpoint_insert` only considers KVM so far. My
+>> question is: Has anyone planned adding debugging support to HAXM? Or is
+>> anyone actively working on QEMU's HAXM frontend at all? If not, I would like
+>> to work on it myself. Are there any guidelines or things I should take into
+>> consideration to work on this accelerator (pinging Anthony and Glauber)?
+> The main person working on HAXM is Yu Ning.  Anthony and Glauber are
+> only listed because they are the authors of the KVM support (and HAXM
+> support in turn is based on KVM).
 
-if you see mismatch on second check - after vm_b stop/start, this means=20
-that it is a persistent case, so incoming migration should fail, and=20
-bitmap is loaded from file, but how it can mismatch? persistance bug?
-
+That is correct, and thanks Paolo for the introduction.  In fact I just 
+reviewed a HAXM pull request from Alexandro on GitHub, so we know each 
+other already.
 
 >
->>
->> Max
+>> Would it be more reasonable to add debugging support to HAXM [1] directly
+>> instead of trying to use the existing APIs from QEMU to achieve the same
+>> thing  (I was thinking in patching memory, e.g. with `hlt` instructions, to
+>> trigger VM exits)?
+> That would probably be less "hackish", but harder too.  It would also
+> let you support singlestep and hardware breakpoints---they are often
+> better than software breakpoints for debugging if you can live with the
+> limit of four breakpoints.
 >
->
+> Yu Ning, what do you think?
 
+First of all, I think adding debugging support to HAXM is a great idea, 
+and I really look forward to Alexandro's contribution.  But I only know 
+the very basics of how breakpoints work, and I'm a little confused after 
+reading your discussion.
 
---=20
-Best regards,
-Vladimir
+I guess the "less hackish and harder" approach Paolo referred to is the 
+KVM approach, not the patching-with-HLT approach.  If so, I'd agree.  It 
+seems KVM implements software breakpoints with memory patching too, 
+using the INT 3 instruction, which I think requires the hypervisor to 
+handle breakpoint exceptions (#BP).  Is this the sole reason to patch 
+with HLT instead of INT 3, to avoid handling #BP in HAXM or perhaps 
+avoid modifying the HAXM kernel module at all?
+
+Alexandro, I'm not sure what you mean by not using existing QEMU APIs.  
+Surely you still need to add HAXM-specific logic to 
+gdb_breakpoint_insert(), etc., otherwise you wouldn't be able to debug 
+your guest using the QEMU gdbserver?  Finally, in case you need to add 
+any new HAXM APIs, please feel free to propose a design on GitHub, and 
+we can continue our discussion there.  Thanks.
+
+-Yu
