@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f6fI8-0004AE-Ei
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 12:41:45 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f6fI7-00019z-Hs
+	(envelope-from <imammedo@redhat.com>) id 1f6fI7-00046Q-9f
 	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 12:41:44 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <imammedo@redhat.com>) id 1f6fI6-00018z-77
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 12:41:43 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 12 Apr 2018 18:40:17 +0200
-Message-Id: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.13 0/4] arm: isolate and clean up dtb
- generation
+Date: Thu, 12 Apr 2018 18:40:18 +0200
+Message-Id: <1523551221-11612-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
+References: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.13 1/4] arm: reuse
+ arm_boot_address_space() in armv7m_load_kernel()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,54 +23,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com
 
+reduce code duplication by resusing arm_boot_address_space()
 
-While working on cpu hotplug for mach-virt, I've noticed that DTB
-is generated incrementally across whole machvirt_init(). While it's
-fine for machines with static DTB, it won't really work in case of
-cpu hotplug and followed up reset since machine will load old DTB
-that doesn't account for hotplugged CPUs.
-So I've set on a quest to consolidate DTB generation and make it
-reentrant so that on reset guest would see update DTB.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ include/hw/arm/arm.h |  2 ++
+ hw/arm/armv7m.c      | 10 +---------
+ hw/arm/boot.c        | 16 ++++++++--------
+ 3 files changed, 11 insertions(+), 17 deletions(-)
 
-It's preliminary series which makes possible to call load_dtb()
-later outside of arm_load_kernel() and in process of it drops
-several machine_done notifiers, that were introduced to make
-plaform-bus-devices work. Hopefully it makes code easier to follow.
-It replaces machine_done notifiers with device hotplug framework
-to allow for dynamic sysbus devices mapping at the moment they
-are created instead of waiting for machine_done time and trying to
-juggle with notifiers order to do initialization in propper order.
-
-Mostly 'make check' tested +
-manually with "ppce500" machine type and eTSEC device
-(eTSEC is still initialized with the same IRQs as before series)
-
-
-CC: qemu-arm@nongnu.org
-CC: peter.maydell@linaro.org
-CC: eric.auger@redhat.com
-
-Igor Mammedov (4):
-  arm: reuse arm_boot_address_space() in armv7m_load_kernel()
-  platform-bus-device: use device plug callback instead of machine_done
-    notifier
-  arm: always start from first_cpu when registering loader cpu reset
-    callback
-  arm/boot: split load_dtb() from arm_load_kernel()
-
- hw/ppc/e500.h               |   3 ++
- include/hw/arm/arm.h        |  39 ++++++++++++-----
- include/hw/arm/sysbus-fdt.h |  37 ++++------------
- include/hw/arm/virt.h       |   3 ++
- include/hw/platform-bus.h   |   4 +-
- hw/arm/armv7m.c             |  10 +----
- hw/arm/boot.c               |  85 +++++++++++--------------------------
- hw/arm/sysbus-fdt.c         |  67 +++--------------------------
- hw/arm/virt.c               | 100 +++++++++++++++++++++++++++++---------------
- hw/core/platform-bus.c      |  29 +++----------
- hw/ppc/e500.c               |  37 +++++++++-------
- hw/ppc/e500plat.c           |  60 +++++++++++++++++++++++++-
- 12 files changed, 227 insertions(+), 247 deletions(-)
-
+diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+index ce769bd..188d18b 100644
+--- a/include/hw/arm/arm.h
++++ b/include/hw/arm/arm.h
+@@ -143,6 +143,8 @@ struct arm_boot_info {
+  */
+ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info);
+ 
++AddressSpace *arm_boot_address_space(ARMCPU *cpu, bool secure_boot);
++
+ /* Write a secure board setup routine with a dummy handler for SMCs */
+ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+                                             const struct arm_boot_info *info,
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index f123cc7..d372d9c 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -289,8 +289,6 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+     uint64_t lowaddr;
+     int big_endian;
+     AddressSpace *as;
+-    int asidx;
+-    CPUState *cs = CPU(cpu);
+ 
+ #ifdef TARGET_WORDS_BIGENDIAN
+     big_endian = 1;
+@@ -303,13 +301,7 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+         exit(1);
+     }
+ 
+-    if (arm_feature(&cpu->env, ARM_FEATURE_EL3)) {
+-        asidx = ARMASIdx_S;
+-    } else {
+-        asidx = ARMASIdx_NS;
+-    }
+-    as = cpu_get_address_space(cs, asidx);
+-
++    as = arm_boot_address_space(cpu, true);
+     if (kernel_filename) {
+         image_size = load_elf_as(kernel_filename, NULL, NULL, &entry, &lowaddr,
+                                  NULL, big_endian, EM_ARM, 1, 0, as);
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 26184bc..2f464ca 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -36,8 +36,7 @@
+ #define ARM64_TEXT_OFFSET_OFFSET    8
+ #define ARM64_MAGIC_OFFSET          56
+ 
+-static AddressSpace *arm_boot_address_space(ARMCPU *cpu,
+-                                            const struct arm_boot_info *info)
++AddressSpace *arm_boot_address_space(ARMCPU *cpu, bool secure_boot)
+ {
+     /* Return the address space to use for bootloader reads and writes.
+      * We prefer the secure address space if the CPU has it and we're
+@@ -46,7 +45,7 @@ static AddressSpace *arm_boot_address_space(ARMCPU *cpu,
+     int asidx;
+     CPUState *cs = CPU(cpu);
+ 
+-    if (arm_feature(&cpu->env, ARM_FEATURE_EL3) && info->secure_boot) {
++    if (arm_feature(&cpu->env, ARM_FEATURE_EL3) && secure_boot) {
+         asidx = ARMASIdx_S;
+     } else {
+         asidx = ARMASIdx_NS;
+@@ -193,7 +192,7 @@ static void default_write_secondary(ARMCPU *cpu,
+                                     const struct arm_boot_info *info)
+ {
+     uint32_t fixupcontext[FIXUP_MAX];
+-    AddressSpace *as = arm_boot_address_space(cpu, info);
++    AddressSpace *as = arm_boot_address_space(cpu, info->secure_boot);
+ 
+     fixupcontext[FIXUP_GIC_CPU_IF] = info->gic_cpu_if_addr;
+     fixupcontext[FIXUP_BOOTREG] = info->smp_bootreg_addr;
+@@ -211,7 +210,7 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+                                             const struct arm_boot_info *info,
+                                             hwaddr mvbar_addr)
+ {
+-    AddressSpace *as = arm_boot_address_space(cpu, info);
++    AddressSpace *as = arm_boot_address_space(cpu, info->secure_boot);
+     int n;
+     uint32_t mvbar_blob[] = {
+         /* mvbar_addr: secure monitor vectors
+@@ -262,7 +261,7 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+ static void default_reset_secondary(ARMCPU *cpu,
+                                     const struct arm_boot_info *info)
+ {
+-    AddressSpace *as = arm_boot_address_space(cpu, info);
++    AddressSpace *as = arm_boot_address_space(cpu, info->secure_boot);
+     CPUState *cs = CPU(cpu);
+ 
+     address_space_stl_notdirty(as, info->smp_bootreg_addr,
+@@ -753,7 +752,8 @@ static void do_cpu_reset(void *opaque)
+             }
+ 
+             if (cs == first_cpu) {
+-                AddressSpace *as = arm_boot_address_space(cpu, info);
++                AddressSpace *as =
++                    arm_boot_address_space(cpu, info->secure_boot);
+ 
+                 cpu_set_pc(cs, info->loader_start);
+ 
+@@ -950,7 +950,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+     ARMCPU *cpu = n->cpu;
+     struct arm_boot_info *info =
+         container_of(n, struct arm_boot_info, load_kernel_notifier);
+-    AddressSpace *as = arm_boot_address_space(cpu, info);
++    AddressSpace *as = arm_boot_address_space(cpu, info->secure_boot);
+ 
+     /* The board code is not supposed to set secure_board_setup unless
+      * running its code in secure mode is actually possible, and KVM
 -- 
 2.7.4
