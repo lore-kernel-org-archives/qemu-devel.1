@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f6Xb2-0001KG-BH
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:28:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6XgS-0004hN-EN
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f6Xay-0005AR-EY
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:28:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52580 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f6Xay-00059U-At
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:28:40 -0400
-Date: Thu, 12 Apr 2018 09:28:22 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180412082822.GC31024@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-	<1523089594-1422-3-git-send-email-lidongchen@tencent.com>
-	<20180411171818.GJ2667@work-vm>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6XgM-0000pC-5r
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:34:20 -0400
+References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
+	<47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
+	<ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
+	<90b289f4-d976-1fb7-57e2-aa02d00947d1@virtuozzo.com>
+	<e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
+Date: Thu, 12 Apr 2018 11:34:01 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180411171818.GJ2667@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration: add the interface to set
- get_return_path
+In-Reply-To: <e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Lidong Chen <jemmy858585@gmail.com>, quintela@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-On Wed, Apr 11, 2018 at 06:18:18PM +0100, Dr. David Alan Gilbert wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
-> > The default get_return_path function of iochannel does not work for
-> > RDMA live migration. So add the interface to set get_return_path.
-> > 
-> > Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> 
-> Lets see how Dan wants this done, he knows the channel/file stuff;
-> to me this feels like it should be adding a member to QIOChannelClass
-> that gets used by QEMUFile's get_return_path.
+11.04.2018 19:11, Max Reitz wrote:
+> On 2018-04-11 15:05, Vladimir Sementsov-Ogievskiy wrote:
+>
+> [...]
+>
+>> Hmm, first type? I'm now not sure about, did I really see sha256
+>> mismatch, or something like this (should be error, but found bitmap):
+>>
+>> --- /work/src/qemu/up-169/tests/qemu-iotests/169.out=C2=A0=C2=A0=C2=A0 2=
+018-04-11
+>> 15:35:10.055027392 +0300
+>> +++ /work/src/qemu/up-169/tests/qemu-iotests/169.out.bad 2018-04-11
+>> 15:58:09.300450045 +0300
+>> @@ -1,5 +1,20 @@
+>> -........
+>> +F.......
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +FAIL: test__not_persistent__migbitmap__offline
+>> (__main__.TestDirtyBitmapMigration)
+>> +methodcaller(name, ...) --> methodcaller object
+>> +----------------------------------------------------------------------
+>> +Traceback (most recent call last):
+>> +=C2=A0 File "169", line 136, in do_test_migration
+>> +=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persistent el=
+se False)
+>> +=C2=A0 File "169", line 77, in check_bitmap
+>> +=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
+>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", line=
+ 389,
+>> in assert_qmp
+>> +=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
+>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", line=
+ 348,
+>> in dictpath
+>> +=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s"' %=
+ (path, str(d)))
+>> +AssertionError: failed path traversal for "error/desc" in "{u'return':
+>> {u'sha256':
+>> u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}}"
+>>
+>>
+>> Max, did you really seed sha256 mismatch or only something like this?
+> I'm pretty sure I did see mismatches.
 
-No that doesn't really fit the model. IMHO the entire concept of a separate
-return path object is really wrong. The QIOChannel implementations are
-(almost) all capable of bi-directional I/O, which is why the the get_retun_path
-function just creates a second QEMUFile pointing to the same QIOChannel
-object we already had. Migration only needs the second QEMUFile, because that
-struct re-uses the same struct fields for tracking different bits of info
-depending on which direction you're doing I/O in. A real fix would be to
-stop overloading the same fields for multiple purposes in the QEMUFile, so
-that we only needed a single QEMUFile instance.
+hm, may be it possible too, because of not waiting for RESUME in this=20
+case, we can request sha256 in the intermediate state of bitmap loading
 
-Ignoring that though, the particular problem we're facing here is that the
-QIOChannelRDMA impl that is used is not written in a way that allows
-bi-directional I/O, despite the RDMA code it uses being capable of it.
+>
+> Max
 
-So rather than changing this get_return_path code, IMHO, the right fix to
-simply improve the QIOChannelRDMA impl so that it fully supports bi-directional
-I/O like all the other channels do.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+Best regards,
+Vladimir
