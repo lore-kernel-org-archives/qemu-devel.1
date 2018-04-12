@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f6Wp0-00073P-DS
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:39:07 -0400
+	(envelope-from <jasowang@redhat.com>) id 1f6Wp0-00073s-VN
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:39:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f6Wow-0003Nl-1f
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:39:06 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 12 Apr 2018 09:38:03 +0200
-Message-Id: <1523518688-26674-13-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 12/17] hw/arm/virt: Add SMMUv3 to the virt
- board
+	(envelope-from <jasowang@redhat.com>) id 1f6Wow-0003O8-Fm
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:39:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35614 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f6Wow-0003Nr-At
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:39:02 -0400
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
+	<fc66437c-ae8c-15fa-c8d3-6aa6bdb22a36@redhat.com>
+	<20180411083853.qa6y6zevjpvamrdx@debian>
+	<20180411200127-mutt-send-email-mst@kernel.org>
+	<20180412014439.d7uzqukwdejtmofh@debian>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0372329a-5106-e3ca-260a-8fe8aa5396b4@redhat.com>
+Date: Thu, 12 Apr 2018 15:38:50 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180412014439.d7uzqukwdejtmofh@debian>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,193 +32,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
-Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
+To: Tiwei Bie <tiwei.bie@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
-From: Prem Mallappa <prem.mallappa@broadcom.com>
 
-Add code to instantiate an smmuv3 in virt machine. A new iommu
-integer member is introduced in VirtMachineState to store the type
-of the iommu in use.
 
-Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+On 2018=E5=B9=B404=E6=9C=8812=E6=97=A5 09:44, Tiwei Bie wrote:
+> On Wed, Apr 11, 2018 at 08:37:17PM +0300, Michael S. Tsirkin wrote:
+>> On Wed, Apr 11, 2018 at 04:38:53PM +0800, Tiwei Bie wrote:
+>>> On Wed, Apr 11, 2018 at 04:01:19PM +0800, Jason Wang wrote:
+>>>> On 2018=E5=B9=B404=E6=9C=8811=E6=97=A5 15:20, Tiwei Bie wrote:
+>>>>> This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+>>>>> feature for vhost-user. By default, vhost-user backend needs
+>>>>> to query the IOTLBs from QEMU after meeting unknown IOVAs.
+>>>>> With this protocol feature negotiated, QEMU will provide all
+>>>>> the IOTLBs to vhost-user backend without waiting for the
+>>>>> queries from backend. This is helpful when using a hardware
+>>>>> accelerator which is not able to handle unknown IOVAs at the
+>>>>> vhost-user backend.
+>>>>>
+>>>>> Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
+>>>>> ---
+>>>>> The idea of this patch is to let QEMU push all the IOTLBs
+>>>>> to vhost-user backend without waiting for the queries from
+>>>>> the backend. Because hardware accelerator at the vhost-user
+>>>>> backend may not be able to handle unknown IOVAs.
+>>>>>
+>>>>> This is just a RFC for now. It seems that, it doesn't work
+>>>>> as expected when guest is using kernel driver (To handle
+>>>>> this case, it seems that some RAM regions' events also need
+>>>>> to be listened). Any comments would be appreciated! Thanks!
+>>>> Interesting, a quick question is why this is needed? Can we just use=
+ exist
+>>>> IOTLB update message?
+>>> Yeah, we are still using the existing IOTLB update messages
+>>> to send the IOTLB messages to backend. The only difference
+>>> is that, QEMU won't wait for the queries before sending the
+>>> IOTLB update messages.
+>> So I have a concern with that, in that without any flow
+>> control the socket buffer used by vhost-user might become
+>> full.
+> Each IOTLB update message needs a reply. So I think it
+> won't happen.
 
----
-v9 -> v10:
-- add VirtIOMMUType
-- add Peter's R-b
+Is this what we've already done now? I don't find any statement on this=20
+in vhost-user.txt?
 
-v7 -> v8:
-- integer iommu member
-- add primary-bus property
+"""
+ =C2=A0* VHOST_USER_IOTLB_MSG
 
-v4 -> v5:
-- add dma-coherent property
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Id: 22
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Equivalent ioctl: N/A (equivalent to VHOS=
+T_IOTLB_MSG message type)
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Master payload: struct vhost_iotlb_msg
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Slave payload: u64
 
-v2 -> v3:
-- vbi was removed. Use vms instead
-- migrate to new smmu binding format (iommu-map)
-- don't use appendprop anymore
-- add vms->smmu and guard instantiation with this latter
-- interrupts type changed to edge
----
- hw/arm/virt.c         | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/arm/virt.h | 10 ++++++++
- 2 files changed, 73 insertions(+), 1 deletion(-)
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Send IOTLB messages with struct vhost_iot=
+lb_msg as payload.
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Master sends such requests to update and =
+invalidate entries in=20
+the device
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IOTLB. The slave has to acknowledge the r=
+equest with sending zero=20
+as u64
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 payload for success, non-zero otherwise.
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This request should be send only when VIR=
+TIO_F_IOMMU_PLATFORM feature
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 has been successfully negotiated.
+"""
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 94dcb12..1799702 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -58,6 +58,7 @@
- #include "hw/smbios/smbios.h"
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
-+#include "hw/arm/smmuv3.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -141,6 +142,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-+    [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -161,6 +163,7 @@ static const int a15irqmap[] = {
-     [VIRT_SECURE_UART] = 8,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-+    [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
-     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
- };
- 
-@@ -942,7 +945,57 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                            0x7           /* PCI irq */);
- }
- 
--static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-+static void create_smmu(const VirtMachineState *vms, qemu_irq *pic,
-+                        PCIBus *bus)
-+{
-+    char *node;
-+    const char compat[] = "arm,smmu-v3";
-+    int irq =  vms->irqmap[VIRT_SMMU];
-+    int i;
-+    hwaddr base = vms->memmap[VIRT_SMMU].base;
-+    hwaddr size = vms->memmap[VIRT_SMMU].size;
-+    const char irq_names[] = "eventq\0priq\0cmdq-sync\0gerror";
-+    DeviceState *dev;
-+
-+    if (vms->iommu != VIRT_IOMMU_SMMUV3 || !vms->iommu_phandle) {
-+        return;
-+    }
-+
-+    dev = qdev_create(NULL, "arm-smmuv3");
-+
-+    object_property_set_link(OBJECT(dev), OBJECT(bus), "primary-bus",
-+                             &error_abort);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-+    for (i = 0; i < NUM_SMMU_IRQS; i++) {
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
-+    }
-+
-+    node = g_strdup_printf("/smmuv3@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, node);
-+    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg", 2, base, 2, size);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, node, "interrupts",
-+            GIC_FDT_IRQ_TYPE_SPI, irq    , GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
-+            GIC_FDT_IRQ_TYPE_SPI, irq + 1, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
-+            GIC_FDT_IRQ_TYPE_SPI, irq + 2, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
-+            GIC_FDT_IRQ_TYPE_SPI, irq + 3, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+
-+    qemu_fdt_setprop(vms->fdt, node, "interrupt-names", irq_names,
-+                     sizeof(irq_names));
-+
-+    qemu_fdt_setprop_cell(vms->fdt, node, "clocks", vms->clock_phandle);
-+    qemu_fdt_setprop_string(vms->fdt, node, "clock-names", "apb_pclk");
-+    qemu_fdt_setprop(vms->fdt, node, "dma-coherent", NULL, 0);
-+
-+    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
-+
-+    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
-+    g_free(node);
-+}
-+
-+static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
- {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
-@@ -1055,6 +1108,15 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
-     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
- 
-+    if (vms->iommu) {
-+        vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-+
-+        create_smmu(vms, pic, pci->bus);
-+
-+        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
-+                               0x0, vms->iommu_phandle, 0x0, 0x10000);
-+    }
-+
-     g_free(nodename);
- }
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index ba0c1a4..886372c 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -38,6 +38,7 @@
- 
- #define NUM_GICV2M_SPIS       64
- #define NUM_VIRTIO_TRANSPORTS 32
-+#define NUM_SMMU_IRQS          4
- 
- #define ARCH_GICV3_MAINT_IRQ  9
- 
-@@ -59,6 +60,7 @@ enum {
-     VIRT_GIC_V2M,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
-+    VIRT_SMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-     VIRT_RTC,
-@@ -74,6 +76,12 @@ enum {
-     VIRT_SECURE_MEM,
- };
- 
-+typedef enum VirtIOMMUType {
-+    VIRT_IOMMU_NONE,
-+    VIRT_IOMMU_SMMUV3,
-+    VIRT_IOMMU_VIRTIO,
-+} VirtIOMMUType;
-+
- typedef struct MemMapEntry {
-     hwaddr base;
-     hwaddr size;
-@@ -97,6 +105,7 @@ typedef struct {
-     bool its;
-     bool virt;
-     int32_t gic_version;
-+    VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
-     const MemMapEntry *memmap;
-     const int *irqmap;
-@@ -106,6 +115,7 @@ typedef struct {
-     uint32_t clock_phandle;
-     uint32_t gic_phandle;
-     uint32_t msi_phandle;
-+    uint32_t iommu_phandle;
-     int psci_conduit;
- } VirtMachineState;
- 
--- 
-2.5.5
+And you probably need to modify the following statement:
+
+"""
+The master isn't expected to take the initiative to send IOTLB update=20
+messages,
+as the slave sends IOTLB miss messages for the guest virtual memory areas=
+ it
+needs to access.
+"""
+
+Thanks
+
+
+>
+> Best regards,
+> Tiwei Bie
+>
