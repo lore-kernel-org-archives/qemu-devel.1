@@ -1,33 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f6dI6-0005NW-9X
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:33:42 -0400
+	(envelope-from <david@redhat.com>) id 1f6dLH-0008H5-DZ
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f6dI1-0004XS-U2
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:33:34 -0400
-Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:41826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f6dI1-0004XF-OV
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:33:29 -0400
-Received: by mail-qt0-x232.google.com with SMTP id d3so6383525qth.8
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 07:33:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-5-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cc8a518b-b278-9a99-88b2-dc54280417f5@amsat.org>
-Date: Thu, 12 Apr 2018 11:33:25 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-5-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 04/24] Makefile: Rename TARGET_DIRS to
- TARGET_LIST
+	(envelope-from <david@redhat.com>) id 1f6dLE-0007Z5-LF
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:36:51 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 12 Apr 2018 16:36:32 +0200
+Message-Id: <20180412143635.19949-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] pc-dimm: factor out MemoryDevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,138 +17,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, cota@braap.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-On 04/10/2018 04:38 PM, Alex Bennée wrote:
-> From: Fam Zheng <famz@redhat.com>
-> 
-> To be more accurate on its purpose and make code that looks for a certain
-> target out of this variable more readable.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+Right now we can only map PCDIMM/NVDIMM into guest address space. In the
+future, we might want to do the same for virtio devices - e.g.
+virtio-pmem or virtio-mem. Especially, they should be able to live side
+by side to each other.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+E.g. the virto based memory devices regions will not be exposed via ACPI
+and friends. They will be detected just like other virtio devices and
+indicate the applicable memory region. This makes it possible to also use
+them on architectures without memory device detection support (e.g. s390x).
 
-> ---
->  Makefile               | 20 ++++++++++----------
->  configure              |  2 +-
->  scripts/create_config  |  2 +-
->  tests/Makefile.include |  2 +-
->  4 files changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 727ef118f3..2c54cd8345 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can fix this by running \
->  endif
->  endif
->  
-> -CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
-> -CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
-> +CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
-> +CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
->  CONFIG_XEN := $(CONFIG_XEN_BACKEND)
->  CONFIG_ALL=y
->  -include config-all-devices.mak
-> @@ -362,8 +362,8 @@ DOCS=
->  endif
->  
->  SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
-> -SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
-> -SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
-> +SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
-> +SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
->  
->  ifeq ($(SUBDIR_DEVICES_MAK),)
->  config-all-devices.mak:
-> @@ -466,7 +466,7 @@ config-host.h-timestamp: config-host.mak
->  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
->  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
->  
-> -SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
-> +SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
->  SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
->  
->  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
-> @@ -510,7 +510,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
->  romsubdir-%:
->  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
->  
-> -ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
-> +ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
->  
->  recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
->  
-> @@ -763,7 +763,7 @@ distclean: clean
->  	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
->  	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
->  	rm -f docs/qemu-block-drivers.7
-> -	for d in $(TARGET_DIRS); do \
-> +	for d in $(TARGET_LIST); do \
->  	rm -rf $$d || exit 1 ; \
->          done
->  	rm -Rf .sdk
-> @@ -864,7 +864,7 @@ endif
->  		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
->  	done
->  	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
-> -	for d in $(TARGET_DIRS); do \
-> +	for d in $(TARGET_LIST); do \
->  	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
->          done
->  
-> @@ -1062,9 +1062,9 @@ endif
->  	@echo  '  ctags/TAGS      - Generate tags file for editors'
->  	@echo  '  cscope          - Generate cscope index'
->  	@echo  ''
-> -	@$(if $(TARGET_DIRS), \
-> +	@$(if $(TARGET_LIST), \
->  		echo 'Architecture specific targets:'; \
-> -		$(foreach t, $(TARGET_DIRS), \
-> +		$(foreach t, $(TARGET_LIST), \
->  		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
->  		echo '')
->  	@echo  'Cleaning targets:'
-> diff --git a/configure b/configure
-> index add87ff4d4..5a41c87cc3 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6094,7 +6094,7 @@ qemu_version=$(head $source_path/VERSION)
->  echo "VERSION=$qemu_version" >>$config_host_mak
->  echo "PKGVERSION=$pkgversion" >>$config_host_mak
->  echo "SRC_PATH=$source_path" >> $config_host_mak
-> -echo "TARGET_DIRS=$target_list" >> $config_host_mak
-> +echo "TARGET_LIST=$target_list" >> $config_host_mak
->  if [ "$docs" = "yes" ] ; then
->    echo "BUILD_DOCS=yes" >> $config_host_mak
->  fi
-> diff --git a/scripts/create_config b/scripts/create_config
-> index d727e5e36e..58948a67a4 100755
-> --- a/scripts/create_config
-> +++ b/scripts/create_config
-> @@ -107,7 +107,7 @@ case $line in
->      target_name=${line#*=}
->      echo "#define TARGET_NAME \"$target_name\""
->      ;;
-> - TARGET_DIRS=*)
-> + TARGET_LIST=*)
->      # do nothing
->      ;;
->   TARGET_*=y) # configuration
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3b9a5e31a2..3d2f0458ab 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -854,7 +854,7 @@ endif
->  
->  # QTest rules
->  
-> -TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
-> +TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
->  ifeq ($(CONFIG_POSIX),y)
->  QTEST_TARGETS = $(TARGETS)
->  check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
-> 
+Let's factor out the memory device code into a MemoryDevice interface.
+
+See the patch descriptions for details.
+
+v1 -> v2:
+- Fix compile issues on ppc (still untested O:-) )
+
+David Hildenbrand (3):
+  pc-dimm: factor out MemoryDevice interface
+  machine: make MemoryHotplugState accessible via the machine
+  pc-dimm: factor out address space logic into MemoryDevice code
+
+ hw/i386/acpi-build.c                         |   3 +-
+ hw/i386/pc.c                                 |  24 ++-
+ hw/mem/Makefile.objs                         |   1 +
+ hw/mem/memory-device.c                       | 281 +++++++++++++++++++++++++
+ hw/mem/pc-dimm.c                             | 304 +++++++--------------------
+ hw/ppc/spapr.c                               |  24 ++-
+ hw/ppc/spapr_hcall.c                         |   1 +
+ include/hw/boards.h                          |  16 ++
+ include/hw/mem/memory-device.h               |  48 +++++
+ include/hw/mem/pc-dimm.h                     |  26 +--
+ numa.c                                       |   3 +-
+ qmp.c                                        |   4 +-
+ stubs/Makefile.objs                          |   2 +-
+ stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
+ 14 files changed, 464 insertions(+), 277 deletions(-)
+ create mode 100644 hw/mem/memory-device.c
+ create mode 100644 include/hw/mem/memory-device.h
+ rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
+
+-- 
+2.14.3
