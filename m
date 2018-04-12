@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6b2I-0005tc-MW
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:09:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6bEC-0003N1-U8
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6b2H-0005iZ-PZ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:09:06 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:40053)
+	(envelope-from <bounces@canonical.com>) id 1f6bE9-0004pV-Gq
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:21:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f6b2H-0005iP-Ko
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:09:05 -0400
-Received: by mail-oi0-x236.google.com with SMTP id x9-v6so4882198oig.7
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 05:09:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f6bE9-0004mG-8M
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:21:21 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f6bE7-0003Ht-Ss
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 12:21:19 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D97722E8025
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 12:21:19 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180412115326.GF2704@work-vm>
-References: <20180412101858.21304-1-clg@kaod.org>
-	<CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
-	<20180412115326.GF2704@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Apr 2018 13:08:44 +0100
-Message-ID: <CAFEAcA9-LzsfBpnYJUVc7j6j4ePUyiQYqGv3EaGjvAgw-3nyKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: discard RAMBlocks of type
- ram_device
+Date: Thu, 12 Apr 2018 12:13:24 -0000
+From: Gonzalo <1734792@bugs.launchpad.net>
+Reply-To: Bug 1734792 <1734792@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151183114573.10651.11339653840196724023.malonedeb@wampee.canonical.com>
+Message-Id: <152353520476.31596.15662220161538137125.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1734792] Re: qemu-x86_64 fails with unsupported
+ syscall 319
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 12 April 2018 at 12:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wro=
-te:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> David suggested on IRC that we would want a flag on the ramblock
->> for "not migratable", because there are other uses for "don't
->> migrate this" than just "is this a ram device".
->
-> My original suggestion to your series was with a flag, but I'd forgotten
-> about that by the time I'd made the suggestion to C=C3=A9dric.
-> In your case would just adding an extra term to the
-> ram_block_is_migratable function work, or do you really need a flag?
+Not only qemu-x86_64, but also:
 
-I don't see how else you would identify the ram block that needs
-to be skipped. Also I think it's just better design to decouple
-the decision about "should we migrate this ram block" from the
-migration code itself, and push it up to the code layer that knows
-it's creating ram blocks that shouldn't be migrated.
+qemu-aarch64 =3D> qemu: Unsupported syscall: 279
+qemu-arm =3D> qemu: Unsupported syscall: 385
+qemu-mips =3D> qemu: Unsupported syscall: 4354
+qemu-mips64 =3D> qemu: Unsupported syscall: 5314
+qemu-powerpc =3D> qemu: Unsupported syscall: 360
+qemu-powerpc64 =3D> qemu: Unsupported syscall: 360
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1734792
+
+Title:
+  qemu-x86_64 fails with unsupported syscall 319
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-x86_66 GIT HEAD fails on a userspace application that requires
+  memfd_create with:
+
+  "qemu: Unsupported syscall: 319".
+
+  memfd_create support needs to be implemented in QEMU.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1734792/+subscriptions
