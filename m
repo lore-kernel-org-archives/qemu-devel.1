@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6cx1-00030K-B3
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:11:52 -0400
+	(envelope-from <tournier.elie@gmail.com>) id 1f6d2n-0005VT-V6
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6cwx-0000Tk-9O
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:11:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46826 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f6cwx-0000TV-4X
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:11:43 -0400
-References: <20180412101858.21304-1-clg@kaod.org>
-	<CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
-	<20180412115326.GF2704@work-vm>
-	<CAFEAcA9-LzsfBpnYJUVc7j6j4ePUyiQYqGv3EaGjvAgw-3nyKw@mail.gmail.com>
-	<3432d654-c562-505e-e341-afe9d8fdf6cb@kaod.org>
-	<CAFEAcA9G_ZwrZ1HkuvUPzOHadYbq7fKu819K=kFieMccDwt1AQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a2a27461-c792-9204-849d-9c7c0ffbd0c6@redhat.com>
-Date: Thu, 12 Apr 2018 16:11:30 +0200
+	(envelope-from <tournier.elie@gmail.com>) id 1f6d2k-0003kq-MJ
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:17:45 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35342)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
+	id 1f6d2k-0003kE-Cu
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 10:17:42 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id r82so9998126wme.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 07:17:42 -0700 (PDT)
+Date: Thu, 12 Apr 2018 15:11:53 +0100
+From: Elie Tournier <tournier.elie@gmail.com>
+Message-ID: <20180412141153.GA16814@Nikki.localdomain>
+References: <20180410120222.31845-1-tournier.elie@gmail.com>
+	<20180410120222.31845-2-tournier.elie@gmail.com>
+	<c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
+	<20180410133335.zzvgg7lqe2lb2zdx@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9G_ZwrZ1HkuvUPzOHadYbq7fKu819K=kFieMccDwt1AQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: discard RAMBlocks of type
- ram_device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180410133335.zzvgg7lqe2lb2zdx@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2 for-2.12?] qapi: Parameter gl of
+ DisplayType now accept an enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?= =?UTF-8?Q?r?= <clg@kaod.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com, Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>
 
-On 12/04/2018 15:51, Peter Maydell wrote:
-> Paolo may have an opinion what the API here should be, but
-> at the MemoryRegion level we already have a mix of functions
-> memory_region_init_foo_nomigrate() and memory_region_init_foo(),
-> which at the moment just control whether we call
-> vmstate_register_ram() or not. Is it possible to hook into that,
-> so that we default to marking RAMBlocks as not-migrated, and
-> when vmstate_register_ram() is called we set the flag to
-> "migrated"?
+Hello,
 
-Yes, that sounds pretty.
+On Tue, Apr 10, 2018 at 03:33:35PM +0200, Gerd Hoffmann wrote:
+> > # @off: Disable OpenGL (default).
 
-Paolo
+Just to be sure, I have to add @ in front of all parameter, right?
 
-> NB: this probably requires careful thought to make sure we
-> don't accidentally break migration compat, but it seems like
-> the cleaner approach. At the moment we do weird things if you
-> migrate a RAM block that hasn't had its ID string set, IIRC,
-> so just not migrating those RAM blocks seems like a better
-> plan than mishandling them. It would also mean that the
-> vmstate_register/unregister_ram() functions did what they
-> claim to do based on the function name, I think.
+> > 
+> > > + # 'on'    Use OpenGL, pick context type automatically.
+> > > + #         Would better be named 'auto' but is called 'on' for backward
+> > > + #         compatibility with bool type.
+> > 
+> > See below...
+> 
+> > DisplayOptions was added in 2.12.  This is a backwards-incompatible
+> > change in QMP (you CANNOT change 'bool' to 'DisplayGLMode' across
+> > releases, because the on-the-wire representation differs; pre-patch it
+> > would be "gl":true, post-patch it is "gl":"on").  So if it affects QMP,
+> > and we want it, this patch either HAS to go in 2.12, or we have to have
+> > more finesse (perhaps by using an 'alternate' type in the QAPI) so that
+> > it remains backwards-compatible.
+> > 
+> > /me goes and looks at introspection output...
+> > 
+> > You may be in luck - there is no instance of 'window-close' in the
+> > introspection output, which means 'DisplayType' exists only for ease of
+> > command-line parsing and is not currently used by QMP, so tweaks here
+> > are not affecting the command line.
+> 
+> Yes, right now the struct is only used to store the parsed command line
+> opts, so no effect on QMP.
+> 
+> Plan for the future is to also parse command line options with generic
+> qapi/json code instead of the home-grown parser, but that switch didn't
+> happen yet.
+> 
+> > That said, you can STILL name the enum value something smarter than 'on'
+> > IF you make the change now, for 2.12, given that the QAPI type was only
+> > introduced in 2.12 (you only have to worry about backwards compatibility
+> > if 2.11 already parsed gl=on).
+> 
+> gl=on is older, so that must continue to work.  Making both "on" and
+> "auto" work isn't a problem for our home-grown parser (aka
+> parse_display() in vl.c).  But having quirks like this makes the switch
+> to generic parser code more difficuilt, so I'd prefer to avoid that ...
+
+Is it possible to upstream this change before 2.12 release?
+
+> 
+> cheers,
+>   Gerd
+> 
