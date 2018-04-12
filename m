@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f6cTP-0001oU-2x
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 09:41:12 -0400
+	(envelope-from <clg@kaod.org>) id 1f6cU4-0002Mt-V5
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 09:41:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f6cTL-0005e2-TJ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 09:41:11 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:44888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f6cTL-0005db-LD
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 09:41:07 -0400
-Received: by mail-wr0-x236.google.com with SMTP id u46so5171471wrc.11
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 06:41:07 -0700 (PDT)
-References: <152215564388.18893.1601223531883570946.malonedeb@chaenomeles.canonical.com>
-	<152339082825.12513.17266713653673903879.malone@wampee.canonical.com>
-	<924dbc89-fb1c-720d-9091-a5f5c16df4b9@mail.uni-paderborn.de>
-	<87woxe3t2t.fsf@linaro.org>
-	<a8872e48-4dea-9394-3974-eb067df252d7@mail.uni-paderborn.de>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <a8872e48-4dea-9394-3974-eb067df252d7@mail.uni-paderborn.de>
-Date: Thu, 12 Apr 2018 14:41:05 +0100
-Message-ID: <87lgdsmtji.fsf@linaro.org>
+	(envelope-from <clg@kaod.org>) id 1f6cU1-0006dj-QK
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 09:41:52 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:53043)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f6cU1-0006b0-Hb
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 09:41:49 -0400
+Received: from player773.ha.ovh.net (unknown [10.109.105.37])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id EE65516635A
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 15:41:46 +0200 (CEST)
+References: <20180412101858.21304-1-clg@kaod.org>
+	<CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
+	<20180412115326.GF2704@work-vm>
+	<CAFEAcA9-LzsfBpnYJUVc7j6j4ePUyiQYqGv3EaGjvAgw-3nyKw@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3432d654-c562-505e-e341-afe9d8fdf6cb@kaod.org>
+Date: Thu, 12 Apr 2018 15:41:30 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9-LzsfBpnYJUVc7j6j4ePUyiQYqGv3EaGjvAgw-3nyKw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1759264] Re: fpu/softfloat:
- round_to_int_and_pack refactor broke TriCore ftoi insns
+Subject: Re: [Qemu-devel] [PATCH] migration: discard RAMBlocks of type
+ ram_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1759264 <1759264@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com, Eric Blake <eblake@redhat.com>
 
-
-Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
-
-> On 04/11/2018 01:01 PM, Alex Benn=C3=A9e wrote:
->> Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
+On 04/12/2018 02:08 PM, Peter Maydell wrote:
+> On 12 April 2018 at 12:53, Dr. David Alan Gilbert <dgilbert@redhat.com>=
+ wrote:
+>> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>> David suggested on IRC that we would want a flag on the ramblock
+>>> for "not migratable", because there are other uses for "don't
+>>> migrate this" than just "is this a ram device".
 >>
->>> On 04/10/2018 10:07 PM, Alex Benn=C3=A9e wrote:
->>>> Yeah it looks like it was missed, the round_to_uint code does it.
->>>>
->>>> Do you have a test case I can verify?
->>>>
->>>
->>> For the NaN input 0xffffffff the expected result for the flags is that
->>> flag_invalid is raised.
->>>
->>> I can provide you with some TriCore asm, but it is a bit of pain to get
->>> the gnu assembler to build, since the public version is a decade old.
->>
->> I'll trust you if you send me a static binary for this particular
->> verification ;-)
->
-> I set up a github repo with working binutils and the corresponding
-> testcase:
->
-> https://github.com/bkoppelmann/tricore-fpu
->
-> The one caveat is, that we cannot produce any binaries with the TriCore
-> ISA > 1.3.
->
-> In this testcase the last ftoi instruction is supposed to raise the
-> invalid flag and return 0 since the input was NaN. We did that by only
-> checking for NaN if any flag was raised after ftoi, then do the NaN
-> check, and if positive, return 0.
+>> My original suggestion to your series was with a flag, but I'd forgott=
+en
+>> about that by the time I'd made the suggestion to C=C3=A9dric.
+>> In your case would just adding an extra term to the
+>> ram_block_is_migratable function work, or do you really need a flag?
+>=20
+> I don't see how else you would identify the ram block that needs
+> to be skipped. Also I think it's just better design to decouple
+> the decision about "should we migrate this ram block" from the
+> migration code itself, and push it up to the code layer that knows
+> it's creating ram blocks that shouldn't be migrated.
 
-Well it builds and I get an fpu-test.elf but I'm a bit stuck on how to
-run it. What are the runes for launching the test?
+Do you mean adding a new RAMBlock flag RAM_NON_MIGRATABLE=20
+in exec.c ? That would require to add an extra bool to the=20
+following functions :
 
->
-> Cheers,
-> Bastian
+	memory_region_init_ram_ptr()
+	qemu_ram_alloc_from_ptr()
+	qemu_ram_alloc_internal()
 
+Would that be ok ?=20
 
---
-Alex Benn=C3=A9e
+Thanks,
+
+C.=20
