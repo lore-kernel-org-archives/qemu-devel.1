@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6hQA-0008Lw-Dt
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:58:11 -0400
+	(envelope-from <david@redhat.com>) id 1f6hrQ-0005Yo-Er
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 15:26:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6hQ5-0004tq-TV
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:58:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36582 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6hQ5-0004tU-OP
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:58:05 -0400
-Date: Thu, 12 Apr 2018 19:58:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180412185801.GK2704@work-vm>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-	<1523089594-1422-5-git-send-email-lidongchen@tencent.com>
-	<20180411164357.GH2667@work-vm>
-	<CAOGPPbfVN2gz95Tsj4Vs1LzJcMbkda0_6=+sC_5g+WG8Hg3KNg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbfVN2gz95Tsj4Vs1LzJcMbkda0_6=+sC_5g+WG8Hg3KNg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] migration: fix qemu carsh when RDMA
- live migration
+	(envelope-from <david@redhat.com>) id 1f6hrN-0005qM-5a
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 15:26:20 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 12 Apr 2018 21:26:02 +0200
+Message-Id: <20180412192602.13430-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC] s390x: refactor reset/reipl handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +17,402 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-* 858585 jemmy (jemmy858585@gmail.com) wrote:
-> On Thu, Apr 12, 2018 at 12:43 AM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Lidong Chen (jemmy858585@gmail.com) wrote:
-> >> After postcopy, the destination qemu work in the dedicated
-> >> thread, so only invoke yield_until_fd_readable before postcopy
-> >> migration.
-> >
-> > The subject line needs to be more discriptive:
-> >    migration: Stop rdma yielding during incoming postcopy
-> >
-> > I think.
-> > (Also please check the subject spellings)
-> >
-> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> >> ---
-> >>  migration/rdma.c | 4 +++-
-> >>  1 file changed, 3 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/migration/rdma.c b/migration/rdma.c
-> >> index 53773c7..81be482 100644
-> >> --- a/migration/rdma.c
-> >> +++ b/migration/rdma.c
-> >> @@ -1489,11 +1489,13 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
-> >>       * Coroutine doesn't start until migration_fd_process_incoming()
-> >>       * so don't yield unless we know we're running inside of a coroutine.
-> >>       */
-> >> -    if (rdma->migration_started_on_destination) {
-> >> +    if (rdma->migration_started_on_destination &&
-> >> +        migration_incoming_get_current()->state == MIGRATION_STATUS_ACTIVE) {
-> >
-> > OK, that's a bit delicate; watch if it ever gets called in a failure
-> > case or similar - and also wathc out if we make more use of the status
-> > on the destination, but otherwise, and with a fix for the subject;
-> 
-> How about use migration_incoming_get_current()->have_listen_thread?
+Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
+not be the best idea. As pause_all_vcpus() temporarily drops the qemu
+mutex, two parallel calls to pause_all_vcpus() can be active at a time,
+resulting in a deadlock. (either by two VCPUs or by the main thread and a
+VCPU)
 
-That's supposed to be pretty internal to the postcopy code, so I prefer
-the status check.
+Let's handle it via the main loop instead, as suggested by Paolo. If we
+would have two parallel reset requests by two different VCPUs at the
+same time, the last one would win.
 
-Dave
+We use the existing ipl device to handle it. The nice side effect is
+that we can get rid of reipl_requested.
 
->     if (rdma->migration_started_on_destination &&
->         migration_incoming_get_current()->have_listen_thread == false) {
->         yield_until_fd_readable(rdma->comp_channel->fd);
->     }
-> 
-> >
-> >
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
-> >>          yield_until_fd_readable(rdma->comp_channel->fd);
-> >>      } else {
-> >>          /* This is the source side, we're in a separate thread
-> >>           * or destination prior to migration_fd_process_incoming()
-> >> +         * after postcopy, the destination also in a seprate thread.
-> >>           * we can't yield; so we have to poll the fd.
-> >>           * But we need to be able to handle 'cancel' or an error
-> >>           * without hanging forever.
-> >> --
-> >> 1.8.3.1
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This change implies that all reset handling now goes via the common
+path, so "no-reboot" handling is now active for all kinds of reboots.
+
+Let's execute any CPU initialization code on the target CPU using
+run_on_cpu.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+
+Did only a quick check with TCG. I think this way it is way easier to
+control what is getting reset.
+
+ hw/s390x/ipl.c                     | 44 ++++++++++++++++++++++++---
+ hw/s390x/ipl.h                     | 16 ++++++++--
+ hw/s390x/s390-virtio-ccw.c         | 49 +++++++++++++++++++++++++-----
+ include/hw/s390x/s390-virtio-ccw.h |  2 --
+ target/s390x/cpu.h                 | 26 ++++++++++++++++
+ target/s390x/diag.c                | 61 +++-----------------------------------
+ target/s390x/internal.h            |  6 ----
+ target/s390x/kvm.c                 |  2 +-
+ 8 files changed, 127 insertions(+), 79 deletions(-)
+
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index fb554ab156..f7589d20f1 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -26,6 +26,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
++#include "exec/exec-all.h"
+ 
+ #define KERN_IMAGE_START                0x010000UL
+ #define KERN_PARM_AREA                  0x010480UL
+@@ -484,11 +485,22 @@ IplParameterBlock *s390_ipl_get_iplb(void)
+     return &ipl->iplb;
+ }
+ 
+-void s390_reipl_request(void)
++void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+ {
+     S390IPLState *ipl = get_ipl_device();
+ 
+-    ipl->reipl_requested = true;
++    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
++        /* let's always use CPU 0 */
++        ipl->reset_cpu = NULL;
++    } else {
++        ipl->reset_cpu = cs;
++    }
++    ipl->reset_type = reset_type;
++
++    if (reset_type != S390_RESET_REIPL) {
++        goto no_reipl;
++    }
++
+     if (ipl->iplb_valid &&
+         !ipl->netboot &&
+         ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
+@@ -505,7 +517,32 @@ void s390_reipl_request(void)
+             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+         }
+     }
++no_reipl:
+     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++    /* as this is triggered by a CPU, make sure to exit the loop */
++    if (tcg_enabled()) {
++        cpu_loop_exit(cs);
++    }
++}
++
++void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type)
++{
++    S390IPLState *ipl = get_ipl_device();
++
++    *cs = ipl->reset_cpu;
++    if (!ipl->reset_cpu) {
++        /* use CPU 0 as default */
++        *cs = qemu_get_cpu(0);
++    }
++    *reset_type = ipl->reset_type;
++}
++
++void s390_ipl_clear_reset_request(void)
++{
++    S390IPLState *ipl = get_ipl_device();
++
++    ipl->reset_type = S390_RESET_EXTERNAL;
++    ipl->reset_cpu = NULL;
+ }
+ 
+ static void s390_ipl_prepare_qipl(S390CPU *cpu)
+@@ -552,11 +589,10 @@ static void s390_ipl_reset(DeviceState *dev)
+ {
+     S390IPLState *ipl = S390_IPL(dev);
+ 
+-    if (!ipl->reipl_requested) {
++    if (ipl->reset_type != S390_RESET_REIPL) {
+         ipl->iplb_valid = false;
+         memset(&ipl->iplb, 0, sizeof(IplParameterBlock));
+     }
+-    ipl->reipl_requested = false;
+ }
+ 
+ static void s390_ipl_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 0570d0ad75..102f1ea7af 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -87,7 +87,17 @@ int s390_ipl_set_loadparm(uint8_t *loadparm);
+ void s390_ipl_update_diag308(IplParameterBlock *iplb);
+ void s390_ipl_prepare_cpu(S390CPU *cpu);
+ IplParameterBlock *s390_ipl_get_iplb(void);
+-void s390_reipl_request(void);
++
++enum s390_reset {
++    /* default is a reset not triggered by a CPU e.g. issued by QMP */
++    S390_RESET_EXTERNAL = 0,
++    S390_RESET_REIPL,
++    S390_RESET_MODIFIED_CLEAR,
++    S390_RESET_LOAD_NORMAL,
++};
++void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
++void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
++void s390_ipl_clear_reset_request(void);
+ 
+ #define QIPL_ADDRESS  0xcc
+ 
+@@ -129,9 +139,11 @@ struct S390IPLState {
+     bool enforce_bios;
+     IplParameterBlock iplb;
+     bool iplb_valid;
+-    bool reipl_requested;
+     bool netboot;
+     QemuIplParameters qipl;
++    /* reset related properties don't have to be migrated or reset */
++    enum s390_reset reset_type;
++    CPUState *reset_cpu;
+ 
+     /*< public >*/
+     char *kernel;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 435f7c99e7..f625900435 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -93,7 +93,7 @@ static const char *const reset_dev_types[] = {
+     "diag288",
+ };
+ 
+-void subsystem_reset(void)
++static void subsystem_reset(void)
+ {
+     DeviceState *dev;
+     int i;
+@@ -364,17 +364,52 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+     }
+ }
+ 
++static inline void s390_do_cpu_ipl(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPU *cpu = S390_CPU(cs);
++
++    s390_ipl_prepare_cpu(cpu);
++    s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
++}
++
+ static void s390_machine_reset(void)
+ {
+-    S390CPU *ipl_cpu = S390_CPU(qemu_get_cpu(0));
++    enum s390_reset reset_type;
++    CPUState *cs, *t;
+ 
++    /* get the reset parameters, reset them once done */
++    s390_ipl_get_reset_request(&cs, &reset_type);
++
++    /* all CPUs are paused and synchronized at this point */
+     s390_cmma_reset();
+-    qemu_devices_reset();
+-    s390_crypto_reset();
+ 
+-    /* all cpus are stopped - configure and start the ipl cpu only */
+-    s390_ipl_prepare_cpu(ipl_cpu);
+-    s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
++    switch (reset_type) {
++    case S390_RESET_EXTERNAL:
++    case S390_RESET_REIPL:
++        qemu_devices_reset();
++        s390_crypto_reset();
++
++        /* configure and start the ipl CPU only */
++        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
++        break;
++    case S390_RESET_MODIFIED_CLEAR:
++        CPU_FOREACH(t) {
++            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
++        }
++        subsystem_reset();
++        s390_crypto_reset();
++        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
++        break;
++    case S390_RESET_LOAD_NORMAL:
++        CPU_FOREACH(t) {
++            run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
++        }
++        subsystem_reset();
++        run_on_cpu(cs, s390_do_cpu_initital_reset, RUN_ON_CPU_NULL);
++        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
++        break;
++    }
++    s390_ipl_clear_reset_request();
+ }
+ 
+ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index ac896e31ea..ab88d49d10 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -53,6 +53,4 @@ bool cpu_model_allowed(void);
+  */
+ bool css_migration_enabled(void);
+ 
+-void subsystem_reset(void);
+-
+ #endif
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 3ee40f08b7..0c2583fd3c 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -686,6 +686,32 @@ static inline uint64_t s390_build_validity_mcic(void)
+     return mcic;
+ }
+ 
++static inline void s390_do_cpu_full_reset(CPUState *cs, run_on_cpu_data arg)
++{
++    cpu_reset(cs);
++}
++
++static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
++
++    scc->cpu_reset(cs);
++}
++
++static inline void s390_do_cpu_initital_reset(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
++
++    scc->initial_cpu_reset(cs);
++}
++
++static inline void s390_do_cpu_load_normal(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
++
++    scc->load_normal(cs);
++}
++
+ 
+ /* cpu.c */
+ int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index a755837ad5..ac2c40f363 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -22,51 +22,6 @@
+ #include "hw/s390x/ipl.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
+ 
+-static int modified_clear_reset(S390CPU *cpu)
+-{
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+-    CPUState *t;
+-
+-    pause_all_vcpus();
+-    cpu_synchronize_all_states();
+-    CPU_FOREACH(t) {
+-        run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+-    }
+-    s390_cmma_reset();
+-    subsystem_reset();
+-    s390_crypto_reset();
+-    scc->load_normal(CPU(cpu));
+-    cpu_synchronize_all_post_reset();
+-    resume_all_vcpus();
+-    return 0;
+-}
+-
+-static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
+-{
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
+-
+-    scc->cpu_reset(cs);
+-}
+-
+-static int load_normal_reset(S390CPU *cpu)
+-{
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+-    CPUState *t;
+-
+-    pause_all_vcpus();
+-    cpu_synchronize_all_states();
+-    CPU_FOREACH(t) {
+-        run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+-    }
+-    s390_cmma_reset();
+-    subsystem_reset();
+-    scc->initial_cpu_reset(CPU(cpu));
+-    scc->load_normal(CPU(cpu));
+-    cpu_synchronize_all_post_reset();
+-    resume_all_vcpus();
+-    return 0;
+-}
+-
+ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ {
+     uint64_t func = env->regs[r1];
+@@ -101,6 +56,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ 
+ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ {
++    CPUState *cs = CPU(s390_env_get_cpu(env));
+     uint64_t addr =  env->regs[r1];
+     uint64_t subcode = env->regs[r3];
+     IplParameterBlock *iplb;
+@@ -117,22 +73,13 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ 
+     switch (subcode) {
+     case 0:
+-        modified_clear_reset(s390_env_get_cpu(env));
+-        if (tcg_enabled()) {
+-            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+-        }
++        s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
+         break;
+     case 1:
+-        load_normal_reset(s390_env_get_cpu(env));
+-        if (tcg_enabled()) {
+-            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+-        }
++        s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
+         break;
+     case 3:
+-        s390_reipl_request();
+-        if (tcg_enabled()) {
+-            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+-        }
++        s390_ipl_reset_request(cs, S390_RESET_REIPL);
+         break;
+     case 5:
+         if ((r1 & 1) || (addr & 0x0fffULL)) {
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index d911e84958..e392a02d12 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -273,12 +273,6 @@ static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
+ /* Base/displacement are at the same locations. */
+ #define decode_basedisp_rs decode_basedisp_s
+ 
+-static inline void s390_do_cpu_full_reset(CPUState *cs, run_on_cpu_data arg)
+-{
+-    cpu_reset(cs);
+-}
+-
+-
+ /* arch_dump.c */
+ int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+                               int cpuid, void *opaque);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index fb59d92def..b033d53f69 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1785,7 +1785,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+             ret = handle_intercept(cpu);
+             break;
+         case KVM_EXIT_S390_RESET:
+-            s390_reipl_request();
++            s390_ipl_reset_request(cs, S390_RESET_REIPL);
+             break;
+         case KVM_EXIT_S390_TSCH:
+             ret = handle_tsch(cpu);
+-- 
+2.14.3
