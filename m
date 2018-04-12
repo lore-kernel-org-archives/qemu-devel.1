@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f6asI-0007LM-9J
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:58:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f6awC-0002Fr-RA
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f6asE-0007Py-HM
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:58:46 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:52877)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f6asE-0007PS-Bx
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:58:42 -0400
-Received: by mail-wm0-x243.google.com with SMTP id g8so10970732wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 04:58:42 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 12 Apr 2018 12:58:38 +0100
-Message-Id: <20180412115838.10208-3-alex.bennee@linaro.org>
-In-Reply-To: <20180412115838.10208-1-alex.bennee@linaro.org>
-References: <20180412115838.10208-1-alex.bennee@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1f6awC-0001js-15
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:02:48 -0400
+References: <20180411163940.2523-1-kwolf@redhat.com>
+	<20180411163940.2523-8-kwolf@redhat.com>
+	<33c2ce2d-18d6-5479-19d4-3a1923cea3cb@redhat.com>
+	<20180412095157.GA5004@localhost.localdomain>
+	<f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
+	<20180412111143.GB5004@localhost.localdomain>
+	<569800ae-12f8-53f1-012a-50408700ba39@redhat.com>
+	<20180412115316.GC5004@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <306e73f3-9e72-e60f-123c-47a8a72915e2@redhat.com>
+Date: Thu, 12 Apr 2018 14:02:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 2/2] fpu/softfloat: raise float_invalid for
- NaN in float_to_int
+In-Reply-To: <20180412115316.GC5004@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 07/19] block: Really pause block jobs on
+ drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Fixes https://bugs.launchpad.net/qemu/+bug/1759264
+On 12/04/2018 13:53, Kevin Wolf wrote:
+>> The problem I have is that there is a direction through which I/O flows
+>> (parent-to-child), so why can't draining follow that natural direction.
+>> Having to check for the parents' I/O, while draining the child, seems
+>> wrong.  Perhaps we can't help it, but I cannot understand the reason.
+> I'm not sure what's there that could be not understood. You already
+> confirmed that we need to drain the parents, too, when we drain a node.
+> Drain really must propagate in the opposite direction of I/O, because
+> part of its job is to quiesce the origin of any I/O to the node that
+> should be drained. Opposite of I/O _is_ the natural direction for drain.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
----
- fpu/softfloat.c | 1 +
- 1 file changed, 1 insertion(+)
+Opposite of I/O is the natural direction for drain to propagate, yes.
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 9b99aa6ec8..ddc77c273c 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1344,6 +1344,7 @@ static int64_t round_to_int_and_pack(FloatParts in, int rmode,
-     case float_class_qnan:
-     case float_class_dnan:
-     case float_class_msnan:
-+        s->float_exception_flags = orig_flags | float_flag_invalid;
-         return max;
-     case float_class_inf:
-         return p.sign ? min : max;
--- 
-2.17.0
+However, I/O direction is the natural direction for requests to stop.
+After quiescing X and calling X->drv->bdrv_drain(X), there can be
+pending requests only in X's children.  So I don't understand why you
+need to keep checking in_flight over the whole subgraph, when there are
+roots that will conclude their request first, and then their children,
+and so on so forth.
+
+Thanks,
+
+Paolo
+
+> We also have subtree drains, but that's not because that's the natural
+> direction for drain, but just as a convenience function because some
+> operations (e.g. reopen) affect a whole subtree, so they need everything
+> in that subtree drained rather than just a single node.
