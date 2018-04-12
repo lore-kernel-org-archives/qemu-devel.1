@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6diq-0007li-2c
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:01:17 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1f6dw3-0005j6-Ud
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6din-0006OF-23
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:01:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6dim-0006NX-HY
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:01:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6dik-0004fW-MB
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 15:01:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A687A2E80CD
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 15:01:06 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Apr 2018 14:46:59 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-Reply-To: Bug 1761401 <1761401@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152291524524.10021.7220810119975025094.malonedeb@soybean.canonical.com>
-Message-Id: <152354441922.23982.11936787820326840874.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1761401] Re: ARM/Neon: vcvt rounding error
+	(envelope-from <tiwei.bie@intel.com>) id 1f6dw0-0007Q3-Of
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:14:51 -0400
+Received: from mga09.intel.com ([134.134.136.24]:48812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f6dw0-0007PY-El
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:14:48 -0400
+From: Tiwei Bie <tiwei.bie@intel.com>
+Date: Thu, 12 Apr 2018 23:12:26 +0800
+Message-Id: <20180412151232.17506-1-tiwei.bie@intel.com>
+Subject: [Qemu-devel] [PATCH v3 0/6] Extend vhost-user to support
+ registering external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +22,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com, tiwei.bie@intel.com
 
-I updated my QEMU git tree such that it includes commit
-bd49e6027cbc207c, and the test now passes.
+The original subject is: Extend vhost-user to support VFIO based accelerators
 
-Thanks for the prompt fix!
+Update notes
+============
 
+Now, this patch set just focuses on adding the support for
+registering memory region based host notifiers. With this
+support, guest driver in the VM will be able to notify the
+hardware device at the vhost backend directly.
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+It's one of the most important things in vDPA -- the host
+notification offload. Because, normally, the hardware device
+heavily depends on the notifications. Without this support,
+there will be a lot of VM-Exit happen due to the notifications
+from guest driver (it will drop the VM performance) and a
+lot of CPU resources wasted to do the notification relay
+(it will make the hardware offload less attractive, because
+one important goal of hardware offload is to free the CPU
+resources).
 
--- =
+More backgrounds of this patch set can be found from the
+cover letter of the previous versions:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1761401
+RFC: http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg04844.html
+v1:  http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg06028.html
+v2:  http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg05009.html
 
-Title:
-  ARM/Neon: vcvt rounding error
+v2 -> v3:
+- A better implementation of the shared vhost-user state (MST);
+- Use bus callback to add/delete subregions for notification (MST);
+- Refine APIs' names which add/delete subregions for notification (MST);
+- Refine the doc of the new vhost-user types and messages (MST);
+- Separate host notification offload from the guest notification offload (MST);
+- Drop the guest notification offload support from this patch;
+- Add memory filter for vhost backend to filter the sections they can handle;
 
-Status in QEMU:
-  Fix Committed
+v1 -> v2:
+- Add some explanations about why extend vhost-user in commit log (Paolo);
+- Bug fix in slave_read() according to Stefan's fix in DPDK;
+- Remove IOMMU feature check and related commit log;
+- Some minor refinements;
+- Rebase to the latest QEMU;
 
-Bug description:
-  Hello,
+RFC -> v1:
+- Add some details about how vDPA works in cover letter (Alexey)
+- Add some details about the OVS offload use-case in cover letter (Jason)
+- Move PCI specific stuffs out of vhost-user (Jason)
+- Handle the virtual IOMMU case (Jason)
+- Move VFIO group management code into vfio/common.c (Alex)
+- Various refinements;
+(approximately sorted by comment posting time)
 
-  While using QEMU commit 47d3b60858d90ac8a0cc3a72af7f95c96781125a
-  (March 28, 2018), I've noticed failures in one of the GCC ARM/Neon
-  tests. The test passes on hardware, and with QEMU-2.11.0, so it looks
-  like a recent regression.
+Tiwei Bie (6):
+  vhost-user: add Net prefix to internal state structure
+  vhost-user: introduce shared vhost-user state
+  vhost-user: support receiving file descriptors in slave_read
+  virtio: support setting memory region based host notifier
+  vhost: allow backends to filter memory sections
+  vhost-user: support registering external host notifiers
 
-  The test builds a vector of 4 float32 with "125.9" as value, then convert=
-s them to 4 uint32_t.
-  The expected result is 125, but we get 126 instead.
+ backends/cryptodev-vhost-user.c     |  20 +++-
+ docs/interop/vhost-user.txt         |  33 ++++++
+ hw/block/vhost-user-blk.c           |  22 +++-
+ hw/scsi/vhost-user-scsi.c           |  20 +++-
+ hw/virtio/Makefile.objs             |   2 +-
+ hw/virtio/vhost-stub.c              |  10 ++
+ hw/virtio/vhost-user.c              | 206 ++++++++++++++++++++++++++++++++++--
+ hw/virtio/vhost.c                   |   9 +-
+ hw/virtio/virtio-pci.c              |  22 ++++
+ hw/virtio/virtio.c                  |  13 +++
+ include/hw/virtio/vhost-backend.h   |   4 +
+ include/hw/virtio/vhost-user-blk.h  |   2 +
+ include/hw/virtio/vhost-user-scsi.h |   2 +
+ include/hw/virtio/vhost-user.h      |  28 +++++
+ include/hw/virtio/virtio-bus.h      |   2 +
+ include/hw/virtio/virtio.h          |   2 +
+ net/vhost-user.c                    |  78 +++++++++-----
+ 17 files changed, 433 insertions(+), 42 deletions(-)
+ create mode 100644 include/hw/virtio/vhost-user.h
 
-  Maybe it's just a matter of default rounding mode?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1761401/+subscriptions
+-- 
+2.11.0
