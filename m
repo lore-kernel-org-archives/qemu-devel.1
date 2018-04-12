@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f6UF4-0005Lf-H9
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 00:53:52 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f6UcW-00070k-Lc
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 01:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ajaygargnsit@gmail.com>) id 1f6UF2-0000U1-V6
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 00:53:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f6UcU-0005Pw-NK
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 01:18:04 -0400
+Date: Thu, 12 Apr 2018 15:15:03 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180412051503.GN9425@umbus.fritz.box>
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-3-clg@kaod.org>
+	<20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHP4M8V_NBFS9T_+TQzAPgw56n9THk-phqUiLuRw6DJRn+UQAw@mail.gmail.com>
-References: <CAHP4M8VnuS5KijfVw9eDz41KPwaT4rJ+4VEU==EbBgdwgFKJhA@mail.gmail.com>
-	<87efjov999.fsf@linaro.org>
-	<CAHP4M8W-WuBmJUdb6LGR1t3tPayrnaS+b1ZZ1zew71aM==-imA@mail.gmail.com>
-	<87d0z8v78e.fsf@linaro.org>
-	<CAHP4M8VSzm4L6oS06J-e93FwjuHM=weJf2MegCaDNH8MPbsqgA@mail.gmail.com>
-	<CAFEAcA91iNyUnahri9EdL7Th1Q9v44765z0OJexxMrNUD_DXEQ@mail.gmail.com>
-	<CAHP4M8ViS=O4R+sMmR=CmkbgQtwd8RHGxLwNb5m_aMS_M++f6A@mail.gmail.com>
-	<CAFEAcA8xG_GrVL5zgZqN26OQGj0UHWFNZ9xWEmHJyaiUFZLH8Q@mail.gmail.com>
-	<CAHP4M8WEuR5JJTV_KggwJok0Pzbu8=4BifLuFOjhv3T9hfjUUg@mail.gmail.com>
-	<CAHP4M8UESYxeJOd5Y+Hj1K26QUb2D1UJJoBTh9SYCsvuwBP95w@mail.gmail.com>
-	<CAHP4M8V_NBFS9T_+TQzAPgw56n9THk-phqUiLuRw6DJRn+UQAw@mail.gmail.com>
-From: Ajay Garg <ajaygargnsit@gmail.com>
-Date: Thu, 12 Apr 2018 10:23:42 +0530
-Message-ID: <CAHP4M8VYmpm2paarNJjMtiVtkZk5imZixHHmoqZmggdeyRRW3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] Crash when running hello-world
- unikernel for ARM
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6yHiY5vv/BiPjcMt"
+Content-Disposition: inline
+In-Reply-To: <2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,149 +32,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, rumpkernel-users@freelists.org, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-
-Is "integratorcp" the same board that rumprun is being built for
-(https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch/arm/integrator)?
-
-On Thu, Apr 12, 2018 at 9:56 AM, Ajay Garg <ajaygargnsit@gmail.com> wrote:
-> Actually just realised that qemu does support integratorcp as one of
-> the supported-boards.
->
-> Unfortunately, when I use
->           qemu-system-arm -machine integratorcp -nographic -kernel helloer.bin
-> the shell just hangs :(
->
->
-> Following are the details when run through gdb :
->
-> ##########################################################################
-> GNU gdb (Debian 7.7.1+dfsg-5) 7.7.1
-> Copyright (C) 2014 Free Software Foundation, Inc.
-> License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-> This is free software: you are free to change and redistribute it.
-> There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-> and "show warranty" for details.
-> This GDB was configured as "arm-linux-gnueabihf".
-> Type "show configuration" for configuration details.
-> For bug reporting instructions, please see:
-> <http://www.gnu.org/software/gdb/bugs/>.
-> Find the GDB manual and other documentation resources online at:
-> <http://www.gnu.org/software/gdb/documentation/>.
-> For help, type "help".
-> Type "apropos word" to search for commands related to "word"...
-> Reading symbols from qemu-system-arm...(no debugging symbols found)...done.
-> (gdb) r
-> Starting program: /usr/bin/qemu-system-arm -machine integratorcp
-> -nographic -kernel helloer.bin
-> [Thread debugging using libthread_db enabled]
-> Using host libthread_db library "/lib/arm-linux-gnueabihf/libthread_db.so.1".
-> [New Thread 0xb388f290 (LWP 596)]
->
-> Program received signal SIGUSR1, User defined signal 1.
-> [Switching to Thread 0xb388f290 (LWP 596)]
-> memset () at ../ports/sysdeps/arm/memset.S:50
-> 50    ../ports/sysdeps/arm/memset.S: No such file or directory.
-> (gdb) bt
-> #0  memset () at ../ports/sysdeps/arm/memset.S:50
-> #1  0xb65e1c6c in ?? () from /lib/arm-linux-gnueabihf/libglib-2.0.so.0
-> Backtrace stopped: previous frame identical to this frame (corrupt stack?)
-> (gdb)
-> ##########################################################################
->
-> On Wed, Apr 11, 2018 at 12:49 PM, Ajay Garg <ajaygargnsit@gmail.com> wrote:
->> Hi All.
->>
->> Just wondering if there is something specific that needs to changed at
->> https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch/arm/integrator
->> in order to get a hello-world app run on "virt" machine?
->>
->> If so, I would request the rumprun-guys to kindly throw in some light,
->> on what needs to be done in order to have something run on a "virt"
->> machine in qemu-context.
->>
->>
->> Thanks and Regards,
->> Ajay
->>
->> On Tue, Apr 10, 2018 at 3:49 PM, Ajay Garg <ajaygargnsit@gmail.com> wrote:
->>> Thanks Peter .. my sincere gratitude.
->>> You pin-pointed the real issue ..
->>>
->>>
->>>
->>> On Tue, Apr 10, 2018 at 2:50 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> On 10 April 2018 at 09:16, Ajay Garg <ajaygargnsit@gmail.com> wrote:
->>>>> On Tue, Apr 10, 2018 at 1:08 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>>>> What hardware (what CPU, board, etc) is this "rumprun" software
->>>>>> expecting to run on?
->>>>>
->>>>> Yep, just to ensure that there are no cross-compiling issues, I am
->>>>> building rumprun on the pseudo-real hardware itself.
->>>>> In our case, the pseudo-real hardware are :
->>>>>
->>>>> a)
->>>>> An ARM32 "virt" hardware/machine in a qemu environment
->>>>> (https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
->>>>>
->>>>> Once I start  this machine, all environment is arm32, and I compile
->>>>> rumprun within this environemnt without any cross-compiling.
->>>>>
->>>>> b)
->>>>> A beaglebone-green-wireless.
->>>>> This is a arm32 machine bottoms-up, so no question of cross-compiling
->>>>> whatsoever here :)
->>>>>
->>>>> In both cases, I then use qemu-system-arm (on the "virt" machine, and
->>>>> beaglebone-green-wireless itself).
->>>>
->>>> That's telling me what setups you're trying to compile in,
->>>> which doesn't correspond necessarily to what the guest
->>>> OS is built to run on.
->>>>
->>>>> One query : It is apparent that there is nested qemu-virtualization in
->>>>> step a), could that be an issue?
->>>>
->>>> Why are you running this in a nested setup? I don't understand
->>>> the purpose of doing that. It would be simpler and faster to
->>>> just run the guest on a QEMU running in your native host system.
->>>>
->>>> Assuming this is the source for the guest you're trying to run:
->>>>
->>>> https://github.com/rumpkernel/rumprun/tree/master/platform/hw/arch
->>>>
->>>> that suggests that the only Arm board it supports is "integrator"
->>>> (which is an absolutely ancient devboard with very little memory,
->>>> no PCI and no virtio support). You need to confirm what Arm hardware
->>>> this 'rumpkernel' is actually intended to run on, and then give QEMU
->>>> the right command line arguments to emulate that hardware. I can't
->>>> really help any further, I'm afraid -- you need somebody who knows
->>>> about this guest OS.
->>>>
->>>> thanks
->>>> -- PMM
->>>
->>>
->>>
->>> --
->>> Regards,
->>> Ajay
->>
->>
->>
->> --
->> Regards,
->> Ajay
->
->
->
-> --
-> Regards,
-> Ajay
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
+--6yHiY5vv/BiPjcMt
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Regards,
-Ajay
+On Wed, Jan 17, 2018 at 03:39:46PM +0100, C=E9dric Le Goater wrote:
+> On 01/17/2018 12:10 PM, Benjamin Herrenschmidt wrote:
+> > On Wed, 2018-01-17 at 10:18 +0100, C=E9dric Le Goater wrote:
+> >>>>> Also, have we decided how the process of switching between XICS and
+> >>>>> XIVE will work vs. CAS ?=20
+> >>>>
+> >>>> That's how it is described in the architecture. The current choice is
+> >>>> to create both XICS and XIVE objects and choose at CAS which one to
+> >>>> use. It relies today on the capability of the pseries machine to=20
+> >>>> allocate IRQ numbers for both interrupt controller backends. These
+> >>>> patches have been merged in QEMU.
+> >>>>
+> >>>> A change of interrupt mode results in a reset. The device tree is=20
+> >>>> populated accordingly and the ICPs are switched for the model in=20
+> >>>> use.=20
+> >>>
+> >>> For KVM we need to only instanciate one of them though.
+> >>
+> >> Hmm,
+> >>
+> >> How would we handle a guest rebooting on a kernel without XIVE support=
+ ?=20
+> >=20
+> > It will do CAS again and we can change the devices.
+>=20
+> So, we would destroy the previous QEMU ICS object and create a new one=20
+> in the CAS hcall. That would probably work. There might be some issues=20
+> in creating and destroying the ICS KVM device, but that can be studied=20
+> without XIVE.
+
+Adding and removing devices at runtime based on guest requests like
+this will get really hairy in qemu.
+
+As I've said before for the first cut, I think we want to select just
+one as a machine option to avoid this confusion.
+
+Looking further ahead, I think we'll be better off having both the
+XIVE and XICS models always present (at least minimally) in qemu, but
+with only one "active" at any given time.
+
+Note that having the inactive one destroy and clean up the
+corresponding KVM devices is fine, as is deallocating as much of its
+runtime state as we can without changing the notional QOM tree.
+
+>=20
+> It used to be considered ugly to create a QEMU device at reset time, so=
+=20
+> I wonder if this is still the case, because when the machine reaches CAS,=
+=20
+> we really are beyond reset.  =20
+>=20
+> If this is OK, then the next "issue" is to keep in sync the allocated=20
+> IRQ numbers. The IRQ allocator is now merged at the machine level, so=20
+> the synchronization is obvious to do when both backend QEMU objects=20
+> are available. that's the path I took. If both QEMU objects are not=20
+> available, then we need to scan the IRQ number space in the current=20
+> interrupt mode and allocate the same IRQs in the newly negotiated mode.=
+=20
+> Probably OK. I don't see major problems with the current code.=20
+>=20
+> Migration is a problem. We will need both backend QEMU objects to be=20
+> available anyhow if we want to migrate. So we are back to the current=20
+> solution creating both QEMU objects but we can try to defer some of the=
+=20
+> KVM inits and create the KVM device on demand at CAS time.
+>=20
+> The next problem is the ICP object that currently needs the KVM device=20
+> fd to connect the vcpus ... So, we will need to change that also.=20
+> That is probably the biggest problem today. We need a way to disconnect=
+=20
+> the vpcu from the KVM device and see how we can defer the connection.
+> I need to make sure this is possible, I can check that without XIVE
+> I think.
+>=20
+> >> Are you suggesting to create the XICS or XIVE device in the CAS negoti=
+ation=20
+> >> process ? So, the machine would not have any interrupt controller befo=
+re=20
+> >> CAS. That seems really late to me. grub uses the console for instance.=
+=20
+> >=20
+> > We start with XICS by default.
+>=20
+> yes.
+>=20
+> >> I think it should prepare for both options, start in XIVE legacy mode,=
+=20
+> >> which is XICS, then possibly switch to XIVE exploitation mode.
+> >>
+> >>>>> And how that will interact with KVM ?=20
+> >>>>
+> >>>> I expect we will do the same, which is to create two KVM devices to=
+=20
+> >>>> be able to handle both interrupt controller backends depending on th=
+e=20
+> >>>> mode negotiated by the guest. =20
+> >>>
+> >>> That will be an ungodly mess, I'd rather we only instanciate the right
+> >>> one.
+> >>
+> >> It's rather transparent currently in the emulated version. There are t=
+wo=20
+> >> sets of objects in QEMU, switching is done in CAS. KVM support should =
+not=20
+> >> change anything in that area.=20
+> >>
+> >> I expect the 'xive-kvm' object to get/set states for migration, just l=
+ike=20
+> >> for XICS and to setup the ESB+TIMA memory regions, which is new.=20
+> >=20
+> > But both XICS and XIVE are completely different kernel KVM devices that=
+ will
+> > need to "hook" into the same set of internal hooks for things like inte=
+rrupts
+> > being passed through, RTAS calls etc...=20
+> >=20
+> > How does KVM knows which one to "activate" ?
+>=20
+> Can't we add an extra IRQ type and use vcpu->arch.irq_type for that ?=20
+> I haven't studied all the low level details though.
+>=20
+> > I don't think the kernel should have both.=20
+>=20
+> I hear that. From a QEMU perspective, it is much easier to put everything=
+=20
+> in place for both interrupt modes and let the guest decide what it wants=
+=20
+> to use.=20
+>=20
+> If we choose not to, we will need to find solution to defer the KVM inits
+> and to disconnect/reconnect the vcpus. For the latter, we could add a=20
+> KVM_DISABLE_CAP ioctl or maybe better add a new capability like=20
+> KVM_CAP_IRQ_XIVE to perform the switch.
+>=20
+>=20
+> C.
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6yHiY5vv/BiPjcMt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrO61cACgkQbDjKyiDZ
+s5LcOw//exDAMcRCjcdIgsMkiEwX4GKGzhSCI/WUwaNZz/ToE82DM6voPfQU8MpF
+KEKfGvovgr6mxZ5N4myIIwBpe1YmA5w7GD87XhdlUbelYdnOa3smHxascEmeV57X
+EZNx3GYLz/enP6cDQzbRTSR/h8TMgxySLCox6X7FZOvLX9rBGZP9FTxmOhp057Qj
+toSlwv2mve5hSlYUwyTDcEjQJemAhYTdyS4Mn97RhD3TF8JAr2rlPz3yXl2jbvV0
+Bhw88r+eoCPzMydvxUxhqAE+ufPRA36hqhyW9B1mmU+t8Y7yL3SpNsIyuzgF4U/y
+8bvrd4RF9fKG7glNl79NV6eRRh+nqlHjM4oiroJLHFct1MWBfX3KtJ661Y2U4Kwz
+j8SdKlMPOFiM/SPIyf7ZcLMThpxavY8BoxLB6c8xDBiy0mU4Tplii5KplIB+J85E
+O3E9W9mLicD1YKLgsrSF/C6k6TYoVAL+zd3fuF5p35kqJ7Ed1j1Eyp98weMXBxC4
+PYA0rvzmKb6Erkg313VCWBojnXa3OrTOo/ig6BLWR4h0q0CrJgSL76pglf96LiZh
+omCYedsA3r+mHs95/SN568PuNovYjFUGrphlBYo0oFuJCOiGvf11fxUmJSSsNHJ5
+mebBfwTm97m9adMRzwtkxAD5iDaE/ElhGgzNC2XF8IPRjbzFYUU=
+=ZcAC
+-----END PGP SIGNATURE-----
+
+--6yHiY5vv/BiPjcMt--
