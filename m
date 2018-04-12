@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prasanna.kalever@redhat.com>) id 1f6aDK-0002I0-8a
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:16:27 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1f6aQK-0001IV-51
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:29:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prasanna.kalever@redhat.com>) id 1f6aDG-0002Ov-8b
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:16:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41758 helo=mx1.redhat.com)
+	(envelope-from <linzhecheng@huawei.com>) id 1f6aQG-0003wT-72
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:29:52 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2266 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prasanna.kalever@redhat.com>)
-	id 1f6aDG-0002Me-51
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:16:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 44F3581A88A3
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 11:16:21 +0000 (UTC)
-From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-Date: Thu, 12 Apr 2018 16:46:14 +0530
-Message-Id: <20180412111614.9724-1-prasanna.kalever@redhat.com>
-Subject: [Qemu-devel] [PATCH] block/gluster: defend on legacy ftruncate api
- use
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1f6aQF-0003sp-K5
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:29:48 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Thu, 12 Apr 2018 11:29:09 +0000
+Message-ID: <D9DE8DBB19F2A24080482022C1DE758302C69E5E@dggemm509-mbx.china.huawei.com>
+Content-Language: zh-CN
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel]  [Bug Report] vm paused after succeeding to migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ndevos@redhat.com, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "quintela@redhat.com" <quintela@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
 
-Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
----
- block/gluster.c | 15 +++++++++++++--
- configure       |  8 ++++++++
- 2 files changed, 21 insertions(+), 2 deletions(-)
+Hi, all
+I encounterd a bug when I try to migrate a windows vm.
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 4adc1a875b..2474580ad6 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -996,6 +996,7 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
-                                     PreallocMode prealloc, Error **errp)
- {
-     int64_t current_length;
-+    int ret;
- 
-     current_length = glfs_lseek(fd, 0, SEEK_END);
-     if (current_length < 0) {
-@@ -1023,7 +1024,12 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
- #endif /* CONFIG_GLUSTERFS_FALLOCATE */
- #ifdef CONFIG_GLUSTERFS_ZEROFILL
-     case PREALLOC_MODE_FULL:
--        if (glfs_ftruncate(fd, offset)) {
-+#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
-+        ret = glfs_ftruncate(fd, offset);
-+#else
-+        ret = glfs_ftruncate(fd, offset, NULL, NULL);
-+#endif
-+        if (ret) {
-             error_setg_errno(errp, errno, "Could not resize file");
-             return -errno;
-         }
-@@ -1034,7 +1040,12 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
-         break;
- #endif /* CONFIG_GLUSTERFS_ZEROFILL */
-     case PREALLOC_MODE_OFF:
--        if (glfs_ftruncate(fd, offset)) {
-+#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
-+        ret = glfs_ftruncate(fd, offset);
-+#else
-+        ret = glfs_ftruncate(fd, offset, NULL, NULL);
-+#endif
-+        if (ret) {
-             error_setg_errno(errp, errno, "Could not resize file");
-             return -errno;
-         }
-diff --git a/configure b/configure
-index 0a19b033bc..69827b0098 100755
---- a/configure
-+++ b/configure
-@@ -429,6 +429,7 @@ glusterfs_xlator_opt="no"
- glusterfs_discard="no"
- glusterfs_fallocate="no"
- glusterfs_zerofill="no"
-+glusterfs_legacy_ftruncate="no"
- gtk=""
- gtkabi=""
- gtk_gl="no"
-@@ -3856,6 +3857,9 @@ if test "$glusterfs" != "no" ; then
-       glusterfs_fallocate="yes"
-       glusterfs_zerofill="yes"
-     fi
-+    if ! $pkg_config --atleast-version=7.4 glusterfs-api; then
-+      glusterfs_legacy_ftruncate="yes"
-+    fi
-   else
-     if test "$glusterfs" = "yes" ; then
-       feature_not_found "GlusterFS backend support" \
-@@ -6502,6 +6506,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
-   echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
- fi
- 
-+if test "$glusterfs_legacy_ftruncate" = "yes" ; then
-+  echo "CONFIG_GLUSTERFS_LEGACY_FTRUNCATE=y" >> $config_host_mak
-+fi
-+
- if test "$libssh2" = "yes" ; then
-   echo "CONFIG_LIBSSH2=m" >> $config_host_mak
-   echo "LIBSSH2_CFLAGS=$libssh2_cflags" >> $config_host_mak
--- 
-2.14.3
+Enviroment information:
+host A: cpu E5620(model WestmereEP without flag xsave)
+host B: cpu E5-2643(model SandyBridgeEP with xsave)
+
+The reproduce steps is :
+1. Start a windows 2008 vm with -cpu host(which means host-passthrough).
+2. Migrate the vm to host B when cr4.OSXSAVE=3D0 (successfully).
+3. Vm runs on host B for a while so that cr4.OSXSAVE changes to 1.
+4. Then migrate the vm to host A (successfully), but vm was paused, and qem=
+u printed log as followed:
+
+KVM: entry failed, hardware error 0x80000021
+
+If you're running a guest on an Intel machine without unrestricted mode
+support, the failure can be most likely due to the guest entering an invali=
+d
+state for Intel VT. For example, the guest maybe running in big real mode
+which is not supported on less recent Intel processors.
+
+EAX=3D019b3bb0 EBX=3D01a3ae80 ECX=3D01a61ce8 EDX=3D00000000
+ESI=3D01a62000 EDI=3D00000000 EBP=3D00000000 ESP=3D01718b20
+EIP=3D0185d982 EFL=3D00000286 [--S--P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
+=3D0
+ES =3D0000 00000000 0000ffff 00009300
+CS =3Df000 ffff0000 0000ffff 00009b00
+SS =3D0000 00000000 0000ffff 00009300
+DS =3D0000 00000000 0000ffff 00009300
+FS =3D0000 00000000 0000ffff 00009300
+GS =3D0000 00000000 0000ffff 00009300
+LDT=3D0000 00000000 0000ffff 00008200
+TR =3D0000 00000000 0000ffff 00008b00
+GDT=3D     00000000 0000ffff
+IDT=3D     00000000 0000ffff
+CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
+0000000000000000
+DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+EFER=3D0000000000000000
+Code=3D00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <00> 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 00 00
+
+I have found that problem happened when kvm_put_sregs returns err -22(calle=
+d by kvm_arch_put_registers(qemu)).
+Because kvm_arch_vcpu_ioctl_set_sregs(kvm-mod) checked that guest_cpuid_has=
+ no X86_FEATURE_XSAVE but cr4.OSXSAVE=3D1.
+So should we cancel migration when kvm_arch_put_registers returns error?
