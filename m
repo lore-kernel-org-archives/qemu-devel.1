@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6YK2-0000Gr-5l
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:15:15 -0400
+	(envelope-from <david@redhat.com>) id 1f6YOZ-0002tz-Ic
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6YJv-00040g-Sh
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:15:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f6YJv-00040M-NQ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:15:07 -0400
-References: <20180329032149.44685-1-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
-Date: Thu, 12 Apr 2018 11:15:04 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180329032149.44685-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+	(envelope-from <david@redhat.com>) id 1f6YOV-00077k-GR
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:19:54 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 12 Apr 2018 11:19:35 +0200
+Message-Id: <20180412091936.32446-3-david@redhat.com>
+In-Reply-To: <20180412091936.32446-1-david@redhat.com>
+References: <20180412091936.32446-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 2/3] machine: make MemoryHotplugState
+ accessible via the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +20,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Markus Armbruster --cc=qemu-ppc @ nongnu . org" <armbru@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On 29/03/2018 05:21, Alexey Kardashevskiy wrote:
-> +    DeviceState *dev =3D (DeviceState *) object_dynamic_cast(obj, TYPE=
-_DEVICE);
-> +    const char *id =3D object_property_print(obj, "id", true, NULL);
+Let's allow to query the MemoryHotplugState from the machine.
 
-I learnt now about commit e1ff3c67e8544f41f1bea76ba76385faee0d2bb7 and I
-find it a mistake.  The "id" is available through
-object_get_canonical_path_component.  Can you change the "id" assignment
-to use object_get_canonical_path_component instead?
+This allows us to generically detect if a certain machine has support
+for memory devices, and to generically manage it (find free address
+range, plug/unplug a memory region).
 
-> +    const char *name =3D object_property_print(obj, "name", true, NULL=
-);
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c             | 12 ++++++++++++
+ hw/ppc/spapr.c           | 12 ++++++++++++
+ include/hw/boards.h      | 16 ++++++++++++++++
+ include/hw/mem/pc-dimm.h | 12 +-----------
+ 4 files changed, 41 insertions(+), 11 deletions(-)
 
-Who defines a name property?
-
-> +    mon_printf(f, " %s:{", label);
-> +    if (dev) {
-> +        mon_printf(f, "dev");
-> +        if (dev->id) {
-> +            mon_printf(f, " id=3D%s", dev->id);
-> +        }
-> +    } else {
-> +        mon_printf(f, "obj");
-
-> +    }
-> +    if (name) {
-> +        mon_printf(f, " name=3D%s ", name);
-> +    }
-> +    if (id) {
-> +        mon_printf(f, " id=3D%s ", id);
-> +    }
-> +    if (dev && (!name && !id && !dev->id)) {
-> +        mon_printf(f, " path=3D%s", dev->canonical_path);
-
-Why not print the path for the !dev case?  I think we can just have
-
-    mon_prinf(f, " %s:{%s", label, dev ? "dev" : "obj");
-    if (dev ? dev->id : id) {
-        mon_printf(f, " id=3D%s", dev ? dev->id : id);
-    } else {
-        canonical_path =3D object_get_canonical_path(...)
-        mon_printf(f, " path=3D%s", canonical_path);
-        g_free(canonical_path);
-    }
-
-Thanks,
-
-Paolo
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d36bac8c89..fa8862af33 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2337,6 +2337,17 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
+ }
+ 
++static MemoryHotplugState *pc_machine_get_memory_hotplug_state(MachineState *ms)
++{
++    PCMachineState *pcms = PC_MACHINE(ms);
++
++    if (!pcms->hotplug_memory.base) {
++        /* hotplug not supported */
++        return NULL;
++    }
++    return &pcms->hotplug_memory;
++}
++
+ static void pc_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -2376,6 +2387,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = pc_machine_device_unplug_cb;
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
++    mc->get_memory_hotplug_state = pc_machine_get_memory_hotplug_state;
+ 
+     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
+         pc_machine_get_hotplug_memory_region_size, NULL,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ea93c5de08..0a6528a421 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3867,6 +3867,17 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
+     return NULL;
+ }
+ 
++static MemoryHotplugState *spapr_get_memory_hotplug_state(MachineState *ms)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
++
++    if (!spapr->hotplug_memory.base) {
++        /* hotplug not supported */
++        return NULL;
++    }
++    return &spapr->hotplug_memory;
++}
++
+ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -3926,6 +3937,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
+      */
+     mc->numa_mem_align_shift = 28;
++    mc->get_memory_hotplug_state = spapr_get_memory_hotplug_state;
+ 
+     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a609239112..447bdc7219 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -105,6 +105,17 @@ typedef struct {
+     CPUArchId cpus[0];
+ } CPUArchIdList;
+ 
++/**
++ * MemoryHotplugState:
++ * @base: address in guest physical address space where hotplug memory
++ * address space begins.
++ * @mr: hotplug memory address space container
++ */
++typedef struct MemoryHotplugState {
++    hwaddr base;
++    MemoryRegion mr;
++} MemoryHotplugState;
++
+ /**
+  * MachineClass:
+  * @max_cpus: maximum number of CPUs supported. Default: 1
+@@ -156,6 +167,10 @@ typedef struct {
+  *    should instead use "unimplemented-device" for all memory ranges where
+  *    the guest will attempt to probe for a device that QEMU doesn't
+  *    implement and a stub device is required.
++ * @get_memory_hotplug_state:
++ *    If a machine support memory hotplug, the returned data ontains
++ *    information about the portion of guest physical address space
++ *    where memory devices can be mapped to (e.g. to hotplug a pc-dimm).
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -212,6 +227,7 @@ struct MachineClass {
+                                                          unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
++    MemoryHotplugState *(*get_memory_hotplug_state)(MachineState *ms);
+ };
+ 
+ /**
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index e88073321f..8bda37adab 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -19,6 +19,7 @@
+ #include "exec/memory.h"
+ #include "sysemu/hostmem.h"
+ #include "hw/qdev.h"
++#include "hw/boards.h"
+ 
+ #define TYPE_PC_DIMM "pc-dimm"
+ #define PC_DIMM(obj) \
+@@ -75,17 +76,6 @@ typedef struct PCDIMMDeviceClass {
+     MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
+ } PCDIMMDeviceClass;
+ 
+-/**
+- * MemoryHotplugState:
+- * @base: address in guest physical address space where hotplug memory
+- * address space begins.
+- * @mr: hotplug memory address space container
+- */
+-typedef struct MemoryHotplugState {
+-    hwaddr base;
+-    MemoryRegion mr;
+-} MemoryHotplugState;
+-
+ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
+                                uint64_t address_space_size,
+                                uint64_t *hint, uint64_t align, uint64_t size,
+-- 
+2.14.3
