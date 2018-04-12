@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f6QAx-0004Fl-V1
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 20:33:20 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1f6Qna-0002kd-2R
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 21:13:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f6QAu-0007GC-R1
-	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 20:33:19 -0400
-Date: Thu, 12 Apr 2018 10:30:26 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180412003026.GB9425@umbus.fritz.box>
-References: <20180411070418.6304-1-david@gibson.dropbear.id.au>
-	<89ae5f83-ee3a-9d71-1f66-019821109c49@redhat.com>
+	(envelope-from <tiwei.bie@intel.com>) id 1f6QnV-0005w0-3y
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 21:13:14 -0400
+Received: from mga18.intel.com ([134.134.136.126]:2279)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f6QnU-0005ud-Ms
+	for qemu-devel@nongnu.org; Wed, 11 Apr 2018 21:13:09 -0400
+Date: Thu, 12 Apr 2018 09:10:59 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180412011059.yywn73znjdip2cyv@debian>
+References: <20180411072027.5656-1-tiwei.bie@intel.com>
+	<20180411161926-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="GRPZ8SYKNexpdSJ7"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <89ae5f83-ee3a-9d71-1f66-019821109c49@redhat.com>
-Subject: Re: [Qemu-devel] [PATCHv3 for-2.13 0/2] Helpers to obtain host page
- sizes for guest RAM
+In-Reply-To: <20180411161926-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
+ protocol feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +28,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: ehabkost@redhat.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
 
+On Wed, Apr 11, 2018 at 04:22:21PM +0300, Michael S. Tsirkin wrote:
+> On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
+> > This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+> > feature for vhost-user. By default, vhost-user backend needs
+> > to query the IOTLBs from QEMU after meeting unknown IOVAs.
+> > With this protocol feature negotiated, QEMU will provide all
+> > the IOTLBs to vhost-user backend without waiting for the
+> > queries from backend. This is helpful when using a hardware
+> > accelerator which is not able to handle unknown IOVAs at the
+> > vhost-user backend.
+> > 
+> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> 
+> This is potentially a large amount of data to be sent
+> on a socket.
 
---GRPZ8SYKNexpdSJ7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If we take the hardware accelerator out of this picture, we
+will find that it's actually a question of "pre-loading" vs
+"lazy-loading". I think neither of them is perfect.
 
-On Wed, Apr 11, 2018 at 03:54:20PM +0200, Paolo Bonzini wrote:
-> On 11/04/2018 09:04, David Gibson wrote:
-> > This series makes some small changes to make it easier to obtain the
-> > host page size backing given portions of guest RAM.  We use this in a
-> > couple of places currently, and I have one or two more to add in some
-> > upcoming code.
-> >=20
-> > Assuming there are no objections, what should be the procedure for
-> > staging this?  Can I put it in my for-2.13 ppc tree, even though it's
-> > technically generic code, or should it go through someone else's tree?
->=20
-> Yes, go ahead:
->=20
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+For "pre-loading", as you said, we may have a tough starting.
+But for "lazy-loading", we can't have a predictable performance.
+A sudden, unexpected performance drop may happen at any time,
+because we may meet an unknown IOVA at any time in this case.
+Once we meet an unknown IOVA, the backend's data path will need
+to stop and query the mapping of the IOVA via the socket and
+wait for the reply. And the latency is not negligible (sometimes
+it's even unacceptable), especially in high performance network
+case. So maybe it's better to make both of them available to
+the vhost backend.
 
-I'm assuming that's an ack to putting it through my tree.
+> 
+> I had an impression that a hardware accelerator was using
+> VFIO anyway. Given this, can't we have QEMU program
+> the shadow IOMMU tables into VFIO directly?
 
-In which case, done, thanks.
+I think it's a good idea! Currently, my concern about it is
+that, the hardware device may not use IOMMU and it may have
+its builtin address translation unit. And it will be a pain
+for device vendors to teach VFIO to be able to work with the
+builtin address translation unit.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Best regards,
+Tiwei Bie
 
---GRPZ8SYKNexpdSJ7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrOqKAACgkQbDjKyiDZ
-s5Igjw/9H1nLPClSALKQb6SuOmhoynJwJVp4K2QaNHnS0mL7fo6ezB+geDIYBbzv
-rlMzB89GqTH9/csBbRH/Ybf1/tMwHh0MCzmdkr+xyh49Efvy8JFoX0XZPaJUMDSN
-P7hIuRImawVgbt6hrnOfr9TngDEyGumpXuLUFX7lA4XmUEZgyeeuAoUpN3OAijwh
-sNpmzQOokq3B7LZPfliOpHzAymhJt1Gng+85x2ot65tkp8o1rrs1Q+DT972bUVyz
-4bNd/QyzIQf9mfZ0Ul3JVNspnj9ldLe/FJ02RvlG41zy3HOlJhJhqQ7gp8/CzvXn
-piTpIrdPnc+Qv/TcP822u8aKBJ0J6PJgOTAblgZV4He4tv/EEqXbwXRK/FOzMVnB
-6xrPOomZgSfGqKCh7AUWJzUygSx5zw6/f8oZH3iGr9mw/zXZxMHH/Ri6weJg7D2n
-o2PX8mfvRYMrjv3rHnZ9Wy+vngMxa33Or+St2QlwBC/qBFouoxoFpk1aqZn/9+j0
-8Kn38SfR8armwaJiFU9BAV+DYVw7ASeEE+8kHz9rP99wM8TuXMqooq0Hn1gHGX5c
-dCCuGX3wOdvvQQ0SbkoXksb6jRs6XafuVSwQSXDAdkHB2aYD8T6j1t0t7j5mVZQU
-A+FGrfqVHgiCbOuDPP3wGnB2a17GFSn2hLGMFbtFiA3cRvmygZw=
-=+rKi
------END PGP SIGNATURE-----
-
---GRPZ8SYKNexpdSJ7--
+> 
+> 
+> > ---
+> > The idea of this patch is to let QEMU push all the IOTLBs
+> > to vhost-user backend without waiting for the queries from
+> > the backend. Because hardware accelerator at the vhost-user
+> > backend may not be able to handle unknown IOVAs.
+> > 
+> > This is just a RFC for now. It seems that, it doesn't work
+> > as expected when guest is using kernel driver (To handle
+> > this case, it seems that some RAM regions' events also need
+> > to be listened). Any comments would be appreciated! Thanks!
+> > 
+> >  docs/interop/vhost-user.txt       |  9 ++++++++
+> >  hw/virtio/vhost-backend.c         |  7 ++++++
+> >  hw/virtio/vhost-user.c            |  8 +++++++
+> >  hw/virtio/vhost.c                 | 47 ++++++++++++++++++++++++++++++++++++---
+> >  include/hw/virtio/vhost-backend.h |  3 +++
+> >  5 files changed, 71 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> > index 534caab18a..73e07f9dad 100644
+> > --- a/docs/interop/vhost-user.txt
+> > +++ b/docs/interop/vhost-user.txt
+> > @@ -380,6 +380,7 @@ Protocol features
+> >  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+> >  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+> >  #define VHOST_USER_PROTOCOL_F_CONFIG         9
+> > +#define VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB 10
+> >  
+> >  Master message types
+> >  --------------------
+> > @@ -797,3 +798,11 @@ resilient for selective requests.
+> >  For the message types that already solicit a reply from the client, the
+> >  presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being set brings
+> >  no behavioural change. (See the 'Communication' section for details.)
+> > +
+> > +VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
+> > +------------------------------------
+> > +By default, vhost-user backend needs to query the IOTLBs from QEMU after
+> > +meeting unknown IOVAs. With this protocol feature negotiated, QEMU will
+> > +provide all the IOTLBs to vhost backend without waiting for the queries
+> > +from backend. This is helpful when using a hardware accelerator which is
+> > +not able to handle unknown IOVAs at the vhost-user backend.
+> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> > index 7f09efab8b..d72994e9a5 100644
+> > --- a/hw/virtio/vhost-backend.c
+> > +++ b/hw/virtio/vhost-backend.c
+> > @@ -233,6 +233,11 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+> >          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+> >  }
+> >  
+> > +static bool vhost_kernel_need_all_device_iotlb(struct vhost_dev *dev)
+> > +{
+> > +    return false;
+> > +}
+> > +
+> >  static const VhostOps kernel_ops = {
+> >          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+> >          .vhost_backend_init = vhost_kernel_init,
+> > @@ -264,6 +269,8 @@ static const VhostOps kernel_ops = {
+> >  #endif /* CONFIG_VHOST_VSOCK */
+> >          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+> >          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+> > +        .vhost_backend_need_all_device_iotlb =
+> > +                                vhost_kernel_need_all_device_iotlb,
+> >  };
+> >  
+> >  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > index 38da8692bb..30e0b1c13b 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -47,6 +47,7 @@ enum VhostUserProtocolFeature {
+> >      VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+> >      VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+> >      VHOST_USER_PROTOCOL_F_CONFIG = 9,
+> > +    VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB = 10,
+> >      VHOST_USER_PROTOCOL_F_MAX
+> >  };
+> >  
+> > @@ -1581,6 +1582,12 @@ vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
+> >      return 0;
+> >  }
+> >  
+> > +static bool vhost_user_need_all_device_iotlb(struct vhost_dev *dev)
+> > +{
+> > +    return virtio_has_feature(dev->protocol_features,
+> > +                              VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB);
+> > +}
+> > +
+> >  const VhostOps user_ops = {
+> >          .backend_type = VHOST_BACKEND_TYPE_USER,
+> >          .vhost_backend_init = vhost_user_init,
+> > @@ -1611,4 +1618,5 @@ const VhostOps user_ops = {
+> >          .vhost_set_config = vhost_user_set_config,
+> >          .vhost_crypto_create_session = vhost_user_crypto_create_session,
+> >          .vhost_crypto_close_session = vhost_user_crypto_close_session,
+> > +        .vhost_backend_need_all_device_iotlb = vhost_user_need_all_device_iotlb,
+> >  };
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index f51bf573d5..70922ee998 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -48,6 +48,9 @@ static unsigned int used_memslots;
+> >  static QLIST_HEAD(, vhost_dev) vhost_devices =
+> >      QLIST_HEAD_INITIALIZER(vhost_devices);
+> >  
+> > +static int vhost_memory_region_lookup(struct vhost_dev *hdev, uint64_t gpa,
+> > +                                      uint64_t *uaddr, uint64_t *len);
+> > +
+> >  bool vhost_has_free_slot(void)
+> >  {
+> >      unsigned int slots_limit = ~0U;
+> > @@ -634,12 +637,39 @@ static void vhost_region_addnop(MemoryListener *listener,
+> >      vhost_region_add_section(dev, section);
+> >  }
+> >  
+> > -static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > +static void vhost_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> >  {
+> >      struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
+> >      struct vhost_dev *hdev = iommu->hdev;
+> >      hwaddr iova = iotlb->iova + iommu->iommu_offset;
+> >  
+> > +    if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> > +        uint64_t uaddr, len;
+> > +
+> > +        rcu_read_lock();
+> > +
+> > +        if (iotlb->target_as != NULL) {
+> > +            if (vhost_memory_region_lookup(hdev, iotlb->translated_addr,
+> > +                        &uaddr, &len)) {
+> > +                error_report("Fail to lookup the translated address "
+> > +                        "%"PRIx64, iotlb->translated_addr);
+> > +                goto out;
+> > +            }
+> > +
+> > +            len = MIN(iotlb->addr_mask + 1, len);
+> > +            iova = iova & ~iotlb->addr_mask;
+> > +
+> > +            if (vhost_backend_update_device_iotlb(hdev, iova, uaddr,
+> > +                                                  len, iotlb->perm)) {
+> > +                error_report("Fail to update device iotlb");
+> > +                goto out;
+> > +            }
+> > +        }
+> > +out:
+> > +        rcu_read_unlock();
+> > +        return;
+> > +    }
+> > +
+> >      if (vhost_backend_invalidate_device_iotlb(hdev, iova,
+> >                                                iotlb->addr_mask + 1)) {
+> >          error_report("Fail to invalidate device iotlb");
+> > @@ -652,6 +682,7 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+> >      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> >                                           iommu_listener);
+> >      struct vhost_iommu *iommu;
+> > +    IOMMUNotifierFlag flags;
+> >      Int128 end;
+> >  
+> >      if (!memory_region_is_iommu(section->mr)) {
+> > @@ -662,8 +693,15 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+> >      end = int128_add(int128_make64(section->offset_within_region),
+> >                       section->size);
+> >      end = int128_sub(end, int128_one());
+> > -    iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> > -                        IOMMU_NOTIFIER_UNMAP,
+> > +
+> > +    if (dev->vhost_ops->vhost_backend_need_all_device_iotlb(dev)) {
+> > +        flags = IOMMU_NOTIFIER_ALL;
+> > +    } else {
+> > +        flags = IOMMU_NOTIFIER_UNMAP;
+> > +    }
+> > +
+> > +    iommu_notifier_init(&iommu->n, vhost_iommu_map_notify,
+> > +                        flags,
+> >                          section->offset_within_region,
+> >                          int128_get64(end));
+> >      iommu->mr = section->mr;
+> > @@ -673,6 +711,9 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+> >      memory_region_register_iommu_notifier(section->mr, &iommu->n);
+> >      QLIST_INSERT_HEAD(&dev->iommu_list, iommu, iommu_next);
+> >      /* TODO: can replay help performance here? */
+> > +    if (flags == IOMMU_NOTIFIER_ALL) {
+> > +        memory_region_iommu_replay(IOMMU_MEMORY_REGION(iommu->mr), &iommu->n);
+> > +    }
+> >  }
+> >  
+> >  static void vhost_iommu_region_del(MemoryListener *listener,
+> > diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> > index 5dac61f9ea..602fd987a4 100644
+> > --- a/include/hw/virtio/vhost-backend.h
+> > +++ b/include/hw/virtio/vhost-backend.h
+> > @@ -101,6 +101,8 @@ typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
+> >  typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
+> >                                               uint64_t session_id);
+> >  
+> > +typedef bool (*vhost_backend_need_all_device_iotlb_op)(struct vhost_dev *dev);
+> > +
+> >  typedef struct VhostOps {
+> >      VhostBackendType backend_type;
+> >      vhost_backend_init vhost_backend_init;
+> > @@ -138,6 +140,7 @@ typedef struct VhostOps {
+> >      vhost_set_config_op vhost_set_config;
+> >      vhost_crypto_create_session_op vhost_crypto_create_session;
+> >      vhost_crypto_close_session_op vhost_crypto_close_session;
+> > +    vhost_backend_need_all_device_iotlb_op vhost_backend_need_all_device_iotlb;
+> >  } VhostOps;
+> >  
+> >  extern const VhostOps user_ops;
+> > -- 
+> > 2.11.0
