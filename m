@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f6W66-0002YT-Jp
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:52:43 -0400
+	(envelope-from <clg@kaod.org>) id 1f6WFb-0006dk-Ax
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f6W63-0007TT-I1
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:52:42 -0400
-Resent-Message-Id: <E1f6W63-0007TT-I1@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f6W63-0007So-8A
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 02:52:39 -0400
-In-Reply-To: <20180412060358.9118-1-peterx@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152351322708.1854.4413712485366884044@71c20359a636>
+	(envelope-from <clg@kaod.org>) id 1f6WFY-0003lc-8U
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:02:31 -0400
+Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:45451)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f6WFY-0003kq-1x
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:02:28 -0400
+Received: from player773.ha.ovh.net (unknown [10.109.108.48])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 2AF0B1179E
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 09:02:26 +0200 (CEST)
+References: <20180411172014.24711-1-clg@kaod.org>
+	<20180411192136.GL2667@work-vm>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b7df24c5-311d-41b1-6304-a52ef8c28732@kaod.org>
+Date: Thu, 12 Apr 2018 09:02:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 11 Apr 2018 23:07:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] monitor: let cur_mon be per-thread
+In-Reply-To: <20180411192136.GL2667@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] migration: discard RAMBlocks of type
+ ram_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +32,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jiangshanlai@gmail.com
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, alex.williamson@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDEyMDYwMzU4LjkxMTgtMS1wZXRlcnhAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBtb25pdG9yOiBsZXQgY3VyX21vbiBiZSBwZXItdGhy
-ZWFkCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIw
-MTgwNDEyMDYwMzU4LjkxMTgtMS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNDEy
-MDYwMzU4LjkxMTgtMS1wZXRlcnhAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCmU4OThmYThkZTMgbW9uaXRvcjogbGV0IGN1cl9tb24gYmUgcGVyLXRocmVhZAoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBtb25pdG9yOiBsZXQgY3VyX21v
-biBiZSBwZXItdGhyZWFkLi4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAg
-b3IgTlVMTAojNjI6IEZJTEU6IHN0dWJzL21vbml0b3IuYzo2OgorX190aHJlYWQgTW9uaXRvciAq
-Y3VyX21vbiA9IE5VTEw7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMyIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 04/11/2018 09:21 PM, Dr. David Alan Gilbert wrote:
+> * C=C3=A9dric Le Goater (clg@kaod.org) wrote:
+>> Here is some context for this strange change request.
+>>
+>> On the POWER9 processor, the XIVE interrupt controller can control
+>> interrupt sources using MMIO to trigger events, to EOI or to turn off
+>> the sources. Priority management and interrupt acknowledgment is also
+>> controlled by MMIO in the presenter subengine.
+>>
+>> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+>> device' memory mappings, similarly to VFIO, and the VMAs are populated
+>> dynamically with the appropriate pages using a fault handler.
+>>
+>> But, these regions are an issue for migration. We need to discard the
+>> associated RAMBlocks from the RAM state on the source VM and let the
+>> destination VM rebuild the memory mappings on the new host in the
+>> post_load() operation just before resuming the system.
+>>
+>> This is the goal of the following proposal. Does it make sense ? It
+>> seems to be working enough to migrate a running guest but there might
+>> be a better, more subtle, approach.
+>=20
+> If this is always true of RAM devices (which I suspect it is).
+>
+> Interestingly, your patch comes less than 2 weeks after Lai Jiangshan's
+>  'add capability to bypass the shared memory'
+>    https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg07511.ht=
+ml
+
+I missed that.
+
+> which is the only other case I think we've got of someone trying to
+> avoid transmitting a block.
+>=20
+> We should try and merge the two sets to make them consistent; you've
+> covered some more cases (the other patch wasn't expected to work with
+> Postcopy anyway).
+> (At this rate then we can expect another 20 for the year....)
+>=20
+> We should probably have:
+>    1) A     bool is_migratable_block(RAMBlock *)
+>    2) A RAMBLOCK_FOREACH_MIGRATABLE(block)  macro that is like
+> RAMBLOCK_FOREACH but does the call to is_migratable_block
+>
+> then the changes should be mostly pretty tidy.
+
+yes, indeed, they do.
+
+> A sanity check is probably needed on load as well, to give a neat
+> error if for some reason the source transmits pages to you.
+
+OK.=20
+
+Would a check on the block migratability at the end of function=20
+ram_block_from_stream() be enough ? This is called in ram_load()
+and ram_load_postcopy()
+
+> One other thing I notice is your code changes ram_bytes_total(),
+> where as the other patch avoids it;  I think your code is actually
+> more correct.
+>=20
+> Is there *any* case in existing QEMUs where we migrate ram devices
+> succesfully, if so we've got to make it backwards compatible; but I
+> think you're saying there isn't.
+
+The only RAM devices I know of are the VFIOs.
+
+Thanks,
+
+C.
