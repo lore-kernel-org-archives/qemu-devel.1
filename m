@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f6UcW-00070j-DZ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 01:18:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f6UcY-000714-04
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 01:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f6UcU-0005Pm-Nv
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 01:18:04 -0400
-Date: Thu, 12 Apr 2018 15:08:21 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1f6UcU-0005Pu-My
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 01:18:05 -0400
+Date: Thu, 12 Apr 2018 15:10:31 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180412050821.GL9425@umbus.fritz.box>
+Message-ID: <20180412051031.GM9425@umbus.fritz.box>
 References: <20171209084338.29395-1-clg@kaod.org>
 	<20171209084338.29395-3-clg@kaod.org>
 	<20171220050947.GC5981@umbus.fritz.box>
 	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TnYVF1hk1c8rpHiF"
+	protocol="application/pgp-signature"; boundary="C01fF7hLGvN0zd9s"
 Content-Disposition: inline
-In-Reply-To: <1513815126.2743.34.camel@kernel.crashing.org>
+In-Reply-To: <683d0912-ad48-927c-8235-5358417be44c@kaod.org>
 Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
  the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
@@ -27,73 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---TnYVF1hk1c8rpHiF
-Content-Type: text/plain; charset=us-ascii
+--C01fF7hLGvN0zd9s
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 21, 2017 at 11:12:06AM +1100, Benjamin Herrenschmidt wrote:
-> On Wed, 2017-12-20 at 16:09 +1100, David Gibson wrote:
+On Wed, Jan 17, 2018 at 10:18:43AM +0100, C=E9dric Le Goater wrote:
+> >>> Also, have we decided how the process of switching between XICS and
+> >>> XIVE will work vs. CAS ?=20
+> >>
+> >> That's how it is described in the architecture. The current choice is
+> >> to create both XICS and XIVE objects and choose at CAS which one to
+> >> use. It relies today on the capability of the pseries machine to=20
+> >> allocate IRQ numbers for both interrupt controller backends. These
+> >> patches have been merged in QEMU.
+> >>
+> >> A change of interrupt mode results in a reset. The device tree is=20
+> >> populated accordingly and the ICPs are switched for the model in=20
+> >> use.=20
 > >=20
-> > As you've suggested in yourself, I think we might need to more
-> > explicitly model the different components of the XIVE system.  As part
-> > of that, I think you need to be clearer in this base skeleton about
-> > exactly what component your XIVE object represents.
-> >=20
-> > If the answer is "the overall thing" I suspect that's not what you
-> > want - I had one of those for XICs which proved to be a mistake
-> > (eventually replaced by the XICSFabric interface).
-> >=20
-> > Changing the model later isn't impossible, but doing so without
-> > breaking migration can be a real pain, so I think it's worth a
-> > reasonable effort to try and get it right initially.
+> > For KVM we need to only instanciate one of them though.
 >=20
-> Note: we do need to speed things up a bit, as having exploitation mode
-> in KVM will significantly help with IPI performance among other things.
+> Hmm,
 >=20
-> I'm about ready to do the KVM bits. The one thing we need to discuss
-> and figure a good design for is how we map all those interrupt control
-> pages into qemu.
+> How would we handle a guest rebooting on a kernel without XIVE support ?=
+=20
+> Are you suggesting to create the XICS or XIVE device in the CAS negotiati=
+on=20
+> process ? So, the machine would not have any interrupt controller before=
+=20
+> CAS. That seems really late to me. grub uses the console for instance.=20
 >=20
-> Each interrupt (either PCIe pass-through or the "generic XIVE IPIs"
-> which are used for guest IPIs and for vio/virtio/emulated interrupts)
-> comes with a "control page" (ESB page) which needs to be mapped into
-> the guest, and the generic IPIs also come with a trigger page which
-> needs to be mapped into the guest for guest IPIs or OpenCAPI
-> interrupts, or just qemu for emulated devices.
->=20
-> Now that can be thousands of these critters. I certainly don't want to
-> create thousands of VMAs in qemu and even less thousands of memory
-> regions in KVM.
->=20
-> So we need some kind of mechanism by wich a single large VMA gets
-> mmap'ed into qemu (or maybe a couple of these, but not too many) and
-> the interrupt pages can be assigned to slots in there and demand
-> faulted.
+> I think it should prepare for both options, start in XIVE legacy mode,=20
+> which is XICS, then possibly switch to XIVE exploitation mode.
 
-Ok, I see your point.  We'll definitely need to be able to map things
-in as a block, rather than one by one.
+I think for our first draft we should have XIVE and XICS based
+platforms as separate machine types (or a machine option, I guess).
 
-> For the generic interrupts, this can probably be covered by KVM, adding
-> some arch ioctls for allocating IPIs and mmap'ing that region etc...
+We do want to allow this to be autonegotiated, but I feel like
+emphasising that at the beginning is causing unnatural design
+decisions in the XIVE model itself.
+
 >=20
-> For pass-through, it's trickier, we don't want to mmap each irqfd
-> individually for the above reason, so we want to "link" them to KVM. We
-> don't want to allow qemu to take control of any arbitrary interrupt in
-> the system though, so it has to related to the ownership of the irqfd
-> coming from vfio.
+> >>> And how that will interact with KVM ?
+> >>
+> >> I expect we will do the same, which is to create two KVM devices to=20
+> >> be able to handle both interrupt controller backends depending on the=
+=20
+> >> mode negotiated by the guest. =20
+> >=20
+> > That will be an ungodly mess, I'd rather we only instanciate the right
+> > one.
 >=20
-> OpenCAPI I suspect will be its own can of worms...
+> It's rather transparent currently in the emulated version. There are two=
+=20
+> sets of objects in QEMU, switching is done in CAS. KVM support should not=
+=20
+> change anything in that area.=20
 >=20
-> Also, have we decided how the process of switching between XICS and
-> XIVE will work vs. CAS ? And how that will interact with KVM ? I was
-> thinking the kernel would implement a different KVM device type, ie
-> the "emulated XICS" would remain KVM_DEV_TYPE_XICS and XIVE would be
-> KVM_DEV_TYPE_XIVE.
+> I expect the 'xive-kvm' object to get/set states for migration, just like=
+=20
+> for XICS and to setup the ESB+TIMA memory regions, which is new.=20
+>=20
+> C.=20
+> =20
+> >>> I was
+> >>> thinking the kernel would implement a different KVM device type, ie
+> >>> the "emulated XICS" would remain KVM_DEV_TYPE_XICS and XIVE would be
+> >>> KVM_DEV_TYPE_XIVE.
+> >>
+> >> yes. it makes sense. The new device will have a lot in common with the=
+=20
+> >> KVM_DEV_TYPE_XICS using kvm_xive_ops.
+> >=20
+> > Ben.
+> >=20
 >=20
 
 --=20
@@ -102,24 +117,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TnYVF1hk1c8rpHiF
+--C01fF7hLGvN0zd9s
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrO6cUACgkQbDjKyiDZ
-s5Jy7hAAlPj+A1RKLfJh3zZlw4Q4wAndWRM8CscPpPr3Ks6oK7TgZvAaZ9z+4eA0
-927RtPzj7DDI6nVAq0nYbAPLtL7v7Mi0ymExVbkEyRahEGhlV/Wq4bNNJ8MT4Fj2
-Kj1ozj5LP2zbTVXYe4SGvfse/LhCFrFF/Rbny6kgTpe6UapV9melE7yEsHY42UPO
-AeDlvawwY9O6rgpRNrNrPuRjSEE2RlL9DmmupmTeY6S29c0RFpdjEQDVOofP0mEC
-w731/botMwJb5okz0vGnJriXF5f9gQP4XGZwJD+Cf7HPdxCYvs8tK+17HIMKK74Z
-EFePy2xMvBmKtMZOskWnzKm9qVF1kOTbitF9Yy4/QpxLejLdf0crscgdIpd+CK9E
-t4udVaPyi2BaVl1VM1+zLaEpUMccKNZQJ0rcVR9cxGvI0oxQQe2CwTL9vPJeBa8i
-0/1vuR+7Nn9Kk7+l7ipDTzf2ONMMd+/qJ8gfJrL2bMruB1LzYbAiSl3ttcyIgm0b
-GatrCbDgxYWYn0T6E3DmyiPoZRo8hjLQ1+14a4GogXXJt8uw/OPlm6+N8/YcFqSX
-/x6zkXaXKjuZ8m3r4Cym6JlHoFESZNV/gEV1Une8qacniYwYIikyjSBGrVfE6Yzf
-WJ4m4ZBVSEavzdTgHe4JV1fGmIrWT1GQpKmJyp998nTNuzRLEvE=
-=+TWg
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrO6kcACgkQbDjKyiDZ
+s5I0LA//XsH8/L/uG5pUNsZjKm1e0rbf2/8ecZ4Bct9YdS/cGbJjIR3RRyGGT1wA
+HW17Dr2lQcCIGeBusHWLJKhss0qXi5x7tFIyrc644totKRCFvxTRVed5+OswoEC5
+cYiNiDOA9xyXmBYPx8wfxjVFcZ2VrwtiP3vf9qTBkFlJIih4BVqE2cNH6bf2Esgv
+hFPhHercL5uqzVSVyw+wjkDTBvUCr4ZObMoawntqvsd27fwN7qnkBkIgki9OWvNy
+INe+OLpMiPbEI6TT90TTLJE1SI+sJbzkfJEc7qqfuZLiihzKhgTHsB+s0hKSHT6H
+stZwCVmpVjKVAKyZf4sshEIgU1lGUjWu4g40n6eQGaY3YwcIF2aEmXIHGcyR6+Pp
++Ftpd3l/k8p57kU5N6/hgs2FwK7RVQD9CoMebQK+hpBEfwHCGT5REmRh5Y+4uUgX
+iswf0hWM6XhGvOF87UsDVjpJkLz+1T9BI9accUUoBicbmbKWV3tU4BWBSBC8P1Pe
+izmGZ6afMnQth+bZWYqqP34Gm0uX3QrINNDmGdAuPI8Z75Sy0SyDpozmsjfTxD1T
+5uQijlZA0PNZFJzqIPg2LiFGO+/i+80HT+O+4PdYefihupz7dMj6/UYLxjW2NzoK
+r7RzOQbr7Bln5oWHJHmG9ue8j6CUR6jrRMtAKZPX1GjzTuFiJSY=
+=E+cj
 -----END PGP SIGNATURE-----
 
---TnYVF1hk1c8rpHiF--
+--C01fF7hLGvN0zd9s--
