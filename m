@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f6fhT-0008TM-3B
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:07:56 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f6fi1-0000Mc-CL
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:08:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f6fhO-0002x8-8I
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:07:55 -0400
-Date: Thu, 12 Apr 2018 19:07:11 +0200
-From: Alberto Garcia <berto@igalia.com>
-Message-ID: <20180412170711.GA6240@igalia.com>
+	(envelope-from <alindsay@codeaurora.org>) id 1f6fi0-0003X9-B9
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:08:29 -0400
+Date: Thu, 12 Apr 2018 13:08:16 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180412170816.GI24561@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-11-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA8XARzPc-YEoQVQUEoV2gL+ZOLsqzxhh36xzqjXZXniPw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [RFC] Intermediate block mirroring
+In-Reply-To: <CAFEAcA8XARzPc-YEoQVQUEoV2gL+ZOLsqzxhh36xzqjXZXniPw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 10/22] target/arm: Allow EL change hooks
+ to do IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-Hello,
+On Apr 12 17:53, Peter Maydell wrote:
+> On 16 March 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > During code generation, surround CPSR writes and exception returns which
+> > call the EL change hooks with gen_io_start/end. The immediate need is
+> > for the PMU to access the clock and icount during EL change to support
+> > mode filtering.
+> >
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> >  target/arm/translate-a64.c | 2 ++
+> >  target/arm/translate.c     | 4 ++++
+> >  2 files changed, 6 insertions(+)
+> >
+> > diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> > index 31ff047..e1ae676 100644
+> > --- a/target/arm/translate-a64.c
+> > +++ b/target/arm/translate-a64.c
+> > @@ -1919,7 +1919,9 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+> >              unallocated_encoding(s);
+> >              return;
+> >          }
+> > +        gen_io_start();
+> >          gen_helper_exception_return(cpu_env);
+> > +        gen_io_end();
+> 
+> You don't want to call gen_io_start() or gen_io_end() unless
+> tb_cflags(s->base.tb) & CF_USE_ICOUNT) is true.
+> 
+> (Ditto in the other cases below.)
 
-I mentioned this some time ago, but I'd like to retake it now: I'm
-checking how to copy arbitrary nodes on a backing chain, so if I have
-e.g.
+I assume there's nothing tricky about this and updating this as follows
+is sufficient?
 
-   [A] <- [B] <- [C] <- [D]
+> > +        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+> > +            gen_io_start();
+> > +        }
+> >          gen_helper_exception_return(cpu_env);
+> > +        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+> > +            gen_io_end();
+> > +        }
 
-I'd like to end up with
+-Aaron
 
-   [A] <- [E] <- [C] <- [D]
+> 
+> >          /* Must exit loop to check un-masked IRQs */
+> >          s->base.is_jmp = DISAS_EXIT;
+> >          return;
+> > diff --git a/target/arm/translate.c b/target/arm/translate.c
+> > index ba6ab7d..fd5871e 100644
+> > --- a/target/arm/translate.c
+> > +++ b/target/arm/translate.c
+> > @@ -4536,7 +4536,9 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
+> >       * appropriately depending on the new Thumb bit, so it must
+> >       * be called after storing the new PC.
+> >       */
+> > +    gen_io_start();
+> >      gen_helper_cpsr_write_eret(cpu_env, cpsr);
+> > +    gen_io_end();
+> >      tcg_temp_free_i32(cpsr);
+> >      /* Must exit loop to check un-masked IRQs */
+> >      s->base.is_jmp = DISAS_EXIT;
+> > @@ -9828,7 +9830,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+> >                  if (exc_return) {
+> >                      /* Restore CPSR from SPSR.  */
+> >                      tmp = load_cpu_field(spsr);
+> > +                    gen_io_start();
+> >                      gen_helper_cpsr_write_eret(cpu_env, tmp);
+> > +                    gen_io_end();
+> >                      tcg_temp_free_i32(tmp);
+> >                      /* Must exit loop to check un-masked IRQs */
+> >                      s->base.is_jmp = DISAS_EXIT;
+> > --
+> > Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+> > Qualcomm Technologies, Inc. is a member of the
+> > Code Aurora Forum, a Linux Foundation Collaborative Project.
+> >
+> 
+> thanks
+> -- PMM
 
-where [E] is a copy of [B]. The most obvious use case is to move [B]
-to a different storage backend.
-
-At the moment we can already copy [B] into [E] (outside QEMU) and then
-do
-
-   change-backing-file device=[D] image-node-name=[C] backing-file=[E]
-
-However this only changes the image on disk and the bs->backing_file
-string in memory. QEMU keeps using the [B] BlockDriverState, and we
-need to make it switch to [E].
-
-One possible way to do this would be to modify blockdev-mirror so the
-source image can be located anywhere on a chain. Currently there's
-bs->backing_blocker preventing that, plus qmp_blockdev_mirror()
-refuses to take any non-root source node. Other than permission
-changes I don't think the algorithm itself needs any additional
-modification, although I suppose we'd like to change the backing file
-as part of the same job, and that would require API changes.
-
-One other way is to have a more generic replace-node command which
-would call bdrv_replace_node(), but I don't know if we want to expose
-that and I don't have any other use case for it at the moment.
-
-Opinions, comments?
-
-Berto
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
