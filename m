@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6Y9Z-0000xy-1D
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:04:25 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6YEV-0003wO-8X
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f6Y9T-0005rM-Jj
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:04:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39724 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f6Y9T-0005qu-Ez
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:04:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DAF0EBFEE
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 09:04:08 +0000 (UTC)
-References: <20180412053444.17801-1-peterx@redhat.com>
-	<20180412075514.GA24896@lemon.usersys.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <74e8f82f-8fa2-e7c8-4a15-ba752b4688c9@redhat.com>
-Date: Thu, 12 Apr 2018 11:04:02 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f6YER-0008KD-7z
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:09:31 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
+	<47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
+	<ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
+	<90b289f4-d976-1fb7-57e2-aa02d00947d1@virtuozzo.com>
+	<e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
+	<44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
+Message-ID: <0ad6b9fc-59fd-3c32-43d3-1a4d433d9154@virtuozzo.com>
+Date: Thu, 12 Apr 2018 12:09:10 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180412075514.GA24896@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-thread: always keep the posix
- wrapper layer
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,12 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-On 12/04/2018 09:55, Fam Zheng wrote:
-> Reviewed-by: Fam Zheng <famz@redhat.com>
+12.04.2018 11:34, Vladimir Sementsov-Ogievskiy wrote:
+> 11.04.2018 19:11, Max Reitz wrote:
+>> On 2018-04-11 15:05, Vladimir Sementsov-Ogievskiy wrote:
+>>
+>> [...]
+>>
+>>> Hmm, first type? I'm now not sure about, did I really see sha256
+>>> mismatch, or something like this (should be error, but found bitmap):
+>>>
+>>> --- /work/src/qemu/up-169/tests/qemu-iotests/169.out 2018-04-11
+>>> 15:35:10.055027392 +0300
+>>> +++ /work/src/qemu/up-169/tests/qemu-iotests/169.out.bad 2018-04-11
+>>> 15:58:09.300450045 +0300
+>>> @@ -1,5 +1,20 @@
+>>> -........
+>>> +F.......
+>>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>> +FAIL: test__not_persistent__migbitmap__offline
+>>> (__main__.TestDirtyBitmapMigration)
+>>> +methodcaller(name, ...) --> methodcaller object
+>>> +----------------------------------------------------------------------
+>>> +Traceback (most recent call last):
+>>> +=C2=A0 File "169", line 136, in do_test_migration
+>>> +=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persistent e=
+lse False)
+>>> +=C2=A0 File "169", line 77, in check_bitmap
+>>> +=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
+>>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", lin=
+e=20
+>>> 389,
+>>> in assert_qmp
+>>> +=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
+>>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", lin=
+e=20
+>>> 348,
+>>> in dictpath
+>>> +=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s"' =
+% (path,=20
+>>> str(d)))
+>>> +AssertionError: failed path traversal for "error/desc" in "{u'return':
+>>> {u'sha256':
+>>> u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}}"
+>>>
+>>>
+>>> Max, did you really seed sha256 mismatch or only something like this?
+>> I'm pretty sure I did see mismatches.
+>
+> hm, may be it possible too, because of not waiting for RESUME in this=20
+> case, we can request sha256 in the intermediate state of bitmap loading
 
-Queued, thanks Fam and Peter.
+no. if you see mismatch on first check after migration, then it is after=20
+RESUME event, so it means, migrated broken bitmap, it's a bug..
 
-Paolo
+if you see mismatch on second check - after vm_b stop/start, this means=20
+that it is a persistent case, so incoming migration should fail, and=20
+bitmap is loaded from file, but how it can mismatch? persistance bug?
+
+
+>
+>>
+>> Max
+>
+>
+
+
+--=20
+Best regards,
+Vladimir
