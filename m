@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1f6dwC-0005p1-K2
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1f6dwG-0005uS-JT
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1f6dwB-0007W9-JG
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:00 -0400
-Received: from mga09.intel.com ([134.134.136.24]:48812)
+	(envelope-from <eblake@redhat.com>) id 1f6dwD-0007XI-Ed
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37638 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f6dwB-0007PY-6P
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:14:59 -0400
-From: Tiwei Bie <tiwei.bie@intel.com>
-Date: Thu, 12 Apr 2018 23:12:31 +0800
-Message-Id: <20180412151232.17506-6-tiwei.bie@intel.com>
-In-Reply-To: <20180412151232.17506-1-tiwei.bie@intel.com>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-Subject: [Qemu-devel] [PATCH v3 5/6] vhost: allow backends to filter memory
- sections
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f6dwD-0007Ww-8P
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:01 -0400
+References: <20180412101858.21304-1-clg@kaod.org>
+	<CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ddb22501-d3d9-22ed-a966-8bb8afabfa17@redhat.com>
+Date: Thu, 12 Apr 2018 10:14:49 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97"
+Subject: Re: [Qemu-devel] [PATCH] migration: discard RAMBlocks of type
+ ram_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +29,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
-Cc: cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com, tiwei.bie@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?= =?UTF-8?Q?r?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com
 
-This patch introduces a vhost op for vhost backends to allow
-them to filter the memory sections that they can handle.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?=
+ =?UTF-8?Q?r?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com
+Message-ID: <ddb22501-d3d9-22ed-a966-8bb8afabfa17@redhat.com>
+Subject: Re: [PATCH] migration: discard RAMBlocks of type ram_device
+References: <20180412101858.21304-1-clg@kaod.org>
+ <CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
----
- hw/virtio/vhost-user.c            | 11 +++++++++++
- hw/virtio/vhost.c                 |  9 +++++++--
- include/hw/virtio/vhost-backend.h |  4 ++++
- 3 files changed, 22 insertions(+), 2 deletions(-)
+On 04/12/2018 06:47 AM, Peter Maydell wrote:
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 9cea2c8c51..791e0a4763 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -1622,6 +1622,16 @@ vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
-     return 0;
- }
- 
-+static bool vhost_user_mem_section_filter(struct vhost_dev *dev,
-+                                          MemoryRegionSection *section)
-+{
-+    bool result;
-+
-+    result = memory_region_get_fd(section->mr) >= 0;
-+
-+    return result;
-+}
-+
- VhostUserState *vhost_user_init(void)
- {
-     VhostUserState *user = g_new0(struct VhostUserState, 1);
-@@ -1663,4 +1673,5 @@ const VhostOps user_ops = {
-         .vhost_set_config = vhost_user_set_config,
-         .vhost_crypto_create_session = vhost_user_crypto_create_session,
-         .vhost_crypto_close_session = vhost_user_crypto_close_session,
-+        .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
- };
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index f51bf573d5..a939a38d97 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -382,7 +382,7 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-     return r;
- }
- 
--static bool vhost_section(MemoryRegionSection *section)
-+static bool vhost_section(struct vhost_dev *dev, MemoryRegionSection *section)
- {
-     bool result;
-     bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
-@@ -395,6 +395,11 @@ static bool vhost_section(MemoryRegionSection *section)
-      */
-     result &= !log_dirty;
- 
-+    if (result && dev->vhost_ops->vhost_backend_mem_section_filter) {
-+        result &=
-+            dev->vhost_ops->vhost_backend_mem_section_filter(dev, section);
-+    }
-+
-     trace_vhost_section(section->mr->name, result);
-     return result;
- }
-@@ -628,7 +633,7 @@ static void vhost_region_addnop(MemoryListener *listener,
-     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-                                          memory_listener);
- 
--    if (!vhost_section(section)) {
-+    if (!vhost_section(dev, section)) {
-         return;
-     }
-     vhost_region_add_section(dev, section);
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 5dac61f9ea..81283ec50f 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -101,6 +101,9 @@ typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
- typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
-                                              uint64_t session_id);
- 
-+typedef bool (*vhost_backend_mem_section_filter_op)(struct vhost_dev *dev,
-+                                                MemoryRegionSection *section);
-+
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -138,6 +141,7 @@ typedef struct VhostOps {
-     vhost_set_config_op vhost_set_config;
-     vhost_crypto_create_session_op vhost_crypto_create_session;
-     vhost_crypto_close_session_op vhost_crypto_close_session;
-+    vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
- } VhostOps;
- 
- extern const VhostOps user_ops;
--- 
-2.11.0
+>>  /*
+>> + * Identifies RAM blocks which should be discarded from migration. Fo=
+r
+>> + * the moment, it only applies to blocks backed by a 'ram_device'
+>> + * memory region.
+>> + */
+>> +static inline bool ram_block_is_migratable(RAMBlock *block)
+>> +{
+>> +    return !memory_region_is_ram_device(block->mr);
+>> +}
+>> +
+>> +/* Should be holding either ram_list.mutex, or the RCU lock. */
+>> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+>> +    RAMBLOCK_FOREACH(block)                            \
+>> +        if (ram_block_is_migratable(block))
+>=20
+> This will mishandle some uses, like:
+>=20
+>     if (foo)
+>         RAMBLOCK_FOREACH_MIGRATABLE(block)
+>             stuff;
+>     else
+>         morestuff;
+>=20
+> as the if() inside the macro will capture the else clause.
+> (The lack of braces in the calling code would be against our
+> coding style, of course, so not very likely.)
+
+All existing callers of RAMBLOCK_FOREACH() already supply their own {}
+around stuff (same is true for QLIST_FOREACH_RCU(), which is what is
+being used under the hood).  By the time you correct that to:
+
+if (foo)
+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+        stuff;
+    }
+else
+    morestuff;
+
+then even though the outer if violates coding standard, the correct
+usage of the macro with {} around stuff won't leak that there is a
+trailing if.
+
+But yeah, if you're worrying about code that omitted {}, then dealing
+with omitted {} in both places is something to think about.
+
+>=20
+> Eric, is there a 'standard' trick for this? I thought of
+> maybe
+>=20
+> #define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+>     RAMBLOCK_FOREACH(block)                            \
+>         if (!ram_block_is_migratable(block)) {} else
+
+at which point, yes, this is a little bit safer for taking exactly one
+statement without risking that a later bare 'else' could match to the
+wrong unbraced 'if'.  I'm not coming up with any better ideas for
+(abusing?) the syntax.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrPd+kACgkQp6FrSiUn
+Q2rqzQf/farJtTH+FkslJSnd+b6MMzJ+sCPV3lXTSXk1WtmA/WEzw+U3/lVEKGug
+MDErrwSX4Hnxt8XLkRd3G56DNUyLuPOGYpd47Bmjgit9Pwzc1RAaTYlyw3813yC0
+l6zjflX0KGKz3XWtEPJGNPd4GAk7Ll1KTS+Y2PsyenBxwlBK5ae5bUJFw78USWK8
+52Tpq4spV1r03DyaBXj0HU3QM74crupl5JDUoOpkEeHnAALOF1wjBH+M3E74RVav
+C8zYxtAswtlot/jFanzhfKXGK4M3DFwkZN9KuB/LwvH6QxvbiPmUSfajZmZfpO6M
+tkR4kjxdKOQ3t9V0n8mL3Z1EueEBeg==
+=u4i5
+-----END PGP SIGNATURE-----
+
+--ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97--
