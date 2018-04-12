@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f6hrQ-0005Yo-Er
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 15:26:22 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f6hz3-0001GO-2l
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 15:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f6hrN-0005qM-5a
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 15:26:20 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 12 Apr 2018 21:26:02 +0200
-Message-Id: <20180412192602.13430-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC] s390x: refactor reset/reipl handling
+	(envelope-from <alindsay@codeaurora.org>) id 1f6hz2-0003D2-56
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 15:34:13 -0400
+Date: Thu, 12 Apr 2018 15:34:02 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180412193402.GL24561@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA8G-WD2U4+NUzWYk_gwM51-mmDNj6o9CeeAjW+USSW=uw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8G-WD2U4+NUzWYk_gwM51-mmDNj6o9CeeAjW+USSW=uw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/22] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,402 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
-not be the best idea. As pause_all_vcpus() temporarily drops the qemu
-mutex, two parallel calls to pause_all_vcpus() can be active at a time,
-resulting in a deadlock. (either by two VCPUs or by the main thread and a
-VCPU)
+On Apr 12 18:32, Peter Maydell wrote:
+> On 16 March 2018 at 20:30, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > The ARM PMU implementation currently contains a basic cycle counter, but it is
+> > often useful to gather counts of other events and filter them based on
+> > execution mode. These patches flesh out the implementations of various PMU
+> > registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
+> > represent arbitrary counter types, implement mode filtering, and add
+> > instruction, cycle, and software increment events.
+> 
+> Hi; sorry it's taken me a while to get to this (I've been focusing
+> on for-2.12 work). I've now reviewed most of the patches in this
+> set. My suggestion is that you fix the stuff I've commented on
+> and send out a v4, and then I can take some of the patches from
+> the start of that into target-arm.next, and I'll review the tail
+> end of the set then.
 
-Let's handle it via the main loop instead, as suggested by Paolo. If we
-would have two parallel reset requests by two different VCPUs at the
-same time, the last one would win.
+Thanks for the review! I'll see if I can get a v4 out late this week or
+early next.
 
-We use the existing ipl device to handle it. The nice side effect is
-that we can get rid of reipl_requested.
+I'll make a note of this when I send it out, but one thing to look out
+for in the next version is that I had to reorganize a few things to make
+the interrupt-on-overflow functionality work better. I think the changes
+are fairly minor and limited to the later patches, with the possible
+exception of using two variables per counter (because you have to know
+what the previous counter value was in addition to the current value to
+know if you've overflowed since your last check).
 
-This change implies that all reset handling now goes via the common
-path, so "no-reboot" handling is now active for all kinds of reboots.
+-Aaron
 
-Let's execute any CPU initialization code on the target CPU using
-run_on_cpu.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-
-Did only a quick check with TCG. I think this way it is way easier to
-control what is getting reset.
-
- hw/s390x/ipl.c                     | 44 ++++++++++++++++++++++++---
- hw/s390x/ipl.h                     | 16 ++++++++--
- hw/s390x/s390-virtio-ccw.c         | 49 +++++++++++++++++++++++++-----
- include/hw/s390x/s390-virtio-ccw.h |  2 --
- target/s390x/cpu.h                 | 26 ++++++++++++++++
- target/s390x/diag.c                | 61 +++-----------------------------------
- target/s390x/internal.h            |  6 ----
- target/s390x/kvm.c                 |  2 +-
- 8 files changed, 127 insertions(+), 79 deletions(-)
-
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index fb554ab156..f7589d20f1 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -26,6 +26,7 @@
- #include "qemu/config-file.h"
- #include "qemu/cutils.h"
- #include "qemu/option.h"
-+#include "exec/exec-all.h"
- 
- #define KERN_IMAGE_START                0x010000UL
- #define KERN_PARM_AREA                  0x010480UL
-@@ -484,11 +485,22 @@ IplParameterBlock *s390_ipl_get_iplb(void)
-     return &ipl->iplb;
- }
- 
--void s390_reipl_request(void)
-+void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
- {
-     S390IPLState *ipl = get_ipl_device();
- 
--    ipl->reipl_requested = true;
-+    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
-+        /* let's always use CPU 0 */
-+        ipl->reset_cpu = NULL;
-+    } else {
-+        ipl->reset_cpu = cs;
-+    }
-+    ipl->reset_type = reset_type;
-+
-+    if (reset_type != S390_RESET_REIPL) {
-+        goto no_reipl;
-+    }
-+
-     if (ipl->iplb_valid &&
-         !ipl->netboot &&
-         ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
-@@ -505,7 +517,32 @@ void s390_reipl_request(void)
-             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
-         }
-     }
-+no_reipl:
-     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    /* as this is triggered by a CPU, make sure to exit the loop */
-+    if (tcg_enabled()) {
-+        cpu_loop_exit(cs);
-+    }
-+}
-+
-+void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type)
-+{
-+    S390IPLState *ipl = get_ipl_device();
-+
-+    *cs = ipl->reset_cpu;
-+    if (!ipl->reset_cpu) {
-+        /* use CPU 0 as default */
-+        *cs = qemu_get_cpu(0);
-+    }
-+    *reset_type = ipl->reset_type;
-+}
-+
-+void s390_ipl_clear_reset_request(void)
-+{
-+    S390IPLState *ipl = get_ipl_device();
-+
-+    ipl->reset_type = S390_RESET_EXTERNAL;
-+    ipl->reset_cpu = NULL;
- }
- 
- static void s390_ipl_prepare_qipl(S390CPU *cpu)
-@@ -552,11 +589,10 @@ static void s390_ipl_reset(DeviceState *dev)
- {
-     S390IPLState *ipl = S390_IPL(dev);
- 
--    if (!ipl->reipl_requested) {
-+    if (ipl->reset_type != S390_RESET_REIPL) {
-         ipl->iplb_valid = false;
-         memset(&ipl->iplb, 0, sizeof(IplParameterBlock));
-     }
--    ipl->reipl_requested = false;
- }
- 
- static void s390_ipl_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 0570d0ad75..102f1ea7af 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -87,7 +87,17 @@ int s390_ipl_set_loadparm(uint8_t *loadparm);
- void s390_ipl_update_diag308(IplParameterBlock *iplb);
- void s390_ipl_prepare_cpu(S390CPU *cpu);
- IplParameterBlock *s390_ipl_get_iplb(void);
--void s390_reipl_request(void);
-+
-+enum s390_reset {
-+    /* default is a reset not triggered by a CPU e.g. issued by QMP */
-+    S390_RESET_EXTERNAL = 0,
-+    S390_RESET_REIPL,
-+    S390_RESET_MODIFIED_CLEAR,
-+    S390_RESET_LOAD_NORMAL,
-+};
-+void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
-+void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
-+void s390_ipl_clear_reset_request(void);
- 
- #define QIPL_ADDRESS  0xcc
- 
-@@ -129,9 +139,11 @@ struct S390IPLState {
-     bool enforce_bios;
-     IplParameterBlock iplb;
-     bool iplb_valid;
--    bool reipl_requested;
-     bool netboot;
-     QemuIplParameters qipl;
-+    /* reset related properties don't have to be migrated or reset */
-+    enum s390_reset reset_type;
-+    CPUState *reset_cpu;
- 
-     /*< public >*/
-     char *kernel;
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 435f7c99e7..f625900435 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -93,7 +93,7 @@ static const char *const reset_dev_types[] = {
-     "diag288",
- };
- 
--void subsystem_reset(void)
-+static void subsystem_reset(void)
- {
-     DeviceState *dev;
-     int i;
-@@ -364,17 +364,52 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
-     }
- }
- 
-+static inline void s390_do_cpu_ipl(CPUState *cs, run_on_cpu_data arg)
-+{
-+    S390CPU *cpu = S390_CPU(cs);
-+
-+    s390_ipl_prepare_cpu(cpu);
-+    s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
-+}
-+
- static void s390_machine_reset(void)
- {
--    S390CPU *ipl_cpu = S390_CPU(qemu_get_cpu(0));
-+    enum s390_reset reset_type;
-+    CPUState *cs, *t;
- 
-+    /* get the reset parameters, reset them once done */
-+    s390_ipl_get_reset_request(&cs, &reset_type);
-+
-+    /* all CPUs are paused and synchronized at this point */
-     s390_cmma_reset();
--    qemu_devices_reset();
--    s390_crypto_reset();
- 
--    /* all cpus are stopped - configure and start the ipl cpu only */
--    s390_ipl_prepare_cpu(ipl_cpu);
--    s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
-+    switch (reset_type) {
-+    case S390_RESET_EXTERNAL:
-+    case S390_RESET_REIPL:
-+        qemu_devices_reset();
-+        s390_crypto_reset();
-+
-+        /* configure and start the ipl CPU only */
-+        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
-+        break;
-+    case S390_RESET_MODIFIED_CLEAR:
-+        CPU_FOREACH(t) {
-+            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-+        }
-+        subsystem_reset();
-+        s390_crypto_reset();
-+        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
-+        break;
-+    case S390_RESET_LOAD_NORMAL:
-+        CPU_FOREACH(t) {
-+            run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-+        }
-+        subsystem_reset();
-+        run_on_cpu(cs, s390_do_cpu_initital_reset, RUN_ON_CPU_NULL);
-+        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
-+        break;
-+    }
-+    s390_ipl_clear_reset_request();
- }
- 
- static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index ac896e31ea..ab88d49d10 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -53,6 +53,4 @@ bool cpu_model_allowed(void);
-  */
- bool css_migration_enabled(void);
- 
--void subsystem_reset(void);
--
- #endif
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 3ee40f08b7..0c2583fd3c 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -686,6 +686,32 @@ static inline uint64_t s390_build_validity_mcic(void)
-     return mcic;
- }
- 
-+static inline void s390_do_cpu_full_reset(CPUState *cs, run_on_cpu_data arg)
-+{
-+    cpu_reset(cs);
-+}
-+
-+static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
-+{
-+    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
-+
-+    scc->cpu_reset(cs);
-+}
-+
-+static inline void s390_do_cpu_initital_reset(CPUState *cs, run_on_cpu_data arg)
-+{
-+    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
-+
-+    scc->initial_cpu_reset(cs);
-+}
-+
-+static inline void s390_do_cpu_load_normal(CPUState *cs, run_on_cpu_data arg)
-+{
-+    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
-+
-+    scc->load_normal(cs);
-+}
-+
- 
- /* cpu.c */
- int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index a755837ad5..ac2c40f363 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -22,51 +22,6 @@
- #include "hw/s390x/ipl.h"
- #include "hw/s390x/s390-virtio-ccw.h"
- 
--static int modified_clear_reset(S390CPU *cpu)
--{
--    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
--    CPUState *t;
--
--    pause_all_vcpus();
--    cpu_synchronize_all_states();
--    CPU_FOREACH(t) {
--        run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
--    }
--    s390_cmma_reset();
--    subsystem_reset();
--    s390_crypto_reset();
--    scc->load_normal(CPU(cpu));
--    cpu_synchronize_all_post_reset();
--    resume_all_vcpus();
--    return 0;
--}
--
--static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
--{
--    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
--
--    scc->cpu_reset(cs);
--}
--
--static int load_normal_reset(S390CPU *cpu)
--{
--    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
--    CPUState *t;
--
--    pause_all_vcpus();
--    cpu_synchronize_all_states();
--    CPU_FOREACH(t) {
--        run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
--    }
--    s390_cmma_reset();
--    subsystem_reset();
--    scc->initial_cpu_reset(CPU(cpu));
--    scc->load_normal(CPU(cpu));
--    cpu_synchronize_all_post_reset();
--    resume_all_vcpus();
--    return 0;
--}
--
- int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
- {
-     uint64_t func = env->regs[r1];
-@@ -101,6 +56,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
- 
- void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- {
-+    CPUState *cs = CPU(s390_env_get_cpu(env));
-     uint64_t addr =  env->regs[r1];
-     uint64_t subcode = env->regs[r3];
-     IplParameterBlock *iplb;
-@@ -117,22 +73,13 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- 
-     switch (subcode) {
-     case 0:
--        modified_clear_reset(s390_env_get_cpu(env));
--        if (tcg_enabled()) {
--            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
--        }
-+        s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
-         break;
-     case 1:
--        load_normal_reset(s390_env_get_cpu(env));
--        if (tcg_enabled()) {
--            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
--        }
-+        s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
-         break;
-     case 3:
--        s390_reipl_request();
--        if (tcg_enabled()) {
--            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
--        }
-+        s390_ipl_reset_request(cs, S390_RESET_REIPL);
-         break;
-     case 5:
-         if ((r1 & 1) || (addr & 0x0fffULL)) {
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index d911e84958..e392a02d12 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -273,12 +273,6 @@ static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
- /* Base/displacement are at the same locations. */
- #define decode_basedisp_rs decode_basedisp_s
- 
--static inline void s390_do_cpu_full_reset(CPUState *cs, run_on_cpu_data arg)
--{
--    cpu_reset(cs);
--}
--
--
- /* arch_dump.c */
- int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, void *opaque);
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index fb59d92def..b033d53f69 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1785,7 +1785,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-             ret = handle_intercept(cpu);
-             break;
-         case KVM_EXIT_S390_RESET:
--            s390_reipl_request();
-+            s390_ipl_reset_request(cs, S390_RESET_REIPL);
-             break;
-         case KVM_EXIT_S390_TSCH:
-             ret = handle_tsch(cpu);
 -- 
-2.14.3
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
