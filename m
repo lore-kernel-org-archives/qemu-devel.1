@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f6X4r-0005ml-9j
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:55:30 -0400
+	(envelope-from <famz@redhat.com>) id 1f6XHD-00053Q-1y
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:08:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f6X4n-0004Eg-8w
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:55:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51772 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1f6XH9-0004IJ-2Z
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:08:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37288 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f6X4m-0004EL-W1
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 03:55:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2ECD42BDF12
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 07:55:19 +0000 (UTC)
-Date: Thu, 12 Apr 2018 15:55:14 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f6XH8-0004Hy-Tl
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 04:08:10 -0400
+Date: Thu, 12 Apr 2018 16:07:59 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180412075514.GA24896@lemon.usersys.redhat.com>
-References: <20180412053444.17801-1-peterx@redhat.com>
+Message-ID: <20180412080759.GB24896@lemon.usersys.redhat.com>
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+	<20180410193919.28026-7-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180412053444.17801-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-thread: always keep the posix
- wrapper layer
+In-Reply-To: <20180410193919.28026-7-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 06/24] docker: extend "cc" command to
+ accept compiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,96 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, cota@braap.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On Thu, 04/12 13:34, Peter Xu wrote:
-> We will conditionally have a wrapper layer depending on whether the host
-> has the PTHREAD_SETNAME capability.  It complicates stuff.  Let's keep
-> the wrapper there; we opt out the pthread_setname_np() call only.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Tue, 04/10 20:39, Alex Benn=E9e wrote:
+> When calling our cross-compilation images we want to call something
+> other than the default cc.
+
+Makes sense to me!
+
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
 > ---
-> v2:
-> - set thread name only conditionally [Eric]
-> ---
->  util/qemu-thread-posix.c | 33 +++++++++++++--------------------
->  1 file changed, 13 insertions(+), 20 deletions(-)
-> 
-> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> index b789cf32e9..a1c34ba6f2 100644
-> --- a/util/qemu-thread-posix.c
-> +++ b/util/qemu-thread-posix.c
-> @@ -482,7 +482,6 @@ static void __attribute__((constructor)) qemu_thread_atexit_init(void)
->  }
->  
->  
-> -#ifdef CONFIG_PTHREAD_SETNAME_NP
->  typedef struct {
->      void *(*start_routine)(void *);
->      void *arg;
-> @@ -495,16 +494,18 @@ static void *qemu_thread_start(void *args)
->      void *(*start_routine)(void *) = qemu_thread_args->start_routine;
->      void *arg = qemu_thread_args->arg;
->  
-> +#ifdef CONFIG_PTHREAD_SETNAME_NP
->      /* Attempt to set the threads name; note that this is for debug, so
->       * we're not going to fail if we can't set it.
->       */
-> -    pthread_setname_np(pthread_self(), qemu_thread_args->name);
-> +    if (name_threads && qemu_thread_args->name) {
-> +        pthread_setname_np(pthread_self(), qemu_thread_args->name);
-> +    }
-> +#endif
->      g_free(qemu_thread_args->name);
->      g_free(qemu_thread_args);
->      return start_routine(arg);
->  }
-> -#endif
-> -
->  
->  void qemu_thread_create(QemuThread *thread, const char *name,
->                         void *(*start_routine)(void*),
-> @@ -513,6 +514,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->      sigset_t set, oldset;
->      int err;
->      pthread_attr_t attr;
-> +    QemuThreadArgs *qemu_thread_args;
->  
->      err = pthread_attr_init(&attr);
->      if (err) {
-> @@ -527,22 +529,13 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->      sigfillset(&set);
->      pthread_sigmask(SIG_SETMASK, &set, &oldset);
->  
-> -#ifdef CONFIG_PTHREAD_SETNAME_NP
-> -    if (name_threads) {
-> -        QemuThreadArgs *qemu_thread_args;
-> -        qemu_thread_args = g_new0(QemuThreadArgs, 1);
-> -        qemu_thread_args->name = g_strdup(name);
-> -        qemu_thread_args->start_routine = start_routine;
-> -        qemu_thread_args->arg = arg;
-> -
-> -        err = pthread_create(&thread->thread, &attr,
-> -                             qemu_thread_start, qemu_thread_args);
-> -    } else
-> -#endif
-> -    {
-> -        err = pthread_create(&thread->thread, &attr,
-> -                             start_routine, arg);
-> -    }
-> +    qemu_thread_args = g_new0(QemuThreadArgs, 1);
-> +    qemu_thread_args->name = g_strdup(name);
-> +    qemu_thread_args->start_routine = start_routine;
-> +    qemu_thread_args->arg = arg;
+>  tests/docker/docker.py | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 8733266153..9444f4bea4 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -397,6 +397,8 @@ class CcCommand(SubCommand):
+>      def args(self, parser):
+>          parser.add_argument("--image", "-i", required=3DTrue,
+>                              help=3D"The docker image in which to run c=
+c")
+> +        parser.add_argument("--cc",
+> +                            help=3D"The compiler executable to call")
+
+If add "default=3D'cc'" to this call, we don't need the 'if args.cc' chec=
+k below.
+
+>          parser.add_argument("--source-path", "-s", nargs=3D"*", dest=3D=
+"paths",
+>                              help=3D"""Extra paths to (ro) mount into c=
+ontainer for
+>                              reading sources""")
+> @@ -407,9 +409,19 @@ class CcCommand(SubCommand):
+>          cwd =3D os.getcwd()
+>          cmd =3D ["--rm", "-w", cwd,
+>                 "-v", "%s:%s:rw" % (cwd, cwd)]
+> -        for p in args.paths:
+> -           cmd +=3D ["-v", "%s:%s:ro,z" % (p, p)]
+> -        cmd +=3D [args.image, "cc"]
 > +
-> +    err = pthread_create(&thread->thread, &attr,
-> +                         qemu_thread_start, qemu_thread_args);
->  
->      if (err)
->          error_exit(err, __func__);
-> -- 
-> 2.14.3
-> 
+> +        if args.paths:
+> +            for p in args.paths:
+> +                cmd +=3D ["-v", "%s:%s:ro,z" % (p, p)]
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+I'm not sure the introduction of this if condition belongs to this patch,=
+ or is
+necessary at all. Could you confirm?
+
+Thanks.
+
+Fam
+
+> +
+> +        cmd +=3D [args.image]
+> +
+> +        # The compile command we are running
+> +        if args.cc:
+> +            cmd +=3D [args.cc]
+> +        else:
+> +            cmd +=3D ["cc"]
+> +
+>          cmd +=3D argv
+>          return Docker().command("run", cmd, True)
+> =20
+> --=20
+> 2.16.2
+>=20
