@@ -1,14 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f6YOb-0002ue-3k
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:19:58 -0400
+	(envelope-from <david@redhat.com>) id 1f6Ydl-00042N-3g
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f6YOZ-00079B-V4
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:19:57 -0400
+	(envelope-from <david@redhat.com>) id 1f6Ydg-0000YT-5R
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 05:35:37 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 12 Apr 2018 11:19:33 +0200
-Message-Id: <20180412091936.32446-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 0/3] pc-dimm: factor out MemoryDevice
+Date: Thu, 12 Apr 2018 11:35:21 +0200
+Message-Id: <20180412093521.2469-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] s390x/kvm: cleanup calls to
+ cpu_synchronize_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,45 +18,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Markus Armbruster --cc=qemu-ppc @ nongnu . org" <armbru@redhat.com>
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Right now we can only map PCDIMM/NVDIMM into guest address space. In the
-future, we might want to do the same for virtio devices - e.g.
-virtio-pmem or virtio-mem. Especially, they should be able to live side
-by side to each other.
+We have a call to cpu_synchronize_state() on every kvm_arch_handle_exit().
 
-E.g. the virto based memory devices regions will not be exposed via ACPI
-and friends. They will be detected just like other virtio devices and
-indicate the applicable memory region. This makes it possible to also use
-them on architectures without memory device detection support (e.g. s390x).
+Let's remove the ones that are no longer needed.
 
-Let's factor out the memory device code into a MemoryDevice interface.
+Remaining places (for s390x) are in
+- target/s390x/sigp.c, on the target CPU
+- target/s390x/cpu.c:s390_cpu_get_crash_info()
 
-See the patch descriptions for details.
+While at it, use kvm_cpu_synchronize_state() instead of
+cpu_synchronize_state() in KVM code. (suggested by Thomas Huth)
 
-David Hildenbrand (3):
-  pc-dimm: factor out MemoryDevice interface
-  machine: make MemoryHotplugState accessible via the machine
-  pc-dimm: factor out address space logic into MemoryDevice code
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/s390x/s390-pci-inst.c |  8 --------
+ target/s390x/kvm.c       | 20 +-------------------
+ 2 files changed, 1 insertion(+), 27 deletions(-)
 
- hw/i386/acpi-build.c                         |   3 +-
- hw/i386/pc.c                                 |  24 ++-
- hw/mem/Makefile.objs                         |   1 +
- hw/mem/memory-device.c                       | 281 +++++++++++++++++++++++++
- hw/mem/pc-dimm.c                             | 304 +++++++--------------------
- hw/ppc/spapr.c                               |  15 +-
- include/hw/boards.h                          |  16 ++
- include/hw/mem/memory-device.h               |  48 +++++
- include/hw/mem/pc-dimm.h                     |  26 +--
- numa.c                                       |   3 +-
- qmp.c                                        |   4 +-
- stubs/Makefile.objs                          |   2 +-
- stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
- 13 files changed, 460 insertions(+), 271 deletions(-)
- create mode 100644 hw/mem/memory-device.c
- create mode 100644 include/hw/mem/memory-device.h
- rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
-
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 3fcc330fe3..02a815fd31 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -155,8 +155,6 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
+     S390pciState *s = s390_get_phb();
+     int i;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+         s390_program_interrupt(env, PGM_PRIVILEGED, 4, ra);
+         return 0;
+@@ -389,8 +387,6 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
+     uint32_t fh;
+     uint8_t pcias;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+         s390_program_interrupt(env, PGM_PRIVILEGED, 4, ra);
+         return 0;
+@@ -487,8 +483,6 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
+     uint32_t fh;
+     uint8_t pcias;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+         s390_program_interrupt(env, PGM_PRIVILEGED, 4, ra);
+         return 0;
+@@ -620,8 +614,6 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
+     S390IOTLBEntry entry;
+     hwaddr start, end;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+         s390_program_interrupt(env, PGM_PRIVILEGED, 4, ra);
+         return 0;
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index fb59d92def..12b90cf5c5 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1081,7 +1081,6 @@ static int kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
+     uint32_t code;
+     int r = 0;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+     sccb = env->regs[ipbh0 & 0xf];
+     code = env->regs[(ipbh0 & 0xf0) >> 4];
+ 
+@@ -1101,8 +1100,6 @@ static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+     int rc = 0;
+     uint16_t ipbh0 = (run->s390_sieic.ipb & 0xffff0000) >> 16;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     switch (ipa1) {
+     case PRIV_B2_XSCH:
+         ioinst_handle_xsch(cpu, env->regs[1], RA_IGNORED);
+@@ -1248,7 +1245,6 @@ static int kvm_stpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
+     uint8_t ar;
+ 
+     if (s390_has_feat(S390_FEAT_ZPCI)) {
+-        cpu_synchronize_state(CPU(cpu));
+         fiba = get_base_disp_rxy(cpu, run, &ar);
+ 
+         return stpcifc_service_call(cpu, r1, fiba, ar, RA_IGNORED);
+@@ -1266,7 +1262,6 @@ static int kvm_sic_service_call(S390CPU *cpu, struct kvm_run *run)
+     uint16_t mode;
+     int r;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+     mode = env->regs[r1] & 0xffff;
+     isc = (env->regs[r3] >> 27) & 0x7;
+     r = css_do_sic(env, isc, mode);
+@@ -1297,7 +1292,6 @@ static int kvm_pcistb_service_call(S390CPU *cpu, struct kvm_run *run)
+     uint8_t ar;
+ 
+     if (s390_has_feat(S390_FEAT_ZPCI)) {
+-        cpu_synchronize_state(CPU(cpu));
+         gaddr = get_base_disp_rsy(cpu, run, &ar);
+ 
+         return pcistb_service_call(cpu, r1, r3, gaddr, ar, RA_IGNORED);
+@@ -1313,7 +1307,6 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
+     uint8_t ar;
+ 
+     if (s390_has_feat(S390_FEAT_ZPCI)) {
+-        cpu_synchronize_state(CPU(cpu));
+         fiba = get_base_disp_rxy(cpu, run, &ar);
+ 
+         return mpcifc_service_call(cpu, r1, fiba, ar, RA_IGNORED);
+@@ -1401,7 +1394,6 @@ static int handle_hypercall(S390CPU *cpu, struct kvm_run *run)
+     CPUS390XState *env = &cpu->env;
+     int ret;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+     ret = s390_virtio_hypercall(env);
+     if (ret == -EINVAL) {
+         kvm_s390_program_interrupt(cpu, PGM_SPECIFICATION);
+@@ -1416,7 +1408,6 @@ static void kvm_handle_diag_288(S390CPU *cpu, struct kvm_run *run)
+     uint64_t r1, r3;
+     int rc;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+     r1 = (run->s390_sieic.ipa & 0x00f0) >> 4;
+     r3 = run->s390_sieic.ipa & 0x000f;
+     rc = handle_diag_288(&cpu->env, r1, r3);
+@@ -1429,7 +1420,6 @@ static void kvm_handle_diag_308(S390CPU *cpu, struct kvm_run *run)
+ {
+     uint64_t r1, r3;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+     r1 = (run->s390_sieic.ipa & 0x00f0) >> 4;
+     r3 = run->s390_sieic.ipa & 0x000f;
+     handle_diag_308(&cpu->env, r1, r3, RA_IGNORED);
+@@ -1440,8 +1430,6 @@ static int handle_sw_breakpoint(S390CPU *cpu, struct kvm_run *run)
+     CPUS390XState *env = &cpu->env;
+     unsigned long pc;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     pc = env->psw.addr - sw_bp_ilen;
+     if (kvm_find_sw_breakpoint(CPU(cpu), pc)) {
+         env->psw.addr = pc;
+@@ -1493,8 +1481,6 @@ static int kvm_s390_handle_sigp(S390CPU *cpu, uint8_t ipa1, uint32_t ipb)
+     int ret;
+     uint8_t order;
+ 
+-    cpu_synchronize_state(CPU(cpu));
+-
+     /* get order code */
+     order = decode_basedisp_rs(env, ipb, NULL) & SIGP_ORDER_MASK;
+ 
+@@ -1556,7 +1542,6 @@ static int handle_oper_loop(S390CPU *cpu, struct kvm_run *run)
+     CPUState *cs = CPU(cpu);
+     PSW oldpsw, newpsw;
+ 
+-    cpu_synchronize_state(cs);
+     newpsw.mask = ldq_phys(cs->as, cpu->env.psa +
+                            offsetof(LowCore, program_new_psw));
+     newpsw.addr = ldq_phys(cs->as, cpu->env.psa +
+@@ -1609,7 +1594,6 @@ static int handle_intercept(S390CPU *cpu)
+             break;
+         case ICPT_WAITPSW:
+             /* disabled wait, since enabled wait is handled in kernel */
+-            cpu_synchronize_state(cs);
+             s390_handle_wait(cpu);
+             r = EXCP_HALTED;
+             break;
+@@ -1651,8 +1635,6 @@ static int handle_tsch(S390CPU *cpu)
+     struct kvm_run *run = cs->kvm_run;
+     int ret;
+ 
+-    cpu_synchronize_state(cs);
+-
+     ret = ioinst_handle_tsch(cpu, cpu->env.regs[1], run->s390_tsch.ipb,
+                              RA_IGNORED);
+     if (ret < 0) {
+@@ -1778,7 +1760,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+ 
+     qemu_mutex_lock_iothread();
+ 
+-    cpu_synchronize_state(cs);
++    kvm_cpu_synchronize_state(cs);
+ 
+     switch (run->exit_reason) {
+         case KVM_EXIT_S390_SIEIC:
 -- 
 2.14.3
