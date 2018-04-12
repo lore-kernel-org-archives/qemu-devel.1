@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6anM-0004YU-TQ
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:53:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f6asH-0007LH-ML
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6anL-0003TN-Vi
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:53:40 -0400
-Date: Thu, 12 Apr 2018 13:53:16 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180412115316.GC5004@localhost.localdomain>
-References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-8-kwolf@redhat.com>
-	<33c2ce2d-18d6-5479-19d4-3a1923cea3cb@redhat.com>
-	<20180412095157.GA5004@localhost.localdomain>
-	<f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
-	<20180412111143.GB5004@localhost.localdomain>
-	<569800ae-12f8-53f1-012a-50408700ba39@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1f6asD-0007Od-AY
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:58:45 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40101)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f6asD-0007Mw-2y
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:58:41 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v60so940575wrc.7
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 04:58:40 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 12 Apr 2018 12:58:37 +0100
+Message-Id: <20180412115838.10208-2-alex.bennee@linaro.org>
+In-Reply-To: <20180412115838.10208-1-alex.bennee@linaro.org>
+References: <20180412115838.10208-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <569800ae-12f8-53f1-012a-50408700ba39@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/19] block: Really pause block jobs on
- drain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 1/2] softfloat: fix {min,
+ max}nummag for same-abs-value inputs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Am 12.04.2018 um 13:30 hat Paolo Bonzini geschrieben:
-> On 12/04/2018 13:11, Kevin Wolf wrote:
-> >> Well, there is one gotcha: bdrv_ref protects against disappearance, but
-> >> bdrv_ref/bdrv_unref are not thread-safe.  Am I missing something else?
-> >
-> > Apart from the above, if we do an extra bdrv_ref/unref we'd also have
-> > to keep track of all the nodes that we've referenced so that we unref
-> > the same nodes again, even if the graph has changes.
-> >
-> > So essentially you'd be introducing a new list of BDSes that we have to
-> > manage and then check for every reachable node whether it's already in
-> > that list or not, and for every node in the list whether it's still
-> > reachable.
-> 
-> That would be a hash table (a set), not a list, so easy to check.  But
-> the thread-safety is a bigger issue.
-> 
-> The problem I have is that there is a direction through which I/O flows
-> (parent-to-child), so why can't draining follow that natural direction.
-> Having to check for the parents' I/O, while draining the child, seems
-> wrong.  Perhaps we can't help it, but I cannot understand the reason.
+From: "Emilio G. Cota" <cota@braap.org>
 
-I'm not sure what's there that could be not understood. You already
-confirmed that we need to drain the parents, too, when we drain a node.
-Drain really must propagate in the opposite direction of I/O, because
-part of its job is to quiesce the origin of any I/O to the node that
-should be drained. Opposite of I/O _is_ the natural direction for drain.
+Before 8936006 ("fpu/softfloat: re-factor minmax", 2018-02-21),
+we used to return +Zero for maxnummag(-Zero,+Zero); after that
+commit, we return -Zero.
 
-We also have subtree drains, but that's not because that's the natural
-direction for drain, but just as a convenience function because some
-operations (e.g. reopen) affect a whole subtree, so they need everything
-in that subtree drained rather than just a single node.
+Fix it by making {min,max}nummag consistent with {min,max}num,
+deferring to the latter when the absolute value of the operands
+is the same.
 
-Kevin
+With this fix we now pass fp-test.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ fpu/softfloat.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index b46dccc63e..9b99aa6ec8 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1704,7 +1704,6 @@ static FloatParts minmax_floats(FloatParts a, FloatParts b, bool ismin,
+         return pick_nan(a, b, s);
+     } else {
+         int a_exp, b_exp;
+-        bool a_sign, b_sign;
+ 
+         switch (a.cls) {
+         case float_class_normal:
+@@ -1735,20 +1734,22 @@ static FloatParts minmax_floats(FloatParts a, FloatParts b, bool ismin,
+             break;
+         }
+ 
+-        a_sign = a.sign;
+-        b_sign = b.sign;
+-        if (ismag) {
+-            a_sign = b_sign = 0;
++        if (ismag && (a_exp != b_exp || a.frac != b.frac)) {
++            bool a_less = a_exp < b_exp;
++            if (a_exp == b_exp) {
++                a_less = a.frac < b.frac;
++            }
++            return a_less ^ ismin ? b : a;
+         }
+ 
+-        if (a_sign == b_sign) {
++        if (a.sign == b.sign) {
+             bool a_less = a_exp < b_exp;
+             if (a_exp == b_exp) {
+                 a_less = a.frac < b.frac;
+             }
+-            return a_sign ^ a_less ^ ismin ? b : a;
++            return a.sign ^ a_less ^ ismin ? b : a;
+         } else {
+-            return a_sign ^ ismin ? b : a;
++            return a.sign ^ ismin ? b : a;
+         }
+     }
+ }
+-- 
+2.17.0
