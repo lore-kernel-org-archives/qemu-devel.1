@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1f6gOF-0008Q2-4Q
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:52:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6gXN-0004Pc-Vh
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1f6gOA-0005YQ-8W
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:52:07 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:33814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1f6gO9-0005X6-UA
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:52:02 -0400
-Date: Thu, 12 Apr 2018 20:51:45 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20180412175140.GA5406@yuvallap>
-References: <20180312183628.394722-9-eblake@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1f6gXN-0003KI-5Y
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:01:34 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:40970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f6gXM-0003Jv-U1
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:01:33 -0400
+Received: by mail-ot0-x241.google.com with SMTP id m22-v6so6993963otf.8
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 11:01:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180312183628.394722-9-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PULL, 08/36] qapi: Remove qobject_to_X() functions
+In-Reply-To: <20180324192455.12254-3-mdavidsaver@gmail.com>
+References: <20180324192455.12254-1-mdavidsaver@gmail.com>
+	<20180324192455.12254-3-mdavidsaver@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Apr 2018 19:01:10 +0100
+Message-ID: <CAFEAcA-MV9YaUybz=N7JdUDbFbLGO=oUsCJVABVJZYaSSUDZxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 02/14] timer: ds1338 use registerfields.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,220 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Michael Davidsaver <mdavidsaver@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Eric,
+On 24 March 2018 at 19:24, Michael Davidsaver <mdavidsaver@gmail.com> wrote:
+> Use names for registers and bits except
+> for R_CTRL which will be dealt with later,
+> and isn't modeled anyway.
+>
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 
-On Mon, Mar 12, 2018 at 01:35:59PM -0500, Eric Blake wrote:
-> From: Max Reitz <mreitz@redhat.com>
-> 
-> They are no longer needed now.
-
-I'm doing some off-list development which use these functions.
-Unfortunately i'm not subscribed (yet) to qemu-devel so obviously missed
-this email.
-
-Is there any alternative to these functions?
-
-My code looks something like this:
-
-QObject *oid;
-unsigned long id;
-
-oid = qlist_pop(list);
-id = qnum_get_uint(qobject_to_qnum(oid));
-
-Since objects in the list are QObject type.
-
-Yuval
-
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Message-Id: <20180224154033.29559-5-mreitz@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  include/qapi/qmp/qbool.h   |  1 -
->  include/qapi/qmp/qdict.h   |  1 -
->  include/qapi/qmp/qlist.h   |  1 -
->  include/qapi/qmp/qnum.h    |  1 -
->  include/qapi/qmp/qstring.h |  1 -
->  qobject/qbool.c            | 11 -----------
->  qobject/qdict.c            | 11 -----------
->  qobject/qlist.c            | 11 -----------
->  qobject/qnum.c             | 11 -----------
->  qobject/qstring.c          | 11 -----------
->  10 files changed, 60 deletions(-)
-> 
-> diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
-> index 629c508d34f..b9a44a1bfe0 100644
-> --- a/include/qapi/qmp/qbool.h
-> +++ b/include/qapi/qmp/qbool.h
-> @@ -23,7 +23,6 @@ struct QBool {
-> 
->  QBool *qbool_from_bool(bool value);
->  bool qbool_get_bool(const QBool *qb);
-> -QBool *qobject_to_qbool(const QObject *obj);
->  bool qbool_is_equal(const QObject *x, const QObject *y);
->  void qbool_destroy_obj(QObject *obj);
-> 
-> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-> index 7c6d8445495..2cc3e906f7b 100644
-> --- a/include/qapi/qmp/qdict.h
-> +++ b/include/qapi/qmp/qdict.h
-> @@ -39,7 +39,6 @@ void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
->  void qdict_del(QDict *qdict, const char *key);
->  int qdict_haskey(const QDict *qdict, const char *key);
->  QObject *qdict_get(const QDict *qdict, const char *key);
-> -QDict *qobject_to_qdict(const QObject *obj);
->  bool qdict_is_equal(const QObject *x, const QObject *y);
->  void qdict_iter(const QDict *qdict,
->                  void (*iter)(const char *key, QObject *obj, void *opaque),
-> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-> index 5fd976a3981..5c673acb060 100644
-> --- a/include/qapi/qmp/qlist.h
-> +++ b/include/qapi/qmp/qlist.h
-> @@ -53,7 +53,6 @@ QObject *qlist_pop(QList *qlist);
->  QObject *qlist_peek(QList *qlist);
->  int qlist_empty(const QList *qlist);
->  size_t qlist_size(const QList *qlist);
-> -QList *qobject_to_qlist(const QObject *obj);
->  bool qlist_is_equal(const QObject *x, const QObject *y);
->  void qlist_destroy_obj(QObject *obj);
-> 
-> diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-> index 15e3971c7f1..3e47475b2cb 100644
-> --- a/include/qapi/qmp/qnum.h
-> +++ b/include/qapi/qmp/qnum.h
-> @@ -68,7 +68,6 @@ double qnum_get_double(QNum *qn);
-> 
->  char *qnum_to_string(QNum *qn);
-> 
-> -QNum *qobject_to_qnum(const QObject *obj);
->  bool qnum_is_equal(const QObject *x, const QObject *y);
->  void qnum_destroy_obj(QObject *obj);
-> 
-> diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
-> index 98070ef3d6a..b72843fc1b0 100644
-> --- a/include/qapi/qmp/qstring.h
-> +++ b/include/qapi/qmp/qstring.h
-> @@ -30,7 +30,6 @@ const char *qstring_get_str(const QString *qstring);
->  void qstring_append_int(QString *qstring, int64_t value);
->  void qstring_append(QString *qstring, const char *str);
->  void qstring_append_chr(QString *qstring, int c);
-> -QString *qobject_to_qstring(const QObject *obj);
->  bool qstring_is_equal(const QObject *x, const QObject *y);
->  void qstring_destroy_obj(QObject *obj);
-> 
-> diff --git a/qobject/qbool.c b/qobject/qbool.c
-> index 5be6277cca8..b58249925c2 100644
-> --- a/qobject/qbool.c
-> +++ b/qobject/qbool.c
-> @@ -39,17 +39,6 @@ bool qbool_get_bool(const QBool *qb)
->      return qb->value;
->  }
-> 
-> -/**
-> - * qobject_to_qbool(): Convert a QObject into a QBool
-> - */
-> -QBool *qobject_to_qbool(const QObject *obj)
-> -{
-> -    if (!obj || qobject_type(obj) != QTYPE_QBOOL) {
-> -        return NULL;
-> -    }
-> -    return container_of(obj, QBool, base);
-> -}
-> -
->  /**
->   * qbool_is_equal(): Test whether the two QBools are equal
->   */
-> diff --git a/qobject/qdict.c b/qobject/qdict.c
-> index 1e588123d00..45c8b53361f 100644
-> --- a/qobject/qdict.c
-> +++ b/qobject/qdict.c
-> @@ -37,17 +37,6 @@ QDict *qdict_new(void)
->      return qdict;
->  }
-> 
-> -/**
-> - * qobject_to_qdict(): Convert a QObject into a QDict
-> - */
-> -QDict *qobject_to_qdict(const QObject *obj)
-> -{
-> -    if (!obj || qobject_type(obj) != QTYPE_QDICT) {
-> -        return NULL;
-> -    }
-> -    return container_of(obj, QDict, base);
-> -}
-> -
->  /**
->   * tdb_hash(): based on the hash agorithm from gdbm, via tdb
->   * (from module-init-tools)
-> diff --git a/qobject/qlist.c b/qobject/qlist.c
-> index 77f19ffda78..954fe983751 100644
-> --- a/qobject/qlist.c
-> +++ b/qobject/qlist.c
-> @@ -151,17 +151,6 @@ size_t qlist_size(const QList *qlist)
->      return count;
->  }
-> 
-> -/**
-> - * qobject_to_qlist(): Convert a QObject into a QList
-> - */
-> -QList *qobject_to_qlist(const QObject *obj)
-> -{
-> -    if (!obj || qobject_type(obj) != QTYPE_QLIST) {
-> -        return NULL;
-> -    }
-> -    return container_of(obj, QList, base);
-> -}
-> -
->  /**
->   * qlist_is_equal(): Test whether the two QLists are equal
->   *
-> diff --git a/qobject/qnum.c b/qobject/qnum.c
-> index ea091cfaa4b..1501c828323 100644
-> --- a/qobject/qnum.c
-> +++ b/qobject/qnum.c
-> @@ -199,17 +199,6 @@ char *qnum_to_string(QNum *qn)
->      return NULL;
->  }
-> 
-> -/**
-> - * qobject_to_qnum(): Convert a QObject into a QNum
-> - */
-> -QNum *qobject_to_qnum(const QObject *obj)
-> -{
-> -    if (!obj || qobject_type(obj) != QTYPE_QNUM) {
-> -        return NULL;
-> -    }
-> -    return container_of(obj, QNum, base);
-> -}
-> -
->  /**
->   * qnum_is_equal(): Test whether the two QNums are equal
->   *
-> diff --git a/qobject/qstring.c b/qobject/qstring.c
-> index 2b2153206df..8bae529ef79 100644
-> --- a/qobject/qstring.c
-> +++ b/qobject/qstring.c
-> @@ -105,17 +105,6 @@ void qstring_append_chr(QString *qstring, int c)
->      qstring->string[qstring->length] = 0;
->  }
-> 
-> -/**
-> - * qobject_to_qstring(): Convert a QObject to a QString
-> - */
-> -QString *qobject_to_qstring(const QObject *obj)
-> -{
-> -    if (!obj || qobject_type(obj) != QTYPE_QSTRING) {
-> -        return NULL;
-> -    }
-> -    return container_of(obj, QString, base);
-> -}
-> -
->  /**
->   * qstring_get_str(): Return a pointer to the stored string
->   *
+>  hw/timer/ds1338.c | 84 ++++++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 58 insertions(+), 26 deletions(-)
+> @@ -61,25 +89,29 @@ static void capture_current_time(DS1338State *s)
+>       */
+>      struct tm now;
+>      qemu_get_timedate(&now, s->offset);
+> -    s->nvram[0] = to_bcd(now.tm_sec);
+> -    s->nvram[1] = to_bcd(now.tm_min);
+> -    if (s->nvram[2] & HOURS_12) {
+> +    s->nvram[R_SEC] = to_bcd(now.tm_sec);
+> +    s->nvram[R_MIN] = to_bcd(now.tm_min);
+> +    if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
+>          int tmp = now.tm_hour;
+>          if (tmp % 12 == 0) {
+>              tmp += 12;
+>          }
+> +        s->nvram[R_HOUR] = 0;
+> +        ARRAY_FIELD_DP32(s->nvram, HOUR, SET12, 1);
+>          if (tmp <= 12) {
+> -            s->nvram[2] = HOURS_12 | to_bcd(tmp);
+> +            ARRAY_FIELD_DP32(s->nvram, HOUR, AMPM, 0);
+
+This is zeroing a bit that's already zero.
+
+> +            ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR12, to_bcd(tmp));
+>          } else {
+> -            s->nvram[2] = HOURS_12 | HOURS_PM | to_bcd(tmp - 12);
+> +            ARRAY_FIELD_DP32(s->nvram, HOUR, AMPM, 1);
+> +            ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR12, to_bcd(tmp - 12));
+>          }
+>      } else {
+> -        s->nvram[2] = to_bcd(now.tm_hour);
+> +        ARRAY_FIELD_DP32(s->nvram, HOUR, HOUR24, to_bcd(now.tm_hour));
+
+This else clause used to definitely set all the bits in nvram[2],
+and now it doesn't (the s->nvram[R_HOUR] = 0 is only in the if {}).
+
+For cases like this where we're setting the whole thing, I think
+    s->nvram[R_HOUR] = R_HOUR_SET12_MASK | to_bcd(tmp);
+
+    s->nvram[R_HOUR] = R_HOUR_SET12_MASK | R_HOUR_AMPM_MASK | to_bcd(tmp - 12);
+
+    s->nvram[R_HOUR] = R_HOUR_HOUR24_MASK | to_bcm(now.tm_hour);
+
+is clearer than individually setting each field, but you can
+do the "clear and then set individual fields" approach if you like.
+
+Otherwise
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
