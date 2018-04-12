@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6fvW-0001Hb-5B
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:22:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6g1b-0004sV-05
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6fvQ-0003jC-7A
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:22:26 -0400
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:34882)
+	(envelope-from <peter.maydell@linaro.org>) id 1f6g1a-0007se-4b
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:28:43 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:36918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f6fvQ-0003im-3E
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:22:20 -0400
-Received: by mail-ot0-x22f.google.com with SMTP id f47-v6so6879844oth.2
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 10:22:20 -0700 (PDT)
+	id 1f6g1Z-0007sP-Uz
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:28:42 -0400
+Received: by mail-oi0-x241.google.com with SMTP id f63-v6so5923811oic.4
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 10:28:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180412170816.GI24561@codeaurora.org>
+In-Reply-To: <1521232280-13089-17-git-send-email-alindsay@codeaurora.org>
 References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-	<1521232280-13089-11-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA8XARzPc-YEoQVQUEoV2gL+ZOLsqzxhh36xzqjXZXniPw@mail.gmail.com>
-	<20180412170816.GI24561@codeaurora.org>
+	<1521232280-13089-17-git-send-email-alindsay@codeaurora.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Apr 2018 18:21:59 +0100
-Message-ID: <CAFEAcA8E0NiXMZDRmU1zKCsm78Y15b-f=mbxvqywhfnW81XR7A@mail.gmail.com>
+Date: Thu, 12 Apr 2018 18:28:20 +0100
+Message-ID: <CAFEAcA8Z0hiFD+VZpvje_76rG+W4NKuEJhNp6cUxUK9eA6+=1Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 10/22] target/arm: Allow EL change hooks
- to do IO
+Subject: Re: [Qemu-devel] [PATCH v3 16/22] target/arm: Implement PMOVSSET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +32,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aaron Lindsay <alindsay@codeaurora.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On 12 April 2018 at 18:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> On Apr 12 17:53, Peter Maydell wrote:
->> On 16 March 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
->> > During code generation, surround CPSR writes and exception returns which
->> > call the EL change hooks with gen_io_start/end. The immediate need is
->> > for the PMU to access the clock and icount during EL change to support
->> > mode filtering.
->> >
->> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
->> > ---
->> >  target/arm/translate-a64.c | 2 ++
->> >  target/arm/translate.c     | 4 ++++
->> >  2 files changed, 6 insertions(+)
->> >
->> > diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
->> > index 31ff047..e1ae676 100644
->> > --- a/target/arm/translate-a64.c
->> > +++ b/target/arm/translate-a64.c
->> > @@ -1919,7 +1919,9 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
->> >              unallocated_encoding(s);
->> >              return;
->> >          }
->> > +        gen_io_start();
->> >          gen_helper_exception_return(cpu_env);
->> > +        gen_io_end();
->>
->> You don't want to call gen_io_start() or gen_io_end() unless
->> tb_cflags(s->base.tb) & CF_USE_ICOUNT) is true.
->>
->> (Ditto in the other cases below.)
+On 16 March 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> Adding an array for v7VE+ CP registers was necessary so that PMOVSSET
+> wasn't defined for all v7 processors.
 >
-> I assume there's nothing tricky about this and updating this as follows
-> is sufficient?
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> ---
+>  target/arm/helper.c | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index d4f06e6..f5e800e 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -1241,9 +1241,17 @@ static void pmcntenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>  static void pmovsr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                           uint64_t value)
+>  {
+> +    value &= PMU_COUNTER_MASK(env);
+>      env->cp15.c9_pmovsr &= ~value;
+>  }
+>
+> +static void pmovsset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                         uint64_t value)
+> +{
+> +    value &= PMU_COUNTER_MASK(env);
+> +    env->cp15.c9_pmovsr |= value;
+> +}
+> +
+>  static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                               uint64_t value)
+>  {
+> @@ -1406,7 +1414,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+>        .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcnten),
+>        .writefn = pmcntenclr_write },
+>      { .name = "PMOVSR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 3,
+> -      .access = PL0_RW, .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
+> +      .access = PL0_RW, .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmovsr),
+>        .accessfn = pmreg_access,
+>        .writefn = pmovsr_write,
+>        .raw_writefn = raw_write },
 
-Yes, that's sufficient. (The other thing that needs to happen
-for a gen_io_start/end is that the insn has to end the TB --
-but in all these cases that's already true as they set
-s->base.is_jmp = DISAS_EXIT.)
+This change is half of a bug fix (the other half being to make the
+field in the CPU struct be uint64_t rather than uint32_t). That
+bug fix should be in a patch of its own.
+
+pmuserenr has the same bug (uint32_t state field accessed by
+a STATE_AA64 sysreg).
 
 thanks
 -- PMM
