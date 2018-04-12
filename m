@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6bEC-0003N1-U8
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:21:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6bJ0-0006SB-Ll
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6bE9-0004pV-Gq
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:21:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60786)
+	(envelope-from <peter.maydell@linaro.org>) id 1f6bIz-0007b6-Pn
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:26:22 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:43797)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6bE9-0004mG-8M
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:21:21 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6bE7-0003Ht-Ss
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 12:21:19 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D97722E8025
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 12:21:19 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f6bIz-0007an-Hh
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:26:21 -0400
+Received: by mail-ot0-x243.google.com with SMTP id d9-v6so5731408oth.10
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 05:26:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180412115838.10208-3-alex.bennee@linaro.org>
+References: <20180412115838.10208-1-alex.bennee@linaro.org>
+	<20180412115838.10208-3-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Apr 2018 13:26:00 +0100
+Message-ID: <CAFEAcA_9F3s5h8r-BGF2K_3-qgs7qUzpQQpjwtn+CdgUF-9zkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Apr 2018 12:13:24 -0000
-From: Gonzalo <1734792@bugs.launchpad.net>
-Reply-To: Bug 1734792 <1734792@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151183114573.10651.11339653840196724023.malonedeb@wampee.canonical.com>
-Message-Id: <152353520476.31596.15662220161538137125.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1734792] Re: qemu-x86_64 fails with unsupported
- syscall 319
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] fpu/softfloat: raise float_invalid
+ for NaN in float_to_int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-Not only qemu-x86_64, but also:
+On 12 April 2018 at 12:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Fixes https://bugs.launchpad.net/qemu/+bug/1759264
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> ---
+>  fpu/softfloat.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 9b99aa6ec8..ddc77c273c 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -1344,6 +1344,7 @@ static int64_t round_to_int_and_pack(FloatParts in,=
+ int rmode,
+>      case float_class_qnan:
+>      case float_class_dnan:
+>      case float_class_msnan:
+> +        s->float_exception_flags =3D orig_flags | float_flag_invalid;
+>          return max;
+>      case float_class_inf:
+>          return p.sign ? min : max;
 
-qemu-aarch64 =3D> qemu: Unsupported syscall: 279
-qemu-arm =3D> qemu: Unsupported syscall: 385
-qemu-mips =3D> qemu: Unsupported syscall: 4354
-qemu-mips64 =3D> qemu: Unsupported syscall: 5314
-qemu-powerpc =3D> qemu: Unsupported syscall: 360
-qemu-powerpc64 =3D> qemu: Unsupported syscall: 360
+Don't we also need to raise the Invalid flag for float_class_inf ?
 
--- =
+In both cases, this is fixing a regression introduced in
+commit ab52f973a50, I think.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1734792
-
-Title:
-  qemu-x86_64 fails with unsupported syscall 319
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu-x86_66 GIT HEAD fails on a userspace application that requires
-  memfd_create with:
-
-  "qemu: Unsupported syscall: 319".
-
-  memfd_create support needs to be implemented in QEMU.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1734792/+subscriptions
+thanks
+-- PMM
