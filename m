@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6fuW-0000X9-E9
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:21:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6fvW-0001Hb-5B
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6fuV-00038Z-KF
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:21:24 -0400
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:44350)
+	(envelope-from <peter.maydell@linaro.org>) id 1f6fvQ-0003jC-7A
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:22:26 -0400
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:34882)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f6fuV-00038E-F2
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:21:23 -0400
-Received: by mail-ot0-x234.google.com with SMTP id p33-v6so6858039otp.11
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 10:21:23 -0700 (PDT)
+	id 1f6fvQ-0003im-3E
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 13:22:20 -0400
+Received: by mail-ot0-x22f.google.com with SMTP id f47-v6so6879844oth.2
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 10:22:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180412170139.GH24561@codeaurora.org>
+In-Reply-To: <20180412170816.GI24561@codeaurora.org>
 References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-	<1521232280-13089-10-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA9UpNW8q+vBKDskhAMVxHh4QUOJ5diP8AR6mpMRk+enBQ@mail.gmail.com>
-	<20180412170139.GH24561@codeaurora.org>
+	<1521232280-13089-11-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA8XARzPc-YEoQVQUEoV2gL+ZOLsqzxhh36xzqjXZXniPw@mail.gmail.com>
+	<20180412170816.GI24561@codeaurora.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Apr 2018 18:21:02 +0100
-Message-ID: <CAFEAcA-TQ-mihXqEZUe1AsWeDu8d7Yq3BeZbmnRgO-UCKeRgYw@mail.gmail.com>
+Date: Thu, 12 Apr 2018 18:21:59 +0100
+Message-ID: <CAFEAcA8E0NiXMZDRmU1zKCsm78Y15b-f=mbxvqywhfnW81XR7A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 09/22] target/arm: Add pre-EL change
- hooks
+Subject: Re: [Qemu-devel] [PATCH v3 10/22] target/arm: Allow EL change hooks
+ to do IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +35,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aaron Lindsay <alindsay@codeaurora.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On 12 April 2018 at 18:01, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> On Apr 12 17:49, Peter Maydell wrote:
->> Do we make the guarantee that if we call the pre-change hook
->> then we will definitely subsequently call the post-change hook?
->> (ie does the PMU hook rely on that?)
+On 12 April 2018 at 18:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> On Apr 12 17:53, Peter Maydell wrote:
+>> On 16 March 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+>> > During code generation, surround CPSR writes and exception returns which
+>> > call the EL change hooks with gen_io_start/end. The immediate need is
+>> > for the PMU to access the clock and icount during EL change to support
+>> > mode filtering.
+>> >
+>> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+>> > ---
+>> >  target/arm/translate-a64.c | 2 ++
+>> >  target/arm/translate.c     | 4 ++++
+>> >  2 files changed, 6 insertions(+)
+>> >
+>> > diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>> > index 31ff047..e1ae676 100644
+>> > --- a/target/arm/translate-a64.c
+>> > +++ b/target/arm/translate-a64.c
+>> > @@ -1919,7 +1919,9 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+>> >              unallocated_encoding(s);
+>> >              return;
+>> >          }
+>> > +        gen_io_start();
+>> >          gen_helper_exception_return(cpu_env);
+>> > +        gen_io_end();
+>>
+>> You don't want to call gen_io_start() or gen_io_end() unless
+>> tb_cflags(s->base.tb) & CF_USE_ICOUNT) is true.
+>>
+>> (Ditto in the other cases below.)
 >
-> Yes, the PMU relies on the pre- and post- hooks being called in pairs
-> since they drive the state machine of sorts that exists in the variables
-> holding the counter values/deltas. And unless I've really screwed up the
-> implementation, I believe the change hooks in my patchset make that
-> guarantee.
+> I assume there's nothing tricky about this and updating this as follows
+> is sufficient?
 
-Yes, I think I agree. We should document in the comment that
-this is a guarantee that we make.
+Yes, that's sufficient. (The other thing that needs to happen
+for a gen_io_start/end is that the insn has to end the TB --
+but in all these cases that's already true as they set
+s->base.is_jmp = DISAS_EXIT.)
 
 thanks
 -- PMM
