@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f6edI-0001FI-C1
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:59:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6elX-00005E-Dz
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 12:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f6edF-0004A0-8L
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:59:32 -0400
-Received: from mga12.intel.com ([192.55.52.136]:13530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1f6edE-000494-Sv
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:59:29 -0400
-From: "Zhang, Yulei" <yulei.zhang@intel.com>
-Date: Thu, 12 Apr 2018 15:59:24 +0000
-Message-ID: <01FDBDDE256B79498DC57789713132D46A15ADFF@SHSMSX101.ccr.corp.intel.com>
-References: <20180411172014.24711-1-clg@kaod.org>
-	<20180411115511.342c75b9@w520.home>
-In-Reply-To: <20180411115511.342c75b9@w520.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1f6elW-0006wT-Fe
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 12:08:03 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:39443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f6elW-0006ve-An
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 12:08:02 -0400
+Received: by mail-ot0-x242.google.com with SMTP id a14-v6so6614092otf.6
+	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 09:08:02 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] migration: discard RAMBlocks of type
- ram_device
+In-Reply-To: <1521232280-13089-3-git-send-email-alindsay@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-3-git-send-email-alindsay@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Apr 2018 17:07:41 +0100
+Message-ID: <CAFEAcA_sMbYp2cu2im=kWaxRrzpW8z2mBx5=ihSAHba4K5T_8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 02/22] target/arm: A15 PMCEID0
+ initialization style nit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,139 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleCBXaWxsaWFtc29u
-IFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBB
-cHJpbCAxMiwgMjAxOCAxOjU1IEFNDQo+IFRvOiBDw6lkcmljIExlIEdvYXRlciA8Y2xnQGthb2Qu
-b3JnPg0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBKdWFuIFF1aW50ZWxhIDxxdWludGVs
-YUByZWRoYXQuY29tPjsgRHIgLg0KPiBEYXZpZCBBbGFuIEdpbGJlcnQgPGRnaWxiZXJ0QHJlZGhh
-dC5jb20+OyBEYXZpZCBHaWJzb24NCj4gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT47IFpo
-YW5nLCBZdWxlaSA8eXVsZWkuemhhbmdAaW50ZWwuY29tPjsgVGlhbiwNCj4gS2V2aW4gPGtldmlu
-LnRpYW5AaW50ZWwuY29tPjsgam9vbmFzLmxhaHRpbmVuQGxpbnV4LmludGVsLmNvbTsNCj4gemhl
-bnl1d0BsaW51eC5pbnRlbC5jb207IGt3YW5raGVkZUBudmlkaWEuY29tOyBXYW5nLCBaaGkgQQ0K
-PiA8emhpLmEud2FuZ0BpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1JG
-QyBQQVRDSF0gbWlncmF0aW9uOiBkaXNjYXJkIFJBTUJsb2NrcyBvZiB0eXBlDQo+IHJhbV9kZXZp
-Y2UNCj4gDQo+IFtjYyArZm9sa3Mgd29ya2luZyBvbiB2ZmlvLW1kZXYgbWlncmF0aW9uXQ0KPiAN
-Cj4gT24gV2VkLCAxMSBBcHIgMjAxOCAxOToyMDoxNCArMDIwMA0KPiBDw6lkcmljIExlIEdvYXRl
-ciA8Y2xnQGthb2Qub3JnPiB3cm90ZToNCj4gDQo+ID4gSGVyZSBpcyBzb21lIGNvbnRleHQgZm9y
-IHRoaXMgc3RyYW5nZSBjaGFuZ2UgcmVxdWVzdC4NCj4gPg0KPiA+IE9uIHRoZSBQT1dFUjkgcHJv
-Y2Vzc29yLCB0aGUgWElWRSBpbnRlcnJ1cHQgY29udHJvbGxlciBjYW4gY29udHJvbA0KPiA+IGlu
-dGVycnVwdCBzb3VyY2VzIHVzaW5nIE1NSU8gdG8gdHJpZ2dlciBldmVudHMsIHRvIEVPSSBvciB0
-byB0dXJuIG9mZg0KPiA+IHRoZSBzb3VyY2VzLiBQcmlvcml0eSBtYW5hZ2VtZW50IGFuZCBpbnRl
-cnJ1cHQgYWNrbm93bGVkZ21lbnQgaXMgYWxzbw0KPiA+IGNvbnRyb2xsZWQgYnkgTU1JTyBpbiB0
-aGUgcHJlc2VudGVyIHN1YmVuZ2luZS4NCj4gPg0KPiA+IFRoZXNlIE1NSU8gcmVnaW9ucyBhcmUg
-ZXhwb3NlZCB0byBndWVzdHMgaW4gUUVNVSB3aXRoIGEgc2V0IG9mICdyYW0NCj4gPiBkZXZpY2Un
-IG1lbW9yeSBtYXBwaW5ncywgc2ltaWxhcmx5IHRvIFZGSU8sIGFuZCB0aGUgVk1BcyBhcmUgcG9w
-dWxhdGVkDQo+ID4gZHluYW1pY2FsbHkgd2l0aCB0aGUgYXBwcm9wcmlhdGUgcGFnZXMgdXNpbmcg
-YSBmYXVsdCBoYW5kbGVyLg0KPiA+DQo+ID4gQnV0LCB0aGVzZSByZWdpb25zIGFyZSBhbiBpc3N1
-ZSBmb3IgbWlncmF0aW9uLiBXZSBuZWVkIHRvIGRpc2NhcmQgdGhlDQo+ID4gYXNzb2NpYXRlZCBS
-QU1CbG9ja3MgZnJvbSB0aGUgUkFNIHN0YXRlIG9uIHRoZSBzb3VyY2UgVk0gYW5kIGxldCB0aGUN
-Cj4gPiBkZXN0aW5hdGlvbiBWTSByZWJ1aWxkIHRoZSBtZW1vcnkgbWFwcGluZ3Mgb24gdGhlIG5l
-dyBob3N0IGluIHRoZQ0KPiA+IHBvc3RfbG9hZCgpIG9wZXJhdGlvbiBqdXN0IGJlZm9yZSByZXN1
-bWluZyB0aGUgc3lzdGVtLg0KPiA+DQo+ID4gVGhpcyBpcyB0aGUgZ29hbCBvZiB0aGUgZm9sbG93
-aW5nIHByb3Bvc2FsLiBEb2VzIGl0IG1ha2Ugc2Vuc2UgPyBJdA0KPiA+IHNlZW1zIHRvIGJlIHdv
-cmtpbmcgZW5vdWdoIHRvIG1pZ3JhdGUgYSBydW5uaW5nIGd1ZXN0IGJ1dCB0aGVyZSBtaWdodA0K
-PiA+IGJlIGEgYmV0dGVyLCBtb3JlIHN1YnRsZSwgYXBwcm9hY2guDQo+IA0KPiBZdWxlaSwgaXMg
-dGhpcyBzb21ldGhpbmcgeW91J3ZlIHJ1biBpbnRvIHdpdGggR1ZULWcgbWlncmF0aW9uPyAgSSBk
-b24ndCBzZWUNCj4gaG93IHdlIGNhbiByZWFkIGZyb20gb3Igd3JpdGUgdG8gcmFtX2RldmljZSBy
-ZWdpb25zIGluIGEgdXNlZnVsIHdheSBkdXJpbmcNCj4gbWlncmF0aW9uIGFueXdheSwgc28gdGhl
-IGNoYW5nZSBpbml0aWFsbHkgbG9va3MgY29ycmVjdCB0byBtZS4NCj4gVGhhbmtzLA0KPiANCj4g
-QWxleA0KPiANCg0KRGlkbid0IG1lZXQgc3VjaCBpc3N1ZSBiZWZvcmUuIEkgdGhpbmsgdGhlIGNo
-YW5nZSB3aWxsIGJlIGZpbmUgaWYgdGhlIHZlbmRvciBkcml2ZXINCmhhbmRsZSB0aGUgcmVjb25z
-dHJ1Y3Rpb24gd2VsbCBvbiB0aGUgdGFyZ2V0IHNpZGUuIEFuZCBJIGFncmVlIHdpdGggRGF2ZSdz
-IHN1Z2dlc3Rpb24sDQpob3cgYWJvdXQgdmVuZG9yIGRyaXZlciByZXBvcnQgYSBmbGFnIGFib3V0
-IHRoZSBtYXBwZWQgcmVnaW9uIHRvIGluZGljYXRlIGl0IGNhbg0KYmUgcmVnaXN0ZXJlZCBhcyBt
-aWdyYXRhYmxlIG1lbW9yeSBibG9jayBvciBub3QuICAgDQoNCll1bGVpDQo+ID4gU2lnbmVkLW9m
-Zi1ieTogQ8OpZHJpYyBMZSBHb2F0ZXIgPGNsZ0BrYW9kLm9yZz4NCj4gPiAtLS0NCj4gPiAgbWln
-cmF0aW9uL3JhbS5jIHwgNDIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCA0MCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygt
-KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9yYW0uYyBiL21pZ3JhdGlvbi9yYW0u
-YyBpbmRleA0KPiA+IDBlOTBlZmEwOTIzNi4uNjQwNGNjZDA0NmQ4IDEwMDY0NA0KPiA+IC0tLSBh
-L21pZ3JhdGlvbi9yYW0uYw0KPiA+ICsrKyBiL21pZ3JhdGlvbi9yYW0uYw0KPiA+IEBAIC03ODAs
-NiArNzgwLDEwIEBAIHVuc2lnbmVkIGxvbmcNCj4gbWlncmF0aW9uX2JpdG1hcF9maW5kX2RpcnR5
-KFJBTVN0YXRlICpycywgUkFNQmxvY2sgKnJiLA0KPiA+ICAgICAgdW5zaWduZWQgbG9uZyAqYml0
-bWFwID0gcmItPmJtYXA7DQo+ID4gICAgICB1bnNpZ25lZCBsb25nIG5leHQ7DQo+ID4NCj4gPiAr
-ICAgIGlmIChtZW1vcnlfcmVnaW9uX2lzX3JhbV9kZXZpY2UocmItPm1yKSkgew0KPiA+ICsgICAg
-ICAgIHJldHVybiBzaXplOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAgICAgIGlmIChycy0+cmFt
-X2J1bGtfc3RhZ2UgJiYgc3RhcnQgPiAwKSB7DQo+ID4gICAgICAgICAgbmV4dCA9IHN0YXJ0ICsg
-MTsNCj4gPiAgICAgIH0gZWxzZSB7DQo+ID4gQEAgLTgyNiw2ICs4MzAsOSBAQCB1aW50NjRfdCBy
-YW1fcGFnZXNpemVfc3VtbWFyeSh2b2lkKQ0KPiA+ICAgICAgdWludDY0X3Qgc3VtbWFyeSA9IDA7
-DQo+ID4NCj4gPiAgICAgIFJBTUJMT0NLX0ZPUkVBQ0goYmxvY2spIHsNCj4gPiArICAgICAgICBp
-ZiAobWVtb3J5X3JlZ2lvbl9pc19yYW1fZGV2aWNlKGJsb2NrLT5tcikpIHsNCj4gPiArICAgICAg
-ICAgICAgY29udGludWU7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICAgICAgICAgIHN1bW1hcnkgfD0g
-YmxvY2stPnBhZ2Vfc2l6ZTsNCj4gPiAgICAgIH0NCj4gPg0KPiA+IEBAIC04NTAsNiArODU3LDkg
-QEAgc3RhdGljIHZvaWQgbWlncmF0aW9uX2JpdG1hcF9zeW5jKFJBTVN0YXRlICpycykNCj4gPiAg
-ICAgIHFlbXVfbXV0ZXhfbG9jaygmcnMtPmJpdG1hcF9tdXRleCk7DQo+ID4gICAgICByY3VfcmVh
-ZF9sb2NrKCk7DQo+ID4gICAgICBSQU1CTE9DS19GT1JFQUNIKGJsb2NrKSB7DQo+ID4gKyAgICAg
-ICAgaWYgKG1lbW9yeV9yZWdpb25faXNfcmFtX2RldmljZShibG9jay0+bXIpKSB7DQo+ID4gKyAg
-ICAgICAgICAgIGNvbnRpbnVlOw0KPiA+ICsgICAgICAgIH0NCj4gPiAgICAgICAgICBtaWdyYXRp
-b25fYml0bWFwX3N5bmNfcmFuZ2UocnMsIGJsb2NrLCAwLCBibG9jay0+dXNlZF9sZW5ndGgpOw0K
-PiA+ICAgICAgfQ0KPiA+ICAgICAgcmN1X3JlYWRfdW5sb2NrKCk7DQo+ID4gQEAgLTE0OTksNiAr
-MTUwOSwxMCBAQCBzdGF0aWMgaW50IHJhbV9zYXZlX2hvc3RfcGFnZShSQU1TdGF0ZSAqcnMsDQo+
-IFBhZ2VTZWFyY2hTdGF0dXMgKnBzcywNCj4gPiAgICAgIHNpemVfdCBwYWdlc2l6ZV9iaXRzID0N
-Cj4gPiAgICAgICAgICBxZW11X3JhbV9wYWdlc2l6ZShwc3MtPmJsb2NrKSA+PiBUQVJHRVRfUEFH
-RV9CSVRTOw0KPiA+DQo+ID4gKyAgICBpZiAobWVtb3J5X3JlZ2lvbl9pc19yYW1fZGV2aWNlKHBz
-cy0+YmxvY2stPm1yKSkgew0KPiA+ICsgICAgICAgIHJldHVybiAwOw0KPiA+ICsgICAgfQ0KPiA+
-ICsNCj4gPiAgICAgIGRvIHsNCj4gPiAgICAgICAgICB0bXBwYWdlcyA9IHJhbV9zYXZlX3Rhcmdl
-dF9wYWdlKHJzLCBwc3MsIGxhc3Rfc3RhZ2UpOw0KPiA+ICAgICAgICAgIGlmICh0bXBwYWdlcyA8
-IDApIHsNCj4gPiBAQCAtMTU4OCw2ICsxNjAyLDkgQEAgdWludDY0X3QgcmFtX2J5dGVzX3RvdGFs
-KHZvaWQpDQo+ID4NCj4gPiAgICAgIHJjdV9yZWFkX2xvY2soKTsNCj4gPiAgICAgIFJBTUJMT0NL
-X0ZPUkVBQ0goYmxvY2spIHsNCj4gPiArICAgICAgICBpZiAobWVtb3J5X3JlZ2lvbl9pc19yYW1f
-ZGV2aWNlKGJsb2NrLT5tcikpIHsNCj4gPiArICAgICAgICAgICAgY29udGludWU7DQo+ID4gKyAg
-ICAgICAgfQ0KPiA+ICAgICAgICAgIHRvdGFsICs9IGJsb2NrLT51c2VkX2xlbmd0aDsNCj4gPiAg
-ICAgIH0NCj4gPiAgICAgIHJjdV9yZWFkX3VubG9jaygpOw0KPiA+IEBAIC0xNjQzLDYgKzE2NjAs
-OSBAQCBzdGF0aWMgdm9pZCByYW1fc2F2ZV9jbGVhbnVwKHZvaWQgKm9wYXF1ZSkNCj4gPiAgICAg
-IG1lbW9yeV9nbG9iYWxfZGlydHlfbG9nX3N0b3AoKTsNCj4gPg0KPiA+ICAgICAgUUxJU1RfRk9S
-RUFDSF9SQ1UoYmxvY2ssICZyYW1fbGlzdC5ibG9ja3MsIG5leHQpIHsNCj4gPiArICAgICAgICBp
-ZiAobWVtb3J5X3JlZ2lvbl9pc19yYW1fZGV2aWNlKGJsb2NrLT5tcikpIHsNCj4gPiArICAgICAg
-ICAgICAgY29udGludWU7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICAgICAgICAgIGdfZnJlZShibG9j
-ay0+Ym1hcCk7DQo+ID4gICAgICAgICAgYmxvY2stPmJtYXAgPSBOVUxMOw0KPiA+ICAgICAgICAg
-IGdfZnJlZShibG9jay0+dW5zZW50bWFwKTsNCj4gPiBAQCAtMTcxMCw2ICsxNzMwLDkgQEAgdm9p
-ZA0KPiByYW1fcG9zdGNvcHlfbWlncmF0ZWRfbWVtb3J5X3JlbGVhc2UoTWlncmF0aW9uU3RhdGUg
-Km1zKQ0KPiA+ICAgICAgICAgIHVuc2lnbmVkIGxvbmcgcmFuZ2UgPSBibG9jay0+dXNlZF9sZW5n
-dGggPj4gVEFSR0VUX1BBR0VfQklUUzsNCj4gPiAgICAgICAgICB1bnNpZ25lZCBsb25nIHJ1bl9z
-dGFydCA9IGZpbmRfbmV4dF96ZXJvX2JpdChiaXRtYXAsIHJhbmdlLA0KPiA+IDApOw0KPiA+DQo+
-ID4gKyAgICAgICAgaWYgKG1lbW9yeV9yZWdpb25faXNfcmFtX2RldmljZShibG9jay0+bXIpKSB7
-DQo+ID4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiA+ICsgICAgICAgIH0NCj4gPiAgICAgICAg
-ICB3aGlsZSAocnVuX3N0YXJ0IDwgcmFuZ2UpIHsNCj4gPiAgICAgICAgICAgICAgdW5zaWduZWQg
-bG9uZyBydW5fZW5kID0gZmluZF9uZXh0X2JpdChiaXRtYXAsIHJhbmdlLCBydW5fc3RhcnQgKw0K
-PiAxKTsNCj4gPiAgICAgICAgICAgICAgcmFtX2Rpc2NhcmRfcmFuZ2UoYmxvY2stPmlkc3RyLCBy
-dW5fc3RhcnQgPDwNCj4gPiBUQVJHRVRfUEFHRV9CSVRTLCBAQCAtMTc4NCw4ICsxODA3LDEzIEBA
-IHN0YXRpYyBpbnQNCj4gcG9zdGNvcHlfZWFjaF9yYW1fc2VuZF9kaXNjYXJkKE1pZ3JhdGlvblN0
-YXRlICptcykNCj4gPiAgICAgIGludCByZXQ7DQo+ID4NCj4gPiAgICAgIFJBTUJMT0NLX0ZPUkVB
-Q0goYmxvY2spIHsNCj4gPiAtICAgICAgICBQb3N0Y29weURpc2NhcmRTdGF0ZSAqcGRzID0NCj4g
-PiAtICAgICAgICAgICAgcG9zdGNvcHlfZGlzY2FyZF9zZW5kX2luaXQobXMsIGJsb2NrLT5pZHN0
-cik7DQo+ID4gKyAgICAgICAgUG9zdGNvcHlEaXNjYXJkU3RhdGUgKnBkczsNCj4gPiArDQo+ID4g
-KyAgICAgICAgaWYgKG1lbW9yeV9yZWdpb25faXNfcmFtX2RldmljZShibG9jay0+bXIpKSB7DQo+
-ID4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiA+ICsgICAgICAgIH0NCj4gPiArDQo+ID4gKyAg
-ICAgICAgcGRzID0gcG9zdGNvcHlfZGlzY2FyZF9zZW5kX2luaXQobXMsIGJsb2NrLT5pZHN0cik7
-DQo+ID4NCj4gPiAgICAgICAgICAvKg0KPiA+ICAgICAgICAgICAqIFBvc3Rjb3B5IHNlbmRzIGNo
-dW5rcyBvZiBiaXRtYXAgb3ZlciB0aGUgd2lyZSwgYnV0IGl0IEBADQo+ID4gLTE5OTYsNiArMjAy
-NCwxMCBAQCBpbnQNCj4gcmFtX3Bvc3Rjb3B5X3NlbmRfZGlzY2FyZF9iaXRtYXAoTWlncmF0aW9u
-U3RhdGUgKm1zKQ0KPiA+ICAgICAgICAgIHVuc2lnbmVkIGxvbmcgKmJpdG1hcCA9IGJsb2NrLT5i
-bWFwOw0KPiA+ICAgICAgICAgIHVuc2lnbmVkIGxvbmcgKnVuc2VudG1hcCA9IGJsb2NrLT51bnNl
-bnRtYXA7DQo+ID4NCj4gPiArICAgICAgICBpZiAobWVtb3J5X3JlZ2lvbl9pc19yYW1fZGV2aWNl
-KGJsb2NrLT5tcikpIHsNCj4gPiArICAgICAgICAgICAgY29udGludWU7DQo+ID4gKyAgICAgICAg
-fQ0KPiA+ICsNCj4gPiAgICAgICAgICBpZiAoIXVuc2VudG1hcCkgew0KPiA+ICAgICAgICAgICAg
-ICAvKiBXZSBkb24ndCBoYXZlIGEgc2FmZSB3YXkgdG8gcmVzaXplIHRoZSBzZW50bWFwLCBzbw0K
-PiA+ICAgICAgICAgICAgICAgKiBpZiB0aGUgYml0bWFwIHdhcyByZXNpemVkIGl0IHdpbGwgYmUg
-TlVMTCBhdCB0aGlzIEBADQo+ID4gLTIxNTEsNiArMjE4Myw5IEBAIHN0YXRpYyB2b2lkIHJhbV9s
-aXN0X2luaXRfYml0bWFwcyh2b2lkKQ0KPiA+ICAgICAgLyogU2tpcCBzZXR0aW5nIGJpdG1hcCBp
-ZiB0aGVyZSBpcyBubyBSQU0gKi8NCj4gPiAgICAgIGlmIChyYW1fYnl0ZXNfdG90YWwoKSkgew0K
-PiA+ICAgICAgICAgIFFMSVNUX0ZPUkVBQ0hfUkNVKGJsb2NrLCAmcmFtX2xpc3QuYmxvY2tzLCBu
-ZXh0KSB7DQo+ID4gKyAgICAgICAgICAgIGlmIChtZW1vcnlfcmVnaW9uX2lzX3JhbV9kZXZpY2Uo
-YmxvY2stPm1yKSkgew0KPiA+ICsgICAgICAgICAgICAgICAgY29udGludWU7DQo+ID4gKyAgICAg
-ICAgICAgIH0NCj4gPiAgICAgICAgICAgICAgcGFnZXMgPSBibG9jay0+bWF4X2xlbmd0aCA+PiBU
-QVJHRVRfUEFHRV9CSVRTOw0KPiA+ICAgICAgICAgICAgICBibG9jay0+Ym1hcCA9IGJpdG1hcF9u
-ZXcocGFnZXMpOw0KPiA+ICAgICAgICAgICAgICBiaXRtYXBfc2V0KGJsb2NrLT5ibWFwLCAwLCBw
-YWdlcyk7IEBAIC0yMjI3LDYgKzIyNjIsOSBAQA0KPiA+IHN0YXRpYyBpbnQgcmFtX3NhdmVfc2V0
-dXAoUUVNVUZpbGUgKmYsIHZvaWQgKm9wYXF1ZSkNCj4gPiAgICAgIHFlbXVfcHV0X2JlNjQoZiwg
-cmFtX2J5dGVzX3RvdGFsKCkgfCBSQU1fU0FWRV9GTEFHX01FTV9TSVpFKTsNCj4gPg0KPiA+ICAg
-ICAgUkFNQkxPQ0tfRk9SRUFDSChibG9jaykgew0KPiA+ICsgICAgICAgIGlmIChtZW1vcnlfcmVn
-aW9uX2lzX3JhbV9kZXZpY2UoYmxvY2stPm1yKSkgew0KPiA+ICsgICAgICAgICAgICBjb250aW51
-ZTsNCj4gPiArICAgICAgICB9DQo+ID4gICAgICAgICAgcWVtdV9wdXRfYnl0ZShmLCBzdHJsZW4o
-YmxvY2stPmlkc3RyKSk7DQo+ID4gICAgICAgICAgcWVtdV9wdXRfYnVmZmVyKGYsICh1aW50OF90
-ICopYmxvY2stPmlkc3RyLCBzdHJsZW4oYmxvY2stPmlkc3RyKSk7DQo+ID4gICAgICAgICAgcWVt
-dV9wdXRfYmU2NChmLCBibG9jay0+dXNlZF9sZW5ndGgpOw0KDQo=
+On 16 March 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> ---
+>  target/arm/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 022d8c5..072cbbf 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1524,7 +1524,7 @@ static void cortex_a15_initfn(Object *obj)
+>      cpu->id_pfr0 = 0x00001131;
+>      cpu->id_pfr1 = 0x00011011;
+>      cpu->id_dfr0 = 0x02010555;
+> -    cpu->pmceid0 = 0x0000000;
+> +    cpu->pmceid0 = 0x00000000;
+>      cpu->pmceid1 = 0x00000000;
+>      cpu->id_afr0 = 0x00000000;
+>      cpu->id_mmfr0 = 0x10201105;
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
