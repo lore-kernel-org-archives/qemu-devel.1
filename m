@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1f6beb-0002RH-Gz
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:48:42 -0400
+	(envelope-from <geert.uytterhoeven@gmail.com>) id 1f6bgJ-0003wI-Vn
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:50:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1f6beY-0004su-G8
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:48:41 -0400
-Received: from zucker2.schokokeks.org ([178.63.68.90]:47249)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1f6beY-0004rp-8L
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:48:38 -0400
-Date: Thu, 12 Apr 2018 14:48:34 +0200
-From: Simon Ruderich <simon@ruderich.org>
-Message-ID: <20180412124834.GA2025@ruderich.org>
-References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
-	<0a960aa8-2a3f-8667-3d46-cecf8e65e482@redhat.com>
-	<20180411073638.GA10940@ruderich.org>
-	<6e51f584-b850-9881-a8e1-3dafa85a11df@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-In-Reply-To: <6e51f584-b850-9881-a8e1-3dafa85a11df@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qmp: add pmemload command
+	(envelope-from <geert.uytterhoeven@gmail.com>) id 1f6bgJ-0005fH-7U
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 08:50:28 -0400
+MIME-Version: 1.0
+Sender: geert.uytterhoeven@gmail.com
+In-Reply-To: <3ee22637-a0a9-306a-4e6d-14295d4bcb27@redhat.com>
+References: <1518189456-2873-1-git-send-email-geert+renesas@glider.be>
+	<1518189456-2873-4-git-send-email-geert+renesas@glider.be>
+	<3ee22637-a0a9-306a-4e6d-14295d4bcb27@redhat.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 12 Apr 2018 14:50:22 +0200
+Message-ID: <CAMuHMdUKLg2S-cySkN1_6esgt7ZEjqRwxHdB73i6+f9MaGjh6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH/RFC 3/5] hw/arm/virt: Allow dynamic sysbus
+ devices again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Alexander Graf <agraf@suse.de>, Magnus Damm <magnus.damm@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 
-On Wed, Apr 11, 2018 at 08:02:58AM -0500, Eric Blake wrote:
-> You could always add qemu_fopen/qemu_fclose to match the existing
-> qemu_open/qemu_close.  But you do have a point that you can't call
-> qemu_close/fclose (because fclose would be left with a stale fd that
-> might spuriously close something that has been opened in another thread
-> during the race window), nor fclose/qemu_close.
->
-> The FILE interface may sometimes be easier to work with, but it also
-> comes with buffering issues that you don't have to worry about when
-> using the fd interface.
+Hi Eric,
 
-Yeah. I'm using plain qemu_open()/qemu_close() and read/write
-directly.
+On Wed, Feb 14, 2018 at 11:37 AM, Auger Eric <eric.auger@redhat.com> wrote:
+> On 09/02/18 16:17, Geert Uytterhoeven wrote:
+>> Allow the instantation of generic dynamic sysbus devices again, without
+>> the need to create a new device-specific vfio type.
+>>
+>> This is a partial revert of commit  6f2062b9758ebc64 ("hw/arm/virt:
+>> Allow only supported dynamic sysbus devices").
+>>
+>> Not-Yet-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+>> ---
+>>  hw/arm/virt.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index b334c82edae9fb1f..fa83784fc08ed076 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1596,6 +1596,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>>      mc->max_cpus = 255;
+>>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
+>>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
+>> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+> Couldn't you limit that to TYPE_VFIO_PLATFORM instead?
 
-> Good point - but yes, ideally it should always be possible to pass in an
-> fd instead of having qemu itself open a file, because there are
-> execution environments where qemu is intentionally prohibited from
-> directly calling open() for security reasons (where the management app,
-> such as libvirt, opens and then passes fds to qemu instead).
+Yep, that works. Thanks!
 
-I've converted qmp_memsave/qmp_pmemsave in extra patches to use
-qemu_open() (and some additional cleanup).
+Gr{oetje,eeting}s,
 
-> You are correct that we can't really change the existing interface; so
-> documenting in the commit message that your choice of names is for
-> consistency reasons may be sufficient.
+                        Geert
 
-Will do.
-
-Revised patches which should implement all of your suggestions
-(and the style issue noticed by the bot) as replies to this mail.
-
-Regards
-Simon
 -- 
-+ privacy is necessary
-+ using gnupg http://gnupg.org
-+ public key id: 0x92FEFDB7E44C32F9
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
