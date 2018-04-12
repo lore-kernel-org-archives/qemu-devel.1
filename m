@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6dwG-0005uS-JT
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:09 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1f6dwK-0005yl-1l
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f6dwD-0007XI-Ed
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37638 helo=mx1.redhat.com)
+	(envelope-from <tiwei.bie@intel.com>) id 1f6dwE-0007Xc-1X
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:08 -0400
+Received: from mga09.intel.com ([134.134.136.24]:48812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f6dwD-0007Ww-8P
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f6dwD-0007PY-Lf
 	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 11:15:01 -0400
-References: <20180412101858.21304-1-clg@kaod.org>
-	<CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ddb22501-d3d9-22ed-a966-8bb8afabfa17@redhat.com>
-Date: Thu, 12 Apr 2018 10:14:49 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97"
-Subject: Re: [Qemu-devel] [PATCH] migration: discard RAMBlocks of type
- ram_device
+From: Tiwei Bie <tiwei.bie@intel.com>
+Date: Thu, 12 Apr 2018 23:12:32 +0800
+Message-Id: <20180412151232.17506-7-tiwei.bie@intel.com>
+In-Reply-To: <20180412151232.17506-1-tiwei.bie@intel.com>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+Subject: [Qemu-devel] [PATCH v3 6/6] vhost-user: support registering
+ external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +24,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?= =?UTF-8?Q?r?= <clg@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com
+To: mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com, tiwei.bie@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?=
- =?UTF-8?Q?r?= <clg@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Alex Williamson <alex.williamson@redhat.com>,
- Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com,
- Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com
-Message-ID: <ddb22501-d3d9-22ed-a966-8bb8afabfa17@redhat.com>
-Subject: Re: [PATCH] migration: discard RAMBlocks of type ram_device
-References: <20180412101858.21304-1-clg@kaod.org>
- <CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
-In-Reply-To: <CAFEAcA8wJCSwtpypvH+3HKvv39o9bPC1vXJ_Co4VwiZTOt78ZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch introduces VHOST_USER_PROTOCOL_F_HOST_NOTIFIER.
+With this feature negotiated, vhost-user backend can register
+memory region based host notifiers. And it will allow the guest
+driver in the VM to notify the hardware accelerator at the
+vhost-user backend directly.
 
-On 04/12/2018 06:47 AM, Peter Maydell wrote:
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+---
+ docs/interop/vhost-user.txt    |  33 +++++++++++
+ hw/virtio/vhost-user.c         | 123 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-user.h |   8 +++
+ 3 files changed, 164 insertions(+)
 
->>  /*
->> + * Identifies RAM blocks which should be discarded from migration. Fo=
-r
->> + * the moment, it only applies to blocks backed by a 'ram_device'
->> + * memory region.
->> + */
->> +static inline bool ram_block_is_migratable(RAMBlock *block)
->> +{
->> +    return !memory_region_is_ram_device(block->mr);
->> +}
->> +
->> +/* Should be holding either ram_list.mutex, or the RCU lock. */
->> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
->> +    RAMBLOCK_FOREACH(block)                            \
->> +        if (ram_block_is_migratable(block))
->=20
-> This will mishandle some uses, like:
->=20
->     if (foo)
->         RAMBLOCK_FOREACH_MIGRATABLE(block)
->             stuff;
->     else
->         morestuff;
->=20
-> as the if() inside the macro will capture the else clause.
-> (The lack of braces in the calling code would be against our
-> coding style, of course, so not very likely.)
-
-All existing callers of RAMBLOCK_FOREACH() already supply their own {}
-around stuff (same is true for QLIST_FOREACH_RCU(), which is what is
-being used under the hood).  By the time you correct that to:
-
-if (foo)
-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-        stuff;
-    }
-else
-    morestuff;
-
-then even though the outer if violates coding standard, the correct
-usage of the macro with {} around stuff won't leak that there is a
-trailing if.
-
-But yeah, if you're worrying about code that omitted {}, then dealing
-with omitted {} in both places is something to think about.
-
->=20
-> Eric, is there a 'standard' trick for this? I thought of
-> maybe
->=20
-> #define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
->     RAMBLOCK_FOREACH(block)                            \
->         if (!ram_block_is_migratable(block)) {} else
-
-at which point, yes, this is a little bit safer for taking exactly one
-statement without risking that a later bare 'else' could match to the
-wrong unbraced 'if'.  I'm not coming up with any better ideas for
-(abusing?) the syntax.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrPd+kACgkQp6FrSiUn
-Q2rqzQf/farJtTH+FkslJSnd+b6MMzJ+sCPV3lXTSXk1WtmA/WEzw+U3/lVEKGug
-MDErrwSX4Hnxt8XLkRd3G56DNUyLuPOGYpd47Bmjgit9Pwzc1RAaTYlyw3813yC0
-l6zjflX0KGKz3XWtEPJGNPd4GAk7Ll1KTS+Y2PsyenBxwlBK5ae5bUJFw78USWK8
-52Tpq4spV1r03DyaBXj0HU3QM74crupl5JDUoOpkEeHnAALOF1wjBH+M3E74RVav
-C8zYxtAswtlot/jFanzhfKXGK4M3DFwkZN9KuB/LwvH6QxvbiPmUSfajZmZfpO6M
-tkR4kjxdKOQ3t9V0n8mL3Z1EueEBeg==
-=u4i5
------END PGP SIGNATURE-----
-
---ktXbq1yWAlQqM2P6usfj2XqHqL4fX0y97--
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 534caab18a..9e57b36b20 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -132,6 +132,16 @@ Depending on the request type, payload can be:
+    Payload: Size bytes array holding the contents of the virtio
+        device's configuration space
+ 
++ * Vring area description
++   -----------------------
++   | u64 | size | offset |
++   -----------------------
++
++   u64: a 64-bit integer contains vring index and flags
++   Size: a 64-bit size of this area
++   Offset: a 64-bit offset of this area from the start of the
++       supplied file descriptor
++
+ In QEMU the vhost-user message is implemented with the following struct:
+ 
+ typedef struct VhostUserMsg {
+@@ -146,6 +156,7 @@ typedef struct VhostUserMsg {
+         VhostUserLog log;
+         struct vhost_iotlb_msg iotlb;
+         VhostUserConfig config;
++        VhostUserVringArea area;
+     };
+ } QEMU_PACKED VhostUserMsg;
+ 
+@@ -380,6 +391,7 @@ Protocol features
+ #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+ #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+ #define VHOST_USER_PROTOCOL_F_CONFIG         9
++#define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  10
+ 
+ Master message types
+ --------------------
+@@ -777,6 +789,27 @@ Slave message types
+      the VHOST_USER_NEED_REPLY flag, master must respond with zero when
+      operation is successfully completed, or non-zero otherwise.
+ 
++ * VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG
++
++      Id: 3
++      Equivalent ioctl: N/A
++      Slave payload: vring area description
++      Master payload: N/A
++
++      Sets host notifier for a specified queue. The queue index is contained
++      in the u64 field of the vring area description. The host notifier is
++      described by the file descriptor (typically it's a VFIO device fd) which
++      is passed as ancillary data and the size (which is mmap size and should
++      be the same as host page size) and offset (which is mmap offset) carried
++      in the vring area description. QEMU can mmap the file descriptor based
++      on the size and offset to get a memory range. Registering a host notifier
++      means mapping this memory range to the VM as the specified queue's notify
++      MMIO region. Slave sends this request to tell QEMU to de-register the
++      existing notifier if any and register the new notifier if the request is
++      sent with a file descriptor.
++      This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
++      protocol feature has been successfully negotiated.
++
+ VHOST_USER_PROTOCOL_F_REPLY_ACK:
+ -------------------------------
+ The original vhost-user specification only demands replies for certain
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 791e0a4763..1cd9c7276b 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -13,6 +13,7 @@
+ #include "hw/virtio/vhost.h"
+ #include "hw/virtio/vhost-user.h"
+ #include "hw/virtio/vhost-backend.h"
++#include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "chardev/char-fe.h"
+ #include "sysemu/kvm.h"
+@@ -48,6 +49,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+     VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+     VHOST_USER_PROTOCOL_F_CONFIG = 9,
++    VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 10,
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+ 
+@@ -92,6 +94,7 @@ typedef enum VhostUserSlaveRequest {
+     VHOST_USER_SLAVE_NONE = 0,
+     VHOST_USER_SLAVE_IOTLB_MSG = 1,
+     VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
++    VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
+     VHOST_USER_SLAVE_MAX
+ }  VhostUserSlaveRequest;
+ 
+@@ -136,6 +139,12 @@ static VhostUserConfig c __attribute__ ((unused));
+                                    + sizeof(c.size) \
+                                    + sizeof(c.flags))
+ 
++typedef struct VhostUserVringArea {
++    uint64_t u64;
++    uint64_t size;
++    uint64_t offset;
++} VhostUserVringArea;
++
+ typedef struct {
+     VhostUserRequest request;
+ 
+@@ -157,6 +166,7 @@ typedef union {
+         struct vhost_iotlb_msg iotlb;
+         VhostUserConfig config;
+         VhostUserCryptoSession session;
++        VhostUserVringArea area;
+ } VhostUserPayload;
+ 
+ typedef struct VhostUserMsg {
+@@ -638,9 +648,37 @@ static int vhost_user_set_vring_num(struct vhost_dev *dev,
+     return vhost_set_vring(dev, VHOST_USER_SET_VRING_NUM, ring);
+ }
+ 
++static void vhost_user_host_notifier_restore(struct vhost_dev *dev,
++                                             int queue_idx)
++{
++    struct vhost_user *u = dev->opaque;
++    VhostUserHostNotifier *n = &u->user->notifier[queue_idx];
++    VirtIODevice *vdev = dev->vdev;
++
++    if (n->addr && !n->set) {
++        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true);
++        n->set = true;
++    }
++}
++
++static void vhost_user_host_notifier_remove(struct vhost_dev *dev,
++                                            int queue_idx)
++{
++    struct vhost_user *u = dev->opaque;
++    VhostUserHostNotifier *n = &u->user->notifier[queue_idx];
++    VirtIODevice *vdev = dev->vdev;
++
++    if (n->addr && n->set) {
++        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
++        n->set = false;
++    }
++}
++
+ static int vhost_user_set_vring_base(struct vhost_dev *dev,
+                                      struct vhost_vring_state *ring)
+ {
++    vhost_user_host_notifier_restore(dev, ring->index);
++
+     return vhost_set_vring(dev, VHOST_USER_SET_VRING_BASE, ring);
+ }
+ 
+@@ -674,6 +712,8 @@ static int vhost_user_get_vring_base(struct vhost_dev *dev,
+         .hdr.size = sizeof(msg.payload.state),
+     };
+ 
++    vhost_user_host_notifier_remove(dev, ring->index);
++
+     if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+         return -1;
+     }
+@@ -847,6 +887,76 @@ static int vhost_user_slave_handle_config_change(struct vhost_dev *dev)
+     return ret;
+ }
+ 
++static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
++                                                       VhostUserVringArea *area,
++                                                       int fd)
++{
++    int queue_idx = area->u64 & VHOST_USER_VRING_IDX_MASK;
++    size_t page_size = qemu_real_host_page_size;
++    struct vhost_user *u = dev->opaque;
++    VhostUserState *user = u->user;
++    VirtIODevice *vdev = dev->vdev;
++    VhostUserHostNotifier *n;
++    int ret = 0;
++    void *addr;
++    char *name;
++
++    if (!virtio_has_feature(dev->protocol_features,
++                            VHOST_USER_PROTOCOL_F_HOST_NOTIFIER) ||
++        vdev == NULL || queue_idx >= virtio_get_num_queues(vdev)) {
++        ret = -1;
++        goto out;
++    }
++
++    n = &user->notifier[queue_idx];
++
++    if (n->addr) {
++        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
++        object_unparent(OBJECT(&n->mr));
++        munmap(n->addr, page_size);
++        n->addr = NULL;
++    }
++
++    if (area->u64 & VHOST_USER_VRING_NOFD_MASK) {
++        goto out;
++    }
++
++    /* Sanity check. */
++    if (area->size != page_size) {
++        ret = -1;
++        goto out;
++    }
++
++    addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
++                fd, area->offset);
++    if (addr == MAP_FAILED) {
++        ret = -1;
++        goto out;
++    }
++
++    name = g_strdup_printf("vhost-user/host-notifier@%p mmaps[%d]",
++                           user, queue_idx);
++    memory_region_init_ram_device_ptr(&n->mr, OBJECT(vdev), name,
++                                      page_size, addr);
++    g_free(name);
++
++    if (virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true)) {
++        munmap(addr, page_size);
++        ret = -1;
++        goto out;
++    }
++
++    n->addr = addr;
++    n->set = true;
++
++out:
++    /* Always close the fd. */
++    if (fd != -1) {
++        close(fd);
++    }
++    return ret;
++}
++
+ static void slave_read(void *opaque)
+ {
+     struct vhost_dev *dev = opaque;
+@@ -913,6 +1023,10 @@ static void slave_read(void *opaque)
+     case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG :
+         ret = vhost_user_slave_handle_config_change(dev);
+         break;
++    case VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG:
++        ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
++                                                          fd);
++        break;
+     default:
+         error_report("Received unexpected msg type.");
+         if (fd != -1) {
+@@ -1641,6 +1755,15 @@ VhostUserState *vhost_user_init(void)
+ 
+ void vhost_user_cleanup(VhostUserState *user)
+ {
++    int i;
++
++    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++        if (user->notifier[i].addr) {
++            object_unparent(OBJECT(&user->notifier[i].mr));
++            munmap(user->notifier[i].addr, qemu_real_host_page_size);
++            user->notifier[i].addr = NULL;
++        }
++    }
+ }
+ 
+ const VhostOps user_ops = {
+diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+index eb8bc0d90d..fd660393a0 100644
+--- a/include/hw/virtio/vhost-user.h
++++ b/include/hw/virtio/vhost-user.h
+@@ -9,9 +9,17 @@
+ #define HW_VIRTIO_VHOST_USER_H
+ 
+ #include "chardev/char-fe.h"
++#include "hw/virtio/virtio.h"
++
++typedef struct VhostUserHostNotifier {
++    MemoryRegion mr;
++    void *addr;
++    bool set;
++} VhostUserHostNotifier;
+ 
+ typedef struct VhostUserState {
+     CharBackend *chr;
++    VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
+ } VhostUserState;
+ 
+ VhostUserState *vhost_user_init(void);
+-- 
+2.11.0
