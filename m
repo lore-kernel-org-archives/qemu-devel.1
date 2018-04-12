@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1f6a3q-0005iI-44
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:06:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f6a93-00088t-OJ
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1f6a3l-00043D-6X
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:06:38 -0400
-Received: from mga07.intel.com ([134.134.136.100]:63492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1f6a3k-0003oj-Rf
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:06:33 -0400
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Thu, 12 Apr 2018 11:06:20 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257439BCD441@SHSMSX104.ccr.corp.intel.com>
-References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1519900415-30314-6-git-send-email-yi.l.liu@linux.intel.com>
-	<20180306103352.GB3158@sky-dev> <20180412023602.GF9425@umbus.fritz.box>
-In-Reply-To: <20180412023602.GF9425@umbus.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <kwolf@redhat.com>) id 1f6a92-0007dz-EB
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:12:01 -0400
+Date: Thu, 12 Apr 2018 13:11:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180412111143.GB5004@localhost.localdomain>
+References: <20180411163940.2523-1-kwolf@redhat.com>
+	<20180411163940.2523-8-kwolf@redhat.com>
+	<33c2ce2d-18d6-5479-19d4-3a1923cea3cb@redhat.com>
+	<20180412095157.GA5004@localhost.localdomain>
+	<f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 05/12] hw/pci: introduce PCISVAOps to
- PCIDevice
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 07/19] block: Really pause block jobs on
+ drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,196 +28,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peterx@redhat.com" <peterx@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Hi David,
+Am 12.04.2018 um 12:12 hat Paolo Bonzini geschrieben:
+> On 12/04/2018 11:51, Kevin Wolf wrote:
+> > Am 12.04.2018 um 10:37 hat Paolo Bonzini geschrieben:
+> >> On 11/04/2018 18:39, Kevin Wolf wrote:
+> >>> +bool bdrv_drain_poll(BlockDriverState *bs, bool top_level)
+> >>>  {
+> >>>      /* Execute pending BHs first and check everything else only af=
+ter the BHs
+> >>>       * have executed. */
+> >>> -    while (aio_poll(bs->aio_context, false));
+> >>> +    if (top_level) {
+> >>> +        while (aio_poll(bs->aio_context, false));
+> >>> +    }
+> >>> +
+> >>> +    if (bdrv_parent_drained_poll(bs)) {
+> >>> +        return true;
+> >>> +    }
+> >>> +
+> >>>      return atomic_read(&bs->in_flight);
+> >>>  }
+> >>> =20
+> >>
+> >> Up until now I liked very much this series, but I like this patch a =
+bit
+> >> less for two reasons.
+> >>
+> >> 1) I think I would prefer to have the !top_level case in a separate
+> >> function---making the API easier to use in the BdrvChildRole callbac=
+k
+> >> because there is no need to pass false.
+> >=20
+> > Basically just move the aio_poll() out to a different function that
+> > calls bdrv_drain_poll afterwards? Maybe it's a bit cleaner, yes.
+> > However, see below.
+>=20
+> Yes.
+>=20
+> >> In addition, the callback is not really polling anything, but rather
+> >> returning whether the children are quiescent.  So a better name woul=
+d
+> >> be bdrv_children_drained and c->role->drained.
+> >=20
+> > Why isn't it polling? We're actively checking the state of the node, =
+and
+> > we keep calling the callback until it has the expected state. Would i=
+t
+> > only become polling for you if the loop were in this function rather
+> > than the its caller?
+>=20
+> It's just checking the status, it's not invoking the event loop.  The
+> polling (in the sense of aio_poll or AIO_POLL_WHILE) is done elsewhere,
+> this function is just the condition.  It's just nomenclature I guess.
 
-> From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> Sent: Thursday, April 12, 2018 10:36 AM
-> On Tue, Mar 06, 2018 at 06:33:52PM +0800, Liu, Yi L wrote:
-> > On Mon, Mar 05, 2018 at 02:31:44PM +1100, David Gibson wrote:
-> > > On Thu, Mar 01, 2018 at 06:31:55PM +0800, Liu, Yi L wrote:
-> > > > This patch intoduces PCISVAOps for virt-SVA.
-> > > >
-> > > > So far, to setup virt-SVA for assigned SVA capable device, needs to
-> > > > config host translation structures. e.g. for VT-d, needs to set the
-> > > > guest pasid table to host and enable nested translation. Besides,
-> > > > vIOMMU emulator needs to forward guest's cache invalidation to host=
+Yes, it doesn't poll the AioContext events. I don't think that the name
+implies that, though. It does poll the state of the block node and its
+users.
+
+> >> 2) Worse, the main idea behind the first drain restructuring was tha=
+t
+> >> draining could proceed in topological order: first drain the roots' =
+I/O,
+> >> then call bdrv_drain to send the last requests to their children, th=
+en
+> >> recurse.  It is not clear to me why you need to introduce this recur=
+sive
+> >> step, which is also O(n^2) in the worst case.
+> >=20
+> > I need to introduce it because it fixes the bug that we don't wait un=
+til
+> > the parents are actually quiesced and don't send new requests any mor=
+e.
+> > I don't see how this could be fixed without going to the parents.
+>=20
+> Yes, you do need to go to the parents.  I don't understand however why
+> you need more than a walk of the graph in parent-before-child order
+> (which is a topological order, so it is reverse depth-first order and
+> it's easy to do the walk in a recursive function).  If you're draining =
+X
+> below:
+>=20
+>      A
+>      |
+>      B   C
+>       \ /
+>        X
+>=20
+> then you start by draining A/B/C in topological order (so A before B).
+> If B happens to be already quiescent, you can skip not only B but A too=
 .
-> > > > On VT-d, it is guest's invalidation to 1st level translation relate=
-d
-> > > > cache, such invalidation should be forwarded to host.
-> > > >
-> > > > Proposed PCISVAOps are:
-> > > > * sva_bind_guest_pasid_table: set the guest pasid table to host, an=
-d
-> > > >                               enable nested translation in host
-> > > > * sva_register_notifier: register sva_notifier to forward guest's
-> > > >                          cache invalidation to host
-> > > > * sva_unregister_notifier: unregister sva_notifier
-> > > >
-> > > > The PCISVAOps should be provided by vfio or modules alike. Mainly f=
-or
-> > > > assigned SVA capable devices.
-> > > >
-> > > > Take virt-SVA on VT-d as an exmaple:
-> > > > If a guest wants to setup virt-SVA for an assigned SVA capable devi=
-ce,
-> > > > it programs its context entry. vIOMMU emulator captures guest's con=
-text
-> > > > entry programming, and figure out the target device. vIOMMU emulato=
-r
-> > > > use the pci_device_sva_bind_pasid_table() API to bind the guest pas=
-id
-> > > > table to host.
-> > > >
-> > > > Guest would also program its pasid table. vIOMMU emulator captures
-> > > > guest's pasid entry programming. In Qemu, needs to allocate an
-> > > > AddressSpace to stand for the pasid tagged address space and Qemu a=
-lso
-> > > > needs to register sva_notifier to forward future cache invalidation
-> > > > request to host.
-> > > >
-> > > > Allocating AddressSpace to stand for the pasid tagged address space=
- is
-> > > > for the emulation of emulated SVA capable devices. Emulated SVA cap=
-able
-> > > > devices may issue SVA aware DMAs, Qemu needs to emulate read/write =
-to a
-> > > > pasid tagged AddressSpace. Thus needs an abstraction for such addre=
-ss
-> > > > space in Qemu.
-> > > >
-> > > > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> > >
-> > > So PCISVAOps is roughly equivalent to the cluster-of-PASIDs context I
-> > > was suggesting in my earlier comments,
-> >
-> > yes, it is. The purpose is to expose pasid table bind and sva notfier
-> > registration/unregistration to vIOMMU emulators.
-> >
-> > > however it's only an ops
-> > > structure.  That means you can't easily share a context between
-> > > multiple PCI devices which is unfortunate because:
-> > >     * The simplest use case for SVA I can see would just put the
-> > >       same set of PASIDs into place for every SVA capable device
-> >
-> > Do you mean for emulated SVA capable device?
->=20
-> Not necessarily.  I'd expect that model could be useful for both
-> emulated and passthrough SVA capable devices.
->=20
-> > >     * Sometimes the IOMMU can't determine exactly what device a DMA
-> > >       came from.  Now the bridge cases where this applies are probabl=
-y
-> > >       unlikely with SVA devices, but I wouldn't want to bet on it.  I=
-n
-> > >       addition, the chances some manufacturer will eventually put out
-> > >       a buggy multifunction SVA capable device that use the wrong RID=
-s
-> > >       for the secondary functions is pretty darn high.
-> >
-> > I'm not sure I 100% got your point here. Do yu mean physical device?
-> > In PCIE TLP, DMA packet should have a RID field?
->=20
-> Yes, but that RID isn't accurate in all cases.
->=20
-> One case is if you have a PCIe device behind both a PCIe->PCI and
-> PCI->PCIe bridge.  Now obviously SVA won't work in that case, but it
-> would be good to at least detect it and refuse to attempt SVA.
->=20
-> Another case is with a buggy device that just sends the wrong RID.  In
-> particular there are some multifunction devices that use function 0's
-> RID for all functions.  Obviously that's a hardware bug and we can't
-> expect everything to work in this case.  But forcing all the functions
-> to share an SVAContext in this case - like we alreayd force them to
-> share an IOMMU group - allows us to reason about what will and won't work
 
-Agree.
+Are we talking only about bdrv_drain_poll() here or the complete
+bdrv_do_drained_begin() call?
 
->=20
-> > And it looks more like
-> > a hardware layer trouble. For this series, it only provides necessary
-> > software support to make sure guest's SVA operation is well prepared
-> > before the SVA device issues the SVA aware DMA. e.g. link guest's pasid
-> > table to host, and config iommu translation in nested mode.
+If you don't want to recurse separately for .drain_begin and the polling
+phase, but keep everything in one function like it's before this series,
+you can't skip anything just because it's already quiescent. You don't
+have control over that other drain and it might end too early; also,
+.drain_begin/end must come in pairs.
 
-yes, it is.
+If we're only talking about .drain_poll, then in theory you could skip A
+if B knows that it's fully quiesced (i.e. not only .drain_begin was
+called, but also .drain_poll has returned false at least once). We don't
+store this information anywhere, though, and I'm not sure if the saved
+recursion would be worth additional state.
 
-> >
-> > >
-> > > So I think instead you want a cluster-of-PASIDs object which has an
-> > > ops table including both these and the per-PASID calls from the
-> > > earlier patches (but the per-PASID calls would now take an explicit
-> > > PASID value).
-> >
-> > I didn't quite get "including both these and the per-PASID calls".
-> > What do you mean by "these"? Do you mean the PCISVAOps?
->=20
-> I mean that I think PCISVAOps should become a full object including an
-> ops table, not just an ops table.  That table would include the things
-> currently in PCISVAOps.  It would also include callbacks for the
-> things that are in your per-PASID object in this draft, but those
-> callbacks would now need to take an explicit PASIC parameter.
-
-Based on some comments from Peter Xu and your comments on the
-" [PATCH v3 03/12] hw/core: introduce IOMMUSVAContext for virt-SVA"
-I've considered a new approach which might be able to reuse the existing
-translation logic based on MemoryRegion. I'm preparing some code to
-show it. Before that, I'd like to see your opinion.
-
-As we discussed, for assigned devices, we want to prepare the config before
-the SVA device issues the SVA aware DMA. And this can be achieved by
-PCISVAOps proposed as below:
-
-struct PCISVAOps {
-    void (*pasid_bind_table)(PCIBus *bus, int32_t devfn,
-                    uint64_t pasidt_addr, uint32_t size);
-    void (*pasid_invalidate_extend_iotlb)(PCIBus *bus,
-                              int32_t devfn, void *data);
-}
-This is no more notifier based, for further extension, it could include mor=
+>  If the nodes disappear or move elsewhere in the graph it's okay, you'v=
 e
-callback in this ops. Previously, I thought notifier is better. However, Pe=
-ter
-corrected me in another thread.
+> just done useless work.
 
-While for emulated devices, we need to support address translation. So I
-introduced IOMMUSVAContext and translate callback in this series. But it
-duplicates much translation logic from MemoryRegion based logic. So I
-reconsidered if it is ok to reuse MemoryRegion. And seems like possible.
-Below is my thought. I took VT-d as example, you may check if works based
-on your understanding.
+Not really. The node is drained now and bdrv_do_drained_end() won't end
+the drained section because the moved node isn't reachable any more from
+this original node.
 
-1) add "pasid" and "pasid_allocated" field in the structure below. For each
-PASID tagged address space, Qemu creates a VTDAddressSpace instance,
-and set the pasid field. For PCI DMA address space, it won't init pasid and
-pasid_allocated field.
+> When you're done you ensure that every parent
+> is quiescent, and if so you're done.  If it's not, , a new parent
+> appeared---drain that too, using the same parent-before-child order, an=
+d
+> loop.
 
-struct VTDAddressSpace {
-     PCIBus *bus;
-     uint8_t devfn;
-+    bool pasid_allocated;
-+    uint32_t pasid;
-     AddressSpace as;
-     IOMMUMemoryRegion iommu;
-     MemoryRegion root;
-     ...
-}
+That might work if we only ever were in a single drained section and
+BlockDriverState had a bool quiesced. What we do have is a
+quiesce_count, and when you look at the quiesce_count of a node, you
+can't tell whether it came from you or someone else. So there is no way
+to tell whether a parent was already drained by you or not.
 
-When emulated SVA capable devices issues SVA aware DMA, its device
-model should be able to get a PASID, and then get correct AddressSpace.
-The DMA emulation logic would finally call into imrc->translate() callback
-which provided by IOMMU emulator. In the callback, it can get the
-VTDAddressSpace and check if PASID is allocated. If yes, do translation wit=
-h
-corresponding 1st-level page table. If no, walk through the I/O page table(
-2nd level-page table).
+And to be honest, even if it worked, it would still seem kind of
+complicated to me. Just calling .drain_begin everywhere first and then
+polling until nobody has anything in flight any more feels much simpler
+conceptually than keeping track of which nodes we drained and repeating
+that until no new nodes appear, and somehow undraining the nodes that
+disappeared, but are potentially still referenced from somewhere else.
 
-Another benefit of reusing MemoryRegion would be: if someone wants to
-implement SVA with shadow solution, he or she could use the MAP/UNMAP
-API to shadow SVA mapping to host iommu.
+> Well, there is one gotcha: bdrv_ref protects against disappearance, but
+> bdrv_ref/bdrv_unref are not thread-safe.  Am I missing something else?
 
-Thanks,
-Yi Liu
+Apart from the above, if we do an extra bdrv_ref/unref we'd also have
+to keep track of all the nodes that we've referenced so that we unref
+the same nodes again, even if the graph has changes.
+
+So essentially you'd be introducing a new list of BDSes that we have to
+manage and then check for every reachable node whether it's already in
+that list or not, and for every node in the list whether it's still
+reachable. I don't really see how that's going to reduce the complexity.
+
+> > Is the O(n=B2) that you mean that we recursively iterate all children=
+ in
+> > bdrv_do_drained_begin() (or later in the series in bdrv_drain_poll())=
+,
+> > and then come back from the children when they poll their parents?
+>=20
+> Yes.
+>=20
+> Paolo
+>=20
+> > We could do the same thing as for bdrv_parent_drained_begin(), i.e. p=
+ass
+> > the parent that we came from (BdrvChild *parent instead of bool
+> > top_level, NULL instead of top_level=3Dtrue) and then skip that paren=
+t
+> > while calling the BdrvChildRole .drain_poll callbacks. Would that
+> > address your concerns?
+
+Ok, then this should be the solution. I can implement it for v2.
+
+Kevin
