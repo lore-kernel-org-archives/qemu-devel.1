@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f6ZKJ-00044X-Lx
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:19:40 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1f6a3q-0005iI-44
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f6ZKG-0004Ep-Fg
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:19:35 -0400
-Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:57318)
+	(envelope-from <yi.l.liu@intel.com>) id 1f6a3l-00043D-6X
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:06:38 -0400
+Received: from mga07.intel.com ([134.134.136.100]:63492)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f6ZKG-0004DB-5N
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 06:19:32 -0400
-Received: from player773.ha.ovh.net (unknown [10.109.122.84])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id DB3601A55BA
-	for <qemu-devel@nongnu.org>; Thu, 12 Apr 2018 12:19:29 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 12 Apr 2018 12:18:58 +0200
-Message-Id: <20180412101858.21304-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1f6a3k-0003oj-Rf
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 07:06:33 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Thu, 12 Apr 2018 11:06:20 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439BCD441@SHSMSX104.ccr.corp.intel.com>
+References: <1519900415-30314-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1519900415-30314-6-git-send-email-yi.l.liu@linux.intel.com>
+	<20180306103352.GB3158@sky-dev> <20180412023602.GF9425@umbus.fritz.box>
+In-Reply-To: <20180412023602.GF9425@umbus.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration: discard RAMBlocks of type ram_device
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 05/12] hw/pci: introduce PCISVAOps to
+ PCIDevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,209 +30,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peterx@redhat.com" <peterx@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>
 
-On the POWER9 processor, the XIVE interrupt controller can control
-interrupt sources using MMIO to trigger events, to EOI or to turn off
-the sources. Priority management and interrupt acknowledgment is also
-controlled by MMIO in the presenter sub-engine.
+Hi David,
 
-These MMIO regions are exposed to guests in QEMU with a set of 'ram
-device' memory mappings, similarly to VFIO, and the VMAs are populated
-dynamically with the appropriate pages using a fault handler.
+> From: David Gibson [mailto:david@gibson.dropbear.id.au]
+> Sent: Thursday, April 12, 2018 10:36 AM
+> On Tue, Mar 06, 2018 at 06:33:52PM +0800, Liu, Yi L wrote:
+> > On Mon, Mar 05, 2018 at 02:31:44PM +1100, David Gibson wrote:
+> > > On Thu, Mar 01, 2018 at 06:31:55PM +0800, Liu, Yi L wrote:
+> > > > This patch intoduces PCISVAOps for virt-SVA.
+> > > >
+> > > > So far, to setup virt-SVA for assigned SVA capable device, needs to
+> > > > config host translation structures. e.g. for VT-d, needs to set the
+> > > > guest pasid table to host and enable nested translation. Besides,
+> > > > vIOMMU emulator needs to forward guest's cache invalidation to host=
+.
+> > > > On VT-d, it is guest's invalidation to 1st level translation relate=
+d
+> > > > cache, such invalidation should be forwarded to host.
+> > > >
+> > > > Proposed PCISVAOps are:
+> > > > * sva_bind_guest_pasid_table: set the guest pasid table to host, an=
+d
+> > > >                               enable nested translation in host
+> > > > * sva_register_notifier: register sva_notifier to forward guest's
+> > > >                          cache invalidation to host
+> > > > * sva_unregister_notifier: unregister sva_notifier
+> > > >
+> > > > The PCISVAOps should be provided by vfio or modules alike. Mainly f=
+or
+> > > > assigned SVA capable devices.
+> > > >
+> > > > Take virt-SVA on VT-d as an exmaple:
+> > > > If a guest wants to setup virt-SVA for an assigned SVA capable devi=
+ce,
+> > > > it programs its context entry. vIOMMU emulator captures guest's con=
+text
+> > > > entry programming, and figure out the target device. vIOMMU emulato=
+r
+> > > > use the pci_device_sva_bind_pasid_table() API to bind the guest pas=
+id
+> > > > table to host.
+> > > >
+> > > > Guest would also program its pasid table. vIOMMU emulator captures
+> > > > guest's pasid entry programming. In Qemu, needs to allocate an
+> > > > AddressSpace to stand for the pasid tagged address space and Qemu a=
+lso
+> > > > needs to register sva_notifier to forward future cache invalidation
+> > > > request to host.
+> > > >
+> > > > Allocating AddressSpace to stand for the pasid tagged address space=
+ is
+> > > > for the emulation of emulated SVA capable devices. Emulated SVA cap=
+able
+> > > > devices may issue SVA aware DMAs, Qemu needs to emulate read/write =
+to a
+> > > > pasid tagged AddressSpace. Thus needs an abstraction for such addre=
+ss
+> > > > space in Qemu.
+> > > >
+> > > > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> > >
+> > > So PCISVAOps is roughly equivalent to the cluster-of-PASIDs context I
+> > > was suggesting in my earlier comments,
+> >
+> > yes, it is. The purpose is to expose pasid table bind and sva notfier
+> > registration/unregistration to vIOMMU emulators.
+> >
+> > > however it's only an ops
+> > > structure.  That means you can't easily share a context between
+> > > multiple PCI devices which is unfortunate because:
+> > >     * The simplest use case for SVA I can see would just put the
+> > >       same set of PASIDs into place for every SVA capable device
+> >
+> > Do you mean for emulated SVA capable device?
+>=20
+> Not necessarily.  I'd expect that model could be useful for both
+> emulated and passthrough SVA capable devices.
+>=20
+> > >     * Sometimes the IOMMU can't determine exactly what device a DMA
+> > >       came from.  Now the bridge cases where this applies are probabl=
+y
+> > >       unlikely with SVA devices, but I wouldn't want to bet on it.  I=
+n
+> > >       addition, the chances some manufacturer will eventually put out
+> > >       a buggy multifunction SVA capable device that use the wrong RID=
+s
+> > >       for the secondary functions is pretty darn high.
+> >
+> > I'm not sure I 100% got your point here. Do yu mean physical device?
+> > In PCIE TLP, DMA packet should have a RID field?
+>=20
+> Yes, but that RID isn't accurate in all cases.
+>=20
+> One case is if you have a PCIe device behind both a PCIe->PCI and
+> PCI->PCIe bridge.  Now obviously SVA won't work in that case, but it
+> would be good to at least detect it and refuse to attempt SVA.
+>=20
+> Another case is with a buggy device that just sends the wrong RID.  In
+> particular there are some multifunction devices that use function 0's
+> RID for all functions.  Obviously that's a hardware bug and we can't
+> expect everything to work in this case.  But forcing all the functions
+> to share an SVAContext in this case - like we alreayd force them to
+> share an IOMMU group - allows us to reason about what will and won't work
 
-But, these regions are an issue for migration. We need to discard the
-associated RAMBlocks from the RAM state on the source VM and let the
-destination VM rebuild the memory mappings on the new host in the
-post_load() operation just before resuming the system.
+Agree.
 
-To achieve this goal, the following introduces a new helper,
-ram_block_is_migratable(), which identifies RAMBlocks to discard on
-the source. Some checks are also performed on the destination to make
-sure nothing invalid was sent.
+>=20
+> > And it looks more like
+> > a hardware layer trouble. For this series, it only provides necessary
+> > software support to make sure guest's SVA operation is well prepared
+> > before the SVA device issues the SVA aware DMA. e.g. link guest's pasid
+> > table to host, and config iommu translation in nested mode.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+yes, it is.
 
- I am not sure we want to taker into account patchew complaint :
-=20
-   ERROR: braces {} are necessary for all arms of this statement
-   #52: FILE: migration/ram.c:203:
-   +        if (ram_block_is_migratable(block))
-   [...]
+> >
+> > >
+> > > So I think instead you want a cluster-of-PASIDs object which has an
+> > > ops table including both these and the per-PASID calls from the
+> > > earlier patches (but the per-PASID calls would now take an explicit
+> > > PASID value).
+> >
+> > I didn't quite get "including both these and the per-PASID calls".
+> > What do you mean by "these"? Do you mean the PCISVAOps?
+>=20
+> I mean that I think PCISVAOps should become a full object including an
+> ops table, not just an ops table.  That table would include the things
+> currently in PCISVAOps.  It would also include callbacks for the
+> things that are in your per-PASID object in this draft, but those
+> callbacks would now need to take an explicit PASIC parameter.
 
-   total: 1 errors, 0 warnings, 136 lines checked
+Based on some comments from Peter Xu and your comments on the
+" [PATCH v3 03/12] hw/core: introduce IOMMUSVAContext for virt-SVA"
+I've considered a new approach which might be able to reuse the existing
+translation logic based on MemoryRegion. I'm preparing some code to
+show it. Before that, I'd like to see your opinion.
 
- migration/ram.c | 52 ++++++++++++++++++++++++++++++++++++++++++---------=
--
- 1 file changed, 42 insertions(+), 10 deletions(-)
+As we discussed, for assigned devices, we want to prepare the config before
+the SVA device issues the SVA aware DMA. And this can be achieved by
+PCISVAOps proposed as below:
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 0e90efa09236..32371950865b 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -188,6 +188,21 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb, vo=
-id *host_addr,
- }
-=20
- /*
-+ * Identifies RAM blocks which should be discarded from migration. For
-+ * the moment, it only applies to blocks backed by a 'ram_device'
-+ * memory region.
-+ */
-+static inline bool ram_block_is_migratable(RAMBlock *block)
-+{
-+    return !memory_region_is_ram_device(block->mr);
-+}
-+
-+/* Should be holding either ram_list.mutex, or the RCU lock. */
-+#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-+    RAMBLOCK_FOREACH(block)                            \
-+        if (ram_block_is_migratable(block))
-+
-+/*
-  * An outstanding page request, on the source, having been received
-  * and queued
-  */
-@@ -780,6 +795,10 @@ unsigned long migration_bitmap_find_dirty(RAMState *=
-rs, RAMBlock *rb,
-     unsigned long *bitmap =3D rb->bmap;
-     unsigned long next;
-=20
-+    if (!ram_block_is_migratable(rb)) {
-+        return size;
-+    }
-+
-     if (rs->ram_bulk_stage && start > 0) {
-         next =3D start + 1;
-     } else {
-@@ -825,7 +844,7 @@ uint64_t ram_pagesize_summary(void)
-     RAMBlock *block;
-     uint64_t summary =3D 0;
-=20
--    RAMBLOCK_FOREACH(block) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         summary |=3D block->page_size;
-     }
-=20
-@@ -849,7 +868,7 @@ static void migration_bitmap_sync(RAMState *rs)
-=20
-     qemu_mutex_lock(&rs->bitmap_mutex);
-     rcu_read_lock();
--    RAMBLOCK_FOREACH(block) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         migration_bitmap_sync_range(rs, block, 0, block->used_length);
-     }
-     rcu_read_unlock();
-@@ -1499,6 +1518,10 @@ static int ram_save_host_page(RAMState *rs, PageSe=
-archStatus *pss,
-     size_t pagesize_bits =3D
-         qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
-=20
-+    if (!ram_block_is_migratable(pss->block)) {
-+        return 0;
-+    }
-+
-     do {
-         tmppages =3D ram_save_target_page(rs, pss, last_stage);
-         if (tmppages < 0) {
-@@ -1587,7 +1610,7 @@ uint64_t ram_bytes_total(void)
-     uint64_t total =3D 0;
-=20
-     rcu_read_lock();
--    RAMBLOCK_FOREACH(block) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         total +=3D block->used_length;
-     }
-     rcu_read_unlock();
-@@ -1642,7 +1665,7 @@ static void ram_save_cleanup(void *opaque)
-      */
-     memory_global_dirty_log_stop();
-=20
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         g_free(block->bmap);
-         block->bmap =3D NULL;
-         g_free(block->unsentmap);
-@@ -1705,7 +1728,7 @@ void ram_postcopy_migrated_memory_release(Migration=
-State *ms)
- {
-     struct RAMBlock *block;
-=20
--    RAMBLOCK_FOREACH(block) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         unsigned long *bitmap =3D block->bmap;
-         unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
-         unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0)=
-;
-@@ -1783,7 +1806,7 @@ static int postcopy_each_ram_send_discard(Migration=
-State *ms)
-     struct RAMBlock *block;
-     int ret;
-=20
--    RAMBLOCK_FOREACH(block) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         PostcopyDiscardState *pds =3D
-             postcopy_discard_send_init(ms, block->idstr);
-=20
-@@ -1991,7 +2014,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
- *ms)
-     rs->last_sent_block =3D NULL;
-     rs->last_page =3D 0;
-=20
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS;
-         unsigned long *bitmap =3D block->bmap;
-         unsigned long *unsentmap =3D block->unsentmap;
-@@ -2150,7 +2173,7 @@ static void ram_list_init_bitmaps(void)
-=20
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
--        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+        RAMBLOCK_FOREACH_MIGRATABLE(block) {
-             pages =3D block->max_length >> TARGET_PAGE_BITS;
-             block->bmap =3D bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-@@ -2226,7 +2249,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
-)
-=20
-     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-=20
--    RAMBLOCK_FOREACH(block) {
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-         qemu_put_byte(f, strlen(block->idstr));
-         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr)=
-);
-         qemu_put_be64(f, block->used_length);
-@@ -2471,6 +2494,11 @@ static inline RAMBlock *ram_block_from_stream(QEMU=
-File *f, int flags)
-         return NULL;
-     }
-=20
-+    if (!ram_block_is_migratable(block)) {
-+        error_report("block %s should not be migrated !", id);
-+        return NULL;
-+    }
-+
-     return block;
- }
-=20
-@@ -2921,7 +2949,11 @@ static int ram_load(QEMUFile *f, void *opaque, int=
- version_id)
-                 length =3D qemu_get_be64(f);
-=20
-                 block =3D qemu_ram_block_by_name(id);
--                if (block) {
-+                if (block && !ram_block_is_migratable(block)) {
-+                    error_report("block %s should not be migrated !", id=
-);
-+                    ret =3D -EINVAL;
-+
-+                } else if (block) {
-                     if (length !=3D block->used_length) {
-                         Error *local_err =3D NULL;
-=20
---=20
-2.13.6
+struct PCISVAOps {
+    void (*pasid_bind_table)(PCIBus *bus, int32_t devfn,
+                    uint64_t pasidt_addr, uint32_t size);
+    void (*pasid_invalidate_extend_iotlb)(PCIBus *bus,
+                              int32_t devfn, void *data);
+}
+This is no more notifier based, for further extension, it could include mor=
+e
+callback in this ops. Previously, I thought notifier is better. However, Pe=
+ter
+corrected me in another thread.
+
+While for emulated devices, we need to support address translation. So I
+introduced IOMMUSVAContext and translate callback in this series. But it
+duplicates much translation logic from MemoryRegion based logic. So I
+reconsidered if it is ok to reuse MemoryRegion. And seems like possible.
+Below is my thought. I took VT-d as example, you may check if works based
+on your understanding.
+
+1) add "pasid" and "pasid_allocated" field in the structure below. For each
+PASID tagged address space, Qemu creates a VTDAddressSpace instance,
+and set the pasid field. For PCI DMA address space, it won't init pasid and
+pasid_allocated field.
+
+struct VTDAddressSpace {
+     PCIBus *bus;
+     uint8_t devfn;
++    bool pasid_allocated;
++    uint32_t pasid;
+     AddressSpace as;
+     IOMMUMemoryRegion iommu;
+     MemoryRegion root;
+     ...
+}
+
+When emulated SVA capable devices issues SVA aware DMA, its device
+model should be able to get a PASID, and then get correct AddressSpace.
+The DMA emulation logic would finally call into imrc->translate() callback
+which provided by IOMMU emulator. In the callback, it can get the
+VTDAddressSpace and check if PASID is allocated. If yes, do translation wit=
+h
+corresponding 1st-level page table. If no, walk through the I/O page table(
+2nd level-page table).
+
+Another benefit of reusing MemoryRegion would be: if someone wants to
+implement SVA with shadow solution, he or she could use the MAP/UNMAP
+API to shadow SVA mapping to host iommu.
+
+Thanks,
+Yi Liu
