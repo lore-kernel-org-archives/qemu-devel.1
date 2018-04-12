@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6hOB-00074h-Ud
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:56:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1f6hPa-0007wS-3E
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:57:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f6hO7-0003TQ-85
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:56:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58720 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f6hO7-0003St-0y
-	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:56:03 -0400
-Date: Thu, 12 Apr 2018 19:55:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180412185558.GJ2704@work-vm>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-	<1523089594-1422-6-git-send-email-lidongchen@tencent.com>
-	<20180411155647.GG2667@work-vm>
-	<CAOGPPbcF=Ln6U2UAxWFysMHAA-K08=whGQEL3FepZ+mzM4pmMg@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1f6hPV-0004Z2-8c
+	for qemu-devel@nongnu.org; Thu, 12 Apr 2018 14:57:34 -0400
+References: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
+	<1523372486-13190-3-git-send-email-walling@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <107962d1-87b5-2574-92a3-a6625757f9e7@redhat.com>
+Date: Thu, 12 Apr 2018 20:57:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbcF=Ln6U2UAxWFysMHAA-K08=whGQEL3FepZ+mzM4pmMg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] migration: disable RDMA WRITR after
- postcopy started.
+In-Reply-To: <1523372486-13190-3-git-send-email-walling@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/4] pc-bios/s390-ccw: fix loadparm
+ initialization and int conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
+Cc: gor@linux.ibm.com, frankja@linux.ibm.com
 
-* 858585 jemmy (jemmy858585@gmail.com) wrote:
-> On Wed, Apr 11, 2018 at 11:56 PM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Lidong Chen (jemmy858585@gmail.com) wrote:
-> >> RDMA write operations are performed with no notification to the destination
-> >> qemu, then the destination qemu can not wakeup. So disable RDMA WRITE after
-> >> postcopy started.
-> >>
-> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> >
-> > This patch needs to be near the beginning of the series; at the moment a
-> > bisect would lead you to the middle of the series which had return
-> > paths, but then would fail to work properly because it would try and use
-> > the RDMA code.
-> 
-> I will fix this problem in next version.
-> 
-> >
-> >> ---
-> >>  migration/qemu-file.c |  3 ++-
-> >>  migration/rdma.c      | 12 ++++++++++++
-> >>  2 files changed, 14 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> >> index 8acb574..a64ac3a 100644
-> >> --- a/migration/qemu-file.c
-> >> +++ b/migration/qemu-file.c
-> >> @@ -260,7 +260,8 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
-> >>          int ret = f->hooks->save_page(f, f->opaque, block_offset,
-> >>                                        offset, size, bytes_sent);
-> >>          f->bytes_xfer += size;
-> >> -        if (ret != RAM_SAVE_CONTROL_DELAYED) {
-> >> +        if (ret != RAM_SAVE_CONTROL_DELAYED &&
-> >> +            ret != RAM_SAVE_CONTROL_NOT_SUPP) {
-> >
-> > What about f->bytes_xfer in this case?
-> 
-> f->bytes_xfer should not update when RAM_SAVE_CONTROL_NOT_SUPP.
-> I will fix this problem in next version.
-> 
-> >
-> > Is there anything we have to do at the switchover into postcopy to make
-> > sure that all pages have been received?
-> 
-> ram_save_iterate invoke ram_control_after_iterate(f, RAM_CONTROL_ROUND),
-> so before next iteration which switchover into postcopy, all the pages
-> sent by previous
-> iteration have been received.
+On 10.04.2018 17:01, Collin Walling wrote:
+> Rename the loadparm char array in main.c to loadparm_str and
+> increase the size by one byte to account for a null termination
+> when converting the loadparm string to an int via atoui. Also=20
+> allow the boot menu to be enabled when loadparm is set to an=20
+> empty string or a series of spaces.
+>=20
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
+> ---
+>  hw/s390x/ipl.c          |  2 ++
+>  pc-bios/s390-ccw/main.c | 14 +++++++-------
+>  2 files changed, 9 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index fdeaec3..23b5b54 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -352,6 +352,8 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
+>              loadparm[i] =3D ascii2ebcdic[(uint8_t) lp[i]];
+>          }
+> =20
+> +        memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces =
+*/
+> +
+>          g_free(lp);
+>          return 0;
+>      }
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 9d9f8cf..26f9adf 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -15,11 +15,11 @@
+>  char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+>  static SubChannelId blk_schid =3D { .one =3D 1 };
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+> -static char loadparm[8] =3D { 0, 0, 0, 0, 0, 0, 0, 0 };
+> +static char loadparm_str[9] =3D { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>  QemuIplParameters qipl;
+> =20
+>  #define LOADPARM_PROMPT "PROMPT  "
+> -#define LOADPARM_EMPTY  "........"
+> +#define LOADPARM_EMPTY  "        "
 
-OK, great.
+Sorry for my ignorance, but why was the old string containing dots?
 
-Dave
-
-> >
-> > Dave
-> >
-> >>              if (bytes_sent && *bytes_sent > 0) {
-> >>                  qemu_update_position(f, *bytes_sent);
-> >>              } else if (ret < 0) {
-> >> diff --git a/migration/rdma.c b/migration/rdma.c
-> >> index 81be482..8529ddd 100644
-> >> --- a/migration/rdma.c
-> >> +++ b/migration/rdma.c
-> >> @@ -2964,6 +2964,10 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
-> >>
-> >>      CHECK_ERROR_STATE();
-> >>
-> >> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> >> +        return RAM_SAVE_CONTROL_NOT_SUPP;
-> >> +    }
-> >> +
-> >>      qemu_fflush(f);
-> >>
-> >>      if (size > 0) {
-> >> @@ -3528,6 +3532,10 @@ static int qemu_rdma_registration_start(QEMUFile *f, void *opaque,
-> >>
-> >>      CHECK_ERROR_STATE();
-> >>
-> >> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> >> +        return 0;
-> >> +    }
-> >> +
-> >>      trace_qemu_rdma_registration_start(flags);
-> >>      qemu_put_be64(f, RAM_SAVE_FLAG_HOOK);
-> >>      qemu_fflush(f);
-> >> @@ -3550,6 +3558,10 @@ static int qemu_rdma_registration_stop(QEMUFile *f, void *opaque,
-> >>
-> >>      CHECK_ERROR_STATE();
-> >>
-> >> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> >> +        return 0;
-> >> +    }
-> >> +
-> >>      qemu_fflush(f);
-> >>      ret = qemu_rdma_drain_cq(f, rdma);
-> >>
-> >> --
-> >> 1.8.3.1
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thomas
