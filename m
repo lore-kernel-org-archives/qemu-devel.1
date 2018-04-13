@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f6rzj-00049Z-4Q
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 02:15:36 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1f6s5i-00084N-Vq
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 02:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f6rzg-0006YD-09
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 02:15:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56362 helo=mx1.redhat.com)
+	(envelope-from <mprivozn@redhat.com>) id 1f6s5f-0002co-Rs
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 02:21:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34800 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f6rzf-0006Xb-Rd
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 02:15:31 -0400
-Date: Fri, 13 Apr 2018 08:15:29 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180413061529.ulu6jxmcs4mgfmdc@sirius.home.kraxel.org>
-References: <20180410120222.31845-1-tournier.elie@gmail.com>
-	<20180410120222.31845-2-tournier.elie@gmail.com>
-	<c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
-	<20180410133335.zzvgg7lqe2lb2zdx@sirius.home.kraxel.org>
-	<20180412141153.GA16814@Nikki.localdomain>
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1f6s5f-0002cR-M7
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 02:21:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A26BCEB6F6
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 06:21:31 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <0c14166c-28c4-a1ad-093b-ba63e373e790@redhat.com>
+Date: Fri, 13 Apr 2018 08:21:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180412141153.GA16814@Nikki.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2 for-2.12?] qapi: Parameter gl of
- DisplayType now accept an enum
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Purpose of memory-backend-file.discard-data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Elie Tournier <tournier.elie@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Apr 12, 2018 at 03:11:53PM +0100, Elie Tournier wrote:
-> Hello,
-> 
-> On Tue, Apr 10, 2018 at 03:33:35PM +0200, Gerd Hoffmann wrote:
-> > > # @off: Disable OpenGL (default).
-> 
-> Just to be sure, I have to add @ in front of all parameter, right?
-> 
-> > > 
-> > > > + # 'on'    Use OpenGL, pick context type automatically.
-> > > > + #         Would better be named 'auto' but is called 'on' for backward
-> > > > + #         compatibility with bool type.
-> > > 
-> > > See below...
-> > 
-> > > DisplayOptions was added in 2.12.  This is a backwards-incompatible
-> > > change in QMP (you CANNOT change 'bool' to 'DisplayGLMode' across
-> > > releases, because the on-the-wire representation differs; pre-patch it
-> > > would be "gl":true, post-patch it is "gl":"on").  So if it affects QMP,
-> > > and we want it, this patch either HAS to go in 2.12, or we have to have
-> > > more finesse (perhaps by using an 'alternate' type in the QAPI) so that
-> > > it remains backwards-compatible.
-> > > 
-> > > /me goes and looks at introspection output...
-> > > 
-> > > You may be in luck - there is no instance of 'window-close' in the
-> > > introspection output, which means 'DisplayType' exists only for ease of
-> > > command-line parsing and is not currently used by QMP, so tweaks here
-> > > are not affecting the command line.
-> > 
-> > Yes, right now the struct is only used to store the parsed command line
-> > opts, so no effect on QMP.
-> > 
-> > Plan for the future is to also parse command line options with generic
-> > qapi/json code instead of the home-grown parser, but that switch didn't
-> > happen yet.
-> > 
-> > > That said, you can STILL name the enum value something smarter than 'on'
-> > > IF you make the change now, for 2.12, given that the QAPI type was only
-> > > introduced in 2.12 (you only have to worry about backwards compatibility
-> > > if 2.11 already parsed gl=on).
-> > 
-> > gl=on is older, so that must continue to work.  Making both "on" and
-> > "auto" work isn't a problem for our home-grown parser (aka
-> > parse_display() in vl.c).  But having quirks like this makes the switch
-> > to generic parser code more difficuilt, so I'd prefer to avoid that ...
-> 
-> Is it possible to upstream this change before 2.12 release?
+Eduardo et al,
 
-No need to hurry with this.  QMP doesn't see the structs, so no
-compatibility problem here.  gl=on cmd line option was present in 2.11 +
-older already, so that must continue to work no matter whenever this
-makes 2.12 or not.
+I'm looking at 11ae6ed8affdd131e and I wanted to implement libvirt
+support for that. But more I look at it less I understand it. My
+understanding it is an optimization (although not very effective one
+since madvise() is/should be immediately followed by munmap()). So any
+application that is trying to keep track of guest memory  can stop doing
+so as soon as it sees munmap(). Or does the optimization lies in fact
+that madvise() is called sooner and thus the app can stop caring
+slightly sooner?
 
-cheers,
-  Gerd
+Also, I don't quite understand why is this configurable. What's the harm
+in turning it on by default? Yesterday I've posted some patches to
+libvirt list [1] (although I have to admit I am still not fully
+convinced about the design) and they implement just this - whenever qemu
+supports the feature libvirt turns it on.
+
+Michal
+
+1: https://www.redhat.com/archives/libvir-list/2018-April/msg01066.html
