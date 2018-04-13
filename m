@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f76t7-0006g2-0R
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 18:09:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1f76vR-0000Iq-52
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 18:12:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f76t6-0000TA-7q
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 18:09:44 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180413164545.18409-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <87db1aab-1bcb-7ba8-f871-017b7a9c0f6c@amsat.org>
-Date: Fri, 13 Apr 2018 19:09:26 -0300
+	(envelope-from <bounces@canonical.com>) id 1f76vM-0001if-V2
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 18:12:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f76vM-0001gs-Kv
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 18:12:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f76vL-0006Be-N4
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 22:12:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id ACBD62E80CC
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 22:12:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180413164545.18409-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] acpi: fix a comment about aml_call0()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Apr 2018 21:51:52 -0000
+From: Thomas Huth <1446726@bugs.launchpad.net>
+Reply-To: Bug 1446726 <1446726@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150421153539.13624.79753.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152365631254.20493.16855918005350692646.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1446726] Re: qemu stable 2.0 crashes during loadvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 04/13/2018 01:45 PM, Marc-André Lureau wrote:
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> ---
->  hw/acpi/aml-build.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 3fa557cea1..1e43cd736d 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -627,7 +627,7 @@ Aml *aml_notify(Aml *arg1, Aml *arg2)
->      return var;
->  }
->  
-> -/* helper to call method with 1 argument */
-> +/* helper to call method without argument */
->  Aml *aml_call0(const char *method)
->  {
->      Aml *var = aml_alloc();
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1446726
+
+Title:
+  qemu stable 2.0 crashes during loadvm
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Qemu output:
+
+  2015-03-06 01:06:54.255+0000: starting up =
+
+  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin=
+:/bin QEMU_AUDIO_DRV=3Dnone /usr/bin/qemu-system-x86_64 -name instance-0000=
+462a -S -machine pc-i440fx-trusty,accel=3Dkvm,usb=3Doff -cpu Westmere,+erms=
+,+smep,+3dnowprefetch,+rdtscp,+rdrand,+tsc-deadline,+movbe,+pdcm,+xtpr,+tm2=
+,+est,+vmx,+ds_cpl,+monitor,+dtes64,+pclmuldq,+pbe,+tm,+ht,+ss,+acpi,+ds,+v=
+me -m 4096 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -=
+uuid 7c3f225c-df2a-4014-997b-3200fcfff43d -smbios type=3D1,manufacturer=3DO=
+penStack Foundation,product=3DOpenStack Nova,version=3D2014.1.2,serial=3D47=
+4aef35-d474-8001-e411-6108001017ac,uuid=3D7c3f225c-df2a-4014-997b-3200fcfff=
+43d -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/va=
+r/lib/libvirt/qemu/instance-0000462a.monitor,server,nowait -mon chardev=3Dc=
+harmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfix=3Dslew -glo=
+bal kvm-pit.lost_tick_policy=3Ddiscard -no-hpet -no-shutdown -boot strict=
+=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive fil=
+e=3D/var/lib/nova/instances/7c3f225c-df2a-4014-997b-3200fcfff43d/disk,if=3D=
+none,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone,iops_rd=3D100,iops=
+_wr=3D100 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x6,drive=3D=
+drive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/dev/mappe=
+r/258c232d7056e0047,if=3Dnone,id=3Ddrive-virtio-disk1,format=3Draw,serial=
+=3Ddedb9d8d-e727-4d09-bf89-52e870125303,cache=3Dnone -device virtio-blk-pci=
+,scsi=3Doff,bus=3Dpci.0,addr=3D0x9,drive=3Ddrive-virtio-disk1,id=3Dvirtio-d=
+isk1 -drive file=3D/var/lib/nova/instances/7c3f225c-df2a-4014-997b-3200fcff=
+f43d/disk.config,if=3Dnone,id=3Ddrive-virtio-disk25,format=3Draw,cache=3Dno=
+ne,iops_rd=3D100,iops_wr=3D100 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.=
+0,addr=3D0x7,drive=3Ddrive-virtio-disk25,id=3Dvirtio-disk25 -chardev file,i=
+d=3Dcharserial0,path=3D/var/lib/nova/instances/7c3f225c-df2a-4014-997b-3200=
+fcfff43d/console.log -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 =
+-chardev pty,id=3Dcharserial1 -device isa-serial,chardev=3Dcharserial1,id=
+=3Dserial1 -device usb-tablet,id=3Dinput0 -vnc 127.0.0.1:0 -k ja -device ci=
+rrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -incoming fd:23 -device virtio-=
+balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 =
+
+  char device redirected to /dev/pts/3 (label charserial1) =
+
+  qemu-system-x86_64: /build/buildd/qemu-2.0.0+dfsg/memory.c:1403: memory_r=
+egion_del_eventfd: Assertion `i !=3D mr->ioeventfd_nb' failed. =
+
+  2015-03-06 01:09:02.585+0000: shutting down
+
+  =
+
+  Libvirt log:
+  2015-03-05 11:29:48.434+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 00:13:33.077+0000: 8397: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/26, skipping
+  2015-03-06 00:13:40.981+0000: 8397: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 00:14:27.206+0000: 8396: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 00:14:40.160+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 00:20:45.414+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 00:26:21.849+0000: 8396: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/25, skipping
+  2015-03-06 00:26:24.764+0000: 8396: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 00:28:09.425+0000: 8398: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 00:29:29.981+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 00:35:06.485+0000: 8398: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/26, skipping
+  2015-03-06 00:35:09.645+0000: 8398: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 00:37:58.701+0000: 8397: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 00:59:12.925+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 01:04:57.990+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 01:05:18.031+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 01:05:37.954+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 01:06:13.213+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 01:06:29.870+0000: 8398: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/26, skipping
+  2015-03-06 01:06:31.024+0000: 8398: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 01:06:57.274+0000: 8395: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 01:09:02.581+0000: 8392: error : qemuMonitorIORead:554 : Unabl=
+e to read from monitor: Connection reset by peer
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1446726/+subscriptions
