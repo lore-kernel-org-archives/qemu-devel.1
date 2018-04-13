@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1f6ymv-0004gH-CL
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:30:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6yrC-0007FQ-KT
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1f6yms-0005lb-9K
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:30:49 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:58818)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1f6ymr-0005l4-W8
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:30:46 -0400
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Fri, 13 Apr 2018 16:30:41 +0300
-Message-ID: <20180413133041.29509.59064.stgit@pasha-VirtualBox>
+	(envelope-from <peter.maydell@linaro.org>) id 1f6yrB-0008Tn-CL
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:14 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45148)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f6yrA-0008TL-Su
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:13 -0400
+Received: by mail-ot0-x241.google.com with SMTP id m3-v6so754138ote.12
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 06:35:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2] m68: fix exception stack frame for 68000
+In-Reply-To: <1522160122-10744-5-git-send-email-eric.auger@redhat.com>
+References: <1522160122-10744-1-git-send-email-eric.auger@redhat.com>
+	<1522160122-10744-5-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 13 Apr 2018 14:34:51 +0100
+Message-ID: <CAFEAcA8sQSuVcYPyE58tjapxxe6FNdD5qcyftYrZeWQ0fbev8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 4/8] hw/intc/arm_gicv3: Implement
+ register_redist_region API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, laurent@vivier.eu, pavel.dovgaluk@ispras.ru
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-68000 CPUs do not save format in the exception stack frame.
-This patch adds feature checking to prevent format saving for 68000.
-m68k_ret() already includes this modification, this patch fixes
-the exception processing function too.
+On 27 March 2018 at 15:15, Eric Auger <eric.auger@redhat.com> wrote:
+> This patch defines and implements the register_redist_region() API
+> for both arm_gicv3 and arm_gicv3_kvm. Virt machine now directly calls
+> the function to set the single redistributor region. The associated
+> memory region init is removed from gicv3_init_irqs_and_mmio.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/arm/virt.c                      |  6 +++++-
+>  hw/intc/arm_gicv3.c                | 21 +++++++++++++++++++++
+>  hw/intc/arm_gicv3_common.c         | 10 ++++++----
+>  hw/intc/arm_gicv3_kvm.c            | 38 +++++++++++++++++++++++++++++++++++---
+>  include/hw/intc/arm_gicv3_common.h |  5 +++--
+>  5 files changed, 70 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 94dcb12..0eef6aa 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -526,7 +526,11 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+>      gicbusdev = SYS_BUS_DEVICE(gicdev);
+>      sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
+>      if (type == 3) {
+> -        sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
+> +        ARMGICv3CommonClass *agcc = ARM_GICV3_COMMON_GET_CLASS(gicdev);
+> +
+> +        agcc->register_redist_region((GICv3State *)gicdev,
+> +                                 vms->memmap[VIRT_GIC_REDIST].base,
+> +                                 vms->memmap[VIRT_GIC_REDIST].size >> 17);
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+What is this magic number 17 ?
 
---
+>      } else {
+>          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
+>      }
+> diff --git a/hw/intc/arm_gicv3.c b/hw/intc/arm_gicv3.c
+> index 479c667..37f7564 100644
+> --- a/hw/intc/arm_gicv3.c
+> +++ b/hw/intc/arm_gicv3.c
+> @@ -378,6 +378,26 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
+>      gicv3_init_cpuif(s);
+>  }
+>
+> +static int arm_gicv3_register_redist_region(GICv3State *s, hwaddr base,
+> +                                            uint32_t count)
+> +{
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
+> +
+> +    if (s->nb_redist_regions > 0) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    s->redist_region[s->nb_redist_regions].base = base;
+> +    s->redist_region[s->nb_redist_regions].count = count;
+> +    memory_region_init_io(&s->redist_region[s->nb_redist_regions].mr, OBJECT(s),
+> +                          gic_ops, s, "gicv3_redist", 0x20000 * count);
+> +    sysbus_init_mmio(sbd, &s->redist_region[s->nb_redist_regions].mr);
+> +    sysbus_mmio_map(sbd, 1, base);
 
-v2:
- - moved switch under the condition (suggested by Laurent Vivier)
----
- target/m68k/op_helper.c |   33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+Devices should never call sysbus_mmio_map() -- they should
+just provide sysbus MMIO regions, and let the board code map
+them in the right places. More generally the device code
+shouldn't be told where in the memory map it is. kvm_arm_register_device()
+goes to some lengths to maintain this abstraction (by setting
+up a notifier to tell the kernel where things are only once
+everything has been created and mapped).
 
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 3a7f7f2..8d09ed9 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -287,22 +287,25 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
-                                   uint16_t format, uint16_t sr,
-                                   uint32_t addr, uint32_t retaddr)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
--    switch (format) {
--    case 4:
--        *sp -= 4;
--        cpu_stl_kernel(env, *sp, env->pc);
--        *sp -= 4;
--        cpu_stl_kernel(env, *sp, addr);
--        break;
--    case 3:
--    case 2:
--        *sp -= 4;
--        cpu_stl_kernel(env, *sp, addr);
--        break;
-+    if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
-+        /*  all except 68000 */
-+        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+        switch (format) {
-+        case 4:
-+            *sp -= 4;
-+            cpu_stl_kernel(env, *sp, env->pc);
-+            *sp -= 4;
-+            cpu_stl_kernel(env, *sp, addr);
-+            break;
-+        case 3:
-+        case 2:
-+            *sp -= 4;
-+            cpu_stl_kernel(env, *sp, addr);
-+            break;
-+        }
-+        *sp -= 2;
-+        cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
-     }
--    *sp -= 2;
--    cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
-     *sp -= 4;
-     cpu_stl_kernel(env, *sp, retaddr);
-     *sp -= 2;
+Similar remarks apply to other changes in this patch (and
+I suspect will need some restructuring to address).
+
+> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+> index 3cf132f..549ccc3 100644
+> --- a/include/hw/intc/arm_gicv3_common.h
+> +++ b/include/hw/intc/arm_gicv3_common.h
+> @@ -220,6 +220,7 @@ struct GICv3State {
+>      MemoryRegion iomem_dist; /* Distributor */
+>      GICv3RDISTRegion redist_region[GICV3_MAX_RDIST_REGIONS];
+>      uint32_t nb_redist_regions;
+> +    bool support_multiple_redist_regions;
+>
+>      uint32_t num_cpu;
+>      uint32_t num_irq;
+> @@ -297,8 +298,8 @@ typedef struct ARMGICv3CommonClass {
+>
+>      void (*pre_save)(GICv3State *s);
+>      void (*post_load)(GICv3State *s);
+> -    /* register an RDIST region at @base, containing @pfns 64kB pages */
+> -    int (*register_redist_region)(GICv3State *s, hwaddr base, uint32_t pfns);
+> +    /* register an RDIST region at @base, containing @count redistributors */
+> +    int (*register_redist_region)(GICv3State *s, hwaddr base, uint32_t count);
+
+This looks like a change that should have been folded into a
+previous patch.
+
+>  } ARMGICv3CommonClass;
+>
+>  void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
+> --
+> 2.5.5
+
+thanks
+-- PMM
