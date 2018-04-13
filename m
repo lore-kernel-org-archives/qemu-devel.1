@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6q44-0007Xt-T0
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 00:11:58 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1f6qyC-0004Sy-Rs
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 01:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f6q41-0008Sg-O7
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 00:11:56 -0400
-References: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
-	<1523372486-13190-3-git-send-email-walling@linux.ibm.com>
-	<107962d1-87b5-2574-92a3-a6625757f9e7@redhat.com>
-	<445a3858-d399-ef49-6426-3de9a95509dd@linux.ibm.com>
-	<125df9c3-b133-6882-7d92-1ffc9e4c040f@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7be1f156-2044-317f-ce8f-d79588497a57@redhat.com>
-Date: Fri, 13 Apr 2018 06:11:33 +0200
+	(envelope-from <linzhecheng@huawei.com>) id 1f6qy9-0003M2-LB
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 01:09:56 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2389 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1f6qy9-0003Kr-9a
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 01:09:53 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Fri, 13 Apr 2018 05:09:42 +0000
+Message-ID: <D9DE8DBB19F2A24080482022C1DE758302C6A043@dggemm509-mbx.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <125df9c3-b133-6882-7d92-1ffc9e4c040f@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] pc-bios/s390-ccw: fix loadparm
- initialization and int conversion
+Subject: Re: [Qemu-devel] [Bug Report] vm paused after succeeding to migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
-Cc: frankja@linux.ibm.com, gor@linux.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>
 
-On 12.04.2018 23:04, Farhan Ali wrote:
->=20
->=20
-> On 04/12/2018 04:57 PM, Collin Walling wrote:
->> On 04/12/2018 02:57 PM, Thomas Huth wrote:
->>> On 10.04.2018 17:01, Collin Walling wrote:
->>>> Rename the loadparm char array in main.c to loadparm_str and
->>>> increase the size by one byte to account for a null termination
->>>> when converting the loadparm string to an int via atoui. Also
->>>> allow the boot menu to be enabled when loadparm is set to an
->>>> empty string or a series of spaces.
->>>>
->>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->>>> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
->>>> ---
->>>> =C2=A0 hw/s390x/ipl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 2 ++
->>>> =C2=A0 pc-bios/s390-ccw/main.c | 14 +++++++-------
->>>> =C2=A0 2 files changed, 9 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->>>> index fdeaec3..23b5b54 100644
->>>> --- a/hw/s390x/ipl.c
->>>> +++ b/hw/s390x/ipl.c
->>>> @@ -352,6 +352,8 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 loadparm[i] =3D ascii2ebcdic[(uint8_t) lp[i]];
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(loadparm +=
- i, 0x40, 8 - i); /* fill with EBCDIC
->>>> spaces */
->>>> +
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_free(lp);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
->>>> index 9d9f8cf..26f9adf 100644
->>>> --- a/pc-bios/s390-ccw/main.c
->>>> +++ b/pc-bios/s390-ccw/main.c
->>>> @@ -15,11 +15,11 @@
->>>> =C2=A0 char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZ=
-E)));
->>>> =C2=A0 static SubChannelId blk_schid =3D { .one =3D 1 };
->>>> =C2=A0 IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE))=
-);
->>>> -static char loadparm[8] =3D { 0, 0, 0, 0, 0, 0, 0, 0 };
->>>> +static char loadparm_str[9] =3D { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
->>>> =C2=A0 QemuIplParameters qipl;
->>>> =C2=A0 =C2=A0 #define LOADPARM_PROMPT "PROMPT=C2=A0 "
->>>> -#define LOADPARM_EMPTY=C2=A0 "........"
->>>> +#define LOADPARM_EMPTY=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 "
->>>
->>> Sorry for my ignorance, but why was the old string containing dots?
->>>
->>> =C2=A0 Thomas
->>>
->>
->> No need for apologies :)
->>
->> If -machine loadparm is *not* present on the command line, then the
->> loadparm in the sclp
->> will be a series of nulls. For whatever reason, that gets translated
->> into a series of dots.
->>
->=20
-> It's because of the ebc2asc table we use for conversion, which results
-> in the dots when converting from ebcdic_to_ascii.
-
-Ah, great, thanks to both of you for the explanation, that was the part
-that I was missing. I was only looking at the tables in
-include/hw/s390x/ebcdic.h (since I thought that the dots were already
-created on the QEMU side), and did not expect that the pc-bios could
-create them.
-
-The patch now makes sense to me:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogRHIuIERhdmlkIEFsYW4gR2lsYmVy
+dCBbbWFpbHRvOmRnaWxiZXJ0QHJlZGhhdC5jb21dDQo+ILeiy83KsbzkOiAyMDE4xOo01MIxMsjV
+IDIwOjM3DQo+IMrVvP7IyzogbGluemhlY2hlbmcgPGxpbnpoZWNoZW5nQGh1YXdlaS5jb20+OyBw
+Ym9uemluaUByZWRoYXQuY29tDQo+ILOty806IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgd2FuZ3hp
+biAoVSkgPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsNCj4gWmhvdWppYW4gKGpheSkgPGpp
+YW5qYXkuemhvdUBodWF3ZWkuY29tPjsgcXVpbnRlbGFAcmVkaGF0LmNvbQ0KPiDW98ziOiBSZTog
+W1FlbXUtZGV2ZWxdIFtCdWcgUmVwb3J0XSB2bSBwYXVzZWQgYWZ0ZXIgc3VjY2VlZGluZyB0byBt
+aWdyYXRlDQo+IA0KPiAqIGxpbnpoZWNoZW5nIChsaW56aGVjaGVuZ0BodWF3ZWkuY29tKSB3cm90
+ZToNCj4gPiBIaSwgYWxsDQo+ID4gSSBlbmNvdW50ZXJkIGEgYnVnIHdoZW4gSSB0cnkgdG8gbWln
+cmF0ZSBhIHdpbmRvd3Mgdm0uDQo+ID4NCj4gPiBFbnZpcm9tZW50IGluZm9ybWF0aW9uOg0KPiA+
+IGhvc3QgQTogY3B1IEU1NjIwKG1vZGVsIFdlc3RtZXJlRVAgd2l0aG91dCBmbGFnIHhzYXZlKSBo
+b3N0IEI6IGNwdQ0KPiA+IEU1LTI2NDMobW9kZWwgU2FuZHlCcmlkZ2VFUCB3aXRoIHhzYXZlKQ0K
+PiA+DQo+ID4gVGhlIHJlcHJvZHVjZSBzdGVwcyBpcyA6DQo+ID4gMS4gU3RhcnQgYSB3aW5kb3dz
+IDIwMDggdm0gd2l0aCAtY3B1IGhvc3Qod2hpY2ggbWVhbnMgaG9zdC1wYXNzdGhyb3VnaCkuDQo+
+ID4gMi4gTWlncmF0ZSB0aGUgdm0gdG8gaG9zdCBCIHdoZW4gY3I0Lk9TWFNBVkU9MCAoc3VjY2Vz
+c2Z1bGx5KS4NCj4gPiAzLiBWbSBydW5zIG9uIGhvc3QgQiBmb3IgYSB3aGlsZSBzbyB0aGF0IGNy
+NC5PU1hTQVZFIGNoYW5nZXMgdG8gMS4NCj4gPiA0LiBUaGVuIG1pZ3JhdGUgdGhlIHZtIHRvIGhv
+c3QgQSAoc3VjY2Vzc2Z1bGx5KSwgYnV0IHZtIHdhcyBwYXVzZWQsIGFuZA0KPiBxZW11IHByaW50
+ZWQgbG9nIGFzIGZvbGxvd2VkOg0KPiANCj4gUmVtZW1iZXIgdGhhdCBtaWdyYXRpbmcgdXNpbmcg
+LWNwdSBob3N0ICBhY3Jvc3MgZGlmZmVyZW50IENQVSBtb2RlbHMgaXMgTk9UDQo+IGV4cGVjdGVk
+IHRvIHdvcmsuDQo+IA0KPiA+IEtWTTogZW50cnkgZmFpbGVkLCBoYXJkd2FyZSBlcnJvciAweDgw
+MDAwMDIxDQo+ID4NCj4gPiBJZiB5b3UncmUgcnVubmluZyBhIGd1ZXN0IG9uIGFuIEludGVsIG1h
+Y2hpbmUgd2l0aG91dCB1bnJlc3RyaWN0ZWQNCj4gPiBtb2RlIHN1cHBvcnQsIHRoZSBmYWlsdXJl
+IGNhbiBiZSBtb3N0IGxpa2VseSBkdWUgdG8gdGhlIGd1ZXN0IGVudGVyaW5nDQo+ID4gYW4gaW52
+YWxpZCBzdGF0ZSBmb3IgSW50ZWwgVlQuIEZvciBleGFtcGxlLCB0aGUgZ3Vlc3QgbWF5YmUgcnVu
+bmluZyBpbg0KPiA+IGJpZyByZWFsIG1vZGUgd2hpY2ggaXMgbm90IHN1cHBvcnRlZCBvbiBsZXNz
+IHJlY2VudCBJbnRlbCBwcm9jZXNzb3JzLg0KPiA+DQo+ID4gRUFYPTAxOWIzYmIwIEVCWD0wMWEz
+YWU4MCBFQ1g9MDFhNjFjZTggRURYPTAwMDAwMDAwDQo+ID4gRVNJPTAxYTYyMDAwIEVEST0wMDAw
+MDAwMCBFQlA9MDAwMDAwMDAgRVNQPTAxNzE4YjIwDQo+ID4gRUlQPTAxODVkOTgyIEVGTD0wMDAw
+MDI4NiBbLS1TLS1QLV0gQ1BMPTAgSUk9MCBBMjA9MSBTTU09MCBITFQ9MCBFUw0KPiA+ID0wMDAw
+IDAwMDAwMDAwIDAwMDBmZmZmIDAwMDA5MzAwIENTID1mMDAwIGZmZmYwMDAwIDAwMDBmZmZmIDAw
+MDA5YjAwDQo+ID4gU1MgPTAwMDAgMDAwMDAwMDAgMDAwMGZmZmYgMDAwMDkzMDAgRFMgPTAwMDAg
+MDAwMDAwMDAgMDAwMGZmZmYNCj4gPiAwMDAwOTMwMCBGUyA9MDAwMCAwMDAwMDAwMCAwMDAwZmZm
+ZiAwMDAwOTMwMCBHUyA9MDAwMCAwMDAwMDAwMA0KPiA+IDAwMDBmZmZmIDAwMDA5MzAwDQo+ID4g
+TERUPTAwMDAgMDAwMDAwMDAgMDAwMGZmZmYgMDAwMDgyMDANCj4gPiBUUiA9MDAwMCAwMDAwMDAw
+MCAwMDAwZmZmZiAwMDAwOGIwMA0KPiA+IEdEVD0gICAgIDAwMDAwMDAwIDAwMDBmZmZmDQo+ID4g
+SURUPSAgICAgMDAwMDAwMDAgMDAwMGZmZmYNCj4gPiBDUjA9NjAwMDAwMTAgQ1IyPTAwMDAwMDAw
+IENSMz0wMDAwMDAwMCBDUjQ9MDAwMDAwMDANCj4gPiBEUjA9MDAwMDAwMDAwMDAwMDAwMCBEUjE9
+MDAwMDAwMDAwMDAwMDAwMCBEUjI9MDAwMDAwMDAwMDAwMDAwMA0KPiA+IERSMz0wMDAwMDAwMDAw
+MDAwMDAwDQo+ID4gRFI2PTAwMDAwMDAwZmZmZjBmZjAgRFI3PTAwMDAwMDAwMDAwMDA0MDANCj4g
+PiBFRkVSPTAwMDAwMDAwMDAwMDAwMDANCj4gPiBDb2RlPTAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDwwMD4NCj4gPiAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
+MA0KPiA+IDAwIDAwIDAwIDAwIDAwIDAwDQo+ID4NCj4gPiBJIGhhdmUgZm91bmQgdGhhdCBwcm9i
+bGVtIGhhcHBlbmVkIHdoZW4ga3ZtX3B1dF9zcmVncyByZXR1cm5zIGVyciAtDQo+IDIyKGNhbGxl
+ZCBieSBrdm1fYXJjaF9wdXRfcmVnaXN0ZXJzKHFlbXUpKS4NCj4gPiBCZWNhdXNlIGt2bV9hcmNo
+X3ZjcHVfaW9jdGxfc2V0X3NyZWdzKGt2bS1tb2QpIGNoZWNrZWQgdGhhdA0KPiBndWVzdF9jcHVp
+ZF9oYXMgbm8gWDg2X0ZFQVRVUkVfWFNBVkUgYnV0IGNyNC5PU1hTQVZFPTEuDQo+ID4gU28gc2hv
+dWxkIHdlIGNhbmNlbCBtaWdyYXRpb24gd2hlbiBrdm1fYXJjaF9wdXRfcmVnaXN0ZXJzIHJldHVy
+bnMgZXJyb3I/DQo+IA0KPiBJdCB3b3VsZCBzZWVtIGdvb2QgaWYgd2UgY2FuIG1ha2UgdGhlIG1p
+Z3JhdGlvbiBmYWlsIHRoZXJlIHJhdGhlciB0aGFuIGhpdHRpbmcNCj4gdGhhdCBLVk0gZXJyb3Iu
+DQo+IEl0IGxvb2tzIGxpa2Ugd2UgbmVlZCB0byBkbyBhIGJpdCBvZiBwbHVtYmluZyB0byBjb252
+ZXJ0IHRoZSBwbGFjZXMgdGhhdCBjYWxsIGl0IHRvDQo+IHJldHVybiBhIGJvb2wgcmF0aGVyIHRo
+YW4gdm9pZC4NCkkgdGhpbmsgd2Ugc2hvdWxkIHJldHVybiBhIGludCB2YWx1ZSBvZiBydW5fb25f
+Y3B1IHdoaWNoIGNhbGxiYWNrIHJ1bl9vbl9jcHVfZnVuYywgYnV0IHJ1bl9vbl9jcHVfZnVuYyBp
+cyB0aGUgcHJvdG90eXBlIG9mIG1hbnkgZnVuY3Rpb25zLA0KSXMgaXQgb3ZlcmtpbGw/DQo+IA0K
+PiBEYXZlDQo+IA0KPiAtLQ0KPiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRAcmVk
+aGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVLDQo=
