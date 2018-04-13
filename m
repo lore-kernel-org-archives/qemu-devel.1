@@ -1,42 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f708N-00027j-Oz
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:57:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f70CZ-0004C4-G8
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f708I-0001za-Vf
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:57:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35250
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1f708I-0001zH-Q3
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:56:58 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3DEq9tI026892
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:58 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2haus8s2vc-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:57 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 13 Apr 2018 10:56:56 -0400
-References: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
-	<1523372486-13190-4-git-send-email-walling@linux.ibm.com>
-	<7326624e-a5d7-b486-ba76-05da7885fcd9@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Fri, 13 Apr 2018 10:56:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f70CU-0004Br-JI
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:01:23 -0400
+References: <cover.1521016003.git.berto@igalia.com>
+	<14bbd13c5c93211ed4e36188624f429087a6a273.1521016003.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b9df06c2-0116-8e5c-6725-a59b6d03ed6b@redhat.com>
+Date: Fri, 13 Apr 2018 17:00:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <7326624e-a5d7-b486-ba76-05da7885fcd9@redhat.com>
+In-Reply-To: <14bbd13c5c93211ed4e36188624f429087a6a273.1521016003.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <c47d7c19-ad87-6d27-a43d-465bc5ad962d@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/4] pc-bios/s390-ccw: fix
- non-sequential boot entries (eckd)
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qcow2: Give the refcount cache the
+ minimum possible size by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,120 +25,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
-Cc: frankja@linux.ibm.com, gor@linux.ibm.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 04/13/2018 02:14 AM, Thomas Huth wrote:
-> On 10.04.2018 17:01, Collin Walling wrote:
->> zIPL boot menu entries can be non-sequential. Let's account
->> for this issue for the s390 zIPL boot menu. Since this boot
->> menu is actually an imitation and is not completely capable
->> of everything the real zIPL menu can do, let's also print a
->> different banner to the user.
->>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
->> ---
->>  pc-bios/s390-ccw/menu.c | 32 ++++++++++++++++++++------------
->>  1 file changed, 20 insertions(+), 12 deletions(-)
->>
->> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
->> index 96eec81..083405f 100644
->> --- a/pc-bios/s390-ccw/menu.c
->> +++ b/pc-bios/s390-ccw/menu.c
->> @@ -158,7 +158,7 @@ static void boot_menu_prompt(bool retry)
->>      }
->>  }
->>  
->> -static int get_boot_index(int entries)
->> +static int get_boot_index(bool *valid_entries)
->>  {
->>      int boot_index;
->>      bool retry = false;
->> @@ -168,7 +168,8 @@ static int get_boot_index(int entries)
->>          boot_menu_prompt(retry);
->>          boot_index = get_index();
->>          retry = true;
->> -    } while (boot_index < 0 || boot_index >= entries);
->> +    } while (boot_index < 0 || boot_index >= MAX_BOOT_ENTRIES ||
->> +             !valid_entries[boot_index]);
->>  
->>      sclp_print("\nBooting entry #");
->>      sclp_print(uitoa(boot_index, tmp, sizeof(tmp)));
->> @@ -176,21 +177,28 @@ static int get_boot_index(int entries)
->>      return boot_index;
->>  }
->>  
->> -static void zipl_println(const char *data, size_t len)
->> +static void zipl_println(const char *data, size_t len, bool *valid_entries)
->>  {
->>      char buf[len + 2];
->> +    int entry;
->>  
->>      ebcdic_to_ascii(data, buf, len);
->>      buf[len] = '\n';
->>      buf[len + 1] = '\0';
->>  
->>      sclp_print(buf);
->> +
->> +    entry = buf[0] == ' ' ? atoui(buf + 1) : atoui(buf);
->> +    valid_entries[entry] = true;
+On 2018-03-14 09:29, Alberto Garcia wrote:
+> The L2 and refcount caches have default sizes that can be overridden
+> using the l2-cache-size and refcount-cache-size (an additional
+> parameter named cache-size sets the combined size of both caches).
 > 
-> zipl_println is now doing more than its name suggests - it now also
-> populates the valid_entries array. So I think you should either put an
-> explaining comment in front of zipl_println, or (what I'd prefer), move
-> this valid_entries populating code rather to the while loop in
-> menu_get_zipl_boot_index below instead.
-
-Fair enough. I'll spin up v2 for the list after this change and some reassurance testing.
-
-Thanks for the feedback and r-b's.
-
-
+> Unless forced by one of the aforementioned parameters, QEMU will set
+> the unspecified sizes so that the L2 cache is 4 times larger than the
+> refcount cache.
 > 
->> +    if (entry == 0)
->> +        sclp_print("\n");
->>  }
->>  
->>  int menu_get_zipl_boot_index(const char *menu_data)
->>  {
->>      size_t len;
->> -    int entries;
->> +    bool valid_entries[MAX_BOOT_ENTRIES] = {false};
->>      uint16_t zipl_flag = *(uint16_t *)(menu_data - ZIPL_FLAG_OFFSET);
->>      uint16_t zipl_timeout = *(uint16_t *)(menu_data - ZIPL_TIMEOUT_OFFSET);
->>  
->> @@ -202,19 +210,19 @@ int menu_get_zipl_boot_index(const char *menu_data)
->>          timeout = zipl_timeout * 1000;
->>      }
->>  
->> -    /* Print and count all menu items, including the banner */
->> -    for (entries = 0; *menu_data; entries++) {
->> +    /* Print banner */
->> +    sclp_print("s390-ccw zIPL Boot Menu\n\n");
->> +    menu_data += strlen(menu_data) + 1;
->> +
->> +    /* Print entries */
->> +    while (*menu_data) {
->>          len = strlen(menu_data);
->> -        zipl_println(menu_data, len);
->> +        zipl_println(menu_data, len, valid_entries);
->>          menu_data += len + 1;
->> -
->> -        if (entries < 2) {
->> -            sclp_print("\n");
->> -        }
->>      }
->>  
->>      sclp_print("\n");
->> -    return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
->> +    return get_boot_index(valid_entries);
->>  }
+> This is based on the premise that the refcount metadata needs to be
+> only a fourth of the L2 metadata to cover the same amount of disk
+> space. This is incorrect for two reasons:
 > 
->  Thomas
+>  a) The amount of disk covered by an L2 table depends solely on the
+>     cluster size, but in the case of a refcount block it depends on
+>     the cluster size *and* the width of each refcount entry.
+>     The 4/1 ratio is only valid with 16-bit entries (the default).
 > 
+>  b) When we talk about disk space and L2 tables we are talking about
+>     guest space (L2 tables map guest clusters to host clusters),
+>     whereas refcount blocks are used for host clusters (including
+>     L1/L2 tables and the refcount blocks themselves). On a fully
+>     populated (and uncompressed) qcow2 file, image size > virtual size
+>     so there are more refcount entries than L2 entries.
+> 
+> Problem (a) could be fixed by adjusting the algorithm to take into
+> account the refcount entry width. Problem (b) could be fixed by
+> increasing a bit the refcount cache size to account for the clusters
+> used for qcow2 metadata.
 
+Yeah, well, but I wouldn't give too much thought to (b).  In case of
+internal snapshots, you won't write to them, so those clusters don't
+matter.  So, yes, you get a bit of overhead for the metadata, but come
+on, that's not really much.
 
--- 
-Respectfully,
-- Collin Walling
+And (a) would be trivial, as you yourself say.
+
+> However this patch takes a completely different approach and instead
+> of keeping a ratio between both cache sizes it assigns as much as
+> possible to the L2 cache and the remainder to the refcount cache.
+
+Seems reasonable in a sense, but I'm wary still.  I especially don't
+like that it just changes the default when nothing has been specified.
+
+I can see that we want to limit the refcount cache size, so if you want
+to give really much RAM to the L2 tables, then you don't want a 25 %
+overhead for the refcount cache, but do we really need to limit it to
+the minimum size?
+
+OTOH, four clusters doesn't seem extremely limited...  Did you do your
+benchmark on an HDD?
+
+Max
+
+> The reason is that L2 tables are used for every single I/O request
+> from the guest and the effect of increasing the cache is significant
+> and clearly measurable. Refcount blocks are however only used for
+> cluster allocation and internal snapshots and in practice are accessed
+> sequentially in most cases, so the effect of increasing the cache is
+> negligible (even when doing random writes from the guest).
+> 
+> So, make the refcount cache as small as possible unless the user
+> explicitly asks for a larger one.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2.c              | 31 +++++++++++++++++++------------
+>  block/qcow2.h              |  4 ----
+>  tests/qemu-iotests/137.out |  2 +-
+>  3 files changed, 20 insertions(+), 17 deletions(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 7472af6931..8342b0186f 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -802,23 +802,30 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+>          } else if (refcount_cache_size_set) {
+>              *l2_cache_size = combined_cache_size - *refcount_cache_size;
+>          } else {
+> -            *refcount_cache_size = combined_cache_size
+> -                                 / (DEFAULT_L2_REFCOUNT_SIZE_RATIO + 1);
+> -            *l2_cache_size = combined_cache_size - *refcount_cache_size;
+> +            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+> +            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+> +            uint64_t min_refcount_cache =
+> +                (uint64_t) MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+> +
+> +            /* Assign as much memory as possible to the L2 cache, and
+> +             * use the remainder for the refcount cache */
+> +            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
+> +                *l2_cache_size = max_l2_cache;
+> +                *refcount_cache_size = combined_cache_size - *l2_cache_size;
+> +            } else {
+> +                *refcount_cache_size =
+> +                    MIN(combined_cache_size, min_refcount_cache);
+> +                *l2_cache_size = combined_cache_size - *refcount_cache_size;
+> +            }
+>          }
+>      } else {
+> -        if (!l2_cache_size_set && !refcount_cache_size_set) {
+> +        if (!l2_cache_size_set) {
+>              *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
+>                                   (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
+>                                   * s->cluster_size);
+> -            *refcount_cache_size = *l2_cache_size
+> -                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+> -        } else if (!l2_cache_size_set) {
+> -            *l2_cache_size = *refcount_cache_size
+> -                           * DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+> -        } else if (!refcount_cache_size_set) {
+> -            *refcount_cache_size = *l2_cache_size
+> -                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+> +        }
+> +        if (!refcount_cache_size_set) {
+> +            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+>          }
+>      }
+>  
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index ccb92a9696..cdf41055ae 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -77,10 +77,6 @@
+>  #define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
+>  #define DEFAULT_L2_CACHE_BYTE_SIZE 1048576 /* bytes */
+>  
+> -/* The refblock cache needs only a fourth of the L2 cache size to cover as many
+> - * clusters */
+> -#define DEFAULT_L2_REFCOUNT_SIZE_RATIO 4
+> -
+>  #define DEFAULT_CLUSTER_SIZE 65536
+>  
+>  
+> diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+> index e28e1eadba..96724a6c33 100644
+> --- a/tests/qemu-iotests/137.out
+> +++ b/tests/qemu-iotests/137.out
+> @@ -22,7 +22,7 @@ refcount-cache-size may not exceed cache-size
+>  L2 cache size too big
+>  L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+>  L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+> -L2 cache size too big
+> +Refcount cache size too big
+>  Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-check.template' ('all')
+>  Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
+>  Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
+> 
