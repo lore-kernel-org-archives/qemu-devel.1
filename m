@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1f6yVc-0003uL-2D
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:12:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f6ykS-0002wT-Io
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1f6yVY-0001NF-Lf
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:12:56 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:57440)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1f6yVY-0001MC-DZ
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:12:52 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180413111245.28627.3415.stgit@pasha-VirtualBox>
-	<8d351a47-11fb-330e-b389-3dd430559226@vivier.eu>
-In-Reply-To: <8d351a47-11fb-330e-b389-3dd430559226@vivier.eu>
-Date: Fri, 13 Apr 2018 16:12:46 +0300
-Message-ID: <002201d3d329$1d6fea70$584fbf50$@ru>
+	(envelope-from <peter.maydell@linaro.org>) id 1f6ykR-0004SF-1D
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:28:16 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:46860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f6ykQ-0004RZ-Qg
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:28:14 -0400
+Received: by mail-oi0-x244.google.com with SMTP id e123-v6so8332167oih.13
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 06:28:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] m68: fix exception stack frame for 68000
+In-Reply-To: <1522160122-10744-3-git-send-email-eric.auger@redhat.com>
+References: <1522160122-10744-1-git-send-email-eric.auger@redhat.com>
+	<1522160122-10744-3-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 13 Apr 2018 14:27:53 +0100
+Message-ID: <CAFEAcA9nkLs3CF0=52DYWygrprgxexrz1_vf0r5RVfNYMA4H5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 2/8] hw/intc/arm_gicv3: Use an array of
+ redistributor regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Laurent Vivier' <laurent@vivier.eu>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: maria.klimushenkova@ispras.ru
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-> From: Laurent Vivier [mailto:laurent@vivier.eu]
-> Le 13/04/2018 =C3=A0 13:12, Pavel Dovgalyuk a =C3=A9crit :
-> > 68000 CPUs do not save format in the exception stack frame.
-> > This patch adds feature checking to prevent format saving for 68000.
-> > m68k_ret() already includes this modification, this patch fixes
-> > the exception processing function too.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > ---
-> >  target/m68k/op_helper.c |    7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-> > index 3a7f7f2..e367133 100644
-> > --- a/target/m68k/op_helper.c
-> > +++ b/target/m68k/op_helper.c
-> > @@ -301,8 +301,11 @@ static inline void do_stack_frame(CPUM68KState =
-*env, uint32_t *sp,
-> >          cpu_stl_kernel(env, *sp, addr);
-> >          break;
-> >      }
-> > -    *sp -=3D 2;
-> > -    cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index =
-<< 2));
-> > +    if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
-> > +        /*  all except 68000 */
-> > +        *sp -=3D 2;
-> > +        cpu_stw_kernel(env, *sp, (format << 12) + =
-(cs->exception_index << 2));
-> > +    }
-> >      *sp -=3D 4;
-> >      cpu_stl_kernel(env, *sp, retaddr);
-> >      *sp -=3D 2;
-> >
->=20
-> To be the exact counterpart of m68k_rte(), I think you should include
-> the "switch () { }" into the "if () { }".
+On 27 March 2018 at 15:15, Eric Auger <eric.auger@redhat.com> wrote:
+> In the prospect to support multiple redistributor regions,
+> let's introduce a GICv3RDISTRegion struct datatype and a
+> statically sized array of those. For the time being, only
+> one redistributor region is used.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/intc/arm_gicv3_common.c         |  5 +++--
+>  hw/intc/arm_gicv3_kvm.c            |  3 ++-
+>  include/hw/intc/arm_gicv3_common.h | 13 ++++++++++++-
+>  3 files changed, 17 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+> index 7b54d52..cb4ee0e 100644
+> --- a/hw/intc/arm_gicv3_common.c
+> +++ b/hw/intc/arm_gicv3_common.c
+> @@ -199,11 +199,12 @@ void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
+>
+>      memory_region_init_io(&s->iomem_dist, OBJECT(s), ops, s,
+>                            "gicv3_dist", 0x10000);
+> -    memory_region_init_io(&s->iomem_redist, OBJECT(s), ops ? &ops[1] : NULL, s,
+> +    memory_region_init_io(&s->redist_region[0].mr, OBJECT(s),
+> +                          ops ? &ops[1] : NULL, s,
+>                            "gicv3_redist", 0x20000 * s->num_cpu);
+>
+>      sysbus_init_mmio(sbd, &s->iomem_dist);
+> -    sysbus_init_mmio(sbd, &s->iomem_redist);
+> +    sysbus_init_mmio(sbd, &s->redist_region[0].mr);
+>  }
+>
+>  static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index ec37177..a07bc55 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -755,7 +755,8 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>
+>      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd);
+> -    kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +    kvm_arm_register_device(&s->redist_region[0].mr, -1,
+> +                            KVM_DEV_ARM_VGIC_GRP_ADDR,
+>                              KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd);
+>
+>      if (kvm_has_gsi_routing()) {
+> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+> index bccdfe1..3cf132f 100644
+> --- a/include/hw/intc/arm_gicv3_common.h
+> +++ b/include/hw/intc/arm_gicv3_common.h
+> @@ -137,12 +137,20 @@ typedef struct GICv3CPUState GICv3CPUState;
+>  #define GICV3_S 0
+>  #define GICV3_NS 1
+>
+> +#define GICV3_MAX_RDIST_REGIONS 8
 
-That's right, thank you.
+Where does 8 come from? Is it a limit in the kernel, or just
+a random number?
 
+> +
+>  typedef struct {
+>      int irq;
+>      uint8_t prio;
+>      int grp;
+>  } PendingIrq;
+>
+> +typedef struct GICv3RDISTRegion {
 
-Pavel Dovgalyuk
+"GICv3RedistRegion"
+
+> +    hwaddr base;
+> +    uint32_t count; /* number or redistributors */
+
+"of"
+
+> +    MemoryRegion mr;
+> +} GICv3RDISTRegion ;
+> +
+>  struct GICv3CPUState {
+>      GICv3State *gic;
+>      CPUState *cpu;
+> @@ -210,7 +218,8 @@ struct GICv3State {
+>      /*< public >*/
+>
+>      MemoryRegion iomem_dist; /* Distributor */
+> -    MemoryRegion iomem_redist; /* Redistributors */
+> +    GICv3RDISTRegion redist_region[GICV3_MAX_RDIST_REGIONS];
+> +    uint32_t nb_redist_regions;
+>
+>      uint32_t num_cpu;
+>      uint32_t num_irq;
+> @@ -288,6 +297,8 @@ typedef struct ARMGICv3CommonClass {
+>
+>      void (*pre_save)(GICv3State *s);
+>      void (*post_load)(GICv3State *s);
+> +    /* register an RDIST region at @base, containing @pfns 64kB pages */
+> +    int (*register_redist_region)(GICv3State *s, hwaddr base, uint32_t pfns);
+
+"pfn" is a kernelism (and I can never remember what it means) -- can you
+use a more comprehensible variable name, please ?
+
+>  } ARMGICv3CommonClass;
+>
+>  void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
+> --
+
+thanks
+-- PMM
