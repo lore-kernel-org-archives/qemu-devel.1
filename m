@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f72kt-0000sy-PM
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 13:45:00 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1f7309-0007PX-VD
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f72ks-0002IF-SH
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 13:44:59 -0400
-References: <20180321121940.39426-1-vsementsov@virtuozzo.com>
-	<20180321121940.39426-3-vsementsov@virtuozzo.com>
-	<b3976794-7cb4-912d-d457-762dca65a2f8@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <a5e15d04-9d0c-65f0-2368-4313f721dfc2@virtuozzo.com>
-Date: Fri, 13 Apr 2018 20:44:46 +0300
+	(envelope-from <eric.auger@redhat.com>) id 1f7307-0007C2-V8
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:00:46 -0400
+References: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
+	<1523551221-11612-3-git-send-email-imammedo@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b80208b4-ff33-3862-3d52-97b56aa5c788@redhat.com>
+Date: Fri, 13 Apr 2018 20:00:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <b3976794-7cb4-912d-d457-762dca65a2f8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 2/4] nbd/server: add nbd_meta_single_query
- helper
+In-Reply-To: <1523551221-11612-3-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.13 2/4] platform-bus-device: use
+ device plug callback instead of machine_done notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +24,419 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, agraf@suse.de, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
 
-21.03.2018 18:05, Eric Blake wrote:
-> On 03/21/2018 07:19 AM, Vladimir Sementsov-Ogievskiy wrote:
->> The helper will be reused for bitmaps namespace.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> =C2=A0 nbd/server.c | 41 ++++++++++++++++++++++++++++-------------
->> =C2=A0 1 file changed, 28 insertions(+), 13 deletions(-)
->>
->
->> +/* Read len bytes and check matching to the pattern.
->> + * @match is set to true on empty query for _LIST_ and for query=20
->> matching the
->> + * @pattern. @match is never set to false.
->
-> How about:
->
-> Read @len bytes, and set @match to true if they match @pattern, or if=20
-> @len is 0 and the client is performing _LIST_.=C2=A0 @match is never set =
-to=20
-> false.
+Hi Igor,
 
-will add, as always, thank you for natural rewording) Hm, I have a=20
-question: why do you often use double white-space "=C2=A0 " between=20
-sentences? Is it something meaningful?
+On 12/04/18 18:40, Igor Mammedov wrote:
+> platform-bus were using machine_done notifier to get and map
+> (assign irq/mmio resources) dynamically added sysbus devices
+> after all '-device' options had been processed.
+> That however creates non obvious dependencies on ordering of
+> machine_done notifiers and requires carefull line juggling
+> to keep it working. For example see comment above
+> create_platform_bus() and 'straitforward' arm_load_kernel()
+> had to converted to machine_done notifier and that lead to
+> yet another machine_done notifier to keep it working
+> arm_register_platform_bus_fdt_creator().
+> 
+> Instead of hiding resource assignment in platform-bus-device
+> to magically initialize sysbus devices, use device plug
+> callback and assign resources explicitly at board level
+> at the moment each -device option is being processed.
+> 
+> That adds a bunch of machine declaration boiler plate to
+> e500plat board, similar to ARM/x86 but gets rid of hidden
+> machine_done notifier and would allow to remove the dependent
+> notifiers in ARM code simplifying it and making code flow
+> easier to follow.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: agraf@suse.de
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
+> ---
+>  hw/ppc/e500.h             |  3 +++
+>  include/hw/arm/virt.h     |  3 +++
+>  include/hw/platform-bus.h |  4 ++--
+>  hw/arm/sysbus-fdt.c       |  3 ---
+>  hw/arm/virt.c             | 36 ++++++++++++++++++++++++++++
+>  hw/core/platform-bus.c    | 29 ++++-------------------
+>  hw/ppc/e500.c             | 37 +++++++++++++++++------------
+>  hw/ppc/e500plat.c         | 60 +++++++++++++++++++++++++++++++++++++++++++++--
+>  8 files changed, 129 insertions(+), 46 deletions(-)
+> 
+> diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
+> index 70ba1d8..d0f8ddd 100644
+> --- a/hw/ppc/e500.h
+> +++ b/hw/ppc/e500.h
+> @@ -2,6 +2,7 @@
+>  #define PPCE500_H
+>  
+>  #include "hw/boards.h"
+> +#include "hw/sysbus.h"
+>  
+>  typedef struct PPCE500Params {
+>      int pci_first_slot;
+> @@ -26,6 +27,8 @@ typedef struct PPCE500Params {
+>  
+>  void ppce500_init(MachineState *machine, PPCE500Params *params);
+>  
+> +void ppce500_plug_dynamic_sysbus_device(SysBusDevice *sbdev);
+> +
+>  hwaddr booke206_page_size_to_tlb(uint64_t size);
+>  
+>  #endif
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index ba0c1a4..5535760 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -86,11 +86,14 @@ typedef struct {
+>      bool no_pmu;
+>      bool claim_edge_triggered_timers;
+>      bool smbios_old_sys_ver;
+> +    HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+> +                                           DeviceState *dev);
+>  } VirtMachineClass;
+>  
+>  typedef struct {
+>      MachineState parent;
+>      Notifier machine_done;
+> +    DeviceState *platform_bus_dev;
+>      FWCfgState *fw_cfg;
+>      bool secure;
+>      bool highmem;
+> diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
+> index a00775c..19e20c5 100644
+> --- a/include/hw/platform-bus.h
+> +++ b/include/hw/platform-bus.h
+> @@ -37,8 +37,6 @@ typedef struct PlatformBusDevice PlatformBusDevice;
+>  struct PlatformBusDevice {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> -    Notifier notifier;
+> -    bool done_gathering;
+>  
+>      /*< public >*/
+>      uint32_t mmio_size;
+> @@ -54,4 +52,6 @@ int platform_bus_get_irqn(PlatformBusDevice *platform_bus, SysBusDevice *sbdev,
+>  hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+>                                    int n);
+>  
+> +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev);
+> +
+>  #endif /* HW_PLATFORM_BUS_H */
+> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+> index d68e3dc..80ff70e 100644
+> --- a/hw/arm/sysbus-fdt.c
+> +++ b/hw/arm/sysbus-fdt.c
+> @@ -506,9 +506,6 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
+>      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
+>      pbus = PLATFORM_BUS_DEVICE(dev);
+>  
+> -    /* We can only create dt nodes for dynamic devices when they're ready */
+> -    assert(pbus->done_gathering);
+> -
+>      PlatformBusFDTData data = {
+>          .fdt = fdt,
+>          .irq_start = irq_start,
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 94dcb12..2e10d8b 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1087,6 +1087,7 @@ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
+>      qdev_prop_set_uint32(dev, "mmio_size",
+>          platform_bus_params.platform_bus_size);
+>      qdev_init_nofail(dev);
+> +    vms->platform_bus_dev = dev;
+>      s = SYS_BUS_DEVICE(dev);
+>  
+>      for (i = 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
+> @@ -1536,9 +1537,37 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>      return ms->possible_cpus;
+>  }
+>  
+> +static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+> +                                        DeviceState *dev, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        if (vms->platform_bus_dev) {
+do we need this check? Isn't this function supposed to be called only
+after the machine creation, time at which the platform_bus_dev is created.
+> +            platform_bus_link_device(PLATFORM_BUS_DEVICE(vms->platform_bus_dev),
+> +                                     SYS_BUS_DEVICE(dev));
+> +        }
+> +    }
+> +}
+> +
+> +static HotplugHandler *virt_machine_get_hotpug_handler(MachineState *machine,
+> +                                                       DeviceState *dev)
+> +{
+> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
+> +
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        return HOTPLUG_HANDLER(machine);
+> +    }
+> +
+> +    return vmc->get_hotplug_handler ?
+> +        vmc->get_hotplug_handler(machine, dev) : NULL;
+> +}
+> +
+>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>  
+>      mc->init = machvirt_init;
+>      /* Start max_cpus at the maximum QEMU supports. We'll further restrict
+> @@ -1557,6 +1586,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
+> +    vmc->get_hotplug_handler = mc->get_hotplug_handler;
+> +    mc->get_hotplug_handler = virt_machine_get_hotpug_handler;
+> +    hc->plug = virt_machine_device_plug_cb;
+>  }
+>  
+>  static const TypeInfo virt_machine_info = {
+> @@ -1566,6 +1598,10 @@ static const TypeInfo virt_machine_info = {
+>      .instance_size = sizeof(VirtMachineState),
+>      .class_size    = sizeof(VirtMachineClass),
+>      .class_init    = virt_machine_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +         { TYPE_HOTPLUG_HANDLER },
+> +         { }
+> +    },
+>  };
+>  
+>  static void machvirt_machine_init(void)
+> diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
+> index 33d32fb..807cb5c 100644
+> --- a/hw/core/platform-bus.c
+> +++ b/hw/core/platform-bus.c
+> @@ -103,7 +103,6 @@ static void plaform_bus_refresh_irqs(PlatformBusDevice *pbus)
+>  {
+>      bitmap_zero(pbus->used_irqs, pbus->num_irqs);
+>      foreach_dynamic_sysbus_device(platform_bus_count_irqs, pbus);
+> -    pbus->done_gathering = true;
+>  }
+>  
+>  static void platform_bus_map_irq(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+> @@ -163,12 +162,11 @@ static void platform_bus_map_mmio(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+>  }
+>  
+>  /*
+> - * For each sysbus device, look for unassigned IRQ lines as well as
+> - * unassociated MMIO regions. Connect them to the platform bus if available.
+> + * Look for unassigned IRQ lines as well as unassociated MMIO regions.
+> + * Connect them to the platform bus if available.
+>   */
+> -static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
+> +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev)
+>  {
+> -    PlatformBusDevice *pbus = opaque;
+>      int i;
+>  
+>      for (i = 0; sysbus_has_irq(sbdev, i); i++) {
+> @@ -180,19 +178,6 @@ static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
+>      }
+>  }
+>  
+> -static void platform_bus_init_notify(Notifier *notifier, void *data)
+> -{
+> -    PlatformBusDevice *pb = container_of(notifier, PlatformBusDevice, notifier);
+> -
+> -    /*
+> -     * Generate a bitmap of used IRQ lines, as the user might have specified
+> -     * them on the command line.
+> -     */
+> -    plaform_bus_refresh_irqs(pb);
+I have a doubt about this being moved at realize time and above comment.
+Seems to say the userspace can define the gsi on the command line. I am
+not used to this property, tried sysbus-irq[n] but the property does not
+seem to be recognized.
+> -
+> -    foreach_dynamic_sysbus_device(link_sysbus_device, pb);
+> -}
+> -
+>  static void platform_bus_realize(DeviceState *dev, Error **errp)
+>  {
+>      PlatformBusDevice *pbus;
+> @@ -211,12 +196,8 @@ static void platform_bus_realize(DeviceState *dev, Error **errp)
+>          sysbus_init_irq(d, &pbus->irqs[i]);
+>      }
+>  
+> -    /*
+> -     * Register notifier that allows us to gather dangling devices once the
+> -     * machine is completely assembled
+> -     */
+> -    pbus->notifier.notify = platform_bus_init_notify;
+> -    qemu_add_machine_init_done_notifier(&pbus->notifier);
+> +    /* some devices might be initialized before so update used IRQs map */
+> +    plaform_bus_refresh_irqs(pbus);
+>  }
+>  
+>  static Property platform_bus_properties[] = {
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 9a85a41..e2829db 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -64,6 +64,8 @@
+>  #define MPC8XXX_GPIO_OFFSET        0x000FF000ULL
+>  #define MPC8XXX_GPIO_IRQ           47
+>  
+> +static SysBusDevice *pbus_dev;
+> +
+>  struct boot_info
+>  {
+>      uint32_t dt_base;
+> @@ -248,23 +250,28 @@ static void platform_bus_create_devtree(PPCE500Params *params, void *fdt,
+>      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
+>      pbus = PLATFORM_BUS_DEVICE(dev);
+>  
+> -    /* We can only create dt nodes for dynamic devices when they're ready */
+> -    if (pbus->done_gathering) {
+> -        PlatformDevtreeData data = {
+> -            .fdt = fdt,
+> -            .mpic = mpic,
+> -            .irq_start = irq_start,
+> -            .node = node,
+> -            .pbus = pbus,
+> -        };
+> +    /* Create dt nodes for dynamic devices */
+> +    PlatformDevtreeData data = {
+> +        .fdt = fdt,
+> +        .mpic = mpic,
+> +        .irq_start = irq_start,
+> +        .node = node,
+> +        .pbus = pbus,
+> +    };
+>  
+> -        /* Loop through all dynamic sysbus devices and create nodes for them */
+> -        foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
+> -    }
+> +    /* Loop through all dynamic sysbus devices and create nodes for them */
+> +    foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
+>  
+>      g_free(node);
+>  }
+>  
+> +void ppce500_plug_dynamic_sysbus_device(SysBusDevice *sbdev)
+> +{
+> +    if (pbus_dev) {
+> +        platform_bus_link_device(PLATFORM_BUS_DEVICE(pbus_dev), sbdev);
+> +    }
+> +}
+> +
+>  static int ppce500_load_device_tree(MachineState *machine,
+>                                      PPCE500Params *params,
+>                                      hwaddr addr,
+> @@ -945,16 +952,16 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+>          qdev_prop_set_uint32(dev, "num_irqs", params->platform_bus_num_irqs);
+>          qdev_prop_set_uint32(dev, "mmio_size", params->platform_bus_size);
+>          qdev_init_nofail(dev);
+> -        s = SYS_BUS_DEVICE(dev);
+> +        pbus_dev = SYS_BUS_DEVICE(dev);
+>  
+>          for (i = 0; i < params->platform_bus_num_irqs; i++) {
+>              int irqn = params->platform_bus_first_irq + i;
+> -            sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
+> +            sysbus_connect_irq(pbus_dev, i, qdev_get_gpio_in(mpicdev, irqn));
+>          }
+>  
+>          memory_region_add_subregion(address_space_mem,
+>                                      params->platform_bus_base,
+> -                                    sysbus_mmio_get_region(s, 0));
+> +                                    sysbus_mmio_get_region(pbus_dev, 0));
+>      }
+>  
+>      /*
+> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
+> index 81d03e1..2f014cc 100644
+> --- a/hw/ppc/e500plat.c
+> +++ b/hw/ppc/e500plat.c
+> @@ -60,8 +60,49 @@ static void e500plat_init(MachineState *machine)
+>      ppce500_init(machine, &params);
+>  }
+>  
+> -static void e500plat_machine_init(MachineClass *mc)
+> +typedef struct {
+> +    MachineClass parent;
+> +    HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+> +                                           DeviceState *dev);
+> +} E500PlatMachineClass;
+> +
+> +#define TYPE_E500PLAT_MACHINE  MACHINE_TYPE_NAME("ppce500")
+> +#define E500PLAT_MACHINE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(E500PlatMachineClass, obj, TYPE_E500PLAT_MACHINE)
+> +#define E500PLAT_MACHINE_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(E500PlatMachineClass, klass, TYPE_E500PLAT_MACHINE)
+> +
+> +static void e500plat_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+> +                                            DeviceState *dev, Error **errp)
+>  {
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        ppce500_plug_dynamic_sysbus_device(SYS_BUS_DEVICE(dev));
+> +    }
+> +}
+> +
+> +static
+> +HotplugHandler *e500plat_machine_get_hotpug_handler(MachineState *machine,
+> +                                                    DeviceState *dev)
+> +{
+> +    E500PlatMachineClass *emc = E500PLAT_MACHINE_GET_CLASS(machine);
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        return HOTPLUG_HANDLER(machine);
+> +    }
+> +
+> +    return emc->get_hotplug_handler ?
+> +        emc->get_hotplug_handler(machine, dev) : NULL;
+> +}
+> +
+> +static void e500plat_machine_class_init(ObjectClass *oc, void *data)
+> +{
+> +    E500PlatMachineClass *emc = E500PLAT_MACHINE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +
+> +    emc->get_hotplug_handler = mc->get_hotplug_handler;
+> +    mc->get_hotplug_handler = e500plat_machine_get_hotpug_handler;
+> +    hc->plug = e500plat_machine_device_plug_cb;
+> +
+>      mc->desc = "generic paravirt e500 platform";
+>      mc->init = e500plat_init;
+>      mc->max_cpus = 32;
+> @@ -69,4 +110,19 @@ static void e500plat_machine_init(MachineClass *mc)
+>      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
+>  }
+>  
+> -DEFINE_MACHINE("ppce500", e500plat_machine_init)
+> +static const TypeInfo e500plat_info = {
+> +    .name          = TYPE_E500PLAT_MACHINE,
+> +    .parent        = TYPE_MACHINE,
+> +    .class_size    = sizeof(E500PlatMachineClass),
+> +    .class_init    = e500plat_machine_class_init,
+> +    .interfaces    = (InterfaceInfo[]) {
+> +         { TYPE_HOTPLUG_HANDLER },
+> +         { }
+> +    }
+> +};
+> +
+> +static void e500plat_register_types(void)
+> +{
+> +    type_register_static(&e500plat_info);
+> +}
+> +type_init(e500plat_register_types)
 
->
-> At any rate, the refactoring is sane; and comment touchups are=20
-> trivial, so
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
+Otherwise I gave a try on Seattle with the Calxeda xgmac vfio-device and
+I do not observe any regression with my sample command line.
 
+Thanks
 
---=20
-Best regards,
-Vladimir
+Eric
+> 
