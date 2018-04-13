@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6y2r-0000s2-P1
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 08:43:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1f6y37-000116-VV
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 08:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6y2q-00047P-Lh
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 08:43:13 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f6y2q-00047K-Fw
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 08:43:12 -0400
-Received: by mail-oi0-x244.google.com with SMTP id u141-v6so8234116oif.1
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 05:43:12 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1f6y32-0004Bj-VR
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 08:43:29 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:53793)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f6y32-0004Aq-Lv
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 08:43:24 -0400
+References: <20180413111245.28627.3415.stgit@pasha-VirtualBox>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <8d351a47-11fb-330e-b389-3dd430559226@vivier.eu>
+Date: Fri, 13 Apr 2018 14:43:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180324192455.12254-6-mdavidsaver@gmail.com>
-References: <20180324192455.12254-1-mdavidsaver@gmail.com>
-	<20180324192455.12254-6-mdavidsaver@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Apr 2018 13:42:51 +0100
-Message-ID: <CAFEAcA_zWoiC1EmkPpgPtBnYjXfSqA=aymwndEnfLt2nFoMvoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 05/14] timer: ds1338 change write handling
+In-Reply-To: <20180413111245.28627.3415.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] m68: fix exception stack frame for 68000
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Davidsaver <mdavidsaver@gmail.com>
-Cc: Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru
 
-On 24 March 2018 at 19:24, Michael Davidsaver <mdavidsaver@gmail.com> wrote:
-> instead of a read-modify-write, do direct translation
-> of device registers to struct tm members.
->
-> This new ds1338_update() is the reverse of
-> the existing capture_current_time().
->
-> Simplifies later handling of CENTURY bit in
-> similar Dallas RTC chips.
->
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+Le 13/04/2018 à 13:12, Pavel Dovgalyuk a écrit :
+> 68000 CPUs do not save format in the exception stack frame.
+> This patch adds feature checking to prevent format saving for 68000.
+> m68k_ret() already includes this modification, this patch fixes
+> the exception processing function too.
+> 
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 > ---
->  hw/timer/ds1338.c | 86 ++++++++++++++++++++++++++-----------------------------
->  1 file changed, 40 insertions(+), 46 deletions(-)
->
-> diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
-> index 9bcda26e51..071c031563 100644
-> --- a/hw/timer/ds1338.c
-> +++ b/hw/timer/ds1338.c
-> @@ -159,6 +159,42 @@ static int ds1338_recv(I2CSlave *i2c)
->      return res;
->  }
->
-> +/* call after guest writes to current time registers
-> + * to re-compute our offset from host time.
-> + */
-> +static void ds1338_update(DS1338State *s)
-> +{
-> +
-> +    struct tm now;
-> +    memset(&now, 0, sizeof(now));
-
-You can zero initialize a struct with just
-       struct tm now = {};
-
-so you don't need the memset.
-
-> +
-> +    /* TODO: Implement CH (stop) bit?  */
-> +    now.tm_sec = from_bcd(s->nvram[R_SEC] & 0x7f);
-> +    now.tm_min = from_bcd(s->nvram[R_MIN] & 0x7f);
-> +    if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
-> +        /* 12 hour (1-12) */
-> +        /* read and wrap 1-12 -> 0-11 */
-> +        now.tm_hour = from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR12)) % 12u;
-> +        if (ARRAY_FIELD_EX32(s->nvram, HOUR, AMPM)) {
-> +            now.tm_hour += 12;
-> +        }
-> +
-> +    } else {
-> +        now.tm_hour = from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR24));
+>  target/m68k/op_helper.c |    7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+> index 3a7f7f2..e367133 100644
+> --- a/target/m68k/op_helper.c
+> +++ b/target/m68k/op_helper.c
+> @@ -301,8 +301,11 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
+>          cpu_stl_kernel(env, *sp, addr);
+>          break;
+>      }
+> -    *sp -= 2;
+> -    cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
+> +    if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
+> +        /*  all except 68000 */
+> +        *sp -= 2;
+> +        cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
 > +    }
-> +    {
-> +        /* The day field is supposed to contain a value in
-> +               the range 1-7. Otherwise behavior is undefined.
-> +             */
+>      *sp -= 4;
+>      cpu_stl_kernel(env, *sp, retaddr);
+>      *sp -= 2;
+> 
 
-This patch is a good opportunity to bring the format of this
-comment in line with the others in the file, ie
-  /* multiple lines
-   * all have a star on the left
-   */
+To be the exact counterpart of m68k_rte(), I think you should include
+the "switch () { }" into the "if () { }".
 
-> +        int user_wday = (s->nvram[R_WDAY] & 7) - 1;
-
-I would just declare user_wday at the top of the function, and
-then you can drop the local {} scope.
-
-> +        s->wday_offset = (user_wday - now.tm_wday + 7) % 7;
-
-This line copied from the previous code is still assuming that
-'now' contains valid date information, so it won't produce the
-right answer. What you need to do is
- (1) move this down to after you set s->offset,
-     so that we have the new offset value, and then
- (2) call qemu_get_timedate(&now, s->offset);
-     to get an updated 'now' struct with a valid now.tm_wday;
- (3) then you can do
-    s->wday_offset = (user_wday - now.tm_wday + 7) % 7;
-
-(I think that's right, anyway -- you should check my working...)
-
-> +    }
-> +    now.tm_mday = from_bcd(s->nvram[R_DATE] & 0x3f);
-> +    now.tm_mon = from_bcd(s->nvram[R_MONTH] & 0x1f) - 1;
-> +    now.tm_year = from_bcd(s->nvram[R_YEAR]) + 100;
-> +    s->offset = qemu_timedate_diff(&now);
-> +
-
-The rest of this looks good.
-
-thanks
--- PMM
+Thanks,
+Laurent
