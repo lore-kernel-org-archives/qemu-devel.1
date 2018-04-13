@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wgv-0006OV-Aw
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:16:30 -0400
+	(envelope-from <quintela@redhat.com>) id 1f6whJ-0006bP-6e
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wgq-0003Yj-C1
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:16:29 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6wgq-0003YU-5E
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:16:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6wgn-00024h-Vk
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 11:16:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 78C4B2E80C9
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 11:16:21 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1f6whE-0003hO-U1
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:16:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55898 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1f6whE-0003gw-Q5
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:16:48 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <152360619100.1854.4118391342119729453@71c20359a636>
+	(no-reply@patchew.org's message of "Fri, 13 Apr 2018 00:56:32 -0700
+	(PDT)")
+References: <152360619100.1854.4118391342119729453@71c20359a636>
+Reply-To: quintela@redhat.com
+Date: Fri, 13 Apr 2018 13:18:14 +0200
+Message-ID: <87d0z3pd6x.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Apr 2018 11:06:43 -0000
-From: Taylor Holberton <taylorcholberton@gmail.com>
-Reply-To: Bug 1714538 <1714538@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150427875291.17031.5249448331290490011.malonedeb@gac.canonical.com>
-Message-Id: <152361760356.32037.3050656770841114791.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1714538] Re: Support for Raspberry Pi 3 Model B
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: no-reply@patchew.org
+Cc: clg@kaod.org, qemu-devel@nongnu.org, famz@redhat.com, dgilbert@redhat.com, peter.maydell@linaro.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com, yulei.zhang@intel.com, alex.williamson@redhat.com, pbonzini@redhat.com, zhi.a.wang@intel.com, david@gibson.dropbear.id.au
 
-I saw that in the mailing list! Can't wait to try it out!
+no-reply@patchew.org wrote:
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> Type: series
+> Message-id: 20180413075200.15217-1-clg@kaod.org
+> Subject: [Qemu-devel] [PATCH v2] migration: discard non-migratable RAMBlocks
+>
 
--- =
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/1: migration: discard non-migratable RAMBlocks...
+> ERROR: Macros with multiple statements should be enclosed in a do - while loop
+> #96: FILE: migration/ram.c:191:
+> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+> +    RAMBLOCK_FOREACH(block)                            \
+> +        if (!qemu_ram_is_migratable(block)) {} else
+>
+> ERROR: trailing statements should be on next line
+> #98: FILE: migration/ram.c:193:
+> +        if (!qemu_ram_is_migratable(block)) {} else
+>
+> total: 2 errors, 0 warnings, 167 lines checked
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1714538
+To be fair, I don't know how to fix this outside of:
 
-Title:
-  Support for Raspberry Pi 3 Model B
+BEGIN_RAMBLOCK_FOREACH(...)
 
-Status in QEMU:
-  Fix Committed
+END_RAMBLOCK_FOREACH()
 
-Bug description:
-  The raspberry pi 3 B uses a 64-bit instruction set. It would be useful
-  if qemu could emulate the boardn
+type of construct.  I was wondering about what could happen if the
+RAMBLOCK_FOREACH was insied an if, but checkpatch beated me to it.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1714538/+subscriptions
+Later, Juan.
