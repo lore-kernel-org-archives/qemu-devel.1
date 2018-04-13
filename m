@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f6vj1-0003aH-OU
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:14:36 -0400
+	(envelope-from <tournier.elie@gmail.com>) id 1f6vqr-0006xN-Uo
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:22:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f6viy-0000f6-Jj
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:14:35 -0400
-References: <20180409130700.5692-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <39789551-e757-de4c-e901-1f4c774a8c8c@redhat.com>
-Date: Fri, 13 Apr 2018 12:14:25 +0200
+	(envelope-from <tournier.elie@gmail.com>) id 1f6vqo-00052c-RZ
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:22:41 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:53285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
+	id 1f6vqo-00052G-Jx
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:22:38 -0400
+Received: by mail-wm0-x229.google.com with SMTP id 66so4115698wmd.3
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 03:22:38 -0700 (PDT)
+Date: Fri, 13 Apr 2018 11:16:46 +0100
+From: Elie Tournier <tournier.elie@gmail.com>
+Message-ID: <20180413101646.GA6099@Nikki.localdomain>
+References: <20180410120222.31845-1-tournier.elie@gmail.com>
+	<20180410120222.31845-2-tournier.elie@gmail.com>
+	<c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
+	<20180410133335.zzvgg7lqe2lb2zdx@sirius.home.kraxel.org>
+	<20180412141153.GA16814@Nikki.localdomain>
+	<20180413061529.ulu6jxmcs4mgfmdc@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180409130700.5692-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] cpus: track calls to
- resume/pause_all_vcpus()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180413061529.ulu6jxmcs4mgfmdc@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2 for-2.12?] qapi: Parameter gl of
+ DisplayType now accept an enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>
 
-On 09.04.2018 15:07, David Hildenbrand wrote:
-> If we have parallel calls to resume/pause_all_vcpus() we can get
-> into trouble because the qemu mutex is temporarily dropped while
-> waiting for all threads to stop. This can happen e.g. for s390x, where
-> resume/pause_all_vcpus() can be triggered by a VCPU.
+On Fri, Apr 13, 2018 at 08:15:29AM +0200, Gerd Hoffmann wrote:
+> On Thu, Apr 12, 2018 at 03:11:53PM +0100, Elie Tournier wrote:
+> > Hello,
+> > 
+> > On Tue, Apr 10, 2018 at 03:33:35PM +0200, Gerd Hoffmann wrote:
+> > > > # @off: Disable OpenGL (default).
+> > 
+> > Just to be sure, I have to add @ in front of all parameter, right?
+> > 
+> > > > 
+> > > > > + # 'on'    Use OpenGL, pick context type automatically.
+> > > > > + #         Would better be named 'auto' but is called 'on' for backward
+> > > > > + #         compatibility with bool type.
+> > > > 
+> > > > See below...
+> > > 
+> > > > DisplayOptions was added in 2.12.  This is a backwards-incompatible
+> > > > change in QMP (you CANNOT change 'bool' to 'DisplayGLMode' across
+> > > > releases, because the on-the-wire representation differs; pre-patch it
+> > > > would be "gl":true, post-patch it is "gl":"on").  So if it affects QMP,
+> > > > and we want it, this patch either HAS to go in 2.12, or we have to have
+> > > > more finesse (perhaps by using an 'alternate' type in the QAPI) so that
+> > > > it remains backwards-compatible.
+> > > > 
+> > > > /me goes and looks at introspection output...
+> > > > 
+> > > > You may be in luck - there is no instance of 'window-close' in the
+> > > > introspection output, which means 'DisplayType' exists only for ease of
+> > > > command-line parsing and is not currently used by QMP, so tweaks here
+> > > > are not affecting the command line.
+> > > 
+> > > Yes, right now the struct is only used to store the parsed command line
+> > > opts, so no effect on QMP.
+> > > 
+> > > Plan for the future is to also parse command line options with generic
+> > > qapi/json code instead of the home-grown parser, but that switch didn't
+> > > happen yet.
+> > > 
+> > > > That said, you can STILL name the enum value something smarter than 'on'
+> > > > IF you make the change now, for 2.12, given that the QAPI type was only
+> > > > introduced in 2.12 (you only have to worry about backwards compatibility
+> > > > if 2.11 already parsed gl=on).
+> > > 
+> > > gl=on is older, so that must continue to work.  Making both "on" and
+> > > "auto" work isn't a problem for our home-grown parser (aka
+> > > parse_display() in vl.c).  But having quirks like this makes the switch
+> > > to generic parser code more difficuilt, so I'd prefer to avoid that ...
+> > 
+> > Is it possible to upstream this change before 2.12 release?
 > 
-> Pause/Resume exactly once, when we leave/hit "0".
+> No need to hurry with this.  QMP doesn't see the structs, so no
+> compatibility problem here.  gl=on cmd line option was present in 2.11 +
+> older already, so that must continue to work no matter whenever this
+> makes 2.12 or not.
+
+Alright, thanks.
+Well, to be fair, I just want to see this feature upstream, I don't really care
+about the release number.
+
+Just a question before I resend the series.
+Should I note "Since 2.12" or "Since 2.13" in qapi/ui.json?
+
+BR,
+Elie
+
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  cpus.c | 31 ++++++++++++++++++++++++-------
->  1 file changed, 24 insertions(+), 7 deletions(-)
+> cheers,
+>   Gerd
 > 
-> diff --git a/cpus.c b/cpus.c
-> index 2e6701795b..7c7e0245c5 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1778,17 +1778,26 @@ static bool all_vcpus_paused(void)
->      return true;
->  }
->  
-> +/* wait for the initial vm_start() call */
-> +static int vcpus_paused = 1;
-> +
->  void pause_all_vcpus(void)
->  {
->      CPUState *cpu;
->  
-> -    qemu_clock_enable(QEMU_CLOCK_VIRTUAL, false);
-> -    CPU_FOREACH(cpu) {
-> -        if (qemu_cpu_is_self(cpu)) {
-> -            qemu_cpu_stop(cpu, true);
-> -        } else {
-> -            cpu->stop = true;
-> -            qemu_cpu_kick(cpu);
-> +    assert(qemu_mutex_iothread_locked());
-> +    assert(vcpus_paused >= 0);
-> +
-> +    vcpus_paused++;
-> +    if (vcpus_paused == 1) {
-> +        qemu_clock_enable(QEMU_CLOCK_VIRTUAL, false);
-> +        CPU_FOREACH(cpu) {
-> +            if (qemu_cpu_is_self(cpu)) {
-> +                qemu_cpu_stop(cpu, true);
-> +            } else {
-> +                cpu->stop = true;
-> +                qemu_cpu_kick(cpu);
-> +            }
->          }
->      }
->  
-> @@ -1820,6 +1829,14 @@ void resume_all_vcpus(void)
->  {
->      CPUState *cpu;
->  
-> +    assert(vcpus_paused >= 0);
-> +    assert(qemu_mutex_iothread_locked());
-> +
-> +    vcpus_paused--;
-> +    if (vcpus_paused > 0) {
-> +        return;
-> +    }
-> +
->      qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->      CPU_FOREACH(cpu) {
->          cpu_resume(cpu);
-> 
-
-So if everything goes well, we have a replacement for s390x and this
-patch should no longer be needed.
-
-pause_all_vcpus/resume_all_vcpus should not be called from a VCPU.
-
-.. that implies that I have to find another way to get all CPUs out KVM
-for the prototype I am working on :/
-
--- 
-
-Thanks,
-
-David / dhildenb
