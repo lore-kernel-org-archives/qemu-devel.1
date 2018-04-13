@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6zCh-0006cx-Op
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:57:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f6zEL-0007si-4G
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:59:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f6zCd-0003rO-Sh
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:57:27 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:46691)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f6zCd-0003qf-J2
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:57:23 -0400
-References: <20180413133041.29509.59064.stgit@pasha-VirtualBox>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <450c3294-4e9e-1547-f75b-133ba756ca0a@vivier.eu>
-Date: Fri, 13 Apr 2018 15:57:19 +0200
+	(envelope-from <imammedo@redhat.com>) id 1f6zEK-00051R-9X
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:59:09 -0400
+Date: Fri, 13 Apr 2018 15:59:01 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180413155901.45a02b95@redhat.com>
+In-Reply-To: <CAFEAcA-AVuHMao5kQUrfEYWpGL0y-CwbuqCA_8ZSZrVbqz9nCg@mail.gmail.com>
+References: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
+	<1523551221-11612-4-git-send-email-imammedo@redhat.com>
+	<CAFEAcA-AVuHMao5kQUrfEYWpGL0y-CwbuqCA_8ZSZrVbqz9nCg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180413133041.29509.59064.stgit@pasha-VirtualBox>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] m68: fix exception stack frame for 68000
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.13 3/4] arm: always start
+ from first_cpu when registering loader cpu reset callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-Le 13/04/2018 à 15:30, Pavel Dovgalyuk a écrit :
-> 68000 CPUs do not save format in the exception stack frame.
-> This patch adds feature checking to prevent format saving for 68000.
-> m68k_ret() already includes this modification, this patch fixes
-> the exception processing function too.
+On Thu, 12 Apr 2018 19:29:28 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On 12 April 2018 at 17:40, Igor Mammedov <imammedo@redhat.com> wrote:
+> > if arm_load_kernel() were passed non first_cpu, QEMU would end up
+> > with partially set do_cpu_reset() callback leaving some CPUs without it.
+> >
+> > Make sure that do_cpu_reset() is registered for all CPUs by enumerating
+> > CPUs from first_cpu.
+> >
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  hw/arm/boot.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> > index 2f464ca..2591fee 100644
+> > --- a/hw/arm/boot.c
+> > +++ b/hw/arm/boot.c
+> > @@ -1188,7 +1188,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+> >       * actually loading a kernel, the handler is also responsible for
+> >       * arranging that we start it correctly.
+> >       */
+> > -    for (cs = CPU(cpu); cs; cs = CPU_NEXT(cs)) {
+> > +    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+> >          qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+> >      }
+> >  }  
 > 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Definitely a bug fix, so:
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > 
-> --
-> 
-> v2:
->  - moved switch under the condition (suggested by Laurent Vivier)
-> ---
->  target/m68k/op_helper.c |   33 ++++++++++++++++++---------------
->  1 file changed, 18 insertions(+), 15 deletions(-)
-> 
+> I think though that in at least some cases we'll still mishandle
+> being passed anything other than first_cpu as the CPU pointer,
+> because in do_cpu_reset() we do some checks for "do this if
+> cs == first_cpu", on the assumption that first_cpu is the
+> primary CPU that we're booting. We should instead I suppose
+> be checking against the CPU pointer we're given as the
+> arm_load_kernel() argument (which I think do_cpu_reset() can
+> get at via info->load_kernel_notifier.cpu).
+Agreed,
+only that load_kernel_notifier is being removed in 4/4,
+but nothing prevents us from adding pointer to arm_boot_info directly.
+
+> We should probably analyse which boards actually pass anything
+> other than first_cpu -- I suspect it will end up just being
+> the xilinx board which has both A and R profile cores...
+Probably,
+I've managed to stop myself digging deeper into reset handling for now,
+and deal with firmware blobs regeneration first.
+I still might have to look back at do_cpu_reset() later
+if it proves to be in a way of cpu hotplug but not just yet.
 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> thanks
+> -- PMM
