@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f6zQT-0001uZ-2R
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:11:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1f6zUs-000673-1E
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:16:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1f6zQS-0005WN-0K
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:11:41 -0400
-References: <1522160122-10744-1-git-send-email-eric.auger@redhat.com>
-	<1522160122-10744-9-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA_O3QK0t5DHfnAFEOHv_yyxvL9HZX+0geHs0ibVVwTbNQ@mail.gmail.com>
-	<57b01152-1179-9735-eb6a-a9dbfc933a6c@redhat.com>
-	<CAFEAcA-wT8vERbkjq_HoROi1ymPauAe+y3oc16zoCJXsHKqBoQ@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <94299045-3027-517c-d634-4613f78de163@redhat.com>
-Date: Fri, 13 Apr 2018 16:11:24 +0200
+	(envelope-from <armbru@redhat.com>) id 1f6zUq-0007yU-Ir
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:16:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33408 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f6zUq-0007xc-DF
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:16:12 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180303002504.25142-1-aik@ozlabs.ru>
+	<20180303002504.25142-3-aik@ozlabs.ru>
+Date: Fri, 13 Apr 2018 16:16:10 +0200
+In-Reply-To: <20180303002504.25142-3-aik@ozlabs.ru> (Alexey Kardashevskiy's
+	message of "Sat, 3 Mar 2018 11:25:04 +1100")
+Message-ID: <87o9inxkd1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-wT8vERbkjq_HoROi1ymPauAe+y3oc16zoCJXsHKqBoQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 8/8] hw/arm/virt: Allow up to 512 vcpus along
- with KVM VGICv3
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH qemu v4 2/2] qmp: Add qom-list-properties
+ to list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-Hi Peter,
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
-On 13/04/18 16:06, Peter Maydell wrote:
-> On 13 April 2018 at 15:01, Auger Eric <eric.auger@redhat.com> wrote:
->> On 13/04/18 15:41, Peter Maydell wrote:
->>> I think it would be better to explicitly check "do we have
->>> support for split redistributors" rather than looking at
->>> KVM_MAX_VCPUS. It's not impossible that a distro kernel
->>> might have chosen to backport support for one but not the
->>> other.
->>
->> The issue is we have race here:
->> to check whether the new ATTR is supported I need to query the GICV3 KVM
->> device. This later is created in the GICv3 initialize. But to initialize
->> the VGIC I need the VCPUs to be created. And to create the VCPUs I need
->> to check their max number. Or do I miss somethinh?
->>
->> The KVM device create dry-run mode cannot be used here. I would need to
->> really create the KVM device and then delete it. The issue is there is
->> no kvm device DELETE ioctl at kernel level since KVM devices are deleted
->> on VM deletion if I understand correctly. Adding a KVM device delete at
->> kernel level may not be straightforward as I suspect some
->> simplifications could be made in KVM device deletion knowing the VM was
->> under deletion.
-> 
-> Two possibilities:
-> 
-> (1) do like we do in kvm_arm_get_host_cpu_features() where we
-> create a scratch VM to interrogate it and then throw it away
-> when we have the info we need
-Oh OK. I did not know this was in place. At first sight, this looks
-simpler than (2) to me. I will investigate this solution.
+> There is already 'device-list-properties' which does most of the job,
+> however it does not handle everything returned by qom-list-types such
+> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+> It does not handle abstract classes either.
+>
+> This adds a new qom-list-properties command which prints properties
+> of a specific class and its instance. It is pretty much a simplified copy
+> of the device-list-properties handler.
+>
+> Since it creates an object instance, device properties should appear
+> in the output as they are copied to QOM properties at the instance_init
+> hook.
+>
+> This adds a object_class_property_iter_init() helper to allow class
+> properties enumeration uses it in the new QMP command to allow properties
+> listing for abstract classes.
+>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v3:
+> * Used ObjectPropertyInfo instead of QOMPropertyInfo
+>
+> v2:
+> * added abstract classes support, now things like "pci-device" or
+> "spapr-machine" show properties, previously these would produce
+> an "abstract class" error
+>
+> # Conflicts:
+> #	qapi-schema.json
+> ---
+>  qapi-schema.json     | 15 +++++++++++++++
+>  include/qom/object.h | 16 ++++++++++++++++
+>  qmp.c                | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  qom/object.c         |  7 +++++++
+>  4 files changed, 87 insertions(+)
+>
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 5cdf89a..3021e90 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -1442,6 +1442,21 @@
+>    'returns': [ 'ObjectPropertyInfo' ] }
+>  
+>  ##
+> +# @qom-list-properties:
+> +#
+> +# List properties associated with a QOM object.
+> +#
+> +# @typename: the type name of an object
+> +#
+> +# Returns: a list of ObjectPropertyInfo describing object properties
 
-Thanks!
+Quoting my review of the RFC PATCH,
+Message-ID: <871si6vt8n.fsf@dusky.pond.sub.org>:
 
-Eric
-> 
-> (2) add an API to the kernel to make it easier to query it
-> for this sort of feature
-> 
-> thanks
-> -- PMM
-> 
+    qom-list-properties is like instantiate with default configuration
+    and without realizing + qom-list + destroy.
+
+    We need to instantiate because QOM properties are dynamic: they
+    aren't specified by data (which qom-list-properties could simply
+    read), they are created by (instantiation) code (which
+    qom-list-properties has to run).
+
+    Properties created only after instantiation (by realize, perhaps)
+    aren't visible in qom-list-properties.  Do such properties exist?
+
+    Properties created only in non-default configuration aren't visible
+    either.  Such properties have to exist, or else dynamic property
+    creation would be idiotic.
+
+    Likewise for properties created differently (say with a different
+    type) in non-default configuration.  We can hope that no such beasts
+    exist.  Since properties get created by code, and code can do
+    anything, we're reduced to hope.  Data is so much easier to reason
+    about than code.
+
+And Message-ID: <87r2q3n8oe.fsf@dusky.pond.sub.org>:
+
+    Thus, qom-list-properties design limitation: the result need not
+    reflect properties of instantiated objects.  It usually does, as
+    most QOM properties behave as if they were static.  But when it
+    doesn't, what then?  How are users of qom-list-properties supposed
+    to deal with such inaccurate / incorrect information?  Do they just
+    have to know which properties aren't visible in qom-list-properties,
+    and which properties are, but cannot be trusted?
+
+Please document the design limitation in a followup patch.
+
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'qom-list-properties',
+> +  'data': { 'typename': 'str'},
+> +  'returns': [ 'ObjectPropertyInfo' ] }
+> +
+> +##
+>  # @xen-set-global-dirty-log:
+>  #
+>  # Enable or disable the global dirty log mode.
+[...]
