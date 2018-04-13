@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6yrC-0007FQ-KT
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f6yrR-0007TS-Pb
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f6yrB-0008Tn-CL
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:14 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f6yrA-0008TL-Su
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:13 -0400
-Received: by mail-ot0-x241.google.com with SMTP id m3-v6so754138ote.12
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 06:35:12 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1f6yrQ-0000CK-Ry
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 09:35:29 -0400
+References: <20180330161040.350271-1-vsementsov@virtuozzo.com>
+	<b6a499bc-b5c6-7c35-e916-d63861f0c0c5@redhat.com>
+	<3d0d9016-276f-c1c6-eb7e-ef78c0744f01@redhat.com>
+	<47c416af-4b8e-db9a-4b4b-9b0eb060b4ff@virtuozzo.com>
+	<ec4ee8f5-7a47-2e18-1fe3-d4f3859bc8ce@virtuozzo.com>
+	<90b289f4-d976-1fb7-57e2-aa02d00947d1@virtuozzo.com>
+	<e8cc4fbe-4b0e-4ab8-64ff-0c12a080e09e@redhat.com>
+	<44329c83-20d8-0924-ebf3-249e5777a1d5@virtuozzo.com>
+	<0ad6b9fc-59fd-3c32-43d3-1a4d433d9154@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <99388cf8-8e8c-17f0-fb73-09b0f8fe1b60@redhat.com>
+Date: Fri, 13 Apr 2018 15:35:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <1522160122-10744-5-git-send-email-eric.auger@redhat.com>
-References: <1522160122-10744-1-git-send-email-eric.auger@redhat.com>
-	<1522160122-10744-5-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Apr 2018 14:34:51 +0100
-Message-ID: <CAFEAcA8sQSuVcYPyE58tjapxxe6FNdD5qcyftYrZeWQ0fbev8w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 4/8] hw/intc/arm_gicv3: Implement
- register_redist_region API
+In-Reply-To: <0ad6b9fc-59fd-3c32-43d3-1a4d433d9154@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-On 27 March 2018 at 15:15, Eric Auger <eric.auger@redhat.com> wrote:
-> This patch defines and implements the register_redist_region() API
-> for both arm_gicv3 and arm_gicv3_kvm. Virt machine now directly calls
-> the function to set the single redistributor region. The associated
-> memory region init is removed from gicv3_init_irqs_and_mmio.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  hw/arm/virt.c                      |  6 +++++-
->  hw/intc/arm_gicv3.c                | 21 +++++++++++++++++++++
->  hw/intc/arm_gicv3_common.c         | 10 ++++++----
->  hw/intc/arm_gicv3_kvm.c            | 38 +++++++++++++++++++++++++++++++++++---
->  include/hw/intc/arm_gicv3_common.h |  5 +++--
->  5 files changed, 70 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 94dcb12..0eef6aa 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -526,7 +526,11 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->      gicbusdev = SYS_BUS_DEVICE(gicdev);
->      sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
->      if (type == 3) {
-> -        sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
-> +        ARMGICv3CommonClass *agcc = ARM_GICV3_COMMON_GET_CLASS(gicdev);
-> +
-> +        agcc->register_redist_region((GICv3State *)gicdev,
-> +                                 vms->memmap[VIRT_GIC_REDIST].base,
-> +                                 vms->memmap[VIRT_GIC_REDIST].size >> 17);
+On 2018-04-12 11:09, Vladimir Sementsov-Ogievskiy wrote:
+> 12.04.2018 11:34, Vladimir Sementsov-Ogievskiy wrote:
+>> 11.04.2018 19:11, Max Reitz wrote:
+>>> On 2018-04-11 15:05, Vladimir Sementsov-Ogievskiy wrote:
+>>>
+>>> [...]
+>>>
+>>>> Hmm, first type? I'm now not sure about, did I really see sha256
+>>>> mismatch, or something like this (should be error, but found bitmap)=
+:
+>>>>
+>>>> --- /work/src/qemu/up-169/tests/qemu-iotests/169.out 2018-04-11
+>>>> 15:35:10.055027392 +0300
+>>>> +++ /work/src/qemu/up-169/tests/qemu-iotests/169.out.bad 2018-04-11
+>>>> 15:58:09.300450045 +0300
+>>>> @@ -1,5 +1,20 @@
+>>>> -........
+>>>> +F.......
+>>>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>> +FAIL: test__not_persistent__migbitmap__offline
+>>>> (__main__.TestDirtyBitmapMigration)
+>>>> +methodcaller(name, ...) --> methodcaller object
+>>>> +-------------------------------------------------------------------=
+---
+>>>> +Traceback (most recent call last):
+>>>> +=C2=A0 File "169", line 136, in do_test_migration
+>>>> +=C2=A0=C2=A0=C2=A0 self.check_bitmap(self.vm_b, sha256 if persisten=
+t else False)
+>>>> +=C2=A0 File "169", line 77, in check_bitmap
+>>>> +=C2=A0=C2=A0=C2=A0 "Dirty bitmap 'bitmap0' not found");
+>>>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", =
+line
+>>>> 389,
+>>>> in assert_qmp
+>>>> +=C2=A0=C2=A0=C2=A0 result =3D self.dictpath(d, path)
+>>>> +=C2=A0 File "/work/src/qemu/up-169/tests/qemu-iotests/iotests.py", =
+line
+>>>> 348,
+>>>> in dictpath
+>>>> +=C2=A0=C2=A0=C2=A0 self.fail('failed path traversal for "%s" in "%s=
+"' % (path,
+>>>> str(d)))
+>>>> +AssertionError: failed path traversal for "error/desc" in "{u'retur=
+n':
+>>>> {u'sha256':
+>>>> u'01d2ebedcb8f549a2547dbf8e231c410e3e747a9479e98909fc936e0035cf8b1'}=
+}"
+>>>>
+>>>>
+>>>> Max, did you really seed sha256 mismatch or only something like this=
+?
+>>> I'm pretty sure I did see mismatches.
+>>
+>> hm, may be it possible too, because of not waiting for RESUME in this
+>> case, we can request sha256 in the intermediate state of bitmap loadin=
+g
+>=20
+> no. if you see mismatch on first check after migration, then it is afte=
+r
+> RESUME event, so it means, migrated broken bitmap, it's a bug..
+>=20
+> if you see mismatch on second check - after vm_b stop/start, this means
+> that it is a persistent case, so incoming migration should fail, and
+> bitmap is loaded from file, but how it can mismatch? persistance bug?
 
-What is this magic number 17 ?
+Well, I'll tell you if I ever see it again.  If not... Then I guess
+we're fine.
 
->      } else {
->          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
->      }
-> diff --git a/hw/intc/arm_gicv3.c b/hw/intc/arm_gicv3.c
-> index 479c667..37f7564 100644
-> --- a/hw/intc/arm_gicv3.c
-> +++ b/hw/intc/arm_gicv3.c
-> @@ -378,6 +378,26 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
->      gicv3_init_cpuif(s);
->  }
->
-> +static int arm_gicv3_register_redist_region(GICv3State *s, hwaddr base,
-> +                                            uint32_t count)
-> +{
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
-> +
-> +    if (s->nb_redist_regions > 0) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    s->redist_region[s->nb_redist_regions].base = base;
-> +    s->redist_region[s->nb_redist_regions].count = count;
-> +    memory_region_init_io(&s->redist_region[s->nb_redist_regions].mr, OBJECT(s),
-> +                          gic_ops, s, "gicv3_redist", 0x20000 * count);
-> +    sysbus_init_mmio(sbd, &s->redist_region[s->nb_redist_regions].mr);
-> +    sysbus_mmio_map(sbd, 1, base);
-
-Devices should never call sysbus_mmio_map() -- they should
-just provide sysbus MMIO regions, and let the board code map
-them in the right places. More generally the device code
-shouldn't be told where in the memory map it is. kvm_arm_register_device()
-goes to some lengths to maintain this abstraction (by setting
-up a notifier to tell the kernel where things are only once
-everything has been created and mapped).
-
-Similar remarks apply to other changes in this patch (and
-I suspect will need some restructuring to address).
-
-> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-> index 3cf132f..549ccc3 100644
-> --- a/include/hw/intc/arm_gicv3_common.h
-> +++ b/include/hw/intc/arm_gicv3_common.h
-> @@ -220,6 +220,7 @@ struct GICv3State {
->      MemoryRegion iomem_dist; /* Distributor */
->      GICv3RDISTRegion redist_region[GICV3_MAX_RDIST_REGIONS];
->      uint32_t nb_redist_regions;
-> +    bool support_multiple_redist_regions;
->
->      uint32_t num_cpu;
->      uint32_t num_irq;
-> @@ -297,8 +298,8 @@ typedef struct ARMGICv3CommonClass {
->
->      void (*pre_save)(GICv3State *s);
->      void (*post_load)(GICv3State *s);
-> -    /* register an RDIST region at @base, containing @pfns 64kB pages */
-> -    int (*register_redist_region)(GICv3State *s, hwaddr base, uint32_t pfns);
-> +    /* register an RDIST region at @base, containing @count redistributors */
-> +    int (*register_redist_region)(GICv3State *s, hwaddr base, uint32_t count);
-
-This looks like a change that should have been folded into a
-previous patch.
-
->  } ARMGICv3CommonClass;
->
->  void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
-> --
-> 2.5.5
-
-thanks
--- PMM
+Max
