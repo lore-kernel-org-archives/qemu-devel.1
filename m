@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f70T9-0005vF-A6
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:18:32 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f70Yu-0001yJ-SH
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f70T8-0008Ce-Ev
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:18:31 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f70T8-0008CR-9r
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:18:30 -0400
-Received: by mail-ot0-x244.google.com with SMTP id h55-v6so10242404ote.9
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 08:18:30 -0700 (PDT)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f70Yr-0001t5-M1
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:24:28 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:60456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1f70Yr-0001sr-7P
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:24:25 -0400
+References: <20180413140334.26622-1-alex.bennee@linaro.org>
+	<20180413140334.26622-3-alex.bennee@linaro.org>
+	<3a3a9132-8f03-c476-bd0d-b6c91a9cc3a4@mail.uni-paderborn.de>
+	<CAFEAcA9FWu7VU1-RtXA4h-LQOXVoDfOG9P8aTs02B-NF9N93qg@mail.gmail.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <0703fdde-da82-d85f-3d68-e45e0839a9dc@mail.uni-paderborn.de>
+Date: Fri, 13 Apr 2018 17:24:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180406151752.10854-1-christophe.lyon@st.com>
-References: <20180406151752.10854-1-christophe.lyon@st.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Apr 2018 16:18:09 +0100
-Message-ID: <CAFEAcA9f7UHZAK51jdZsSsx-wc6Mvee0L2BPnOsKy78+ceWi3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [ARM/FDPIC 0/4] FDPIC ABI for ARM
+In-Reply-To: <CAFEAcA9FWu7VU1-RtXA4h-LQOXVoDfOG9P8aTs02B-NF9N93qg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] fpu/softfloat: raise float_invalid
+ for NaN/Inf in round_to_int_and_pack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Lyon <christophe.lyon@st.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 6 April 2018 at 16:17, Christophe Lyon <christophe.lyon@st.com> wrote:
-> Hello,
->
-> This patch series implements the QEMU contribution of the FDPIC
-> ABI for ARM targets.
+On 04/13/2018 04:07 PM, Peter Maydell wrote:
+> On 13 April 2018 at 15:06, Bastian Koppelmann
+> <kbastian@mail.uni-paderborn.de> wrote:
+>> On 04/13/2018 04:03 PM, Alex Bennée wrote:
+>>> The re-factor broke the raising of INVALID when NaN/Inf is passed to
+>>> the float_to_int conversion functions. round_to_uint_and_pack got this
+>>> right for NaN but also missed out the Inf handling.
+>>>
+>>> Fixes https://bugs.launchpad.net/qemu/+bug/1759264
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+>>> ---
+>>>  fpu/softfloat.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>
+>> Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> 
+> Could you run your tricore test case with this patch? I think
+> Alex was having difficulty getting that running...
 
-> I am currently working on updating the patches for the other toolchain
-> components, and will upstream them soon. This includes gcc, uclibc,
-> and gdb.
->
-> This series provides support for ARM v7 and later architectures and
-> has been used to run the GCC tests on arm-linux-gnueabi without
-> regression, as well as arm-linux-uclibceabi.
->
-> Are the QEMU patches OK for inclusion in master?
+This fixes the ftoi problem, so
+Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Hi; I've given the patches a quick look over for structural
-issues, though I haven't looked too closely at the details.
-I think that given that the support is in Linux master I'm
-happy with it also going into QEMU.
+However, my risu-like tests found another flag raising problem with
+float32_div. I'll investigate it on Monday.
 
-NB that Laurent has some patchsets outstanding which rework
-the linux-user code to split the per-architecture parts of
-signal.c and main.c into per-architecture files rather than
-having lots of ifdefs. Those will probably land early in the
-2.13 cycle. I mention this just as a heads-up that at some point
-you'll find yourself with a somewhat painful rebase.
-
-PS: I'd recommend cc'ing the linux-user maintainers (listed in
-the MAINTAINERS file) on your next version of this patchset.
-
-thanks
--- PMM
+Cheers,
+Bastian
