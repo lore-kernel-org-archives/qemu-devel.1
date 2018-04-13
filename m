@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f70JF-0000Fh-92
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:08:19 -0400
+	(envelope-from <mst@redhat.com>) id 1f70NK-000390-HO
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f70JE-0000ib-9l
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:08:17 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:42991)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f70JE-0000hB-3z
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:08:16 -0400
-Received: by mail-oi0-x243.google.com with SMTP id l190-v6so8656448oig.9
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 08:08:16 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1f70NG-0004eW-I1
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:12:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38134 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f70NF-0004dq-SF
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 11:12:26 -0400
+Date: Fri, 13 Apr 2018 18:12:09 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180413181055-mutt-send-email-mst@kernel.org>
+References: <20180413142336.32163-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180406151752.10854-3-christophe.lyon@st.com>
-References: <20180406151752.10854-1-christophe.lyon@st.com>
-	<20180406151752.10854-3-christophe.lyon@st.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Apr 2018 16:07:55 +0100
-Message-ID: <CAFEAcA9uRijXvB=zZpoqVP39DSh8QNtghRgf6AYfQTk4+JoBog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180413142336.32163-1-peter.maydell@linaro.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [ARM/FDPIC 2/4] linux-user: ARM-FDPIC: Add support
- of FDPIC for ARM.
+Subject: Re: [Qemu-devel] [PATCH for-2.12] tcg/mips: Handle large offsets
+ from target env to tlb_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Lyon <christophe.lyon@st.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-On 6 April 2018 at 16:17, Christophe Lyon <christophe.lyon@st.com> wrote:
-> Add FDPIC info into image_info structure since interpreter info is on
-> stack and needs to be saved to be accessed later on.
->
-> Co-Authored-By:  Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
-> Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
->
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 7ba3795..363da67 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -287,6 +287,23 @@ static inline void init_thread(struct target_pt_regs=
- *regs,
->      /* For uClinux PIC binaries.  */
->      /* XXX: Linux does this only on ARM with no MMU (do we care ?) */
->      regs->uregs[10] =3D infop->start_data;
-> +#ifdef CONFIG_USE_FDPIC
-> +    /* Support ARM FDPIC.  */
-> +    /* As described in the ABI document, r7 points to the loadmap info
-> +     * prepared by the kernel. If an interpreter is needed, r8 points
-> +     * to the interpreter loadmap and r9 points to the interpreter
-> +     * PT_DYNAMIC info. If no interpreter is needed, r8 is zer0, and
-> +     * r9 points to the main program PT_DYNAMIC info.  */
-> +    regs->uregs[7] =3D infop->loadmap_addr;
-> +    if (infop->interpreter_loadmap_addr) {
-> +        /* Executable is dynamically loaded.  */
-> +        regs->uregs[8] =3D infop->interpreter_loadmap_addr;
-> +        regs->uregs[9] =3D infop->interpreter_pt_dynamic_addr;
-> +    } else {
-> +        regs->uregs[8] =3D 0;
-> +        regs->uregs[9] =3D infop->pt_dynamic_addr;
-> +    }
+On Fri, Apr 13, 2018 at 03:23:36PM +0100, Peter Maydell wrote:
+> The MIPS TCG target makes the assumption that the offset from the
+> target env pointer to the tlb_table is less than about 64K. This
+> used to be true, but gradual addition of features to the Arm
+> target means that it's no longer true there. This results in
+> the build-time assertion failing:
+>=20
+> In file included from /home/pm215/qemu/include/qemu/osdep.h:36:0,
+>                  from /home/pm215/qemu/tcg/tcg.c:28:
+> /home/pm215/qemu/tcg/mips/tcg-target.inc.c: In function =E2=80=98tcg_ou=
+t_tlb_load=E2=80=99:
+> /home/pm215/qemu/include/qemu/compiler.h:90:36: error: static assertion=
+ failed: "not expecting: offsetof(CPUArchState, tlb_table[NB_MMU_MODES - =
+1][1]) > 0x7ff0 + 0x7fff"
+>  #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+>                                     ^
+> /home/pm215/qemu/include/qemu/compiler.h:98:30: note: in expansion of m=
+acro =E2=80=98QEMU_BUILD_BUG_MSG=E2=80=99
+>  #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #=
+x)
+>                               ^
+> /home/pm215/qemu/tcg/mips/tcg-target.inc.c:1236:9: note: in expansion o=
+f macro =E2=80=98QEMU_BUILD_BUG_ON=E2=80=99
+>          QEMU_BUILD_BUG_ON(offsetof(CPUArchState,
+>          ^
+> /home/pm215/qemu/rules.mak:66: recipe for target 'tcg/tcg.o' failed
+>=20
+> An ideal long term approach would be to rearrange the CPU state
+> so that the tlb_table was not so far along it, but this is tricky
+> because it would move it from the "not cleared on CPU reset" part
+> of the struct to the "cleared on CPU reset" part. As a simple fix
+> for the 2.12 release, make the MIPS TCG target handle an arbitrary
+> offset by emitting more add instructions. This will mean an extra
+> instruction in the fastpath for TCG loads and stores for the
+> affected guests (currently just aarch64-softmmu).
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Is it really correct to set these registers always, and not only if
-this is an FDPIC ELF ?
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-> +#endif
->  }
-
->  int load_elf_binary(struct linux_binprm *bprm, struct image_info *info);
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 19a0c03..90c8ee1 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -629,6 +629,12 @@ typedef struct CPUARMState {
->      const struct arm_boot_info *boot_info;
->      /* Store GICv3CPUState to access from this struct */
->      void *gicv3state;
-> +
-> +#if defined(CONFIG_USER_ONLY) && defined(CONFIG_USE_FDPIC)
-> +    /* We need to know if we have an FDPIC binary to adapt signal
-> +     * syscalls.  */
-> +    int is_fdpic;
-
-linux-user specific information shouldn't live in CPUARMState;
-put it in the TaskState struct instead, perhaps.
-
-> +#endif
->  } CPUARMState;
->
->  /**
-
-thanks
--- PMM
+> ---
+> This is sufficient that on MIPS host we can now at least build
+> and run an aarch64 guest kernel. I haven't tried 'make check'
+> because the only MIPS system I have access to is way too slow...
+>=20
+>  tcg/mips/tcg-target.inc.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+> index 4b55ab8856..ca5f1d4894 100644
+> --- a/tcg/mips/tcg-target.inc.c
+> +++ b/tcg/mips/tcg-target.inc.c
+> @@ -1229,13 +1229,10 @@ static void tcg_out_tlb_load(TCGContext *s, TCG=
+Reg base, TCGReg addrl,
+>      tcg_out_opc_reg(s, ALIAS_PADD, TCG_REG_A0, TCG_REG_A0, TCG_AREG0);
+> =20
+>      /* Compensate for very large offsets.  */
+> -    if (add_off >=3D 0x8000) {
+> -        /* Most target env are smaller than 32k; none are larger than =
+64k.
+> -           Simplify the logic here merely to offset by 0x7ff0, giving =
+us a
+> -           range just shy of 64k.  Check this assumption.  */
+> -        QEMU_BUILD_BUG_ON(offsetof(CPUArchState,
+> -                                   tlb_table[NB_MMU_MODES - 1][1])
+> -                          > 0x7ff0 + 0x7fff);
+> +    while (add_off >=3D 0x8000) {
+> +        /* Most target env are smaller than 32k, but a few are larger =
+than 64k,
+> +         * so handle an arbitrarily large offset.
+> +         */
+>          tcg_out_opc_imm(s, ALIAS_PADDI, TCG_REG_A0, TCG_REG_A0, 0x7ff0=
+);
+>          cmp_off -=3D 0x7ff0;
+>          add_off -=3D 0x7ff0;
+> --=20
+> 2.16.2
