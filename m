@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f6zJs-0004Ab-Ve
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:55 -0400
+	(envelope-from <tournier.elie@gmail.com>) id 1f6zJu-0004Ah-Az
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f6zJs-00018J-2V
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:52 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33689)
+	(envelope-from <tournier.elie@gmail.com>) id 1f6zJt-000193-72
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:54 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:46874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
-	id 1f6zJr-000185-SG
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:52 -0400
-Received: by mail-wr0-x242.google.com with SMTP id z73so8441528wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 07:04:51 -0700 (PDT)
+	id 1f6zJt-00018P-1b
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:53 -0400
+Received: by mail-wr0-x243.google.com with SMTP id d1so8420050wrj.13
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 07:04:52 -0700 (PDT)
 From: Elie Tournier <tournier.elie@gmail.com>
-Date: Fri, 13 Apr 2018 14:58:40 +0100
-Message-Id: <20180413135842.21325-2-tournier.elie@gmail.com>
+Date: Fri, 13 Apr 2018 14:58:41 +0100
+Message-Id: <20180413135842.21325-3-tournier.elie@gmail.com>
 In-Reply-To: <20180413135842.21325-1-tournier.elie@gmail.com>
 References: <20180413135842.21325-1-tournier.elie@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] qapi: Parameter gl of DisplayType now
- accept an enum
+Subject: [Qemu-devel] [PATCH v3 2/3] sdl: Move DisplayOptions global to
+ sdl2_console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +30,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kraxel@redhat.com, Elie Tournier <tournier.elie@gmail.com>, Elie Tournier <elie.tournier@collabora.com>
 
-v2: Rebase on top of master
-v3: Fix the json format (Eric Blake)
-    Fix a comparison issue (Gerd Hoffmann)
-
+Suggested-by: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Elie Tournier <elie.tournier@collabora.com>
 ---
- qapi/ui.json | 20 +++++++++++++++++++-
- vl.c         | 10 +++++-----
- 2 files changed, 24 insertions(+), 6 deletions(-)
+ include/ui/sdl2.h |  1 +
+ ui/sdl2.c         | 10 +++++-----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 5d01ad4304..3ad7835992 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1019,6 +1019,24 @@
- { 'struct'  : 'DisplayGTK',
-   'data'    : { '*grab-on-hover' : 'bool' } }
+diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
+index 51084e6320..f43eecdbd6 100644
+--- a/include/ui/sdl2.h
++++ b/include/ui/sdl2.h
+@@ -14,6 +14,7 @@
+ struct sdl2_console {
+     DisplayChangeListener dcl;
+     DisplaySurface *surface;
++    DisplayOptions *opts;
+     SDL_Texture *texture;
+     SDL_Window *real_window;
+     SDL_Renderer *real_renderer;
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 83b917fa37..da037248c2 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -32,7 +32,6 @@
  
-+ ##
-+ # @DisplayGLMode:
-+ #
-+ # Display OpenGL mode.
-+ #
-+ # @off: Disable OpenGL (default).
-+ # @on: Use OpenGL, pick context type automatically.
-+ #      Would better be named 'auto' but is called 'on' for backward
-+ #      compatibility with bool type.
-+ # @core: Use OpenGL with Core (desktop) Context.
-+ # @es: Use OpenGL with ES (embedded systems) Context.
-+ #
-+ # Since: 2.13
-+ #
-+ ##
-+ { 'enum'    : 'DisplayGLMode',
-+   'data'    : [ 'off', 'on', 'core', 'es' ] }
-+
- ##
- # @DisplayType:
- #
-@@ -1048,7 +1066,7 @@
-   'base'    : { 'type'           : 'DisplayType',
-                 '*full-screen'   : 'bool',
-                 '*window-close'  : 'bool',
--                '*gl'            : 'bool' },
-+                '*gl'            : 'DisplayGLMode' },
-   'discriminator' : 'type',
-   'data'    : { 'default'        : 'DisplayNoOpts',
-                 'none'           : 'DisplayNoOpts',
-diff --git a/vl.c b/vl.c
-index fce1fd12d8..99284fd518 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2142,9 +2142,9 @@ static void parse_display(const char *p)
-                 opts = nextopt;
-                 dpy.has_gl = true;
-                 if (strstart(opts, "on", &nextopt)) {
--                    dpy.gl = true;
-+                    dpy.gl = DISPLAYGL_MODE_ON;
-                 } else if (strstart(opts, "off", &nextopt)) {
--                    dpy.gl = false;
-+                    dpy.gl = DISPLAYGL_MODE_OFF;
-                 } else {
-                     goto invalid_sdl_args;
-                 }
-@@ -2185,9 +2185,9 @@ static void parse_display(const char *p)
-                 opts = nextopt;
-                 dpy.has_gl = true;
-                 if (strstart(opts, "on", &nextopt)) {
--                    dpy.gl = true;
-+                    dpy.gl = DISPLAYGL_MODE_ON;
-                 } else if (strstart(opts, "off", &nextopt)) {
--                    dpy.gl = false;
-+                    dpy.gl = DISPLAYGL_MODE_OFF;
-                 } else {
-                     goto invalid_gtk_args;
-                 }
-@@ -4343,7 +4343,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_display_early_init(&dpy);
-     qemu_console_early_init();
+ static int sdl2_num_outputs;
+ static struct sdl2_console *sdl2_console;
+-static DisplayOptions *opts;
  
--    if (dpy.has_gl && dpy.gl && display_opengl == 0) {
-+    if (dpy.has_gl && dpy.gl != DISPLAYGL_MODE_OFF && display_opengl == 0) {
- #if defined(CONFIG_OPENGL)
-         error_report("OpenGL is not supported by the display");
- #else
+ static SDL_Surface *guest_sprite_surface;
+ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
+@@ -566,7 +565,7 @@ static void handle_windowevent(SDL_Event *ev)
+         break;
+     case SDL_WINDOWEVENT_CLOSE:
+         if (qemu_console_is_graphic(scon->dcl.con)) {
+-            if (opts->has_window_close && !opts->window_close) {
++            if (scon->opts->has_window_close && !scon->opts->window_close) {
+                 allow_close = false;
+             }
+             if (allow_close) {
+@@ -613,7 +612,7 @@ void sdl2_poll_events(struct sdl2_console *scon)
+             handle_textinput(ev);
+             break;
+         case SDL_QUIT:
+-            if (opts->has_window_close && !opts->window_close) {
++            if (scon->opts->has_window_close && !scon->opts->window_close) {
+                 allow_close = false;
+             }
+             if (allow_close) {
+@@ -770,7 +769,6 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+     SDL_SysWMinfo info;
+ 
+     assert(o->type == DISPLAY_TYPE_SDL);
+-    opts = o;
+ 
+ #ifdef __linux__
+     /* on Linux, SDL may use fbcon|directfb|svgalib when run without
+@@ -806,6 +804,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+         return;
+     }
+     sdl2_console = g_new0(struct sdl2_console, sdl2_num_outputs);
++    sdl2_console->opts = o;
+     for (i = 0; i < sdl2_num_outputs; i++) {
+         QemuConsole *con = qemu_console_lookup_by_index(i);
+         assert(con != NULL);
+@@ -846,7 +845,8 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+         g_free(filename);
+     }
+ 
+-    if (opts->has_full_screen && opts->full_screen) {
++    if (sdl2_console->opts->has_full_screen &&
++        sdl2_console->opts->full_screen) {
+         gui_fullscreen = 1;
+         sdl_grab_start(0);
+     }
 -- 
 2.17.0
