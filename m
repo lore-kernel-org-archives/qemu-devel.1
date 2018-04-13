@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6teC-0002xq-Dw
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 04:01:33 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f6ton-0007Sa-NW
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 04:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f6te8-0004uP-DV
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 04:01:28 -0400
-Date: Fri, 13 Apr 2018 10:01:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180413080105.GA4134@localhost.localdomain>
-References: <20180412095157.GA5004@localhost.localdomain>
-	<f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
-	<20180412111143.GB5004@localhost.localdomain>
-	<569800ae-12f8-53f1-012a-50408700ba39@redhat.com>
-	<20180412115316.GC5004@localhost.localdomain>
-	<306e73f3-9e72-e60f-123c-47a8a72915e2@redhat.com>
-	<20180412132735.GD5004@localhost.localdomain>
-	<dc693c45-e1dc-5a3d-3c95-adcb946c65d6@redhat.com>
-	<20180412142519.GE5004@localhost.localdomain>
-	<302b4aea-7e42-a321-f8db-4d0f69794bbf@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1f6toj-0006ff-Ke
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 04:12:25 -0400
+Resent-Message-Id: <E1f6toj-0006ff-Ke@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21042)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f6toj-0006US-E8
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 04:12:21 -0400
+In-Reply-To: <20180413075200.15217-1-clg@kaod.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152360619100.1854.4118391342119729453@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <302b4aea-7e42-a321-f8db-4d0f69794bbf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/19] block: Really pause block jobs on
- drain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 13 Apr 2018 00:56:32 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: clg@kaod.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, peter.maydell@linaro.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com, yulei.zhang@intel.com, alex.williamson@redhat.com, pbonzini@redhat.com, zhi.a.wang@intel.com, david@gibson.dropbear.id.au
 
-Am 12.04.2018 um 22:44 hat Paolo Bonzini geschrieben:
-> On 12/04/2018 16:25, Kevin Wolf wrote:
-> > This is already the order we have there. What is probably different from
-> > what you envision is that after the parents have concluded, we still
-> > check that they are still quiescent in every iteration.
-> 
-> Yes, and that's the quadratic part.
-> 
-> > What we could do easily is introducing a bool bs->quiesce_concluded or
-> > something that bdrv_drain_poll() sets to true the first time that it
-> > returns false. It also gets a shortcut so that it returns false
-> > immediately if bs->quiesce_concluded is true. The field is reset in
-> > bdrv_do_drained_end() when bs->quiesce_counter reaches 0.
-> 
-> Or bs->quiescent, for the sake of bikeshedding.
-
-Yes, that sounds better.
-
-The only problem with the proposal as I made it is that it's wrong. We
-can't keep bs->quiescent until bdrv_do_drained_end() because the caller
-can issue new requests and then have a nested drained section that needs
-to wait for all requests again instead of deciding that everything is
-already quiescent.
-
-Maybe where we should really reset it is in the initial recursion of
-bdrv_do_drained_begin(), specifically in bdrv_do_drained_begin_quiesce()
-which is called by both the parent and the child recursion.
-
-There don't seem to be completely obviously correct solutions (can't an
-I/O thread be draining a specific node while the main loop runs
-drain_all?), but this would probably be the most obvious one.
-
-Hm... Or actually, reset bs->quiescent in bdrv_inc_in_flight()? Would
-this be enough?
-
-Kevin
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDEzMDc1MjAwLjE1MjE3LTEtY2xnQGthb2Qub3JnClN1YmplY3Q6IFtR
+ZW11LWRldmVsXSBbUEFUQ0ggdjJdIG1pZ3JhdGlvbjogZGlzY2FyZCBub24tbWlncmF0YWJsZSBS
+QU1CbG9ja3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
+Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
+bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
+YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
+dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
+ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
+ZXcvMTUyMzM3MjQ4Ni0xMzE5MC0xLWdpdC1zZW5kLWVtYWlsLXdhbGxpbmdAbGludXguaWJtLmNv
+bSAtPiBwYXRjaGV3LzE1MjMzNzI0ODYtMTMxOTAtMS1naXQtc2VuZC1lbWFpbC13YWxsaW5nQGxp
+bnV4LmlibS5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQxMzA3
+NTIwMC4xNTIxNy0xLWNsZ0BrYW9kLm9yZyAtPiBwYXRjaGV3LzIwMTgwNDEzMDc1MjAwLjE1MjE3
+LTEtY2xnQGthb2Qub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTlmN2RkNDM1
+MSBtaWdyYXRpb246IGRpc2NhcmQgbm9uLW1pZ3JhdGFibGUgUkFNQmxvY2tzCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IG1pZ3JhdGlvbjogZGlzY2FyZCBub24tbWln
+cmF0YWJsZSBSQU1CbG9ja3MuLi4KRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVu
+dHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiM5NjogRklMRTogbWln
+cmF0aW9uL3JhbS5jOjE5MToKKyNkZWZpbmUgUkFNQkxPQ0tfRk9SRUFDSF9NSUdSQVRBQkxFKGJs
+b2NrKSAgICAgICAgICAgICBcCisgICAgUkFNQkxPQ0tfRk9SRUFDSChibG9jaykgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXAorICAgICAgICBpZiAoIXFlbXVfcmFtX2lzX21pZ3JhdGFibGUo
+YmxvY2spKSB7fSBlbHNlCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24g
+bmV4dCBsaW5lCiM5ODogRklMRTogbWlncmF0aW9uL3JhbS5jOjE5MzoKKyAgICAgICAgaWYgKCFx
+ZW11X3JhbV9pc19taWdyYXRhYmxlKGJsb2NrKSkge30gZWxzZQoKdG90YWw6IDIgZXJyb3JzLCAw
+IHdhcm5pbmdzLCAxNjcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
