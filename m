@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wDp-0000mG-Hi
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:46:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6wNe-0004WI-4Z
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wDl-000433-Im
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:46:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44906)
+	(envelope-from <bounces@canonical.com>) id 1f6wNb-0001GN-3u
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:56:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6wDl-00042Z-C9
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:46:21 -0400
+	id 1f6wNa-0001FI-SW
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:56:31 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6wDj-0003ih-Ba
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:46:19 +0000
+	id 1f6wNV-0005Po-Fh
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1A16D2E8267
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:46:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 961A82E82FF
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Apr 2018 10:32:18 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 13 Apr 2018 10:47:49 -0000
+From: Gonzalo <1754372@bugs.launchpad.net>
 Reply-To: Bug 1754372 <1754372@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152052329803.20387.7205053769147453578.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152361553872.20529.3769491957365855914.malone@gac.canonical.com>
+Message-Id: <152361646968.31891.15932888007896817120.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1754372] Re: Set MIPS MSA in ELF Auxiliary Vectors
 List-Id: <qemu-devel.nongnu.org>
@@ -38,13 +38,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fix now in master as commit 46a1ee4f397ff and will be in 2.12.
-
-
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
-
-** Tags added: linux-user
+Thanks !
 
 -- =
 
