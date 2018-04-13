@@ -1,44 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f7399-0003qT-P2
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:10:06 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f73D6-0005Vi-De
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:14:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f7396-0004nq-Hi
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:10:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45346
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1f7396-0004ne-CB
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:10:00 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3DHxt3D042007
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 14:09:59 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hb0tphu7y-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 14:09:59 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 13 Apr 2018 14:09:58 -0400
-References: <1523629847-22369-1-git-send-email-thuth@redhat.com>
-	<df1a9534-c1ca-972b-91a6-359685a671df@linux.vnet.ibm.com>
-	<f3d7c3d0-26fe-37db-abb3-0e99373ae315@redhat.com>
-	<6b294d1a-5f3b-aa9c-c0e4-db9da04c4548@linux.vnet.ibm.com>
-	<fb58d12d-92b3-2a68-af10-f8f5608f5237@amsat.org>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Fri, 13 Apr 2018 14:09:55 -0400
-MIME-Version: 1.0
-In-Reply-To: <fb58d12d-92b3-2a68-af10-f8f5608f5237@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Message-Id: <c7dec4d0-2674-e51e-9698-571c7f02b6a7@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: size_t should
- be unsigned
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f73D3-0007sS-7s
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 14:14:08 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 13 Apr 2018 21:13:59 +0300
+Message-Id: <20180413181401.46318-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20180413181401.46318-1-vsementsov@virtuozzo.com>
+References: <20180413181401.46318-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] nbd/server: add nbd_meta_single_query
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,77 +20,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, eblake@redhat.com, armbru@redhat.com, jsnow@redhat.com
 
-On 04/13/2018 02:06 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 04/13/2018 01:59 PM, Halil Pasic wrote:
->>>> On 04/13/2018 04:30 PM, Thomas Huth wrote:
->>>>> "size_t" should be an unsigned type - the signed counterpart is cal=
-led
->>>>> "ssize_t" in the C standard instead. Thus we should also use this
->>>> The first sentence sounds like ssize_t is too a type defined by some
->>>> C standard. Is it or does ssize_t come form somewhere else?
->>> Arrr, seems like ssize_t is rather coming from POSIX than from the C
->>> standard, thanks for the hint. I'll rephrase the first sentence to:
->>>
->>> "size_t" should be an unsigned type according to the C standard, and
->>> most libc implementations provide a signed counterpart called "ssize_=
-t".
->>>
->>> OK?
->>>
->>
->> This ssize_t seems to be an rather interesting type. For instance POSI=
-X says
->> """
->> size_t
->>     Used for sizes of objects.
->> ssize_t
->>     Used for a count of bytes or an error indication.
->> """
->> and
->> """
->> The type ssize_t shall be capable of storing values at least in the ra=
-nge [-1, {SSIZE_MAX}].
->> """
->>
->> And it does not mandate SSIZE_MIN in limits (but of course mandates SS=
-IZE_MAX.
->>
->> I don't like this 'counterpart' word here, because AFAIU these don't h=
-ave to
->> be counterparts in any sense. That is SSIZE_MAX << SIZE_MAX is possibl=
-e for
->> example. I'm not sure about the every positive has a negative thing, b=
-ut
->> that's not important here.
->>
->> The code in question kind of uses both signed and unsigned size for
->> the same (the string). We even have a signed to unsigned comparison wh=
-ich
->> could result in warnings. I still think the change is OK in practice, =
-but
->> maybe avoiding introducing ssize_t (until we really need it) is a bett=
-er
->> course of action. I think uitoa can be easily rewritten so it does not
->> need the ssize_t.
->>
->> How about that?
->=20
-> This seems clever indeed.
->=20
+The helper will be reused for bitmaps namespace.
 
-This whole issue stems from my misuse of size_t in the first place. If it=
- makes
-things easier, let's just make num_idx of type "signed long".
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 40 +++++++++++++++++++++++++++-------------
+ 1 file changed, 27 insertions(+), 13 deletions(-)
 
-After reading this discussion, I think it makes sense to drop ssize_t. No=
- need
-to make it available for just one function unless there are strong claims=
- to
-also use this type elsewhere in the pc-bios (I can't find any).
-
---=20
-Respectfully,
-- Collin Walling
+diff --git a/nbd/server.c b/nbd/server.c
+index cea158913b..c169c11b3e 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -733,44 +733,58 @@ static int nbd_negotiate_send_meta_context(NBDClient *client,
+     return qio_channel_writev_all(client->ioc, iov, 2, errp) < 0 ? -EIO : 0;
+ }
+ 
+-/* nbd_meta_base_query
+- *
+- * Handle query to 'base' namespace. For now, only base:allocation context is
+- * available in it.  'len' is the amount of text remaining to be read from
+- * the current name, after the 'base:' portion has been stripped.
++/* Read @len bytes, and set @match to true if they match @pattern, or if @len
++ * is 0 and the client is performing _LIST_. @match is never set to false.
+  *
+  * Return -errno on I/O error, 0 if option was completely handled by
+  * sending a reply about inconsistent lengths, or 1 on success. */
+-static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
+-                               uint32_t len, Error **errp)
++static int nbd_meta_single_query(NBDClient *client, const char *pattern,
++                                 uint32_t len, bool *match, Error **errp)
+ {
+     int ret;
+-    char query[sizeof("allocation") - 1];
+-    size_t alen = strlen("allocation");
++    char *query;
+ 
+     if (len == 0) {
+         if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
+-            meta->base_allocation = true;
++            *match = true;
+         }
+         return 1;
+     }
+ 
+-    if (len != alen) {
++    if (len != strlen(pattern)) {
+         return nbd_opt_skip(client, len, errp);
+     }
+ 
++    query = g_malloc(len);
+     ret = nbd_opt_read(client, query, len, errp);
+     if (ret <= 0) {
++        g_free(query);
+         return ret;
+     }
+ 
+-    if (strncmp(query, "allocation", alen) == 0) {
+-        meta->base_allocation = true;
++    if (strncmp(query, pattern, len) == 0) {
++        *match = true;
+     }
++    g_free(query);
+ 
+     return 1;
+ }
+ 
++/* nbd_meta_base_query
++ *
++ * Handle query to 'base' namespace. For now, only base:allocation context is
++ * available in it.  'len' is the amount of text remaining to be read from
++ * the current name, after the 'base:' portion has been stripped.
++ *
++ * Return -errno on I/O error, 0 if option was completely handled by
++ * sending a reply about inconsistent lengths, or 1 on success. */
++static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
++                               uint32_t len, Error **errp)
++{
++    return nbd_meta_single_query(client, "allocation", len,
++                                 &meta->base_allocation, errp);
++}
++
+ /* nbd_negotiate_meta_query
+  *
+  * Parse namespace name and call corresponding function to parse body of the
+-- 
+2.11.1
