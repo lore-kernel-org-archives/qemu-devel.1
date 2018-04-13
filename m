@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1f71Ct-0008V3-AV
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:05:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f71Kj-0003dy-7j
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1f71Cq-00036L-3B
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:05:47 -0400
-Received: from mail-io0-f195.google.com ([209.85.223.195]:46160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f71Cp-00035x-Uk
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:05:44 -0400
-Received: by mail-io0-f195.google.com with SMTP id t13so3271622ioc.13
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 09:05:43 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <49475649-b8d8-e09a-8e95-7ce36c7396f2@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1f71Kd-0007Qf-Fd
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:13:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40230 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f71Kd-0007Po-9q
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:13:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 199C6407246E
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 16:13:43 +0000 (UTC)
 References: <20180329154833.566-1-marcandre.lureau@redhat.com>
-	<20180329154833.566-5-marcandre.lureau@redhat.com>
-	<49475649-b8d8-e09a-8e95-7ce36c7396f2@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 13 Apr 2018 18:05:42 +0200
-Message-ID: <CAMxuvazz_Zzget3-oVD_Fa4-G4YT+HLXg9Psh0bjpD9tbPxO3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<20180329154833.566-4-marcandre.lureau@redhat.com>
+	<b041bde4-b926-2ede-d8a5-4721dafe6736@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <79dc3c32-32fe-316c-1874-779caf9a0e39@redhat.com>
+Date: Fri, 13 Apr 2018 18:13:32 +0200
+MIME-Version: 1.0
+In-Reply-To: <b041bde4-b926-2ede-d8a5-4721dafe6736@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] qobject: modify qobject_ref() to
- assert on NULL and return obj
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] qobject: replace
+ qobject_incref/QINCREF qobject_decref/QDECREF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange,
-	Daniel" <berrange@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, "Bonzini,
-	Paolo" <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, armbru@redhat.com
 
-Hi
-
-On Thu, Mar 29, 2018 at 6:10 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 03/29/2018 10:48 AM, Marc-Andr=C3=A9 Lureau wrote:
+On 29/03/2018 18:23, Eric Blake wrote:
 >>
->> Following a discussion on the mailing list: while it may be convenient
->> to accept NULL value in qobject_unref() (for similar reasons as free()
->> accepts NULL), it is a probably a bad idea to accept NULL argument in
->> qobject_ref().
->>
->> Furthermore, it is convenient and more clear to call qobject_ref() at
->> the time when the reference is associated with a variable, or
->> argument. For this reason, make qobject_ref() return the same pointer
->> as given.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->
->
->> @@ -101,13 +101,18 @@ static inline void qobject_unref(QObject *obj)
->>     /**
->>    * qobject_ref(): Increment QObject's reference count
->> + * @obj: a #QObject or children type instance (must not be NULL)
->
->
-> s/children/child/
->
->> + *
->> + * Returns: the same @obj. The type of @obj will be propagated to the
->> + * return type.
->>    */
->>   #define qobject_ref(obj)                        \
->> -    qobject_ref(QOBJECT(obj))
->> +    (typeof(obj)) qobject_ref(QOBJECT(obj))
->
->
-> You're missing outer ().  There are cases where '(cast) (expr)' and
-> '((cast)(expr))' can behave differently when combined with surrounding
-> syntax; for example, -> has higher precedence than cast.  Consider:
->
-> qobject_ref(my_qdict)->size;
->
-> As you wrote it, you would attempt to dereference the 'size' member of vo=
-id*
-> (compile error), prior to casting that result to QDict*; with the
-> parenthesis, you get the intended dereference of the size member of the
-> QDict pointer.
->
+>> =C2=A0 +/**
+>> + * qobject_ref(): Increment QObject's reference count
+>> + */
+>> +#define qobject_ref(obj)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 \
+>> +=C2=A0=C2=A0=C2=A0 qobject_ref(QOBJECT(obj))
+>=20
+> ...below the functions of the same name.=C2=A0 C preprocessor rules gua=
+rantee
+> that you don't get infinite expansion, although I did a double-take the
+> first time I read through the patch (especially since your v2 used the
+> name qobject_ref_impl() for the function, distinct from the macro name)=
+.
+> =C2=A0Worth a comment?
 
-ok
+I prefer qobject_ref_impl, FWIW.  There are already a few examples in
+include/qemu/thread.h and include/qemu/coroutine.h.
 
->> +++ b/block.c
->> @@ -5134,8 +5134,8 @@ static bool append_open_options(QDict *d,
->> BlockDriverState *bs)
->>               continue;
->>           }
->>   -        qobject_ref(qdict_entry_value(entry));
->> -        qdict_put_obj(d, qdict_entry_key(entry),
->> qdict_entry_value(entry));
->> +        qdict_put_obj(d, qdict_entry_key(entry),
->> +                      qobject_ref(qdict_entry_value(entry)));
->
->
-> However, I like this simplification that your patch enables.  How did you
-> find candidate spots? Manually, or via Coccinelle?
+Thanks,
 
-Manual review (there are not that many qobject_ref())
-
-thanks
+Paolo
