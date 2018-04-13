@@ -1,39 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f705d-0000VF-Fj
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:54:14 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1f708N-00027j-Oz
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1f705Y-0008P5-RQ
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:54:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39340)
+	(envelope-from <walling@linux.ibm.com>) id 1f708I-0001za-Vf
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:57:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35250
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1f705Y-0008OY-JE
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:54:08 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3DEq58q026756
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:54:06 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hav5h86ge-1
+	id 1f708I-0001zH-Q3
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:56:58 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3DEq9tI026892
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:58 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2haus8s2vc-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:54:06 -0400
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:57 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 13 Apr 2018 10:54:05 -0400
-References: <1523629847-22369-1-git-send-email-thuth@redhat.com>
+	Fri, 13 Apr 2018 10:56:56 -0400
+References: <1523372486-13190-1-git-send-email-walling@linux.ibm.com>
+	<1523372486-13190-4-git-send-email-walling@linux.ibm.com>
+	<7326624e-a5d7-b486-ba76-05da7885fcd9@redhat.com>
 From: Collin Walling <walling@linux.ibm.com>
-Date: Fri, 13 Apr 2018 10:54:03 -0400
+Date: Fri, 13 Apr 2018 10:56:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <1523629847-22369-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <7326624e-a5d7-b486-ba76-05da7885fcd9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <82bc6a4d-c51f-ee71-39e5-f37f24a4927c@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: size_t should
- be unsigned
+Message-Id: <c47d7c19-ad87-6d27-a43d-465bc5ad962d@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/4] pc-bios/s390-ccw: fix
+ non-sequential boot entries (eckd)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,57 +45,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
+Cc: frankja@linux.ibm.com, gor@linux.ibm.com
 
-On 04/13/2018 10:30 AM, Thomas Huth wrote:
-> "size_t" should be an unsigned type - the signed counterpart is called
-> "ssize_t" in the C standard instead. Thus we should also use this
-> convention in the s390-ccw firmware to avoid confusion. I checked the
-> sources, and apart from one spot in libc.c (which now uses ssize_t with
-> this patch), the code should all be fine with this change.
+On 04/13/2018 02:14 AM, Thomas Huth wrote:
+> On 10.04.2018 17:01, Collin Walling wrote:
+>> zIPL boot menu entries can be non-sequential. Let's account
+>> for this issue for the s390 zIPL boot menu. Since this boot
+>> menu is actually an imitation and is not completely capable
+>> of everything the real zIPL menu can do, let's also print a
+>> different banner to the user.
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
+>> ---
+>>  pc-bios/s390-ccw/menu.c | 32 ++++++++++++++++++++------------
+>>  1 file changed, 20 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+>> index 96eec81..083405f 100644
+>> --- a/pc-bios/s390-ccw/menu.c
+>> +++ b/pc-bios/s390-ccw/menu.c
+>> @@ -158,7 +158,7 @@ static void boot_menu_prompt(bool retry)
+>>      }
+>>  }
+>>  
+>> -static int get_boot_index(int entries)
+>> +static int get_boot_index(bool *valid_entries)
+>>  {
+>>      int boot_index;
+>>      bool retry = false;
+>> @@ -168,7 +168,8 @@ static int get_boot_index(int entries)
+>>          boot_menu_prompt(retry);
+>>          boot_index = get_index();
+>>          retry = true;
+>> -    } while (boot_index < 0 || boot_index >= entries);
+>> +    } while (boot_index < 0 || boot_index >= MAX_BOOT_ENTRIES ||
+>> +             !valid_entries[boot_index]);
+>>  
+>>      sclp_print("\nBooting entry #");
+>>      sclp_print(uitoa(boot_index, tmp, sizeof(tmp)));
+>> @@ -176,21 +177,28 @@ static int get_boot_index(int entries)
+>>      return boot_index;
+>>  }
+>>  
+>> -static void zipl_println(const char *data, size_t len)
+>> +static void zipl_println(const char *data, size_t len, bool *valid_entries)
+>>  {
+>>      char buf[len + 2];
+>> +    int entry;
+>>  
+>>      ebcdic_to_ascii(data, buf, len);
+>>      buf[len] = '\n';
+>>      buf[len + 1] = '\0';
+>>  
+>>      sclp_print(buf);
+>> +
+>> +    entry = buf[0] == ' ' ? atoui(buf + 1) : atoui(buf);
+>> +    valid_entries[entry] = true;
 > 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1753437
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/libc.c | 2 +-
->  pc-bios/s390-ccw/libc.h | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
+> zipl_println is now doing more than its name suggests - it now also
+> populates the valid_entries array. So I think you should either put an
+> explaining comment in front of zipl_println, or (what I'd prefer), move
+> this valid_entries populating code rather to the while loop in
+> menu_get_zipl_boot_index below instead.
+
+Fair enough. I'll spin up v2 for the list after this change and some reassurance testing.
+
+Thanks for the feedback and r-b's.
+
+
 > 
-> diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
-> index 38ea77d..827d204 100644
-> --- a/pc-bios/s390-ccw/libc.c
-> +++ b/pc-bios/s390-ccw/libc.c
-> @@ -63,7 +63,7 @@ uint64_t atoui(const char *str)
->   */
->  char *uitoa(uint64_t num, char *str, size_t len)
->  {
-> -    size_t num_idx = 1; /* account for NUL */
-> +    ssize_t num_idx = 1; /* account for NUL */
->      uint64_t tmp = num;
->  
->      IPL_assert(str != NULL, "uitoa: no space allocated to store string");
-> diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-> index 63ece70..57c4199 100644
-> --- a/pc-bios/s390-ccw/libc.h
-> +++ b/pc-bios/s390-ccw/libc.h
-> @@ -12,7 +12,8 @@
->  #ifndef S390_CCW_LIBC_H
->  #define S390_CCW_LIBC_H
->  
-> -typedef long               size_t;
-> +typedef unsigned long      size_t;
-> +typedef signed long        ssize_t;
->  typedef int                bool;
->  typedef unsigned char      uint8_t;
->  typedef unsigned short     uint16_t;
+>> +    if (entry == 0)
+>> +        sclp_print("\n");
+>>  }
+>>  
+>>  int menu_get_zipl_boot_index(const char *menu_data)
+>>  {
+>>      size_t len;
+>> -    int entries;
+>> +    bool valid_entries[MAX_BOOT_ENTRIES] = {false};
+>>      uint16_t zipl_flag = *(uint16_t *)(menu_data - ZIPL_FLAG_OFFSET);
+>>      uint16_t zipl_timeout = *(uint16_t *)(menu_data - ZIPL_TIMEOUT_OFFSET);
+>>  
+>> @@ -202,19 +210,19 @@ int menu_get_zipl_boot_index(const char *menu_data)
+>>          timeout = zipl_timeout * 1000;
+>>      }
+>>  
+>> -    /* Print and count all menu items, including the banner */
+>> -    for (entries = 0; *menu_data; entries++) {
+>> +    /* Print banner */
+>> +    sclp_print("s390-ccw zIPL Boot Menu\n\n");
+>> +    menu_data += strlen(menu_data) + 1;
+>> +
+>> +    /* Print entries */
+>> +    while (*menu_data) {
+>>          len = strlen(menu_data);
+>> -        zipl_println(menu_data, len);
+>> +        zipl_println(menu_data, len, valid_entries);
+>>          menu_data += len + 1;
+>> -
+>> -        if (entries < 2) {
+>> -            sclp_print("\n");
+>> -        }
+>>      }
+>>  
+>>      sclp_print("\n");
+>> -    return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
+>> +    return get_boot_index(valid_entries);
+>>  }
+> 
+>  Thomas
 > 
 
-Looks good to me as well.
-
-If another r-b is even necessary:
-
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
 
 -- 
 Respectfully,
