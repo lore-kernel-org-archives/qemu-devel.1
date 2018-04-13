@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f71O2-0005Vt-F1
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:17:19 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f71Pa-0006TL-Pr
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f71Nz-0001Wi-5K
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:17:18 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:45496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1f71Ny-0001Tj-O5
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:17:15 -0400
-References: <20180413140334.26622-1-alex.bennee@linaro.org>
-	<20180413140334.26622-3-alex.bennee@linaro.org>
-	<3a3a9132-8f03-c476-bd0d-b6c91a9cc3a4@mail.uni-paderborn.de>
-	<CAFEAcA9FWu7VU1-RtXA4h-LQOXVoDfOG9P8aTs02B-NF9N93qg@mail.gmail.com>
-	<0703fdde-da82-d85f-3d68-e45e0839a9dc@mail.uni-paderborn.de>
-	<CAFEAcA-ZzUVK_WWd6nA35YbHQHCCJHo93H7eomeq=2F9m59pnA@mail.gmail.com>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <87f52989-c6b8-b5cc-a36d-36612b549e6e@mail.uni-paderborn.de>
-Date: Fri, 13 Apr 2018 18:17:10 +0200
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f71PY-0002Ms-4Y
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:18:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40348 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1f71PX-0002MD-W4
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:18:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B44C3407246E
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 16:18:48 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 13 Apr 2018 18:18:39 +0200
+Message-Id: <20180413161842.5117-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180413161842.5117-1-marcandre.lureau@redhat.com>
+References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-ZzUVK_WWd6nA35YbHQHCCJHo93H7eomeq=2F9m59pnA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] fpu/softfloat: raise float_invalid
- for NaN/Inf in round_to_int_and_pack
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 1/4] qobject: ensure base is at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,18 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 04/13/2018 05:29 PM, Peter Maydell wrote:
-> On 13 April 2018 at 16:24, Bastian Koppelmann
-> <kbastian@mail.uni-paderborn.de> wrote:
->> However, my risu-like tests found another flag raising problem with
->> float32_div. I'll investigate it on Monday.
-> 
-> Is it a regression from our previous (2.11) behaviour?
+All QObject types have the base QObject as first field. This allows to
+simplify qobject_to() and will allow further simplification in
+following patch.
 
-Yes, for tag v2.11.0 my failing test succeeds.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qapi/qmp/qobject.h | 5 ++---
+ qobject/qobject.c          | 9 +++++++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-Cheers,
-Bastian
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index e022707578..5206ff9ee1 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -61,9 +61,8 @@ struct QObject {
+ QEMU_BUILD_BUG_MSG(QTYPE__MAX !=3D 7,
+                    "The QTYPE_CAST_TO_* list needs to be extended");
+=20
+-#define qobject_to(type, obj) ({ \
+-    QObject *_tmp =3D qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)=
+); \
+-    _tmp ? container_of(_tmp, type, base) : (type *)NULL; })
++#define qobject_to(type, obj)                                       \
++    ((type *)qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)))
+=20
+ /* Initialize an object to default values */
+ static inline void qobject_init(QObject *obj, QType type)
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index 23600aa1c1..87649c5be5 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -16,6 +16,15 @@
+ #include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
+=20
++QEMU_BUILD_BUG_MSG(
++    offsetof(QNull, base) !=3D 0 ||
++    offsetof(QNum, base) !=3D 0 ||
++    offsetof(QString, base) !=3D 0 ||
++    offsetof(QDict, base) !=3D 0 ||
++    offsetof(QList, base) !=3D 0 ||
++    offsetof(QBool, base) !=3D 0,
++    "base qobject must be at offset 0");
++
+ static void (*qdestroy[QTYPE__MAX])(QObject *) =3D {
+     [QTYPE_NONE] =3D NULL,               /* No such object exists */
+     [QTYPE_QNULL] =3D NULL,              /* qnull_ is indestructible */
+--=20
+2.17.0.rc1.36.gcedb63ea2f
