@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wNe-0004WI-4Z
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:56:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6wOA-0004ss-8M
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wNb-0001GN-3u
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:56:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47482)
+	(envelope-from <bounces@canonical.com>) id 1f6wO7-0001Rf-8V
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:57:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6wNa-0001FI-SW
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:56:31 -0400
+	id 1f6wO7-0001RM-1p
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:57:03 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6wNV-0005Po-Fh
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:26 +0000
+	id 1f6wO4-0005QW-GV
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:57:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 961A82E82FF
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:08 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F10702E83D3
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:56:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Apr 2018 10:47:49 -0000
-From: Gonzalo <1754372@bugs.launchpad.net>
-Reply-To: Bug 1754372 <1754372@bugs.launchpad.net>
+Date: Fri, 13 Apr 2018 10:45:40 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1714538 <1714538@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152052329803.20387.7205053769147453578.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152361646968.31891.15932888007896817120.malone@chaenomeles.canonical.com>
+References: <150427875291.17031.5249448331290490011.malonedeb@gac.canonical.com>
+Message-Id: <152361634065.14269.10043065236021454922.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754372] Re: Set MIPS MSA in ELF Auxiliary Vectors
+Subject: [Qemu-devel] [Bug 1714538] Re: Support for Raspberry Pi 3 Model B
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,32 +38,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Thanks !
+We have a raspi3 model in QEMU now, it will be available in the upcoming
+2.12 release.
+
+
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754372
+https://bugs.launchpad.net/bugs/1714538
 
 Title:
-  Set MIPS MSA in ELF Auxiliary Vectors
+  Support for Raspberry Pi 3 Model B
 
 Status in QEMU:
   Fix Committed
 
 Bug description:
-  The MIPS MSA feature is currently not set in the ELF auxiliary vector.
-
-  That is, querying the AT_HWCAP key of the ELF auxiliary vectors for a
-  MIPS CPU that has the MSA feature should return a value that has the
-  second bit [0] set.
-
-  From [0], `HWCAP_MIPS_MSA` is defined to `1 << 1`.
-
-  [0]:
-  https://github.com/torvalds/linux/blob/master/arch/mips/include/uapi/asm/=
-hwcap.h
+  The raspberry pi 3 B uses a 64-bit instruction set. It would be useful
+  if qemu could emulate the boardn
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754372/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1714538/+subscriptions
