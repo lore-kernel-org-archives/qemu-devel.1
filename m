@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f6zcC-0003NH-4m
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:23:49 -0400
+	(envelope-from <thuth@redhat.com>) id 1f6zjD-0007vF-Bq
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f6zcB-0004JK-6a
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:23:48 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f6zcA-0004De-VA
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:23:47 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Apr 2018 15:23:36 +0100
-Message-Id: <20180413142336.32163-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-2.12] tcg/mips: Handle large offsets from
- target env to tlb_table
+	(envelope-from <thuth@redhat.com>) id 1f6zj7-0000rE-Nd
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:31:03 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 13 Apr 2018 16:30:47 +0200
+Message-Id: <1523629847-22369-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: size_t should be
+ unsigned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +18,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-The MIPS TCG target makes the assumption that the offset from the
-target env pointer to the tlb_table is less than about 64K. This
-used to be true, but gradual addition of features to the Arm
-target means that it's no longer true there. This results in
-the build-time assertion failing:
+"size_t" should be an unsigned type - the signed counterpart is called
+"ssize_t" in the C standard instead. Thus we should also use this
+convention in the s390-ccw firmware to avoid confusion. I checked the
+sources, and apart from one spot in libc.c (which now uses ssize_t with
+this patch), the code should all be fine with this change.
 
-In file included from /home/pm215/qemu/include/qemu/osdep.h:36:0,
-                 from /home/pm215/qemu/tcg/tcg.c:28:
-/home/pm215/qemu/tcg/mips/tcg-target.inc.c: In function ‘tcg_out_tlb_load’:
-/home/pm215/qemu/include/qemu/compiler.h:90:36: error: static assertion failed: "not expecting: offsetof(CPUArchState, tlb_table[NB_MMU_MODES - 1][1]) > 0x7ff0 + 0x7fff"
- #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
-                                    ^
-/home/pm215/qemu/include/qemu/compiler.h:98:30: note: in expansion of macro ‘QEMU_BUILD_BUG_MSG’
- #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
-                              ^
-/home/pm215/qemu/tcg/mips/tcg-target.inc.c:1236:9: note: in expansion of macro ‘QEMU_BUILD_BUG_ON’
-         QEMU_BUILD_BUG_ON(offsetof(CPUArchState,
-         ^
-/home/pm215/qemu/rules.mak:66: recipe for target 'tcg/tcg.o' failed
-
-An ideal long term approach would be to rearrange the CPU state
-so that the tlb_table was not so far along it, but this is tricky
-because it would move it from the "not cleared on CPU reset" part
-of the struct to the "cleared on CPU reset" part. As a simple fix
-for the 2.12 release, make the MIPS TCG target handle an arbitrary
-offset by emitting more add instructions. This will mean an extra
-instruction in the fastpath for TCG loads and stores for the
-affected guests (currently just aarch64-softmmu).
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1753437
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
-This is sufficient that on MIPS host we can now at least build
-and run an aarch64 guest kernel. I haven't tried 'make check'
-because the only MIPS system I have access to is way too slow...
+ pc-bios/s390-ccw/libc.c | 2 +-
+ pc-bios/s390-ccw/libc.h | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
- tcg/mips/tcg-target.inc.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
-
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 4b55ab8856..ca5f1d4894 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -1229,13 +1229,10 @@ static void tcg_out_tlb_load(TCGContext *s, TCGReg base, TCGReg addrl,
-     tcg_out_opc_reg(s, ALIAS_PADD, TCG_REG_A0, TCG_REG_A0, TCG_AREG0);
+diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
+index 38ea77d..827d204 100644
+--- a/pc-bios/s390-ccw/libc.c
++++ b/pc-bios/s390-ccw/libc.c
+@@ -63,7 +63,7 @@ uint64_t atoui(const char *str)
+  */
+ char *uitoa(uint64_t num, char *str, size_t len)
+ {
+-    size_t num_idx = 1; /* account for NUL */
++    ssize_t num_idx = 1; /* account for NUL */
+     uint64_t tmp = num;
  
-     /* Compensate for very large offsets.  */
--    if (add_off >= 0x8000) {
--        /* Most target env are smaller than 32k; none are larger than 64k.
--           Simplify the logic here merely to offset by 0x7ff0, giving us a
--           range just shy of 64k.  Check this assumption.  */
--        QEMU_BUILD_BUG_ON(offsetof(CPUArchState,
--                                   tlb_table[NB_MMU_MODES - 1][1])
--                          > 0x7ff0 + 0x7fff);
-+    while (add_off >= 0x8000) {
-+        /* Most target env are smaller than 32k, but a few are larger than 64k,
-+         * so handle an arbitrarily large offset.
-+         */
-         tcg_out_opc_imm(s, ALIAS_PADDI, TCG_REG_A0, TCG_REG_A0, 0x7ff0);
-         cmp_off -= 0x7ff0;
-         add_off -= 0x7ff0;
+     IPL_assert(str != NULL, "uitoa: no space allocated to store string");
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+index 63ece70..57c4199 100644
+--- a/pc-bios/s390-ccw/libc.h
++++ b/pc-bios/s390-ccw/libc.h
+@@ -12,7 +12,8 @@
+ #ifndef S390_CCW_LIBC_H
+ #define S390_CCW_LIBC_H
+ 
+-typedef long               size_t;
++typedef unsigned long      size_t;
++typedef signed long        ssize_t;
+ typedef int                bool;
+ typedef unsigned char      uint8_t;
+ typedef unsigned short     uint16_t;
 -- 
-2.16.2
+1.8.3.1
