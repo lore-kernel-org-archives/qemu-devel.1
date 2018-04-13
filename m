@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f6zJx-0004Cu-He
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1f6zKc-0004vH-Lu
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f6zJu-00019K-AB
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:57 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44714)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
-	id 1f6zJu-00019D-3V
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:04:54 -0400
-Received: by mail-wr0-x242.google.com with SMTP id u46so8435221wrc.11
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 07:04:53 -0700 (PDT)
-From: Elie Tournier <tournier.elie@gmail.com>
-Date: Fri, 13 Apr 2018 14:58:42 +0100
-Message-Id: <20180413135842.21325-4-tournier.elie@gmail.com>
-In-Reply-To: <20180413135842.21325-1-tournier.elie@gmail.com>
-References: <20180413135842.21325-1-tournier.elie@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] sdl: Allow OpenGL ES context creation
+	(envelope-from <armbru@redhat.com>) id 1f6zKZ-0001Su-HF
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:05:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34722 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f6zKZ-0001Sf-Cz
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:05:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180219141259.26526-1-danielhb@linux.vnet.ibm.com>
+	<eebc1ad7-2191-d9cc-81fd-5fefa9e3b1c8@linux.vnet.ibm.com>
+Date: Fri, 13 Apr 2018 16:05:33 +0200
+In-Reply-To: <eebc1ad7-2191-d9cc-81fd-5fefa9e3b1c8@linux.vnet.ibm.com> (Daniel
+	Henrique Barboza's message of "Wed, 14 Mar 2018 10:12:46 -0300")
+Message-ID: <87tvsfxkuq.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 0/2] qmp: 'wakeup-suspend-support' in
+ query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +28,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, kraxel@redhat.com, Elie Tournier <tournier.elie@gmail.com>, Elie Tournier <elie.tournier@collabora.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
-Signed-off-by: Elie Tournier <elie.tournier@collabora.com>
----
- qemu-options.hx |  2 +-
- ui/sdl2-gl.c    | 19 +++++++++++++++++--
- vl.c            |  4 ++++
- 3 files changed, 22 insertions(+), 3 deletions(-)
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ca4e412f2f..333dd1f1c8 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1240,7 +1240,7 @@ ETEXI
- 
- DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "-display sdl[,frame=on|off][,alt_grab=on|off][,ctrl_grab=on|off]\n"
--    "            [,window_close=on|off][,gl=on|off]\n"
-+    "            [,window_close=on|off][,gl=on|core|es|off]\n"
-     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
-     "-display vnc=<display>[,<optargs>]\n"
-     "-display curses\n"
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index c3683e6b65..a1200bfd20 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -140,12 +140,27 @@ QEMUGLContext sdl2_gl_create_context(DisplayChangeListener *dcl,
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
- 
-     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
--    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
--                        SDL_GL_CONTEXT_PROFILE_CORE);
-+    if (scon->opts->gl == DISPLAYGL_MODE_ON ||
-+        scon->opts->gl == DISPLAYGL_MODE_CORE) {
-+       SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-+                           SDL_GL_CONTEXT_PROFILE_CORE);
-+    } else if (scon->opts->gl == DISPLAYGL_MODE_ES) {
-+       SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-+                           SDL_GL_CONTEXT_PROFILE_ES);
-+    }
-     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, params->major_ver);
-     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, params->minor_ver);
- 
-     ctx = SDL_GL_CreateContext(scon->real_window);
-+
-+    /* If SDL fail to create a GL context and we use the "on" flag,
-+     * then try to fallback to GLES.
-+     */
-+    if (!ctx && scon->opts->gl == DISPLAYGL_MODE_ON) {
-+       SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-+                           SDL_GL_CONTEXT_PROFILE_ES);
-+       ctx = SDL_GL_CreateContext(scon->real_window);
-+    }
-     return (QEMUGLContext)ctx;
- }
- 
-diff --git a/vl.c b/vl.c
-index 99284fd518..3bd3b902a0 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2143,6 +2143,10 @@ static void parse_display(const char *p)
-                 dpy.has_gl = true;
-                 if (strstart(opts, "on", &nextopt)) {
-                     dpy.gl = DISPLAYGL_MODE_ON;
-+                } else if (strstart(opts, "core", &nextopt)) {
-+                    dpy.gl = DISPLAYGL_MODE_CORE;
-+                } else if (strstart(opts, "es", &nextopt)) {
-+                    dpy.gl = DISPLAYGL_MODE_ES;
-                 } else if (strstart(opts, "off", &nextopt)) {
-                     dpy.gl = DISPLAYGL_MODE_OFF;
-                 } else {
--- 
-2.17.0
+> Ping
+
+Michael, you reviewed v4 (at least in part), can you have a look?
