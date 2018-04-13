@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wS9-0007Ki-Mg
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:01:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f6wWS-00017t-VZ
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6wS6-0003DG-MC
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:01:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49452)
+	(envelope-from <pbonzini@redhat.com>) id 1f6wWM-00068J-2Q
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:05:38 -0400
+Received: from mail-wr0-f179.google.com ([209.85.128.179]:35566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6wS6-0003Cr-FS
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:01:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6wS5-00073W-Ao
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 11:01:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 49CC52E80D4
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 11:01:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f6wWL-00067Z-TE
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 07:05:34 -0400
+Received: by mail-wr0-f179.google.com with SMTP id o3so7913256wri.2
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 04:05:33 -0700 (PDT)
+References: <20180412095157.GA5004@localhost.localdomain>
+	<f30ff8e9-4273-c01b-ae67-5784d5914c7a@redhat.com>
+	<20180412111143.GB5004@localhost.localdomain>
+	<569800ae-12f8-53f1-012a-50408700ba39@redhat.com>
+	<20180412115316.GC5004@localhost.localdomain>
+	<306e73f3-9e72-e60f-123c-47a8a72915e2@redhat.com>
+	<20180412132735.GD5004@localhost.localdomain>
+	<dc693c45-e1dc-5a3d-3c95-adcb946c65d6@redhat.com>
+	<20180412142519.GE5004@localhost.localdomain>
+	<302b4aea-7e42-a321-f8db-4d0f69794bbf@redhat.com>
+	<20180413080105.GA4134@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a8e995b9-039d-0f0c-25a1-eaa8ee1ea725@redhat.com>
+Date: Fri, 13 Apr 2018 13:05:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Apr 2018 10:49:25 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 902720 <902720@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111211064733.26491.7785.malonedeb@soybean.canonical.com>
-Message-Id: <152361656571.14427.7688669497289062541.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 902720] Re: TIME_MAX not set correctly for
- OpenBSD in qemu-common.h
+In-Reply-To: <20180413080105.GA4134@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 07/19] block: Really pause
+ block jobs on drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +40,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-This was fixed in commit e7b47c22e2df14d, which was in the 2.11.0
-release.
+On 13/04/2018 10:01, Kevin Wolf wrote:
+>> Or bs->quiescent, for the sake of bikeshedding.
+> Yes, that sounds better.
+> 
+> The only problem with the proposal as I made it is that it's wrong. We
+> can't keep bs->quiescent until bdrv_do_drained_end() because the caller
+> can issue new requests and then have a nested drained section that needs
+> to wait for all requests again instead of deciding that everything is
+> already quiescent.
+> 
+> Maybe where we should really reset it is in the initial recursion of
+> bdrv_do_drained_begin(), specifically in bdrv_do_drained_begin_quiesce()
+> which is called by both the parent and the child recursion.
+> 
+> There don't seem to be completely obviously correct solutions (can't an
+> I/O thread be draining a specific node while the main loop runs
+> drain_all?), but this would probably be the most obvious one.
 
+Or use a hash table?
 
-** Changed in: qemu
-       Status: Triaged =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/902720
-
-Title:
-  TIME_MAX not set correctly for OpenBSD in qemu-common.h
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Looking at the OpenBSD buildbot logs I noticed a warning that appears to =
-be a bug in the code.
-  OpenBSD has a 32-bit time_t on all archs at the moment (32-bit and 64-bit=
-).
-
-    CC    i386-softmmu/monitor.o
-  /buildbot-qemu/default_openbsd_current/build/monitor.c: In function 'expi=
-re_password':
-  /buildbot-qemu/default_openbsd_current/build/monitor.c:944: warning: over=
-flow in implicit constant conversion
-
-  qemu-common.h has...
-
-  #ifndef TIME_MAX
-  #define TIME_MAX LONG_MAX
-  #endif
-
-  for OpenBSD this should be INT_MAX.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/902720/+subscriptions
+Paolo
