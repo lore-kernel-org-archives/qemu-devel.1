@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6vtG-0000K3-1s
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:25:11 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f6wBQ-0007jS-Q7
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f6vtC-0006Qv-TM
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:25:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37390)
+	(envelope-from <mlureau@redhat.com>) id 1f6wBL-0002VO-V1
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:43:56 -0400
+Received: from mail-it0-f65.google.com ([209.85.214.65]:51236)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f6vtC-0006Pl-GH
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:25:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f6vtB-0000DR-Bg
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:25:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 574F92E80C8
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:25:05 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f6wBL-0002Uu-QM
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:43:51 -0400
+Received: by mail-it0-f65.google.com with SMTP id b5-v6so2643953itj.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 03:43:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180412061108.10875-1-peterx@redhat.com>
+References: <20180412061108.10875-1-peterx@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 13 Apr 2018 12:43:49 +0200
+Message-ID: <CAMxuvaxKq-xQnMr=ab2qBDKoUSSqN+tMZFH+uwz_kHHs3MZJXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Apr 2018 10:13:17 -0000
-From: TJ <ubuntu@iam.tj>
-Reply-To: Bug 955379 <955379@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120314192314.1716.70997.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152361439802.31212.12321294807666188540.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 955379] Re: cmake hangs with qemu-arm-static
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,60 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+On Thu, Apr 12, 2018 at 8:11 AM, Peter Xu <peterx@redhat.com> wrote:
+> In the future the monitor iothread may be accessing the cur_mon as
+> well (via monitor_qmp_dispatch_one()).  Before we introduce a real
+> Out-Of-Band command, let's convert the cur_mon variable to be a
+> per-thread variable to make sure there won't be a race between threads.
+>
+> Note that thread variables are not initialized to a valid value when new
+> thread is created.  However for our case we don't need to set it up,
+> since the cur_mon variable is only used in such a pattern:
+>
+>   old_mon =3D cur_mon;
+>   cur_mon =3D xxx;
+>   (do something, read cur_mon if necessary in the stack)
+>   cur_mon =3D old_mon;
+>
+> It plays a role as stack variable, so no need to be initialized at all.
+> We only need to make sure the variable won't be changed unexpectedly by
+> other threads.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Confirmed
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-** Changed in: qemu (Ubuntu)
-    Milestone: None =3D> ubuntu-16.04.5
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/955379
-
-Title:
-  cmake hangs with qemu-arm-static
-
-Status in QEMU:
-  Fix Released
-Status in Linaro QEMU:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
-Status in qemu-linaro package in Ubuntu:
-  Confirmed
-
-Bug description:
-  I'm using git commit 3e7ecd976b06f... configured with --target-list
-  =3Darm-linux-user --static in a chroot environment to compile some
-  things. I ran into this problem with both pcl and opencv-2.3.1. cmake
-  consistently freezes at some point during its execution, though in a
-  different spot each time, usually during a step when it's searching
-  for some libraries. For instance, pcl most commonly stops after:
-
-  [snip]
-  -- Boost version: 1.46.1
-  -- Found the following Boost libraries:
-  --   system
-  --   filesystem
-  --   thread
-  --   date_time
-  -- checking for module 'eigen3'
-  --   found eigen3, version 3.0.1
-
-  which is perplexing because it freezes after finding what it wants,
-  not during the search. When it does get past that point, it does so
-  almost immediately but freezes somewhere else.
-
-  I'm using 64-bit Ubuntu 11.10 with kernel release 3.0.0-16-generic
-  with an Intel i5.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/955379/+subscriptions
+> ---
+> v3:
+> - fix code style warning from patchew
+> v2:
+> - drop qemu-thread changes
+> ---
+>  include/monitor/monitor.h | 2 +-
+>  monitor.c                 | 2 +-
+>  stubs/monitor.c           | 2 +-
+>  tests/test-util-sockets.c | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+> index d6ab70cae2..2ef5e04b37 100644
+> --- a/include/monitor/monitor.h
+> +++ b/include/monitor/monitor.h
+> @@ -6,7 +6,7 @@
+>  #include "qapi/qapi-types-misc.h"
+>  #include "qemu/readline.h"
+>
+> -extern Monitor *cur_mon;
+> +extern __thread Monitor *cur_mon;
+>
+>  /* flags for monitor_init */
+>  /* 0x01 unused */
+> diff --git a/monitor.c b/monitor.c
+> index 39f8ee17ba..c90c31b6b3 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -266,7 +266,7 @@ static mon_cmd_t info_cmds[];
+>
+>  QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
+>
+> -Monitor *cur_mon;
+> +__thread Monitor *cur_mon;
+>
+>  static QEMUClockType event_clock_type =3D QEMU_CLOCK_REALTIME;
+>
+> diff --git a/stubs/monitor.c b/stubs/monitor.c
+> index e018c8f594..3890771bb5 100644
+> --- a/stubs/monitor.c
+> +++ b/stubs/monitor.c
+> @@ -3,7 +3,7 @@
+>  #include "qemu-common.h"
+>  #include "monitor/monitor.h"
+>
+> -Monitor *cur_mon =3D NULL;
+> +__thread Monitor *cur_mon;
+>
+>  int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+>  {
+> diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+> index acadd85e8f..6195a3ac36 100644
+> --- a/tests/test-util-sockets.c
+> +++ b/tests/test-util-sockets.c
+> @@ -69,7 +69,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
+ror **errp)
+>   * stubs/monitor.c is defined, to make sure monitor.o is discarded
+>   * otherwise we get duplicate syms at link time.
+>   */
+> -Monitor *cur_mon;
+> +__thread Monitor *cur_mon;
+>  void monitor_init(Chardev *chr, int flags) {}
+>
+>
+> --
+> 2.14.3
+>
