@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1f723F-0007lF-3p
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:59:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f72C2-0002wn-SF
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 13:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1f723C-0000KT-Ao
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:59:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52524
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1f723C-0000Ju-4u
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 12:59:50 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3DGooZe119019
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 12:59:49 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hayryjc98-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 12:59:48 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 13 Apr 2018 17:59:47 +0100
-References: <1523629847-22369-1-git-send-email-thuth@redhat.com>
-	<df1a9534-c1ca-972b-91a6-359685a671df@linux.vnet.ibm.com>
-	<f3d7c3d0-26fe-37db-abb3-0e99373ae315@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 13 Apr 2018 18:59:44 +0200
+	(envelope-from <mreitz@redhat.com>) id 1f72C1-0005qH-Ve
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 13:08:58 -0400
+References: <20180227155514.16721-1-eblake@redhat.com>
+	<20180227162944.17343-2-eblake@redhat.com>
+	<w51vaehpfzw.fsf@maestria.local.igalia.com>
+	<89477aaf-a1af-861d-fcd5-5bfe2143f8b8@redhat.com>
+	<w51po4pp54z.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f1d1c403-1a2a-aee2-5fe6-7cfbb81339d6@redhat.com>
+Date: Fri, 13 Apr 2018 19:08:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <f3d7c3d0-26fe-37db-abb3-0e99373ae315@redhat.com>
+In-Reply-To: <w51po4pp54z.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <6b294d1a-5f3b-aa9c-c0e4-db9da04c4548@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: size_t should
- be unsigned
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] qcow2: Document some maximum size
+ constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,55 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-
-
-On 04/13/2018 05:50 PM, Thomas Huth wrote:
-> On 13.04.2018 17:28, Halil Pasic wrote:
+On 2018-02-28 15:20, Alberto Garcia wrote:
+> On Wed 28 Feb 2018 03:01:33 PM CET, Eric Blake wrote:
+> 
+>>>> The refcount table has implications on the maximum host file size; a
+>>>> larger cluster size is required for the refcount table to cover
+>>>> larger offsets.
+>>>
+>>> Why is this? Because of the refcount_table_clusters field ?
+>>>
+>>> I think the maximum offset allowed by that is ridiculously high,
+>>> exceeding any other limit imposed by the L1/L2 tables.
+>    [...]
+>>> With 512 byte clusters and 64 bit refcount entries I still get 8 PB,
+>>> way over what's limited by the L1/L2 tables (128 GB).
 >>
->> On 04/13/2018 04:30 PM, Thomas Huth wrote:
->>> "size_t" should be an unsigned type - the signed counterpart is called
->>> "ssize_t" in the C standard instead. Thus we should also use this
->> The first sentence sounds like ssize_t is too a type defined by some
->> C standard. Is it or does ssize_t come form somewhere else?
-> Arrr, seems like ssize_t is rather coming from POSIX than from the C
-> standard, thanks for the hint. I'll rephrase the first sentence to:
+>> Do I need to make any modifications to the sentence, then?
 > 
-> "size_t" should be an unsigned type according to the C standard, and
-> most libc implementations provide a signed counterpart called "ssize_t".
+> I guess what surprised me the first time that I read it was that it
+> suggests that this has to be taken into account when calculating the
+> physical limits of an image, while in practice it can be ignored.
 > 
-> OK?
+> You could say something like 
 > 
+>   Although the larger the cluster size, the larger the offsets that can
+>   be covered by the refcount table, in practice these limits cannot be
+>   reached because they are larger than the ones imposed by other data
+>   structures.
 
-This ssize_t seems to be an rather interesting type. For instance POSIX says
-"""
-size_t
-    Used for sizes of objects.
-ssize_t
-    Used for a count of bytes or an error indication.
-"""
-and
-"""
-The type ssize_t shall be capable of storing values at least in the range [-1, {SSIZE_MAX}].
-"""
+Are there any updates here?  I guess I personally would just drop the
+whole paragraph, because I think it really doesn't matter...
 
-And it does not mandate SSIZE_MIN in limits (but of course mandates SSIZE_MAX.
+Also note that the maximum file size of ext4 is 16 PB (for 4 kB blocks).
+ OK, it's bigger for XFS, but that still gives some perspective.
 
-I don't like this 'counterpart' word here, because AFAIU these don't have to
-be counterparts in any sense. That is SSIZE_MAX << SIZE_MAX is possible for
-example. I'm not sure about the every positive has a negative thing, but
-that's not important here.
+Also, long before anyone is going to complain about the specification
+failing to mention that limit, they are going to complain that qemu
+refuses to open their image (because of its limit on the reftable size).
 
-The code in question kind of uses both signed and unsigned size for
-the same (the string). We even have a signed to unsigned comparison which
-could result in warnings. I still think the change is OK in practice, but
-maybe avoiding introducing ssize_t (until we really need it) is a better
-course of action. I think uitoa can be easily rewritten so it does not
-need the ssize_t.
+Max
 
-How about that?
-
-Regards,
-Halil
+> although I'm sure that you can come up with a better wording than mine :)
+> 
+> Berto
+> 
