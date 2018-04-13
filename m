@@ -1,14 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6zkE-00007f-RT
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:32:13 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1f6zmE-0001iF-4r
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f6zk9-0001g7-RN
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:32:06 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 13 Apr 2018 17:31:56 +0300
-Message-Id: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
+	(envelope-from <rkagan@virtuozzo.com>) id 1f6zmA-0003IT-VW
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:34:10 -0400
+Received: from mail-ve1eur01on0113.outbound.protection.outlook.com
+	([104.47.1.113]:61632
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1f6zmA-0003Gn-3g
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 10:34:06 -0400
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Fri, 13 Apr 2018 17:33:54 +0300
+Message-Id: <20180413143354.17614-1-rkagan@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] update-linux-headers: drop hyperv.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,80 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Handle nbd CACHE command. Just do read, without sending read data back.
-Cache mechanism should be done by exported node driver chain.
+As of mainline linux commit 5a485803221777013944cbd1a7cd5c62efba3ffa
+"x86/hyper-v: move hyperv.h out of uapi" by Vitaly Kuznetsov, no linux
+uapi header includes it, so we no longer need to create a stub for it.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- include/block/nbd.h |  3 ++-
- nbd/server.c        | 10 ++++++----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ scripts/update-linux-headers.sh | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index fcdcd54502..b4793d0a29 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -135,6 +135,7 @@ typedef struct NBDExtent {
- #define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
- #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
- #define NBD_FLAG_SEND_DF           (1 << 7) /* Send DF (Do not Fragment) */
-+#define NBD_FLAG_SEND_CACHE        (1 << 8) /* Send CACHE (prefetch) */
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 5b1d8dcdf4..b65c03f0ae 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -118,9 +118,6 @@ for arch in $ARCHLIST; do
+         cp "$tmpdir/include/asm/unistd-common.h" "$output/linux-headers/asm-arm/"
+     fi
+     if [ $arch = x86 ]; then
+-        cat <<-EOF >"$output/include/standard-headers/asm-x86/hyperv.h"
+-        /* this is a temporary placeholder until kvm_para.h stops including it */
+-EOF
+         cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+@@ -144,9 +141,6 @@ else
+     cp "$linux/COPYING" "$output/linux-headers"
+ fi
  
- /* New-style handshake (global) flags, sent from server to client, and
-    control what will happen during handshake phase. */
-@@ -195,7 +196,7 @@ enum {
-     NBD_CMD_DISC = 2,
-     NBD_CMD_FLUSH = 3,
-     NBD_CMD_TRIM = 4,
--    /* 5 reserved for failed experiment NBD_CMD_CACHE */
-+    NBD_CMD_CACHE = 5,
-     NBD_CMD_WRITE_ZEROES = 6,
-     NBD_CMD_BLOCK_STATUS = 7,
- };
-diff --git a/nbd/server.c b/nbd/server.c
-index 9e1f227178..30d7d3f444 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1134,7 +1134,7 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
-     int ret;
-     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
-                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
--                              NBD_FLAG_SEND_WRITE_ZEROES);
-+                              NBD_FLAG_SEND_WRITE_ZEROES | NBD_FLAG_SEND_CACHE);
-     bool oldStyle;
- 
-     /* Old style negotiation header, no room for options
-@@ -1826,7 +1826,9 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-         return -EIO;
-     }
- 
--    if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
-+    if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE ||
-+        request->type == NBD_CMD_CACHE)
-+    {
-         if (request->len > NBD_MAX_BUFFER_SIZE) {
-             error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
-                        request->len, NBD_MAX_BUFFER_SIZE);
-@@ -1911,7 +1913,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     int ret;
-     NBDExport *exp = client->exp;
- 
--    assert(request->type == NBD_CMD_READ);
-+    assert(request->type == NBD_CMD_READ || request->type == NBD_CMD_CACHE);
- 
-     /* XXX: NBD Protocol only documents use of FUA with WRITE */
-     if (request->flags & NBD_CMD_FLAG_FUA) {
-@@ -1930,7 +1932,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
- 
-     ret = blk_pread(exp->blk, request->from + exp->dev_offset, data,
-                     request->len);
--    if (ret < 0) {
-+    if (ret < 0 || request->type == NBD_CMD_CACHE) {
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "reading from file failed", errp);
-     }
+-cat <<EOF >$output/linux-headers/asm-x86/hyperv.h
+-#include "standard-headers/asm-x86/hyperv.h"
+-EOF
+ cat <<EOF >$output/linux-headers/linux/virtio_config.h
+ #include "standard-headers/linux/virtio_config.h"
+ EOF
 -- 
-2.11.1
+2.14.3
