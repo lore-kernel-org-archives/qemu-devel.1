@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f6vqr-0006xN-Uo
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:22:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1f6vtG-0000K3-1s
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tournier.elie@gmail.com>) id 1f6vqo-00052c-RZ
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:22:41 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:53285)
+	(envelope-from <bounces@canonical.com>) id 1f6vtC-0006Qv-TM
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:25:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
-	id 1f6vqo-00052G-Jx
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:22:38 -0400
-Received: by mail-wm0-x229.google.com with SMTP id 66so4115698wmd.3
-	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 03:22:38 -0700 (PDT)
-Date: Fri, 13 Apr 2018 11:16:46 +0100
-From: Elie Tournier <tournier.elie@gmail.com>
-Message-ID: <20180413101646.GA6099@Nikki.localdomain>
-References: <20180410120222.31845-1-tournier.elie@gmail.com>
-	<20180410120222.31845-2-tournier.elie@gmail.com>
-	<c6e49f50-0cd0-c118-f080-48751de595ec@redhat.com>
-	<20180410133335.zzvgg7lqe2lb2zdx@sirius.home.kraxel.org>
-	<20180412141153.GA16814@Nikki.localdomain>
-	<20180413061529.ulu6jxmcs4mgfmdc@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f6vtC-0006Pl-GH
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 06:25:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f6vtB-0000DR-Bg
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:25:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 574F92E80C8
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 10:25:05 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180413061529.ulu6jxmcs4mgfmdc@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2 for-2.12?] qapi: Parameter gl of
- DisplayType now accept an enum
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Apr 2018 10:13:17 -0000
+From: TJ <ubuntu@iam.tj>
+Reply-To: Bug 955379 <955379@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120314192314.1716.70997.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152361439802.31212.12321294807666188540.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 955379] Re: cmake hangs with qemu-arm-static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Elie Tournier <elie.tournier@collabora.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 13, 2018 at 08:15:29AM +0200, Gerd Hoffmann wrote:
-> On Thu, Apr 12, 2018 at 03:11:53PM +0100, Elie Tournier wrote:
-> > Hello,
-> > 
-> > On Tue, Apr 10, 2018 at 03:33:35PM +0200, Gerd Hoffmann wrote:
-> > > > # @off: Disable OpenGL (default).
-> > 
-> > Just to be sure, I have to add @ in front of all parameter, right?
-> > 
-> > > > 
-> > > > > + # 'on'    Use OpenGL, pick context type automatically.
-> > > > > + #         Would better be named 'auto' but is called 'on' for backward
-> > > > > + #         compatibility with bool type.
-> > > > 
-> > > > See below...
-> > > 
-> > > > DisplayOptions was added in 2.12.  This is a backwards-incompatible
-> > > > change in QMP (you CANNOT change 'bool' to 'DisplayGLMode' across
-> > > > releases, because the on-the-wire representation differs; pre-patch it
-> > > > would be "gl":true, post-patch it is "gl":"on").  So if it affects QMP,
-> > > > and we want it, this patch either HAS to go in 2.12, or we have to have
-> > > > more finesse (perhaps by using an 'alternate' type in the QAPI) so that
-> > > > it remains backwards-compatible.
-> > > > 
-> > > > /me goes and looks at introspection output...
-> > > > 
-> > > > You may be in luck - there is no instance of 'window-close' in the
-> > > > introspection output, which means 'DisplayType' exists only for ease of
-> > > > command-line parsing and is not currently used by QMP, so tweaks here
-> > > > are not affecting the command line.
-> > > 
-> > > Yes, right now the struct is only used to store the parsed command line
-> > > opts, so no effect on QMP.
-> > > 
-> > > Plan for the future is to also parse command line options with generic
-> > > qapi/json code instead of the home-grown parser, but that switch didn't
-> > > happen yet.
-> > > 
-> > > > That said, you can STILL name the enum value something smarter than 'on'
-> > > > IF you make the change now, for 2.12, given that the QAPI type was only
-> > > > introduced in 2.12 (you only have to worry about backwards compatibility
-> > > > if 2.11 already parsed gl=on).
-> > > 
-> > > gl=on is older, so that must continue to work.  Making both "on" and
-> > > "auto" work isn't a problem for our home-grown parser (aka
-> > > parse_display() in vl.c).  But having quirks like this makes the switch
-> > > to generic parser code more difficuilt, so I'd prefer to avoid that ...
-> > 
-> > Is it possible to upstream this change before 2.12 release?
-> 
-> No need to hurry with this.  QMP doesn't see the structs, so no
-> compatibility problem here.  gl=on cmd line option was present in 2.11 +
-> older already, so that must continue to work no matter whenever this
-> makes 2.12 or not.
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
 
-Alright, thanks.
-Well, to be fair, I just want to see this feature upstream, I don't really care
-about the release number.
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Confirmed
 
-Just a question before I resend the series.
-Should I note "Since 2.12" or "Since 2.13" in qapi/ui.json?
+** Changed in: qemu (Ubuntu)
+    Milestone: None =3D> ubuntu-16.04.5
 
-BR,
-Elie
+-- =
 
-> 
-> cheers,
->   Gerd
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/955379
+
+Title:
+  cmake hangs with qemu-arm-static
+
+Status in QEMU:
+  Fix Released
+Status in Linaro QEMU:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+Status in qemu-linaro package in Ubuntu:
+  Confirmed
+
+Bug description:
+  I'm using git commit 3e7ecd976b06f... configured with --target-list
+  =3Darm-linux-user --static in a chroot environment to compile some
+  things. I ran into this problem with both pcl and opencv-2.3.1. cmake
+  consistently freezes at some point during its execution, though in a
+  different spot each time, usually during a step when it's searching
+  for some libraries. For instance, pcl most commonly stops after:
+
+  [snip]
+  -- Boost version: 1.46.1
+  -- Found the following Boost libraries:
+  --   system
+  --   filesystem
+  --   thread
+  --   date_time
+  -- checking for module 'eigen3'
+  --   found eigen3, version 3.0.1
+
+  which is perplexing because it freezes after finding what it wants,
+  not during the search. When it does get past that point, it does so
+  almost immediately but freezes somewhere else.
+
+  I'm using 64-bit Ubuntu 11.10 with kernel release 3.0.0-16-generic
+  with an Intel i5.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/955379/+subscriptions
