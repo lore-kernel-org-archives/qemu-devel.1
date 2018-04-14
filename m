@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agk@godking.net>) id 1f7BVp-0003EC-KI
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 23:06:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f7BsZ-0001xy-49
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 23:29:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agk@godking.net>) id 1f7BVk-0001tm-La
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 23:06:01 -0400
-Received: from s18231873.onlinehome-server.info ([217.160.179.168]:38984
-	helo=godking.net) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agk@godking.net>) id 1f7BVk-0001ri-Bh
-	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 23:05:56 -0400
-From: Alexander Kappner <agk@godking.net>
-Date: Fri, 13 Apr 2018 20:05:25 -0700
-Message-Id: <1523675125-14022-1-git-send-email-agk@godking.net>
-Subject: [Qemu-devel] [PATCH] Implement query-usbhost QMP command
+	(envelope-from <richard.henderson@linaro.org>) id 1f7BsV-0006DP-4h
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 23:29:31 -0400
+Received: from mail-pl0-x22b.google.com ([2607:f8b0:400e:c01::22b]:34036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f7BsU-0006Cw-TZ
+	for qemu-devel@nongnu.org; Fri, 13 Apr 2018 23:29:27 -0400
+Received: by mail-pl0-x22b.google.com with SMTP id y12-v6so7120398plt.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Apr 2018 20:29:26 -0700 (PDT)
+References: <1522980788-1252-1-git-send-email-cota@braap.org>
+	<1522980788-1252-11-git-send-email-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <87be5f7f-e33e-a101-ff01-2a7375ac9934@linaro.org>
+Date: Fri, 13 Apr 2018 17:29:20 -1000
+MIME-Version: 1.0
+In-Reply-To: <1522980788-1252-11-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/17] translate-all: use per-page
+ locking in !user-mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,229 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com, eblake@redhat.com, armbru@redhat.com
-Cc: Alexander Kappner <agk@godking.net>, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Implement a QMP command similar to the HMP's "info usbhost" command.
-This allows a QMP client to query which USB devices may be available
-for redirection. Because the availability of the command needs to
-depend on the target's (not the build host's) USB configuration,
-a qmp_nousb.c is provided for targets without USB support.
+On 04/05/2018 04:13 PM, Emilio G. Cota wrote:
+> +/**
+> + * struct page_collection - tracks a set of pages (i.e. &struct page_entry's)
+> + * @tree:   Binary search tree (BST) of the pages, with key == page index
+> + * @max:    Pointer to the page in @tree with the highest page index
+> + *
+> + * To avoid deadlock we lock pages in ascending order of page index.
+> + * When operating on a set of pages, we need to keep track of them so that
+> + * we can lock them in order and also unlock them later. For this we collect
+> + * pages (i.e. &struct page_entry's) in a binary search @tree. Given that the
+> + * @tree implementation we use does not provide an O(1) operation to obtain the
+> + * highest-ranked element, we use @max to keep track of the inserted page
+> + * with the highest index. This is valuable because if a page is not in
+> + * the tree and its index is higher than @max's, then we can lock it
+> + * without breaking the locking order rule.
+> + *
+> + * Note on naming: 'struct page_set' would be shorter, but we already have a few
+> + * page_set_*() helpers, so page_collection is used instead to avoid confusion.
+> + *
+> + * See also: page_collection_lock().
+> + */
+> +struct page_collection {
+> +    GTree *tree;
+> +    struct page_entry *max;
+> +};
 
-Signed-off-by: Alexander Kappner <agk@godking.net>
----
- hw/usb/Makefile.objs |  2 ++
- hw/usb/host-libusb.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/usb/qmp-nousb.c   | 28 +++++++++++++++++++++++
- qapi/misc.json       | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 156 insertions(+)
- create mode 100644 hw/usb/qmp-nousb.c
+I don't understand the motivation for this data structure.  Substituting one
+tree for another does not, on the face of it, seem to be a win.
 
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 41be700..10569ba 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -58,3 +58,5 @@ common-obj-$(CONFIG_XEN) += xen-usb.o
- xen-usb.o-cflags := $(LIBUSB_CFLAGS)
- xen-usb.o-libs := $(LIBUSB_LIBS)
- endif
-+
-+obj-$(call lnot,$(CONFIG_USB)) += qmp-nousb.o
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index 1b0be07..efdf577 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -40,6 +40,7 @@
- #include <libusb.h>
- 
- #include "qapi/error.h"
-+#include "qapi/qapi-commands-misc.h"
- #include "qemu-common.h"
- #include "monitor/monitor.h"
- #include "qemu/error-report.h"
-@@ -1743,6 +1744,69 @@ bool usb_host_dev_is_scsi_storage(USBDevice *ud)
-     return is_scsi_storage;
- }
- 
-+UsbDeviceInfoList *qmp_query_usbhost(Error **errp)
-+{
-+    UsbDeviceInfoList *usb_list = NULL;
-+    UsbDeviceInfoList *info;
-+    libusb_device **devs = NULL;
-+    struct libusb_device_descriptor ddesc;
-+    char port[16];
-+    int i, n;
-+
-+    if (usb_host_init() != 0) {
-+        return NULL;
-+    }
-+    n = libusb_get_device_list(ctx, &devs);
-+
-+    for (i = 0; i < n; i++) {
-+        if (libusb_get_device_descriptor(devs[i], &ddesc) != 0) {
-+            continue;
-+        }
-+        if (ddesc.bDeviceClass == LIBUSB_CLASS_HUB) {
-+            continue;
-+        }
-+        usb_host_get_port(devs[i], port, sizeof(port));
-+        info = g_new0(UsbDeviceInfoList, 1);
-+        info->value = g_new0(UsbDeviceInfo, 1);
-+        info->value->id_vendor = ddesc.idVendor;
-+        info->value->bus_num = libusb_get_bus_number(devs[i]);
-+        info->value->dev_addr = libusb_get_device_address(devs[i]);
-+        info->value->id_product = ddesc.idProduct;
-+        info->value->b_device_class = ddesc.bDeviceClass;
-+        info->value->speed = libusb_get_device_speed(devs[i]);
-+        info->next = usb_list;
-+        usb_list = info;
-+
-+        if (ddesc.iProduct) {
-+            libusb_device_handle *handle;
-+            if (libusb_open(devs[i], &handle) == 0) {
-+                unsigned char name[64] = "";
-+                libusb_get_string_descriptor_ascii(handle,
-+                                                   ddesc.iProduct,
-+                                                   name, sizeof(name));
-+                libusb_close(handle);
-+                info->value->str_product = g_strdup((gchar *)name);
-+            }
-+        } else
-+            info->value->str_product = NULL;
-+
-+        if (ddesc.iManufacturer) {
-+            libusb_device_handle *handle;
-+            if (libusb_open(devs[i], &handle) == 0) {
-+                unsigned char name[64] = "";
-+                libusb_get_string_descriptor_ascii(handle,
-+                                                   ddesc.iManufacturer,
-+                                                   name, sizeof(name));
-+                libusb_close(handle);
-+                info->value->str_manufacturer = g_strdup((gchar *)name);
-+            }
-+        } else
-+        info->value->str_manufacturer = NULL;
-+    }
-+    libusb_free_device_list(devs, 1);
-+    return usb_list;
-+}
-+
- void hmp_info_usbhost(Monitor *mon, const QDict *qdict)
- {
-     libusb_device **devs = NULL;
-diff --git a/hw/usb/qmp-nousb.c b/hw/usb/qmp-nousb.c
-new file mode 100644
-index 0000000..2ce8962
---- /dev/null
-+++ b/hw/usb/qmp-nousb.c
-@@ -0,0 +1,28 @@
-+/*
-+ * QMP Target options - Commands handled based on a target config
-+ *                      versus a host config
-+ *
-+ * Copyright (c) 2018 Alexander Kappner <agk@godking.net>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qmp/qerror.h"
-+
-+UsbDeviceInfoList *qmp_query_usbhost(Error **errp)
-+{
-+    error_setg(errp, QERR_FEATURE_DISABLED, "usb");
-+    return NULL;
-+};
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 5636f4a..19a1453 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -270,6 +270,46 @@
- { 'command': 'query-kvm', 'returns': 'KvmInfo' }
- 
- ##
-+# @query-usbhost:
-+#
-+# Returns information about USB devices available on the host
-+#
-+# Returns: a [UsbDeviceInfo]. Returns an error if compiled without
-+# CONFIG_USB.
-+#
-+# Since: TODO (maintainer insert version number if mainlined)
-+#
-+# Example:
-+#
-+# -> {"execute": "query-usbhost" }
-+# {
-+#     "return": [
-+#         {
-+#             "b_device_class": 239,
-+#             "id_product": 793,
-+#             "id_vendor": 3468,
-+#             "speed": 3,
-+#             "str_manufacturer": "Schiit Audio",
-+#             "str_product": "Schiit Modi Uber"
-+#             "bus_num": 5,
-+#             "dev_addr": 21
-+#         },
-+#         {
-+#             "b_device_class": 0,
-+#             "id_product": 6944,
-+#             "id_vendor": 6940,
-+#             "speed": 2,
-+#             "str_manufacturer": "Corsair",
-+#             "str_product": "Corsair STRAFE RGB Gaming Keyboard"
-+#             "bus_num": 5,
-+#             "dev_addr": 35
-+#         }
-+#     ]
-+# }
-+##
-+{ 'command': 'query-usbhost', 'returns': ['UsbDeviceInfo'] }
-+
-+##
- # @UuidInfo:
- #
- # Guest UUID information (Universally Unique Identifier).
-@@ -876,6 +916,28 @@
-            'regions': ['PciMemoryRegion']} }
- 
- ##
-+# @UsbDeviceInfo:
-+#
-+# @speed: the speed
-+#
-+# @id_vendor: idVendor field from device descriptor
-+#
-+# @id_product: idProduct field from device descriptor
-+#
-+# @str_product: string descriptor referenced by iProduct index, if any
-+#
-+# @str_manufacturer: string descriptor referenced by iManufacturer index, if any
-+#
-+# @dev_addr: address on bus that device is connected to
-+#
-+# @bus_num: bus number device is connected to
-+##
-+{ 'struct': 'UsbDeviceInfo',
-+  'data':
-+  {'speed': 'int', 'id_vendor': 'int', 'id_product' : 'int', 'str_product': 'str',
-+   'b_device_class': 'int', 'str_manufacturer' : 'str', 'dev_addr' : 'int', 'bus_num' : 'int'} }
-+
-+##
- # @PciInfo:
- #
- # Information about a PCI bus
--- 
-2.1.4
+Given that your locking order is based on the physical address, I can
+understand that the sequential virtual addresses that these routines are given
+is not appropriate.  But surely you should know how many pages are involved,
+and therefore be able to allocate a flat array to hold the PageDesc.
+
+> +/*
+> + * Lock a range of pages ([@start,@end[) as well as the pages of all
+> + * intersecting TBs.
+> + * Locking order: acquire locks in ascending order of page index.
+> + */
+
+I don't think I understand this either.  From whence do you wind up with a
+range of physical addresses?
+
+> +struct page_collection *
+> +page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
+
+...
+
+> +    /*
+> +     * Add the TB to the page list.
+> +     * To avoid deadlock, acquire first the lock of the lower-addressed page.
+> +     */
+> +    p = page_find_alloc(phys_pc >> TARGET_PAGE_BITS, 1);
+> +    if (likely(phys_page2 == -1)) {
+>          tb->page_addr[1] = -1;
+> +        page_lock(p);
+> +        tb_page_add(p, tb, 0, phys_pc & TARGET_PAGE_MASK);
+> +    } else {
+> +        p2 = page_find_alloc(phys_page2 >> TARGET_PAGE_BITS, 1);
+> +        if (phys_pc < phys_page2) {
+> +            page_lock(p);
+> +            page_lock(p2);
+> +        } else {
+> +            page_lock(p2);
+> +            page_lock(p);
+> +        }
+
+Extract this as a helper for use here and page_lock_tb?
+
+>  /*
+>   * Invalidate all TBs which intersect with the target physical address range
+> + * [start;end[. NOTE: start and end must refer to the *same* physical page.
+> + * 'is_cpu_write_access' should be true if called from a real cpu write
+> + * access: the virtual CPU will exit the current TB if code is modified inside
+> + * this TB.
+> + *
+> + * Called with tb_lock/mmap_lock held for user-mode emulation
+> + * Called with tb_lock held for system-mode emulation
+> + */
+> +void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+> +                                   int is_cpu_write_access)
+
+FWIW, we should probably notice and optimize end = start + 1, which appears to
+have the largest number of users for e.g. watchpoints.
+
+
+r~
