@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f7eFI-0000jH-9k
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 05:46:55 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f7n01-0005DP-0E
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 15:07:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1f7eFF-0007ON-5A
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 05:46:52 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:45551)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1f7eFE-0007Mz-Qd
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 05:46:49 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Sun, 15 Apr 2018 11:46:38 +0200
-Message-Id: <20180415094638.3278-2-laurent@vivier.eu>
-In-Reply-To: <20180415094638.3278-1-laurent@vivier.eu>
-References: <20180415094638.3278-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 1/1] m68k: fix exception stack frame for 68000
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1f7mzw-0005Do-GR
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 15:07:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1f7mzw-0005CY-96
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 15:07:36 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3FJ6vKp036048
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 15:07:35 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hbu40wmq5-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 15:07:34 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Sun, 15 Apr 2018 15:07:33 -0400
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Sun, 15 Apr 2018 15:07:20 -0400
+In-Reply-To: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Message-Id: <1523819244-29954-2-git-send-email-akrowiak@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 1/5] linux-headers: linux header updates for
+ AP support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +39,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, akrowiak@linux.vnet.ibm.com
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Updates the linux header files in preparation for introduction
+of the VFIO AP device:
 
-68000 CPUs do not save format in the exception stack frame.
-This patch adds feature checking to prevent format saving for 68000.
-m68k_ret() already includes this modification, this patch fixes
-the exception processing function too.
+* Added a feature ID to indicate AP facilities are installed
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180413133041.29509.59064.stgit@pasha-VirtualBox>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+* Added a device attribute to the KVM_S390_VM_CRYPTO group to
+  indicate whether AP instructions are to be interpreted
+
+* Added VFIO device information for AP devices
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
 ---
- target/m68k/op_helper.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+ linux-headers/asm-s390/kvm.h |    2 ++
+ linux-headers/linux/vfio.h   |    2 ++
+ 2 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 3a7f7f2219..8d09ed91c4 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -287,22 +287,25 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
-                                   uint16_t format, uint16_t sr,
-                                   uint32_t addr, uint32_t retaddr)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
--    switch (format) {
--    case 4:
--        *sp -= 4;
--        cpu_stl_kernel(env, *sp, env->pc);
--        *sp -= 4;
--        cpu_stl_kernel(env, *sp, addr);
--        break;
--    case 3:
--    case 2:
--        *sp -= 4;
--        cpu_stl_kernel(env, *sp, addr);
--        break;
-+    if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
-+        /*  all except 68000 */
-+        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+        switch (format) {
-+        case 4:
-+            *sp -= 4;
-+            cpu_stl_kernel(env, *sp, env->pc);
-+            *sp -= 4;
-+            cpu_stl_kernel(env, *sp, addr);
-+            break;
-+        case 3:
-+        case 2:
-+            *sp -= 4;
-+            cpu_stl_kernel(env, *sp, addr);
-+            break;
-+        }
-+        *sp -= 2;
-+        cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
-     }
--    *sp -= 2;
--    cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
-     *sp -= 4;
-     cpu_stl_kernel(env, *sp, retaddr);
-     *sp -= 2;
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 11def14..391b250 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -130,6 +130,7 @@ struct kvm_s390_vm_cpu_machine {
+ #define KVM_S390_VM_CPU_FEAT_PFMFI	11
+ #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
+ #define KVM_S390_VM_CPU_FEAT_KSS	13
++#define KVM_S390_VM_CPU_FEAT_AP		14
+ struct kvm_s390_vm_cpu_feat {
+ 	__u64 feat[16];
+ };
+@@ -160,6 +161,7 @@ struct kvm_s390_vm_cpu_subfunc {
+ #define KVM_S390_VM_CRYPTO_ENABLE_DEA_KW	1
+ #define KVM_S390_VM_CRYPTO_DISABLE_AES_KW	2
+ #define KVM_S390_VM_CRYPTO_DISABLE_DEA_KW	3
++#define KVM_S390_VM_CRYPTO_INTERPRET_AP		4
+ 
+ /* kvm attributes for migration mode */
+ #define KVM_S390_VM_MIGRATION_STOP	0
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 3a0a305..1bb9897 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -200,6 +200,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+ #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+ #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
++#define VFIO_DEVICE_FLAGS_AP (1 << 5)		/* vfio-ap device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
+ };
+@@ -215,6 +216,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_API_PLATFORM_STRING		"vfio-platform"
+ #define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
+ #define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
++#define VFIO_DEVICE_API_AP_STRING		"vfio-ap"
+ 
+ /**
+  * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
 -- 
-2.14.3
+1.7.1
