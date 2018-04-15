@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7oIy-00088h-IC
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 16:31:21 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f7olS-000080-Sg
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 17:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7oIu-0001Ps-JX
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 16:31:20 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 15 Apr 2018 17:31:06 -0300
-Message-Id: <20180415203106.24333-1-f4bug@amsat.org>
+	(envelope-from <no-reply@patchew.org>) id 1f7olP-0002Cd-Rl
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 17:00:46 -0400
+Resent-Message-Id: <E1f7olP-0002Cd-Rl@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21144)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f7olP-000293-K0
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 17:00:43 -0400
+In-Reply-To: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152381968527.1863.4451282704564773311@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-2.12?] m25p80: Correct the
- at25128a/at25256a eeproms size
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 15 Apr 2018 12:14:47 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marcin=20Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: akrowiak@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
->From the datasheet (3368J–SEEPR) description:
-    The AT25128A/256A provides 131,072/262,144 bits of serial
-    electrically-erasable programmable read only memory (EEPROM)
-    organized as 16,384/32,768 words of 8 bits each.
-
-However QEMU models the flash size in bytes.
-Correct the at25128a/at25256a entries to reflect the datasheet size.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-This is not a regression, so can now wait for 2.13.
-
- hw/block/m25p80.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index b49c8e9caa..d0b9fbfc50 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -196,8 +196,8 @@ static const FlashPartInfo known_devices[] = {
-     /* Atmel EEPROMS - it is assumed, that don't care bit in command
-      * is set to 0. Block protection is not supported.
-      */
--    { INFO("at25128a-nonjedec", 0x0,     0,         1, 131072, EEPROM) },
--    { INFO("at25256a-nonjedec", 0x0,     0,         1, 262144, EEPROM) },
-+    { INFO("at25128a-nonjedec", 0x0,     0,         1, 16384, EEPROM) },
-+    { INFO("at25256a-nonjedec", 0x0,     0,         1, 32768, EEPROM) },
- 
-     /* EON -- en25xxx */
-     { INFO("en25f32",     0x1c3116,      0,  64 << 10,  64, ER_4K) },
--- 
-2.17.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjM4MTkyNDQtMjk5NTQtMS1naXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51
+eC52bmV0LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzVdIHMzOTB4
+OiB2ZmlvLWFwOiBndWVzdCBkZWRpY2F0ZWQgY3J5cHRvIGFkYXB0ZXJzCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
+LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
+dQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjM4MTkyNDQtMjk5NTQtMS1n
+aXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8xNTIz
+ODE5MjQ0LTI5OTU0LTEtZ2l0LXNlbmQtZW1haWwtYWtyb3dpYWtAbGludXgudm5ldC5pYm0uY29t
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDVjMjVjZDBmMiBzMzkwOiBkb2M6IGRl
+dGFpbGVkIHNwZWNpZmljYXRpb25zIGZvciBBUCB2aXJ0dWFsaXphdGlvbgo1NDNlNWNiYzQ2IHMz
+OTB4L3ZmaW86IGFwOiBJbnRyb2R1Y2UgVkZJTyBBUCBkZXZpY2UKOTk0OTEzNDQxZiBzMzkweC9j
+cHVtb2RlbDogU2V0IHVwIENQVSBtb2RlbCBmb3IgQVAgZGV2aWNlIHN1cHBvcnQKZTdmOTBiMTI1
+OCBzMzkweC9hcDogYmFzZSBBZGp1bmN0IFByb2Nlc3NvciAoQVApIG9iamVjdAoxMzYwMmQyMzZl
+IGxpbnV4LWhlYWRlcnM6IGxpbnV4IGhlYWRlciB1cGRhdGVzIGZvciBBUCBzdXBwb3J0Cgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGxpbnV4LWhlYWRlcnM6IGxpbnV4
+IGhlYWRlciB1cGRhdGVzIGZvciBBUCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDIvNTogczM5
+MHgvYXA6IGJhc2UgQWRqdW5jdCBQcm9jZXNzb3IgKEFQKSBvYmplY3QuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMy81OiBzMzkweC9jcHVtb2RlbDogU2V0IHVwIENQVSBtb2RlbCBmb3IgQVAgZGV2aWNlIHN1
+cHBvcnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQzOiBGSUxFOiB0YXJn
+ZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6NDM6CisgICAgRkVBVF9JTklUKCJhcHFjaSIsIFMzOTBf
+RkVBVF9UWVBFX1NURkwsIDEyLCAiUXVlcnkgQVAgQ29uZmlndXJhdGlvbiBmYWNpbGl0eSIpLAoK
+RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NjogRklMRTogdGFyZ2V0L3MzOTB4L2Nw
+dV9mZWF0dXJlcy5jOjQ2OgorICAgIEZFQVRfSU5JVCgiYXBmdCIsIFMzOTBfRkVBVF9UWVBFX1NU
+RkwsIDE1LCAiQWRqdW5jdCBQcm9jZXNzb3IgRmFjaWxpdGllcyBUZXN0IGZhY2lsaXR5IiksCgp0
+b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNTogczM5MHgvdmZp
+bzogYXA6IEludHJvZHVjZSBWRklPIEFQIGRldmljZS4uLgpDaGVja2luZyBQQVRDSCA1LzU6IHMz
+OTA6IGRvYzogZGV0YWlsZWQgc3BlY2lmaWNhdGlvbnMgZm9yIEFQIHZpcnR1YWxpemF0aW9uLi4u
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
