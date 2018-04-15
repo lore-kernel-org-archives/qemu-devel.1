@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f7olS-000080-Sg
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 17:00:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f7qiJ-0007Al-J5
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f7olP-0002Cd-Rl
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 17:00:46 -0400
-Resent-Message-Id: <E1f7olP-0002Cd-Rl@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f7olP-000293-K0
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 17:00:43 -0400
-In-Reply-To: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152381968527.1863.4451282704564773311@71c20359a636>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f7qiG-000320-Gb
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:05:39 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:44297)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f7qiG-00031q-BE
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:05:36 -0400
+Received: by mail-qt0-x242.google.com with SMTP id j26so13491530qtl.11
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 16:05:36 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Sun, 15 Apr 2018 20:05:18 -0300
+Message-Id: <20180415230522.24404-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 15 Apr 2018 12:14:47 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] s390x: vfio-ap: guest dedicated
- crypto adapters
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/4] build: fix failure when host provides too
+ old libfdt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: akrowiak@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, YunQiang Su <syq@debian.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjM4MTkyNDQtMjk5NTQtMS1naXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51
-eC52bmV0LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzVdIHMzOTB4
-OiB2ZmlvLWFwOiBndWVzdCBkZWRpY2F0ZWQgY3J5cHRvIGFkYXB0ZXJzCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjM4MTkyNDQtMjk5NTQtMS1n
-aXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8xNTIz
-ODE5MjQ0LTI5OTU0LTEtZ2l0LXNlbmQtZW1haWwtYWtyb3dpYWtAbGludXgudm5ldC5pYm0uY29t
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDVjMjVjZDBmMiBzMzkwOiBkb2M6IGRl
-dGFpbGVkIHNwZWNpZmljYXRpb25zIGZvciBBUCB2aXJ0dWFsaXphdGlvbgo1NDNlNWNiYzQ2IHMz
-OTB4L3ZmaW86IGFwOiBJbnRyb2R1Y2UgVkZJTyBBUCBkZXZpY2UKOTk0OTEzNDQxZiBzMzkweC9j
-cHVtb2RlbDogU2V0IHVwIENQVSBtb2RlbCBmb3IgQVAgZGV2aWNlIHN1cHBvcnQKZTdmOTBiMTI1
-OCBzMzkweC9hcDogYmFzZSBBZGp1bmN0IFByb2Nlc3NvciAoQVApIG9iamVjdAoxMzYwMmQyMzZl
-IGxpbnV4LWhlYWRlcnM6IGxpbnV4IGhlYWRlciB1cGRhdGVzIGZvciBBUCBzdXBwb3J0Cgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGxpbnV4LWhlYWRlcnM6IGxpbnV4
-IGhlYWRlciB1cGRhdGVzIGZvciBBUCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDIvNTogczM5
-MHgvYXA6IGJhc2UgQWRqdW5jdCBQcm9jZXNzb3IgKEFQKSBvYmplY3QuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMy81OiBzMzkweC9jcHVtb2RlbDogU2V0IHVwIENQVSBtb2RlbCBmb3IgQVAgZGV2aWNlIHN1
-cHBvcnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQzOiBGSUxFOiB0YXJn
-ZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6NDM6CisgICAgRkVBVF9JTklUKCJhcHFjaSIsIFMzOTBf
-RkVBVF9UWVBFX1NURkwsIDEyLCAiUXVlcnkgQVAgQ29uZmlndXJhdGlvbiBmYWNpbGl0eSIpLAoK
-RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NjogRklMRTogdGFyZ2V0L3MzOTB4L2Nw
-dV9mZWF0dXJlcy5jOjQ2OgorICAgIEZFQVRfSU5JVCgiYXBmdCIsIFMzOTBfRkVBVF9UWVBFX1NU
-RkwsIDE1LCAiQWRqdW5jdCBQcm9jZXNzb3IgRmFjaWxpdGllcyBUZXN0IGZhY2lsaXR5IiksCgp0
-b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNTogczM5MHgvdmZp
-bzogYXA6IEludHJvZHVjZSBWRklPIEFQIGRldmljZS4uLgpDaGVja2luZyBQQVRDSCA1LzU6IHMz
-OTA6IGRvYzogZGV0YWlsZWQgc3BlY2lmaWNhdGlvbnMgZm9yIEFQIHZpcnR1YWxpemF0aW9uLi4u
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+Hi, I already hit this problem on Shippable and tried to resolve it for 2.10;
+and shamefully hit it again yesterday on a Debian 8 host with distrib libfdt
+installed. I wondered how to fix this without root access and realized my
+previous Shippable kludge wasn't the best fix :)
+
+Here we go adding the QEMU_LDFLAGS to enforce local libfdt in library path
+before the system one.
+This time it looks like the correct fix, also scalable for other libraries.
+
+It would be great to have QEMU 2.12 buildable in Debian<9, but nobody
+complained since 2.10 so this can wait 2.13 (this is not a regression neither).
+
+Regards,
+
+Phil.
+
+Jan Kiszka (1):
+  build: Silence dtc directory creation
+
+Philippe Mathieu-Daudé (3):
+  configure: Really use local libfdt if the system one is too old
+  configure: Display if libfdt is from system or git
+  shippable: Remove Debian 8 libfdt kludge
+
+ configure      | 15 +++++++++------
+ Makefile       |  2 +-
+ rules.mak      |  2 +-
+ .shippable.yml |  8 --------
+ 4 files changed, 11 insertions(+), 16 deletions(-)
+
+-- 
+2.17.0
