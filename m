@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51126)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rJZ-0004x3-K0
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:44:10 -0400
+	id 1f7rJc-00051E-QW
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rJY-0000eB-Q0
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:44:09 -0400
+	id 1f7rJc-0000ge-2o
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:44:12 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 15 Apr 2018 20:42:41 -0300
-Message-Id: <20180415234307.28132-16-f4bug@amsat.org>
+Date: Sun, 15 Apr 2018 20:42:42 -0300
+Message-Id: <20180415234307.28132-17-f4bug@amsat.org>
 In-Reply-To: <20180415234307.28132-1-f4bug@amsat.org>
 References: <20180415234307.28132-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 15/41] hw/misc: Use the BYTE-based
+Subject: [Qemu-devel] [PATCH v3 16/41] hw/riscv: Use the BYTE-based
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Jiri Slaby <jslaby@suse.cz>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
 It eases code review, unit is explicit.
 
@@ -40,51 +40,29 @@ and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/auxbus.c | 3 ++-
- hw/misc/edu.c    | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ hw/riscv/virt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index b4cacd664b..0252c72654 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -27,6 +27,7 @@
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index e2c214e86a..eb465a0158 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -19,6 +19,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
  #include "qemu/log.h"
- #include "hw/misc/auxbus.h"
- #include "hw/i2c/i2c.h"
-@@ -68,7 +69,7 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+@@ -95,7 +96,7 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
+      * halfway into RAM, and for boards with 256MB of RAM or more we put
+      * the initrd at 128MB.
+      */
+-    *start = kernel_entry + MIN(mem_size / 2, 128 * 1024 * 1024);
++    *start = kernel_entry + MIN(mem_size / 2, 128 * M_BYTE);
  
-     /* Memory related. */
-     bus->aux_io = g_malloc(sizeof(*bus->aux_io));
--    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", (1 << 20));
-+    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", 1 * M_BYTE);
-     address_space_init(&bus->aux_addr_space, bus->aux_io, "aux-io");
-     return bus;
- }
-diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 34eb05d213..ceaa2e1679 100644
---- a/hw/misc/edu.c
-+++ b/hw/misc/edu.c
-@@ -23,6 +23,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
- #include "qemu/timer.h"
-@@ -357,7 +358,7 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
-                        edu, QEMU_THREAD_JOINABLE);
- 
-     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
--                    "edu-mmio", 1 << 20);
-+                    "edu-mmio", 1 * M_BYTE);
-     pci_register_bar(pdev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &edu->mmio);
- }
- 
+     size = load_ramdisk(filename, *start, mem_size - *start);
+     if (size == -1) {
 -- 
 2.17.0
