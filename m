@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f7WQ9-00021u-Qq
-	for qemu-devel@nongnu.org; Sat, 14 Apr 2018 21:25:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1f7ZJs-0004Dx-7k
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 00:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f7WQ8-0006Dv-OQ
-	for qemu-devel@nongnu.org; Sat, 14 Apr 2018 21:25:33 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:43221)
+	(envelope-from <bounces@canonical.com>) id 1f7ZJo-00032z-7J
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 00:31:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f7WQ8-0006DK-F7
-	for qemu-devel@nongnu.org; Sat, 14 Apr 2018 21:25:32 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id y7so16817997wrh.10
-	for <qemu-devel@nongnu.org>; Sat, 14 Apr 2018 18:25:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f7ZJo-00032b-1D
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 00:31:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f7ZJm-0003CH-Kj
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 04:31:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9BE272E80C8
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 04:31:10 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <15bb2d94.286e.162c4d4ab19.Coremail.suhang16@mails.ucas.ac.cn>
-References: <1523245158-16443-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<1523245158-16443-2-git-send-email-suhang16@mails.ucas.ac.cn>
-	<CAJSP0QVJbCz=n-huxj3grUtcMAgOYzcExEZHh8rJEoaxnz_jgA@mail.gmail.com>
-	<15bb2d94.286e.162c4d4ab19.Coremail.suhang16@mails.ucas.ac.cn>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Sun, 15 Apr 2018 09:25:30 +0800
-Message-ID: <CAJSP0QW2e7w6bvv5RdWo3etrYipNj5=sVUwVMBodW4W5HkhgKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] Implement .hex file loader
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 15 Apr 2018 04:17:25 -0000
+From: Launchpad Bug Tracker <1405176@bugs.launchpad.net>
+Reply-To: Bug 1405176 <1405176@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141223133531.22375.47812.malonedeb@gac.canonical.com>
+Message-Id: <152376584545.25258.5116935402581293078.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1405176] Re: ctrl+alt+2 not work on gtk display
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Su Hang <suhang16@mails.ucas.ac.cn>
-Cc: jim mussared <jim@groklearning.com>, qemu-devel <qemu-devel@nongnu.org>, joel stanley <joel@jms.id.au>
+To: qemu-devel@nongnu.org
 
-On Sat, Apr 14, 2018 at 11:44 PM, Su Hang <suhang16@mails.ucas.ac.cn> wrote:
-> Thanks for your detailed reply! I  will carefully treat
-> all the content that you mentioned, and apply them in v5.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-By the way, if you are wondering why the parser needs to validate
-everything, here is an example scenario:
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-QEMU may be used to host an online micro:bit simulator where the user
-can provide a .hex file.  In that case QEMU is running on a server and
-the .hex file is provided by an untrusted user.  That user must not be
-able to crash QEMU (and exploit security holes).
+-- =
 
-Stefan
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1405176
+
+Title:
+  ctrl+alt+2 not work on gtk display
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  I download 2.2.0 release  on http://wiki.qemu.org/Download
+  the monitor console does not appear in gtk display but works for sdl and =
+vnc.
+  my gtk is 3.12.2
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1405176/+subscriptions
