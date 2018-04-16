@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f83Em-0003O7-5h
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:28:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f83K5-0006Sh-7d
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f83Eh-00027r-5T
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:28:00 -0400
-References: <1523657288-6587-1-git-send-email-walling@linux.ibm.com>
-	<1523657288-6587-3-git-send-email-walling@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <97821ab2-60aa-2760-313c-1130115f5884@redhat.com>
-Date: Mon, 16 Apr 2018 14:27:40 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f83K4-00057L-9l
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:33:29 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33613)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f83K4-00056v-45
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:33:28 -0400
+Received: by mail-oi0-x242.google.com with SMTP id 126-v6so14310600oig.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 05:33:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1523657288-6587-3-git-send-email-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 2/4] pc-bios/s390-ccw: fix
- loadparm initialization and int conversion
+In-Reply-To: <1523518688-26674-3-git-send-email-eric.auger@redhat.com>
+References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
+	<1523518688-26674-3-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 13:33:06 +0100
+Message-ID: <CAFEAcA-SM6DkdpEcC6eSOvrjLOMC2cpxyaWjS3ezcp_EnvCjFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v11 02/17] hw/arm/smmu-common: IOMMU memory
+ region and address space setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
-Cc: frankja@linux.ibm.com, gor@linux.ibm.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On 14.04.2018 00:08, Collin Walling wrote:
-> Rename the loadparm char array in main.c to loadparm_str and
-> increased the size by one byte to account for a null termination
-> when converting the loadparm string to an int  via atoui. We
-> also allow the boot menu to be enabled when loadparm is set to
-> an empty string or a series of spaces.
->=20
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
+> We set up the infrastructure to enumerate all the PCI devices
+> attached to the SMMU and create an associated IOMMU memory
+> region and address space.
+>
+> Those info are stored in SMMUDevice objects. The devices are
+> grouped according to the PCIBus they belong to. A hash table
+> indexed by the PCIBus pointer is used. Also an array indexed by
+> the bus number allows to find the list of SMMUDevices.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+>
 > ---
->  hw/s390x/ipl.c          |  2 ++
->  pc-bios/s390-ccw/main.c | 14 +++++++-------
->  2 files changed, 9 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index fdeaec3..23b5b54 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -352,6 +352,8 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
->              loadparm[i] =3D ascii2ebcdic[(uint8_t) lp[i]];
->          }
-> =20
-> +        memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces =
-*/
-> +
->          g_free(lp);
->          return 0;
->      }
+> v9 -> v10:
+> - comment functions added to the header
+> - g_free(name)
+> - renamed smmu_find_as_from_bus_num into smmu_find_smmu_pcibus
+> - add a comment about lazy init in smmu_find_smmu_pcibus
+> - add a trace event when creating the smmu iommu mr
+>
+> v8 -> v9:
+> - fix key value for lookup
+>
+> v7 -> v8:
+> - introduce SMMU_MAX_VA_BITS
+> - use PCI bus handle as a key
+> - do not clear s->smmu_as_by_bus_num
+> - use g_new0 instead of g_malloc0
+> - use primary_bus field
+> ---
+>  hw/arm/smmu-common.c         | 69 ++++++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/trace-events          |  3 ++
+>  include/hw/arm/smmu-common.h |  8 +++++
+>  3 files changed, 80 insertions(+)
+>
+> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+> index e086ff5..9a966bb 100644
+> --- a/hw/arm/smmu-common.c
+> +++ b/hw/arm/smmu-common.c
+> @@ -28,8 +28,69 @@
+>  #include "qemu/error-report.h"
+>  #include "hw/arm/smmu-common.h"
+>
+> +/**
+> + * The bus number is used for lookup when SID based invalidatation occurs.
 
-When compiling this code, my GCC (v4.8.5) complains:
+"invalidation"
 
-  CC      s390x-softmmu/hw/s390x/ipl.o
-In file included from /usr/include/string.h:638:0,
-                 from /home/thuth/devel/qemu/include/qemu/osdep.h:69,
-                 from /home/thuth/devel/qemu/hw/s390x/ipl.c:14:
-In function =E2=80=98memset=E2=80=99,
-    inlined from =E2=80=98s390_ipl_set_loadparm=E2=80=99 at
-/home/thuth/devel/qemu/hw/s390x/ipl.c:376:15:
-/usr/include/bits/string3.h:81:30: error: call to
-=E2=80=98__warn_memset_zero_len=E2=80=99 declared with attribute warning:=
- memset used
-with constant zero length parameter; this could be due to transposed
-parameters [-Werror]
-       __warn_memset_zero_len ();
+> + * In that case we lazily populate the SMMUPciBus array from the bus hash
+> + * table. At the time the SMMUPciBus is created (smmu_find_add_as), the bus
+> + * numbers may not be always initialized yet.
+> + */
 
-I guess this might happen due to some internal loop unrolling of GCC or
-something similar ... to make sure that we can compile the code also
-without warnings, could you please add a check around the memset =C3=A0 l=
-a:
 
-    if (i < 8) {
-        memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
-    }
+> +/* Return the stream ID of an SMMU device */
+> +static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
+> +{
+> +    return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
 
- Thanks,
-  Thomas
+I think this is PCI_BUILD_BDF(pci_bus_num(sdev->bus), sdev->devfn)
+and I suspect the mask with 0xff is unneeded (compare pci_get_bdf()
+and amdvi_do_translate(), which just assume the bus number is sane).
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
