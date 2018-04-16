@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f801q-0006jQ-F5
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:02:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f80AY-0001hv-AO
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f801m-0003uC-Dg
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:02:26 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35835)
+	(envelope-from <peter.maydell@linaro.org>) id 1f80AX-0001OJ-EP
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:11:26 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:32958)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f801m-0003tk-3X
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:02:22 -0400
-Received: by mail-wr0-x244.google.com with SMTP id w3so7082950wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 02:02:21 -0700 (PDT)
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-4-alex.bennee@linaro.org>
-	<82169d34-1570-2f5c-07e4-8556e64e5b11@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <82169d34-1570-2f5c-07e4-8556e64e5b11@amsat.org>
-Date: Mon, 16 Apr 2018 10:02:19 +0100
-Message-ID: <877ep7bk2s.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f80AX-0001Np-7i
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:11:25 -0400
+Received: by mail-ot0-x241.google.com with SMTP id g23-v6so1422615oti.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 02:11:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180413140334.26622-1-alex.bennee@linaro.org>
+References: <20180413140334.26622-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 10:11:03 +0100
+Message-ID: <CAFEAcA-PZCroM7MA_UYiSrLs6XTC4O507DbhJTQLUcJF7+on4Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 03/24] configure: move i386_cc to
- cross_cc_i386
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Softfloat Fixes for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,155 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, cota@braap.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> Hi Alex,
+On 13 April 2018 at 15:03, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Hi,
 >
-> On 04/10/2018 04:38 PM, Alex Benn=C3=A9e wrote:
->> We should still be able to use the system cross compiler with the
->> appropriate flags on x86_64 hosts.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  configure | 23 +++++++++++++++--------
->>  1 file changed, 15 insertions(+), 8 deletions(-)
->>=20
->> diff --git a/configure b/configure
->> index b5f3b3fe29..add87ff4d4 100755
->> --- a/configure
->> +++ b/configure
->> @@ -284,7 +284,6 @@ libs_softmmu=3D""
->>  libs_tools=3D""
->>  audio_pt_int=3D""
->>  audio_win_int=3D""
->> -cc_i386=3Di386-pc-linux-gnu-gcc
->>  libs_qga=3D""
->>  debug_info=3D"yes"
->>  stack_protector=3D""
->> @@ -457,6 +456,8 @@ docker=3D"no"
->>  cross_cc_aarch64=3D"aarch64-linux-gnu-gcc"
->>  cross_cc_arm=3D"arm-linux-gnueabihf-gcc"
->>  cross_cc_powerpc=3D"powerpc-linux-gnu-gcc"
->> +cross_cc_i386=3D"i386-pc-linux-gnu-gcc"
->> +cross_cc_i386_cflags=3D""
+> The float_invalid patch now handles the Inf case as well and includes
+> the fix to round_to_uint_and_pack.
 >
-> Can you keep this sorted? (arm < i386 < powerpc)
-
-Sure.
-
+> Alex Benn=C3=A9e (1):
+>   fpu/softfloat: raise float_invalid for NaN/Inf in
+>     round_to_int_and_pack
 >
-> Thanks :)
+> Emilio G. Cota (1):
+>   softfloat: fix {min,max}nummag for same-abs-value inputs
 >
->>=20=20
->>  enabled_cross_compilers=3D""
->>=20=20
->> @@ -687,12 +688,10 @@ case "$cpu" in
->
-> What do you think about renaming $cpu -> host_cpu/target_cpu?
+>  fpu/softfloat.c | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
 
-I'd rather avoid too much churn in configure. Maybe a separate clean-up
-patch?
+Applied to master for 2.12, thanks.
 
->
->>    i386|i486|i586|i686|i86pc|BePC)
->>      cpu=3D"i386"
->>      supported_cpu=3D"yes"
->> -    cross_cc_i386=3Dgcc
->>    ;;
->>    x86_64|amd64)
->>      cpu=3D"x86_64"
->>      supported_cpu=3D"yes"
->> -    cross_cc_x86_64=3Dgcc
->>    ;;
->>    armv*b|armv*l|arm)
->>      cpu=3D"arm"
->> @@ -1435,7 +1434,6 @@ case "$cpu" in
->>      i386)
->>             CPU_CFLAGS=3D"-m32"
->>             LDFLAGS=3D"-m32 $LDFLAGS"
->> -           cc_i386=3D'$(CC) -m32'
->>             ;;
->>      x86_64)
->>             # ??? Only extremely old AMD cpus do not have cmpxchg16b.
->> @@ -1443,12 +1441,14 @@ case "$cpu" in
->>             # runtime and generate the fallback to serial emulation.
->>             CPU_CFLAGS=3D"-m64 -mcx16"
->>             LDFLAGS=3D"-m64 $LDFLAGS"
->> -           cc_i386=3D'$(CC) -m32'
->> +           cross_cc_i386=3D$cc
->> +           cross_cc_i386_cflags=3D"-m32"
->>             ;;
->>      x32)
->>             CPU_CFLAGS=3D"-mx32"
->>             LDFLAGS=3D"-mx32 $LDFLAGS"
->> -           cc_i386=3D'$(CC) -m32'
->> +           cross_cc_i386=3D$cc
->> +           cross_cc_i386_cflags=3D"-m32"
->>             ;;
->>      # No special flags required for other host CPUs
->>  esac
->> @@ -6664,7 +6664,6 @@ echo "CC=3D$cc" >> $config_host_mak
->>  if $iasl -h > /dev/null 2>&1; then
->>    echo "IASL=3D$iasl" >> $config_host_mak
->>  fi
->> -echo "CC_I386=3D$cc_i386" >> $config_host_mak
->>  echo "HOST_CC=3D$host_cc" >> $config_host_mak
->>  echo "CXX=3D$cxx" >> $config_host_mak
->>  echo "OBJCC=3D$objcc" >> $config_host_mak
->> @@ -6783,6 +6782,7 @@ case "$target" in
->>  esac
->>=20=20
->>  target_compiler=3D""
->> +target_compiler_cflags=3D""
->>=20=20
->>  mkdir -p $target_dir
->>  echo "# Automatically generated by configure - do not modify" > $config=
-_target_mak
->> @@ -6799,10 +6799,13 @@ TARGET_ABI_DIR=3D""
->>  case "$target_name" in
->>    i386)
->>      gdb_xml_files=3D"i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.=
-xml"
->> +    target_compiler=3D$cross_cc_i386
->> +    target_compiler_cflags=3D$cross_cc_i386_cflags
->>    ;;
->>    x86_64)
->>      TARGET_BASE_ARCH=3Di386
->>      gdb_xml_files=3D"i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.=
-xml"
->> +    target_compiler=3D$cross_cc_x86_64
->>    ;;
->>    alpha)
->>      mttcg=3D"yes"
->> @@ -6947,7 +6950,7 @@ int main(void) {
->>  }
->>  EOF
->>=20=20
->> -    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
->> +    if ! do_compiler $target_compiler $target_compiler_cflags -o $TMPE =
-$TMPC -static ; then
->>          target_compiler=3D""
->>      else
->>          enabled_cross_compilers=3D"${enabled_cross_compilers} ${target_=
-compiler}"
->> @@ -7033,6 +7036,10 @@ if test -n "$target_compiler"; then
->>    echo "CROSS_CC_GUEST=3D$target_compiler" >> $config_target_mak
->>  fi
->>=20=20
->> +if test -n "$target_compiler_cflags"; then
->> +  echo "CROSS_CC_GUEST_CFLAGS=3D$target_compiler_cflags" >> $config_tar=
-get_mak
->> +fi
->> +
->>  # generate QEMU_CFLAGS/LDFLAGS for targets
->>=20=20
->>  cflags=3D""
->>=20
-
-
---=20
-Alex Benn=C3=A9e
+-- PMM
