@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8CPs-0005KO-FA
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 18:16:06 -0400
+	(envelope-from <agk@godking.net>) id 1f8Cyq-0001uZ-Ez
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 18:52:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8CPp-0005xN-Lk
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 18:16:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f8CPp-0005ul-D8
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 18:16:01 -0400
-Date: Mon, 16 Apr 2018 16:15:59 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180416161559.530ee800@w520.home>
-In-Reply-To: <1523424250-3835-1-git-send-email-xiong.y.zhang@intel.com>
-References: <1523424250-3835-1-git-send-email-xiong.y.zhang@intel.com>
+	(envelope-from <agk@godking.net>) id 1f8Cyn-0002iN-Cf
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 18:52:12 -0400
+Received: from s18231873.onlinehome-server.info ([217.160.179.168]:34152
+	helo=godking.net) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <agk@godking.net>) id 1f8Cyn-0002dg-3T
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 18:52:09 -0400
+References: <1523698174-22832-1-git-send-email-agk@godking.net>
+	<20180416082944.fkgqs5htp2rr3yi5@sirius.home.kraxel.org>
+From: Alexander Kappner <agk@godking.net>
+Message-ID: <b751dfad-7548-63f1-4f79-7b068a5952aa@godking.net>
+Date: Mon, 16 Apr 2018 15:52:03 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180416082944.fkgqs5htp2rr3yi5@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks.c: Make stolen memory size
- adjustable for igd VFIO
+Subject: Re: [Qemu-devel] qapi: [PATCH v2] Implement query-usbhost QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,185 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiong Zhang <xiong.y.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, zhenyuw@linux.intel.com, zhi.a.wang@intel.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: armbru@redhat.com, qemu-devel@nongnu.org
 
-On Wed, 11 Apr 2018 13:24:10 +0800
-Xiong Zhang <xiong.y.zhang@intel.com> wrote:
+Hi Gerd,
 
-> Currenly linux guest with kernel above 3.19 couldn't boot up on igd
-> passthrough env. The root case is i915 driver use stolen memory, but
-> qemu vfio doesn't support it.
+thanks for reviewing. I'll follow up with a v3 of the patch addressing your proposed changes.
+
+>> This allows a QMP client to query which USB devices may be available
+>> for redirection.
+
+> At least libvirt sandboxes qemu, for security reasons, and you wouldn't
+> get any useful results because qemu hasn't the permissions needed to
+> scan the usb bus.
+Then at least this tells you that you can't make anything available via redirection either, which is also useful information.
+
+> I'm wondering what the use case is?
+I'm working on a smartphone client that talks to a QEMU instance via QMP, and that allows the user to switch USB devices between host and QEMU guest. This removes the need for a separate set of input devices permanently assigned to the host (since if I pass through a keyboard/mouse to the VM, I can't use that same keyboard/mouse to run a command that re-attaches those devices to the host, so I need some external channel). Basically using the phone as a KVM switch.
+
+Best
+Alexander
+
+On 04/16/2018 01:29 AM, Gerd Hoffmann wrote:
+> On Sat, Apr 14, 2018 at 02:29:34AM -0700, Alexander Kappner wrote:
+>> Implement a QMP command similar to the HMP's "info usbhost" command.
 > 
-> This patch set stolen memory size to zero default, so guest i915 won't
-> use it. But this breaks old windows igd driver which will be unloaded
-> once it see zero stolen memory size. Then this patch also use x-igd-gms
-> option to adjust stolen memory size. New windows igd driver fixes this and
-> could work with zero stolen memory size.
+> The hmp version of the command should be switched over to call the
+> qmp_query_usbhost() and pretty-print the qapi struct then, to make
+> sure hmp and qmp versions of the command deliver consistent results.
 > 
-> Finally with this patch, Linux guest and windows guest with igd driver
-> above 15.45.4860 could work successfully, windows guest with igd driver
-> below 15.45.4860 should add x-igd-gms=* option.
-
-Sorry, I can't understand the above commit log in comparison to what
-this patch is actually doing.
-
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
->  hw/vfio/pci-quirks.c | 95 ++++++++++++++++++++++++++++------------------------
->  1 file changed, 52 insertions(+), 43 deletions(-)
+>> This allows a QMP client to query which USB devices may be available
+>> for redirection.
 > 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 60ad5fb..6e9ed7f 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1372,14 +1372,60 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      uint16_t cmd_orig, cmd;
->      Error *err = NULL;
->  
-> +    /* This must be an Intel VGA device. */
-> +    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-> +        !vfio_is_vga(vdev) || nr != 4) {
-> +        return;
-> +    }
-> +
->      /*
-> -     * This must be an Intel VGA device at address 00:02.0 for us to even
-> -     * consider enabling legacy mode.  The vBIOS has dependencies on the
-> -     * PCI bus address.
-> +     * IGD is not a standard, they like to change their specs often.  We
-> +     * only attempt to support back to SandBridge and we hope that newer
-> +     * devices maintain compatibility with generation 8.
->       */
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-> -        !vfio_is_vga(vdev) || nr != 4 ||
-> -        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-> +    gen = igd_gen(vdev);
-> +    if (gen != 6 && gen != 8) {
-> +        error_report("IGD device %s is unsupported by IGD quirks, "
-> +                     "try SandyBridge or newer", vdev->vbasedev.name);
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Regardless of running in UPT or legacy mode, the guest graphics
-> +     * driver may attempt to use stolen memory, however only legacy mode
-> +     * has BIOS support for reserving stolen memory in the guest VM.
-> +     * Emulate the GMCH register in all cases and zero out the stolen
-> +     * memory size here.
-> +     */
-> +    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-> +    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-
-Aha!  You want to enable stolen memory in either UPT or legacy mode.  I
-could not possibly have determined that from the commit log.  Please
-rewrite the commit log to describe what is actually changing here.
-
-> +
-> +    /*
-> +     * Assume we have no GMS memory, but allow it to be overrided by device
-> +     * option (experimental). Old windows igd driver must see non-zero stolen
-> +     * memory size, otherwise it will be unloaded. New igd windows driver fix
-> +     * this issue and could load with zero stolen memory size.
-> +     */
-> +    if (vdev->igd_gms) {
-> +        if (vdev->igd_gms <= 0x10) {
-> +            gms_mb = vdev->igd_gms * 32;
-> +            gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-> +        } else {
-> +            error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
-> +            vdev->igd_gms = 0;
-> +        }
-> +    }
-
-You state in the previous code block that only legacy mode has BIOS
-support for reserving stolen memory, so why should UPT mode be allowed
-to specify stolen memory?  Where is it allocated?
-
-> +
-> +    /* GMCH is read-only, emulated */
-> +    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-> +    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-> +    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-> +
-> +    /*
-> +     * This must be at address 00:02.0 for us to even onsider enabling
-> +     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
-> +     */
-> +    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
->                                         0, PCI_DEVFN(0x2, 0))) {
-
-So we allow the user to specify stolen memory size in UPT mode, we
-emulate that in the GMCH register, but we do nothing with the BDSM
-register which tells the guest driver the address of the stolen
-memory.  What's the point?  I'm lost.  Thanks,
-
-Alex
-
->          return;
->      }
-> @@ -1399,18 +1445,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      }
->  
->      /*
-> -     * IGD is not a standard, they like to change their specs often.  We
-> -     * only attempt to support back to SandBridge and we hope that newer
-> -     * devices maintain compatibility with generation 8.
-> -     */
-> -    gen = igd_gen(vdev);
-> -    if (gen != 6 && gen != 8) {
-> -        error_report("IGD device %s is unsupported in legacy mode, "
-> -                     "try SandyBridge or newer", vdev->vbasedev.name);
-> -        return;
-> -    }
-> -
-> -    /*
->       * Most of what we're doing here is to enable the ROM to run, so if
->       * there's no ROM, there's no point in setting up this quirk.
->       * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
-> @@ -1465,8 +1499,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->          goto out;
->      }
->  
-> -    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-> -
->      /*
->       * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
->       * try to enable it.  Probably shouldn't be using legacy mode without VGA,
-> @@ -1532,24 +1564,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      }
->  
->      /*
-> -     * Assume we have no GMS memory, but allow it to be overrided by device
-> -     * option (experimental).  The spec doesn't actually allow zero GMS when
-> -     * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
-> -     * so let's not waste VM memory for it.
-> -     */
-> -    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-> -
-> -    if (vdev->igd_gms) {
-> -        if (vdev->igd_gms <= 0x10) {
-> -            gms_mb = vdev->igd_gms * 32;
-> -            gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-> -        } else {
-> -            error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
-> -            vdev->igd_gms = 0;
-> -        }
-> -    }
-> -
-> -    /*
->       * Request reserved memory for stolen memory via fw_cfg.  VM firmware
->       * must allocate a 1MB aligned reserved memory region below 4GB with
->       * the requested size (in bytes) for use by the Intel PCI class VGA
-> @@ -1562,11 +1576,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->      fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
->                      bdsm_size, sizeof(*bdsm_size));
->  
-> -    /* GMCH is read-only, emulated */
-> -    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-> -    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-> -    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-> -
->      /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
->      pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
->      pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
+> I'm wondering what the use case is?
+> 
+> At least libvirt sandboxes qemu, for security reasons, and you wouldn't
+> get any useful results because qemu hasn't the permissions needed to
+> scan the usb bus.
+> 
+>>  ##
+>> +# @query-usbhost:
+>> +#
+>> +# Returns information about USB devices available on the host
+>> +#
+>> +# Returns: a [UsbDeviceInfo]. Returns an error if compiled without
+>> +# CONFIG_USB_LIBUSB
+>> +#
+>> +# Since: TODO (maintainer insert version number if mainlined)
+> 
+> Will not make it into 2.12, so 2.13.
+> 
+>> +# @UsbDeviceInfo:
+>> +#
+>> +# @speed: the speed
+> 
+> Use an enum for this?
+> 
+>> +# @id_vendor: idVendor field from device descriptor
+>> +#
+>> +# @id_product: idProduct field from device descriptor
+>> +#
+>> +# @str_product: string descriptor referenced by iProduct index, if any
+>> +#
+>> +# @str_manufacturer: string descriptor referenced by iManufacturer index, if any
+>> +#
+>> +# @dev_addr: address on bus that device is connected to
+>> +#
+>> +# @bus_num: bus number device is connected to
+> 
+> No port?
+> 
+> cheers,
+>   Gerd
+> 
