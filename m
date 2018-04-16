@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f84lb-0001u6-48
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:06:05 -0400
+	(envelope-from <prvs=6373d119a=Ian.Jackson@citrix.com>)
+	id 1f84md-0002et-OZ
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:07:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f84lU-0005Lq-Ko
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:05:59 -0400
-References: <cover.1521016003.git.berto@igalia.com>
-	<14bbd13c5c93211ed4e36188624f429087a6a273.1521016003.git.berto@igalia.com>
-	<b9df06c2-0116-8e5c-6725-a59b6d03ed6b@redhat.com>
-	<w51d0yzgsph.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f02789cc-d5a6-eaf9-b457-396bea318d14@redhat.com>
-Date: Mon, 16 Apr 2018 16:05:21 +0200
+	(envelope-from <prvs=6373d119a=Ian.Jackson@citrix.com>)
+	id 1f84mX-0006HI-Nl
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:07:03 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:59045)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=6373d119a=Ian.Jackson@citrix.com>)
+	id 1f84mX-0006F6-EZ
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:06:57 -0400
+From: Ian Jackson <ian.jackson@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <w51d0yzgsph.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vsOYT6rLCwTMfCONkAinLaBRFwZf2IHE7"
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] qcow2: Give the refcount cache the
- minimum possible size by default
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23252.44539.262716.947319@mariner.uk.xensource.com>
+Date: Mon, 16 Apr 2018 15:06:51 +0100
+In-Reply-To: <874lkfxfxt.fsf@dusky.pond.sub.org>
+References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1520535787-6223-9-git-send-email-ian.jackson@eu.citrix.com>
+	<874lkfxfxt.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 08/12] os-posix: Provide new -runas
+ <uid>:<gid> facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,135 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano  Stabellini <sstabellini@kernel.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony  PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vsOYT6rLCwTMfCONkAinLaBRFwZf2IHE7
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <f02789cc-d5a6-eaf9-b457-396bea318d14@redhat.com>
-Subject: Re: [PATCH v2 1/2] qcow2: Give the refcount cache the minimum
- possible size by default
-References: <cover.1521016003.git.berto@igalia.com>
- <14bbd13c5c93211ed4e36188624f429087a6a273.1521016003.git.berto@igalia.com>
- <b9df06c2-0116-8e5c-6725-a59b6d03ed6b@redhat.com>
- <w51d0yzgsph.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51d0yzgsph.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thanks for the review.  Taking your comments out of order slightly:
 
-On 2018-04-16 15:56, Alberto Garcia wrote:
-> On Fri 13 Apr 2018 05:00:48 PM CEST, Max Reitz wrote:
->> On 2018-03-14 09:29, Alberto Garcia wrote:
->>> The L2 and refcount caches have default sizes that can be overridden
->>> using the l2-cache-size and refcount-cache-size (an additional
->>> parameter named cache-size sets the combined size of both caches).
->>>
->>> Unless forced by one of the aforementioned parameters, QEMU will set
->>> the unspecified sizes so that the L2 cache is 4 times larger than the=
+Markus Armbruster writes ("Re: [Qemu-devel] [PATCH 08/12] os-posix: Provide new -runas <uid>:<gid> facility"):
+> [change_process_uid] is the only user of @user_pwd, @user_uid, @user_gid.
+> 
+> Have you considered replacing global @user_pwd by @user_uid, @user_gid
+> and @user_name?  --runas with numeric uid and gid would leave @user_name
+> null.
 
->>> refcount cache.
->>>
->>> This is based on the premise that the refcount metadata needs to be
->>> only a fourth of the L2 metadata to cover the same amount of disk
->>> space. This is incorrect for two reasons:
->>>
->>>  a) The amount of disk covered by an L2 table depends solely on the
->>>     cluster size, but in the case of a refcount block it depends on
->>>     the cluster size *and* the width of each refcount entry.
->>>     The 4/1 ratio is only valid with 16-bit entries (the default).
->>>
->>>  b) When we talk about disk space and L2 tables we are talking about
->>>     guest space (L2 tables map guest clusters to host clusters),
->>>     whereas refcount blocks are used for host clusters (including
->>>     L1/L2 tables and the refcount blocks themselves). On a fully
->>>     populated (and uncompressed) qcow2 file, image size > virtual siz=
-e
->>>     so there are more refcount entries than L2 entries.
->>>
->>> Problem (a) could be fixed by adjusting the algorithm to take into
->>> account the refcount entry width. Problem (b) could be fixed by
->>> increasing a bit the refcount cache size to account for the clusters
->>> used for qcow2 metadata.
->>
->> Yeah, well, but I wouldn't give too much thought to (b).  In case of
->> internal snapshots, you won't write to them, so those clusters don't
->> matter.  So, yes, you get a bit of overhead for the metadata, but come=
+That would defer the getpwnam from argument parsing to os_setup_post.
+I think that's undesriable.
 
->> on, that's not really much.
->=20
-> With that text I just wanted to point out that the calculation mixes
-> host clusters and guest clusters. I agree that the ratio we're using is=
+> Ian Jackson <ian.jackson@eu.citrix.com> writes:
+> >  static struct passwd *user_pwd;
+> > +static uid_t user_uid = (uid_t)-1;
+> > +static gid_t user_gid = (gid_t)-1;
+> 
+> As we'll see below, @user_pwd->pw_uid, @user_pwd_pw_gid take precedence
+> over @user_uid, @user_gid.  Awkward.
 
-> a good approximation (apart from the refcount width issue).
->=20
->>> However this patch takes a completely different approach and instead
->>> of keeping a ratio between both cache sizes it assigns as much as
->>> possible to the L2 cache and the remainder to the refcount cache.
->>
->> Seems reasonable in a sense, but I'm wary still.  I especially don't
->> like that it just changes the default when nothing has been specified.=
+My patch has the right behaviour: each -runas completely overrides the
+previous one.  -runas that sets user_{uid,gid} always clears user_pwd
+on the way.  So user_pwd can only be set if the most recent -runas was
+a name, and then we should honour the name.
 
->>
->> I can see that we want to limit the refcount cache size, so if you
->> want to give really much RAM to the L2 tables, then you don't want a
->> 25 % overhead for the refcount cache, but do we really need to limit
->> it to the minimum size?
->>
->> OTOH, four clusters doesn't seem extremely limited...  Did you do your=
+This is rather obscure.  I think you are right that this is confusing.
+It ought to be clearer.
 
->> benchmark on an HDD?
->=20
-> I tried, I see no difference, and I don't see why there would be any.
->=20
-> Refcount entries are used to reference host clusters, and host clusters=
+I will
+  - add a comment next to these three variables saying they must
+    all be set at the same time
+  - explicitly (redundantly) clear user_pwd in os_parse_runas_uid_gid
+  - explicitly set user_{uid,gid} to -1 when -runas gets a
+    success from getpwnam
+  - assert in change_process_uid that the combination is legal
 
-> are always(*) allocated sequentially, so caching refcount blocks doesn'=
-t
-> do much. You're always loading the same refcount block until it's full,=
+> > +    errno = 0;
+> > +    rc = qemu_strtoul(optarg, &ep, 0, &lv);
+...
+> > +    lv = 0;
+> 
+> Either zero lv before both qemu_strtoul() or neither one.
 
-> then you move on to the next one. As I mentioned in a previous e-mail,
-> having a very large refcount cache would even be detrimental because it=
+This is a hangover from the previous version which used raw strtoul.
+The assignments to both lv and errno are redundant.
 
-> would make cache hits slower (noticeable under tmpfs).
+> > -        if (!user_pwd) {
+> > -            fprintf(stderr, "User \"%s\" doesn't exist\n", optarg);
+> > +        if (!user_pwd && !os_parse_runas_uid_gid(optarg)) {
+> > +            error_report("User doesn't exist (and is not <uid>:<gid>)");
+> 
+> The error message no longer includes the offending value.  Intentional?
 
-Ah, right.  I'm not sure whether I want to ask you whether you have
-tested internal snapshots.  I suppose it can be detrimental for them
-because when taking or deleting a snapshot you need to update the
-refcounts of a whole bunch of clusters that might be spread randomly
-across the image.  But I suspect that it would be rather time-consuming
-to produce an image with such a configuration; and I suppose if people
-want to make heavy use of internal snapshots they can adapt the cache
-size themselves?
+I was in two minds.  I will put it back.
 
-Max
+> > +    if (user_pwd || user_uid != (uid_t)-1) {
+> > +        gid_t intended_gid = user_pwd ? user_pwd->pw_gid : user_gid;
+> > +        uid_t intended_uid = user_pwd ? user_pwd->pw_uid : user_uid;
+> > +        if (setgid(intended_gid) < 0) {
+> > +            fprintf(stderr, "Failed to setgid(%d)\n", intended_gid);
+> 
+> error_report(), please.  More of the same below.
 
-> (*) when a cluster gets deallocated (e.g. when the refcount table needs=
+I was following the existing code in this function.  I'll add a
+pre-patch to fix this up here, and maybe a post-patch to fix the rest
+of this file.
 
-> to grow) then there's a hole in the file and QEMU starts looking for
-> free clusters again from the beginning of the file. In that case old
-> refcount blocks are loaded again, but the cache wouldn't help here
-> either (unless we would have all refcount blocks cached).
-
-
---vsOYT6rLCwTMfCONkAinLaBRFwZf2IHE7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrUraEACgkQ9AfbAGHV
-z0DqXAf/REMvzrwBpJ4CpdJxjYOhlWwhDv/bg2W4FUB2YdasKxMu537qdxa0pbJv
-SmgWrvdOQU7GC5C3zYMKwVy65pq6odlw/yv4/3jgiAYpoQPR5Z8t6gl+8slDkkwa
-YSlJV4QdLIxseB9JIXLJ98kkmqOmrgiwAd0ii7pa3eF6JB7M/0Cn23TB5ZKeWxoe
-/DRkTaWRy5kZ/xpVfo7iCUsVJRpzhBpeSNenIhwwzAfwIZzB6IEvkWG9RFUIPwsW
-cUDFyiZFexAhSX565Yx4SljFHWJKU+nSv0vccDP+jKnRgRit3LQ4i2sUp3n4TNlH
-w8MIMVsTA3Yv355NgsSSUFEsALPb+A==
-=YNwM
------END PGP SIGNATURE-----
-
---vsOYT6rLCwTMfCONkAinLaBRFwZf2IHE7--
+Thanks,
+Ian.
