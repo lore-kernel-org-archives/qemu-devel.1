@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f859e-0005Zm-Gf
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:30:54 -0400
+	(envelope-from <berto@igalia.com>) id 1f85AA-0005xX-Ua
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f859d-0006ea-H0
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:30:50 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44423)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f859d-0006eM-CI
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:30:49 -0400
-Received: by mail-ot0-x243.google.com with SMTP id p33-v6so17556668otp.11
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:30:49 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1f85A6-0007Ao-4J
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:31:22 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <f02789cc-d5a6-eaf9-b457-396bea318d14@redhat.com>
+References: <cover.1521016003.git.berto@igalia.com>
+	<14bbd13c5c93211ed4e36188624f429087a6a273.1521016003.git.berto@igalia.com>
+	<b9df06c2-0116-8e5c-6725-a59b6d03ed6b@redhat.com>
+	<w51d0yzgsph.fsf@maestria.local.igalia.com>
+	<f02789cc-d5a6-eaf9-b457-396bea318d14@redhat.com>
+Date: Mon, 16 Apr 2018 16:31:15 +0200
+Message-ID: <w51a7u3gr4c.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <e879b530-1e00-6b58-7e23-eb8e76f7bfa4@twiddle.net>
-References: <20180413142336.32163-1-peter.maydell@linaro.org>
-	<e879b530-1e00-6b58-7e23-eb8e76f7bfa4@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Apr 2018 15:30:28 +0100
-Message-ID: <CAFEAcA90-LDMEBHhntTrtLxvjTPN17C1fZhOZ2ttB3jCg4LvwA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12] tcg/mips: Handle large offsets
- from target env to tlb_table
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qcow2: Give the refcount cache the
+ minimum possible size by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 13 April 2018 at 20:09, Richard Henderson <rth@twiddle.net> wrote:
-> On 04/13/2018 04:23 AM, Peter Maydell wrote:
->> The MIPS TCG target makes the assumption that the offset from the
->> target env pointer to the tlb_table is less than about 64K. This
->> used to be true, but gradual addition of features to the Arm
->> target means that it's no longer true there. This results in
->> the build-time assertion failing:
->>
->> In file included from /home/pm215/qemu/include/qemu/osdep.h:36:0,
->>                  from /home/pm215/qemu/tcg/tcg.c:28:
->> /home/pm215/qemu/tcg/mips/tcg-target.inc.c: In function =E2=80=98tcg_out=
-_tlb_load=E2=80=99:
->> /home/pm215/qemu/include/qemu/compiler.h:90:36: error: static assertion =
-failed: "not expecting: offsetof(CPUArchState, tlb_table[NB_MMU_MODES - 1][=
-1]) > 0x7ff0 + 0x7fff"
->>  #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
->>                                     ^
->> /home/pm215/qemu/include/qemu/compiler.h:98:30: note: in expansion of ma=
-cro =E2=80=98QEMU_BUILD_BUG_MSG=E2=80=99
->>  #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x=
-)
->>                               ^
->> /home/pm215/qemu/tcg/mips/tcg-target.inc.c:1236:9: note: in expansion of=
- macro =E2=80=98QEMU_BUILD_BUG_ON=E2=80=99
->>          QEMU_BUILD_BUG_ON(offsetof(CPUArchState,
->>          ^
->> /home/pm215/qemu/rules.mak:66: recipe for target 'tcg/tcg.o' failed
+On Mon 16 Apr 2018 04:05:21 PM CEST, Max Reitz wrote:
+>> Refcount entries are used to reference host clusters, and host
+>> clusters are always(*) allocated sequentially, so caching refcount
+>> blocks doesn't do much. You're always loading the same refcount block
+>> until it's full, then you move on to the next one. As I mentioned in
+>> a previous e-mail, having a very large refcount cache would even be
+>> detrimental because it would make cache hits slower (noticeable under
+>> tmpfs).
 >
-> Yes, I asked for help on this from the MIPS folks back in January when I =
-posted
-> patches for ppc and arm(32) hosts.  And then of course forgot about it in=
- the
-> interim.
->
->> +    while (add_off >=3D 0x8000) {
->> +        /* Most target env are smaller than 32k, but a few are larger t=
-han 64k,
->> +         * so handle an arbitrarily large offset.
->> +         */
->>          tcg_out_opc_imm(s, ALIAS_PADDI, TCG_REG_A0, TCG_REG_A0, 0x7ff0)=
-;
->>          cmp_off -=3D 0x7ff0;
->>          add_off -=3D 0x7ff0;
->
-> This is a pretty darned good solution, really.  I should have thought of =
-it
-> myself at the time.  The new AArch64 offset is about 80k, so there will b=
-e two
-> adds emitted.  Loading C<<16 into a temp register and then adding would b=
-e no
-> better in the end (one can only add C<<16 directly with mipsr6 extensions=
-).
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Ah, right.  I'm not sure whether I want to ask you whether you have
+> tested internal snapshots.  I suppose it can be detrimental for them
+> because when taking or deleting a snapshot you need to update the
+> refcounts of a whole bunch of clusters that might be spread randomly
+> across the image.  But I suspect that it would be rather
+> time-consuming to produce an image with such a configuration; and I
+> suppose if people want to make heavy use of internal snapshots they
+> can adapt the cache size themselves?
 
-Thanks; applied to master.
+Exactly.
 
--- PMM
+Berto
