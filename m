@@ -1,16 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f87TY-0007uj-Nk
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:59:34 -0400
+	(envelope-from <prvs=6373d119a=Ian.Jackson@citrix.com>)
+	id 1f87Uq-0000mf-Cc
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f87TW-0003Y8-Ci
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:59:32 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Apr 2018 18:58:49 +0200
-Message-Id: <20180416165849.28864-10-mreitz@redhat.com>
-In-Reply-To: <20180416165849.28864-1-mreitz@redhat.com>
-References: <20180416165849.28864-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 9/9] iotests: Add test for COR across nodes
+	(envelope-from <prvs=6373d119a=Ian.Jackson@citrix.com>)
+	id 1f87Un-0004eI-5a
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:00:52 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:11768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=6373d119a=Ian.Jackson@citrix.com>)
+	id 1f87Um-0004dA-R6
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:00:49 -0400
+From: Ian Jackson <ian.jackson@citrix.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23252.54972.659826.276061@mariner.uk.xensource.com>
+Date: Mon, 16 Apr 2018 18:00:44 +0100
+In-Reply-To: <87tvsbm8gl.fsf@dusky.pond.sub.org>
+References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1520535787-6223-9-git-send-email-ian.jackson@eu.citrix.com>
+	<874lkfxfxt.fsf@dusky.pond.sub.org>
+	<23252.44539.262716.947319@mariner.uk.xensource.com>
+	<87tvsbm8gl.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 08/12] os-posix: Provide new -runas
+ <uid>:<gid> facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,200 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-COR across nodes (that is, you have some filter node between the
-actually COR target and the node that performs the COR) cannot reliably
-work together with the permission system when there is no explicit COR
-node that can request the WRITE_UNCHANGED permission for its child.
-This is because COR (currently) sneaks its requests by the usual
-permission checks, so it can work without a WRITE* permission; but if
-there is a filter node in between, that will re-issue the request, which
-then passes through the usual check -- and if nobody has requested a
-WRITE_UNCHANGED permission, that check will fail.
+Markus Armbruster writes ("Re: [Qemu-devel] [PATCH 08/12] os-posix: Provide new -runas <uid>:<gid> facility"):
+> Ian Jackson <ian.jackson@citrix.com> writes:
+> > That would defer the getpwnam from argument parsing to os_setup_post.
+> > I think that's undesriable.
+> 
+> No argument.  But why can't os_parse_cmd_args() call getpwnam() as it
+> does now, then store user_pwd->pw_uid, ->pw_gid and ->pw_name instead of
+> user_pwd?  Store a null name when it parses the argument as UID:GID.
 
-There is no real direct fix apart from hoping that there is someone who
-has requested that permission; in case of just the qemu-io HMP command
-(and no guest device), however, that is not the case.  The real real fix
-is to implement the copy-on-read flag through an implicitly added COR
-node.  Such a node can request the necessary permissions as shown in
-this test.
+Oh, I see.  It seems less obvious to me than what I have done, but I
+can do it like that if you like.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/216     | 117 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/216.out |  28 +++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 146 insertions(+)
- create mode 100755 tests/qemu-iotests/216
- create mode 100644 tests/qemu-iotests/216.out
-
-diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
-new file mode 100755
-index 0000000000..2f34f94faa
---- /dev/null
-+++ b/tests/qemu-iotests/216
-@@ -0,0 +1,117 @@
-+#!/usr/bin/env python
-+#
-+# Copy-on-read tests using a COR filter node
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Max Reitz <mreitz@redhat.com>
-+#
-+# Non-shared storage migration test using NBD server and drive-mirror
-+
-+import iotests
-+from iotests import log, qemu_img_pipe, qemu_io, filter_qemu_io
-+
-+# Need backing file support
-+iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
-+iotests.verify_platform(['linux'])
-+
-+log('')
-+log('=== Copy-on-read across nodes ===')
-+log('')
-+
-+# The old copy-on-read mechanism without a filter node cannot request
-+# WRITE_UNCHANGED permissions for its child.  Therefore it just tries
-+# to sneak its write by the usual permission system and holds its
-+# fingers crossed.  However, that sneaking does not work so well when
-+# there is a filter node in the way: That will receive the write
-+# request and re-issue a new one to its child, which this time is a
-+# proper write request that will make the permission system cough --
-+# unless there is someone at the top (like a guest device) that has
-+# requested write permissions.
-+#
-+# A COR filter node, however, can request the proper permissions for
-+# its child and therefore is not hit by this issue.
-+
-+with iotests.FilePath('base.img') as base_img_path, \
-+     iotests.FilePath('top.img') as top_img_path, \
-+     iotests.VM() as vm:
-+
-+    log('--- Setting up images ---')
-+    log('')
-+
-+    qemu_img_pipe('create', '-f', iotests.imgfmt, base_img_path, '64M')
-+
-+    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'write -P 1 0M 1M')))
-+
-+    qemu_img_pipe('create', '-f', iotests.imgfmt, '-b', base_img_path,
-+                  top_img_path)
-+
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'write -P 2 1M 1M')))
-+
-+    log('')
-+    log('--- Doing COR ---')
-+    log('')
-+
-+    # Compare with e.g. the following:
-+    #   vm.add_drive_raw('if=none,node-name=node0,copy-on-read=on,driver=raw,' \
-+    #                    'file.driver=%s,file.file.filename=%s' %
-+    #                       (iotests.imgfmt, top_img_path))
-+    # (Remove the blockdev-add instead.)
-+    # ((Not tested here because it hits an assertion in the permission
-+    #   system.))
-+
-+    vm.launch()
-+
-+    log(vm.qmp('blockdev-add',
-+                    node_name='node0',
-+                    driver='cor',
-+                    file={
-+                        'driver': 'raw',
-+                        'file': {
-+                            'driver': 'cor',
-+                            'file': {
-+                                'driver': 'raw',
-+                                'file': {
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': top_img_path
-+                                    },
-+                                    'backing': {
-+                                        'driver': iotests.imgfmt,
-+                                        'file': {
-+                                            'driver': 'file',
-+                                            'filename': base_img_path
-+                                        }
-+                                    }
-+                                }
-+                            }
-+                        }
-+                    }))
-+
-+    # Trigger COR
-+    log(vm.qmp('human-monitor-command',
-+               command_line='qemu-io node0 "read 0 64M"'))
-+
-+    vm.shutdown()
-+
-+    log('')
-+    log('--- Checking COR result ---')
-+    log('')
-+
-+    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'discard 0 64M')))
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 1 0M 1M')))
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 2 1M 1M')))
-diff --git a/tests/qemu-iotests/216.out b/tests/qemu-iotests/216.out
-new file mode 100644
-index 0000000000..d3fc590d29
---- /dev/null
-+++ b/tests/qemu-iotests/216.out
-@@ -0,0 +1,28 @@
-+
-+=== Copy-on-read across nodes ===
-+
-+--- Setting up images ---
-+
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+wrote 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+
-+--- Doing COR ---
-+
-+{u'return': {}}
-+{u'return': u''}
-+
-+--- Checking COR result ---
-+
-+discard 67108864/67108864 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index f1179ffde7..2edc377370 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -214,3 +214,4 @@
- 213 rw auto quick
- 214 rw auto
- 215 rw auto quick
-+216 rw auto quick
--- 
-2.14.3
+Ian.
