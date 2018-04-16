@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44740)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tLC-00071u-V3
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 21:54:00 -0400
+	id 1f7tVI-00023g-Ld
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tLB-0003D9-VM
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 21:53:59 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:40824)
+	id 1f7tVD-0000r5-Oz
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:04:24 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35533)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tLB-0003D5-Qz
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 21:53:57 -0400
-Received: by mail-qt0-x243.google.com with SMTP id d12so1004032qtp.7
-	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 18:53:57 -0700 (PDT)
+	id 1f7tVD-0000r0-Ir
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:04:19 -0400
+Received: by mail-qk0-x243.google.com with SMTP id c188so15020139qkg.2
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 19:04:19 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-25-alex.bennee@linaro.org>
+	<20180410193919.28026-3-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8264b7be-b16f-75e8-1462-88b3d197933d@amsat.org>
-Date: Sun, 15 Apr 2018 22:53:53 -0300
+Message-ID: <5464750f-75ed-dddc-797c-5ca3561dc7dd@amsat.org>
+Date: Sun, 15 Apr 2018 23:04:11 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-25-alex.bennee@linaro.org>
+In-Reply-To: <20180410193919.28026-3-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 24/24] tests/Makefile.include: add
- (clean-)check-tcg targets
+Subject: Re: [Qemu-devel] [PATCH v1 02/24] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,61 +39,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Cc: famz@redhat.com, cota@braap.org
 
-On 04/10/2018 04:39 PM, Alex Bennée wrote:
-> This will ensure all linux-user targets build their guest test
-> programs.
+On 04/10/2018 04:38 PM, Alex Bennée wrote:
+> This allows us to specify cross compilers for our guests. This is
+> useful for building test images/programs. Currently we re-run the
+> compile test for each target. I couldn't think of a way to cache the
+> value for a given arch without getting messier configure code.
+> 
+> The cross compiler for the guest is visible to each target as
+> CROSS_CC_GUEST in config-target.mak.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->  tests/Makefile.include | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  configure | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3d2f0458ab..c402de901e 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -10,6 +10,7 @@ check-help:
->  	@echo " $(MAKE) check-speed          Run qobject speed tests"
->  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
->  	@echo " $(MAKE) check-block          Run block tests"
-> +	@echo " $(MAKE) check-tcg            Run TCG tests"
->  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
->  	@echo " $(MAKE) check-clean          Clean the tests"
->  	@echo
-> @@ -916,6 +917,23 @@ check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check
->  check-report.html: check-report.xml
->  	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
+> diff --git a/configure b/configure
+> index b402befe94..b5f3b3fe29 100755
+> --- a/configure
+> +++ b/configure
+> @@ -453,6 +453,13 @@ vxhs=""
+>  libxml2=""
+>  docker="no"
 >  
-> +# Per guest TCG tests
+> +# cross compilers defaults, can be overridden with --cross-cc-ARCH
+> +cross_cc_aarch64="aarch64-linux-gnu-gcc"
+> +cross_cc_arm="arm-linux-gnueabihf-gcc"
+> +cross_cc_powerpc="powerpc-linux-gnu-gcc"
+
+These seems distrib-specific... Should we add a case $distrib) ...?
+
 > +
-> +LINUX_USER_TARGETS=$(filter %-linux-user,$(TARGET_LIST))
-> +BUILD_TCG_TARGET_RULES=$(patsubst %,tcg-tests-%, $(LINUX_USER_TARGETS))
-> +CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
+> +enabled_cross_compilers=""
 > +
-> +tcg-tests-%:
-> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" guest-tests,)
-> +
-> +clean-tcg-tests-%:
-> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" clean-guest-tests,)
-> +
-> +.PHONY: check-tcg
-> +check-tcg: $(BUILD_TCG_TARGET_RULES)
-> +
-> +.PHONY: clean-tcg
-> +clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+>  supported_cpu="no"
+>  supported_os="no"
+>  bogus_os="no"
+> @@ -483,6 +490,11 @@ for opt do
+>    ;;
+>    --disable-debug-info) debug_info="no"
+>    ;;
+> +  --cross-cc-*[!a-zA-Z0-9_0]=*) error_exit "Passed bad --cross-cc-FOO option"
+> +  ;;
+> +  --cross-cc-*) cc_arch=${opt#--cross-cc-}
+> +                eval "cross_cc_${cc_arch}=\$optarg"
+> +  ;;
+>    esac
+>  done
+>  # OS specific
+> @@ -675,10 +687,12 @@ case "$cpu" in
+>    i386|i486|i586|i686|i86pc|BePC)
+>      cpu="i386"
+>      supported_cpu="yes"
+> +    cross_cc_i386=gcc
+>    ;;
+>    x86_64|amd64)
+>      cpu="x86_64"
+>      supported_cpu="yes"
+> +    cross_cc_x86_64=gcc
+>    ;;
+>    armv*b|armv*l|arm)
+>      cpu="arm"
+> @@ -912,6 +926,8 @@ for opt do
+>    ;;
+>    --disable-debug-info)
+>    ;;
+> +  --cross-cc-*)
+> +  ;;
+>    --enable-modules)
+>        modules="yes"
+>    ;;
+> @@ -6766,6 +6782,8 @@ case "$target" in
+>      ;;
+>  esac
 >  
->  # Other tests
+> +target_compiler=""
+> +
+>  mkdir -p $target_dir
+>  echo "# Automatically generated by configure - do not modify" > $config_target_mak
 >  
-> @@ -958,7 +976,6 @@ check-speed: $(patsubst %,check-%, $(check-speed-y))
->  check-block: $(patsubst %,check-%, $(check-block-y))
->  check: check-qapi-schema check-unit check-qtest check-decodetree
->  check-clean:
-> -	$(MAKE) -C tests/tcg clean
->  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
->  	rm -f tests/test-qapi-gen-timestamp
+> @@ -6794,6 +6812,7 @@ case "$target_name" in
+>      bflt="yes"
+>      mttcg="yes"
+>      gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+> +    target_compiler=$cross_cc_arm
+>    ;;
+>    aarch64|aarch64_be)
+>      TARGET_ARCH=aarch64
+> @@ -6801,6 +6820,7 @@ case "$target_name" in
+>      bflt="yes"
+>      mttcg="yes"
+>      gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+> +    target_compiler=$cross_cc_aarch64
+>    ;;
+>    cris)
+>    ;;
+> @@ -6842,6 +6862,7 @@ case "$target_name" in
+>    ;;
+>    ppc)
+>      gdb_xml_files="power-core.xml power-fpu.xml power-altivec.xml power-spe.xml"
+> +    target_compiler=$cross_cc_powerpc
+>    ;;
+>    ppcemb)
+>      TARGET_BASE_ARCH=ppc
+> @@ -6916,6 +6937,25 @@ if [ "$TARGET_BASE_ARCH" = "" ]; then
+>    TARGET_BASE_ARCH=$TARGET_ARCH
+>  fi
+>  
+> +# Do we have a cross compiler for this target?
+> +if has $target_compiler; then
+> +
+> +    cat > $TMPC << EOF
+> +#include <stdio.h>
+> +int main(void) {
+> +    printf("Hello World!\n");
+> +}
+> +EOF
+> +
+> +    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
+> +        target_compiler=""
+> +    else
+> +        enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
+> +    fi
+> +else
+> +    target_compiler=""
+> +fi
+> +
+>  symlink "$source_path/Makefile.target" "$target_dir/Makefile"
+>  
+>  upper() {
+> @@ -6989,6 +7029,10 @@ if test "$target_bsd_user" = "yes" ; then
+>    echo "CONFIG_BSD_USER=y" >> $config_target_mak
+>  fi
+>  
+> +if test -n "$target_compiler"; then
+> +  echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
+> +fi
+> +
+>  # generate QEMU_CFLAGS/LDFLAGS for targets
+>  
+>  cflags=""
+> @@ -7111,6 +7155,12 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
+>  
+>  done # for target in $targets
+>  
+> +if test -n "$enabled_cross_compilers"; then
+> +    echo
+> +    echo "NOTE: cross-compilers enabled:"
+> +    printf '%s\n' $enabled_cross_compilers | sort -u
+> +fi
+> +
+>  if [ "$dtc_internal" = "yes" ]; then
+>    echo "config-host.h: subdir-dtc" >> $config_host_mak
+>  fi
 > 
