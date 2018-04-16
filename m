@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f887D-0003e1-Hp
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:40:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1f888O-0004R3-8r
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f887C-0002MY-Ja
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:40:31 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f887C-0002M4-AR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:40:30 -0400
-Received: by mail-oi0-x241.google.com with SMTP id 188-v6so15329225oih.8
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 10:40:30 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180416093719.2543-1-mjt@msgid.tls.msk.ru>
-References: <20180416093719.2543-1-mjt@msgid.tls.msk.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Apr 2018 18:40:09 +0100
-Message-ID: <CAFEAcA_6_bZOZDpUSwCzu96v3kj5ZPdj-yCOnLTYBVv3dvRxMw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12] Makefile: install gtk message
- catalogs if CONFIG_GTK=y too, not only =m
+	(envelope-from <thuth@redhat.com>) id 1f888J-0003WF-Dj
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:41:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54536 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f888J-0003UV-9p
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:41:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B2EAEBFFD
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 17:41:35 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 16 Apr 2018 19:41:29 +0200
+Message-Id: <1523900489-25950-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] scripts/device-crash-test: Removed fixed CAN
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Bruce Rogers <brogers@suse.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 16 April 2018 at 10:37, Michael Tokarev <mjt@tls.msk.ru> wrote:
-> Fixes 722cd7496474cebb2218f21e038592fad8603365
->
-> Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 727ef118f3..d71dd5bea4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -856,7 +856,7 @@ ifneq ($(BLOBS),)
->                 $(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)"; \
->         done
->  endif
-> -ifeq ($(CONFIG_GTK),m)
-> +ifdef CONFIG_GTK
->         $(MAKE) -C po $@
->  endif
->         $(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
-> --
-> 2.11.0
+The CAN device crashes have been fixed with the commit
+089eac81e1d34d202471c0a023284f47f4c5f00e already.
 
-Applied, thanks.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ scripts/device-crash-test | 3 ---
+ 1 file changed, 3 deletions(-)
 
--- PMM
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index 5d17dc6..b3ce720 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -218,9 +218,6 @@ ERROR_WHITELIST = [
+     {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
+     {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
+     {'exitcode':-11, 'device':'isa-serial', 'loglevel':logging.ERROR, 'expected':True},
+-    {'exitcode':-11, 'device':'mioe3680_pci', 'loglevel':logging.ERROR, 'expected':True},
+-    {'exitcode':-11, 'device':'pcm3680_pci', 'loglevel':logging.ERROR, 'expected':True},
+-    {'exitcode':-11, 'device':'kvaser_pci', 'loglevel':logging.ERROR, 'expected':True},
+ 
+     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
+     {'exitcode':None, 'fatal':True, 'loglevel':logging.FATAL},
+-- 
+1.8.3.1
