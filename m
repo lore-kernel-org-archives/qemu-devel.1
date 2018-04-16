@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1f80Io-0005Lx-29
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:19:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f80J2-0005Z7-6W
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1f80In-0005cj-3L
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:19:58 -0400
-Date: Mon, 16 Apr 2018 11:19:41 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180416091941.7n24dd3qjyuqh4h6@kamzik.brq.redhat.com>
-References: <1522160122-10744-1-git-send-email-eric.auger@redhat.com>
-	<1522160122-10744-9-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA_O3QK0t5DHfnAFEOHv_yyxvL9HZX+0geHs0ibVVwTbNQ@mail.gmail.com>
-	<57b01152-1179-9735-eb6a-a9dbfc933a6c@redhat.com>
-	<CAFEAcA-wT8vERbkjq_HoROi1ymPauAe+y3oc16zoCJXsHKqBoQ@mail.gmail.com>
-	<94299045-3027-517c-d634-4613f78de163@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1f80J1-0005kP-Ec
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:20:12 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:40568)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f80J1-0005jn-AG
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 05:20:11 -0400
+Received: by mail-ot0-x242.google.com with SMTP id h8-v6so5513203otj.7
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 02:20:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <94299045-3027-517c-d634-4613f78de163@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 8/8] hw/arm/virt: Allow up to 512 vcpus along
- with KVM VGICv3
+In-Reply-To: <6aa86822-d3c1-61bc-622a-0ce329f5bc7a@st.com>
+References: <20180406151752.10854-1-christophe.lyon@st.com>
+	<20180406151752.10854-2-christophe.lyon@st.com>
+	<CAFEAcA9b7coeoZUX9JhkMZbLsEaM265g5Y844JScaO0k-1dsxA@mail.gmail.com>
+	<6aa86822-d3c1-61bc-622a-0ce329f5bc7a@st.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 10:19:50 +0100
+Message-ID: <CAFEAcA_4PW-crD3NaQj2nhy6bupt4XW2Yf54i-cjs2edz39hRw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [ARM/FDPIC 1/4] linux-user: ARM-FDPIC: Add
+ configure option to support loading of FDPIC binaries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Eric Auger <eric.auger.pro@gmail.com>
+To: Christophe Lyon <christophe.lyon@st.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>
 
-On Fri, Apr 13, 2018 at 04:11:24PM +0200, Auger Eric wrote:
-> Hi Peter,
-> 
-> On 13/04/18 16:06, Peter Maydell wrote:
-> > On 13 April 2018 at 15:01, Auger Eric <eric.auger@redhat.com> wrote:
-> >> On 13/04/18 15:41, Peter Maydell wrote:
-> >>> I think it would be better to explicitly check "do we have
-> >>> support for split redistributors" rather than looking at
-> >>> KVM_MAX_VCPUS. It's not impossible that a distro kernel
-> >>> might have chosen to backport support for one but not the
-> >>> other.
-> >>
-> >> The issue is we have race here:
-> >> to check whether the new ATTR is supported I need to query the GICV3 KVM
-> >> device. This later is created in the GICv3 initialize. But to initialize
-> >> the VGIC I need the VCPUs to be created. And to create the VCPUs I need
-> >> to check their max number. Or do I miss somethinh?
-> >>
-> >> The KVM device create dry-run mode cannot be used here. I would need to
-> >> really create the KVM device and then delete it. The issue is there is
-> >> no kvm device DELETE ioctl at kernel level since KVM devices are deleted
-> >> on VM deletion if I understand correctly. Adding a KVM device delete at
-> >> kernel level may not be straightforward as I suspect some
-> >> simplifications could be made in KVM device deletion knowing the VM was
-> >> under deletion.
-> > 
-> > Two possibilities:
-> > 
-> > (1) do like we do in kvm_arm_get_host_cpu_features() where we
-> > create a scratch VM to interrogate it and then throw it away
-> > when we have the info we need
-> Oh OK. I did not know this was in place. At first sight, this looks
-> simpler than (2) to me. I will investigate this solution.
+On 16 April 2018 at 08:57, Christophe Lyon <christophe.lyon@st.com> wrote:
+> On 13/04/2018 17:04, Peter Maydell wrote:
+>> I think we should just have support for these binaries enabled
+>> always. Otherwise it will bitrot because nobody compiles it.
+>>
+> We are relying on a pre-existing CONFIG_USE_FDPIC, which is currently
+> never defined. This was introduced by commit 1af02e83 back in 2011,
+> and indeed if you try to build QEMU with CONFIG_USE_FDPIC, the build fails
+> because elf_is_fdpic() is not defined.
 
-But (1) isn't awesome. It'd be better if we could avoid scratch VMs
-altogether as they slow VM launch and create confusing traces when
-debugging. Also, it's just not a pretty way to do things. If we must
-keep a scratch VM, then let's at least make sure we only have one,
-i.e. put all probing into a single scratch VM.
+This looks like an excellent demonstration of why we shouldn't
+hide this feature behind a defaults-to-off #define :-)
 
-> 
-> Thanks!
-> 
-> Eric
-> > 
-> > (2) add an API to the kernel to make it easier to query it
-> > for this sort of feature
+> Do you suggest removing CONFIG_USE_FDPIC?
 
-This is the cleaner choice, but I wasn't opposed to the max-vcpus
-query getting double-duty though. While the backporting argument is
-a good point, I'm not sure we've ever really cared about what
-issues backporters have had to endure when they cherry-pick features
-before.
+Yes. Given how old the existing disabled FDPIC code is, I would also
+suggest you carefully review any of it that you're using...
 
-Thanks,
-drew
-
-
-> > 
-> > thanks
-> > -- PMM
-> > 
-> 
+thanks
+-- PMM
