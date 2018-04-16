@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60930)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rae-00035D-WE
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:01:50 -0400
+	id 1f7rbg-0003tD-Hz
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:02:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rae-0002np-4Q
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:01:49 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:45102)
+	id 1f7rbc-00037F-Ud
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:02:52 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:42443)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rad-0002nl-Va
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:01:48 -0400
-Received: by mail-qk0-x242.google.com with SMTP id f9so6905436qkm.12
-	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 17:01:47 -0700 (PDT)
+	id 1f7rbc-000378-QW
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:02:48 -0400
+Received: by mail-qk0-x241.google.com with SMTP id d193so3415549qke.9
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 17:02:48 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-4-alex.bennee@linaro.org>
+	<20180410193919.28026-8-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <82169d34-1570-2f5c-07e4-8556e64e5b11@amsat.org>
-Date: Sun, 15 Apr 2018 21:01:44 -0300
+Message-ID: <7781c7ab-cecb-122f-8a7a-5cd41c589279@amsat.org>
+Date: Sun, 15 Apr 2018 21:02:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-4-alex.bennee@linaro.org>
+In-Reply-To: <20180410193919.28026-8-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 03/24] configure: move i386_cc to
- cross_cc_i386
+Subject: Re: [Qemu-devel] [PATCH v1 07/24] docker: allow "cc" command to run
+ in user context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +37,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, cota@braap.org
+Cc: berrange@redhat.com, famz@redhat.com, cota@braap.org
 
-Hi Alex,
-
-On 04/10/2018 04:38 PM, Alex Bennée wrote:
-> We should still be able to use the system cross compiler with the
-> appropriate flags on x86_64 hosts.
-> 
+On 04/10/2018 04:39 PM, Alex Bennée wrote:
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  configure | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
+>  tests/docker/docker.py | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> diff --git a/configure b/configure
-> index b5f3b3fe29..add87ff4d4 100755
-> --- a/configure
-> +++ b/configure
-> @@ -284,7 +284,6 @@ libs_softmmu=""
->  libs_tools=""
->  audio_pt_int=""
->  audio_win_int=""
-> -cc_i386=i386-pc-linux-gnu-gcc
->  libs_qga=""
->  debug_info="yes"
->  stack_protector=""
-> @@ -457,6 +456,8 @@ docker="no"
->  cross_cc_aarch64="aarch64-linux-gnu-gcc"
->  cross_cc_arm="arm-linux-gnueabihf-gcc"
->  cross_cc_powerpc="powerpc-linux-gnu-gcc"
-> +cross_cc_i386="i386-pc-linux-gnu-gcc"
-> +cross_cc_i386_cflags=""
-
-Can you keep this sorted? (arm < i386 < powerpc)
-
-Thanks :)
-
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 9444f4bea4..f79213044d 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -399,6 +399,8 @@ class CcCommand(SubCommand):
+>                              help="The docker image in which to run cc")
+>          parser.add_argument("--cc",
+>                              help="The compiler executable to call")
+> +        parser.add_argument("--user",
+> +                            help="The user-id to run under")
+>          parser.add_argument("--source-path", "-s", nargs="*", dest="paths",
+>                              help="""Extra paths to (ro) mount into container for
+>                              reading sources""")
+> @@ -414,6 +416,9 @@ class CcCommand(SubCommand):
+>              for p in args.paths:
+>                  cmd += ["-v", "%s:%s:ro,z" % (p, p)]
 >  
->  enabled_cross_compilers=""
->  
-> @@ -687,12 +688,10 @@ case "$cpu" in
-
-What do you think about renaming $cpu -> host_cpu/target_cpu?
-
->    i386|i486|i586|i686|i86pc|BePC)
->      cpu="i386"
->      supported_cpu="yes"
-> -    cross_cc_i386=gcc
->    ;;
->    x86_64|amd64)
->      cpu="x86_64"
->      supported_cpu="yes"
-> -    cross_cc_x86_64=gcc
->    ;;
->    armv*b|armv*l|arm)
->      cpu="arm"
-> @@ -1435,7 +1434,6 @@ case "$cpu" in
->      i386)
->             CPU_CFLAGS="-m32"
->             LDFLAGS="-m32 $LDFLAGS"
-> -           cc_i386='$(CC) -m32'
->             ;;
->      x86_64)
->             # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-> @@ -1443,12 +1441,14 @@ case "$cpu" in
->             # runtime and generate the fallback to serial emulation.
->             CPU_CFLAGS="-m64 -mcx16"
->             LDFLAGS="-m64 $LDFLAGS"
-> -           cc_i386='$(CC) -m32'
-> +           cross_cc_i386=$cc
-> +           cross_cc_i386_cflags="-m32"
->             ;;
->      x32)
->             CPU_CFLAGS="-mx32"
->             LDFLAGS="-mx32 $LDFLAGS"
-> -           cc_i386='$(CC) -m32'
-> +           cross_cc_i386=$cc
-> +           cross_cc_i386_cflags="-m32"
->             ;;
->      # No special flags required for other host CPUs
->  esac
-> @@ -6664,7 +6664,6 @@ echo "CC=$cc" >> $config_host_mak
->  if $iasl -h > /dev/null 2>&1; then
->    echo "IASL=$iasl" >> $config_host_mak
->  fi
-> -echo "CC_I386=$cc_i386" >> $config_host_mak
->  echo "HOST_CC=$host_cc" >> $config_host_mak
->  echo "CXX=$cxx" >> $config_host_mak
->  echo "OBJCC=$objcc" >> $config_host_mak
-> @@ -6783,6 +6782,7 @@ case "$target" in
->  esac
->  
->  target_compiler=""
-> +target_compiler_cflags=""
->  
->  mkdir -p $target_dir
->  echo "# Automatically generated by configure - do not modify" > $config_target_mak
-> @@ -6799,10 +6799,13 @@ TARGET_ABI_DIR=""
->  case "$target_name" in
->    i386)
->      gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
-> +    target_compiler=$cross_cc_i386
-> +    target_compiler_cflags=$cross_cc_i386_cflags
->    ;;
->    x86_64)
->      TARGET_BASE_ARCH=i386
->      gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
-> +    target_compiler=$cross_cc_x86_64
->    ;;
->    alpha)
->      mttcg="yes"
-> @@ -6947,7 +6950,7 @@ int main(void) {
->  }
->  EOF
->  
-> -    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
-> +    if ! do_compiler $target_compiler $target_compiler_cflags -o $TMPE $TMPC -static ; then
->          target_compiler=""
->      else
->          enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
-> @@ -7033,6 +7036,10 @@ if test -n "$target_compiler"; then
->    echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
->  fi
->  
-> +if test -n "$target_compiler_cflags"; then
-> +  echo "CROSS_CC_GUEST_CFLAGS=$target_compiler_cflags" >> $config_target_mak
-> +fi
+> +        if args.user:
+> +            cmd += ["-u", args.user]
 > +
->  # generate QEMU_CFLAGS/LDFLAGS for targets
+>          cmd += [args.image]
 >  
->  cflags=""
+>          # The compile command we are running
 > 
