@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f7xsq-0007HM-Qd
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1f7xsq-0007HL-QG
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f7xso-0007bw-D4
+	(envelope-from <thuth@redhat.com>) id 1f7xsl-0007aJ-Vr
 	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50042 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53014 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f7xso-0007bf-7J
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:44:58 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f7xsl-0007Zq-Qm
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:44:55 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Apr 2018 08:44:40 +0200
-Message-Id: <1523861081-3600-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1523861081-3600-1-git-send-email-thuth@redhat.com>
-References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.13 2/3] net: Get rid of 'vlan'
- terminology and use 'hub' instead in the source files
+Date: Mon, 16 Apr 2018 08:44:38 +0200
+Message-Id: <1523861081-3600-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 for-2.13 0/3] net: Get rid of 'vlan'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +24,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-'vlan' is very confusing since it does not mean something like IEEE
-802.1Q, but rather emulated hubs, so let's switch to that terminology
-instead.
+The 'vlan' term caused a lot of confusion and misconfigurations in the
+past. The parameter has been marked as deprecated since QEMU v2.9.0, so
+it's now time to finally remove the parameter and use the better word "hub"
+in the remaining spots that actually mean the QEMU emulated hub feature.
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/658904
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- net/hub.c   | 7 +++----
- net/slirp.c | 8 ++++----
- net/tap.c   | 4 ++--
- 3 files changed, 9 insertions(+), 10 deletions(-)
+v3:
+ - Some rewordings in qemu-doc and net.json according to Paolo's suggestions
 
-diff --git a/net/hub.c b/net/hub.c
-index 5e84a9a..78b671e 100644
---- a/net/hub.c
-+++ b/net/hub.c
-@@ -23,8 +23,7 @@
- 
- /*
-  * A hub broadcasts incoming packets to all its ports except the source port.
-- * Hubs can be used to provide independent network segments, also confusingly
-- * named the QEMU 'vlan' feature.
-+ * Hubs can be used to provide independent emulated network segments.
-  */
- 
- typedef struct NetHub NetHub;
-@@ -345,10 +344,10 @@ void net_hub_check_clients(void)
-             }
-         }
-         if (has_host_dev && !has_nic) {
--            warn_report("vlan %d with no nics", hub->id);
-+            warn_report("hub %d with no nics", hub->id);
-         }
-         if (has_nic && !has_host_dev) {
--            warn_report("vlan %d is not connected to host network", hub->id);
-+            warn_report("hub %d is not connected to host network", hub->id);
-         }
-     }
- }
-diff --git a/net/slirp.c b/net/slirp.c
-index 8991816..6922524 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -415,7 +415,7 @@ static SlirpState *slirp_lookup(Monitor *mon, const char *hub_id,
-         if (hub_id) {
-             nc = net_hub_find_client_by_name(strtol(hub_id, NULL, 0), name);
-             if (!nc) {
--                monitor_printf(mon, "unrecognized (vlan-id, stackname) pair\n");
-+                monitor_printf(mon, "unrecognized (hub-id, stackname) pair\n");
-                 return NULL;
-             }
-         } else {
-@@ -870,9 +870,9 @@ void hmp_info_usernet(Monitor *mon, const QDict *qdict)
- 
-     QTAILQ_FOREACH(s, &slirp_stacks, entry) {
-         int id;
--        bool got_vlan_id = net_hub_id_for_client(&s->nc, &id) == 0;
--        monitor_printf(mon, "VLAN %d (%s):\n",
--                       got_vlan_id ? id : -1,
-+        bool got_hub_id = net_hub_id_for_client(&s->nc, &id) == 0;
-+        monitor_printf(mon, "Hub %d (%s):\n",
-+                       got_hub_id ? id : -1,
-                        s->nc.name);
-         slirp_connection_info(s->slirp, mon);
-     }
-diff --git a/net/tap.c b/net/tap.c
-index 2b3a36f..de05f20 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -766,10 +766,10 @@ int net_init_tap(const Netdev *netdev, const char *name,
-     queues = tap->has_queues ? tap->queues : 1;
-     vhostfdname = tap->has_vhostfd ? tap->vhostfd : NULL;
- 
--    /* QEMU vlans does not support multiqueue tap, in this case peer is set.
-+    /* QEMU hubs do not support multiqueue tap, in this case peer is set.
-      * For -netdev, peer is always NULL. */
-     if (peer && (tap->has_queues || tap->has_fds || tap->has_vhostfds)) {
--        error_setg(errp, "Multiqueue tap cannot be used with QEMU vlans");
-+        error_setg(errp, "Multiqueue tap cannot be used with hubs");
-         return -1;
-     }
- 
+v2:
+ - Added first patch to actually remove the deprecated 'vlan' parameter
+   (instead of only updating the wording in the sources and docs)
+
+Thomas Huth (3):
+  net: Remove the deprecated "vlan" parameter
+  net: Get rid of 'vlan' terminology and use 'hub' instead in the source
+    files
+  net: Get rid of 'vlan' terminology and use 'hub' instead in the doc
+    files
+
+ docs/qdev-device-use.txt         |  3 --
+ hw/core/qdev-properties-system.c | 80 ----------------------------------------
+ include/hw/qdev-properties.h     |  3 --
+ include/net/net.h                |  1 -
+ net/hub.c                        |  7 ++--
+ net/net.c                        | 12 ++----
+ net/slirp.c                      |  8 ++--
+ net/tap.c                        |  4 +-
+ qapi/net.json                    | 15 ++++----
+ qemu-doc.texi                    | 51 ++++++++++++-------------
+ qemu-options.hx                  | 29 ++++++---------
+ 11 files changed, 54 insertions(+), 159 deletions(-)
+
 -- 
 1.8.3.1
