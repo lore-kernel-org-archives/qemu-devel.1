@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f856C-0002r2-Hl
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:27:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f857V-0003fC-7M
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f8569-0003hs-CR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:27:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45812 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f8569-0003hU-5X
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:27:13 -0400
-Date: Mon, 16 Apr 2018 16:27:06 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180416162706.43212a69@redhat.com>
-In-Reply-To: <e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
-References: <20180329032149.44685-1-aik@ozlabs.ru>
-	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
-	<20180416152040.7b88b902@redhat.com>
-	<e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1f857U-0004fa-Cc
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:28:37 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34169)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f857U-0004fJ-5L
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:28:36 -0400
+Received: by mail-ot0-x243.google.com with SMTP id i5-v6so8110535oth.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:28:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+In-Reply-To: <871sffp7fv.fsf@dusky.pond.sub.org>
+References: <20180312131806.23209-1-stefanha@redhat.com>
+	<CAFEAcA8VxyrDVMija0C219E5cPtKLC13YHcLFbB+VMRw9uCA_A@mail.gmail.com>
+	<871sffp7fv.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 15:28:14 +0100
+Message-ID: <CAFEAcA8Q+0CGW6YR5kuvq090E8Q1YO_Fm9L8RVgJ8nFByHF1qA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
+ file changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 16 Apr 2018 15:30:39 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 16 April 2018 at 15:11, Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> On 12 March 2018 at 13:18, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>>> Warn if files are added/renamed/deleted without MAINTAINERS file
+>>> changes.  This has helped me in Linux and we could benefit from this
+>>> check in QEMU.
+>>>
+>>> This patch is a manual cherry-pick of Linux commit
+>>> 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warning on
+>>> file add/move/delete") by Joe Perches <joe@perches.com>.
+>>>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> ---
+>>
+>> Unfortunately the patch doesn't magically cause maintainers
+>> to appear for the new files :-)
+>
+> Fortunately, the patch can get new files non-magically rejected unless a
+> maintainers appears :)
 
-> On 16/04/2018 15:20, Igor Mammedov wrote:
-> > Generally object doesn't need to know its own name,
-> > we use it only for debugging and nice error reporting so far.
-> > I'd rather have 'id' property at Object level so we won't have
-> > to fish out ID from parent /which we aren't supposed to do and
-> > which doesn't work in some cases/ when it's needed within
-> > object itself.  
-> 
-> Having an 'id' at object level is also a mess, because that id is
-> invalid after unparent.
-I'd just consider 'id' as object name which is valid even if there
-is no parent (during whole object lifecycle).
-That would allow for object to have a reachable name vs getting NULL
-when parent isn't set.
-Maybe Object::id is overkill, but we probably could use NamedObject
-where it's needed and avoid reverse engineering id from path.
- 
-> Since this is just for debugging use,
-> object_get_canonical_path_component is the right function.  We can just
-> make it return NULL if there is no parent.
-looking at current use it out-grew just debugging usecases
-and it's rather messy right now:
+I think that "author of code lists themselves in MAINTAINERS
+but then doesn't in practice do anything" is not really much
+better (and arguably worse) than "code has no listed maintainer".
 
-ram_backend_memory_alloc, throttle_group_obj_complete,
-xlnx_zynqmp_create_rpu, spapr_drc.c:realize, iothread_complete,
-memory_region_name
-
-
-> Paolo
+thanks
+-- PMM
