@@ -1,22 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f896s-0002KW-Hi
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:44:15 -0400
+	(envelope-from <hwertz10@gmail.com>) id 1f897b-0002zk-7a
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f896o-00047S-JI
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:44:14 -0400
-Date: Mon, 16 Apr 2018 19:44:06 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180416184406.GC14488@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180416181844.7851-1-marcandre.lureau@redhat.com>
-	<CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
+	(envelope-from <hwertz10@gmail.com>) id 1f897a-0004p8-4g
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:44:59 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] mux: fix ctrl-a b again
+From: Henry Wertz <hwertz10@gmail.com>
+Date: Mon, 16 Apr 2018 13:44:52 -0500
+Message-ID: <CAOuPqTE8GsN_+REWzSt4DOiqddSbZC-kOH=WnYG3U8ge3GsLoA@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="001a11469e3c0eed180569fb9e8a"
+Subject: [Qemu-devel] Patch for ARM memory barriers and getdent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +19,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-arm@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Apr 16, 2018 at 07:28:28PM +0100, Peter Maydell wrote:
-> On 16 April 2018 at 19:18, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> > Commit fb5e19d2e1472e96d72d5e4d89c20033f8ab345c originally fixed the
-> > regression, but was inadvertently broken again in merge commit
-> > 2d6752d38d8acda.
-> >
-> > Fixes:
-> > https://bugs.launchpad.net/qemu/+bug/1654137
-> >
-> > Cc: qemu-stable@nongnu.org
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  chardev/char-mux.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-> > index 1b925c8dec..6055e76293 100644
-> > --- a/chardev/char-mux.c
-> > +++ b/chardev/char-mux.c
-> > @@ -304,6 +304,7 @@ void mux_set_focus(Chardev *chr, int focus)
-> >      }
-> >
-> >      d->focus =3D focus;
-> > +    chr->be =3D d->backends[focus];
-> >      mux_chr_send_event(d, d->focus, CHR_EVENT_MUX_IN);
-> >  }
-> >
-> > --
-> > 2.17.0.rc1.36.gcedb63ea2f
->=20
-> Opinions welcome on whether this is a regression fix worth
-> putting into rc4.
+--001a11469e3c0eed180569fb9e8a
+Content-Type: text/plain; charset="UTF-8"
 
-It is a regression, but a long standing one - we've been broken for quite
-a while since 2.9.0 or even before.
+Please find submitted a patch for ARM memory barriers.  This patch is
+against qemu-2.12-rc2 but I do believe it should apply for anything from
+2.11.x to current.
 
-If we're doing an rc4 anyway I'd suggest including it, but not the end of
-the world if it has to go in via -stable given how long we've been broken
-for.
+I found with qemu 2.11.x or newer that I would get an illegal instruction
+error running some Intel binaries on my ARM chromebook.  On investigation,
+I found it was quitting on memory barriers.
+qemu instruction:
+mb $0x31
+was translating as:
+0x604050cc:  5bf07ff5  blpl     #0x600250a8
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+After patch it gives:
+0x604050cc:  f57ff05b  dmb      ish
+
+In short, I found INSN_DMB_ISH (memory barrier for ARMv7) appeared to be
+correct based on online docs, but due to some endian-related shenanigans it
+had to be byte-swapped to suit qemu; it appears INSN_DMB_MCR (memory
+barrier for ARMv6) also should be byte swapped  (and this patch does so).
+I have not checked for correctness of aarch64's barrier instruction.
+-------------------------------
+Please find submitted a patch for getdents (this system call stands for
+"get directory entries", it is passed a file descriptor pointing to a
+directory and returns a struct with info on the entries in that
+directory.)  This patch is against qemu-2.10 series but continues to apply
+cleanly on current as of April 15 2018.  If you are running a 32-bit binary
+on 64-bit target current qemu will convert he getdents struct, but it will
+NOT in the case of 64-bit binary on 32-bit host.  (In my case, I had
+android SDK's "aapt" for x86-64 error out on 32-bit ARM without this patch,
+and run fine with it.)  This patch simply replaces a "#if TARGET_ABI_BITS
+== 32 && HOST_LONG_BITS == 64" with "#if TARGET_ABI_BITS != HOST_LONG_BITS".
+
+Thanks!
+
+--001a11469e3c0eed180569fb9e8a
+Content-Type: text/x-patch; charset="US-ASCII"; name="arm-mb.patch"
+Content-Disposition: attachment; filename="arm-mb.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jg2l7sjc0
+
+KioqIHRjZy9hcm0vdGNnLXRhcmdldC5pbmMuYy5vcmlnCTIwMTgtMDQtMDQgMTU6Mjg6NTAuMDAw
+MDAwMDAwIC0wNTAwCi0tLSB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmMJMjAxOC0wNC0xNiAxMjo1
+NTowNC45MTc1MTg4OTggLTA1MDAKKioqKioqKioqKioqKioqCioqKiAxNTgsMTY3ICoqKioKICAg
+ICAgSU5TTl9MRFJEX1JFRyAgPSAweDAwMDAwMGQwLAogICAgICBJTlNOX1NUUkRfSU1NICA9IDB4
+MDA0MDAwZjAsCiAgICAgIElOU05fU1RSRF9SRUcgID0gMHgwMDAwMDBmMCwKICAKISAgICAgSU5T
+Tl9ETUJfSVNIICAgPSAweDViZjA3ZmY1LAohICAgICBJTlNOX0RNQl9NQ1IgICA9IDB4YmEwZjA3
+ZWUsCiAgCiAgICAgIC8qIEFyY2hpdGVjdGVkIG5vcCBpbnRyb2R1Y2VkIGluIHY2ay4gICovCiAg
+ICAgIC8qID8/PyBUaGlzIGlzIGFuIE1TUiAoaW1tKSAwLDAsMCBpbnNuLiAgQW55b25lIGtub3cg
+aWYgdGhpcwogICAgICAgICBhbHNvIEp1c3QgU28gSGFwcGVuZWQgdG8gZG8gbm90aGluZyBvbiBw
+cmUtdjZrIHNvIHRoYXQgd2UKLS0tIDE1OCwxNjcgLS0tLQogICAgICBJTlNOX0xEUkRfUkVHICA9
+IDB4MDAwMDAwZDAsCiAgICAgIElOU05fU1RSRF9JTU0gID0gMHgwMDQwMDBmMCwKICAgICAgSU5T
+Tl9TVFJEX1JFRyAgPSAweDAwMDAwMGYwLAogIAohICAgICBJTlNOX0RNQl9JU0ggICA9IDB4ZjU3
+ZmYwNWIsCiEgICAgIElOU05fRE1CX01DUiAgID0gMHhlZTA3MGZiYSwKICAKICAgICAgLyogQXJj
+aGl0ZWN0ZWQgbm9wIGludHJvZHVjZWQgaW4gdjZrLiAgKi8KICAgICAgLyogPz8/IFRoaXMgaXMg
+YW4gTVNSIChpbW0pIDAsMCwwIGluc24uICBBbnlvbmUga25vdyBpZiB0aGlzCiAgICAgICAgIGFs
+c28gSnVzdCBTbyBIYXBwZW5lZCB0byBkbyBub3RoaW5nIG9uIHByZS12Nmsgc28gdGhhdCB3ZQo=
+--001a11469e3c0eed180569fb9e8a
+Content-Type: text/x-patch; charset="US-ASCII"; name="qemu-getdents.patch"
+Content-Disposition: attachment; filename="qemu-getdents.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jg2l7slu1
+
+KioqIGxpbnV4LXVzZXIvc3lzY2FsbC5jfgkyMDE3LTAzLTA0IDEwOjMxOjE0LjAwMDAwMDAwMCAt
+MDYwMAotLS0gbGludXgtdXNlci9zeXNjYWxsLmMJMjAxNy0wMy0wNyAxNzowODoyNC42MTUzOTkx
+MTYgLTA2MDAKKioqKioqKioqKioqKioqCioqKiA5OTEzLDk5MjEgKioqKgogICNlbmRpZgogICNp
+ZmRlZiBUQVJHRVRfTlJfZ2V0ZGVudHMKICAgICAgY2FzZSBUQVJHRVRfTlJfZ2V0ZGVudHM6CiAg
+I2lmZGVmIF9fTlJfZ2V0ZGVudHMKISAjaWYgVEFSR0VUX0FCSV9CSVRTID09IDMyICYmIEhPU1Rf
+TE9OR19CSVRTID09IDY0CiAgICAgICAgICB7CiAgICAgICAgICAgICAgc3RydWN0IHRhcmdldF9k
+aXJlbnQgKnRhcmdldF9kaXJwOwogICAgICAgICAgICAgIHN0cnVjdCBsaW51eF9kaXJlbnQgKmRp
+cnA7CiAgICAgICAgICAgICAgYWJpX2xvbmcgY291bnQgPSBhcmczOwotLS0gOTkxMyw5OTIxIC0t
+LS0KICAjZW5kaWYKICAjaWZkZWYgVEFSR0VUX05SX2dldGRlbnRzCiAgICAgIGNhc2UgVEFSR0VU
+X05SX2dldGRlbnRzOgogICNpZmRlZiBfX05SX2dldGRlbnRzCiEgI2lmIFRBUkdFVF9BQklfQklU
+UyAhPSBIT1NUX0xPTkdfQklUUwogICAgICAgICAgewogICAgICAgICAgICAgIHN0cnVjdCB0YXJn
+ZXRfZGlyZW50ICp0YXJnZXRfZGlycDsKICAgICAgICAgICAgICBzdHJ1Y3QgbGludXhfZGlyZW50
+ICpkaXJwOwogICAgICAgICAgICAgIGFiaV9sb25nIGNvdW50ID0gYXJnMzsK
+--001a11469e3c0eed180569fb9e8a--
