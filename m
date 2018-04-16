@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f85OR-0006mS-Ry
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:46:08 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f85SG-0000rf-Mw
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:50:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f85OR-0000Cl-3m
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:46:07 -0400
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:45743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f85OQ-0000CW-Ug
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:46:07 -0400
-Received: by mail-ot0-x22c.google.com with SMTP id w2-v6so6689337otj.12
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:46:06 -0700 (PDT)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f85SC-0002tO-33
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:50:04 -0400
+Received: from smtp62.cstnet.cn ([159.226.251.62]:40930 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1f85SB-0002q9-9H
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:50:00 -0400
+Date: Mon, 16 Apr 2018 22:49:48 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <CAJSP0QW2e7w6bvv5RdWo3etrYipNj5=sVUwVMBodW4W5HkhgKA@mail.gmail.com>
+References: <1523245158-16443-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<1523245158-16443-2-git-send-email-suhang16@mails.ucas.ac.cn>
+	<CAJSP0QVJbCz=n-huxj3grUtcMAgOYzcExEZHh8rJEoaxnz_jgA@mail.gmail.com>
+	<15bb2d94.286e.162c4d4ab19.Coremail.suhang16@mails.ucas.ac.cn>
+	<CAJSP0QW2e7w6bvv5RdWo3etrYipNj5=sVUwVMBodW4W5HkhgKA@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <87604rb4b5.fsf@linaro.org>
-References: <20180416135442.30606-1-alex.bennee@linaro.org>
-	<aca6055a-1e49-7902-428f-e7e199ed8a12@mail.uni-paderborn.de>
-	<87604rb4b5.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Apr 2018 15:45:45 +0100
-Message-ID: <CAFEAcA9rmiisOeT1ZrApxoOn53y71U7jHeNH1wwD1U+ZcHfkZQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
- before /0
+Message-ID: <1df70ee4.21aaa.162ceeef0e0.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] Implement .hex file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: stefan hajnoczi <stefanha@gmail.com>
+Cc: jim mussared <jim@groklearning.com>, qemu-devel <qemu-devel@nongnu.org>, joel stanley <joel@jms.id.au>
 
-On 16 April 2018 at 15:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
->
->> On 04/16/2018 03:54 PM, Alex Benn=C3=A9e wrote:
->>> The re-factoring of div_floats changed the order of checking meaning
->>> an operation like -inf/0 erroneously raises the divbyzero flag.
->>> IEEE-754 (2008) specifies this should only occur for operations on
->>> finite operands.
->>>
->>> We fix this by moving the check on the dividend being Inf/0 to before
->>> the divisor is zero check.
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->>> ---
->>>  fpu/softfloat.c | 10 +++++-----
->>>  1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->> Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->
-> Peter are you going to grab these tags or do you want me to re-spin?
-
-'patches' will grab them automatically when it applies the patch.
-
-thanks
--- PMM
+U29ycnkgSSBkaWRuJ3QgcmVwbHkgaW4gZGV0YWkgb24gbGFzdCB3ZWVrZW5kLgpIZXJlIGFyZSBz
+b21lIHBvaW50cyBJIHdhbnQgdG8gZGlzY3Vzcy4KCj4gcGFyc2VfaGV4X2Jsb2IoKSBtdXN0IGhh
+bmRsZSBpbnB1dCBmaWxlcyB0aGF0IHRvdWNoIGxhcmdlIHJhbmdlcyBvZgo+IG1lbW9yeS4gIEF0
+IHRoZSBtb21lbnQgaXQgYXNzdW1lcyBiaW5fYnVmIHdpbGwgYmUgbGFyZ2UgZW5vdWdoIGZvciB0
+aGUKPiBtZW1vcnkgcmVnaW9ucyBkZXNjcmliZWQgYnkgdGhlIGlucHV0IGZpbGUuICBTaW5jZSBJ
+bnRlbCBIRVggZmlsZXMKPiBzdXBwb3J0IDMyLWJpdCBhZGRyZXNzaW5nLCB0aGF0IG1lYW5zIHBy
+b2Nlc3NpbmcgYSBmaWxlIGluIHRoaXMgd2F5Cj4gY291bGQgcmVxdWlyZSA0IEdCIG9mIFJBTSEg
+IFRocmVlIHNvbHV0aW9uczoKPiAxLiBSZWplY3QgZmlsZXMgdGhhdCBoYXZlIGxhcmdlIGdhcHMg
+aW4gdGhlaXIgYWRkcmVzcyByYW5nZXMuCj4gMi4gUmV0dXJuIGEgbGlzdCBvZiBkYXRhIGJsb2Jz
+LCBlYWNoIHdpdGggaXRzIG93biBzdGFydCBhZGRyZXNzLgo+IDMuIFNldCB1cCB0aGUgUk9NIHN0
+cnVjdHMgZGlyZWN0bHkgd2l0aGluIHBhcnNlX2hleF9ibG9iKCkgaW5zdGVhZCBvZgo+IHJldHVy
+bmluZyBhIGxpbmVhciBidWZmZXIuCgpJIHRoaW5rIHNvbHV0aW9uIDMgaXMgbW9yZSBuYXR1cmFs
+IGFuZCBzaG91bGQgYmUgdGhlIGJlc3QgaW4gdGhpcyBjYXNlLgpJIHdpbGwgcmVhZCB0aGUgc291
+cmNlIGNvZGUgdG8gbGVhcm4gaG93IHRvIHNldCB1cCBST00gc3RydWN0cyBjb3JyZWN0bHksCnRo
+ZW4gdHJ5IHRvIGFwcGx5IHNvbHV0aW9uIDMuCgo+IEhhdmUgeW91IGNvbnNpZGVyZWQgdXNpbmcg
+ZnNjYW5mKCkgaW5zdGVhZD8gIEl0IHJlbW92ZXMgdGhlIG5lZWQgZm9yCj4gSGV4TGluZSwgaGV4
+X2J1ZiwgYW5kIHRoZSBjaGFyYWN0ZXIgcGFyc2luZyBsb29wOgo+Cj4gICBpZiAoZnNjYW5mKGZw
+LCAiOiUwMmhoeCUwNGh4JTAyaGh4IiwgJmJ5dGVfY291bnQsICZhZGRyZXNzLAo+ICZyZWNvcmRf
+dHlwZSkgIT0gMykgewoKZnNjYW5mKCkgaW5kZWVkIHdvcmtzLCBidXQgSSB3b3JyeSBpdCB3aWxs
+IGJlIG11Y2ggc2xvd2VyIHRoYW4gaGFuZGxlIGl0Cm1hbnVhbGx5LCBlc3BlY2lhbGx5IHdoZW4g
+eW91IG1lbnRpb25lZCB0aGUgaW5wdXQgZmlsZSBjYW4gYmUgYXMgbGFyZ2UgYXMgNEdCLgoKPiBX
+aHkgaXMgdGhlIHNpemUgaGV4X2Jsb2Jfc2l6ZSAqIDI/CkkgbXVzdCBjb25mZXNzIEkgZGlkIGl0
+IGluIGEgcm91Z2ggd2F5LCBpbiBvcmRlciB0byBxdWlja2x5IHdyaXRlCmEgcnVubmFibGUgcHJv
+dG90eXBlLCBJIGRpZG4ndCB0YWtlIHNhZmV0eSBpbnRvIGNvbnNpZGVyYXRpb24uClNvcnJ5LCBJ
+IHdpbGwga2VlcCBzYWZldHkgcG9pbnQgaW4gbWluZCBpbiBteSBmdXR1cmUgd29yay4KV2h5IEkg
+c2V0IHNpemUgPSBoZXhfYmxvYl9zaXplICogMiwgYmVjYXVzZSBJIGFzc3VtZWQgaXQgd291bGQK
+c2F0aXNmeSBiaW5fYnVmIHJlcXVpcmVtZW50LihPZiBjb3Vyc2UsIGRlbGliZXJhdGVseSBjb25z
+dHJ1Y3RlZAptYWxpY2lvdXMgdXNlciBpbnB1dCBjYW4gZWFzaWx5IGJyZWFrIHRoaXMgaHlwb3Ro
+ZXNpcy4pCgo+ID4gKyAgICAgICAgICAgIGNhc2UgU1RBUlRfU0VHX0FERFJfUkVDT1JEOgo+ID4g
+KyAgICAgICAgICAgICAgICAvKiBUT0RPICovCj4KPiBUaGUgZnVuY3Rpb24gc2hvdWxkIHJldHVy
+biBhbiBlcnJvciBpZiBhbiB1bnN1cHBvcnRlZCByZWNvcmQgaXMgZW5jb3VudGVyZWQuCgpJIHJl
+YWQgREFQTGluayBjb2RlKGFuZCBmZXcgb3RoZXJzIGhleCB0byBiaW4gY29udmVydGVyJ3Mgc291
+cmNlIGNvZGUpLAp0aGV5IGp1c3Qgc2ltcGx5IGlnbm9yZSB0aGlzIHJlY29yZCB0eXBlIGFuZCBk
+byBub3RoaW5nLgpUaGUgaGV4IGZpbGUgZ2VuZXJhdGVkIGJ5IG9mZmljaWFsIG9ubGluZSBjb21w
+aWxlciBkbyBjb250YWluIHRoaXMga2luZCBvZgpyZWNvcmQgdHlwZS4KCkkgdmltZGlmZiB0aGUg
+aGV4IGZpbGUgYW5kIGJpbiBmaWxlKGdlbmVyYXRlZCBieQpgYXJtLW5vbmUtZWFiaS1vYmpjb3B5
+IC1JIGloZXggbWljcm9iaXQuaGV4IC1PIGJpbmFyeSBtaWNyb2JpdC5iaW5gLAp0aGVuIHVzZSAn
+JSF4eGQnIGluIHZpbSksCkkgbm90aWNlZCAnYXJtLW5vbmUtZWFiaS1vYmpjb3B5JyBkaWRuJ3Qg
+Z2VuZXJhdGUgYW55IGNvZGUgY29ycmVzcG9uZGluZyB0bwpTVEFSVF9TRUdfQUREUl9SRUNPUkQg
+cmVjb3JkIHR5cGUuCgoxKSBTbyBzaG91bGQgSSByZXR1cm4gYW4gZXJyb3IgZm9yICdTdGFydCBT
+ZWdtZW50IEFkZHJlc3MnIGFuZAogICAnU3RhcnQgTGluZWFyIEFkZHJlc3MnIHR5cGU/CgoyKSBP
+ciBtYXliZSBJIHNob3VsZCBpbnNlcnQgc29tZSBBUk0gYXNzZW1ibHkgbGlrZQonJycKbW92ICAg
+ICByMCwgIzAgICAgICBAIFNldCByMCB0byAwLgpiICAgICAgIHRhcmdldCAgICAgIEAgSnVtcCBm
+b3J3YXJkIHRvICd0YXJnZXQnLgonJycgdG8gYmluX2J1Zj8KCjMpIE9yIHNob3VsZCBJIGp1c3Qg
+aWdub3JlIHRoaXMgdHdvIHR5cGVzIGxpa2UgREFQTGluayBhbmQKICAgJ2FybS1ub25lLWVhYmkt
+b2JqY29weScgZG8/Cgo+ID4gKyAgICAgICAgICAgIGxpbmUuYWRkcmVzcyA9IGJzd2FwMTYobGlu
+ZS5hZGRyZXNzKTsKPgo+IFRoaXMgYXNzdW1lcyB0aGUgaG9zdCBDUFUgaXMgbGl0dGxlLWVuZGlh
+bi4gIFBsZWFzZSB1c2UgYmUxNl90b19jcHUoKQo+IGluc3RlYWQgc28gaXQgd29ya3Mgb24gYmln
+LWVuZGlhbiBob3N0IENQVXMgdG9vLgoKSSBoYXZlIHRyaWVkIHRvIHVzZSBiZTE2X3RvX2NwdSgp
+IHRoZSBmaXJzdCB0aW1lIHlvdSBzdWdnZXN0ZWQgaXQgdG8gbWUsCmJ1dCBxZW11IGNyYXNoZWQu
+Li4KSSBoYXZlIHJlYWQgb3RoZXIgcGxhY2VzIGNhbGwgdGhpcyBmdW5jdGlvbiB0byB2ZXJpZnkg
+SSB1c2UgaXQgY29ycmVjdGx5LApidXQgaXQgZGlkIGNyYXNoKHRoYXQncyB3aHkgSSBjaG9vc2Ug
+YnN3YXAxNigpKSwgSXQncyBzdHJhbmdlLi4uCkknbGwgcmVwb3J0IG1vcmUgZGV0YWlsIGFib3V0
+IHRoaXMgY2FzZSB0b21vcnJvdy4KCgpUaGFuayB5b3UgZm9yIHlvdXIgcGF0aWVuY2Ugd2l0aCBt
+eSBpZ25vcmFuY2UhCgpXaXRoIHNpbmNlcmVzdCBncmF0aXR1ZGUsClN1IEhhbmcKCgo+IC0tLS0t
+T3JpZ2luYWwgTWVzc2FnZXMtLS0tLQo+IEZyb206ICJTdGVmYW4gSGFqbm9jemkiIDxzdGVmYW5o
+YUBnbWFpbC5jb20+Cj4gU2VudCBUaW1lOiAyMDE4LTA0LTE1IDA5OjI1OjMwIChTdW5kYXkpCj4g
+VG86ICJTdSBIYW5nIiA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5jbj4KPiBDYzogImppbSBtdXNz
+YXJlZCIgPGppbUBncm9rbGVhcm5pbmcuY29tPiwgcWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25n
+bnUub3JnPiwgImpvZWwgc3RhbmxleSIgPGpvZWxAam1zLmlkLmF1Pgo+IFN1YmplY3Q6IFJlOiBb
+UWVtdS1kZXZlbF0gW1BBVENIIHY0IDEvMl0gSW1wbGVtZW50IC5oZXggZmlsZSBsb2FkZXIKPiAK
+PiBPbiBTYXQsIEFwciAxNCwgMjAxOCBhdCAxMTo0NCBQTSwgU3UgSGFuZyA8c3VoYW5nMTZAbWFp
+bHMudWNhcy5hYy5jbj4gd3JvdGU6Cj4gPiBUaGFua3MgZm9yIHlvdXIgZGV0YWlsZWQgcmVwbHkh
+IEkgIHdpbGwgY2FyZWZ1bGx5IHRyZWF0Cj4gPiBhbGwgdGhlIGNvbnRlbnQgdGhhdCB5b3UgbWVu
+dGlvbmVkLCBhbmQgYXBwbHkgdGhlbSBpbiB2NS4KPiAKPiBCeSB0aGUgd2F5LCBpZiB5b3UgYXJl
+IHdvbmRlcmluZyB3aHkgdGhlIHBhcnNlciBuZWVkcyB0byB2YWxpZGF0ZQo+IGV2ZXJ5dGhpbmcs
+IGhlcmUgaXMgYW4gZXhhbXBsZSBzY2VuYXJpbzoKPiAKPiBRRU1VIG1heSBiZSB1c2VkIHRvIGhv
+c3QgYW4gb25saW5lIG1pY3JvOmJpdCBzaW11bGF0b3Igd2hlcmUgdGhlIHVzZXIKPiBjYW4gcHJv
+dmlkZSBhIC5oZXggZmlsZS4gIEluIHRoYXQgY2FzZSBRRU1VIGlzIHJ1bm5pbmcgb24gYSBzZXJ2
+ZXIgYW5kCj4gdGhlIC5oZXggZmlsZSBpcyBwcm92aWRlZCBieSBhbiB1bnRydXN0ZWQgdXNlci4g
+IFRoYXQgdXNlciBtdXN0IG5vdCBiZQo+IGFibGUgdG8gY3Jhc2ggUUVNVSAoYW5kIGV4cGxvaXQg
+c2VjdXJpdHkgaG9sZXMpLgo+IAo+IFN0ZWZhbgo=
