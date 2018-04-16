@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f8A1J-0006dm-W8
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 15:42:36 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f8AQ5-0002dn-UY
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 16:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f8A1G-0008PX-Rt
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 15:42:34 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:39636)
+	(envelope-from <alex.bennee@linaro.org>) id 1f8AQ1-00020i-TP
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 16:08:09 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f8A1G-0008Og-LQ
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 15:42:30 -0400
-Received: by mail-pg0-x242.google.com with SMTP id b9so4295324pgf.6
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 12:42:30 -0700 (PDT)
-References: <20180416151923.22588-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b0d166e4-b84d-e450-b46b-73b609c1185a@linaro.org>
-Date: Mon, 16 Apr 2018 09:42:25 -1000
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f8AQ1-00020H-Iq
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 16:08:05 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id d19so29408112wre.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 13:08:05 -0700 (PDT)
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+	<20180410193919.28026-24-alex.bennee@linaro.org>
+	<8838744d-6952-38ea-6cee-a151e30fdbca@amsat.org>
+	<87efjfbkh6.fsf@linaro.org>
+	<1cfe9453-44f6-0dcd-4297-9715160b8620@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1cfe9453-44f6-0dcd-4297-9715160b8620@amsat.org>
+Date: Mon, 16 Apr 2018 21:08:03 +0100
+Message-ID: <8736zuc3to.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180416151923.22588-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [prefix=PATCH for-2.12?] linux-user: check that
- all of AArch64 SVE extended sigframe is writable
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 23/24] Makefile.target: add
+ (clean-)guest-tests targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +34,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, patches@linaro.org
-
-On 04/16/2018 05:19 AM, Peter Maydell wrote:
-> In commit 8c5931de0ac7738809 we added support for SVE extended
-> sigframe records.  These mean that the signal frame might now be
-> larger than the size of the target_rt_sigframe record, so make sure
-> we call lock_user on the entire frame size when we're creating it.
-> (The code for restoring the signal frame already correctly handles
-> the extended records by locking the 'extra' section separately to the
-> main section.)
-> 
-> In particular, this fixes a bug even for non-SVE signal frames,
-> because it extends the locked section to cover the
-> target_rt_frame_record. Previously this was part of 'struct
-> target_rt_sigframe', but in commit e1eecd1d9d4c1ade3 we pulled
-> it out into its own struct, and so locking the target_rt_sigframe
-> alone doesn't cover it. This bug would mean that we would fail
-> to correctly handle the case where a signal was taken with
-> SP pointing 16 bytes into an unwritable page, with the page
-> immediately below it in memory being writable.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> The requirements to trigger the bug sound implausible, except
-> that the stack page might be unwritable because we just
-> executed some trampoline code from it, so perhaps not so
-> unlikely as it first seems? Not sure whether to put into 2.12
-> or not...
-> ---
->  linux-user/signal.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-
-Yes, let's just go ahead and fix this all properly now.
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, cota@braap.org
 
 
-r~
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> On 04/16/2018 05:53 AM, Alex Benn=C3=A9e wrote:
+>>
+>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>
+>>> On 04/10/2018 04:39 PM, Alex Benn=C3=A9e wrote:
+>>>> Now all the build infrastructure is in place we can build tests for
+>>>> each guest that we support. That support mainly depends on having
+>>>> cross compilers installed or docker setup. To keep all the logic for
+>>>> that together we put the rules in tests/tcg/Makefile.include and
+>>>> include it from the main Makefile.target.
+>>>>
+>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>> ---
+>>>>  Makefile.target            |  5 +++
+>>>>  tests/tcg/Makefile.include | 79 +++++++++++++++++++++++++++++++++++++=
++++++++++
+>>>>  2 files changed, 84 insertions(+)
+>>>>  create mode 100644 tests/tcg/Makefile.include
+>>>>
+>>>> diff --git a/Makefile.target b/Makefile.target
+>>>> index d0ec77a307..a30fd40257 100644
+>>>> --- a/Makefile.target
+>>>> +++ b/Makefile.target
+>>>> @@ -36,6 +36,11 @@ endif
+>>>>  PROGS=3D$(QEMU_PROG) $(QEMU_PROGW)
+>>>>  STPFILES=3D
+>>>>
+>>>> +# Makefile Tests
+>>>> +ifdef CONFIG_USER_ONLY
+>>>> +include $(SRC_PATH)/tests/tcg/Makefile.include
+>>>> +endif
+>>>> +
+>>>>  config-target.h: config-target.h-timestamp
+>>>>  config-target.h-timestamp: config-target.mak
+>>>>
+>>>> diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
+>>>> new file mode 100644
+>>>> index 0000000000..cb8bb36026
+>>>> --- /dev/null
+>>>> +++ b/tests/tcg/Makefile.include
+>>>> @@ -0,0 +1,79 @@
+>>>> +# -*- Mode: makefile -*-
+>>>> +#
+>>>> +# TCG tests (per-target rules)
+>>>> +#
+>>>> +# This Makefile fragement is included from the per-target
+>>>> +# Makefile.target so will be invoked for each linux-user program we
+>>>> +# build. We have two options for compiling, either using a configured
+>>>> +# guest compiler or calling one of our docker images to do it for us.
+>>>> +#
+>>>> +
+>>>> +# The per ARCH makefile, if it exists holds extra information about
+>>>> +# useful docker images or alternative compiler flags. Include it if it
+>>>> +# exists
+>>>> +
+>>>> +ARCH_MAKEFILE=3D$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
+>>>> +CHECK_INCLUDE=3D$(wildcard $(ARCH_MAKEFILE))
+>>>> +
+>>>> +ifeq ($(ARCH_MAKEFILE),$(CHECK_INCLUDE))
+>>>> +include $(ARCH_MAKEFILE)
+>>>> +endif
+>>>> +
+>>>> +GUEST_BUILD=3D
+>>>> +
+>>>> +# Support installed Cross Compilers
+>>>> +
+>>>> +ifdef CROSS_CC_GUEST
+>>>> +
+>>>> +.PHONY: cross-build-guest-tests
+>>>> +cross-build-guest-tests:
+>>>> +	$(call quiet-command, \
+>>>> +          (mkdir -p tests && cd tests && \
+>>>> +	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=3D$(TARGET_NAME) CC=
+=3D$(CROSS_CC_GUEST)), \
+>>>> +	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
+>>>> +
+>>>> +
+>>>> +GUEST_BUILD=3Dcross-build-guest-tests
+>>>> +
+>>>> +endif
+>>>> +
+>>>> +# Support building with Docker
+>>>> +
+>>>> +ifeq ($(HAVE_USER_DOCKER)$(GUEST_BUILD),y)
+>>>> +ifneq ($(DOCKER_IMAGE),)
+>>>> +
+>>>> +# We also need the Docker make rules to depend on
+>>>> +include $(SRC_PATH)/tests/docker/Makefile.include
+>>>> +
+>>>
+>>> Eventually:
+>>>
+>>> DOCKER_CROSS_COMPILER ?=3D $(DOCKER_CROSS_COMPILER_PREFIX)-gcc
+>>>
+>>>> +DOCKER_COMPILE_CMD=3D"$(DOCKER_SCRIPT) cc --user $(shell id -u) \
+>>>> +		--cc $(DOCKER_CROSS_COMPILER) \
+>>>> +		-i qemu:$(DOCKER_IMAGE) \
+>>>> +		-s $(SRC_PATH) -- "
+>>>
+>>> Should we check $(DOCKER_CROSS_COMPILER) is set?
+>>
+>> Currently it's implied. It would be nice if there was an easy way just
+>> to fish it out of the env of the docker image as they already have it
+>> set there.
+>>
+>> I've been trying quite hard to ensure all the tests can just use LD (see
+>> the hoops I jump in i386 for this). Maybe a prefix config makes more
+>> sense though....
+>
+> We might also need some CROSS_CFLAGS, i.e. for armeb we need to use
+> -mbig-endian. This would go in
+> tests/tcg/$(TARGET_NAME)/Makefile.target
+
+Yeah we can fish that out from config-target.mak
+
+However I've run into problems with compiling things with -mbig-endian
+as it forces the inclusion of something that seems to be missing in the
+glibc-dev:
+
+
+aarch64-linux-gnu-gcc -mbig-endian -o config-temp/qemu-conf.exe config-temp=
+/qemu-conf.c -static
+In file included from /usr/aarch64-linux-gnu/include/features.h:391:0,
+                 from /usr/aarch64-linux-gnu/include/stdio.h:27,
+                 from config-temp/qemu-conf.c:1:
+/usr/aarch64-linux-gnu/include/gnu/stubs.h:11:32: fatal error: gnu/stubs-lp=
+64_be.h: No such file or directory
+compilation terminated.
+
+And they aren't packaged if the distro doesn't support the arch.
+
+>
+>>
+>>>
+>>>> +DOCKER_PREREQ=3Ddocker-image-$(DOCKER_IMAGE)
+>>>> +
+>>>> +.PHONY: docker-build-guest-tests
+>>>> +docker-build-guest-tests: $(DOCKER_PREREQ)
+>>>> +	$(call quiet-command, \
+>>>> +          (mkdir -p tests && cd tests && \
+>>>> +	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=3D$(TARGET_NAME) CC=
+=3D$(DOCKER_COMPILE_CMD)), \
+>>>> +	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKE=
+R_IMAGE)")
+>>>> +
+>>>> +GUEST_BUILD=3Ddocker-build-guest-tests
+>>>> +
+>>>> +endif
+>>>> +endif
+>>>> +
+>>>> +# Final targets
+>>>> +.PHONY: guest-tests
+>>>> +
+>>>> +ifneq ($(GUEST_BUILD),)
+>>>> +guest-tests: $(GUEST_BUILD)
+>>>> +else
+>>>> +guest-tests:
+>>>> +	$(call quiet-command, /bin/true, "CROSS-BUILD", "$(TARGET_NAME) gues=
+t-tests SKIPPED")
+>>>> +endif
+>>>> +
+>>>> +# It doesn't mater if these don't exits
+>>>> +.PHONY: clean-guest-tests
+>>>> +clean-guest-tests:
+>>>> +	rm -rf tests || echo "no $(TARGET_NAME) tests to remove"
+>>>>
+
+
+--
+Alex Benn=C3=A9e
