@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f7w8z-0004d6-Un
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:53:34 -0400
+	(envelope-from <th.huth@gmail.com>) id 1f7wE9-0006Sn-Ml
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f7w8w-0000zw-Px
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:53:34 -0400
+	(envelope-from <th.huth@gmail.com>) id 1f7wE6-0003v3-M7
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:58:53 -0400
 References: <20180415234307.28132-1-f4bug@amsat.org>
-	<20180415234307.28132-2-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a2d59a3a-0176-6065-68ae-60fee97c2332@redhat.com>
-Date: Mon, 16 Apr 2018 06:53:22 +0200
+	<20180415234307.28132-18-f4bug@amsat.org>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <16a3d8ff-2361-27c8-d93a-e210d7080063@tuxfamily.org>
+Date: Mon, 16 Apr 2018 06:58:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180415234307.28132-2-f4bug@amsat.org>
+In-Reply-To: <20180415234307.28132-18-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/41] hw: Clean "hw/devices.h" includes
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 17/41] hw/m68k: Use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +26,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Thomas Huth <huth@tuxfamily.org>
 
-On 16.04.2018 01:42, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 16.04.2018 01:42, Philippe Mathieu-Daudé wrote:
+> It eases code review, unit is explicit.
+> 
+> Patch generated using:
+> 
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
+> 
+> and modified manually.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  include/hw/devices.h | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
->=20
-> diff --git a/include/hw/devices.h b/include/hw/devices.h
-> index 861ddea8af..0e27feb0c2 100644
-> --- a/include/hw/devices.h
-> +++ b/include/hw/devices.h
-> @@ -1,13 +1,10 @@
->  #ifndef QEMU_DEVICES_H
->  #define QEMU_DEVICES_H
-> =20
-> -#include "hw/irq.h"
-> -
-> -/* ??? Not all users of this file can include cpu-common.h.  */
-> -struct MemoryRegion;
-> -
->  /* Devices that have nowhere better to go.  */
-> =20
-> +#include "hw/hw.h"
-> +
->  /* smc91c111.c */
->  void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
+>  hw/m68k/mcf5208.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+> index fac0d09cbc..673d65f8fd 100644
+> --- a/hw/m68k/mcf5208.c
+> +++ b/hw/m68k/mcf5208.c
+> @@ -6,6 +6,7 @@
+>   * This code is licensed under the GPL
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+> @@ -241,7 +242,7 @@ static void mcf5208evb_init(MachineState *machine)
+>      memory_region_add_subregion(address_space_mem, 0x40000000, ram);
+>  
+>      /* Internal SRAM.  */
+> -    memory_region_init_ram(sram, NULL, "mcf5208.sram", 16384, &error_fatal);
+> +    memory_region_init_ram(sram, NULL, "mcf5208.sram", 16 * K_BYTE, &error_fatal);
+>      memory_region_add_subregion(address_space_mem, 0x80000000, sram);
+>  
+>      /* Internal peripherals.  */
+> 
 
-IMHO we should rather get rid of devices.h (in a separate patch series)
-and introduce proper small headers =C3=A0 la smc91c111.h for the single
-sections in here... Just my 0.02 =E2=82=AC.
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@tuxfamily.org>
