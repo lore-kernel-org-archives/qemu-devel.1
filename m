@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f7xsq-0007HL-QG
+	(envelope-from <thuth@redhat.com>) id 1f7xsr-0007Hf-PA
 	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f7xsl-0007aJ-Vr
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53014 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1f7xsq-0007d5-JK
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54552 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f7xsl-0007Zq-Qm
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:44:55 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f7xsq-0007cl-DN
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 02:45:00 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Apr 2018 08:44:38 +0200
-Message-Id: <1523861081-3600-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.13 0/3] net: Get rid of 'vlan'
+Date: Mon, 16 Apr 2018 08:44:41 +0200
+Message-Id: <1523861081-3600-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1523861081-3600-1-git-send-email-thuth@redhat.com>
+References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 for-2.13 3/3] net: Get rid of 'vlan'
+ terminology and use 'hub' instead in the doc files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +27,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The 'vlan' term caused a lot of confusion and misconfigurations in the
-past. The parameter has been marked as deprecated since QEMU v2.9.0, so
-it's now time to finally remove the parameter and use the better word "hub"
-in the remaining spots that actually mean the QEMU emulated hub feature.
+'vlan' is very confusing since it does not mean something like IEEE
+802.1Q, but rather emulated hubs, so let's switch to that terminology
+instead. While we're at it, move the subsection about hub a little bit
+downward in the documentation (it's not as important anymore as it was
+before the invention of the -netdev parameter), and extend it a little
+bit.
 
-v3:
- - Some rewordings in qemu-doc and net.json according to Paolo's suggestions
+Buglink: https://bugs.launchpad.net/qemu/+bug/658904
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ qemu-doc.texi | 42 +++++++++++++++++++++++-------------------
+ 1 file changed, 23 insertions(+), 19 deletions(-)
 
-v2:
- - Added first patch to actually remove the deprecated 'vlan' parameter
-   (instead of only updating the wording in the sources and docs)
-
-Thomas Huth (3):
-  net: Remove the deprecated "vlan" parameter
-  net: Get rid of 'vlan' terminology and use 'hub' instead in the source
-    files
-  net: Get rid of 'vlan' terminology and use 'hub' instead in the doc
-    files
-
- docs/qdev-device-use.txt         |  3 --
- hw/core/qdev-properties-system.c | 80 ----------------------------------------
- include/hw/qdev-properties.h     |  3 --
- include/net/net.h                |  1 -
- net/hub.c                        |  7 ++--
- net/net.c                        | 12 ++----
- net/slirp.c                      |  8 ++--
- net/tap.c                        |  4 +-
- qapi/net.json                    | 15 ++++----
- qemu-doc.texi                    | 51 ++++++++++++-------------
- qemu-options.hx                  | 29 ++++++---------
- 11 files changed, 54 insertions(+), 159 deletions(-)
-
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index b901cc2..f058341 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -714,20 +714,12 @@ state is not saved or restored properly (in particular USB).
+ @node pcsys_network
+ @section Network emulation
+ 
+-QEMU can simulate several network cards (PCI or ISA cards on the PC
+-target) and can connect them to an arbitrary number of Virtual Local
+-Area Networks (VLANs). Host TAP devices can be connected to any QEMU
+-VLAN. VLAN can be connected between separate instances of QEMU to
+-simulate large networks. For simpler usage, a non privileged user mode
+-network stack can replace the TAP device to have a basic network
+-connection.
+-
+-@subsection VLANs
+-
+-QEMU simulates several VLANs. A VLAN can be symbolised as a virtual
+-connection between several network devices. These devices can be for
+-example QEMU virtual Ethernet cards or virtual Host ethernet devices
+-(TAP devices).
++QEMU can simulate several network cards (e.g. PCI or ISA cards on the PC
++target) and can connect them to a network backend on the host or an emulated
++hub. The various host network backends can either be used to connect the NIC of
++the guest to a real network (e.g. by using a TAP devices or the non-privileged
++user mode network stack), or to other guest instances running in another QEMU
++process (e.g. by using the socket host network backend).
+ 
+ @subsection Using TAP network interfaces
+ 
+@@ -763,7 +755,7 @@ network). The virtual network configuration is the following:
+ 
+ @example
+ 
+-         QEMU VLAN      <------>  Firewall/DHCP server <-----> Internet
++     guest (10.0.2.15)  <------>  Firewall/DHCP server <-----> Internet
+                            |          (10.0.2.2)
+                            |
+                            ---->  DNS server (10.0.2.3)
+@@ -798,11 +790,23 @@ When using the @option{'-netdev user,hostfwd=...'} option, TCP or UDP
+ connections can be redirected from the host to the guest. It allows for
+ example to redirect X11, telnet or SSH connections.
+ 
+-@subsection Connecting VLANs between QEMU instances
++@subsection Hubs
++
++QEMU can simulate several hubs. A hub can be symbolised as a virtual connection
++between several network devices. These devices can be for example QEMU virtual
++ethernet cards or virtual Host ethernet devices (TAP devices). You can connect
++guest NICs or host network backends to such a hub using the @option{-netdev
++hubport} or @option{-nic hubport} options. The legacy @option{-net} option
++also connects the given device to the emulated hub with ID 0 (i.e. the default
++hub) unless you specify a netdev with @option{-net nic,netdev=xxx} here.
++
++@subsection Connecting emulated networks between QEMU instances
+ 
+-Using the @option{-net socket} option, it is possible to make VLANs
+-that span several QEMU instances. See @ref{sec_invocation} to have a
+-basic example.
++Using the @option{-netdev socket} (or @option{-nic socket} or
++@option{-net socket}) option, it is possible to create emulated
++networks that span several QEMU instances.
++See the description of the @option{-netdev socket} option in the
++@ref{sec_invocation,,Invocation chapter} to have a basic example.
+ 
+ @node pcsys_other_devs
+ @section Other Devices
 -- 
 1.8.3.1
