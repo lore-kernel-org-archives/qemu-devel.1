@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f81QF-0001df-WC
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:31:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f81W6-000477-L5
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f81QE-0008PC-LR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:31:44 -0400
-Date: Mon, 16 Apr 2018 11:31:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180416103118.GH17600@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180413192605.2145-1-nirsof@gmail.com>
-	<20180413192605.2145-2-nirsof@gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f81W2-00042C-Ht
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:37:46 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:39833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f81W2-00041y-BA
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:37:42 -0400
+Received: by mail-qk0-x242.google.com with SMTP id j73so15953730qke.6
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 03:37:42 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <72bb50ab-6332-dc8b-f8d8-a24baabe82c5@amsat.org>
+Date: Mon, 16 Apr 2018 07:37:38 -0300
 MIME-Version: 1.0
+In-Reply-To: <20180410193919.28026-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180413192605.2145-2-nirsof@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] nbd: Add option to disallow listing
- exports
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 00/24] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +34,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nirsof@gmail.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, rjones@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, cota@braap.org
 
-On Fri, Apr 13, 2018 at 10:26:03PM +0300, Nir Soffer wrote:
-> When a management application expose images using qemu-nbd, it needs a
-> secure way to allow temporary access to the disk. Using a random export
-> name can solve this problem:
+On 04/10/2018 04:38 PM, Alex Bennée wrote:
+> Hi,
 > 
->     nbd://server:10809/22965f19-9ab5-4d18-94e1-cbeb321fa433
+> We've talked about fixing this up for a long time and there have been
+> several RFC patches sent attempting to do that. This is yet another
+> RFC but hopefully shows a way forward which can build on our docker
+> support but also allow users to specify their own guest cross
+> compilers.
 > 
-> Assuming that the url is passed to the user in a secure way, and the
-> user is using TLS to access the image.
+> So far I've built arm, aarch64, ppc64 and s390x but adding support for
+> additional guests is simple, especially if we already have a docker
+> cross compile setup.
+
+The current docker setup is limited to x86_64 hosts (amd64) and doesn't
+work with armhf/arm64 hosts.
+
+Although armhf (arm32v7) is easier for end-user, I believe at some point
+it'll be useful to support aarch64 (arm64v8) hosts and eventually s390x.
+
+> I've weeded out any tests that linked with QEMU (testpath) and reduced
+> the expectations of any tests/tcg test to just having access to libc.
+> This is the lowest common denominator for anything that can reasonably
+> be called a cross compiler.
 > 
-> However, since qemu-nbd implements NBD_OPT_LIST, anyone can easily find
-> the secret export:
+> The tests are all aimed at linux-user targets. We could probably come
+> up with something for building bare-metal softmmu tests but I suspect
+> that might be better served by using a different mechanism to import
+> existing tests into our build (e.g. kvm-unit-tests).
 > 
->     $ nbd-client -l server 10809
->     Negotiation: ..
->     22965f19-9ab5-4d18-94e1-cbeb321fa433
+> Let's breakdown the series:
 > 
-> Add a new --nolist option, disabling listing, similar the "allowlist"
-> nbd-server configuration option.
+> configure:
 > 
-> When used, listing exports will fail like this:
+> As we need make magic we move the detection of docker and cross
+> compilers into configure. If any cross compiler is detected for a
+> given target we set CROSS_CC_GUEST in each config-target.mak. A
+> functioning cross compiler takes precedence over the docker fallback.
+> I think this makes sense for individual target sub-maintainers as they
+> likely already have a cross compile setup.
 > 
->     $ nbd-client -l localhost 10809
->     Negotiation: ..
+> For docker we only set HAVE_USER_DOCKER in config-host.mak if the user
+> can run docker without sudo. We still need match up a docker image and
+> compiler once we build. This is handled by
+> tests/tcg/$(ARCH)/Makefile.include.
 > 
->     E: listing not allowed by server.
->     Server said: Listing exports is forbidden
-
-Essentially this is abusing the export name as a crude authentication
-token. There are NBD servers that expect NBD_OPT_LIST to always succeeed
-when they detect that the new style protocol is available. I really hate
-the idea of making it possible to break the NBD_OPT_LIST functionality
-via a command line arg like this.
-
-Furthermore, applications are *not* considering the export names to be
-security sensitive data, so will not be taking any precautions to ensure
-they remain secret, as they would do with authentication credentials.
-Again I really hate the idea of using NBD exports an an auth credential.
-
-So I don't think we should be suggesting that security through obscurity of
-the export name is a supported approach to securing NBD.
-
-I understand the desire to be able to secure NBD exports though, so think
-we need to come up with some kind of supportable solution for this. There
-are two approaches we should take
-
- - Add support for TLS client certification whitelisting. eg every client
-   has a unique identity based on the distinguished name (dname) in the
-   x509 cert they were issued. The NBD server can be told which of these
-   dnames should be a permitted to connect. This is supported in VNC for
-   years, and I've had patches pending to support this in a QEMU for chardevs
-   NBD and migration for a while. These were stalled on way to convert
-   -object ... syntax into nested QOM objects.
-
- - Define a mapping of the SASL protocol ontop NBD. SASL is a generic pluggable
-   authentication mechanism for network protocols. It is already used in
-   libvirt, VNC and SPICE, and would easily fit in with NBD from a conceptual
-   POV. When used in combination with TLS, this offers a wide range of auth
-   mechanisms from simple username+password, to full integration with Kerberos.
-
-If this need is urgent, I think we could partially unblock the TLS x509
-whitelisting support without much difficulty. We haven't been pushing hard
-to unblock it simply because no one was urgently blocked by its absence
-so far. This provides a strong solution, but the difficulty is that the
-server may not know the x509 dname of the permitted client, which makes
-it hard to use in practice. SASL with a simple username+password scheme
-is thus still very compelling to implement, but will obviously  take longer
-due to the amount of code/spec work required.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> docker:
+> 
+> I've extended Fam's original patches to allow a bit more flexibility
+> for the "cc" command. I'm not overly wedded to using the docker.py
+> wrapper, we could just construct the command directly in Make if we
+> wanted to.
+> 
+> tests/tcg:
+> 
+> The top of the tree has been cleared out and everything moved into
+> sub-directories. There is a new multiarch sub-directory which is built
+> for every linux-user guest that has compiler support. Additional tests
+> are then included from tests/tcg/$(ARCH)/*.c or manually
+> added/modified by tests/tcg/$(ARCH)/Makefile.target.
+> 
+> Makefile:
+> 
+> As we are building tests/tcg for each target so Makefile.target now
+> invokes a sub-make with tests/tcg/Makefile while in the appropriate
+> build directory $(ARCH)-linux-user/tests/. The check-tcg and clean-tcg
+> targets unroll into all the configured FOO-linux-user targets and will
+> build the tests if cross compilation is available, otherwise the build
+> is skipped without failing the make.
+> 
+> Running tests:
+> 
+> Currently this is done manually from the build directory:
+> 
+>   ./qemu-arm tests/hello-arm
+> 
+> However once we have everything converted it shouldn't be too hard to
+> plumb into the normal make check sequence.
+> 
+> So what do people think? Is this a viable way to go forward?
+> 
+> Alex Bennée (20):
+>   configure: add test for docker availability
+>   configure: add support for --cross-cc-FOO
+>   configure: move i386_cc to cross_cc_i386
+>   docker: extend "cc" command to accept compiler
+>   docker: allow "cc" command to run in user context
+>   docker: Makefile.include introduce DOCKER_SCRIPT
+>   tests/tcg: move architecture independent tests into subdir
+>   tests/tcg: move i386 specific tests into subdir
+>   tests/tcg/i386: move test-i386-sse.c to tests/tcg/x86_64/test-sse.c
+>   tests/tcg/i386: fix test-i386
+>   tests/tcg/i368: fix hello-i386
+>   tests/tcg/i386: fix test-i386-fprem
+>   tests/tcg: move ARM specific tests into subdir
+>   tests/tcg/arm: fix hello-arm
+>   tests/tcg: move MIPS specific tests into subdir
+>   tests/tcg: enable building for s390x
+>   tests/tcg: enable building for ppc64
+>   tests/tcg/Makefile: update to be called from Makefile.target
+>   Makefile.target: add (clean-)guest-tests targets
+>   tests/Makefile.include: add (clean-)check-tcg targets
+> 
+> Fam Zheng (4):
+>   Makefile: Rename TARGET_DIRS to TARGET_LIST
+>   docker: Add "cc" subcommand
+>   tests/tcg/multiarch: Build fix for linux-test
+>   tests/tcg/i386: Build fix for hello-i386
+> 
+>  Makefile                                           |  20 +--
+>  Makefile.target                                    |   5 +
+>  configure                                          |  92 +++++++++-
+>  scripts/create_config                              |   2 +-
+>  tests/Makefile.include                             |  21 ++-
+>  tests/docker/Makefile.include                      |  10 +-
+>  tests/docker/docker.py                             |  40 +++++
+>  tests/tcg/Makefile                                 | 185 +++++----------------
+>  tests/tcg/Makefile.include                         |  79 +++++++++
+>  tests/tcg/README                                   |  69 +-------
+>  tests/tcg/arm/Makefile.target                      |   6 +
+>  tests/tcg/arm/README                               |  11 ++
+>  tests/tcg/{ => arm}/hello-arm.c                    |   0
+>  tests/tcg/{ => arm}/test-arm-iwmmxt.s              |   0
+>  tests/tcg/i386/Makefile.target                     |  35 ++++
+>  tests/tcg/i386/README                              |  38 +++++
+>  tests/tcg/{ => i386}/hello-i386.c                  |   1 +
+>  tests/tcg/{ => i386}/pi_10.com                     | Bin
+>  tests/tcg/{ => i386}/runcom.c                      |   0
+>  tests/tcg/{ => i386}/test-i386-code16.S            |   0
+>  tests/tcg/{ => i386}/test-i386-fprem.c             |   9 +-
+>  tests/tcg/{ => i386}/test-i386-muldiv.h            |   0
+>  tests/tcg/{ => i386}/test-i386-shift.h             |   0
+>  tests/tcg/{ => i386}/test-i386-vm86.S              |   0
+>  tests/tcg/{ => i386}/test-i386.c                   |   1 -
+>  tests/tcg/{ => i386}/test-i386.h                   |   0
+>  tests/tcg/mips/README                              |   7 +
+>  tests/tcg/{ => mips}/hello-mips.c                  |   0
+>  tests/tcg/multiarch/README                         |   1 +
+>  tests/tcg/{ => multiarch}/linux-test.c             |  68 +++-----
+>  tests/tcg/{ => multiarch}/sha1.c                   |   0
+>  tests/tcg/{ => multiarch}/test-mmap.c              |   0
+>  tests/tcg/{ => multiarch}/testthread.c             |   0
+>  tests/tcg/ppc64/Makefile.include                   |   2 +
+>  tests/tcg/s390x/Makefile.include                   |   2 +
+>  tests/tcg/test_path.c                              | 157 -----------------
+>  tests/tcg/{test-i386-ssse3.c => x86_64/test-sse.c} |   6 +-
+>  37 files changed, 424 insertions(+), 443 deletions(-)
+>  create mode 100644 tests/tcg/Makefile.include
+>  create mode 100644 tests/tcg/arm/Makefile.target
+>  create mode 100644 tests/tcg/arm/README
+>  rename tests/tcg/{ => arm}/hello-arm.c (100%)
+>  rename tests/tcg/{ => arm}/test-arm-iwmmxt.s (100%)
+>  create mode 100644 tests/tcg/i386/Makefile.target
+>  create mode 100644 tests/tcg/i386/README
+>  rename tests/tcg/{ => i386}/hello-i386.c (96%)
+>  rename tests/tcg/{ => i386}/pi_10.com (100%)
+>  rename tests/tcg/{ => i386}/runcom.c (100%)
+>  rename tests/tcg/{ => i386}/test-i386-code16.S (100%)
+>  rename tests/tcg/{ => i386}/test-i386-fprem.c (98%)
+>  rename tests/tcg/{ => i386}/test-i386-muldiv.h (100%)
+>  rename tests/tcg/{ => i386}/test-i386-shift.h (100%)
+>  rename tests/tcg/{ => i386}/test-i386-vm86.S (100%)
+>  rename tests/tcg/{ => i386}/test-i386.c (99%)
+>  rename tests/tcg/{ => i386}/test-i386.h (100%)
+>  create mode 100644 tests/tcg/mips/README
+>  rename tests/tcg/{ => mips}/hello-mips.c (100%)
+>  create mode 100644 tests/tcg/multiarch/README
+>  rename tests/tcg/{ => multiarch}/linux-test.c (91%)
+>  rename tests/tcg/{ => multiarch}/sha1.c (100%)
+>  rename tests/tcg/{ => multiarch}/test-mmap.c (100%)
+>  rename tests/tcg/{ => multiarch}/testthread.c (100%)
+>  create mode 100644 tests/tcg/ppc64/Makefile.include
+>  create mode 100644 tests/tcg/s390x/Makefile.include
+>  delete mode 100644 tests/tcg/test_path.c
+>  rename tests/tcg/{test-i386-ssse3.c => x86_64/test-sse.c} (93%)
+> 
