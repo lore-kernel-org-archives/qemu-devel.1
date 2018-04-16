@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f7zXg-0007ro-Ev
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:31:20 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f7zcO-0001yD-QX
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f7zXa-0005Vh-Ba
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:31:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57990 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1f7zcK-0008Ei-Mw
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:36:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56616 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f7zXa-0005VA-7H
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:31:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDED04040073
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 08:31:09 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
-	<20180413161842.5117-3-marcandre.lureau@redhat.com>
-	<87r2nfsh7w.fsf@dusky.pond.sub.org>
-Date: Mon, 16 Apr 2018 10:31:08 +0200
-In-Reply-To: <87r2nfsh7w.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Mon, 16 Apr 2018 10:12:03 +0200")
-Message-ID: <87efjfsgc3.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f7zcK-0008E1-IO
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:36:04 -0400
+Date: Mon, 16 Apr 2018 10:35:57 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180416103557.27ba514e@redhat.com>
+In-Reply-To: <9BD73EA91F8E404F851CF3F519B14AA801719EA3@dggemi501-mbs.china.huawei.com>
+References: <9BD73EA91F8E404F851CF3F519B14AA801719260@dggemi501-mbs.china.huawei.com>
+	<20180413153857.75556707@redhat.com>
+	<9BD73EA91F8E404F851CF3F519B14AA801719EA3@dggemi501-mbs.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] qobject: use a QObjectBase_ struct
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Hot add vcpu not working in Windows server 2012r2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,63 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: "Wuzongyong (Euler Dept)" <cordius.wu@huawei.com>
+Cc: "Wanzongshun (Vincent)" <wanzongshun@huawei.com>, huangfeiqing <huangfeiqing@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Mon, 16 Apr 2018 07:28:47 +0000
+"Wuzongyong (Euler Dept)" <cordius.wu@huawei.com> wrote:
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> By moving the base fields to a QObjectBase_, QObject can be a type
->> which also has a 'base' field. This allows to write a generic
->> QOBJECT() macro that will work with any QObject type, including
->> QObject itself. The container_of() macro ensures that the object to
->> cast has a QObjectBase_ base field, giving some type safety
->> guarantees. However, for it to work properly, all QObject types must
->> have 'base' at offset 0 (which is ensured by static checking from
->> the previous patch)
->
-> I'm afraid this condition is neither sufficient nor necessary.
->
-> QOBJECT() maps a pointer to some subtype to the base type QObject.  For
-> this to work, the subtype must contain a QObject.
->
-> Before the patch, this is trivially the case: the subtypes have a member
-> QObject base, and QOBJECT() returns its address.
->
-> Afterwards, the subtypes have a member QObjectBase_ base, and QOBJECT()
-> returns the address of a notional QObject wrapped around this member.
-> Works because QObject has no other members.
->
-> The condition 'base is at offset 0' does not ensure this, and is
-> therefore not sufficient.
->
-> It's not necessary, either: putting base elsewhere would work just fine
-> as long as we put *all* of QObject there.
->
-> Please document the real condition "QObject must have no members but
-> QObjectBase_ base, or else QOBJECT() breaks".  Feel free to check their
-> sizes are the same (I wouldn't bother).
->
-> If requiring base to be at offset zero for all subtypes materially
-> simplifies code, then go ahead and do that in a separate patch.  My gut
-> feeling is it doesn't, but I could be wrong.
+> > On Fri, 13 Apr 2018 03:14:44 +0000
+> > "Wuzongyong (Euler Dept)" <cordius.wu@huawei.com> wrote:
+> >   
+> > > Hi,
+> > >
+> > > I try to hot add vcpus to a windows server 2012r2 virtual machine on  
+> > RHEL 7.4 platform.  
+> > > But Task Manager didn't show extra processors I hot added though they
+> > > appeared in Device Manager. Actually, I need to require reboot the vm
+> > > to make processors hot Added appear in Task Manager.
+> > > Is there some problem with redhat qemu? Why the processors I hot-added
+> > > didn't online automatically?
+> > > I don't know if I ask the right person or in a right mail list,  
+> > apologize first if I bother you.
+> > It might depend on particular edition of windows server you are running.
+> > I usually test it with 'data server' edition where it supposed to work.
+> > Could you check if that works?  
+> Win2012 datacenter build 9200 don't help.
+> I try to install a high version qemu from a centos repo, and it can hot-add
+> vcpus normally. I guess the release of qemu in rhel 7.5 is too low.
+Basic RHEL version is pretty old, you should use qemu-kvm-rhev instead.
 
-Uh, there's another reason: existing type casts from QObject * to
-subtypes.  I just spotted one in tests/check-qdict.c:
-
-    dst =3D (QDict *)qdict_crumple(src, &error_abort);
-
-There may well be more.
-
->> QObjectBase_ is not typedef and use a trailing underscore to make it
->> obvious it is not for normal use and to avoid potential abuse.
->
-> Trailing underscore I like, lack of typedef I don't mind (but I'm firmly
-> in the "eschew typedef for structs" camp).  It does violate the common
-> QEMU coding style, though.
->
-> A comment /* Not for use outside include/qapi/qmp/ */ next to
-> QObjectBase_ wouldn't hurt.
->
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> 
+> Thanks,
+> Wu Zongyong
