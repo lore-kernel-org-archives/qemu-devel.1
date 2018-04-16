@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f871x-0005mx-4S
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:31:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1f871y-0005n8-Bg
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f871u-0000nX-Gu
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:31:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f871u-0000mu-AM
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:30:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f871s-0005FE-8Z
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 16:30:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3F2862E80CE
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 16:30:56 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1f871v-0000o4-OM
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:31:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47424 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f871v-0000nw-K6
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:30:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180416111743.8473-1-berrange@redhat.com>
+Date: Mon, 16 Apr 2018 18:30:45 +0200
+In-Reply-To: <20180416111743.8473-1-berrange@redhat.com> ("Daniel
+	P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Mon, 16 Apr 2018 12:17:40
+	+0100")
+Message-ID: <87muy3m7uy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Apr 2018 16:20:28 -0000
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Reply-To: Bug 1759264 <1759264@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152215564388.18893.1601223531883570946.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152389562935.19798.17137711647215533060.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1759264] Re: fpu/softfloat: round_to_int_and_pack
- refactor broke TriCore ftoi insns
+Subject: Re: [Qemu-devel] [PATCH 0/3] Remove artificial length limits when
+ parsing options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
--- =
+> A user trying out SMBIOS "OEM strings" feature reported that the data
+> they are exposing to the guest was truncated at 1023 bytes, which breaks
+> the app consuming in the guest. After searching for the cause I
+> eventually found that the QemuOpts parsing is using fixed length 1024
+> byte array for option values and 128 byte array for key names.
+>
+> We can certainly debate whether it is sane to have such long command
+> line argument values (it is not sane), but if the OS was capable of
+> exec'ing QEMU with such an ARGV array, there is little good reason for
+> imposing an artificial length restriction when parsing it. Even worse is
+> that we silently truncate without reporting an error when hitting limits
+> resulting in a semantically incorrect behaviour, possibly even leading
+> to security flaws depending on the data that was truncated.
+>
+> Thus this patch series removes the artificial length limits by killing
+> the fixed length buffers.
+>
+> Separately I intend to make it possible to read "OEM strings" data from
+> a file, to avoid need to have long command line args.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1759264
+Too bad I haven't been able to complete my quest to kill QemuOpts.
 
-Title:
-  fpu/softfloat: round_to_int_and_pack refactor broke TriCore ftoi insns
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  After the refactor from ab52f973a504f8de0c5df64631ba4caea70a7d9e the
-  bahaviour of int32_to_float32() was altered.
-
-  helper_ftoi() in target/tricore/fpu_helper.c relied on
-  int32_to_float32 to raise the invalid flag if the input was NaN to
-  properly return 0. Likewise if the input is infinity.
-
-  The obvious fix for softfloat would be to raise this flag in round_to_int=
-_and_pack(). However,
-  I'm not sure if this breaks other targets and I have no easy way to test =
-it.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1759264/+subscriptions
+As far as I know, keyval.c's only arbitrary limit is the length of a key
+fragment (the things separated by '.').
