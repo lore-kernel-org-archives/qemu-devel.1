@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f7vs0-00085F-K5
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:36:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f83k5-0004BR-Rd
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f7vrv-0007GE-UH
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41300)
+	(envelope-from <peter.maydell@linaro.org>) id 1f83k4-0005rl-QD
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:00:21 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:32843)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f7vrv-0007Dg-Na
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f7vrt-0003rt-GB
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:35:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0B6C62E818C
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:35:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f83k4-0005rB-K4
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:00:20 -0400
+Received: by mail-oi0-x243.google.com with SMTP id 126-v6so14387882oig.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 06:00:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Apr 2018 04:22:05 -0000
-From: David Lechner <david@lechnology.com>
-Reply-To: Bug 955379 <955379@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120314192314.1716.70997.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152385252602.22199.13020673428797575464.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 955379] Re: cmake hangs with qemu-arm-static
+In-Reply-To: <1523518688-26674-4-git-send-email-eric.auger@redhat.com>
+References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
+	<1523518688-26674-4-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 13:59:59 +0100
+Message-ID: <CAFEAcA84iZV8vUK4DxPpuO6LwUqE=LEoW63qy=FTiF6KHvYhEw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v11 03/17] hw/arm/smmu-common: VMSAv8-64
+ page table walk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +30,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-I am seeing the same symptoms as the original poster. I'm building the
-opencv package in a debian stretch armfh chroot on a ubuntu bionic amd64
-host. So, I'm guessing that the race condition wasn't entirely fixed or
-there has been some sort of regression.
+On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
+> This patch implements the page table walk for VMSAv8-64.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 
--- =
+> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+> index 9a966bb..6a58948 100644
+> --- a/hw/arm/smmu-common.c
+> +++ b/hw/arm/smmu-common.c
+> @@ -27,6 +27,215 @@
+>
+>  #include "qemu/error-report.h"
+>  #include "hw/arm/smmu-common.h"
+> +#include "smmu-internal.h"
+> +
+> +/* VMSAv8-64 Translation */
+> +
+> +/**
+> + * get_pte - Get the content of a page table entry located t
+> + * @base_addr[@index]
+> + */
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/955379
+Comment appears to be truncated ?
 
-Title:
-  cmake hangs with qemu-arm-static
+> +static int get_pte(dma_addr_t baseaddr, uint32_t index, uint64_t *pte,
+> +                   SMMUPTWEventInfo *info)
+> +{
+> +    int ret;
+> +    dma_addr_t addr = baseaddr + index * sizeof(*pte);
+> +
+> +    /* TODO: guarantee 64-bit single-copy atomicity */
+> +    ret = dma_memory_read(&address_space_memory, addr,
+> +                          (uint8_t *)pte, sizeof(*pte));
+> +
+> +    if (ret != MEMTX_OK) {
+> +        info->type = SMMU_PTW_ERR_WALK_EABT;
+> +        info->addr = addr;
+> +        return -EINVAL;
+> +    }
+> +    trace_smmu_get_pte(baseaddr, index, addr, *pte);
+> +    return 0;
+> +}
+> +
 
-Status in QEMU:
-  Fix Released
-Status in Linaro QEMU:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
-Status in qemu-linaro package in Ubuntu:
-  Confirmed
+> +/**
+> + * smmu_ptw - Walk the page tables for an IOVA, according to @cfg
+> + *
+> + * @cfg: translation configuration
+> + * @iova: iova to translate
+> + * @perm: tentative access type
+> + * @tlbe: returned entry
+> + * @info: ptw event handle
+> + *
+> + * return 0 on success
+> + */
+> +inline int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+> +             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
+> +{
+> +    if (!cfg->aa64) {
+> +        /*
+> +         * This code path is not entered as we check this while decoding
+> +         * the configuration data in the derived SMMU model.
+> +         */
+> +        assert(0);
 
-Bug description:
-  I'm using git commit 3e7ecd976b06f... configured with --target-list
-  =3Darm-linux-user --static in a chroot environment to compile some
-  things. I ran into this problem with both pcl and opencv-2.3.1. cmake
-  consistently freezes at some point during its execution, though in a
-  different spot each time, usually during a step when it's searching
-  for some libraries. For instance, pcl most commonly stops after:
+Prefer either g_assert_not_reached() or just assert(cfg->aa64).
 
-  [snip]
-  -- Boost version: 1.46.1
-  -- Found the following Boost libraries:
-  --   system
-  --   filesystem
-  --   thread
-  --   date_time
-  -- checking for module 'eigen3'
-  --   found eigen3, version 3.0.1
+> +    }
+> +
+> +    return smmu_ptw_64(cfg, iova, perm, tlbe, info);
+> +}
+>
 
-  which is perplexing because it freezes after finding what it wants,
-  not during the search. When it does get past that point, it does so
-  almost immediately but freezes somewhere else.
+> +
+> +/*
+> + * TODO: At the moment all transactions are considered as priviledged (EL1)
 
-  I'm using 64-bit Ubuntu 11.10 with kernel release 3.0.0-16-generic
-  with an Intel i5.
+"privileged"
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/955379/+subscriptions
+> + * as IOMMU translation callback does not pass user/priv attributes.
+> + */
+> +#define is_permission_fault(ap, perm) \
+> +    (((perm) & IOMMU_WO) && ((ap) & 0x2))
+> +
+> +#define PTE_AP_TO_PERM(ap) \
+> +    (IOMMU_ACCESS_FLAG(true, !((ap) & 0x2)))
+> +
+> +/* Level Indexing */
+> +
+> +static inline int level_shift(int level, int granule_sz)
+> +{
+> +    return granule_sz + (3 - level) * (granule_sz - 3);
+> +}
+> +
+> +static inline uint64_t level_page_mask(int level, int granule_sz)
+> +{
+> +    return ~(MAKE_64BIT_MASK(0, level_shift(level, granule_sz)));
+> +}
+> +
+> +/**
+> + * TODO: handle the case where the level resolves less than
+> + * granule_sz -3 IA bits.
+> + */
+> +static inline
+> +uint64_t iova_level_offset(uint64_t iova, int level, int granule_sz)
+> +{
+> +    return (iova >> level_shift(level, granule_sz)) &
+> +            MAKE_64BIT_MASK(0, granule_sz - 3);
+> +}
+> +
+> +#endif
+
+When does the TODO case happen, and what goes wrong?
+
+> --- a/include/hw/arm/smmu-common.h
+> +++ b/include/hw/arm/smmu-common.h
+> @@ -129,4 +129,18 @@ static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
+>  {
+>      return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
+>  }
+> +
+> +/**
+> + * smmu_ptw - Perform the page table walk for a given iova / access flags
+> + * pair, according to @cfg translation config
+> + */
+> +int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+> +             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
+> +
+> +/**
+> + * select_tt - compute which translation table shall be used according
+
+"according to"
+
+> + * the input iova and tranlsation config and return the TT specific info
+
+"translation"
+
+> + */
+> +SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova);
+> +
+>  #endif  /* HW_ARM_SMMU_COMMON */
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
