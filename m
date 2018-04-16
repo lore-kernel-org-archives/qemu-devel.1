@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f84rM-0005qo-Qh
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:12:00 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f84vq-0007bg-He
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f84rG-0001vJ-UU
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:11:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41882 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f84rG-0001uh-Qm
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:11:50 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180312131806.23209-1-stefanha@redhat.com>
-	<CAFEAcA8VxyrDVMija0C219E5cPtKLC13YHcLFbB+VMRw9uCA_A@mail.gmail.com>
-Date: Mon, 16 Apr 2018 16:11:32 +0200
-In-Reply-To: <CAFEAcA8VxyrDVMija0C219E5cPtKLC13YHcLFbB+VMRw9uCA_A@mail.gmail.com>
-	(Peter Maydell's message of "Mon, 12 Mar 2018 13:34:27 +0000")
-Message-ID: <871sffp7fv.fsf@dusky.pond.sub.org>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1f84vn-00053q-Al
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:16:34 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:41562)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1f84vm-000530-Tu
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 10:16:31 -0400
+References: <20180416135442.30606-1-alex.bennee@linaro.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <aca6055a-1e49-7902-428f-e7e199ed8a12@mail.uni-paderborn.de>
+Date: Mon, 16 Apr 2018 16:16:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
- file changes
+In-Reply-To: <20180416135442.30606-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
+ before /0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Aurelien Jarno <aurelien@aurel32.net>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 04/16/2018 03:54 PM, Alex Bennée wrote:
+> The re-factoring of div_floats changed the order of checking meaning
+> an operation like -inf/0 erroneously raises the divbyzero flag.
+> IEEE-754 (2008) specifies this should only occur for operations on
+> finite operands.
+> 
+> We fix this by moving the check on the dividend being Inf/0 to before
+> the divisor is zero check.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> ---
+>  fpu/softfloat.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-> On 12 March 2018 at 13:18, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->> Warn if files are added/renamed/deleted without MAINTAINERS file
->> changes.  This has helped me in Linux and we could benefit from this
->> check in QEMU.
->>
->> This patch is a manual cherry-pick of Linux commit
->> 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warning on
->> file add/move/delete") by Joe Perches <joe@perches.com>.
->>
->> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->> ---
->
-> Unfortunately the patch doesn't magically cause maintainers
-> to appear for the new files :-)
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Fortunately, the patch can get new files non-magically rejected unless a
-maintainers appears :)
+Cheers,
+Bastian
