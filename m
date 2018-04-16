@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f87CP-00035Y-LY
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:41:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f87H1-000609-4T
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f87CN-0007vD-2Q
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:41:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41794)
+	(envelope-from <peter.maydell@linaro.org>) id 1f87H0-0002MU-0P
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:46:35 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:46102)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f87CM-0007uj-R3
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:41:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f87CL-0007n3-7P
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 16:41:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C3F6D2E81C5
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 16:41:41 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f87Gz-0002LY-Qp
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:46:33 -0400
+Received: by mail-ot0-x241.google.com with SMTP id v64-v6so18125727otb.13
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 09:46:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Apr 2018 16:33:42 -0000
-From: Daniel Berrange <1654137@bugs.launchpad.net>
-Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
-Message-Id: <152389642258.10216.13978614314913591462.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1654137] Re: Ctrl-A b not working in 2.8.0
+In-Reply-To: <1523518688-26674-8-git-send-email-eric.auger@redhat.com>
+References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
+	<1523518688-26674-8-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 17:46:12 +0100
+Message-ID: <CAFEAcA9HJSjumMzL7N6BuS+VJiEuFXRd6iuEPmqaSNjb4F8JZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v11 07/17] hw/arm/smmuv3: Implement MMIO
+ write operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-@elmarco could you take a look at this possible regression since bisect
-claims it was due to the mux refactor
+On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
+> Now we have relevant helpers for queue and irq
+> management, let's implement MMIO write operations.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 
--- =
+> -int smmuv3_cmdq_consume(SMMUv3State *s)
+> +static int smmuv3_cmdq_consume(SMMUv3State *s)
+>  {
+>      SMMUCmdError cmd_error = SMMU_CERROR_NONE;
+>      SMMUQueue *q = &s->cmdq;
+> @@ -269,11 +270,170 @@ int smmuv3_cmdq_consume(SMMUv3State *s)
+>      return 0;
+>  }
+>
+> -static MemTxResult smmu_write_mmio(void *opaque, hwaddr offset, uint64_t data,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1654137
+You changed the name of the argument here from 'value' to 'data', which
+is why the diff has come out looking a bit awkward like this.
+Better to be consistent with the name from the start.
 
-Title:
-  Ctrl-A b not working in 2.8.0
+> +static MemTxResult smmu_writell(SMMUv3State *s, hwaddr offset,
+> +                               uint64_t value, MemTxAttrs attrs)
 
-Status in QEMU:
-  Confirmed
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Bug description:
-  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
-  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
-  Other Ctrl-A sequences seem to work correctly.
-
-  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
-  installed on this system from source.
-
-  Reverting to the previous install restores "break" capability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
+thanks
+-- PMM
