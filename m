@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f7zMR-0001sz-TJ
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:19:42 -0400
+	(envelope-from <andr2000@gmail.com>) id 1f7zOu-0003UA-U5
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f7zMP-0006mZ-Q9
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:19:39 -0400
-Date: Mon, 16 Apr 2018 10:19:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180416101914.1184e90e@redhat.com>
-In-Reply-To: <20180416024355.GA20551@umbus.fritz.box>
-References: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
-	<1523551221-11612-3-git-send-email-imammedo@redhat.com>
-	<20180416024355.GA20551@umbus.fritz.box>
+	(envelope-from <andr2000@gmail.com>) id 1f7zOs-00083b-6S
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:22:12 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:38762)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <andr2000@gmail.com>) id 1f7zOr-00083I-P6
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:22:10 -0400
+Received: by mail-lf0-x243.google.com with SMTP id n14-v6so3157086lfe.5
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 01:22:09 -0700 (PDT)
+References: <20180406090747.gwiegu22z4noj23i@sirius.home.kraxel.org>
+	<9a085854-3758-1500-9971-806c611cb54f@gmail.com>
+	<20180406115730.jtwcbz5okrphlxli@sirius.home.kraxel.org>
+	<7ef89a29-6584-d23c-efd1-f30d9b767a24@gmail.com>
+	<20180406185746.GA4983@downor-Z87X-UD5H>
+	<c5923162-4144-56ef-ac81-eb1ab3eb5e8f@gmail.com>
+	<20180410172605.GA26472@downor-Z87X-UD5H>
+	<e4be9524-53d8-640c-e242-8ed3bfd05541@gmail.com>
+	<20180413153708.GW31310@phenom.ffwll.local>
+	<ced31540-9e93-6a24-ea60-20a1bddf2d39@gmail.com>
+	<20180416074302.GG31310@phenom.ffwll.local>
+From: Oleksandr Andrushchenko <andr2000@gmail.com>
+Message-ID: <d7d0fb50-0407-b51d-fb20-7275d17db47b@gmail.com>
+Date: Mon, 16 Apr 2018 11:22:06 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180416074302.GG31310@phenom.ffwll.local>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.13 2/4] platform-bus-device: use
- device plug callback instead of machine_done notifier
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RfC PATCH] Add udmabuf misc device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,426 +39,372 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com, agraf@suse.de, qemu-ppc@nongnu.org
+To: Dongwon Kim <dongwon.kim@intel.com>, Tomeu Vizoso <tomeu.vizoso@collabora.com>, David Airlie <airlied@linux.ie>, open list <linux-kernel@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, qemu-devel@nongnu.org, "moderated list:DMA BUFFER SHARING FRAMEWORK" <linaro-mm-sig@lists.linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>, "Oleksandr_Andrushchenko@epam.com" <Oleksandr_Andrushchenko@epam.com>
 
-On Mon, 16 Apr 2018 12:43:55 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On 04/16/2018 10:43 AM, Daniel Vetter wrote:
+> On Mon, Apr 16, 2018 at 10:16:31AM +0300, Oleksandr Andrushchenko wrote:
+>> On 04/13/2018 06:37 PM, Daniel Vetter wrote:
+>>> On Wed, Apr 11, 2018 at 08:59:32AM +0300, Oleksandr Andrushchenko wrote:
+>>>> On 04/10/2018 08:26 PM, Dongwon Kim wrote:
+>>>>> On Tue, Apr 10, 2018 at 09:37:53AM +0300, Oleksandr Andrushchenko wrote:
+>>>>>> On 04/06/2018 09:57 PM, Dongwon Kim wrote:
+>>>>>>> On Fri, Apr 06, 2018 at 03:36:03PM +0300, Oleksandr Andrushchenko wrote:
+>>>>>>>> On 04/06/2018 02:57 PM, Gerd Hoffmann wrote:
+>>>>>>>>>      Hi,
+>>>>>>>>>
+>>>>>>>>>>> I fail to see any common ground for xen-zcopy and udmabuf ...
+>>>>>>>>>> Does the above mean you can assume that xen-zcopy and udmabuf
+>>>>>>>>>> can co-exist as two different solutions?
+>>>>>>>>> Well, udmabuf route isn't fully clear yet, but yes.
+>>>>>>>>>
+>>>>>>>>> See also gvt (intel vgpu), where the hypervisor interface is abstracted
+>>>>>>>>> away into a separate kernel modules even though most of the actual vgpu
+>>>>>>>>> emulation code is common.
+>>>>>>>> Thank you for your input, I'm just trying to figure out
+>>>>>>>> which of the three z-copy solutions intersect and how much
+>>>>>>>>>> And what about hyper-dmabuf?
+>>>>>>> xen z-copy solution is pretty similar fundamentally to hyper_dmabuf
+>>>>>>> in terms of these core sharing feature:
+>>>>>>>
+>>>>>>> 1. the sharing process - import prime/dmabuf from the producer -> extract
+>>>>>>> underlying pages and get those shared -> return references for shared pages
+>>>>> Another thing is danvet was kind of against to the idea of importing existing
+>>>>> dmabuf/prime buffer and forward it to the other domain due to synchronization
+>>>>> issues. He proposed to make hyper_dmabuf only work as an exporter so that it
+>>>>> can have a full control over the buffer. I think we need to talk about this
+>>>>> further as well.
+>>>> Yes, I saw this. But this limits the use-cases so much.
+>>>> For instance, running Android as a Guest (which uses ION to allocate
+>>>> buffers) means that finally HW composer will import dma-buf into
+>>>> the DRM driver. Then, in case of xen-front for example, it needs to be
+>>>> shared with the backend (Host side). Of course, we can change user-space
+>>>> to make xen-front allocate the buffers (make it exporter), but what we try
+>>>> to avoid is to change user-space which in normal world would have remain
+>>>> unchanged otherwise.
+>>>> So, I do think we have to support this use-case and just have to understand
+>>>> the complexity.
+>>> Erm, why do you need importer capability for this use-case?
+>>>
+>>> guest1 -> ION -> xen-front -> hypervisor -> guest 2 -> xen-zcopy exposes
+>>> that dma-buf -> import to the real display hw
+>>>
+>>> No where in this chain do you need xen-zcopy to be able to import a
+>>> dma-buf (within linux, it needs to import a bunch of pages from the
+>>> hypervisor).
+>>>
+>>> Now if your plan is to use xen-zcopy in the guest1 instead of xen-front,
+>>> then you indeed need to import.
+>> This is the exact use-case I was referring to while saying
+>> we need to import on Guest1 side. If hyper-dmabuf is so
+>> generic that there is no xen-front in the picture, then
+>> it needs to import a dma-buf, so it can be exported at Guest2 side.
+>>>    But that imo doesn't make sense:
+>>> - xen-front gives you clearly defined flip events you can forward to the
+>>>     hypervisor. xen-zcopy would need to add that again.
+>> xen-zcopy is a helper driver which doesn't handle page flips
+>> and is not a KMS driver as one might think of: the DRM UAPI it uses is
+>> just to export a dma-buf as a PRIME buffer, but that's it.
+>> Flipping etc. is done by the backend [1], not xen-zcopy.
+>>>    Same for
+>>>     hyperdmabuf (and really we're not going to shuffle struct dma_fence over
+>>>     the wire in a generic fashion between hypervisor guests).
+>>>
+>>> - xen-front already has the idea of pixel format for the buffer (and any
+>>>     other metadata). Again, xen-zcopy and hyperdmabuf lack that, would need
+>>>     to add it shoehorned in somehow.
+>> Again, here you are talking of something which is implemented in
+>> Xen display backend, not xen-zcopy, e.g. display backend can
+>> implement para-virtual display w/o xen-zcopy at all, but in this case
+>> there is a memory copying for each frame. With the help of xen-zcopy
+>> the backend feeds xen-front's buffers directly into Guest2 DRM/KMS or
+>> Weston or whatever as xen-zcopy exports remote buffers as PRIME buffers,
+>> thus no buffer copying is required.
+> Why do you need to copy on every frame for xen-front? In the above
+> pipeline, using xen-front I see 0 architectural reasons to have a copy
+> anywhere.
+>
+> This seems to be the core of the confusion we're having here.
+Ok, so I'll try to explain:
+1. xen-front - produces a display buffer to be shown at Guest2
+by the backend, shares its grant references with the backend
+2. xen-front sends page flip event to the backend specifying the
+buffer in question
+3. Backend takes the shared buffer (which is only a buffer mapped into
+backend's memory, it is not a dma-buf/PRIME one) and makes memcpy from
+it to a local dumb/surface
+4. Backend flips that local dumb buffer/surface
 
-> On Thu, Apr 12, 2018 at 06:40:19PM +0200, Igor Mammedov wrote:
-> > platform-bus were using machine_done notifier to get and map
-> > (assign irq/mmio resources) dynamically added sysbus devices
-> > after all '-device' options had been processed.
-> > That however creates non obvious dependencies on ordering of
-> > machine_done notifiers and requires carefull line juggling
-> > to keep it working. For example see comment above
-> > create_platform_bus() and 'straitforward' arm_load_kernel()
-> > had to converted to machine_done notifier and that lead to
-> > yet another machine_done notifier to keep it working
-> > arm_register_platform_bus_fdt_creator().
-> > 
-> > Instead of hiding resource assignment in platform-bus-device
-> > to magically initialize sysbus devices, use device plug
-> > callback and assign resources explicitly at board level
-> > at the moment each -device option is being processed.
-> > 
-> > That adds a bunch of machine declaration boiler plate to
-> > e500plat board, similar to ARM/x86 but gets rid of hidden
-> > machine_done notifier and would allow to remove the dependent
-> > notifiers in ARM code simplifying it and making code flow
-> > easier to follow.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > CC: agraf@suse.de
-> > CC: david@gibson.dropbear.id.au
-> > CC: qemu-ppc@nongnu.org
-> > ---
-> >  hw/ppc/e500.h             |  3 +++
-> >  include/hw/arm/virt.h     |  3 +++
-> >  include/hw/platform-bus.h |  4 ++--
-> >  hw/arm/sysbus-fdt.c       |  3 ---
-> >  hw/arm/virt.c             | 36 ++++++++++++++++++++++++++++
-> >  hw/core/platform-bus.c    | 29 ++++-------------------
-> >  hw/ppc/e500.c             | 37 +++++++++++++++++------------
-> >  hw/ppc/e500plat.c         | 60 +++++++++++++++++++++++++++++++++++++++++++++--
-> >  8 files changed, 129 insertions(+), 46 deletions(-)
-> > 
-> > diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-> > index 70ba1d8..d0f8ddd 100644
-> > --- a/hw/ppc/e500.h
-> > +++ b/hw/ppc/e500.h
-> > @@ -2,6 +2,7 @@
-> >  #define PPCE500_H
-> >  
-> >  #include "hw/boards.h"
-> > +#include "hw/sysbus.h"
-> >  
-> >  typedef struct PPCE500Params {
-> >      int pci_first_slot;
-> > @@ -26,6 +27,8 @@ typedef struct PPCE500Params {
-> >  
-> >  void ppce500_init(MachineState *machine, PPCE500Params *params);
-> >  
-> > +void ppce500_plug_dynamic_sysbus_device(SysBusDevice *sbdev);
-> > +
-> >  hwaddr booke206_page_size_to_tlb(uint64_t size);
-> >  
-> >  #endif
-> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> > index ba0c1a4..5535760 100644
-> > --- a/include/hw/arm/virt.h
-> > +++ b/include/hw/arm/virt.h
-> > @@ -86,11 +86,14 @@ typedef struct {
-> >      bool no_pmu;
-> >      bool claim_edge_triggered_timers;
-> >      bool smbios_old_sys_ver;
-> > +    HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-> > +                                           DeviceState *dev);
-> >  } VirtMachineClass;
-> >  
-> >  typedef struct {
-> >      MachineState parent;
-> >      Notifier machine_done;
-> > +    DeviceState *platform_bus_dev;
-> >      FWCfgState *fw_cfg;
-> >      bool secure;
-> >      bool highmem;
-> > diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
-> > index a00775c..19e20c5 100644
-> > --- a/include/hw/platform-bus.h
-> > +++ b/include/hw/platform-bus.h
-> > @@ -37,8 +37,6 @@ typedef struct PlatformBusDevice PlatformBusDevice;
-> >  struct PlatformBusDevice {
-> >      /*< private >*/
-> >      SysBusDevice parent_obj;
-> > -    Notifier notifier;
-> > -    bool done_gathering;
-> >  
-> >      /*< public >*/
-> >      uint32_t mmio_size;
-> > @@ -54,4 +52,6 @@ int platform_bus_get_irqn(PlatformBusDevice *platform_bus, SysBusDevice *sbdev,
-> >  hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-> >                                    int n);
-> >  
-> > +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev);
-> > +
-> >  #endif /* HW_PLATFORM_BUS_H */
-> > diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> > index d68e3dc..80ff70e 100644
-> > --- a/hw/arm/sysbus-fdt.c
-> > +++ b/hw/arm/sysbus-fdt.c
-> > @@ -506,9 +506,6 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
-> >      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
-> >      pbus = PLATFORM_BUS_DEVICE(dev);
-> >  
-> > -    /* We can only create dt nodes for dynamic devices when they're ready */
-> > -    assert(pbus->done_gathering);
-> > -
-> >      PlatformBusFDTData data = {
-> >          .fdt = fdt,
-> >          .irq_start = irq_start,
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 94dcb12..2e10d8b 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1087,6 +1087,7 @@ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-> >      qdev_prop_set_uint32(dev, "mmio_size",
-> >          platform_bus_params.platform_bus_size);
-> >      qdev_init_nofail(dev);
-> > +    vms->platform_bus_dev = dev;
-> >      s = SYS_BUS_DEVICE(dev);
-> >  
-> >      for (i = 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
-> > @@ -1536,9 +1537,37 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-> >      return ms->possible_cpus;
-> >  }
-> >  
-> > +static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-> > +                                        DeviceState *dev, Error **errp)
-> > +{
-> > +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> > +
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> > +        if (vms->platform_bus_dev) {
-> > +            platform_bus_link_device(PLATFORM_BUS_DEVICE(vms->platform_bus_dev),
-> > +                                     SYS_BUS_DEVICE(dev));
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +static HotplugHandler *virt_machine_get_hotpug_handler(MachineState *machine,
-> > +                                                       DeviceState *dev)
-> > +{
-> > +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
-> > +
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> > +        return HOTPLUG_HANDLER(machine);
-> > +    }
-> > +
-> > +    return vmc->get_hotplug_handler ?
-> > +        vmc->get_hotplug_handler(machine, dev) : NULL;
-> > +}
-> > +
-> >  static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >  {
-> >      MachineClass *mc = MACHINE_CLASS(oc);
-> > +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(oc);
-> > +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
-> >  
-> >      mc->init = machvirt_init;
-> >      /* Start max_cpus at the maximum QEMU supports. We'll further restrict
-> > @@ -1557,6 +1586,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-> >      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-> >      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> > +    vmc->get_hotplug_handler = mc->get_hotplug_handler;
-> > +    mc->get_hotplug_handler = virt_machine_get_hotpug_handler;
-> > +    hc->plug = virt_machine_device_plug_cb;
-> >  }
-> >  
-> >  static const TypeInfo virt_machine_info = {
-> > @@ -1566,6 +1598,10 @@ static const TypeInfo virt_machine_info = {
-> >      .instance_size = sizeof(VirtMachineState),
-> >      .class_size    = sizeof(VirtMachineClass),
-> >      .class_init    = virt_machine_class_init,
-> > +    .interfaces = (InterfaceInfo[]) {
-> > +         { TYPE_HOTPLUG_HANDLER },
-> > +         { }
-> > +    },
-> >  };
-> >  
-> >  static void machvirt_machine_init(void)
-> > diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-> > index 33d32fb..807cb5c 100644
-> > --- a/hw/core/platform-bus.c
-> > +++ b/hw/core/platform-bus.c
-> > @@ -103,7 +103,6 @@ static void plaform_bus_refresh_irqs(PlatformBusDevice *pbus)
-> >  {
-> >      bitmap_zero(pbus->used_irqs, pbus->num_irqs);
-> >      foreach_dynamic_sysbus_device(platform_bus_count_irqs, pbus);
-> > -    pbus->done_gathering = true;
-> >  }
-> >  
-> >  static void platform_bus_map_irq(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-> > @@ -163,12 +162,11 @@ static void platform_bus_map_mmio(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-> >  }
-> >  
-> >  /*
-> > - * For each sysbus device, look for unassigned IRQ lines as well as
-> > - * unassociated MMIO regions. Connect them to the platform bus if available.
-> > + * Look for unassigned IRQ lines as well as unassociated MMIO regions.
-> > + * Connect them to the platform bus if available.
-> >   */
-> > -static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
-> > +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev)
-> >  {
-> > -    PlatformBusDevice *pbus = opaque;
-> >      int i;
-> >  
-> >      for (i = 0; sysbus_has_irq(sbdev, i); i++) {
-> > @@ -180,19 +178,6 @@ static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
-> >      }
-> >  }
-> >  
-> > -static void platform_bus_init_notify(Notifier *notifier, void *data)
-> > -{
-> > -    PlatformBusDevice *pb = container_of(notifier, PlatformBusDevice, notifier);
-> > -
-> > -    /*
-> > -     * Generate a bitmap of used IRQ lines, as the user might have specified
-> > -     * them on the command line.
-> > -     */
-> > -    plaform_bus_refresh_irqs(pb);
-> > -
-> > -    foreach_dynamic_sysbus_device(link_sysbus_device, pb);
-> > -}
-> > -
-> >  static void platform_bus_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      PlatformBusDevice *pbus;
-> > @@ -211,12 +196,8 @@ static void platform_bus_realize(DeviceState *dev, Error **errp)
-> >          sysbus_init_irq(d, &pbus->irqs[i]);
-> >      }
-> >  
-> > -    /*
-> > -     * Register notifier that allows us to gather dangling devices once the
-> > -     * machine is completely assembled
-> > -     */
-> > -    pbus->notifier.notify = platform_bus_init_notify;
-> > -    qemu_add_machine_init_done_notifier(&pbus->notifier);
-> > +    /* some devices might be initialized before so update used IRQs map */
-> > +    plaform_bus_refresh_irqs(pbus);
-> >  }
-> >  
-> >  static Property platform_bus_properties[] = {
-> > diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> > index 9a85a41..e2829db 100644
-> > --- a/hw/ppc/e500.c
-> > +++ b/hw/ppc/e500.c
-> > @@ -64,6 +64,8 @@
-> >  #define MPC8XXX_GPIO_OFFSET        0x000FF000ULL
-> >  #define MPC8XXX_GPIO_IRQ           47
-> >  
-> > +static SysBusDevice *pbus_dev;  
-> 
-> I'm not thrilled about adding a new global for information that really
-> belongs in the machine state.  Although I do recognize that adding an
-> actual MachineState subtype that didn't previously exist is a bit of a pain.
-yep, adding MachineState seemed too much for the task that's why I've used global.
-I can switch to actual MachineState here if you'd prefer it.
+If I have a xen-zcopy helper driver then I can avoid doing step 3):
+1) 2) remain the same as above
+3) Initially for a new display buffer, backend calls xen-zcopy to create
+a local PRIME buffer from the grant references provided by the xen-front
+via displif protocol [1]: we now have handle_zcopy
+4) Backend exports this PRIME with HANDLE_TO_FD from xen-zcopy and imports
+it into Weston-KMS/DRM or real HW DRM driver with FD_TO_HANDLE: we now have
+handle_local
+5) On page flip event backend flips local PRIME: uses handle_local for flips
+>
+>>> Ofc you won't be able to shovel sound or media stream data over to another
+>>> guest like this, but that's what you have xen-v4l and xen-sound or
+>>> whatever else for. Trying to make a new uapi, which means userspace must
+>>> be changed for all the different use-case, instead of reusing standard
+>>> linux driver uapi (which just happens to send the data to another
+>>> hypervisor guest instead of real hw) imo just doesn't make much sense.
+>>>
+>>> Also, at least for the gpu subsystem: Any new uapi must have full
+>>> userspace available for it, see:
+>>>
+>>> https://dri.freedesktop.org/docs/drm/gpu/drm-uapi.html#open-source-userspace-requirements
+>>>
+>>> Adding more uapi is definitely the most painful way to fix a use-case.
+>>> Personally I'd go as far and also change the xen-zcopy side on the
+>>> receiving guest to use some standard linux uapi. E.g. you could write an
+>>> output v4l driver to receive the frames from guest1.
+>> So, we now know that xen-zcopy was not meant to handle page flips,
+>> but to implement new UAPI to let user-space create buffers either
+>> from Guest2 grant references (so it can be exported to Guest1) or
+>> other way round, e.g. create (from Guest1 grant references to export to
+>> Guest 2). For that reason it adds 2 IOCTLs: create buffer from grefs
+>> or produce grefs for the buffer given.
+>> One additional IOCTL is to wait for the buffer to be released by
+>> Guest2 user-space.
+>> That being said, I don't quite see how v4l can be used here to implement
+>> UAPI I need.
+> Under the assumption that you can make xen-front to zerocopy for the
+> kernel->hypervisor path, v4l could be made to work for the
+> hypervisor->kernel side of the pipeline.
+>
+> But it sounds like we have a confusion already on why or why not xen-front
+> can or cannot do zerocopy.
+xen-front provides an array of grant references to Guest2 (backend).
+It's up to backend what it does with those grant references
+which at Guest2 side are not PRIME or dma-buf, but just a set of pages.
+This is xen-zcopy which turns these pages into a PRIME. When this is done
+backend can now tell DRM drivers to use the buffer in DRM terms.
+>>>>> danvet, can you comment on this topic?
+>>>>>
+>>>>>>> 2. the page sharing mechanism - it uses Xen-grant-table.
+>>>>>>>
+>>>>>>> And to give you a quick summary of differences as far as I understand
+>>>>>>> between two implementations (please correct me if I am wrong, Oleksandr.)
+>>>>>>>
+>>>>>>> 1. xen-zcopy is DRM specific - can import only DRM prime buffer
+>>>>>>> while hyper_dmabuf can export any dmabuf regardless of originator
+>>>>>> Well, this is true. And at the same time this is just a matter
+>>>>>> of extending the API: xen-zcopy is a helper driver designed for
+>>>>>> xen-front/back use-case, so this is why it only has DRM PRIME API
+>>>>>>> 2. xen-zcopy doesn't seem to have dma-buf synchronization between two VMs
+>>>>>>> while (as danvet called it as remote dmabuf api sharing) hyper_dmabuf sends
+>>>>>>> out synchronization message to the exporting VM for synchronization.
+>>>>>> This is true. Again, this is because of the use-cases it covers.
+>>>>>> But having synchronization for a generic solution seems to be a good idea.
+>>>>> Yeah, understood xen-zcopy works ok with your use case. But I am just curious
+>>>>> if it is ok not to have any inter-domain synchronization in this sharing model.
+>>>> The synchronization is done with displif protocol [1]
+>>>>> The buffer being shared is technically dma-buf and originator needs to be able
+>>>>> to keep track of it.
+>>>> As I am working in DRM terms the tracking is done by the DRM core
+>>>> for me for free. (This might be one of the reasons Daniel sees DRM
+>>>> based implementation fit very good from code-reuse POV).
+>>> Hm, not sure what tracking you refer to here all ... I got lost in all the
+>>> replies while catching up.
+>>>
+>> I was just referring to accounting stuff already implemented in the DRM
+>> core,
+>> so I don't have to worry about doing the same for buffers to understand
+>> when they are released etc.
+>>>>>>> 3. 1-level references - when using grant-table for sharing pages, there will
+>>>>>>> be same # of refs (each 8 byte)
+>>>>>> To be precise, grant ref is 4 bytes
+>>>>> You are right. Thanks for correction.;)
+>>>>>
+>>>>>>> as # of shared pages, which is passed to
+>>>>>>> the userspace to be shared with importing VM in case of xen-zcopy.
+>>>>>> The reason for that is that xen-zcopy is a helper driver, e.g.
+>>>>>> the grant references come from the display backend [1], which implements
+>>>>>> Xen display protocol [2]. So, effectively the backend extracts references
+>>>>>> from frontend's requests and passes those to xen-zcopy as an array
+>>>>>> of refs.
+>>>>>>>     Compared
+>>>>>>> to this, hyper_dmabuf does multiple level addressing to generate only one
+>>>>>>> reference id that represents all shared pages.
+>>>>>> In the protocol [2] only one reference to the gref directory is passed
+>>>>>> between VMs
+>>>>>> (and the gref directory is a single-linked list of shared pages containing
+>>>>>> all
+>>>>>> of the grefs of the buffer).
+>>>>> ok, good to know. I will look into its implementation in more details but is
+>>>>> this gref directory (chained grefs) something that can be used for any general
+>>>>> memory sharing use case or is it jsut for xen-display (in current code base)?
+>>>> Not to mislead you: one grant ref is passed via displif protocol,
+>>>> but the page it's referencing contains the rest of the grant refs.
+>>>>
+>>>> As to if this can be used for any memory: yes. It is the same for
+>>>> sndif and displif Xen protocols, but defined twice as strictly speaking
+>>>> sndif and displif are two separate protocols.
+>>>>
+>>>> While reviewing your RFC v2 one of the comments I had [2] was that if we
+>>>> can start from defining such a generic protocol for hyper-dmabuf.
+>>>> It can be a header file, which not only has the description part
+>>>> (which then become a part of Documentation/...rst file), but also defines
+>>>> all the required constants for requests, responses, defines message formats,
+>>>> state diagrams etc. all at one place. Of course this protocol must not be
+>>>> Xen specific, but be OS/hypervisor agnostic.
+>>>> Having that will trigger a new round of discussion, so we have it all
+>>>> designed
+>>>> and discussed before we start implementing.
+>>>>
+>>>> Besides the protocol we have to design UAPI part as well and make sure
+>>>> the hyper-dmabuf is not only accessible from user-space, but there will be
+>>>> number
+>>>> of kernel-space users as well.
+>>> Again, why do you want to create new uapi for this? Given the very strict
+>>> requirements we have for new uapi (see above link), it's the toughest way
+>>> to get any kind of support in.
+>> I do understand that adding new UAPI is not good for many reasons.
+>> But here I was meaning that current hyper-dmabuf design is
+>> only user-space oriented, e.g. it provides number of IOCTLs to do all
+>> the work. But I need a way to access the same from the kernel, so, for
+>> example,
+>> some other para-virtual driver can export/import dma-buf, not only
+>> user-space.
+> If you need an import-export helper library, just merge it. Do not attach
+> any uapi to it, just the internal helpers.
+>
+> Much, much, much easier to land.
+This can be done, but again, I will need some entity which
+backend may use to convert xen-front's grant references into
+a PRIME buffer, hence there is UAPI for that. In other words,
+I'll need a thiner xen-zcopy which will implement the same UAPI
+and use that library for Xen related stuff.
 
+The confusion may also come from the fact that the backend is
+a user-space application, not a kernel module (we have 2 modes
+of its operation as of now: DRM master or Weston client), so
+it needs a way to talk to the kernel.
+>>> That's why I had essentially zero big questions for xen-front (except some
+>>> implementation improvements, and stuff to make sure xen-front actually
+>>> implements the real uapi semantics instead of its own), and why I'm asking
+>>> much more questions on this stuff here.
+>>>
+>>>>>>> 4. inter VM messaging (hype_dmabuf only) - hyper_dmabuf has inter-vm msg
+>>>>>>> communication defined for dmabuf synchronization and private data (meta
+>>>>>>> info that Matt Roper mentioned) exchange.
+>>>>>> This is true, xen-zcopy has no means for inter VM sync and meta-data,
+>>>>>> simply because it doesn't have any code for inter VM exchange in it,
+>>>>>> e.g. the inter VM protocol is handled by the backend [1].
+>>>>>>> 5. driver-to-driver notification (hyper_dmabuf only) - importing VM gets
+>>>>>>> notified when newdmabuf is exported from other VM - uevent can be optionally
+>>>>>>> generated when this happens.
+>>>>>>>
+>>>>>>> 6. structure - hyper_dmabuf is targetting to provide a generic solution for
+>>>>>>> inter-domain dmabuf sharing for most hypervisors, which is why it has two
+>>>>>>> layers as mattrope mentioned, front-end that contains standard API and backend
+>>>>>>> that is specific to hypervisor.
+>>>>>> Again, xen-zcopy is decoupled from inter VM communication
+>>>>>>>>> No idea, didn't look at it in detail.
+>>>>>>>>>
+>>>>>>>>> Looks pretty complex from a distant view.  Maybe because it tries to
+>>>>>>>>> build a communication framework using dma-bufs instead of a simple
+>>>>>>>>> dma-buf passing mechanism.
+>>>>>>> we started with simple dma-buf sharing but realized there are many
+>>>>>>> things we need to consider in real use-case, so we added communication
+>>>>>>> , notification and dma-buf synchronization then re-structured it to
+>>>>>>> front-end and back-end (this made things more compicated..) since Xen
+>>>>>>> was not our only target. Also, we thought passing the reference for the
+>>>>>>> buffer (hyper_dmabuf_id) is not secure so added uvent mechanism later.
+>>>>>>>
+>>>>>>>> Yes, I am looking at it now, trying to figure out the full story
+>>>>>>>> and its implementation. BTW, Intel guys were about to share some
+>>>>>>>> test application for hyper-dmabuf, maybe I have missed one.
+>>>>>>>> It could probably better explain the use-cases and the complexity
+>>>>>>>> they have in hyper-dmabuf.
+>>>>>>> One example is actually in github. If you want take a look at it, please
+>>>>>>> visit:
+>>>>>>>
+>>>>>>> https://github.com/downor/linux_hyper_dmabuf_test/tree/xen/simple_export
+>>>>>> Thank you, I'll have a look
+>>>>>>>>> Like xen-zcopy it seems to depend on the idea that the hypervisor
+>>>>>>>>> manages all memory it is easy for guests to share pages with the help of
+>>>>>>>>> the hypervisor.
+>>>>>>>> So, for xen-zcopy we were not trying to make it generic,
+>>>>>>>> it just solves display (dumb) zero-copying use-cases for Xen.
+>>>>>>>> We implemented it as a DRM helper driver because we can't see any
+>>>>>>>> other use-cases as of now.
+>>>>>>>> For example, we also have Xen para-virtualized sound driver, but
+>>>>>>>> its buffer memory usage is not comparable to what display wants
+>>>>>>>> and it works somewhat differently (e.g. there is no "frame done"
+>>>>>>>> event, so one can't tell when the sound buffer can be "flipped").
+>>>>>>>> At the same time, we do not use virtio-gpu, so this could probably
+>>>>>>>> be one more candidate for shared dma-bufs some day.
+>>>>>>>>>      Which simply isn't the case on kvm.
+>>>>>>>>>
+>>>>>>>>> hyper-dmabuf and xen-zcopy could maybe share code, or hyper-dmabuf build
+>>>>>>>>> on top of xen-zcopy.
+>>>>>>>> Hm, I can imagine that: xen-zcopy could be a library code for hyper-dmabuf
+>>>>>>>> in terms of implementing all that page sharing fun in multiple directions,
+>>>>>>>> e.g. Host->Guest, Guest->Host, Guest<->Guest.
+>>>>>>>> But I'll let Matt and Dongwon to comment on that.
+>>>>>>> I think we can definitely collaborate. Especially, maybe we are using some
+>>>>>>> outdated sharing mechanism/grant-table mechanism in our Xen backend (thanks
+>>>>>>> for bringing that up Oleksandr). However, the question is once we collaborate
+>>>>>>> somehow, can xen-zcopy's usecase use the standard API that hyper_dmabuf
+>>>>>>> provides? I don't think we need different IOCTLs that do the same in the final
+>>>>>>> solution.
+>>>>>>>
+>>>>>> If you think of xen-zcopy as a library (which implements Xen
+>>>>>> grant references mangling) and DRM PRIME wrapper on top of that
+>>>>>> library, we can probably define proper API for that library,
+>>>>>> so both xen-zcopy and hyper-dmabuf can use it. What is more, I am
+>>>>>> about to start upstreaming Xen para-virtualized sound device driver soon,
+>>>>>> which also uses similar code and gref passing mechanism [3].
+>>>>>> (Actually, I was about to upstream drm/xen-front, drm/xen-zcopy and
+>>>>>> snd/xen-front and then propose a Xen helper library for sharing big buffers,
+>>>>>> so common code of the above drivers can use the same code w/o code
+>>>>>> duplication)
+>>>>> I think it is possible to use your functions for memory sharing part in
+>>>>> hyper_dmabuf's backend (this 'backend' means the layer that does page sharing
+>>>>> and inter-vm communication with xen-specific way.), so why don't we work on
+>>>>> "Xen helper library for sharing big buffers" first while we continue our
+>>>>> discussion on the common API layer that can cover any dmabuf sharing cases.
+>>>>>
+>>>> Well, I would love we reuse the code that I have, but I also
+>>>> understand that it was limited by my use-cases. So, I do not
+>>>> insist we have to ;)
+>>>> If we start designing and discussing hyper-dmabuf protocol we of course
+>>>> can work on this helper library in parallel.
+>>> Imo code reuse is overrated. Adding new uapi is what freaks me out here
+>>> :-)
+>>>
+>>> If we end up with duplicated implementations, even in upstream, meh, not
+>>> great, but also ok. New uapi, and in a similar way, new hypervisor api
+>>> like the dma-buf forwarding that hyperdmabuf does is the kind of thing
+>>> that will lock us in for 10+ years (if we make a mistake).
+>>>
+>>>>>> Thank you,
+>>>>>> Oleksandr
+>>>>>>
+>>>>>> P.S. All, is it a good idea to move this out of udmabuf thread into a
+>>>>>> dedicated one?
+>>>>> Either way is fine with me.
+>>>> So, if you can start designing the protocol we may have a dedicated mail
+>>>> thread for that. I will try to help with the protocol as much as I can
+>>> Please don't start with the protocol. Instead start with the concrete
+>>> use-cases, and then figure out why exactly you need new uapi. Once we have
+>>> that answered, we can start thinking about fleshing out the details.
+>> On my side there are only 2 use-cases, Guest2 only:
+>> 1. Create a PRIME (dma-buf) from grant references
+>> 2. Create grant references from PRIME (dma-buf)
+> So these grant references, are those userspace visible things?
+Yes, the user-space backend receives those from xen-front via [1]
 
-> >  struct boot_info
-> >  {
-> >      uint32_t dt_base;
-> > @@ -248,23 +250,28 @@ static void platform_bus_create_devtree(PPCE500Params *params, void *fdt,
-> >      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
-> >      pbus = PLATFORM_BUS_DEVICE(dev);
-> >  
-> > -    /* We can only create dt nodes for dynamic devices when they're ready */
-> > -    if (pbus->done_gathering) {
-> > -        PlatformDevtreeData data = {
-> > -            .fdt = fdt,
-> > -            .mpic = mpic,
-> > -            .irq_start = irq_start,
-> > -            .node = node,
-> > -            .pbus = pbus,
-> > -        };
-> > +    /* Create dt nodes for dynamic devices */
-> > +    PlatformDevtreeData data = {
-> > +        .fdt = fdt,
-> > +        .mpic = mpic,
-> > +        .irq_start = irq_start,
-> > +        .node = node,
-> > +        .pbus = pbus,
-> > +    };
-> >  
-> > -        /* Loop through all dynamic sysbus devices and create nodes for them */
-> > -        foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
-> > -    }
-> > +    /* Loop through all dynamic sysbus devices and create nodes for them */
-> > +    foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
-> >  
-> >      g_free(node);
-> >  }
-> >  
-> > +void ppce500_plug_dynamic_sysbus_device(SysBusDevice *sbdev)
-> > +{
-> > +    if (pbus_dev) {
-> > +        platform_bus_link_device(PLATFORM_BUS_DEVICE(pbus_dev), sbdev);
-> > +    }
-> > +}
-> > +
-> >  static int ppce500_load_device_tree(MachineState *machine,
-> >                                      PPCE500Params *params,
-> >                                      hwaddr addr,
-> > @@ -945,16 +952,16 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-> >          qdev_prop_set_uint32(dev, "num_irqs", params->platform_bus_num_irqs);
-> >          qdev_prop_set_uint32(dev, "mmio_size", params->platform_bus_size);
-> >          qdev_init_nofail(dev);
-> > -        s = SYS_BUS_DEVICE(dev);
-> > +        pbus_dev = SYS_BUS_DEVICE(dev);
-> >  
-> >          for (i = 0; i < params->platform_bus_num_irqs; i++) {
-> >              int irqn = params->platform_bus_first_irq + i;
-> > -            sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
-> > +            sysbus_connect_irq(pbus_dev, i, qdev_get_gpio_in(mpicdev, irqn));
-> >          }
-> >  
-> >          memory_region_add_subregion(address_space_mem,
-> >                                      params->platform_bus_base,
-> > -                                    sysbus_mmio_get_region(s, 0));
-> > +                                    sysbus_mmio_get_region(pbus_dev, 0));
-> >      }
-> >  
-> >      /*
-> > diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> > index 81d03e1..2f014cc 100644
-> > --- a/hw/ppc/e500plat.c
-> > +++ b/hw/ppc/e500plat.c
-> > @@ -60,8 +60,49 @@ static void e500plat_init(MachineState *machine)
-> >      ppce500_init(machine, &params);
-> >  }
-> >  
-> > -static void e500plat_machine_init(MachineClass *mc)
-> > +typedef struct {
-> > +    MachineClass parent;
-> > +    HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-> > +                                           DeviceState *dev);
-> > +} E500PlatMachineClass;
-> > +
-> > +#define TYPE_E500PLAT_MACHINE  MACHINE_TYPE_NAME("ppce500")
-> > +#define E500PLAT_MACHINE_GET_CLASS(obj) \
-> > +    OBJECT_GET_CLASS(E500PlatMachineClass, obj, TYPE_E500PLAT_MACHINE)
-> > +#define E500PLAT_MACHINE_CLASS(klass) \
-> > +    OBJECT_CLASS_CHECK(E500PlatMachineClass, klass, TYPE_E500PLAT_MACHINE)
-> > +
-> > +static void e500plat_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-> > +                                            DeviceState *dev, Error **errp)
-> >  {
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> > +        ppce500_plug_dynamic_sysbus_device(SYS_BUS_DEVICE(dev));
-> > +    }
-> > +}
-> > +
-> > +static
-> > +HotplugHandler *e500plat_machine_get_hotpug_handler(MachineState *machine,
-> > +                                                    DeviceState *dev)
-> > +{
-> > +    E500PlatMachineClass *emc = E500PLAT_MACHINE_GET_CLASS(machine);
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> > +        return HOTPLUG_HANDLER(machine);
-> > +    }
-> > +
-> > +    return emc->get_hotplug_handler ?
-> > +        emc->get_hotplug_handler(machine, dev) : NULL;
-> > +}
-> > +
-> > +static void e500plat_machine_class_init(ObjectClass *oc, void *data)
-> > +{
-> > +    E500PlatMachineClass *emc = E500PLAT_MACHINE_CLASS(oc);
-> > +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
-> > +    MachineClass *mc = MACHINE_CLASS(oc);
-> > +
-> > +    emc->get_hotplug_handler = mc->get_hotplug_handler;
-> > +    mc->get_hotplug_handler = e500plat_machine_get_hotpug_handler;  
-> 
-> I'm pretty sure the parent type will never have a handler, so I'm not
-> sure this is really necessary.
-It seems that only PC machine handles chain correctly while other
-targets /spapr,s390x/ don't.
-
-Perhaps we should just drop caching original
-MachineClass::get_hotplug_handler (which is NULL) everywhere
-so it will be consistent across boards.
-If we ever need chaining here, we could add it then and do
-it consistently for every board that uses it.
- 
-> > +    hc->plug = e500plat_machine_device_plug_cb;
-> > +
-> >      mc->desc = "generic paravirt e500 platform";
-> >      mc->init = e500plat_init;
-> >      mc->max_cpus = 32;
-> > @@ -69,4 +110,19 @@ static void e500plat_machine_init(MachineClass *mc)
-> >      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
-> >  }
-> >  
-> > -DEFINE_MACHINE("ppce500", e500plat_machine_init)
-> > +static const TypeInfo e500plat_info = {
-> > +    .name          = TYPE_E500PLAT_MACHINE,
-> > +    .parent        = TYPE_MACHINE,
-> > +    .class_size    = sizeof(E500PlatMachineClass),
-> > +    .class_init    = e500plat_machine_class_init,
-> > +    .interfaces    = (InterfaceInfo[]) {
-> > +         { TYPE_HOTPLUG_HANDLER },
-> > +         { }
-> > +    }
-> > +};
-> > +
-> > +static void e500plat_register_types(void)
-> > +{
-> > +    type_register_static(&e500plat_info);
-> > +}
-> > +type_init(e500plat_register_types)  
-> 
+> I thought
+> the grant references was just the kernel/hypervisor internal magic to make
+> this all work?
+So, I can map the grant references from user-space, but I won't
+be able to turn those into a PRIME buffer. So, the only use of those
+w/o xen-zcopy is to map grant refs and copy into real HW dumb on every 
+page flip.
+> -Daniel
+[1] 
+https://elixir.bootlin.com/linux/v4.17-rc1/source/include/xen/interface/io/displif.h#L484
