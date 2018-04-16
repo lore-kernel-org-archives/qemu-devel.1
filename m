@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f87Ag-0001fW-4c
+	(envelope-from <ehabkost@redhat.com>) id 1f87Ad-0001d7-6b
 	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:40:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f87Af-0006qf-4W
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:40:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41748)
+	(envelope-from <ehabkost@redhat.com>) id 1f87Aa-0006n5-Lr
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:39:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f87Ae-0006qG-Up
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:40:01 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f87Aa-0006mO-FR
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:39:56 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 16 Apr 2018 13:39:53 -0300
-Message-Id: <20180416163953.31188-2-ehabkost@redhat.com>
-In-Reply-To: <20180416163953.31188-1-ehabkost@redhat.com>
-References: <20180416163953.31188-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] i386: Don't automatically enable
+Date: Mon, 16 Apr 2018 13:39:52 -0300
+Message-Id: <20180416163953.31188-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] i386: Don't automatically enable
  FEAT_KVM_HINTS bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,57 +25,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-The assumption in the cpu->max_features code is that anything
-enabled on GET_SUPPORTED_CPUID should be enabled on "-cpu host".
-This shouldn't be the case for FEAT_KVM_HINTS.
+Last remaining fix for -rc4.
 
-This adds a new FeatureWordInfo::no_autoenable_flags field, that
-can be used to prevent FEAT_KVM_HINTS bits to be enabled
-automatically.
+The following changes since commit 042f6a31af3d38eefc6ec995cce1d762c41d4515:
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180410211534.26079-1-ehabkost@redhat.com>
-Tested-by: Wanpeng Li <wanpengli@tencent.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
+  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-04-16' into staging (2018-04-16 15:30:54 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
+
+for you to fetch changes up to 0d914f39a77954bf5472b16130aeefe573a068f5:
+
+  i386: Don't automatically enable FEAT_KVM_HINTS bits (2018-04-16 13:36:52 -0300)
+
+----------------------------------------------------------------
+i386: Don't automatically enable FEAT_KVM_HINTS bits
+
+Bug fix for "-cpu host" with newer kernels.
+
+----------------------------------------------------------------
+
+Eduardo Habkost (1):
+  i386: Don't automatically enable FEAT_KVM_HINTS bits
+
  target/i386/cpu.c | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 1a6b082b6f..a20fe26573 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -295,6 +295,8 @@ typedef struct FeatureWordInfo {
-     uint32_t tcg_features; /* Feature flags supported by TCG */
-     uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
-     uint32_t migratable_flags; /* Feature flags known to be migratable */
-+    /* Features that shouldn't be auto-enabled by "-cpu host" */
-+    uint32_t no_autoenable_flags;
- } FeatureWordInfo;
- 
- static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-@@ -400,6 +402,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         },
-         .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
-         .tcg_features = TCG_KVM_FEATURES,
-+        /*
-+         * KVM hints aren't auto-enabled by -cpu host, they need to be
-+         * explicitly enabled in the command-line.
-+         */
-+        .no_autoenable_flags = ~0U,
-     },
-     [FEAT_HYPERV_EAX] = {
-         .feat_names = {
-@@ -4062,7 +4069,8 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-              */
-             env->features[w] |=
-                 x86_cpu_get_supported_feature_word(w, cpu->migratable) &
--                ~env->user_features[w];
-+                ~env->user_features[w] & \
-+                ~feature_word_info[w].no_autoenable_flags;
-         }
-     }
- 
 -- 
 2.14.3
