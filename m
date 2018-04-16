@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f84Dd-0006g6-UN
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:30:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f84at-0005Ez-0Q
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:54:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f84Da-0005St-Qv
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:30:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55244 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f84Da-0005SF-Ki
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:30:50 -0400
-References: <20180329032149.44685-1-aik@ozlabs.ru>
-	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
-	<20180416152040.7b88b902@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
-Date: Mon, 16 Apr 2018 15:30:39 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1f84ao-0006sj-Ha
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:54:55 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f84ao-0006s3-AW
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:54:50 -0400
+Received: by mail-wr0-x243.google.com with SMTP id w3so9666585wrg.2
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 06:54:49 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 16 Apr 2018 14:54:42 +0100
+Message-Id: <20180416135442.30606-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180416152040.7b88b902@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
+ before /0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 16/04/2018 15:20, Igor Mammedov wrote:
-> Generally object doesn't need to know its own name,
-> we use it only for debugging and nice error reporting so far.
-> I'd rather have 'id' property at Object level so we won't have
-> to fish out ID from parent /which we aren't supposed to do and
-> which doesn't work in some cases/ when it's needed within
-> object itself.
+The re-factoring of div_floats changed the order of checking meaning
+an operation like -inf/0 erroneously raises the divbyzero flag.
+IEEE-754 (2008) specifies this should only occur for operations on
+finite operands.
 
-Having an 'id' at object level is also a mess, because that id is
-invalid after unparent.  Since this is just for debugging use,
-object_get_canonical_path_component is the right function.  We can just
-make it return NULL if there is no parent.
+We fix this by moving the check on the dividend being Inf/0 to before
+the divisor is zero check.
 
-Paolo
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+---
+ fpu/softfloat.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index b46dccc63e..a7d0f3ff56 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1146,6 +1146,11 @@ static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
+         a.cls = float_class_dnan;
+         return a;
+     }
++    /* Inf / x or 0 / x */
++    if (a.cls == float_class_inf || a.cls == float_class_zero) {
++        a.sign = sign;
++        return a;
++    }
+     /* Div 0 => Inf */
+     if (b.cls == float_class_zero) {
+         s->float_exception_flags |= float_flag_divbyzero;
+@@ -1153,11 +1158,6 @@ static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
+         a.sign = sign;
+         return a;
+     }
+-    /* Inf / x or 0 / x */
+-    if (a.cls == float_class_inf || a.cls == float_class_zero) {
+-        a.sign = sign;
+-        return a;
+-    }
+     /* Div by Inf */
+     if (b.cls == float_class_inf) {
+         a.cls = float_class_zero;
+-- 
+2.17.0
