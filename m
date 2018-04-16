@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f864T-0001fE-Us
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f864g-0001oZ-43
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f864Q-0005GF-Ns
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45368 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f864Q-0005G4-IR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:30 -0400
-References: <20180329032149.44685-1-aik@ozlabs.ru>
-	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
-	<20180416152040.7b88b902@redhat.com>
-	<e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
-	<20180416162706.43212a69@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13008b1f-4b59-c6e1-69d2-98f8280f6f34@redhat.com>
-Date: Mon, 16 Apr 2018 17:29:23 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f864f-0005PK-5M
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:46 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f864f-0005Ow-0u
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:45 -0400
+Received: by mail-oi0-x241.google.com with SMTP id f63-v6so14902477oic.4
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 08:29:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180416162706.43212a69@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+In-Reply-To: <ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
+References: <267f42a5-b7ce-379e-ffd1-f2611393d2ff@web.de>
+	<ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 16:29:23 +0100
+Message-ID: <CAFEAcA9V9nFMVixeYjfBj54OT3zhRCVHM495AZHDzxVryh4JFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] e1000e: Do not auto-clear ICR bits which
+ aren't set in EIAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 16/04/2018 16:27, Igor Mammedov wrote:
-> On Mon, 16 Apr 2018 15:30:39 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> On 16/04/2018 15:20, Igor Mammedov wrote:
->>> Generally object doesn't need to know its own name,
->>> we use it only for debugging and nice error reporting so far.
->>> I'd rather have 'id' property at Object level so we won't have
->>> to fish out ID from parent /which we aren't supposed to do and
->>> which doesn't work in some cases/ when it's needed within
->>> object itself.  
+On 16 April 2018 at 16:25, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+> On 2018-04-01 23:17, Jan Kiszka wrote:
+>> From: Jan Kiszka <jan.kiszka@siemens.com>
 >>
->> Having an 'id' at object level is also a mess, because that id is
->> invalid after unparent.
-> I'd just consider 'id' as object name which is valid even if there
-> is no parent (during whole object lifecycle).
-
-What's the point of an object name if it cannot be unique?
-
-Paolo
-
-> That would allow for object to have a reachable name vs getting NULL
-> when parent isn't set.
-> Maybe Object::id is overkill, but we probably could use NamedObject
-> where it's needed and avoid reverse engineering id from path.
->  
->> Since this is just for debugging use,
->> object_get_canonical_path_component is the right function.  We can just
->> make it return NULL if there is no parent.
+>> The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES when
+>> E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixes the
+>> issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Avoid
+>> receiver overrun interrupt bursts") and was worked around by
+>> 745d0bd3af99 ("e1000e: Remove Other from EIAC").
+>>
+>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>> ---
+>>
+>> This resolves the issue I reported on February 18 ("e1000e: MSI-X
+>> problem with recent Linux drivers").
+>>
+>>  hw/net/e1000e_core.c | 4 ----
+>>  1 file changed, 4 deletions(-)
+>>
+>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>> index ecf9b15555..d38f025c0f 100644
+>> --- a/hw/net/e1000e_core.c
+>> +++ b/hw/net/e1000e_core.c
+>> @@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
+>>
+>>      effective_eiac = core->mac[EIAC] & cause;
+>>
+>> -    if (effective_eiac == E1000_ICR_OTHER) {
+>> -        effective_eiac |= E1000_ICR_OTHER_CAUSES;
+>> -    }
+>> -
+>>      core->mac[ICR] &= ~effective_eiac;
+>>
+>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>>
 >
-> looking at current use it out-grew just debugging usecases
-> and it's rather messy right now:
-> 
-> ram_backend_memory_alloc, throttle_group_obj_complete,
-> xlnx_zynqmp_create_rpu, spapr_drc.c:realize, iothread_complete,
-> memory_region_name
+> Ping for this - as well as https://patchwork.ozlabs.org/patch/895476.
+>
+> Given that q35 uses e1000e by default and many Linux kernel versions no
+> longer work, this should likely go into upcoming and stable versions
 
-I agree, _but_ it's definitely okay for debugging usecases.
+I'd rather not put it into 2.12 at this point in the release
+cycle unless it's a regression from 2.11, I think.
 
-Paolo
+thanks
+-- PMM
