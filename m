@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f7vrl-0007vC-CM
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1f7w8z-0004d6-Un
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f7vrh-00070O-FJ
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f7vrh-0006z4-8t
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f7vrf-0003Yn-RZ
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:35:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B81722E80D5
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:35:39 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1f7w8w-0000zw-Px
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:53:34 -0400
+References: <20180415234307.28132-1-f4bug@amsat.org>
+	<20180415234307.28132-2-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a2d59a3a-0176-6065-68ae-60fee97c2332@redhat.com>
+Date: Mon, 16 Apr 2018 06:53:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180415234307.28132-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Apr 2018 04:17:35 -0000
-From: Launchpad Bug Tracker <1461918@bugs.launchpad.net>
-Reply-To: Bug 1461918 <1461918@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150604121104.9929.24787.malonedeb@wampee.canonical.com>
-Message-Id: <152385225555.15004.7380448250965484847.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1461918] Re: guest hangs after use ethtool to set
- scatter-gather on
+Subject: Re: [Qemu-devel] [PATCH v3 01/41] hw: Clean "hw/devices.h" includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 16.04.2018 01:42, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/devices.h | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/hw/devices.h b/include/hw/devices.h
+> index 861ddea8af..0e27feb0c2 100644
+> --- a/include/hw/devices.h
+> +++ b/include/hw/devices.h
+> @@ -1,13 +1,10 @@
+>  #ifndef QEMU_DEVICES_H
+>  #define QEMU_DEVICES_H
+> =20
+> -#include "hw/irq.h"
+> -
+> -/* ??? Not all users of this file can include cpu-common.h.  */
+> -struct MemoryRegion;
+> -
+>  /* Devices that have nowhere better to go.  */
+> =20
+> +#include "hw/hw.h"
+> +
+>  /* smc91c111.c */
+>  void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+IMHO we should rather get rid of devices.h (in a separate patch series)
+and introduce proper small headers =C3=A0 la smc91c111.h for the single
+sections in here... Just my 0.02 =E2=82=AC.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1461918
-
-Title:
-  guest hangs after use ethtool to set scatter-gather on
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  On the guests,  i have a rtl8139 nic,  I use ethtool to set  scatter-gath=
-er on ( ethtool -K eth0 sg on ),
-  after that,   at host side,  I  use scp to send a file into guest.  As a =
-result, guest hang.
-  At that point qemu is using 100% of one host CPU, about 100% guest.
-
-  If guest is centOS6.5=EF=BC=8C with no problem.
-
-
-  The guest system is Fedora release 19(Kernel 3.11.10-200.fc19.x86_64).
-
-  host system is debian 7.1.
-  Kernel:3.10.0
-  Qemu: 2.3.0
-
-  cmd:
-  /boot/qemu-2.3.0-bin/qemu-system-x86_64 -vnc :13 -enable-kvm -name fedora=
- -smp sockets=3D1,cores=3D2 -cpu core2duo -nodefaults -vga cirrus -k en-us =
--boot menu=3Don,splash-time=3D8000 -m 2048 -usb -drive file=3D/boot/vm-disk=
--1.qcow2,if=3Dnone,id=3Ddrive-ide0,cache=3Dnone,aio=3Dnative -device ide-hd=
-,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0,id=3Dide0,bootindex=3D100 -netdev =
-type=3Dtap,id=3Dnet0,ifname=3D200,script=3D/etc/kvm/vtp-bridge -device rtl8=
-139,romfile=3D,mac=3DFE:FC:FE:5C:58:65,netdev=3Dnet0,bus=3Dpci.0,addr=3D0x1=
-2,id=3Dnet0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1461918/+subscriptions
+ Thomas
