@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f87MX-0001hg-H9
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:18 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f87N5-00029n-0u
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f87MW-0006q2-2K
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:17 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37765)
+	(envelope-from <mlureau@redhat.com>) id 1f87N0-0007NZ-VG
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:51 -0400
+Received: from mail-it0-f50.google.com ([209.85.214.50]:51524)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f87MV-0006pI-T1
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:16 -0400
-Received: by mail-oi0-x241.google.com with SMTP id f63-v6so15180298oic.4
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 09:52:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f87N0-0007NG-PM
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:46 -0400
+Received: by mail-it0-f50.google.com with SMTP id b5-v6so12288476itj.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 09:52:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1523518688-26674-9-git-send-email-eric.auger@redhat.com>
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-	<1523518688-26674-9-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Apr 2018 17:51:54 +0100
-Message-ID: <CAFEAcA-gwTH7DE4v5qzRpcBYtbWZpi0AMgVxPM7tX3Zsp-pLMQ@mail.gmail.com>
+In-Reply-To: <87efjfsgc3.fsf@dusky.pond.sub.org>
+References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
+	<20180413161842.5117-3-marcandre.lureau@redhat.com>
+	<87r2nfsh7w.fsf@dusky.pond.sub.org>
+	<87efjfsgc3.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 16 Apr 2018 18:52:45 +0200
+Message-ID: <CAMxuvay5MCUZTaY5KpW_jTRP=LMV2YhMkFquGgXxUuYH5r89fQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 08/17] hw/arm/smmuv3: Event queue
- recording helper
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] qobject: use a QObjectBase_ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,209 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
-> Let's introduce a helper function aiming at recording an
-> event in the event queue.
+On Mon, Apr 16, 2018 at 10:31 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> Markus Armbruster <armbru@redhat.com> writes:
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>>> By moving the base fields to a QObjectBase_, QObject can be a type
+>>> which also has a 'base' field. This allows to write a generic
+>>> QOBJECT() macro that will work with any QObject type, including
+>>> QObject itself. The container_of() macro ensures that the object to
+>>> cast has a QObjectBase_ base field, giving some type safety
+>>> guarantees. However, for it to work properly, all QObject types must
+>>> have 'base' at offset 0 (which is ensured by static checking from
+>>> the previous patch)
+>>
+>> I'm afraid this condition is neither sufficient nor necessary.
+>>
+>> QOBJECT() maps a pointer to some subtype to the base type QObject.  For
+>> this to work, the subtype must contain a QObject.
+>>
+>> Before the patch, this is trivially the case: the subtypes have a member
+>> QObject base, and QOBJECT() returns its address.
+>>
+>> Afterwards, the subtypes have a member QObjectBase_ base, and QOBJECT()
+>> returns the address of a notional QObject wrapped around this member.
+>> Works because QObject has no other members.
+>>
+>> The condition 'base is at offset 0' does not ensure this, and is
+>> therefore not sufficient.
+>>
+>> It's not necessary, either: putting base elsewhere would work just fine
+>> as long as we put *all* of QObject there.
+>>
+>> Please document the real condition "QObject must have no members but
+>> QObjectBase_ base, or else QOBJECT() breaks".  Feel free to check their
+>> sizes are the same (I wouldn't bother).
+>>
+>> If requiring base to be at offset zero for all subtypes materially
+>> simplifies code, then go ahead and do that in a separate patch.  My gut
+>> feeling is it doesn't, but I could be wrong.
 >
-> ---
-> v9 -> v10:
-> - rework SMMU_EVENT_STRING
-> - trigger a GERROR EVENTQ_ABT_ERR in case of eventq write failure
+> Uh, there's another reason: existing type casts from QObject * to
+> subtypes.  I just spotted one in tests/check-qdict.c:
 >
-> v8 -> v9:
-> - add SMMU_EVENT_STRING
+>     dst =3D (QDict *)qdict_crumple(src, &error_abort);
 >
-> v7 -> v8:
-> - use dma_addr_t instead of hwaddr in smmuv3_record_event()
-> - introduce struct SMMUEventInfo
-> - add event_stringify + helpers for all fields
-> ---
->  hw/arm/smmuv3-internal.h | 142 ++++++++++++++++++++++++++++++++++++++++++++++-
->  hw/arm/smmuv3.c          | 108 +++++++++++++++++++++++++++++++++--
->  hw/arm/trace-events      |   1 +
->  3 files changed, 243 insertions(+), 8 deletions(-)
+> There may well be more.
 >
-> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-> index 8550be0..8e546bf 100644
-> --- a/hw/arm/smmuv3-internal.h
-> +++ b/hw/arm/smmuv3-internal.h
-> @@ -205,8 +205,6 @@ static inline void smmu_write_cmdq_err(SMMUv3State *s, uint32_t err_type)
->      s->cmdq.cons = FIELD_DP32(s->cmdq.cons, CMDQ_CONS, ERR, err_type);
->  }
->
-> -void smmuv3_write_eventq(SMMUv3State *s, Evt *evt);
-> -
->  /* Commands */
->
->  typedef enum SMMUCommandType {
-> @@ -308,4 +306,144 @@ enum { /* Command completion notification */
->
->  #define SMMU_FEATURE_2LVL_STE (1 << 0)
->
-> +/* Events */
-> +
-> +typedef enum SMMUEventType {
-> +    SMMU_EVT_OK                 = 0x00,
-> +    SMMU_EVT_F_UUT              = 0x01,
-> +    SMMU_EVT_C_BAD_STREAMID     = 0x02,
-> +    SMMU_EVT_F_STE_FETCH        = 0x03,
-> +    SMMU_EVT_C_BAD_STE          = 0x04,
-> +    SMMU_EVT_F_BAD_ATS_TREQ     = 0x05,
-> +    SMMU_EVT_F_STREAM_DISABLED  = 0x06,
-> +    SMMU_EVT_F_TRANS_FORBIDDEN  = 0x07,
-> +    SMMU_EVT_C_BAD_SUBSTREAMID  = 0x08,
-> +    SMMU_EVT_F_CD_FETCH         = 0x09,
-> +    SMMU_EVT_C_BAD_CD           = 0x0a,
-> +    SMMU_EVT_F_WALK_EABT        = 0x0b,
 
-Most of the other enums you let the auto-increment deal
-with long runs of consecutive integers like this. I don't
-much care which but being consistent is generally nicer.
-
-> +    SMMU_EVT_F_TRANSLATION      = 0x10,
-> +    SMMU_EVT_F_ADDR_SIZE        = 0x11,
-> +    SMMU_EVT_F_ACCESS           = 0x12,
-> +    SMMU_EVT_F_PERMISSION       = 0x13,
-> +    SMMU_EVT_F_TLB_CONFLICT     = 0x20,
-> +    SMMU_EVT_F_CFG_CONFLICT     = 0x21,
-> +    SMMU_EVT_E_PAGE_REQ         = 0x24,
-> +} SMMUEventType;
-> +
-> +static const char *event_stringify[] = {
-> +    [SMMU_EVT_OK]                       = "SMMU_EVT_OK",
-> +    [SMMU_EVT_F_UUT]                    = "SMMU_EVT_F_UUT",
-> +    [SMMU_EVT_C_BAD_STREAMID]           = "SMMU_EVT_C_BAD_STREAMID",
-> +    [SMMU_EVT_F_STE_FETCH]              = "SMMU_EVT_F_STE_FETCH",
-> +    [SMMU_EVT_C_BAD_STE]                = "SMMU_EVT_C_BAD_STE",
-> +    [SMMU_EVT_F_BAD_ATS_TREQ]           = "SMMU_EVT_F_BAD_ATS_TREQ",
-> +    [SMMU_EVT_F_STREAM_DISABLED]        = "SMMU_EVT_F_STREAM_DISABLED",
-> +    [SMMU_EVT_F_TRANS_FORBIDDEN]        = "SMMU_EVT_F_TRANS_FORBIDDEN",
-> +    [SMMU_EVT_C_BAD_SUBSTREAMID]        = "SMMU_EVT_C_BAD_SUBSTREAMID",
-> +    [SMMU_EVT_F_CD_FETCH]               = "SMMU_EVT_F_CD_FETCH",
-> +    [SMMU_EVT_C_BAD_CD]                 = "SMMU_EVT_C_BAD_CD",
-> +    [SMMU_EVT_F_WALK_EABT]              = "SMMU_EVT_F_WALK_EABT",
-> +    [SMMU_EVT_F_TRANSLATION]            = "SMMU_EVT_F_TRANSLATION",
-> +    [SMMU_EVT_F_ADDR_SIZE]              = "SMMU_EVT_F_ADDR_SIZE",
-> +    [SMMU_EVT_F_ACCESS]                 = "SMMU_EVT_F_ACCESS",
-> +    [SMMU_EVT_F_PERMISSION]             = "SMMU_EVT_F_PERMISSION",
-> +    [SMMU_EVT_F_TLB_CONFLICT]           = "SMMU_EVT_F_TLB_CONFLICT",
-> +    [SMMU_EVT_F_CFG_CONFLICT]           = "SMMU_EVT_F_CFG_CONFLICT",
-> +    [SMMU_EVT_E_PAGE_REQ]               = "SMMU_EVT_E_PAGE_REQ",
-> +};
-> +
-> +static inline const char *smmu_event_string(SMMUEventType type)
-> +{
-> +    return event_stringify[type] ? event_stringify[type] : "UNKNOWN";
-
-Same remarks about being defensive about out of range values
-apply here, I expect.
-
-> +}
-> +
-> +/*  Encode an event record */
-> +typedef struct SMMUEventInfo {
-> +    SMMUEventType type;
-> +    uint32_t sid;
-> +    bool recorded;
-> +    bool record_trans_faults;
-> +    union {
-> +        struct {
-> +            uint32_t ssid;
-> +            bool ssv;
-> +            dma_addr_t addr;
-> +            bool rnw;
-> +            bool pnu;
-> +            bool ind;
-> +       } f_uut;
-> +       struct ssid_info {
-> +            uint32_t ssid;
-> +            bool ssv;
-> +       } c_bad_streamid;
-
-If we were being really picky about coding style these
-embedded struct names like ssid_info ought to be camelcase.
-
-> +       struct ssid_addr_info {
-> +            uint32_t ssid;
-> +            bool ssv;
-> +            dma_addr_t addr;
-> +       } f_ste_fetch;
-> +       struct ssid_info c_bad_ste;
-> +       struct {
-> +            dma_addr_t addr;
-> +            bool rnw;
-> +       } f_transl_forbidden;
-> +       struct {
-> +            uint32_t ssid;
-> +       } c_bad_substream;
-> +       struct ssid_addr_info f_cd_fetch;
-> +       struct ssid_info c_bad_cd;
-> +       struct full_info {
-> +            bool stall;
-> +            uint16_t stag;
-> +            uint32_t ssid;
-> +            bool ssv;
-> +            bool s2;
-> +            dma_addr_t addr;
-> +            bool rnw;
-> +            bool pnu;
-> +            bool ind;
-> +            uint8_t class;
-> +            dma_addr_t addr2;
-> +       } f_walk_eabt;
-> +       struct full_info f_translation;
-> +       struct full_info f_addr_size;
-> +       struct full_info f_access;
-> +       struct full_info f_permission;
-> +       struct ssid_info f_cfg_conflict;
-> +       /**
-> +        * not supported yet:
-> +        * F_BAD_ATS_TREQ
-> +        * F_BAD_ATS_TREQ
-> +        * F_TLB_CONFLICT
-> +        * E_PAGE_REQUEST
-> +        * IMPDEF_EVENTn
-> +        */
-> +    } u;
-> +} SMMUEventInfo;
-> +
-> +/* EVTQ fields */
-> +
-> +#define EVT_Q_OVERFLOW        (1 << 31)
-> +
-> +#define EVT_SET_TYPE(x, v)              deposit32((x)->word[0], 0 , 8 ,  v)
-> +#define EVT_SET_SSV(x, v)               deposit32((x)->word[0], 11, 1 ,  v)
-> +#define EVT_SET_SSID(x, v)              deposit32((x)->word[0], 12, 20, v)
-> +#define EVT_SET_SID(x, v)               ((x)->word[1] =  v)
-> +#define EVT_SET_STAG(x, v)              deposit32((x)->word[2], 0 , 16, v)
-> +#define EVT_SET_STALL(x, v)             deposit32((x)->word[2], 31, 1 , v)
-> +#define EVT_SET_PNU(x, v)               deposit32((x)->word[3], 1 , 1 , v)
-> +#define EVT_SET_IND(x, v)               deposit32((x)->word[3], 2 , 1 , v)
-> +#define EVT_SET_RNW(x, v)               deposit32((x)->word[3], 3 , 1 , v)
-> +#define EVT_SET_S2(x, v)                deposit32((x)->word[3], 7 , 1 , v)
-> +#define EVT_SET_CLASS(x, v)             deposit32((x)->word[3], 8 , 2 , v)
-
-There's some weird extra spaces in these macros.
-
-> +#define EVT_SET_ADDR(x, addr) ({                    \
-> +            (x)->word[5] = (uint32_t)(addr >> 32);        \
-> +            (x)->word[4] = (uint32_t)(addr & 0xffffffff); \
-> +        })
-> +#define EVT_SET_ADDR2(x, addr) ({                    \
-> +            deposit32((x)->word[7], 3, 29, addr >> 16);        \
-> +            deposit32((x)->word[7], 0, 16, addr & 0xffff); \
-> +        })
-
-These don't need the GCC ({ }) extension -- you can just do them
-as normal do { ... } while (0) macros.
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+So we better have checks from patch 1, don't we?
