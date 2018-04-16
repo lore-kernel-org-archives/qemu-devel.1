@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1f87N5-00029n-0u
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f87Pc-0004NT-MC
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1f87N0-0007NZ-VG
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:51 -0400
-Received: from mail-it0-f50.google.com ([209.85.214.50]:51524)
+	(envelope-from <peter.maydell@linaro.org>) id 1f87Pb-0000WH-OY
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:55:28 -0400
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:45631)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f87N0-0007NG-PM
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:52:46 -0400
-Received: by mail-it0-f50.google.com with SMTP id b5-v6so12288476itj.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 09:52:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f87Pb-0000VT-Fa
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:55:27 -0400
+Received: by mail-ot0-x231.google.com with SMTP id w2-v6so7202490otj.12
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 09:55:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87efjfsgc3.fsf@dusky.pond.sub.org>
-References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
-	<20180413161842.5117-3-marcandre.lureau@redhat.com>
-	<87r2nfsh7w.fsf@dusky.pond.sub.org>
-	<87efjfsgc3.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 16 Apr 2018 18:52:45 +0200
-Message-ID: <CAMxuvay5MCUZTaY5KpW_jTRP=LMV2YhMkFquGgXxUuYH5r89fQ@mail.gmail.com>
+In-Reply-To: <1523518688-26674-15-git-send-email-eric.auger@redhat.com>
+References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
+	<1523518688-26674-15-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 17:55:05 +0100
+Message-ID: <CAFEAcA8zMJvdRhf=f7O6GuRhqejbgb7moD43TPvVHJowBGeoug@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] qobject: use a QObjectBase_ struct
+Subject: Re: [Qemu-devel] [PATCH v11 14/17] hw/arm/virt: Introduce the iommu
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On Mon, Apr 16, 2018 at 10:31 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> Markus Armbruster <armbru@redhat.com> writes:
+On 12 April 2018 at 08:38, Eric Auger <eric.auger@redhat.com> wrote:
+> ARM virt machine now exposes a new "iommu" option.
+> The SMMUv3 IOMMU is instantiated using -machine virt,iommu=smmuv3.
 >
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->>> By moving the base fields to a QObjectBase_, QObject can be a type
->>> which also has a 'base' field. This allows to write a generic
->>> QOBJECT() macro that will work with any QObject type, including
->>> QObject itself. The container_of() macro ensures that the object to
->>> cast has a QObjectBase_ base field, giving some type safety
->>> guarantees. However, for it to work properly, all QObject types must
->>> have 'base' at offset 0 (which is ensured by static checking from
->>> the previous patch)
->>
->> I'm afraid this condition is neither sufficient nor necessary.
->>
->> QOBJECT() maps a pointer to some subtype to the base type QObject.  For
->> this to work, the subtype must contain a QObject.
->>
->> Before the patch, this is trivially the case: the subtypes have a member
->> QObject base, and QOBJECT() returns its address.
->>
->> Afterwards, the subtypes have a member QObjectBase_ base, and QOBJECT()
->> returns the address of a notional QObject wrapped around this member.
->> Works because QObject has no other members.
->>
->> The condition 'base is at offset 0' does not ensure this, and is
->> therefore not sufficient.
->>
->> It's not necessary, either: putting base elsewhere would work just fine
->> as long as we put *all* of QObject there.
->>
->> Please document the real condition "QObject must have no members but
->> QObjectBase_ base, or else QOBJECT() breaks".  Feel free to check their
->> sizes are the same (I wouldn't bother).
->>
->> If requiring base to be at offset zero for all subtypes materially
->> simplifies code, then go ahead and do that in a separate patch.  My gut
->> feeling is it doesn't, but I could be wrong.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 >
-> Uh, there's another reason: existing type casts from QObject * to
-> subtypes.  I just spotted one in tests/check-qdict.c:
+> ---
+> v9 -> v10:
+> - remove no_iommu
 >
->     dst =3D (QDict *)qdict_crumple(src, &error_abort);
+> v7 -> v8:
+> - Revert to machine option, now dubbed "iommu", preparing for virtio
+>   instantiation.
 >
-> There may well be more.
+> v5 -> v6: machine 2_11
+> ---
+>  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 >
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 1799702..a3398d6 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1560,6 +1560,34 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
+>      }
+>  }
+>
+> +static char *virt_get_iommu(Object *obj, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    switch (vms->iommu) {
+> +    case VIRT_IOMMU_NONE:
+> +        return g_strdup("none");
+> +    case VIRT_IOMMU_SMMUV3:
+> +        return g_strdup("smmuv3");
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +}
+> +
+> +static void virt_set_iommu(Object *obj, const char *value, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    if (!strcmp(value, "smmuv3")) {
+> +        vms->iommu = VIRT_IOMMU_SMMUV3;
+> +    } else if (!strcmp(value, "none")) {
+> +        vms->iommu = VIRT_IOMMU_NONE;
+> +    } else {
+> +        error_setg(errp, "Invalid iommu value");
+> +        error_append_hint(errp, "Valid values are none, smmuv3.\n");
+> +    }
+> +}
+> +
+>  static CpuInstanceProperties
+>  virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+>  {
+> @@ -1692,6 +1720,14 @@ static void virt_2_12_instance_init(Object *obj)
+>                                          NULL);
+>      }
+>
+> +    /* Default disallows iommu instantiation */
+> +    vms->iommu = VIRT_IOMMU_NONE;
+> +    object_property_add_str(obj, "iommu", virt_get_iommu, virt_set_iommu, NULL);
+> +    object_property_set_description(obj, "iommu",
+> +                                    "Set the IOMMU model among "
+> +                                    "none, smmuv3 (default none)",
+> +                                    NULL);
 
-So we better have checks from patch 1, don't we?
+We should phrase this consistently with how we're describing other
+options like the GIC version, so
+   "Set the IOMMU type. Valid values are none and smmuv3"
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
