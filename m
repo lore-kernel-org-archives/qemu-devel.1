@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f7z6z-0004an-90
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:03:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1f7zFG-0007RT-TP
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:12:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f7z6u-0005L0-M0
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:03:41 -0400
-Date: Mon, 16 Apr 2018 10:03:34 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180416080334.uu74ibkzhgbtjoba@sirius.home.kraxel.org>
-References: <20180415234307.28132-1-f4bug@amsat.org>
-	<20180415234307.28132-35-f4bug@amsat.org>
+	(envelope-from <armbru@redhat.com>) id 1f7zFE-0002yN-6g
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:12:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55812 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f7zFE-0002xp-0v
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:12:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C36638079FC9
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 08:12:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
+	<20180413161842.5117-3-marcandre.lureau@redhat.com>
+Date: Mon, 16 Apr 2018 10:12:03 +0200
+In-Reply-To: <20180413161842.5117-3-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 13 Apr 2018 18:18:40 +0200")
+Message-ID: <87r2nfsh7w.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180415234307.28132-35-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 34/41] hw/usb: Use the BYTE-based
- definitions
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] qobject: use a QObjectBase_ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Sun, Apr 15, 2018 at 08:43:00PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> It eases code review, unit is explicit.
->=20
-> Patch generated using:
->=20
->   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include=
-/hw/
->=20
-> and modified manually.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> By moving the base fields to a QObjectBase_, QObject can be a type
+> which also has a 'base' field. This allows to write a generic
+> QOBJECT() macro that will work with any QObject type, including
+> QObject itself. The container_of() macro ensures that the object to
+> cast has a QObjectBase_ base field, giving some type safety
+> guarantees. However, for it to work properly, all QObject types must
+> have 'base' at offset 0 (which is ensured by static checking from
+> the previous patch)
+
+I'm afraid this condition is neither sufficient nor necessary.
+
+QOBJECT() maps a pointer to some subtype to the base type QObject.  For
+this to work, the subtype must contain a QObject.
+
+Before the patch, this is trivially the case: the subtypes have a member
+QObject base, and QOBJECT() returns its address.
+
+Afterwards, the subtypes have a member QObjectBase_ base, and QOBJECT()
+returns the address of a notional QObject wrapped around this member.
+Works because QObject has no other members.
+
+The condition 'base is at offset 0' does not ensure this, and is
+therefore not sufficient.
+
+It's not necessary, either: putting base elsewhere would work just fine
+as long as we put *all* of QObject there.
+
+Please document the real condition "QObject must have no members but
+QObjectBase_ base, or else QOBJECT() breaks".  Feel free to check their
+sizes are the same (I wouldn't bother).
+
+If requiring base to be at offset zero for all subtypes materially
+simplifies code, then go ahead and do that in a separate patch.  My gut
+feeling is it doesn't, but I could be wrong.
+
+> QObjectBase_ is not typedef and use a trailing underscore to make it
+> obvious it is not for normal use and to avoid potential abuse.
+
+Trailing underscore I like, lack of typedef I don't mind (but I'm firmly
+in the "eschew typedef for structs" camp).  It does violate the common
+QEMU coding style, though.
+
+A comment /* Not for use outside include/qapi/qmp/ */ next to
+QObjectBase_ wouldn't hurt.
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
