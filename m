@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f83uj-0000Yn-6U
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:11:22 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f843z-0003cV-AB
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f83ui-0005R1-1W
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:11:21 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f83uh-0005Qg-RZ
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:11:19 -0400
-Received: by mail-ot0-x244.google.com with SMTP id m22-v6so17251537otf.8
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 06:11:19 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1f843w-0007GH-MU
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:20:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41388 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f843w-0007EM-Gw
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 09:20:52 -0400
+Date: Mon, 16 Apr 2018 15:20:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180416152040.7b88b902@redhat.com>
+In-Reply-To: <bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
+References: <20180329032149.44685-1-aik@ozlabs.ru>
+	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1523518688-26674-6-git-send-email-eric.auger@redhat.com>
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-	<1523518688-26674-6-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Apr 2018 14:10:58 +0100
-Message-ID: <CAFEAcA-8xH7Tmr7mz9Gjk6jX=RgjVWX9cqVnpNr2kCAs0pb5xg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 05/17] hw/arm/smmuv3: Wired IRQ and
- GERROR helpers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
+ in "info mtree"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
-> We introduce some helpers to handle wired IRQs and especially
-> GERROR interrupt. SMMU writes GERROR register on GERROR event
-> and SW acks GERROR interrupts by setting GERRORn.
->
-> The Wired interrupts are edge sensitive hence the pulse usage.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->
-> ---
-> v9 - v10:
-> - s/hwaddr/uint64_t in trace-events
-> - use qemu_log_mask LOG_UNIMP on PRI IRQ
-> - add a comment saying smmuv3_trigger_irq and smmuv3_write_gerrorn
->   will become static later on
-> - write gerrorn without filtering (ie. even if the guest toggles non
->   active IRQs)
-> - pulse if at least one new IRQ type
-> - smmuv3_eventq_irq_enabled and smmuv3_gerror_irq_enabled become
->   static inline
->
-> v7 -> v8:
-> - remove SMMU_PENDING_GERRORS macro
-> - properly toggle gerror
-> - properly sanitize gerrorn write
-> ---
->  hw/arm/smmuv3-internal.h | 36 +++++++++++----------------
->  hw/arm/smmuv3.c          | 64 ++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/arm/trace-events      |  3 +++
->  3 files changed, 81 insertions(+), 22 deletions(-)
->
-> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-> index a6461fe..32f81d4 100644
-> --- a/hw/arm/smmuv3-internal.h
-> +++ b/hw/arm/smmuv3-internal.h
-> @@ -129,28 +129,6 @@ typedef struct Evt  {
->      uint32_t word[8];
->  } Evt;
->
-> -/**
-> - * smmu_read64 - 64-bit register read utility function supporting
-> - * aligned 32-bit word access to both 32-bit halves and aligned 64-bit
-> - * access.
-> - *
-> - * @r: register address
-> - * @offset: byte offset if 32-bit access
-> - * @size: read byte size
-> - */
-> -static inline uint64_t smmu_read64(uint64_t r, unsigned offset,
-> -                                   unsigned size)
-> -{
-> -    if (size == 8) {
-> -        return r;
-> -    }
-> -
-> -    /* 32 bit access */
-> -    assert(!offset || offset == 4);
-> -
-> -    return extract64(r, offset << 3, 32);
-> -}
-> -
+On Thu, 12 Apr 2018 11:15:04 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Ah, this change should be squashed into the previous patch,
-which addresses one of my review comments there.
+> On 29/03/2018 05:21, Alexey Kardashevskiy wrote:
+> > +    DeviceState *dev = (DeviceState *) object_dynamic_cast(obj, TYPE_DEVICE);
+> > +    const char *id = object_property_print(obj, "id", true, NULL);  
+> 
+> I learnt now about commit e1ff3c67e8544f41f1bea76ba76385faee0d2bb7 and I
+> find it a mistake.  The "id" is available through
+> object_get_canonical_path_component.  Can you change the "id" assignment
+> to use object_get_canonical_path_component instead?
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+object_get_canonical_path_component() should be used with care as it
+assumes that object HAS parent. It will crash if parent is NULL
+or hasn't been assigned yet.
 
-thanks
--- PMM
+Generally object doesn't need to know its own name,
+we use it only for debugging and nice error reporting so far.
+I'd rather have 'id' property at Object level so we won't have
+to fish out ID from parent /which we aren't supposed to do and
+which doesn't work in some cases/ when it's needed within
+object itself.
+
+
+> > +    const char *name = object_property_print(obj, "name", true, NULL);  
+> 
+> Who defines a name property?
+> 
+> > +    mon_printf(f, " %s:{", label);
+> > +    if (dev) {
+> > +        mon_printf(f, "dev");
+> > +        if (dev->id) {
+> > +            mon_printf(f, " id=%s", dev->id);
+> > +        }
+> > +    } else {
+> > +        mon_printf(f, "obj");  
+> 
+> > +    }
+> > +    if (name) {
+> > +        mon_printf(f, " name=%s ", name);
+> > +    }
+> > +    if (id) {
+> > +        mon_printf(f, " id=%s ", id);
+> > +    }
+> > +    if (dev && (!name && !id && !dev->id)) {
+> > +        mon_printf(f, " path=%s", dev->canonical_path);  
+> 
+> Why not print the path for the !dev case?  I think we can just have
+> 
+>     mon_prinf(f, " %s:{%s", label, dev ? "dev" : "obj");
+>     if (dev ? dev->id : id) {
+>         mon_printf(f, " id=%s", dev ? dev->id : id);
+>     } else {
+>         canonical_path = object_get_canonical_path(...)
+>         mon_printf(f, " path=%s", canonical_path);
+>         g_free(canonical_path);
+>     }
+> 
+> Thanks,
+> 
+> Paolo
