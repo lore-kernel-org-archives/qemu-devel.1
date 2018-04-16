@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f87i3-0003rV-BJ
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:14:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f87ld-0006zH-Rh
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f87i0-000732-4B
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:14:31 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:41463)
+	(envelope-from <peter.maydell@linaro.org>) id 1f87lc-0001gd-Np
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:18:13 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:35179)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f87hz-00072S-UK
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:14:28 -0400
-Received: by mail-qt0-x236.google.com with SMTP id d3so16093727qth.8
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 10:14:27 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-24-alex.bennee@linaro.org>
-	<8838744d-6952-38ea-6cee-a151e30fdbca@amsat.org>
-	<87efjfbkh6.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1cfe9453-44f6-0dcd-4297-9715160b8620@amsat.org>
-Date: Mon, 16 Apr 2018 14:14:23 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f87lc-0001gB-II
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:18:12 -0400
+Received: by mail-oi0-x230.google.com with SMTP id 10-v6so3491398oix.2
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 10:18:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87efjfbkh6.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 23/24] Makefile.target: add
- (clean-)guest-tests targets
+In-Reply-To: <CAFEAcA-AVuHMao5kQUrfEYWpGL0y-CwbuqCA_8ZSZrVbqz9nCg@mail.gmail.com>
+References: <1523551221-11612-1-git-send-email-imammedo@redhat.com>
+	<1523551221-11612-4-git-send-email-imammedo@redhat.com>
+	<CAFEAcA-AVuHMao5kQUrfEYWpGL0y-CwbuqCA_8ZSZrVbqz9nCg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 18:17:51 +0100
+Message-ID: <CAFEAcA_nM4VanwwPKB3bpL6=wvk=u-bh1b+O3ahNFMpRnchcsg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.13 3/4] arm: always start
+ from first_cpu when registering loader cpu reset callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,147 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, cota@braap.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-On 04/16/2018 05:53 AM, Alex Bennée wrote:
-> 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> On 04/10/2018 04:39 PM, Alex Bennée wrote:
->>> Now all the build infrastructure is in place we can build tests for
->>> each guest that we support. That support mainly depends on having
->>> cross compilers installed or docker setup. To keep all the logic for
->>> that together we put the rules in tests/tcg/Makefile.include and
->>> include it from the main Makefile.target.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  Makefile.target            |  5 +++
->>>  tests/tcg/Makefile.include | 79 ++++++++++++++++++++++++++++++++++++++++++++++
->>>  2 files changed, 84 insertions(+)
->>>  create mode 100644 tests/tcg/Makefile.include
->>>
->>> diff --git a/Makefile.target b/Makefile.target
->>> index d0ec77a307..a30fd40257 100644
->>> --- a/Makefile.target
->>> +++ b/Makefile.target
->>> @@ -36,6 +36,11 @@ endif
->>>  PROGS=$(QEMU_PROG) $(QEMU_PROGW)
->>>  STPFILES=
->>>  
->>> +# Makefile Tests
->>> +ifdef CONFIG_USER_ONLY
->>> +include $(SRC_PATH)/tests/tcg/Makefile.include
->>> +endif
->>> +
->>>  config-target.h: config-target.h-timestamp
->>>  config-target.h-timestamp: config-target.mak
->>>  
->>> diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
->>> new file mode 100644
->>> index 0000000000..cb8bb36026
->>> --- /dev/null
->>> +++ b/tests/tcg/Makefile.include
->>> @@ -0,0 +1,79 @@
->>> +# -*- Mode: makefile -*-
->>> +#
->>> +# TCG tests (per-target rules)
->>> +#
->>> +# This Makefile fragement is included from the per-target
->>> +# Makefile.target so will be invoked for each linux-user program we
->>> +# build. We have two options for compiling, either using a configured
->>> +# guest compiler or calling one of our docker images to do it for us.
->>> +#
->>> +
->>> +# The per ARCH makefile, if it exists holds extra information about
->>> +# useful docker images or alternative compiler flags. Include it if it
->>> +# exists
->>> +
->>> +ARCH_MAKEFILE=$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
->>> +CHECK_INCLUDE=$(wildcard $(ARCH_MAKEFILE))
->>> +
->>> +ifeq ($(ARCH_MAKEFILE),$(CHECK_INCLUDE))
->>> +include $(ARCH_MAKEFILE)
->>> +endif
->>> +
->>> +GUEST_BUILD=
->>> +
->>> +# Support installed Cross Compilers
->>> +
->>> +ifdef CROSS_CC_GUEST
->>> +
->>> +.PHONY: cross-build-guest-tests
->>> +cross-build-guest-tests:
->>> +	$(call quiet-command, \
->>> +          (mkdir -p tests && cd tests && \
->>> +	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=$(TARGET_NAME) CC=$(CROSS_CC_GUEST)), \
->>> +	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
->>> +
->>> +
->>> +GUEST_BUILD=cross-build-guest-tests
->>> +
->>> +endif
->>> +
->>> +# Support building with Docker
->>> +
->>> +ifeq ($(HAVE_USER_DOCKER)$(GUEST_BUILD),y)
->>> +ifneq ($(DOCKER_IMAGE),)
->>> +
->>> +# We also need the Docker make rules to depend on
->>> +include $(SRC_PATH)/tests/docker/Makefile.include
->>> +
+On 12 April 2018 at 19:29, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 12 April 2018 at 17:40, Igor Mammedov <imammedo@redhat.com> wrote:
+>> if arm_load_kernel() were passed non first_cpu, QEMU would end up
+>> with partially set do_cpu_reset() callback leaving some CPUs without it.
 >>
->> Eventually:
+>> Make sure that do_cpu_reset() is registered for all CPUs by enumerating
+>> CPUs from first_cpu.
 >>
->> DOCKER_CROSS_COMPILER ?= $(DOCKER_CROSS_COMPILER_PREFIX)-gcc
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>>  hw/arm/boot.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->>> +DOCKER_COMPILE_CMD="$(DOCKER_SCRIPT) cc --user $(shell id -u) \
->>> +		--cc $(DOCKER_CROSS_COMPILER) \
->>> +		-i qemu:$(DOCKER_IMAGE) \
->>> +		-s $(SRC_PATH) -- "
->>
->> Should we check $(DOCKER_CROSS_COMPILER) is set?
-> 
-> Currently it's implied. It would be nice if there was an easy way just
-> to fish it out of the env of the docker image as they already have it
-> set there.
-> 
-> I've been trying quite hard to ensure all the tests can just use LD (see
-> the hoops I jump in i386 for this). Maybe a prefix config makes more
-> sense though....
+>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>> index 2f464ca..2591fee 100644
+>> --- a/hw/arm/boot.c
+>> +++ b/hw/arm/boot.c
+>> @@ -1188,7 +1188,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+>>       * actually loading a kernel, the handler is also responsible for
+>>       * arranging that we start it correctly.
+>>       */
+>> -    for (cs = CPU(cpu); cs; cs = CPU_NEXT(cs)) {
+>> +    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+>>          qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+>>      }
+>>  }
+>
+> Definitely a bug fix, so:
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> I think though that in at least some cases we'll still mishandle
+> being passed anything other than first_cpu as the CPU pointer,
+> because in do_cpu_reset() we do some checks for "do this if
+> cs == first_cpu", on the assumption that first_cpu is the
+> primary CPU that we're booting. We should instead I suppose
+> be checking against the CPU pointer we're given as the
+> arm_load_kernel() argument (which I think do_cpu_reset() can
+> get at via info->load_kernel_notifier.cpu).
+>
+> We should probably analyse which boards actually pass anything
+> other than first_cpu -- I suspect it will end up just being
+> the xilinx board which has both A and R profile cores...
 
-We might also need some CROSS_CFLAGS, i.e. for armeb we need to use
--mbig-endian. This would go in tests/tcg/$(TARGET_NAME)/Makefile.target
+I did the check, and in fact all of our boards always pass the
+first CPU as the boot CPU. Xilinx comes the closest, in that
+the SoC object has a boot-cpu property to pick a boot CPU, but
+since none of our boards set that it defaults to the first CPU.
 
-> 
->>
->>> +DOCKER_PREREQ=docker-image-$(DOCKER_IMAGE)
->>> +
->>> +.PHONY: docker-build-guest-tests
->>> +docker-build-guest-tests: $(DOCKER_PREREQ)
->>> +	$(call quiet-command, \
->>> +          (mkdir -p tests && cd tests && \
->>> +	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=$(TARGET_NAME) CC=$(DOCKER_COMPILE_CMD)), \
->>> +	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER_IMAGE)")
->>> +
->>> +GUEST_BUILD=docker-build-guest-tests
->>> +
->>> +endif
->>> +endif
->>> +
->>> +# Final targets
->>> +.PHONY: guest-tests
->>> +
->>> +ifneq ($(GUEST_BUILD),)
->>> +guest-tests: $(GUEST_BUILD)
->>> +else
->>> +guest-tests:
->>> +	$(call quiet-command, /bin/true, "CROSS-BUILD", "$(TARGET_NAME) guest-tests SKIPPED")
->>> +endif
->>> +
->>> +# It doesn't mater if these don't exits
->>> +.PHONY: clean-guest-tests
->>> +clean-guest-tests:
->>> +	rm -rf tests || echo "no $(TARGET_NAME) tests to remove"
->>>
+Since this patch isn't very related to the rest of the series
+I've just applied it to target-arm.next ready for 2.13 (with
+a note in the commit message that in practice it isn't a behaviour
+change). Let me know if that's awkward for you and you'd prefer
+to keep it in this series, in which case I'll drop it.
+
+thanks
+-- PMM
