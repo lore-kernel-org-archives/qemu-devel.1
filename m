@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54536)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tjc-0007YD-4e
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:19:13 -0400
+	id 1f7tkP-0008A5-Vm
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tjb-0007UX-1j
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:19:12 -0400
+	id 1f7tkO-00081f-HA
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:20:01 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-	<20180411185651.21351-11-laurent@vivier.eu>
+	<20180411185651.21351-18-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2b8df2cf-1fed-c39f-a54d-e5501d6345e0@amsat.org>
-Date: Sun, 15 Apr 2018 23:19:00 -0300
+Message-ID: <59a0a40e-f411-8fc8-4cae-17a24da9e24a@amsat.org>
+Date: Sun, 15 Apr 2018 23:19:51 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180411185651.21351-11-laurent@vivier.eu>
+In-Reply-To: <20180411185651.21351-18-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 10/19] linux-user: move sh4 cpu
- loop to sh4 directory
+Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 17/19] linux-user: move riscv
+ cpu loop to riscv directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,224 +34,239 @@ Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Pet
 
 On 04/11/2018 03:56 PM, Laurent Vivier wrote:
 > No code change, only move code from main.c to
-> sh4/cpu_loop.c.
+> riscv/cpu_loop.c.
 > 
 > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Michael Clark <mjc@sifive.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
-> 
-> Notes:
->     v2: expand tabs
-> 
->  linux-user/main.c         | 90 -----------------------------------------------
->  linux-user/sh4/cpu_loop.c | 85 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 85 insertions(+), 90 deletions(-)
+>  linux-user/main.c           | 101 +-------------------------------------------
+>  linux-user/riscv/cpu_loop.c |  92 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 93 insertions(+), 100 deletions(-)
 > 
 > diff --git a/linux-user/main.c b/linux-user/main.c
-> index af26a17c46..d7fee3e3db 100644
+> index 32922110f1..834ec0bfe5 100644
 > --- a/linux-user/main.c
 > +++ b/linux-user/main.c
-> @@ -149,87 +149,6 @@ void fork_end(int child)
+> @@ -149,100 +149,6 @@ void fork_end(int child)
 >      }
 >  }
 >  
-> -#ifdef TARGET_SH4
-> -void cpu_loop(CPUSH4State *env)
+> -#ifdef TARGET_RISCV
+> -
+> -void cpu_loop(CPURISCVState *env)
 > -{
-> -    CPUState *cs = CPU(sh_env_get_cpu(env));
-> -    int trapnr, ret;
-> -    target_siginfo_t info;
+> -    CPUState *cs = CPU(riscv_env_get_cpu(env));
+> -    int trapnr, signum, sigcode;
+> -    target_ulong sigaddr;
+> -    target_ulong ret;
 > -
-> -    while (1) {
-> -        bool arch_interrupt = true;
-> -
+> -    for (;;) {
 > -        cpu_exec_start(cs);
 > -        trapnr = cpu_exec(cs);
 > -        cpu_exec_end(cs);
 > -        process_queued_cpu_work(cs);
 > -
+> -        signum = 0;
+> -        sigcode = 0;
+> -        sigaddr = 0;
+> -
 > -        switch (trapnr) {
-> -        case 0x160:
-> -            env->pc += 2;
-> -            ret = do_syscall(env,
-> -                             env->gregs[3],
-> -                             env->gregs[4],
-> -                             env->gregs[5],
-> -                             env->gregs[6],
-> -                             env->gregs[7],
-> -                             env->gregs[0],
-> -                             env->gregs[1],
-> -                             0, 0);
-> -            if (ret == -TARGET_ERESTARTSYS) {
-> -                env->pc -= 2;
-> -            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-> -                env->gregs[0] = ret;
-> -            }
-> -            break;
 > -        case EXCP_INTERRUPT:
 > -            /* just indicate that signals should be handled asap */
 > -            break;
-> -        case EXCP_DEBUG:
-> -            {
-> -                int sig;
-> -
-> -                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-> -                if (sig) {
-> -                    info.si_signo = sig;
-> -                    info.si_errno = 0;
-> -                    info.si_code = TARGET_TRAP_BRKPT;
-> -                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> -                } else {
-> -                    arch_interrupt = false;
-> -                }
-> -            }
-> -            break;
-> -	case 0xa0:
-> -	case 0xc0:
-> -            info.si_signo = TARGET_SIGSEGV;
-> -            info.si_errno = 0;
-> -            info.si_code = TARGET_SEGV_MAPERR;
-> -            info._sifields._sigfault._addr = env->tea;
-> -            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> -	    break;
 > -        case EXCP_ATOMIC:
 > -            cpu_exec_step_atomic(cs);
-> -            arch_interrupt = false;
+> -            break;
+> -        case RISCV_EXCP_U_ECALL:
+> -            env->pc += 4;
+> -            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
+> -                /* riscv_flush_icache_syscall is a no-op in QEMU as
+> -                   self-modifying code is automatically detected */
+> -                ret = 0;
+> -            } else {
+> -                ret = do_syscall(env,
+> -                                 env->gpr[xA7],
+> -                                 env->gpr[xA0],
+> -                                 env->gpr[xA1],
+> -                                 env->gpr[xA2],
+> -                                 env->gpr[xA3],
+> -                                 env->gpr[xA4],
+> -                                 env->gpr[xA5],
+> -                                 0, 0);
+> -            }
+> -            if (ret == -TARGET_ERESTARTSYS) {
+> -                env->pc -= 4;
+> -            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+> -                env->gpr[xA0] = ret;
+> -            }
+> -            if (cs->singlestep_enabled) {
+> -                goto gdbstep;
+> -            }
+> -            break;
+> -        case RISCV_EXCP_ILLEGAL_INST:
+> -            signum = TARGET_SIGILL;
+> -            sigcode = TARGET_ILL_ILLOPC;
+> -            break;
+> -        case RISCV_EXCP_BREAKPOINT:
+> -            signum = TARGET_SIGTRAP;
+> -            sigcode = TARGET_TRAP_BRKPT;
+> -            sigaddr = env->pc;
+> -            break;
+> -        case RISCV_EXCP_INST_PAGE_FAULT:
+> -        case RISCV_EXCP_LOAD_PAGE_FAULT:
+> -        case RISCV_EXCP_STORE_PAGE_FAULT:
+> -            signum = TARGET_SIGSEGV;
+> -            sigcode = TARGET_SEGV_MAPERR;
+> -            break;
+> -        case EXCP_DEBUG:
+> -        gdbstep:
+> -            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
+> -            sigcode = TARGET_TRAP_BRKPT;
 > -            break;
 > -        default:
-> -            printf ("Unhandled trap: 0x%x\n", trapnr);
-> -            cpu_dump_state(cs, stderr, fprintf, 0);
+> -            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
+> -                     trapnr);
 > -            exit(EXIT_FAILURE);
 > -        }
-> -        process_pending_signals (env);
 > -
-> -        /* Most of the traps imply an exception or interrupt, which
-> -           implies an REI instruction has been executed.  Which means
-> -           that LDST (aka LOK_ADDR) should be cleared.  But there are
-> -           a few exceptions for traps internal to QEMU.  */
-> -        if (arch_interrupt) {
-> -            env->lock_addr = -1;
+> -        if (signum) {
+> -            target_siginfo_t info = {
+> -                .si_signo = signum,
+> -                .si_errno = 0,
+> -                .si_code = sigcode,
+> -                ._sifields._sigfault._addr = sigaddr
+> -            };
+> -            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
 > -        }
+> -
+> -        process_pending_signals(env);
 > -    }
 > -}
-> -#endif
 > -
->  #ifdef TARGET_CRIS
->  void cpu_loop(CPUCRISState *env)
->  {
-> @@ -2361,15 +2280,6 @@ int main(int argc, char **argv, char **envp)
->          env->pc = regs->sepc;
->          env->gpr[xSP] = regs->sp;
->      }
-> -#elif defined(TARGET_SH4)
+> -#endif /* TARGET_RISCV */
+> -
+>  #ifdef TARGET_HPPA
+>  
+>  static abi_ulong hppa_lws(CPUHPPAState *env)
+> @@ -1322,12 +1228,7 @@ int main(int argc, char **argv, char **envp)
+>  
+>      target_cpu_copy_regs(env, regs);
+>  
+> -#if defined(TARGET_RISCV)
 > -    {
-> -        int i;
-> -
-> -        for(i = 0; i < 16; i++) {
-> -            env->gregs[i] = regs->regs[i];
-> -        }
-> -        env->pc = regs->pc;
+> -        env->pc = regs->sepc;
+> -        env->gpr[xSP] = regs->sp;
 > -    }
->  #elif defined(TARGET_ALPHA)
+> -#elif defined(TARGET_HPPA)
+> +#if defined(TARGET_HPPA)
 >      {
 >          int i;
-> diff --git a/linux-user/sh4/cpu_loop.c b/linux-user/sh4/cpu_loop.c
-> index b7700a5561..418833ea25 100644
-> --- a/linux-user/sh4/cpu_loop.c
-> +++ b/linux-user/sh4/cpu_loop.c
-> @@ -21,6 +21,91 @@
+>          for (i = 1; i < 32; i++) {
+> diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+> index b7700a5561..f137d39d7e 100644
+> --- a/linux-user/riscv/cpu_loop.c
+> +++ b/linux-user/riscv/cpu_loop.c
+> @@ -21,6 +21,98 @@
 >  #include "qemu.h"
 >  #include "cpu_loop-common.h"
 >  
-> +void cpu_loop(CPUSH4State *env)
+> +void cpu_loop(CPURISCVState *env)
 > +{
-> +    CPUState *cs = CPU(sh_env_get_cpu(env));
-> +    int trapnr, ret;
-> +    target_siginfo_t info;
+> +    CPUState *cs = CPU(riscv_env_get_cpu(env));
+> +    int trapnr, signum, sigcode;
+> +    target_ulong sigaddr;
+> +    target_ulong ret;
 > +
-> +    while (1) {
-> +        bool arch_interrupt = true;
-> +
+> +    for (;;) {
 > +        cpu_exec_start(cs);
 > +        trapnr = cpu_exec(cs);
 > +        cpu_exec_end(cs);
 > +        process_queued_cpu_work(cs);
 > +
+> +        signum = 0;
+> +        sigcode = 0;
+> +        sigaddr = 0;
+> +
 > +        switch (trapnr) {
-> +        case 0x160:
-> +            env->pc += 2;
-> +            ret = do_syscall(env,
-> +                             env->gregs[3],
-> +                             env->gregs[4],
-> +                             env->gregs[5],
-> +                             env->gregs[6],
-> +                             env->gregs[7],
-> +                             env->gregs[0],
-> +                             env->gregs[1],
-> +                             0, 0);
-> +            if (ret == -TARGET_ERESTARTSYS) {
-> +                env->pc -= 2;
-> +            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-> +                env->gregs[0] = ret;
-> +            }
-> +            break;
 > +        case EXCP_INTERRUPT:
 > +            /* just indicate that signals should be handled asap */
 > +            break;
-> +        case EXCP_DEBUG:
-> +            {
-> +                int sig;
-> +
-> +                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-> +                if (sig) {
-> +                    info.si_signo = sig;
-> +                    info.si_errno = 0;
-> +                    info.si_code = TARGET_TRAP_BRKPT;
-> +                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +                } else {
-> +                    arch_interrupt = false;
-> +                }
-> +            }
-> +            break;
-> +        case 0xa0:
-> +        case 0xc0:
-> +            info.si_signo = TARGET_SIGSEGV;
-> +            info.si_errno = 0;
-> +            info.si_code = TARGET_SEGV_MAPERR;
-> +            info._sifields._sigfault._addr = env->tea;
-> +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +            break;
 > +        case EXCP_ATOMIC:
 > +            cpu_exec_step_atomic(cs);
-> +            arch_interrupt = false;
+> +            break;
+> +        case RISCV_EXCP_U_ECALL:
+> +            env->pc += 4;
+> +            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
+> +                /* riscv_flush_icache_syscall is a no-op in QEMU as
+> +                   self-modifying code is automatically detected */
+> +                ret = 0;
+> +            } else {
+> +                ret = do_syscall(env,
+> +                                 env->gpr[xA7],
+> +                                 env->gpr[xA0],
+> +                                 env->gpr[xA1],
+> +                                 env->gpr[xA2],
+> +                                 env->gpr[xA3],
+> +                                 env->gpr[xA4],
+> +                                 env->gpr[xA5],
+> +                                 0, 0);
+> +            }
+> +            if (ret == -TARGET_ERESTARTSYS) {
+> +                env->pc -= 4;
+> +            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+> +                env->gpr[xA0] = ret;
+> +            }
+> +            if (cs->singlestep_enabled) {
+> +                goto gdbstep;
+> +            }
+> +            break;
+> +        case RISCV_EXCP_ILLEGAL_INST:
+> +            signum = TARGET_SIGILL;
+> +            sigcode = TARGET_ILL_ILLOPC;
+> +            break;
+> +        case RISCV_EXCP_BREAKPOINT:
+> +            signum = TARGET_SIGTRAP;
+> +            sigcode = TARGET_TRAP_BRKPT;
+> +            sigaddr = env->pc;
+> +            break;
+> +        case RISCV_EXCP_INST_PAGE_FAULT:
+> +        case RISCV_EXCP_LOAD_PAGE_FAULT:
+> +        case RISCV_EXCP_STORE_PAGE_FAULT:
+> +            signum = TARGET_SIGSEGV;
+> +            sigcode = TARGET_SEGV_MAPERR;
+> +            break;
+> +        case EXCP_DEBUG:
+> +        gdbstep:
+> +            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
+> +            sigcode = TARGET_TRAP_BRKPT;
 > +            break;
 > +        default:
-> +            printf ("Unhandled trap: 0x%x\n", trapnr);
-> +            cpu_dump_state(cs, stderr, fprintf, 0);
+> +            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
+> +                     trapnr);
 > +            exit(EXIT_FAILURE);
 > +        }
-> +        process_pending_signals (env);
 > +
-> +        /* Most of the traps imply an exception or interrupt, which
-> +           implies an REI instruction has been executed.  Which means
-> +           that LDST (aka LOK_ADDR) should be cleared.  But there are
-> +           a few exceptions for traps internal to QEMU.  */
-> +        if (arch_interrupt) {
-> +            env->lock_addr = -1;
+> +        if (signum) {
+> +            target_siginfo_t info = {
+> +                .si_signo = signum,
+> +                .si_errno = 0,
+> +                .si_code = sigcode,
+> +                ._sifields._sigfault._addr = sigaddr
+> +            };
+> +            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
 > +        }
+> +
+> +        process_pending_signals(env);
 > +    }
 > +}
 > +
 >  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 >  {
-> +    int i;
-> +
-> +    for(i = 0; i < 16; i++) {
-> +        env->gregs[i] = regs->regs[i];
-> +    }
-> +    env->pc = regs->pc;
+> +    env->pc = regs->sepc;
+> +    env->gpr[xSP] = regs->sp;
 >  }
 > 
