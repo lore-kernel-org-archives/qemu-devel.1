@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f7y9I-0005rk-ML
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:02:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1f7yKN-0000Y2-3B
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f7y9E-0008V3-Ql
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:02:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43604)
+	(envelope-from <bounces@canonical.com>) id 1f7yKJ-0004jF-R3
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:13:27 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f7y9E-0008Rk-L3
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:01:56 -0400
+	id 1f7yKJ-0004iu-Kg
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:13:23 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f7y9B-0004aE-OZ
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:01:53 +0000
+	id 1f7yKH-0007K3-7Q
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:13:21 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B59D72E80CB
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:01:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2E5F32E80C9
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 07:13:21 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Apr 2018 06:48:27 -0000
+Date: Mon, 16 Apr 2018 06:53:58 -0000
 From: ChristianEhrhardt <955379@bugs.launchpad.net>
 Reply-To: Bug 955379 <955379@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120314192314.1716.70997.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152386130838.31320.18267148763064196987.launchpad@soybean.canonical.com>
+Message-Id: <152386163831.6480.11563882454329026575.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 955379] Re: cmake hangs with qemu-arm-static
 List-Id: <qemu-devel.nongnu.org>
@@ -38,13 +38,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Also affects: qemu (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
+That means our assumption taken in comment #63 that it was fixed in
+http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D014628a705bdaf31c09915
+either was wrong (unset fix released) - or this is a similar but not the
+same issue (which would imply a new bug since this already has plenty of
+potentially mismatching history).
 
-** Also affects: qemu-linaro (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
+Given the time this was considered closed I'd vote for a new bug to analyze=
+ things from scratch.
+@David - would you mind opening a new bug?
+
+@TJ - before considering backporting something of the current solution to x=
+enial, (all other releases are >=3D2.7) would you mind testing e.g. qemu 2.=
+10 via [1].
+Also a trivial reproducer will help to make this SRUable, like David added =
+his (for the probably new issue). Or is the one in comment #58 representing=
+ your case as well?
+
+[1]: https://wiki.ubuntu.com/OpenStack/CloudArchive#Pike
+
+** Changed in: qemu (Ubuntu Xenial)
+       Status: New =3D> Incomplete
+
+** Changed in: qemu (Ubuntu)
+       Status: Confirmed =3D> Fix Released
 
 -- =
 
