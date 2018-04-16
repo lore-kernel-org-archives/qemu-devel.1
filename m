@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f8649-0001TO-P0
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f864T-0001fE-Us
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f8646-00058u-KR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:13 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33758)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f8646-00058T-Ck
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:10 -0400
-Received: by mail-wr0-x241.google.com with SMTP id z73so27227469wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 08:29:10 -0700 (PDT)
-References: <20180416140322.904-1-alex.bennee@linaro.org>
-	<CAFEAcA-1GVMOSJVQ5p8+qpo8P-+fBq0-6TaA2mdvLDbk3fiihg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-1GVMOSJVQ5p8+qpo8P-+fBq0-6TaA2mdvLDbk3fiihg@mail.gmail.com>
-Date: Mon, 16 Apr 2018 16:29:07 +0100
-Message-ID: <874lkbb264.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1f864Q-0005GF-Ns
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45368 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f864Q-0005G4-IR
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:29:30 -0400
+References: <20180329032149.44685-1-aik@ozlabs.ru>
+	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
+	<20180416152040.7b88b902@redhat.com>
+	<e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
+	<20180416162706.43212a69@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <13008b1f-4b59-c6e1-69d2-98f8280f6f34@redhat.com>
+Date: Mon, 16 Apr 2018 17:29:23 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180416162706.43212a69@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: support reading of
- CNTVCT_EL0 from user-space
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
+ in "info mtree"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, takeharu.kato@linaro.org, Renato Golin <renato.golin@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 16 April 2018 at 15:03, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->> Since kernel commit a86bd139f2 (arm64: arch_timer: Enable CNTVCT_EL0
->> trap..) user-space has been able to read this system register. This
->> patch enables access to that register although currently it always
->> returns 0 as we don't yet have a mechanism for managing timers in
->> linux-user mode.
+On 16/04/2018 16:27, Igor Mammedov wrote:
+> On Mon, 16 Apr 2018 15:30:39 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> On 16/04/2018 15:20, Igor Mammedov wrote:
+>>> Generally object doesn't need to know its own name,
+>>> we use it only for debugging and nice error reporting so far.
+>>> I'd rather have 'id' property at Object level so we won't have
+>>> to fish out ID from parent /which we aren't supposed to do and
+>>> which doesn't work in some cases/ when it's needed within
+>>> object itself.  
 >>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  target/arm/helper.c | 20 +++++++++++++++++---
->>  1 file changed, 17 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index b14fdab140..8244badd63 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -2121,11 +2121,25 @@ static const ARMCPRegInfo generic_timer_cp_regin=
-fo[] =3D {
->>  };
->>
->>  #else
->> -/* In user-mode none of the generic timer registers are accessible,
->> - * and their implementation depends on QEMU_CLOCK_VIRTUAL and qdev gpio=
- outputs,
->> - * so instead just don't register any of them.
->> +
->> +/* In user-mode most of the generic timer registers are inaccessible
->> + * however modern kernels (4.12+) allow access to cntvct_el0
->>   */
->> +
->> +static uint64_t gt_virt_cnt_read(CPUARMState *env, const ARMCPRegInfo *=
-ri)
->> +{
->> +    /* Currently we have no support for QEMUTimer in linux-user so we
->> +     * can't call gt_get_countervalue(env).
->> +     */
->> +    return 0;
->> +}
->> +
->>  static const ARMCPRegInfo generic_timer_cp_reginfo[] =3D {
->> +    { .name =3D "CNTVCT_EL0", .state =3D ARM_CP_STATE_AA64,
->> +      .opc0 =3D 3, .opc1 =3D 3, .crn =3D 14, .crm =3D 0, .opc2 =3D 2,
->> +      .access =3D PL0_R, .type =3D ARM_CP_NO_RAW | ARM_CP_IO,
->> +      .readfn =3D gt_virt_cnt_read,
->> +    },
->>      REGINFO_SENTINEL
->>  };
+>> Having an 'id' at object level is also a mess, because that id is
+>> invalid after unparent.
+> I'd just consider 'id' as object name which is valid even if there
+> is no parent (during whole object lifecycle).
+
+What's the point of an object name if it cannot be unique?
+
+Paolo
+
+> That would allow for object to have a reachable name vs getting NULL
+> when parent isn't set.
+> Maybe Object::id is overkill, but we probably could use NamedObject
+> where it's needed and avoid reverse engineering id from path.
+>  
+>> Since this is just for debugging use,
+>> object_get_canonical_path_component is the right function.  We can just
+>> make it return NULL if there is no parent.
 >
-> CNTVCT_EL0 isn't much use without CNTFRQ_EL0 which tells
-> you how fast it ticks...
+> looking at current use it out-grew just debugging usecases
+> and it's rather messy right now:
+> 
+> ram_backend_memory_alloc, throttle_group_obj_complete,
+> xlnx_zynqmp_create_rpu, spapr_drc.c:realize, iothread_complete,
+> memory_region_name
 
-I've added it but of course:
+I agree, _but_ it's definitely okay for debugging usecases.
 
-    /* Note that CNTFRQ is purely reads-as-written for the benefit
-     * of software; writing it doesn't actually change the timer frequency.
-     * Our reset value matches the fixed frequency we implement the timer a=
-t.
-     */
-
-So it's not like we do anything with it internally. I assume in real
-life you could mess with this but still have a monotonically increasing
-counter.
-
->
-> It looks like other targets use cpu_get_host_ticks() for an
-> arbitrary time-counter thingy. Not sure you can get the frequency
-> for it, though :-(
-
-Hmm I've just used:
-
-  return cpu_get_clock()/GTIMER_SCALE;
-
-For now....
-
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
+Paolo
