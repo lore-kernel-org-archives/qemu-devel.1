@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57891)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f81W6-000477-L5
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:37:48 -0400
+	id 1f81Z5-0005OY-IS
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f81W2-00042C-Ht
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:37:46 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:39833)
+	id 1f81Z1-0005gb-CL
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:40:51 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37012)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f81W2-00041y-BA
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:37:42 -0400
-Received: by mail-qk0-x242.google.com with SMTP id j73so15953730qke.6
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 03:37:42 -0700 (PDT)
+	id 1f81Z1-0005gR-7z
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:40:47 -0400
+Received: by mail-qt0-x243.google.com with SMTP id w12so14682844qti.4
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 03:40:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180410193919.28026-1-alex.bennee@linaro.org>
+References: <20180415230522.24404-1-f4bug@amsat.org>
+	<20180415230522.24404-3-f4bug@amsat.org>
+	<5adfa8ce-b400-b017-5495-a0690decd183@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <72bb50ab-6332-dc8b-f8d8-a24baabe82c5@amsat.org>
-Date: Mon, 16 Apr 2018 07:37:38 -0300
+Message-ID: <ce6ca491-febc-169b-ede7-9a6eccdcc9f4@amsat.org>
+Date: Mon, 16 Apr 2018 07:40:42 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180410193919.28026-1-alex.bennee@linaro.org>
+In-Reply-To: <5adfa8ce-b400-b017-5495-a0690decd183@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 00/24] fix building of tests/tcg
+Subject: Re: [Qemu-devel] [PATCH 2/4] configure: Display if libfdt is from
+ system or git
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,181 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, cota@braap.org
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, YunQiang Su <syq@debian.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 04/10/2018 04:38 PM, Alex Bennée wrote:
-> Hi,
-> 
-> We've talked about fixing this up for a long time and there have been
-> several RFC patches sent attempting to do that. This is yet another
-> RFC but hopefully shows a way forward which can build on our docker
-> support but also allow users to specify their own guest cross
-> compilers.
-> 
-> So far I've built arm, aarch64, ppc64 and s390x but adding support for
-> additional guests is simple, especially if we already have a docker
-> cross compile setup.
+Hi Thomas,
 
-The current docker setup is limited to x86_64 hosts (amd64) and doesn't
-work with armhf/arm64 hosts.
+On 04/16/2018 02:16 AM, Thomas Huth wrote:
+> On 16.04.2018 01:05, Philippe Mathieu-Daudé wrote:
+>> The configure script outputs "yes" regardless which libfdt is used:
+>>
+>>   ./configure
+>>   [...]
+>>   fdt support       yes
+>>
+>> Sometimes you can have both system and local git version available,
+>> change the configure script to display which library got selected:
+>>
+>>   debian8$ dpkg-query --showformat='${Version}\n' --show libfdt-dev
+>>   1.4.0+dfsg-1
+>>
+>>   debian8$ ./configure
+>>   [...]
+>>   fdt support       git
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  configure | 9 ++++-----
+>>  1 file changed, 4 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/configure b/configure
+>> index 162e804b49..056b391f22 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -3758,15 +3758,14 @@ int main(void) { fdt_first_subnode(0, 0); return 0; }
+>>  EOF
+>>    if compile_prog "" "$fdt_libs" ; then
+>>      # system DTC is good - use it
+>> -    fdt=yes
+>> +    fdt=system
+>>    else
+>>        # have GIT checkout, so activate dtc submodule
+>>        if test -e "${source_path}/.git" ; then
+>>            git_submodules="${git_submodules} dtc"
+>>        fi
+>>        if test -d "${source_path}/dtc/libfdt" || test -e "${source_path}/.git" ; then
+>> -          fdt=yes
+>> -          dtc_internal="yes"
+>> +          fdt=git
+> 
+> That's ok for git checkout, but what about release tarballs? I'd strange
+> to see "git" here. So maybe better use "internal" instead of "git" here?
+> 
+> OTOH, capstone is also using the term "git" here, so this is just
+> consistent here...
 
-Although armhf (arm32v7) is easier for end-user, I believe at some point
-it'll be useful to support aarch64 (arm64v8) hosts and eventually s390x.
-
-> I've weeded out any tests that linked with QEMU (testpath) and reduced
-> the expectations of any tests/tcg test to just having access to libc.
-> This is the lowest common denominator for anything that can reasonably
-> be called a cross compiler.
-> 
-> The tests are all aimed at linux-user targets. We could probably come
-> up with something for building bare-metal softmmu tests but I suspect
-> that might be better served by using a different mechanism to import
-> existing tests into our build (e.g. kvm-unit-tests).
-> 
-> Let's breakdown the series:
-> 
-> configure:
-> 
-> As we need make magic we move the detection of docker and cross
-> compilers into configure. If any cross compiler is detected for a
-> given target we set CROSS_CC_GUEST in each config-target.mak. A
-> functioning cross compiler takes precedence over the docker fallback.
-> I think this makes sense for individual target sub-maintainers as they
-> likely already have a cross compile setup.
-> 
-> For docker we only set HAVE_USER_DOCKER in config-host.mak if the user
-> can run docker without sudo. We still need match up a docker image and
-> compiler once we build. This is handled by
-> tests/tcg/$(ARCH)/Makefile.include.
-> 
-> docker:
-> 
-> I've extended Fam's original patches to allow a bit more flexibility
-> for the "cc" command. I'm not overly wedded to using the docker.py
-> wrapper, we could just construct the command directly in Make if we
-> wanted to.
-> 
-> tests/tcg:
-> 
-> The top of the tree has been cleared out and everything moved into
-> sub-directories. There is a new multiarch sub-directory which is built
-> for every linux-user guest that has compiler support. Additional tests
-> are then included from tests/tcg/$(ARCH)/*.c or manually
-> added/modified by tests/tcg/$(ARCH)/Makefile.target.
-> 
-> Makefile:
-> 
-> As we are building tests/tcg for each target so Makefile.target now
-> invokes a sub-make with tests/tcg/Makefile while in the appropriate
-> build directory $(ARCH)-linux-user/tests/. The check-tcg and clean-tcg
-> targets unroll into all the configured FOO-linux-user targets and will
-> build the tests if cross compilation is available, otherwise the build
-> is skipped without failing the make.
-> 
-> Running tests:
-> 
-> Currently this is done manually from the build directory:
-> 
->   ./qemu-arm tests/hello-arm
-> 
-> However once we have everything converted it shouldn't be too hard to
-> plumb into the normal make check sequence.
-> 
-> So what do people think? Is this a viable way to go forward?
-> 
-> Alex Bennée (20):
->   configure: add test for docker availability
->   configure: add support for --cross-cc-FOO
->   configure: move i386_cc to cross_cc_i386
->   docker: extend "cc" command to accept compiler
->   docker: allow "cc" command to run in user context
->   docker: Makefile.include introduce DOCKER_SCRIPT
->   tests/tcg: move architecture independent tests into subdir
->   tests/tcg: move i386 specific tests into subdir
->   tests/tcg/i386: move test-i386-sse.c to tests/tcg/x86_64/test-sse.c
->   tests/tcg/i386: fix test-i386
->   tests/tcg/i368: fix hello-i386
->   tests/tcg/i386: fix test-i386-fprem
->   tests/tcg: move ARM specific tests into subdir
->   tests/tcg/arm: fix hello-arm
->   tests/tcg: move MIPS specific tests into subdir
->   tests/tcg: enable building for s390x
->   tests/tcg: enable building for ppc64
->   tests/tcg/Makefile: update to be called from Makefile.target
->   Makefile.target: add (clean-)guest-tests targets
->   tests/Makefile.include: add (clean-)check-tcg targets
-> 
-> Fam Zheng (4):
->   Makefile: Rename TARGET_DIRS to TARGET_LIST
->   docker: Add "cc" subcommand
->   tests/tcg/multiarch: Build fix for linux-test
->   tests/tcg/i386: Build fix for hello-i386
-> 
->  Makefile                                           |  20 +--
->  Makefile.target                                    |   5 +
->  configure                                          |  92 +++++++++-
->  scripts/create_config                              |   2 +-
->  tests/Makefile.include                             |  21 ++-
->  tests/docker/Makefile.include                      |  10 +-
->  tests/docker/docker.py                             |  40 +++++
->  tests/tcg/Makefile                                 | 185 +++++----------------
->  tests/tcg/Makefile.include                         |  79 +++++++++
->  tests/tcg/README                                   |  69 +-------
->  tests/tcg/arm/Makefile.target                      |   6 +
->  tests/tcg/arm/README                               |  11 ++
->  tests/tcg/{ => arm}/hello-arm.c                    |   0
->  tests/tcg/{ => arm}/test-arm-iwmmxt.s              |   0
->  tests/tcg/i386/Makefile.target                     |  35 ++++
->  tests/tcg/i386/README                              |  38 +++++
->  tests/tcg/{ => i386}/hello-i386.c                  |   1 +
->  tests/tcg/{ => i386}/pi_10.com                     | Bin
->  tests/tcg/{ => i386}/runcom.c                      |   0
->  tests/tcg/{ => i386}/test-i386-code16.S            |   0
->  tests/tcg/{ => i386}/test-i386-fprem.c             |   9 +-
->  tests/tcg/{ => i386}/test-i386-muldiv.h            |   0
->  tests/tcg/{ => i386}/test-i386-shift.h             |   0
->  tests/tcg/{ => i386}/test-i386-vm86.S              |   0
->  tests/tcg/{ => i386}/test-i386.c                   |   1 -
->  tests/tcg/{ => i386}/test-i386.h                   |   0
->  tests/tcg/mips/README                              |   7 +
->  tests/tcg/{ => mips}/hello-mips.c                  |   0
->  tests/tcg/multiarch/README                         |   1 +
->  tests/tcg/{ => multiarch}/linux-test.c             |  68 +++-----
->  tests/tcg/{ => multiarch}/sha1.c                   |   0
->  tests/tcg/{ => multiarch}/test-mmap.c              |   0
->  tests/tcg/{ => multiarch}/testthread.c             |   0
->  tests/tcg/ppc64/Makefile.include                   |   2 +
->  tests/tcg/s390x/Makefile.include                   |   2 +
->  tests/tcg/test_path.c                              | 157 -----------------
->  tests/tcg/{test-i386-ssse3.c => x86_64/test-sse.c} |   6 +-
->  37 files changed, 424 insertions(+), 443 deletions(-)
->  create mode 100644 tests/tcg/Makefile.include
->  create mode 100644 tests/tcg/arm/Makefile.target
->  create mode 100644 tests/tcg/arm/README
->  rename tests/tcg/{ => arm}/hello-arm.c (100%)
->  rename tests/tcg/{ => arm}/test-arm-iwmmxt.s (100%)
->  create mode 100644 tests/tcg/i386/Makefile.target
->  create mode 100644 tests/tcg/i386/README
->  rename tests/tcg/{ => i386}/hello-i386.c (96%)
->  rename tests/tcg/{ => i386}/pi_10.com (100%)
->  rename tests/tcg/{ => i386}/runcom.c (100%)
->  rename tests/tcg/{ => i386}/test-i386-code16.S (100%)
->  rename tests/tcg/{ => i386}/test-i386-fprem.c (98%)
->  rename tests/tcg/{ => i386}/test-i386-muldiv.h (100%)
->  rename tests/tcg/{ => i386}/test-i386-shift.h (100%)
->  rename tests/tcg/{ => i386}/test-i386-vm86.S (100%)
->  rename tests/tcg/{ => i386}/test-i386.c (99%)
->  rename tests/tcg/{ => i386}/test-i386.h (100%)
->  create mode 100644 tests/tcg/mips/README
->  rename tests/tcg/{ => mips}/hello-mips.c (100%)
->  create mode 100644 tests/tcg/multiarch/README
->  rename tests/tcg/{ => multiarch}/linux-test.c (91%)
->  rename tests/tcg/{ => multiarch}/sha1.c (100%)
->  rename tests/tcg/{ => multiarch}/test-mmap.c (100%)
->  rename tests/tcg/{ => multiarch}/testthread.c (100%)
->  create mode 100644 tests/tcg/ppc64/Makefile.include
->  create mode 100644 tests/tcg/s390x/Makefile.include
->  delete mode 100644 tests/tcg/test_path.c
->  rename tests/tcg/{test-i386-ssse3.c => x86_64/test-sse.c} (93%)
-> 
+Having both use "internal" sounds a good cleanup.
