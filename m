@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f7zWH-0006wN-U4
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:29:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1f7zXg-0007ro-Ev
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f7zWD-0003UL-Qi
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:29:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56430 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1f7zXa-0005Vh-Ba
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:31:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57990 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f7zWD-0003Tv-Md
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:29:45 -0400
-Date: Mon, 16 Apr 2018 10:29:44 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180416082944.fkgqs5htp2rr3yi5@sirius.home.kraxel.org>
-References: <1523698174-22832-1-git-send-email-agk@godking.net>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f7zXa-0005VA-7H
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:31:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CDED04040073
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 08:31:09 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
+	<20180413161842.5117-3-marcandre.lureau@redhat.com>
+	<87r2nfsh7w.fsf@dusky.pond.sub.org>
+Date: Mon, 16 Apr 2018 10:31:08 +0200
+In-Reply-To: <87r2nfsh7w.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 16 Apr 2018 10:12:03 +0200")
+Message-ID: <87efjfsgc3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1523698174-22832-1-git-send-email-agk@godking.net>
-Subject: Re: [Qemu-devel] qapi: [PATCH v2] Implement query-usbhost QMP
- command
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] qobject: use a QObjectBase_ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Kappner <agk@godking.net>
-Cc: eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Sat, Apr 14, 2018 at 02:29:34AM -0700, Alexander Kappner wrote:
-> Implement a QMP command similar to the HMP's "info usbhost" command.
+Markus Armbruster <armbru@redhat.com> writes:
 
-The hmp version of the command should be switched over to call the
-qmp_query_usbhost() and pretty-print the qapi struct then, to make
-sure hmp and qmp versions of the command deliver consistent results.
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> By moving the base fields to a QObjectBase_, QObject can be a type
+>> which also has a 'base' field. This allows to write a generic
+>> QOBJECT() macro that will work with any QObject type, including
+>> QObject itself. The container_of() macro ensures that the object to
+>> cast has a QObjectBase_ base field, giving some type safety
+>> guarantees. However, for it to work properly, all QObject types must
+>> have 'base' at offset 0 (which is ensured by static checking from
+>> the previous patch)
+>
+> I'm afraid this condition is neither sufficient nor necessary.
+>
+> QOBJECT() maps a pointer to some subtype to the base type QObject.  For
+> this to work, the subtype must contain a QObject.
+>
+> Before the patch, this is trivially the case: the subtypes have a member
+> QObject base, and QOBJECT() returns its address.
+>
+> Afterwards, the subtypes have a member QObjectBase_ base, and QOBJECT()
+> returns the address of a notional QObject wrapped around this member.
+> Works because QObject has no other members.
+>
+> The condition 'base is at offset 0' does not ensure this, and is
+> therefore not sufficient.
+>
+> It's not necessary, either: putting base elsewhere would work just fine
+> as long as we put *all* of QObject there.
+>
+> Please document the real condition "QObject must have no members but
+> QObjectBase_ base, or else QOBJECT() breaks".  Feel free to check their
+> sizes are the same (I wouldn't bother).
+>
+> If requiring base to be at offset zero for all subtypes materially
+> simplifies code, then go ahead and do that in a separate patch.  My gut
+> feeling is it doesn't, but I could be wrong.
 
-> This allows a QMP client to query which USB devices may be available
-> for redirection.
+Uh, there's another reason: existing type casts from QObject * to
+subtypes.  I just spotted one in tests/check-qdict.c:
 
-I'm wondering what the use case is?
+    dst =3D (QDict *)qdict_crumple(src, &error_abort);
 
-At least libvirt sandboxes qemu, for security reasons, and you wouldn't
-get any useful results because qemu hasn't the permissions needed to
-scan the usb bus.
+There may well be more.
 
->  ##
-> +# @query-usbhost:
-> +#
-> +# Returns information about USB devices available on the host
-> +#
-> +# Returns: a [UsbDeviceInfo]. Returns an error if compiled without
-> +# CONFIG_USB_LIBUSB
-> +#
-> +# Since: TODO (maintainer insert version number if mainlined)
-
-Will not make it into 2.12, so 2.13.
-
-> +# @UsbDeviceInfo:
-> +#
-> +# @speed: the speed
-
-Use an enum for this?
-
-> +# @id_vendor: idVendor field from device descriptor
-> +#
-> +# @id_product: idProduct field from device descriptor
-> +#
-> +# @str_product: string descriptor referenced by iProduct index, if any
-> +#
-> +# @str_manufacturer: string descriptor referenced by iManufacturer index, if any
-> +#
-> +# @dev_addr: address on bus that device is connected to
-> +#
-> +# @bus_num: bus number device is connected to
-
-No port?
-
-cheers,
-  Gerd
+>> QObjectBase_ is not typedef and use a trailing underscore to make it
+>> obvious it is not for normal use and to avoid potential abuse.
+>
+> Trailing underscore I like, lack of typedef I don't mind (but I'm firmly
+> in the "eschew typedef for structs" camp).  It does violate the common
+> QEMU coding style, though.
+>
+> A comment /* Not for use outside include/qapi/qmp/ */ next to
+> QObjectBase_ wouldn't hurt.
+>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
