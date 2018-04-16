@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1f81he-0008So-4t
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:49:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f81iR-0000jc-OY
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:50:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1f81hb-0002SB-3B
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:49:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41924
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1f81ha-0002Rw-TR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:49:39 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3GAnYxv094278
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 06:49:38 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hcs0mv86r-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 06:49:37 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 16 Apr 2018 11:49:35 +0100
-References: <1523864720-4680-1-git-send-email-thuth@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 16 Apr 2018 12:49:34 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f81iQ-0002sz-Tl
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:50:31 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f81iQ-0002sr-ON
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 06:50:30 -0400
+Received: by mail-ot0-x244.google.com with SMTP id g23-v6so1688116oti.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 03:50:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1523864720-4680-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <5ae53b81-258c-eeca-578f-e4e03205c604@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.13] pc-bios/s390-ccw: size_t
- should be unsigned
+In-Reply-To: <20180415094638.3278-1-laurent@vivier.eu>
+References: <20180415094638.3278-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Apr 2018 11:50:09 +0100
+Message-ID: <CAFEAcA_7Rp2S-b2gtCScosf0drD4F9JFjzD=E27TG8xFSdfiSg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] m68k fixes for 2.12-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,18 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 15 April 2018 at 10:46, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 38e83a71d02e026d4a6d0ab1ef9855c4924c2c68:
+>
+>   Update version for v2.12.0-rc3 release (2018-04-11 19:03:24 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
+>
+> for you to fetch changes up to 000761dc0c97d70e7314db3e8f52783880325a22:
+>
+>   m68k: fix exception stack frame for 68000 (2018-04-15 11:37:58 +0200)
+>
+> ----------------------------------------------------------------
+> This patch fixes a problem with the exception stack for
+> 68000 only CPU. As we use 68040 for linux-user and coldfire
+> for softmmu, I don't think we should trigger a -rc4
+> only for that, so merge this only if a -rc4 is needed
+> by something else.
+> ----------------------------------------------------------------
+>
+> Pavel Dovgalyuk (1):
+>   m68k: fix exception stack frame for 68000
+>
+>  target/m68k/op_helper.c | 33 ++++++++++++++++++---------------
+>  1 file changed, 18 insertions(+), 15 deletions(-)
 
+Applied, thanks.
 
-On 04/16/2018 09:45 AM, Thomas Huth wrote:
-> "size_t" should be an unsigned type according to the C standard.
-> Thus we should also use this convention in the s390-ccw firmware to avoid
-> confusion. I checked the sources, and apart from one spot in libc.c, the
-> code should all be fine with this change.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1753437
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+-- PMM
