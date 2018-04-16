@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55693)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tlO-0000XJ-Df
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:21:04 -0400
+	id 1f7tlt-0000tP-Ei
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7tlN-0000LC-1M
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:21:02 -0400
+	id 1f7tlr-0000zE-Ey
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 22:21:33 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180411185651.21351-1-laurent@vivier.eu>
-	<20180411185651.21351-16-laurent@vivier.eu>
+	<20180411185651.21351-13-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6fb5452f-9e97-7cd0-cbb6-ff08791764a5@amsat.org>
-Date: Sun, 15 Apr 2018 23:20:49 -0300
+Message-ID: <b97fa93f-cc98-56f2-db85-7a23842aafc7@amsat.org>
+Date: Sun, 15 Apr 2018 23:21:21 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180411185651.21351-16-laurent@vivier.eu>
+In-Reply-To: <20180411185651.21351-13-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 15/19] linux-user: move s390x
- cpu loop to s390x directory
+Subject: Re: [Qemu-devel] [PATCH for 2.13 v2 12/19] linux-user: move
+ microblaze cpu loop to microblaze directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +34,37 @@ Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org, Pet
 
 On 04/11/2018 03:56 PM, Laurent Vivier wrote:
 > No code change, only move code from main.c to
-> s390x/cpu_loop.c.
+> microblaze/cpu_loop.c.
 > 
 > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  linux-user/main.c           | 146 --------------------------------------------
->  linux-user/s390x/cpu_loop.c | 139 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 139 insertions(+), 146 deletions(-)
+> 
+> Notes:
+>     v2: expand tabs
+> 
+>  linux-user/main.c                | 155 ---------------------------------------
+>  linux-user/microblaze/cpu_loop.c | 150 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 150 insertions(+), 155 deletions(-)
 > 
 > diff --git a/linux-user/main.c b/linux-user/main.c
-> index 37cf3a7d6f..7f6cfa5548 100644
+> index 9e01325d6a..9e49c8a30c 100644
 > --- a/linux-user/main.c
 > +++ b/linux-user/main.c
-> @@ -149,143 +149,6 @@ void fork_end(int child)
+> @@ -149,125 +149,6 @@ void fork_end(int child)
 >      }
 >  }
 >  
-> -#ifdef TARGET_S390X
-> -
-> -/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-> -#define S390X_FAIL_ADDR_MASK -4096LL
-> -
-> -void cpu_loop(CPUS390XState *env)
+> -#ifdef TARGET_MICROBLAZE
+> -void cpu_loop(CPUMBState *env)
 > -{
-> -    CPUState *cs = CPU(s390_env_get_cpu(env));
-> -    int trapnr, n, sig;
+> -    CPUState *cs = CPU(mb_env_get_cpu(env));
+> -    int trapnr, ret;
 > -    target_siginfo_t info;
-> -    target_ulong addr;
-> -    abi_long ret;
-> -
+> -    
 > -    while (1) {
 > -        cpu_exec_start(cs);
 > -        trapnr = cpu_exec(cs);
@@ -75,161 +72,171 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > -        process_queued_cpu_work(cs);
 > -
 > -        switch (trapnr) {
-> -        case EXCP_INTERRUPT:
-> -            /* Just indicate that signals should be handled asap.  */
-> -            break;
-> -
-> -        case EXCP_SVC:
-> -            n = env->int_svc_code;
-> -            if (!n) {
-> -                /* syscalls > 255 */
-> -                n = env->regs[1];
-> -            }
-> -            env->psw.addr += env->int_svc_ilen;
-> -            ret = do_syscall(env, n, env->regs[2], env->regs[3],
-> -                             env->regs[4], env->regs[5],
-> -                             env->regs[6], env->regs[7], 0, 0);
-> -            if (ret == -TARGET_ERESTARTSYS) {
-> -                env->psw.addr -= env->int_svc_ilen;
-> -            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-> -                env->regs[2] = ret;
-> -            }
-> -            break;
-> -
-> -        case EXCP_DEBUG:
-> -            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-> -            if (sig) {
-> -                n = TARGET_TRAP_BRKPT;
-> -                goto do_signal_pc;
-> -            }
-> -            break;
-> -        case EXCP_PGM:
-> -            n = env->int_pgm_code;
-> -            switch (n) {
-> -            case PGM_OPERATION:
-> -            case PGM_PRIVILEGED:
-> -                sig = TARGET_SIGILL;
-> -                n = TARGET_ILL_ILLOPC;
-> -                goto do_signal_pc;
-> -            case PGM_PROTECTION:
-> -            case PGM_ADDRESSING:
-> -                sig = TARGET_SIGSEGV;
+> -        case 0xaa:
+> -            {
+> -                info.si_signo = TARGET_SIGSEGV;
+> -                info.si_errno = 0;
 > -                /* XXX: check env->error_code */
-> -                n = TARGET_SEGV_MAPERR;
-> -                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
-> -                goto do_signal;
-> -            case PGM_EXECUTE:
-> -            case PGM_SPECIFICATION:
-> -            case PGM_SPECIAL_OP:
-> -            case PGM_OPERAND:
-> -            do_sigill_opn:
-> -                sig = TARGET_SIGILL;
-> -                n = TARGET_ILL_ILLOPN;
-> -                goto do_signal_pc;
-> -
-> -            case PGM_FIXPT_OVERFLOW:
-> -                sig = TARGET_SIGFPE;
-> -                n = TARGET_FPE_INTOVF;
-> -                goto do_signal_pc;
-> -            case PGM_FIXPT_DIVIDE:
-> -                sig = TARGET_SIGFPE;
-> -                n = TARGET_FPE_INTDIV;
-> -                goto do_signal_pc;
-> -
-> -            case PGM_DATA:
-> -                n = (env->fpc >> 8) & 0xff;
-> -                if (n == 0xff) {
-> -                    /* compare-and-trap */
-> -                    goto do_sigill_opn;
-> -                } else {
-> -                    /* An IEEE exception, simulated or otherwise.  */
-> -                    if (n & 0x80) {
-> -                        n = TARGET_FPE_FLTINV;
-> -                    } else if (n & 0x40) {
-> -                        n = TARGET_FPE_FLTDIV;
-> -                    } else if (n & 0x20) {
-> -                        n = TARGET_FPE_FLTOVF;
-> -                    } else if (n & 0x10) {
-> -                        n = TARGET_FPE_FLTUND;
-> -                    } else if (n & 0x08) {
-> -                        n = TARGET_FPE_FLTRES;
-> -                    } else {
-> -                        /* ??? Quantum exception; BFP, DFP error.  */
-> -                        goto do_sigill_opn;
-> -                    }
-> -                    sig = TARGET_SIGFPE;
-> -                    goto do_signal_pc;
-> -                }
-> -
-> -            default:
-> -                fprintf(stderr, "Unhandled program exception: %#x\n", n);
-> -                cpu_dump_state(cs, stderr, fprintf, 0);
-> -                exit(EXIT_FAILURE);
+> -                info.si_code = TARGET_SEGV_MAPERR;
+> -                info._sifields._sigfault._addr = 0;
+> -                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > -            }
 > -            break;
-> -
-> -        do_signal_pc:
-> -            addr = env->psw.addr;
-> -        do_signal:
-> -            info.si_signo = sig;
-> -            info.si_errno = 0;
-> -            info.si_code = n;
-> -            info._sifields._sigfault._addr = addr;
-> -            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> -	case EXCP_INTERRUPT:
+> -	  /* just indicate that signals should be handled asap */
+> -	  break;
+> -        case EXCP_BREAK:
+> -            /* Return address is 4 bytes after the call.  */
+> -            env->regs[14] += 4;
+> -            env->sregs[SR_PC] = env->regs[14];
+> -            ret = do_syscall(env, 
+> -                             env->regs[12], 
+> -                             env->regs[5], 
+> -                             env->regs[6], 
+> -                             env->regs[7], 
+> -                             env->regs[8], 
+> -                             env->regs[9], 
+> -                             env->regs[10],
+> -                             0, 0);
+> -            if (ret == -TARGET_ERESTARTSYS) {
+> -                /* Wind back to before the syscall. */
+> -                env->sregs[SR_PC] -= 4;
+> -            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+> -                env->regs[3] = ret;
+> -            }
+> -            /* All syscall exits result in guest r14 being equal to the
+> -             * PC we return to, because the kernel syscall exit "rtbd" does
+> -             * this. (This is true even for sigreturn(); note that r14 is
+> -             * not a userspace-usable register, as the kernel may clobber it
+> -             * at any point.)
+> -             */
+> -            env->regs[14] = env->sregs[SR_PC];
 > -            break;
+> -        case EXCP_HW_EXCP:
+> -            env->regs[17] = env->sregs[SR_PC] + 4;
+> -            if (env->iflags & D_FLAG) {
+> -                env->sregs[SR_ESR] |= 1 << 12;
+> -                env->sregs[SR_PC] -= 4;
+> -                /* FIXME: if branch was immed, replay the imm as well.  */
+> -            }
 > -
+> -            env->iflags &= ~(IMM_FLAG | D_FLAG);
+> -
+> -            switch (env->sregs[SR_ESR] & 31) {
+> -                case ESR_EC_DIVZERO:
+> -                    info.si_signo = TARGET_SIGFPE;
+> -                    info.si_errno = 0;
+> -                    info.si_code = TARGET_FPE_FLTDIV;
+> -                    info._sifields._sigfault._addr = 0;
+> -                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> -                    break;
+> -                case ESR_EC_FPU:
+> -                    info.si_signo = TARGET_SIGFPE;
+> -                    info.si_errno = 0;
+> -                    if (env->sregs[SR_FSR] & FSR_IO) {
+> -                        info.si_code = TARGET_FPE_FLTINV;
+> -                    }
+> -                    if (env->sregs[SR_FSR] & FSR_DZ) {
+> -                        info.si_code = TARGET_FPE_FLTDIV;
+> -                    }
+> -                    info._sifields._sigfault._addr = 0;
+> -                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> -                    break;
+> -                default:
+> -                    printf ("Unhandled hw-exception: 0x%x\n",
+> -                            env->sregs[SR_ESR] & ESR_EC_MASK);
+> -                    cpu_dump_state(cs, stderr, fprintf, 0);
+> -                    exit(EXIT_FAILURE);
+> -                    break;
+> -            }
+> -            break;
+> -        case EXCP_DEBUG:
+> -            {
+> -                int sig;
+> -
+> -                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+> -                if (sig)
+> -                  {
+> -                    info.si_signo = sig;
+> -                    info.si_errno = 0;
+> -                    info.si_code = TARGET_TRAP_BRKPT;
+> -                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> -                  }
+> -            }
+> -            break;
 > -        case EXCP_ATOMIC:
 > -            cpu_exec_step_atomic(cs);
 > -            break;
 > -        default:
-> -            fprintf(stderr, "Unhandled trap: 0x%x\n", trapnr);
+> -            printf ("Unhandled trap: 0x%x\n", trapnr);
 > -            cpu_dump_state(cs, stderr, fprintf, 0);
 > -            exit(EXIT_FAILURE);
 > -        }
 > -        process_pending_signals (env);
 > -    }
 > -}
+> -#endif
 > -
-> -#endif /* TARGET_S390X */
-> -
->  #ifdef TARGET_TILEGX
+>  #ifdef TARGET_M68K
 >  
->  static void gen_sigill_reg(CPUTLGState *env)
-> @@ -1720,15 +1583,6 @@ int main(int argc, char **argv, char **envp)
->          env->pc = regs->sepc;
->          env->gpr[xSP] = regs->sp;
+>  void cpu_loop(CPUM68KState *env)
+> @@ -2169,42 +2050,6 @@ int main(int argc, char **argv, char **envp)
+>          env->sr = regs->sr;
+>          ts->sim_syscalls = 1;
 >      }
-> -#elif defined(TARGET_S390X)
+> -#elif defined(TARGET_MICROBLAZE)
 > -    {
-> -            int i;
-> -            for (i = 0; i < 16; i++) {
-> -                env->regs[i] = regs->gprs[i];
-> -            }
-> -            env->psw.mask = regs->psw.mask;
-> -            env->psw.addr = regs->psw.addr;
+> -        env->regs[0] = regs->r0;
+> -        env->regs[1] = regs->r1;
+> -        env->regs[2] = regs->r2;
+> -        env->regs[3] = regs->r3;
+> -        env->regs[4] = regs->r4;
+> -        env->regs[5] = regs->r5;
+> -        env->regs[6] = regs->r6;
+> -        env->regs[7] = regs->r7;
+> -        env->regs[8] = regs->r8;
+> -        env->regs[9] = regs->r9;
+> -        env->regs[10] = regs->r10;
+> -        env->regs[11] = regs->r11;
+> -        env->regs[12] = regs->r12;
+> -        env->regs[13] = regs->r13;
+> -        env->regs[14] = regs->r14;
+> -        env->regs[15] = regs->r15;	    
+> -        env->regs[16] = regs->r16;	    
+> -        env->regs[17] = regs->r17;	    
+> -        env->regs[18] = regs->r18;	    
+> -        env->regs[19] = regs->r19;	    
+> -        env->regs[20] = regs->r20;	    
+> -        env->regs[21] = regs->r21;	    
+> -        env->regs[22] = regs->r22;	    
+> -        env->regs[23] = regs->r23;	    
+> -        env->regs[24] = regs->r24;	    
+> -        env->regs[25] = regs->r25;	    
+> -        env->regs[26] = regs->r26;	    
+> -        env->regs[27] = regs->r27;	    
+> -        env->regs[28] = regs->r28;	    
+> -        env->regs[29] = regs->r29;	    
+> -        env->regs[30] = regs->r30;	    
+> -        env->regs[31] = regs->r31;	    
+> -        env->sregs[SR_PC] = regs->pc;
 > -    }
->  #elif defined(TARGET_TILEGX)
+>  #elif defined(TARGET_RISCV)
 >      {
->          int i;
-> diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
-> index b7700a5561..99f5f1594f 100644
-> --- a/linux-user/s390x/cpu_loop.c
-> +++ b/linux-user/s390x/cpu_loop.c
-> @@ -21,6 +21,145 @@
+>          env->pc = regs->sepc;
+> diff --git a/linux-user/microblaze/cpu_loop.c b/linux-user/microblaze/cpu_loop.c
+> index b7700a5561..5ffb83dea2 100644
+> --- a/linux-user/microblaze/cpu_loop.c
+> +++ b/linux-user/microblaze/cpu_loop.c
+> @@ -21,6 +21,156 @@
 >  #include "qemu.h"
 >  #include "cpu_loop-common.h"
 >  
-> +/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-> +#define S390X_FAIL_ADDR_MASK -4096LL
-> +
-> +void cpu_loop(CPUS390XState *env)
+> +void cpu_loop(CPUMBState *env)
 > +{
-> +    CPUState *cs = CPU(s390_env_get_cpu(env));
-> +    int trapnr, n, sig;
+> +    CPUState *cs = CPU(mb_env_get_cpu(env));
+> +    int trapnr, ret;
 > +    target_siginfo_t info;
-> +    target_ulong addr;
-> +    abi_long ret;
-> +
+> +    
 > +    while (1) {
 > +        cpu_exec_start(cs);
 > +        trapnr = cpu_exec(cs);
@@ -237,114 +244,103 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > +        process_queued_cpu_work(cs);
 > +
 > +        switch (trapnr) {
-> +        case EXCP_INTERRUPT:
-> +            /* Just indicate that signals should be handled asap.  */
-> +            break;
-> +
-> +        case EXCP_SVC:
-> +            n = env->int_svc_code;
-> +            if (!n) {
-> +                /* syscalls > 255 */
-> +                n = env->regs[1];
-> +            }
-> +            env->psw.addr += env->int_svc_ilen;
-> +            ret = do_syscall(env, n, env->regs[2], env->regs[3],
-> +                             env->regs[4], env->regs[5],
-> +                             env->regs[6], env->regs[7], 0, 0);
-> +            if (ret == -TARGET_ERESTARTSYS) {
-> +                env->psw.addr -= env->int_svc_ilen;
-> +            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-> +                env->regs[2] = ret;
-> +            }
-> +            break;
-> +
-> +        case EXCP_DEBUG:
-> +            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-> +            if (sig) {
-> +                n = TARGET_TRAP_BRKPT;
-> +                goto do_signal_pc;
-> +            }
-> +            break;
-> +        case EXCP_PGM:
-> +            n = env->int_pgm_code;
-> +            switch (n) {
-> +            case PGM_OPERATION:
-> +            case PGM_PRIVILEGED:
-> +                sig = TARGET_SIGILL;
-> +                n = TARGET_ILL_ILLOPC;
-> +                goto do_signal_pc;
-> +            case PGM_PROTECTION:
-> +            case PGM_ADDRESSING:
-> +                sig = TARGET_SIGSEGV;
+> +        case 0xaa:
+> +            {
+> +                info.si_signo = TARGET_SIGSEGV;
+> +                info.si_errno = 0;
 > +                /* XXX: check env->error_code */
-> +                n = TARGET_SEGV_MAPERR;
-> +                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
-> +                goto do_signal;
-> +            case PGM_EXECUTE:
-> +            case PGM_SPECIFICATION:
-> +            case PGM_SPECIAL_OP:
-> +            case PGM_OPERAND:
-> +            do_sigill_opn:
-> +                sig = TARGET_SIGILL;
-> +                n = TARGET_ILL_ILLOPN;
-> +                goto do_signal_pc;
-> +
-> +            case PGM_FIXPT_OVERFLOW:
-> +                sig = TARGET_SIGFPE;
-> +                n = TARGET_FPE_INTOVF;
-> +                goto do_signal_pc;
-> +            case PGM_FIXPT_DIVIDE:
-> +                sig = TARGET_SIGFPE;
-> +                n = TARGET_FPE_INTDIV;
-> +                goto do_signal_pc;
-> +
-> +            case PGM_DATA:
-> +                n = (env->fpc >> 8) & 0xff;
-> +                if (n == 0xff) {
-> +                    /* compare-and-trap */
-> +                    goto do_sigill_opn;
-> +                } else {
-> +                    /* An IEEE exception, simulated or otherwise.  */
-> +                    if (n & 0x80) {
-> +                        n = TARGET_FPE_FLTINV;
-> +                    } else if (n & 0x40) {
-> +                        n = TARGET_FPE_FLTDIV;
-> +                    } else if (n & 0x20) {
-> +                        n = TARGET_FPE_FLTOVF;
-> +                    } else if (n & 0x10) {
-> +                        n = TARGET_FPE_FLTUND;
-> +                    } else if (n & 0x08) {
-> +                        n = TARGET_FPE_FLTRES;
-> +                    } else {
-> +                        /* ??? Quantum exception; BFP, DFP error.  */
-> +                        goto do_sigill_opn;
-> +                    }
-> +                    sig = TARGET_SIGFPE;
-> +                    goto do_signal_pc;
-> +                }
-> +
-> +            default:
-> +                fprintf(stderr, "Unhandled program exception: %#x\n", n);
-> +                cpu_dump_state(cs, stderr, fprintf, 0);
-> +                exit(EXIT_FAILURE);
+> +                info.si_code = TARGET_SEGV_MAPERR;
+> +                info._sifields._sigfault._addr = 0;
+> +                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
 > +            }
 > +            break;
-> +
-> +        do_signal_pc:
-> +            addr = env->psw.addr;
-> +        do_signal:
-> +            info.si_signo = sig;
-> +            info.si_errno = 0;
-> +            info.si_code = n;
-> +            info._sifields._sigfault._addr = addr;
-> +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +        case EXCP_INTERRUPT:
+> +          /* just indicate that signals should be handled asap */
+> +          break;
+> +        case EXCP_BREAK:
+> +            /* Return address is 4 bytes after the call.  */
+> +            env->regs[14] += 4;
+> +            env->sregs[SR_PC] = env->regs[14];
+> +            ret = do_syscall(env, 
+> +                             env->regs[12], 
+> +                             env->regs[5], 
+> +                             env->regs[6], 
+> +                             env->regs[7], 
+> +                             env->regs[8], 
+> +                             env->regs[9], 
+> +                             env->regs[10],
+> +                             0, 0);
+> +            if (ret == -TARGET_ERESTARTSYS) {
+> +                /* Wind back to before the syscall. */
+> +                env->sregs[SR_PC] -= 4;
+> +            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
+> +                env->regs[3] = ret;
+> +            }
+> +            /* All syscall exits result in guest r14 being equal to the
+> +             * PC we return to, because the kernel syscall exit "rtbd" does
+> +             * this. (This is true even for sigreturn(); note that r14 is
+> +             * not a userspace-usable register, as the kernel may clobber it
+> +             * at any point.)
+> +             */
+> +            env->regs[14] = env->sregs[SR_PC];
 > +            break;
+> +        case EXCP_HW_EXCP:
+> +            env->regs[17] = env->sregs[SR_PC] + 4;
+> +            if (env->iflags & D_FLAG) {
+> +                env->sregs[SR_ESR] |= 1 << 12;
+> +                env->sregs[SR_PC] -= 4;
+> +                /* FIXME: if branch was immed, replay the imm as well.  */
+> +            }
 > +
+> +            env->iflags &= ~(IMM_FLAG | D_FLAG);
+> +
+> +            switch (env->sregs[SR_ESR] & 31) {
+> +                case ESR_EC_DIVZERO:
+> +                    info.si_signo = TARGET_SIGFPE;
+> +                    info.si_errno = 0;
+> +                    info.si_code = TARGET_FPE_FLTDIV;
+> +                    info._sifields._sigfault._addr = 0;
+> +                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +                    break;
+> +                case ESR_EC_FPU:
+> +                    info.si_signo = TARGET_SIGFPE;
+> +                    info.si_errno = 0;
+> +                    if (env->sregs[SR_FSR] & FSR_IO) {
+> +                        info.si_code = TARGET_FPE_FLTINV;
+> +                    }
+> +                    if (env->sregs[SR_FSR] & FSR_DZ) {
+> +                        info.si_code = TARGET_FPE_FLTDIV;
+> +                    }
+> +                    info._sifields._sigfault._addr = 0;
+> +                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +                    break;
+> +                default:
+> +                    printf ("Unhandled hw-exception: 0x%x\n",
+> +                            env->sregs[SR_ESR] & ESR_EC_MASK);
+> +                    cpu_dump_state(cs, stderr, fprintf, 0);
+> +                    exit(EXIT_FAILURE);
+> +                    break;
+> +            }
+> +            break;
+> +        case EXCP_DEBUG:
+> +            {
+> +                int sig;
+> +
+> +                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+> +                if (sig)
+> +                  {
+> +                    info.si_signo = sig;
+> +                    info.si_errno = 0;
+> +                    info.si_code = TARGET_TRAP_BRKPT;
+> +                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +                  }
+> +            }
+> +            break;
 > +        case EXCP_ATOMIC:
 > +            cpu_exec_step_atomic(cs);
 > +            break;
 > +        default:
-> +            fprintf(stderr, "Unhandled trap: 0x%x\n", trapnr);
+> +            printf ("Unhandled trap: 0x%x\n", trapnr);
 > +            cpu_dump_state(cs, stderr, fprintf, 0);
 > +            exit(EXIT_FAILURE);
 > +        }
@@ -354,11 +350,38 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > +
 >  void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 >  {
-> +    int i;
-> +    for (i = 0; i < 16; i++) {
-> +        env->regs[i] = regs->gprs[i];
-> +    }
-> +    env->psw.mask = regs->psw.mask;
-> +    env->psw.addr = regs->psw.addr;
+> +    env->regs[0] = regs->r0;
+> +    env->regs[1] = regs->r1;
+> +    env->regs[2] = regs->r2;
+> +    env->regs[3] = regs->r3;
+> +    env->regs[4] = regs->r4;
+> +    env->regs[5] = regs->r5;
+> +    env->regs[6] = regs->r6;
+> +    env->regs[7] = regs->r7;
+> +    env->regs[8] = regs->r8;
+> +    env->regs[9] = regs->r9;
+> +    env->regs[10] = regs->r10;
+> +    env->regs[11] = regs->r11;
+> +    env->regs[12] = regs->r12;
+> +    env->regs[13] = regs->r13;
+> +    env->regs[14] = regs->r14;
+> +    env->regs[15] = regs->r15;
+> +    env->regs[16] = regs->r16;
+> +    env->regs[17] = regs->r17;
+> +    env->regs[18] = regs->r18;
+> +    env->regs[19] = regs->r19;
+> +    env->regs[20] = regs->r20;
+> +    env->regs[21] = regs->r21;
+> +    env->regs[22] = regs->r22;
+> +    env->regs[23] = regs->r23;
+> +    env->regs[24] = regs->r24;
+> +    env->regs[25] = regs->r25;
+> +    env->regs[26] = regs->r26;
+> +    env->regs[27] = regs->r27;
+> +    env->regs[28] = regs->r28;
+> +    env->regs[29] = regs->r29;
+> +    env->regs[30] = regs->r30;
+> +    env->regs[31] = regs->r31;
+> +    env->sregs[SR_PC] = regs->pc;
 >  }
 > 
