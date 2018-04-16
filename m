@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f7zpp-0006p3-Lp
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:50:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f7zqw-0007WP-5K
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f7zpm-0003bV-Cn
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:50:01 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37403)
+	(envelope-from <alex.bennee@linaro.org>) id 1f7zqr-0004It-T0
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:51:09 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46226)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f7zpm-0003Zz-1g
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:49:58 -0400
-Received: by mail-wr0-x244.google.com with SMTP id l49so23602022wrl.4
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 01:49:56 -0700 (PDT)
+	id 1f7zqr-0004Hu-IA
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:51:05 -0400
+Received: by mail-wr0-x244.google.com with SMTP id d1so23609062wrj.13
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 01:51:05 -0700 (PDT)
 References: <20180410193919.28026-1-alex.bennee@linaro.org>
-	<20180410193919.28026-3-alex.bennee@linaro.org>
-	<5464750f-75ed-dddc-797c-5ca3561dc7dd@amsat.org>
+	<20180410193919.28026-11-alex.bennee@linaro.org>
+	<4bc22552-25b4-2a04-dc73-dc17201a2251@amsat.org>
+	<3b680ef4-3304-99d5-75ef-c4d5d570bb3a@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <5464750f-75ed-dddc-797c-5ca3561dc7dd@amsat.org>
-Date: Mon, 16 Apr 2018 09:49:53 +0100
-Message-ID: <87h8obbkni.fsf@linaro.org>
+In-reply-to: <3b680ef4-3304-99d5-75ef-c4d5d570bb3a@amsat.org>
+Date: Mon, 16 Apr 2018 09:51:02 +0100
+Message-ID: <87fu3vbkll.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 02/24] configure: add support for
- --cross-cc-FOO
+Subject: Re: [Qemu-devel] [PATCH v1 10/24] tests/tcg/multiarch: Build fix
+ for linux-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,170 +39,250 @@ Cc: qemu-devel@nongnu.org, famz@redhat.com, cota@braap.org
 
 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> On 04/10/2018 04:38 PM, Alex Benn=C3=A9e wrote:
->> This allows us to specify cross compilers for our guests. This is
->> useful for building test images/programs. Currently we re-run the
->> compile test for each target. I couldn't think of a way to cache the
->> value for a given arch without getting messier configure code.
+> On 04/15/2018 09:07 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi Fam, Alex,
 >>=20
->> The cross compiler for the guest is visible to each target as
->> CROSS_CC_GUEST in config-target.mak.
+>> On 04/10/2018 04:39 PM, Alex Benn=C3=A9e wrote:
+>>> From: Fam Zheng <famz@redhat.com>
+>>>
+>>> To keep the compiler happy, and to fit in our buildsys flags:
+>>>
+>>> - Make local functions "static"
+>>> - #ifdef out unused functions
+>>> - drop cutils/osdep dependencies
+>>>
+>>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>> [AJB: drop cutils/osdep dependencies]
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>>  tests/tcg/multiarch/linux-test.c | 68 +++++++++++++-------------------=
+--------
+>>>  1 file changed, 21 insertions(+), 47 deletions(-)
+>>>
+>>> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/lin=
+ux-test.c
+>>> index 5070d31446..4457bd04ba 100644
+>>> --- a/tests/tcg/multiarch/linux-test.c
+>>> +++ b/tests/tcg/multiarch/linux-test.c
+>>> @@ -16,7 +16,6 @@
+>>>   *  You should have received a copy of the GNU General Public License
+>>>   *  along with this program; if not, see <http://www.gnu.org/licenses/=
+>.
+>>>   */
+>>> -#define _GNU_SOURCE
+>>>  #include <stdarg.h>
+>>>  #include <stdlib.h>
+>>>  #include <stdio.h>
+>>> @@ -31,6 +30,7 @@
+>>>  #include <utime.h>
+>>>  #include <time.h>
+>>>  #include <sys/time.h>
+>>> +#include <sys/resource.h>
+>>>  #include <sys/uio.h>
+>>>  #include <sys/socket.h>
+>>>  #include <netinet/in.h>
+>>> @@ -39,13 +39,12 @@
+>>>  #include <dirent.h>
+>>>  #include <setjmp.h>
+>>>  #include <sys/shm.h>
+>>> -#include "qemu/cutils.h"
+>>>=20=20
+>>>  #define TESTPATH "/tmp/linux-test.tmp"
+>>>  #define TESTPORT 7654
+>>>  #define STACK_SIZE 16384
+>>>=20=20
+>>> -void error1(const char *filename, int line, const char *fmt, ...)
+>>> +static void error1(const char *filename, int line, const char *fmt, ..=
+.)
+>>>  {
+>>>      va_list ap;
+>>>      va_start(ap, fmt);
+>>> @@ -56,7 +55,7 @@ void error1(const char *filename, int line, const cha=
+r *fmt, ...)
+>>>      exit(1);
+>>>  }
+>>>=20=20
+>>> -int __chk_error(const char *filename, int line, int ret)
+>>> +static int __chk_error(const char *filename, int line, int ret)
+>>>  {
+>>>      if (ret < 0) {
+>>>          error1(filename, line, "%m (ret=3D%d, errno=3D%d)",
+>>> @@ -73,7 +72,7 @@ int __chk_error(const char *filename, int line, int r=
+et)
+>>>=20=20
+>>>  #define FILE_BUF_SIZE 300
+>>>=20=20
+>>> -void test_file(void)
+>>> +static void test_file(void)
+>>>  {
+>>>      int fd, i, len, ret;
+>>>      uint8_t buf[FILE_BUF_SIZE];
+>>> @@ -210,7 +209,7 @@ void test_file(void)
+>>>      chk_error(rmdir(TESTPATH));
+>>>  }
+>>>=20=20
+>>> -void test_fork(void)
+>>> +static void test_fork(void)
+>>>  {
+>>>      int pid, status;
+>>>=20=20
+>>> @@ -224,7 +223,7 @@ void test_fork(void)
+>>>          error("waitpid status=3D0x%x", status);
+>>>  }
+>>>=20=20
+>>> -void test_time(void)
+>>> +static void test_time(void)
+>>>  {
+>>>      struct timeval tv, tv2;
+>>>      struct timespec ts, rem;
+>>> @@ -251,34 +250,7 @@ void test_time(void)
+>>>          error("getrusage");
+>>>  }
+>>>=20=20
+>>> -void pstrcpy(char *buf, int buf_size, const char *str)
+>>> -{
+>>> -    int c;
+>>> -    char *q =3D buf;
+>>> -
+>>> -    if (buf_size <=3D 0)
+>>> -        return;
+>>> -
+>>> -    for(;;) {
+>>> -        c =3D *str++;
+>>> -        if (c =3D=3D 0 || q >=3D buf + buf_size - 1)
+>>> -            break;
+>>> -        *q++ =3D c;
+>>> -    }
+>>> -    *q =3D '\0';
+>>> -}
+>>> -
+>>> -/* strcat and truncate. */
+>>> -char *pstrcat(char *buf, int buf_size, const char *s)
+>>> -{
+>>> -    int len;
+>>> -    len =3D strlen(buf);
+>>> -    if (len < buf_size)
+>>> -        pstrcpy(buf + len, buf_size - len, s);
+>>> -    return buf;
+>>> -}
+>>> -
+>>> -int server_socket(void)
+>>> +static int server_socket(void)
+>>>  {
+>>>      int val, fd;
+>>>      struct sockaddr_in sockaddr;
+>>> @@ -298,7 +270,7 @@ int server_socket(void)
+>>>=20=20
+>>>  }
+>>>=20=20
+>>> -int client_socket(void)
+>>> +static int client_socket(void)
+>>>  {
+>>>      int fd;
+>>>      struct sockaddr_in sockaddr;
+>>> @@ -312,9 +284,9 @@ int client_socket(void)
+>>>      return fd;
+>>>  }
+>>>=20=20
+>>> -const char socket_msg[] =3D "hello socket\n";
+>>> +static const char socket_msg[] =3D "hello socket\n";
+>>>=20=20
+>>> -void test_socket(void)
+>>> +static void test_socket(void)
+>>>  {
+>>>      int server_fd, client_fd, fd, pid, ret, val;
+>>>      struct sockaddr_in sockaddr;
+>>> @@ -348,9 +320,10 @@ void test_socket(void)
+>>>      chk_error(close(server_fd));
+>>>  }
+>>>=20=20
+>>> +#if 0
 >>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  configure | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 50 insertions(+)
->>=20
->> diff --git a/configure b/configure
->> index b402befe94..b5f3b3fe29 100755
->> --- a/configure
->> +++ b/configure
->> @@ -453,6 +453,13 @@ vxhs=3D""
->>  libxml2=3D""
->>  docker=3D"no"
->>=20=20
->> +# cross compilers defaults, can be overridden with --cross-cc-ARCH
->> +cross_cc_aarch64=3D"aarch64-linux-gnu-gcc"
->> +cross_cc_arm=3D"arm-linux-gnueabihf-gcc"
->> +cross_cc_powerpc=3D"powerpc-linux-gnu-gcc"
+>> Why keep this now dead code?
 >
-> These seems distrib-specific... Should we add a case $distrib) ...?
+> You can use: #ifdef LINUX_TEST_CLONE
+>
+> But this my be even better to move this chunk as a stand-alone test in a
+> new file, linux-clone-test.c and add a make rule to only include it in
+> the TEST_SRCS var when the host is able to run it.
 
-I think of this more as sensible defaults - I would expect most people
-using local cross-compilers to be manually setting them up with the
---cross-cc-FOO flag.
+There is certainly some cleaning up to the tests to do. I'll put it in a
+separate patch though.
 
 >
->> +
->> +enabled_cross_compilers=3D""
->> +
->>  supported_cpu=3D"no"
->>  supported_os=3D"no"
->>  bogus_os=3D"no"
->> @@ -483,6 +490,11 @@ for opt do
->>    ;;
->>    --disable-debug-info) debug_info=3D"no"
->>    ;;
->> +  --cross-cc-*[!a-zA-Z0-9_0]=3D*) error_exit "Passed bad --cross-cc-FOO=
- option"
->> +  ;;
->> +  --cross-cc-*) cc_arch=3D${opt#--cross-cc-}
->> +                eval "cross_cc_${cc_arch}=3D\$optarg"
->> +  ;;
->>    esac
->>  done
->>  # OS specific
->> @@ -675,10 +687,12 @@ case "$cpu" in
->>    i386|i486|i586|i686|i86pc|BePC)
->>      cpu=3D"i386"
->>      supported_cpu=3D"yes"
->> +    cross_cc_i386=3Dgcc
->>    ;;
->>    x86_64|amd64)
->>      cpu=3D"x86_64"
->>      supported_cpu=3D"yes"
->> +    cross_cc_x86_64=3Dgcc
->>    ;;
->>    armv*b|armv*l|arm)
->>      cpu=3D"arm"
->> @@ -912,6 +926,8 @@ for opt do
->>    ;;
->>    --disable-debug-info)
->>    ;;
->> +  --cross-cc-*)
->> +  ;;
->>    --enable-modules)
->>        modules=3D"yes"
->>    ;;
->> @@ -6766,6 +6782,8 @@ case "$target" in
->>      ;;
->>  esac
->>=20=20
->> +target_compiler=3D""
->> +
->>  mkdir -p $target_dir
->>  echo "# Automatically generated by configure - do not modify" > $config=
-_target_mak
->>=20=20
->> @@ -6794,6 +6812,7 @@ case "$target_name" in
->>      bflt=3D"yes"
->>      mttcg=3D"yes"
->>      gdb_xml_files=3D"arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
->> +    target_compiler=3D$cross_cc_arm
->>    ;;
->>    aarch64|aarch64_be)
->>      TARGET_ARCH=3Daarch64
->> @@ -6801,6 +6820,7 @@ case "$target_name" in
->>      bflt=3D"yes"
->>      mttcg=3D"yes"
->>      gdb_xml_files=3D"aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-=
-vfp.xml arm-vfp3.xml arm-neon.xml"
->> +    target_compiler=3D$cross_cc_aarch64
->>    ;;
->>    cris)
->>    ;;
->> @@ -6842,6 +6862,7 @@ case "$target_name" in
->>    ;;
->>    ppc)
->>      gdb_xml_files=3D"power-core.xml power-fpu.xml power-altivec.xml pow=
-er-spe.xml"
->> +    target_compiler=3D$cross_cc_powerpc
->>    ;;
->>    ppcemb)
->>      TARGET_BASE_ARCH=3Dppc
->> @@ -6916,6 +6937,25 @@ if [ "$TARGET_BASE_ARCH" =3D "" ]; then
->>    TARGET_BASE_ARCH=3D$TARGET_ARCH
->>  fi
->>=20=20
->> +# Do we have a cross compiler for this target?
->> +if has $target_compiler; then
->> +
->> +    cat > $TMPC << EOF
->> +#include <stdio.h>
->> +int main(void) {
->> +    printf("Hello World!\n");
->> +}
->> +EOF
->> +
->> +    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
->> +        target_compiler=3D""
->> +    else
->> +        enabled_cross_compilers=3D"${enabled_cross_compilers} ${target_=
-compiler}"
->> +    fi
->> +else
->> +    target_compiler=3D""
->> +fi
->> +
->>  symlink "$source_path/Makefile.target" "$target_dir/Makefile"
->>=20=20
->>  upper() {
->> @@ -6989,6 +7029,10 @@ if test "$target_bsd_user" =3D "yes" ; then
->>    echo "CONFIG_BSD_USER=3Dy" >> $config_target_mak
->>  fi
->>=20=20
->> +if test -n "$target_compiler"; then
->> +  echo "CROSS_CC_GUEST=3D$target_compiler" >> $config_target_mak
->> +fi
->> +
->>  # generate QEMU_CFLAGS/LDFLAGS for targets
->>=20=20
->>  cflags=3D""
->> @@ -7111,6 +7155,12 @@ echo "QEMU_CFLAGS+=3D$cflags" >> $config_target_m=
-ak
->>=20=20
->>  done # for target in $targets
->>=20=20
->> +if test -n "$enabled_cross_compilers"; then
->> +    echo
->> +    echo "NOTE: cross-compilers enabled:"
->> +    printf '%s\n' $enabled_cross_compilers | sort -u
->> +fi
->> +
->>  if [ "$dtc_internal" =3D "yes" ]; then
->>    echo "config-host.h: subdir-dtc" >> $config_host_mak
->>  fi
 >>=20
+>>>  #define WCOUNT_MAX 512
+>>>=20=20
+>>> -void test_pipe(void)
+>>> +static void test_pipe(void)
+>>>  {
+>>>      fd_set rfds, wfds;
+>>>      int fds[2], fd_max, ret;
+>>> @@ -391,10 +364,10 @@ void test_pipe(void)
+>>>      chk_error(close(fds[1]));
+>>>  }
+>>>=20=20
+>>> -int thread1_res;
+>>> -int thread2_res;
+>>> +static int thread1_res;
+>>> +static int thread2_res;
+>>>=20=20
+>>> -int thread1_func(void *arg)
+>>> +static int thread1_func(void *arg)
+>>>  {
+>>>      int i;
+>>>      for(i=3D0;i<5;i++) {
+>>> @@ -404,7 +377,7 @@ int thread1_func(void *arg)
+>>>      return 0;
+>>>  }
+>>>=20=20
+>>> -int thread2_func(void *arg)
+>>> +static int thread2_func(void *arg)
+>>>  {
+>>>      int i;
+>>>      for(i=3D0;i<6;i++) {
+>>> @@ -435,27 +408,28 @@ void test_clone(void)
+>>>          thread2_res !=3D 6)
+>>>          error("clone");
+>>>  }
+>>> +#endif
+>>>=20=20
+>>>  /***********************************/
+>>>=20=20
+>>>  volatile int alarm_count;
+>>>  jmp_buf jmp_env;
+>>>=20=20
+>>> -void sig_alarm(int sig)
+>>> +static void sig_alarm(int sig)
+>>>  {
+>>>      if (sig !=3D SIGALRM)
+>>>          error("signal");
+>>>      alarm_count++;
+>>>  }
+>>>=20=20
+>>> -void sig_segv(int sig, siginfo_t *info, void *puc)
+>>> +static void sig_segv(int sig, siginfo_t *info, void *puc)
+>>>  {
+>>>      if (sig !=3D SIGSEGV)
+>>>          error("signal");
+>>>      longjmp(jmp_env, 1);
+>>>  }
+>>>=20=20
+>>> -void test_signal(void)
+>>> +static void test_signal(void)
+>>>  {
+>>>      struct sigaction act;
+>>>      struct itimerval it, oit;
+>>> @@ -510,7 +484,7 @@ void test_signal(void)
+>>>=20=20
+>>>  #define SHM_SIZE 32768
+>>>=20=20
+>>> -void test_shm(void)
+>>> +static void test_shm(void)
+>>>  {
+>>>      void *ptr;
+>>>      int shmid;
+>>>
 
 
 --=20
