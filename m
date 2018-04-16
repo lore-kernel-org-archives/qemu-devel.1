@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f82eJ-0002Aj-ES
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:50:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f82fD-0002vA-8p
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f82eE-0000xF-ES
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:50:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34586 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f82eE-0000vY-6S
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:50:14 -0400
-References: <20180416111743.8473-1-berrange@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b12787c-c195-9888-1970-09a220410368@redhat.com>
-Date: Mon, 16 Apr 2018 13:50:01 +0200
+	(envelope-from <mreitz@redhat.com>) id 1f82fC-0001fo-7Q
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:51:15 -0400
+References: <20180406151731.4285-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <55f6042f-f077-1860-877f-adb57db254ad@redhat.com>
+Date: Mon, 16 Apr 2018 13:51:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180416111743.8473-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] Remove artificial length limits when
- parsing options
+In-Reply-To: <20180406151731.4285-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MF5DYTBD9RwXiVe7j9l1PWoJCPNfCHMEu"
+Subject: Re: [Qemu-devel] [PATCH 0/2] iotests: Skip 181 and 201 without
+ userfaultfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 16/04/2018 13:17, Daniel P. Berrang=C3=A9 wrote:
-> A user trying out SMBIOS "OEM strings" feature reported that the data
-> they are exposing to the guest was truncated at 1023 bytes, which break=
-s
-> the app consuming in the guest. After searching for the cause I
-> eventually found that the QemuOpts parsing is using fixed length 1024
-> byte array for option values and 128 byte array for key names.
->=20
-> We can certainly debate whether it is sane to have such long command
-> line argument values (it is not sane), but if the OS was capable of
-> exec'ing QEMU with such an ARGV array, there is little good reason for
-> imposing an artificial length restriction when parsing it. Even worse i=
-s
-> that we silently truncate without reporting an error when hitting limit=
-s
-> resulting in a semantically incorrect behaviour, possibly even leading
-> to security flaws depending on the data that was truncated.
->=20
-> Thus this patch series removes the artificial length limits by killing
-> the fixed length buffers.
->=20
-> Separately I intend to make it possible to read "OEM strings" data from
-> a file, to avoid need to have long command line args.
->=20
-> Daniel P. Berrang=C3=A9 (3):
->   accel: use g_strsplit for parsing accelerator names
->   opts: don't silently truncate long parameter keys
->   opts: don't silently truncate long option values
->=20
->  accel/accel.c          |  16 +++---
->  hw/i386/multiboot.c    |  33 +++++++----
->  include/qemu/option.h  |   3 +-
->  tests/test-qemu-opts.c |  18 ------
->  util/qemu-option.c     | 150 ++++++++++++++++++++++++++---------------=
---------
->  5 files changed, 108 insertions(+), 112 deletions(-)
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MF5DYTBD9RwXiVe7j9l1PWoJCPNfCHMEu
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <55f6042f-f077-1860-877f-adb57db254ad@redhat.com>
+Subject: Re: [PATCH 0/2] iotests: Skip 181 and 201 without userfaultfd
+References: <20180406151731.4285-1-mreitz@redhat.com>
+In-Reply-To: <20180406151731.4285-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Queued, thanks.
+On 2018-04-06 17:17, Max Reitz wrote:
+> My non-Fedora testing system does not have a kernel with userfaultfd
+> support which causes 181 and 201 to fail.  That is annoying.  This
+> series makes those tests recognize the issue and convert it into a
+> _notrun.
+>=20
+>=20
+> Max Reitz (2):
+>   iotests: Add failure matching to common.qemu
+>   iotests: Skip 181 and 201 without userfaultfd
+>=20
+>  tests/qemu-iotests/181         | 13 ++++++++++
+>  tests/qemu-iotests/201         | 13 ++++++++++
+>  tests/qemu-iotests/common.qemu | 58 ++++++++++++++++++++++++++++++++++=
++++-----
+>  3 files changed, 77 insertions(+), 7 deletions(-)
 
-Paolo
+Ping (considering these are test suite fixes, I'd merge them without
+review, too, though.)
+
+Max
+
+
+--MF5DYTBD9RwXiVe7j9l1PWoJCPNfCHMEu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrUjigACgkQ9AfbAGHV
+z0BRJwf/WcUCAbnK58SCuyhjH9P7uyqDePseUJExywAO2mrbhK3OKW/w0a8Jv+Q9
+um0ZuFUxJ3god+IB17l499Wj03Lr9ZThn98g+B55tH/fdFOBvYl1qNdkJ5FFDkHo
+11F9sn9f9sskY6viSzmz2jtDNz0TQHcFNOpHFPgUQeINMg8c0pUoNqEbtltNK8EX
+lJq7udaCE/WPWAvmBwpNPxCOiTqlJP+5dg07XSdnNMg+hd/L14cQ9tecUTl+FjlV
+/jiyGb4KmSQqKD2yf2+IFFedzKOPyMzW+ldQzjKN+d9G7rH+o8qhrO+1KYUVKQoh
+Hfmc1rmUFJfDD+ee3fL7yqzgYC3LPg==
+=gOpT
+-----END PGP SIGNATURE-----
+
+--MF5DYTBD9RwXiVe7j9l1PWoJCPNfCHMEu--
