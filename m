@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f7ze9-0002tC-Cf
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:37:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f7zpp-0006p3-Lp
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:50:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f7ze5-0001oo-AC
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:37:57 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:44341)
+	(envelope-from <alex.bennee@linaro.org>) id 1f7zpm-0003bV-Cn
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:50:01 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37403)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f7ze5-0001oD-3O
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:37:53 -0400
-Received: by mail-pl0-x243.google.com with SMTP id s13-v6so2375660plq.11
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 01:37:52 -0700 (PDT)
-Date: Mon, 16 Apr 2018 16:37:48 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180416083748.GD28904@stefanha-x1.localdomain>
-References: <20180412061108.10875-1-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f7zpm-0003Zz-1g
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:49:58 -0400
+Received: by mail-wr0-x244.google.com with SMTP id l49so23602022wrl.4
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 01:49:56 -0700 (PDT)
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+	<20180410193919.28026-3-alex.bennee@linaro.org>
+	<5464750f-75ed-dddc-797c-5ca3561dc7dd@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <5464750f-75ed-dddc-797c-5ca3561dc7dd@amsat.org>
+Date: Mon, 16 Apr 2018 09:49:53 +0100
+Message-ID: <87h8obbkni.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="11Y7aswkeuHtSBEs"
-Content-Disposition: inline
-In-Reply-To: <20180412061108.10875-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 02/24] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +32,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, cota@braap.org
 
 
---11Y7aswkeuHtSBEs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-On Thu, Apr 12, 2018 at 02:11:08PM +0800, Peter Xu wrote:
-> In the future the monitor iothread may be accessing the cur_mon as
-> well (via monitor_qmp_dispatch_one()).  Before we introduce a real
-> Out-Of-Band command, let's convert the cur_mon variable to be a
-> per-thread variable to make sure there won't be a race between threads.
+> On 04/10/2018 04:38 PM, Alex Benn=C3=A9e wrote:
+>> This allows us to specify cross compilers for our guests. This is
+>> useful for building test images/programs. Currently we re-run the
+>> compile test for each target. I couldn't think of a way to cache the
+>> value for a given arch without getting messier configure code.
+>>=20
+>> The cross compiler for the guest is visible to each target as
+>> CROSS_CC_GUEST in config-target.mak.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  configure | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 50 insertions(+)
+>>=20
+>> diff --git a/configure b/configure
+>> index b402befe94..b5f3b3fe29 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -453,6 +453,13 @@ vxhs=3D""
+>>  libxml2=3D""
+>>  docker=3D"no"
+>>=20=20
+>> +# cross compilers defaults, can be overridden with --cross-cc-ARCH
+>> +cross_cc_aarch64=3D"aarch64-linux-gnu-gcc"
+>> +cross_cc_arm=3D"arm-linux-gnueabihf-gcc"
+>> +cross_cc_powerpc=3D"powerpc-linux-gnu-gcc"
 >
-> Note that thread variables are not initialized to a valid value when new
-> thread is created.  However for our case we don't need to set it up,
-> since the cur_mon variable is only used in such a pattern:
->=20
->   old_mon =3D cur_mon;
->   cur_mon =3D xxx;
->   (do something, read cur_mon if necessary in the stack)
->   cur_mon =3D old_mon;
->=20
-> It plays a role as stack variable, so no need to be initialized at all.
-> We only need to make sure the variable won't be changed unexpectedly by
-> other threads.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
-> v3:
-> - fix code style warning from patchew
-> v2:
-> - drop qemu-thread changes
-> ---
->  include/monitor/monitor.h | 2 +-
->  monitor.c                 | 2 +-
->  stubs/monitor.c           | 2 +-
->  tests/test-util-sockets.c | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
+> These seems distrib-specific... Should we add a case $distrib) ...?
 
-The Monitor object is not fully thread-safe, so although the correct
-cur_mon is now accessible, code may still be unsafe.  For example,
-monitor_get_fd(cur_mon, ...) is not thread-safe and must not be used by
-OOB commands.
+I think of this more as sensible defaults - I would expect most people
+using local cross-compilers to be manually setting them up with the
+--cross-cc-FOO flag.
 
-Future OOB commands need to know which monitor.h APIs are safe to call,
-otherwise bugs are likely.  Please send a follow up patch to address
-this (e.g. doc comments, locking where needed, etc).
+>
+>> +
+>> +enabled_cross_compilers=3D""
+>> +
+>>  supported_cpu=3D"no"
+>>  supported_os=3D"no"
+>>  bogus_os=3D"no"
+>> @@ -483,6 +490,11 @@ for opt do
+>>    ;;
+>>    --disable-debug-info) debug_info=3D"no"
+>>    ;;
+>> +  --cross-cc-*[!a-zA-Z0-9_0]=3D*) error_exit "Passed bad --cross-cc-FOO=
+ option"
+>> +  ;;
+>> +  --cross-cc-*) cc_arch=3D${opt#--cross-cc-}
+>> +                eval "cross_cc_${cc_arch}=3D\$optarg"
+>> +  ;;
+>>    esac
+>>  done
+>>  # OS specific
+>> @@ -675,10 +687,12 @@ case "$cpu" in
+>>    i386|i486|i586|i686|i86pc|BePC)
+>>      cpu=3D"i386"
+>>      supported_cpu=3D"yes"
+>> +    cross_cc_i386=3Dgcc
+>>    ;;
+>>    x86_64|amd64)
+>>      cpu=3D"x86_64"
+>>      supported_cpu=3D"yes"
+>> +    cross_cc_x86_64=3Dgcc
+>>    ;;
+>>    armv*b|armv*l|arm)
+>>      cpu=3D"arm"
+>> @@ -912,6 +926,8 @@ for opt do
+>>    ;;
+>>    --disable-debug-info)
+>>    ;;
+>> +  --cross-cc-*)
+>> +  ;;
+>>    --enable-modules)
+>>        modules=3D"yes"
+>>    ;;
+>> @@ -6766,6 +6782,8 @@ case "$target" in
+>>      ;;
+>>  esac
+>>=20=20
+>> +target_compiler=3D""
+>> +
+>>  mkdir -p $target_dir
+>>  echo "# Automatically generated by configure - do not modify" > $config=
+_target_mak
+>>=20=20
+>> @@ -6794,6 +6812,7 @@ case "$target_name" in
+>>      bflt=3D"yes"
+>>      mttcg=3D"yes"
+>>      gdb_xml_files=3D"arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+>> +    target_compiler=3D$cross_cc_arm
+>>    ;;
+>>    aarch64|aarch64_be)
+>>      TARGET_ARCH=3Daarch64
+>> @@ -6801,6 +6820,7 @@ case "$target_name" in
+>>      bflt=3D"yes"
+>>      mttcg=3D"yes"
+>>      gdb_xml_files=3D"aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-=
+vfp.xml arm-vfp3.xml arm-neon.xml"
+>> +    target_compiler=3D$cross_cc_aarch64
+>>    ;;
+>>    cris)
+>>    ;;
+>> @@ -6842,6 +6862,7 @@ case "$target_name" in
+>>    ;;
+>>    ppc)
+>>      gdb_xml_files=3D"power-core.xml power-fpu.xml power-altivec.xml pow=
+er-spe.xml"
+>> +    target_compiler=3D$cross_cc_powerpc
+>>    ;;
+>>    ppcemb)
+>>      TARGET_BASE_ARCH=3Dppc
+>> @@ -6916,6 +6937,25 @@ if [ "$TARGET_BASE_ARCH" =3D "" ]; then
+>>    TARGET_BASE_ARCH=3D$TARGET_ARCH
+>>  fi
+>>=20=20
+>> +# Do we have a cross compiler for this target?
+>> +if has $target_compiler; then
+>> +
+>> +    cat > $TMPC << EOF
+>> +#include <stdio.h>
+>> +int main(void) {
+>> +    printf("Hello World!\n");
+>> +}
+>> +EOF
+>> +
+>> +    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
+>> +        target_compiler=3D""
+>> +    else
+>> +        enabled_cross_compilers=3D"${enabled_cross_compilers} ${target_=
+compiler}"
+>> +    fi
+>> +else
+>> +    target_compiler=3D""
+>> +fi
+>> +
+>>  symlink "$source_path/Makefile.target" "$target_dir/Makefile"
+>>=20=20
+>>  upper() {
+>> @@ -6989,6 +7029,10 @@ if test "$target_bsd_user" =3D "yes" ; then
+>>    echo "CONFIG_BSD_USER=3Dy" >> $config_target_mak
+>>  fi
+>>=20=20
+>> +if test -n "$target_compiler"; then
+>> +  echo "CROSS_CC_GUEST=3D$target_compiler" >> $config_target_mak
+>> +fi
+>> +
+>>  # generate QEMU_CFLAGS/LDFLAGS for targets
+>>=20=20
+>>  cflags=3D""
+>> @@ -7111,6 +7155,12 @@ echo "QEMU_CFLAGS+=3D$cflags" >> $config_target_m=
+ak
+>>=20=20
+>>  done # for target in $targets
+>>=20=20
+>> +if test -n "$enabled_cross_compilers"; then
+>> +    echo
+>> +    echo "NOTE: cross-compilers enabled:"
+>> +    printf '%s\n' $enabled_cross_compilers | sort -u
+>> +fi
+>> +
+>>  if [ "$dtc_internal" =3D "yes" ]; then
+>>    echo "config-host.h: subdir-dtc" >> $config_host_mak
+>>  fi
+>>=20
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---11Y7aswkeuHtSBEs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa1GDcAAoJEJykq7OBq3PIfPAIAJxGO/0oioO8PDzQWJLXpeGj
-7VJkzVrGivp7M7082aEAHNDa0Z7NEKQn8DVvY4zodu8yBwsT8DohkBSyzjsSLYuR
-CLsq+8JvSyHzcdr/qlE1CC4j54qPybQF1z/qECl+yFDSf8do+gqbSj5OIXhDtAfk
-kGUOuRU2IjFnZ9mWODzOJD+LkDlRsJuEd/gVJeZSM7YQgW/MEmad0XtDx0lPQzrI
-qcbSKDMTZmBMk4ZFIqlgtYfqp/uiBB/qmSQLwFRoGYS0DdbBhQVxzRqgxoTnmaWG
-aFPxaae5I2vDLPmVwFjKZ0RS3tRSZ+6bd8bl0TGSOnr30dNxsKt5rk8LtUI+rb0=
-=bRig
------END PGP SIGNATURE-----
-
---11Y7aswkeuHtSBEs--
+--=20
+Alex Benn=C3=A9e
