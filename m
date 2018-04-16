@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f7ybX-0006qd-5p
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:31:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f7ybj-0006xk-6H
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f7ybS-00076y-4v
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:31:11 -0400
-Received: from mail-pl0-x235.google.com ([2607:f8b0:400e:c01::235]:33537)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f7ybR-00076i-UX
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:31:06 -0400
-Received: by mail-pl0-x235.google.com with SMTP id w12-v6so8622281plp.0
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 00:31:05 -0700 (PDT)
-Date: Mon, 16 Apr 2018 15:31:00 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180416073100.GA28904@stefanha-x1.localdomain>
-References: <20180406194205.9872-1-nikhilbalachandra.inbox@gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1f7ybe-0007Ay-6G
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 03:31:23 -0400
+Date: Mon, 16 Apr 2018 09:31:05 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180416093105.180b2ce3.cohuck@redhat.com>
+In-Reply-To: <c7dec4d0-2674-e51e-9698-571c7f02b6a7@linux.ibm.com>
+References: <1523629847-22369-1-git-send-email-thuth@redhat.com>
+	<df1a9534-c1ca-972b-91a6-359685a671df@linux.vnet.ibm.com>
+	<f3d7c3d0-26fe-37db-abb3-0e99373ae315@redhat.com>
+	<6b294d1a-5f3b-aa9c-c0e4-db9da04c4548@linux.vnet.ibm.com>
+	<fb58d12d-92b3-2a68-af10-f8f5608f5237@amsat.org>
+	<c7dec4d0-2674-e51e-9698-571c7f02b6a7@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IS0zKkzwUGydFO0o"
-Content-Disposition: inline
-In-Reply-To: <20180406194205.9872-1-nikhilbalachandra.inbox@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] Make qemu-bridge-helper work in macOS
- and FreeBSD
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.13] pc-bios/s390-ccw: size_t should
+ be unsigned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikhil Balachandra <nikhilbalachandra.inbox@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Collin Walling <walling@linux.ibm.com>
+Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
+On Fri, 13 Apr 2018 14:09:55 -0400
+Collin Walling <walling@linux.ibm.com> wrote:
 
---IS0zKkzwUGydFO0o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 04/13/2018 02:06 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 04/13/2018 01:59 PM, Halil Pasic wrote: =20
+> >>>> On 04/13/2018 04:30 PM, Thomas Huth wrote: =20
+> >>>>> "size_t" should be an unsigned type - the signed counterpart is cal=
+led
+> >>>>> "ssize_t" in the C standard instead. Thus we should also use this =
+=20
+> >>>> The first sentence sounds like ssize_t is too a type defined by some
+> >>>> C standard. Is it or does ssize_t come form somewhere else? =20
+> >>> Arrr, seems like ssize_t is rather coming from POSIX than from the C
+> >>> standard, thanks for the hint. I'll rephrase the first sentence to:
+> >>>
+> >>> "size_t" should be an unsigned type according to the C standard, and
+> >>> most libc implementations provide a signed counterpart called "ssize_=
+t".
+> >>>
+> >>> OK?
+> >>> =20
+> >>
+> >> This ssize_t seems to be an rather interesting type. For instance POSI=
+X says
+> >> """
+> >> size_t
+> >>     Used for sizes of objects.
+> >> ssize_t
+> >>     Used for a count of bytes or an error indication.
+> >> """
+> >> and
+> >> """
+> >> The type ssize_t shall be capable of storing values at least in the ra=
+nge [-1, {SSIZE_MAX}].
+> >> """
+> >>
+> >> And it does not mandate SSIZE_MIN in limits (but of course mandates SS=
+IZE_MAX.
+> >>
+> >> I don't like this 'counterpart' word here, because AFAIU these don't h=
+ave to
+> >> be counterparts in any sense. That is SSIZE_MAX << SIZE_MAX is possibl=
+e for
+> >> example. I'm not sure about the every positive has a negative thing, b=
+ut
+> >> that's not important here.
+> >>
+> >> The code in question kind of uses both signed and unsigned size for
+> >> the same (the string). We even have a signed to unsigned comparison wh=
+ich
+> >> could result in warnings. I still think the change is OK in practice, =
+but
+> >> maybe avoiding introducing ssize_t (until we really need it) is a bett=
+er
+> >> course of action. I think uitoa can be easily rewritten so it does not
+> >> need the ssize_t.
+> >>
+> >> How about that? =20
+> >=20
+> > This seems clever indeed.
+> >  =20
+>=20
+> This whole issue stems from my misuse of size_t in the first place. If it=
+ makes
+> things easier, let's just make num_idx of type "signed long".
+>=20
+> After reading this discussion, I think it makes sense to drop ssize_t. No=
+ need
+> to make it available for just one function unless there are strong claims=
+ to
+> also use this type elsewhere in the pc-bios (I can't find any).
+>=20
 
-On Sat, Apr 07, 2018 at 01:12:05AM +0530, Nikhil Balachandra wrote:
-> Eventhough macOS does not ship with the if_bridgevar.h header file[2],
-> I expect the API to remain stable as this header file is similar to what
-> is found in other BSDs. If this patch is decided to be included in the
-> qemu, can experienced qemu developers please tell me how to go about
-> having this header file in the include path such that it does not require
-> manually downloading and copying the file[3]?
-
-QEMU ships Linux headers.  They are synced using this script:
-scripts/update-linux-headers.sh
-
-If the macOS header is appropriately licensed, it could be kept under
-include/standard-headers/ alongside the other third-party headers that
-QEMU ships.
-
-> @@ -310,30 +374,18 @@ int main(int argc, char **argv)
->          goto cleanup;
->      }
-> =20
-> +
->      /* open the tap device */
-> -    fd =3D open("/dev/net/tun", O_RDWR);
-> +    memset(&iface, '\0', sizeof(char) * IFNAMSIZ);
-> +    int vnet_supported =3D has_vnet_hdr(fd);
-
-fd is always -1 here, so this patch breaks vnet hdr?
-
-> +    Error *err =3D NULL;
-> +    fd =3D tap_open(&iface[0], sizeof(iface), &vnet_supported, use_vnet,=
- 0, &err);
-
-tap_open() was not written with setuid programs in mind.  I think this
-is a case where code duplication is justified.
-
-It's safer to have the minimal code to open the tap device rather than
-calling into QEMU code which may not realize it is running setuid.
-
---IS0zKkzwUGydFO0o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa1FE0AAoJEJykq7OBq3PI+9IIAK4OkFoRuRLk7e8uArjHFgob
-Od2cUxC35RepOQx4S2ahT4YV7V373nDP1rvnyDsh8I8rDw2YR+fZp/0v5Z72/gh6
-Z1ey6lijXAt0WKVhOZOVaJYVz8ONshJu2MdBSNiVZsps53x6ZlMHN7lkYHShkr52
-hScuI72Mr3XycPE2uziSUMZPeMvqWTlLFQNOSgvLQwYRKEGFB2VbYWKyosbnHNGe
-id3vQ5Uf46HShuoUpYfJqpZPdcK9tuxi/0CmFIcZ2Fzikh7fzx2RefzEmiKAVLDG
-MBXYWzZlcSYcKQNcOV34riMTPMYQDA3la/7TZacIjwsg7IcJBjM+np0PBGdxGJo=
-=Jgw0
------END PGP SIGNATURE-----
-
---IS0zKkzwUGydFO0o--
++1 to just using signed long. Let's not make this needlessly complicated.
