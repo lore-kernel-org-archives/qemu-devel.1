@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f88Q6-0006Kh-7A
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:00:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1f88Ru-0007PB-SY
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f88Q2-000899-QW
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:00:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f88Q2-000881-IR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 13:59:58 -0400
-Date: Mon, 16 Apr 2018 14:59:55 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180416175955.GO29865@localhost.localdomain>
-References: <0c14166c-28c4-a1ad-093b-ba63e373e790@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1f88Rr-0001yf-P8
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:01:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f88Rr-0001vR-IS
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 14:01:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f88Rp-0005iQ-Sk
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 18:01:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CF8342E81C1
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 18:01:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0c14166c-28c4-a1ad-093b-ba63e373e790@redhat.com>
-Subject: Re: [Qemu-devel] Purpose of memory-backend-file.discard-data
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Apr 2018 17:47:12 -0000
+From: Thomas Huth <1654137@bugs.launchpad.net>
+Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
+Message-Id: <152390083343.12613.2972476658894722081.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1654137] Re: Ctrl-A b not working in 2.8.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +36,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Zack Cornelius <zack.cornelius@kove.net>
+To: qemu-devel@nongnu.org
 
-(CCing Zack Cornelius)
+** Changed in: qemu
+     Assignee: (unassigned) =3D> elmarco (marcandre-lureau)
 
-On Fri, Apr 13, 2018 at 08:21:26AM +0200, Michal Privoznik wrote:
-> Eduardo et al,
-> 
-> I'm looking at 11ae6ed8affdd131e and I wanted to implement libvirt
-> support for that. But more I look at it less I understand it. My
-> understanding it is an optimization (although not very effective one
-> since madvise() is/should be immediately followed by munmap()). So any
-> application that is trying to keep track of guest memory  can stop doing
-> so as soon as it sees munmap(). Or does the optimization lies in fact
-> that madvise() is called sooner and thus the app can stop caring
-> slightly sooner?
+-- =
 
-munmap() or close() are not enough: it would still make the host
-kernel unnecessarily write data to backing storage.  The point of
-the madvise() call is to tell the kernel that data can be
-destroyed instead of being written back.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1654137
 
-The original use case is described by Zack here:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg473538.html
+Title:
+  Ctrl-A b not working in 2.8.0
 
+Status in QEMU:
+  Confirmed
 
-> 
-> Also, I don't quite understand why is this configurable. What's the harm
-> in turning it on by default? Yesterday I've posted some patches to
-> libvirt list [1] (although I have to admit I am still not fully
-> convinced about the design) and they implement just this - whenever qemu
-> supports the feature libvirt turns it on.S
+Bug description:
+  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
+  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
+  Other Ctrl-A sequences seem to work correctly.
 
-The option can destroy the data on the backing file, so QEMU can't enable it by
-default.  libvirt can enable it as long as it knows it can destroy the data on
-the backing file.
+  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
+  installed on this system from source.
 
-> 
-> Michal
-> 
-> 1: https://www.redhat.com/archives/libvir-list/2018-April/msg01066.html
+  Reverting to the previous install restores "break" capability.
 
--- 
-Eduardo
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
