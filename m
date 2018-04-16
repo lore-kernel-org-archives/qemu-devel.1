@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiangshanlai@gmail.com>) id 1f85cT-0005qN-Sy
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:00:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f85r2-0002Au-Is
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiangshanlai@gmail.com>) id 1f85cQ-00036M-4n
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:00:37 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiangshanlai@gmail.com>)
-	id 1f85cP-00035L-Rv
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:00:34 -0400
-Received: by mail-pl0-x244.google.com with SMTP id a39-v6so10170190pla.10
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 08:00:33 -0700 (PDT)
-From: Lai Jiangshan <jiangshanlai@gmail.com>
-Date: Mon, 16 Apr 2018 23:00:11 +0800
-Message-Id: <20180416150011.55916-1-jiangshanlai@gmail.com>
-In-Reply-To: <CAJhGHyAMGjZe+QR3BQtA1cVxkz=isQbx6kWjNR6fa5LmW3rQUg@mail.gmail.com>
-References: <CAJhGHyAMGjZe+QR3BQtA1cVxkz=isQbx6kWjNR6fa5LmW3rQUg@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1f85r1-0005s5-71
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 11:15:40 -0400
+References: <20180412170711.GA6240@igalia.com>
+	<1695266a-47ac-1f6d-49d1-bdfb81e0e345@redhat.com>
+	<w517ep7gpsz.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
+Date: Mon, 16 Apr 2018 17:15:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH V5] migration: add capability to bypass the
- shared memory
+In-Reply-To: <w517ep7gpsz.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iUOI3PJf8Z0XH0uG7r6CRnZxoKCzkNA0P"
+Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,276 +25,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, "James O . D . Hunt" <james.o.hunt@intel.com>, Xu Wang <gnawux@gmail.com>, Peng Tao <bergwolf@gmail.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-1) What's this
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iUOI3PJf8Z0XH0uG7r6CRnZxoKCzkNA0P
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
+Subject: Re: [RFC] Intermediate block mirroring
+References: <20180412170711.GA6240@igalia.com>
+ <1695266a-47ac-1f6d-49d1-bdfb81e0e345@redhat.com>
+ <w517ep7gpsz.fsf@maestria.local.igalia.com>
+In-Reply-To: <w517ep7gpsz.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-When the migration capability 'bypass-shared-memory'
-is set, the shared memory will be bypassed when migration.
+On 2018-04-16 16:59, Alberto Garcia wrote:
+> On Fri 13 Apr 2018 04:23:07 PM CEST, Max Reitz wrote:
+>> On 2018-04-12 19:07, Alberto Garcia wrote:
+>>> Hello,
+>>>
+>>> I mentioned this some time ago, but I'd like to retake it now: I'm
+>>> checking how to copy arbitrary nodes on a backing chain, so if I have=
 
-It is the key feature to enable several excellent features for
-the qemu, such as qemu-local-migration, qemu-live-update,
-extremely-fast-save-restore, vm-template, vm-fast-live-clone,
-yet-another-post-copy-migration, etc..
+>>> e.g.
+>>>
+>>>    [A] <- [B] <- [C] <- [D]
+>>>
+>>> I'd like to end up with
+>>>
+>>>    [A] <- [E] <- [C] <- [D]
+>>>
+>>> where [E] is a copy of [B]. The most obvious use case is to move [B]
+>>> to a different storage backend.
+>>>
+>>> At the moment we can already copy [B] into [E] (outside QEMU) and the=
+n
+>>> do
+>>>
+>>>    change-backing-file device=3D[D] image-node-name=3D[C] backing-fil=
+e=3D[E]
+>>>
+>>> However this only changes the image on disk and the bs->backing_file
+>>> string in memory. QEMU keeps using the [B] BlockDriverState, and we
+>>> need to make it switch to [E].
+>>>
+>>> One possible way to do this would be to modify blockdev-mirror so the=
 
-The philosophy behind this key feature, including the resulting
-advanced key features, is that a part of the memory management
-is separated out from the qemu, and let the other toolkits
-such as libvirt, kata-containers (https://github.com/kata-containers)
-runv(https://github.com/hyperhq/runv/) or some multiple cooperative
-qemu commands directly access to it, manage it, provide features on it.
+>>> source image can be located anywhere on a chain. Currently there's
+>>> bs->backing_blocker preventing that, plus qmp_blockdev_mirror()
+>>> refuses to take any non-root source node. Other than permission
+>>> changes I don't think the algorithm itself needs any additional
+>>> modification, although I suppose we'd like to change the backing file=
 
-2) Status in real world
+>>> as part of the same job, and that would require API changes.
+>>
+>> Another way would be to write blockdev-copy. :-)
+>=20
+> Something like blockdev-backup but without copying data from backing
+> files? blockdev-mirror already allows configuring that using the
+> MirrorSyncMode parameter.
 
-The hyperhq(http://hyper.sh  http://hypercontainer.io/)
-introduced the feature vm-template(vm-fast-live-clone)
-to the hyper container for several years, it works perfect.
-(see https://github.com/hyperhq/runv/pull/297).
+No, a block job that unites blockdev-backup, blockdev-mirror, and
+block-commit.
 
-The feature vm-template makes the containers(VMs) can
-be started in 130ms and save 80M memory for every
-container(VM). So that the hyper containers are fast
-and high-density as normal containers.
+Active commit already is just mirror, non-active commit probably can
+easily be implemented with mirror (we just need an auto-complete), and
+it should be possible to add a backup mode to mirror (like active
+mirroring).  So we'd just have a single blockdev-copy job that can
+simply... Copy data from any node to any other.
 
-kata-containers project (https://github.com/kata-containers)
-which was launched by hyper, intel and friends and which descended
-from runv (and clear-container) should have this feature enabled.
-Unfortunately, due to the code confliction between runv&cc,
-this feature was temporary disabled and it is being brought
-back by hyper and intel team.
+I think we wanted to exclude streaming, because that works differently.
+But, well, streaming would be just installing a COR filter node and
+doing a blockdev-copy to null-co://, right? :-)
 
-3) How to use and bring up advanced features.
+>> I don't think there should be a limitation which nodes can be used as
+>> the source of blockdev-mirror, and I think the hardest part about
+>> lifting that limitation is about thinking what might break...  Maybe
+>> we should just drop the limitation and deal with the fallout later?  I=
 
-In current qemu command line, shared memory has
-to be configured via memory-object.
+>> can't imagine a single node configuration where we'd want to disallow
+>> copying off a node, so I suppose if that breaks in some edge case that=
 
-a) feature: qemu-local-migration, qemu-live-update
-Set the mem-path on the tmpfs and set share=on for it when
-start the vm. example:
--object \
-memory-backend-file,id=mem,size=128M,mem-path=/dev/shm/memory,share=on \
--numa node,nodeid=0,cpus=0-7,memdev=mem
+>> wouldn't be something we'd have to disallow again but we'd just have
+>> to fix it.
+>=20
+> I can't think of any problem either. The important question is what to
+> do if the source node is read/write, but that's what blockdev-mirror is=
 
-when you want to migrate the vm locally (after fixed a security bug
-of the qemu-binary, or other reason), you can start a new qemu with
-the same command line and -incoming, then you can migrate the
-vm from the old qemu to the new qemu with the migration capability
-'bypass-shared-memory' set. The migration will migrate the device-state
-*ONLY*, the memory is the origin memory backed by tmpfs file.
+> already about. In all other cases the source node is going to be read
+> only, isn't it?
 
-b) feature: extremely-fast-save-restore
-the same above, but the mem-path is on the persistent file system.
+I guess so.
 
-c)  feature: vm-template, vm-fast-live-clone
-the template vm is started as 1), and paused when the guest reaches
-the template point(example: the guest app is ready), then the template
-vm is saved. (the qemu process of the template can be killed now, because
-we need only the memory and the device state files (in tmpfs)).
+I just now remembered a bitmap issue, but that probably shouldn't stop
+you.  There is an issue with bitmaps on nodes with shared-writing childre=
+n.
 
-Then we can launch one or multiple VMs base on the template vm states,
-the new VMs are started without the “share=on”, all the new VMs share
-the initial memory from the memory file, they save a lot of memory.
-all the new VMs start from the template point, the guest app can go to
-work quickly.
+Imagine you have some qcow2 node or whatever, and you have a guest
+running on it.  Then you attach a filter to it (which allows shared
+writing) and put a mirror job on top of the filter.  Now whenever the
+guest writes to the qcow2 node, the bitmap the mirror job installed on
+the filter won't reflect that.  So that's an issue, but I think that
+case isn't forbidden by the current permission system, so we're already
+screwed there.
 
-The new VM booted from template vm can’t become template again,
-if you need this unusual chained-template feature, you can write
-a cloneable-tmpfs kernel module for it.
+So on the contrary, I'd suspect that running mirror inside of some
+backing chain or whatever may be less problematic than running it on
+top, actually...
 
-The libvirt toolkit can’t manage vm-template currently, in the
-hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
-“libvrit managed template” feature to libvirt.
+>>> One other way is to have a more generic replace-node command which
+>>> would call bdrv_replace_node(), but I don't know if we want to expose=
 
-d) feature: yet-another-post-copy-migration
-It is a possible feature, no toolkit can do it well now.
-Using nbd server/client on the memory file is reluctantly Ok but
-inconvenient. A special feature for tmpfs might be needed to
-fully complete this feature.
-No one need yet another post copy migration method,
-but it is possible when some crazy man need it.
+>>> that and I don't have any other use case for it at the moment.
+>>
+>> I think we do want to expose that.  As far as I'm informed, for graph
+>> manipulation we want a command that can replace nodes (including
+>> replacing nothing by a new node or replacing an existing node by
+>> nothing, if the parent supports that).
+>=20
+> Was there any discussion about this in the mailing list? (proposed name=
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>
-Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Cc: James O. D. Hunt <james.o.hunt@intel.com>
-Cc: Xu Wang <gnawux@gmail.com>
-Cc: Peng Tao <bergwolf@gmail.com>
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Signed-off-by: Lai Jiangshan <jiangshanlai@gmail.com>
----
+> for this function, features, etc.)
 
-Changes in V5:
- check cappability conflict in migrate_caps_check()
+Well, there is x-blockdev-change.  But we probably want to expose
+bdrv_reopen() in the long run.
 
-Changes in V4:
- fixes checkpatch.pl errors
+http://lists.nongnu.org/archive/html/qemu-block/2017-12/msg00522.html is
+what I can offer you.  That also has some info on blockdev-copy and the
+bitmap issue ("omniscient bitmaps" is the keyword).
 
-Changes in V3:
- rebased on upstream master
- update the available version of the capability to
- v2.13
+Max
 
-Changes in V2:
- rebased on 2.11.1
+>> Also, well, there is blockdev-mirror already has a @replaces
+>> parameter, right?  That was supposed to work with quorum, but it seems=
 
- migration/migration.c | 22 ++++++++++++++++++++++
- migration/migration.h |  1 +
- migration/ram.c       | 27 ++++++++++++++++++---------
- qapi/migration.json   |  6 +++++-
- 4 files changed, 46 insertions(+), 10 deletions(-)
+>> obvious to use it here, too.
+>=20
+> Yes, it could be used for this.
+>=20
+> Berto
+>=20
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 52a5092add..110b40f6d4 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -736,6 +736,19 @@ static bool migrate_caps_check(bool *cap_list,
-             return false;
-         }
- 
-+        if (cap_list[MIGRATION_CAPABILITY_BYPASS_SHARED_MEMORY]) {
-+            /* Bypass and postcopy are quite conflicting ways
-+             * to get memory in the destination.  And there
-+             * is not code to discriminate the differences and
-+             * handle the conflicts currently.  It should be possible
-+             * to fix, but it is generally useless when both ways
-+             * are used together.
-+             */
-+            error_setg(errp, "Bypass is not currently compatible "
-+                       "with postcopy");
-+            return false;
-+        }
-+
-         /* This check is reasonably expensive, so only when it's being
-          * set the first time, also it's only the destination that needs
-          * special support.
-@@ -1509,6 +1522,15 @@ bool migrate_release_ram(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_RELEASE_RAM];
- }
- 
-+bool migrate_bypass_shared_memory(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_BYPASS_SHARED_MEMORY];
-+}
-+
- bool migrate_postcopy_ram(void)
- {
-     MigrationState *s;
-diff --git a/migration/migration.h b/migration/migration.h
-index 8d2f320c48..cfd2513ef0 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -206,6 +206,7 @@ MigrationState *migrate_get_current(void);
- 
- bool migrate_postcopy(void);
- 
-+bool migrate_bypass_shared_memory(void);
- bool migrate_release_ram(void);
- bool migrate_postcopy_ram(void);
- bool migrate_zero_blocks(void);
-diff --git a/migration/ram.c b/migration/ram.c
-index 0e90efa092..bca170c386 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -780,6 +780,11 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-     unsigned long *bitmap = rb->bmap;
-     unsigned long next;
- 
-+    /* when this ramblock is requested bypassing */
-+    if (!bitmap) {
-+        return size;
-+    }
-+
-     if (rs->ram_bulk_stage && start > 0) {
-         next = start + 1;
-     } else {
-@@ -850,7 +855,9 @@ static void migration_bitmap_sync(RAMState *rs)
-     qemu_mutex_lock(&rs->bitmap_mutex);
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
--        migration_bitmap_sync_range(rs, block, 0, block->used_length);
-+        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
-+            migration_bitmap_sync_range(rs, block, 0, block->used_length);
-+        }
-     }
-     rcu_read_unlock();
-     qemu_mutex_unlock(&rs->bitmap_mutex);
-@@ -2132,18 +2139,12 @@ static int ram_state_init(RAMState **rsp)
-     qemu_mutex_init(&(*rsp)->src_page_req_mutex);
-     QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
- 
--    /*
--     * Count the total number of pages used by ram blocks not including any
--     * gaps due to alignment or unplugs.
--     */
--    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
--
-     ram_state_reset(*rsp);
- 
-     return 0;
- }
- 
--static void ram_list_init_bitmaps(void)
-+static void ram_list_init_bitmaps(RAMState *rs)
- {
-     RAMBlock *block;
-     unsigned long pages;
-@@ -2151,9 +2152,17 @@ static void ram_list_init_bitmaps(void)
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
-         QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+            if (migrate_bypass_shared_memory() && qemu_ram_is_shared(block)) {
-+                continue;
-+            }
-             pages = block->max_length >> TARGET_PAGE_BITS;
-             block->bmap = bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-+            /*
-+             * Count the total number of pages used by ram blocks not
-+             * including any gaps due to alignment or unplugs.
-+             */
-+            rs->migration_dirty_pages += pages;
-             if (migrate_postcopy_ram()) {
-                 block->unsentmap = bitmap_new(pages);
-                 bitmap_set(block->unsentmap, 0, pages);
-@@ -2169,7 +2178,7 @@ static void ram_init_bitmaps(RAMState *rs)
-     qemu_mutex_lock_ramlist();
-     rcu_read_lock();
- 
--    ram_list_init_bitmaps();
-+    ram_list_init_bitmaps(rs);
-     memory_global_dirty_log_start();
-     migration_bitmap_sync(rs);
- 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 9d0bf82cf4..45326480bd 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -357,13 +357,17 @@
- # @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
- #                 (since 2.12)
- #
-+# @bypass-shared-memory: the shared memory region will be bypassed on migration.
-+#          This feature allows the memory region to be reused by new qemu(s)
-+#          or be migrated separately. (since 2.13)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-            'block', 'return-path', 'pause-before-switchover', 'x-multifd',
--           'dirty-bitmaps' ] }
-+           'dirty-bitmaps', 'bypass-shared-memory' ] }
- 
- ##
- # @MigrationCapabilityStatus:
--- 
-2.15.1 (Apple Git-101)
+
+
+--iUOI3PJf8Z0XH0uG7r6CRnZxoKCzkNA0P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrUvgkACgkQ9AfbAGHV
+z0D1xQf+Oh7CSv4MhFi8S2XmKbF0zjZB0njq9QanNuntxXCicQh1zbJeVwiVzVrR
+ywK0rnAHRFCLDxUgylWbXLpeyBN8ZJ2ONc6BvGrg5d68/H8GDFKlOVRRd8bDn1iZ
+IKq3nplzulXf/dBVtb1r57RWiF9Sf8vGJ0aDA/pZuocOe+TnLbpXb5sjjP3xL3Sh
+2rNbxdtI382Z6SmtJw0bZcYVdVTJd1anS2ZjoPz45c7V4DHO2Xuu3rgFjGgTHinY
+Hx0bK6Sx2Dt0N0VLch4ZdWqxhjupVeR16LLdmpZ9vsurWcLS9qxU/gWNJzGytKYW
+um0M1x8toj3wvEwdF7qHCXOkkCrFrg==
+=UzRd
+-----END PGP SIGNATURE-----
+
+--iUOI3PJf8Z0XH0uG7r6CRnZxoKCzkNA0P--
