@@ -1,38 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frankja@linux.ibm.com>) id 1f7zjt-0005C9-BP
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:43:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1f7vs0-00085F-K5
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frankja@linux.ibm.com>) id 1f7zjq-0006pE-00
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:43:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
-	id 1f7zjp-0006na-NR
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 04:43:49 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3G8dTGI006653
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:43:47 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hcqs5a811-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:43:47 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
-	Mon, 16 Apr 2018 09:43:44 +0100
-References: <1523657288-6587-1-git-send-email-walling@linux.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Date: Mon, 16 Apr 2018 10:43:32 +0200
+	(envelope-from <bounces@canonical.com>) id 1f7vrv-0007GE-UH
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f7vrv-0007Dg-Na
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 00:35:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f7vrt-0003rt-GB
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:35:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0B6C62E818C
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 04:35:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1523657288-6587-1-git-send-email-walling@linux.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BxdougYu1y6jG1lWH7RD30HUwGszMfaVI"
-Message-Id: <73328409-4fa9-2a76-ce2f-0e6b4537fad9@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Small fixes for s390x QEMU boot menu
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Apr 2018 04:22:05 -0000
+From: David Lechner <david@lechnology.com>
+Reply-To: Bug 955379 <955379@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120314192314.1716.70997.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152385252602.22199.13020673428797575464.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 955379] Re: cmake hangs with qemu-arm-static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,93 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, borntraeger@de.ibm.com
-Cc: gor@linux.ibm.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BxdougYu1y6jG1lWH7RD30HUwGszMfaVI
-From: Janosch Frank <frankja@linux.ibm.com>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com,
- borntraeger@de.ibm.com
-Cc: gor@linux.ibm.com
-Message-ID: <73328409-4fa9-2a76-ce2f-0e6b4537fad9@linux.ibm.com>
-Subject: Re: [PATCH v2 0/4] Small fixes for s390x QEMU boot menu
-References: <1523657288-6587-1-git-send-email-walling@linux.ibm.com>
-In-Reply-To: <1523657288-6587-1-git-send-email-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I am seeing the same symptoms as the original poster. I'm building the
+opencv package in a debian stretch armfh chroot on a ubuntu bionic amd64
+host. So, I'm guessing that the race condition wasn't entirely fixed or
+there has been some sort of regression.
 
-On 14.04.2018 00:08, Collin Walling wrote:
-> Change Log:
->=20
->     v2
->=20
->         - added r-b's
->         - s/zipl_println/zipl_print_entry
->             - prints entry and returns entry number
->         - while loop now handles valid_entries
+-- =
 
-Series reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/955379
 
->=20
-> These patches fix the following:
->=20
->     - The QEMU zIPL boot menu does not allow accurate selection of
->         non-sequential entries.
->=20
->     - The QEMU zIPL boot menu does not have all the capabilities of the=
+Title:
+  cmake hangs with qemu-arm-static
 
->         real zIPL menu (such as commandline args). We should print a di=
-fferent
->         banner to reflect this.
->=20
->     - The loadparm array in main.c can end up being not null terminated=
- when
->         converted to an integer via atoui.
->=20
->     - A loadparm set to an empty string does not allow a boot menu.
->=20
->=20
-> Collin Walling (4):
->   pc-bios/s390-ccw: rename MAX_TABLE_ENTRIES to MAX_BOOT_ENTRIES
->   pc-bios/s390-ccw: fix loadparm initialization and int conversion
->   pc-bios/s390-ccw: fix non-sequential boot entries (eckd)
->   pc-bios/s390-ccw: fix non-sequential boot entries (enum)
->=20
->  hw/s390x/ipl.c              |  2 ++
->  pc-bios/s390-ccw/bootmap.c  | 16 +++++++------
->  pc-bios/s390-ccw/bootmap.h  |  2 --
->  pc-bios/s390-ccw/main.c     | 14 +++++------
->  pc-bios/s390-ccw/menu.c     | 58 +++++++++++++++++++++++++++++++------=
---------
->  pc-bios/s390-ccw/s390-ccw.h |  4 +++-
->  6 files changed, 61 insertions(+), 35 deletions(-)
->=20
+Status in QEMU:
+  Fix Released
+Status in Linaro QEMU:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+Status in qemu-linaro package in Ubuntu:
+  Confirmed
 
+Bug description:
+  I'm using git commit 3e7ecd976b06f... configured with --target-list
+  =3Darm-linux-user --static in a chroot environment to compile some
+  things. I ran into this problem with both pcl and opencv-2.3.1. cmake
+  consistently freezes at some point during its execution, though in a
+  different spot each time, usually during a step when it's searching
+  for some libraries. For instance, pcl most commonly stops after:
 
+  [snip]
+  -- Boost version: 1.46.1
+  -- Found the following Boost libraries:
+  --   system
+  --   filesystem
+  --   thread
+  --   date_time
+  -- checking for module 'eigen3'
+  --   found eigen3, version 3.0.1
 
---BxdougYu1y6jG1lWH7RD30HUwGszMfaVI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  which is perplexing because it freezes after finding what it wants,
+  not during the search. When it does get past that point, it does so
+  almost immediately but freezes somewhere else.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  I'm using 64-bit Ubuntu 11.10 with kernel release 3.0.0-16-generic
+  with an Intel i5.
 
-iQIcBAEBCAAGBQJa1GI7AAoJEBcO/8Q8ZEV5MvAQALxaz7giuqsWGvBAXbySq9jV
-u5PzsLmHFs315ybufy/oh7rF5CErRistnGi8rLX+8M/Q5Qx5DIlrqB5hKXAAw9f1
-5DKGFzrkCaOMfxowZzBlmYiU1Uk6UZKHEEKisljxyWwxve2pwrX8aHLK39Fyu80B
-j75liBuzqF+vXG45AjmOYJ/7OA7QFdD1oXXwutSP+nJbNQGWxGXipEBDwj+t/Jyb
-AT4g80yTEI+hakrRsZZIt+VfHJIdU2A7Ea+akDpAkEgnwpzeeD7nB138p22O2mf4
-+9biOg6DOrLbKo7e/FDEoo8ES9octeUcMn0KaXnolzx7e+EuSRWdmKl1zbwn2hQ7
-mBjfs3YWJnw/KEFARKhdZnv1VPww1shYBrwYWWAkVzTm3GV/jy/n90708rWzDmDy
-uOP4co5d9204jbAG3qHmTv7wSzYsWGM9LGXIuOE9PGF4RmHhV104tL3y4DhhdaZs
-XJ1CbfO0f+dkWgm11E8E/XFC9QssPVkpT+vnibuu9VjpVBoZqskegh+UQ84mqg/7
-Ulos1P/AXIVfdf10R24tJNP4ZS2JUiKWaYT4bd6l02mlP0SSS+DpfeuJtcx+pmwD
-dLx1ei/q0se/9r3MH+eDBx0VJ9fjgdrlDz5H/lrHV5CtWm/2AmY09M5lFR52tPgp
-eT4oH5jELHEnwa2dPHzl
-=YeIk
------END PGP SIGNATURE-----
-
---BxdougYu1y6jG1lWH7RD30HUwGszMfaVI--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/955379/+subscriptions
