@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f87T7-0007Rn-VM
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:59:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f87T8-0007SS-LB
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f87T6-0003Ez-O5
+	(envelope-from <mreitz@redhat.com>) id 1f87T7-0003FJ-5h
 	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:59:06 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 16 Apr 2018 18:58:40 +0200
-Message-Id: <20180416165849.28864-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/9] block: Add COR filter driver
+Date: Mon, 16 Apr 2018 18:58:41 +0200
+Message-Id: <20180416165849.28864-2-mreitz@redhat.com>
+In-Reply-To: <20180416165849.28864-1-mreitz@redhat.com>
+References: <20180416165849.28864-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/9] block: Add COR filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +22,241 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-In our quest to... (Oh, man, I always struggle with writing cover
-letters.  But rarely have I become stuck so early on.)  Orthogonalize?
-the block layer (that is, turn hard-coded special options into
-independent data processing nodes you can put anywhere in your data flow
-graph), this series adds a copy-on-read filter driver that is supposed
-to replace the copy-on-read -drive option in the long run.  In the short
-run, it allows you to use COR with blockdev-add.
+This adds a simple copy-on-read filter driver.  It relies on the already
+existing COR functionality in the central block layer code, which may be
+moved here once we no longer need it there.
 
-The patch itself is extremely simple.  It's just patch 1.  All we have
-to do for now is to set the BDRV_REQ_COPY_ON_READ flag for read
-requests.  We probably want to extend the COR driver's capabilities
-later on, though, more on that below under "What to do as a follow-up?".
-
-But there is something to do on top of that.  One real issue with the
-current copy-on-read model is that you generally cannot do COR through
-filter nodes (-drive copy-on-read=on,driver=raw,file.driver=qcow2,...).
-Unless you are lucky that someone has requested WRITE permission, you
-will run into a failed assertion from the permission system (see
-patch 9).  Actually, you should always run into such an abort, but the
-COR code cleverly sneaks its writes around it.  Well, actually, the
-respective assertion is just commented out with a comment noting that
-we'd need a proper COR filter so we could do the assertion.
-
-So the new COR node will take the permission for its child that the
-current code does not (because it cannot, for the lack of a node that
-would do this).  However, of course we don't want it to require a WRITE
-permission but just WRITE_UNCHANGED.  But when it issues a post-COR
-write request that goes down to a filter and that filter re-issues that
-write down to its child, then it will just be a normal write.  So
-suddenly WRITE_UNCHANGED won't be sufficient, we'd need a standard WRITE
-instead.
-
-That isn't what we want, though.  So this series also adds a
-BDRV_REQ_WRITE_UNCHANGED write request flag that is set when issuing a
-COR write.  This flag tells the block code that the WRITE_UNCHANGED
-permission will be sufficient to execute the request.  Filter drivers
-need to pass this along; format drivers don't because they take a
-full-on WRITE permission on their file anyway.
-
-So most of this series is about adding this new flag.
-
-(Note that this does nothing to fix the situation with the old
- copy-on-read=on.  That will still runs into a failed assertion if you
- poke it the right way.  But the cruel reality is that the only way to
- really fix this is by converting copy-on-read=on into an implicit COR
- node.)
-
-
-Finally, the test we have for COR (197) is copied and modified to use
-the COR filter; and another test is added for the situation described
-above (COR through filter nodes).
-
-
-=== What to do as a follow-up? ===
-
-The obvious thing is to transform the current copy-on-read flag into an
-implicit COR node.  Probably not too difficult, actually (just handle it
-like snapshot=on), but we need to hide that fact in the query functions.
-
-Also, we want to make the stream block job code use this node.  Maybe we
-eventually want this node become the stream block job eventually,
-actually.  That is, give it enough runtime options that you can perform
-a stream operation just by inserting a COR node into the graph.  But
-probably that won't be possible, because someone still needs to submit
-reads requests across the whole disk so that everything is actually
-copied.  This could be achieved with a blockdev-copy to null-co://,
-though.
-
-Once both is done, we want to remove the COR code from block.c and move
-it directly into the COR driver.
-
-Max Reitz (9):
-  block: Add COR filter driver
-  block: BLK_PERM_WRITE includes ..._UNCHANGED
-  block: Add BDRV_REQ_WRITE_UNCHANGED flag
-  block: Set BDRV_REQ_WRITE_UNCHANGED for COR writes
-  block/quorum: Support BDRV_REQ_WRITE_UNCHANGED
-  block: Support BDRV_REQ_WRITE_UNCHANGED in filters
-  iotests: Clean up wrap image in 197
-  iotests: Copy 197 for COR filter driver
-  iotests: Add test for COR across nodes
-
- block/Makefile.objs        |   2 +-
- qapi/block-core.json       |   5 +-
- include/block/block.h      |   9 ++-
- block/blkdebug.c           |   9 +--
- block/blkreplay.c          |   3 +
- block/blkverify.c          |   3 +
- block/cor.c                | 173 +++++++++++++++++++++++++++++++++++++++++++++
- block/io.c                 |  12 +++-
- block/mirror.c             |   2 +
- block/quorum.c             |  19 +++--
- block/raw-format.c         |   9 +--
- block/throttle.c           |   6 +-
- tests/qemu-iotests/197     |   1 +
- tests/qemu-iotests/215     | 120 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/215.out |  26 +++++++
- tests/qemu-iotests/216     | 117 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/216.out |  28 ++++++++
- tests/qemu-iotests/group   |   2 +
- 18 files changed, 524 insertions(+), 22 deletions(-)
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/Makefile.objs  |   2 +-
+ qapi/block-core.json |   5 +-
+ block/cor.c          | 171 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 176 insertions(+), 2 deletions(-)
  create mode 100644 block/cor.c
- create mode 100755 tests/qemu-iotests/215
- create mode 100644 tests/qemu-iotests/215.out
- create mode 100755 tests/qemu-iotests/216
- create mode 100644 tests/qemu-iotests/216.out
 
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index d644bac60a..6fdf786c04 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -26,7 +26,7 @@ block-obj-y += accounting.o dirty-bitmap.o
+ block-obj-y += write-threshold.o
+ block-obj-y += backup.o
+ block-obj-$(CONFIG_REPLICATION) += replication.o
+-block-obj-y += throttle.o
++block-obj-y += throttle.o cor.o
+ 
+ block-obj-y += crypto.o
+ 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index c50517bff3..3abbf4fcf1 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2506,11 +2506,12 @@
+ # @vxhs: Since 2.10
+ # @throttle: Since 2.11
+ # @nvme: Since 2.12
++# @cor: Since 2.13
+ #
+ # Since: 2.9
+ ##
+ { 'enum': 'BlockdevDriver',
+-  'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop',
++  'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop', 'cor',
+             'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+             'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
+@@ -3522,6 +3523,7 @@
+       'blkverify':  'BlockdevOptionsBlkverify',
+       'bochs':      'BlockdevOptionsGenericFormat',
+       'cloop':      'BlockdevOptionsGenericFormat',
++      'cor':        'BlockdevOptionsGenericFormat',
+       'dmg':        'BlockdevOptionsGenericFormat',
+       'file':       'BlockdevOptionsFile',
+       'ftp':        'BlockdevOptionsCurlFtp',
+@@ -4049,6 +4051,7 @@
+       'blkverify':      'BlockdevCreateNotSupported',
+       'bochs':          'BlockdevCreateNotSupported',
+       'cloop':          'BlockdevCreateNotSupported',
++      'cor':            'BlockdevCreateNotSupported',
+       'dmg':            'BlockdevCreateNotSupported',
+       'file':           'BlockdevCreateOptionsFile',
+       'ftp':            'BlockdevCreateNotSupported',
+diff --git a/block/cor.c b/block/cor.c
+new file mode 100644
+index 0000000000..a4cb4e2b84
+--- /dev/null
++++ b/block/cor.c
+@@ -0,0 +1,171 @@
++/*
++ * Copy-on-read filter block driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * Author:
++ *   Max Reitz <mreitz@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block_int.h"
++
++
++static int cor_open(BlockDriverState *bs, QDict *options, int flags,
++                    Error **errp)
++{
++    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
++                               errp);
++    if (!bs->file) {
++        return -EINVAL;
++    }
++
++    bs->supported_write_flags = BDRV_REQ_FUA &
++                                    bs->file->bs->supported_write_flags;
++
++    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++                                    bs->file->bs->supported_zero_flags;
++
++    return 0;
++}
++
++
++static void cor_close(BlockDriverState *bs)
++{
++}
++
++
++#define PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
++                          | BLK_PERM_WRITE \
++                          | BLK_PERM_RESIZE)
++#define PERM_UNCHANGED (BLK_PERM_ALL & ~PERM_PASSTHROUGH)
++
++static void cor_child_perm(BlockDriverState *bs, BdrvChild *c,
++                           const BdrvChildRole *role,
++                           BlockReopenQueue *reopen_queue,
++                           uint64_t perm, uint64_t shared,
++                           uint64_t *nperm, uint64_t *nshared)
++{
++    if (c == NULL) {
++        *nperm = (perm & PERM_PASSTHROUGH) | BLK_PERM_WRITE_UNCHANGED;
++        *nshared = (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
++        return;
++    }
++
++    *nperm = (perm & PERM_PASSTHROUGH) |
++             (c->perm & PERM_UNCHANGED);
++    *nshared = (shared & PERM_PASSTHROUGH) |
++               (c->shared_perm & PERM_UNCHANGED);
++}
++
++
++static int64_t cor_getlength(BlockDriverState *bs)
++{
++    return bdrv_getlength(bs->file->bs);
++}
++
++
++static int cor_truncate(BlockDriverState *bs, int64_t offset,
++                        PreallocMode prealloc, Error **errp)
++{
++    return bdrv_truncate(bs->file, offset, prealloc, errp);
++}
++
++
++static int coroutine_fn cor_co_preadv(BlockDriverState *bs,
++                                      uint64_t offset, uint64_t bytes,
++                                      QEMUIOVector *qiov, int flags)
++{
++    return bdrv_co_preadv(bs->file, offset, bytes, qiov,
++                          flags | BDRV_REQ_COPY_ON_READ);
++}
++
++
++static int coroutine_fn cor_co_pwritev(BlockDriverState *bs,
++                                       uint64_t offset, uint64_t bytes,
++                                       QEMUIOVector *qiov, int flags)
++{
++
++    return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
++}
++
++
++static int coroutine_fn cor_co_pwrite_zeroes(BlockDriverState *bs,
++                                             int64_t offset, int bytes,
++                                             BdrvRequestFlags flags)
++{
++    return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
++}
++
++
++static int coroutine_fn cor_co_pdiscard(BlockDriverState *bs,
++                                        int64_t offset, int bytes)
++{
++    return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
++}
++
++
++static void cor_eject(BlockDriverState *bs, bool eject_flag)
++{
++    bdrv_eject(bs->file->bs, eject_flag);
++}
++
++
++static void cor_lock_medium(BlockDriverState *bs, bool locked)
++{
++    bdrv_lock_medium(bs->file->bs, locked);
++}
++
++
++static bool cor_recurse_is_first_non_filter(BlockDriverState *bs,
++                                            BlockDriverState *candidate)
++{
++    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
++}
++
++
++BlockDriver bdrv_cor = {
++    .format_name                        = "cor",
++
++    .bdrv_open                          = cor_open,
++    .bdrv_close                         = cor_close,
++    .bdrv_child_perm                    = cor_child_perm,
++
++    .bdrv_getlength                     = cor_getlength,
++    .bdrv_truncate                      = cor_truncate,
++
++    .bdrv_co_preadv                     = cor_co_preadv,
++    .bdrv_co_pwritev                    = cor_co_pwritev,
++    .bdrv_co_pwrite_zeroes              = cor_co_pwrite_zeroes,
++    .bdrv_co_pdiscard                   = cor_co_pdiscard,
++
++    .bdrv_eject                         = cor_eject,
++    .bdrv_lock_medium                   = cor_lock_medium,
++
++    .bdrv_co_block_status               = bdrv_co_block_status_from_file,
++
++    .bdrv_recurse_is_first_non_filter   = cor_recurse_is_first_non_filter,
++
++    .has_variable_length                = true,
++    .is_filter                          = true,
++};
++
++static void bdrv_cor_init(void)
++{
++    bdrv_register(&bdrv_cor);
++}
++
++block_init(bdrv_cor_init);
 -- 
 2.14.3
