@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f82Ya-0006AV-05
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f82Ya-0006Ab-21
 	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f82YU-0005kx-TF
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f82YU-0005lE-VS
 	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 07:44:23 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 16 Apr 2018 14:44:11 +0300
-Message-Id: <20180416114414.18406-5-vsementsov@virtuozzo.com>
+Date: Mon, 16 Apr 2018 14:44:10 +0300
+Message-Id: <20180416114414.18406-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20180416114414.18406-1-vsementsov@virtuozzo.com>
 References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 4/7] dirty-bitmap: separate unused
- meta-bitmap related functions
+Subject: [Qemu-devel] [PATCH v2 3/7] dirty-bitmap: remove missed
+ bdrv_dirty_bitmap_get_autoload header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +23,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, eblake@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com
 
-Separate them in the header and clarify needed locking in comments.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/dirty-bitmap.h | 14 +++++++++-----
- block/dirty-bitmap.c         |  5 +++++
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ include/block/dirty-bitmap.h | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index c7e910016d..b7ccfd1363 100644
+index 1ff8949b1b..c7e910016d 100644
 --- a/include/block/dirty-bitmap.h
 +++ b/include/block/dirty-bitmap.h
-@@ -9,9 +9,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-                                           uint32_t granularity,
-                                           const char *name,
-                                           Error **errp);
--void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
--                                   int chunk_size);
--void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-                                        BdrvDirtyBitmap *bitmap,
-                                        Error **errp);
-@@ -45,7 +42,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                            int64_t offset, int64_t bytes);
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                              int64_t offset, int64_t bytes);
--BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
- 
-@@ -84,7 +80,6 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
--int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+@@ -88,7 +88,6 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
  void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
-@@ -99,4 +94,13 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-                                                   BdrvDirtyBitmap *bitmap,
-                                                   Error **errp);
- 
-+/*
-+ * Unused for now meta-bitmaps related functions
-+ */
-+
-+void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap, int chunk_size);
-+void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
-+BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
-+int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-+
- #endif
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 6c00288fd7..1812e17549 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -149,6 +149,8 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-  * @bitmap: the block dirty bitmap for which to create a meta dirty bitmap.
-  * @chunk_size: how many bytes of bitmap data does each bit in the meta bitmap
-  * track.
-+ *
-+ * Called with BQL taken.
-  */
- void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                                    int chunk_size)
-@@ -160,6 +162,7 @@ void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-     qemu_mutex_unlock(bitmap->mutex);
- }
- 
-+/* Called with BQL taken. */
- void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
- {
-     assert(bitmap->meta);
-@@ -529,6 +532,7 @@ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
-     return iter;
- }
- 
-+/* Called with BQL and dirty_bitmap_mutex locked. */
- BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap)
- {
-     BdrvDirtyBitmapIter *iter = g_new(BdrvDirtyBitmapIter, 1);
-@@ -688,6 +692,7 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
-     return hbitmap_count(bitmap->bitmap);
- }
- 
-+/* Called with BQL or dirty_bitmap_mutex locked */
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
- {
-     return hbitmap_count(bitmap->meta);
+-bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap);
+ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
 -- 
 2.11.1
