@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1f7wcE-0006Gu-6Y
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 01:23:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1f7wjG-0000wY-9X
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 01:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1f7wcD-00085X-1D
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 01:23:46 -0400
-References: <20180415234307.28132-1-f4bug@amsat.org>
-	<20180415234307.28132-34-f4bug@amsat.org>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <f11c4eac-fcbf-0aa3-06bf-570ff57144c4@weilnetz.de>
-Date: Mon, 16 Apr 2018 07:23:33 +0200
+	(envelope-from <thuth@redhat.com>) id 1f7wjC-0003qn-Av
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 01:31:02 -0400
+References: <1523657288-6587-1-git-send-email-walling@linux.ibm.com>
+	<1523657288-6587-4-git-send-email-walling@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5c1cb916-c9be-269d-ea0e-324d1afb07e3@redhat.com>
+Date: Mon, 16 Apr 2018 07:30:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180415234307.28132-34-f4bug@amsat.org>
+In-Reply-To: <1523657288-6587-4-git-send-email-walling@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 33/41] hw/net: Use the BYTE-based
- definitions
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] pc-bios/s390-ccw: fix non-sequential
+ boot entries (eckd)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,140 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, "open list:Allwinner-a10" <qemu-arm@nongnu.org>
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
+Cc: gor@linux.ibm.com, frankja@linux.ibm.com
 
-Am 16.04.2018 um 01:42 schrieb Philippe Mathieu-Daud=C3=A9:
-> It eases code review, unit is explicit.
->=20
-> Patch generated using:
->=20
->   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include=
-/hw/
->=20
-> and modified manually.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 14.04.2018 00:08, Collin Walling wrote:
+> zIPL boot menu entries can be non-sequential. Let's account
+> for this issue for the s390 zIPL boot menu. Since this boot
+> menu is actually an imitation and is not completely capable
+> of everything the real zIPL menu can do, let's also print a
+> different banner to the user.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
 > ---
->  include/hw/net/allwinner_emac.h | 5 +++--
->  hw/net/e1000e.c                 | 7 ++++---
->  hw/net/e1000x_common.c          | 3 ++-
->  hw/net/eepro100.c               | 7 +++----
->  4 files changed, 12 insertions(+), 10 deletions(-)
->=20
-> diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner=
-_emac.h
-> index 4cc8aab7ec..4b53b6485c 100644
-> --- a/include/hw/net/allwinner_emac.h
-> +++ b/include/hw/net/allwinner_emac.h
-> @@ -23,6 +23,7 @@
->  #ifndef ALLWINNER_EMAC_H
->  #define ALLWINNER_EMAC_H
-> =20
-> +#include "qemu/units.h"
->  #include "net/net.h"
->  #include "qemu/fifo8.h"
->  #include "hw/net/mii.h"
-> @@ -125,8 +126,8 @@
->  #define EMAC_INT_RX         (1 << 8)
-> =20
->  /* Due to lack of specifications, size of fifos is chosen arbitrarily =
-*/
-> -#define TX_FIFO_SIZE        (4 * 1024)
-> -#define RX_FIFO_SIZE        (32 * 1024)
-> +#define TX_FIFO_SIZE        (4 * K_BYTE)
-> +#define RX_FIFO_SIZE        (32 * K_BYTE)
-> =20
->  #define NUM_TX_FIFOS        2
->  #define RX_HDR_SIZE         8
-> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-> index 16a9417a85..101efe7c83 100644
-> --- a/hw/net/e1000e.c
-> +++ b/hw/net/e1000e.c
-> @@ -34,6 +34,7 @@
->  */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "net/net.h"
->  #include "net/tap.h"
->  #include "qemu/range.h"
-> @@ -81,10 +82,10 @@ typedef struct E1000EState {
->  #define E1000E_IO_IDX       2
->  #define E1000E_MSIX_IDX     3
-> =20
-> -#define E1000E_MMIO_SIZE    (128 * 1024)
-> -#define E1000E_FLASH_SIZE   (128 * 1024)
-> +#define E1000E_MMIO_SIZE    (128 * K_BYTE)
-> +#define E1000E_FLASH_SIZE   (128 * K_BYTE)
->  #define E1000E_IO_SIZE      (32)
-> -#define E1000E_MSIX_SIZE    (16 * 1024)
-> +#define E1000E_MSIX_SIZE    (16 * K_BYTE)
-> =20
->  #define E1000E_MSIX_TABLE   (0x0000)
->  #define E1000E_MSIX_PBA     (0x2000)
-> diff --git a/hw/net/e1000x_common.c b/hw/net/e1000x_common.c
-> index eb0e097137..58c8db77e9 100644
-> --- a/hw/net/e1000x_common.c
-> +++ b/hw/net/e1000x_common.c
-> @@ -23,6 +23,7 @@
->  */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "hw/hw.h"
->  #include "hw/pci/pci.h"
->  #include "net/net.h"
-> @@ -111,7 +112,7 @@ bool e1000x_is_oversized(uint32_t *mac, size_t size=
-)
->      static const int maximum_ethernet_vlan_size =3D 1522;
->      /* this is the size past which hardware will
->         drop packets when setting LPE=3D1 */
-> -    static const int maximum_ethernet_lpe_size =3D 16384;
-> +    static const int maximum_ethernet_lpe_size =3D 16 * K_BYTE;
-> =20
->      if ((size > maximum_ethernet_lpe_size ||
->          (size > maximum_ethernet_vlan_size
-> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> index a07a63247e..a02e2b55e8 100644
-> --- a/hw/net/eepro100.c
-> +++ b/hw/net/eepro100.c
-> @@ -41,6 +41,7 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "hw/hw.h"
->  #include "hw/pci/pci.h"
->  #include "net/net.h"
-> @@ -60,8 +61,6 @@
->   * changed to pad short packets itself. */
->  #define CONFIG_PAD_RECEIVED_FRAMES
-> =20
-> -#define KiB 1024
-> -
->  /* Debug EEPRO100 card. */
->  #if 0
->  # define DEBUG_EEPRO100
-> @@ -104,9 +103,9 @@
->  /* Use 64 word EEPROM. TODO: could be a runtime option. */
->  #define EEPROM_SIZE     64
-> =20
-> -#define PCI_MEM_SIZE            (4 * KiB)
-> +#define PCI_MEM_SIZE            (4 * K_BYTE)
->  #define PCI_IO_SIZE             64
-> -#define PCI_FLASH_SIZE          (128 * KiB)
-> +#define PCI_FLASH_SIZE          (128 * K_BYTE)
-> =20
->  #define BITS(n, m) (((0xffffffffU << (31 - n)) >> (31 - n + m)) << m)
+>  pc-bios/s390-ccw/menu.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+> index 96eec81..aaf5d61 100644
+> --- a/pc-bios/s390-ccw/menu.c
+> +++ b/pc-bios/s390-ccw/menu.c
+> @@ -158,7 +158,7 @@ static void boot_menu_prompt(bool retry)
+>      }
+>  }
+>  
+> -static int get_boot_index(int entries)
+> +static int get_boot_index(bool *valid_entries)
+>  {
+>      int boot_index;
+>      bool retry = false;
+> @@ -168,7 +168,8 @@ static int get_boot_index(int entries)
+>          boot_menu_prompt(retry);
+>          boot_index = get_index();
+>          retry = true;
+> -    } while (boot_index < 0 || boot_index >= entries);
+> +    } while (boot_index < 0 || boot_index >= MAX_BOOT_ENTRIES ||
+> +             !valid_entries[boot_index]);
+>  
+>      sclp_print("\nBooting entry #");
+>      sclp_print(uitoa(boot_index, tmp, sizeof(tmp)));
+> @@ -176,7 +177,8 @@ static int get_boot_index(int entries)
+>      return boot_index;
+>  }
+>  
+> -static void zipl_println(const char *data, size_t len)
+> +/* Returns the entry number that was printed */
+> +static int zipl_print_entry(const char *data, size_t len)
+>  {
+>      char buf[len + 2];
+>  
+> @@ -185,12 +187,15 @@ static void zipl_println(const char *data, size_t len)
+>      buf[len + 1] = '\0';
+>  
+>      sclp_print(buf);
+> +
+> +    return buf[0] == ' ' ? atoui(buf + 1) : atoui(buf);
+>  }
+>  
+>  int menu_get_zipl_boot_index(const char *menu_data)
+>  {
+>      size_t len;
+> -    int entries;
+> +    int entry;
+> +    bool valid_entries[MAX_BOOT_ENTRIES] = {false};
+>      uint16_t zipl_flag = *(uint16_t *)(menu_data - ZIPL_FLAG_OFFSET);
+>      uint16_t zipl_timeout = *(uint16_t *)(menu_data - ZIPL_TIMEOUT_OFFSET);
+>  
+> @@ -202,19 +207,25 @@ int menu_get_zipl_boot_index(const char *menu_data)
+>          timeout = zipl_timeout * 1000;
+>      }
+>  
+> -    /* Print and count all menu items, including the banner */
+> -    for (entries = 0; *menu_data; entries++) {
+> +    /* Print banner */
+> +    sclp_print("s390-ccw zIPL Boot Menu\n\n");
+> +    menu_data += strlen(menu_data) + 1;
+> +
+> +    /* Print entries */
+> +    while (*menu_data) {
+>          len = strlen(menu_data);
+> -        zipl_println(menu_data, len);
+> +        entry = zipl_print_entry(menu_data, len);
+>          menu_data += len + 1;
+>  
+> -        if (entries < 2) {
+> +        valid_entries[entry] = true;
+> +
+> +        if (entry == 0) {
+>              sclp_print("\n");
+>          }
+>      }
+>  
+>      sclp_print("\n");
+> -    return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
+> +    return get_boot_index(valid_entries);
+>  }
 
-
-Technically this is fine, therefore
-
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-
-Practically I'd prefer replacing all K_BYTE by KiB, because that is the
-standard name with a precise definition:
-https://en.wikipedia.org/wiki/Kibibyte.
-
-Stefan
+Reviewed-by: Thomas Huth <thuth@redhat.com>
