@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f83K5-0006Sh-7d
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:33:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f83P5-00009h-Tm
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f83K4-00057L-9l
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:33:29 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f83K4-00056v-45
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:33:28 -0400
-Received: by mail-oi0-x242.google.com with SMTP id 126-v6so14310600oig.0
-	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 05:33:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1523518688-26674-3-git-send-email-eric.auger@redhat.com>
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-	<1523518688-26674-3-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Apr 2018 13:33:06 +0100
-Message-ID: <CAFEAcA-SM6DkdpEcC6eSOvrjLOMC2cpxyaWjS3ezcp_EnvCjFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 02/17] hw/arm/smmu-common: IOMMU memory
- region and address space setup
+	(envelope-from <mreitz@redhat.com>) id 1f83P4-0008JN-Tj
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 08:38:39 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 16 Apr 2018 14:38:21 +0200
+Message-Id: <20180416123822.11744-2-mreitz@redhat.com>
+In-Reply-To: <20180416123822.11744-1-mreitz@redhat.com>
+References: <20180416123822.11744-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 1/2] qcow2: try load bitmaps only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +19,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
-> We set up the infrastructure to enumerate all the PCI devices
-> attached to the SMMU and create an associated IOMMU memory
-> region and address space.
->
-> Those info are stored in SMMUDevice objects. The devices are
-> grouped according to the PCIBus they belong to. A hash table
-> indexed by the PCIBus pointer is used. Also an array indexed by
-> the bus number allows to find the list of SMMUDevices.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->
-> ---
-> v9 -> v10:
-> - comment functions added to the header
-> - g_free(name)
-> - renamed smmu_find_as_from_bus_num into smmu_find_smmu_pcibus
-> - add a comment about lazy init in smmu_find_smmu_pcibus
-> - add a trace event when creating the smmu iommu mr
->
-> v8 -> v9:
-> - fix key value for lookup
->
-> v7 -> v8:
-> - introduce SMMU_MAX_VA_BITS
-> - use PCI bus handle as a key
-> - do not clear s->smmu_as_by_bus_num
-> - use g_new0 instead of g_malloc0
-> - use primary_bus field
-> ---
->  hw/arm/smmu-common.c         | 69 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/arm/trace-events          |  3 ++
->  include/hw/arm/smmu-common.h |  8 +++++
->  3 files changed, 80 insertions(+)
->
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index e086ff5..9a966bb 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -28,8 +28,69 @@
->  #include "qemu/error-report.h"
->  #include "hw/arm/smmu-common.h"
->
-> +/**
-> + * The bus number is used for lookup when SID based invalidatation occurs.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-"invalidation"
+Checking reopen by existence of some bitmaps is wrong, as it may be
+some other bitmaps, or on the other hand, user may remove bitmaps. This
+criteria is bad. To simplify things and make behavior more predictable
+let's just add a flag to remember, that we've already tried to load
+bitmaps on open and do not want do it again.
 
-> + * In that case we lazily populate the SMMUPciBus array from the bus hash
-> + * table. At the time the SMMUPciBus is created (smmu_find_add_as), the bus
-> + * numbers may not be always initialized yet.
-> + */
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20180411122606.367301-2-vsementsov@virtuozzo.com
+[mreitz: Changed comment wording according to Eric Blake's suggestion]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.h |  1 +
+ block/qcow2.c | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-
-> +/* Return the stream ID of an SMMU device */
-> +static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
-> +{
-> +    return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
-
-I think this is PCI_BUILD_BDF(pci_bus_num(sdev->bus), sdev->devfn)
-and I suspect the mask with 0xff is unneeded (compare pci_get_bdf()
-and amdvi_do_translate(), which just assume the bus number is sane).
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+diff --git a/block/qcow2.h b/block/qcow2.h
+index d301f77cea..adf5c3950f 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -298,6 +298,7 @@ typedef struct BDRVQcow2State {
+     uint32_t nb_bitmaps;
+     uint64_t bitmap_directory_size;
+     uint64_t bitmap_directory_offset;
++    bool dirty_bitmaps_loaded;
+ 
+     int flags;
+     int qcow_version;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 486f3e83b7..ef68772aca 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1142,6 +1142,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+     uint64_t ext_end;
+     uint64_t l1_vm_state_index;
+     bool update_header = false;
++    bool header_updated = false;
+ 
+     ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
+     if (ret < 0) {
+@@ -1480,10 +1481,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+     }
+ 
+-    if (bdrv_dirty_bitmap_next(bs, NULL)) {
+-        /* It's some kind of reopen with already existing dirty bitmaps. There
+-         * are no known cases where we need loading bitmaps in such situation,
+-         * so it's safer don't load them.
++    if (s->dirty_bitmaps_loaded) {
++        /* It's some kind of reopen. There are no known cases where we need to
++         * reload bitmaps in such a situation, so it's safer to skip them.
+          *
+          * Moreover, if we have some readonly bitmaps and we are reopening for
+          * rw we should reopen bitmaps correspondingly.
+@@ -1491,13 +1491,13 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+         if (bdrv_has_readonly_bitmaps(bs) &&
+             !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
+         {
+-            bool header_updated = false;
+             qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+-            update_header = update_header && !header_updated;
+         }
+-    } else if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+-        update_header = false;
++    } else {
++        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
++        s->dirty_bitmaps_loaded = true;
+     }
++    update_header = update_header && !header_updated;
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+         ret = -EINVAL;
+-- 
+2.14.3
