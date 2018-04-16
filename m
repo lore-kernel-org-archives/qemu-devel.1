@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f87II-0006jm-Qu
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:47:56 -0400
+	(envelope-from <mlureau@redhat.com>) id 1f87Lr-0001H3-E2
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1f87IH-0003LZ-QM
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:47:54 -0400
-References: <1523472120-56496-1-git-send-email-spopovyc@redhat.com>
-	<1523472120-56496-2-git-send-email-spopovyc@redhat.com>
-	<20180413075739.GC14855@in.ibm.com>
-From: Serhii Popovych <spopovyc@redhat.com>
-Message-ID: <e651fb40-2e44-73ed-6082-d9e497073e69@redhat.com>
-Date: Mon, 16 Apr 2018 19:47:29 +0300
+	(envelope-from <mlureau@redhat.com>) id 1f87Ln-00060r-CD
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:51:35 -0400
+Received: from mail-it0-f53.google.com ([209.85.214.53]:39313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1f87Ln-0005sP-6a
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 12:51:31 -0400
+Received: by mail-it0-f53.google.com with SMTP id 85-v6so9807783iti.4
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 09:51:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180413075739.GC14855@in.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="tpgAzdtJCarQP0YV43NbBWijl8O14qNcu"
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v3 1/2] spapr: Add ibm,
- max-associativity-domains property
+In-Reply-To: <87r2nfsh7w.fsf@dusky.pond.sub.org>
+References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
+	<20180413161842.5117-3-marcandre.lureau@redhat.com>
+	<87r2nfsh7w.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 16 Apr 2018 18:51:24 +0200
+Message-ID: <CAMxuvawfVz-Q-XemOXDzHPSB-pvOLw3-zERea1nYDRT5Nf0FJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] qobject: use a QObjectBase_ struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,144 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tpgAzdtJCarQP0YV43NbBWijl8O14qNcu
-From: Serhii Popovych <spopovyc@redhat.com>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Message-ID: <e651fb40-2e44-73ed-6082-d9e497073e69@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.13 v3 1/2] spapr: Add ibm,
- max-associativity-domains property
-References: <1523472120-56496-1-git-send-email-spopovyc@redhat.com>
- <1523472120-56496-2-git-send-email-spopovyc@redhat.com>
- <20180413075739.GC14855@in.ibm.com>
-In-Reply-To: <20180413075739.GC14855@in.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-Bharata B Rao wrote:
-> On Wed, Apr 11, 2018 at 02:41:59PM -0400, Serhii Popovych wrote:
->> Now recent kernels (i.e. since linux-stable commit a346137e9142
->> ("powerpc/numa: Use ibm,max-associativity-domains to discover possible=
- nodes")
->> support this property to mark initially memory-less NUMA nodes as "pos=
-sible"
->> to allow further memory hot-add to them.
->>
->> Advertise this property for pSeries machines to let guest kernels dete=
-ct
->> maximum supported node configuration and benefit from kernel side chan=
-ge
->> when hot-add memory to specific, possibly empty before, NUMA node.
->>
->> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index a81570e..c05bbad 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -910,6 +910,13 @@ static void spapr_dt_rtas(sPAPRMachineState *spap=
-r, void *fdt)
->>          0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
->>          cpu_to_be32(max_cpus / smp_threads),
->>      };
->> +    uint32_t maxdomains[] =3D {
->> +        cpu_to_be32(4),
->> +        cpu_to_be32(0),
->> +        cpu_to_be32(0),
->> +        cpu_to_be32(0),
->> +        cpu_to_be32(nb_numa_nodes - 1),
->> +    };
->>
->>      _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
->>
->> @@ -946,6 +953,9 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr=
-, void *fdt)
->>      _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",=
+On Mon, Apr 16, 2018 at 10:12 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> By moving the base fields to a QObjectBase_, QObject can be a type
+>> which also has a 'base' field. This allows to write a generic
+>> QOBJECT() macro that will work with any QObject type, including
+>> QObject itself. The container_of() macro ensures that the object to
+>> cast has a QObjectBase_ base field, giving some type safety
+>> guarantees. However, for it to work properly, all QObject types must
+>> have 'base' at offset 0 (which is ensured by static checking from
+>> the previous patch)
+>
+> I'm afraid this condition is neither sufficient nor necessary.
+>
+> QOBJECT() maps a pointer to some subtype to the base type QObject.  For
+> this to work, the subtype must contain a QObject.
+>
+> Before the patch, this is trivially the case: the subtypes have a member
+> QObject base, and QOBJECT() returns its address.
+>
+> Afterwards, the subtypes have a member QObjectBase_ base, and QOBJECT()
+> returns the address of a notional QObject wrapped around this member.
+> Works because QObject has no other members.
+>
+> The condition 'base is at offset 0' does not ensure this, and is
+> therefore not sufficient.
+>
+> It's not necessary, either: putting base elsewhere would work just fine
+> as long as we put *all* of QObject there.
+>
+> Please document the real condition "QObject must have no members but
+> QObjectBase_ base, or else QOBJECT() breaks".  Feel free to check their
+> sizes are the same (I wouldn't bother).
 
->>                       refpoints, sizeof(refpoints)));
->>
->> +    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
->> +                     maxdomains, sizeof(maxdomains)));
->> +
->>      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
->>                            RTAS_ERROR_LOG_MAX));
->>      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
->> --=20
->> 1.8.3.1
->=20
-> This commit causes hash guest with latest guest kernel to hang at early=
- boot.
+ok
 
-I use v4.16 tag from stable and can't reproduce on P8 machine reported
-issue.
+>
+> If requiring base to be at offset zero for all subtypes materially
+> simplifies code, then go ahead and do that in a separate patch.  My gut
+> feeling is it doesn't, but I could be wrong.
 
-Could you please share more details about your setup, kernel commit id
-you spot problem?
+what is missing from patch 1?
 
->=20
-> Quiescing Open Firmware ...
-> Booting Linux via __start() @ 0x0000000002000000 ...
-> [    0.000000] hash-mmu: Page sizes from device-tree:
-> [    0.000000] hash-mmu: base_shift=3D12: shift=3D12, sllp=3D0x0000, av=
-pnm=3D0x00000000, tlbiel=3D1, penc=3D0
-> [    0.000000] hash-mmu: base_shift=3D16: shift=3D16, sllp=3D0x0110, av=
-pnm=3D0x00000000, tlbiel=3D1, penc=3D1
-> [    0.000000] Using 1TB segments
-> [    0.000000] hash-mmu: Initializing hash mmu with SLB
-> [    0.000000] Linux version 4.16.0-rc7+ (root@localhost.localdomain) (=
-gcc version 7.1.1 20170622 (Red Hat 7.1.1-3) (GCC)) #60 SMP Wed Apr 11 10=
-:36:22 IST 2018
-> [    0.000000] Found initrd at 0xc000000003c00000:0xc000000004f9a34c
-> [    0.000000] Using pSeries machine description
-> [    0.000000] bootconsole [udbg0] enabled
-> [    0.000000] Partition configured for 32 cpus.
-> [    0.000000] CPU maps initialized for 1 thread per core
-> [    0.000000] -----------------------------------------------------
-> [    0.000000] ppc64_pft_size    =3D 0x1a
-> [    0.000000] phys_mem_size     =3D 0x200000000
-> [    0.000000] dcache_bsize      =3D 0x80
-> [    0.000000] icache_bsize      =3D 0x80
-> [    0.000000] cpu_features      =3D 0x077c7a6c18500249
-> [    0.000000]   possible        =3D 0xffffffff18500649
-> [    0.000000]   always          =3D 0x0000000018100040
-> [    0.000000] cpu_user_features =3D 0xdc0065c2 0xae000000
-> [    0.000000] mmu_features      =3D 0x78006001
-> [    0.000000] firmware_features =3D 0x00000001415a445f
-> [    0.000000] htab_hash_mask    =3D 0x7ffff
-> [    0.000000] -----------------------------------------------------
->=20
-> No progess after this.
->=20
->=20
+>
+>> QObjectBase_ is not typedef and use a trailing underscore to make it
+>> obvious it is not for normal use and to avoid potential abuse.
+>
+> Trailing underscore I like, lack of typedef I don't mind (but I'm firmly
+> in the "eschew typedef for structs" camp).  It does violate the common
+> QEMU coding style, though.
+>
+> A comment /* Not for use outside include/qapi/qmp/ */ next to
+> QObjectBase_ wouldn't hurt.
+>
 
-
---=20
-Thanks,
-Serhii
-
-
---tpgAzdtJCarQP0YV43NbBWijl8O14qNcu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQEcBAEBAgAGBQJa1NOnAAoJEBTawMmQ61bBbFIIAMcQybzX53NMM4esshHlOjlh
-iRDIkou651OAjGGnHTJ5rtbWEPb3P42jm22F7ocsd5TVSUoimnSioOIUnhbuwLvd
-W36verb7Pe81ghZcsOZaiKF7rLfI0fLDMXahoEucuJc8qxXPOvsY/NB6OPFsqQzT
-vannlnWUYJF/myq8kIGjHule7WhNZsK4+12W4zgJf6T7M77MCex6DgZkgBWWPUhK
-7PvYD1rsq18mJZnVu2rzZ7uO/R2LM0JAfcxPtzdKWBc27BL3xqj+9xflDnQhItbB
-8eFqbAHrR22jVs7MmQf2ut24e238HO+clpW0QPXg6ZhEEVJNvkrXdUppRiEvHjQ=
-=RykH
------END PGP SIGNATURE-----
-
---tpgAzdtJCarQP0YV43NbBWijl8O14qNcu--
+ok
