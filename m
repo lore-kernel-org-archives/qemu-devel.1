@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60524)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rL4-0006aV-02
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:45:42 -0400
+	id 1f7rae-00035D-WE
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f7rL3-0001vl-5K
-	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 19:45:42 -0400
+	id 1f7rae-0002np-4Q
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:01:49 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:45102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f7rad-0002nl-Va
+	for qemu-devel@nongnu.org; Sun, 15 Apr 2018 20:01:48 -0400
+Received: by mail-qk0-x242.google.com with SMTP id f9so6905436qkm.12
+	for <qemu-devel@nongnu.org>; Sun, 15 Apr 2018 17:01:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 15 Apr 2018 20:43:07 -0300
-Message-Id: <20180415234307.28132-42-f4bug@amsat.org>
-In-Reply-To: <20180415234307.28132-1-f4bug@amsat.org>
-References: <20180415234307.28132-1-f4bug@amsat.org>
+References: <20180410193919.28026-1-alex.bennee@linaro.org>
+	<20180410193919.28026-4-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <82169d34-1570-2f5c-07e4-8556e64e5b11@amsat.org>
+Date: Sun, 15 Apr 2018 21:01:44 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180410193919.28026-4-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 41/41] cutils: Do not include "qemu/units.h"
- directly
+Subject: Re: [Qemu-devel] [PATCH v1 03/24] configure: move i386_cc to
+ cross_cc_i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +36,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, cota@braap.org
 
-All files using "qemu/units.h" definitions already include it directly,
-we can now remove it from "qemu/cutils.h".
+Hi Alex,
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/qemu/cutils.h | 1 -
- hw/core/machine.c     | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+On 04/10/2018 04:38 PM, Alex Bennée wrote:
+> We should still be able to use the system cross compiler with the
+> appropriate flags on x86_64 hosts.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  configure | 23 +++++++++++++++--------
+>  1 file changed, 15 insertions(+), 8 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index b5f3b3fe29..add87ff4d4 100755
+> --- a/configure
+> +++ b/configure
+> @@ -284,7 +284,6 @@ libs_softmmu=""
+>  libs_tools=""
+>  audio_pt_int=""
+>  audio_win_int=""
+> -cc_i386=i386-pc-linux-gnu-gcc
+>  libs_qga=""
+>  debug_info="yes"
+>  stack_protector=""
+> @@ -457,6 +456,8 @@ docker="no"
+>  cross_cc_aarch64="aarch64-linux-gnu-gcc"
+>  cross_cc_arm="arm-linux-gnueabihf-gcc"
+>  cross_cc_powerpc="powerpc-linux-gnu-gcc"
+> +cross_cc_i386="i386-pc-linux-gnu-gcc"
+> +cross_cc_i386_cflags=""
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 056e6629bb..cdb0f0db75 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -2,7 +2,6 @@
- #define QEMU_CUTILS_H
- 
- #include "qemu/fprintf-fn.h"
--#include "qemu/units.h"
- 
- /**
-  * pstrcpy:
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 2040177664..8f70c5ad94 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -19,7 +19,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/numa.h"
- #include "qemu/error-report.h"
--#include "qemu/cutils.h"
-+#include "qemu/units.h"
- #include "sysemu/qtest.h"
- 
- static char *machine_get_accel(Object *obj, Error **errp)
--- 
-2.17.0
+Can you keep this sorted? (arm < i386 < powerpc)
+
+Thanks :)
+
+>  
+>  enabled_cross_compilers=""
+>  
+> @@ -687,12 +688,10 @@ case "$cpu" in
+
+What do you think about renaming $cpu -> host_cpu/target_cpu?
+
+>    i386|i486|i586|i686|i86pc|BePC)
+>      cpu="i386"
+>      supported_cpu="yes"
+> -    cross_cc_i386=gcc
+>    ;;
+>    x86_64|amd64)
+>      cpu="x86_64"
+>      supported_cpu="yes"
+> -    cross_cc_x86_64=gcc
+>    ;;
+>    armv*b|armv*l|arm)
+>      cpu="arm"
+> @@ -1435,7 +1434,6 @@ case "$cpu" in
+>      i386)
+>             CPU_CFLAGS="-m32"
+>             LDFLAGS="-m32 $LDFLAGS"
+> -           cc_i386='$(CC) -m32'
+>             ;;
+>      x86_64)
+>             # ??? Only extremely old AMD cpus do not have cmpxchg16b.
+> @@ -1443,12 +1441,14 @@ case "$cpu" in
+>             # runtime and generate the fallback to serial emulation.
+>             CPU_CFLAGS="-m64 -mcx16"
+>             LDFLAGS="-m64 $LDFLAGS"
+> -           cc_i386='$(CC) -m32'
+> +           cross_cc_i386=$cc
+> +           cross_cc_i386_cflags="-m32"
+>             ;;
+>      x32)
+>             CPU_CFLAGS="-mx32"
+>             LDFLAGS="-mx32 $LDFLAGS"
+> -           cc_i386='$(CC) -m32'
+> +           cross_cc_i386=$cc
+> +           cross_cc_i386_cflags="-m32"
+>             ;;
+>      # No special flags required for other host CPUs
+>  esac
+> @@ -6664,7 +6664,6 @@ echo "CC=$cc" >> $config_host_mak
+>  if $iasl -h > /dev/null 2>&1; then
+>    echo "IASL=$iasl" >> $config_host_mak
+>  fi
+> -echo "CC_I386=$cc_i386" >> $config_host_mak
+>  echo "HOST_CC=$host_cc" >> $config_host_mak
+>  echo "CXX=$cxx" >> $config_host_mak
+>  echo "OBJCC=$objcc" >> $config_host_mak
+> @@ -6783,6 +6782,7 @@ case "$target" in
+>  esac
+>  
+>  target_compiler=""
+> +target_compiler_cflags=""
+>  
+>  mkdir -p $target_dir
+>  echo "# Automatically generated by configure - do not modify" > $config_target_mak
+> @@ -6799,10 +6799,13 @@ TARGET_ABI_DIR=""
+>  case "$target_name" in
+>    i386)
+>      gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
+> +    target_compiler=$cross_cc_i386
+> +    target_compiler_cflags=$cross_cc_i386_cflags
+>    ;;
+>    x86_64)
+>      TARGET_BASE_ARCH=i386
+>      gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
+> +    target_compiler=$cross_cc_x86_64
+>    ;;
+>    alpha)
+>      mttcg="yes"
+> @@ -6947,7 +6950,7 @@ int main(void) {
+>  }
+>  EOF
+>  
+> -    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
+> +    if ! do_compiler $target_compiler $target_compiler_cflags -o $TMPE $TMPC -static ; then
+>          target_compiler=""
+>      else
+>          enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
+> @@ -7033,6 +7036,10 @@ if test -n "$target_compiler"; then
+>    echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
+>  fi
+>  
+> +if test -n "$target_compiler_cflags"; then
+> +  echo "CROSS_CC_GUEST_CFLAGS=$target_compiler_cflags" >> $config_target_mak
+> +fi
+> +
+>  # generate QEMU_CFLAGS/LDFLAGS for targets
+>  
+>  cflags=""
+> 
