@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNW-0002v5-GC
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:06 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNc-00030T-JM
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNS-0005Fd-69
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:02 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNZ-00062G-Mm
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:08 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Tue, 17 Apr 2018 16:37:47 -0400
-Message-Id: <1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
+Date: Tue, 17 Apr 2018 16:37:52 -0400
+Message-Id: <1523997485-1905-9-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
 References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v4 03/21] target/arm: Reorganize PMCCNTR
- accesses
+Subject: [Qemu-devel] [PATCH v4 08/21] target/arm: Allow EL change hooks to
+ do IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,226 +23,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-pmccntr_read and pmccntr_write contained duplicate code that was already
-being handled by pmccntr_sync. Consolidate the duplicated code into two
-functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
-c15_ccnt in CPUARMState so that we can simultaneously save both the
-architectural register value and the last underlying cycle count - this
-ensure time isn't lost and will also allow us to access the 'old'
-architectural register value in order to detect overflows in later
-patches.
+During code generation, surround CPSR writes and exception returns which
+call the EL change hooks with gen_io_start/end. The immediate need is
+for the PMU to access the clock and icount during EL change to support
+mode filtering.
 
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 ---
- target/arm/cpu.h    |  28 ++++++++++-----
- target/arm/helper.c | 100 ++++++++++++++++++++++++++++------------------------
- 2 files changed, 73 insertions(+), 55 deletions(-)
+ target/arm/translate-a64.c |  6 ++++++
+ target/arm/translate.c     | 12 ++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 19a0c03..04041db 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -454,10 +454,20 @@ typedef struct CPUARMState {
-         uint64_t oslsr_el1; /* OS Lock Status */
-         uint64_t mdcr_el2;
-         uint64_t mdcr_el3;
--        /* If the counter is enabled, this stores the last time the counter
--         * was reset. Otherwise it stores the counter value
-+        /* Stores the architectural value of the counter *the last time it was
-+         * updated* by pmccntr_op_start. Accesses should always be surrounded
-+         * by pmccntr_op_start/pmccntr_op_finish to guarantee the latest
-+         * architecturally-corect value is being read/set.
-          */
-         uint64_t c15_ccnt;
-+        /* Stores the delta between the architectural value and the underlying
-+         * cycle count during normal operation. It is used to update c15_ccnt
-+         * to be the correct architectural value before accesses. During
-+         * accesses, c15_ccnt_delta contains the underlying count being used
-+         * for the access, after which it reverts to the delta value in
-+         * pmccntr_op_finish.
-+         */
-+        uint64_t c15_ccnt_delta;
-         uint64_t pmccfiltr_el0; /* Performance Monitor Filter Register */
-         uint64_t vpidr_el2; /* Virtualization Processor ID Register */
-         uint64_t vmpidr_el2; /* Virtualization Multiprocessor ID Register */
-@@ -890,15 +900,17 @@ int cpu_arm_signal_handler(int host_signum, void *pinfo,
-                            void *puc);
- 
- /**
-- * pmccntr_sync
-+ * pmccntr_op_start/finish
-  * @env: CPUARMState
-  *
-- * Synchronises the counter in the PMCCNTR. This must always be called twice,
-- * once before any action that might affect the timer and again afterwards.
-- * The function is used to swap the state of the register if required.
-- * This only happens when not in user mode (!CONFIG_USER_ONLY)
-+ * Convert the counter in the PMCCNTR between its delta form (the typical mode
-+ * when it's enabled) and the guest-visible value. These two calls must always
-+ * surround any action which might affect the counter, and the return value
-+ * from pmccntr_op_start must be supplied as the second argument to
-+ * pmccntr_op_finish.
-  */
--void pmccntr_sync(CPUARMState *env);
-+void pmccntr_op_start(CPUARMState *env);
-+void pmccntr_op_finish(CPUARMState *env);
- 
- /* SCTLR bit meanings. Several bits have been reused in newer
-  * versions of the architecture; in that case we define constants
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 83ea8f4..f6269a2 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1000,28 +1000,53 @@ static inline bool arm_ccnt_enabled(CPUARMState *env)
- 
-     return true;
- }
--
--void pmccntr_sync(CPUARMState *env)
-+/*
-+ * Ensure c15_ccnt is the guest-visible count so that operations such as
-+ * enabling/disabling the counter or filtering, modifying the count itself,
-+ * etc. can be done logically. This is essentially a no-op if the counter is
-+ * not enabled at the time of the call.
-+ */
-+void pmccntr_op_start(CPUARMState *env)
- {
--    uint64_t temp_ticks;
--
--    temp_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+    uint64_t cycles = 0;
-+    cycles = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
- 
--    if (env->cp15.c9_pmcr & PMCRD) {
--        /* Increment once every 64 processor clock cycles */
--        temp_ticks /= 64;
--    }
--
-     if (arm_ccnt_enabled(env)) {
--        env->cp15.c15_ccnt = temp_ticks - env->cp15.c15_ccnt;
-+        uint64_t eff_cycles = cycles;
-+        if (env->cp15.c9_pmcr & PMCRD) {
-+            /* Increment once every 64 processor clock cycles */
-+            eff_cycles /= 64;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c913292..bff4e13 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1930,7 +1930,13 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+             unallocated_encoding(s);
+             return;
+         }
++        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++            gen_io_start();
 +        }
-+
-+        env->cp15.c15_ccnt = eff_cycles - env->cp15.c15_ccnt_delta;
+         gen_helper_exception_return(cpu_env);
++        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++            gen_io_end();
++        }
+         /* Must exit loop to check un-masked IRQs */
+         s->base.is_jmp = DISAS_EXIT;
+         return;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index db1ce65..9bc2ce1 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4548,7 +4548,13 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
+      * appropriately depending on the new Thumb bit, so it must
+      * be called after storing the new PC.
+      */
++    if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
 +    }
-+    env->cp15.c15_ccnt_delta = cycles;
-+}
-+
-+/*
-+ * If PMCCNTR is enabled, recalculate the delta between the clock and the
-+ * guest-visible count. A call to pmccntr_op_finish should follow every call to
-+ * pmccntr_op_start.
-+ */
-+void pmccntr_op_finish(CPUARMState *env)
-+{
-+    if (arm_ccnt_enabled(env)) {
-+        uint64_t prev_cycles = env->cp15.c15_ccnt_delta;
-+
-+        if (env->cp15.c9_pmcr & PMCRD) {
-+            /* Increment once every 64 processor clock cycles */
-+            prev_cycles /= 64;
-+        }
-+
-+        env->cp15.c15_ccnt_delta = prev_cycles - env->cp15.c15_ccnt;
-     }
- }
- 
- static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                        uint64_t value)
- {
--    pmccntr_sync(env);
-+    pmccntr_op_start(env);
- 
-     if (value & PMCRC) {
-         /* The counter has been reset */
-@@ -1032,26 +1057,16 @@ static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     env->cp15.c9_pmcr &= ~0x39;
-     env->cp15.c9_pmcr |= (value & 0x39);
- 
--    pmccntr_sync(env);
-+    pmccntr_op_finish(env);
- }
- 
- static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
--    uint64_t total_ticks;
--
--    if (!arm_ccnt_enabled(env)) {
--        /* Counter is disabled, do not change value */
--        return env->cp15.c15_ccnt;
--    }
--
--    total_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
--
--    if (env->cp15.c9_pmcr & PMCRD) {
--        /* Increment once every 64 processor clock cycles */
--        total_ticks /= 64;
--    }
--    return total_ticks - env->cp15.c15_ccnt;
-+    uint64_t ret;
-+    pmccntr_op_start(env);
-+    ret = env->cp15.c15_ccnt;
-+    pmccntr_op_finish(env);
-+    return ret;
- }
- 
- static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1068,22 +1083,9 @@ static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void pmccntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                         uint64_t value)
- {
--    uint64_t total_ticks;
--
--    if (!arm_ccnt_enabled(env)) {
--        /* Counter is disabled, set the absolute value */
--        env->cp15.c15_ccnt = value;
--        return;
--    }
--
--    total_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
--
--    if (env->cp15.c9_pmcr & PMCRD) {
--        /* Increment once every 64 processor clock cycles */
--        total_ticks /= 64;
--    }
--    env->cp15.c15_ccnt = total_ticks - value;
-+    pmccntr_op_start(env);
-+    env->cp15.c15_ccnt = value;
-+    pmccntr_op_finish(env);
- }
- 
- static void pmccntr_write32(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1096,7 +1098,11 @@ static void pmccntr_write32(CPUARMState *env, const ARMCPRegInfo *ri,
- 
- #else /* CONFIG_USER_ONLY */
- 
--void pmccntr_sync(CPUARMState *env)
-+void pmccntr_op_start(CPUARMState *env)
-+{
-+}
-+
-+void pmccntr_op_finish(CPUARMState *env)
- {
- }
- 
-@@ -1105,9 +1111,9 @@ void pmccntr_sync(CPUARMState *env)
- static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
- {
--    pmccntr_sync(env);
-+    pmccntr_op_start(env);
-     env->cp15.pmccfiltr_el0 = value & 0x7E000000;
--    pmccntr_sync(env);
-+    pmccntr_op_finish(env);
- }
- 
- static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     gen_helper_cpsr_write_eret(cpu_env, cpsr);
++    if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++        gen_io_end();
++    }
+     tcg_temp_free_i32(cpsr);
+     /* Must exit loop to check un-masked IRQs */
+     s->base.is_jmp = DISAS_EXIT;
+@@ -9843,7 +9849,13 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                 if (exc_return) {
+                     /* Restore CPSR from SPSR.  */
+                     tmp = load_cpu_field(spsr);
++                    if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++                        gen_io_start();
++                    }
+                     gen_helper_cpsr_write_eret(cpu_env, tmp);
++                    if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++                        gen_io_end();
++                    }
+                     tcg_temp_free_i32(tmp);
+                     /* Must exit loop to check un-masked IRQs */
+                     s->base.is_jmp = DISAS_EXIT;
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
