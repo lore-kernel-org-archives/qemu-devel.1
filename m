@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNs-0003Hf-NQ
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNs-0003Hh-OI
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNn-0007c9-8C
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNn-0007d4-Cd
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:24 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Tue, 17 Apr 2018 16:38:01 -0400
-Message-Id: <1523997485-1905-18-git-send-email-alindsay@codeaurora.org>
+Date: Tue, 17 Apr 2018 16:37:59 -0400
+Message-Id: <1523997485-1905-16-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
 References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v4 17/21] target/arm: PMU: Add instruction and
- cycle events
+Subject: [Qemu-devel] [PATCH v4 15/21] target/arm: Add array for supported
+ PMU events, generate PMCEID[01]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,173 +23,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-The instruction event is only enabled when icount is used, cycles are
-always supported. Always defining get_cycle_count (but altering its
-behavior depending on CONFIG_USER_ONLY) allows us to remove some
-CONFIG_USER_ONLY #defines throughout the rest of the code.
+This commit doesn't add any supported events, but provides the framework
+for adding them. We store the pm_event structs in a simple array, and
+provide the mapping from the event numbers to array indexes in the
+supported_event_map array. Because the value of PMCEID[01] depends upon
+which events are supported at runtime, generate it dynamically.
 
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 ---
- target/arm/helper.c | 88 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 43 insertions(+), 45 deletions(-)
+ target/arm/cpu.c    | 20 +++++++++++++-------
+ target/arm/cpu.h    | 10 ++++++++++
+ target/arm/cpu64.c  |  2 --
+ target/arm/helper.c | 37 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 60 insertions(+), 9 deletions(-)
 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9d27ffc..22063ca 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -897,9 +897,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (!cpu->has_pmu) {
+         unset_feature(env, ARM_FEATURE_PMU);
+         cpu->id_aa64dfr0 &= ~0xf00;
+-    } else if (!kvm_enabled()) {
+-        arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+-        arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
++    }
++    if (arm_feature(env, ARM_FEATURE_PMU)) {
++        uint64_t pmceid = get_pmceid(&cpu->env);
++        cpu->pmceid0 = pmceid & 0xffffffff;
++        cpu->pmceid1 = (pmceid >> 32) & 0xffffffff;
++
++        if (!kvm_enabled()) {
++            arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
++            arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
++        }
++    } else {
++        cpu->pmceid0 = 0x00000000;
++        cpu->pmceid1 = 0x00000000;
+     }
+ 
+     if (!arm_feature(env, ARM_FEATURE_EL2)) {
+@@ -1511,8 +1521,6 @@ static void cortex_a7_initfn(Object *obj)
+     cpu->id_pfr0 = 0x00001131;
+     cpu->id_pfr1 = 0x00011011;
+     cpu->id_dfr0 = 0x02010555;
+-    cpu->pmceid0 = 0x00000000;
+-    cpu->pmceid1 = 0x00000000;
+     cpu->id_afr0 = 0x00000000;
+     cpu->id_mmfr0 = 0x10101105;
+     cpu->id_mmfr1 = 0x40000000;
+@@ -1557,8 +1565,6 @@ static void cortex_a15_initfn(Object *obj)
+     cpu->id_pfr0 = 0x00001131;
+     cpu->id_pfr1 = 0x00011011;
+     cpu->id_dfr0 = 0x02010555;
+-    cpu->pmceid0 = 0x0000000;
+-    cpu->pmceid1 = 0x00000000;
+     cpu->id_afr0 = 0x00000000;
+     cpu->id_mmfr0 = 0x10201105;
+     cpu->id_mmfr1 = 0x20000000;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 132e08d..f058f5c 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -935,6 +935,16 @@ void pmu_op_finish(CPUARMState *env);
+ void pmu_pre_el_change(ARMCPU *cpu, void *ignored);
+ void pmu_post_el_change(ARMCPU *cpu, void *ignored);
+ 
++/*
++ * get_pmceid
++ * @env: CPUARMState
++ *
++ * Return the PMCEID[01] register values corresponding to the counters which
++ * are supported given the current configuration (0 is low 32, 1 is high 32
++ * bits)
++ */
++uint64_t get_pmceid(CPUARMState *env);
++
+ /* SCTLR bit meanings. Several bits have been reused in newer
+  * versions of the architecture; in that case we define constants
+  * for both old and new bit meanings. Code which tests against those
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 991d764..7da0ea4 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -141,8 +141,6 @@ static void aarch64_a57_initfn(Object *obj)
+     cpu->id_isar5 = 0x00011121;
+     cpu->id_aa64pfr0 = 0x00002222;
+     cpu->id_aa64dfr0 = 0x10305106;
+-    cpu->pmceid0 = 0x00000000;
+-    cpu->pmceid1 = 0x00000000;
+     cpu->id_aa64isar0 = 0x00011120;
+     cpu->id_aa64mmfr0 = 0x00001124;
+     cpu->dbgdidr = 0x3516d000;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index b36630f..b91f022 100644
+index 572709e..7a715a6 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -15,6 +15,7 @@
- #include "arm_ldst.h"
- #include <zlib.h> /* For crc32 */
- #include "exec/semihost.h"
-+#include "sysemu/cpus.h"
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
+@@ -933,6 +933,43 @@ static inline uint64_t pmu_counter_mask(CPUARMState *env)
+   return (1 << 31) | ((1 << pmu_num_counters(env)) - 1);
+ }
  
-@@ -943,8 +944,49 @@ typedef struct pm_event {
-     uint64_t (*get_count)(CPUARMState *);
- } pm_event;
- 
-+static bool event_always_supported(CPUARMState *env)
-+{
-+    return true;
-+}
++typedef struct pm_event {
++    uint16_t number; /* PMEVTYPER.evtCount is 10 bits wide */
++    /* If the event is supported on this CPU (used to generate PMCEID[01]) */
++    bool (*supported)(CPUARMState *);
++    /* Retrieve the current count of the underlying event. The programmed
++     * counters hold a difference from the return value from this function */
++    uint64_t (*get_count)(CPUARMState *);
++} pm_event;
++
++#define SUPPORTED_EVENT_SENTINEL UINT16_MAX
++static const pm_event pm_events[] = {
++    { .number = SUPPORTED_EVENT_SENTINEL }
++};
++static uint16_t supported_event_map[0x3f];
 +
 +/*
-+ * Return the underlying cycle count for the PMU cycle counters. If we're in
-+ * usermode, simply return 0.
++ * Called upon initialization to build PMCEID0 (low 32 bits) and PMCEID1 (high
++ * 32). We also use it to build a map of ARM event numbers to indices in
++ * our pm_events array.
 + */
-+static uint64_t cycles_get_count(CPUARMState *env)
++uint64_t get_pmceid(CPUARMState *env)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                   ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-+#else
-+    return 0;
-+#endif
++    uint64_t pmceid = 0;
++    unsigned int i = 0;
++    while (pm_events[i].number != SUPPORTED_EVENT_SENTINEL) {
++        const pm_event *cnt = &pm_events[i];
++        if (cnt->number < 0x3f && cnt->supported(env)) {
++            pmceid |= (1 << cnt->number);
++            supported_event_map[cnt->number] = i;
++        } else {
++            supported_event_map[cnt->number] = SUPPORTED_EVENT_SENTINEL;
++        }
++        i++;
++    }
++    return pmceid;
 +}
 +
-+#ifndef CONFIG_USER_ONLY
-+static bool instructions_supported(CPUARMState *env)
-+{
-+    return use_icount == 1 /* Precise instruction counting */;
-+}
-+
-+static uint64_t instructions_get_count(CPUARMState *env)
-+{
-+    return (uint64_t)cpu_get_icount_raw();
-+}
-+#endif
-+
- #define SUPPORTED_EVENT_SENTINEL UINT16_MAX
- static const pm_event pm_events[] = {
-+#ifndef CONFIG_USER_ONLY
-+    { .number = 0x008, /* INST_RETIRED, Instruction architecturally executed */
-+      .supported = instructions_supported,
-+      .get_count = instructions_get_count
-+    },
-+    { .number = 0x011, /* CPU_CYCLES, Cycle */
-+      .supported = event_always_supported,
-+      .get_count = cycles_get_count
-+    },
-+#endif
-     { .number = SUPPORTED_EVENT_SENTINEL }
- };
- static uint16_t supported_event_map[0x3f];
-@@ -1024,8 +1066,6 @@ static CPAccessResult pmreg_access_swinc(CPUARMState *env,
-     return pmreg_access(env, ri, isread);
- }
- 
--#ifndef CONFIG_USER_ONLY
--
- static CPAccessResult pmreg_access_selr(CPUARMState *env,
-                                         const ARMCPRegInfo *ri,
-                                         bool isread)
-@@ -1140,9 +1180,7 @@ static inline bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
-  */
- void pmccntr_op_start(CPUARMState *env)
+ static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
+                                    bool isread)
  {
--    uint64_t cycles = 0;
--    cycles = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                          ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-+    uint64_t cycles = cycles_get_count(env);
- 
-     if (pmu_counter_enabled(env, 31)) {
-         uint64_t eff_cycles = cycles;
-@@ -1285,42 +1323,6 @@ static void pmccntr_write32(CPUARMState *env, const ARMCPRegInfo *ri,
-     pmccntr_write(env, ri, deposit64(cur_val, 0, 32, value));
- }
- 
--#else /* CONFIG_USER_ONLY */
--
--void pmccntr_op_start(CPUARMState *env)
--{
--}
--
--void pmccntr_op_finish(CPUARMState *env)
--{
--}
--
--void pmevcntr_op_start(CPUARMState *env, uint8_t i)
--{
--}
--
--void pmevcntr_op_finish(CPUARMState *env, uint8_t i)
--{
--}
--
--void pmu_op_start(CPUARMState *env)
--{
--}
--
--void pmu_op_finish(CPUARMState *env)
--{
--}
--
--void pmu_pre_el_change(ARMCPU *cpu, void *ignored)
--{
--}
--
--void pmu_post_el_change(ARMCPU *cpu, void *ignored)
--{
--}
--
--#endif
--
- static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
- {
-@@ -1633,7 +1635,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-     /* Unimplemented so WI. */
-     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
-       .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NOP },
--#ifndef CONFIG_USER_ONLY
-     { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
-       .access = PL0_RW, .type = ARM_CP_ALIAS,
-       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmselr),
-@@ -1653,7 +1654,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .access = PL0_RW, .accessfn = pmreg_access_ccntr,
-       .type = ARM_CP_IO,
-       .readfn = pmccntr_read, .writefn = pmccntr_write, },
--#endif
-     { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
-       .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
-       .access = PL0_RW, .accessfn = pmreg_access,
-@@ -5191,7 +5191,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-          * field as main ID register, and we implement only the cycle
-          * count register.
-          */
--#ifndef CONFIG_USER_ONLY
-         ARMCPRegInfo pmcr = {
-             .name = "PMCR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 0,
-             .access = PL0_RW,
-@@ -5245,7 +5244,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-             g_free(pmevtyper_name);
-             g_free(pmevtyper_el0_name);
-         }
--#endif
-         ARMCPRegInfo clidr = {
-             .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
-             .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 1,
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
