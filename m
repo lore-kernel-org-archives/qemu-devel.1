@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f8Krr-0003QE-S7
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:17:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f8Krt-0003Ra-Cd
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f8Krq-0008SY-7Z
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:17:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f8Krq-0008SM-6y
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:17:33 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Apr 2018 17:17:13 +1000
-Message-Id: <20180417071722.9399-2-david@gibson.dropbear.id.au>
+Date: Tue, 17 Apr 2018 17:17:15 +1000
+Message-Id: <20180417071722.9399-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180417071722.9399-1-david@gibson.dropbear.id.au>
 References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH for-2.13 01/10] spapr: Avoid redundant calls to
- spapr_cpu_reset()
+Subject: [Qemu-devel] [PATCH for-2.13 03/10] target/ppc: Remove unnecessary
+ initialization of LPCR_UPRT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org
 Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-af81cf323c1 "spapr: CPU hotplug support" added a direct call to
-spapr_cpu_reset() in spapr_cpu_init(), as well as registering it as a
-reset callback.  That was in order to make sure that the reset function
-got called for a newly hotplugged cpu, which would miss the global machine
-reset.
+In cpu_ppc_set_papr() the UPRT and GTSE bits of the LPCR are initialized
+based on on ppc64_radix_guest().  Which seems reasonable, except that
+ppc64_radix_guest() is based on spapr->patb_entry which is only set up
+in spapr_machine_reset, called much later than cpu_ppc_set_papr().
 
-However, this change means that spapr_cpu_reset() gets called twice for
-normal cold-plugged cpus: once from spapr_cpu_init(), then again during
-the system reset.  As well as being ugly in its redundancy, the first call
-happens before the machine reset calls have happened, which will cause
-problems for some things we're going to want to add.
-
-So, we remove the reset call from spapr_cpu_init().  We instead put an
-explicit reset call in the hotplug specific path.
+So the initialization here is pointless.  The base cpu initialization
+already sets a value that's good enough until the guest uses an hcall to
+configure it's preferred MMU mode.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c                  |  6 ++++--
- hw/ppc/spapr_cpu_core.c         | 13 ++++++++++++-
- include/hw/ppc/spapr_cpu_core.h |  2 ++
- 3 files changed, 18 insertions(+), 3 deletions(-)
+ target/ppc/translate_init.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7b2bc4e25d..81b50af3b5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3370,9 +3370,11 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index bb79d23b50..14f346f441 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8897,22 +8897,6 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+     lpcr->default_value &= ~LPCR_RMLS;
+     lpcr->default_value |= 1ull << LPCR_RMLS_SHIFT;
  
-         if (hotplugged) {
-             /*
--             * Send hotplug notification interrupt to the guest only
--             * in case of hotplugged CPUs.
-+             * For hotplugged CPUs, we need to reset them (they missed
-+             * out on the system reset), and send the guest a
-+             * notification
-              */
-+            spapr_cpu_core_reset(core);
-             spapr_hotplug_req_add_by_index(drc);
-         } else {
-             spapr_drc_reset(drc);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 94afeb399e..aa17626cda 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -70,7 +70,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-     cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
- 
-     qemu_register_reset(spapr_cpu_reset, cpu);
--    spapr_cpu_reset(cpu);
- }
- 
- /*
-@@ -208,6 +207,18 @@ err:
-     error_propagate(errp, local_err);
- }
- 
-+void spapr_cpu_core_reset(sPAPRCPUCore *sc)
-+{
-+    CPUCore *cc = CPU_CORE(sc);
-+    int i;
-+
-+    for (i = 0; i < cc->nr_threads; i++) {
-+        PowerPCCPU *cpu = sc->threads[i];
-+
-+        spapr_cpu_reset(cpu);
-+    }
-+}
-+
- static Property spapr_cpu_core_properties[] = {
-     DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_END_OF_LIST()
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index 1129f344aa..1a38544706 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -38,4 +38,6 @@ typedef struct sPAPRCPUCoreClass {
- } sPAPRCPUCoreClass;
- 
- const char *spapr_get_cpu_core_type(const char *cpu_type);
-+void spapr_cpu_core_reset(sPAPRCPUCore *sc);
-+
- #endif
+-    if (env->mmu_model == POWERPC_MMU_3_00) {
+-        /* By default we choose legacy mode and switch to new hash or radix
+-         * when a register process table hcall is made. So disable process
+-         * tables and guest translation shootdown by default
+-         *
+-         * Hot-plugged CPUs inherit from the guest radix setting under
+-         * KVM but not under TCG. Update the default LPCR to keep new
+-         * CPUs in sync when radix is enabled.
+-         */
+-        if (ppc64_radix_guest(cpu)) {
+-            lpcr->default_value |= LPCR_UPRT | LPCR_GTSE;
+-        } else {
+-            lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
+-        }
+-    }
+-
+     /* Only enable Power-saving mode Exit Cause exceptions on the boot
+      * CPU. The RTAS command start-cpu will enable them on secondaries.
+      */
 -- 
 2.14.3
