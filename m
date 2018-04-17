@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f8ZUD-00069R-3M
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:54:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8ZbR-0000P2-Gx
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 19:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f8ZU9-0006SX-64
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:54:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f8ZU8-0006Qh-SU
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:54:01 -0400
-Date: Tue, 17 Apr 2018 19:53:54 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180417225354.GI29865@localhost.localdomain>
-References: <20171010003951-mutt-send-email-mst@kernel.org>
-	<20171010083143.GA30015@redhat.com>
-	<CAJ+F1CLGJLXYnJ8SnrbVkWc6bdU2geYKeEaKrxWaYBhXwA=Opg@mail.gmail.com>
-	<20171010150628.GI30015@redhat.com>
-	<20171010180110.GI3246@localhost.localdomain>
-	<20171015044800-mutt-send-email-mst@kernel.org>
-	<20171020184820.GP2942@localhost.localdomain>
-	<a5ff2864-f794-e728-5be1-0c1e58d9f163@redhat.com>
-	<20180417211126.GD29865@localhost.localdomain>
-	<f822d32f-5d0f-aa42-95a8-46afd4923d45@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1f8ZbQ-000773-Lr
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 19:01:33 -0400
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:41156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f8ZbQ-00075m-Gr
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 19:01:32 -0400
+Received: by mail-ot0-x22a.google.com with SMTP id m22-v6so23247630otf.8
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 16:01:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <f822d32f-5d0f-aa42-95a8-46afd4923d45@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
+In-Reply-To: <cee77754-64f5-e4e2-6462-f70603655e3e@linaro.org>
+References: <20180416135442.30606-1-alex.bennee@linaro.org>
+	<20180417190439.GA28717@flamenco>
+	<CAFEAcA87BUwn96GY5esyNBtoGQY+myVAX9XoPW02gpaJbqyBzg@mail.gmail.com>
+	<20180417212710.GA10948@flamenco>
+	<CAFEAcA9PS2FNSq0VFgO652RaemTViGKzOQStiycqFB8DDhy_ig@mail.gmail.com>
+	<20180417223837.GA25085@flamenco>
+	<cee77754-64f5-e4e2-6462-f70603655e3e@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 18 Apr 2018 00:01:11 +0100
+Message-ID: <CAFEAcA_2=rYDZ7yVEHrENzWYsdDHf8DFba9ymffsVwHXvVP4ew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
+ before /0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,89 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cole Robinson <crobinso@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Dave Anderson <anderson@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Martin Kletzander <mkletzan@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Tue, Apr 17, 2018 at 06:31:57PM -0400, Cole Robinson wrote:
-> On 04/17/2018 05:11 PM, Eduardo Habkost wrote:
-> > On Tue, Apr 17, 2018 at 03:12:03PM -0400, Cole Robinson wrote:
-> > [...]
-> >> Reviving this... did any follow up changes happen?
-> >>
-> >> Marc-Andr=E9 patched virt-manager a few months back to enable -devic=
-e
-> >> vmcoreinfo for new VMs:
-> >>
-> >> https://www.redhat.com/archives/virt-tools-list/2018-February/msg000=
-20.html
-> >>
-> >> And I see there's at least a bug tracking adding this to openstack f=
-or
-> >> new VMs:
-> >>
-> >> https://bugzilla.redhat.com/show_bug.cgi?id=3D1555276
-> >>
-> >> If this feature doesn't really have any downsides, it would be nice =
-to
-> >> get this tied to new machine types. Saves a lot of churn for higher
-> >> levels of the stack
-> >=20
-> > I understand this would be nice to have considering the existing
-> > stacks, but at the same time I would like the rest of the
-> > stack(s) to really try to not depend on QEMU machine-types to
-> > define policy/defaults.
-> >=20
-> > Every feature that is hidden behind an opaque machine-type name
-> > and not visible in the domain XML and QEMU command-line increases
-> > the risk of migration and compatibility bugs.
-> >=20
->=20
-> What exactly is the migration compatibility issue with turning on the
-> equivalent of -device vmcoreinfo for -M *-2.13+ ? Possibly prevents
-> backwards migration to older qemu but is that even a goal?
+On 17 April 2018 at 23:49, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 04/17/2018 12:38 PM, Emilio G. Cota wrote:
+>> On Tue, Apr 17, 2018 at 22:45:51 +0100, Peter Maydell wrote:
+>>> On 17 April 2018 at 22:27, Emilio G. Cota <cota@braap.org> wrote:
+>>>> (...)
+>>>> +cff 0xffb00000, expected: 0x7ff8000000000000, returned: 0x7ff4000000000000, \
+>>>>   expected exceptions: i, returned: none
+>>>> +error: flags mismatch for input @ ibm/Basic-Types-Inputs.fptest:26170:
+>>>> +b32b64cff =0 S -> Q i
+>>>
+>>> SNaN conversion from 32 bit to 64 bit. Here I agree
+>>> with the test -- we should quieten the NaN and raise
+>>> Invalid -- which implies that the hardware is wrong ?!?
+>>
+>> This passes on an Intel host, and fails on both Power7 and 8 hosts I have
+>> access to. I don't have the Power ISA spec in front of me, but I hope
+>> there's something about this specified in it.
+>
+> IIRC this is unspecified and does vary by implementation.
 
-I mean the extra migration compatibility code that needs to be
-maintained on older machine-types.  It's extra maintenance burden
-on both upstream and downstream QEMU trees.
+I think 754-2008 does specify it: s6.2 says that you get
+'set Invalid and return a QNaN if an input is an SNaN' for
+"every general-computational and signaling-computational
+operation except for the conversions described in 5.12".
+So the only exceptions are:
+ 1) the s5.12 conversions, which are to/from strings-of-characters
+ 2) quiet-computational operations, which are just
+    copy, abs, negate, copySign, and some re-encoding
+    operations involving decimal formats
 
+float-to-float conversions are general-computational.
 
->=20
-> > This was being discussed in a mail thread at:
-> > https://www.mail-archive.com/ovirt-devel@redhat.com/msg01196.html
-> >=20
-> > Quoting Daniel, on that thread:
-> >=20
-> > ] Another case is the pvpanic device - while in theory that could
-> > ] have been enabled by default for all guests, by QEMU or a config
-> > ] generator library, doing so is not useful on its own. The hard
-> > ] bit of the work is adding code to the mgmt app to choose the
-> > ] action for when pvpanic triggers, and code to handle the results
-> > ] of that action.
-> >=20
-> > From that comment, I understand that simply making QEMU create a
-> > pvpanic device by default on pc-2.13+ won't be useful at all?
-> >=20
->=20
-> This qemu-devel thread was about -device vmcoreinfo though, not pvpanic=
-.
-> vmcoreinfo doesn't need anything else to work AFAICT and shouldn't need
-> any explicit config, heck it doesn't even have any -device properties.
->=20
-> Like Dan says pvpanic isn't a 'just works' thing, and I know for window=
-s
-> VMs it shows up in device manager which has considerations for things
-> like SVVP. I think vmcoreinfo doesn't have the same impact
->=20
+I don't have the original IEEE754 spec to hand though;
+that may have left this unspecified.
 
-Oops, nevermind.  I confused both.
-
-
-> There are some guest visible things that we have turned on for new
-> machine types in the past, pveoi and x2apic comes to mind.
-
-Yes, we have tons of guest-visible things that we tie to the
-machine-type.  What I'm looking for is a solution to make this
-less frequent in the future.
-
---=20
-Eduardo
+thanks
+-- PMM
