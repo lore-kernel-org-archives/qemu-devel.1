@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f8Prh-0001jJ-1E
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:37:45 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f8Psg-0002Qo-61
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:38:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f8Prd-0005R3-Qp
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:37:41 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 17 Apr 2018 15:37:04 +0300
-Message-Id: <9695182c2eb11b77cb319689a1ebaa4e7c9d6591.1523968389.git.berto@igalia.com>
-In-Reply-To: <cover.1523968389.git.berto@igalia.com>
-References: <cover.1523968389.git.berto@igalia.com>
-In-Reply-To: <cover.1523968389.git.berto@igalia.com>
-References: <cover.1523968389.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] qcow2: Give the refcount cache the
- minimum possible size by default
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f8Psf-0005pp-C8
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:38:42 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:45192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1f8Psf-0005pc-3u
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:38:41 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id u11so35071460wri.12
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 05:38:40 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180417153548.53b08fa1@vp-pc>
+References: <20180416194011.11969-1-viktor.prutyanov@virtuozzo.com>
+	<CAJ+F1CKf=GCJBOqAc5mTs1G7V7+KsPSukcCYjQAnUFdFa-dhEw@mail.gmail.com>
+	<20180417153548.53b08fa1@vp-pc>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 17 Apr 2018 14:38:39 +0200
+Message-ID: <CAJ+F1C+nxVO2yBtvtmXiB2z2kq6+-x53qvpJ0M-p_z=5BkTeLQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] dump: add Windows dump format to
+ dump-guest-memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,135 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-The L2 and refcount caches have default sizes that can be overridden
-using the l2-cache-size and refcount-cache-size (an additional
-parameter named cache-size sets the combined size of both caches).
+Hi
 
-Unless forced by one of the aforementioned parameters, QEMU will set
-the unspecified sizes so that the L2 cache is 4 times larger than the
-refcount cache.
+On Tue, Apr 17, 2018 at 2:35 PM, Viktor Prutyanov
+<viktor.prutyanov@virtuozzo.com> wrote:
+> On Tue, 17 Apr 2018 14:03:18 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>
+>> Hi
+>>
+>> On Mon, Apr 16, 2018 at 9:40 PM, Viktor Prutyanov
+>> <viktor.prutyanov@virtuozzo.com> wrote:
+>> > This patch adds Windows crashdumping feature. Now QEMU can produce
+>> > crashdump file understandable for WinDbg. The crashdump will be
+>> > obtained by joining physical memory dump and 8K header exposed
+>> > through vmcoreinfo/fw_cfg device by guest driver at BSOD time.
+>> > Option '-w' was added to dump-guest-memory command. At the moment,
+>> > only x64 configuration is supported. Suitable driver can be found at
+>> > https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/fw=
+cfg64
+>> >
+>> > Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+>>
+>> Why do you reuse VMCOREINFO_FORMAT_ELF ? It looks like a hack to me. I
+>> can imagine there is some code similarity for new format support, like
+>> the cpu_physical_memory_read(addr, s->guest_note, size), but what else
+>> do you gain from reusing VMCOREINFO_FORMAT_ELF instead of introducing
+>> explicitely a new windows dump specific format ? This could really
+>> help avoiding some confusion imho
+>
+> Reuse of VMCOREINFO_FORMAT_ELF makes possible to produce valid ELF-dump
+> which can be converted to Windows dump format later with another tool.
+>
 
-This is based on the premise that the refcount metadata needs to be
-only a fourth of the L2 metadata to cover the same amount of disk
-space. This is incorrect for two reasons:
+Ah I didn't get that! could you update the commit message, and/or the
+HMP/QMP documentation?
 
- a) The amount of disk covered by an L2 table depends solely on the
-    cluster size, but in the case of a refcount block it depends on
-    the cluster size *and* the width of each refcount entry.
-    The 4/1 ratio is only valid with 16-bit entries (the default).
-
- b) When we talk about disk space and L2 tables we are talking about
-    guest space (L2 tables map guest clusters to host clusters),
-    whereas refcount blocks are used for host clusters (including
-    L1/L2 tables and the refcount blocks themselves). On a fully
-    populated (and uncompressed) qcow2 file, image size > virtual size
-    so there are more refcount entries than L2 entries.
-
-Problem (a) could be fixed by adjusting the algorithm to take into
-account the refcount entry width. Problem (b) could be fixed by
-increasing a bit the refcount cache size to account for the clusters
-used for qcow2 metadata.
-
-However this patch takes a completely different approach and instead
-of keeping a ratio between both cache sizes it assigns as much as
-possible to the L2 cache and the remainder to the refcount cache.
-
-The reason is that L2 tables are used for every single I/O request
-from the guest and the effect of increasing the cache is significant
-and clearly measurable. Refcount blocks are however only used for
-cluster allocation and internal snapshots and in practice are accessed
-sequentially in most cases, so the effect of increasing the cache is
-negligible (even when doing random writes from the guest).
-
-So, make the refcount cache as small as possible unless the user
-explicitly asks for a larger one.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2.c              | 31 +++++++++++++++++++------------
- block/qcow2.h              |  4 ----
- tests/qemu-iotests/137.out |  2 +-
- 3 files changed, 20 insertions(+), 17 deletions(-)
-
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ef68772aca..091088e09e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -802,23 +802,30 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-         } else if (refcount_cache_size_set) {
-             *l2_cache_size = combined_cache_size - *refcount_cache_size;
-         } else {
--            *refcount_cache_size = combined_cache_size
--                                 / (DEFAULT_L2_REFCOUNT_SIZE_RATIO + 1);
--            *l2_cache_size = combined_cache_size - *refcount_cache_size;
-+            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-+            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
-+            uint64_t min_refcount_cache =
-+                (uint64_t) MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
-+
-+            /* Assign as much memory as possible to the L2 cache, and
-+             * use the remainder for the refcount cache */
-+            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
-+                *l2_cache_size = max_l2_cache;
-+                *refcount_cache_size = combined_cache_size - *l2_cache_size;
-+            } else {
-+                *refcount_cache_size =
-+                    MIN(combined_cache_size, min_refcount_cache);
-+                *l2_cache_size = combined_cache_size - *refcount_cache_size;
-+            }
-         }
-     } else {
--        if (!l2_cache_size_set && !refcount_cache_size_set) {
-+        if (!l2_cache_size_set) {
-             *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
-                                  (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
-                                  * s->cluster_size);
--            *refcount_cache_size = *l2_cache_size
--                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
--        } else if (!l2_cache_size_set) {
--            *l2_cache_size = *refcount_cache_size
--                           * DEFAULT_L2_REFCOUNT_SIZE_RATIO;
--        } else if (!refcount_cache_size_set) {
--            *refcount_cache_size = *l2_cache_size
--                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
-+        }
-+        if (!refcount_cache_size_set) {
-+            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
-         }
-     }
- 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index adf5c3950f..01b5250415 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -77,10 +77,6 @@
- #define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
- #define DEFAULT_L2_CACHE_BYTE_SIZE 1048576 /* bytes */
- 
--/* The refblock cache needs only a fourth of the L2 cache size to cover as many
-- * clusters */
--#define DEFAULT_L2_REFCOUNT_SIZE_RATIO 4
--
- #define DEFAULT_CLUSTER_SIZE 65536
- 
- 
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index e28e1eadba..96724a6c33 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -22,7 +22,7 @@ refcount-cache-size may not exceed cache-size
- L2 cache size too big
- L2 cache entry size must be a power of two between 512 and the cluster size (65536)
- L2 cache entry size must be a power of two between 512 and the cluster size (65536)
--L2 cache size too big
-+Refcount cache size too big
- Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-check.template' ('all')
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
--- 
-2.11.0
+--=20
+Marc-Andr=C3=A9 Lureau
