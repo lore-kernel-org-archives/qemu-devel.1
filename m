@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8Rh1-0000Di-FB
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:34:48 -0400
+	(envelope-from <prvs=63880a4e9=anthony.perard@citrix.com>)
+	id 1f8Rje-0001fa-7Y
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8Rgy-0001l3-9l
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:34:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35022)
+	(envelope-from <prvs=63880a4e9=anthony.perard@citrix.com>)
+	id 1f8Rjb-0003bu-3R
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:37:30 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:13540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f8Rgy-0001kj-2v
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:34:44 -0400
-Date: Tue, 17 Apr 2018 08:34:34 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180417083434.7a0ec81c@w520.home>
-In-Reply-To: <01FDBDDE256B79498DC57789713132D46A18E8D0@SHSMSX101.ccr.corp.intel.com>
-References: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
-	<20180416143745.3cb868d9@w520.home>
-	<01FDBDDE256B79498DC57789713132D46A18E8D0@SHSMSX101.ccr.corp.intel.com>
+	(Exim 4.71)
+	(envelope-from <prvs=63880a4e9=anthony.perard@citrix.com>)
+	id 1f8Rja-0003bK-Q2
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:37:27 -0400
+Date: Tue, 17 Apr 2018 15:37:23 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180417143723.GN2208@perard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for
- VFIO device to support live migration
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <c7d408cb-454c-2322-3812-a7cacecdbe5f@citrix.com>
+	<635d45e1-2d97-6313-2348-1e2bc9061d8b@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH] xen/pt: use address_space_memory object
+ for memory region hooks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Yulei" <yulei.zhang@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, ross.lagerwall@citrix.com
 
-On Tue, 17 Apr 2018 08:11:12 +0000
-"Zhang, Yulei" <yulei.zhang@intel.com> wrote:
-
-> > -----Original Message-----
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Tuesday, April 17, 2018 4:38 AM
-> > To: Zhang, Yulei <yulei.zhang@intel.com>
-> > Cc: qemu-devel@nongnu.org; Tian, Kevin <kevin.tian@intel.com>;
-> > joonas.lahtinen@linux.intel.com; zhenyuw@linux.intel.com;
-> > kwankhede@nvidia.com; Wang, Zhi A <zhi.a.wang@intel.com>;
-> > dgilbert@redhat.com; quintela@redhat.com
-> > Subject: Re: [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for VFIO device
-> > to support live migration
+On Tue, Apr 17, 2018 at 03:18:55PM +0100, Igor Druzhinin wrote:
+> On 17/04/18 15:15, Anthony PERARD wrote:
+> > On Fri, Apr 06, 2018 at 10:21:23PM +0100, Igor Druzhinin wrote:
+> >> The issue that the original patch tried to workaround (uneven number of
+> >> region_add/del calls on device attach/detach) was fixed in later QEMU
+> >> versions.
 > > 
-> > On Tue, 10 Apr 2018 14:03:13 +0800
-> > Yulei Zhang <yulei.zhang@intel.com> wrote:
-> >   
-> > > Instead of using vm state description, add SaveVMHandlers for VFIO
-> > > device to support live migration.
-> > >
-> > > Introduce new Ioctl VFIO_DEVICE_GET_DIRTY_BITMAP to fetch the  
-> > memory  
-> > > bitmap that dirtied by vfio device during the iterative precopy stage
-> > > to shorten the system downtime afterward.
-> > >
-> > > For vfio pci device status migrate, during the system downtime, it
-> > > will save the following states 1. pci configuration space addr0~addr5
-> > > 2. pci configuration space msi_addr msi_data 3. pci device status
-> > > fetch from device driver
-> > >
-> > > And on the target side the vfio_load will restore the same states 1.
-> > > re-setup the pci bar configuration 2. re-setup the pci device msi
-> > > configuration 3. restore the pci device status  
+> > Do you know when the issue was fixed?
 > > 
-> > Interrupts are configured via ioctl, but I don't see any code here to configure
-> > the device into the correct interrupt state.  How do we know the target
-> > device is compatible with the source device?  Do we rely on the vendor
-> > driver to implicitly include some kind of device and version information and
-> > fail at the very end of the migration?  It seems like we need to somehow
-> > front-load that sort of device compatibility checking since a vfio-pci device
-> > can be anything (ex. what happens if a user tries to migrate a GVT-g vGPU to
-> > an NVIDIA vGPU?).  Thanks,
-> > 
-> > Alex  
 > 
-> We emulate the write to the pci configure space in vfio_load() which will help
-> setup the interrupt state. 
+> I haven't tracked down a particular version but the previous behavior of
+> memory_listener_unregister() was to remove the listener from the list
+> without calling the callback. It has changed since then and now the
+> callback is called in listener_del_address_space().
 
-But you're only doing that for MSI, not MSI-X, we cannot simply say
-that we don't have an MSI-X devices right now and add it later or we'll
-end up with incompatible vmstate, we need to plan for how we'll support
-it within the save state stream now.
+On Tue, Apr 17, 2018 at 03:29:42PM +0100, Igor Druzhinin wrote:
+> I think it's this commit:
+> 
+> commit d25836cafd7508090d211e97acfc0abc5ae88daa
+> Author: Peter Xu <peterx@redhat.com>
+> Date:   Mon Jan 22 14:02:44 2018 +0800
+> 
+>     memory: do explicit cleanup when remove listeners
 
-> For compatibility I think currently the vendor driver would put version number 
-> or device specific info in the device state region, so during the pre-copy stage
-> the target side will discover the difference and call off the migration.
 
-Those sorts of things should be built into the device state region, we
-shouldn't rely on vendor drivers to make these kinds of considerations,
-we should build it into the API, which also allows QEMU to check state
-compatibility before attempting a migration.  Thanks,
+I think these information ought to be in the commit message, in
+particular the fact that the callback wasn't call on detach. And with
+the commit message updated, you can add my:
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Alex
+Thanks,
+
+-- 
+Anthony PERARD
