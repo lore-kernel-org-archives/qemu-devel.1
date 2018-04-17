@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8RN3-0005GM-Mt
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:14:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1f8ROJ-0006J2-AL
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8RN0-00078E-5d
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:14:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51798 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1f8ROD-0007ju-Rb
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:15:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51876 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8RMz-000782-WA
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:14:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC4AB406E970
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:14:05 +0000 (UTC)
-References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
-	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
-	<7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
-	<87efjeaqd2.fsf@dusky.pond.sub.org> <20180417140540.GD15421@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com>
-Date: Tue, 17 Apr 2018 16:14:02 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8ROD-0007ja-FF
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:15:21 -0400
+Date: Tue, 17 Apr 2018 15:15:18 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180417141518.GF15421@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAFEAcA-FaS+HeihGmbhrLAR8e=jmz-Og+OKGakGX7MGb_KgwCw@mail.gmail.com>
+	<d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
+	<CAFEAcA_rswg=c-QWcL1VraqiOEN1+zPmGG=-AP2f2CnYUA0K+g@mail.gmail.com>
+	<37db1c18-cb62-0d93-3b4c-38d2ab20c804@weilnetz.de>
 MIME-Version: 1.0
-In-Reply-To: <20180417140540.GD15421@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
- chapter to make "-net" less prominent
+Content-Disposition: inline
+In-Reply-To: <37db1c18-cb62-0d93-3b4c-38d2ab20c804@weilnetz.de>
+Subject: Re: [Qemu-devel] Last call for release-critical fixes for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,21 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 17/04/2018 16:05, Daniel P. Berrang=C3=A9 wrote:
->> For what it's worth, my "[RFC PATCH 00/32] Command line QAPIfication"
->> replaces the original parsing art by getopt_long_only().
->>
->> Completing that work will take some time, but once it's done, we can
->> (and I think we should) prefer double-dash for consistency.
-> Since our existing parser accepts single & double-dash already, is it
-> worth explicitly deprecating single-dash usage right now. So that when
-> your code comes along ready to merge, we're already able to say
-> "i told you so" and drop single-dash support at that same time.
+On Tue, Apr 17, 2018 at 04:05:46PM +0200, Stefan Weil wrote:
+> Am 17.04.2018 um 15:50 schrieb Peter Maydell:
+> > On 17 April 2018 at 14:19, Stefan Weil <sw@weilnetz.de> wrote:
+> >> Update po files? That's not a "must fix", but it would be nice to have
+> >> those files synchronized with ui/gtk.c again.
+> > Judging by the "POT-Creation-Date" timestamps, we haven't done
+> > that for a year or so, so there doesn't seem to be a great
+> > urgency to do it now.
+> >
+> > Overall:
+> >  * I don't really understand why we need to keep doing this;
+> >    I tried "make -C po update" but all it did was update the
+> >    date stamp and a bunch of comments in the .po files
+> >  * If we do need to do this, we need to come up with a
+> >    process (preferably automatic) that ensures that we do
+> >    it in a more timely manner than "somebody mentions it
+> >    on the day we're thinking of tagging the final rc"
+> >
+> > Asking me to manually run a magic command I don't understand
+> > doesn't really work, as you can see from how infrequently
+> > it's happened.
+> >
+> > thanks
+> > -- PMM
+> 
+> The only visible consequence if it is not done is that developers who
+> run "make install" (which updates the po files) then have a local code
+> modification which is in the way if they are working with git. Not many
+> run "make install", and obviously those who do can handle the situation.
+> I think that there would be a real problem if people tried to build with
+> the source on a read only medium.
+> 
+> I wonder whether generating the po files without the line comments would
+> improve the situation. Currently each added or removed line in ui/gtk.c
+> changes the line numbers which are part of the comments. If the comments
+> would not include line numbers, then only relevant changes of message
+> texts would need an update of the po files. Maybe we should try that for
+> the next release.
 
-Serious questions: is _anyone_ of you actually using double-dash support
-in daily invocations of QEMU?
+Yes, storing full po files in GIT is really awful for a number of reasons.
+Stripping source location comments when storing in git is good, because
+those because out of date the moment someone changes the code containging
+the original msgid. You also want to sort msgids alphabetically instead
+by source location so you don't get stuff moving around all in the po
+file when code is refactored/moved/renamed.
 
-Paolo
+I've coincidentally been tackling this same problem in libvirt just last
+week
+
+  https://www.redhat.com/archives/libvir-list/2018-April/msg01004.html
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
