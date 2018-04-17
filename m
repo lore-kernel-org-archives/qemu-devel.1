@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8W8f-0004LS-GW
+	(envelope-from <dgilbert@redhat.com>) id 1f8W8f-0004LT-GZ
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8W8c-0000iG-RD
+	(envelope-from <dgilbert@redhat.com>) id 1f8W8d-0000iS-5L
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:19:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45370 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45372 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8W8c-0000hi-Li
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:19:34 -0400
-References: <AM3PR07MB273186AEFA49A506BFC2D28B3B30@AM3PR07MB273.eurprd07.prod.outlook.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2c22286f-9fae-06fb-0bc3-e307385f39f8@redhat.com>
-Date: Tue, 17 Apr 2018 14:19:25 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f8W8c-0000hy-VT
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:19:35 -0400
+Date: Tue, 17 Apr 2018 20:19:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180417191927.GH2417@work-vm>
+References: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <AM3PR07MB273186AEFA49A506BFC2D28B3B30@AM3PR07MB273.eurprd07.prod.outlook.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RGYmgs5nqqZjQIT7MDrXcQ1kNazSZYzgp"
-Subject: Re: [Qemu-devel] [PATCH] Show values and description when using
- "qom-list"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for
+ VFIO device to support live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,176 +27,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Perez Blanco, Ricardo (Nokia - BE/Antwerp)" <ricardo.perez_blanco@nokia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+To: Yulei Zhang <yulei.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, quintela@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RGYmgs5nqqZjQIT7MDrXcQ1kNazSZYzgp
-From: Eric Blake <eblake@redhat.com>
-To: "Perez Blanco, Ricardo (Nokia - BE/Antwerp)"
- <ricardo.perez_blanco@nokia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>
-Message-ID: <2c22286f-9fae-06fb-0bc3-e307385f39f8@redhat.com>
-Subject: Re: [PATCH] Show values and description when using "qom-list"
-References: <AM3PR07MB273186AEFA49A506BFC2D28B3B30@AM3PR07MB273.eurprd07.prod.outlook.com>
-In-Reply-To: <AM3PR07MB273186AEFA49A506BFC2D28B3B30@AM3PR07MB273.eurprd07.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/13/2018 03:05 AM, Perez Blanco, Ricardo (Nokia - BE/Antwerp) wrote:=
-
-> Dear all,
->=20
-> Here you can find my first contribution to qemu. Please, do not hesitat=
-e to do any kind of remark.
-
-Welcome to the community.  Looking forward to your v2 patch submission
-(see my reply to your followup, for more things to fix before you send v2=
-).
-
-
-> Subject: [PATCH] Show values and description when using "qom-list"
->=20
-> For debugging purposes it is very useful to:
->  - See the description of the field. This information is already filled=
-
->    in but not shown in "qom-list" command.
->  - Display value of the field. So far, only well known types are
->    implemented (string, str, int, uint, bool).
->=20
-> Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
+* Yulei Zhang (yulei.zhang@intel.com) wrote:
+> Instead of using vm state description, add SaveVMHandlers for VFIO
+> device to support live migration.
+> 
+> Introduce new Ioctl VFIO_DEVICE_GET_DIRTY_BITMAP to fetch the memory
+> bitmap that dirtied by vfio device during the iterative precopy stage
+> to shorten the system downtime afterward.
+> 
+> For vfio pci device status migrate, during the system downtime, it will
+> save the following states
+> 1. pci configuration space addr0~addr5
+> 2. pci configuration space msi_addr msi_data
+> 3. pci device status fetch from device driver
+> 
+> And on the target side the vfio_load will restore the same states
+> 1. re-setup the pci bar configuration
+> 2. re-setup the pci device msi configuration
+> 3. restore the pci device status
+> 
+> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 > ---
->  hmp.c          | 13 +++++++++++--
->  qapi/misc.json |  4 +++-
->  qmp.c          | 26 ++++++++++++++++++++++++++
->  3 files changed, 40 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hmp.c b/hmp.c
-> index a25c7bd..967e0b2 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2490,8 +2490,17 @@ void hmp_qom_list(Monitor *mon, const QDict *qdi=
-ct)
->          while (list !=3D NULL) {
->              ObjectPropertyInfo *value =3D list->value;
->=20
-> -            monitor_printf(mon, "%s (%s)\n",
-> -                           value->name, value->type);
-> +            monitor_printf(mon, "%s", value->name);
-> +            if (value->value) {
-> +                monitor_printf(mon, "=3D%s", value->value);
-> +            }
-
-Technically, you should be checking 'if (value->has_value)'.  It happens
-that our current code sets value->value to NULL if value->has_value is
-false, but that's less reliable.  Someday, we may improve our QAPI code
-generator to quit generating has_FOO members when FOO is an optional
-pointer and NULL is an obvious indication that FOO was not provided (at
-which point, your code as written is correct), but we're not there yet.
-
-
-> +++ b/qapi/misc.json
-> @@ -1328,10 +1328,12 @@
->  #
->  # @description: if specified, the description of the property.
->  #
-> +# @value: if specified, the value of the property.
-
-Missing a mention that this field is '(since 2.13)'.
-
-> +#
->  # Since: 1.2
->  ##
->  { 'struct': 'ObjectPropertyInfo',
-> -  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
-> +  'data': { 'name': 'str', 'type': 'str', '*description':'str', '*valu=
-e':'str' } }
->=20
->  ##
->  # @qom-list:
-> diff --git a/qmp.c b/qmp.c
-> index f722616..750b5d0 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -237,6 +237,32 @@ ObjectPropertyInfoList *qmp_qom_list(const char *p=
-ath, Error **errp)
->=20
->          entry->value->name =3D g_strdup(prop->name);
->          entry->value->type =3D g_strdup(prop->type);
-> +        if (prop->description) {
-> +            entry->value->description =3D g_strdup(prop->description);=
-
+>  hw/vfio/pci.c              | 195 +++++++++++++++++++++++++++++++++++++++++++--
+>  linux-headers/linux/vfio.h |  14 ++++
+>  2 files changed, 204 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 13d8c73..ac6a9c7 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -33,9 +33,14 @@
+>  #include "trace.h"
+>  #include "qapi/error.h"
+>  #include "migration/blocker.h"
+> +#include "migration/register.h"
+> +#include "exec/ram_addr.h"
+>  
+>  #define MSIX_CAP_LENGTH 12
+>  
+> +#define VFIO_SAVE_FLAG_SETUP 0
+> +#define VFIO_SAVE_FLAG_DEV_STATE 1
+> +
+>  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+>  static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
+> @@ -2639,6 +2644,190 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+>      vdev->req_enabled = false;
+>  }
+>  
+> +static uint64_t vfio_dirty_log_sync(VFIOPCIDevice *vdev)
+> +{
+> +    RAMBlock *block;
+> +    struct vfio_device_get_dirty_bitmap *d;
+> +    uint64_t page = 0;
+> +    ram_addr_t size;
+> +    unsigned long nr, bitmap;
+> +
+> +    RAMBLOCK_FOREACH(block) {
+> +        size = block->used_length;
+> +        nr = size >> TARGET_PAGE_BITS;
+> +        bitmap = (BITS_TO_LONGS(nr) + 1) * sizeof(unsigned long);
+> +        d = g_malloc0(sizeof(*d) +  bitmap);
+> +        d->start_addr = block->offset;
+> +        d->page_nr = nr;
+> +        if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_DIRTY_BITMAP, d)) {
+> +            error_report("vfio: Failed to get device dirty bitmap");
+> +            g_free(d);
+> +            goto exit;
 > +        }
-> +        if ((g_ascii_strncasecmp(entry->value->type, "string", 6) =3D=3D=
- 0) ||
-> +            (g_ascii_strncasecmp(entry->value->type, "str", 3) =3D=3D =
-0)) {
-
-This will accept a type named "strange"; is that intentional?
-
-> +            Error **errp =3D NULL;
-> +            entry->value->value =3D g_strdup_printf("\"%s\"",
-> +                object_property_get_str(obj, entry->value->name, errp)=
-);
+> +
+> +        if (d->page_nr) {
+> +            cpu_physical_memory_set_dirty_lebitmap(
+> +                                 (unsigned long *)&d->dirty_bitmap,
+> +                                 d->start_addr, d->page_nr);
+> +            page += d->page_nr;
 > +        }
-> +        if (g_ascii_strncasecmp(entry->value->type, "int", 3) =3D=3D 0=
-) {
+> +        g_free(d);
+> +    }
+> +
+> +exit:
+> +    return page;
+> +}
+> +
+> +static void vfio_save_live_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+> +                   uint64_t *non_postcopiable_pending,
+> +                   uint64_t *postcopiable_pending)
+> +{
+> +    VFIOPCIDevice *vdev = opaque;
+> +    uint64_t pending;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    rcu_read_lock();
+> +    pending = vfio_dirty_log_sync(vdev);
+> +    rcu_read_unlock();
+> +    qemu_mutex_unlock_iothread();
+> +    *non_postcopiable_pending += pending;
+> +}
+> +
+> +static int vfio_load(QEMUFile *f, void *opaque, int version_id)
+> +{
+> +    VFIOPCIDevice *vdev = opaque;
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
+> +    uint8_t *buf = NULL;
+> +    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
+> +    bool msi_64bit;
+> +
+> +    if (qemu_get_byte(f) == VFIO_SAVE_FLAG_SETUP) {
+> +        goto exit;
+> +    }
 
-Likewise, this will accept a type named "internal".  I'm not sure if
-your manual checking for types by names is the best approach; and the
-fact that we are stringizing the result instead of using the natural
-JSON type (a string for "str", a number for "int") is a bit worrisome.
+If you're building something complex like this, you might want to add
+some version flags at the start and a canary at the end to detect
+corruption.
 
-> +            Error **errp =3D NULL;
-> +            entry->value->value =3D g_strdup_printf("%ld",
-> +                object_property_get_int(obj, entry->value->name, errp)=
-);
-> +        }
-> +        if (g_ascii_strncasecmp(entry->value->type, "uint", 4) =3D=3D =
-0) {
-> +            Error **errp =3D NULL;
-> +            entry->value->value =3D g_strdup_printf("%lu",
-> +                object_property_get_uint(obj, entry->value->name, errp=
-));
-> +        }
-> +        if (g_ascii_strncasecmp(entry->value->type, "bool", 4) =3D=3D =
-0) {
-> +            Error **errp =3D NULL;
-> +            entry->value->value =3D g_strdup_printf("%s",
-> +               (object_property_get_bool(obj, entry->value->name, errp=
-) =3D=3D true)
-> +                ? "true" : "false");
-> +        }
+Also note that the migration could fail at any point; so calling
+qemu_file_get_error is good practice at points before acting on data
+youv'e read with qemu_get_be* since it could be bogus if it's already
+failed.
 
-Since the ->value field is optional, you have to set
-entry->value->has_value =3D true anywhere that you are setting
-entry->value->value to a string.
+> +    /* retore pci bar configuration */
+> +    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> +                          ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        bar_cfg = qemu_get_be32(f);
+> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar_cfg, 4);
+> +    }
+> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> +                          ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
+> +
+> +    /* restore msi configuration */
+> +    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> +    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
+> +
+> +    vfio_pci_write_config(&vdev->pdev,
+> +                          pdev->msi_cap + PCI_MSI_FLAGS,
+> +                          ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
+> +
+> +    msi_lo = qemu_get_be32(f);
+> +    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
+> +
+> +    if (msi_64bit) {
+> +        msi_hi = qemu_get_be32(f);
+> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> +                              msi_hi, 4);
+> +    }
+> +    msi_data = qemu_get_be32(f);
+> +    vfio_pci_write_config(pdev,
+> +              pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> +              msi_data, 2);
+> +
+> +    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> +                          ctl | PCI_MSI_FLAGS_ENABLE, 2);
+> +
+> +    buf = g_malloc(sz);
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Please validate 'sz' before using it - just assume that the byte stream
+got horribly corrupted and you should really check for it.
 
+> +    if (buf == NULL) {
+> +        error_report("vfio: Failed to allocate memory for migrate");
+> +        return -1;
+> +    }
 
---RGYmgs5nqqZjQIT7MDrXcQ1kNazSZYzgp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+g_malloc doesn't fail by returning NULL; it asserts;  so use
+g_try_malloc.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> +    qemu_get_buffer(f, buf, sz);
+> +    if (pwrite(vdev->vbasedev.fd, buf, sz,
+> +               vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
+> +        error_report("vfio: Failed to write Device State Region");
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWSL0ACgkQp6FrSiUn
-Q2o0egf/SlT2FUwFqsl3oxSjqjzcRD6Gp3WZbnZHEouBSQMbs+cRHPfNntlTGGD7
-jqDPWC1NBp9gxeKuWKQ4eVo4+/+GzJ/CZcN4b1Xtrn1buQmG7WrUQyUwwvWoTOGq
-qGt3gfOgqPCGyiYoZJAplMpaqJP37/As8cHrbUAXBHKp4gxhy9CxN/h45GHWhvbj
-/PW4XixJtnbcL2kb5nDe+vYGUuPlfnmKwI1DehEVwYm8ATVATbdY0iM6cCRkaV8Y
-71G0CfN1dpK7M3KcEYrVbaC4qp8ttgI4Ej1iRykOg8BATCuQx3sYWzyDPuJq0s+j
-yUh68RWKxwwe/jhAZ6dZPf0KChAP3g==
-=+O6J
------END PGP SIGNATURE-----
+free the buffer here.
+> +        return -1;
+> +    }
+> +
+> +    g_free(buf);
+> +
+> +exit:
+> +    return 0;
+> +}
+> +
+> +static int vfio_save_complete(QEMUFile *f, void *opaque)
 
---RGYmgs5nqqZjQIT7MDrXcQ1kNazSZYzgp--
+Echoing Kirti's mail, this doesn't seem to be an iterative save routine;
+this is just all at the end; in which case use VMState.
+If you want it iterative then you need to define the other functions.
+
+> +{
+> +    VFIOPCIDevice *vdev = opaque;
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
+> +    uint8_t *buf = NULL;
+> +    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
+> +    bool msi_64bit;
+> +
+> +    qemu_put_byte(f, VFIO_SAVE_FLAG_DEV_STATE);
+> +
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> +        qemu_put_be32(f, bar_cfg);
+> +    }
+> +
+> +    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> +    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
+> +
+> +    msi_lo = pci_default_read_config(pdev,
+> +                                     pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> +    qemu_put_be32(f, msi_lo);
+> +
+> +    if (msi_64bit) {
+> +        msi_hi = pci_default_read_config(pdev,
+> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> +                                         4);
+> +        qemu_put_be32(f, msi_hi);
+> +    }
+> +
+> +    msi_data = pci_default_read_config(pdev,
+> +               pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> +               2);
+> +    qemu_put_be32(f, msi_data);
+> +
+> +    buf = g_malloc(sz);
+> +    if (buf == NULL) {
+> +        error_report("vfio: Failed to allocate memory for migrate");
+> +        goto exit;
+> +    }
+
+Same about the allocation above.
+
+> +    if (pread(vdev->vbasedev.fd, buf, sz,
+> +              vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
+> +        error_report("vfio: Failed to read Device State Region");
+
+Include errno?
+
+> +        goto exit;
+> +    }
+> +
+> +    qemu_put_buffer(f, buf, sz);
+> +
+> +exit:
+> +    g_free(buf);
+> +
+> +    return 0;
+> +}
+> +
+> +static int vfio_save_setup(QEMUFile *f, void *opaque)
+> +{
+> +    qemu_put_byte(f, VFIO_SAVE_FLAG_SETUP);
+> +    return 0;
+> +}
+> +
+> +static SaveVMHandlers savevm_vfio_handlers = {
+> +    .save_setup = vfio_save_setup,
+> +    .save_live_pending = vfio_save_live_pending,
+> +    .save_live_complete_precopy = vfio_save_complete,
+> +    .load_state = vfio_load,
+> +};
+> +
+>  static void vfio_realize(PCIDevice *pdev, Error **errp)
+>  {
+>      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> @@ -2898,6 +3087,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>      vfio_register_req_notifier(vdev);
+>      vfio_setup_resetfn_quirk(vdev);
+>      qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
+> +    register_savevm_live(NULL, "vfio-pci", 0, 1, &savevm_vfio_handlers, vdev);
+>  
+>      return;
+>  
+> @@ -3051,10 +3241,6 @@ static Property vfio_pci_dev_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> -static const VMStateDescription vfio_pci_vmstate = {
+> -    .name = "vfio-pci",
+> -};
+> -
+>  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -3062,7 +3248,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+>  
+>      dc->reset = vfio_pci_reset;
+>      dc->props = vfio_pci_dev_properties;
+> -    dc->vmsd = &vfio_pci_vmstate;
+>      dc->desc = "VFIO-based PCI device assignment";
+>      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>      pdc->realize = vfio_realize;
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index 8f02f2f..2c911d9 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -512,6 +512,20 @@ struct vfio_pci_hot_reset {
+>  
+>  #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
+>  
+> +/**
+> + * VFIO_DEVICE_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE, VFIO_BASE + 14,
+> + *				    struct vfio_device_get_dirty_bitmap)
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +struct vfio_device_get_dirty_bitmap {
+> +	__u64	       start_addr;
+> +	__u64	       page_nr;
+> +	__u8           dirty_bitmap[];
+> +};
+
+Header updates should be in a separate patch.
+
+Dave
+
+> +#define VFIO_DEVICE_GET_DIRTY_BITMAP	_IO(VFIO_TYPE, VFIO_BASE + 14)
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
