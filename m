@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f8XQ5-0005HO-UX
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:41:43 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f8XQ7-0005JV-Th
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f8XQ1-0002Qt-0D
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:41:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f8XQ0-0002ID-QH
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:41:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f8XPy-00049V-Gq
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 20:41:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7020C2E80E2
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 20:41:32 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1f8XQ3-0002mI-5m
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:41:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f8XQ2-0002ce-Rl
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:41:39 -0400
+Date: Tue, 17 Apr 2018 17:41:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180417204135.GB29865@localhost.localdomain>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<87zi21apkh.fsf@dusky.pond.sub.org>
+	<20180417142739.GV29865@localhost.localdomain>
+	<20180417174110.1a7f1daf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Apr 2018 20:32:31 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1654137@bugs.launchpad.net>
-Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
-Message-Id: <152399715198.13092.8340134701167106298.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1654137] Re: Ctrl-A b not working in 2.8.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180417174110.1a7f1daf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
+ machine_init() from QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-Hi Andreas, beware... while 1b2503fcf7b5 fixes this bug, it introduces anot=
-her regression.
-I suggest waiting for the release tag before cherry-picking it.
+On Tue, Apr 17, 2018 at 05:41:10PM +0200, Igor Mammedov wrote:
+> On Tue, 17 Apr 2018 11:27:39 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Tue, Apr 17, 2018 at 04:13:34PM +0200, Markus Armbruster wrote:
+> > > Igor Mammedov <imammedo@redhat.com> writes:
+> > > 
+> > > [...]  
+> > > > Series allows to configure NUMA mapping at runtime using QMP
+> > > > interface. For that to happen it introduces a new '-preconfig' CLI option
+> > > > which allows to pause QEMU before machine_init() is run and
+> > > > adds new set-numa-node QMP command which in conjunction with
+> > > > query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
+> > > >
+> > > > Later we can modify other commands to run early, for example device_add.
+> > > > I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
+> > > > paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
+> > > > stage it's considered hotplug already), so SPAPR had to work around the issue.  
+> > > 
+> > > That instance is just stupidity / laziness, I think: we consider any
+> > > plug after machine creation a hot plug.  Real machines remain cold until
+> > > you press the power button.  Our virtual machines should remain cold
+> > > until they start running, i.e. with -S until the first "cont".
+> It probably would be too risky to change semantics of -S from hotplug to coldplug.
+> But even if we were easy it won't matter in case if dynamic configuration
+> done properly. More on it below.
+> 
+> > > I vaguely remember me asking this before, but your answer didn't make it
+> > > into this cover letter, which gives me a pretext to ask again instead of
+> > > looking it up in the archives: what exactly prevents us from keeping the
+> > > machine cold enough for numa configuration until the first "cont"?  
+> > 
+> > I also think this would be better, but it seems to be difficult
+> > in practice, see:
+> > http://mid.mail-archive.com/20180323210532.GD28161@localhost.localdomain
+> 
+> In addition to Eduardo's reply, here is what I've answered back
+> when you've asked question the 1st time (v2 late at -S pause point reconfig):
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg504140.html
+> 
+> In short:
+> I think it's wrong in general doing fixups after machine is build
+> instead of getting correct configuration before building machine.
+> That's going to be complex and fragile and might be hard to do at
+> all depending on what we are fixing up.
 
--- =
+What "building the machine" should mean, exactly, for external
+users?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1654137
+The main question I'd like to see answered is: why exactly we
+must "build" the machine before the first "cont" is issued when
+using -S?  Why can't we delay everything to "cont" when using -S?
 
-Title:
-  Ctrl-A b not working in 2.8.0
+Is it just because it's a long and complex task?  Does that mean
+we might still do that eventually, and eliminate the
+prelaunch/preconfig distinction in the distant future?
 
-Status in QEMU:
-  Fix Committed
+Even if we follow your approach, we need to answer these
+questions.  I'm sure we will try to reorder initialization steps
+between the preconfig/prelaunch states in the future, and we
+shouldn't break any expectations from external users when doing
+that.
 
-Bug description:
-  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
-  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
-  Other Ctrl-A sequences seem to work correctly.
+> 
+> BTW this is an outdated version of series and there is a newer one v5
+> https://patchwork.ozlabs.org/cover/895315/
+> so pleases review it.
+> 
+> Short diff vs 1:
+>  - only limited(minimum) set of commands is available at preconfig stage for now
+>  - use QAPI schema to mark commands as preconfig enabled,
+>    so mgmt could see when it can use commands.
+>  - added preconfig runstate state-machine instead of adding more global variables
+>    to cleanly keep track of where QEMU is paused and what it's allowed to do
 
-  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
-  installed on this system from source.
-
-  Reverting to the previous install restores "break" capability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
+-- 
+Eduardo
