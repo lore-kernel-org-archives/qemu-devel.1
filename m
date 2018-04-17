@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8R0z-0006m5-FR
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:51:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f8R1T-00076L-6O
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8R0y-0002hQ-N6
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:51:21 -0400
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:45152)
+	(envelope-from <alex.bennee@linaro.org>) id 1f8R1P-0002yN-4w
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:51:51 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8R0y-0002hE-Gu
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:51:20 -0400
-Received: by mail-ot0-x231.google.com with SMTP id w4-v6so2433979ote.12
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:51:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f8R1O-0002xc-U2
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:51:47 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v60so31883040wrc.7
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:51:46 -0700 (PDT)
+References: <20180417025328.25431-1-richard.henderson@linaro.org>
+	<20180417025328.25431-3-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180417025328.25431-3-richard.henderson@linaro.org>
+Date: Tue, 17 Apr 2018 14:51:44 +0100
+Message-ID: <871sfeaqkv.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
-References: <CAFEAcA-FaS+HeihGmbhrLAR8e=jmz-Og+OKGakGX7MGb_KgwCw@mail.gmail.com>
-	<d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Apr 2018 14:50:59 +0100
-Message-ID: <CAFEAcA_rswg=c-QWcL1VraqiOEN1+zPmGG=-AP2f2CnYUA0K+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Last call for release-critical fixes for 2.12
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] fpu: Bound increment for scalbn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 17 April 2018 at 14:19, Stefan Weil <sw@weilnetz.de> wrote:
-> Update po files? That's not a "must fix", but it would be nice to have
-> those files synchronized with ui/gtk.c again.
 
-Judging by the "POT-Creation-Date" timestamps, we haven't done
-that for a year or so, so there doesn't seem to be a great
-urgency to do it now.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Overall:
- * I don't really understand why we need to keep doing this;
-   I tried "make -C po update" but all it did was update the
-   date stamp and a bunch of comments in the .po files
- * If we do need to do this, we need to come up with a
-   process (preferably automatic) that ensures that we do
-   it in a more timely manner than "somebody mentions it
-   on the day we're thinking of tagging the final rc"
+> Without bounding the increment, we can overflow exp either here
+> in scalbn_decomposed or when adding the bias in round_canonical.
+> This can result in e.g. underflowing to 0 instead of overflowing
+> to infinity.
+>
+> The old softfloat code did bound the increment.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  fpu/softfloat.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index ba6e654050..a589f328c9 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -1883,6 +1883,12 @@ static FloatParts scalbn_decomposed(FloatParts a, =
+int n, float_status *s)
+>          return return_nan(a, s);
+>      }
+>      if (a.cls =3D=3D float_class_normal) {
+> +        /* The largest float type (even though not supported by FloatPar=
+ts)
+> +         * is float128, which has a 15 bit exponent.  Bounding N to 16 b=
+its
+> +         * still allows rounding to infinity, without allowing overflow
+> +         * within the int32_t that backs FloatParts.exp.
+> +         */
+> +        n =3D MIN(MAX(n, -0x10000), 0x10000);
+>          a.exp +=3D n;
+>      }
+>      return a;
 
-Asking me to manually run a magic command I don't understand
-doesn't really work, as you can see from how infrequently
-it's happened.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-thanks
--- PMM
+(risu FWIW although it obviously didn't catch this failure ;-)
+
+--
+Alex Benn=C3=A9e
