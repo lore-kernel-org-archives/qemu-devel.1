@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8TrM-0004LV-Ou
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:53:38 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f8Tu4-0005tN-9a
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8TrJ-0006WK-JZ
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:53:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f8TrJ-0006VV-BG
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:53:33 -0400
-Date: Tue, 17 Apr 2018 10:53:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180417105331.30429dca@w520.home>
-In-Reply-To: <8082FF9BCB2B054996454E47167FF4EC1C7FE5CA@SHSMSX104.ccr.corp.intel.com>
-References: <1523424250-3835-1-git-send-email-xiong.y.zhang@intel.com>
-	<20180416161559.530ee800@w520.home>
-	<8082FF9BCB2B054996454E47167FF4EC1C7FE5CA@SHSMSX104.ccr.corp.intel.com>
+	(envelope-from <jsnow@redhat.com>) id 1f8Tu2-0008Pr-RM
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:56:24 -0400
+References: <20180310082746.24198-1-jsnow@redhat.com>
+	<87zi22c5i0.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e06b144e-9676-0b08-d6e9-35101a7cef84@redhat.com>
+Date: Tue, 17 Apr 2018 12:56:16 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <87zi22c5i0.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks.c: Make stolen memory size
- adjustable for igd VFIO
+Subject: Re: [Qemu-devel] [PATCH v5 00/21] blockjobs: add explicit job
+ management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,157 +25,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-On Tue, 17 Apr 2018 02:37:21 +0000
-"Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
 
-> > On Wed, 11 Apr 2018 13:24:10 +0800
-> > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
-> >   
-> > > Currenly linux guest with kernel above 3.19 couldn't boot up on igd
-> > > passthrough env. The root case is i915 driver use stolen memory, but
-> > > qemu vfio doesn't support it.
-> > >
-> > > This patch set stolen memory size to zero default, so guest i915 won't
-> > > use it. But this breaks old windows igd driver which will be unloaded
-> > > once it see zero stolen memory size. Then this patch also use
-> > > x-igd-gms option to adjust stolen memory size. New windows igd driver
-> > > fixes this and could work with zero stolen memory size.
-> > >
-> > > Finally with this patch, Linux guest and windows guest with igd driver
-> > > above 15.45.4860 could work successfully, windows guest with igd
-> > > driver below 15.45.4860 should add x-igd-gms=* option.  
-> > 
-> > Sorry, I can't understand the above commit log in comparison to what this
-> > patch is actually doing.
-> >   
-> > > Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> > > ---
-> > >  hw/vfio/pci-quirks.c | 95
-> > > ++++++++++++++++++++++++++++------------------------
-> > >  1 file changed, 52 insertions(+), 43 deletions(-)
-> > >
-> > > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c index
-> > > 60ad5fb..6e9ed7f 100644
-> > > --- a/hw/vfio/pci-quirks.c
-> > > +++ b/hw/vfio/pci-quirks.c
-> > > @@ -1372,14 +1372,60 @@ static void  
-> > vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)  
-> > >      uint16_t cmd_orig, cmd;
-> > >      Error *err = NULL;
-> > >
-> > > +    /* This must be an Intel VGA device. */
-> > > +    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-> > > +        !vfio_is_vga(vdev) || nr != 4) {
-> > > +        return;
-> > > +    }
-> > > +
-> > >      /*
-> > > -     * This must be an Intel VGA device at address 00:02.0 for us to even
-> > > -     * consider enabling legacy mode.  The vBIOS has dependencies on  
-> > the  
-> > > -     * PCI bus address.
-> > > +     * IGD is not a standard, they like to change their specs often.  We
-> > > +     * only attempt to support back to SandBridge and we hope that  
-> > newer  
-> > > +     * devices maintain compatibility with generation 8.
-> > >       */
-> > > -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-> > > -        !vfio_is_vga(vdev) || nr != 4 ||
-> > > -        &vdev->pdev !=  
-> > pci_find_device(pci_device_root_bus(&vdev->pdev),  
-> > > +    gen = igd_gen(vdev);
-> > > +    if (gen != 6 && gen != 8) {
-> > > +        error_report("IGD device %s is unsupported by IGD quirks, "
-> > > +                     "try SandyBridge or newer",  
-> > vdev->vbasedev.name);  
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    /*
-> > > +     * Regardless of running in UPT or legacy mode, the guest graphics
-> > > +     * driver may attempt to use stolen memory, however only legacy  
-> > mode  
-> > > +     * has BIOS support for reserving stolen memory in the guest VM.
-> > > +     * Emulate the GMCH register in all cases and zero out the stolen
-> > > +     * memory size here.
-> > > +     */
-> > > +    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-> > > +    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));  
-> > 
-> > Aha!  You want to enable stolen memory in either UPT or legacy mode.  I
-> > could not possibly have determined that from the commit log.  Please
-> > rewrite the commit log to describe what is actually changing here.  
-> [Zhang, Xiong Y] Here, I want to disable stolen memory in UPT and legacy mode.
-> Sure, I will rewrite the commit log.
-> >   
-> > > +
-> > > +    /*
-> > > +     * Assume we have no GMS memory, but allow it to be overrided by  
-> > device  
-> > > +     * option (experimental). Old windows igd driver must see non-zero  
-> > stolen  
-> > > +     * memory size, otherwise it will be unloaded. New igd windows  
-> > driver fix  
-> > > +     * this issue and could load with zero stolen memory size.
-> > > +     */
-> > > +    if (vdev->igd_gms) {
-> > > +        if (vdev->igd_gms <= 0x10) {
-> > > +            gms_mb = vdev->igd_gms * 32;
-> > > +            gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-> > > +        } else {
-> > > +            error_report("Unsupported IGD GMS value 0x%x",  
-> > vdev->igd_gms);  
-> > > +            vdev->igd_gms = 0;
-> > > +        }
-> > > +    }  
-> > 
-> > You state in the previous code block that only legacy mode has BIOS support
-> > for reserving stolen memory, so why should UPT mode be allowed to specify
-> > stolen memory?  Where is it allocated?  
-> [Zhang, Xiong Y] As the previous code disable stolen memory and set the size of stolen memory to zero,
 
-Only in Legacy Mode, GMCH is not virtualized in UPT Mode.
+On 04/17/2018 09:44 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> This series seeks to address two distinct but closely related issues
+>> concerning the job management API.
+>>
+>> (1) For jobs that complete when a monitor is not attached and receiving
+>>     events or notifications, there's no way to discern the job's final
+>>     return code. Jobs must remain in the query list until dismissed
+>>     for reliable management.
+>>
+>> (2) Jobs that change the block graph structure at an indeterminate point
+>>     after the job starts compete with the management layer that relies
+>>     on that graph structure to issue meaningful commands.
+>>
+>>     This structure should change only at the behest of the management
+>>     API, and not asynchronously at unknown points in time. Before a job
+>>     issues such changes, it must rely on explicit and synchronous
+>>     confirmation from the management API.
+>>
+>> These changes are implemented by formalizing a State Transition Machine
+>> for the BlockJob subsystem.
+>>
+>> Job States:
+>>
+>> UNDEFINED       Default state. Internal state only.
+>> CREATED         Job has been created
+>> RUNNING         Job has been started and is running
+>> PAUSED          Job is not ready and has been paused
+>> READY           Job is ready and is running
+>> STANDBY         Job is ready and is paused
+>>
+>> WAITING         Job is waiting on peers in transaction
+>> PENDING         Job is waiting on ACK from QMP
+>> ABORTING        Job is aborting or has been cancelled
+>> CONCLUDED       Job has finished and has a retcode available
+>> NULL            Job is being dismantled. Internal state only.
+>>
+>> Job Verbs:
+>>
 
-> this cause old windows igd driver couldn't be loaded as the old
-> windows igd driver will be unloaded once it see zero size stolen
-> memory but the old windows igd driver doesn't use stolen memory, so
-> for old windows igd driver, we just need to set a none zero size
-> stolen memory and don't need to allocate an emulated stolen memory .
+Backporting your quote up here:
 
-And this is likely why UPT Mode doesn't virtualize GMCH, we cannot
-allocate BDSM for UPT Mode, so our only option would have been to set
-GMCH to zero, but this would break Windows, so we did nothing.
+> For each job verb and job state: what's the new job state?
+>
 
-> This is old windows igd driver issue and has been fixed in new windows
-> igd driver.
+That's not always 1:1, though I tried to address it in the commit messages.
 
-So now Windows can operate with GMCH set to zero, but if we set it to
-zero we still break anyone using the old driver.  I also note that the
-new driver isn't available for all generations of IGD we claim to
-support in UPT Mode (Broadwell+), so there is no "update the guest
-drivers" fix, the user is required to modify their VM configuration to
-set a stolen memory value.  So now you're asking that we set UPT Mode
-stolen memory to zero, which will break some users.  To allow those
-users to return to their previously working setup, we need to provide
-an option to set a stolen memory size, but setting the size is a lie
-because we have no mechanism to allocate a range for it in the VM or
-set the BDSM register for it.
 
-> So the above code is just for old windows igd driver. if user use an old windows igd driver, he could use x-igd-gms option to workaround old windows igd driver issue. Without this code, old windows igd driver couldn't work anymore in upt mode. And I'm afraid, a lot of user are using  old windows igd driver.
+>> CANCEL          Instructs a running job to terminate with error,
+>>                 (Except when that job is READY, which produces no error.)
 
-What's our need to do anything here, what's the behavior of the new
-Windows driver with the existing UPT Mode behavior?  If this is only an
-attempt to virtualize GMCH so that it's a little more coherent in the
-guest at the expense of breaking older drivers, that's not a good
-trade-off.  On the other hand, if new Windows drivers are broken
-because GMCH is non-zero yet BDSM is not virtualized, maybe we could
-virtualize BDSM to report a reserved base address so that Windows
-recognizes stolen memory is unavailable.  As I understood it, we were
-supposed to be able to ignore stolen memory in UPT Mode because it was
-a legacy feature, why isn't the hardware and software moving away from
-it?  Thanks,
+CANCEL will take a job to either NULL... (this is the early abort
+pathway, prior to the job being fully realized.)
 
-Alex
+...or to ABORTING (from CREATED once it has fully realized the job, or
+from RUNNING, READY, WAITING, or PENDING.)
+
+>> PAUSE           Request a job to pause.
+
+issued to RUNNING or READY, transitions to PAUSED or STANDBY respectively.
+
+>> RESUME          Request a job to resume from a pause.
+
+issued to PAUSED or STANDBY, transitions to RUNNING or READY respectively.
+
+>> SET-SPEED       Change the speed limiting parameter of a job.
+
+No run state change.
+
+>> COMPLETE        Ask a READY job to finish and exit.
+>>
+
+Issued to a READY job, transitions to WAITING.
+
+>> FINALIZE        Ask a PENDING job to perform its graph finalization.
+
+Issued to a PENDING job, transitions to CONCLUDED.
+
+>> DISMISS         Finish cleaning up an empty job.
+> 
+
+Issued to a CONCLUDED job, transitions to NULL.
+
+
+>> And here's my stab at a diagram:
+>>
+>>                  +---------+
+>>                  |UNDEFINED|
+>>                  +--+------+
+>>                     |
+>>                  +--v----+
+>>        +---------+CREATED+-----------------+
+>>        |         +--+----+                 |
+>>        |            |                      |
+>>        |         +--+----+     +------+    |
+>>        +---------+RUNNING<----->PAUSED|    |
+>>        |         +--+-+--+     +------+    |
+>>        |            | |                    |
+>>        |            | +------------------+ |
+>>        |            |                    | |
+>>        |         +--v--+       +-------+ | |
+>>        +---------+READY<------->STANDBY| | |
+>>        |         +--+--+       +-------+ | |
+>>        |            |                    | |
+>>        |         +--v----+               | |
+>>        +---------+WAITING<---------------+ |
+>>        |         +--+----+                 |
+>>        |            |                      |
+>>        |         +--v----+                 |
+>>        +---------+PENDING|                 |
+>>        |         +--+----+                 |
+>>        |            |                      |
+>>     +--v-----+   +--v------+               |
+>>     |ABORTING+--->CONCLUDED|               |
+>>     +--------+   +--+------+               |
+>>                     |                      |
+>>                  +--v-+                    |
+>>                  |NULL<--------------------+
+>>                  +----+
+> 
+> Is this diagram missing a few arrowheads?  E.g. on the edge between
+> RUNNING and WAITING.
+> 
+
+Apparently yes. :\
+
+(Secretly fixed up in my reply.)
+
+> Might push the limits of ASCII art, but here goes anyway: can we label
+> the arrows with job verbs?
+> 
+
+Can you recommend a tool to help me do that? I've been using asciiflow
+infinity (http://asciiflow.com) and it's not very good, but I don't have
+anything better.
+
+> Can you briefly explain how this state machine addresses (1) and (2)?
+> 
+
+(1) The CONCLUDED state allows jobs to persist in the job query list
+after they would have disappeared in 2.11-era QEMU. This lets us query
+for completion codes and to dismiss the job at our own leisure.
+
+(2) The PENDING state allows jobs to wait in a nearly-completed state,
+pending authorization from the QMP client to make graph changes.
+Otherwise, the job has to asynchronously perform this cleanup and the
+exact point in time is unknowable to the QMP client. By making a PENDING
+state and a finalize callback (.prepare), we can make this portion of a
+job's task synchronous.
+
+
+
+"John, you added more than two states..."
+
+Yup, this was to help simplify the existing state machine, believe it or
+not. I modeled all jobs as transactions to eliminate different cleanup
+routing and added two new interim states;
+
+- WAITING
+- ABORTING
+
+to help make assertions about the valid transitions jobs can make. The
+ABORTING state helps make it clear when a job is allowed to fail (and
+emit QMP events related to such).
+
+The WAITING state is simply advisory to help a client know that a job is
+"finished" but cannot yet receive further instruction because of peers
+in a transaction. This helps me to add nice QMP errors for any verbs
+issued to such jobs. "Sorry pal, this job is waiting and can't hear you
+right now!"
+
+This kept the code cleaner than adding a bunch of very fragile boolean
+error-checking pathways in dozens of helper functions to help avoid
+illegal instructions on jobs not prepared to receive those instructions.
+
+So these two new states don't help accomplish (1) or (2) strictly, but
+they do facilitate the code additions that _do_ a lot less ugly.
+
+--js
