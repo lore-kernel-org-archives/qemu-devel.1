@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Vjl-0004zV-R6
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:53:54 -0400
+	(envelope-from <mst@redhat.com>) id 1f8VoD-0007Gj-Tt
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Vjk-00013Q-Qp
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:53:53 -0400
-References: <cover.1523968389.git.berto@igalia.com>
-	<c5f0bde23558dd9d33b21fffc76ac9953cc19c56.1523968389.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <424ac0b5-3325-3bfd-1839-d93b8c5d89f1@redhat.com>
-Date: Tue, 17 Apr 2018 13:53:45 -0500
+	(envelope-from <mst@redhat.com>) id 1f8Vo9-00040F-VF
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:58:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35546 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f8Vo9-0003zk-Gr
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:58:25 -0400
+Date: Tue, 17 Apr 2018 21:58:16 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1523991487-241006-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c5f0bde23558dd9d33b21fffc76ac9953cc19c56.1523968389.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="axgDFUzx3UYeYlHDatcxlDPtgjgbR1Zkb"
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs: Document the new default
- sizes of the qcow2 caches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH 0/4] move kvm_para.h to standard-headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Wanpeng Li <kernellwp@gmail.com>, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---axgDFUzx3UYeYlHDatcxlDPtgjgbR1Zkb
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <424ac0b5-3325-3bfd-1839-d93b8c5d89f1@redhat.com>
-Subject: Re: [PATCH v3 2/2] docs: Document the new default sizes of the qcow2
- caches
-References: <cover.1523968389.git.berto@igalia.com>
- <c5f0bde23558dd9d33b21fffc76ac9953cc19c56.1523968389.git.berto@igalia.com>
-In-Reply-To: <c5f0bde23558dd9d33b21fffc76ac9953cc19c56.1523968389.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+kvm_para.h is normally an interface for guest.  It's natural to need the
+header in host to emulate that in qemu.
 
-On 04/17/2018 07:37 AM, Alberto Garcia wrote:
-> We have just reduced the refcount cache size to the minimum unless
-> the user explicitly requests a larger one, so we have to update the
-> documentation to reflect this change.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  docs/qcow2-cache.txt | 33 ++++++++++++++++-----------------
->  1 file changed, 16 insertions(+), 17 deletions(-)
+ATM it does not actually work on non-kvm systems, which allowed us to
+get by sticking it in linux-headers and only pulling it in on Linux, but
+that turns out to be more pain than it's worth.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+The result seems to be that we are forced to duplicate
+more and more code from there when we are in portable code.
+Not nice.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Let's just pull it into standard-headers instead, and use
+on all platforms unconditionally.
 
+It turns out we only need the x86 version, so that is
+and extra a plus - drop the rest.
 
---axgDFUzx3UYeYlHDatcxlDPtgjgbR1Zkb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Michael S. Tsirkin (4):
+  update-linux-headers.sh: drop kvm_para.h hacks
+  include/standard-headers: add asm-x86/kvm_para.h
+  x86/cpu: use standard-headers/asm-x86.kvm_para.h
+  linux-headers: drop kvm_para.h
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+ .../standard-headers}/asm-x86/kvm_para.h           | 49 ++++++-----
+ include/sysemu/kvm.h                               |  1 -
+ linux-headers/asm-arm/kvm_para.h                   |  2 -
+ linux-headers/asm-arm64/kvm_para.h                 |  1 -
+ linux-headers/asm-generic/kvm_para.h               |  4 -
+ linux-headers/asm-mips/kvm_para.h                  |  5 --
+ linux-headers/asm-powerpc/epapr_hcalls.h           | 99 ----------------------
+ linux-headers/asm-powerpc/kvm_para.h               | 98 ---------------------
+ linux-headers/asm-s390/kvm_para.h                  |  8 --
+ linux-headers/linux/kvm_para.h                     | 35 --------
+ target/i386/cpu.h                                  |  2 -
+ target/i386/kvm_i386.h                             |  6 --
+ hw/i386/kvm/clock.c                                |  2 +-
+ target/i386/cpu.c                                  |  4 +-
+ target/i386/kvm.c                                  |  4 +-
+ scripts/update-linux-headers.sh                    | 16 ++--
+ 16 files changed, 35 insertions(+), 301 deletions(-)
+ rename {linux-headers => include/standard-headers}/asm-x86/kvm_para.h (80%)
+ delete mode 100644 linux-headers/asm-arm/kvm_para.h
+ delete mode 100644 linux-headers/asm-arm64/kvm_para.h
+ delete mode 100644 linux-headers/asm-generic/kvm_para.h
+ delete mode 100644 linux-headers/asm-mips/kvm_para.h
+ delete mode 100644 linux-headers/asm-powerpc/epapr_hcalls.h
+ delete mode 100644 linux-headers/asm-powerpc/kvm_para.h
+ delete mode 100644 linux-headers/asm-s390/kvm_para.h
+ delete mode 100644 linux-headers/linux/kvm_para.h
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWQrkACgkQp6FrSiUn
-Q2otfAf/bovoB4i4J9d7wqIlVsMtzplLPamFNrAt8Sruvv42gBVN+Ieobds74jcq
-n0ZXSDDQvK+sCwrYHTEdl5K/V8Hs20SlC+OpCID8gcUmHCwy4mmx39KrrGjLb6x9
-LehacFcuYQfXHraGDYH2/yEsnyLuJ/JQfn3jcTKrVYyZIUYERhdQ2/Y0+HJe1c1P
-5/fJ4dSKtojf2ebJDn+CJPhsN1AWUpaaeqCR1a6Ycofc/orkD2TfF1DfxoFgB3Y9
-O4nIH7gIaOxDb8J+YbPfacanpzP4ocNjP3RuW3qEBHpj2Gjg2nbmyW6gIWP3q2pg
-q1yEsSxumDzPK3ega1/fbEpG+vBuOw==
-=YlG+
------END PGP SIGNATURE-----
-
---axgDFUzx3UYeYlHDatcxlDPtgjgbR1Zkb--
+-- 
+MST
