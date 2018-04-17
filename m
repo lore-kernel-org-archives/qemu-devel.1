@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNs-0003HP-HF
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:27 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNs-0003HX-KW
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNn-0007dc-FL
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNn-0007cg-BQ
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:24 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Tue, 17 Apr 2018 16:38:02 -0400
-Message-Id: <1523997485-1905-19-git-send-email-alindsay@codeaurora.org>
+Date: Tue, 17 Apr 2018 16:37:57 -0400
+Message-Id: <1523997485-1905-14-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
 References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v4 18/21] target/arm: PMU: Set PMCR.N to 4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 13/21] target/arm: Add ARM_FEATURE_V7VE for
+ v7 Virtualization Extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +26,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-This both advertises that we support four counters and adds them to the
-implementation because the PMU_NUM_COUNTERS macro reads this value from
-the PMCR.
-
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- target/arm/helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/arm/cpu.c | 3 +++
+ target/arm/cpu.h | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index b91f022..7970129 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1587,7 +1587,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .access = PL1_W, .type = ARM_CP_NOP },
-     /* Performance monitors are implementation defined in v7,
-      * but with an ARM recommended set of registers, which we
--     * follow (although we don't actually implement any counters)
-+     * follow.
-      *
-      * Performance registers fall into three categories:
-      *  (a) always UNDEF in PL0, RW in PL1 (PMINTENSET, PMINTENCLR)
-@@ -5205,7 +5205,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-             .access = PL0_RW, .accessfn = pmreg_access,
-             .type = ARM_CP_IO,
-             .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcr),
--            .resetvalue = cpu->midr & 0xff000000,
-+            /* 4 counters enabled */
-+            .resetvalue = (cpu->midr & 0xff000000) | (0x4 << PMCRN_SHIFT),
-             .writefn = pmcr_write, .raw_writefn = raw_write,
-         };
-         define_one_arm_cp_reg(cpu, &pmcr);
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 2228e4c..9d27ffc 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -774,6 +774,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error=
+ **errp)
+     /* Some features automatically imply others: */
+     if (arm_feature(env, ARM_FEATURE_V8)) {
+         set_feature(env, ARM_FEATURE_V7);
++        set_feature(env, ARM_FEATURE_V7VE);
+         set_feature(env, ARM_FEATURE_ARM_DIV);
+         set_feature(env, ARM_FEATURE_LPAE);
+     }
+@@ -1490,6 +1491,7 @@ static void cortex_a7_initfn(Object *obj)
+=20
+     cpu->dtb_compatible =3D "arm,cortex-a7";
+     set_feature(&cpu->env, ARM_FEATURE_V7);
++    set_feature(&cpu->env, ARM_FEATURE_V7VE);
+     set_feature(&cpu->env, ARM_FEATURE_VFP4);
+     set_feature(&cpu->env, ARM_FEATURE_NEON);
+     set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+@@ -1535,6 +1537,7 @@ static void cortex_a15_initfn(Object *obj)
+=20
+     cpu->dtb_compatible =3D "arm,cortex-a15";
+     set_feature(&cpu->env, ARM_FEATURE_V7);
++    set_feature(&cpu->env, ARM_FEATURE_V7VE);
+     set_feature(&cpu->env, ARM_FEATURE_VFP4);
+     set_feature(&cpu->env, ARM_FEATURE_NEON);
+     set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9f769ae..132e08d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1445,6 +1445,7 @@ enum arm_features {
+     ARM_FEATURE_OMAPCP, /* OMAP specific CP15 ops handling.  */
+     ARM_FEATURE_THUMB2EE,
+     ARM_FEATURE_V7MP,    /* v7 Multiprocessing Extensions */
++    ARM_FEATURE_V7VE,    /* v7 with Virtualization Extensions */
+     ARM_FEATURE_V4T,
+     ARM_FEATURE_V5,
+     ARM_FEATURE_STRONGARM,
+--=20
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies=
+, Inc.
 Qualcomm Technologies, Inc. is a member of the
 Code Aurora Forum, a Linux Foundation Collaborative Project.
