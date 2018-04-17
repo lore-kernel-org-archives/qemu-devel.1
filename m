@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8RcD-0006LW-6k
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:29:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1f8RfP-0007fN-Jm
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8RcA-0007WV-GM
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:29:49 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:12677)
+	(envelope-from <armbru@redhat.com>) id 1f8RfH-00015v-TW
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:33:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52764 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8RcA-0007UM-7h
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:29:46 -0400
-References: <1523049683-11782-1-git-send-email-igor.druzhinin@citrix.com>
-	<20180417141518.GM2208@perard>
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Message-ID: <c7d408cb-454c-2322-3812-a7cacecdbe5f@citrix.com>
-Date: Tue, 17 Apr 2018 15:29:42 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f8RfH-00015i-PR
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:32:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F279D406E8B9
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:32:55 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+	<7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
+	<87efjeaqd2.fsf@dusky.pond.sub.org>
+	<20180417140540.GD15421@redhat.com>
+	<21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com>
+Date: Tue, 17 Apr 2018 16:32:50 +0200
+In-Reply-To: <21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com> (Paolo
+	Bonzini's message of "Tue, 17 Apr 2018 16:14:02 +0200")
+Message-ID: <87po2x6gz1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180417141518.GM2208@perard>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] xen/pt: use address_space_memory object
- for memory region hooks
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +39,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, ross.lagerwall@citrix.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On 17/04/18 15:15, Anthony PERARD wrote:
-> On Fri, Apr 06, 2018 at 10:21:23PM +0100, Igor Druzhinin wrote:
->> Commit 99605175c (xen-pt: Fix PCI devices re-attach failed) introduced
->> a subtle bug. As soon as the guest switches off Bus Mastering on the
->> device it immediately causes all the BARs be unmapped due to the DMA
->> address space of the device being changed. This is undesired behavior
->> because the guest may try to communicate with the device after that
->> which triggers the following errors in the logs:
->>
->> [00:05.0] xen_pt_bar_read: Error: Should not read BAR through QEMU. @0x0000000000000200
->> [00:05.0] xen_pt_bar_write: Error: Should not write BAR through QEMU. @0x0000000000000200
->>
->> The issue that the original patch tried to workaround (uneven number of
->> region_add/del calls on device attach/detach) was fixed in later QEMU
->> versions.
-> 
-> Do you know when the issue was fixed?
-> 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-I think it's this commit:
+> On 17/04/2018 16:05, Daniel P. Berrang=C3=A9 wrote:
+>>> For what it's worth, my "[RFC PATCH 00/32] Command line QAPIfication"
+>>> replaces the original parsing art by getopt_long_only().
+>>>
+>>> Completing that work will take some time, but once it's done, we can
+>>> (and I think we should) prefer double-dash for consistency.
+>> Since our existing parser accepts single & double-dash already, is it
+>> worth explicitly deprecating single-dash usage right now. So that when
+>> your code comes along ready to merge, we're already able to say
+>> "i told you so" and drop single-dash support at that same time.
+>
+> Serious questions: is _anyone_ of you actually using double-dash support
+> in daily invocations of QEMU?
 
-commit d25836cafd7508090d211e97acfc0abc5ae88daa
-Author: Peter Xu <peterx@redhat.com>
-Date:   Mon Jan 22 14:02:44 2018 +0800
+I use both.  I readily concede that people familiar with QEMU probably
+use single dash a lot more than double dash.  I don't think we should
+get rid of single dash, unless we decide to bite the bullet and clean up
+our command line without regard for backward compatibility, as Thomas
+proposed elsewhere in this thread, and others proposed before, multiple
+times.
 
-    memory: do explicit cleanup when remove listeners
-
-Igor
+I don't entertain the idea of compatibility breaks lightly.  But our
+command line is genuinely nasty.  The closer you look, the nastier.
