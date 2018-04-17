@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1f8GVB-0007FR-7G
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 22:37:51 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f8GkT-0004RG-Tc
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 22:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1f8GV8-00077s-5M
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 22:37:49 -0400
-Received: from mga18.intel.com ([134.134.136.126]:31958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1f8GV7-00072j-Sd
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 22:37:46 -0400
-Date: Tue, 17 Apr 2018 10:35:39 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180417023539.yweapei6mpvuqxhf@debian>
-References: <20180411072027.5656-1-tiwei.bie@intel.com>
-	<20180416074706.GB28904@stefanha-x1.localdomain>
+	(envelope-from <richard.henderson@linaro.org>) id 1f8GkQ-0007XQ-TT
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 22:53:38 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:42970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f8GkQ-0007V6-MQ
+	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 22:53:34 -0400
+Received: by mail-pl0-x242.google.com with SMTP id t20-v6so11152206ply.9
+	for <qemu-devel@nongnu.org>; Mon, 16 Apr 2018 19:53:34 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 16 Apr 2018 16:53:26 -1000
+Message-Id: <20180417025328.25431-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180416074706.GB28904@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC] vhost-user: introduce F_NEED_ALL_IOTLB
- protocol feature
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-2.12 0/2] softfloat fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +27,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: mst@redhat.com, jasowang@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org, dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-On Mon, Apr 16, 2018 at 03:47:06PM +0800, Stefan Hajnoczi wrote:
-> On Wed, Apr 11, 2018 at 03:20:27PM +0800, Tiwei Bie wrote:
-> > This patch introduces VHOST_USER_PROTOCOL_F_NEED_ALL_IOTLB
-> 
-> Naming suggestion: "PREFILL_IOTLB" instead of "NEED_ALL_IOTLB".
-> 
-> I wasn't able to guess what "NEED_ALL_IOTLB" does.  "PREFILL_IOTLB"
-> communicates that memory translation will be set up in advance.
+An alternate fix for Bastian's division problem and another
+fix for a scalbn problem exposed during SVE testing.  Again,
+the SVE issue should be visible with normal NEON insns too.
 
-By naming it as NEED_ALL_IOTLB, I want to indicate that,
-without this, it's hard or impossible for backend to get
-all the IOTLBs (because backend needs to meet IOVAs first
-before getting the corresponding IOTLBs, and backend can't
-tell whether it has met all the IOVAs or not, especially
-when dynamic mapping is being used by guest). But with
-this feature negotiated, backend will expect to get all
-the IOTLBs. But it seems that, the name (NEED_ALL_IOTLB)
-isn't good. And thanks for your suggestion! :)
 
-Best regards,
-Tiwei Bie
+r~
+
+
+Richard Henderson (2):
+  fpu: Check for inf/x before x/0
+  fpu: Bound increment for scalbn
+
+ fpu/softfloat.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+-- 
+2.14.3
