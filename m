@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8W1D-0007Qo-Vt
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:11:58 -0400
+	(envelope-from <crobinso@redhat.com>) id 1f8W1T-0007Yj-Qr
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:12:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8W1A-0004eN-Ew
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:11:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48228 helo=mx1.redhat.com)
+	(envelope-from <crobinso@redhat.com>) id 1f8W1Q-0004il-Gr
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:12:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51346 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8W1A-0004eD-8X
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:11:52 -0400
-References: <AM3PR07MB273186AEFA49A506BFC2D28B3B30@AM3PR07MB273.eurprd07.prod.outlook.com>
-	<152362403305.1857.2509619226545139975@71c20359a636>
-	<AM3PR07MB273FE7C1A9E51037C029754B3B00@AM3PR07MB273.eurprd07.prod.outlook.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c06b13a1-e838-e86a-03f9-a5304080c888@redhat.com>
-Date: Tue, 17 Apr 2018 14:11:40 -0500
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1f8W1Q-0004iV-Ac
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:12:08 -0400
+References: <20170911165929.2791-3-marcandre.lureau@redhat.com>
+	<20171009110336.GA17824@redhat.com>
+	<20171009144344.38bbd1e9@nial.brq.redhat.com>
+	<20171009130218.GK2954@redhat.com>
+	<20171010003951-mutt-send-email-mst@kernel.org>
+	<20171010083143.GA30015@redhat.com>
+	<CAJ+F1CLGJLXYnJ8SnrbVkWc6bdU2geYKeEaKrxWaYBhXwA=Opg@mail.gmail.com>
+	<20171010150628.GI30015@redhat.com>
+	<20171010180110.GI3246@localhost.localdomain>
+	<20171015044800-mutt-send-email-mst@kernel.org>
+	<20171020184820.GP2942@localhost.localdomain>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <a5ff2864-f794-e728-5be1-0c1e58d9f163@redhat.com>
+Date: Tue, 17 Apr 2018 15:12:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <AM3PR07MB273FE7C1A9E51037C029754B3B00@AM3PR07MB273.eurprd07.prod.outlook.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8hle6IGVDS7VXu2g8kge6eyCfTMMzPTDl"
-Subject: Re: [Qemu-devel] [PATCH] Show values and description when using
- "qom-list"
+In-Reply-To: <20171020184820.GP2942@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +37,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Perez Blanco, Ricardo (Nokia - BE/Antwerp)" <ricardo.perez_blanco@nokia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Dave Anderson <anderson@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8hle6IGVDS7VXu2g8kge6eyCfTMMzPTDl
-From: Eric Blake <eblake@redhat.com>
-To: "Perez Blanco, Ricardo (Nokia - BE/Antwerp)"
- <ricardo.perez_blanco@nokia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>
-Message-ID: <c06b13a1-e838-e86a-03f9-a5304080c888@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Show values and description when using
- "qom-list"
-References: <AM3PR07MB273186AEFA49A506BFC2D28B3B30@AM3PR07MB273.eurprd07.prod.outlook.com>
- <152362403305.1857.2509619226545139975@71c20359a636>
- <AM3PR07MB273FE7C1A9E51037C029754B3B00@AM3PR07MB273.eurprd07.prod.outlook.com>
-In-Reply-To: <AM3PR07MB273FE7C1A9E51037C029754B3B00@AM3PR07MB273.eurprd07.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/16/2018 07:00 AM, Perez Blanco, Ricardo (Nokia - BE/Antwerp) wrote:=
-
-> Hi,
+On 10/20/2017 02:48 PM, Eduardo Habkost wrote:
+> On Sun, Oct 15, 2017 at 04:56:28AM +0300, Michael S. Tsirkin wrote:
+>> On Tue, Oct 10, 2017 at 03:01:10PM -0300, Eduardo Habkost wrote:
+>>> On Tue, Oct 10, 2017 at 04:06:28PM +0100, Daniel P. Berrange wrote:
+>>>> On Tue, Oct 10, 2017 at 05:00:18PM +0200, Marc-Andr=C3=A9 Lureau wro=
+te:
+>>>>> Hi
+>>>>>
+>>>>> On Tue, Oct 10, 2017 at 10:31 AM, Daniel P. Berrange
+>>>>> <berrange@redhat.com> wrote:
+>>>>>> On Tue, Oct 10, 2017 at 12:44:26AM +0300, Michael S. Tsirkin wrote=
+:
+>>>>>>> On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrot=
+e:
+>>>>>>>> On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
+>>>>>>>>> On Mon, 9 Oct 2017 12:03:36 +0100
+>>>>>>>>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>>>>>>>>>
+>>>>>>>>>> On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=C3=A9 Lure=
+au wrote:
+>>>>>>>>>>> See docs/specs/vmcoreinfo.txt for details.
+>>>>>>>>>>>
+>>>>>>>>>>> "etc/vmcoreinfo" fw_cfg entry is added when using "-device vm=
+coreinfo".
+>>>>>>>>>>
+>>>>>>>>>> I'm wondering if you considered just adding the entry to fw_cf=
+g by
+>>>>>>>>>> default, without requiring any -device arg ? Unless I'm misund=
+erstanding,
+>>>>>>>>>> this doesn't feel like a device to me - its just a well known =
+bucket
+>>>>>>>>>> in fw_cfg IIUC ?  Obviously its existance would need to be tie=
+d to
+>>>>>>>>>> the latest machine type for ABI reasons though. The benefit of=
+ this
+>>>>>>>>>> is that it would "just work" without us having to plumb it thr=
+ough to
+>>>>>>>>>> all the downstream applications that use QEMU for mgmt guest (=
+OpenStack,
+>>>>>>>>>> oVirt, GNOME Boxes, virt-manager, and countless other mgmt app=
+s).
+>>>>>>>>> it follows model set by pvpanic device, it's easier to manage f=
+rom migration
+>>>>>>>>> POV, one could use it even for old machine types with new qemu =
+(just by adding
+>>>>>>>>> device, it makes instance not backwards migratable to old qemu =
+but should work
+>>>>>>>>> for forward migration) and if user doesn't need it, device coul=
+d be just omitted
+>>>>>>>>> from CLI.
+>>>>>>>>
+>>>>>>>> Sure but it means that in effect no one will have this functiona=
+lity enabled
+>>>>>>>> for several years. pvpanic has been around a long time and I rar=
+ely see it
+>>>>>>>> present in configured guests :-(
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Regards,
+>>>>>>>> Daniel
+>>>>>>>
+>>>>>>> libvirt runs with -nodefaults, right? I'd argue pretty strongly -=
+nodefaults
+>>>>>>> shouldn't add optional devices anyway.
+>>>>>>
+>>>>>> This isn't really adding a device though is it - it is just a well=
+ known
+>>>>>> location in fw_cfg to receive data.
+>>>>>
+>>>>> Enabling the device on some configurations by default can be done a=
+s a
+>>>>> follow-up patch. Can we get this series reviewed & merged?
+>>>>
+>>>> The problem with the -device approach + turning it on by default is =
+that there
+>>>> is no way to turn it off again if you don't want it. eg there's way =
+to undo
+>>>> an implicit '-device foo' except via -nodefaults, but since libvirt =
+uses that
+>>>> already it would negate the effect of enabling it by default uncondi=
+tionally.
+>>>
+>>> It's still possible to add a -machine option that can
+>>> enable/disable automatic creation of the device.
+>>>
+>>> But I also don't see why it needs to be implemented using -device
+>>> if it's not really a device.  A boolean machine or fw_cfg
+>>> property is good enough for that.
+>>
+>> It certainly feels like a device. It has state
+>> (that needs to be migrated), it has a host/guest interface.
 >=20
-> A new patch (to be rebase on top of my previous one).=20
-
-A patch-to-a-patch doesn't work well.  Instead, run:
-
-git rebase -i origin
-
-then mark the second patch as 'squash' before closing the editor, and
-git will merge the two patches into one.  Then resend things with 'v2'
-in the subject line, by using 'git send-email -v2 ...'.
-
-More patch submission hints at https://wiki.qemu.org/Contribute/SubmitAPa=
-tch
-
+> (Sorry for the late reply)
 >=20
-> From 77f7217c07d5e3892f26082f220954678eb375b3 Mon Sep 17 00:00:00 2001
-> From: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
-> Date: Mon, 16 Apr 2018 13:51:42 +0200
-> Subject: [PATCH] [PATCHv2] Show values and description when using "qom-=
-list"
+> That's convincing enough to me.  :)
 >=20
->     For debugging purposes it is very useful to:
-
-This is not in 'git send-email' format, which makes it harder for our
-automated tooling to evaluate your patch.
-
->      - See the description of the field. This information is already
->        filled
->        in but not shown in "qom-list" command.
->      - Display value of the field. So far, only well known types are
->        implemented (string, str, int, uint, bool).
 >=20
-> Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
-> ---
->  qmp.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>>>>
+>>>> Your previous approach of "-global fw_cfg.vmcoreinfo=3Don" is nicer =
+in this
+>>>> respect, as you can trivially turn it on/off, overriding the default=
+ state
+>>>> in both directions.
+>>>
+>>> Both "-global fw_cfg.vmcoreinfo=3Don|off" and
+>>> "-machine vmcoreinfo=3Don|off" sound good enough to me.
+>>
+>>
+>> Certainly not a fw cfg flag. Can be a machine flag I guess
+>> but then we'd have to open-code each such device.
+>> And don't forget auto - this is what Daniel asks for.
 >=20
-> diff --git a/qmp.c b/qmp.c
-> index 750b5d0..5be9d8d 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -249,12 +249,14 @@ ObjectPropertyInfoList *qmp_qom_list(const char *=
-path, Error **errp)
->          if (g_ascii_strncasecmp(entry->value->type, "int", 3) =3D=3D 0=
-) {
->              Error **errp =3D NULL;
->              entry->value->value =3D g_strdup_printf("%ld",
-> -                object_property_get_int(obj, entry->value->name, errp)=
-);
-> +                (long int) object_property_get_int(
-> +                    obj, entry->value->name, errp));
-
-This is wrong.  Casting 'int64_t' to 'long int' on a 32-bit platform
-silently truncates the value.  You don't want the cast; instead, you
-should be using "%"PRId64 in place of "%ld", so that your printf format
-always matches the correct spelling corresponding to the 64-bit value
-you will be printing.
-
-
-> -----Original Message-----
-> From: no-reply@patchew.org [mailto:no-reply@patchew.org]=20
-> Sent: Friday, April 13, 2018 2:54 PM
-> To: Perez Blanco, Ricardo (Nokia - BE/Antwerp) <ricardo.perez_blanco@no=
-kia.com>
-> Cc: famz@redhat.com; qemu-devel@nongnu.org; dgilbert@redhat.com; armbru=
-@redhat.com
-> Subject: Re: [Qemu-devel] [PATCH] Show values and description when usin=
-g "qom-list"
+> I'm not sure Daniel is really asking for "auto": he is just
+> asking for a way to disable the new default.  If "vmcoreinfo=3Doff"
+> and "vmcoreinfo=3Doff" works, there's no need for a user-visible
+> "auto" value.
 >=20
-> Hi,
+> (Actually, "auto" values makes compatibility code even messier,
+> because we would need one additional compat property/field to
+> tell QEMU what "auto" means on each machine)
 >=20
 
-Also, you are top-posting, which makes it hard to follow your
-conversation.  On technical lists, it is better to reply inline instead
-of top-posting, and to trim content that is not essential to your reply.
+Reviving this... did any follow up changes happen?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Marc-Andr=C3=A9 patched virt-manager a few months back to enable -device
+vmcoreinfo for new VMs:
 
+https://www.redhat.com/archives/virt-tools-list/2018-February/msg00020.ht=
+ml
 
---8hle6IGVDS7VXu2g8kge6eyCfTMMzPTDl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+And I see there's at least a bug tracking adding this to openstack for
+new VMs:
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1555276
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWRuwACgkQp6FrSiUn
-Q2oLYAf+LIbzBfYwgsKMFa80LIPy9VhD37tywby2TGvZrzBzFRAoGsiTtZ2QkHb8
-YXIMaCXS6J9Bj4YHOHSZajXioUBTfJ6xLSzJ/mhFOBt2R9HLflWUlcA2PHNNq4yV
-XA4oAtyI++EJ0zOarHwHqOJnfQWki0olZEZgmKnukyNoW6Oo6/w1LM5mYckcQnNq
-rXpsGhF3EZevR3N+1FbY7QMn8Cq4P620jc158HgDsTyCSck/hWFvxDeGet5I6sPH
-NrXWsXSpO+XW2MdRVHdGNquSKGtv2mGN+qmzoR117DYabrrDgXHav24FOmNoyWBw
-u6SD+JPtmbxyrwVoB09o8BdLh3/aVQ==
-=alws
------END PGP SIGNATURE-----
+If this feature doesn't really have any downsides, it would be nice to
+get this tied to new machine types. Saves a lot of churn for higher
+levels of the stack
 
---8hle6IGVDS7VXu2g8kge6eyCfTMMzPTDl--
+Thanks,
+Cole
