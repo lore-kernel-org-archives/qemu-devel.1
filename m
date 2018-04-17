@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNi-000377-3h
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:18 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNh-00036K-D0
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNe-0006eE-UR
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:14 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNc-0006Of-Qa
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:13 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Tue, 17 Apr 2018 16:37:56 -0400
-Message-Id: <1523997485-1905-13-git-send-email-alindsay@codeaurora.org>
+Date: Tue, 17 Apr 2018 16:37:55 -0400
+Message-Id: <1523997485-1905-12-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
 References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v4 12/21] target/arm: Make PMOVSCLR and
- PMUSERENR 64 bits wide
+Subject: [Qemu-devel] [PATCH v4 11/21] target/arm: Allow AArch32 access for
+ PMCCFILTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-This is a bug fix to ensure 64-bit reads of these registers don't read
-adjacent data.
-
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 ---
- target/arm/cpu.h    | 4 ++--
- target/arm/helper.c | 5 +++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ target/arm/helper.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a56e9a0..9f769ae 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -367,8 +367,8 @@ typedef struct CPUARMState {
-         uint32_t c9_data;
-         uint64_t c9_pmcr; /* performance monitor control register */
-         uint64_t c9_pmcnten; /* perf monitor counter enables */
--        uint32_t c9_pmovsr; /* perf monitor overflow status */
--        uint32_t c9_pmuserenr; /* perf monitor user enable */
-+        uint64_t c9_pmovsr; /* perf monitor overflow status */
-+        uint64_t c9_pmuserenr; /* perf monitor user enable */
-         uint64_t c9_pmselr; /* perf monitor counter selection register */
-         uint64_t c9_pminten; /* perf monitor interrupt enables */
-         union { /* Memory attribute redirection */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 62cace7..20b42b4 100644
+index 5953980..62cace7 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -1427,7 +1427,8 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcnten),
-       .writefn = pmcntenclr_write },
-     { .name = "PMOVSR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 3,
--      .access = PL0_RW, .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
-+      .access = PL0_RW,
-+      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmovsr),
-       .accessfn = pmreg_access,
-       .writefn = pmovsr_write,
-       .raw_writefn = raw_write },
-@@ -1487,7 +1488,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .accessfn = pmreg_access_xevcntr },
-     { .name = "PMUSERENR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 0,
-       .access = PL0_R | PL1_RW, .accessfn = access_tpm,
--      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
-+      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmuserenr),
-       .resetvalue = 0,
-       .writefn = pmuserenr_write, .raw_writefn = raw_write },
-     { .name = "PMUSERENR_EL0", .state = ARM_CP_STATE_AA64,
+@@ -918,6 +918,10 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
+ #define PMXEVTYPER_MT         0x02000000
+ #define PMXEVTYPER_EVTCOUNT   0x000003ff
+ 
++#define PMCCFILTR             0xf8000000
++#define PMCCFILTR_M           PMXEVTYPER_M
++#define PMCCFILTR_EL0         (PMCCFILTR | PMCCFILTR_M)
++
+ static inline uint32_t pmu_num_counters(CPUARMState *env)
+ {
+   return (env->cp15.c9_pmcr & PMCRN_MASK) >> PMCRN_SHIFT;
+@@ -1221,10 +1225,26 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+     pmccntr_op_start(env);
+-    env->cp15.pmccfiltr_el0 = value & 0xfc000000;
++    env->cp15.pmccfiltr_el0 = value & PMCCFILTR_EL0;
+     pmccntr_op_finish(env);
+ }
+ 
++static void pmccfiltr_write_a32(CPUARMState *env, const ARMCPRegInfo *ri,
++                            uint64_t value)
++{
++    uint64_t saved_cycles = pmccntr_op_start(env);
++    /* M is not accessible from AArch32 */
++    env->cp15.pmccfiltr_el0 = (env->cp15.pmccfiltr_el0 & PMCCFILTR_M) |
++        (value & PMCCFILTR);
++    pmccntr_op_finish(env, saved_cycles);
++}
++
++static uint64_t pmccfiltr_read_a32(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /* M is not visible in AArch32 */
++    return env->cp15.pmccfiltr_el0 & PMCCFILTR;
++}
++
+ static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+@@ -1442,6 +1462,11 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .type = ARM_CP_IO,
+       .readfn = pmccntr_read, .writefn = pmccntr_write, },
+ #endif
++    { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
++      .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
++      .access = PL0_RW, .accessfn = pmreg_access,
++      .type = ARM_CP_ALIAS | ARM_CP_IO,
++      .resetvalue = 0, },
+     { .name = "PMCCFILTR_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 15, .opc2 = 7,
+       .writefn = pmccfiltr_write,
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
