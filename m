@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNS-0002qD-5t
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:00 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNU-0002t1-7W
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNQ-00052J-8y
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:38:58 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNR-00059k-BS
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:00 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Tue, 17 Apr 2018 16:37:46 -0400
-Message-Id: <1523997485-1905-3-git-send-email-alindsay@codeaurora.org>
+Date: Tue, 17 Apr 2018 16:37:49 -0400
+Message-Id: <1523997485-1905-6-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
 References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v4 02/21] target/arm: Treat PMCCNTR as alias of
- PMCCNTR_EL0
+Subject: [Qemu-devel] [PATCH v4 05/21] target/arm: Fetch GICv3 state
+ directly from CPUARMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-They share the same underlying state
+This eliminates the need for fetching it from el_change_hook_opaque, and
+allows for supporting multiple el_change_hooks without having to hack
+something together to find the registered opaque belonging to GICv3.
 
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/intc/arm_gicv3_cpuif.c | 10 ++--------
+ target/arm/cpu.h          | 10 ----------
+ 2 files changed, 2 insertions(+), 18 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 485004e..83ea8f4 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1318,7 +1318,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
-       .writefn = pmselr_write, .raw_writefn = raw_write, },
-     { .name = "PMCCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 0,
--      .access = PL0_RW, .resetvalue = 0, .type = ARM_CP_IO,
-+      .access = PL0_RW, .resetvalue = 0, .type = ARM_CP_ALIAS | ARM_CP_IO,
-       .readfn = pmccntr_read, .writefn = pmccntr_write32,
-       .accessfn = pmreg_access_ccntr },
-     { .name = "PMCCNTR_EL0", .state = ARM_CP_STATE_AA64,
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index 26f5eed..cb9a3a5 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -29,11 +29,7 @@ void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s)
+ 
+ static GICv3CPUState *icc_cs_from_env(CPUARMState *env)
+ {
+-    /* Given the CPU, find the right GICv3CPUState struct.
+-     * Since we registered the CPU interface with the EL change hook as
+-     * the opaque pointer, we can just directly get from the CPU to it.
+-     */
+-    return arm_get_el_change_hook_opaque(arm_env_get_cpu(env));
++    return env->gicv3state;
+ }
+ 
+ static bool gicv3_use_ns_bank(CPUARMState *env)
+@@ -2615,9 +2611,7 @@ void gicv3_init_cpuif(GICv3State *s)
+          * it might be with code translated by CPU 0 but run by CPU 1, in
+          * which case we'd get the wrong value.
+          * So instead we define the regs with no ri->opaque info, and
+-         * get back to the GICv3CPUState from the ARMCPU by reading back
+-         * the opaque pointer from the el_change_hook, which we're going
+-         * to need to register anyway.
++         * get back to the GICv3CPUState from the CPUARMState.
+          */
+         define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
+         if (arm_feature(&cpu->env, ARM_FEATURE_EL2)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 04041db..ff349f5 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2915,16 +2915,6 @@ void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHook *hook,
+                                  void *opaque);
+ 
+ /**
+- * arm_get_el_change_hook_opaque:
+- * Return the opaque data that will be used by the el_change_hook
+- * for this CPU.
+- */
+-static inline void *arm_get_el_change_hook_opaque(ARMCPU *cpu)
+-{
+-    return cpu->el_change_hook_opaque;
+-}
+-
+-/**
+  * aa32_vfp_dreg:
+  * Return a pointer to the Dn register within env in 32-bit mode.
+  */
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
