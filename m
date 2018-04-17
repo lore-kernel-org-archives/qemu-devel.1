@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8RHF-0000JK-Ei
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:10 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8RHK-0000O6-FY
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8RHB-0003FV-Io
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39200 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1f8RHE-0003HF-Ar
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39208 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8RHB-0003Es-ED
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:05 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8RHE-0003Gm-5X
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:08 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E66D4068046
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:08:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D29F1406AE2C
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:08:07 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-116-72.ams2.redhat.com
 	[10.36.116.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 954B3202660D
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:08:03 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0279C200BCB0
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:08:06 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 17 Apr 2018 16:07:58 +0200
-Message-Id: <20180417140802.16711-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/4] exec: reintroduce MemoryRegion caching
+Date: Tue, 17 Apr 2018 16:08:02 +0200
+Message-Id: <20180417140802.16711-5-pbonzini@redhat.com>
+In-Reply-To: <20180417140802.16711-1-pbonzini@redhat.com>
+References: <20180417140802.16711-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 4/4] exec: reintroduce MemoryRegion caching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +36,455 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 MemoryRegionCache was reverted to "normal" address_space_* operations
-for 2.9, due to lack of support for IOMMUs.  This series reinstates
-optimizations, caching only the IOMMU translation but not the IOMMU
-lookup and target AddressSpace translation.
+for 2.9, due to lack of support for IOMMUs.  Reinstate the
+optimizations, caching only the IOMMU translation at address_cache_init
+but not the IOMMU lookup and target AddressSpace translation are not
+cached; now that MemoryRegionCache supports IOMMUs, it becomes more widely
+applicable too.
 
-Patches 1 to 3 prepare by introducing a new function
-address_space_translate_iommu (split out of address_space_translate)
-and new header files for declarations shared by regular and "cached"
-address_space_* functions.  Patch 4 uses them to introduce both
-the slow path for IOMMU and MMIO cached regions, and the fast path
-for RAM cached regions.
+The inlined fast path is defined in memory_ldst_cached.inc.h, while the
+slow path uses memory_ldst.inc.c as before.  The smaller fast path causes
+a little code size reduction in MemoryRegionCache users:
 
-Paolo
+    hw/virtio/virtio.o text size before: 32373
+    hw/virtio/virtio.o text size after: 31941
 
-Paolo Bonzini (4):
-  exec: move memory access declarations to a common header, inline
-    *_phys functions
-  exec: small changes to flatview_do_translate
-  exec: extract address_space_translate_iommu, fix page_mask corner case
-  exec: reintroduce MemoryRegion caching
-
- exec.c                                | 245 ++++++++++++++++++++------
- include/exec/cpu-all.h                |  79 ++++-----
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ exec.c                                | 121 +++++++++++++++++++++++---
+ include/exec/cpu-all.h                |   6 +-
  include/exec/memory-internal.h        |   3 +
- include/exec/memory.h                 | 209 ++++++++++------------
- include/exec/memory_ldst.inc.h        |  71 ++++++++
- include/exec/memory_ldst_cached.inc.h | 108 ++++++++++++
- include/exec/memory_ldst_phys.inc.h   | 147 ++++++++++++++++
+ include/exec/memory.h                 |  58 ++++++++++--
+ include/exec/memory_ldst_cached.inc.h | 108 +++++++++++++++++++++++
  memory.c                              |   4 +-
- memory_ldst.inc.c                     | 126 -------------
- 9 files changed, 651 insertions(+), 341 deletions(-)
- create mode 100644 include/exec/memory_ldst.inc.h
+ 6 files changed, 280 insertions(+), 20 deletions(-)
  create mode 100644 include/exec/memory_ldst_cached.inc.h
- create mode 100644 include/exec/memory_ldst_phys.inc.h
 
+diff --git a/exec.c b/exec.c
+index 868f89c345..8c01f01e98 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3654,33 +3654,130 @@ int64_t address_space_cache_init(MemoryRegionCache *cache,
+                                  hwaddr len,
+                                  bool is_write)
+ {
+-    cache->len = len;
+-    cache->as = as;
+-    cache->xlat = addr;
+-    return len;
++    AddressSpaceDispatch *d;
++    hwaddr l;
++    MemoryRegion *mr;
++
++    assert(len > 0);
++
++    l = len;
++    cache->fv = address_space_get_flatview(as);
++    d = flatview_to_dispatch(cache->fv);
++    cache->mrs = *address_space_translate_internal(d, addr, &cache->xlat, &l, true);
++
++    mr = cache->mrs.mr;
++    memory_region_ref(mr);
++    if (memory_access_is_direct(mr, is_write)) {
++        l = flatview_extend_translation(cache->fv, addr, len, mr,
++                                        cache->xlat, l, is_write);
++        cache->ptr = qemu_ram_ptr_length(mr->ram_block, cache->xlat, &l, true);
++    } else {
++        cache->ptr = NULL;
++    }
++
++    cache->len = l;
++    cache->is_write = is_write;
++    return l;
+ }
+ 
+ void address_space_cache_invalidate(MemoryRegionCache *cache,
+                                     hwaddr addr,
+                                     hwaddr access_len)
+ {
++    assert(cache->is_write);
++    if (likely(cache->ptr)) {
++        invalidate_and_set_dirty(cache->mrs.mr, addr + cache->xlat, access_len);
++    }
+ }
+ 
+ void address_space_cache_destroy(MemoryRegionCache *cache)
+ {
+-    cache->as = NULL;
++    if (!cache->mrs.mr) {
++        return;
++    }
++
++    if (xen_enabled()) {
++        xen_invalidate_map_cache_entry(cache->ptr);
++    }
++    memory_region_unref(cache->mrs.mr);
++    flatview_unref(cache->fv);
++    cache->mrs.mr = NULL;
++    cache->fv = NULL;
++}
++
++/* Called from RCU critical section.  This function has the same
++ * semantics as address_space_translate, but it only works on a
++ * predefined range of a MemoryRegion that was mapped with
++ * address_space_cache_init.
++ */
++static inline MemoryRegion *address_space_translate_cached(
++    MemoryRegionCache *cache, hwaddr addr, hwaddr *xlat,
++    hwaddr *plen, bool is_write)
++{
++    MemoryRegionSection section;
++    MemoryRegion *mr;
++    IOMMUMemoryRegion *iommu_mr;
++    AddressSpace *target_as;
++
++    assert(!cache->ptr);
++    *xlat = addr + cache->xlat;
++
++    mr = cache->mrs.mr;
++    iommu_mr = memory_region_get_iommu(mr);
++    if (!iommu_mr) {
++        /* MMIO region.  */
++        return mr;
++    }
++
++    section = address_space_translate_iommu(iommu_mr, xlat, plen,
++                                            NULL, is_write, true,
++                                            &target_as);
++    return section.mr;
++}
++
++/* Called from RCU critical section. address_space_read_cached uses this
++ * out of line function when the target is an MMIO or IOMMU region.
++ */
++void
++address_space_read_cached_slow(MemoryRegionCache *cache, hwaddr addr,
++                                   void *buf, int len)
++{
++    hwaddr addr1, l;
++    MemoryRegion *mr;
++
++    l = len;
++    mr = address_space_translate_cached(cache, addr, &addr1, &l, false);
++    flatview_read_continue(cache->fv,
++                           addr, MEMTXATTRS_UNSPECIFIED, buf, len,
++                           addr1, l, mr);
++}
++
++/* Called from RCU critical section. address_space_write_cached uses this
++ * out of line function when the target is an MMIO or IOMMU region.
++ */
++void
++address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
++                                    const void *buf, int len)
++{
++    hwaddr addr1, l;
++    MemoryRegion *mr;
++
++    l = len;
++    mr = address_space_translate_cached(cache, addr, &addr1, &l, true);
++    flatview_write_continue(cache->fv,
++                            addr, MEMTXATTRS_UNSPECIFIED, buf, len,
++                            addr1, l, mr);
+ }
+ 
+ #define ARG1_DECL                MemoryRegionCache *cache
+ #define ARG1                     cache
+-#define SUFFIX                   _cached
+-#define TRANSLATE(addr, ...)     \
+-    address_space_translate(cache->as, cache->xlat + (addr), __VA_ARGS__)
+-#define IS_DIRECT(mr, is_write)  true
+-#define MAP_RAM(mr, ofs)         qemu_map_ram_ptr((mr)->ram_block, ofs)
++#define SUFFIX                   _cached_slow
++#define TRANSLATE(...)           address_space_translate_cached(cache, __VA_ARGS__)
++#define IS_DIRECT(mr, is_write)  memory_access_is_direct(mr, is_write)
++#define MAP_RAM(mr, ofs)         (cache->ptr + (ofs - cache->xlat))
+ #define INVALIDATE(mr, ofs, len) invalidate_and_set_dirty(mr, ofs, len)
+-#define RCU_READ_LOCK()          rcu_read_lock()
+-#define RCU_READ_UNLOCK()        rcu_read_unlock()
++#define RCU_READ_LOCK()          ((void)0)
++#define RCU_READ_UNLOCK()        ((void)0)
+ #include "memory_ldst.inc.c"
+ 
+ /* virtual memory access for debug (includes writing to ROM) */
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 173edd1fb4..a635f532f9 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -175,7 +175,7 @@ extern unsigned long reserved_va;
+ #define TARGET_ENDIANNESS
+ #include "exec/memory_ldst.inc.h"
+ 
+-#define SUFFIX       _cached
++#define SUFFIX       _cached_slow
+ #define ARG1         cache
+ #define ARG1_DECL    MemoryRegionCache *cache
+ #define TARGET_ENDIANNESS
+@@ -193,6 +193,10 @@ static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val
+ #define TARGET_ENDIANNESS
+ #include "exec/memory_ldst_phys.inc.h"
+ 
++/* Inline fast path for direct RAM access.  */
++#define ENDIANNESS
++#include "exec/memory_ldst_cached.inc.h"
++
+ #define SUFFIX       _cached
+ #define ARG1         cache
+ #define ARG1_DECL    MemoryRegionCache *cache
+diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+index 6a5ee42d36..58399b9318 100644
+--- a/include/exec/memory-internal.h
++++ b/include/exec/memory-internal.h
+@@ -31,6 +31,9 @@ static inline AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as)
+     return flatview_to_dispatch(address_space_to_flatview(as));
+ }
+ 
++FlatView *address_space_get_flatview(AddressSpace *as);
++void flatview_unref(FlatView *view);
++
+ extern const MemoryRegionOps unassigned_mem_ops;
+ 
+ bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index ca361bc409..525619a5f4 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1688,12 +1688,16 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+ #include "exec/memory_ldst_phys.inc.h"
+ 
+ struct MemoryRegionCache {
++    void *ptr;
+     hwaddr xlat;
+     hwaddr len;
+-    AddressSpace *as;
++    FlatView *fv;
++    MemoryRegionSection mrs;
++    bool is_write;
+ };
+ 
+-#define MEMORY_REGION_CACHE_INVALID ((MemoryRegionCache) { .as = NULL })
++#define MEMORY_REGION_CACHE_INVALID ((MemoryRegionCache) { .mrs.mr = NULL })
++
+ 
+ /* address_space_ld*_cached: load from a cached #MemoryRegion
+  * address_space_st*_cached: store into a cached #MemoryRegion
+@@ -1719,11 +1723,40 @@ struct MemoryRegionCache {
+  *   if NULL, this information is discarded
+  */
+ 
+-#define SUFFIX       _cached
++#define SUFFIX       _cached_slow
+ #define ARG1         cache
+ #define ARG1_DECL    MemoryRegionCache *cache
+ #include "exec/memory_ldst.inc.h"
+ 
++/* Inline fast path for direct RAM access.  */
++static inline uint8_t address_space_ldub_cached(MemoryRegionCache *cache,
++    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len);
++    if (likely(cache->ptr)) {
++        return ldub_p(cache->ptr + addr);
++    } else {
++        return address_space_ldub_cached_slow(cache, addr, attrs, result);
++    }
++}
++
++static inline void address_space_stb_cached(MemoryRegionCache *cache,
++    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len);
++    if (likely(cache->ptr)) {
++        stb_p(cache->ptr + addr, val);
++    } else {
++        address_space_stb_cached_slow(cache, addr, val, attrs, result);
++    }
++}
++
++#define ENDIANNESS   _le
++#include "exec/memory_ldst_cached.inc.h"
++
++#define ENDIANNESS   _be
++#include "exec/memory_ldst_cached.inc.h"
++
+ #define SUFFIX       _cached
+ #define ARG1         cache
+ #define ARG1_DECL    MemoryRegionCache *cache
+@@ -1860,6 +1893,13 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+                                    MemoryRegion *mr);
+ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
+ 
++/* Internal functions, part of the implementation of address_space_read_cached
++ * and address_space_write_cached.  */
++void address_space_read_cached_slow(MemoryRegionCache *cache,
++                                    hwaddr addr, void *buf, int len);
++void address_space_write_cached_slow(MemoryRegionCache *cache,
++                                     hwaddr addr, const void *buf, int len);
++
+ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+ {
+     if (is_write) {
+@@ -1928,7 +1968,11 @@ address_space_read_cached(MemoryRegionCache *cache, hwaddr addr,
+                           void *buf, int len)
+ {
+     assert(addr < cache->len && len <= cache->len - addr);
+-    address_space_read(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
++    if (likely(cache->ptr)) {
++        memcpy(buf, cache->ptr + addr, len);
++    } else {
++        address_space_read_cached_slow(cache, addr, buf, len);
++    }
+ }
+ 
+ /**
+@@ -1944,7 +1988,11 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+                            void *buf, int len)
+ {
+     assert(addr < cache->len && len <= cache->len - addr);
+-    address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
++    if (likely(cache->ptr)) {
++        memcpy(cache->ptr + addr, buf, len);
++    } else {
++        address_space_write_cached_slow(cache, addr, buf, len);
++    }
+ }
+ 
+ #endif
+diff --git a/include/exec/memory_ldst_cached.inc.h b/include/exec/memory_ldst_cached.inc.h
+new file mode 100644
+index 0000000000..fd4bbb40e7
+--- /dev/null
++++ b/include/exec/memory_ldst_cached.inc.h
+@@ -0,0 +1,108 @@
++/*
++ *  Memory access templates for MemoryRegionCache
++ *
++ *  Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#define ADDRESS_SPACE_LD_CACHED(size) \
++    glue(glue(address_space_ld, size), glue(ENDIANNESS, _cached))
++#define ADDRESS_SPACE_LD_CACHED_SLOW(size) \
++    glue(glue(address_space_ld, size), glue(ENDIANNESS, _cached_slow))
++#define LD_P(size) \
++    glue(glue(ld, size), glue(ENDIANNESS, _p))
++
++static inline uint32_t ADDRESS_SPACE_LD_CACHED(l)(MemoryRegionCache *cache,
++    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len && 4 <= cache->len - addr);
++    if (likely(cache->ptr)) {
++        return LD_P(l)(cache->ptr + addr);
++    } else {
++        return ADDRESS_SPACE_LD_CACHED_SLOW(l)(cache, addr, attrs, result);
++    }
++}
++
++static inline uint64_t ADDRESS_SPACE_LD_CACHED(q)(MemoryRegionCache *cache,
++    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len && 8 <= cache->len - addr);
++    if (likely(cache->ptr)) {
++        return LD_P(q)(cache->ptr + addr);
++    } else {
++        return ADDRESS_SPACE_LD_CACHED_SLOW(q)(cache, addr, attrs, result);
++    }
++}
++
++static inline uint32_t ADDRESS_SPACE_LD_CACHED(uw)(MemoryRegionCache *cache,
++    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len && 2 <= cache->len - addr);
++    if (likely(cache->ptr)) {
++        return LD_P(uw)(cache->ptr + addr);
++    } else {
++        return ADDRESS_SPACE_LD_CACHED_SLOW(uw)(cache, addr, attrs, result);
++    }
++}
++
++#undef ADDRESS_SPACE_LD_CACHED
++#undef ADDRESS_SPACE_LD_CACHED_SLOW
++#undef LD_P
++
++#define ADDRESS_SPACE_ST_CACHED(size) \
++    glue(glue(address_space_st, size), glue(ENDIANNESS, _cached))
++#define ADDRESS_SPACE_ST_CACHED_SLOW(size) \
++    glue(glue(address_space_st, size), glue(ENDIANNESS, _cached_slow))
++#define ST_P(size) \
++    glue(glue(st, size), glue(ENDIANNESS, _p))
++
++static inline void ADDRESS_SPACE_ST_CACHED(l)(MemoryRegionCache *cache,
++    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len && 4 <= cache->len - addr);
++    if (likely(cache->ptr)) {
++        ST_P(l)(cache->ptr + addr, val);
++    } else {
++        ADDRESS_SPACE_ST_CACHED_SLOW(l)(cache, addr, val, attrs, result);
++    }
++}
++
++static inline void ADDRESS_SPACE_ST_CACHED(w)(MemoryRegionCache *cache,
++    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len && 2 <= cache->len - addr);
++    if (likely(cache->ptr)) {
++        ST_P(w)(cache->ptr + addr, val);
++    } else {
++        ADDRESS_SPACE_ST_CACHED_SLOW(w)(cache, addr, val, attrs, result);
++    }
++}
++
++static inline void ADDRESS_SPACE_ST_CACHED(q)(MemoryRegionCache *cache,
++    hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
++{
++    assert(addr < cache->len && 8 <= cache->len - addr);
++    if (likely(cache->ptr)) {
++        ST_P(q)(cache->ptr + addr, val);
++    } else {
++        ADDRESS_SPACE_ST_CACHED_SLOW(q)(cache, addr, val, attrs, result);
++    }
++}
++
++#undef ADDRESS_SPACE_ST_CACHED
++#undef ADDRESS_SPACE_ST_CACHED_SLOW
++#undef ST_P
++
++#undef ENDIANNESS
+diff --git a/memory.c b/memory.c
+index e70b64b8b9..fc7f9b782b 100644
+--- a/memory.c
++++ b/memory.c
+@@ -298,7 +298,7 @@ static bool flatview_ref(FlatView *view)
+     return atomic_fetch_inc_nonzero(&view->ref) > 0;
+ }
+ 
+-static void flatview_unref(FlatView *view)
++void flatview_unref(FlatView *view)
+ {
+     if (atomic_fetch_dec(&view->ref) == 1) {
+         trace_flatview_destroy_rcu(view, view->root);
+@@ -822,7 +822,7 @@ static void address_space_add_del_ioeventfds(AddressSpace *as,
+     }
+ }
+ 
+-static FlatView *address_space_get_flatview(AddressSpace *as)
++FlatView *address_space_get_flatview(AddressSpace *as)
+ {
+     FlatView *view;
+ 
 -- 
 2.17.0
