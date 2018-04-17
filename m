@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f8Z3k-0003zm-E4
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:26:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f8Z7G-0005Js-Mg
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f8Z3h-0005EE-5z
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:26:44 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46530)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f8Z3g-0005CB-SV
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:26:41 -0400
-Received: by mail-pf0-x244.google.com with SMTP id h69so12815672pfe.13
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 15:26:40 -0700 (PDT)
-Received: from cloudburst.ASUS (cpe-66-75-76-48.hawaii.res.rr.com.
-	[66.75.76.48])
-	by smtp.gmail.com with ESMTPSA id p5sm4383986pgv.58.2018.04.17.15.26.36
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 17 Apr 2018 15:26:37 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 17 Apr 2018 12:26:35 -1000
-Message-Id: <20180417222635.17007-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.13] tcg: Improve TCGv_ptr support
+	(envelope-from <no-reply@patchew.org>) id 1f8Z7D-0002jW-BO
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:30:22 -0400
+Resent-Message-Id: <E1f8Z7D-0002jW-BO@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21113)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f8Z7D-0002gn-4t
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:30:19 -0400
+In-Reply-To: <20180417222635.17007-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152400420155.1926.8714812877368730120@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 17 Apr 2018 15:30:02 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH for-2.13] tcg: Improve TCGv_ptr support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,362 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Drop TCGV_PTR_TO_NAT and TCGV_NAT_TO_PTR internal macros.
-
-Add tcg_temp_local_new_ptr, tcg_gen_brcondi_ptr, tcg_gen_ext_i32_ptr,
-tcg_gen_trunc_i64_ptr, tcg_gen_extu_ptr_i64, tcg_gen_trunc_ptr_i32.
-
-Use inlines instead of macros where possible.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-----
-
-These additions will be used by target/arm/translate-sve.c.
-
-
-r~
-
-----
- tcg/tcg-op.h            | 91 +++++++++++++++++++++++++++++++++++++------------
- tcg/tcg.h               | 86 ++++++++++++++++++++++++++++++----------------
- target/hppa/translate.c | 16 ++-------
- tcg/tcg.c               | 31 ++---------------
- 4 files changed, 130 insertions(+), 94 deletions(-)
-
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 75bb55aeac..5d2c91a1b6 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -1137,25 +1137,74 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #endif
- 
- #if UINTPTR_MAX == UINT32_MAX
--# define tcg_gen_ld_ptr(R, A, O) \
--    tcg_gen_ld_i32(TCGV_PTR_TO_NAT(R), (A), (O))
--# define tcg_gen_discard_ptr(A) \
--    tcg_gen_discard_i32(TCGV_PTR_TO_NAT(A))
--# define tcg_gen_add_ptr(R, A, B) \
--    tcg_gen_add_i32(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), TCGV_PTR_TO_NAT(B))
--# define tcg_gen_addi_ptr(R, A, B) \
--    tcg_gen_addi_i32(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), (B))
--# define tcg_gen_ext_i32_ptr(R, A) \
--    tcg_gen_mov_i32(TCGV_PTR_TO_NAT(R), (A))
-+# define PTR  i32
-+# define NAT  TCGv_i32
- #else
--# define tcg_gen_ld_ptr(R, A, O) \
--    tcg_gen_ld_i64(TCGV_PTR_TO_NAT(R), (A), (O))
--# define tcg_gen_discard_ptr(A) \
--    tcg_gen_discard_i64(TCGV_PTR_TO_NAT(A))
--# define tcg_gen_add_ptr(R, A, B) \
--    tcg_gen_add_i64(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), TCGV_PTR_TO_NAT(B))
--# define tcg_gen_addi_ptr(R, A, B) \
--    tcg_gen_addi_i64(TCGV_PTR_TO_NAT(R), TCGV_PTR_TO_NAT(A), (B))
--# define tcg_gen_ext_i32_ptr(R, A) \
--    tcg_gen_ext_i32_i64(TCGV_PTR_TO_NAT(R), (A))
--#endif /* UINTPTR_MAX == UINT32_MAX */
-+# define PTR  i64
-+# define NAT  TCGv_i64
-+#endif
-+
-+static inline void tcg_gen_ld_ptr(TCGv_ptr r, TCGv_ptr a, intptr_t o)
-+{
-+    glue(tcg_gen_ld_,PTR)((NAT)r, a, o);
-+}
-+
-+static inline void tcg_gen_discard_ptr(TCGv_ptr a)
-+{
-+    glue(tcg_gen_discard_,PTR)((NAT)a);
-+}
-+
-+static inline void tcg_gen_add_ptr(TCGv_ptr r, TCGv_ptr a, TCGv_ptr b)
-+{
-+    glue(tcg_gen_add_,PTR)((NAT)r, (NAT)a, (NAT)b);
-+}
-+
-+static inline void tcg_gen_addi_ptr(TCGv_ptr r, TCGv_ptr a, intptr_t b)
-+{
-+    glue(tcg_gen_addi_,PTR)((NAT)r, (NAT)a, b);
-+}
-+
-+static inline void tcg_gen_brcondi_ptr(TCGCond cond, TCGv_ptr a,
-+                                       intptr_t b, TCGLabel *label)
-+{
-+    glue(tcg_gen_brcondi_,PTR)(cond, (NAT)a, b, label);
-+}
-+
-+static inline void tcg_gen_ext_i32_ptr(TCGv_ptr r, TCGv_i32 a)
-+{
-+#if UINTPTR_MAX == UINT32_MAX
-+    tcg_gen_mov_i32((NAT)r, a);
-+#else
-+    tcg_gen_ext_i32_i64((NAT)r, a);
-+#endif
-+}
-+
-+static inline void tcg_gen_trunc_i64_ptr(TCGv_ptr r, TCGv_i64 a)
-+{
-+#if UINTPTR_MAX == UINT32_MAX
-+    tcg_gen_extrl_i64_i32((NAT)r, a);
-+#else
-+    tcg_gen_mov_i64((NAT)r, a);
-+#endif
-+}
-+
-+static inline void tcg_gen_extu_ptr_i64(TCGv_i64 r, TCGv_ptr a)
-+{
-+#if UINTPTR_MAX == UINT32_MAX
-+    tcg_gen_extu_i32_i64(r, (NAT)a);
-+#else
-+    tcg_gen_mov_i64(r, (NAT)a);
-+#endif
-+}
-+
-+static inline void tcg_gen_trunc_ptr_i32(TCGv_i32 r, TCGv_ptr a)
-+{
-+#if UINTPTR_MAX == UINT32_MAX
-+    tcg_gen_mov_i32(r, (NAT)a);
-+#else
-+    tcg_gen_extrl_i64_i32(r, (NAT)a);
-+#endif
-+}
-+
-+#undef PTR
-+#undef NAT
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 30896ca304..eb0d4f6ca7 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -890,15 +890,30 @@ void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
- 
- TCGTemp *tcg_global_mem_new_internal(TCGType, TCGv_ptr,
-                                      intptr_t, const char *);
--
--TCGv_i32 tcg_temp_new_internal_i32(int temp_local);
--TCGv_i64 tcg_temp_new_internal_i64(int temp_local);
-+TCGTemp *tcg_temp_new_internal(TCGType, bool);
-+void tcg_temp_free_internal(TCGTemp *);
- TCGv_vec tcg_temp_new_vec(TCGType type);
- TCGv_vec tcg_temp_new_vec_matching(TCGv_vec match);
- 
--void tcg_temp_free_i32(TCGv_i32 arg);
--void tcg_temp_free_i64(TCGv_i64 arg);
--void tcg_temp_free_vec(TCGv_vec arg);
-+static inline void tcg_temp_free_i32(TCGv_i32 arg)
-+{
-+    tcg_temp_free_internal(tcgv_i32_temp(arg));
-+}
-+
-+static inline void tcg_temp_free_i64(TCGv_i64 arg)
-+{
-+    tcg_temp_free_internal(tcgv_i64_temp(arg));
-+}
-+
-+static inline void tcg_temp_free_ptr(TCGv_ptr arg)
-+{
-+    tcg_temp_free_internal(tcgv_ptr_temp(arg));
-+}
-+
-+static inline void tcg_temp_free_vec(TCGv_vec arg)
-+{
-+    tcg_temp_free_internal(tcgv_vec_temp(arg));
-+}
- 
- static inline TCGv_i32 tcg_global_mem_new_i32(TCGv_ptr reg, intptr_t offset,
-                                               const char *name)
-@@ -909,12 +924,14 @@ static inline TCGv_i32 tcg_global_mem_new_i32(TCGv_ptr reg, intptr_t offset,
- 
- static inline TCGv_i32 tcg_temp_new_i32(void)
- {
--    return tcg_temp_new_internal_i32(0);
-+    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_I32, false);
-+    return temp_tcgv_i32(t);
- }
- 
- static inline TCGv_i32 tcg_temp_local_new_i32(void)
- {
--    return tcg_temp_new_internal_i32(1);
-+    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_I32, true);
-+    return temp_tcgv_i32(t);
- }
- 
- static inline TCGv_i64 tcg_global_mem_new_i64(TCGv_ptr reg, intptr_t offset,
-@@ -926,12 +943,33 @@ static inline TCGv_i64 tcg_global_mem_new_i64(TCGv_ptr reg, intptr_t offset,
- 
- static inline TCGv_i64 tcg_temp_new_i64(void)
- {
--    return tcg_temp_new_internal_i64(0);
-+    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_I64, false);
-+    return temp_tcgv_i64(t);
- }
- 
- static inline TCGv_i64 tcg_temp_local_new_i64(void)
- {
--    return tcg_temp_new_internal_i64(1);
-+    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_I64, true);
-+    return temp_tcgv_i64(t);
-+}
-+
-+static inline TCGv_ptr tcg_global_mem_new_ptr(TCGv_ptr reg, intptr_t offset,
-+                                              const char *name)
-+{
-+    TCGTemp *t = tcg_global_mem_new_internal(TCG_TYPE_PTR, reg, offset, name);
-+    return temp_tcgv_ptr(t);
-+}
-+
-+static inline TCGv_ptr tcg_temp_new_ptr(void)
-+{
-+    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_PTR, false);
-+    return temp_tcgv_ptr(t);
-+}
-+
-+static inline TCGv_ptr tcg_temp_local_new_ptr(void)
-+{
-+    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_PTR, true);
-+    return temp_tcgv_ptr(t);
- }
- 
- #if defined(CONFIG_DEBUG_TCG)
-@@ -1009,26 +1047,6 @@ do {\
-     abort();\
- } while (0)
- 
--#if UINTPTR_MAX == UINT32_MAX
--static inline TCGv_ptr TCGV_NAT_TO_PTR(TCGv_i32 n) { return (TCGv_ptr)n; }
--static inline TCGv_i32 TCGV_PTR_TO_NAT(TCGv_ptr n) { return (TCGv_i32)n; }
--
--#define tcg_const_ptr(V) TCGV_NAT_TO_PTR(tcg_const_i32((intptr_t)(V)))
--#define tcg_global_mem_new_ptr(R, O, N) \
--    TCGV_NAT_TO_PTR(tcg_global_mem_new_i32((R), (O), (N)))
--#define tcg_temp_new_ptr() TCGV_NAT_TO_PTR(tcg_temp_new_i32())
--#define tcg_temp_free_ptr(T) tcg_temp_free_i32(TCGV_PTR_TO_NAT(T))
--#else
--static inline TCGv_ptr TCGV_NAT_TO_PTR(TCGv_i64 n) { return (TCGv_ptr)n; }
--static inline TCGv_i64 TCGV_PTR_TO_NAT(TCGv_ptr n) { return (TCGv_i64)n; }
--
--#define tcg_const_ptr(V) TCGV_NAT_TO_PTR(tcg_const_i64((intptr_t)(V)))
--#define tcg_global_mem_new_ptr(R, O, N) \
--    TCGV_NAT_TO_PTR(tcg_global_mem_new_i64((R), (O), (N)))
--#define tcg_temp_new_ptr() TCGV_NAT_TO_PTR(tcg_temp_new_i64())
--#define tcg_temp_free_ptr(T) tcg_temp_free_i64(TCGV_PTR_TO_NAT(T))
--#endif
--
- bool tcg_op_supported(TCGOpcode op);
- 
- void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args);
-@@ -1052,6 +1070,14 @@ TCGv_vec tcg_const_ones_vec(TCGType);
- TCGv_vec tcg_const_zeros_vec_matching(TCGv_vec);
- TCGv_vec tcg_const_ones_vec_matching(TCGv_vec);
- 
-+#if UINTPTR_MAX == UINT32_MAX
-+# define tcg_const_ptr(x)        ((TCGv_ptr)tcg_const_i32((intptr_t)(x)))
-+# define tcg_const_local_ptr(x)  ((TCGv_ptr)tcg_const_local_i32((intptr_t)(x)))
-+#else
-+# define tcg_const_ptr(x)        ((TCGv_ptr)tcg_const_i64((intptr_t)(x)))
-+# define tcg_const_local_ptr(x)  ((TCGv_ptr)tcg_const_local_i64((intptr_t)(x)))
-+#endif
-+
- TCGLabel *gen_new_label(void);
- 
- /**
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index c532889b1f..cdc397308b 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -151,13 +151,7 @@
- #define tcg_gen_qemu_ld_reg  tcg_gen_qemu_ld_i64
- #define tcg_gen_qemu_st_reg  tcg_gen_qemu_st_i64
- #define tcg_gen_atomic_xchg_reg tcg_gen_atomic_xchg_i64
--#if UINTPTR_MAX == UINT32_MAX
--# define tcg_gen_trunc_reg_ptr(p, r) \
--    tcg_gen_trunc_i64_i32(TCGV_PTR_TO_NAT(p), r)
--#else
--# define tcg_gen_trunc_reg_ptr(p, r) \
--    tcg_gen_mov_i64(TCGV_PTR_TO_NAT(p), r)
--#endif
-+#define tcg_gen_trunc_reg_ptr   tcg_gen_trunc_i64_ptr
- #else
- #define TCGv_reg             TCGv_i32
- #define tcg_temp_new         tcg_temp_new_i32
-@@ -251,13 +245,7 @@
- #define tcg_gen_qemu_ld_reg  tcg_gen_qemu_ld_i32
- #define tcg_gen_qemu_st_reg  tcg_gen_qemu_st_i32
- #define tcg_gen_atomic_xchg_reg tcg_gen_atomic_xchg_i32
--#if UINTPTR_MAX == UINT32_MAX
--# define tcg_gen_trunc_reg_ptr(p, r) \
--    tcg_gen_mov_i32(TCGV_PTR_TO_NAT(p), r)
--#else
--# define tcg_gen_trunc_reg_ptr(p, r) \
--    tcg_gen_extu_i32_i64(TCGV_PTR_TO_NAT(p), r)
--#endif
-+#define tcg_gen_trunc_reg_ptr   tcg_gen_ext_i32_ptr
- #endif /* TARGET_REGISTER_BITS */
- 
- typedef struct DisasCond {
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index bb24526c93..b5e706bc49 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -980,7 +980,7 @@ TCGTemp *tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
-     return ts;
- }
- 
--static TCGTemp *tcg_temp_new_internal(TCGType type, int temp_local)
-+TCGTemp *tcg_temp_new_internal(TCGType type, bool temp_local)
- {
-     TCGContext *s = tcg_ctx;
-     TCGTemp *ts;
-@@ -1025,18 +1025,6 @@ static TCGTemp *tcg_temp_new_internal(TCGType type, int temp_local)
-     return ts;
- }
- 
--TCGv_i32 tcg_temp_new_internal_i32(int temp_local)
--{
--    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_I32, temp_local);
--    return temp_tcgv_i32(t);
--}
--
--TCGv_i64 tcg_temp_new_internal_i64(int temp_local)
--{
--    TCGTemp *t = tcg_temp_new_internal(TCG_TYPE_I64, temp_local);
--    return temp_tcgv_i64(t);
--}
--
- TCGv_vec tcg_temp_new_vec(TCGType type)
- {
-     TCGTemp *t;
-@@ -1072,7 +1060,7 @@ TCGv_vec tcg_temp_new_vec_matching(TCGv_vec match)
-     return temp_tcgv_vec(t);
- }
- 
--static void tcg_temp_free_internal(TCGTemp *ts)
-+void tcg_temp_free_internal(TCGTemp *ts)
- {
-     TCGContext *s = tcg_ctx;
-     int k, idx;
-@@ -1093,21 +1081,6 @@ static void tcg_temp_free_internal(TCGTemp *ts)
-     set_bit(idx, s->free_temps[k].l);
- }
- 
--void tcg_temp_free_i32(TCGv_i32 arg)
--{
--    tcg_temp_free_internal(tcgv_i32_temp(arg));
--}
--
--void tcg_temp_free_i64(TCGv_i64 arg)
--{
--    tcg_temp_free_internal(tcgv_i64_temp(arg));
--}
--
--void tcg_temp_free_vec(TCGv_vec arg)
--{
--    tcg_temp_free_internal(tcgv_vec_temp(arg));
--}
--
- TCGv_i32 tcg_const_i32(int32_t val)
- {
-     TCGv_i32 t0;
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDE3MjIyNjM1LjE3MDA3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvci0yLjEzXSB0Y2c6IEltcHJvdmUg
+VENHdl9wdHIgc3VwcG9ydAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
+QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
+ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
+aXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAg
+ICAgcGF0Y2hldy8yMDE4MDQxNzIyMjYzNS4xNzAwNy0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
+by5vcmcgLT4gcGF0Y2hldy8yMDE4MDQxNzIyMjYzNS4xNzAwNy0xLXJpY2hhcmQuaGVuZGVyc29u
+QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozZDdmYTA2NTg0IHRj
+ZzogSW1wcm92ZSBUQ0d2X3B0ciBzdXBwb3J0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzE6IHRjZzogSW1wcm92ZSBUQ0d2X3B0ciBzdXBwb3J0Li4uCkVSUk9SOiBzcGFj
+ZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzEwMTogRklMRTogdGNnL3RjZy1v
+cC5oOjExNDk6CisgICAgZ2x1ZSh0Y2dfZ2VuX2xkXyxQVFIpKChOQVQpciwgYSwgbyk7CiAgICAg
+ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
+Y3R4OlZ4VikKIzEwNjogRklMRTogdGNnL3RjZy1vcC5oOjExNTQ6CisgICAgZ2x1ZSh0Y2dfZ2Vu
+X2Rpc2NhcmRfLFBUUikoKE5BVClhKTsKICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
+Ujogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTE6IEZJTEU6IHRj
+Zy90Y2ctb3AuaDoxMTU5OgorICAgIGdsdWUodGNnX2dlbl9hZGRfLFBUUikoKE5BVClyLCAoTkFU
+KWEsIChOQVQpYik7CiAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWly
+ZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTY6IEZJTEU6IHRjZy90Y2ctb3AuaDoxMTY0
+OgorICAgIGdsdWUodGNnX2dlbl9hZGRpXyxQVFIpKChOQVQpciwgKE5BVClhLCBiKTsKICAgICAg
+ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcg
+KGN0eDpWeFYpCiMxMjI6IEZJTEU6IHRjZy90Y2ctb3AuaDoxMTcwOgorICAgIGdsdWUodGNnX2dl
+bl9icmNvbmRpXyxQVFIpKGNvbmQsIChOQVQpYSwgYiwgbGFiZWwpOwogICAgICAgICAgICAgICAg
+ICAgICAgICAgIF4KCnRvdGFsOiA1IGVycm9ycywgMCB3YXJuaW5ncywgMzA1IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
