@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8LfH-0002j4-Km
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:08:36 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1f8LiF-0004AR-6Q
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:11:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8LfE-0007K7-GT
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:08:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50406 helo=mx1.redhat.com)
+	(envelope-from <yulei.zhang@intel.com>) id 1f8LiC-0000d1-0k
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:11:39 -0400
+Received: from mga03.intel.com ([134.134.136.65]:22681)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f8LfE-0007JC-3r
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:08:32 -0400
-References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
-	<1523861081-3600-2-git-send-email-thuth@redhat.com>
-	<20180417072134.GJ10770@stefanha-x1.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <275bfe53-7c94-0ad0-b388-d8a44a7fb76f@redhat.com>
-Date: Tue, 17 Apr 2018 10:08:13 +0200
+	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
+	id 1f8LiB-0000c8-MS
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:11:35 -0400
+From: "Zhang, Yulei" <yulei.zhang@intel.com>
+Date: Tue, 17 Apr 2018 08:11:12 +0000
+Message-ID: <01FDBDDE256B79498DC57789713132D46A18E8D0@SHSMSX101.ccr.corp.intel.com>
+References: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
+	<20180416143745.3cb868d9@w520.home>
+In-Reply-To: <20180416143745.3cb868d9@w520.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20180417072134.GJ10770@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="CF5cBVDKUnHzbeLA5A6kbklcnjmpkrvAA"
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.13 1/3] net: Remove the deprecated
- "vlan" parameter
+Subject: Re: [Qemu-devel] [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for
+ VFIO device to support live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CF5cBVDKUnHzbeLA5A6kbklcnjmpkrvAA
-From: Thomas Huth <thuth@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <275bfe53-7c94-0ad0-b388-d8a44a7fb76f@redhat.com>
-Subject: Re: [PATCH v3 for-2.13 1/3] net: Remove the deprecated "vlan"
- parameter
-References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
- <1523861081-3600-2-git-send-email-thuth@redhat.com>
- <20180417072134.GJ10770@stefanha-x1.localdomain>
-In-Reply-To: <20180417072134.GJ10770@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 17.04.2018 09:21, Stefan Hajnoczi wrote:
-> On Mon, Apr 16, 2018 at 08:44:39AM +0200, Thomas Huth wrote:
->> @@ -499,10 +497,11 @@
->>  # @opts: device type specific properties (legacy)
->>  #
->>  # Since: 1.2
->> +#
->> +# 'vlan' - removed with 2.12
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Tuesday, April 17, 2018 4:38 AM
+> To: Zhang, Yulei <yulei.zhang@intel.com>
+> Cc: qemu-devel@nongnu.org; Tian, Kevin <kevin.tian@intel.com>;
+> joonas.lahtinen@linux.intel.com; zhenyuw@linux.intel.com;
+> kwankhede@nvidia.com; Wang, Zhi A <zhi.a.wang@intel.com>;
+> dgilbert@redhat.com; quintela@redhat.com
+> Subject: Re: [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for VFIO device
+> to support live migration
 >=20
-> Not sure how to interpret this.  How about "removed in 2.13"?
-
-Sure, will change it.
-
->> @@ -2028,10 +2028,9 @@ DEF("nic", HAS_ARG, QEMU_OPTION_nic,
->>      "                provided a 'user' network connection)\n",
->>      QEMU_ARCH_ALL)
->>  DEF("net", HAS_ARG, QEMU_OPTION_net,
->> -    "-net nic[,vlan=3Dn][,netdev=3Dnd][,macaddr=3Dmac][,model=3Dtype]=
-[,name=3Dstr][,addr=3Dstr][,vectors=3Dv]\n"
->> +    "-net nic[,macaddr=3Dmac][,model=3Dtype][,name=3Dstr][,addr=3Dstr=
-][,vectors=3Dv]\n"
->>      "                configure or create an on-board (or machine defa=
-ult) NIC and\n"
->> -    "                connect it either to VLAN 'n' or the netdev 'nd'=
- (for pluggable\n"
->> -    "                NICs please use '-device devtype,netdev=3Dnd' in=
-stead)\n"
->> +    "                connect it to hub 0 (please use -nic for direct =
-connections)\n"
+> On Tue, 10 Apr 2018 14:03:13 +0800
+> Yulei Zhang <yulei.zhang@intel.com> wrote:
 >=20
-> What does "direct connections" means?
+> > Instead of using vm state description, add SaveVMHandlers for VFIO
+> > device to support live migration.
+> >
+> > Introduce new Ioctl VFIO_DEVICE_GET_DIRTY_BITMAP to fetch the
+> memory
+> > bitmap that dirtied by vfio device during the iterative precopy stage
+> > to shorten the system downtime afterward.
+> >
+> > For vfio pci device status migrate, during the system downtime, it
+> > will save the following states 1. pci configuration space addr0~addr5
+> > 2. pci configuration space msi_addr msi_data 3. pci device status
+> > fetch from device driver
+> >
+> > And on the target side the vfio_load will restore the same states 1.
+> > re-setup the pci bar configuration 2. re-setup the pci device msi
+> > configuration 3. restore the pci device status
+>=20
+> Interrupts are configured via ioctl, but I don't see any code here to con=
+figure
+> the device into the correct interrupt state.  How do we know the target
+> device is compatible with the source device?  Do we rely on the vendor
+> driver to implicitly include some kind of device and version information =
+and
+> fail at the very end of the migration?  It seems like we need to somehow
+> front-load that sort of device compatibility checking since a vfio-pci de=
+vice
+> can be anything (ex. what happens if a user tries to migrate a GVT-g vGPU=
+ to
+> an NVIDIA vGPU?).  Thanks,
+>=20
+> Alex
 
-I mean a 1:1 connection between the backend and frontend here, without a
-hub inbetween. Can you think of a better wording?
-
- Thomas
-
-
---CF5cBVDKUnHzbeLA5A6kbklcnjmpkrvAA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJa1atyAAoJEC7Z13T+cC21TQAP/2nXTZHnSSWKRE4Te2VYPb0U
-B4n0zynB7N+BdhQNQrmZZ7djG+Bm6px0UnVydJRYmh+v3v9NlMMwhNYf63xfdZsM
-c0ZeUhfBbMTGtb2oPGZ8UnTQcmKWN7DEBHPiRqlIfFgmNqZA8kieiteR7ExelU7Y
-isn7KDZjjmXxsAFjs18muAdjITxjZGzpkKBFlAAs4oBfHPcrQtegmULtU3gSuVZc
-cn3x+AGdzi5VhGFsToRRDvb5YPtvHJp6uQCDyJle/jwrAr+dfuQ/teQOJqySgrA0
-ffcCjaj6J9E0ud9C7aO1wwJaC63s/zVNv0k4S4CpR71kLJFZM8wHNc4Knm3x1TXU
-WJRKvlTHJj9o17K0/mEnfwrMBukgEz1s+Uq3O9A+o0FaBscph2Vfn29mWlrn3gcY
-uTXZDk0d1dhLO5o4wf+LYiDdSS/bVuIIjJOBXGYVlazPDYJhyAmiBZJnYDG5hKaY
-/ortJ7Ar7qXRW3t6E8kXfjMFVLvT5UbRQ6jQxs1Fq8RcOprXY2+krTx7vYiFH7gZ
-oksrgJttm0pqmQJubLc0s9KvIxKZJeLlVylshLYuN2aU65iFI+e+1lP4UPPii1Gi
-F8OHsGDOGR5UKBvSoo4Ewj5JqueZTvj20qbTEPLGVM8HN8SLcEky46uWwNcWFiq6
-WIY0TPo5frO1HNR+Nrb3
-=JeLk
------END PGP SIGNATURE-----
-
---CF5cBVDKUnHzbeLA5A6kbklcnjmpkrvAA--
+We emulate the write to the pci configure space in vfio_load() which will h=
+elp
+setup the interrupt state.=20
+For compatibility I think currently the vendor driver would put version num=
+ber=20
+or device specific info in the device state region, so during the pre-copy =
+stage
+the target side will discover the difference and call off the migration.
