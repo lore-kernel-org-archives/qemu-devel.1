@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8SgH-0000FR-Ap
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:38:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8Si8-0001Jv-G7
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:40:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8SgG-0004Ri-JB
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:38:05 -0400
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:41585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8SgG-0004RM-DB
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:38:04 -0400
-Received: by mail-ot0-x22e.google.com with SMTP id m22-v6so21837549otf.8
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 08:38:04 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1f8Si7-0005JZ-M5
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:40:00 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 17 Apr 2018 17:39:39 +0200
+Message-Id: <20180417153945.20737-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180417152101.GP24561@codeaurora.org>
-References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-	<1521232280-13089-13-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA_UP-DgPZPL8-sMAs9TFHiUrfya8LAxAnO2U_WJAMH6yg@mail.gmail.com>
-	<20180412173625.GK24561@codeaurora.org>
-	<20180417152101.GP24561@codeaurora.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Apr 2018 16:37:43 +0100
-Message-ID: <CAFEAcA_QdPChiMPtZt7t_aqQTUcSDweGVG0anchKYH6KtEgEYw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 12/22] target/arm: Filter cycle counter
- based on PMCCFILTR_EL0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/6] atapi: change unlimited recursion to while
+ loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +21,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org
 
-On 17 April 2018 at 16:21, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> On Apr 12 13:36, Aaron Lindsay wrote:
->> On Apr 12 18:15, Peter Maydell wrote:
->> > On 16 March 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
->> > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> > > index b0ef727..9c3b5ef 100644
->> > > --- a/target/arm/cpu.h
->> > > +++ b/target/arm/cpu.h
->> > > @@ -458,6 +458,11 @@ typedef struct CPUARMState {
->> > >           * was reset. Otherwise it stores the counter value
->> > >           */
->> > >          uint64_t c15_ccnt;
->> > > +        /* ccnt_cached_cycles is used to hold the last cycle count when
->> > > +         * c15_ccnt holds the guest-visible count instead of the delta during
->> > > +         * PMU operations which require this.
->> > > +         */
->> > > +        uint64_t ccnt_cached_cycles;
->> >
->> > Can this ever hold valid state at a point when we need to do VM
->> > migration, or is it purely temporary ?
->>
->> I believe that as of this version of the patch it is temporary and will
->> not need to be migrated. However, I believe it's going to be necessary
->> to have two variables to represent the state of each counter in order to
->> implement interrupt on overflow.
->
-> Coming back around to this, I don't see a way around using two variables
-> to hold PMCCNTR's full state to make interrupt on overflow work. I
-> haven't been able to find other examples or documentation covering state
-> needing to be updated in more than one location for a given CP register
-> - do you know of any I've missed or have recommendations about how to
-> approach this?
+Real hardware doesn't have an unlimited stack, so the unlimited
+recursion in the ATAPI code smells a bit.  In fact, the call to
+ide_transfer_start easily becomes a tail call with a small change
+to the code (patch 5); however, we also need to turn the call back to
+ide_atapi_cmd_reply_end into another tail call before turning the
+(double) tail recursion into a while loop.
 
-Can you explain the problem in more detail? In general it's a bit of
-a red flag if you think you need more state storage space than the
-hardware has, and I don't think there's any "hidden" state in the h/w here.
+In particular, patch 1 ensures that the call to the end_transfer_func is
+the last thing in ide_transfer_start.  To do so, it moves the write of
+the PIO Setup FIS before the PIO transfer, which actually makes sense:
+the FIS is sent by the device to inform the AHCI about the transfer,
+so it cannot come after!  This is the main change from the RFC, and
+it simplifies the rest of the series (the RFC had to introduce an
+"end_transfer" callback just for writing the PIO Setup FIS).
 
-thanks
--- PMM
+I tested this manually with READ CD commands sent through sg_raw,
+and the existing AHCI tests still pass.
+
+Paolo Bonzini (6):
+  ahci: move PIO Setup FIS before transfer, fix it for ATAPI commands
+  ide: push end_transfer_func out of start_transfer callback, rename
+    callback
+  ide: call ide_cmd_done from ide_transfer_stop
+  ide: make ide_transfer_stop idempotent
+  atapi: call ide_set_irq before ide_transfer_start
+  ide: introduce ide_transfer_start_norecurse
+
+ hw/ide/ahci.c             | 30 ++++++++++++--------------
+ hw/ide/atapi.c            | 44 +++++++++++++++++++++------------------
+ hw/ide/core.c             | 39 +++++++++++++++++-----------------
+ hw/ide/trace-events       |  2 +-
+ include/hw/ide/internal.h |  4 +++-
+ tests/libqos/ahci.c       | 30 ++++++++++++++++++++++----
+ tests/libqos/ahci.h       |  2 ++
+ 7 files changed, 89 insertions(+), 62 deletions(-)
+
+--=20
+2.17.0
