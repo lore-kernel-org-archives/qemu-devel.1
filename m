@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Vgb-0002yD-Du
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:50:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1f8Vhc-0003U7-Mq
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8VgX-0007U8-EQ
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:50:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35274 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1f8VhY-00083F-NP
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:51:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39866 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8VgX-0007Tq-8E
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:50:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8VhY-00082z-GF
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:51:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFFD74182D58
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:50:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 99339EBFF3
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:51:32 +0000 (UTC)
 References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
-	<20180417133602.23832-5-marcandre.lureau@redhat.com>
+	<20180417133602.23832-6-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a33a9fcb-f6a5-d211-c5f8-0607a65729ab@redhat.com>
-Date: Tue, 17 Apr 2018 13:50:28 -0500
+Message-ID: <845bec97-25ef-6018-7700-f9bfde3c0bf6@redhat.com>
+Date: Tue, 17 Apr 2018 13:51:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180417133602.23832-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20180417133602.23832-6-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf"
-Subject: Re: [Qemu-devel] [PATCH v5 4/5] qobject: modify qobject_ref() to
- return obj
+	boundary="4eMGR8aOOWLE2qaUZltdjz1wcDxVno0d3"
+Subject: Re: [Qemu-devel] [PATCH v5 5/5] qobject: modify qobject_ref() to
+ assert on NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,41 +39,32 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf
+--4eMGR8aOOWLE2qaUZltdjz1wcDxVno0d3
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 Cc: berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com
-Message-ID: <a33a9fcb-f6a5-d211-c5f8-0607a65729ab@redhat.com>
-Subject: Re: [PATCH v5 4/5] qobject: modify qobject_ref() to return obj
+Message-ID: <845bec97-25ef-6018-7700-f9bfde3c0bf6@redhat.com>
+Subject: Re: [PATCH v5 5/5] qobject: modify qobject_ref() to assert on NULL
 References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
- <20180417133602.23832-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20180417133602.23832-5-marcandre.lureau@redhat.com>
+ <20180417133602.23832-6-marcandre.lureau@redhat.com>
+In-Reply-To: <20180417133602.23832-6-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 04/17/2018 08:36 AM, Marc-Andr=C3=A9 Lureau wrote:
-> For convenience and clarity, make it possible to call qobject_ref() at
-> the time when the reference is associated with a variable, or
-> argument, by making qobject_ref() return the same pointer as given.
+> While it may be convenient to accept NULL value in
+> qobject_unref() (for similar reasons as free() accepts NULL), it is
+> not such a good idea for qobject_ref(), assert() on NULL. One place
+> relied on that behaviour (the monitor request id), and it's best to be
+> explicit that NULL is accepted there.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-
-> +++ b/monitor.c
-
-> @@ -4049,8 +4046,7 @@ static void monitor_qmp_respond(Monitor *mon, QOb=
-ject *rsp,
->      if (rsp) {
->          if (id) {
->              /* This is for the qdict below. */
-> -            qobject_ref(id);
-> -            qdict_put_obj(qobject_to(QDict, rsp), "id", id);
-> +            qdict_put_obj(qobject_to(QDict, rsp), "id", qobject_ref(id=
-));
-
-Is the comment still needed?  It made more sense when there were two
-statements, and now I think you can just delete it.
+>  include/qapi/qmp/qobject.h | 7 ++++---
+>  monitor.c                  | 2 +-
+>  2 files changed, 5 insertions(+), 4 deletions(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -83,7 +74,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf
+--4eMGR8aOOWLE2qaUZltdjz1wcDxVno0d3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -92,14 +83,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWQfQACgkQp6FrSiUn
-Q2pQaggArTpT6kz59+Mc2DrBGzScWnPBoKidIHoKehCnjD8KNIHjZuhzIt8XD4Wl
-ukNGfmLFGLfc15KNPzQOO/VIE9TNFhcWsDBhdDtOLxY4X36XR1k4uIpkcq1Vo0C+
-IERfv12TGlyq8pXqj31FHD+wzdfIKPs+lR9dV8tdDVD8jXk/yyJc7rLKZxn+gAek
-mrGPKb/uEGI57wHHkPoZXwn6elAPCR4foFZAX1+xtdY7dolTuYk92bwYs8+JlDPO
-KpncE2jmuhsjMnmDo752x+zopdnrOIe4BTxtFgJyylnArtD9hX9yzbFJgo6Vna9k
-GjncGxcAPNtSw3t1J9QlbMuhTaV41Q==
-=WvPV
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWQi8ACgkQp6FrSiUn
+Q2qZpggAmg8Pad66cMeIHimD8nvpFukXcrI9DHtxYG+/OpjnVmyfO4fD8aK7ZCUV
+kmkokcRKV4PTqDvku4V/+sqlRorsuIy7+jBmOLEYOBX+auq2+LSSjs9Y3b573ecq
+26rN1UMmXE+BA4tT0JSfD4eFjFFWGSCPxaoUlgylZ9uSW7ygZBgUM0PDV4MAk6s+
+CoclpYZOr4RYK+h4JOy9daVE2vP11Brnb1rJYVeaOPc2tbmru6+HKxvEZBYJqjPj
+Z+EDI5QikHKAXTdRSNajgvxDSVYNJjx97uM7x06caXwS/Ioq4eH3uVWTO8Puoq8j
+dayHrpHJQyikYCZjstVlp8y6cOEE+A==
+=Xf6P
 -----END PGP SIGNATURE-----
 
---Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf--
+--4eMGR8aOOWLE2qaUZltdjz1wcDxVno0d3--
