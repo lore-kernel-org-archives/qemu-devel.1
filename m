@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f8Krv-0003TG-94
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:17:38 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f8Kw2-0006zM-FN
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f8Krt-0008Vh-LH
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:17:35 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Apr 2018 17:17:20 +1000
-Message-Id: <20180417071722.9399-9-david@gibson.dropbear.id.au>
-In-Reply-To: <20180417071722.9399-1-david@gibson.dropbear.id.au>
-References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH for-2.13 08/10] spapr: Clean up handling of
- LPCR power-saving exit bits
+	(envelope-from <stefanha@redhat.com>) id 1f8Kvz-0002Ji-Ai
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:21:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50482 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f8Kvz-0002JW-53
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 03:21:47 -0400
+Date: Tue, 17 Apr 2018 15:21:34 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180417072134.GJ10770@stefanha-x1.localdomain>
+References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
+	<1523861081-3600-2-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wHh0aNzodMFDTGdO"
+Content-Disposition: inline
+In-Reply-To: <1523861081-3600-2-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.13 1/3] net: Remove the deprecated
+ "vlan" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,103 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 
-To prevent spurious wakeups on cpus that are supposed to be disabled, we
-need to clear the LPCR bits which control certain wakeup events.
-spapr_cpu_reset() has separate cases here for boot and non-boot (initially
-inactive) cpus.  rtas_start_cpu() then turns the LPCR bits on when the
-non-boot cpus are activated.
 
-But explicit checks against first_cpu are not how we usually do things:
-instead spapr_cpu_reset() generally sets things up for non-boot (inactive)
-cpus, then spapr_machine_reset() and/or rtas_start_cpu() override as
-necessary.
+--wHh0aNzodMFDTGdO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-So, do that instead.  Because the LPCR activation is identical for boot
-cpus and non-boot cpus just activated with rtas_start_cpu() we can put the
-code common in spapr_cpu_set_entry_state().
+On Mon, Apr 16, 2018 at 08:44:39AM +0200, Thomas Huth wrote:
+> @@ -499,10 +497,11 @@
+>  # @opts: device type specific properties (legacy)
+>  #
+>  # Since: 1.2
+> +#
+> +# 'vlan' - removed with 2.12
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_cpu_core.c | 22 +++++++---------------
- hw/ppc/spapr_rtas.c     |  4 ----
- 2 files changed, 7 insertions(+), 19 deletions(-)
+Not sure how to interpret this.  How about "removed in 2.13"?
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index ecd40dbf03..8be0265d04 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -52,28 +52,17 @@ static void spapr_cpu_reset(void *opaque)
-      * Clearing VPM0 will also cause us to use RMOR in mmu-hash64.c for
-      * real mode accesses, which thankfully defaults to 0 and isn't
-      * accessible in guest mode.
-+     *
-+     * Disable Power-saving mode Exit Cause exceptions for the CPU, so
-+     * we don't get spurious wakups before an RTAS start-cpu call.
-      */
--    lpcr &= ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV);
-+    lpcr &= ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_pm);
-     lpcr |= LPCR_LPES0 | LPCR_LPES1;
- 
-     /* Set RMLS to the max (ie, 16G) */
-     lpcr &= ~LPCR_RMLS;
-     lpcr |= 1ull << LPCR_RMLS_SHIFT;
- 
--    /* Only enable Power-saving mode Exit Cause exceptions on the boot
--     * CPU. The RTAS command start-cpu will enable them on secondaries.
--     */
--    if (cs == first_cpu) {
--        lpcr |= pcc->lpcr_pm;
--    }
--
--    /* Disable Power-saving mode Exit Cause exceptions for the CPU.
--     * This can cause issues when rebooting the guest if a secondary
--     * is awaken */
--    if (cs != first_cpu) {
--        lpcr &= ~pcc->lpcr_pm;
--    }
--
-     ppc_store_lpcr(cpu, lpcr);
- 
-     /* Set a full AMOR so guest can use the AMR as it sees fit */
-@@ -82,11 +71,14 @@ static void spapr_cpu_reset(void *opaque)
- 
- void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
- {
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-     CPUPPCState *env = &cpu->env;
- 
-     env->nip = SPAPR_ENTRY_POINT;
-     env->gpr[3] = r3;
-     CPU(cpu)->halted = 0;
-+    /* Enable Power-saving mode Exit Cause exceptions */
-+    ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
- }
- 
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index d79aa44467..e720d54eb5 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -162,7 +162,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-     if (cpu != NULL) {
-         CPUState *cs = CPU(cpu);
-         CPUPPCState *env = &cpu->env;
--        PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
- 
-         if (!cs->halted) {
-             rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-@@ -178,9 +177,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
- 
-         env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
- 
--        /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
--        env->spr[SPR_LPCR] |= pcc->lpcr_pm;
--
-         spapr_cpu_set_endianness(cpu);
-         spapr_cpu_update_tb_offset(cpu);
- 
--- 
-2.14.3
+> @@ -2028,10 +2028,9 @@ DEF("nic", HAS_ARG, QEMU_OPTION_nic,
+>      "                provided a 'user' network connection)\n",
+>      QEMU_ARCH_ALL)
+>  DEF("net", HAS_ARG, QEMU_OPTION_net,
+> -    "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
+> +    "-net nic[,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
+>      "                configure or create an on-board (or machine default) NIC and\n"
+> -    "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
+> -    "                NICs please use '-device devtype,netdev=nd' instead)\n"
+> +    "                connect it to hub 0 (please use -nic for direct connections)\n"
+
+What does "direct connections" means?
+
+--wHh0aNzodMFDTGdO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa1aB9AAoJEJykq7OBq3PI1AQH/A7C7vDNS0aoXJT9LUh/Nxwd
+GATRFq4YNrGmoE0zf44RfSxGgbhNg3vVjrBedjAWyXN4ZOt3VmGs7XOzZzFm4Y7Q
+AvnKoQ9OwuAmoQ4KyknlEAv8ghdvEwhYm/2CLLrXd79s4eTHvxD/mHL95Hr1JAEP
+OLDA78JxZ9niSO10iFPJUsYhATvtWkiS6+FrbeQdrPDk1/jT5IEF0iMXjCIHpyMT
+Sbgym1s9hrBtdSoLwRle9PHWGpND48aBlW449RNBUMf94e0wLYCEYOTCU89Tkmz6
+aWnN3zD561Z90Efe0zuZhJdsTrcT0AvoJQN+/DpRZ9cWsG87hbTl5s9Z/u9Y8PY=
+=agMH
+-----END PGP SIGNATURE-----
+
+--wHh0aNzodMFDTGdO--
