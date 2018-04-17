@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1f8McB-0000VH-Cz
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 05:09:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8NEj-00046h-Sf
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 05:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1f8Mc6-0002UH-J4
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 05:09:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32822)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1f8Mc6-0002NX-27
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 05:09:22 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3H99KQh123811
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 05:09:20 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hdbpupxpj-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 05:09:20 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Tue, 17 Apr 2018 10:09:17 +0100
-Date: Tue, 17 Apr 2018 14:39:09 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <20180416085512.4011-1-bharata@linux.vnet.ibm.com>
-	<20180417011427.GE20551@umbus.fritz.box>
+	(envelope-from <pbonzini@redhat.com>) id 1f8NEh-0003N9-5c
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 05:49:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40642 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8NEg-0003Ge-O9
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 05:49:14 -0400
+References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
+	<1523861081-3600-2-git-send-email-thuth@redhat.com>
+	<20180417072134.GJ10770@stefanha-x1.localdomain>
+	<275bfe53-7c94-0ad0-b388-d8a44a7fb76f@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bc89e971-06fd-6bf4-6a68-73a4ffa26b0d@redhat.com>
+Date: Tue, 17 Apr 2018 11:48:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180417011427.GE20551@umbus.fritz.box>
-Message-Id: <20180417090909.GB3942@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: Support ibm,
- dynamic-memory-v2 property
+In-Reply-To: <275bfe53-7c94-0ad0-b388-d8a44a7fb76f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GvNzy6Hiwmldo9EpX4w9j6qqbIwBTiKzX"
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.13 1/3] net: Remove the deprecated
+ "vlan" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,31 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com, imammedo@redhat.com
+To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-On Tue, Apr 17, 2018 at 11:14:27AM +1000, David Gibson wrote:
-> >  static void spapr_machine_2_12_class_options(MachineClass *mc)
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index d60b7c6d7a..5e044c44af 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -149,6 +149,7 @@ struct sPAPRMachineState {
-> >      sPAPROptionVector *ov5;         /* QEMU-supported option vectors */
-> >      sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
-> >      uint32_t max_compat_pvr;
-> > +    bool use_ibm_dynamic_memory_v2;
-> 
-> TBH, I'm not really sure we even need to adjust this by machine type.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GvNzy6Hiwmldo9EpX4w9j6qqbIwBTiKzX
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P._Berrang=c3=a9?=
+ <berrange@redhat.com>
+Message-ID: <bc89e971-06fd-6bf4-6a68-73a4ffa26b0d@redhat.com>
+Subject: Re: [PATCH v3 for-2.13 1/3] net: Remove the deprecated "vlan"
+ parameter
+References: <1523861081-3600-1-git-send-email-thuth@redhat.com>
+ <1523861081-3600-2-git-send-email-thuth@redhat.com>
+ <20180417072134.GJ10770@stefanha-x1.localdomain>
+ <275bfe53-7c94-0ad0-b388-d8a44a7fb76f@redhat.com>
+In-Reply-To: <275bfe53-7c94-0ad0-b388-d8a44a7fb76f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-There are other similar features controlled by ov5 bits that
-are also determined by machine type version:
+On 17/04/2018 10:08, Thomas Huth wrote:
+>>> -    "-net nic[,vlan=3Dn][,netdev=3Dnd][,macaddr=3Dmac][,model=3Dtype=
+][,name=3Dstr][,addr=3Dstr][,vectors=3Dv]\n"
+>>> +    "-net nic[,macaddr=3Dmac][,model=3Dtype][,name=3Dstr][,addr=3Dst=
+r][,vectors=3Dv]\n"
+>>>      "                configure or create an on-board (or machine def=
+ault) NIC and\n"
+>>> -    "                connect it either to VLAN 'n' or the netdev 'nd=
+' (for pluggable\n"
+>>> -    "                NICs please use '-device devtype,netdev=3Dnd' i=
+nstead)\n"
+>>> +    "                connect it to hub 0 (please use -nic for direct=
+ connections)\n"
+>> What does "direct connections" means?
+> I mean a 1:1 connection between the backend and frontend here, without =
+a
+> hub inbetween. Can you think of a better wording?
 
-Memory hotplug support -- sPAPRMachineClass.dr_lmb_enabled
-Dedicated HP event support -- sPAPRMachineState.use_hotplug_event_source
+"use -nic unless you need a hub"?
 
-Are you saying that presence of ibm,dynamic-memory-v2 probably shouldn't
-be dependent on machine type ?
+Paolo
 
-Regards,
-Bharata.
+
+--GvNzy6Hiwmldo9EpX4w9j6qqbIwBTiKzX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlrVwwQACgkQv/vSX3jH
+roPm9gf7BC6Je/m+vTlHFzCWVBungUokFfitY6wy2x8uAyLCdu5CZ5YI78CvCP8d
+XWETVqRU8OubE1vGvqxtXUEZ8bPlVqhMazc/CHPO1OIHkJc/S+fWNNcFM7q0nXzD
+1m6PNPOCmixSqH3aVnF9ziABjpvHG3UILQ6leRNhNMaUqBNZbf/yOiGHbSupmrqB
+0XaHfpDsoXPX1Pnro2FtkTOt7EVR2ZMBln1Xz4IlQlHjS4sXuHNNE7kkAPYAf4dY
+3qRGb9vJiFg5dSV+UvhlnlkhFUxxVHiA2LdUeo9HbLsUIqGZ1YZYPMIxD6R8FuKY
+09evq+a813zEV3L0bC9znIT1CMlzJg==
+=Qgfd
+-----END PGP SIGNATURE-----
+
+--GvNzy6Hiwmldo9EpX4w9j6qqbIwBTiKzX--
