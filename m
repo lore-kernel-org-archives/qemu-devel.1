@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f8PZ5-0002eO-Nf
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:18:33 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f8PZA-0002fG-J2
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:18:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f8PYz-0004y4-LR
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:18:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59348 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f8PYz-0004wl-Fh
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:18:21 -0400
-Date: Tue, 17 Apr 2018 14:18:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180417141803.2d588b97@redhat.com>
-In-Reply-To: <13008b1f-4b59-c6e1-69d2-98f8280f6f34@redhat.com>
-References: <20180329032149.44685-1-aik@ozlabs.ru>
-	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
-	<20180416152040.7b88b902@redhat.com>
-	<e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
-	<20180416162706.43212a69@redhat.com>
-	<13008b1f-4b59-c6e1-69d2-98f8280f6f34@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f8PZ4-0005BW-35
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:18:32 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36612)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1f8PZ3-00057k-OS
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:18:25 -0400
+Received: by mail-wr0-x244.google.com with SMTP id q13so31490256wre.3
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 05:18:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <878t9nsf4g.fsf@dusky.pond.sub.org>
+References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
+	<20180413161842.5117-4-marcandre.lureau@redhat.com>
+	<878t9nsf4g.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 17 Apr 2018 14:18:24 +0200
+Message-ID: <CAJ+F1CJqJMEmeqKZ7e7izbzfSe1ctW8S-Cw=nsmrAchOubfNvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] qobject: replace
+ qobject_incref/QINCREF qobject_decref/QDECREF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +32,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, peter.maydell@linaro.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On Mon, 16 Apr 2018 17:29:23 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi
 
-> On 16/04/2018 16:27, Igor Mammedov wrote:
-> > On Mon, 16 Apr 2018 15:30:39 +0200
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >  =20
-> >> On 16/04/2018 15:20, Igor Mammedov wrote: =20
-> >>> Generally object doesn't need to know its own name,
-> >>> we use it only for debugging and nice error reporting so far.
-> >>> I'd rather have 'id' property at Object level so we won't have
-> >>> to fish out ID from parent /which we aren't supposed to do and
-> >>> which doesn't work in some cases/ when it's needed within
-> >>> object itself.   =20
-> >>
-> >> Having an 'id' at object level is also a mess, because that id is
-> >> invalid after unparent. =20
-> > I'd just consider 'id' as object name which is valid even if there
-> > is no parent (during whole object lifecycle). =20
->=20
-> What's the point of an object name if it cannot be unique?
-It should be sufficient for it to be unique within parent's
-scope and object_property_add_child() should make sure that
-added object is unique within its parent's namespace.
-Having named object from starters is useful as object
-won't have to piggyback on parent (object_get_canonical_path_component)
-when it need its own name. Then named object could use its name
-freely anywhere including initfn, property setters/getters and
-let object_property_add_child() take care of possible name
-conflict.
-=46rom debugging/error reporting pov 'id' might be ambiguous
-sometimes but it's way better than unanimous "NULL" string
-or crash due to no set parent.
+On Mon, Apr 16, 2018 at 10:57 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Now that we can safely call QOBJECT() on QObject * and children types,
+>> we can have a single macro to ref/unref the object.
+>>
+>> Change the incref/decref prefix name for the more common ref/unref.
+>>
+>> Note that before the patch, "QDECREF(obj)" was problematic because it
+>> would expand to "obj ? obj : ...", which could evaluate "obj" multiple
+>> times.
+>
+> Problematic just in theory, or have you seen problematic uses?
 
-It sort of relates to discussion Peter started with
+I found it by writing some small new test code, that I don't think are
+worth adding.
 
-https://patchwork.kernel.org/patch/10224775/
-"
-Code that used to look like this:
-    object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
-    object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
-    qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
-can now look like this:
-    sysbus_init_child(obj, "ic", &s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
-"=20
+> Perhaps what you want to say is that spelling your new macros lower case
+> is okay, because they evaluate their argument just like a function.
+>
+> Suggest
+>
+>   Now that we can safely call QOBJECT() on QObject * as well as its
+>   subtypes, we can have macros qobject_ref() / qobject_unref() that work
+>   everywhere instead of having to use QINCREF() / QDECREF() for QObject
+>   and qobject_incref() / qobject_decref() for its subtypes.
+>
+>   Note that the new macros evalcuate their argument exactly once, thus
+>   no need to shout them.
 
-Considering that in most cases where named objects are used
-we parent them. We might be better of with API like
+ok
 
-named_object_new(TYPE, NAME, PARENT, ERROR)
-named_object_initialize(PTR, SIZE, TYPE, NAME, PARENT, ERROR)
+>
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  scripts/qapi/events.py              |   2 +-
+>>  include/qapi/qmp/qnull.h            |   2 +-
+>>  include/qapi/qmp/qobject.h          |  36 +++++-----
+>>  block.c                             |  78 +++++++++++-----------
+>>  block/blkdebug.c                    |   4 +-
+>>  block/blkverify.c                   |   4 +-
+>>  block/crypto.c                      |   4 +-
+>>  block/gluster.c                     |   4 +-
+>>  block/iscsi.c                       |   2 +-
+>>  block/nbd.c                         |   4 +-
+>>  block/nfs.c                         |   4 +-
+>>  block/null.c                        |   2 +-
+>>  block/nvme.c                        |   2 +-
+>>  block/parallels.c                   |   4 +-
+>>  block/qapi.c                        |   2 +-
+>>  block/qcow.c                        |   8 +--
+>>  block/qcow2.c                       |   8 +--
+>>  block/qed.c                         |   4 +-
+>>  block/quorum.c                      |   2 +-
+>>  block/rbd.c                         |  14 ++--
+>>  block/sheepdog.c                    |  12 ++--
+>>  block/snapshot.c                    |   4 +-
+>>  block/ssh.c                         |   4 +-
+>>  block/vdi.c                         |   2 +-
+>>  block/vhdx.c                        |   4 +-
+>>  block/vpc.c                         |   4 +-
+>>  block/vvfat.c                       |   2 +-
+>>  block/vxhs.c                        |   2 +-
+>>  blockdev.c                          |  16 ++---
+>>  hw/i386/acpi-build.c                |  12 ++--
+>>  hw/ppc/spapr_drc.c                  |   2 +-
+>>  hw/usb/xen-usb.c                    |   4 +-
+>>  migration/migration.c               |   4 +-
+>>  migration/qjson.c                   |   2 +-
+>>  monitor.c                           |  50 +++++++-------
+>>  qapi/qapi-dealloc-visitor.c         |   4 +-
+>>  qapi/qmp-dispatch.c                 |   6 +-
+>>  qapi/qobject-input-visitor.c        |   8 +--
+>>  qapi/qobject-output-visitor.c       |   8 +--
+>>  qemu-img.c                          |  18 ++---
+>>  qemu-io.c                           |   6 +-
+>>  qga/main.c                          |  12 ++--
+>>  qmp.c                               |   4 +-
+>>  qobject/json-parser.c               |  10 +--
+>>  qobject/qdict.c                     |  38 +++++------
+>>  qobject/qjson.c                     |   2 +-
+>>  qobject/qlist.c                     |   4 +-
+>>  qom/object.c                        |  16 ++---
+>>  qom/object_interfaces.c             |   2 +-
+>>  target/ppc/translate_init.c         |   2 +-
+>>  target/s390x/cpu_models.c           |   2 +-
+>>  tests/ahci-test.c                   |   6 +-
+>>  tests/check-qdict.c                 | 100 ++++++++++++++--------------
+>>  tests/check-qjson.c                 |  84 +++++++++++------------
+>>  tests/check-qlist.c                 |   8 +--
+>>  tests/check-qlit.c                  |  10 +--
+>>  tests/check-qnull.c                 |  10 +--
+>>  tests/check-qnum.c                  |  28 ++++----
+>>  tests/check-qobject.c               |   2 +-
+>>  tests/check-qstring.c               |  10 +--
+>>  tests/cpu-plug-test.c               |   4 +-
+>>  tests/device-introspect-test.c      |  24 +++----
+>>  tests/drive_del-test.c              |   4 +-
+>>  tests/libqos/libqos.c               |   8 +--
+>>  tests/libqos/pci-pc.c               |   2 +-
+>>  tests/libqtest.c                    |  24 +++----
+>>  tests/machine-none-test.c           |   2 +-
+>>  tests/migration-test.c              |  24 +++----
+>>  tests/numa-test.c                   |  16 ++---
+>>  tests/pvpanic-test.c                |   2 +-
+>>  tests/q35-test.c                    |   2 +-
+>>  tests/qmp-test.c                    |  38 +++++------
+>>  tests/qom-test.c                    |   8 +--
+>>  tests/tco-test.c                    |  12 ++--
+>>  tests/test-char.c                   |   2 +-
+>>  tests/test-keyval.c                 |  82 +++++++++++------------
+>>  tests/test-netfilter.c              |  26 ++++----
+>>  tests/test-qemu-opts.c              |  14 ++--
+>>  tests/test-qga.c                    |  76 ++++++++++-----------
+>>  tests/test-qmp-cmds.c               |  24 +++----
+>>  tests/test-qmp-event.c              |   2 +-
+>>  tests/test-qobject-input-visitor.c  |  10 +--
+>>  tests/test-qobject-output-visitor.c |  18 ++---
+>>  tests/test-visitor-serialization.c  |   6 +-
+>>  tests/test-x86-cpuid-compat.c       |  14 ++--
+>>  tests/tmp105-test.c                 |   4 +-
+>>  tests/vhost-user-test.c             |   6 +-
+>>  tests/virtio-net-test.c             |   6 +-
+>>  tests/vmgenid-test.c                |   2 +-
+>>  tests/wdt_ib700-test.c              |  14 ++--
+>>  util/keyval.c                       |  12 ++--
+>>  util/qemu-config.c                  |   4 +-
+>>  docs/devel/qapi-code-gen.txt        |   2 +-
+>>  scripts/coccinelle/qobject.cocci    |   8 +--
+>>  94 files changed, 606 insertions(+), 610 deletions(-)
+>
+> It's a lot of churn.  I'm willing to accept the one-time pain because
+> the result is easier on the eyes.
+>
+>> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+>> index 3dc523cf39..4426861ff1 100644
+>> --- a/scripts/qapi/events.py
+>> +++ b/scripts/qapi/events.py
+>> @@ -142,7 +142,7 @@ out:
+>>  ''')
+>>      ret +=3D mcgen('''
+>>      error_propagate(errp, err);
+>> -    QDECREF(qmp);
+>> +    qobject_unref(qmp);
+>>  }
+>>  ''')
+>>      return ret
+>> diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+>> index e8ea2c315a..75b29c6a39 100644
+>> --- a/include/qapi/qmp/qnull.h
+>> +++ b/include/qapi/qmp/qnull.h
+>> @@ -23,7 +23,7 @@ extern QNull qnull_;
+>>
+>>  static inline QNull *qnull(void)
+>>  {
+>> -    QINCREF(&qnull_);
+>> +    qobject_ref(&qnull_);
+>>      return &qnull_;
+>>  }
+>>
+>> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+>> index 7e6fed242e..fce4a1cd75 100644
+>> --- a/include/qapi/qmp/qobject.h
+>> +++ b/include/qapi/qmp/qobject.h
+>> @@ -16,16 +16,16 @@
+>>   *
+>>   *  - Returning references: A function that returns an object may
+>>   *  return it as either a weak or a strong reference.  If the reference
+>> - *  is strong, you are responsible for calling QDECREF() on the referen=
+ce
+>> + *  is strong, you are responsible for calling qobject_unref() on the r=
+eference
+>
+> Long line.
+>
+>>   *  when you are done.
+>>   *
+>>   *  If the reference is weak, the owner of the reference may free it at
+>>   *  any time in the future.  Before storing the reference anywhere, you
+>> - *  should call QINCREF() to make the reference strong.
+>> + *  should call qobject_ref() to make the reference strong.
+>>   *
+>>   *  - Transferring ownership: when you transfer ownership of a referenc=
+e
+>>   *  by calling a function, you are no longer responsible for calling
+>> - *  QDECREF() when the reference is no longer needed.  In other words,
+>> + *  qobject_unref() when the reference is no longer needed.  In other w=
+ords,
+>>   *  when the function returns you must behave as if the reference to th=
+e
+>>   *  passed object was weak.
+>>   */
+> [...]
+>
 
 
-> Paolo
->=20
-> > That would allow for object to have a reachable name vs getting NULL
-> > when parent isn't set.
-> > Maybe Object::id is overkill, but we probably could use NamedObject
-> > where it's needed and avoid reverse engineering id from path.
-> >   =20
-> >> Since this is just for debugging use,
-> >> object_get_canonical_path_component is the right function.  We can just
-> >> make it return NULL if there is no parent. =20
-> >
-> > looking at current use it out-grew just debugging usecases
-> > and it's rather messy right now:
-> >=20
-> > ram_backend_memory_alloc, throttle_group_obj_complete,
-> > xlnx_zynqmp_create_rpu, spapr_drc.c:realize, iothread_complete,
-> > memory_region_name =20
->=20
-> I agree, _but_ it's definitely okay for debugging usecases.
-yep, since there isn't other way to do it now,
-it's fine to use object_get_canonical_path_component()
 
-
->=20
-> Paolo
+--=20
+Marc-Andr=C3=A9 Lureau
