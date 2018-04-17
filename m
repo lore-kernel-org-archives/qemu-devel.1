@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8TqL-0003k6-Me
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:52:34 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1f8TrM-0004LV-Ou
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8TqI-0005rI-Cz
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:52:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38176 helo=mx1.redhat.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1f8TrJ-0006WK-JZ
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:53:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f8TqI-0005qH-7i
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:52:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 61E5B8DC46
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 16:52:26 +0000 (UTC)
-References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
-	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
-	<7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
-	<87efjeaqd2.fsf@dusky.pond.sub.org> <20180417140540.GD15421@redhat.com>
-	<21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com>
-	<87po2x6gz1.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8c20b01d-d756-d251-268c-f8df14a9b8c4@redhat.com>
-Date: Tue, 17 Apr 2018 18:52:20 +0200
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1f8TrJ-0006VV-BG
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:53:33 -0400
+Date: Tue, 17 Apr 2018 10:53:31 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180417105331.30429dca@w520.home>
+In-Reply-To: <8082FF9BCB2B054996454E47167FF4EC1C7FE5CA@SHSMSX104.ccr.corp.intel.com>
+References: <1523424250-3835-1-git-send-email-xiong.y.zhang@intel.com>
+	<20180416161559.530ee800@w520.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C7FE5CA@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87po2x6gz1.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
- chapter to make "-net" less prominent
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks.c: Make stolen memory size
+ adjustable for igd VFIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,37 +30,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 
-On 17.04.2018 16:32, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
->> On 17/04/2018 16:05, Daniel P. Berrang=C3=A9 wrote:
->>>> For what it's worth, my "[RFC PATCH 00/32] Command line QAPIfication=
-"
->>>> replaces the original parsing art by getopt_long_only().
->>>>
->>>> Completing that work will take some time, but once it's done, we can
->>>> (and I think we should) prefer double-dash for consistency.
->>> Since our existing parser accepts single & double-dash already, is it
->>> worth explicitly deprecating single-dash usage right now. So that whe=
-n
->>> your code comes along ready to merge, we're already able to say
->>> "i told you so" and drop single-dash support at that same time.
->>
->> Serious questions: is _anyone_ of you actually using double-dash suppo=
-rt
->> in daily invocations of QEMU?
->=20
-> I use both.  I readily concede that people familiar with QEMU probably
-> use single dash a lot more than double dash.  I don't think we should
-> get rid of single dash, unless we decide to bite the bullet and clean u=
-p
-> our command line without regard for backward compatibility, as Thomas
-> proposed elsewhere in this thread, and others proposed before, multiple
-> times.
+On Tue, 17 Apr 2018 02:37:21 +0000
+"Zhang, Xiong Y" <xiong.y.zhang@intel.com> wrote:
 
-/me sings the QEMU version 3.0 blues ...
+> > On Wed, 11 Apr 2018 13:24:10 +0800
+> > Xiong Zhang <xiong.y.zhang@intel.com> wrote:
+> >   
+> > > Currenly linux guest with kernel above 3.19 couldn't boot up on igd
+> > > passthrough env. The root case is i915 driver use stolen memory, but
+> > > qemu vfio doesn't support it.
+> > >
+> > > This patch set stolen memory size to zero default, so guest i915 won't
+> > > use it. But this breaks old windows igd driver which will be unloaded
+> > > once it see zero stolen memory size. Then this patch also use
+> > > x-igd-gms option to adjust stolen memory size. New windows igd driver
+> > > fixes this and could work with zero stolen memory size.
+> > >
+> > > Finally with this patch, Linux guest and windows guest with igd driver
+> > > above 15.45.4860 could work successfully, windows guest with igd
+> > > driver below 15.45.4860 should add x-igd-gms=* option.  
+> > 
+> > Sorry, I can't understand the above commit log in comparison to what this
+> > patch is actually doing.
+> >   
+> > > Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+> > > ---
+> > >  hw/vfio/pci-quirks.c | 95
+> > > ++++++++++++++++++++++++++++------------------------
+> > >  1 file changed, 52 insertions(+), 43 deletions(-)
+> > >
+> > > diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c index
+> > > 60ad5fb..6e9ed7f 100644
+> > > --- a/hw/vfio/pci-quirks.c
+> > > +++ b/hw/vfio/pci-quirks.c
+> > > @@ -1372,14 +1372,60 @@ static void  
+> > vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)  
+> > >      uint16_t cmd_orig, cmd;
+> > >      Error *err = NULL;
+> > >
+> > > +    /* This must be an Intel VGA device. */
+> > > +    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+> > > +        !vfio_is_vga(vdev) || nr != 4) {
+> > > +        return;
+> > > +    }
+> > > +
+> > >      /*
+> > > -     * This must be an Intel VGA device at address 00:02.0 for us to even
+> > > -     * consider enabling legacy mode.  The vBIOS has dependencies on  
+> > the  
+> > > -     * PCI bus address.
+> > > +     * IGD is not a standard, they like to change their specs often.  We
+> > > +     * only attempt to support back to SandBridge and we hope that  
+> > newer  
+> > > +     * devices maintain compatibility with generation 8.
+> > >       */
+> > > -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+> > > -        !vfio_is_vga(vdev) || nr != 4 ||
+> > > -        &vdev->pdev !=  
+> > pci_find_device(pci_device_root_bus(&vdev->pdev),  
+> > > +    gen = igd_gen(vdev);
+> > > +    if (gen != 6 && gen != 8) {
+> > > +        error_report("IGD device %s is unsupported by IGD quirks, "
+> > > +                     "try SandyBridge or newer",  
+> > vdev->vbasedev.name);  
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    /*
+> > > +     * Regardless of running in UPT or legacy mode, the guest graphics
+> > > +     * driver may attempt to use stolen memory, however only legacy  
+> > mode  
+> > > +     * has BIOS support for reserving stolen memory in the guest VM.
+> > > +     * Emulate the GMCH register in all cases and zero out the stolen
+> > > +     * memory size here.
+> > > +     */
+> > > +    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
+> > > +    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));  
+> > 
+> > Aha!  You want to enable stolen memory in either UPT or legacy mode.  I
+> > could not possibly have determined that from the commit log.  Please
+> > rewrite the commit log to describe what is actually changing here.  
+> [Zhang, Xiong Y] Here, I want to disable stolen memory in UPT and legacy mode.
+> Sure, I will rewrite the commit log.
+> >   
+> > > +
+> > > +    /*
+> > > +     * Assume we have no GMS memory, but allow it to be overrided by  
+> > device  
+> > > +     * option (experimental). Old windows igd driver must see non-zero  
+> > stolen  
+> > > +     * memory size, otherwise it will be unloaded. New igd windows  
+> > driver fix  
+> > > +     * this issue and could load with zero stolen memory size.
+> > > +     */
+> > > +    if (vdev->igd_gms) {
+> > > +        if (vdev->igd_gms <= 0x10) {
+> > > +            gms_mb = vdev->igd_gms * 32;
+> > > +            gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
+> > > +        } else {
+> > > +            error_report("Unsupported IGD GMS value 0x%x",  
+> > vdev->igd_gms);  
+> > > +            vdev->igd_gms = 0;
+> > > +        }
+> > > +    }  
+> > 
+> > You state in the previous code block that only legacy mode has BIOS support
+> > for reserving stolen memory, so why should UPT mode be allowed to specify
+> > stolen memory?  Where is it allocated?  
+> [Zhang, Xiong Y] As the previous code disable stolen memory and set the size of stolen memory to zero,
 
-;-)
+Only in Legacy Mode, GMCH is not virtualized in UPT Mode.
+
+> this cause old windows igd driver couldn't be loaded as the old
+> windows igd driver will be unloaded once it see zero size stolen
+> memory but the old windows igd driver doesn't use stolen memory, so
+> for old windows igd driver, we just need to set a none zero size
+> stolen memory and don't need to allocate an emulated stolen memory .
+
+And this is likely why UPT Mode doesn't virtualize GMCH, we cannot
+allocate BDSM for UPT Mode, so our only option would have been to set
+GMCH to zero, but this would break Windows, so we did nothing.
+
+> This is old windows igd driver issue and has been fixed in new windows
+> igd driver.
+
+So now Windows can operate with GMCH set to zero, but if we set it to
+zero we still break anyone using the old driver.  I also note that the
+new driver isn't available for all generations of IGD we claim to
+support in UPT Mode (Broadwell+), so there is no "update the guest
+drivers" fix, the user is required to modify their VM configuration to
+set a stolen memory value.  So now you're asking that we set UPT Mode
+stolen memory to zero, which will break some users.  To allow those
+users to return to their previously working setup, we need to provide
+an option to set a stolen memory size, but setting the size is a lie
+because we have no mechanism to allocate a range for it in the VM or
+set the BDSM register for it.
+
+> So the above code is just for old windows igd driver. if user use an old windows igd driver, he could use x-igd-gms option to workaround old windows igd driver issue. Without this code, old windows igd driver couldn't work anymore in upt mode. And I'm afraid, a lot of user are using  old windows igd driver.
+
+What's our need to do anything here, what's the behavior of the new
+Windows driver with the existing UPT Mode behavior?  If this is only an
+attempt to virtualize GMCH so that it's a little more coherent in the
+guest at the expense of breaking older drivers, that's not a good
+trade-off.  On the other hand, if new Windows drivers are broken
+because GMCH is non-zero yet BDSM is not virtualized, maybe we could
+virtualize BDSM to report a reserved base address so that Windows
+recognizes stolen memory is unavailable.  As I understood it, we were
+supposed to be able to ignore stolen memory in UPT Mode because it was
+a legacy feature, why isn't the hardware and software moving away from
+it?  Thanks,
+
+Alex
