@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8Qqf-0000sb-0W
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1f8QuI-0003ot-PP
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8Qqc-0004dB-9I
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:41 -0400
-Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:43248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8Qqc-0004d3-4B
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:38 -0400
-Received: by mail-vk0-x233.google.com with SMTP id v134so11770211vkd.10
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:40:37 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAFEAcA-FaS+HeihGmbhrLAR8e=jmz-Og+OKGakGX7MGb_KgwCw@mail.gmail.com>
-	<d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <942ca9c4-9f23-424b-fcd5-b6758f4ad675@amsat.org>
-Date: Tue, 17 Apr 2018 10:40:33 -0300
+	(envelope-from <armbru@redhat.com>) id 1f8QuH-0006hD-Qg
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:44:26 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180310082746.24198-1-jsnow@redhat.com>
+Date: Tue, 17 Apr 2018 15:44:07 +0200
+In-Reply-To: <20180310082746.24198-1-jsnow@redhat.com> (John Snow's message of
+	"Sat, 10 Mar 2018 03:27:25 -0500")
+Message-ID: <87zi22c5i0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Last call for release-critical fixes for 2.12
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 00/21] blockjobs: add explicit job
+ management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,19 +23,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-Hi Stefan,
+John Snow <jsnow@redhat.com> writes:
 
-On 04/17/2018 10:19 AM, Stefan Weil wrote:
-> Update po files? That's not a "must fix", but it would be nice to have
-> those files synchronized with ui/gtk.c again.
+> This series seeks to address two distinct but closely related issues
+> concerning the job management API.
+>
+> (1) For jobs that complete when a monitor is not attached and receiving
+>     events or notifications, there's no way to discern the job's final
+>     return code. Jobs must remain in the query list until dismissed
+>     for reliable management.
+>
+> (2) Jobs that change the block graph structure at an indeterminate point
+>     after the job starts compete with the management layer that relies
+>     on that graph structure to issue meaningful commands.
+>
+>     This structure should change only at the behest of the management
+>     API, and not asynchronously at unknown points in time. Before a job
+>     issues such changes, it must rely on explicit and synchronous
+>     confirmation from the management API.
+>
+> These changes are implemented by formalizing a State Transition Machine
+> for the BlockJob subsystem.
+>
+> Job States:
+>
+> UNDEFINED       Default state. Internal state only.
+> CREATED         Job has been created
+> RUNNING         Job has been started and is running
+> PAUSED          Job is not ready and has been paused
+> READY           Job is ready and is running
+> STANDBY         Job is ready and is paused
+>
+> WAITING         Job is waiting on peers in transaction
+> PENDING         Job is waiting on ACK from QMP
+> ABORTING        Job is aborting or has been cancelled
+> CONCLUDED       Job has finished and has a retcode available
+> NULL            Job is being dismantled. Internal state only.
+>
+> Job Verbs:
+>
+> CANCEL          Instructs a running job to terminate with error,
+>                 (Except when that job is READY, which produces no error.)
+> PAUSE           Request a job to pause.
+> RESUME          Request a job to resume from a pause.
+> SET-SPEED       Change the speed limiting parameter of a job.
+> COMPLETE        Ask a READY job to finish and exit.
+>
+> FINALIZE        Ask a PENDING job to perform its graph finalization.
+> DISMISS         Finish cleaning up an empty job.
 
-Isn't it now fixed by
-https://github.com/qemu/qemu/commit/2a6b5372d7bad038fe27f9c60e85ef5c8a15e311
-?
+For each job verb and job state: what's the new job state?
 
-Regards,
+> And here's my stab at a diagram:
+>
+>                  +---------+
+>                  |UNDEFINED|
+>                  +--+------+
+>                     |
+>                  +--v----+
+>        +---------+CREATED+-----------------+
+>        |         +--+----+                 |
+>        |            |                      |
+>        |         +--+----+     +------+    |
+>        +---------+RUNNING<----->PAUSED|    |
+>        |         +--+-+--+     +------+    |
+>        |            | |                    |
+>        |            | +------------------+ |
+>        |            |                    | |
+>        |         +--v--+       +-------+ | |
+>        +---------+READY<------->STANDBY| | |
+>        |         +--+--+       +-------+ | |
+>        |            |                    | |
+>        |         +--v----+               | |
+>        +---------+WAITING+---------------+ |
+>        |         +--+----+                 |
+>        |            |                      |
+>        |         +--v----+                 |
+>        +---------+PENDING|                 |
+>        |         +--+----+                 |
+>        |            |                      |
+>     +--v-----+   +--v------+               |
+>     |ABORTING+--->CONCLUDED|               |
+>     +--------+   +--+------+               |
+>                     |                      |
+>                  +--v-+                    |
+>                  |NULL+--------------------+
+>                  +----+
 
-Phil.
+Is this diagram missing a few arrowheads?  E.g. on the edge between
+RUNNING and WAITING.
+
+Might push the limits of ASCII art, but here goes anyway: can we label
+the arrows with job verbs?
+
+Can you briefly explain how this state machine addresses (1) and (2)?
