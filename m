@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8ZHh-0001HZ-Lu
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:41:13 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1f8ZJl-0002Ba-Cj
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8ZHd-0001O6-RF
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:41:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54456 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f8ZHd-0001Kr-JO
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:41:05 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Wed, 18 Apr 2018 00:40:54 +0200
-Message-Id: <20180417224054.26363-1-lersek@redhat.com>
-Subject: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+	(envelope-from <frasse.iglesias@gmail.com>) id 1f8ZJk-0004ck-3s
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:43:17 -0400
+Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:36373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1f8ZJj-0004bT-Q6
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:43:16 -0400
+Received: by mail-pl0-x229.google.com with SMTP id m7-v6so1240244plt.3
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 15:43:15 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1523974696-1965-2-git-send-email-saipava@xilinx.com>
+References: <1523974696-1965-1-git-send-email-saipava@xilinx.com>
+	<1523974696-1965-2-git-send-email-saipava@xilinx.com>
+From: francisco iglesias <frasse.iglesias@gmail.com>
+Date: Wed, 18 Apr 2018 00:43:13 +0200
+Message-ID: <CAAYMZQu5JOTOp3K4awXPvzbaE7oqvK0XqqoNzKjB5ShR=BJnzQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] xilinx_spips: send dummy only if
+ cmd requires it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,754 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, libvir-list@redhat.com
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Cc: alistair@alistair23.me, crosthwaite.peter@gmail.com, Peter Maydell <peter.maydell@linaro.org>, Edde <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Add a schema that describes the different uses and properties of virtual
-machine firmware.
+Hi Sai,
 
-Each firmware executable installed on a host system should come with at
-least one JSON file that conforms to this schema. Each file informs the
-management applications about the firmware's properties and one possible
-use case / feature set.
+[PATCH v1] xilinx_spips: send dummy only if cmd requires it
 
-In addition, a configuration directory with symlinks to the JSON files
-should exist, with the symlinks carefully named to reflect a priority
-order. Management applications can then search this directory in priority
-order for the first firmware description that satisfies their search
-criteria. The found JSON file provides the management layer with domain
-configuration bits that are required to run the firmware binary for a
-certain use case or feature set.
+s/dummy/dummy cycles/
 
-Cc: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: David Gibson <dgibson@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Gary Ching-Pang Lin <glin@suse.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Michal Privoznik <mprivozn@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
----
+On 17 April 2018 at 16:18, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+wrote:
 
-Notes:
-    RFCv2:
-    - previous version (RFCv1) was posted at
-      <http://mid.mail-archive.com/20180407000117.25640-1-lersek@redhat.com>
-    
-    - v2 is basically a rewrite from scratch, starting out with Dan's
-      definitions from
-      <http://mid.mail-archive.com/20180410102033.GL5155@redhat.com> and
-      <http://mid.mail-archive.com/20180410110357.GP5155@redhat.com>,
-      hopefully addressing others' feedback as well
-    
-    RFCv1:
-    - Folks on the CC list, please try to see if the suggested schema is
-      flexible enough to describe the virtual firmware(s) that you are
-      familiar with. Thanks!
+> For all the commands, which do not have an entry in
+> xilinx_spips_num_dummies, present logic sends dummy byte when ever we
+>
 
- Makefile              |   9 +
- Makefile.objs         |   4 +
- qapi/firmware.json    | 503 ++++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/qapi-schema.json |   1 +
- qmp.c                 |   5 +
- .gitignore            |   4 +
- 6 files changed, 526 insertions(+)
- create mode 100644 qapi/firmware.json
+s/dummy byte/dummy cycles/
 
-diff --git a/Makefile b/Makefile
-index d71dd5bea416..32034abe1583 100644
---- a/Makefile
-+++ b/Makefile
-@@ -97,6 +97,7 @@ GENERATED_FILES += qapi/qapi-types-block.h qapi/qapi-types-block.c
- GENERATED_FILES += qapi/qapi-types-char.h qapi/qapi-types-char.c
- GENERATED_FILES += qapi/qapi-types-common.h qapi/qapi-types-common.c
- GENERATED_FILES += qapi/qapi-types-crypto.h qapi/qapi-types-crypto.c
-+GENERATED_FILES += qapi/qapi-types-firmware.h qapi/qapi-types-firmware.c
- GENERATED_FILES += qapi/qapi-types-introspect.h qapi/qapi-types-introspect.c
- GENERATED_FILES += qapi/qapi-types-migration.h qapi/qapi-types-migration.c
- GENERATED_FILES += qapi/qapi-types-misc.h qapi/qapi-types-misc.c
-@@ -115,6 +116,7 @@ GENERATED_FILES += qapi/qapi-visit-block.h qapi/qapi-visit-block.c
- GENERATED_FILES += qapi/qapi-visit-char.h qapi/qapi-visit-char.c
- GENERATED_FILES += qapi/qapi-visit-common.h qapi/qapi-visit-common.c
- GENERATED_FILES += qapi/qapi-visit-crypto.h qapi/qapi-visit-crypto.c
-+GENERATED_FILES += qapi/qapi-visit-firmware.h qapi/qapi-visit-firmware.c
- GENERATED_FILES += qapi/qapi-visit-introspect.h qapi/qapi-visit-introspect.c
- GENERATED_FILES += qapi/qapi-visit-migration.h qapi/qapi-visit-migration.c
- GENERATED_FILES += qapi/qapi-visit-misc.h qapi/qapi-visit-misc.c
-@@ -132,6 +134,7 @@ GENERATED_FILES += qapi/qapi-commands-block.h qapi/qapi-commands-block.c
- GENERATED_FILES += qapi/qapi-commands-char.h qapi/qapi-commands-char.c
- GENERATED_FILES += qapi/qapi-commands-common.h qapi/qapi-commands-common.c
- GENERATED_FILES += qapi/qapi-commands-crypto.h qapi/qapi-commands-crypto.c
-+GENERATED_FILES += qapi/qapi-commands-firmware.h qapi/qapi-commands-firmware.c
- GENERATED_FILES += qapi/qapi-commands-introspect.h qapi/qapi-commands-introspect.c
- GENERATED_FILES += qapi/qapi-commands-migration.h qapi/qapi-commands-migration.c
- GENERATED_FILES += qapi/qapi-commands-misc.h qapi/qapi-commands-misc.c
-@@ -149,6 +152,7 @@ GENERATED_FILES += qapi/qapi-events-block.h qapi/qapi-events-block.c
- GENERATED_FILES += qapi/qapi-events-char.h qapi/qapi-events-char.c
- GENERATED_FILES += qapi/qapi-events-common.h qapi/qapi-events-common.c
- GENERATED_FILES += qapi/qapi-events-crypto.h qapi/qapi-events-crypto.c
-+GENERATED_FILES += qapi/qapi-events-firmware.h qapi/qapi-events-firmware.c
- GENERATED_FILES += qapi/qapi-events-introspect.h qapi/qapi-events-introspect.c
- GENERATED_FILES += qapi/qapi-events-migration.h qapi/qapi-events-migration.c
- GENERATED_FILES += qapi/qapi-events-misc.h qapi/qapi-events-misc.c
-@@ -581,6 +585,7 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.json \
-                $(SRC_PATH)/qapi/char.json \
-                $(SRC_PATH)/qapi/crypto.json \
-+               $(SRC_PATH)/qapi/firmware.json \
-                $(SRC_PATH)/qapi/introspect.json \
-                $(SRC_PATH)/qapi/migration.json \
-                $(SRC_PATH)/qapi/misc.json \
-@@ -600,6 +605,7 @@ qapi/qapi-types-block.c qapi/qapi-types-block.h \
- qapi/qapi-types-char.c qapi/qapi-types-char.h \
- qapi/qapi-types-common.c qapi/qapi-types-common.h \
- qapi/qapi-types-crypto.c qapi/qapi-types-crypto.h \
-+qapi/qapi-types-firmware.c qapi/qapi-types-firmware.h \
- qapi/qapi-types-introspect.c qapi/qapi-types-introspect.h \
- qapi/qapi-types-migration.c qapi/qapi-types-migration.h \
- qapi/qapi-types-misc.c qapi/qapi-types-misc.h \
-@@ -618,6 +624,7 @@ qapi/qapi-visit-block.c qapi/qapi-visit-block.h \
- qapi/qapi-visit-char.c qapi/qapi-visit-char.h \
- qapi/qapi-visit-common.c qapi/qapi-visit-common.h \
- qapi/qapi-visit-crypto.c qapi/qapi-visit-crypto.h \
-+qapi/qapi-visit-firmware.c qapi/qapi-visit-firmware.h \
- qapi/qapi-visit-introspect.c qapi/qapi-visit-introspect.h \
- qapi/qapi-visit-migration.c qapi/qapi-visit-migration.h \
- qapi/qapi-visit-misc.c qapi/qapi-visit-misc.h \
-@@ -635,6 +642,7 @@ qapi/qapi-commands-block.c qapi/qapi-commands-block.h \
- qapi/qapi-commands-char.c qapi/qapi-commands-char.h \
- qapi/qapi-commands-common.c qapi/qapi-commands-common.h \
- qapi/qapi-commands-crypto.c qapi/qapi-commands-crypto.h \
-+qapi/qapi-commands-firmware.c qapi/qapi-commands-firmware.h \
- qapi/qapi-commands-introspect.c qapi/qapi-commands-introspect.h \
- qapi/qapi-commands-migration.c qapi/qapi-commands-migration.h \
- qapi/qapi-commands-misc.c qapi/qapi-commands-misc.h \
-@@ -652,6 +660,7 @@ qapi/qapi-events-block.c qapi/qapi-events-block.h \
- qapi/qapi-events-char.c qapi/qapi-events-char.h \
- qapi/qapi-events-common.c qapi/qapi-events-common.h \
- qapi/qapi-events-crypto.c qapi/qapi-events-crypto.h \
-+qapi/qapi-events-firmware.c qapi/qapi-events-firmware.h \
- qapi/qapi-events-introspect.c qapi/qapi-events-introspect.h \
- qapi/qapi-events-migration.c qapi/qapi-events-migration.h \
- qapi/qapi-events-misc.c qapi/qapi-events-misc.h \
-diff --git a/Makefile.objs b/Makefile.objs
-index c6c9b8fc2177..6ed4e0010b10 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -9,6 +9,7 @@ util-obj-y += qapi/qapi-types-block.o
- util-obj-y += qapi/qapi-types-char.o
- util-obj-y += qapi/qapi-types-common.o
- util-obj-y += qapi/qapi-types-crypto.o
-+util-obj-y += qapi/qapi-types-firmware.o
- util-obj-y += qapi/qapi-types-introspect.o
- util-obj-y += qapi/qapi-types-migration.o
- util-obj-y += qapi/qapi-types-misc.o
-@@ -27,6 +28,7 @@ util-obj-y += qapi/qapi-visit-block.o
- util-obj-y += qapi/qapi-visit-char.o
- util-obj-y += qapi/qapi-visit-common.o
- util-obj-y += qapi/qapi-visit-crypto.o
-+util-obj-y += qapi/qapi-visit-firmware.o
- util-obj-y += qapi/qapi-visit-introspect.o
- util-obj-y += qapi/qapi-visit-migration.o
- util-obj-y += qapi/qapi-visit-misc.o
-@@ -44,6 +46,7 @@ util-obj-y += qapi/qapi-events-block.o
- util-obj-y += qapi/qapi-events-char.o
- util-obj-y += qapi/qapi-events-common.o
- util-obj-y += qapi/qapi-events-crypto.o
-+util-obj-y += qapi/qapi-events-firmware.o
- util-obj-y += qapi/qapi-events-introspect.o
- util-obj-y += qapi/qapi-events-migration.o
- util-obj-y += qapi/qapi-events-misc.o
-@@ -139,6 +142,7 @@ common-obj-y += qapi/qapi-commands-block.o
- common-obj-y += qapi/qapi-commands-char.o
- common-obj-y += qapi/qapi-commands-common.o
- common-obj-y += qapi/qapi-commands-crypto.o
-+common-obj-y += qapi/qapi-commands-firmware.o
- common-obj-y += qapi/qapi-commands-introspect.o
- common-obj-y += qapi/qapi-commands-migration.o
- common-obj-y += qapi/qapi-commands-misc.o
-diff --git a/qapi/firmware.json b/qapi/firmware.json
-new file mode 100644
-index 000000000000..3653b4628a5b
---- /dev/null
-+++ b/qapi/firmware.json
-@@ -0,0 +1,503 @@
-+# -*- Mode: Python -*-
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# Authors:
-+#  Daniel P. Berrange <berrange@redhat.com>
-+#  Laszlo Ersek <lersek@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later. See
-+# the COPYING file in the top-level directory.
-+
-+##
-+# = Firmware
-+##
-+
-+{ 'include' : 'block-core.json' }
-+
-+##
-+# @FirmwareType:
-+#
-+# Lists firmware types commonly used with QEMU virtual machines.
-+#
-+# @bios: The firmware was built from the SeaBIOS project.
-+#
-+# @slof: The firmware was built from the Slimline Open Firmware project.
-+#
-+# @uboot: The firmware was built from the U-Boot project.
-+#
-+# @uefi: The firmware was built from the edk2 (EFI Development Kit II) project.
-+#
-+# Since: 2.13
-+##
-+{ 'enum' : 'FirmwareType',
-+  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }
-+
-+##
-+# @FirmwareDevice:
-+#
-+# Defines the device types that firmware can be mapped into.
-+#
-+# @flash: The firmware executable and its accompanying NVRAM file are to be
-+#         mapped into a pflash chip each.
-+#
-+# @kernel: The firmware is to be loaded like a Linux kernel. This is similar to
-+#          @memory but may imply additional processing that is specific to the
-+#          target architecture and machine type.
-+#
-+# @memory: The firmware is to be mapped into memory.
-+#
-+# Since: 2.13
-+##
-+{ 'enum' : 'FirmwareDevice',
-+  'data' : [ 'flash', 'kernel', 'memory' ] }
-+
-+##
-+# @FirmwareArchitecture:
-+#
-+# Defines the target architectures (emulator binaries) that firmware may
-+# execute on.
-+#
-+# @aarch64: The firmware can be executed by the qemu-system-aarch64 emulator.
-+#
-+# @arm: The firmware can be executed by the qemu-system-arm emulator.
-+#
-+# @i386: The firmware can be executed by the qemu-system-i386 emulator.
-+#
-+# @x86_64: The firmware can be executed by the qemu-system-x86_64 emulator.
-+#
-+# Since: 2.13
-+##
-+{ 'enum' : 'FirmwareArchitecture',
-+  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] }
-+
-+##
-+# @FirmwareTarget:
-+#
-+# Defines the machine types that firmware may execute on.
-+#
-+# @architecture: Determines the emulation target (the QEMU system emulator)
-+#                that can execute the firmware.
-+#
-+# @machines: Lists the machine types (known by the emulator that is specified
-+#            through @architecture) that can execute the firmware. Elements of
-+#            @machines are not supposed to be versioned; if a machine type is
-+#            versioned in QEMU (e.g. "pc-i440fx-2.12"), then its unversioned
-+#            variant, which typically refers to the latest version (e.g. "pc"),
-+#            should be listed in @machines. On the QEMU command line, "-machine
-+#            type=..." specifies the requested machine type.
-+#
-+# Since: 2.13
-+##
-+{ 'struct' : 'FirmwareTarget',
-+  'data'   : { 'architecture' : 'FirmwareArchitecture',
-+               'machines'     : [ 'str' ] } }
-+
-+##
-+# @FirmwareFeature:
-+#
-+# Defines the features that firmware may support, and the platform requirements
-+# that firmware may present.
-+#
-+# @acpi-s3: The firmware supports S3 sleep (suspend to RAM), as defined in the
-+#           ACPI specification. On the "pc" machine type of the @i386 and
-+#           @x86_64 emulation targets, S3 can be enabled with "-global
-+#           PIIX4_PM.disable_s3=0" and disabled with "-global
-+#           PIIX4_PM.disable_s3=1". On the "q35" machine type of the @i386 and
-+#           @x86_64 emulation targets, S3 can be enabled with "-global
-+#           ICH9-LPC.disable_s3=0" and disabled with "-global
-+#           ICH9-LPC.disable_s3=1".
-+#
-+# @acpi-s4: The firmware supports S4 hibernation (suspend to disk), as defined
-+#           in the ACPI specification. On the "pc" machine type of the @i386
-+#           and @x86_64 emulation targets, S4 can be enabled with "-global
-+#           PIIX4_PM.disable_s4=0" and disabled with "-global
-+#           PIIX4_PM.disable_s4=1". On the "q35" machine type of the @i386 and
-+#           @x86_64 emulation targets, S4 can be enabled with "-global
-+#           ICH9-LPC.disable_s4=0" and disabled with "-global
-+#           ICH9-LPC.disable_s4=1".
-+#
-+# @amd-sev: The firmware supports running under AMD Secure Encrypted
-+#           Virtualization, as specified in the AMD64 Architecture Programmer's
-+#           Manual. QEMU command line options related to this feature are
-+#           documented in "docs/amd-memory-encryption.txt".
-+#
-+# @requires-smm: The firmware requires the platform to emulate SMM (System
-+#                Management Mode), as defined in the AMD64 Architecture
-+#                Programmer's Manual, and in the Intel(R)64 and IA-32
-+#                Architectures Software Developer's Manual. On the "q35"
-+#                machine type of the @i386 and @x86_64 emulation targets, SMM
-+#                emulation can be enabled with "-machine smm=on". (On the "q35"
-+#                machine type of the @i386 emulation target, @requires-smm
-+#                presents further CPU requirements; one combination known to
-+#                work is "-cpu coreduo,-nx".) If the firmware is marked as both
-+#                @secure-boot and @requires-smm, then write accesses to the
-+#                pflash chip (NVRAM) that holds the UEFI variable store must be
-+#                restricted to code that executes in SMM, using the additional
-+#                option "-global driver=cfi.pflash01,property=secure,value=on".
-+#                Furthermore, a large guest-physical address space (comprising
-+#                guest RAM, memory hotplug range, and 64-bit PCI MMIO
-+#                aperture), and/or a high VCPU count, may present high SMRAM
-+#                requirements from the firmware. On the "q35" machine type of
-+#                the @i386 and @x86_64 emulation targets, the SMRAM size may be
-+#                increased above the default 16MB with the "-global
-+#                mch.extended-tseg-mbytes=uint16" option. As a rule of thumb,
-+#                the default 16MB size suffices for 1TB of guest-phys address
-+#                space and a few tens of VCPUs; for every further TB of
-+#                guest-phys address space, add 8MB of SMRAM. 48MB should
-+#                suffice for 4TB of guest-phys address space and 2-3 hundred
-+#                VCPUs.
-+#
-+# @secure-boot: The firmware implements the software interfaces for UEFI Secure
-+#               Boot, as defined in the UEFI specification. Note that without
-+#               @requires-smm, guest code running with kernel privileges can
-+#               undermine the security of Secure Boot.
-+#
-+# @secure-boot-enrolled-keys: The variable store (NVRAM) template associated
-+#                             with the firmware binary has the Secure Boot
-+#                             operational mode enabled, and -- at least -- the
-+#                             following certificates enrolled. (1) As Platform
-+#                             Key (PK), and as one Key Exchange Key (KEK), a
-+#                             self-signed certificate issued by the firmware
-+#                             distributor is enrolled. (2) As another Key
-+#                             Exchange Key (KEK), the "Microsoft Corporation
-+#                             KEK CA 2011" certificate is enrolled. The UEFI
-+#                             Forum releases updates for the Secure Boot
-+#                             Signature/Certificate Blacklist ("dbx")
-+#                             periodically at
-+#                             <http://www.uefi.org/revocationlistfile>, signed
-+#                             with a certificate chain anchored in this
-+#                             certificate. (3) As one Secure Boot
-+#                             Signature/Certificate ("db"), the "Microsoft
-+#                             Windows Production PCA 2011" certificate is
-+#                             enrolled. This certificate verifies Windows 8,
-+#                             Windows Server 2012 R2, etc boot loaders. (4) As
-+#                             another Secure Boot Signature/Certificate ("db"),
-+#                             the "Microsoft Corporation UEFI CA 2011"
-+#                             certificate is enrolled. This certificate
-+#                             verifies the "shim" UEFI application, and PCI
-+#                             expansion ROMs. @secure-boot-enrolled-keys is
-+#                             only valid if the firmware also supports
-+#                             @secure-boot.
-+#
-+# @verbose-dynamic: When firmware log capture is enabled, the firmware logs a
-+#                   large amount of debug messages, which may impact boot
-+#                   performance. With log capture disabled, there is no boot
-+#                   performance impact. On the "pc" and "q35" machine types of
-+#                   the @i386 and @x86_64 emulation targets, firmware log
-+#                   capture can be enabled with the QEMU command line options
-+#                   "-chardev file,id=fwdebug,path=LOGFILEPATH -device
-+#                   isa-debugcon,iobase=0x402,chardev=fwdebug".
-+#                   @verbose-dynamic is mutually exclusive with
-+#                   @verbose-static.
-+#
-+# @verbose-static: The firmware unconditionally produces a large amount of
-+#                  debug messages, which may impact boot performance. This
-+#                  feature may typically be carried by certain UEFI firmware
-+#                  for the "virt" machine type of the @arm and @aarch64
-+#                  emulation targets, where the debug messages are written to
-+#                  the first (always present) PL011 UART. @verbose-static is
-+#                  mutually exclusive with @verbose-dynamic.
-+#
-+# Since: 2.13
-+##
-+{ 'enum' : 'FirmwareFeature',
-+  'data' : [ 'acpi-s3', 'acpi-s4', 'amd-sev', 'requires-smm', 'secure-boot',
-+             'secure-boot-enrolled-keys', 'verbose-dynamic',
-+             'verbose-static' ] }
-+
-+##
-+# @FirmwareFlashFile:
-+#
-+# Defines common properties that are necessary for loading a firmware file into
-+# a pflash chip. The corresponding QEMU command line option is "-drive
-+# file=@pathname,format=@format". Note however that the option-argument shown
-+# here is incomplete; it is completed under @FirmwareMappingFlash.
-+#
-+# @pathname: Specifies the pathname on the host filesystem where the firmware
-+#            file can be found.
-+#
-+# @format: Specifies the block format of the file pointed-to by @pathname, such
-+#          as @raw or @qcow2.
-+#
-+# Since: 2.13
-+##
-+{ 'struct' : 'FirmwareFlashFile',
-+  'data'   : { 'pathname' : 'str',
-+               'format'   : 'BlockdevDriver' } }
-+
-+##
-+# @FirmwareMappingFlash:
-+#
-+# Describes loading and mapping properties for the firmware executable and its
-+# accompanying NVRAM file, when @FirmwareDevice is @flash.
-+#
-+# @executable: Identifies the firmware executable. The firmware executable may
-+#              be shared by multiple virtual machine definitions. The
-+#              corresponding QEMU command line option is "-drive
-+#              if=pflash,unit=0,readonly=on,file=@executable.@pathname,format=@executable.@format".
-+#
-+# @nvram_template: Identifies the NVRAM template compatible with @executable.
-+#                  Management software instantiates an individual copy -- a
-+#                  specific NVRAM file -- from @nvram_template.@pathname for
-+#                  each new virtual machine definition created.
-+#                  @nvram_template.@pathname itself is never mapped into
-+#                  virtual machines, only individual copies of it are. An NVRAM
-+#                  file is typically used for persistently storing the
-+#                  non-volatile UEFI variables of a virtual machine definition.
-+#                  The corresponding QEMU command line option is "-drive
-+#                  if=pflash,unit=1,readonly=off,file=PATHNAME_OF_PRIVATE_NVRAM_FILE,format=@nvram_template.@format".
-+#
-+# Since: 2.13
-+##
-+{ 'struct' : 'FirmwareMappingFlash',
-+  'data'   : { 'executable'     : 'FirmwareFlashFile',
-+               'nvram_template' : 'FirmwareFlashFile' } }
-+
-+##
-+# @FirmwareMappingKernel:
-+#
-+# Describes loading and mapping properties for the firmware executable, when
-+# @FirmwareDevice is @kernel.
-+#
-+# @pathname: Identifies the firmware executable. The firmware executable may be
-+#            shared by multiple virtual machine definitions. The corresponding
-+#            QEMU command line option is "-kernel @pathname".
-+#
-+# Since: 2.13
-+##
-+{ 'struct' : 'FirmwareMappingKernel',
-+  'data'   : { 'pathname' : 'str' } }
-+
-+##
-+# @FirmwareMappingMemory:
-+#
-+# Describes loading and mapping properties for the firmware executable, when
-+# @FirmwareDevice is @memory.
-+#
-+# @pathname: Identifies the firmware executable. The firmware executable may be
-+#            shared by multiple virtual machine definitions. The corresponding
-+#            QEMU command line option is "-bios @pathname".
-+#
-+# Since: 2.13
-+##
-+{ 'struct' : 'FirmwareMappingMemory',
-+  'data'   : { 'pathname' : 'str' } }
-+
-+##
-+# @FirmwareMapping:
-+#
-+# Provides a discriminated structure for firmware to describe its loading /
-+# mapping properties.
-+#
-+# @device: Selects the device type that the firmware must be mapped into.
-+#
-+# Since: 2.13
-+##
-+{ 'union'         : 'FirmwareMapping',
-+  'base'          : { 'device' : 'FirmwareDevice' },
-+  'discriminator' : 'device',
-+  'data'          : { 'flash'  : 'FirmwareMappingFlash',
-+                      'kernel' : 'FirmwareMappingKernel',
-+                      'memory' : 'FirmwareMappingMemory' } }
-+
-+##
-+# @Firmware:
-+#
-+# Describes a firmware (or a firmware use case) to management software.
-+#
-+# @description: Provides a human-readable description of the firmware.
-+#               Management software may or may not display @description.
-+#
-+# @type: Exposes the type of the firmware. @type is generally the primary key
-+#        for which management software looks when picking a firmware for a new
-+#        virtual machine definition.
-+#
-+# @mapping: Describes the loading / mapping properties of the firmware.
-+#
-+# @targets: Collects the target architectures (QEMU system emulators) and their
-+#           machine types that may execute the firmware.
-+#
-+# @features: Lists the features that the firmware supports, and the platform
-+#            requirements it presents.
-+#
-+# @tags: A list of auxiliary strings associated with the firmware for which
-+#        @description is not approprite, due to the latter's possible exposure
-+#        to the end-user. @tags serves development and debugging purposes only,
-+#        and management software shall explicitly ignore it.
-+#
-+# Since: 2.13
-+#
-+# Examples:
-+#
-+# {
-+#     "description": "SeaBIOS",
-+#     "type": "bios",
-+#     "mapping": {
-+#         "device": "memory",
-+#         "pathname": "/usr/share/seabios/bios-256k.bin"
-+#     },
-+#     "targets": [
-+#         {
-+#             "architecture": "i386",
-+#             "machines": [
-+#                 "pc",
-+#                 "q35"
-+#             ]
-+#         },
-+#         {
-+#             "architecture": "x86_64",
-+#             "machines": [
-+#                 "pc",
-+#                 "q35"
-+#             ]
-+#         }
-+#     ],
-+#     "features": [
-+#         "acpi-s3",
-+#         "acpi-s4"
-+#     ],
-+#     "tags": [
-+#         "CONFIG_BOOTSPLASH=n",
-+#         "CONFIG_ROM_SIZE=256",
-+#         "CONFIG_USE_SMM=n"
-+#     ]
-+# }
-+#
-+# {
-+#     "description": "OVMF with SB+SMM, empty varstore",
-+#     "type": "uefi",
-+#     "mapping": {
-+#         "device": "flash",
-+#         "executable": {
-+#             "pathname": "/usr/share/OVMF/OVMF_CODE.secboot.fd",
-+#             "format": "raw"
-+#         },
-+#         "nvram_template": {
-+#             "pathname": "/usr/share/OVMF/OVMF_VARS.fd",
-+#             "format": "raw"
-+#         }
-+#     },
-+#     "targets": [
-+#         {
-+#             "architecture": "x86_64",
-+#             "machines": [
-+#                 "q35"
-+#             ]
-+#         }
-+#     ],
-+#     "features": [
-+#         "acpi-s3",
-+#         "amd-sev",
-+#         "requires-smm",
-+#         "secure-boot",
-+#         "verbose-dynamic"
-+#     ],
-+#     "tags": [
-+#         "-a IA32",
-+#         "-a X64",
-+#         "-p OvmfPkg/OvmfPkgIa32X64.dsc",
-+#         "-t GCC48",
-+#         "-b DEBUG",
-+#         "-D SMM_REQUIRE",
-+#         "-D SECURE_BOOT_ENABLE",
-+#         "-D FD_SIZE_4MB"
-+#     ]
-+# }
-+#
-+# {
-+#     "description": "OVMF with SB+SMM, SB enabled, MS certs enrolled",
-+#     "type": "uefi",
-+#     "mapping": {
-+#         "device": "flash",
-+#         "executable": {
-+#             "pathname": "/usr/share/OVMF/OVMF_CODE.secboot.fd",
-+#             "format": "raw"
-+#         },
-+#         "nvram_template": {
-+#             "pathname": "/usr/share/OVMF/OVMF_VARS.secboot.fd",
-+#             "format": "raw"
-+#         }
-+#     },
-+#     "targets": [
-+#         {
-+#             "architecture": "x86_64",
-+#             "machines": [
-+#                 "q35"
-+#             ]
-+#         }
-+#     ],
-+#     "features": [
-+#         "acpi-s3",
-+#         "amd-sev",
-+#         "requires-smm",
-+#         "secure-boot",
-+#         "secure-boot-enrolled-keys",
-+#         "verbose-dynamic"
-+#     ],
-+#     "tags": [
-+#         "-a IA32",
-+#         "-a X64",
-+#         "-p OvmfPkg/OvmfPkgIa32X64.dsc",
-+#         "-t GCC48",
-+#         "-b DEBUG",
-+#         "-D SMM_REQUIRE",
-+#         "-D SECURE_BOOT_ENABLE",
-+#         "-D FD_SIZE_4MB"
-+#     ]
-+# }
-+#
-+# {
-+#     "description": "UEFI firmware for ARM64 virtual machines",
-+#     "type": "uefi",
-+#     "mapping": {
-+#         "device": "flash",
-+#         "executable": {
-+#             "pathname": "/usr/share/AAVMF/AAVMF_CODE.fd",
-+#             "format": "raw"
-+#         },
-+#         "nvram_template": {
-+#             "pathname": "/usr/share/AAVMF/AAVMF_VARS.fd",
-+#             "format": "raw"
-+#         }
-+#     },
-+#     "targets": [
-+#         {
-+#             "architecture": "aarch64",
-+#             "machines": [
-+#                 "virt"
-+#             ]
-+#         }
-+#     ],
-+#     "features": [
-+#
-+#     ],
-+#     "tags": [
-+#         "-a AARCH64",
-+#         "-p ArmVirtPkg/ArmVirtQemu.dsc",
-+#         "-t GCC48",
-+#         "-b DEBUG",
-+#         "-D DEBUG_PRINT_ERROR_LEVEL=0x80000000"
-+#     ]
-+# }
-+##
-+{ 'struct' : 'Firmware',
-+  'data'   : { 'description' : 'str',
-+               'type'        : 'FirmwareType',
-+               'mapping'     : 'FirmwareMapping',
-+               'targets'     : [ 'FirmwareTarget' ],
-+               'features'    : [ 'FirmwareFeature' ],
-+               'tags'        : [ 'str' ] } }
-+
-+##
-+# @x-check-firmware:
-+#
-+# Accept a @Firmware object and do nothing, successfully. This command can be
-+# used in the QMP shell to validate @Firmware JSON against the schema.
-+#
-+# @fw: ignored
-+#
-+# Since: 2.13
-+##
-+{ 'command' : 'x-check-firmware',
-+  'data'    : { 'fw' : 'Firmware' } }
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 25bce78352b8..2d6339ca8c99 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -92,4 +92,5 @@
- { 'include': 'transaction.json' }
- { 'include': 'trace.json' }
- { 'include': 'introspect.json' }
-+{ 'include': 'firmware.json' }
- { 'include': 'misc.json' }
-diff --git a/qmp.c b/qmp.c
-index f72261667f92..2141ebe6f027 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -34,6 +34,7 @@
- #include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-ui.h"
-+#include "qapi/qapi-commands-firmware.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/qobject-input-visitor.h"
-@@ -781,3 +782,7 @@ void qmp_x_oob_test(bool lock, Error **errp)
-         qemu_sem_post(&x_oob_test_sem);
-     }
- }
-+
-+void qmp_x_check_firmware(Firmware *fw, Error **errp)
-+{
-+}
-diff --git a/.gitignore b/.gitignore
-index 4055e12ee85d..1d8d1066d3d1 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -35,6 +35,7 @@
- /qapi/qapi-commands-char.[ch]
- /qapi/qapi-commands-common.[ch]
- /qapi/qapi-commands-crypto.[ch]
-+/qapi/qapi-commands-firmware.[ch]
- /qapi/qapi-commands-introspect.[ch]
- /qapi/qapi-commands-migration.[ch]
- /qapi/qapi-commands-misc.[ch]
-@@ -52,6 +53,7 @@
- /qapi/qapi-events-char.[ch]
- /qapi/qapi-events-common.[ch]
- /qapi/qapi-events-crypto.[ch]
-+/qapi/qapi-events-firmware.[ch]
- /qapi/qapi-events-introspect.[ch]
- /qapi/qapi-events-migration.[ch]
- /qapi/qapi-events-misc.[ch]
-@@ -70,6 +72,7 @@
- /qapi/qapi-types-char.[ch]
- /qapi/qapi-types-common.[ch]
- /qapi/qapi-types-crypto.[ch]
-+/qapi/qapi-types-firmware.[ch]
- /qapi/qapi-types-introspect.[ch]
- /qapi/qapi-types-migration.[ch]
- /qapi/qapi-types-misc.[ch]
-@@ -87,6 +90,7 @@
- /qapi/qapi-visit-char.[ch]
- /qapi/qapi-visit-common.[ch]
- /qapi/qapi-visit-crypto.[ch]
-+/qapi/qapi-visit-firmware.[ch]
- /qapi/qapi-visit-introspect.[ch]
- /qapi/qapi-visit-migration.[ch]
- /qapi/qapi-visit-misc.[ch]
--- 
-2.14.1.3.gb7cf6e02401b
+
+> are in SNOOP_NONE state, fix it to send only if cmd requires them.
+>
+> s/fix it to send only if cmd/fix it to only send dummy cycles if the
+command/
+
+Only transmit max of 1 dummy byte(i.e 8 cycles) is a single snoop cycle.
+> And also convert dummy bytes to cycles (required by m25p80).
+>
+
+Maybe it is better to drop this two last lines (was already done before so
+it could be misleading when reading git history).
+
+
+>
+>
+Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
+> ---
+>  hw/ssi/xilinx_spips.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index 426f971..8278930 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -627,10 +627,17 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS
+> *s)
+>                  tx_rx[i] = tx;
+>              }
+>          } else {
+> -            /* Extract a dummy byte and generate dummy cycles according
+> to the
+> -             * link state */
+>              tx = fifo8_pop(&s->tx_fifo);
+> -            dummy_cycles = 8 / s->link_state;
+> +            if (s->cmd_dummies > 0) {
+> +                /* Extract a dummy byte and generate dummy cycles
+> according to
+> +                 * the link state */
+> +                 dummy_cycles = (s->cmd_dummies ? 1 : 0) * 8 /
+> s->link_state;
+> +                 s->cmd_dummies--;
+> +            } else {
+> +                for (i = 0; i < num_effective_busses(s); ++i) {
+> +                    tx_rx[i] = tx;
+> +                }
+> +            }
+>          }
+>
+>
+Could we replace above with below in the same if ladder so we don't
+complicate the code more than necessary? (Should give the same result when
+num_effective_busses == 1)
+
+-        } else if (s->snoop_state == SNOOP_STRIPING) {
++        } else if (s->snoop_state == SNOOP_STRIPING ||
++                   s->snoop_state == SNOOP_NONE) {
+
+
+Thank you!
+
+Best regards,
+Francisco Iglesias
+
+
+
+
+>          for (i = 0; i < num_effective_busses(s); ++i) {
+> --
+> 2.7.4
+>
+>
