@@ -1,30 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8RRl-0000VC-H0
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:19:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1f8RTg-00025F-PG
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8RRi-00021p-Pd
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:19:01 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:11650)
+	(envelope-from <berrange@redhat.com>) id 1f8RTe-0002tK-2G
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:21:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57432 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8RRi-00021P-Gg
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:18:58 -0400
-References: <1523049683-11782-1-git-send-email-igor.druzhinin@citrix.com>
-	<20180417141518.GM2208@perard>
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Message-ID: <635d45e1-2d97-6313-2348-1e2bc9061d8b@citrix.com>
-Date: Tue, 17 Apr 2018 15:18:55 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8RTd-0002sK-Ur
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:20:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7BE378DC30
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:20:57 +0000 (UTC)
+Date: Tue, 17 Apr 2018 15:20:50 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180417142050.GG15421@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+	<7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
+	<87efjeaqd2.fsf@dusky.pond.sub.org>
+	<20180417140540.GD15421@redhat.com>
+	<21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180417141518.GM2208@perard>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] xen/pt: use address_space_memory object
- for memory region hooks
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +40,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, ross.lagerwall@citrix.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-On 17/04/18 15:15, Anthony PERARD wrote:
-> On Fri, Apr 06, 2018 at 10:21:23PM +0100, Igor Druzhinin wrote:
->> Commit 99605175c (xen-pt: Fix PCI devices re-attach failed) introduced
->> a subtle bug. As soon as the guest switches off Bus Mastering on the
->> device it immediately causes all the BARs be unmapped due to the DMA
->> address space of the device being changed. This is undesired behavior
->> because the guest may try to communicate with the device after that
->> which triggers the following errors in the logs:
->>
->> [00:05.0] xen_pt_bar_read: Error: Should not read BAR through QEMU. @0x0000000000000200
->> [00:05.0] xen_pt_bar_write: Error: Should not write BAR through QEMU. @0x0000000000000200
->>
->> The issue that the original patch tried to workaround (uneven number of
->> region_add/del calls on device attach/detach) was fixed in later QEMU
->> versions.
-> 
-> Do you know when the issue was fixed?
-> 
+On Tue, Apr 17, 2018 at 04:14:02PM +0200, Paolo Bonzini wrote:
+> On 17/04/2018 16:05, Daniel P. Berrang=C3=A9 wrote:
+> >> For what it's worth, my "[RFC PATCH 00/32] Command line QAPIfication=
+"
+> >> replaces the original parsing art by getopt_long_only().
+> >>
+> >> Completing that work will take some time, but once it's done, we can
+> >> (and I think we should) prefer double-dash for consistency.
+> > Since our existing parser accepts single & double-dash already, is it
+> > worth explicitly deprecating single-dash usage right now. So that whe=
+n
+> > your code comes along ready to merge, we're already able to say
+> > "i told you so" and drop single-dash support at that same time.
+>=20
+> Serious questions: is _anyone_ of you actually using double-dash suppor=
+t
+> in daily invocations of QEMU?
 
-I haven't tracked down a particular version but the previous behavior of
-memory_listener_unregister() was to remove the listener from the list
-without calling the callback. It has changed since then and now the
-callback is called in listener_del_address_space().
+I rarely invoke QEMU myself, usually just let libvirt do it. So mostly
+i just using qemu-img/nbd/etc which expect double-dash. I didn't actually
+know QEMU supported double-dash until a year or so ago.
 
-Igor
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
