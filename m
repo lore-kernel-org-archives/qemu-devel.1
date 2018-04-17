@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8S00-0000EG-Ag
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:54:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8S6Z-0002dn-Sc
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8Rzx-0005Qx-9E
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:54:24 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:15957)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
-	id 1f8Rzw-0005Q8-Vf
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:54:21 -0400
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Date: Tue, 17 Apr 2018 15:54:15 +0100
-Message-ID: <1523976855-15234-1-git-send-email-igor.druzhinin@citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1f8S6T-0002Nd-UM
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:01:11 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f8S6T-0002Mx-NA
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:01:05 -0400
+Received: by mail-ot0-x242.google.com with SMTP id g23-v6so6555174oti.0
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 08:01:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] xen/pt: use address_space_memory object for
- memory region hooks
+In-Reply-To: <20180417142318.GO24561@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-16-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA9bYdwByseqCMKSVtWV59mNruT3jJfWWLju1koCnwSb=Q@mail.gmail.com>
+	<20180417142318.GO24561@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Apr 2018 16:00:43 +0100
+Message-ID: <CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 15/22] target/arm: Add ARM_FEATURE_V7VE
+ for v7 Virtualization Extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: anthony.perard@citrix.com, sstabellini@kernel.org, ross.lagerwall@citrix.com, Igor Druzhinin <igor.druzhinin@citrix.com>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-Commit 99605175c (xen-pt: Fix PCI devices re-attach failed) introduced
-a subtle bug. As soon as the guest switches off Bus Mastering on the
-device it immediately causes all the BARs be unmapped due to the DMA
-address space of the device being changed. This is undesired behavior
-because the guest may try to communicate with the device after that
-which triggers the following errors in the logs:
+On 17 April 2018 at 15:23, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> On Apr 12 18:17, Peter Maydell wrote:
+>> What's the difference between this and ARM_FEATURE_EL2 ?
+>
+> I use ARM_FEATURE_V7VE in a later patch to guard against implementing
+> PMOVSSET on v7 machines which don't implement the virtualization
+> extensions
+> (http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg04917.html).
+> I could use ARM_FEATURE_EL2, but declaring that v7 machines supported
+> EL2 didn't feel right. I don't feel strongly one way or the other - how
+> do you prefer to handle this?
 
-[00:05.0] xen_pt_bar_read: Error: Should not read BAR through QEMU. @0x0000000000000200
-[00:05.0] xen_pt_bar_write: Error: Should not write BAR through QEMU. @0x0000000000000200
+So, the underlying issue here is that there's a QEMU specific
+fudge going on. Architecturally, if the CPU implements the
+Virtualization Extensions, then:
+ * it has Hyp mode
+ * it must also implement the Security Extensions
+ * on reset it starts in the Secure world
+ * it has LPAE
+ * it has some stuff that is not inherently tied to having EL2,
+   like the SDIV and UDIV instructions, and the presence of
+   PMOVSSET
 
-The issue that the original patch tried to workaround (uneven number of
-region_add/del calls on device attach/detach) was fixed in d25836cafd
-(memory: do explicit cleanup when remove listeners).
+In an ideal world, we'd just have a feature flag that turned
+all that on. Unfortunately, a combination of backwards compatibility
+issues, the order in which various features were implemented
+in QEMU, and the fact that KVM can't emulate a guest CPU with
+the Security Extensions means that we want to be able to model
+variants of some CPUs that don't really exist in real hardware:
+Cortex-A15 and -A7 which only implement EL0/EL1 but still have
+all the v7VE features that you can see from those ELs. But we
+didn't really properly lay out guidelines for how the feature
+bits should work in this case, with the result that we have
+a bunch of local hacks (for instance get_S1prot() has a check
+on the LPAE feature bit, since in practice that bit is set in
+exactly the CPUs that have v7VE; and the UDIV/SDIV insns have
+their own feature bits.)
 
-Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
-Reported-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
----
-Changes in v2:
-* specify the exact fixing commit in the commit message
----
- hw/xen/xen_pt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So we should probably sort out this mess first, either by:
 
-diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-index 9b7a960..e5a6eff 100644
---- a/hw/xen/xen_pt.c
-+++ b/hw/xen/xen_pt.c
-@@ -907,7 +907,7 @@ out:
-         }
-     }
- 
--    memory_listener_register(&s->memory_listener, &s->dev.bus_master_as);
-+    memory_listener_register(&s->memory_listener, &address_space_memory);
-     memory_listener_register(&s->io_listener, &address_space_io);
-     s->listener_set = true;
-     XEN_PT_LOG(d,
--- 
-2.7.4
+(a) state that we use ARM_FEATURE_LPAE for all checks for
+features that are architecturally v7VE but which we want to
+exist even on our v7VE-no-Hyp-no-Secure oddballs
+(b) define an ARM_FEATURE_V7VE for them
+(c) define separate feature bits for them individually
+
+In any case we'd retain ARM_FEATURE_EL2 for "and really
+has EL2/Hyp mode", and we'd want to do an audit of current
+uses of various feature bits to see whether they followed
+the new rules.
+
+(For AArch64 things are a bit less awkward because the
+architecture allows the idea of an implementation that
+has EL2 but not EL3.)
+
+thanks
+-- PMM
