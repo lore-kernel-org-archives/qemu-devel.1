@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1f8ZJl-0002Ba-Cj
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:43:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f8ZPw-0004S9-Ej
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1f8ZJk-0004ck-3s
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:43:17 -0400
-Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:36373)
+	(envelope-from <richard.henderson@linaro.org>) id 1f8ZPs-0006dQ-Fp
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:49:40 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:44387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1f8ZJj-0004bT-Q6
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:43:16 -0400
-Received: by mail-pl0-x229.google.com with SMTP id m7-v6so1240244plt.3
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 15:43:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f8ZPs-0006bw-8z
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:49:36 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id p15so12845022pff.11
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 15:49:36 -0700 (PDT)
+References: <20180416135442.30606-1-alex.bennee@linaro.org>
+	<20180417190439.GA28717@flamenco>
+	<CAFEAcA87BUwn96GY5esyNBtoGQY+myVAX9XoPW02gpaJbqyBzg@mail.gmail.com>
+	<20180417212710.GA10948@flamenco>
+	<CAFEAcA9PS2FNSq0VFgO652RaemTViGKzOQStiycqFB8DDhy_ig@mail.gmail.com>
+	<20180417223837.GA25085@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cee77754-64f5-e4e2-6462-f70603655e3e@linaro.org>
+Date: Tue, 17 Apr 2018 12:49:30 -1000
 MIME-Version: 1.0
-In-Reply-To: <1523974696-1965-2-git-send-email-saipava@xilinx.com>
-References: <1523974696-1965-1-git-send-email-saipava@xilinx.com>
-	<1523974696-1965-2-git-send-email-saipava@xilinx.com>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Wed, 18 Apr 2018 00:43:13 +0200
-Message-ID: <CAAYMZQu5JOTOp3K4awXPvzbaE7oqvK0XqqoNzKjB5ShR=BJnzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] xilinx_spips: send dummy only if
- cmd requires it
+In-Reply-To: <20180417223837.GA25085@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
+ before /0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Cc: alistair@alistair23.me, crosthwaite.peter@gmail.com, Peter Maydell <peter.maydell@linaro.org>, Edde <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Hi Sai,
+On 04/17/2018 12:38 PM, Emilio G. Cota wrote:
+> On Tue, Apr 17, 2018 at 22:45:51 +0100, Peter Maydell wrote:
+>> On 17 April 2018 at 22:27, Emilio G. Cota <cota@braap.org> wrote:
+>>> BTW I just checked with -t host on an IBM Power8, and we get
+>>> the same 1049 flag errors we get with -t soft plus two additional ones:
+>>>
+>>> +A 0xffb00000, expected: 0x7fa00000, returned: 0x7fa00000, \
+>>>   expected exceptions: i, returned: none
+>>> +error: flags mismatch for input @ ibm/Basic-Types-Inputs.fptest:382:
+>>> +b32A =0 S -> S i
+>>
+>> That's Abs of an SNaN; the test expects Invalid, which is wrong,
+>> because IEEE754 says absolute-value is a "quiet-computational
+>> operation" that never signals an exception.
+>>
+>> What's odd is that we don't report that error for the softfloat
+>> implementation! I also don't understand why the expected value
+>> isn't just the input value with the sign bit flipped.
+> 
+> With -t soft we don't handle "abs" and we don't get the error -- we get
+> a "not handled" instead.
+> Is there a function that we could use for abs? The only ones I've seen
+> are floatX_abs() which mask out the sign bit and do nothing else.
 
-[PATCH v1] xilinx_spips: send dummy only if cmd requires it
+Both abs and neg are pure bit operations.  So, yes, floatX_abs (and floatX_chs)
+are the softfloat functions for these.
 
-s/dummy/dummy cycles/
+And if fp-test thinks Invalid should be raised, it's wrong.
 
-On 17 April 2018 at 16:18, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-wrote:
+>>> (...)
+>>> +cff 0xffb00000, expected: 0x7ff8000000000000, returned: 0x7ff4000000000000, \
+>>>   expected exceptions: i, returned: none
+>>> +error: flags mismatch for input @ ibm/Basic-Types-Inputs.fptest:26170:
+>>> +b32b64cff =0 S -> Q i
+>>
+>> SNaN conversion from 32 bit to 64 bit. Here I agree
+>> with the test -- we should quieten the NaN and raise
+>> Invalid -- which implies that the hardware is wrong ?!?
+> 
+> This passes on an Intel host, and fails on both Power7 and 8 hosts I have
+> access to. I don't have the Power ISA spec in front of me, but I hope
+> there's something about this specified in it.
 
-> For all the commands, which do not have an entry in
-> xilinx_spips_num_dummies, present logic sends dummy byte when ever we
->
-
-s/dummy byte/dummy cycles/
-
-
-> are in SNOOP_NONE state, fix it to send only if cmd requires them.
->
-> s/fix it to send only if cmd/fix it to only send dummy cycles if the
-command/
-
-Only transmit max of 1 dummy byte(i.e 8 cycles) is a single snoop cycle.
-> And also convert dummy bytes to cycles (required by m25p80).
->
-
-Maybe it is better to drop this two last lines (was already done before so
-it could be misleading when reading git history).
-
-
->
->
-Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
-> ---
->  hw/ssi/xilinx_spips.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index 426f971..8278930 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -627,10 +627,17 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS
-> *s)
->                  tx_rx[i] = tx;
->              }
->          } else {
-> -            /* Extract a dummy byte and generate dummy cycles according
-> to the
-> -             * link state */
->              tx = fifo8_pop(&s->tx_fifo);
-> -            dummy_cycles = 8 / s->link_state;
-> +            if (s->cmd_dummies > 0) {
-> +                /* Extract a dummy byte and generate dummy cycles
-> according to
-> +                 * the link state */
-> +                 dummy_cycles = (s->cmd_dummies ? 1 : 0) * 8 /
-> s->link_state;
-> +                 s->cmd_dummies--;
-> +            } else {
-> +                for (i = 0; i < num_effective_busses(s); ++i) {
-> +                    tx_rx[i] = tx;
-> +                }
-> +            }
->          }
->
->
-Could we replace above with below in the same if ladder so we don't
-complicate the code more than necessary? (Should give the same result when
-num_effective_busses == 1)
-
--        } else if (s->snoop_state == SNOOP_STRIPING) {
-+        } else if (s->snoop_state == SNOOP_STRIPING ||
-+                   s->snoop_state == SNOOP_NONE) {
+IIRC this is unspecified and does vary by implementation.
 
 
-Thank you!
-
-Best regards,
-Francisco Iglesias
-
-
-
-
->          for (i = 0; i < num_effective_busses(s); ++i) {
-> --
-> 2.7.4
->
->
+r~
