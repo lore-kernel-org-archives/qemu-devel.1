@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1f8RF5-0007WM-Fv
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:05:56 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8RHE-0000IO-8y
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1f8RF0-00026D-GX
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:05:55 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:37570
-	helo=v2201612906741603.powersrv.de)
+	(envelope-from <pbonzini@redhat.com>) id 1f8RHC-0003G9-Gm
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35548 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1f8RF0-00025d-8S
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:05:50 -0400
-References: <CAFEAcA-FaS+HeihGmbhrLAR8e=jmz-Og+OKGakGX7MGb_KgwCw@mail.gmail.com>
-	<d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
-	<CAFEAcA_rswg=c-QWcL1VraqiOEN1+zPmGG=-AP2f2CnYUA0K+g@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <37db1c18-cb62-0d93-3b4c-38d2ab20c804@weilnetz.de>
-Date: Tue, 17 Apr 2018 16:05:46 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_rswg=c-QWcL1VraqiOEN1+zPmGG=-AP2f2CnYUA0K+g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] Last call for release-critical fixes for 2.12
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8RHC-0003Fn-AZ
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:08:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 027EB406C510
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:08:06 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-116-72.ams2.redhat.com
+	[10.36.116.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 887B0200BCB0
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:08:05 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 17 Apr 2018 16:08:00 +0200
+Message-Id: <20180417140802.16711-3-pbonzini@redhat.com>
+In-Reply-To: <20180417140802.16711-1-pbonzini@redhat.com>
+References: <20180417140802.16711-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/4] exec: small changes to
+ flatview_do_translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +34,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Am 17.04.2018 um 15:50 schrieb Peter Maydell:
-> On 17 April 2018 at 14:19, Stefan Weil <sw@weilnetz.de> wrote:
->> Update po files? That's not a "must fix", but it would be nice to have
->> those files synchronized with ui/gtk.c again.
-> Judging by the "POT-Creation-Date" timestamps, we haven't done
-> that for a year or so, so there doesn't seem to be a great
-> urgency to do it now.
->
-> Overall:
->  * I don't really understand why we need to keep doing this;
->    I tried "make -C po update" but all it did was update the
->    date stamp and a bunch of comments in the .po files
->  * If we do need to do this, we need to come up with a
->    process (preferably automatic) that ensures that we do
->    it in a more timely manner than "somebody mentions it
->    on the day we're thinking of tagging the final rc"
->
-> Asking me to manually run a magic command I don't understand
-> doesn't really work, as you can see from how infrequently
-> it's happened.
->
-> thanks
-> -- PMM
+Prepare for extracting the IOMMU part to a separate function.  Mostly
+cosmetic; the only semantic change is that, if there is more than one
+cascaded IOMMU and the second one fails to translate, *plen_out is now
+adjusted according to the page mask of the first IOMMU.
 
-The only visible consequence if it is not done is that developers who
-run "make install" (which updates the po files) then have a local code
-modification which is in the way if they are working with git. Not many
-run "make install", and obviously those who do can handle the situation.
-I think that there would be a real problem if people tried to build with
-the source on a read only medium.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ exec.c | 33 ++++++++++++++-------------------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
 
-I wonder whether generating the po files without the line comments would
-improve the situation. Currently each added or removed line in ui/gtk.c
-changes the line numbers which are part of the comments. If the comments
-would not include line numbers, then only relevant changes of message
-texts would need an update of the po files. Maybe we should try that for
-the next release.
-
-Stefan
+diff --git a/exec.c b/exec.c
+index 02b1efebb7..1dea3e9c95 100644
+--- a/exec.c
++++ b/exec.c
+@@ -476,6 +476,7 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
+  *            would tell. It can be @NULL if we don't care about it.
+  * @is_write: whether the translation operation is for write
+  * @is_mmio: whether this can be MMIO, set true if it can
++ * @target_as: the address space targeted by the IOMMU
+  *
+  * This function is called from RCU critical section
+  */
+@@ -495,14 +496,14 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+     hwaddr page_mask = (hwaddr)(-1);
+     hwaddr plen = (hwaddr)(-1);
+ 
+-    if (plen_out) {
+-        plen = *plen_out;
++    if (!plen_out) {
++        plen_out = &plen;
+     }
+ 
+     for (;;) {
+         section = address_space_translate_internal(
+-                flatview_to_dispatch(fv), addr, &addr,
+-                &plen, is_mmio);
++                flatview_to_dispatch(fv), addr, xlat,
++                plen_out, is_mmio);
+ 
+         iommu_mr = memory_region_get_iommu(section->mr);
+         if (!iommu_mr) {
+@@ -510,35 +511,29 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+         }
+         imrc = memory_region_get_iommu_class_nocheck(iommu_mr);
+ 
++        addr = *xlat;
+         iotlb = imrc->translate(iommu_mr, addr, is_write ?
+                                 IOMMU_WO : IOMMU_RO);
+-        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+-                | (addr & iotlb.addr_mask));
+-        page_mask &= iotlb.addr_mask;
+-        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
+         if (!(iotlb.perm & (1 << is_write))) {
+             goto translate_fail;
+         }
+ 
++        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
++                | (addr & iotlb.addr_mask));
++        page_mask &= iotlb.addr_mask;
++        *plen_out = MIN(*plen_out, (addr | iotlb.addr_mask) - addr + 1);
+         fv = address_space_to_flatview(iotlb.target_as);
+         *target_as = iotlb.target_as;
+     }
+ 
+-    *xlat = addr;
+-
+-    if (page_mask == (hwaddr)(-1)) {
+-        /* Not behind an IOMMU, use default page size. */
+-        page_mask = ~TARGET_PAGE_MASK;
+-    }
+-
+     if (page_mask_out) {
++        if (page_mask == (hwaddr)(-1)) {
++            /* Not behind an IOMMU, use default page size. */
++            page_mask = ~TARGET_PAGE_MASK;
++        }
+         *page_mask_out = page_mask;
+     }
+ 
+-    if (plen_out) {
+-        *plen_out = plen;
+-    }
+-
+     return *section;
+ 
+ translate_fail:
+-- 
+2.17.0
