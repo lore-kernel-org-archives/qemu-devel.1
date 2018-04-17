@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f8Xsx-00054q-VL
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:33 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f8Xt5-0005Az-SV
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f8Xsu-0005h7-JA
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f8Xsu-0005SH-9X
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f8Xss-0003Vs-3z
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 21:11:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8646F2E80D4
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 21:11:25 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1f8Xt2-0006me-Cg
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46078)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f8Xt2-0006dt-3C
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:36 -0400
+Date: Tue, 17 Apr 2018 18:11:26 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180417211126.GD29865@localhost.localdomain>
+References: <20171009144344.38bbd1e9@nial.brq.redhat.com>
+	<20171009130218.GK2954@redhat.com>
+	<20171010003951-mutt-send-email-mst@kernel.org>
+	<20171010083143.GA30015@redhat.com>
+	<CAJ+F1CLGJLXYnJ8SnrbVkWc6bdU2geYKeEaKrxWaYBhXwA=Opg@mail.gmail.com>
+	<20171010150628.GI30015@redhat.com>
+	<20171010180110.GI3246@localhost.localdomain>
+	<20171015044800-mutt-send-email-mst@kernel.org>
+	<20171020184820.GP2942@localhost.localdomain>
+	<a5ff2864-f794-e728-5be1-0c1e58d9f163@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <a5ff2864-f794-e728-5be1-0c1e58d9f163@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Apr 2018 21:02:50 -0000
-From: David Wilder <1763536@bugs.launchpad.net>
-Reply-To: Bug 1763536 <1763536@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152357545161.20027.863482450235173908.malonedeb@gac.canonical.com>
-Message-Id: <152399897087.12388.11165211415691243649.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1763536] Re: go build fails under
- qemu-ppc64le-static (qemu-user)
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,126 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cole Robinson <crobinso@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Dave Anderson <anderson@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Martin Kletzander <mkletzan@redhat.com>
 
-I will attempt to find an way to re-create without docker.  The key is
-we need a way to create a ppc64le (or arm64) fakeroot with go that we
-can chroot into.  That is easy to do with docker.  BTW: the use case
-using docker and qemu-user-static is becoming fairly common way to cross
-build container images.
+On Tue, Apr 17, 2018 at 03:12:03PM -0400, Cole Robinson wrote:
+[...]
+> Reviving this... did any follow up changes happen?
+>=20
+> Marc-Andr=E9 patched virt-manager a few months back to enable -device
+> vmcoreinfo for new VMs:
+>=20
+> https://www.redhat.com/archives/virt-tools-list/2018-February/msg00020.=
+html
+>=20
+> And I see there's at least a bug tracking adding this to openstack for
+> new VMs:
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1555276
+>=20
+> If this feature doesn't really have any downsides, it would be nice to
+> get this tied to new machine types. Saves a lot of churn for higher
+> levels of the stack
 
--- =
+I understand this would be nice to have considering the existing
+stacks, but at the same time I would like the rest of the
+stack(s) to really try to not depend on QEMU machine-types to
+define policy/defaults.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1763536
+Every feature that is hidden behind an opaque machine-type name
+and not visible in the domain XML and QEMU command-line increases
+the risk of migration and compatibility bugs.
 
-Title:
-  go build fails under qemu-ppc64le-static (qemu-user)
+This was being discussed in a mail thread at:
+https://www.mail-archive.com/ovirt-devel@redhat.com/msg01196.html
 
-Status in QEMU:
-  New
+Quoting Daniel, on that thread:
 
-Bug description:
-  I am using qemu-user (built static) in a docker container environment.
-  When running multi-threaded go commands in the container (go build for
-  example) the process may hang, report segfaults or other errors.  I
-  built qemu-ppc64le from the upstream git (master).
+] Another case is the pvpanic device - while in theory that could
+] have been enabled by default for all guests, by QEMU or a config
+] generator library, doing so is not useful on its own. The hard
+] bit of the work is adding code to the mgmt app to choose the
+] action for when pvpanic triggers, and code to handle the results
+] of that action.
 
-  I see the problem running on a multi core system with Intel i7 processors.
-  # cat /proc/cpuinfo | grep "model name"
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+>From that comment, I understand that simply making QEMU create a
+pvpanic device by default on pc-2.13+ won't be useful at all?
 
-  Steps to reproduce:
-  1) Build qemu-ppc64le as static and copy into docker build directory name=
-d it qemu-ppc64le-static.
-
-  2) Add hello.go to docker build dir.
-
-  package main
-  import "fmt"
-  func main() {
-  	fmt.Println("hello world")
-  }
-
-  3) Create the Dockerfile from below:
-
-  FROM ppc64le/golang:1.10.1-alpine3.
-  COPY qemu-ppc64le-static /usr/bin/
-  COPY hello.go /go
-
-  4) Build container
-  $ docker build -t qemutest -f Dockerfile ./go =
-
-
-  5) Run test
-  $ docker run -it qemutest
-
-  /go # /usr/bin/qemu-ppc64le-static --version
-  qemu-ppc64le version 2.11.93 (v2.12.0-rc3-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  /go # go version
-  go version go1.10.1 linux/ppc64le
-
-  /go # go build hello.go
-  fatal error: fatal error: stopm holding locksunexpected signal during run=
-time execution
-
-  panic during panic
-  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x1003=
-528c]
-
-  runtime stack:
-  runtime: unexpected return pc for syscall.Syscall6 called from 0xc42007f5=
-00
-  stack: frame=3D{sp:0xc4203be840, fp:0xc4203be860} stack=3D[0x4000b7ecf0,0=
-x4000b928f0)
-
-  syscall.Syscall6(0x100744e8, 0x3d, 0xc42050c140, 0x20, 0x18, 0x10422b80, =
-0xc4203be968[signal , 0x10012d88SIGSEGV: segmentation violation, 0xc4205940=
-00 code=3D, 0x00x1 addr=3D0x0 pc=3D0x1003528c)
-  ]
-
-  runtime stack:
-  	/usr/local/go/src/syscall/asm_linux_ppc64x.s:61runtime.throw(0x10472d19,=
- 0x13)
-   +	/usr/local/go/src/runtime/panic.go:0x6c616 +0x68
-
-  =
-
-  runtime.stopm()
-  	/usr/local/go/src/runtime/proc.go:1939goroutine  +10x158
-   [runtime.exitsyscall0semacquire(0xc42007f500)
-  	/usr/local/go/src/runtime/proc.go:3129 +]:
-  0x130
-  runtime.mcall(0xc42007f500)
-  	/usr/local/go/src/runtime/asm_ppc64x.s:183 +0x58sync.runtime_Semacquire
-  (0xc4201fab1c)
-  	/usr/local/go/src/runtime/sema.go:56 +0x38
-
-  ----
-  Note the results may differ between attempts,  hangs and other faults som=
-etimes happen.
-  ----
-  If I run "go: single threaded I don't see the problem, for example:
-
-  /go # GOMAXPROCS=3D1 go build -p 1 hello.go =
-
-  /go # ./hello
-  hello world
-
-  I see the same issue with arm64.  I don't think this is a go issue,
-  but don't have a real evidence to prove that.  This problem looks
-  similar to other problem I have seen reported against qemu running
-  multi-threaded applications.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1763536/+subscriptions
+--=20
+Eduardo
