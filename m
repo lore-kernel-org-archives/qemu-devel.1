@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f8Z7G-0005Js-Mg
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:30:24 -0400
+	(envelope-from <crobinso@redhat.com>) id 1f8Z90-0006Hs-1x
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f8Z7D-0002jW-BO
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:30:22 -0400
-Resent-Message-Id: <E1f8Z7D-0002jW-BO@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f8Z7D-0002gn-4t
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:30:19 -0400
-In-Reply-To: <20180417222635.17007-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152400420155.1926.8714812877368730120@71c20359a636>
+	(envelope-from <crobinso@redhat.com>) id 1f8Z8v-0004zG-7H
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:32:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42770 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1f8Z8v-0004xP-2K
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 18:32:05 -0400
+References: <20171009144344.38bbd1e9@nial.brq.redhat.com>
+	<20171009130218.GK2954@redhat.com>
+	<20171010003951-mutt-send-email-mst@kernel.org>
+	<20171010083143.GA30015@redhat.com>
+	<CAJ+F1CLGJLXYnJ8SnrbVkWc6bdU2geYKeEaKrxWaYBhXwA=Opg@mail.gmail.com>
+	<20171010150628.GI30015@redhat.com>
+	<20171010180110.GI3246@localhost.localdomain>
+	<20171015044800-mutt-send-email-mst@kernel.org>
+	<20171020184820.GP2942@localhost.localdomain>
+	<a5ff2864-f794-e728-5be1-0c1e58d9f163@redhat.com>
+	<20180417211126.GD29865@localhost.localdomain>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <f822d32f-5d0f-aa42-95a8-46afd4923d45@redhat.com>
+Date: Tue, 17 Apr 2018 18:31:57 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 17 Apr 2018 15:30:02 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-2.13] tcg: Improve TCGv_ptr support
+In-Reply-To: <20180417211126.GD29865@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Dave Anderson <anderson@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Martin Kletzander <mkletzan@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDE3MjIyNjM1LjE3MDA3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvci0yLjEzXSB0Y2c6IEltcHJvdmUg
-VENHdl9wdHIgc3VwcG9ydAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAg
-ICAgcGF0Y2hldy8yMDE4MDQxNzIyMjYzNS4xNzAwNy0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
-by5vcmcgLT4gcGF0Y2hldy8yMDE4MDQxNzIyMjYzNS4xNzAwNy0xLXJpY2hhcmQuaGVuZGVyc29u
-QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozZDdmYTA2NTg0IHRj
-ZzogSW1wcm92ZSBUQ0d2X3B0ciBzdXBwb3J0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzE6IHRjZzogSW1wcm92ZSBUQ0d2X3B0ciBzdXBwb3J0Li4uCkVSUk9SOiBzcGFj
-ZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzEwMTogRklMRTogdGNnL3RjZy1v
-cC5oOjExNDk6CisgICAgZ2x1ZSh0Y2dfZ2VuX2xkXyxQVFIpKChOQVQpciwgYSwgbyk7CiAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
-Y3R4OlZ4VikKIzEwNjogRklMRTogdGNnL3RjZy1vcC5oOjExNTQ6CisgICAgZ2x1ZSh0Y2dfZ2Vu
-X2Rpc2NhcmRfLFBUUikoKE5BVClhKTsKICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
-Ujogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTE6IEZJTEU6IHRj
-Zy90Y2ctb3AuaDoxMTU5OgorICAgIGdsdWUodGNnX2dlbl9hZGRfLFBUUikoKE5BVClyLCAoTkFU
-KWEsIChOQVQpYik7CiAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWly
-ZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTY6IEZJTEU6IHRjZy90Y2ctb3AuaDoxMTY0
-OgorICAgIGdsdWUodGNnX2dlbl9hZGRpXyxQVFIpKChOQVQpciwgKE5BVClhLCBiKTsKICAgICAg
-ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcg
-KGN0eDpWeFYpCiMxMjI6IEZJTEU6IHRjZy90Y2ctb3AuaDoxMTcwOgorICAgIGdsdWUodGNnX2dl
-bl9icmNvbmRpXyxQVFIpKGNvbmQsIChOQVQpYSwgYiwgbGFiZWwpOwogICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCnRvdGFsOiA1IGVycm9ycywgMCB3YXJuaW5ncywgMzA1IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 04/17/2018 05:11 PM, Eduardo Habkost wrote:
+> On Tue, Apr 17, 2018 at 03:12:03PM -0400, Cole Robinson wrote:
+> [...]
+>> Reviving this... did any follow up changes happen?
+>>
+>> Marc-Andr=C3=A9 patched virt-manager a few months back to enable -devi=
+ce
+>> vmcoreinfo for new VMs:
+>>
+>> https://www.redhat.com/archives/virt-tools-list/2018-February/msg00020=
+.html
+>>
+>> And I see there's at least a bug tracking adding this to openstack for
+>> new VMs:
+>>
+>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1555276
+>>
+>> If this feature doesn't really have any downsides, it would be nice to
+>> get this tied to new machine types. Saves a lot of churn for higher
+>> levels of the stack
+>=20
+> I understand this would be nice to have considering the existing
+> stacks, but at the same time I would like the rest of the
+> stack(s) to really try to not depend on QEMU machine-types to
+> define policy/defaults.
+>=20
+> Every feature that is hidden behind an opaque machine-type name
+> and not visible in the domain XML and QEMU command-line increases
+> the risk of migration and compatibility bugs.
+>=20
+
+What exactly is the migration compatibility issue with turning on the
+equivalent of -device vmcoreinfo for -M *-2.13+ ? Possibly prevents
+backwards migration to older qemu but is that even a goal?
+
+> This was being discussed in a mail thread at:
+> https://www.mail-archive.com/ovirt-devel@redhat.com/msg01196.html
+>=20
+> Quoting Daniel, on that thread:
+>=20
+> ] Another case is the pvpanic device - while in theory that could
+> ] have been enabled by default for all guests, by QEMU or a config
+> ] generator library, doing so is not useful on its own. The hard
+> ] bit of the work is adding code to the mgmt app to choose the
+> ] action for when pvpanic triggers, and code to handle the results
+> ] of that action.
+>=20
+> From that comment, I understand that simply making QEMU create a
+> pvpanic device by default on pc-2.13+ won't be useful at all?
+>=20
+
+This qemu-devel thread was about -device vmcoreinfo though, not pvpanic.
+vmcoreinfo doesn't need anything else to work AFAICT and shouldn't need
+any explicit config, heck it doesn't even have any -device properties.
+
+Like Dan says pvpanic isn't a 'just works' thing, and I know for windows
+VMs it shows up in device manager which has considerations for things
+like SVVP. I think vmcoreinfo doesn't have the same impact
+
+There are some guest visible things that we have turned on for new
+machine types in the past, pveoi and x2apic comes to mind.
+
+Thanks,
+Cole
