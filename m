@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1f8W1T-0007Yj-Qr
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:12:13 -0400
+	(envelope-from <kwankhede@nvidia.com>) id 1f8W4C-0001FI-BF
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:15:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1f8W1Q-0004il-Gr
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:12:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51346 helo=mx1.redhat.com)
+	(envelope-from <kwankhede@nvidia.com>) id 1f8W49-0006G0-0e
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:15:00 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:19322)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1f8W1Q-0004iV-Ac
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:12:08 -0400
-References: <20170911165929.2791-3-marcandre.lureau@redhat.com>
-	<20171009110336.GA17824@redhat.com>
-	<20171009144344.38bbd1e9@nial.brq.redhat.com>
-	<20171009130218.GK2954@redhat.com>
-	<20171010003951-mutt-send-email-mst@kernel.org>
-	<20171010083143.GA30015@redhat.com>
-	<CAJ+F1CLGJLXYnJ8SnrbVkWc6bdU2geYKeEaKrxWaYBhXwA=Opg@mail.gmail.com>
-	<20171010150628.GI30015@redhat.com>
-	<20171010180110.GI3246@localhost.localdomain>
-	<20171015044800-mutt-send-email-mst@kernel.org>
-	<20171020184820.GP2942@localhost.localdomain>
-From: Cole Robinson <crobinso@redhat.com>
-Message-ID: <a5ff2864-f794-e728-5be1-0c1e58d9f163@redhat.com>
-Date: Tue, 17 Apr 2018 15:12:03 -0400
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1f8W48-0006E0-L3
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:14:56 -0400
+References: <1523340177-8975-1-git-send-email-yulei.zhang@intel.com>
+	<d9da5967-e44f-d0a4-3f8a-375f640e56d2@nvidia.com>
+	<20180416142328.18fbe5f6@w520.home>
+	<01FDBDDE256B79498DC57789713132D46A18F6E9@SHSMSX101.ccr.corp.intel.com>
+	<20180417084344.7a241a9e@w520.home>
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <e9039b4e-7f3d-7a82-ff38-14c57da6ea31@nvidia.com>
+Date: Wed, 18 Apr 2018 00:44:35 +0530
 MIME-Version: 1.0
-In-Reply-To: <20171020184820.GP2942@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180417084344.7a241a9e@w520.home>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH V4 2/4] vfio: Add vm status change
+ callback to stop/restart the mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,147 +33,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Dave Anderson <anderson@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, "Zhang, Yulei" <yulei.zhang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
 
-On 10/20/2017 02:48 PM, Eduardo Habkost wrote:
-> On Sun, Oct 15, 2017 at 04:56:28AM +0300, Michael S. Tsirkin wrote:
->> On Tue, Oct 10, 2017 at 03:01:10PM -0300, Eduardo Habkost wrote:
->>> On Tue, Oct 10, 2017 at 04:06:28PM +0100, Daniel P. Berrange wrote:
->>>> On Tue, Oct 10, 2017 at 05:00:18PM +0200, Marc-Andr=C3=A9 Lureau wro=
-te:
->>>>> Hi
+
+
+On 4/17/2018 8:13 PM, Alex Williamson wrote:
+> On Tue, 17 Apr 2018 13:40:32 +0000
+> "Zhang, Yulei" <yulei.zhang@intel.com> wrote:
+> 
+>>> -----Original Message-----
+>>> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+>>> Sent: Tuesday, April 17, 2018 4:23 AM
+>>> To: Kirti Wankhede <kwankhede@nvidia.com>
+>>> Cc: Zhang, Yulei <yulei.zhang@intel.com>; qemu-devel@nongnu.org; Tian,
+>>> Kevin <kevin.tian@intel.com>; joonas.lahtinen@linux.intel.com;
+>>> zhenyuw@linux.intel.com; Wang, Zhi A <zhi.a.wang@intel.com>;
+>>> dgilbert@redhat.com; quintela@redhat.com
+>>> Subject: Re: [RFC PATCH V4 2/4] vfio: Add vm status change callback to
+>>> stop/restart the mdev device
+>>>
+>>> On Mon, 16 Apr 2018 20:14:27 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>   
+>>>> On 4/10/2018 11:32 AM, Yulei Zhang wrote:  
+>>>>> VM status change handler is added to change the vfio pci device
+>>>>> status during the migration, write the demanded device status
+>>>>> to the DEVICE STATUS subregion to stop the device on the source side
+>>>>> before fetch its status and start the deivce on the target side
+>>>>> after restore its status.
 >>>>>
->>>>> On Tue, Oct 10, 2017 at 10:31 AM, Daniel P. Berrange
->>>>> <berrange@redhat.com> wrote:
->>>>>> On Tue, Oct 10, 2017 at 12:44:26AM +0300, Michael S. Tsirkin wrote=
-:
->>>>>>> On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrot=
-e:
->>>>>>>> On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
->>>>>>>>> On Mon, 9 Oct 2017 12:03:36 +0100
->>>>>>>>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->>>>>>>>>
->>>>>>>>>> On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=C3=A9 Lure=
-au wrote:
->>>>>>>>>>> See docs/specs/vmcoreinfo.txt for details.
->>>>>>>>>>>
->>>>>>>>>>> "etc/vmcoreinfo" fw_cfg entry is added when using "-device vm=
-coreinfo".
->>>>>>>>>>
->>>>>>>>>> I'm wondering if you considered just adding the entry to fw_cf=
-g by
->>>>>>>>>> default, without requiring any -device arg ? Unless I'm misund=
-erstanding,
->>>>>>>>>> this doesn't feel like a device to me - its just a well known =
-bucket
->>>>>>>>>> in fw_cfg IIUC ?  Obviously its existance would need to be tie=
-d to
->>>>>>>>>> the latest machine type for ABI reasons though. The benefit of=
- this
->>>>>>>>>> is that it would "just work" without us having to plumb it thr=
-ough to
->>>>>>>>>> all the downstream applications that use QEMU for mgmt guest (=
-OpenStack,
->>>>>>>>>> oVirt, GNOME Boxes, virt-manager, and countless other mgmt app=
-s).
->>>>>>>>> it follows model set by pvpanic device, it's easier to manage f=
-rom migration
->>>>>>>>> POV, one could use it even for old machine types with new qemu =
-(just by adding
->>>>>>>>> device, it makes instance not backwards migratable to old qemu =
-but should work
->>>>>>>>> for forward migration) and if user doesn't need it, device coul=
-d be just omitted
->>>>>>>>> from CLI.
->>>>>>>>
->>>>>>>> Sure but it means that in effect no one will have this functiona=
-lity enabled
->>>>>>>> for several years. pvpanic has been around a long time and I rar=
-ely see it
->>>>>>>> present in configured guests :-(
->>>>>>>>
->>>>>>>>
->>>>>>>> Regards,
->>>>>>>> Daniel
->>>>>>>
->>>>>>> libvirt runs with -nodefaults, right? I'd argue pretty strongly -=
-nodefaults
->>>>>>> shouldn't add optional devices anyway.
->>>>>>
->>>>>> This isn't really adding a device though is it - it is just a well=
- known
->>>>>> location in fw_cfg to receive data.
+>>>>> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+>>>>> ---
+>>>>>  hw/vfio/pci.c                 | 20 ++++++++++++++++++++
+>>>>>  include/hw/vfio/vfio-common.h |  1 +
+>>>>>  linux-headers/linux/vfio.h    |  6 ++++++
+>>>>>  roms/seabios                  |  2 +-
+>>>>>  4 files changed, 28 insertions(+), 1 deletion(-)
 >>>>>
->>>>> Enabling the device on some configurations by default can be done a=
-s a
->>>>> follow-up patch. Can we get this series reviewed & merged?
+>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>>>> index f98a9dd..13d8c73 100644
+>>>>> --- a/hw/vfio/pci.c
+>>>>> +++ b/hw/vfio/pci.c
+>>>>> @@ -38,6 +38,7 @@
+>>>>>
+>>>>>  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>>>>>  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+>>>>> +static void vfio_vm_change_state_handler(void *pv, int running,  
+>>> RunState state);  
+>>>>>
+>>>>>  /*
+>>>>>   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+>>>>> @@ -2896,6 +2897,7 @@ static void vfio_realize(PCIDevice *pdev, Error  
+>>> **errp)  
+>>>>>      vfio_register_err_notifier(vdev);
+>>>>>      vfio_register_req_notifier(vdev);
+>>>>>      vfio_setup_resetfn_quirk(vdev);
+>>>>> +  
+>>> qemu_add_vm_change_state_handler(vfio_vm_change_state_handler,
+>>> vdev);  
+>>>>>
+>>>>>      return;
+>>>>>
+>>>>> @@ -2982,6 +2984,24 @@ post_reset:
+>>>>>      vfio_pci_post_reset(vdev);
+>>>>>  }
+>>>>>
+>>>>> +static void vfio_vm_change_state_handler(void *pv, int running,  
+>>> RunState state)  
+>>>>> +{
+>>>>> +    VFIOPCIDevice *vdev = pv;
+>>>>> +    VFIODevice *vbasedev = &vdev->vbasedev;
+>>>>> +    uint8_t dev_state;
+>>>>> +    uint8_t sz = 1;
+>>>>> +
+>>>>> +    dev_state = running ? VFIO_DEVICE_START : VFIO_DEVICE_STOP;
+>>>>> +
+>>>>> +    if (pwrite(vdev->vbasedev.fd, &dev_state,
+>>>>> +               sz, vdev->device_state.offset) != sz) {
+>>>>> +        error_report("vfio: Failed to %s device", running ? "start" : "stop");
+>>>>> +        return;
+>>>>> +    }
+>>>>> +
+>>>>> +    vbasedev->device_state = dev_state;
+>>>>> +}
+>>>>> +  
 >>>>
->>>> The problem with the -device approach + turning it on by default is =
-that there
->>>> is no way to turn it off again if you don't want it. eg there's way =
-to undo
->>>> an implicit '-device foo' except via -nodefaults, but since libvirt =
-uses that
->>>> already it would negate the effect of enabling it by default uncondi=
-tionally.
+>>>> Is it expected to trap device_state region by vendor driver?
+>>>> Can this information be communicated to vendor driver through an ioctl?  
 >>>
->>> It's still possible to add a -machine option that can
->>> enable/disable automatic creation of the device.
+>>> Either the mdev vendor driver or vfio bus driver (ie. vfio-pci) would
+>>> be providing REGION_INFO for this region, so the vendor driver is
+>>> already in full control here using existing ioctls.  I don't see that
+>>> we need new ioctls, we just need to fully define the API of the
+>>> proposed regions here.
+>>>   
+>> If the device state region is mmaped, we may not be able to use
+>> region device state offset to convey the running state. It may need
+>> a new ioctl to set the device state.
+> 
+> The vendor driver defines the mmap'ability of the region, the vendor
+> driver is still in control.  The API of the region and the
+> implementation by the vendor driver should account for handling
+> mmap'able sections within the region.  Thanks,
+> 
+> Alex
+> 
+>  
+
+If this same region should be used for communicating state or other
+parameters instead of ioctl, may be first page of this region need to be
+reserved. Mmappable region's start address should be page aligned. Is
+this API going to utilize 4K of the reserved part of this region?
+Instead of carving out part of section from the region, are there any
+disadvantages of adding an ioctl?
+May be defining a single ioctl and using different flags (GET_*/SET_*)
+would work?
+
+>>>> Here only device state is conveyed to vendor driver but knowing
+>>>> 'RunState' in vendor driver is very useful and vendor driver can take
+>>>> necessary action accordingly like RUN_STATE_PAUSED indicating that VM  
+>>> is  
+>>>> in paused state, similarly RUN_STATE_SUSPENDED,
+>>>> RUN_STATE_FINISH_MIGRATE, RUN_STATE_IO_ERROR. If these states are
+>>>> handled properly, all the cases can be supported with same interface
+>>>> like VM suspend-resume, VM pause-restore.  
 >>>
->>> But I also don't see why it needs to be implemented using -device
->>> if it's not really a device.  A boolean machine or fw_cfg
->>> property is good enough for that.
->>
->> It certainly feels like a device. It has state
->> (that needs to be migrated), it has a host/guest interface.
->=20
-> (Sorry for the late reply)
->=20
-> That's convincing enough to me.  :)
->=20
->=20
->>>>
->>>> Your previous approach of "-global fw_cfg.vmcoreinfo=3Don" is nicer =
-in this
->>>> respect, as you can trivially turn it on/off, overriding the default=
- state
->>>> in both directions.
+>>> I agree, but let's remember that we're talking about device state, not
+>>> VM state.  vfio is a userspace device interface, not specifically a
+>>> virtual machine interface, so states should be in terms of the device.
+>>> The API of this region needs to be clearly defined and using only 1
+>>> byte at the start of the region is not very forward looking.  Thanks,
 >>>
->>> Both "-global fw_cfg.vmcoreinfo=3Don|off" and
->>> "-machine vmcoreinfo=3Don|off" sound good enough to me.
->>
->>
->> Certainly not a fw cfg flag. Can be a machine flag I guess
->> but then we'd have to open-code each such device.
->> And don't forget auto - this is what Daniel asks for.
->=20
-> I'm not sure Daniel is really asking for "auto": he is just
-> asking for a way to disable the new default.  If "vmcoreinfo=3Doff"
-> and "vmcoreinfo=3Doff" works, there's no need for a user-visible
-> "auto" value.
->=20
-> (Actually, "auto" values makes compatibility code even messier,
-> because we would need one additional compat property/field to
-> tell QEMU what "auto" means on each machine)
->=20
+>>> Alex
+>>>   
 
-Reviving this... did any follow up changes happen?
-
-Marc-Andr=C3=A9 patched virt-manager a few months back to enable -device
-vmcoreinfo for new VMs:
-
-https://www.redhat.com/archives/virt-tools-list/2018-February/msg00020.ht=
-ml
-
-And I see there's at least a bug tracking adding this to openstack for
-new VMs:
-
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1555276
-
-If this feature doesn't really have any downsides, it would be nice to
-get this tied to new machine types. Saves a lot of churn for higher
-levels of the stack
+Sorry for using wrong term in my previous reply, 'RunState' is actually
+CPU state and not VM state. In terms of vfio device interface knowing
+CPU state would be helpful, right?
 
 Thanks,
-Cole
+Kirti
+
+>>>>>  static void vfio_instance_init(Object *obj)
+>>>>>  {
+>>>>>      PCIDevice *pci_dev = PCI_DEVICE(obj);
+>>>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-  
+>>> common.h  
+>>>>> index f3a2ac9..9c14a8f 100644
+>>>>> --- a/include/hw/vfio/vfio-common.h
+>>>>> +++ b/include/hw/vfio/vfio-common.h
+>>>>> @@ -125,6 +125,7 @@ typedef struct VFIODevice {
+>>>>>      unsigned int num_irqs;
+>>>>>      unsigned int num_regions;
+>>>>>      unsigned int flags;
+>>>>> +    bool device_state;
+>>>>>  } VFIODevice;
+>>>>>
+>>>>>  struct VFIODeviceOps {
+>>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>>>>> index e3380ad..8f02f2f 100644
+>>>>> --- a/linux-headers/linux/vfio.h
+>>>>> +++ b/linux-headers/linux/vfio.h
+>>>>> @@ -304,6 +304,12 @@ struct vfio_region_info_cap_type {
+>>>>>  /* Mdev sub-type for device state save and restore */
+>>>>>  #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+>>>>>
+>>>>> +/* Offset in region to save device state */
+>>>>> +#define VFIO_DEVICE_STATE_OFFSET	1
+>>>>> +
+>>>>> +#define VFIO_DEVICE_START	0
+>>>>> +#define VFIO_DEVICE_STOP	1
+>>>>> +
+>>>>>  /**
+>>>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>>>>   *				    struct vfio_irq_info)
+>>>>> diff --git a/roms/seabios b/roms/seabios
+>>>>> index 63451fc..5f4c7b1 160000
+>>>>> --- a/roms/seabios
+>>>>> +++ b/roms/seabios
+>>>>> @@ -1 +1 @@
+>>>>> -Subproject commit 63451fca13c75870e1703eb3e20584d91179aebc
+>>>>> +Subproject commit 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
+>>>>>  
+>>
+> 
