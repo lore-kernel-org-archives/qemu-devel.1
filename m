@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8MPn-0002y9-8N
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:56:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8MR6-0003nn-RK
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8MPm-0004VZ-FX
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:56:39 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45156)
+	(envelope-from <peter.maydell@linaro.org>) id 1f8MR1-0007to-5Q
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:58:00 -0400
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:44009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8MPm-0004Tm-9d
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:56:38 -0400
-Received: by mail-oi0-x241.google.com with SMTP id j10-v6so3108903oii.12
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 01:56:37 -0700 (PDT)
+	id 1f8MR1-0007sL-0n
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:57:55 -0400
+Received: by mail-ot0-x232.google.com with SMTP id d9-v6so20557326oth.10
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 01:57:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <614d4cef-07d2-f025-1039-2577be467c71@linaro.org>
+In-Reply-To: <20180416135442.30606-1-alex.bennee@linaro.org>
 References: <20180416135442.30606-1-alex.bennee@linaro.org>
-	<614d4cef-07d2-f025-1039-2577be467c71@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Apr 2018 09:56:16 +0100
-Message-ID: <CAFEAcA-qBWUW7gtfzfQ91gx4YrPB=+WmrCF=rJGbod9BOycMxw@mail.gmail.com>
+Date: Tue, 17 Apr 2018 09:57:33 +0100
+Message-ID: <CAFEAcA8SO4ZRptoTvqXuG=fidkG-ibJjmeSNLOTmk_M51icBPQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
@@ -31,22 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 16 April 2018 at 20:39, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 04/16/2018 03:54 AM, Alex Benn=C3=A9e wrote:
->> +    /* Inf / x or 0 / x */
->> +    if (a.cls =3D=3D float_class_inf || a.cls =3D=3D float_class_zero) =
-{
->> +        a.sign =3D sign;
->> +        return a;
->> +    }
+On 16 April 2018 at 14:54, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> The re-factoring of div_floats changed the order of checking meaning
+> an operation like -inf/0 erroneously raises the divbyzero flag.
+> IEEE-754 (2008) specifies this should only occur for operations on
+> finite operands.
 >
-> 0/0 should raise an exception.
+> We fix this by moving the check on the dividend being Inf/0 to before
+> the divisor is zero check.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-It does -- we check for 0/0 and Inf/Inf first, just before this check.
+Applied, thanks.
 
-thanks
 -- PMM
