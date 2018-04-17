@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8Qkq-0004j5-TN
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:34:42 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f8QmL-0005kt-OA
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8Qkp-0001ER-K1
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:34:40 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43951)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8Qkp-0001E4-Dt
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:34:39 -0400
-Received: by mail-oi0-x241.google.com with SMTP id p62-v6so1603606oie.10
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:34:39 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f8QmH-0002Os-Jj
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:36:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50206 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1f8QmH-0002O8-Ep
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:36:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8994D406E8B9
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 13:36:07 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 17 Apr 2018 15:35:57 +0200
+Message-Id: <20180417133602.23832-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOuPqTE8GsN_+REWzSt4DOiqddSbZC-kOH=WnYG3U8ge3GsLoA@mail.gmail.com>
-References: <CAOuPqTE8GsN_+REWzSt4DOiqddSbZC-kOH=WnYG3U8ge3GsLoA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Apr 2018 14:34:18 +0100
-Message-ID: <CAFEAcA_Hti-FYqEse7ubdNyVr3fPHO==e6MDv9Ym4KVYJcYTwA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Patch for ARM memory barriers and getdent
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/5] Simplify qobject refcount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +31,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Henry Wertz <hwertz10@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <Laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 16 April 2018 at 19:44, Henry Wertz <hwertz10@gmail.com> wrote:
-> Please find submitted a patch for ARM memory barriers.  This patch is
-> against qemu-2.12-rc2 but I do believe it should apply for anything from
-> 2.11.x to current.
+Hi,
 
-Hi Henry; thanks for these patches. Please could you provide
-a Signed-off-by: line for them? This says you're happy for us
-to apply them to QEMU under our license, and we can't do anything
-with them without one. The top part of
-https://wiki.qemu.org/Contribute/SubmitAPatch
-has more detail.
+This series aims to get rid of the distinction between QObject, that
+must use qobject_incref/qobject_decref and its various derived types
+that have to use QINCREF/QDECREF. Instead, replace it with
+qobject_ref/qobject_unref for all types.
 
-> I found with qemu 2.11.x or newer that I would get an illegal instruction
-> error running some Intel binaries on my ARM chromebook.  On investigation,
-> I found it was quitting on memory barriers.
-> qemu instruction:
-> mb $0x31
-> was translating as:
-> 0x604050cc:  5bf07ff5  blpl     #0x600250a8
->
-> After patch it gives:
-> 0x604050cc:  f57ff05b  dmb      ish
->
-> In short, I found INSN_DMB_ISH (memory barrier for ARMv7) appeared to be
-> correct based on online docs, but due to some endian-related shenanigans it
-> had to be byte-swapped to suit qemu; it appears INSN_DMB_MCR (memory
-> barrier for ARMv6) also should be byte swapped  (and this patch does so).
-> I have not checked for correctness of aarch64's barrier instruction.
+v5: after Markus review
+- various commit message & comments update
+- split the object_ref() patch to assert() on NULL, and return obj
+- drop RFC from cover letter
 
-Yeah, this definitely looks like a bug -- I can't see how the code
-as it stands could ever have worked (it was added in commit 40f191ab8226fdada).
+v4:
+- rename QObjectCommon->QObjectBase_
+- add back qobject_ref_impl/qobject_unref_impl
+- add extra parenthesis for qobject_ref() cast
+- commit message tweaks
 
-> -------------------------------
-> Please find submitted a patch for getdents (this system call stands for
-> "get directory entries",
+v3: after v2 review with Eric and Paolo
+- fix clang ubsan warning when a null pointer is given to QOBJECT.
+- add a patch to make qobject_ref() assert on null pointer, and return
+  the same pointer, simplifying some code.
 
-You'll probably have better luck if you submit patches as separate
-emails rather than all in one -- the set of people who care about
-reviewing TCG backend patches is different from the people who
-look after the linux-user syscall emulation code.
+v2:
+- use the QObjectCommon base approach suggested by Paolo and Eric
+- remove need for QEMU_GENERIC
 
-> it is passed a file descriptor pointing to a
-> directory and returns a struct with info on the entries in that
-> directory.)  This patch is against qemu-2.10 series but continues to apply
-> cleanly on current as of April 15 2018.  If you are running a 32-bit binary
-> on 64-bit target current qemu will convert he getdents struct, but it will
-> NOT in the case of 64-bit binary on 32-bit host.
+Marc-Andr=C3=A9 Lureau (5):
+  qobject: ensure base is at offset 0
+  qobject: use a QObjectBase_ struct
+  qobject: replace qobject_incref/QINCREF qobject_decref/QDECREF
+  qobject: modify qobject_ref() to return obj
+  qobject: modify qobject_ref() to assert on NULL
 
-In general, 64-bit binary on a 32-bit host is not supported by linux-user.
-Various things are likely to go wrong for anything but the simplest
-of guest binaries. You need a 64-bit host to reliably use linux-user
-for a 64-bit guest binary.
+ scripts/qapi/events.py              |   2 +-
+ include/qapi/qmp/qbool.h            |   2 +-
+ include/qapi/qmp/qdict.h            |   2 +-
+ include/qapi/qmp/qlist.h            |   2 +-
+ include/qapi/qmp/qnull.h            |   5 +-
+ include/qapi/qmp/qnum.h             |   2 +-
+ include/qapi/qmp/qobject.h          |  74 ++++++++++---------
+ include/qapi/qmp/qstring.h          |   2 +-
+ block.c                             |  82 ++++++++++-----------
+ block/blkdebug.c                    |   7 +-
+ block/blkverify.c                   |   8 +--
+ block/crypto.c                      |   4 +-
+ block/gluster.c                     |   4 +-
+ block/iscsi.c                       |   2 +-
+ block/nbd.c                         |   4 +-
+ block/nfs.c                         |   4 +-
+ block/null.c                        |   3 +-
+ block/nvme.c                        |   3 +-
+ block/parallels.c                   |   4 +-
+ block/qapi.c                        |   2 +-
+ block/qcow.c                        |   8 +--
+ block/qcow2.c                       |   8 +--
+ block/qed.c                         |   4 +-
+ block/quorum.c                      |   4 +-
+ block/rbd.c                         |  14 ++--
+ block/sheepdog.c                    |  12 ++--
+ block/snapshot.c                    |   4 +-
+ block/ssh.c                         |   4 +-
+ block/vdi.c                         |   2 +-
+ block/vhdx.c                        |   4 +-
+ block/vpc.c                         |   4 +-
+ block/vvfat.c                       |   2 +-
+ block/vxhs.c                        |   2 +-
+ blockdev.c                          |  16 ++---
+ hw/i386/acpi-build.c                |  12 ++--
+ hw/ppc/spapr_drc.c                  |   2 +-
+ hw/usb/xen-usb.c                    |   4 +-
+ migration/migration.c               |   4 +-
+ migration/qjson.c                   |   2 +-
+ monitor.c                           |  57 +++++++--------
+ qapi/qapi-dealloc-visitor.c         |   4 +-
+ qapi/qmp-dispatch.c                 |   6 +-
+ qapi/qobject-input-visitor.c        |  10 ++-
+ qapi/qobject-output-visitor.c       |  11 ++-
+ qemu-img.c                          |  18 ++---
+ qemu-io.c                           |   6 +-
+ qga/main.c                          |  12 ++--
+ qmp.c                               |   4 +-
+ qobject/json-parser.c               |  10 +--
+ qobject/qdict.c                     |  49 +++++--------
+ qobject/qjson.c                     |   2 +-
+ qobject/qlist.c                     |   4 +-
+ qobject/qobject.c                   |  21 ++++--
+ qom/object.c                        |  16 ++---
+ qom/object_interfaces.c             |   2 +-
+ target/ppc/translate_init.c         |   2 +-
+ target/s390x/cpu_models.c           |   2 +-
+ tests/ahci-test.c                   |   6 +-
+ tests/check-qdict.c                 | 106 ++++++++++++++--------------
+ tests/check-qjson.c                 |  84 +++++++++++-----------
+ tests/check-qlist.c                 |   8 +--
+ tests/check-qlit.c                  |  10 +--
+ tests/check-qnull.c                 |  10 +--
+ tests/check-qnum.c                  |  28 ++++----
+ tests/check-qobject.c               |   2 +-
+ tests/check-qstring.c               |  10 +--
+ tests/cpu-plug-test.c               |   4 +-
+ tests/device-introspect-test.c      |  24 +++----
+ tests/drive_del-test.c              |   4 +-
+ tests/libqos/libqos.c               |   8 +--
+ tests/libqos/pci-pc.c               |   2 +-
+ tests/libqtest.c                    |  24 +++----
+ tests/machine-none-test.c           |   2 +-
+ tests/migration-test.c              |  24 +++----
+ tests/numa-test.c                   |  16 ++---
+ tests/pvpanic-test.c                |   2 +-
+ tests/q35-test.c                    |   2 +-
+ tests/qmp-test.c                    |  38 +++++-----
+ tests/qom-test.c                    |   8 +--
+ tests/tco-test.c                    |  12 ++--
+ tests/test-char.c                   |   2 +-
+ tests/test-keyval.c                 |  82 ++++++++++-----------
+ tests/test-netfilter.c              |  26 +++----
+ tests/test-qemu-opts.c              |  14 ++--
+ tests/test-qga.c                    |  76 ++++++++++----------
+ tests/test-qmp-cmds.c               |  24 +++----
+ tests/test-qmp-event.c              |   2 +-
+ tests/test-qobject-input-visitor.c  |  10 +--
+ tests/test-qobject-output-visitor.c |  18 ++---
+ tests/test-visitor-serialization.c  |   6 +-
+ tests/test-x86-cpuid-compat.c       |  14 ++--
+ tests/tmp105-test.c                 |   4 +-
+ tests/vhost-user-test.c             |   6 +-
+ tests/virtio-net-test.c             |   6 +-
+ tests/vmgenid-test.c                |   2 +-
+ tests/wdt_ib700-test.c              |  14 ++--
+ util/keyval.c                       |  12 ++--
+ util/qemu-config.c                  |   4 +-
+ docs/devel/qapi-code-gen.txt        |   2 +-
+ scripts/coccinelle/qobject.cocci    |   8 +--
+ 100 files changed, 663 insertions(+), 669 deletions(-)
 
-I think your change isn't sufficient to handle the "target 32 bits
-and host 64 bits" case, because the 64-on-32 code path that you're
-using for it uses the guest's buffer size as the size of the
-host buffer it allocates to pass to the host syscall. That's ok
-if the host is 64 bits, because the host struct linux_dirent will
-be bigger than the target's struct linux_dirent, and so we can
-guarantee to fit all the host's structures into the target's
-buffer (with unused space left over at the end). If you try to
-use the same code for "target 64 bits and host 32 bits" then we
-may have more host dirent structures in the host buffer than we
-can fit into the guest buffer, and we'll end up overrunning the
-end of the guest's buffer. I don't see an obvious way to support
-64-on-32 here, because the record sizes are variable, not fixed,
-so you can't tell in advance what sized host buffer you'd need to
-be able to fit the results from the kernel into the guest's buffer.
-Maybe I'm missing a clever trick?
-
-thanks
--- PMM
+--=20
+2.17.0.rc1.36.gcedb63ea2f
