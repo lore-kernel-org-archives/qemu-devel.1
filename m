@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8TBC-0005Lj-0L
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:10:03 -0400
+	(envelope-from <spopovyc@redhat.com>) id 1f8TMY-0000VX-F4
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8TBA-0006zO-KY
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:10:01 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180415234307.28132-1-f4bug@amsat.org>
-	<20180415234307.28132-34-f4bug@amsat.org>
-	<f11c4eac-fcbf-0aa3-06bf-570ff57144c4@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f798155d-7740-42cc-fd37-384bb0d4fb06@amsat.org>
-Date: Tue, 17 Apr 2018 13:09:40 -0300
-MIME-Version: 1.0
-In-Reply-To: <f11c4eac-fcbf-0aa3-06bf-570ff57144c4@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 33/41] hw/net: Use the BYTE-based
- definitions
+	(envelope-from <spopovyc@redhat.com>) id 1f8TMT-0004tY-GM
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 12:21:46 -0400
+From: Serhii Popovych <spopovyc@redhat.com>
+Date: Tue, 17 Apr 2018 12:21:35 -0400
+Message-Id: <1523982095-17175-1-git-send-email-spopovyc@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.13] spapr: Correct max associativity
+ domains value for non-NUMA configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
-Cc: qemu-trivial@nongnu.org, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, "open list:Allwinner-a10" <qemu-arm@nongnu.org>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-Hi Stefan,
+In non-NUMA configurations nb_numa_nodes is zero and we set 5th cell
+in ibm,max-associativity-domains to -1. That causes to stall Linux
+guests during boot after following line:
 
-On 04/16/2018 02:23 AM, Stefan Weil wrote:
-> Am 16.04.2018 um 01:42 schrieb Philippe Mathieu-Daudé:
->> It eases code review, unit is explicit.
->>
->> Patch generated using:
->>
->>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
->>
->> and modified manually.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  include/hw/net/allwinner_emac.h | 5 +++--
->>  hw/net/e1000e.c                 | 7 ++++---
->>  hw/net/e1000x_common.c          | 3 ++-
->>  hw/net/eepro100.c               | 7 +++----
->>  4 files changed, 12 insertions(+), 10 deletions(-)
->>
->> diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner_emac.h
->> index 4cc8aab7ec..4b53b6485c 100644
->> --- a/include/hw/net/allwinner_emac.h
->> +++ b/include/hw/net/allwinner_emac.h
->> @@ -23,6 +23,7 @@
->>  #ifndef ALLWINNER_EMAC_H
->>  #define ALLWINNER_EMAC_H
->>  
->> +#include "qemu/units.h"
->>  #include "net/net.h"
->>  #include "qemu/fifo8.h"
->>  #include "hw/net/mii.h"
->> @@ -125,8 +126,8 @@
->>  #define EMAC_INT_RX         (1 << 8)
->>  
->>  /* Due to lack of specifications, size of fifos is chosen arbitrarily */
->> -#define TX_FIFO_SIZE        (4 * 1024)
->> -#define RX_FIFO_SIZE        (32 * 1024)
->> +#define TX_FIFO_SIZE        (4 * K_BYTE)
->> +#define RX_FIFO_SIZE        (32 * K_BYTE)
->>  
->>  #define NUM_TX_FIFOS        2
->>  #define RX_HDR_SIZE         8
->> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
->> index 16a9417a85..101efe7c83 100644
->> --- a/hw/net/e1000e.c
->> +++ b/hw/net/e1000e.c
->> @@ -34,6 +34,7 @@
->>  */
->>  
->>  #include "qemu/osdep.h"
->> +#include "qemu/units.h"
->>  #include "net/net.h"
->>  #include "net/tap.h"
->>  #include "qemu/range.h"
->> @@ -81,10 +82,10 @@ typedef struct E1000EState {
->>  #define E1000E_IO_IDX       2
->>  #define E1000E_MSIX_IDX     3
->>  
->> -#define E1000E_MMIO_SIZE    (128 * 1024)
->> -#define E1000E_FLASH_SIZE   (128 * 1024)
->> +#define E1000E_MMIO_SIZE    (128 * K_BYTE)
->> +#define E1000E_FLASH_SIZE   (128 * K_BYTE)
->>  #define E1000E_IO_SIZE      (32)
->> -#define E1000E_MSIX_SIZE    (16 * 1024)
->> +#define E1000E_MSIX_SIZE    (16 * K_BYTE)
->>  
->>  #define E1000E_MSIX_TABLE   (0x0000)
->>  #define E1000E_MSIX_PBA     (0x2000)
->> diff --git a/hw/net/e1000x_common.c b/hw/net/e1000x_common.c
->> index eb0e097137..58c8db77e9 100644
->> --- a/hw/net/e1000x_common.c
->> +++ b/hw/net/e1000x_common.c
->> @@ -23,6 +23,7 @@
->>  */
->>  
->>  #include "qemu/osdep.h"
->> +#include "qemu/units.h"
->>  #include "hw/hw.h"
->>  #include "hw/pci/pci.h"
->>  #include "net/net.h"
->> @@ -111,7 +112,7 @@ bool e1000x_is_oversized(uint32_t *mac, size_t size)
->>      static const int maximum_ethernet_vlan_size = 1522;
->>      /* this is the size past which hardware will
->>         drop packets when setting LPE=1 */
->> -    static const int maximum_ethernet_lpe_size = 16384;
->> +    static const int maximum_ethernet_lpe_size = 16 * K_BYTE;
->>  
->>      if ((size > maximum_ethernet_lpe_size ||
->>          (size > maximum_ethernet_vlan_size
->> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
->> index a07a63247e..a02e2b55e8 100644
->> --- a/hw/net/eepro100.c
->> +++ b/hw/net/eepro100.c
->> @@ -41,6 +41,7 @@
->>   */
->>  
->>  #include "qemu/osdep.h"
->> +#include "qemu/units.h"
->>  #include "hw/hw.h"
->>  #include "hw/pci/pci.h"
->>  #include "net/net.h"
->> @@ -60,8 +61,6 @@
->>   * changed to pad short packets itself. */
->>  #define CONFIG_PAD_RECEIVED_FRAMES
->>  
->> -#define KiB 1024
->> -
->>  /* Debug EEPRO100 card. */
->>  #if 0
->>  # define DEBUG_EEPRO100
->> @@ -104,9 +103,9 @@
->>  /* Use 64 word EEPROM. TODO: could be a runtime option. */
->>  #define EEPROM_SIZE     64
->>  
->> -#define PCI_MEM_SIZE            (4 * KiB)
->> +#define PCI_MEM_SIZE            (4 * K_BYTE)
->>  #define PCI_IO_SIZE             64
->> -#define PCI_FLASH_SIZE          (128 * KiB)
->> +#define PCI_FLASH_SIZE          (128 * K_BYTE)
->>  
->>  #define BITS(n, m) (((0xffffffffU << (31 - n)) >> (31 - n + m)) << m)
-> 
-> 
-> Technically this is fine, therefore
-> 
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
-> 
-> Practically I'd prefer replacing all K_BYTE by KiB, because that is the
-> standard name with a precise definition:
-> https://en.wikipedia.org/wiki/Kibibyte.
+[    0.000000] NUMA associativity depth for CPU/Memory: 4
 
-"1 kibibyte is 1024 bytes. The unit symbol for the kibibyte is KiB."
+Make last possible NUMA in property zero to correct support for
+non-NUMA guests.
 
-I like your suggestion :) Mostly because this shortens the code and
-keeps it readable (while respecting the SI).
+Fixes: c1df49a670ef ("spapr: Add ibm,max-associativity-domains property")
+Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+---
+ hw/ppc/spapr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If the other maintainers agree with this change, I'm OK to do the
-cleanup. I couldn't find a rule requiring #defines be all capital letter
-in CODING_STYLE, is this acceptable to have a lower case "i"?
-
-Regards,
-
-Phil.
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 7b2bc4e..bff2125 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -914,7 +914,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+         cpu_to_be32(0),
+         cpu_to_be32(0),
+         cpu_to_be32(0),
+-        cpu_to_be32(nb_numa_nodes - 1),
++        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
+     };
+ 
+     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+-- 
+1.8.3.1
