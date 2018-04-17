@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f8Qqe-0000ro-3R
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8Qqf-0000sb-0W
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f8Qqb-0004cx-Gt
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:40 -0400
-Received: from mga02.intel.com ([134.134.136.20]:24011)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1f8Qqb-0004cW-5G
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:37 -0400
-From: "Zhang, Yulei" <yulei.zhang@intel.com>
-Date: Tue, 17 Apr 2018 13:40:32 +0000
-Message-ID: <01FDBDDE256B79498DC57789713132D46A18F6E9@SHSMSX101.ccr.corp.intel.com>
-References: <1523340177-8975-1-git-send-email-yulei.zhang@intel.com>
-	<d9da5967-e44f-d0a4-3f8a-375f640e56d2@nvidia.com>
-	<20180416142328.18fbe5f6@w520.home>
-In-Reply-To: <20180416142328.18fbe5f6@w520.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8Qqc-0004dB-9I
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:41 -0400
+Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:43248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8Qqc-0004d3-4B
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:40:38 -0400
+Received: by mail-vk0-x233.google.com with SMTP id v134so11770211vkd.10
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:40:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAFEAcA-FaS+HeihGmbhrLAR8e=jmz-Og+OKGakGX7MGb_KgwCw@mail.gmail.com>
+	<d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <942ca9c4-9f23-424b-fcd5-b6758f4ad675@amsat.org>
+Date: Tue, 17 Apr 2018 10:40:33 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH V4 2/4] vfio: Add vm status change
- callback to stop/restart the mdev device
+In-Reply-To: <d002e4ff-e0c9-f66e-a25a-51605a79b55f@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Last call for release-critical fixes for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,159 +35,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+Hi Stefan,
 
+On 04/17/2018 10:19 AM, Stefan Weil wrote:
+> Update po files? That's not a "must fix", but it would be nice to have
+> those files synchronized with ui/gtk.c again.
 
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Tuesday, April 17, 2018 4:23 AM
-> To: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: Zhang, Yulei <yulei.zhang@intel.com>; qemu-devel@nongnu.org; Tian,
-> Kevin <kevin.tian@intel.com>; joonas.lahtinen@linux.intel.com;
-> zhenyuw@linux.intel.com; Wang, Zhi A <zhi.a.wang@intel.com>;
-> dgilbert@redhat.com; quintela@redhat.com
-> Subject: Re: [RFC PATCH V4 2/4] vfio: Add vm status change callback to
-> stop/restart the mdev device
->=20
-> On Mon, 16 Apr 2018 20:14:27 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->=20
-> > On 4/10/2018 11:32 AM, Yulei Zhang wrote:
-> > > VM status change handler is added to change the vfio pci device
-> > > status during the migration, write the demanded device status
-> > > to the DEVICE STATUS subregion to stop the device on the source side
-> > > before fetch its status and start the deivce on the target side
-> > > after restore its status.
-> > >
-> > > Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
-> > > ---
-> > >  hw/vfio/pci.c                 | 20 ++++++++++++++++++++
-> > >  include/hw/vfio/vfio-common.h |  1 +
-> > >  linux-headers/linux/vfio.h    |  6 ++++++
-> > >  roms/seabios                  |  2 +-
-> > >  4 files changed, 28 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > > index f98a9dd..13d8c73 100644
-> > > --- a/hw/vfio/pci.c
-> > > +++ b/hw/vfio/pci.c
-> > > @@ -38,6 +38,7 @@
-> > >
-> > >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
-> > >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled)=
-;
-> > > +static void vfio_vm_change_state_handler(void *pv, int running,
-> RunState state);
-> > >
-> > >  /*
-> > >   * Disabling BAR mmaping can be slow, but toggling it around INTx ca=
-n
-> > > @@ -2896,6 +2897,7 @@ static void vfio_realize(PCIDevice *pdev, Error
-> **errp)
-> > >      vfio_register_err_notifier(vdev);
-> > >      vfio_register_req_notifier(vdev);
-> > >      vfio_setup_resetfn_quirk(vdev);
-> > > +
-> qemu_add_vm_change_state_handler(vfio_vm_change_state_handler,
-> vdev);
-> > >
-> > >      return;
-> > >
-> > > @@ -2982,6 +2984,24 @@ post_reset:
-> > >      vfio_pci_post_reset(vdev);
-> > >  }
-> > >
-> > > +static void vfio_vm_change_state_handler(void *pv, int running,
-> RunState state)
-> > > +{
-> > > +    VFIOPCIDevice *vdev =3D pv;
-> > > +    VFIODevice *vbasedev =3D &vdev->vbasedev;
-> > > +    uint8_t dev_state;
-> > > +    uint8_t sz =3D 1;
-> > > +
-> > > +    dev_state =3D running ? VFIO_DEVICE_START : VFIO_DEVICE_STOP;
-> > > +
-> > > +    if (pwrite(vdev->vbasedev.fd, &dev_state,
-> > > +               sz, vdev->device_state.offset) !=3D sz) {
-> > > +        error_report("vfio: Failed to %s device", running ? "start" =
-: "stop");
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    vbasedev->device_state =3D dev_state;
-> > > +}
-> > > +
-> >
-> > Is it expected to trap device_state region by vendor driver?
-> > Can this information be communicated to vendor driver through an ioctl?
->=20
-> Either the mdev vendor driver or vfio bus driver (ie. vfio-pci) would
-> be providing REGION_INFO for this region, so the vendor driver is
-> already in full control here using existing ioctls.  I don't see that
-> we need new ioctls, we just need to fully define the API of the
-> proposed regions here.
->=20
-If the device state region is mmaped, we may not be able to use
-region device state offset to convey the running state. It may need
-a new ioctl to set the device state.
+Isn't it now fixed by
+https://github.com/qemu/qemu/commit/2a6b5372d7bad038fe27f9c60e85ef5c8a15e311
+?
 
-> > Here only device state is conveyed to vendor driver but knowing
-> > 'RunState' in vendor driver is very useful and vendor driver can take
-> > necessary action accordingly like RUN_STATE_PAUSED indicating that VM
-> is
-> > in paused state, similarly RUN_STATE_SUSPENDED,
-> > RUN_STATE_FINISH_MIGRATE, RUN_STATE_IO_ERROR. If these states are
-> > handled properly, all the cases can be supported with same interface
-> > like VM suspend-resume, VM pause-restore.
->=20
-> I agree, but let's remember that we're talking about device state, not
-> VM state.  vfio is a userspace device interface, not specifically a
-> virtual machine interface, so states should be in terms of the device.
-> The API of this region needs to be clearly defined and using only 1
-> byte at the start of the region is not very forward looking.  Thanks,
->=20
-> Alex
->=20
-> > >  static void vfio_instance_init(Object *obj)
-> > >  {
-> > >      PCIDevice *pci_dev =3D PCI_DEVICE(obj);
-> > > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-
-> common.h
-> > > index f3a2ac9..9c14a8f 100644
-> > > --- a/include/hw/vfio/vfio-common.h
-> > > +++ b/include/hw/vfio/vfio-common.h
-> > > @@ -125,6 +125,7 @@ typedef struct VFIODevice {
-> > >      unsigned int num_irqs;
-> > >      unsigned int num_regions;
-> > >      unsigned int flags;
-> > > +    bool device_state;
-> > >  } VFIODevice;
-> > >
-> > >  struct VFIODeviceOps {
-> > > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> > > index e3380ad..8f02f2f 100644
-> > > --- a/linux-headers/linux/vfio.h
-> > > +++ b/linux-headers/linux/vfio.h
-> > > @@ -304,6 +304,12 @@ struct vfio_region_info_cap_type {
-> > >  /* Mdev sub-type for device state save and restore */
-> > >  #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
-> > >
-> > > +/* Offset in region to save device state */
-> > > +#define VFIO_DEVICE_STATE_OFFSET	1
-> > > +
-> > > +#define VFIO_DEVICE_START	0
-> > > +#define VFIO_DEVICE_STOP	1
-> > > +
-> > >  /**
-> > >   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-> > >   *				    struct vfio_irq_info)
-> > > diff --git a/roms/seabios b/roms/seabios
-> > > index 63451fc..5f4c7b1 160000
-> > > --- a/roms/seabios
-> > > +++ b/roms/seabios
-> > > @@ -1 +1 @@
-> > > -Subproject commit 63451fca13c75870e1703eb3e20584d91179aebc
-> > > +Subproject commit 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
-> > >
+Regards,
+
+Phil.
