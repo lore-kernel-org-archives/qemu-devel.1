@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8P9w-0007v7-L1
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 07:52:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1f8PJT-000439-CG
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8P9v-0007Gg-MN
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 07:52:28 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44797)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8P9v-0007GS-HY
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 07:52:27 -0400
-Received: by mail-ot0-x243.google.com with SMTP id p33-v6so20995346otp.11
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 04:52:27 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1f8PJO-00057g-Co
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:02:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60906 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f8PJO-00057O-6s
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 08:02:14 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180329213857.15499-1-ehabkost@redhat.com>
+	<20180329213857.15499-18-ehabkost@redhat.com>
+Date: Tue, 17 Apr 2018 14:01:53 +0200
+In-Reply-To: <20180329213857.15499-18-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Thu, 29 Mar 2018 18:38:56 -0300")
+Message-ID: <87vacqf3da.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <b0d166e4-b84d-e450-b46b-73b609c1185a@linaro.org>
-References: <20180416151923.22588-1-peter.maydell@linaro.org>
-	<b0d166e4-b84d-e450-b46b-73b609c1185a@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Apr 2018 12:52:06 +0100
-Message-ID: <CAFEAcA8Q7bN28fPjHzAiBDAnFCDUp_w2bucT20DNsexzXhCx+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [prefix=PATCH for-2.12?] linux-user: check that
- all of AArch64 SVE extended sigframe is writable
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC 17/18] validator.py script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +27,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, "patches@linaro.org" <patches@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Amador Pahim <apahim@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 16 April 2018 at 20:42, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 04/16/2018 05:19 AM, Peter Maydell wrote:
->> In commit 8c5931de0ac7738809 we added support for SVE extended
->> sigframe records.  These mean that the signal frame might now be
->> larger than the size of the target_rt_sigframe record, so make sure
->> we call lock_user on the entire frame size when we're creating it.
->> (The code for restoring the signal frame already correctly handles
->> the extended records by locking the 'extra' section separately to the
->> main section.)
->>
->> In particular, this fixes a bug even for non-SVE signal frames,
->> because it extends the locked section to cover the
->> target_rt_frame_record. Previously this was part of 'struct
->> target_rt_sigframe', but in commit e1eecd1d9d4c1ade3 we pulled
->> it out into its own struct, and so locking the target_rt_sigframe
->> alone doesn't cover it. This bug would mean that we would fail
->> to correctly handle the case where a signal was taken with
->> SP pointing 16 bytes into an unwritable page, with the page
->> immediately below it in memory being writable.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> The requirements to trigger the bug sound implausible, except
->> that the stack page might be unwritable because we just
->> executed some trampoline code from it, so perhaps not so
->> unlikely as it first seems? Not sure whether to put into 2.12
->> or not...
->> ---
->>  linux-user/signal.c | 7 ++++---
->>  1 file changed, 4 insertions(+), 3 deletions(-)
+Eduardo Habkost <ehabkost@redhat.com> writes:
+
+> See cover letter for a description of the new test system.
 >
-> Yes, let's just go ahead and fix this all properly now.
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> TODO: code clean up
+> TODO: write description.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  scripts/validator.py | 724 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 724 insertions(+)
+>  create mode 100755 scripts/validator.py
+>
+> diff --git a/scripts/validator.py b/scripts/validator.py
+> new file mode 100755
+> index 0000000000..4312571feb
+> --- /dev/null
+> +++ b/scripts/validator.py
+> @@ -0,0 +1,724 @@
+> +#!/usr/bin/env python
+> +#
+> +#  Copyright (c) 2018 Red Hat Inc
+> +#
+> +# Author:
+> +#  Eduardo Habkost <ehabkost@redhat.com>
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License along
+> +# with this program; if not, write to the Free Software Foundation, Inc.,
+> +# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+> +
+> +"""
+> +QEMU validator script
+> +=====================
+> +
+> +This script will get test YAML test case specifications or Python
+> +modules as input, and generate/run test cases based on them.
+> +
+> +USAGE
+> +-----
+> +
+> +validator.py <specification-file>... -V VAR1=value1 VAR1=value2 VAR2=value3
+> +
+> +specification-file is a YAML file containing the test specification.
 
-Applied, thanks.
+I can see the "test YAML test case specifications", but not the "Python
+modules".
 
--- PMM
+Should we introduce yet another markup language into QEMU?  (pardon the
+pun).
+
+> +
+> +Example::
+> +
+> +    # this test specification is equivalent to the
+> +    # "device/introspect/list" test case in device-introspect-test.c
+
+If we merge this, not for long :)
+
+> +    command-line: '$QEMU -nodefaults -machine none'
+> +    monitor-commands:
+> +    - qmp:
+> +      - execute: qom-list-types
+> +        arguments:
+> +          implements: 'device'
+> +          abstract: true
+> +    - hmp: 'device_add help'
+> +
+> +
+> +VARIABLE EXPANSION
+> +------------------
+> +
+> +The test runner will try to run the test cases with all possible values
+> +for variables appearing in the test specification.
+> +
+> +Some built-in variables are automatically expanded:
+> +
+> +* `$MACHINE` - Expands to a machine-type name supported by $QEMU
+> +* `$ACCEL` - Expands to an accelerator name supported by $QEMU
+> +* `$DEVICE` - Expands to a (user-creatable) device type name supported by $QEMU
+> +* `$CPU` - Expands to a CPU model name supported by $QEMU
+> +
+> +Note that the $QEMU variable must be specified in th
+
+Yes?
+
+> +
+> +TEST SPECIFICATION FIELDS
+> +-------------------------
+> +
+> +command-line
+> +~~~~~~~~~~~~
+> +
+> +List or string, containing the QEMU command-line to be run.
+> +
+> +Default: '$QEMU'
+> +
+> +
+> +monitor-commands
+> +~~~~~~~~~~~~~~~~
+> +
+> +Mapping or list-of-mappings containing monitor commands to run.  The key on each
+> +item can be ``hmp`` or ``qmp``.  The value on each entry can be a string,
+> +mapping, or list.
+> +
+> +Default: None.
+> +
+> +TODO: not implemented yet.
+
+The whole monitor-commands feature?
+
+Can I do
+
+    monitor-commands:
+    - qmp:
+      - execute: eins
+    - hmp: zwei
+    - qmp:
+      - execute: drei
+
+to execute eins, zwei, drei in this order?
+
+> +
+> +
+> +qmp
+> +~~~
+> +
+> +Boolean.  If true (the default), a QMP monitor is configured on the command-line
+> +automatically.
+> +
+> +If true, the test runner will issue a ``quit`` command automatically when
+> +testing is finished.  If false, the test runner will wait until QEMU exits by
+> +itself.
+> +
+> +Example::
+> +
+> +    # just run $QEMU -help and ensure it won't crash
+> +    command-line: ['$QEMU', '-help']
+> +    qmp: false
+> +
+> +
+> +TODO: whitelist
+> +TODO: validate output against reference output
+> +TODO: configure defaults for variables
+> +TODO: compatibility with Avocado multiplexer?
+> +"""
+
+This is a DSL to write tests.  I applaud the idea to write more tests at
+a higher level than C.  We just need to be careful not to create too
+many different ways to write tests, or else readability will suffer.
+Ideally, the way to use for a test should be fairly obvious.
+
+Looking forward to your next iteration.
+
+[...]
