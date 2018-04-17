@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Xhs-0004CQ-RU
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:00:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1f8Xsx-00054q-VL
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Xhl-0001wr-6b
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:00:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45802 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8XhY-0000BN-Ct
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:59:56 -0400
-References: <20180412124834.GA2025@ruderich.org>
-	<68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
-	<510ceca2c869bb1e8d4bdd87986f23170b779047.1523537181.git.simon@ruderich.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e7f00ec2-9f62-d732-5c18-030c9a06ea64@redhat.com>
-Date: Tue, 17 Apr 2018 15:59:39 -0500
+	(envelope-from <bounces@canonical.com>) id 1f8Xsu-0005h7-JA
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f8Xsu-0005SH-9X
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:11:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f8Xss-0003Vs-3z
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 21:11:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8646F2E80D4
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 21:11:25 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <510ceca2c869bb1e8d4bdd87986f23170b779047.1523537181.git.simon@ruderich.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eKUeabmZGspOz4j1UiLrq791SzeX4VJHu"
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] hmp: don't truncate size in
- hmp_memsave/hmp_pmemsave
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Apr 2018 21:02:50 -0000
+From: David Wilder <1763536@bugs.launchpad.net>
+Reply-To: Bug 1763536 <1763536@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152357545161.20027.863482450235173908.malonedeb@gac.canonical.com>
+Message-Id: <152399897087.12388.11165211415691243649.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1763536] Re: go build fails under
+ qemu-ppc64le-static (qemu-user)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +37,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon Ruderich <simon@ruderich.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eKUeabmZGspOz4j1UiLrq791SzeX4VJHu
-From: Eric Blake <eblake@redhat.com>
-To: Simon Ruderich <simon@ruderich.org>, qemu-devel@nongnu.org
-Message-ID: <e7f00ec2-9f62-d732-5c18-030c9a06ea64@redhat.com>
-Subject: Re: [PATCH v2 4/5] hmp: don't truncate size in
- hmp_memsave/hmp_pmemsave
-References: <20180412124834.GA2025@ruderich.org>
- <68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
- <510ceca2c869bb1e8d4bdd87986f23170b779047.1523537181.git.simon@ruderich.org>
-In-Reply-To: <510ceca2c869bb1e8d4bdd87986f23170b779047.1523537181.git.simon@ruderich.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I will attempt to find an way to re-create without docker.  The key is
+we need a way to create a ppc64le (or arm64) fakeroot with go that we
+can chroot into.  That is easy to do with docker.  BTW: the use case
+using docker and qemu-user-static is becoming fairly common way to cross
+build container images.
 
-On 04/12/2018 07:50 AM, Simon Ruderich wrote:
-> The called function takes an uint64_t as size parameter and
-> qdict_get_int() returns an uint64_t. Don't truncate it needlessly to an=
+-- =
 
-> uint32_t.
->=20
-> Signed-off-by: Simon Ruderich <simon@ruderich.org>
-> ---
->  hmp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1763536
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Title:
+  go build fails under qemu-ppc64le-static (qemu-user)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Status in QEMU:
+  New
+
+Bug description:
+  I am using qemu-user (built static) in a docker container environment.
+  When running multi-threaded go commands in the container (go build for
+  example) the process may hang, report segfaults or other errors.  I
+  built qemu-ppc64le from the upstream git (master).
+
+  I see the problem running on a multi core system with Intel i7 processors.
+  # cat /proc/cpuinfo | grep "model name"
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+
+  Steps to reproduce:
+  1) Build qemu-ppc64le as static and copy into docker build directory name=
+d it qemu-ppc64le-static.
+
+  2) Add hello.go to docker build dir.
+
+  package main
+  import "fmt"
+  func main() {
+  	fmt.Println("hello world")
+  }
+
+  3) Create the Dockerfile from below:
+
+  FROM ppc64le/golang:1.10.1-alpine3.
+  COPY qemu-ppc64le-static /usr/bin/
+  COPY hello.go /go
+
+  4) Build container
+  $ docker build -t qemutest -f Dockerfile ./go =
 
 
---eKUeabmZGspOz4j1UiLrq791SzeX4VJHu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  5) Run test
+  $ docker run -it qemutest
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  /go # /usr/bin/qemu-ppc64le-static --version
+  qemu-ppc64le version 2.11.93 (v2.12.0-rc3-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWYDsACgkQp6FrSiUn
-Q2oO2Qf/VKofeOy08z9WG0Nd9OKwIsK3EAADQBtzOpzuQxIlN4nBkzqvWu5iX4IR
-lzsW9Su2eRs2v4ybYypTkxg8v10BRAVRPJwCW3jOtLxkF3wZ2KmFcUffTtQMFHt/
-Y0MbhBSJEjexnIB7oBtyA7Ui+PzGQ5njCTFv8WiQyWGS2Zb8qME9Pn7DEROg8JXQ
-HkSj6cdbCVDAucdGZuuIMC9Z82HrobxJBW8po1f3WEfQwGU+HLpJVYr+MKPsCTBN
-8/5hJlZFaqXWd83GYjFq7BmifeWm5RJ9/2CEmhSl6BLzi6K4ZrAQSBbv4JN0ZuWG
-TH4LXS0L3opuVEQZLlWxHDMd92IEjg==
-=Ubx7
------END PGP SIGNATURE-----
+  /go # go version
+  go version go1.10.1 linux/ppc64le
 
---eKUeabmZGspOz4j1UiLrq791SzeX4VJHu--
+  /go # go build hello.go
+  fatal error: fatal error: stopm holding locksunexpected signal during run=
+time execution
+
+  panic during panic
+  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x1003=
+528c]
+
+  runtime stack:
+  runtime: unexpected return pc for syscall.Syscall6 called from 0xc42007f5=
+00
+  stack: frame=3D{sp:0xc4203be840, fp:0xc4203be860} stack=3D[0x4000b7ecf0,0=
+x4000b928f0)
+
+  syscall.Syscall6(0x100744e8, 0x3d, 0xc42050c140, 0x20, 0x18, 0x10422b80, =
+0xc4203be968[signal , 0x10012d88SIGSEGV: segmentation violation, 0xc4205940=
+00 code=3D, 0x00x1 addr=3D0x0 pc=3D0x1003528c)
+  ]
+
+  runtime stack:
+  	/usr/local/go/src/syscall/asm_linux_ppc64x.s:61runtime.throw(0x10472d19,=
+ 0x13)
+   +	/usr/local/go/src/runtime/panic.go:0x6c616 +0x68
+
+  =
+
+  runtime.stopm()
+  	/usr/local/go/src/runtime/proc.go:1939goroutine  +10x158
+   [runtime.exitsyscall0semacquire(0xc42007f500)
+  	/usr/local/go/src/runtime/proc.go:3129 +]:
+  0x130
+  runtime.mcall(0xc42007f500)
+  	/usr/local/go/src/runtime/asm_ppc64x.s:183 +0x58sync.runtime_Semacquire
+  (0xc4201fab1c)
+  	/usr/local/go/src/runtime/sema.go:56 +0x38
+
+  ----
+  Note the results may differ between attempts,  hangs and other faults som=
+etimes happen.
+  ----
+  If I run "go: single threaded I don't see the problem, for example:
+
+  /go # GOMAXPROCS=3D1 go build -p 1 hello.go =
+
+  /go # ./hello
+  hello world
+
+  I see the same issue with arm64.  I don't think this is a go issue,
+  but don't have a real evidence to prove that.  This problem looks
+  similar to other problem I have seen reported against qemu running
+  multi-threaded applications.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1763536/+subscriptions
