@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f8RMe-0004uP-DZ
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:13:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8RN3-0005GM-Mt
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f8RMb-0006ry-0d
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:13:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51768 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1f8RN0-00078E-5d
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:14:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51798 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f8RMa-0006rd-Qu
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:13:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-Date: Tue, 17 Apr 2018 16:13:34 +0200
-In-Reply-To: <1520860275-101576-1-git-send-email-imammedo@redhat.com> (Igor
-	Mammedov's message of "Mon, 12 Mar 2018 14:11:06 +0100")
-Message-ID: <87zi21apkh.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8RMz-000782-WA
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:14:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC4AB406E970
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:14:05 +0000 (UTC)
+References: <1520839658-20499-1-git-send-email-thuth@redhat.com>
+	<2a85941f-48bf-9e9b-0d6d-832a270d882b@redhat.com>
+	<7413bf34-63ec-837d-d418-af2cfd1038d7@redhat.com>
+	<87efjeaqd2.fsf@dusky.pond.sub.org> <20180417140540.GD15421@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <21d78c43-a6d9-95d8-ff3e-f80a9ce6b0c0@redhat.com>
+Date: Tue, 17 Apr 2018 16:14:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
- machine_init() from QMP
+In-Reply-To: <20180417140540.GD15421@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-doc: Rework the network options
+ chapter to make "-net" less prominent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +37,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-Igor Mammedov <imammedo@redhat.com> writes:
+On 17/04/2018 16:05, Daniel P. Berrang=C3=A9 wrote:
+>> For what it's worth, my "[RFC PATCH 00/32] Command line QAPIfication"
+>> replaces the original parsing art by getopt_long_only().
+>>
+>> Completing that work will take some time, but once it's done, we can
+>> (and I think we should) prefer double-dash for consistency.
+> Since our existing parser accepts single & double-dash already, is it
+> worth explicitly deprecating single-dash usage right now. So that when
+> your code comes along ready to merge, we're already able to say
+> "i told you so" and drop single-dash support at that same time.
 
-[...]
-> Series allows to configure NUMA mapping at runtime using QMP
-> interface. For that to happen it introduces a new '-preconfig' CLI option
-> which allows to pause QEMU before machine_init() is run and
-> adds new set-numa-node QMP command which in conjunction with
-> query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
->
-> Later we can modify other commands to run early, for example device_add.
-> I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
-> paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
-> stage it's considered hotplug already), so SPAPR had to work around the issue.
+Serious questions: is _anyone_ of you actually using double-dash support
+in daily invocations of QEMU?
 
-That instance is just stupidity / laziness, I think: we consider any
-plug after machine creation a hot plug.  Real machines remain cold until
-you press the power button.  Our virtual machines should remain cold
-until they start running, i.e. with -S until the first "cont".
-
-I vaguely remember me asking this before, but your answer didn't make it
-into this cover letter, which gives me a pretext to ask again instead of
-looking it up in the archives: what exactly prevents us from keeping the
-machine cold enough for numa configuration until the first "cont"?
-
->
-> Example of configuration session:
-> $QEMU -smp 2 -preconfig ...
->
-> QMP:
-> # get CPUs layout for current target/machine/CLI
-> -> {'execute': 'query-hotpluggable-cpus' }  
-> <- {'return': [
->        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 1}, ... },
->        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 0}, ... }
->    ]}
->
-> # configure 1st node
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 0 } }  
-> <- {'return': {}}
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',   
->        'node-id': 0, 'core-id': 0, 'thread-id': 0, 'socket-id': 1, }
->    }
-> <- {'return': {}}
->
-> # configure 2nd node
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 1 } }
-> -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',  
->        'node-id': 1, 'core-id': 0, 'thread-id': 0, 'socket-id': 0 }
->    }
-> <- {'return': {}}
->
-> # [optional] verify configuration
-> -> {'execute': 'query-hotpluggable-cpus' }  
-> <- {'return': [
->        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 0, 'socket-id': 1}, ... },
->        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 1, 'socket-id': 0}, ... }
->    ]}
->
->
-> Git tree:
->     https://github.com/imammedo/qemu.git qmp_preconfig_v3
->
-> Ref to v1:
->     https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03583.html
->     Message-Id: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+Paolo
