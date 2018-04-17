@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f8Uuy-0000ii-Rk
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:01:26 -0400
+	(envelope-from <mst@redhat.com>) id 1f8V22-0002yP-Cg
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f8Uuv-0001X9-0f
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:01:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f8Uuu-0001WQ-Oc
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:01:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f8Uus-0000FZ-VZ
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:01:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CDC1A2E80CE
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:01:18 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1f8V1y-0006QE-CX
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:08:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42120 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f8V1y-0006N3-6M
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:08:38 -0400
+Date: Tue, 17 Apr 2018 21:08:23 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180417201904-mutt-send-email-mst@kernel.org>
+References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Apr 2018 17:54:14 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1763536 <1763536@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152357545161.20027.863482450235173908.malonedeb@gac.canonical.com>
-Message-Id: <152398765486.19725.14402366769588218105.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1763536] Re: go build fails under
- qemu-ppc64le-static (qemu-user)
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,122 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wanpeng Li <kernellwp@gmail.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Do you have a simpler repro case (ie one that doesn't require docker) ?
+On Tue, Apr 17, 2018 at 01:24:15AM -0700, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+>=20
+> This patch adds support for KVM_CAP_X86_DISABLE_EXITS. Provides userspa=
+ce with=20
+> per-VM capability(KVM_CAP_X86_DISABLE_EXITS) to not intercept MWAIT/HLT=
+/PAUSE=20
+> in order that to improve latency in some workloads.
+>=20
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>=20
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>=20
+>  linux-headers/linux/kvm.h |  6 +++++-
+>  target/i386/cpu.h         |  2 ++
+>  target/i386/kvm.c         | 16 ++++++++++++++++
+>  3 files changed, 23 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index a167be8..857df15 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -925,7 +925,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_GS 140
+>  #define KVM_CAP_S390_AIS 141
+>  #define KVM_CAP_SPAPR_TCE_VFIO 142
+> -#define KVM_CAP_X86_GUEST_MWAIT 143
+> +#define KVM_CAP_X86_DISABLE_EXITS 143
+>  #define KVM_CAP_ARM_USER_IRQ 144
+>  #define KVM_CAP_S390_CMMA_MIGRATION 145
+>  #define KVM_CAP_PPC_FWNMI 146
+> @@ -1508,6 +1508,10 @@ struct kvm_assigned_msix_entry {
+>  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+>  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+> =20
+> +#define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+> +#define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+> +#define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> +
+>  /* Available with KVM_CAP_ARM_USER_IRQ */
+> =20
+>  /* Bits for run->s.regs.device_irq_level */
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 1b219fa..965de1b 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -685,6 +685,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accum=
+ulation Single Precision */
+>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control =
+*/
+> =20
+> +#define KVM_PV_UNHALT (1U << 7)
+> +
 
--- =
+Why don't we use KVM_FEATURE_PV_UNHALT from kvm_para.h?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1763536
+>  #define KVM_HINTS_DEDICATED (1U << 0)
+> =20
 
-Title:
-  go build fails under qemu-ppc64le-static (qemu-user)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am using qemu-user (built static) in a docker container environment.
-  When running multi-threaded go commands in the container (go build for
-  example) the process may hang, report segfaults or other errors.  I
-  built qemu-ppc64le from the upstream git (master).
-
-  I see the problem running on a multi core system with Intel i7 processors.
-  # cat /proc/cpuinfo | grep "model name"
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-
-  Steps to reproduce:
-  1) Build qemu-ppc64le as static and copy into docker build directory name=
-d it qemu-ppc64le-static.
-
-  2) Add hello.go to docker build dir.
-
-  package main
-  import "fmt"
-  func main() {
-  	fmt.Println("hello world")
-  }
-
-  3) Create the Dockerfile from below:
-
-  FROM ppc64le/golang:1.10.1-alpine3.
-  COPY qemu-ppc64le-static /usr/bin/
-  COPY hello.go /go
-
-  4) Build container
-  $ docker build -t qemutest -f Dockerfile ./go =
+BTW I wonder whether we should switch to a value from
+kvm_para.h? I'll send a version to do it, pls take a look.
 
 
-  5) Run test
-  $ docker run -it qemutest
-
-  /go # /usr/bin/qemu-ppc64le-static --version
-  qemu-ppc64le version 2.11.93 (v2.12.0-rc3-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  /go # go version
-  go version go1.10.1 linux/ppc64le
-
-  /go # go build hello.go
-  fatal error: fatal error: stopm holding locksunexpected signal during run=
-time execution
-
-  panic during panic
-  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x1003=
-528c]
-
-  runtime stack:
-  runtime: unexpected return pc for syscall.Syscall6 called from 0xc42007f5=
-00
-  stack: frame=3D{sp:0xc4203be840, fp:0xc4203be860} stack=3D[0x4000b7ecf0,0=
-x4000b928f0)
-
-  syscall.Syscall6(0x100744e8, 0x3d, 0xc42050c140, 0x20, 0x18, 0x10422b80, =
-0xc4203be968[signal , 0x10012d88SIGSEGV: segmentation violation, 0xc4205940=
-00 code=3D, 0x00x1 addr=3D0x0 pc=3D0x1003528c)
-  ]
-
-  runtime stack:
-  	/usr/local/go/src/syscall/asm_linux_ppc64x.s:61runtime.throw(0x10472d19,=
- 0x13)
-   +	/usr/local/go/src/runtime/panic.go:0x6c616 +0x68
-
-  =
-
-  runtime.stopm()
-  	/usr/local/go/src/runtime/proc.go:1939goroutine  +10x158
-   [runtime.exitsyscall0semacquire(0xc42007f500)
-  	/usr/local/go/src/runtime/proc.go:3129 +]:
-  0x130
-  runtime.mcall(0xc42007f500)
-  	/usr/local/go/src/runtime/asm_ppc64x.s:183 +0x58sync.runtime_Semacquire
-  (0xc4201fab1c)
-  	/usr/local/go/src/runtime/sema.go:56 +0x38
-
-  ----
-  Note the results may differ between attempts,  hangs and other faults som=
-etimes happen.
-  ----
-  If I run "go: single threaded I don't see the problem, for example:
-
-  /go # GOMAXPROCS=3D1 go build -p 1 hello.go =
-
-  /go # ./hello
-  hello world
-
-  I see the same issue with arm64.  I don't think this is a go issue,
-  but don't have a real evidence to prove that.  This problem looks
-  similar to other problem I have seen reported against qemu running
-  multi-threaded applications.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1763536/+subscriptions
+>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Pred=
+iction Barrier */
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 6c49954..3e99830 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1029,6 +1029,22 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+> =20
+> +    if (env->features[FEAT_KVM_HINTS] & KVM_HINTS_DEDICATED) {
+> +        int disable_exits =3D kvm_check_extension(cs->kvm_state, KVM_C=
+AP_X86_DISABLE_EXITS);
+> +
+> +        if (disable_exits) {
+> +            disable_exits &=3D (KVM_X86_DISABLE_EXITS_MWAIT |
+> +                              KVM_X86_DISABLE_EXITS_HLT |
+> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
+> +                disable_exits &=3D ~KVM_X86_DISABLE_EXITS_HLT;
+> +            }
+> +        }
+> +        if (kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS=
+, 0, disable_exits)) {
+> +            error_report("kvm: DISABLE EXITS not supported");
+> +        }
+> +    }
+> +
+>      qemu_add_vm_change_state_handler(cpu_update_state, env);
+> =20
+>      c =3D cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+> --=20
+> 2.7.4
