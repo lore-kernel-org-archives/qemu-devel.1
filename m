@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f8RaV-0005UD-7f
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:28:04 -0400
+	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
+	id 1f8RcD-0006LW-6k
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f8RaS-0006mG-G0
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:28:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52066)
+	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
+	id 1f8RcA-0007WV-GM
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:29:49 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:12677)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f8RaS-0006ln-AY
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:28:00 -0400
-Date: Tue, 17 Apr 2018 11:27:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180417142739.GV29865@localhost.localdomain>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<87zi21apkh.fsf@dusky.pond.sub.org>
+	(Exim 4.71)
+	(envelope-from <prvs=63820fd2d=igor.druzhinin@citrix.com>)
+	id 1f8RcA-0007UM-7h
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:29:46 -0400
+References: <1523049683-11782-1-git-send-email-igor.druzhinin@citrix.com>
+	<20180417141518.GM2208@perard>
+From: Igor Druzhinin <igor.druzhinin@citrix.com>
+Message-ID: <c7d408cb-454c-2322-3812-a7cacecdbe5f@citrix.com>
+Date: Tue, 17 Apr 2018 15:29:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zi21apkh.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
- machine_init() from QMP
+In-Reply-To: <20180417141518.GM2208@perard>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] xen/pt: use address_space_memory object
+ for memory region hooks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, ross.lagerwall@citrix.com
 
-On Tue, Apr 17, 2018 at 04:13:34PM +0200, Markus Armbruster wrote:
-> Igor Mammedov <imammedo@redhat.com> writes:
+On 17/04/18 15:15, Anthony PERARD wrote:
+> On Fri, Apr 06, 2018 at 10:21:23PM +0100, Igor Druzhinin wrote:
+>> Commit 99605175c (xen-pt: Fix PCI devices re-attach failed) introduced
+>> a subtle bug. As soon as the guest switches off Bus Mastering on the
+>> device it immediately causes all the BARs be unmapped due to the DMA
+>> address space of the device being changed. This is undesired behavior
+>> because the guest may try to communicate with the device after that
+>> which triggers the following errors in the logs:
+>>
+>> [00:05.0] xen_pt_bar_read: Error: Should not read BAR through QEMU. @0x0000000000000200
+>> [00:05.0] xen_pt_bar_write: Error: Should not write BAR through QEMU. @0x0000000000000200
+>>
+>> The issue that the original patch tried to workaround (uneven number of
+>> region_add/del calls on device attach/detach) was fixed in later QEMU
+>> versions.
 > 
-> [...]
-> > Series allows to configure NUMA mapping at runtime using QMP
-> > interface. For that to happen it introduces a new '-preconfig' CLI option
-> > which allows to pause QEMU before machine_init() is run and
-> > adds new set-numa-node QMP command which in conjunction with
-> > query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
-> >
-> > Later we can modify other commands to run early, for example device_add.
-> > I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
-> > paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
-> > stage it's considered hotplug already), so SPAPR had to work around the issue.
+> Do you know when the issue was fixed?
 > 
-> That instance is just stupidity / laziness, I think: we consider any
-> plug after machine creation a hot plug.  Real machines remain cold until
-> you press the power button.  Our virtual machines should remain cold
-> until they start running, i.e. with -S until the first "cont".
-> 
-> I vaguely remember me asking this before, but your answer didn't make it
-> into this cover letter, which gives me a pretext to ask again instead of
-> looking it up in the archives: what exactly prevents us from keeping the
-> machine cold enough for numa configuration until the first "cont"?
 
-I also think this would be better, but it seems to be difficult
-in practice, see:
-http://mid.mail-archive.com/20180323210532.GD28161@localhost.localdomain
+I think it's this commit:
 
--- 
-Eduardo
+commit d25836cafd7508090d211e97acfc0abc5ae88daa
+Author: Peter Xu <peterx@redhat.com>
+Date:   Mon Jan 22 14:02:44 2018 +0800
+
+    memory: do explicit cleanup when remove listeners
+
+Igor
