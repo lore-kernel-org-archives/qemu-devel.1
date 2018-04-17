@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Vcg-0001YH-2e
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:46:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1f8Vgb-0002yD-Du
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8Vcb-00052g-Ul
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:46:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47378 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1f8VgX-0007U8-EQ
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:50:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35274 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8Vcb-000526-Mg
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:46:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8VgX-0007Tq-8E
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:50:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 804DD4023150
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:46:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFFD74182D58
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:50:32 +0000 (UTC)
 References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
-	<20180417133602.23832-4-marcandre.lureau@redhat.com>
+	<20180417133602.23832-5-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <22b1c176-a6c2-951e-09ec-aa41b6b0576d@redhat.com>
-Date: Tue, 17 Apr 2018 13:46:20 -0500
+Message-ID: <a33a9fcb-f6a5-d211-c5f8-0607a65729ab@redhat.com>
+Date: Tue, 17 Apr 2018 13:50:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180417133602.23832-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20180417133602.23832-5-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="eeixQoej7hyI2V76mgWil1m1fcA3UPBOQ"
-Subject: Re: [Qemu-devel] [PATCH v5 3/5] qobject: replace
- qobject_incref/QINCREF qobject_decref/QDECREF
+	boundary="Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf"
+Subject: Re: [Qemu-devel] [PATCH v5 4/5] qobject: modify qobject_ref() to
+ return obj
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,61 +39,41 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eeixQoej7hyI2V76mgWil1m1fcA3UPBOQ
+--Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 Cc: berrange@redhat.com, armbru@redhat.com, pbonzini@redhat.com
-Message-ID: <22b1c176-a6c2-951e-09ec-aa41b6b0576d@redhat.com>
-Subject: Re: [PATCH v5 3/5] qobject: replace qobject_incref/QINCREF
- qobject_decref/QDECREF
+Message-ID: <a33a9fcb-f6a5-d211-c5f8-0607a65729ab@redhat.com>
+Subject: Re: [PATCH v5 4/5] qobject: modify qobject_ref() to return obj
 References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
- <20180417133602.23832-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20180417133602.23832-4-marcandre.lureau@redhat.com>
+ <20180417133602.23832-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20180417133602.23832-5-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 04/17/2018 08:36 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Now that we can safely call QOBJECT() on QObject * as well as its
-> subtypes, we can have macros qobject_ref() / qobject_unref() that work
-> everywhere instead of having to use QINCREF() / QDECREF() for QObject
-> and qobject_incref() / qobject_decref() for its subtypes.
->=20
-> Note that the new macros evaluate their argument exactly once, thus no
-> need to shout them.
+> For convenience and clarity, make it possible to call qobject_ref() at
+> the time when the reference is associated with a variable, or
+> argument, by making qobject_ref() return the same pointer as given.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
 
 > +++ b/monitor.c
 
-> @@ -346,7 +346,7 @@ static void monitor_qmp_cleanup_req_queue_locked(Mo=
-nitor *mon)
->  static void monitor_qmp_cleanup_resp_queue_locked(Monitor *mon)
->  {
->      while (!g_queue_is_empty(mon->qmp.qmp_responses)) {
-> -        qobject_decref(g_queue_pop_head(mon->qmp.qmp_responses));
-> +        qobject_unref((QObject *)g_queue_pop_head(mon->qmp.qmp_respons=
-es));
+> @@ -4049,8 +4046,7 @@ static void monitor_qmp_respond(Monitor *mon, QOb=
+ject *rsp,
+>      if (rsp) {
+>          if (id) {
+>              /* This is for the qdict below. */
+> -            qobject_ref(id);
+> -            qdict_put_obj(qobject_to(QDict, rsp), "id", id);
+> +            qdict_put_obj(qobject_to(QDict, rsp), "id", qobject_ref(id=
+));
 
-Interesting that you have to add a cast here.  That is, the new macro is
-more type-safe than the old version (since g_queue_pop_head() returns
-void*); a quick audit of monitor.c shows we only ever pushed QObject*
-onto the queue in the first place...
-
-> @@ -494,9 +494,9 @@ static void monitor_json_emitter(Monitor *mon, QObj=
-ect *data)
->           * caller won't free the data (which will be finally freed in
->           * responder thread).
->           */
-> -        qobject_incref(data);
-> +        qobject_ref(data);
->          qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-> -        g_queue_push_tail(mon->qmp.qmp_responses, (void *)data);
-> +        g_queue_push_tail(mon->qmp.qmp_responses, data);
-
-=2E..but you did manage to get rid of the pointless cast to void* in the
-process.
+Is the comment still needed?  It made more sense when there were two
+statements, and now I think you can just delete it.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -103,7 +83,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---eeixQoej7hyI2V76mgWil1m1fcA3UPBOQ
+--Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -112,14 +92,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWQPwACgkQp6FrSiUn
-Q2qIQwgAn6YA09N09F5MQLAkuf4D2Ze4tC83AnEznXuW8zBLbU9U2GSqhgh9DZCz
-fC9u3ea7mPC2LU4UWmb1D/st7pAgf2f90KQkQmA56iWDZF7q6TjBHnEmZzycRd6I
-H0D1N+THYqWTnkKPWggfPD7dMNE2WREH+p1af9hRs75xIUxAS3eVtnbLpYQtEYHu
-RuduGjmCT1j9iHWota4p6lG7b9b4nxyNZ21VmMVOSigRbCeSaMo0gciznTnVQlYi
-qQOftOMolJjMO00aBsOu4oW9rMJC8jfGJoJd99EtqLFnMKoWU8shw2x7mqslSQTf
-LuXya2n7+Xag18j2ZF20Aow70bq8yA==
-=6ZYq
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWQfQACgkQp6FrSiUn
+Q2pQaggArTpT6kz59+Mc2DrBGzScWnPBoKidIHoKehCnjD8KNIHjZuhzIt8XD4Wl
+ukNGfmLFGLfc15KNPzQOO/VIE9TNFhcWsDBhdDtOLxY4X36XR1k4uIpkcq1Vo0C+
+IERfv12TGlyq8pXqj31FHD+wzdfIKPs+lR9dV8tdDVD8jXk/yyJc7rLKZxn+gAek
+mrGPKb/uEGI57wHHkPoZXwn6elAPCR4foFZAX1+xtdY7dolTuYk92bwYs8+JlDPO
+KpncE2jmuhsjMnmDo752x+zopdnrOIe4BTxtFgJyylnArtD9hX9yzbFJgo6Vna9k
+GjncGxcAPNtSw3t1J9QlbMuhTaV41Q==
+=WvPV
 -----END PGP SIGNATURE-----
 
---eeixQoej7hyI2V76mgWil1m1fcA3UPBOQ--
+--Ov0rHSE9ntFhHed8yF3jzF1koXyDWsJlf--
