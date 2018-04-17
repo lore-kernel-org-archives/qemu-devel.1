@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <erik.schmauss@intel.com>) id 1f8E8A-00088i-6q
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 20:05:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8R32-0008LI-RN
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <erik.schmauss@intel.com>) id 1f8E86-00045H-Ah
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 20:05:54 -0400
-Received: from mga18.intel.com ([134.134.136.126]:25184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <erik.schmauss@intel.com>)
-	id 1f8E85-0003mh-Te
-	for qemu-devel@nongnu.org; Mon, 16 Apr 2018 20:05:50 -0400
-From: "Schmauss, Erik" <erik.schmauss@intel.com>
-Date: Tue, 17 Apr 2018 00:05:42 +0000
-Message-ID: <CF6A88132359CE47947DB4C6E1709ED53972762F@ORSMSX110.amr.corp.intel.com>
-References: <20180215210932.15490-1-erik.schmauss@intel.com>
-	<CAPcyv4hp_pm2n3H_froFkedd_GMQvsrEc8yZxYzfYkPDYvjDww@mail.gmail.com>
-	<CF6A88132359CE47947DB4C6E1709ED5397230D6@ORSMSX110.amr.corp.intel.com>
-	<3701399.BBZtpt46yJ@aspire.rjw.lan>
-	<CAPcyv4j-iC+b07=JPP_TV1MLHA2iO5iKLvc+jaPHoEuRfzoAFQ@mail.gmail.com>
-	<CF6A88132359CE47947DB4C6E1709ED539727606@ORSMSX110.amr.corp.intel.com>
-	<CAPcyv4jEkQTEWxE=+mf0C5oA0j50ZvjU=QpvL1n6mmtemrnBLg@mail.gmail.com>
-In-Reply-To: <CAPcyv4jEkQTEWxE=+mf0C5oA0j50ZvjU=QpvL1n6mmtemrnBLg@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1f8R32-0003f6-6A
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:53:28 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:36414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f8R31-0003ex-Ve
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:53:28 -0400
+Received: by mail-ot0-x241.google.com with SMTP id p2-v6so4616200otf.3
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:53:27 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] ACPICA: Integrate package handling
- with module-level code
+In-Reply-To: <871sfeaqkv.fsf@linaro.org>
+References: <20180417025328.25431-1-richard.henderson@linaro.org>
+	<20180417025328.25431-3-richard.henderson@linaro.org>
+	<871sfeaqkv.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Apr 2018 14:53:06 +0100
+Message-ID: <CAFEAcA_dVdpM+EXmhU4uH3wUd0DdVHf7iu9CVsspsu6Qejrr0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] fpu: Bound increment for scalbn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Williams, Dan J" <dan.j.williams@intel.com>
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux ACPI <linux-acpi@vger.kernel.org>, "Moore, Robert" <robert.moore@intel.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWFjcGktb3duZXJA
-dmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYWNwaS0NCj4gb3duZXJAdmdlci5rZXJuZWwu
-b3JnXSBPbiBCZWhhbGYgT2YgRGFuIFdpbGxpYW1zDQo+IFNlbnQ6IE1vbmRheSwgQXByaWwgMTYs
-IDIwMTggNDoyMiBQTQ0KPiBUbzogU2NobWF1c3MsIEVyaWsgPGVyaWsuc2NobWF1c3NAaW50ZWwu
-Y29tPg0KPiBDYzogUmFmYWVsIEouIFd5c29ja2kgPHJqd0Byand5c29ja2kubmV0PjsgTGludXgg
-QUNQSSA8bGludXgtDQo+IGFjcGlAdmdlci5rZXJuZWwub3JnPjsgTW9vcmUsIFJvYmVydCA8cm9i
-ZXJ0Lm1vb3JlQGludGVsLmNvbT47IGxpbnV4LQ0KPiBudmRpbW0gPGxpbnV4LW52ZGltbUBsaXN0
-cy4wMS5vcmc+OyBRZW11IERldmVsb3BlcnMgPHFlbXUtDQo+IGRldmVsQG5vbmdudS5vcmc+DQo+
-IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgNS83XSBBQ1BJQ0E6IEludGVncmF0ZSBwYWNrYWdlIGhh
-bmRsaW5nIHdpdGggbW9kdWxlLQ0KPiBsZXZlbCBjb2RlDQo+IA0KPiBPbiBNb24sIEFwciAxNiwg
-MjAxOCBhdCA0OjE1IFBNLCBTY2htYXVzcywgRXJpayA8ZXJpay5zY2htYXVzc0BpbnRlbC5jb20+
-DQo+IHdyb3RlOg0KPiA+IFsgdHJpbW1pbmcgXQ0KPiA+PiA+PiBSYWZhZWwsIHdlIG1heSB3YW50
-IHRvIGhvbGQgYmFjayBvbiB0aGUgbW9kdWxlLWxldmVsIGNvZGUgY2hhbmdlcw0KPiA+PiA+PiAo
-dGhlIHBhdGNoZXMgYmVsb3cpIGZvciByYzEuIEJldHdlZW4gdGhpcyBhbmQgdGhlIHN0cmFuZ2Ug
-X1RTUw0KPiA+PiA+PiBpc3N1ZSwgaXQgc2VlbXMgbGlrZSB0aGVyZSBhcmUgYSBmZXcgbW9yZSB0
-aGluZ3MgdG8gcmVzb2x2ZSBiZWZvcmUNCj4gPj4gPj4gdGhpcyBpcyByZWFkeSBmb3Iga2VybmVs
-IHVwc3RyZWFtLg0KPiA+PiA+DQo+ID4gSGkgUmFmYWVsLA0KPiA+DQo+ID4+ID4gSXQgbG9va3Mg
-bGlrZSB5b3UgYXJlIGFza2luZyBtZSB0byBxdWV1ZSB1cCByZXZlcnRzIGFzIHBlciB0aGUNCj4g
-Pj4gPiBEYW4ncyByZXBvcnQsIGlzIHRoYXQgY29ycmVjdD8NCj4gPg0KPiA+IFRoaXMgaXMgaW5k
-ZWVkIHdoYXQgSSBtZWFudCBsYXN0IHdlZWsuIEhvd2V2ZXIsIEkndmUgbG9va2VkIGludG8gdGhl
-DQo+ID4gaXNzdWUgYW5kIERhbidzIHFlbXUgaW5zdGFuY2UgaGFkIEFNTCB0aGF0IHdlIG5vIGxv
-bmdlciBzdXBwb3J0LiBUaGlzDQo+ID4gaXMgYmVjYXVzZSB0aGUgQUNQSUNBIGNvbW1pdCBtYWtl
-cyBjaGFuZ2VzIHRvIHRoZSBleGVjdXRpb24gb2YgQU1MDQo+ID4gZHVyaW5nIHRhYmxlIGxvYWQg
-dG8gbWF0Y2ggd2luZG93cyBBTUwgaW50ZXJwcmV0ZXIgYmVoYXZpb3Igc28gdGhpcyBjb21taXQN
-Cj4gYWxzbyBnb3QgcmlkIG9mIHN1cHBvcnQgZm9yIGV4ZWN1dGluZyBjb2RlIGNvbnRhaW5pbmcg
-Zm9yd2FyZCByZWZlcmVuY2VzIChleGNlcHQNCj4gZm9yIHBhY2thZ2UgZWxlbWVudHMpLg0KPiA+
-DQo+ID4gSSd2ZSBzdWdnZXN0ZWQgYSBmaXggZm9yIHRoZSBmaXJtd2FyZSBpbiBhIHNlcGFyYXRl
-IGVtYWlsLiBTbyBJIHdvdWxkDQo+ID4gc2F5IHRoYXQgdGhpcyBpc3N1ZSBpcyByZXNvbHZlZCBh
-ZnRlciBpZiBEYW4gY2FuIHJ1biBoaXMgdGVzdCBzdWNjZXNzZnVsbHkgd2l0aCB0aGUNCj4gYWRq
-dXN0ZWQgZmlybXdhcmUuDQo+ID4NCj4gPiBJZiBEYW4ncyB0ZXN0IGlzIHN1Y2Nlc3NmdWwsIHdl
-IGRvbuKAmXQgbmVlZCB0byByZXZlcnQgdGhlc2UgY2hhbmdlcw0KPiANCg0KSGkgRGFuLA0KDQo+
-IEknbSBjb25jZXJuZWQgYWJvdXQgb3RoZXIgcWVtdS1rdm0gdXNlcnMgdGhhdCBkbyBub3QgdXBn
-cmFkZSB0aGVpciBoeXBlcnZpc29yDQo+IGF0IHRoZSBzYW1lIHBhY2UgYXMgdGhlaXIgZ3Vlc3Qg
-a2VybmVsLiBFc3BlY2lhbGx5IGZvciBjbG91ZCBwcm92aWRlcnMgdGhhdCBtYXkNCj4gYmUgcnVu
-bmluZyBsYXRlc3QgbWFpbmxpbmUga2VybmVsIG9uIG9sZGVyIHFlbXUta3ZtIHRoaXMgd2lsbCBs
-b29rIGxpa2UgYSBwdXJlDQo+IGtlcm5lbCByZWdyZXNzaW9uLiBJcyB0aGVyZSBhIHF1aWNrIGZp
-eCB3ZSBjYW4gY2FycnkgaW4gdGhlIGtlcm5lbCB0byBzdXBwb3J0IHRoZXNlDQo+IGZvcndhcmQg
-cmVmZXJlbmNlcywgYXQgbGVhc3QgdW50aWwgd2Uga25vdyB0aGF0IHFlbXUta3ZtIGlzIG5vIGxv
-bmdlciBzaGlwcGluZw0KPiB0aGUgYnJva2VuIEFNTD8NCg0KVGhpcyBpcyBhIHZlcnkgZ29vZCBw
-b2ludC4gVGhhbmtzIGZvciBicmluZ2luZyB0aGlzIHVwISBPbmUgb3B0aW9uIGlzIGZvciB0aGVt
-IHRvIHNldA0KdGhlIGdsb2JhbCB2YXJpYWJsZSBhY3BpX2dibF9leGVjdXRlX3RhYmxlc19hc19t
-ZXRob2RzIGluIGluY2x1ZGUvYWNwaS9hY3BpeGYuaCB0byBmYWxzZS4NClRoaXMgd2lsbCBlZmZl
-Y3RpdmVseSByZXZlcnQgdGhlIG5ldyBiZWhhdmlvciBpbiB0aGUgQU1MIGludGVycHJldGVyIGFu
-ZCBnbyBiYWNrIHRvIHRoZSBvbGQgd2F5Lg0KU2luY2UgdGhpcyBpcyBhIGdsb2JhbCBmbGFnLCB3
-ZSBjb3VsZCBoYXZlIGEgY29tbWFuZCBsaW5lIG9wdGlvbiBmb3IgTGludXgga2VybmVsIHRvIHR1
-cm4gdGhpcw0KZmVhdHVyZSBvbi4NCg0KT3V0IG9mIGN1cmlvc2l0eSwgaXMgdGhpcyBBQ1BJIHRh
-YmxlIHNvbWVob3cgY3VzdG9taXplZCBmb3IgeW91ciB3b3JrPyBJIGhhdmUgYSBjb2xsZWN0aW9u
-DQpvZiBhY3BpIHRhYmxlcyBhbmQgeW91ciBBQ1BJIHRhYmxlcyBhcmUgdGhlIG9ubHkgb25lcyB0
-aGF0IGhhdmUgYW4gT3BlcmF0aW9uUmVnaW9uIGNhbGxlZA0KTlJBTS4gV2hhdCBpcyB0aGUgY2hh
-bmNlIHRoYXQgb3RoZXJzIHdpbGwgYmUgcnVubmluZyBMaW51eCBvbiB0aGUgc2FtZSB0YWJsZXMg
-YXMgdGhlIG9uZQ0KeW91IHNlbnQgbWU/DQoNCkVyaWsNCg0KPiAtLQ0KPiBUbyB1bnN1YnNjcmli
-ZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYWNwaSIg
-aW4gdGhlIGJvZHkgb2YNCj4gYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcg
-TW9yZSBtYWpvcmRvbW8gaW5mbyBhdA0KPiBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9t
-by1pbmZvLmh0bWwNCg==
+On 17 April 2018 at 14:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Richard Henderson <richard.henderson@linaro.org> writes:
+>
+>> Without bounding the increment, we can overflow exp either here
+>> in scalbn_decomposed or when adding the bias in round_canonical.
+>> This can result in e.g. underflowing to 0 instead of overflowing
+>> to infinity.
+>>
+>> The old softfloat code did bound the increment.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  fpu/softfloat.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+>> index ba6e654050..a589f328c9 100644
+>> --- a/fpu/softfloat.c
+>> +++ b/fpu/softfloat.c
+>> @@ -1883,6 +1883,12 @@ static FloatParts scalbn_decomposed(FloatParts a,=
+ int n, float_status *s)
+>>          return return_nan(a, s);
+>>      }
+>>      if (a.cls =3D=3D float_class_normal) {
+>> +        /* The largest float type (even though not supported by FloatPa=
+rts)
+>> +         * is float128, which has a 15 bit exponent.  Bounding N to 16 =
+bits
+>> +         * still allows rounding to infinity, without allowing overflow
+>> +         * within the int32_t that backs FloatParts.exp.
+>> +         */
+>> +        n =3D MIN(MAX(n, -0x10000), 0x10000);
+>>          a.exp +=3D n;
+>>      }
+>>      return a;
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> (risu FWIW although it obviously didn't catch this failure ;-)
+
+Thanks; applied this patch to master.
+
+-- PMM
