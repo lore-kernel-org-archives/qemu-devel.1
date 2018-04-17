@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f8QgE-0002qZ-GR
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:29:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8Qkq-0004j5-TN
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f8Qg9-0006xI-0S
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:29:54 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:43341)
+	(envelope-from <peter.maydell@linaro.org>) id 1f8Qkp-0001ER-K1
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:34:40 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1f8Qg8-0006wp-Ps
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:29:48 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id u4so4162639wrg.10
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:29:48 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f8Qkp-0001E4-Dt
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 09:34:39 -0400
+Received: by mail-oi0-x241.google.com with SMTP id p62-v6so1603606oie.10
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 06:34:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87k1t7sgka.fsf@dusky.pond.sub.org>
-References: <20180413161842.5117-1-marcandre.lureau@redhat.com>
-	<20180413161842.5117-5-marcandre.lureau@redhat.com>
-	<87k1t7sgka.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 17 Apr 2018 15:29:47 +0200
-Message-ID: <CAJ+F1C+hdK1hA=8kXTO=rQ7Ud8-NCkNnkb+1+bMZMT39tLiQQw@mail.gmail.com>
+In-Reply-To: <CAOuPqTE8GsN_+REWzSt4DOiqddSbZC-kOH=WnYG3U8ge3GsLoA@mail.gmail.com>
+References: <CAOuPqTE8GsN_+REWzSt4DOiqddSbZC-kOH=WnYG3U8ge3GsLoA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Apr 2018 14:34:18 +0100
+Message-ID: <CAFEAcA_Hti-FYqEse7ubdNyVr3fPHO==e6MDv9Ym4KVYJcYTwA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] qobject: modify qobject_ref() to
- assert on NULL and return obj
+Subject: Re: [Qemu-devel] Patch for ARM memory barriers and getdent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Henry Wertz <hwertz10@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <Laurent@vivier.eu>
 
-Hi
+On 16 April 2018 at 19:44, Henry Wertz <hwertz10@gmail.com> wrote:
+> Please find submitted a patch for ARM memory barriers.  This patch is
+> against qemu-2.12-rc2 but I do believe it should apply for anything from
+> 2.11.x to current.
 
-On Mon, Apr 16, 2018 at 10:26 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Hi Henry; thanks for these patches. Please could you provide
+a Signed-off-by: line for them? This says you're happy for us
+to apply them to QEMU under our license, and we can't do anything
+with them without one. The top part of
+https://wiki.qemu.org/Contribute/SubmitAPatch
+has more detail.
+
+> I found with qemu 2.11.x or newer that I would get an illegal instruction
+> error running some Intel binaries on my ARM chromebook.  On investigation,
+> I found it was quitting on memory barriers.
+> qemu instruction:
+> mb $0x31
+> was translating as:
+> 0x604050cc:  5bf07ff5  blpl     #0x600250a8
 >
->> Following a discussion on the mailing list:
+> After patch it gives:
+> 0x604050cc:  f57ff05b  dmb      ish
 >
-> If a reader of this commit message could profit from reading the
-> discussion, refer to it by URL and/or Message-Id.  If not, don't mention
-> it.
->
->>                                             while it may be convenient
->> to accept NULL value in qobject_unref() (for similar reasons as free()
->> accepts NULL), it is a probably a bad idea to accept NULL argument in
->> qobject_ref().
->
-> Yes?  What's the patch doing about it?  Peeking ahead: it outlaws it.
-> So say that.
->
+> In short, I found INSN_DMB_ISH (memory barrier for ARMv7) appeared to be
+> correct based on online docs, but due to some endian-related shenanigans it
+> had to be byte-swapped to suit qemu; it appears INSN_DMB_MCR (memory
+> barrier for ARMv6) also should be byte swapped  (and this patch does so).
+> I have not checked for correctness of aarch64's barrier instruction.
 
-ok, it's the patch title.
+Yeah, this definitely looks like a bug -- I can't see how the code
+as it stands could ever have worked (it was added in commit 40f191ab8226fdada).
 
->> Furthermore,
->
-> Commit message smell: two things in one patch.  Worth separating them?
->
+> -------------------------------
+> Please find submitted a patch for getdents (this system call stands for
+> "get directory entries",
 
-ok
+You'll probably have better luck if you submit patches as separate
+emails rather than all in one -- the set of people who care about
+reviewing TCG backend patches is different from the people who
+look after the linux-user syscall emulation code.
 
->>              it is convenient and more clear to call qobject_ref() at
->> the time when the reference is associated with a variable, or
->> argument. For this reason, make qobject_ref() return the same pointer
->> as given.
->
-> Not 100% clear whether the patch merely makes the "convenient and more
-> clear" way possible, or reality.  Peeking ahead: it's the latter.  So
-> say that.
->
-> How did you find the places to change?
+> it is passed a file descriptor pointing to a
+> directory and returns a struct with info on the entries in that
+> directory.)  This patch is against qemu-2.10 series but continues to apply
+> cleanly on current as of April 15 2018.  If you are running a 32-bit binary
+> on 64-bit target current qemu will convert he getdents struct, but it will
+> NOT in the case of 64-bit binary on 32-bit host.
 
-manual review
+In general, 64-bit binary on a 32-bit host is not supported by linux-user.
+Various things are likely to go wrong for anything but the simplest
+of guest binaries. You need a 64-bit host to reliably use linux-user
+for a 64-bit guest binary.
 
-> Do you think you got them all?
+I think your change isn't sufficient to handle the "target 32 bits
+and host 64 bits" case, because the 64-on-32 code path that you're
+using for it uses the guest's buffer size as the size of the
+host buffer it allocates to pass to the host syscall. That's ok
+if the host is 64 bits, because the host struct linux_dirent will
+be bigger than the target's struct linux_dirent, and so we can
+guarantee to fit all the host's structures into the target's
+buffer (with unused space left over at the end). If you try to
+use the same code for "target 64 bits and host 32 bits" then we
+may have more host dirent structures in the host buffer than we
+can fit into the guest buffer, and we'll end up overrunning the
+end of the guest's buffer. I don't see an obvious way to support
+64-on-32 here, because the record sizes are variable, not fixed,
+so you can't tell in advance what sized host buffer you'd need to
+be able to fit the results from the kernel into the guest's buffer.
+Maybe I'm missing a clever trick?
 
-I think so
-
->
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+thanks
+-- PMM
