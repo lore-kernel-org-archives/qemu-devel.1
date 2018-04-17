@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8WEu-0007af-KU
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:26:05 -0400
+	(envelope-from <kwankhede@nvidia.com>) id 1f8WJE-000134-7l
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8WEs-0005pn-0o
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:26:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41586 helo=mx1.redhat.com)
+	(envelope-from <kwankhede@nvidia.com>) id 1f8WJB-0001Nu-FE
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:30:32 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:19990)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8WEr-0005p9-OX
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:26:01 -0400
-References: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
-	<a4bfe3d3-d9a0-565e-800c-c4493e328d87@nvidia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <72966c87-f9fe-71d3-8261-7ea315eede47@redhat.com>
-Date: Tue, 17 Apr 2018 14:25:50 -0500
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1f8WJA-0001Mk-Sk
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 15:30:29 -0400
+References: <1523340161-8928-1-git-send-email-yulei.zhang@intel.com>
+	<82e38b24-8675-c7f5-3f37-c73bb14d7804@nvidia.com>
+	<20180416141504.3e82a154@w520.home>
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <7c2659b0-6518-001b-1263-2321cf5d81aa@nvidia.com>
+Date: Wed, 18 Apr 2018 01:00:19 +0530
 MIME-Version: 1.0
-In-Reply-To: <a4bfe3d3-d9a0-565e-800c-c4493e328d87@nvidia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dGBRFZmCRnEEQQCOL0XOVj6TzH05wYeCb"
-Subject: Re: [Qemu-devel] [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for
- VFIO device to support live migration
+In-Reply-To: <20180416141504.3e82a154@w520.home>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH V4 1/4] vfio: introduce a new VFIO
+ subregion for mdev device migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +31,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirti Wankhede <kwankhede@nvidia.com>, Yulei Zhang <yulei.zhang@intel.com>, qemu-devel@nongnu.org
-Cc: kevin.tian@intel.com, quintela@redhat.com, joonas.lahtinen@linux.intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com, alex.williamson@redhat.com, zhi.a.wang@intel.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dGBRFZmCRnEEQQCOL0XOVj6TzH05wYeCb
-From: Eric Blake <eblake@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>, Yulei Zhang
- <yulei.zhang@intel.com>, qemu-devel@nongnu.org
-Cc: kevin.tian@intel.com, quintela@redhat.com,
- joonas.lahtinen@linux.intel.com, dgilbert@redhat.com,
- zhenyuw@linux.intel.com, alex.williamson@redhat.com, zhi.a.wang@intel.com
-Message-ID: <72966c87-f9fe-71d3-8261-7ea315eede47@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for VFIO
- device to support live migration
-References: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
- <a4bfe3d3-d9a0-565e-800c-c4493e328d87@nvidia.com>
-In-Reply-To: <a4bfe3d3-d9a0-565e-800c-c4493e328d87@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/16/2018 09:44 AM, Kirti Wankhede wrote:
->=20
->=20
-> On 4/10/2018 11:33 AM, Yulei Zhang wrote:
->> Instead of using vm state description, add SaveVMHandlers for VFIO
->> device to support live migration.
-
-In the subject line: s/Hanlders/Handlers/
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Yulei Zhang <yulei.zhang@intel.com>, qemu-devel@nongnu.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com, dgilbert@redhat.com, quintela@redhat.com
 
 
---dGBRFZmCRnEEQQCOL0XOVj6TzH05wYeCb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 4/17/2018 1:45 AM, Alex Williamson wrote:
+> On Mon, 16 Apr 2018 20:14:03 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 4/10/2018 11:32 AM, Yulei Zhang wrote:
+>>> New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added
+>>> to fetch and restore the status of mdev device vGPU during the
+>>> live migration.
+>>>
+>>> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+>>> ---
+>>>  hw/vfio/pci.c              | 25 ++++++++++++++++++++++++-
+>>>  hw/vfio/pci.h              |  2 ++
+>>>  linux-headers/linux/vfio.h |  9 ++++++---
+>>>  3 files changed, 32 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>> index c977ee3..f98a9dd 100644
+>>> --- a/hw/vfio/pci.c
+>>> +++ b/hw/vfio/pci.c
+>>> @@ -32,6 +32,7 @@
+>>>  #include "pci.h"
+>>>  #include "trace.h"
+>>>  #include "qapi/error.h"
+>>> +#include "migration/blocker.h"
+>>>  
+>>>  #define MSIX_CAP_LENGTH 12
+>>>  
+>>> @@ -2821,6 +2822,25 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>>          vfio_vga_quirk_setup(vdev);
+>>>      }
+>>>  
+>>> +    struct vfio_region_info *device_state;
+>>> +    /* device state region setup */
+>>> +    if (!vfio_get_dev_region_info(&vdev->vbasedev,
+>>> +                VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
+> 
+> This is not how VENDOR_TYPE is meant to be used.  We have a 32-bit type
+> and 32-bit sub-type.  When bit 31 of type is set (ie. VENDOR_TYPE),
+> then the low 16-bits (VENDOR_MASK) defines a vendor specific set of
+> sub-types.  Using it as above, you're stomping on vendor 0x0000's
+> vendor sub-types.  I would expect non-vendor specific types to leave
+> bit 31 of the type field clear.  We could then define a universal type
+> for device state with a sub-type specifying the API such that we could
+> revise the API by providing an updated sub-type.  Or perhaps there are
+> devices that want separate save vs restore regions, we could do that
+> with the sub-type.
+> 
+>>> +                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
+>>> +        memcpy(&vdev->device_state, device_state,
+>>> +               sizeof(struct vfio_region_info));
+>>> +        g_free(device_state);
+>>> +    } else {
+>>> +        error_setg(&vdev->migration_blocker,
+>>> +                "Migration disabled: cannot support device state region");
+>>> +        migrate_add_blocker(vdev->migration_blocker, &err);
+> 
+> This appears as if it's going to be rather verbose and generate errors
+> for anything not supporting migration, which is currently everything.
+> Maybe there should be an OnOffAuto vfio-pci device option for the user
+> to specify migration such that if migration=on is specified the device
+> will fail if it's not available.  Otherwise the default would be auto.
+> 
+>>> +        if (err) {
+>>> +            error_propagate(errp, err);
+>>> +            error_free(vdev->migration_blocker);
+>>> +            goto error;
+>>> +        }
+>>> +    }
+>>> +  
+>>
+>> I think there should be a _PROBE ioctl before trying to setup region for
+>> migration. If vfio device driver or vendor driver for mdev device
+>> supports migration capability, _PROBE ioctl should return success along
+>> with region's information <index, size> which can be used to setup the
+>> region.
+> 
+> How is _PROBE different from _REGION_INFO which already exists to tell
+> us information about the region?
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrWSj4ACgkQp6FrSiUn
-Q2pnyQgAo1AHY7tF+oVFLvlaUOdwhfPIb+XFgHyCa+Pm5dkw0kL4voSU3evvgKv6
-4nHs3HOJlQmM/Khz4YNByveDFt/2zgS8XWFyj0aGrLE/A763EWIwj5bhIfrRn+9G
-SEdhxfoq3f6A4Ta75BkGYf6dJ5veujT27JeztJwVBJs1sVTIvC3jiAu7yemUTVYu
-JsRLWuzEZVjqG3RExGp5YG51X6azyP/rBQ3weamuXoDKML7PkK+siEd6oHpRrokB
-M1eaKy6DDyZbadrcV4lC1tmR3jcj/2xx6HgsbAKvL9YogkIP2JQw/m1ZNGdSoT9X
-IwevVi7flah3olS+jjL2H9zzqELVpQ==
-=9fRq
------END PGP SIGNATURE-----
+Fine with _REGION_INFO if SUBTYPE is non-vendor specific as you
+mentioned above.
 
---dGBRFZmCRnEEQQCOL0XOVj6TzH05wYeCb--
+Thanks,
+Kirti
+
+>>>      for (i = 0; i < PCI_ROM_SLOT; i++) {
+>>>          vfio_bar_quirk_setup(vdev, i);
+>>>      }
+>>> @@ -2884,6 +2904,10 @@ out_teardown:
+>>>      vfio_teardown_msi(vdev);
+>>>      vfio_bars_exit(vdev);
+>>>  error:
+>>> +    if (vdev->migration_blocker) {
+>>> +        migrate_del_blocker(vdev->migration_blocker);
+>>> +        error_free(vdev->migration_blocker);
+>>> +    }
+>>>      error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
+>>>  }
+>>>  
+>>> @@ -3009,7 +3033,6 @@ static Property vfio_pci_dev_properties[] = {
+>>>  
+>>>  static const VMStateDescription vfio_pci_vmstate = {
+>>>      .name = "vfio-pci",
+>>> -    .unmigratable = 1,  
+>>
+>> Based on the result of above _PROBE ioctl, 'unmigratable' should be set
+>> if vendor driver doesn't support migration capability.
+> 
+> .unmigratable isn't really dynamically settable aiui, thus the
+> existence of the migration blocker.
+> 
+>>>  };
+>>>  
+>>>  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+>>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+>>> index 502a575..0ee1724 100644
+>>> --- a/hw/vfio/pci.h
+>>> +++ b/hw/vfio/pci.h
+>>> @@ -116,6 +116,8 @@ typedef struct VFIOPCIDevice {
+>>>      VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
+>>>      VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
+>>>      void *igd_opregion;
+>>> +    struct vfio_region_info device_state;
+>>> +    Error *migration_blocker;
+>>>      PCIHostDeviceAddress host;
+>>>      EventNotifier err_notifier;
+>>>      EventNotifier req_notifier;
+>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>>> index 4312e96..e3380ad 100644
+>>> --- a/linux-headers/linux/vfio.h
+>>> +++ b/linux-headers/linux/vfio.h
+>>> @@ -297,9 +297,12 @@ struct vfio_region_info_cap_type {
+>>>  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+>>>  
+>>>  /* 8086 Vendor sub-types */
+>>> -#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+>>> -#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>>> -#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>>> +#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
+>>> +#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
+>>> +#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
+>>> +
+>>> +/* Mdev sub-type for device state save and restore */
+>>> +#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+> 
+> This continues on with the 0x8086 vendor sub-types, which is entirely
+> unnecessary as each vendor has an entire sub-type address space and we
+> shouldn't be using a vendor type anyway.  Additionally, we need
+> significantly more documentation on the API for this region.  Thanks,
+> 
+> Alex
+> 
+>>>  
+>>>  /**
+>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>>   
+> 
