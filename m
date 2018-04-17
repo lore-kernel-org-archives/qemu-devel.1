@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f8LiF-0004AR-6Q
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:11:40 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1f8Ltl-0007bP-OD
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1f8LiC-0000d1-0k
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:11:39 -0400
-Received: from mga03.intel.com ([134.134.136.65]:22681)
+	(envelope-from <mprivozn@redhat.com>) id 1f8Ltg-0006i4-So
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:23:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39608 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1f8LiB-0000c8-MS
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:11:35 -0400
-From: "Zhang, Yulei" <yulei.zhang@intel.com>
-Date: Tue, 17 Apr 2018 08:11:12 +0000
-Message-ID: <01FDBDDE256B79498DC57789713132D46A18E8D0@SHSMSX101.ccr.corp.intel.com>
-References: <1523340193-9024-1-git-send-email-yulei.zhang@intel.com>
-	<20180416143745.3cb868d9@w520.home>
-In-Reply-To: <20180416143745.3cb868d9@w520.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1f8Ltg-0006hW-Os
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 04:23:28 -0400
+References: <0c14166c-28c4-a1ad-093b-ba63e373e790@redhat.com>
+	<20180416175955.GO29865@localhost.localdomain>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <77dbce74-6d73-d671-c82f-9fc985957359@redhat.com>
+Date: Tue, 17 Apr 2018 10:23:18 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for
- VFIO device to support live migration
+In-Reply-To: <20180416175955.GO29865@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Purpose of memory-backend-file.discard-data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Zack Cornelius <zack.cornelius@kove.net>
 
+On 04/16/2018 07:59 PM, Eduardo Habkost wrote:
+> (CCing Zack Cornelius)
+> 
+> On Fri, Apr 13, 2018 at 08:21:26AM +0200, Michal Privoznik wrote:
+>> Eduardo et al,
+>>
+>> I'm looking at 11ae6ed8affdd131e and I wanted to implement libvirt
+>> support for that. But more I look at it less I understand it. My
+>> understanding it is an optimization (although not very effective one
+>> since madvise() is/should be immediately followed by munmap()). So any
+>> application that is trying to keep track of guest memory  can stop doing
+>> so as soon as it sees munmap(). Or does the optimization lies in fact
+>> that madvise() is called sooner and thus the app can stop caring
+>> slightly sooner?
+> 
+> munmap() or close() are not enough: it would still make the host
+> kernel unnecessarily write data to backing storage.
 
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Tuesday, April 17, 2018 4:38 AM
-> To: Zhang, Yulei <yulei.zhang@intel.com>
-> Cc: qemu-devel@nongnu.org; Tian, Kevin <kevin.tian@intel.com>;
-> joonas.lahtinen@linux.intel.com; zhenyuw@linux.intel.com;
-> kwankhede@nvidia.com; Wang, Zhi A <zhi.a.wang@intel.com>;
-> dgilbert@redhat.com; quintela@redhat.com
-> Subject: Re: [RFC PATCH V4 3/4] vfio: Add SaveVMHanlders for VFIO device
-> to support live migration
->=20
-> On Tue, 10 Apr 2018 14:03:13 +0800
-> Yulei Zhang <yulei.zhang@intel.com> wrote:
->=20
-> > Instead of using vm state description, add SaveVMHandlers for VFIO
-> > device to support live migration.
-> >
-> > Introduce new Ioctl VFIO_DEVICE_GET_DIRTY_BITMAP to fetch the
-> memory
-> > bitmap that dirtied by vfio device during the iterative precopy stage
-> > to shorten the system downtime afterward.
-> >
-> > For vfio pci device status migrate, during the system downtime, it
-> > will save the following states 1. pci configuration space addr0~addr5
-> > 2. pci configuration space msi_addr msi_data 3. pci device status
-> > fetch from device driver
-> >
-> > And on the target side the vfio_load will restore the same states 1.
-> > re-setup the pci bar configuration 2. re-setup the pci device msi
-> > configuration 3. restore the pci device status
->=20
-> Interrupts are configured via ioctl, but I don't see any code here to con=
-figure
-> the device into the correct interrupt state.  How do we know the target
-> device is compatible with the source device?  Do we rely on the vendor
-> driver to implicitly include some kind of device and version information =
-and
-> fail at the very end of the migration?  It seems like we need to somehow
-> front-load that sort of device compatibility checking since a vfio-pci de=
-vice
-> can be anything (ex. what happens if a user tries to migrate a GVT-g vGPU=
- to
-> an NVIDIA vGPU?).  Thanks,
->=20
-> Alex
+Something like sync()? I though that mem access is always synchronous.
+Or perhaps I don't understand why is kernel still touching data after
+munmap().
 
-We emulate the write to the pci configure space in vfio_load() which will h=
-elp
-setup the interrupt state.=20
-For compatibility I think currently the vendor driver would put version num=
-ber=20
-or device specific info in the device state region, so during the pre-copy =
-stage
-the target side will discover the difference and call off the migration.
+>  The point of
+> the madvise() call is to tell the kernel that data can be
+> destroyed instead of being written back.
+> 
+> The original use case is described by Zack here:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg473538.html
+> 
+> 
+>>
+>> Also, I don't quite understand why is this configurable. What's the harm
+>> in turning it on by default? Yesterday I've posted some patches to
+>> libvirt list [1] (although I have to admit I am still not fully
+>> convinced about the design) and they implement just this - whenever qemu
+>> supports the feature libvirt turns it on.S
+> 
+> The option can destroy the data on the backing file, so QEMU can't enable it by
+> default.  libvirt can enable it as long as it knows it can destroy the data on
+> the backing file.
+
+Destroy data? Oh, okay then. I rather make it configurable. Although I'm
+not quite sure about XML design yet.
+
+Michal
