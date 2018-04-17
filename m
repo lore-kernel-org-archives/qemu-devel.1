@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8RoK-0003eL-Pr
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:42:22 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1f8Rpo-0004gL-QM
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1f8RoH-0006uj-Iu
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:42:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59764)
+	(envelope-from <alex.williamson@redhat.com>) id 1f8Rpl-0007he-He
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:43:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37498 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1f8RoH-0006u8-9t
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:42:17 -0400
-Date: Tue, 17 Apr 2018 08:42:03 -0600
+	id 1f8Rpl-0007hO-Cb
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 10:43:49 -0400
+Date: Tue, 17 Apr 2018 08:43:44 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180417084203.6bbfd326@w520.home>
-In-Reply-To: <01FDBDDE256B79498DC57789713132D46A18EE3B@SHSMSX101.ccr.corp.intel.com>
-References: <1523340161-8928-1-git-send-email-yulei.zhang@intel.com>
-	<82e38b24-8675-c7f5-3f37-c73bb14d7804@nvidia.com>
-	<20180416141504.3e82a154@w520.home>
-	<01FDBDDE256B79498DC57789713132D46A18EE3B@SHSMSX101.ccr.corp.intel.com>
+Message-ID: <20180417084344.7a241a9e@w520.home>
+In-Reply-To: <01FDBDDE256B79498DC57789713132D46A18F6E9@SHSMSX101.ccr.corp.intel.com>
+References: <1523340177-8975-1-git-send-email-yulei.zhang@intel.com>
+	<d9da5967-e44f-d0a4-3f8a-375f640e56d2@nvidia.com>
+	<20180416142328.18fbe5f6@w520.home>
+	<01FDBDDE256B79498DC57789713132D46A18F6E9@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH V4 1/4] vfio: introduce a new VFIO
- subregion for mdev device migration support
+Subject: Re: [Qemu-devel] [RFC PATCH V4 2/4] vfio: Add vm status change
+ callback to stop/restart the mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,190 +34,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Zhang, Yulei" <yulei.zhang@intel.com>
 Cc: Kirti Wankhede <kwankhede@nvidia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Tian, Kevin" <kevin.tian@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
 
-On Tue, 17 Apr 2018 10:36:53 +0000
+On Tue, 17 Apr 2018 13:40:32 +0000
 "Zhang, Yulei" <yulei.zhang@intel.com> wrote:
 
 > > -----Original Message-----
 > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Tuesday, April 17, 2018 4:15 AM
+> > Sent: Tuesday, April 17, 2018 4:23 AM
 > > To: Kirti Wankhede <kwankhede@nvidia.com>
 > > Cc: Zhang, Yulei <yulei.zhang@intel.com>; qemu-devel@nongnu.org; Tian,
 > > Kevin <kevin.tian@intel.com>; joonas.lahtinen@linux.intel.com;
 > > zhenyuw@linux.intel.com; Wang, Zhi A <zhi.a.wang@intel.com>;
 > > dgilbert@redhat.com; quintela@redhat.com
-> > Subject: Re: [RFC PATCH V4 1/4] vfio: introduce a new VFIO subregion for
-> > mdev device migration support
+> > Subject: Re: [RFC PATCH V4 2/4] vfio: Add vm status change callback to
+> > stop/restart the mdev device
 > > 
-> > On Mon, 16 Apr 2018 20:14:03 +0530
+> > On Mon, 16 Apr 2018 20:14:27 +0530
 > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > >   
 > > > On 4/10/2018 11:32 AM, Yulei Zhang wrote:  
-> > > > New VFIO sub region VFIO_REGION_SUBTYPE_DEVICE_STATE is added
-> > > > to fetch and restore the status of mdev device vGPU during the
-> > > > live migration.
+> > > > VM status change handler is added to change the vfio pci device
+> > > > status during the migration, write the demanded device status
+> > > > to the DEVICE STATUS subregion to stop the device on the source side
+> > > > before fetch its status and start the deivce on the target side
+> > > > after restore its status.
 > > > >
 > > > > Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 > > > > ---
-> > > >  hw/vfio/pci.c              | 25 ++++++++++++++++++++++++-
-> > > >  hw/vfio/pci.h              |  2 ++
-> > > >  linux-headers/linux/vfio.h |  9 ++++++---
-> > > >  3 files changed, 32 insertions(+), 4 deletions(-)
+> > > >  hw/vfio/pci.c                 | 20 ++++++++++++++++++++
+> > > >  include/hw/vfio/vfio-common.h |  1 +
+> > > >  linux-headers/linux/vfio.h    |  6 ++++++
+> > > >  roms/seabios                  |  2 +-
+> > > >  4 files changed, 28 insertions(+), 1 deletion(-)
 > > > >
 > > > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > > > index c977ee3..f98a9dd 100644
+> > > > index f98a9dd..13d8c73 100644
 > > > > --- a/hw/vfio/pci.c
 > > > > +++ b/hw/vfio/pci.c
-> > > > @@ -32,6 +32,7 @@
-> > > >  #include "pci.h"
-> > > >  #include "trace.h"
-> > > >  #include "qapi/error.h"
-> > > > +#include "migration/blocker.h"
+> > > > @@ -38,6 +38,7 @@
 > > > >
-> > > >  #define MSIX_CAP_LENGTH 12
+> > > >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+> > > >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> > > > +static void vfio_vm_change_state_handler(void *pv, int running,  
+> > RunState state);  
 > > > >
-> > > > @@ -2821,6 +2822,25 @@ static void vfio_realize(PCIDevice *pdev, Error  
+> > > >  /*
+> > > >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> > > > @@ -2896,6 +2897,7 @@ static void vfio_realize(PCIDevice *pdev, Error  
 > > **errp)  
-> > > >          vfio_vga_quirk_setup(vdev);
-> > > >      }
-> > > >
-> > > > +    struct vfio_region_info *device_state;
-> > > > +    /* device state region setup */
-> > > > +    if (!vfio_get_dev_region_info(&vdev->vbasedev,
-> > > > +                VFIO_REGION_TYPE_PCI_VENDOR_TYPE,  
-> > 
-> > This is not how VENDOR_TYPE is meant to be used.  We have a 32-bit type
-> > and 32-bit sub-type.  When bit 31 of type is set (ie. VENDOR_TYPE),
-> > then the low 16-bits (VENDOR_MASK) defines a vendor specific set of
-> > sub-types.  Using it as above, you're stomping on vendor 0x0000's
-> > vendor sub-types.  I would expect non-vendor specific types to leave
-> > bit 31 of the type field clear.  We could then define a universal type
-> > for device state with a sub-type specifying the API such that we could
-> > revise the API by providing an updated sub-type.  Or perhaps there are
-> > devices that want separate save vs restore regions, we could do that
-> > with the sub-type.  
-> 
-> Got it. For the subtype, can we use it to specify how to use the region,
-> to indicate it can be mmaped or not. 
-
-No, REGION_INFO tells us about mmap'ability and device state regions
-can certainly support the sparse mmap capability, we already have full
-ability to describe the mmap features of a region without dedicating a
-sub-type to it.  A sub-type must have a defined API, but use the
-existing mechanisms for mmap.
-
-> > > > +                VFIO_REGION_SUBTYPE_DEVICE_STATE, &device_state)) {
-> > > > +        memcpy(&vdev->device_state, device_state,
-> > > > +               sizeof(struct vfio_region_info));
-> > > > +        g_free(device_state);
-> > > > +    } else {
-> > > > +        error_setg(&vdev->migration_blocker,
-> > > > +                "Migration disabled: cannot support device state region");
-> > > > +        migrate_add_blocker(vdev->migration_blocker, &err);  
-> > 
-> > This appears as if it's going to be rather verbose and generate errors
-> > for anything not supporting migration, which is currently everything.
-> > Maybe there should be an OnOffAuto vfio-pci device option for the user
-> > to specify migration such that if migration=on is specified the device
-> > will fail if it's not available.  Otherwise the default would be auto.
-> >   
-> We only get this error message when we try to migrate the guest with
-> vfio-pci device which doesn't contain the device_state region, just like 
-> currently we set unmigratable=1.
-
-Ok, I still wonder though if management tools might want the ability to
-fail the device if it doesn't support migration via an OnOffAuto
-option.  I can imagine a customer that doesn't want to compromise the
-migrate'ability of their VM and doesn't want to wait until a migration
-is attempted to find out it's blocked.  Thanks,
-
-Alex
- 
-> > > > +        if (err) {
-> > > > +            error_propagate(errp, err);
-> > > > +            error_free(vdev->migration_blocker);
-> > > > +            goto error;
-> > > > +        }
-> > > > +    }
+> > > >      vfio_register_err_notifier(vdev);
+> > > >      vfio_register_req_notifier(vdev);
+> > > >      vfio_setup_resetfn_quirk(vdev);
 > > > > +  
-> > >
-> > > I think there should be a _PROBE ioctl before trying to setup region for
-> > > migration. If vfio device driver or vendor driver for mdev device
-> > > supports migration capability, _PROBE ioctl should return success along
-> > > with region's information <index, size> which can be used to setup the
-> > > region.  
-> > 
-> > How is _PROBE different from _REGION_INFO which already exists to tell
-> > us information about the region?
-> >   
-> > > >      for (i = 0; i < PCI_ROM_SLOT; i++) {
-> > > >          vfio_bar_quirk_setup(vdev, i);
-> > > >      }
-> > > > @@ -2884,6 +2904,10 @@ out_teardown:
-> > > >      vfio_teardown_msi(vdev);
-> > > >      vfio_bars_exit(vdev);
-> > > >  error:
-> > > > +    if (vdev->migration_blocker) {
-> > > > +        migrate_del_blocker(vdev->migration_blocker);
-> > > > +        error_free(vdev->migration_blocker);
-> > > > +    }
-> > > >      error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
+> > qemu_add_vm_change_state_handler(vfio_vm_change_state_handler,
+> > vdev);  
+> > > >
+> > > >      return;
+> > > >
+> > > > @@ -2982,6 +2984,24 @@ post_reset:
+> > > >      vfio_pci_post_reset(vdev);
 > > > >  }
 > > > >
-> > > > @@ -3009,7 +3033,6 @@ static Property vfio_pci_dev_properties[] = {
-> > > >
-> > > >  static const VMStateDescription vfio_pci_vmstate = {
-> > > >      .name = "vfio-pci",
-> > > > -    .unmigratable = 1,  
-> > >
-> > > Based on the result of above _PROBE ioctl, 'unmigratable' should be set
-> > > if vendor driver doesn't support migration capability.  
-> > 
-> > .unmigratable isn't really dynamically settable aiui, thus the
-> > existence of the migration blocker.
-> >   
-> > > >  };
-> > > >
-> > > >  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-> > > > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> > > > index 502a575..0ee1724 100644
-> > > > --- a/hw/vfio/pci.h
-> > > > +++ b/hw/vfio/pci.h
-> > > > @@ -116,6 +116,8 @@ typedef struct VFIOPCIDevice {
-> > > >      VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
-> > > >      VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
-> > > >      void *igd_opregion;
-> > > > +    struct vfio_region_info device_state;
-> > > > +    Error *migration_blocker;
-> > > >      PCIHostDeviceAddress host;
-> > > >      EventNotifier err_notifier;
-> > > >      EventNotifier req_notifier;
-> > > > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> > > > index 4312e96..e3380ad 100644
-> > > > --- a/linux-headers/linux/vfio.h
-> > > > +++ b/linux-headers/linux/vfio.h
-> > > > @@ -297,9 +297,12 @@ struct vfio_region_info_cap_type {
-> > > >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
-> > > >
-> > > >  /* 8086 Vendor sub-types */
-> > > > -#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
-> > > > -#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
-> > > > -#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-> > > > +#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION		(1)
-> > > > +#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG		(2)
-> > > > +#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
+> > > > +static void vfio_vm_change_state_handler(void *pv, int running,  
+> > RunState state)  
+> > > > +{
+> > > > +    VFIOPCIDevice *vdev = pv;
+> > > > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > > > +    uint8_t dev_state;
+> > > > +    uint8_t sz = 1;
 > > > > +
-> > > > +/* Mdev sub-type for device state save and restore */
-> > > > +#define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)  
+> > > > +    dev_state = running ? VFIO_DEVICE_START : VFIO_DEVICE_STOP;
+> > > > +
+> > > > +    if (pwrite(vdev->vbasedev.fd, &dev_state,
+> > > > +               sz, vdev->device_state.offset) != sz) {
+> > > > +        error_report("vfio: Failed to %s device", running ? "start" : "stop");
+> > > > +        return;
+> > > > +    }
+> > > > +
+> > > > +    vbasedev->device_state = dev_state;
+> > > > +}
+> > > > +  
+> > >
+> > > Is it expected to trap device_state region by vendor driver?
+> > > Can this information be communicated to vendor driver through an ioctl?  
 > > 
-> > This continues on with the 0x8086 vendor sub-types, which is entirely
-> > unnecessary as each vendor has an entire sub-type address space and we
-> > shouldn't be using a vendor type anyway.  Additionally, we need
-> > significantly more documentation on the API for this region.  Thanks,
+> > Either the mdev vendor driver or vfio bus driver (ie. vfio-pci) would
+> > be providing REGION_INFO for this region, so the vendor driver is
+> > already in full control here using existing ioctls.  I don't see that
+> > we need new ioctls, we just need to fully define the API of the
+> > proposed regions here.
+> >   
+> If the device state region is mmaped, we may not be able to use
+> region device state offset to convey the running state. It may need
+> a new ioctl to set the device state.
+
+The vendor driver defines the mmap'ability of the region, the vendor
+driver is still in control.  The API of the region and the
+implementation by the vendor driver should account for handling
+mmap'able sections within the region.  Thanks,
+
+Alex
+
+ 
+> > > Here only device state is conveyed to vendor driver but knowing
+> > > 'RunState' in vendor driver is very useful and vendor driver can take
+> > > necessary action accordingly like RUN_STATE_PAUSED indicating that VM  
+> > is  
+> > > in paused state, similarly RUN_STATE_SUSPENDED,
+> > > RUN_STATE_FINISH_MIGRATE, RUN_STATE_IO_ERROR. If these states are
+> > > handled properly, all the cases can be supported with same interface
+> > > like VM suspend-resume, VM pause-restore.  
+> > 
+> > I agree, but let's remember that we're talking about device state, not
+> > VM state.  vfio is a userspace device interface, not specifically a
+> > virtual machine interface, so states should be in terms of the device.
+> > The API of this region needs to be clearly defined and using only 1
+> > byte at the start of the region is not very forward looking.  Thanks,
 > > 
 > > Alex
 > >   
+> > > >  static void vfio_instance_init(Object *obj)
+> > > >  {
+> > > >      PCIDevice *pci_dev = PCI_DEVICE(obj);
+> > > > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-  
+> > common.h  
+> > > > index f3a2ac9..9c14a8f 100644
+> > > > --- a/include/hw/vfio/vfio-common.h
+> > > > +++ b/include/hw/vfio/vfio-common.h
+> > > > @@ -125,6 +125,7 @@ typedef struct VFIODevice {
+> > > >      unsigned int num_irqs;
+> > > >      unsigned int num_regions;
+> > > >      unsigned int flags;
+> > > > +    bool device_state;
+> > > >  } VFIODevice;
 > > > >
+> > > >  struct VFIODeviceOps {
+> > > > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > > > index e3380ad..8f02f2f 100644
+> > > > --- a/linux-headers/linux/vfio.h
+> > > > +++ b/linux-headers/linux/vfio.h
+> > > > @@ -304,6 +304,12 @@ struct vfio_region_info_cap_type {
+> > > >  /* Mdev sub-type for device state save and restore */
+> > > >  #define VFIO_REGION_SUBTYPE_DEVICE_STATE	(4)
+> > > >
+> > > > +/* Offset in region to save device state */
+> > > > +#define VFIO_DEVICE_STATE_OFFSET	1
+> > > > +
+> > > > +#define VFIO_DEVICE_START	0
+> > > > +#define VFIO_DEVICE_STOP	1
+> > > > +
 > > > >  /**
 > > > >   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+> > > >   *				    struct vfio_irq_info)
+> > > > diff --git a/roms/seabios b/roms/seabios
+> > > > index 63451fc..5f4c7b1 160000
+> > > > --- a/roms/seabios
+> > > > +++ b/roms/seabios
+> > > > @@ -1 +1 @@
+> > > > -Subproject commit 63451fca13c75870e1703eb3e20584d91179aebc
+> > > > +Subproject commit 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
 > > > >  
 > 
