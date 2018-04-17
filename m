@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8Umn-0006fZ-UN
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 13:52:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1f8Uuy-0000ii-Rk
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8Umj-0004Qr-36
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 13:52:58 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:46758)
+	(envelope-from <bounces@canonical.com>) id 1f8Uuv-0001X9-0f
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:01:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55946)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8Umi-0004QU-TU
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 13:52:52 -0400
-Received: by mail-qt0-x236.google.com with SMTP id h4so19662686qtn.13
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 10:52:52 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <62d561d0-fe72-4971-1bf5-72adc4a979f2@amsat.org>
-Date: Tue, 17 Apr 2018 14:52:45 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f8Uuu-0001WQ-Oc
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 14:01:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f8Uus-0000FZ-VZ
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:01:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CDC1A2E80CE
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:01:18 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] vnc: heap-use-after-free in vnc_client_io() after
- vnc_disconnect_finish()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Apr 2018 17:54:14 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1763536 <1763536@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152357545161.20027.863482450235173908.malonedeb@gac.canonical.com>
+Message-Id: <152398765486.19725.14402366769588218105.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1763536] Re: go build fails under
+ qemu-ppc64le-static (qemu-user)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +37,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-running commit ce8d4082054519f2eaac39958edde502860a7fc6:
+Do you have a simpler repro case (ie one that doesn't require docker) ?
 
-qemu-system-mips -M malta -m 512 \
-  -kernel vmlinux-3.2.0-4-4kc-malta \
-  -append 'root=/dev/sda1 console=ttyS0' \
-  -hda debian_wheezy_mips_standard.qcow2 \
-  -redir tcp:5556::22 -serial stdio
+-- =
 
-and connecting with "xtightvncviewer :0" I get when closing vnc:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1763536
 
-==27686==ERROR: AddressSanitizer: heap-use-after-free on address
-0x63100003c814 at pc 0x55eed918362a bp 0x7ffdf5c36c80 sp 0x7ffdf5c36c78
-READ of size 4 at 0x63100003c814 thread T0
-    #0 0x55eed9183629 in vnc_client_io /source/qemu/ui/vnc.c:1549
-    #1 0x55eed94ae26c in qio_channel_fd_source_dispatch
-/source/qemu/io/channel-watch.c:84
-    #2 0x7f3e181860f4 in g_main_context_dispatch
-(/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4c0f4)
-    #3 0x55eed95b9799 in glib_pollfds_poll /source/qemu/util/main-loop.c:215
-    #4 0x55eed95b9989 in os_host_main_loop_wait
-/source/qemu/util/main-loop.c:263
-    #5 0x55eed95b9b5f in main_loop_wait /source/qemu/util/main-loop.c:522
-    #6 0x55eed898f7dd in main_loop /source/qemu/vl.c:1943
-    #7 0x55eed89a1f0b in main /source/qemu/vl.c:4734
-    #8 0x7f3dfe094a86 in __libc_start_main
-(/lib/x86_64-linux-gnu/libc.so.6+0x21a86)
-    #9 0x55eed8518db9 in _start
-(/build/qemu/mips-softmmu/qemu-system-mips+0x14f3db9)
+Title:
+  go build fails under qemu-ppc64le-static (qemu-user)
 
-0x63100003c814 is located 20 bytes inside of 75744-byte region
-[0x63100003c800,0x63100004efe0)
-freed by thread T0 here:
-    #0 0x7f3e18b878c8 in __interceptor_free
-(/usr/lib/x86_64-linux-gnu/libasan.so.4+0xd98c8)
-    #1 0x55eed9181bb0 in vnc_disconnect_finish /source/qemu/ui/vnc.c:1278
-    #2 0x55eed9183225 in vnc_client_read /source/qemu/ui/vnc.c:1511
-    #3 0x55eed91835a9 in vnc_client_io /source/qemu/ui/vnc.c:1541
-    #4 0x55eed94ae26c in qio_channel_fd_source_dispatch
-/source/qemu/io/channel-watch.c:84
-    #5 0x7f3e181860f4 in g_main_context_dispatch
-(/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4c0f4)
+Status in QEMU:
+  New
 
-previously allocated by thread T0 here:
-    #0 0x7f3e18b87df8 in calloc
-(/usr/lib/x86_64-linux-gnu/libasan.so.4+0xd9df8)
-    #1 0x7f3e1818b8b0 in g_malloc0
-(/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x518b0)
-    #2 0x55eed9192aa0 in vnc_listen_io /source/qemu/ui/vnc.c:3186
-    #3 0x55eed94b9fd7 in qio_net_listener_channel_func
-/source/qemu/io/net-listener.c:57
-    #4 0x55eed94ae26c in qio_channel_fd_source_dispatch
-/source/qemu/io/channel-watch.c:84
-    #5 0x7f3e181860f4 in g_main_context_dispatch
-(/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4c0f4)
+Bug description:
+  I am using qemu-user (built static) in a docker container environment.
+  When running multi-threaded go commands in the container (go build for
+  example) the process may hang, report segfaults or other errors.  I
+  built qemu-ppc64le from the upstream git (master).
 
-SUMMARY: AddressSanitizer: heap-use-after-free
-/source/qemu/ui/vnc.c:1549 in vnc_client_io
-Shadow bytes around the buggy address:
-  0x0c627ffff8b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x0c627ffff8c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x0c627ffff8d0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x0c627ffff8e0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x0c627ffff8f0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-=>0x0c627ffff900: fd fd[fd]fd fd fd fd fd fd fd fd fd fd fd fd fd
-  0x0c627ffff910: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
-  0x0c627ffff920: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
-  0x0c627ffff930: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
-  0x0c627ffff940: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
-  0x0c627ffff950: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  I see the problem running on a multi core system with Intel i7 processors.
+  # cat /proc/cpuinfo | grep "model name"
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
 
-Shadow byte legend (one shadow byte represents 8 application bytes):
-  Heap left redzone:       fa
-  Freed heap region:       fd
-==26606==ABORTING
+  Steps to reproduce:
+  1) Build qemu-ppc64le as static and copy into docker build directory name=
+d it qemu-ppc64le-static.
+
+  2) Add hello.go to docker build dir.
+
+  package main
+  import "fmt"
+  func main() {
+  	fmt.Println("hello world")
+  }
+
+  3) Create the Dockerfile from below:
+
+  FROM ppc64le/golang:1.10.1-alpine3.
+  COPY qemu-ppc64le-static /usr/bin/
+  COPY hello.go /go
+
+  4) Build container
+  $ docker build -t qemutest -f Dockerfile ./go =
+
+
+  5) Run test
+  $ docker run -it qemutest
+
+  /go # /usr/bin/qemu-ppc64le-static --version
+  qemu-ppc64le version 2.11.93 (v2.12.0-rc3-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  /go # go version
+  go version go1.10.1 linux/ppc64le
+
+  /go # go build hello.go
+  fatal error: fatal error: stopm holding locksunexpected signal during run=
+time execution
+
+  panic during panic
+  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x1003=
+528c]
+
+  runtime stack:
+  runtime: unexpected return pc for syscall.Syscall6 called from 0xc42007f5=
+00
+  stack: frame=3D{sp:0xc4203be840, fp:0xc4203be860} stack=3D[0x4000b7ecf0,0=
+x4000b928f0)
+
+  syscall.Syscall6(0x100744e8, 0x3d, 0xc42050c140, 0x20, 0x18, 0x10422b80, =
+0xc4203be968[signal , 0x10012d88SIGSEGV: segmentation violation, 0xc4205940=
+00 code=3D, 0x00x1 addr=3D0x0 pc=3D0x1003528c)
+  ]
+
+  runtime stack:
+  	/usr/local/go/src/syscall/asm_linux_ppc64x.s:61runtime.throw(0x10472d19,=
+ 0x13)
+   +	/usr/local/go/src/runtime/panic.go:0x6c616 +0x68
+
+  =
+
+  runtime.stopm()
+  	/usr/local/go/src/runtime/proc.go:1939goroutine  +10x158
+   [runtime.exitsyscall0semacquire(0xc42007f500)
+  	/usr/local/go/src/runtime/proc.go:3129 +]:
+  0x130
+  runtime.mcall(0xc42007f500)
+  	/usr/local/go/src/runtime/asm_ppc64x.s:183 +0x58sync.runtime_Semacquire
+  (0xc4201fab1c)
+  	/usr/local/go/src/runtime/sema.go:56 +0x38
+
+  ----
+  Note the results may differ between attempts,  hangs and other faults som=
+etimes happen.
+  ----
+  If I run "go: single threaded I don't see the problem, for example:
+
+  /go # GOMAXPROCS=3D1 go build -p 1 hello.go =
+
+  /go # ./hello
+  hello world
+
+  I see the same issue with arm64.  I don't think this is a go issue,
+  but don't have a real evidence to prove that.  This problem looks
+  similar to other problem I have seen reported against qemu running
+  multi-threaded applications.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1763536/+subscriptions
