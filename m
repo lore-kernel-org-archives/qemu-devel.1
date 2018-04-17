@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8Y15-0003o4-Qt
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:19:57 -0400
+	(envelope-from <hwertz10@gmail.com>) id 1f8Y87-0006p8-B4
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8Y14-0000Wg-8q
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:19:55 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8Y13-0000Rc-VX
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:19:54 -0400
-Received: by mail-ot0-x242.google.com with SMTP id w4-v6so4011752ote.12
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 14:19:53 -0700 (PDT)
+	(envelope-from <hwertz10@gmail.com>) id 1f8Y84-0001Wd-Vp
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 17:27:11 -0400
 MIME-Version: 1.0
-In-Reply-To: <19b7bccd-2282-5c94-fe7c-68f72ccbaba7@amsat.org>
-References: <20180416181844.7851-1-marcandre.lureau@redhat.com>
-	<CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
-	<20180416184406.GC14488@redhat.com>
-	<CAFEAcA_uS7f-uf+-OkcskdHG3=eTgr92Mw46nk430q27-wve4g@mail.gmail.com>
-	<19b7bccd-2282-5c94-fe7c-68f72ccbaba7@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Apr 2018 22:19:32 +0100
-Message-ID: <CAFEAcA9V86LVT4L8Neq5hzz-w5LtYyR3BsEnDHJ8f4Sn3L-naw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_Hti-FYqEse7ubdNyVr3fPHO==e6MDv9Ym4KVYJcYTwA@mail.gmail.com>
+References: <CAOuPqTE8GsN_+REWzSt4DOiqddSbZC-kOH=WnYG3U8ge3GsLoA@mail.gmail.com>
+	<CAFEAcA_Hti-FYqEse7ubdNyVr3fPHO==e6MDv9Ym4KVYJcYTwA@mail.gmail.com>
+From: Henry Wertz <hwertz10@gmail.com>
+Date: Tue, 17 Apr 2018 16:27:02 -0500
+Message-ID: <CAOuPqTG_C_dLF+RPxP_=A7575KWSg=dTbuN6-94HCDqsTEJPOQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] mux: fix ctrl-a b again
+Subject: Re: [Qemu-devel] Patch for ARM memory barriers and getdent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +22,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <Laurent@vivier.eu>
 
-On 17 April 2018 at 19:36, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> Since this commit, the console on the Malta board stay black...
+Hi Henry; thanks for these patches. Please could you provide
+> a Signed-off-by: line for them? This says you're happy for us
+> to apply them to QEMU under our license, and we can't do anything
+> with them without one. The top part of
+> https://wiki.qemu.org/Contribute/SubmitAPatch
+> has more detail.
 >
-> Before:
-> $ qemu-system-mips -M malta -m 512 \
->   -kernel vmlinux-3.2.0-4-4kc-malta -append 'root=3D/dev/sda1' \
->   -nographic
-> [    0.000000] Initializing cgroup subsys cpuset
-> [    0.000000] Initializing cgroup subsys cpu
-> [    0.000000] Linux version 3.2.0-4-4kc-malta
-> (debian-kernel@lists.debian.org) (gcc version 4.6.3 (Debian 4.6.3-14) )
-> #1 Debian 3.2.51-1
-> [    0.000000] Config serial console: console=3DttyS0,38400n8r
-> [    0.000000] bootconsole [early0] enabled
-> ...
+     Yup, I'll resubmit both in proper format.
+
+> You'll probably have better luck if you submit patches as separate
+> emails rather than all in one -- the set of people who care about
 >
-> After:
-> $ qemu-system-mips -M malta -m 512 \
->   -kernel vmlinux-3.2.0-4-4kc-malta -append 'root=3D/dev/sda1' \
->   -nographic
-> QEMU 2.11.92 monitor - type 'help' for more information
-> (qemu) QEMU 2.11.92 monitor - type 'help' for more information
-> (qemu) q
+     Can do.
 
-I reproed this, and as you can see from the transcripts you
-give the problem is that the mux is confused about what the
-active console should be. Before the patch, we correctly
-start with the serial as the active console and C-a c
-switches, but afterwards we start out with the monitor
-active and C-a c doesn't switch. Revert pushed to master.
+In general, 64-bit binary on a 32-bit host is not supported by linux-user.
+> Various things are likely to go wrong for anything but the simplest
+> of guest binaries. You need a 64-bit host to reliably use linux-user
+> for a 64-bit guest binary.
+>
+     I didn't test it very hard, I was only using it to run the couple
+Android SDK binaries (aapt and friends) that Android Studio runs; these in
+general open a file or two, process them, write out a result, so they
+probably are pretty simple guest binaries.  Nevertheless,with this patch
+these few x86-64 binaries run on 32-bit ARM and (last I checked) 32-bit
+Intel.
 
-thanks
--- PMM
+
+>
+> I think your change isn't sufficient to handle the "target 32 bits
+> and host 64 bits" case, because the 64-on-32 code path that you're
+> using for it uses the guest's buffer size as the size of the
+> host buffer it allocates to pass to the host syscall.
+>
+....
+
+> Maybe I'm missing a clever trick?
+>
+     As far as I can tell, it makes a "linux_dirent" and "target_dirent"
+and is pretty careful to calculate rather than assume offsets, and so on as
+it copies data from one struct to the other.  i didn't look before, but
+there is in fact a line "assert(count1 + treclen <= count);" that would
+trigger if the buffer is going to be overflowed.  I think the code may not
+have even been needed, except that d_type (file type) was moved to the
+"middle" of the dirent64 struct instead of at the end.
+
+Thanks!
+-- Henry
