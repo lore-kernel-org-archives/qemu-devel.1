@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNs-0003HX-KW
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:26 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNs-0003Hf-NQ
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8XNn-0007cg-BQ
+	(envelope-from <alindsay@codeaurora.org>) id 1f8XNn-0007c9-8C
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 16:39:24 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Tue, 17 Apr 2018 16:37:57 -0400
-Message-Id: <1523997485-1905-14-git-send-email-alindsay@codeaurora.org>
+Date: Tue, 17 Apr 2018 16:38:01 -0400
+Message-Id: <1523997485-1905-18-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
 References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 13/21] target/arm: Add ARM_FEATURE_V7VE for
- v7 Virtualization Extensions
+Subject: [Qemu-devel] [PATCH v4 17/21] target/arm: PMU: Add instruction and
+ cycle events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +23,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>
 
-Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- target/arm/cpu.c | 3 +++
- target/arm/cpu.h | 1 +
- 2 files changed, 4 insertions(+)
+The instruction event is only enabled when icount is used, cycles are
+always supported. Always defining get_cycle_count (but altering its
+behavior depending on CONFIG_USER_ONLY) allows us to remove some
+CONFIG_USER_ONLY #defines throughout the rest of the code.
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 2228e4c..9d27ffc 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -774,6 +774,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error=
- **errp)
-     /* Some features automatically imply others: */
-     if (arm_feature(env, ARM_FEATURE_V8)) {
-         set_feature(env, ARM_FEATURE_V7);
-+        set_feature(env, ARM_FEATURE_V7VE);
-         set_feature(env, ARM_FEATURE_ARM_DIV);
-         set_feature(env, ARM_FEATURE_LPAE);
-     }
-@@ -1490,6 +1491,7 @@ static void cortex_a7_initfn(Object *obj)
-=20
-     cpu->dtb_compatible =3D "arm,cortex-a7";
-     set_feature(&cpu->env, ARM_FEATURE_V7);
-+    set_feature(&cpu->env, ARM_FEATURE_V7VE);
-     set_feature(&cpu->env, ARM_FEATURE_VFP4);
-     set_feature(&cpu->env, ARM_FEATURE_NEON);
-     set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
-@@ -1535,6 +1537,7 @@ static void cortex_a15_initfn(Object *obj)
-=20
-     cpu->dtb_compatible =3D "arm,cortex-a15";
-     set_feature(&cpu->env, ARM_FEATURE_V7);
-+    set_feature(&cpu->env, ARM_FEATURE_V7VE);
-     set_feature(&cpu->env, ARM_FEATURE_VFP4);
-     set_feature(&cpu->env, ARM_FEATURE_NEON);
-     set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9f769ae..132e08d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1445,6 +1445,7 @@ enum arm_features {
-     ARM_FEATURE_OMAPCP, /* OMAP specific CP15 ops handling.  */
-     ARM_FEATURE_THUMB2EE,
-     ARM_FEATURE_V7MP,    /* v7 Multiprocessing Extensions */
-+    ARM_FEATURE_V7VE,    /* v7 with Virtualization Extensions */
-     ARM_FEATURE_V4T,
-     ARM_FEATURE_V5,
-     ARM_FEATURE_STRONGARM,
---=20
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies=
-, Inc.
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+---
+ target/arm/helper.c | 88 ++++++++++++++++++++++++++---------------------------
+ 1 file changed, 43 insertions(+), 45 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b36630f..b91f022 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -15,6 +15,7 @@
+ #include "arm_ldst.h"
+ #include <zlib.h> /* For crc32 */
+ #include "exec/semihost.h"
++#include "sysemu/cpus.h"
+ #include "sysemu/kvm.h"
+ #include "fpu/softfloat.h"
+ 
+@@ -943,8 +944,49 @@ typedef struct pm_event {
+     uint64_t (*get_count)(CPUARMState *);
+ } pm_event;
+ 
++static bool event_always_supported(CPUARMState *env)
++{
++    return true;
++}
++
++/*
++ * Return the underlying cycle count for the PMU cycle counters. If we're in
++ * usermode, simply return 0.
++ */
++static uint64_t cycles_get_count(CPUARMState *env)
++{
++#ifndef CONFIG_USER_ONLY
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
++                   ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
++#else
++    return 0;
++#endif
++}
++
++#ifndef CONFIG_USER_ONLY
++static bool instructions_supported(CPUARMState *env)
++{
++    return use_icount == 1 /* Precise instruction counting */;
++}
++
++static uint64_t instructions_get_count(CPUARMState *env)
++{
++    return (uint64_t)cpu_get_icount_raw();
++}
++#endif
++
+ #define SUPPORTED_EVENT_SENTINEL UINT16_MAX
+ static const pm_event pm_events[] = {
++#ifndef CONFIG_USER_ONLY
++    { .number = 0x008, /* INST_RETIRED, Instruction architecturally executed */
++      .supported = instructions_supported,
++      .get_count = instructions_get_count
++    },
++    { .number = 0x011, /* CPU_CYCLES, Cycle */
++      .supported = event_always_supported,
++      .get_count = cycles_get_count
++    },
++#endif
+     { .number = SUPPORTED_EVENT_SENTINEL }
+ };
+ static uint16_t supported_event_map[0x3f];
+@@ -1024,8 +1066,6 @@ static CPAccessResult pmreg_access_swinc(CPUARMState *env,
+     return pmreg_access(env, ri, isread);
+ }
+ 
+-#ifndef CONFIG_USER_ONLY
+-
+ static CPAccessResult pmreg_access_selr(CPUARMState *env,
+                                         const ARMCPRegInfo *ri,
+                                         bool isread)
+@@ -1140,9 +1180,7 @@ static inline bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
+  */
+ void pmccntr_op_start(CPUARMState *env)
+ {
+-    uint64_t cycles = 0;
+-    cycles = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+-                          ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
++    uint64_t cycles = cycles_get_count(env);
+ 
+     if (pmu_counter_enabled(env, 31)) {
+         uint64_t eff_cycles = cycles;
+@@ -1285,42 +1323,6 @@ static void pmccntr_write32(CPUARMState *env, const ARMCPRegInfo *ri,
+     pmccntr_write(env, ri, deposit64(cur_val, 0, 32, value));
+ }
+ 
+-#else /* CONFIG_USER_ONLY */
+-
+-void pmccntr_op_start(CPUARMState *env)
+-{
+-}
+-
+-void pmccntr_op_finish(CPUARMState *env)
+-{
+-}
+-
+-void pmevcntr_op_start(CPUARMState *env, uint8_t i)
+-{
+-}
+-
+-void pmevcntr_op_finish(CPUARMState *env, uint8_t i)
+-{
+-}
+-
+-void pmu_op_start(CPUARMState *env)
+-{
+-}
+-
+-void pmu_op_finish(CPUARMState *env)
+-{
+-}
+-
+-void pmu_pre_el_change(ARMCPU *cpu, void *ignored)
+-{
+-}
+-
+-void pmu_post_el_change(ARMCPU *cpu, void *ignored)
+-{
+-}
+-
+-#endif
+-
+ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+@@ -1633,7 +1635,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+     /* Unimplemented so WI. */
+     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
+       .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NOP },
+-#ifndef CONFIG_USER_ONLY
+     { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
+       .access = PL0_RW, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmselr),
+@@ -1653,7 +1654,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .access = PL0_RW, .accessfn = pmreg_access_ccntr,
+       .type = ARM_CP_IO,
+       .readfn = pmccntr_read, .writefn = pmccntr_write, },
+-#endif
+     { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
+       .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
+       .access = PL0_RW, .accessfn = pmreg_access,
+@@ -5191,7 +5191,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+          * field as main ID register, and we implement only the cycle
+          * count register.
+          */
+-#ifndef CONFIG_USER_ONLY
+         ARMCPRegInfo pmcr = {
+             .name = "PMCR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 0,
+             .access = PL0_RW,
+@@ -5245,7 +5244,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             g_free(pmevtyper_name);
+             g_free(pmevtyper_el0_name);
+         }
+-#endif
+         ARMCPRegInfo clidr = {
+             .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
+             .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 1,
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
 Qualcomm Technologies, Inc. is a member of the
 Code Aurora Forum, a Linux Foundation Collaborative Project.
