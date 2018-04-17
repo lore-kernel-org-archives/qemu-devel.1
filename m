@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8SiD-0001Q8-7r
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:40:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8SiD-0001Qb-M3
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8Si7-0005JU-La
+	(envelope-from <pbonzini@redhat.com>) id 1f8Si9-0005LF-FK
 	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 11:40:05 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 17 Apr 2018 17:39:43 +0200
-Message-Id: <20180417153945.20737-5-pbonzini@redhat.com>
+Date: Tue, 17 Apr 2018 17:39:45 +0200
+Message-Id: <20180417153945.20737-7-pbonzini@redhat.com>
 In-Reply-To: <20180417153945.20737-1-pbonzini@redhat.com>
 References: <20180417153945.20737-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/6] ide: make ide_transfer_stop idempotent
+Subject: [Qemu-devel] [PATCH 6/6] ide: introduce ide_transfer_start_norecurse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,60 +22,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, qemu-block@nongnu.org
 
-There is code checking s->end_transfer_func and it was not taught about
-ide_transfer_cancel.  We can just use ide_transfer_stop because
-s->end_transfer_func is only ever called in the DRQ phase.
-
-ide_transfer_cancel can then be removed, since it would just be
-calling ide_transfer_halt.
+For the case where the end_transfer_func is also the caller of
+ide_transfer_start, the mutual recursion can lead to unlimited
+stack usage.  Introduce a new version that can be used to change
+tail recursion into a loop, and use it in trace_ide_atapi_cmd_reply_end.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ide/core.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ hw/ide/atapi.c            | 42 +++++++++++++++++++++------------------
+ hw/ide/core.c             | 16 +++++++++++----
+ include/hw/ide/internal.h |  2 ++
+ 3 files changed, 37 insertions(+), 23 deletions(-)
 
+diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
+index 7168ff55a7..39e473f9c2 100644
+--- a/hw/ide/atapi.c
++++ b/hw/ide/atapi.c
+@@ -245,15 +245,11 @@ static uint16_t atapi_byte_count_limit(IDEState *s)
+ void ide_atapi_cmd_reply_end(IDEState *s)
+ {
+     int byte_count_limit, size, ret;
+-    trace_ide_atapi_cmd_reply_end(s, s->packet_transfer_size,
+-                                  s->elementary_transfer_size,
+-                                  s->io_buffer_index);
+-    if (s->packet_transfer_size <= 0) {
+-        /* end of transfer */
+-        ide_atapi_cmd_ok(s);
+-        ide_set_irq(s->bus);
+-        trace_ide_atapi_cmd_reply_end_eot(s, s->status);
+-    } else {
++    while (s->packet_transfer_size > 0) {
++        trace_ide_atapi_cmd_reply_end(s, s->packet_transfer_size,
++                                      s->elementary_transfer_size,
++                                      s->io_buffer_index);
++
+         /* see if a new sector must be read */
+         if (s->lba != -1 && s->io_buffer_index >= s->cd_sector_size) {
+             if (!s->elementary_transfer_size) {
+@@ -279,11 +275,6 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+             size = s->cd_sector_size - s->io_buffer_index;
+             if (size > s->elementary_transfer_size)
+                 size = s->elementary_transfer_size;
+-            s->packet_transfer_size -= size;
+-            s->elementary_transfer_size -= size;
+-            s->io_buffer_index += size;
+-            ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
+-                               size, ide_atapi_cmd_reply_end);
+         } else {
+             /* a new transfer is needed */
+             s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO;
+@@ -306,13 +297,26 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+                     size = (s->cd_sector_size - s->io_buffer_index);
+             }
+             trace_ide_atapi_cmd_reply_end_new(s, s->status);
+-            s->packet_transfer_size -= size;
+-            s->elementary_transfer_size -= size;
+-            s->io_buffer_index += size;
+-            ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
+-                               size, ide_atapi_cmd_reply_end);
++        }
++        s->packet_transfer_size -= size;
++        s->elementary_transfer_size -= size;
++        s->io_buffer_index += size;
++
++        /* Some adapters process PIO data right away.  In that case, we need
++         * to avoid mutual recursion between ide_transfer_start
++         * and ide_atapi_cmd_reply_end.
++         */
++        if (!ide_transfer_start_norecurse(s,
++                                          s->io_buffer + s->io_buffer_index - size,
++                                          size, ide_atapi_cmd_reply_end)) {
++            return;
+         }
+     }
++
++    /* end of transfer */
++    trace_ide_atapi_cmd_reply_end_eot(s, s->status);
++    ide_atapi_cmd_ok(s);
++    ide_set_irq(s->bus);
+ }
+ 
+ /* send a reply of 'size' bytes in s->io_buffer to an ATAPI command */
 diff --git a/hw/ide/core.c b/hw/ide/core.c
-index edda171b47..bc3648eb13 100644
+index bc3648eb13..9884df0e2e 100644
 --- a/hw/ide/core.c
 +++ b/hw/ide/core.c
-@@ -548,10 +548,9 @@ static void ide_cmd_done(IDEState *s)
+@@ -524,8 +524,8 @@ static void ide_clear_retry(IDEState *s)
+ }
+ 
+ /* prepare data transfer and tell what to do after */
+-void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
+-                        EndTransferFunc *end_transfer_func)
++bool ide_transfer_start_norecurse(IDEState *s, uint8_t *buf, int size,
++                                  EndTransferFunc *end_transfer_func)
+ {
+     s->data_ptr = buf;
+     s->data_end = buf + size;
+@@ -535,10 +535,18 @@ void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
      }
+     if (!s->bus->dma->ops->pio_transfer) {
+         s->end_transfer_func = end_transfer_func;
+-        return;
++        return false;
+     }
+     s->bus->dma->ops->pio_transfer(s->bus->dma);
+-    end_transfer_func(s);
++    return true;
++}
++
++void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
++                        EndTransferFunc *end_transfer_func)
++{
++    if (ide_transfer_start_norecurse(s, buf, size, end_transfer_func)) {
++        end_transfer_func(s);
++    }
  }
  
--static void ide_transfer_halt(IDEState *s,
--                              void(*end_transfer_func)(IDEState *))
-+static void ide_transfer_halt(IDEState *s)
- {
--    s->end_transfer_func = end_transfer_func;
-+    s->end_transfer_func = ide_transfer_stop;
-     s->data_ptr = s->io_buffer;
-     s->data_end = s->io_buffer;
-     s->status &= ~DRQ_STAT;
-@@ -559,15 +558,10 @@ static void ide_transfer_halt(IDEState *s,
+ static void ide_cmd_done(IDEState *s)
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index f3de6f9b73..594081e57f 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -623,6 +623,8 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val);
  
- void ide_transfer_stop(IDEState *s)
- {
--    ide_transfer_halt(s, ide_transfer_stop);
-+    ide_transfer_halt(s);
-     ide_cmd_done(s);
- }
- 
--static void ide_transfer_cancel(IDEState *s)
--{
--    ide_transfer_halt(s, ide_transfer_cancel);
--}
--
- int64_t ide_get_sector(IDEState *s)
- {
-     int64_t sector_num;
-@@ -1362,7 +1356,7 @@ static bool cmd_nop(IDEState *s, uint8_t cmd)
- static bool cmd_device_reset(IDEState *s, uint8_t cmd)
- {
-     /* Halt PIO (in the DRQ phase), then DMA */
--    ide_transfer_cancel(s);
-+    ide_transfer_halt(s);
-     ide_cancel_dma_sync(s);
- 
-     /* Reset any PIO commands, reset signature, etc */
+ void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
+                         EndTransferFunc *end_transfer_func);
++bool ide_transfer_start_norecurse(IDEState *s, uint8_t *buf, int size,
++                                  EndTransferFunc *end_transfer_func);
+ void ide_transfer_stop(IDEState *s);
+ void ide_set_inactive(IDEState *s, bool more);
+ BlockAIOCB *ide_issue_trim(
 -- 
 2.17.0
