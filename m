@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f8jIe-0002vo-Up
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:22:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8jJG-0003GK-Fr
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f8jIa-0008Vz-A8
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:22:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39974)
+	(envelope-from <pbonzini@redhat.com>) id 1f8jJB-0000Ik-Hr
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:23:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36140 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f8jIa-0008Vk-4J
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:22:44 -0400
-Date: Wed, 18 Apr 2018 06:22:31 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180418092231.GK29865@localhost.localdomain>
-References: <20180329213857.15499-1-ehabkost@redhat.com>
-	<20180329213857.15499-18-ehabkost@redhat.com>
-	<87vacqf3da.fsf@dusky.pond.sub.org>
-	<20180417144256.GW29865@localhost.localdomain>
-	<87lgdl2e87.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f8jJB-0000IQ-Ck
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:23:21 -0400
+References: <20180329032149.44685-1-aik@ozlabs.ru>
+	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
+	<20180416152040.7b88b902@redhat.com>
+	<e483d218-0e93-4a2b-43ea-4a961e559c4d@redhat.com>
+	<20180416162706.43212a69@redhat.com>
+	<13008b1f-4b59-c6e1-69d2-98f8280f6f34@redhat.com>
+	<20180417141803.2d588b97@redhat.com>
+	<a23e5774-9a46-7354-3f80-1ad629d102f9@redhat.com>
+	<87y3hl2fez.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b84fa22b-2658-5a82-6b18-ab30f6a4384e@redhat.com>
+Date: Wed, 18 Apr 2018 11:23:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87lgdl2e87.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC 17/18] validator.py script
+In-Reply-To: <87y3hl2fez.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
+ in "info mtree"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +37,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, peter.maydell@linaro.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Apr 18, 2018 at 08:58:00AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+On 18/04/2018 08:32, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 > 
-> > On Tue, Apr 17, 2018 at 02:01:53PM +0200, Markus Armbruster wrote:
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> [...]
-> >> > +    command-line: '$QEMU -nodefaults -machine none'
-> >> > +    monitor-commands:
-> >> > +    - qmp:
-> >> > +      - execute: qom-list-types
-> >> > +        arguments:
-> >> > +          implements: 'device'
-> >> > +          abstract: true
-> >> > +    - hmp: 'device_add help'
-> [...]
-> >> > +monitor-commands
-> >> > +~~~~~~~~~~~~~~~~
-> >> > +
-> >> > +Mapping or list-of-mappings containing monitor commands to run.
+>> On 17/04/2018 14:18, Igor Mammedov wrote:
+>>>> What's the point of an object name if it cannot be unique?
+>>> It should be sufficient for it to be unique within parent's
+>>> scope and object_property_add_child() should make sure that
+>>> added object is unique within its parent's namespace.
+>>> Having named object from starters is useful as object
+>>> won't have to piggyback on parent (object_get_canonical_path_component)
+>>> when it need its own name. Then named object could use its name
+>>> freely anywhere including initfn, property setters/getters and
+>>> let object_property_add_child() take care of possible name
+>>> conflict.
+>>
+>> I agree that it looks nice, but I'm worried that people forget that the
+>> path component is only unique until object_unparent().  The use for
+>> DEVICE_DELETED events is already a bad thing...
 > 
-> http://yaml.org/spec/1.2/spec.html talks about mappings and sequences.
-> Recommend to say "sequence" rather than "list".
+> Hmm.  If the canonical QOM path isn't the proper way to identify a
+> device in QMP, what else is?  Honest question!
 
-Noted.
+The canonical path is; the last component alone is not.
 
-> 
-> I can't see how sequences come into play.  Your example's
-> monitor-command is a mapping, not a sequence of mappings.  Am I
-> confused?
-
-The example is supposed to be a sequence of mappings.
-
-> 
-> >> >                                                                   The key on each
-> >> > +item can be ``hmp`` or ``qmp``.  The value on each entry can be a string,
-> >> > +mapping, or list.
-> >> > +
-> >> > +Default: None.
-> [...]
-> >> Can I do
-> >> 
-> >>     monitor-commands:
-> >>     - qmp:
-> >>       - execute: eins
-> >>     - hmp: zwei
-> >>     - qmp:
-> >>       - execute: drei
-> >> 
-> >> to execute eins, zwei, drei in this order?
-> >
-> > Yes, it can.  See the test specification examples.
-> 
-> I asked because the YAML spec I quoted above says mappings are unordered
-> and must be unique.  My example violates "unique", and your "yes, it
-> can" violates "unordered".
-> 
-> [...]
-
-The above is a sequence of one-key mappings.
-
-
-This is a (not very useful) mapping:
-
->>> yaml.load("""
-... qmp:
-... - execute: eins
-... hmp: zwei
-... """)
-{'qmp': [{'execute': 'eins'}], 'hmp': 'zwei'}
-
-
-This is a sequence of one-key mappings:
-
->>> yaml.load("""
-... - qmp:
-...   - execute: eins
-... - hmp: zwei
-... - qmp:
-...   - execute: drei
-... """)
-[{'qmp': [{'execute': 'eins'}]}, {'hmp': 'zwei'}, {'qmp': [{'execute': 'drei'}]}]
->>>
-
--- 
-Eduardo
+Paolo
