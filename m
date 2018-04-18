@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8izQ-0000Qn-LI
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:03:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f8j1b-00029C-DI
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:05:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8izP-0005xb-DA
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:02:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53318 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1f8j1V-0007FX-N1
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:05:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35382 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8izP-0005xM-7X
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:02:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4D0A8DC4A
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 09:02:54 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 18 Apr 2018 17:02:39 +0800
-Message-Id: <20180418090239.13090-4-peterx@redhat.com>
-In-Reply-To: <20180418090239.13090-1-peterx@redhat.com>
-References: <20180418090239.13090-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] monitor: add lock to protect mon_fdsets
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f8j1V-0007FF-IP
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:05:05 -0400
+Date: Wed, 18 Apr 2018 11:04:57 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
+	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,184 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-Similar to previous patch, but introduce a new global big lock for
-mon_fdsets.  Take it where needed.
+> This surfaced in the RFCv1 discussion, but Daniel suggested ignoring
+> version numbers:
+>=20
+> http://mid.mail-archive.com/20180410093412.GI5155@redhat.com
+>=20
+> On 04/10/18 11:34, Daniel P. Berrang=E9 wrote:
+> > IMHO it would be valid to just keep life simple and only record the
+> > base machine type name that can use the firmware ie "pc", "q35", and
+> > ignore the fact that in some cases the firmware might require a
+> > specific version of the machine type.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- monitor.c | 48 ++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 6 deletions(-)
+IIRC this bit referes to the fact that SMM requires qemu >=3D 2.x (don't
+remember which x) to work.  So smm-enabled edk2 would just say
+"pc-q35-*" instead of trying to specifying a version range somehow.
 
-diff --git a/monitor.c b/monitor.c
-index f4951cafbc..40b5b56f66 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -254,6 +254,9 @@ typedef struct QMPRequest QMPRequest;
- /* Protects mon_list, monitor_event_state.  */
- static QemuMutex monitor_lock;
- 
-+/* Protects mon_fdsets */
-+static QemuMutex mon_fdsets_lock;
-+
- static QTAILQ_HEAD(mon_list, Monitor) mon_list;
- static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
- static int mon_refcount;
-@@ -270,6 +273,16 @@ static QEMUClockType event_clock_type = QEMU_CLOCK_REALTIME;
- static void monitor_command_cb(void *opaque, const char *cmdline,
-                                void *readline_opaque);
- 
-+/*
-+ * This lock can be used very early, even during param parsing.
-+ * Meanwhile it can also be used even at the end of main.  Let's keep
-+ * it initialized for the whole lifecycle of QEMU.
-+ */
-+static void __attribute__((constructor)) mon_fdsets_lock_init(void)
-+{
-+    qemu_mutex_init(&mon_fdsets_lock);
-+}
-+
- /**
-  * Is @mon a QMP monitor?
-  */
-@@ -2308,9 +2321,11 @@ static void monitor_fdsets_cleanup(void)
-     MonFdset *mon_fdset;
-     MonFdset *mon_fdset_next;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH_SAFE(mon_fdset, &mon_fdsets, next, mon_fdset_next) {
-         monitor_fdset_cleanup(mon_fdset);
-     }
-+    qemu_mutex_unlock(&mon_fdsets_lock);
- }
- 
- AddfdInfo *qmp_add_fd(bool has_fdset_id, int64_t fdset_id, bool has_opaque,
-@@ -2345,6 +2360,7 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
-     MonFdsetFd *mon_fdset_fd;
-     char fd_str[60];
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         if (mon_fdset->id != fdset_id) {
-             continue;
-@@ -2364,10 +2380,12 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
-             goto error;
-         }
-         monitor_fdset_cleanup(mon_fdset);
-+        qemu_mutex_unlock(&mon_fdsets_lock);
-         return;
-     }
- 
- error:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-     if (has_fd) {
-         snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64 ", fd:%" PRId64,
-                  fdset_id, fd);
-@@ -2383,6 +2401,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
-     MonFdsetFd *mon_fdset_fd;
-     FdsetInfoList *fdset_list = NULL;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         FdsetInfoList *fdset_info = g_malloc0(sizeof(*fdset_info));
-         FdsetFdInfoList *fdsetfd_list = NULL;
-@@ -2412,6 +2431,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
-         fdset_info->next = fdset_list;
-         fdset_list = fdset_info;
-     }
-+    qemu_mutex_unlock(&mon_fdsets_lock);
- 
-     return fdset_list;
- }
-@@ -2424,6 +2444,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-     MonFdsetFd *mon_fdset_fd;
-     AddfdInfo *fdinfo;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     if (has_fdset_id) {
-         QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-             /* Break if match found or match impossible due to ordering by ID */
-@@ -2444,6 +2465,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-             if (fdset_id < 0) {
-                 error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "fdset-id",
-                            "a non-negative value");
-+                qemu_mutex_unlock(&mon_fdsets_lock);
-                 return NULL;
-             }
-             /* Use specified fdset ID */
-@@ -2494,6 +2516,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-     fdinfo->fdset_id = mon_fdset->id;
-     fdinfo->fd = mon_fdset_fd->fd;
- 
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-     return fdinfo;
- }
- 
-@@ -2531,29 +2554,38 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
- {
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd_dup;
-+    int ret = -1;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         if (mon_fdset->id != fdset_id) {
-             continue;
-         }
-         QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
-             if (mon_fdset_fd_dup->fd == dup_fd) {
--                return -1;
-+                ret = -1;
-+                goto out;
-             }
-         }
-         mon_fdset_fd_dup = g_malloc0(sizeof(*mon_fdset_fd_dup));
-         mon_fdset_fd_dup->fd = dup_fd;
-         QLIST_INSERT_HEAD(&mon_fdset->dup_fds, mon_fdset_fd_dup, next);
--        return 0;
-+        ret = 0;
-+        break;
-     }
--    return -1;
-+
-+out:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-+    return ret;
- }
- 
- static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
- {
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd_dup;
-+    int ret = -1;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
-             if (mon_fdset_fd_dup->fd == dup_fd) {
-@@ -2562,14 +2594,18 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
-                     if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
-                         monitor_fdset_cleanup(mon_fdset);
-                     }
--                    return -1;
-+                    ret = -1;
-+                    goto out;
-                 } else {
--                    return mon_fdset->id;
-+                    ret = mon_fdset->id;
-+                    goto out;
-                 }
-             }
-         }
-     }
--    return -1;
-+out:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-+    return ret;
- }
- 
- int monitor_fdset_dup_fd_find(int dup_fd)
--- 
-2.14.3
+> Continuing:
+>=20
+> On 04/18/18 08:02, Gerd Hoffmann wrote:
+> >> +# @secure-boot: The firmware implements the software interfaces for=
+ UEFI Secure
+> >> +#               Boot, as defined in the UEFI specification. Note th=
+at without
+> >> +#               @requires-smm, guest code running with kernel privi=
+leges can
+> >> +#               undermine the security of Secure Boot.
+> >> +#
+> >> +# @secure-boot-enrolled-keys: The variable store (NVRAM) template a=
+ssociated
+> >
+> > I think "enrolled-keys" should better be a separate feature.
+>=20
+> It's not possible from the edk2 side; without -D SECURE_BOOT_ENABLE, th=
+e
+> SB-related variables (SetupMode, PK, KEK, ...) don't work at all.
+
+Sure.  The firmware builds will advertise both "secure-boot" and
+"enrolled-keys" features to specify that.
+
+But I think it should be enough to check for "secure-boot" feature to
+figure whenever a given firmware build supports secure boot, not both
+"secure-boot" and "secure-boot-plus-something-else".
+
+cheers,
+  Gerd
