@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f8nlq-0006yD-Kf
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:09:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1f8nso-0001dt-At
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f8nlk-0001yl-M9
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:09:14 -0400
-References: <20180412192602.13430-1-david@redhat.com>
-	<7283d8e8-67ca-4450-d06c-c39c6981273d@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3ee4320b-a9a4-2c2d-e326-b681d6579a95@redhat.com>
-Date: Wed, 18 Apr 2018 16:09:06 +0200
+	(envelope-from <eblake@redhat.com>) id 1f8nsn-000589-9q
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:16:26 -0400
+References: <20180405170619.20480-1-kwolf@redhat.com>
+	<99b844f2-7784-225a-37c4-77dad444fbd6@redhat.com>
+	<20180418135009.GF4971@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2769edf8-0bf6-5163-d86d-f721c1af86bd@redhat.com>
+Date: Wed, 18 Apr 2018 09:16:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <7283d8e8-67ca-4450-d06c-c39c6981273d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] s390x: refactor reset/reipl handling
+In-Reply-To: <20180418135009.GF4971@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OKQIo9UisLAYXlRqebczzRNGAmPRE7tNR"
+Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
+ authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +26,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, jdurgin@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 18.04.2018 16:08, Thomas Huth wrote:
-> On 12.04.2018 21:26, David Hildenbrand wrote:
->> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
->> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
->> mutex, two parallel calls to pause_all_vcpus() can be active at a time,
->> resulting in a deadlock. (either by two VCPUs or by the main thread and a
->> VCPU)
->>
->> Let's handle it via the main loop instead, as suggested by Paolo. If we
->> would have two parallel reset requests by two different VCPUs at the
->> same time, the last one would win.
->>
->> We use the existing ipl device to handle it. The nice side effect is
->> that we can get rid of reipl_requested.
->>
->> This change implies that all reset handling now goes via the common
->> path, so "no-reboot" handling is now active for all kinds of reboots.
->>
->> Let's execute any CPU initialization code on the target CPU using
->> run_on_cpu.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>
->> Did only a quick check with TCG. I think this way it is way easier to
->> control what is getting reset.
->>
->>  hw/s390x/ipl.c                     | 44 ++++++++++++++++++++++++---
->>  hw/s390x/ipl.h                     | 16 ++++++++--
->>  hw/s390x/s390-virtio-ccw.c         | 49 +++++++++++++++++++++++++-----
->>  include/hw/s390x/s390-virtio-ccw.h |  2 --
->>  target/s390x/cpu.h                 | 26 ++++++++++++++++
->>  target/s390x/diag.c                | 61 +++-----------------------------------
->>  target/s390x/internal.h            |  6 ----
->>  target/s390x/kvm.c                 |  2 +-
->>  8 files changed, 127 insertions(+), 79 deletions(-)
->>
->> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->> index fb554ab156..f7589d20f1 100644
->> --- a/hw/s390x/ipl.c
->> +++ b/hw/s390x/ipl.c
->> @@ -26,6 +26,7 @@
->>  #include "qemu/config-file.h"
->>  #include "qemu/cutils.h"
->>  #include "qemu/option.h"
->> +#include "exec/exec-all.h"
->>  
->>  #define KERN_IMAGE_START                0x010000UL
->>  #define KERN_PARM_AREA                  0x010480UL
->> @@ -484,11 +485,22 @@ IplParameterBlock *s390_ipl_get_iplb(void)
->>      return &ipl->iplb;
->>  }
->>  
->> -void s390_reipl_request(void)
->> +void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
->>  {
->>      S390IPLState *ipl = get_ipl_device();
->>  
->> -    ipl->reipl_requested = true;
->> +    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
->> +        /* let's always use CPU 0 */
->> +        ipl->reset_cpu = NULL;
->> +    } else {
->> +        ipl->reset_cpu = cs;
->> +    }
->> +    ipl->reset_type = reset_type;
->> +
->> +    if (reset_type != S390_RESET_REIPL) {
->> +        goto no_reipl;
-> 
-> Could we please avoid goto in this case and simply put the code below
-> into a "if (reset_type == S390_RESET_REIPL)" block?
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OKQIo9UisLAYXlRqebczzRNGAmPRE7tNR
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, jdurgin@redhat.com,
+ jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Message-ID: <2769edf8-0bf6-5163-d86d-f721c1af86bd@redhat.com>
+Subject: Re: [RFC][BROKEN] rbd: Allow configuration of authentication scheme
+References: <20180405170619.20480-1-kwolf@redhat.com>
+ <99b844f2-7784-225a-37c4-77dad444fbd6@redhat.com>
+ <20180418135009.GF4971@localhost.localdomain>
+In-Reply-To: <20180418135009.GF4971@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sure, I wanted to keep changes this RFC minimal for better overview.
+On 04/18/2018 08:50 AM, Kevin Wolf wrote:
 
->> +    }
->> +
->>      if (ipl->iplb_valid &&
->>          !ipl->netboot &&
->>          ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
->> @@ -505,7 +517,32 @@ void s390_reipl_request(void)
->>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
->>          }
->>      }
->> +no_reipl:
->>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->> +    /* as this is triggered by a CPU, make sure to exit the loop */
->> +    if (tcg_enabled()) {
->> +        cpu_loop_exit(cs);
->> +    }
->> +}
-> 
->  Thomas
-> 
+>>> @@ -3195,6 +3215,8 @@
+>>>              '*conf': 'str',
+>>>              '*snapshot': 'str',
+>>>              '*user': 'str',
+>>> +            '*auth-none': 'bool',
+>>> +            '*auth-cephx': 'RbdAuthCephx',
+>>>              '*server': ['InetSocketAddressBase'] } }
+>>
+>> Would it be better to have this be a flat union with 'auth' with enum
+>> values 'none', 'cephx', 'both' as a discriminator that determines whic=
+h
+>> additional fields can be present?  Or does that require that we first
+>> fix the QAPI generator to allow nesting a flat union within another fl=
+at
+>> union (probably doable, just no one has needed it before now)?  Is it
+>> also time to improve the QAPI generator to allow a default value to th=
+e
+>> discriminator field, rather than requiring the field to be present?
+>=20
+> Both options can be enabled at the same time, so that the client
+> connects to a server no matter whether it does 'cephx' authentication o=
+r
+> only 'none. This is even the default for rbd driver (in the existing
+> command line interface, but I think we need to stay compatible with it)=
+=2E
+> With a union you would have to explicitly choose one or the other, but
+> could never accept both.
+>=20
+> The other option we were considering was a list of authentication
+> options, which would be easier to implement, but isn't really an
+> accurate representation of what we really accept. There is no way we
+> could meaningfully implement something like this:
+>=20
+>     'auth': [ { 'type': 'cephx', 'key-secret': 'foo' },
+>               { 'type': 'cephx', 'key-secret': 'bar' } ]
+>=20
+> Because Ceph only allows us to enable the 'cephx' authentication method=
+
+> and to set a single key for it.
+
+How does it look as a choice between:
+
+{'enum':'CephxAuth', 'data': ['none', 'cephx', 'both' ]}
+
+where both 'cephx' and 'both' support the optional 'key-secret'
+parameter, but 'none' does not?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
+--OKQIo9UisLAYXlRqebczzRNGAmPRE7tNR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-David / dhildenb
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrXUygACgkQp6FrSiUn
+Q2rbVgf/ayKYsnlvXtSnV0lFEtrIxqUFULS7jTVMAIjQnuQZA/SI1R/GERBHnPlL
+3LQvhbxqK/pm/V7Zvj5aAj6QL98SASoRzk/X9N9alICdMFBBFa9yDdKCwQ4S0WWm
+o0kg3xmSR/fs09lOtmojz1koDw8fk1bRotRX/dDxj6Re4s3+OBi83YLyF0tcosL7
+l/JuR/C7601KuwZTD9VsvDWB5jxv1csifS+rzZEo86CqkyBK6ogRqptHWgPoi8ur
+le/Zfa0DNv13d8JDgKknQeHb8Y36mjAi7JsXEczwLZme48pQkSrzFCnPVne+wnsu
+Q1Lw9GbPw2TDWqlCSRrJUCqFNufddA==
+=4p3c
+-----END PGP SIGNATURE-----
+
+--OKQIo9UisLAYXlRqebczzRNGAmPRE7tNR--
