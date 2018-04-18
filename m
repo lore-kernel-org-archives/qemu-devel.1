@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f8iwA-0005y1-UF
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:59:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1f8iwc-0006PG-9w
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:00:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f8iw7-0004BM-TR
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:59:35 -0400
-References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1808b8f3-9cff-c849-d012-b23f29d1c11f@redhat.com>
-	<354ba31f-7502-b873-e254-fe3dbfc07b54@de.ibm.com>
-	<20180418094029.14b64108.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9a0e71af-24cf-9674-e634-fdb3bf180d95@redhat.com>
-Date: Wed, 18 Apr 2018 10:59:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180418094029.14b64108.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
- for AP device support
+	(envelope-from <peterx@redhat.com>) id 1f8iwZ-0004Mt-93
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:00:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53148 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8iwZ-0004Mm-3Q
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:59:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A12838DC31
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 08:59:58 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 18 Apr 2018 16:59:54 +0800
+Message-Id: <20180418085954.12582-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH] QemuMutex: support --enable-debug-mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 18.04.2018 09:40, Cornelia Huck wrote:
-> On Tue, 17 Apr 2018 20:21:31 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 04/16/2018 05:44 PM, David Hildenbrand wrote:
->>>   
->>>>  
->>>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->>>> index 0cdbc15..0d5b0f7 100644
->>>> --- a/target/s390x/gen-features.c
->>>> +++ b/target/s390x/gen-features.c
->>>> @@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
->>>>      S390_FEAT_ADAPTER_INT_SUPPRESSION,
->>>>      S390_FEAT_EDAT_2,
->>>>      S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
->>>> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
->>>> +    S390_FEAT_AP_FACILITIES_TEST,
->>>> +    S390_FEAT_AP,
->>>>  };
->>>>    
->>>
->>> Now I have to ask a very stupid question:
->>>
->>> I heard that the execution controls in the SIE block for AP are one of
->>> the oldest ones we have around. How can it be that the AP feature cannot
->>> be used before zEC12?  
->>
->> It was a suggestion from the crypto team due to testability. Nobody has a z196
->> with the older cards.
->>
-> 
-> Might be worth adding a note to that respect?
-> 
+We have had some tracing tools for mutex but it's not easy to use them
+for e.g. dead locks.  Let's provide "--enable-debug-mutex" parameter
+when configure to allow QemuMutex to store the last owner that took
+specific lock.  It might be extremely easy to use this tool to debug
+deadlocks since we can directly know who took the lock then as long as
+we can have a gdb attached to the process.
 
-We used to have the CPU model stick as close as possible to the real CPU
-models.
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Fam Zheng <famz@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ configure                   | 10 ++++++++++
+ include/qemu/thread-posix.h |  4 ++++
+ util/qemu-thread-posix.c    |  4 ++++
+ 3 files changed, 18 insertions(+)
 
-Support statements should cover in specific products what is expected to
-work and what not.
-
-So is there any real (!support statement / !testability) reason to not
-allow this feature on older CPU models that also had support for it?
-
+diff --git a/configure b/configure
+index 0a19b033bc..9ee1064c3b 100755
+--- a/configure
++++ b/configure
+@@ -451,6 +451,7 @@ jemalloc="no"
+ replication="yes"
+ vxhs=""
+ libxml2=""
++debug_mutex="no"
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -1374,6 +1375,10 @@ for opt do
+   ;;
+   --disable-git-update) git_update=no
+   ;;
++  --enable-debug-mutex) debug_mutex=yes
++  ;;
++  --disble-debug-mutex) debug_mutex=yes
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1631,6 +1636,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   crypto-afalg    Linux AF_ALG crypto backend driver
+   vhost-user      vhost-user support
+   capstone        capstone disassembler support
++  debug-mutex     mutex debugging support
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -5874,6 +5880,7 @@ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
+ echo "capstone          $capstone"
++echo "mutex debugging   $debug_mutex"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6602,6 +6609,9 @@ fi
+ if test "$capstone" != "no" ; then
+   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
+ fi
++if test "$debug_mutex" = "yes" ; then
++  echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
++fi
+ 
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
+diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+index f3f47e426f..fd27b34128 100644
+--- a/include/qemu/thread-posix.h
++++ b/include/qemu/thread-posix.h
+@@ -12,6 +12,10 @@ typedef QemuMutex QemuRecMutex;
+ 
+ struct QemuMutex {
+     pthread_mutex_t lock;
++#ifdef CONFIG_DEBUG_MUTEX
++    const char *file;
++    int line;
++#endif
+     bool initialized;
+ };
+ 
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index b789cf32e9..905a816af6 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -68,6 +68,10 @@ void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int line)
+     if (err)
+         error_exit(err, __func__);
+ 
++#ifdef CONFIG_DEBUG_MUTEX
++    mutex->file = file;
++    mutex->line = line;
++#endif
+     trace_qemu_mutex_locked(mutex, file, line);
+ }
+ 
 -- 
-
-Thanks,
-
-David / dhildenb
+2.14.3
