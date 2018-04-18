@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8jJx-0003m7-DK
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:24:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8jPa-0007Gi-01
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8jJs-0000gK-H8
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:24:09 -0400
-References: <20180418075045.27393-1-olaf@aepfle.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <41df38a4-dc02-7c17-4877-26541fddd209@redhat.com>
-Date: Wed, 18 Apr 2018 11:23:56 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f8jPY-0003zK-Vd
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:29:58 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:35007)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f8jPY-0003z6-Pb
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:29:56 -0400
+Received: by mail-oi0-x230.google.com with SMTP id c15-v6so978093oic.2
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 02:29:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180418075045.27393-1-olaf@aepfle.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] configure: recognize more rpmbuild
- macros
+In-Reply-To: <CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
+References: <CAMxP3BSFEuknshd05kSn8EjNuv8F8aPGuNFG3qUd0Ap6GbZFrQ@mail.gmail.com>
+	<18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
+	<CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
+	<CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 18 Apr 2018 10:29:35 +0100
+Message-ID: <CAFEAcA-sGiZFdAa8Gnfbo_=o-ZZbChyDJAV9oGmMTBC8BNS3sQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Latest v2.12.0-rc4 has compiling error, rc3 is OK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>, qemu-trivial@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Bob Chen <a175818323@gmail.com>
+Cc: Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 18/04/2018 09:50, Olaf Hering wrote:
-> Extend the list of recognized, but ignored options from rpms %configure
-> macro. This fixes build on hosts running SUSE Linux.
-> 
-> Signed-off-by: Olaf Hering <olaf@aepfle.de>
-> ---
->  configure | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 0a19b033bc..6e9b994f21 100755
-> --- a/configure
-> +++ b/configure
-> @@ -959,6 +959,9 @@ for opt do
->    ;;
->    --firmwarepath=*) firmwarepath="$optarg"
->    ;;
-> +  --host=*|--build=*|\
-> +  --program-prefix=*|--exec-prefix=*|\
-> +  --disable-dependency-tracking|\
->    --sbindir=*|--sharedstatedir=*|\
->    --oldincludedir=*|--datarootdir=*|--infodir=*|--localedir=*|\
->    --htmldir=*|--dvidir=*|--pdfdir=*|--psdir=*)
-> 
+On 18 April 2018 at 09:09, Bob Chen <a175818323@gmail.com> wrote:
+> I found that it has nothing to do with the release version, but the github
+> one is just not able to work...
+>
+> So what github and qemu.org provide are totally different things?
 
-Queued, thanks.
+The "tarballs" from github don't work and can't work, but
+github provides no mechanism for the project to say "don't
+create this page". You can complain to github about this
+if you like.
 
-Paolo
+You're best off starting with the project's own web
+page: https://www.qemu.org/ -- we use github only as
+a sort of backup git server in case our own is down.
+
+thanks
+-- PMM
