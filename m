@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8lZe-0007vl-U3
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:48:32 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f8lc5-0000dk-Jr
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8lZb-0003R1-N4
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:48:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55352 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f8lZb-0003Qt-HV
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:48:27 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
-	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
-Date: Wed, 18 Apr 2018 13:48:10 +0200
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1f8lc2-0004C1-FC
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:51:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48612)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1f8lc2-0004Be-6Y
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:50:58 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3IBofwS095939
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 07:50:56 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2he2g510fe-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 07:50:56 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Wed, 18 Apr 2018 12:50:53 +0100
+References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
+	<28f80970-6cd3-d28d-df3a-2f80b5252f00@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Wed, 18 Apr 2018 13:50:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <28f80970-6cd3-d28d-df3a-2f80b5252f00@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Message-Id: <ce819627-28f5-73eb-3d68-f6fa9d0036b4@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
+ for AP device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +45,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, alifm@linux.vnet.ibm.com, eskultet@redhat.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
-On 04/18/18 11:04, Gerd Hoffmann wrote:
->> This surfaced in the RFCv1 discussion, but Daniel suggested ignoring
->> version numbers:
+On 18/04/2018 13:03, David Hildenbrand wrote:
+> On 18.04.2018 12:55, Halil Pasic wrote:
 >>
->> http://mid.mail-archive.com/20180410093412.GI5155@redhat.com
->>
->> On 04/10/18 11:34, Daniel P. Berrang=C3=A9 wrote:
->>> IMHO it would be valid to just keep life simple and only record the
->>> base machine type name that can use the firmware ie "pc", "q35", and
->>> ignore the fact that in some cases the firmware might require a
->>> specific version of the machine type.
->=20
-> IIRC this bit referes to the fact that SMM requires qemu >=3D 2.x (don'=
-t
-> remember which x) to work.  So smm-enabled edk2 would just say
-> "pc-q35-*" instead of trying to specifying a version range somehow.
+>> On 04/15/2018 09:07 PM, Tony Krowiak wrote:
+>>> A new CPU model feature and two new CPU model facilities are
+>>> introduced to support AP devices for a KVM guest.
+>> [..]
+>>> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.=
+c
+>>> index 3b9e274..5ee3a2d 100644
+>>> --- a/target/s390x/cpu_features.c
+>>> +++ b/target/s390x/cpu_features.c
+>>> @@ -40,8 +40,10 @@ static const S390FeatDef s390_features[] =3D {
+>>>        FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status=
+ facility"),
+>>>        FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE =
+facility"),
+>>>        FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, "Configuration-topo=
+logy facility"),
+>>> +    FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Query AP Configurat=
+ion facility"),
+>> Why did you change this form qci to apqci. Too may people found the
+>> qci good?
+> If the facility is called "Query AP Configuration facility" it should b=
+e
+> qapc
+>
+> Where does the term "qci" come from ?
 
-OK. I'm fine either way; Dan, can you please confirm you are OK with the
-suggested wildcard format? (I.e., we still shouldn't include actual
-version numbers in the supported machtypes list, but we should be more
-specific than just "pc" and "q35" -- if the machine type is versioned,
-use an asterisk for covering the version number.)
+Query Configuration Information
 
->> Continuing:
->>
->> On 04/18/18 08:02, Gerd Hoffmann wrote:
->>>> +# @secure-boot: The firmware implements the software interfaces for=
- UEFI Secure
->>>> +#               Boot, as defined in the UEFI specification. Note th=
-at without
->>>> +#               @requires-smm, guest code running with kernel privi=
-leges can
->>>> +#               undermine the security of Secure Boot.
->>>> +#
->>>> +# @secure-boot-enrolled-keys: The variable store (NVRAM) template a=
-ssociated
+:)
+
+
+>
+>>>        FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range facili=
+ty"),
+>>>        FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing key=
+-setting facility"),
+>>> +    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "Adjunct Processor Fa=
+cilities Test facility"),
+>>>        FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, "Extended-translati=
+on facility 2"),
+>>>        FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, "Message-securi=
+ty-assist facility (excluding subfunctions)"),
+>>>        FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement=
+ facility"),
+>>> @@ -129,6 +131,7 @@ static const S390FeatDef s390_features[] =3D {
 >>>
->>> I think "enrolled-keys" should better be a separate feature.
+>>>        FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
+>>>        FEAT_INIT_MISC("cmm", "Collaborative-memory-management facilit=
+y"),
+>>> +    FEAT_INIT_MISC("ap", "AP facilities installed"),
+>> Why plural ('facilities')? Would not s/facilities/instructions be more=
+ end-user
+>> friendly?
 >>
->> It's not possible from the edk2 side; without -D SECURE_BOOT_ENABLE, t=
-he
->> SB-related variables (SetupMode, PK, KEK, ...) don't work at all.
->=20
-> Sure.  The firmware builds will advertise both "secure-boot" and
-> "enrolled-keys" features to specify that.
->=20
-> But I think it should be enough to check for "secure-boot" feature to
-> figure whenever a given firmware build supports secure boot, not both
-> "secure-boot" and "secure-boot-plus-something-else".
+>> Regards,
+>> Halil
+>>
+>
 
-Hmmm, I'm not sure I agree. One use case is that you want a domain
-config in which well-known OS-es, signed by the MS UEFI certs, just boot
-with SB enabled. (Some of our internal folks really want this.)
-
-Another use case is that you want a domain in which SB *can* be enabled,
-but your installer is signed with a different certificate chain (or it
-is unsigned), and with *just* the MS certs enrolled, it wouldn't boot at
-all. So you want the SB *feature*, but definitely not the initial
-enrollment / SB *operational mode*.
-
-For me to understand you better, are you suggesting merely that I:
-
-- rename @secure-boot-enrolled-keys to @enrolled-keys, and
-
-- drop the reference to @secure-boot from the end of the @enrolled-keys
-  documentation paragraph? (Namely, "@secure-boot-enrolled-keys is only
-  valid if the firmware also supports @secure-boot").
-
-Or are you suggesting something more?
-
-Thanks!
-Laszlo
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
