@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8f4L-0005Hg-AE
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:51:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f8fOb-000211-8q
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 01:12:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8f4I-0001mM-6s
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:51:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41960 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1f8fOY-0007ND-2i
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 01:12:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42510 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8f4I-0001kv-1V
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:51:42 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 18 Apr 2018 12:51:21 +0800
-Message-Id: <20180418045121.14233-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] intel-iommu: send PSI always when notify_unmap
- set
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f8fOX-0007Mt-T0
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 01:12:38 -0400
+Date: Wed, 18 Apr 2018 13:12:24 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180418051224.GD25649@stefanha-x1.localdomain>
+References: <20180412061108.10875-1-peterx@redhat.com>
+	<20180416083748.GD28904@stefanha-x1.localdomain>
+	<20180416091732.GB21143@xz-mi>
+	<20180417070843.GI10770@stefanha-x1.localdomain>
+	<874lkai4no.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="PHCdUe6m4AxPMzOu"
+Content-Disposition: inline
+In-Reply-To: <874lkai4no.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jintack Lim <jintack@cs.columbia.edu>, Eric Auger <eric.auger@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexander Witte <alexander.witte@baicanada.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-During IOVA page table walk, there is a special case when:
 
-- notify_unmap is set, meanwhile
-- entry is invalid
+--PHCdUe6m4AxPMzOu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In the past, we skip the entry always.  This is not correct.  We should
-send UNMAP notification to registered notifiers in this case.  Otherwise
-some stall pages will still be mapped in the host even if L1 guest
-unmapped them already.
+On Tue, Apr 17, 2018 at 11:05:47AM +0200, Markus Armbruster wrote:
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
+>=20
+> > On Mon, Apr 16, 2018 at 05:17:32PM +0800, Peter Xu wrote:
+> >> On Mon, Apr 16, 2018 at 04:37:48PM +0800, Stefan Hajnoczi wrote:
+> >> > On Thu, Apr 12, 2018 at 02:11:08PM +0800, Peter Xu wrote:
+> >> > > In the future the monitor iothread may be accessing the cur_mon as
+> >> > > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
+> >> > > Out-Of-Band command, let's convert the cur_mon variable to be a
+> >> > > per-thread variable to make sure there won't be a race between thr=
+eads.
+> >> > >
+> >> > > Note that thread variables are not initialized to a valid value wh=
+en new
+> >> > > thread is created.  However for our case we don't need to set it u=
+p,
+> >> > > since the cur_mon variable is only used in such a pattern:
+> >> > >=20
+> >> > >   old_mon =3D cur_mon;
+> >> > >   cur_mon =3D xxx;
+> >> > >   (do something, read cur_mon if necessary in the stack)
+> >> > >   cur_mon =3D old_mon;
+> >> > >=20
+> >> > > It plays a role as stack variable, so no need to be initialized at=
+ all.
+> >> > > We only need to make sure the variable won't be changed unexpected=
+ly by
+> >> > > other threads.
+> >> > >=20
+> >> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> >> > > ---
+> >> > > v3:
+> >> > > - fix code style warning from patchew
+> >> > > v2:
+> >> > > - drop qemu-thread changes
+> >> > > ---
+> >> > >  include/monitor/monitor.h | 2 +-
+> >> > >  monitor.c                 | 2 +-
+> >> > >  stubs/monitor.c           | 2 +-
+> >> > >  tests/test-util-sockets.c | 2 +-
+> >> > >  4 files changed, 4 insertions(+), 4 deletions(-)
+> >> >=20
+> >> > The Monitor object is not fully thread-safe, so although the correct
+> >> > cur_mon is now accessible, code may still be unsafe.  For example,
+> >> > monitor_get_fd(cur_mon, ...) is not thread-safe and must not be used=
+ by
+> >> > OOB commands.
+> >>=20
+> >> IMHO things like monitor_get_fd() should only be called in QMP
+> >> context, so there should always be a monitor_qmp_dispatch_one() in the
+> >> stack already (no matter whether it is in main thread or the monitor
+> >> iothread), which means that cur_mon should have been setup.  So IMHO
+> >> it's a programming error if monitor_get_fd() is called without correct
+> >> cur_mon setup after this patch.
+> >
+> > The pointer value of cur_mon is not the issue, you have made that work
+> > correctly.  The problem is that some monitor.h APIs do not access the
+> > Monitor object in a thread-safe fashion.
+> >
+> > Two QMP commands executing simultaneously in the main loop thread and
+> > the monitor IOThread can hit race conditions.  The example I gave was
+> > the monitor_get_fd() API, which iterates and modifies the mon->fds
+> > QLIST without a lock.
+> >
+> > Please audit monitor.h and either make things thread-safe or document
+> > the thread-safety rules (e.g. "This function cannot be called from
+> > out-of-band QMP context").  This wasn't necessary before but now that
+> > you are adding multi-threading it is.
+>=20
+> Code working with the current thread's monitor via thread-local cur_mon
+> is easier to analyze in some ways than code working with a Monitor *
+> parameter: the latter can interfere with some other thread's monitor,
+> and you may have to argue what values the parameter can take.
+>=20
+> You might want to replace parameters by cur_mon in certain cases.
+>=20
+> Funnily, the plan used to be the opposite.  Commit 376253ece48: "On the
+> mid or long term, those use case will be obsoleted so that [cur_mon] can
+> be removed again."
 
-Without this patch, nested device assignment to L2 guests might dump
-some errors like:
+Either way, the issue I described can still happen since two QMP
+commands for a single Monitor object can execute simultaneously in the
+main loop thread and the monitor IOThread.
 
-qemu-system-x86_64: VFIO_MAP_DMA: -17
-qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
-                    0x7f89a920d000) = -17 (File exists)
+I'm basically warning that QMP multi-threading isn't a solved problem
+yet.  It needs to be solved by a combination of making things
+thread-safe, documentation, and assertions so code fails loudly and
+early when called from an unsupported context.
 
-To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
-affected by this problem).
+Stefan
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
+--PHCdUe6m4AxPMzOu
+Content-Type: application/pgp-signature; name="signature.asc"
 
-To test nested assignment, one also needs to apply below patchset:
-https://lkml.org/lkml/2018/4/18/5
----
- hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index fb31de9416..b359efd6f9 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
- 
- typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
- 
-+static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-+                             vtd_page_walk_hook hook_fn, void *private)
-+{
-+    assert(hook_fn);
-+    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
-+                            entry->addr_mask, entry->perm);
-+    return hook_fn(entry, private);
-+}
-+
- /**
-  * vtd_page_walk_level - walk over specific level for IOVA range
-  *
-@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-          */
-         entry_valid = read_cur | write_cur;
- 
-+        entry.target_as = &address_space_memory;
-+        entry.iova = iova & subpage_mask;
-+        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-+        entry.addr_mask = ~subpage_mask;
-+
-         if (vtd_is_last_slpte(slpte, level)) {
--            entry.target_as = &address_space_memory;
--            entry.iova = iova & subpage_mask;
-             /* NOTE: this is only meaningful if entry_valid == true */
-             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
--            entry.addr_mask = ~subpage_mask;
--            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-             if (!entry_valid && !notify_unmap) {
-                 trace_vtd_page_walk_skip_perm(iova, iova_next);
-                 goto next;
-             }
--            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
--                                    entry.addr_mask, entry.perm);
--            if (hook_fn) {
--                ret = hook_fn(&entry, private);
--                if (ret < 0) {
--                    return ret;
--                }
-+            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-+            if (ret < 0) {
-+                return ret;
-             }
-         } else {
-             if (!entry_valid) {
--                trace_vtd_page_walk_skip_perm(iova, iova_next);
-+                if (notify_unmap) {
-+                    /*
-+                     * The whole entry is invalid; unmap it all.
-+                     * Translated address is meaningless, zero it.
-+                     */
-+                    entry.translated_addr = 0x0;
-+                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-+                    if (ret < 0) {
-+                        return ret;
-+                    }
-+                } else {
-+                    trace_vtd_page_walk_skip_perm(iova, iova_next);
-+                }
-                 goto next;
-             }
-             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
--- 
-2.14.3
+iQEcBAEBAgAGBQJa1tO3AAoJEJykq7OBq3PInQ4H/06ZQXjlatLV6vxx6KyGy+AC
+DNIQojVrvPFIdQkL9vjrr8wRvGbYBH2hfodJbzMVHN1EWyG3Sk0Y/zdJZuiPsKr+
+MZvC4kg1qHJnjeM7iKMbhjsop50nKBZfbWnGnvbH+vvIVfWJLVqipoEMBfKM3Z8t
+43NxpYoCLNMps+Dh+Zcc9Fzx7vQs5QraYw1D4illkoEwwqCMGNogico5c9xRh442
+FCnnCHnTWRKoiPiiZZFEbReCfORjO77ePrwkbgPf+0eXc4XJHUEymf9E1y9+ZzLL
+SxUlKCuPo6M/UlX0Uy4X9mYKnORE6ID36kqIskbEXZ8LnrzHBMUhsDIfVxIcXSM=
+=ZT7y
+-----END PGP SIGNATURE-----
+
+--PHCdUe6m4AxPMzOu--
