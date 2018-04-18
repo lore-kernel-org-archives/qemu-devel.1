@@ -1,30 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f8rHn-0003N2-Lt
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:54:29 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1f8rYQ-0008Hg-Cr
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 14:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f8rHj-0005hV-3F
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:54:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55582 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1f8rHi-0005hF-Uj
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:54:23 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E29EB406E8C3
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 17:54:18 +0000 (UTC)
-Date: Wed, 18 Apr 2018 19:54:12 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180418195412.63a76412.cohuck@redhat.com>
-In-Reply-To: <20180418171151.5263-1-berrange@redhat.com>
-References: <20180418171151.5263-1-berrange@redhat.com>
+	(envelope-from <alifm@linux.ibm.com>) id 1f8rYM-00075D-EA
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 14:11:38 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44512
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1f8rYM-00073O-6h
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 14:11:34 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3II7Hfn062356
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 14:11:33 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2he98vd9a6-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 14:11:32 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Wed, 18 Apr 2018 12:11:32 -0600
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-2-git-send-email-thuth@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Wed, 18 Apr 2018 14:11:27 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] configure: add sanity check to catch
- builds from "git archive"
+In-Reply-To: <1524054707-20663-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1170d2d8-a77e-1839-ae64-81f791b3d4e1@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.13 1/4] pc-bios/s390-ccw/net:
+ Split up net_load() into init, load and uninit parts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +43,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, 18 Apr 2018 18:11:51 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-> The "git archive" feature creates tarballs which are missing all
-> submodule content. GitHub unhelpfully provides users with "Download"
-> links that claim to give them valid source release tarballs. These
-> GitHub archives will not be buildable as they are created by the
-> "git archive" feature and so are missing content. The user gets
-> unhelpful messages from make such as:
->=20
->   fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or directo=
-ry
->=20
-> By adding a sanity check we can give users an informative message about
-> what they've done wrong.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  configure | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->=20
-> diff --git a/configure b/configure
-> index 0a19b033bc..089b00068c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -296,6 +296,24 @@ then
->  else
->      git_update=3Dno
->      git_submodules=3D""
-> +
-> +    if ! test -f "$source_path/ui/keycodemapdb/README"
-> +    then
-> +        echo
-> +        echo "ERROR: missing file $source_path/ui/keycodemapdb/README"
-> +        echo
-> +        echo "This is not a GIT checkout but module content appears to"
-> +        echo "be missing. Do not use 'git archive' or GitHub download li=
-nks"
-> +        echo "to acquire QEMU source archives. Non-GIT builds are only"
-> +        echo "supported with source archives linked from:"
-> +        echo
-> +        echo "  https://www.qemu.org/download/"
-> +        echo
-> +        echo "Developers working with GIT can use scripts/archive-source=
-.sh"
-> +        echo "if they need to create valid source archives."
-> +        echo
-> +        exit 1
-> +    fi
->  fi
->  git=3D"git"
-> =20
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+On 04/18/2018 08:31 AM, Thomas Huth wrote:
+> When we want to support pxelinux-style network booting later, we've got
+> to do several TFTP transfers - and we do not want to apply for a new IP
+> address via DHCP each time. So split up net_load into three parts:
+> 
+> 1. net_init(), which initializes virtio-net, gets an IP address via DHCP
+>     and prints out the related information.
+> 
+> 2. The tftp_load call is now moved directly into the main() function
+> 
+> 3. A new net_uninit() function which should tear down the network stack
+>     before we are done in the firmware.
+> 
+> This will make it easier to extend the code in the next patches.
+> 
+> Signed-off-by: Thomas Huth<thuth@redhat.com>
+
+
+Just a minor nit, if we could rename *_uninit functions to 
+destroy/release? I think it's just easier to read
