@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8pxv-0005xs-DN
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:29:56 -0400
+	(envelope-from <mst@redhat.com>) id 1f8q2P-0007oH-Dd
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:34:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f8pxr-0004rN-GL
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:29:51 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1524061685-83305-1-git-send-email-imammedo@redhat.com>
-	<1524061685-83305-5-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <061e192f-b147-026c-4269-0a7bc8da76a4@amsat.org>
-Date: Wed, 18 Apr 2018 13:29:31 -0300
+	(envelope-from <mst@redhat.com>) id 1f8q2M-0007EI-4u
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:34:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47782 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f8q2L-0007Dg-P6
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:34:26 -0400
+Date: Wed, 18 Apr 2018 19:34:06 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180418192154-mutt-send-email-mst@kernel.org>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-7-tiwei.bie@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1524061685-83305-5-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.13 v2 4/5]
- platform-bus-device: use device plug callback instead of machine_done
- notifier
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180412151232.17506-7-tiwei.bie@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] vhost-user: support registering
+ external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,399 +28,337 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, agraf@suse.de, eric.auger@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On 04/18/2018 11:28 AM, Igor Mammedov wrote:
-> platform-bus were using machine_done notifier to get and map
-> (assign irq/mmio resources) dynamically added sysbus devices
-> after all '-device' options had been processed.
-> That however creates non obvious dependencies on ordering of
-> machine_done notifiers and requires carefull line juggling
-> to keep it working. For example see comment above
-> create_platform_bus() and 'straitforward' arm_load_kernel()
-> had to converted to machine_done notifier and that lead to
-> yet another machine_done notifier to keep it working
-> arm_register_platform_bus_fdt_creator().
+On Thu, Apr 12, 2018 at 11:12:32PM +0800, Tiwei Bie wrote:
+> This patch introduces VHOST_USER_PROTOCOL_F_HOST_NOTIFIER.
+> With this feature negotiated, vhost-user backend can register
+> memory region based host notifiers. And it will allow the guest
+> driver in the VM to notify the hardware accelerator at the
+> vhost-user backend directly.
 > 
-> Instead of hiding resource assignment in platform-bus-device
-> to magically initialize sysbus devices, use device plug
-> callback and assign resources explicitly at board level
-> at the moment each -device option is being processed.
-> 
-> That adds a bunch of machine declaration boiler plate to
-> e500plat board, similar to ARM/x86 but gets rid of hidden
-> machine_done notifier and would allow to remove the dependent
-> notifiers in ARM code simplifying it and making code flow
-> easier to follow.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+
+Overall I think we can merge this approach, but I have two main concerns
+about this:
+
+1. Testing. Most people do not have the virtio hardware
+   so how to make sure this does not bit rot?
+
+   I have an idea: add an option like this to libvhost-user.
+   Naturally libvhost-user can not get notified about a write
+   to an mmapped area, but it can write a special value there
+   (e.g. all-ones?) and then poll it to detect VQ # writes.
+
+   Then include a vhost user bridge test with an option like this.
+
+   I'd like to see a patch doing this.
+
+2. Memory barriers. Right now after updating the avail idx,
+   virtio does smp_wmb() and then the MMIO write.
+   Normal hardware drivers do wmb() which is an sfence.
+   Can a PCI device read bypass index write and see a stale
+   index value?
+   To make virtio pci do wmb() we would need a new feature bit.
+   Alternatively I guess we could maybe look at subsystem vendor/device id.
+
+   I'd like to see a patch doing one of these things.
+
+Thanks!
+
 > ---
-> CC: agraf@suse.de
-> CC: david@gibson.dropbear.id.au
-> CC: qemu-ppc@nongnu.org
+>  docs/interop/vhost-user.txt    |  33 +++++++++++
+>  hw/virtio/vhost-user.c         | 123 +++++++++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user.h |   8 +++
+>  3 files changed, 164 insertions(+)
 > 
-> v2:
->   - don't save original MachineClass::get_hotplug_handler, just overwrite it.
->     (there isn't any use case for chaining get_hotplug_handler() yet,
->      so keep things simple for now) (David Gibson <david@gibson.dropbear.id.au>)
->   - s/hotpug/hotplug/ (Peter Maydell <peter.maydell@linaro.org>)
->   - ppc: rebase on top (ppc: e500: switch E500 based machines to full  machine definition)
-> ---
->  hw/ppc/e500.h             |  5 +++++
->  include/hw/arm/virt.h     |  1 +
->  include/hw/platform-bus.h |  4 ++--
->  hw/arm/sysbus-fdt.c       |  3 ---
->  hw/arm/virt.c             | 31 +++++++++++++++++++++++++++++++
->  hw/core/platform-bus.c    | 29 +++++------------------------
->  hw/ppc/e500.c             | 38 +++++++++++++++++---------------------
->  hw/ppc/e500plat.c         | 31 +++++++++++++++++++++++++++++++
->  8 files changed, 92 insertions(+), 50 deletions(-)
-> 
-> diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-> index 621403b..3fd9f82 100644
-> --- a/hw/ppc/e500.h
-> +++ b/hw/ppc/e500.h
-> @@ -2,11 +2,16 @@
->  #define PPCE500_H
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index 534caab18a..9e57b36b20 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -132,6 +132,16 @@ Depending on the request type, payload can be:
+>     Payload: Size bytes array holding the contents of the virtio
+>         device's configuration space
 >  
->  #include "hw/boards.h"
-> +#include "hw/platform-bus.h"
+> + * Vring area description
+> +   -----------------------
+> +   | u64 | size | offset |
+> +   -----------------------
+> +
+> +   u64: a 64-bit integer contains vring index and flags
+> +   Size: a 64-bit size of this area
+> +   Offset: a 64-bit offset of this area from the start of the
+> +       supplied file descriptor
+> +
+>  In QEMU the vhost-user message is implemented with the following struct:
 >  
->  typedef struct PPCE500MachineState {
->      /*< private >*/
->      MachineState parent_obj;
+>  typedef struct VhostUserMsg {
+> @@ -146,6 +156,7 @@ typedef struct VhostUserMsg {
+>          VhostUserLog log;
+>          struct vhost_iotlb_msg iotlb;
+>          VhostUserConfig config;
+> +        VhostUserVringArea area;
+>      };
+>  } QEMU_PACKED VhostUserMsg;
 >  
-> +    /* points to instance of TYPE_PLATFORM_BUS_DEVICE if
-> +     * board supports dynamic sysbus devices
-> +     */
-> +    PlatformBusDevice *pbus_dev;
->  } PPCE500MachineState;
+> @@ -380,6 +391,7 @@ Protocol features
+>  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+>  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+>  #define VHOST_USER_PROTOCOL_F_CONFIG         9
+> +#define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  10
 >  
->  typedef struct PPCE500MachineClass {
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index ba0c1a4..e4e3e46 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -91,6 +91,7 @@ typedef struct {
+>  Master message types
+>  --------------------
+> @@ -777,6 +789,27 @@ Slave message types
+>       the VHOST_USER_NEED_REPLY flag, master must respond with zero when
+>       operation is successfully completed, or non-zero otherwise.
+>  
+> + * VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG
+> +
+> +      Id: 3
+> +      Equivalent ioctl: N/A
+> +      Slave payload: vring area description
+> +      Master payload: N/A
+> +
+> +      Sets host notifier for a specified queue. The queue index is contained
+> +      in the u64 field of the vring area description. The host notifier is
+> +      described by the file descriptor (typically it's a VFIO device fd) which
+> +      is passed as ancillary data and the size (which is mmap size and should
+> +      be the same as host page size) and offset (which is mmap offset) carried
+> +      in the vring area description. QEMU can mmap the file descriptor based
+> +      on the size and offset to get a memory range. Registering a host notifier
+> +      means mapping this memory range to the VM as the specified queue's notify
+> +      MMIO region. Slave sends this request to tell QEMU to de-register the
+> +      existing notifier if any and register the new notifier if the request is
+> +      sent with a file descriptor.
+> +      This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
+> +      protocol feature has been successfully negotiated.
+> +
+>  VHOST_USER_PROTOCOL_F_REPLY_ACK:
+>  -------------------------------
+>  The original vhost-user specification only demands replies for certain
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 791e0a4763..1cd9c7276b 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -13,6 +13,7 @@
+>  #include "hw/virtio/vhost.h"
+>  #include "hw/virtio/vhost-user.h"
+>  #include "hw/virtio/vhost-backend.h"
+> +#include "hw/virtio/virtio.h"
+>  #include "hw/virtio/virtio-net.h"
+>  #include "chardev/char-fe.h"
+>  #include "sysemu/kvm.h"
+> @@ -48,6 +49,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+>      VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+>      VHOST_USER_PROTOCOL_F_CONFIG = 9,
+> +    VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 10,
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+>  
+> @@ -92,6 +94,7 @@ typedef enum VhostUserSlaveRequest {
+>      VHOST_USER_SLAVE_NONE = 0,
+>      VHOST_USER_SLAVE_IOTLB_MSG = 1,
+>      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
+> +    VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
+>      VHOST_USER_SLAVE_MAX
+>  }  VhostUserSlaveRequest;
+>  
+> @@ -136,6 +139,12 @@ static VhostUserConfig c __attribute__ ((unused));
+>                                     + sizeof(c.size) \
+>                                     + sizeof(c.flags))
+>  
+> +typedef struct VhostUserVringArea {
+> +    uint64_t u64;
+> +    uint64_t size;
+> +    uint64_t offset;
+> +} VhostUserVringArea;
+> +
 >  typedef struct {
->      MachineState parent;
->      Notifier machine_done;
-> +    DeviceState *platform_bus_dev;
->      FWCfgState *fw_cfg;
->      bool secure;
->      bool highmem;
-> diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
-> index a00775c..19e20c5 100644
-> --- a/include/hw/platform-bus.h
-> +++ b/include/hw/platform-bus.h
-> @@ -37,8 +37,6 @@ typedef struct PlatformBusDevice PlatformBusDevice;
->  struct PlatformBusDevice {
->      /*< private >*/
->      SysBusDevice parent_obj;
-> -    Notifier notifier;
-> -    bool done_gathering;
+>      VhostUserRequest request;
 >  
->      /*< public >*/
->      uint32_t mmio_size;
-> @@ -54,4 +52,6 @@ int platform_bus_get_irqn(PlatformBusDevice *platform_bus, SysBusDevice *sbdev,
->  hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
->                                    int n);
+> @@ -157,6 +166,7 @@ typedef union {
+>          struct vhost_iotlb_msg iotlb;
+>          VhostUserConfig config;
+>          VhostUserCryptoSession session;
+> +        VhostUserVringArea area;
+>  } VhostUserPayload;
 >  
-> +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev);
-> +
->  #endif /* HW_PLATFORM_BUS_H */
-> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> index d68e3dc..80ff70e 100644
-> --- a/hw/arm/sysbus-fdt.c
-> +++ b/hw/arm/sysbus-fdt.c
-> @@ -506,9 +506,6 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
->      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
->      pbus = PLATFORM_BUS_DEVICE(dev);
->  
-> -    /* We can only create dt nodes for dynamic devices when they're ready */
-> -    assert(pbus->done_gathering);
-> -
->      PlatformBusFDTData data = {
->          .fdt = fdt,
->          .irq_start = irq_start,
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 94dcb12..112c367 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1087,6 +1087,7 @@ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
->      qdev_prop_set_uint32(dev, "mmio_size",
->          platform_bus_params.platform_bus_size);
->      qdev_init_nofail(dev);
-> +    vms->platform_bus_dev = dev;
->      s = SYS_BUS_DEVICE(dev);
->  
->      for (i = 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
-> @@ -1536,9 +1537,33 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->      return ms->possible_cpus;
+>  typedef struct VhostUserMsg {
+> @@ -638,9 +648,37 @@ static int vhost_user_set_vring_num(struct vhost_dev *dev,
+>      return vhost_set_vring(dev, VHOST_USER_SET_VRING_NUM, ring);
 >  }
 >  
-> +static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-> +                                        DeviceState *dev, Error **errp)
+> +static void vhost_user_host_notifier_restore(struct vhost_dev *dev,
+> +                                             int queue_idx)
 > +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserHostNotifier *n = &u->user->notifier[queue_idx];
+> +    VirtIODevice *vdev = dev->vdev;
 > +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> +        if (vms->platform_bus_dev) {
-
-Inverting the if conditions is probably cheaper.
-
-> +            platform_bus_link_device(PLATFORM_BUS_DEVICE(vms->platform_bus_dev),
-> +                                     SYS_BUS_DEVICE(dev));
+> +    if (n->addr && !n->set) {
+> +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true);
+> +        n->set = true;
+> +    }
+> +}
+> +
+> +static void vhost_user_host_notifier_remove(struct vhost_dev *dev,
+> +                                            int queue_idx)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserHostNotifier *n = &u->user->notifier[queue_idx];
+> +    VirtIODevice *vdev = dev->vdev;
+> +
+> +    if (n->addr && n->set) {
+> +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
+> +        n->set = false;
+> +    }
+> +}
+> +
+>  static int vhost_user_set_vring_base(struct vhost_dev *dev,
+>                                       struct vhost_vring_state *ring)
+>  {
+> +    vhost_user_host_notifier_restore(dev, ring->index);
+> +
+>      return vhost_set_vring(dev, VHOST_USER_SET_VRING_BASE, ring);
+>  }
+>  
+> @@ -674,6 +712,8 @@ static int vhost_user_get_vring_base(struct vhost_dev *dev,
+>          .hdr.size = sizeof(msg.payload.state),
+>      };
+>  
+> +    vhost_user_host_notifier_remove(dev, ring->index);
+> +
+>      if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+>          return -1;
+>      }
+> @@ -847,6 +887,76 @@ static int vhost_user_slave_handle_config_change(struct vhost_dev *dev)
+>      return ret;
+>  }
+>  
+> +static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
+> +                                                       VhostUserVringArea *area,
+> +                                                       int fd)
+> +{
+> +    int queue_idx = area->u64 & VHOST_USER_VRING_IDX_MASK;
+> +    size_t page_size = qemu_real_host_page_size;
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserState *user = u->user;
+> +    VirtIODevice *vdev = dev->vdev;
+> +    VhostUserHostNotifier *n;
+> +    int ret = 0;
+> +    void *addr;
+> +    char *name;
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                            VHOST_USER_PROTOCOL_F_HOST_NOTIFIER) ||
+> +        vdev == NULL || queue_idx >= virtio_get_num_queues(vdev)) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    n = &user->notifier[queue_idx];
+> +
+> +    if (n->addr) {
+> +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
+> +        object_unparent(OBJECT(&n->mr));
+> +        munmap(n->addr, page_size);
+> +        n->addr = NULL;
+> +    }
+> +
+> +    if (area->u64 & VHOST_USER_VRING_NOFD_MASK) {
+> +        goto out;
+> +    }
+> +
+> +    /* Sanity check. */
+> +    if (area->size != page_size) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+> +                fd, area->offset);
+> +    if (addr == MAP_FAILED) {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    name = g_strdup_printf("vhost-user/host-notifier@%p mmaps[%d]",
+> +                           user, queue_idx);
+> +    memory_region_init_ram_device_ptr(&n->mr, OBJECT(vdev), name,
+> +                                      page_size, addr);
+> +    g_free(name);
+> +
+> +    if (virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true)) {
+> +        munmap(addr, page_size);
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    n->addr = addr;
+> +    n->set = true;
+> +
+> +out:
+> +    /* Always close the fd. */
+> +    if (fd != -1) {
+> +        close(fd);
+> +    }
+> +    return ret;
+> +}
+> +
+>  static void slave_read(void *opaque)
+>  {
+>      struct vhost_dev *dev = opaque;
+> @@ -913,6 +1023,10 @@ static void slave_read(void *opaque)
+>      case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG :
+>          ret = vhost_user_slave_handle_config_change(dev);
+>          break;
+> +    case VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG:
+> +        ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
+> +                                                          fd);
+> +        break;
+>      default:
+>          error_report("Received unexpected msg type.");
+>          if (fd != -1) {
+> @@ -1641,6 +1755,15 @@ VhostUserState *vhost_user_init(void)
+>  
+>  void vhost_user_cleanup(VhostUserState *user)
+>  {
+> +    int i;
+> +
+> +    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+> +        if (user->notifier[i].addr) {
+> +            object_unparent(OBJECT(&user->notifier[i].mr));
+> +            munmap(user->notifier[i].addr, qemu_real_host_page_size);
+> +            user->notifier[i].addr = NULL;
 > +        }
 > +    }
-> +}
-> +
-> +static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-> +                                                        DeviceState *dev)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> +        return HOTPLUG_HANDLER(machine);
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
->  static void virt_machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
->  
->      mc->init = machvirt_init;
->      /* Start max_cpus at the maximum QEMU supports. We'll further restrict
-> @@ -1557,6 +1582,8 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
->      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
->      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> +    mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-> +    hc->plug = virt_machine_device_plug_cb;
 >  }
 >  
->  static const TypeInfo virt_machine_info = {
-> @@ -1566,6 +1593,10 @@ static const TypeInfo virt_machine_info = {
->      .instance_size = sizeof(VirtMachineState),
->      .class_size    = sizeof(VirtMachineClass),
->      .class_init    = virt_machine_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +         { TYPE_HOTPLUG_HANDLER },
-> +         { }
-> +    },
->  };
+>  const VhostOps user_ops = {
+> diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+> index eb8bc0d90d..fd660393a0 100644
+> --- a/include/hw/virtio/vhost-user.h
+> +++ b/include/hw/virtio/vhost-user.h
+> @@ -9,9 +9,17 @@
+>  #define HW_VIRTIO_VHOST_USER_H
 >  
->  static void machvirt_machine_init(void)
-> diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-> index 33d32fb..807cb5c 100644
-> --- a/hw/core/platform-bus.c
-> +++ b/hw/core/platform-bus.c
-> @@ -103,7 +103,6 @@ static void plaform_bus_refresh_irqs(PlatformBusDevice *pbus)
->  {
->      bitmap_zero(pbus->used_irqs, pbus->num_irqs);
->      foreach_dynamic_sysbus_device(platform_bus_count_irqs, pbus);
-> -    pbus->done_gathering = true;
->  }
->  
->  static void platform_bus_map_irq(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-> @@ -163,12 +162,11 @@ static void platform_bus_map_mmio(PlatformBusDevice *pbus, SysBusDevice *sbdev,
->  }
->  
->  /*
-> - * For each sysbus device, look for unassigned IRQ lines as well as
-> - * unassociated MMIO regions. Connect them to the platform bus if available.
-> + * Look for unassigned IRQ lines as well as unassociated MMIO regions.
-> + * Connect them to the platform bus if available.
->   */
-> -static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
-> +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev)
->  {
-> -    PlatformBusDevice *pbus = opaque;
->      int i;
->  
->      for (i = 0; sysbus_has_irq(sbdev, i); i++) {
-> @@ -180,19 +178,6 @@ static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
->      }
->  }
->  
-> -static void platform_bus_init_notify(Notifier *notifier, void *data)
-> -{
-> -    PlatformBusDevice *pb = container_of(notifier, PlatformBusDevice, notifier);
-> -
-> -    /*
-> -     * Generate a bitmap of used IRQ lines, as the user might have specified
-> -     * them on the command line.
-> -     */
-> -    plaform_bus_refresh_irqs(pb);
-> -
-> -    foreach_dynamic_sysbus_device(link_sysbus_device, pb);
-> -}
-> -
->  static void platform_bus_realize(DeviceState *dev, Error **errp)
->  {
->      PlatformBusDevice *pbus;
-> @@ -211,12 +196,8 @@ static void platform_bus_realize(DeviceState *dev, Error **errp)
->          sysbus_init_irq(d, &pbus->irqs[i]);
->      }
->  
-> -    /*
-> -     * Register notifier that allows us to gather dangling devices once the
-> -     * machine is completely assembled
-> -     */
-> -    pbus->notifier.notify = platform_bus_init_notify;
-> -    qemu_add_machine_init_done_notifier(&pbus->notifier);
-> +    /* some devices might be initialized before so update used IRQs map */
-> +    plaform_bus_refresh_irqs(pbus);
->  }
->  
->  static Property platform_bus_properties[] = {
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index 30b42a8..e91a5f6 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -221,16 +221,15 @@ static void sysbus_device_create_devtree(SysBusDevice *sbdev, void *opaque)
->      }
->  }
->  
-> -static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
-> +static void platform_bus_create_devtree(PPCE500MachineState *pms,
->                                          void *fdt, const char *mpic)
->  {
-> +    const PPCE500MachineClass *pmc = PPCE500_MACHINE_GET_CLASS(pms);
->      gchar *node = g_strdup_printf("/platform@%"PRIx64, pmc->platform_bus_base);
->      const char platcomp[] = "qemu,platform\0simple-bus";
->      uint64_t addr = pmc->platform_bus_base;
->      uint64_t size = pmc->platform_bus_size;
->      int irq_start = pmc->platform_bus_first_irq;
-> -    PlatformBusDevice *pbus;
-> -    DeviceState *dev;
->  
->      /* Create a /platform node that we can put all devices into */
->  
-> @@ -245,22 +244,17 @@ static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
->  
->      qemu_fdt_setprop_phandle(fdt, node, "interrupt-parent", mpic);
->  
-> -    dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
-> -    pbus = PLATFORM_BUS_DEVICE(dev);
-> -
-> -    /* We can only create dt nodes for dynamic devices when they're ready */
-> -    if (pbus->done_gathering) {
-> -        PlatformDevtreeData data = {
-> -            .fdt = fdt,
-> -            .mpic = mpic,
-> -            .irq_start = irq_start,
-> -            .node = node,
-> -            .pbus = pbus,
-> -        };
-> +    /* Create dt nodes for dynamic devices */
-> +    PlatformDevtreeData data = {
-> +        .fdt = fdt,
-> +        .mpic = mpic,
-> +        .irq_start = irq_start,
-> +        .node = node,
-> +        .pbus = pms->pbus_dev,
-> +    };
->  
-> -        /* Loop through all dynamic sysbus devices and create nodes for them */
-> -        foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
-> -    }
-> +    /* Loop through all dynamic sysbus devices and create nodes for them */
-> +    foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
->  
->      g_free(node);
->  }
-> @@ -527,8 +521,8 @@ static int ppce500_load_device_tree(PPCE500MachineState *pms,
->          create_dt_mpc8xxx_gpio(fdt, soc, mpic);
->      }
->  
-> -    if (pmc->has_platform_bus) {
-> -        platform_bus_create_devtree(pmc, fdt, mpic);
-> +    if (pms->pbus_dev) {
-> +        platform_bus_create_devtree(pms, fdt, mpic);
->      }
->  
->      pmc->fixup_devtree(fdt);
-> @@ -946,8 +940,9 @@ void ppce500_init(MachineState *machine)
->          qdev_prop_set_uint32(dev, "num_irqs", pmc->platform_bus_num_irqs);
->          qdev_prop_set_uint32(dev, "mmio_size", pmc->platform_bus_size);
->          qdev_init_nofail(dev);
-> -        s = SYS_BUS_DEVICE(dev);
-> +        pms->pbus_dev = PLATFORM_BUS_DEVICE(dev);
->  
-> +        s = SYS_BUS_DEVICE(pms->pbus_dev);
->          for (i = 0; i < pmc->platform_bus_num_irqs; i++) {
->              int irqn = pmc->platform_bus_first_irq + i;
->              sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
-> @@ -1090,6 +1085,7 @@ static const TypeInfo ppce500_info = {
->      .name          = TYPE_PPCE500_MACHINE,
->      .parent        = TYPE_MACHINE,
->      .abstract      = true,
-> +    .instance_size = sizeof(PPCE500MachineState),
->      .class_size    = sizeof(PPCE500MachineClass),
->  };
->  
-> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> index f69aadb..1a469ba 100644
-> --- a/hw/ppc/e500plat.c
-> +++ b/hw/ppc/e500plat.c
-> @@ -43,13 +43,40 @@ static void e500plat_init(MachineState *machine)
->      ppce500_init(machine);
->  }
->  
-> +static void e500plat_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-> +                                            DeviceState *dev, Error **errp)
-> +{
-> +    PPCE500MachineState *pms = PPCE500_MACHINE(hotplug_dev);
+>  #include "chardev/char-fe.h"
+> +#include "hw/virtio/virtio.h"
 > +
-> +    if (pms->pbus_dev) {
-> +        if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-
-Here you do it!
-
-> +            platform_bus_link_device(pms->pbus_dev, SYS_BUS_DEVICE(dev));
-> +        }
-> +    }
-> +}
-> +
-> +static
-> +HotplugHandler *e500plat_machine_get_hotpug_handler(MachineState *machine,
-> +                                                    DeviceState *dev)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> +        return HOTPLUG_HANDLER(machine);
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
->  #define TYPE_E500PLAT_MACHINE  MACHINE_TYPE_NAME("ppce500")
+> +typedef struct VhostUserHostNotifier {
+> +    MemoryRegion mr;
+> +    void *addr;
+> +    bool set;
+> +} VhostUserHostNotifier;
 >  
->  static void e500plat_machine_class_init(ObjectClass *oc, void *data)
->  {
->      PPCE500MachineClass *pmc = PPCE500_MACHINE_CLASS(oc);
-> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
->      MachineClass *mc = MACHINE_CLASS(oc);
+>  typedef struct VhostUserState {
+>      CharBackend *chr;
+> +    VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
+>  } VhostUserState;
 >  
-> +    mc->get_hotplug_handler = e500plat_machine_get_hotpug_handler;
-> +    hc->plug = e500plat_machine_device_plug_cb;
-> +
->      pmc->pci_first_slot = 0x1;
->      pmc->pci_nr_slots = PCI_SLOT_MAX - 1;
->      pmc->fixup_devtree = e500plat_fixup_devtree;
-> @@ -77,6 +104,10 @@ static const TypeInfo e500plat_info = {
->      .name          = TYPE_E500PLAT_MACHINE,
->      .parent        = TYPE_PPCE500_MACHINE,
->      .class_init    = e500plat_machine_class_init,
-> +    .interfaces    = (InterfaceInfo[]) {
-> +         { TYPE_HOTPLUG_HANDLER },
-> +         { }
-> +    }
->  };
->  
->  static void e500plat_register_types(void)
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>  VhostUserState *vhost_user_init(void);
+> -- 
+> 2.11.0
