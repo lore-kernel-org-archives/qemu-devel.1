@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8lgi-0002kr-8c
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:55:49 -0400
+	(envelope-from <berrange@redhat.com>) id 1f8liW-0003l0-NT
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8lgf-0006oB-3j
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:55:48 -0400
-References: <20180416181844.7851-1-marcandre.lureau@redhat.com>
-	<CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
-	<20180416184406.GC14488@redhat.com>
-	<CAFEAcA_uS7f-uf+-OkcskdHG3=eTgr92Mw46nk430q27-wve4g@mail.gmail.com>
-	<19b7bccd-2282-5c94-fe7c-68f72ccbaba7@amsat.org>
-	<CAJ+F1CJ4HurD8=OC+qhHSEuNDkO7_QQaiJtH_RVHSu4-xzrqag@mail.gmail.com>
-	<860de622-d4cc-d1bf-ae27-e4d70d5d22f0@redhat.com>
-	<CAJ+F1C+eHYnjZkqh=cFSm7Dw8Udbf-g+-Ck2sgVkqxFQhLxXjA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4a75a9c0-8cf5-5ec1-8edc-e768f360e96f@redhat.com>
-Date: Wed, 18 Apr 2018 13:55:34 +0200
+	(envelope-from <berrange@redhat.com>) id 1f8liV-00082T-JI
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:57:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55794 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8liV-00082L-DL
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:57:39 -0400
+Date: Wed, 18 Apr 2018 12:57:34 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180418115734.GG27579@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
+	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
+	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+eHYnjZkqh=cFSm7Dw8Udbf-g+-Ck2sgVkqxFQhLxXjA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] mux: fix ctrl-a b again
+Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-On 18/04/2018 13:35, Marc-Andr=C3=A9 Lureau wrote:
->> CharBackend is not the frontend, it is *used* by the front-end.  It is
->> the qemu_chr_* functions that are named wrong (they're named according
->> to the user rather than the recipient).
-> If I follow you and the naming, you have this in mind:
+On Wed, Apr 18, 2018 at 01:48:10PM +0200, Laszlo Ersek wrote:
+> On 04/18/18 11:04, Gerd Hoffmann wrote:
+> >> This surfaced in the RFCv1 discussion, but Daniel suggested ignoring
+> >> version numbers:
+> >>
+> >> http://mid.mail-archive.com/20180410093412.GI5155@redhat.com
+> >>
+> >> On 04/10/18 11:34, Daniel P. Berrang=C3=A9 wrote:
+> >>> IMHO it would be valid to just keep life simple and only record the
+> >>> base machine type name that can use the firmware ie "pc", "q35", an=
+d
+> >>> ignore the fact that in some cases the firmware might require a
+> >>> specific version of the machine type.
+> >=20
+> > IIRC this bit referes to the fact that SMM requires qemu >=3D 2.x (do=
+n't
+> > remember which x) to work.  So smm-enabled edk2 would just say
+> > "pc-q35-*" instead of trying to specifying a version range somehow.
 >=20
-> - Chardev: stdio, mux, ringbuf, pty, file, null etc..
-> - CharBackend: the "user" end
-> - frontend: the "user"
+> OK. I'm fine either way; Dan, can you please confirm you are OK with th=
+e
+> suggested wildcard format? (I.e., we still shouldn't include actual
+> version numbers in the supported machtypes list, but we should be more
+> specific than just "pc" and "q35" -- if the machine type is versioned,
+> use an asterisk for covering the version number.)
 
-The frontend is the device, the monitor, etc.  The backend is how the
-frontend sees a Chardev, it never talks to it directly.
+My suggestion to use  a bare "pc" is effectively doing globbing
+anyway, just that we've left off the "*". Gerd is right that it
+is probably better to be explicit and include the wildcard.
 
-Perhaps the confusing part is that the backend is also how the Chardev
-talks to the frontend?
+So now the question is should this string be declared to be
+glob format, or regex format. Regex is more flexible, but
+regex syntax is ill-defined because every regex engine is
+slightly different.
 
-Paolo
 
-> It is quite confusing to me that CharBackend is for the "user"
-> frontend, and the backend of Chardev.
->
-> You have to switch your mind
-> depending on the context or the point of view.
->=20
->  I'd rather use that terminology:
->=20
-> - ChardevBackend: stdio, mux, ringbuf, pty, file, null etc..
-> - CharFrontend: the "user" end
-> - frontend the "user"
->=20
-> This way, there is only one direction from backend to frontend
-> (regardless of the point of view from chardev to frontend)
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
