@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8mFj-0000k5-7g
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:32:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1f8mGA-00013f-Gc
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8mFi-0003KB-1E
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:59 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 18 Apr 2018 14:31:47 +0200
-Message-Id: <1524054707-20663-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.13 4/4] pc-bios/s390-ccw/net: Add
- support for .INS config files
+	(envelope-from <berrange@redhat.com>) id 1f8mG7-0003qC-Em
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:32:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34648 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8mG7-0003pr-A2
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:32:23 -0400
+Date: Wed, 18 Apr 2018 13:32:12 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180418123212.GK27579@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
+	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
+	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
+	<20180418115734.GG27579@redhat.com>
+	<20180418123002.7hiu2hr6rdxvab5u@sirius.home.kraxel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180418123002.7hiu2hr6rdxvab5u@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,87 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-The .INS config files can normally be found on CD-ROM ISO images,
-so by supporting these files, it is now possible to boot directly
-when the TFTP server is set up with the contents of such an CD-ROM
-image.
+On Wed, Apr 18, 2018 at 02:30:02PM +0200, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> > So now the question is should this string be declared to be
+> > glob format, or regex format. Regex is more flexible, but
+> > regex syntax is ill-defined because every regex engine is
+> > slightly different.
+> 
+> I'd go for glob.  It's good enough for the version number and
+> most likely we don't need anything else.
+> 
+> And the machine types are a list, so there is still the option
+> to just have multiple entries in case it turns out we need
+> something glob can't cover with a single entry.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/netmain.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+Ok, works for me.
 
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index fa62bfe..e52e17d 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -441,6 +441,55 @@ static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
-     return -1;
- }
- 
-+/**
-+ * Load via information from a .INS file (which can be found on CD-ROMs
-+ * for example)
-+ */
-+static int handle_ins_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
-+{
-+    char *ptr;
-+    int rc = -1, llen;
-+    void *destaddr;
-+    char *insbuf = cfg;
-+
-+    ptr = strchr(insbuf, '\n');
-+    if (!ptr) {
-+        puts("Does not seem to be a valid .INS file");
-+        return -1;
-+    }
-+
-+    *ptr = 0;
-+    printf("\nParsing .INS file:\n %s\n", &insbuf[2]);
-+
-+    insbuf = ptr + 1;
-+    while (*insbuf && insbuf < cfg + cfgsize) {
-+        ptr = strchr(insbuf, '\n');
-+        if (ptr) {
-+            *ptr = 0;
-+        }
-+        llen = strlen(insbuf);
-+        if (!llen) {
-+            insbuf = ptr + 1;
-+            continue;
-+        }
-+        ptr = strchr(insbuf, ' ');
-+        if (!ptr) {
-+            puts("Missing space separator in .INS file");
-+            return -1;
-+        }
-+        *ptr = 0;
-+        strncpy((char *)fn_ip->filename, insbuf, sizeof(fn_ip->filename));
-+        destaddr = (char *)atol(ptr + 1);
-+        rc = tftp_load(fn_ip, destaddr, (long)_start - (long)destaddr);
-+        if (rc <= 0) {
-+            break;
-+        }
-+        insbuf += llen + 1;
-+    }
-+
-+    return rc;
-+}
-+
- static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
- {
-     int rc;
-@@ -455,6 +504,8 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
-         if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
-             /* Looks like it is a pxelinux.cfg */
-             return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);
-+        } else if (!strncmp("* ", cfgbuf, 2)) {
-+            return handle_ins_cfg(fn_ip, cfgbuf, rc);
-         }
-     }
- 
+Regards,
+Daniel
 -- 
-1.8.3.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
