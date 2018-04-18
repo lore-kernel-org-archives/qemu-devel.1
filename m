@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8nj7-0004xn-Mx
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:06:31 -0400
+	(envelope-from <thuth@redhat.com>) id 1f8nl0-0006LK-SW
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:08:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8nj1-00011l-IG
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:06:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34816 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8nj1-00011U-BT
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:06:19 -0400
-Date: Wed, 18 Apr 2018 15:06:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180418140609.GT27579@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
-	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
-	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
-	<20180418122312.ebmd2nrtvk2h5e45@sirius.home.kraxel.org>
-	<f8c3945f-d2e7-e4a4-2b38-2736acd99e7c@redhat.com>
-	<20180418130619.cmyyyl7fj2wfum7k@sirius.home.kraxel.org>
-	<0545cc73-d821-c2d9-e4ab-938e58c34c2b@redhat.com>
-	<20180418135344.GQ27579@redhat.com>
-	<9b760289-a92e-4ec0-ce3b-f13665b5799b@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1f8nky-0001ka-6W
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:08:22 -0400
+References: <20180412192602.13430-1-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7283d8e8-67ca-4450-d06c-c39c6981273d@redhat.com>
+Date: Wed, 18 Apr 2018 16:08:06 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180412192602.13430-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9b760289-a92e-4ec0-ce3b-f13665b5799b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] s390x: refactor reset/reipl handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,151 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Apr 18, 2018 at 04:03:03PM +0200, Laszlo Ersek wrote:
-> On 04/18/18 15:53, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Apr 18, 2018 at 03:30:36PM +0200, Laszlo Ersek wrote:
-> >> On 04/18/18 15:06, Gerd Hoffmann wrote:
-> >>>>> Other question:  Do we want allow to specify which certs/keys are
-> >>>>> enrolled?  Which would probably mean to drop "enrolled-keys" from
-> >>>>> features and make it an optional string instead,
-> >>>>
-> >>>> Not an enum? "Microsoft" below should be an enum constant, shouldn=
-'t it?
-> >>>
-> >>> I don't think so.  If we want allow other certificate providers (no=
-t
-> >>> sure it makes sense as all physical hardware actually runs with the
-> >>> microsoft certificates), then we don't want a fixed list here.  So =
-any
-> >>> CA can be listed, be it microsoft, redhat, canonical, verisign or
-> >>> kraxel.org ;)
-> >>
-> >> I agree (obviously), but then, at what detail do we stop?
-> >>
-> >> Because, if we go for full flexibility, then we should formalize:
-> >> - the certificate that goes into PK,
-> >> - the list of certificates that go into KEK,
-> >> - the list of certificates that go into db,
-> >>
-> >> and we should likely formalize "certificate" itself as the following=
- pair:
-> >> - human-readable description (possibly the Common Name of the Subjec=
-t),
-> >> - SHA256 digest (fingerprint) of the certificate.
-> >>
-> >> I do think this would totally be overkill, but I don't know where to
-> >> draw the line
-> >> - between the currently proposed @enrolled-keys (or similar enums th=
-at
-> >>   stand for well-defined "constellations")
-> >> - and the full details as described above.
-> >>
-> >> A simple string like "Microsoft" doesn't seem to me helpful for eith=
-er
-> >> the user or management software -- the former won't know what
-> >> "Microsoft" stands for, and the latter won't want to look for free-f=
-orm
-> >> strings. (Same issue as with @tags vs. @features.)
-> >=20
-> > Ignoring secboot cert name for a minute, ultimately no matter what we=
- do
-> > in terms of metadata there is always going to be the possibility that
-> > many firmware images all match the criteria libvirt is searching on.
-> >=20
-> > Apps thus need rules to pick one of the many matches, and users need =
-the
-> > ability to override distro defaults. We can achieve that as follows:
-> >=20
-> > Recommend that firmware files are created with a double-digit prefix
-> > eg    50-ovmf.json  50-seabios-256k.json, etc, etc, so they can be
-> > sorted in predictable order
-> >=20
-> > Second, we should define three well known directory locations
-> >=20
-> >  - /usr/share/qemu/firmware  (used by distros packages)
-> >  - /etc/qemu/firmware  (exclusively for sysadmin local additions)
-> >  - $HOME/.config/qemu/firmware (exclusively for per-user local additi=
-ons)
-> >=20
-> > Apps like libvirt should build list of files from all three locations=
-,
-> > then sort by filename.  If a local directory has a file with same
-> > name as the distro directory, then it should replace the distro provi=
-ded
-> > file. A zero length file should be simply hide the distro provided fi=
-le
-> >=20
-> > So for example, distro ships
-> >=20
-> >    /usr/share/qemu/firmware/50-ovmf.json
-> >    /usr/share/qemu/firmware/50-seabios-256k.json
-> >=20
-> > The sysadmin can now prevent the default ovmf being used at all with
-> >=20
-> >   $ touch /etc/qemu/firmware/50-ovmf.json
-> >=20
-> > The sysadmin can replace/alter the distro default ovmf with
-> >=20
-> >   $ vim /etc/qemu/firmware/50-ovmf.json
-> >=20
-> > Or they can provide a parallel ovmf with higher priority
-> >=20
-> >   $ vim /etc/qemu/firmware/10-ovmf.json
-> >=20
-> > Or they can provide a parallel ovmf with lower priority
-> >=20
-> >   $ vim /etc/qemu/firmware/99-ovmf.json
-> >=20
-> > $HOME/.config/qemu/firmware would take prior over /etc/qemu and
-> > /usr/share/qemu.=20
-> >=20
-> >=20
-> > Getting back to the question of many ovmf images with various differe=
-nt
-> > secboot keys. The distro can now provide many ovmf images each with
-> > different keys, if desired and determine which one is picked by defau=
-lt.
-> >=20
-> > The end user can provide their over ovmf with personal keys that repl=
-aces
-> > the distro microsoft enrolled one entirely, etc.
-> >=20
-> > IOW,  don't think we need to record which certs are use for secboot i=
-n
-> > the JSON metadata. Just lets overrides & ordering take care of it.
->=20
-> OK, thank you. Three more questions:
->=20
-> - Would you like me to capture the directory paths in the firmware.json
->   file, or in the commit message for the patch?
+On 12.04.2018 21:26, David Hildenbrand wrote:
+> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
+> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
+> mutex, two parallel calls to pause_all_vcpus() can be active at a time,
+> resulting in a deadlock. (either by two VCPUs or by the main thread and a
+> VCPU)
+> 
+> Let's handle it via the main loop instead, as suggested by Paolo. If we
+> would have two parallel reset requests by two different VCPUs at the
+> same time, the last one would win.
+> 
+> We use the existing ipl device to handle it. The nice side effect is
+> that we can get rid of reipl_requested.
+> 
+> This change implies that all reset handling now goes via the common
+> path, so "no-reboot" handling is now active for all kinds of reboots.
+> 
+> Let's execute any CPU initialization code on the target CPU using
+> run_on_cpu.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> Did only a quick check with TCG. I think this way it is way easier to
+> control what is getting reset.
+> 
+>  hw/s390x/ipl.c                     | 44 ++++++++++++++++++++++++---
+>  hw/s390x/ipl.h                     | 16 ++++++++--
+>  hw/s390x/s390-virtio-ccw.c         | 49 +++++++++++++++++++++++++-----
+>  include/hw/s390x/s390-virtio-ccw.h |  2 --
+>  target/s390x/cpu.h                 | 26 ++++++++++++++++
+>  target/s390x/diag.c                | 61 +++-----------------------------------
+>  target/s390x/internal.h            |  6 ----
+>  target/s390x/kvm.c                 |  2 +-
+>  8 files changed, 127 insertions(+), 79 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index fb554ab156..f7589d20f1 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -26,6 +26,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/option.h"
+> +#include "exec/exec-all.h"
+>  
+>  #define KERN_IMAGE_START                0x010000UL
+>  #define KERN_PARM_AREA                  0x010480UL
+> @@ -484,11 +485,22 @@ IplParameterBlock *s390_ipl_get_iplb(void)
+>      return &ipl->iplb;
+>  }
+>  
+> -void s390_reipl_request(void)
+> +void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+>  
+> -    ipl->reipl_requested = true;
+> +    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
+> +        /* let's always use CPU 0 */
+> +        ipl->reset_cpu = NULL;
+> +    } else {
+> +        ipl->reset_cpu = cs;
+> +    }
+> +    ipl->reset_type = reset_type;
+> +
+> +    if (reset_type != S390_RESET_REIPL) {
+> +        goto no_reipl;
 
-Should be in whatever file ends up in the docs/specs directory eventually=
-.
+Could we please avoid goto in this case and simply put the code below
+into a "if (reset_type == S390_RESET_REIPL)" block?
 
->=20
-> - Should we keep @secure-boot-enrolled-keys (or, as Gerd suggests,
->   @enrolled-keys) in the schema, as a feature enum constant, but remove
->   the documentation of the actual certificates? (I.e., say "an
->   unspecified set of certificates has been enrolled and SB mode has bee=
-n
->   enabled".)
+> +    }
+> +
+>      if (ipl->iplb_valid &&
+>          !ipl->netboot &&
+>          ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
+> @@ -505,7 +517,32 @@ void s390_reipl_request(void)
+>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+>          }
+>      }
+> +no_reipl:
+>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +    /* as this is triggered by a CPU, make sure to exit the loop */
+> +    if (tcg_enabled()) {
+> +        cpu_loop_exit(cs);
+> +    }
+> +}
 
-I think it is worth keeping the feature flag - we simply don't need
-to say /what/ keys.
-
->=20
-> - Or else, should we drop the feature flag that stands for enrollment
->   completely?
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+ Thomas
