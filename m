@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8i2L-00024X-PE
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:01:55 -0400
+	(envelope-from <a175818323@gmail.com>) id 1f8i9n-0004g1-As
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8i2I-0000VM-Mp
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:01:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33240 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8i2I-0000V9-FZ
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:01:50 -0400
-Date: Wed, 18 Apr 2018 16:01:31 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180418080131.GD14841@xz-mi>
-References: <20180412061108.10875-1-peterx@redhat.com>
-	<20180416083748.GD28904@stefanha-x1.localdomain>
-	<20180416091732.GB21143@xz-mi>
-	<20180417070843.GI10770@stefanha-x1.localdomain>
-	<874lkai4no.fsf@dusky.pond.sub.org>
-	<20180418051224.GD25649@stefanha-x1.localdomain>
-	<20180418063524.GC14841@xz-mi> <87a7u10xgo.fsf@dusky.pond.sub.org>
+	(envelope-from <a175818323@gmail.com>) id 1f8i9m-0003qW-7y
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:09:35 -0400
+Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:40652)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1f8i9m-0003qE-2o
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:09:34 -0400
+Received: by mail-io0-x232.google.com with SMTP id t123-v6so1384213iof.7
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 01:09:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87a7u10xgo.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
+In-Reply-To: <CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
+References: <CAMxP3BSFEuknshd05kSn8EjNuv8F8aPGuNFG3qUd0Ap6GbZFrQ@mail.gmail.com>
+	<18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
+	<CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
+From: Bob Chen <a175818323@gmail.com>
+Date: Wed, 18 Apr 2018 16:09:32 +0800
+Message-ID: <CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Latest v2.12.0-rc4 has compiling error, rc3 is OK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Apr 18, 2018 at 09:45:27AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > On Wed, Apr 18, 2018 at 01:12:24PM +0800, Stefan Hajnoczi wrote:
-> >> On Tue, Apr 17, 2018 at 11:05:47AM +0200, Markus Armbruster wrote:
-> >> > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> >> > 
-> >> > > On Mon, Apr 16, 2018 at 05:17:32PM +0800, Peter Xu wrote:
-> >> > >> On Mon, Apr 16, 2018 at 04:37:48PM +0800, Stefan Hajnoczi wrote:
-> >> > >> > On Thu, Apr 12, 2018 at 02:11:08PM +0800, Peter Xu wrote:
-> >> > >> > > In the future the monitor iothread may be accessing the cur_mon as
-> >> > >> > > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
-> >> > >> > > Out-Of-Band command, let's convert the cur_mon variable to be a
-> >> > >> > > per-thread variable to make sure there won't be a race between threads.
-> >> > >> > >
-> >> > >> > > Note that thread variables are not initialized to a valid value when new
-> >> > >> > > thread is created.  However for our case we don't need to set it up,
-> >> > >> > > since the cur_mon variable is only used in such a pattern:
-> >> > >> > > 
-> >> > >> > >   old_mon = cur_mon;
-> >> > >> > >   cur_mon = xxx;
-> >> > >> > >   (do something, read cur_mon if necessary in the stack)
-> >> > >> > >   cur_mon = old_mon;
-> >> > >> > > 
-> >> > >> > > It plays a role as stack variable, so no need to be initialized at all.
-> >> > >> > > We only need to make sure the variable won't be changed unexpectedly by
-> >> > >> > > other threads.
-> >> > >> > > 
-> >> > >> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >> > >> > > ---
-> >> > >> > > v3:
-> >> > >> > > - fix code style warning from patchew
-> >> > >> > > v2:
-> >> > >> > > - drop qemu-thread changes
-> >> > >> > > ---
-> >> > >> > >  include/monitor/monitor.h | 2 +-
-> >> > >> > >  monitor.c                 | 2 +-
-> >> > >> > >  stubs/monitor.c           | 2 +-
-> >> > >> > >  tests/test-util-sockets.c | 2 +-
-> >> > >> > >  4 files changed, 4 insertions(+), 4 deletions(-)
-> >> > >> > 
-> >> > >> > The Monitor object is not fully thread-safe, so although the correct
-> >> > >> > cur_mon is now accessible, code may still be unsafe.  For example,
-> >> > >> > monitor_get_fd(cur_mon, ...) is not thread-safe and must not be used by
-> >> > >> > OOB commands.
-> >> > >> 
-> >> > >> IMHO things like monitor_get_fd() should only be called in QMP
-> >> > >> context, so there should always be a monitor_qmp_dispatch_one() in the
-> >> > >> stack already (no matter whether it is in main thread or the monitor
-> >> > >> iothread), which means that cur_mon should have been setup.  So IMHO
-> >> > >> it's a programming error if monitor_get_fd() is called without correct
-> >> > >> cur_mon setup after this patch.
-> >> > >
-> >> > > The pointer value of cur_mon is not the issue, you have made that work
-> >> > > correctly.  The problem is that some monitor.h APIs do not access the
-> >> > > Monitor object in a thread-safe fashion.
-> >> > >
-> >> > > Two QMP commands executing simultaneously in the main loop thread and
-> >> > > the monitor IOThread can hit race conditions.  The example I gave was
-> >> > > the monitor_get_fd() API, which iterates and modifies the mon->fds
-> >> > > QLIST without a lock.
-> >> > >
-> >> > > Please audit monitor.h and either make things thread-safe or document
-> >> > > the thread-safety rules (e.g. "This function cannot be called from
-> >> > > out-of-band QMP context").  This wasn't necessary before but now that
-> >> > > you are adding multi-threading it is.
-> >> > 
-> >> > Code working with the current thread's monitor via thread-local cur_mon
-> >> > is easier to analyze in some ways than code working with a Monitor *
-> >> > parameter: the latter can interfere with some other thread's monitor,
-> >> > and you may have to argue what values the parameter can take.
-> >> > 
-> >> > You might want to replace parameters by cur_mon in certain cases.
-> >> > 
-> >> > Funnily, the plan used to be the opposite.  Commit 376253ece48: "On the
-> >> > mid or long term, those use case will be obsoleted so that [cur_mon] can
-> >> > be removed again."
-> >
-> > It's a pity that we didn't follow the plan!
-> 
-> I don't think so.  Yes, global state is often a root of problems.  But
-> replacing global state by passing pointers around can hurt rather than
-> help with a more serious problem, namely *shared* state.
-> 
-> The less we pass around pointers to shared state, the easier we can
-> reason about how this state gets shared, and what needs to be done to
-> make that safe.
-> 
-> That's why I suggested to consider more direct use of the thread-local
-> Monitor *cur_mon.  Dereferencing cur_mon *obviously* uses this thread's
-> monitor.  Dereferencing a Monitor * parameter could use anything.
+I found that it has nothing to do with the release version, but the github
+one is just not able to work...
 
-But note that when with Out-Of-Band cur_mon in thread A could be the
-same cur_mon in thread B. E.g., when main thread is executing one
-command for monitor M meanwhile the monitor iothread is running an
-Out-Of-Band command for the same monitor M.  So AFAIU it looks just
-like a Monitor* that passed in to the functions, the only difference
-is that we pass that in by thread variables from the stack.  And I'm
-afraid we'll face the same "shared state" problem too here...
+So what github and qemu.org provide are totally different things?
 
-> 
-> Use your judgement :)
 
-Will do! :)
 
--- 
-Peter Xu
+
+2018-04-18 14:52 GMT+08:00 Bob Chen <a175818323@gmail.com>:
+
+> No, I downloaded the release tarball from github.
+>
+> 2018-04-18 14:25 GMT+08:00 Stefan Weil <sw@weilnetz.de>:
+>
+>> Am 18.04.2018 um 08:19 schrieb Bob Chen:
+>> > fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or
+>> directory
+>> >
+>> > Build on my CentOS 7.
+>> >
+>>
+>> That file is generated during the build. rc4 compiles in my test on
+>> Debian. Did you start your build from a fresh git clone?
+>>
+>> Stefan
+>>
+>
+>
