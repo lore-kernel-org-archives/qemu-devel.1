@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1f8i9n-0004g1-As
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:09:36 -0400
+	(envelope-from <olaf@aepfle.de>) id 1f8iDp-00068f-22
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1f8i9m-0003qW-7y
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:09:35 -0400
-Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:40652)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1f8i9m-0003qE-2o
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:09:34 -0400
-Received: by mail-io0-x232.google.com with SMTP id t123-v6so1384213iof.7
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 01:09:34 -0700 (PDT)
+	(envelope-from <olaf@aepfle.de>) id 1f8iDo-0005s5-4Y
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:13:45 -0400
+From: Olaf Hering <olaf@aepfle.de>
+Date: Wed, 18 Apr 2018 10:13:10 +0200
+Message-Id: <20180418081311.27803-1-olaf@aepfle.de>
 MIME-Version: 1.0
-In-Reply-To: <CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
-References: <CAMxP3BSFEuknshd05kSn8EjNuv8F8aPGuNFG3qUd0Ap6GbZFrQ@mail.gmail.com>
-	<18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
-	<CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
-From: Bob Chen <a175818323@gmail.com>
-Date: Wed, 18 Apr 2018 16:09:32 +0800
-Message-ID: <CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Latest v2.12.0-rc4 has compiling error, rc3 is OK
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1] roms/ipxe: use configured compiler for ipxe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +19,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: qemu-devel@nongnu.org
+To: qemu-trivial@nongnu.org
+Cc: Olaf Hering <olaf@aepfle.de>, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-I found that it has nothing to do with the release version, but the github
-one is just not able to work...
+configure allows to run a dedicated compiler binary, which is stored in
+CC and HOST_CC variables, and overrides the default 'cc' command.
 
-So what github and qemu.org provide are totally different things?
+This command however is not used when building ipxe from source.
+"make -C roms pxerom" invokes the buildsystem of ipxe.git, which has the
+command "gcc" hardcoded. That binary may not be suitable to build ipxe.
+Reuse the same compiler command that is used to build qemu by specifying
+CC and HOST_CC as make commandline option to override the built-in
+defaults of ipxe.
 
+Signed-off-by: Olaf Hering <olaf@aepfle.de>
+---
+ roms/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
-
-2018-04-18 14:52 GMT+08:00 Bob Chen <a175818323@gmail.com>:
-
-> No, I downloaded the release tarball from github.
->
-> 2018-04-18 14:25 GMT+08:00 Stefan Weil <sw@weilnetz.de>:
->
->> Am 18.04.2018 um 08:19 schrieb Bob Chen:
->> > fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or
->> directory
->> >
->> > Build on my CentOS 7.
->> >
->>
->> That file is generated during the build. rc4 compiles in my test on
->> Debian. Did you start your build from a fresh git clone?
->>
->> Stefan
->>
->
->
+diff --git a/roms/Makefile b/roms/Makefile
+index 02b69fbac8..982bf105a3 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -127,11 +127,13 @@ efi-rom-%: build-pxe-roms build-efi-roms
+ 
+ build-pxe-roms:
+ 	$(MAKE) -C ipxe/src CONFIG=qemu \
++		CC=$(CC) HOST_CC=$(HOST_CC) \
+ 		CROSS_COMPILE=$(x86_64_cross_prefix) \
+ 		$(patsubst %,bin/%.rom,$(pxerom_targets))
+ 
+ build-efi-roms: build-pxe-roms
+ 	$(MAKE) -C ipxe/src CONFIG=qemu \
++		CC=$(CC) HOST_CC=$(HOST_CC) \
+ 		CROSS_COMPILE=$(x86_64_cross_prefix) \
+ 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+ 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
