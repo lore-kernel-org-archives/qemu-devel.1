@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8q5t-0001gG-BT
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:38:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1f8qCt-0005CX-B1
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8q5s-0001dK-Bp
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:38:05 -0400
-References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <461d56f3-4381-4cd6-f66d-1dd510c35fa8@redhat.com>
-Date: Wed, 18 Apr 2018 11:37:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1f8qCq-0004sf-7Y
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:45:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48150 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f8qCq-0004ry-31
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:45:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C7C28DC2E
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 16:45:12 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
+	<20180417133602.23832-2-marcandre.lureau@redhat.com>
+	<ea5c5be8-2e0f-ed00-8ce1-aee6d6e117d4@redhat.com>
+Date: Wed, 18 Apr 2018 18:45:05 +0200
+In-Reply-To: <ea5c5be8-2e0f-ed00-8ce1-aee6d6e117d4@redhat.com> (Eric Blake's
+	message of "Tue, 17 Apr 2018 13:17:46 -0500")
+Message-ID: <87po2wsbu6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wNFogd4faKh9fixph79vwXk82t5I1GaZN"
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 1/5] qobject: ensure base is at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +35,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wNFogd4faKh9fixph79vwXk82t5I1GaZN
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
-Message-ID: <461d56f3-4381-4cd6-f66d-1dd510c35fa8@redhat.com>
-Subject: Re: [PATCH] nbd/server: introduce NBD_CMD_CACHE
-References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On 04/13/2018 09:31 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Handle nbd CACHE command. Just do read, without sending read data back.=
+> On 04/17/2018 08:35 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> All QObject types have the base QObject as first field. This allows to
+>
+> s/as/as their/
+>
+>> simplify qobject_to() and will allow further simplification in
+>
+> s/allows to simplify/allows the simplification of/
+> s/in/in the/
+>
+>> following patch.
+>
+> Might also be worth mentioning that this explicitly guarantees that
+> existing casts work correctly (even though we'd prefer to get rid of
+> such casts in any location except the qobject.h macros); Markus pointed o=
+ut:
+>
+>>> Uh, there's another reason: existing type casts from QObject * to
+>>> subtypes.  I just spotted one in tests/check-qdict.c:
+>>>=20
+>>>     dst =3D (QDict *)qdict_crumple(src, &error_abort);
 
-> Cache mechanism should be done by exported node driver chain.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/nbd.h |  3 ++-
->  nbd/server.c        | 10 ++++++----
->  2 files changed, 8 insertions(+), 5 deletions(-)
->=20
-> diff --git a/include/block/nbd.h b/include/block/nbd.h
-> index fcdcd54502..b4793d0a29 100644
-> --- a/include/block/nbd.h
-> +++ b/include/block/nbd.h
-> @@ -135,6 +135,7 @@ typedef struct NBDExtent {
->  #define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
->  #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
->  #define NBD_FLAG_SEND_DF           (1 << 7) /* Send DF (Do not Fragmen=
-t) */
-> +#define NBD_FLAG_SEND_CACHE        (1 << 8) /* Send CACHE (prefetch) *=
-/
+As far as I'm concerned, that's the real reason.  The simplification
+plus the check to make it safe seems like a wash.
 
-Hmm, this flag is not documented in the upstream NBD protocol yet; are
-we sure it matches the xNBD implementation?  We'll want at least a
-documentation patch proposed for the NBD list before taking this.
+The cast I spotted appears to be the only one, though:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+    $ git-grep '(Q[A-Z][a-z]* \*)'
+    hmp.c:    qmp_device_add((QDict *)qdict, NULL, &err);
+    include/qapi/qmp/qobject.h:        return (QObject *)obj;
+    qobject/qobject.c:static void (*qdestroy[QTYPE__MAX])(QObject *) =3D {
+    tests/check-qdict.c:    dst =3D (QDict *)qdict_crumple(src, &error_abor=
+t);
 
+The first two cast away const, the third isn't a type cast.  The fourth
+one should use qobject_to() instead, regardless of this patch.
 
---wNFogd4faKh9fixph79vwXk82t5I1GaZN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Do we want to force base to come first anyway?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Where does PATCH 2 exploit "base first"?
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrXdGYACgkQp6FrSiUn
-Q2rgBgf+Kvio5uHx62e1ZAlEZW6fhnL6gcHFMPPOGggEamrKhQ/BUb1o4oHC4E91
-NeUiVdbuionSA7cDHvBmmZSAfXRcqVdo7e9c6pt06wuwa3BJLHnGg7K0XK1y0JOx
-lP20CchQxwHNOxrBKUt3F/Nb/IznvPKCOKbpgnFiYp6ZLvwbDG8kooscz1GNYna/
-0cfAfcXOmdZf7K2Z1OSQ4/zgnvQmPA62LpySqsOzDzxB04KlsjQNNvFVd3PmELsb
-Zw2JhNkRvIbpo/nd64a44a6Z6dnnP5JRUl2PRTXDZNV7bXYYMnISSsIrRvSbNxmJ
-OwCCA0WD7R5S1mu12tp8RbmAoGlahw==
-=rLjL
------END PGP SIGNATURE-----
-
---wNFogd4faKh9fixph79vwXk82t5I1GaZN--
+[...]
