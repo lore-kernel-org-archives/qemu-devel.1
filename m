@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f8m79-0004ip-QL
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:23:08 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f8m7T-0004wv-35
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f8m78-0007lL-RU
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:23:07 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f8m7Q-0007qT-0K
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:23:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56584 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f8m7P-0007q7-Ri
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:23:23 -0400
+Date: Wed, 18 Apr 2018 14:23:12 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180418122312.ebmd2nrtvk2h5e45@sirius.home.kraxel.org>
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
+	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
+	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4a75a9c0-8cf5-5ec1-8edc-e768f360e96f@redhat.com>
-References: <20180416181844.7851-1-marcandre.lureau@redhat.com>
-	<CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
-	<20180416184406.GC14488@redhat.com>
-	<CAFEAcA_uS7f-uf+-OkcskdHG3=eTgr92Mw46nk430q27-wve4g@mail.gmail.com>
-	<19b7bccd-2282-5c94-fe7c-68f72ccbaba7@amsat.org>
-	<CAJ+F1CJ4HurD8=OC+qhHSEuNDkO7_QQaiJtH_RVHSu4-xzrqag@mail.gmail.com>
-	<860de622-d4cc-d1bf-ae27-e4d70d5d22f0@redhat.com>
-	<CAJ+F1C+eHYnjZkqh=cFSm7Dw8Udbf-g+-Ck2sgVkqxFQhLxXjA@mail.gmail.com>
-	<4a75a9c0-8cf5-5ec1-8edc-e768f360e96f@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 18 Apr 2018 14:22:59 +0200
-Message-ID: <CAJ+F1CJFfTBJkEEDP4R4PKU1grVU9Bhxjt9WjdKKX84KFizoCg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] mux: fix ctrl-a b again
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
+Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-Hi
+  Hi,
 
-On Wed, Apr 18, 2018 at 1:55 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 18/04/2018 13:35, Marc-Andr=C3=A9 Lureau wrote:
->>> CharBackend is not the frontend, it is *used* by the front-end.  It is
->>> the qemu_chr_* functions that are named wrong (they're named according
->>> to the user rather than the recipient).
->> If I follow you and the naming, you have this in mind:
->>
->> - Chardev: stdio, mux, ringbuf, pty, file, null etc..
->> - CharBackend: the "user" end
->> - frontend: the "user"
->
-> The frontend is the device, the monitor, etc.
+> Hmmm, I'm not sure I agree. One use case is that you want a domain
+> config in which well-known OS-es, signed by the MS UEFI certs, just boot
+> with SB enabled. (Some of our internal folks really want this.)
+> 
+> Another use case is that you want a domain in which SB *can* be enabled,
+> but your installer is signed with a different certificate chain (or it
+> is unsigned), and with *just* the MS certs enrolled, it wouldn't boot at
+> all. So you want the SB *feature*, but definitely not the initial
+> enrollment / SB *operational mode*.
 
-yes, I should have listed it for clarity
+So "secure-boot-enrolled-keys" also has SB turned on.
 
-> The backend is how the
-> frontend sees a Chardev, it never talks to it directly.
+> For me to understand you better, are you suggesting merely that I:
+> 
+> - rename @secure-boot-enrolled-keys to @enrolled-keys, and
+> 
+> - drop the reference to @secure-boot from the end of the @enrolled-keys
+>   documentation paragraph? (Namely, "@secure-boot-enrolled-keys is only
+>   valid if the firmware also supports @secure-boot").
 
+Yes.  So "secure-boot" specifies "firmware binary supports secure-boot"
+and "enrolled-keys" specifies "firmware nvram template has keys enrolled
+(and SB enabled).
 
-Ok, but why not call CharFrontend, since it's the frontend interface
-to the chardev? (which we call the backend, by extension, and because
-many functions are named *_be_* )
+Other question:  Do we want allow to specify which certs/keys are
+enrolled?  Which would probably mean to drop "enrolled-keys" from
+features and make it an optional string instead, then specify
+"'enrolled-keys' : 'Microsoft'" in the json file.
 
-> Perhaps the confusing part is that the backend is also how the Chardev
-> talks to the frontend?
-
-It's less confusing, because that part is mostly internal to char.c
-implementation.
-
-But rather than:
-
-static void chr_be_event(Chardev *s, int event)
-{
-    CharBackend *be =3D s->be;
-...
-    be->chr_event(be->opaque, event);
-}
-
-I would rather have:
-
-static void chr_be_event(Chardev *s, int event)
-{
-    CharFrontend *fe =3D s->fe;
-...
-    fe->chr_event(be->opaque, event);
-}
-
-This would not only mean that we clearly associate CharBackend with
-the frontend, but also the chardev code becomes clearer, sending an
-event on the chardev (be), forwards it to the frontend side... (that
-is so much clearer to me)
-
->
-> Paolo
->
->> It is quite confusing to me that CharBackend is for the "user"
->> frontend, and the backend of Chardev.
->>
->> You have to switch your mind
->> depending on the context or the point of view.
->>
->>  I'd rather use that terminology:
->>
->> - ChardevBackend: stdio, mux, ringbuf, pty, file, null etc..
->> - CharFrontend: the "user" end
->> - frontend the "user"
->>
->> This way, there is only one direction from backend to frontend
->> (regardless of the point of view from chardev to frontend)
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+cheers,
+  Gerd
