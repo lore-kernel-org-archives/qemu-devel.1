@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8jPa-0007Gi-01
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:29:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f8jac-0002Xr-GB
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8jPY-0003zK-Vd
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:29:58 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:35007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8jPY-0003z6-Pb
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:29:56 -0400
-Received: by mail-oi0-x230.google.com with SMTP id c15-v6so978093oic.2
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 02:29:56 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1f8jab-0000oI-8H
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 05:41:22 -0400
+Date: Wed, 18 Apr 2018 11:41:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180418094105.GD4971@localhost.localdomain>
+References: <20180405170619.20480-1-kwolf@redhat.com>
+	<20180406080406.GA4850@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
-References: <CAMxP3BSFEuknshd05kSn8EjNuv8F8aPGuNFG3qUd0Ap6GbZFrQ@mail.gmail.com>
-	<18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
-	<CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
-	<CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Apr 2018 10:29:35 +0100
-Message-ID: <CAFEAcA-sGiZFdAa8Gnfbo_=o-ZZbChyDJAV9oGmMTBC8BNS3sQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Latest v2.12.0-rc4 has compiling error, rc3 is OK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180406080406.GA4850@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC][BROKEN] rbd: Allow
+ configuration of authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bob Chen <a175818323@gmail.com>
-Cc: Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-On 18 April 2018 at 09:09, Bob Chen <a175818323@gmail.com> wrote:
-> I found that it has nothing to do with the release version, but the github
-> one is just not able to work...
->
-> So what github and qemu.org provide are totally different things?
+Am 06.04.2018 um 10:04 hat Kevin Wolf geschrieben:
+> Am 05.04.2018 um 19:06 hat Kevin Wolf geschrieben:
+> > The legacy command line syntax supports a "password-secret" option that
+> > allows to pass an authentication key to Ceph. This was not supported in
+> > QMP so far.
+> > 
+> > This patch introduces authentication options in the QAPI schema, makes
+> > them do the corresponding rados_conf_set() calls and adds compatibility
+> > code that translates the old "password-secret" option both for opening
+> > and creating images to the new set of options.
+> > 
+> > Note that the old option didn't allow to explicitly specify the set of
+> > allowed authentication schemes. The compatibility code assumes that if
+> > "password-secret" is given, only the cephx scheme is allowed. If it's
+> > missing, both none and cephx are allowed because the configuration file
+> > could still provide a key.
+> 
+> There is another problem here that suggests that maybe this is not the
+> right QAPI schema after all: The defaults needed for command line
+> compatibility and those promised in the QAPI schema are conflicting.
+> 
+> The required command line behaviour is as described above:
+> 
+> * password-secret given: only cephx
+> * no options given: cephx, none
+> 
+> The desired QMP default behaviour is:
+> 
+> * auth-cephx given: allow cephx
+> * auth-none given: allow none
+> * both given: allow both
+> * no options given: error
+> 
+> In .bdrv_open() there is no way to distinguish the "no options given" of
+> the command line from that of QMP. The current implementation allows
+> everything if no options are given, i.e. it keeps existing command lines
+> working, but it doesn't correctly implement the behaviour described in
+> the QAPI schema.
+> 
+> I don't think changing the description of the QAPI schema would be a
+> good idea, it would be a rather surprising interface.
+> 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> > 
+> > This doesn't actually work correctly yet because the way that options
+> > are passed through the block layer (QAPI -> QemuOpts -> QDict). Before
+> > we fix or hack around this, let's make sure this is the schema that we
+> > want.
+> > 
+> > The two known problems are:
+> > 
+> > 1. QDict *options in qemu_rbd_open() may contain options either in their
+> >    proper QObject types (if passed from blockdev-add) or as strings
+> >    (-drive). Both forms can be mixed in the same options QDict.
+> > 
+> >    rbd uses the keyval visitor to convert the options into a QAPI
+> >    object. This means that it requires all options to be strings. This
+> >    patch, however, introduces a bool property, so the visitor breaks
+> >    when it gets its input from blockdev-add.
+> > 
+> >    Options to hack around the problem:
+> > 
+> >    a. Do an extra conversion step or two and go through QemuOpts like
+> >       some other block drivers. When I offered something like this to
+> >       Markus a while ago in a similar case, he rejected the idea.
+> > 
+> >    b. Introduce a qdict_stringify_entries() that just does what its name
+> >       says. It would be called before the running keyval visitor so that
+> >       only strings will be present in the QDict.
+> > 
+> >    c. Do a local one-off hack that checks if the entry with the key
+> >       "auth-none" is a QBool, and if so, overwrite it with a string. The
+> >       problem will reappear with the next non-string option.
+> > 
+> >    (d. Get rid of the QDict detour and work only with QAPI objects
+> >        everywhere. Support rbd authentication only in QEMU 4.0.)
+> > 
+> > 2. The proposed schema allows 'auth-cephx': {} as a valid option with
+> >    the meaning that the cephx authentication scheme is enabled, but no
+> >    key is given (e.g. it is taken from the config file).
+> > 
+> >    However, an empty dict cannot currently be represented by flattened
+> >    QDicts. We need to find a way to enable this. I think this will be
+> >    externally visible because it directly translates into the dotted
+> >    syntax of -blockdev, so we may want to be careful.
+> > 
+> > Any thoughts on the proposed QAPI schema or the two implementation
+> > problems are welcome.
 
-The "tarballs" from github don't work and can't work, but
-github provides no mechanism for the project to say "don't
-create this page". You can complain to github about this
-if you like.
+Ping?
 
-You're best off starting with the project's own web
-page: https://www.qemu.org/ -- we use github only as
-a sort of backup git server in case our own is down.
+If nobody has an opinion, we might as well just revert the revert and
+bring the legacy interface 1:1 to QMP.
 
-thanks
--- PMM
+Kevin
