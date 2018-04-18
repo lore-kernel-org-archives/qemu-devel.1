@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8mFd-0000gd-GZ
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1f8mFg-0000jW-Oh
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f8mFc-0003F8-5l
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1f8mFe-0003H1-0B
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:56 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 18 Apr 2018 14:31:44 +0200
-Message-Id: <1524054707-20663-2-git-send-email-thuth@redhat.com>
+Date: Wed, 18 Apr 2018 14:31:45 +0200
+Message-Id: <1524054707-20663-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1524054707-20663-1-git-send-email-thuth@redhat.com>
 References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.13 1/4] pc-bios/s390-ccw/net: Split up
- net_load() into init, load and uninit parts
+Subject: [Qemu-devel] [PATCH v1 for-2.13 2/4] pc-bios/s390-ccw/net: Stop
+ virtio-net device before jumping into the OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,174 +23,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-When we want to support pxelinux-style network booting later, we've got
-to do several TFTP transfers - and we do not want to apply for a new IP
-address via DHCP each time. So split up net_load into three parts:
-
-1. net_init(), which initializes virtio-net, gets an IP address via DHCP
-   and prints out the related information.
-
-2. The tftp_load call is now moved directly into the main() function
-
-3. A new net_uninit() function which should tear down the network stack
-   before we are done in the firmware.
-
-This will make it easier to extend the code in the next patches.
+The virtio-net receive buffers are filled asynchronously, so we should
+make sure to properly shut down the virtio-net device before we jump into
+the loaded kernel. Otherwise an incoming packet could destroy memory of
+the OS kernel if it did not re-initialize the virtio-net device fast
+enough yet.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/netmain.c | 63 +++++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 26 deletions(-)
+ pc-bios/s390-ccw/netmain.c    |  1 +
+ pc-bios/s390-ccw/virtio-net.c |  8 ++++++++
+ pc-bios/s390-ccw/virtio.c     | 19 ++++++++++++++-----
+ pc-bios/s390-ccw/virtio.h     |  3 +++
+ 4 files changed, 26 insertions(+), 5 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index d86d46b..ebdc440 100644
+index ebdc440..e11ed4e 100644
 --- a/pc-bios/s390-ccw/netmain.c
 +++ b/pc-bios/s390-ccw/netmain.c
-@@ -128,13 +128,13 @@ static void seed_rng(uint8_t mac[])
-     srand(seed);
- }
- 
--static int tftp_load(filename_ip_t *fnip, void *buffer, int len,
--                     unsigned int retries, int ip_vers)
-+static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
- {
-     tftp_err_t tftp_err;
-     int rc;
- 
--    rc = tftp(fnip, buffer, len, retries, &tftp_err, 1, 1428, ip_vers);
-+    rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
-+              ip_version);
- 
-     if (rc > 0) {
-         printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename,
-@@ -199,20 +199,19 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len,
-     return rc;
- }
- 
--static int net_load(char *buffer, int len)
-+static int net_init(filename_ip_t *fn_ip)
- {
--    filename_ip_t fn_ip;
-     uint8_t mac[6];
-     int rc;
- 
--    memset(&fn_ip, 0, sizeof(filename_ip_t));
-+    memset(fn_ip, 0, sizeof(filename_ip_t));
- 
-     rc = virtio_net_init(mac);
-     if (rc < 0) {
-         puts("Could not initialize network device");
-         return -101;
-     }
--    fn_ip.fd = rc;
-+    fn_ip->fd = rc;
- 
-     printf("  Using MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-@@ -220,10 +219,10 @@ static int net_load(char *buffer, int len)
-     set_mac_address(mac);    /* init ethernet layer */
-     seed_rng(mac);
- 
--    rc = dhcp(&fn_ip, DEFAULT_BOOT_RETRIES);
-+    rc = dhcp(fn_ip, DEFAULT_BOOT_RETRIES);
-     if (rc >= 0) {
-         if (ip_version == 4) {
--            set_ipv4_address(fn_ip.own_ip);
-+            set_ipv4_address(fn_ip->own_ip);
-         }
-     } else {
-         puts("Could not get IP address");
-@@ -232,18 +231,18 @@ static int net_load(char *buffer, int len)
- 
+@@ -273,6 +273,7 @@ static void net_uninit(filename_ip_t *fn_ip)
      if (ip_version == 4) {
-         printf("  Using IPv4 address: %d.%d.%d.%d\n",
--              (fn_ip.own_ip >> 24) & 0xFF, (fn_ip.own_ip >> 16) & 0xFF,
--              (fn_ip.own_ip >>  8) & 0xFF, fn_ip.own_ip & 0xFF);
-+              (fn_ip->own_ip >> 24) & 0xFF, (fn_ip->own_ip >> 16) & 0xFF,
-+              (fn_ip->own_ip >>  8) & 0xFF, fn_ip->own_ip & 0xFF);
-     } else if (ip_version == 6) {
-         char ip6_str[40];
--        ipv6_to_str(fn_ip.own_ip6.addr, ip6_str);
-+        ipv6_to_str(fn_ip->own_ip6.addr, ip6_str);
-         printf("  Using IPv6 address: %s\n", ip6_str);
+         dhcp_send_release(fn_ip->fd);
      }
- 
-     if (rc == -2) {
-         printf("ARP request to TFTP server (%d.%d.%d.%d) failed\n",
--               (fn_ip.server_ip >> 24) & 0xFF, (fn_ip.server_ip >> 16) & 0xFF,
--               (fn_ip.server_ip >>  8) & 0xFF, fn_ip.server_ip & 0xFF);
-+               (fn_ip->server_ip >> 24) & 0xFF, (fn_ip->server_ip >> 16) & 0xFF,
-+               (fn_ip->server_ip >>  8) & 0xFF, fn_ip->server_ip & 0xFF);
-         return -102;
-     }
-     if (rc == -4 || rc == -3) {
-@@ -251,28 +250,31 @@ static int net_load(char *buffer, int len)
-         return -107;
-     }
- 
-+    printf("  Using TFTP server: ");
-     if (ip_version == 4) {
--        printf("  Requesting file \"%s\" via TFTP from %d.%d.%d.%d\n",
--               fn_ip.filename,
--               (fn_ip.server_ip >> 24) & 0xFF, (fn_ip.server_ip >> 16) & 0xFF,
--               (fn_ip.server_ip >>  8) & 0xFF, fn_ip.server_ip & 0xFF);
-+        printf("%d.%d.%d.%d\n",
-+               (fn_ip->server_ip >> 24) & 0xFF, (fn_ip->server_ip >> 16) & 0xFF,
-+               (fn_ip->server_ip >>  8) & 0xFF, fn_ip->server_ip & 0xFF);
-     } else if (ip_version == 6) {
-         char ip6_str[40];
--        printf("  Requesting file \"%s\" via TFTP from ", fn_ip.filename);
--        ipv6_to_str(fn_ip.server_ip6.addr, ip6_str);
-+        ipv6_to_str(fn_ip->server_ip6.addr, ip6_str);
-         printf("%s\n", ip6_str);
-     }
- 
--    /* Do the TFTP load and print error message if necessary */
--    rc = tftp_load(&fn_ip, buffer, len, DEFAULT_TFTP_RETRIES, ip_version);
--
--    if (ip_version == 4) {
--        dhcp_send_release(fn_ip.fd);
-+    if (strlen((char *)fn_ip->filename) > 0) {
-+        printf("  Bootfile name: '%s'\n", fn_ip->filename);
-     }
- 
-     return rc;
++    virtio_net_uninit();
  }
  
-+static void net_uninit(filename_ip_t *fn_ip)
+ void panic(const char *string)
+diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-net.c
+index ff7f4da..339fe53 100644
+--- a/pc-bios/s390-ccw/virtio-net.c
++++ b/pc-bios/s390-ccw/virtio-net.c
+@@ -67,6 +67,14 @@ int virtio_net_init(void *mac_addr)
+     return 0;
+ }
+ 
++void virtio_net_uninit(void)
 +{
-+    if (ip_version == 4) {
-+        dhcp_send_release(fn_ip->fd);
-+    }
++    VDev *vdev = virtio_get_device();
++
++    virtio_status_set(vdev, VIRTIO_CONFIG_S_FAILED);
++    virtio_reset_dev(vdev);
 +}
 +
- void panic(const char *string)
+ int send(int fd, const void *buf, int len, int flags)
  {
-     sclp_print(string);
-@@ -344,6 +346,7 @@ static void virtio_setup(void)
+     VirtioNetHdr tx_hdr;
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index cdb66f4..1d15b03 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -248,10 +248,21 @@ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd)
+     return 0;
+ }
  
- void main(void)
++void virtio_status_set(VDev *vdev, uint8_t status)
++{
++    IPL_assert(
++        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) == 0,
++        "Could not write status to host");
++}
++
++void virtio_reset_dev(VDev *vdev)
++{
++    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
++}
++
+ void virtio_setup_ccw(VDev *vdev)
  {
-+    filename_ip_t fn_ip;
-     int rc;
+     int i, rc, cfg_size = 0;
+-    unsigned char status = VIRTIO_CONFIG_S_DRIVER_OK;
+     struct VirtioFeatureDesc {
+         uint32_t features;
+         uint8_t index;
+@@ -263,7 +274,7 @@ void virtio_setup_ccw(VDev *vdev)
+     vdev->config.blk.blk_size = 0; /* mark "illegal" - setup started... */
+     vdev->guessed_disk_nature = VIRTIO_GDN_NONE;
  
-     sclp_setup();
-@@ -351,7 +354,15 @@ void main(void)
+-    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
++    virtio_reset_dev(vdev);
  
-     virtio_setup();
+     switch (vdev->senseid.cu_model) {
+     case VIRTIO_ID_NET:
+@@ -320,9 +331,7 @@ void virtio_setup_ccw(VDev *vdev)
+         IPL_assert(run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info)) == 0,
+                    "Cannot set VQ info");
+     }
+-    IPL_assert(
+-        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) == 0,
+-        "Could not write status to host");
++    virtio_status_set(vdev, VIRTIO_CONFIG_S_DRIVER_OK);
+ }
  
--    rc = net_load(NULL, (long)_start);
-+    rc = net_init(&fn_ip);
-+    if (rc) {
-+        panic("Network initialization failed. Halting.\n");
-+    }
-+
-+    rc = tftp_load(&fn_ip, NULL, (long)_start);
-+
-+    net_uninit(&fn_ip);
-+
-     if (rc > 0) {
-         sclp_print("Network loading done, starting kernel...\n");
-         asm volatile (" lpsw 0(%0) " : : "r"(0) : "memory");
+ bool virtio_is_supported(SubChannelId schid)
+diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
+index 19fceb6..c2479be 100644
+--- a/pc-bios/s390-ccw/virtio.h
++++ b/pc-bios/s390-ccw/virtio.h
+@@ -277,8 +277,11 @@ void vring_send_buf(VRing *vr, void *p, int len, int flags);
+ int vr_poll(VRing *vr);
+ int vring_wait_reply(void);
+ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
++void virtio_status_set(VDev *vdev, uint8_t status);
++void virtio_reset_dev(VDev *vdev);
+ void virtio_setup_ccw(VDev *vdev);
+ 
+ int virtio_net_init(void *mac_addr);
++void virtio_net_uninit(void);
+ 
+ #endif /* VIRTIO_H */
 -- 
 1.8.3.1
