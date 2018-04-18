@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8ivN-0005J1-2Z
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:58:46 -0400
+	(envelope-from <peterx@redhat.com>) id 1f8ivP-0005KI-8E
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:58:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f8ivM-0003uQ-2C
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:58:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49348 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1f8ivN-0003wD-VG
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:58:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50824 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8ivL-0003u0-Sy
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:58:43 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8ivN-0003vb-Pl
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 04:58:45 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 680E781A88B4
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 08:58:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 542CF406805A
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 08:58:45 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 18 Apr 2018 16:58:30 +0800
-Message-Id: <20180418085831.12058-3-peterx@redhat.com>
+Date: Wed, 18 Apr 2018 16:58:31 +0800
+Message-Id: <20180418085831.12058-4-peterx@redhat.com>
 In-Reply-To: <20180418085831.12058-1-peterx@redhat.com>
 References: <20180418085831.12058-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] monitor: take mon_lock where proper
+Subject: [Qemu-devel] [PATCH 3/3] monitor: add lock to protect mon_fdsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +32,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com
 
-Went through all the montior.h APIs to make sure existing Monitor
-related APIs will always take the new monitor lock when necessary.
+Similar to previous patch, but introduce a new global big lock for
+mon_fdsets.  Take it where needed.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 33 +++++++++++++++++++++++++++------
- 1 file changed, 27 insertions(+), 6 deletions(-)
+ monitor.c | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 42 insertions(+), 6 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index c93aa4e22b..f4951cafbc 100644
+index f4951cafbc..40b5b56f66 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -306,16 +306,20 @@ void monitor_read_command(Monitor *mon, int show_prompt)
-     if (!mon->rs)
-         return;
+@@ -254,6 +254,9 @@ typedef struct QMPRequest QMPRequest;
+ /* Protects mon_list, monitor_event_state.  */
+ static QemuMutex monitor_lock;
  
-+    qemu_mutex_lock(&mon->mon_lock);
-     readline_start(mon->rs, "(qemu) ", 0, monitor_command_cb, NULL);
-     if (show_prompt)
-         readline_show_prompt(mon->rs);
-+    qemu_mutex_unlock(&mon->mon_lock);
- }
++/* Protects mon_fdsets */
++static QemuMutex mon_fdsets_lock;
++
+ static QTAILQ_HEAD(mon_list, Monitor) mon_list;
+ static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
+ static int mon_refcount;
+@@ -270,6 +273,16 @@ static QEMUClockType event_clock_type = QEMU_CLOCK_REALTIME;
+ static void monitor_command_cb(void *opaque, const char *cmdline,
+                                void *readline_opaque);
  
- int monitor_read_password(Monitor *mon, ReadLineFunc *readline_func,
-                           void *opaque)
- {
-     if (mon->rs) {
-+        qemu_mutex_lock(&mon->mon_lock);
-         readline_start(mon->rs, "Password: ", 1, readline_func, opaque);
-+        qemu_mutex_unlock(&mon->mon_lock);
-         /* prompt is printed on return from the command handler */
-         return 0;
-     } else {
-@@ -1308,8 +1312,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-     cur_mon->qmp.commands = &qmp_commands;
- }
- 
--/* set the current CPU defined by the user */
--int monitor_set_cpu(int cpu_index)
-+static int monitor_set_cpu_locked(Monitor *mon, int cpu_index)
- {
-     CPUState *cpu;
- 
-@@ -1317,15 +1320,28 @@ int monitor_set_cpu(int cpu_index)
-     if (cpu == NULL) {
-         return -1;
-     }
--    g_free(cur_mon->mon_cpu_path);
--    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
-+    g_free(mon->mon_cpu_path);
-+    mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
-     return 0;
- }
- 
-+/* set the current CPU defined by the user */
-+int monitor_set_cpu(int cpu_index)
++/*
++ * This lock can be used very early, even during param parsing.
++ * Meanwhile it can also be used even at the end of main.  Let's keep
++ * it initialized for the whole lifecycle of QEMU.
++ */
++static void __attribute__((constructor)) mon_fdsets_lock_init(void)
 +{
-+    int ret;
-+
-+    qemu_mutex_lock(&cur_mon->mon_lock);
-+    ret = monitor_set_cpu_locked(cur_mon, cpu_index);
-+    qemu_mutex_unlock(&cur_mon->mon_lock);
-+
-+    return ret;
++    qemu_mutex_init(&mon_fdsets_lock);
 +}
 +
- static CPUState *mon_get_cpu_sync(bool synchronize)
- {
-     CPUState *cpu;
+ /**
+  * Is @mon a QMP monitor?
+  */
+@@ -2308,9 +2321,11 @@ static void monitor_fdsets_cleanup(void)
+     MonFdset *mon_fdset;
+     MonFdset *mon_fdset_next;
  
-+    qemu_mutex_lock(&cur_mon->mon_lock);
-     if (cur_mon->mon_cpu_path) {
-         cpu = (CPUState *) object_resolve_path_type(cur_mon->mon_cpu_path,
-                                                     TYPE_CPU, NULL);
-@@ -1336,11 +1352,14 @@ static CPUState *mon_get_cpu_sync(bool synchronize)
++    qemu_mutex_lock(&mon_fdsets_lock);
+     QLIST_FOREACH_SAFE(mon_fdset, &mon_fdsets, next, mon_fdset_next) {
+         monitor_fdset_cleanup(mon_fdset);
      }
-     if (!cur_mon->mon_cpu_path) {
-         if (!first_cpu) {
-+            qemu_mutex_unlock(&cur_mon->mon_lock);
-             return NULL;
++    qemu_mutex_unlock(&mon_fdsets_lock);
+ }
+ 
+ AddfdInfo *qmp_add_fd(bool has_fdset_id, int64_t fdset_id, bool has_opaque,
+@@ -2345,6 +2360,7 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
+     MonFdsetFd *mon_fdset_fd;
+     char fd_str[60];
+ 
++    qemu_mutex_lock(&mon_fdsets_lock);
+     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+         if (mon_fdset->id != fdset_id) {
+             continue;
+@@ -2364,10 +2380,12 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
+             goto error;
          }
--        monitor_set_cpu(first_cpu->cpu_index);
-+        monitor_set_cpu_locked(cur_mon, first_cpu->cpu_index);
-         cpu = first_cpu;
+         monitor_fdset_cleanup(mon_fdset);
++        qemu_mutex_unlock(&mon_fdsets_lock);
+         return;
      }
-+    qemu_mutex_unlock(&cur_mon->mon_lock);
-+
-     if (synchronize) {
-         cpu_synchronize_state(cpu);
+ 
+ error:
++    qemu_mutex_unlock(&mon_fdsets_lock);
+     if (has_fd) {
+         snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64 ", fd:%" PRId64,
+                  fdset_id, fd);
+@@ -2383,6 +2401,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
+     MonFdsetFd *mon_fdset_fd;
+     FdsetInfoList *fdset_list = NULL;
+ 
++    qemu_mutex_lock(&mon_fdsets_lock);
+     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+         FdsetInfoList *fdset_info = g_malloc0(sizeof(*fdset_info));
+         FdsetFdInfoList *fdsetfd_list = NULL;
+@@ -2412,6 +2431,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
+         fdset_info->next = fdset_list;
+         fdset_list = fdset_info;
      }
-@@ -2239,6 +2258,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
++    qemu_mutex_unlock(&mon_fdsets_lock);
+ 
+     return fdset_list;
+ }
+@@ -2424,6 +2444,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
+     MonFdsetFd *mon_fdset_fd;
+     AddfdInfo *fdinfo;
+ 
++    qemu_mutex_lock(&mon_fdsets_lock);
+     if (has_fdset_id) {
+         QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+             /* Break if match found or match impossible due to ordering by ID */
+@@ -2444,6 +2465,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
+             if (fdset_id < 0) {
+                 error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "fdset-id",
+                            "a non-negative value");
++                qemu_mutex_unlock(&mon_fdsets_lock);
+                 return NULL;
+             }
+             /* Use specified fdset ID */
+@@ -2494,6 +2516,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
+     fdinfo->fdset_id = mon_fdset->id;
+     fdinfo->fd = mon_fdset_fd->fd;
+ 
++    qemu_mutex_unlock(&mon_fdsets_lock);
+     return fdinfo;
+ }
+ 
+@@ -2531,29 +2554,38 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
  {
-     mon_fd_t *monfd;
+     MonFdset *mon_fdset;
+     MonFdsetFd *mon_fdset_fd_dup;
++    int ret = -1;
  
-+    qemu_mutex_lock(&mon->mon_lock);
-     QLIST_FOREACH(monfd, &mon->fds, next) {
-         int fd;
- 
-@@ -2252,9 +2272,10 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-         QLIST_REMOVE(monfd, next);
-         g_free(monfd->name);
-         g_free(monfd);
--
-+        qemu_mutex_unlock(&mon->mon_lock);
-         return fd;
++    qemu_mutex_lock(&mon_fdsets_lock);
+     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+         if (mon_fdset->id != fdset_id) {
+             continue;
+         }
+         QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+             if (mon_fdset_fd_dup->fd == dup_fd) {
+-                return -1;
++                ret = -1;
++                goto out;
+             }
+         }
+         mon_fdset_fd_dup = g_malloc0(sizeof(*mon_fdset_fd_dup));
+         mon_fdset_fd_dup->fd = dup_fd;
+         QLIST_INSERT_HEAD(&mon_fdset->dup_fds, mon_fdset_fd_dup, next);
+-        return 0;
++        ret = 0;
++        break;
      }
-+    qemu_mutex_unlock(&mon->mon_lock);
+-    return -1;
++
++out:
++    qemu_mutex_unlock(&mon_fdsets_lock);
++    return ret;
+ }
  
-     error_setg(errp, "File descriptor named '%s' has not been found", fdname);
-     return -1;
+ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+ {
+     MonFdset *mon_fdset;
+     MonFdsetFd *mon_fdset_fd_dup;
++    int ret = -1;
+ 
++    qemu_mutex_lock(&mon_fdsets_lock);
+     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+         QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+             if (mon_fdset_fd_dup->fd == dup_fd) {
+@@ -2562,14 +2594,18 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+                     if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
+                         monitor_fdset_cleanup(mon_fdset);
+                     }
+-                    return -1;
++                    ret = -1;
++                    goto out;
+                 } else {
+-                    return mon_fdset->id;
++                    ret = mon_fdset->id;
++                    goto out;
+                 }
+             }
+         }
+     }
+-    return -1;
++out:
++    qemu_mutex_unlock(&mon_fdsets_lock);
++    return ret;
+ }
+ 
+ int monitor_fdset_dup_fd_find(int dup_fd)
 -- 
 2.14.3
