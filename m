@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f8o5F-0006r7-Go
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:29:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f8o5H-0006tE-7l
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f8o5C-0003y2-BF
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:29:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f8o5E-0003yu-Mz
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:29:19 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 18 Apr 2018 16:28:04 +0200
-Message-Id: <1524061685-83305-5-git-send-email-imammedo@redhat.com>
+Date: Wed, 18 Apr 2018 16:28:05 +0200
+Message-Id: <1524061685-83305-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1524061685-83305-1-git-send-email-imammedo@redhat.com>
 References: <1524061685-83305-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.13 v2 4/5] platform-bus-device: use
- device plug callback instead of machine_done notifier
+Subject: [Qemu-devel] [PATCH for-2.13 v2 5/5] arm/boot: split load_dtb()
+ from arm_load_kernel()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,390 +21,543 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com
 
-platform-bus were using machine_done notifier to get and map
-(assign irq/mmio resources) dynamically added sysbus devices
-after all '-device' options had been processed.
-That however creates non obvious dependencies on ordering of
-machine_done notifiers and requires carefull line juggling
-to keep it working. For example see comment above
-create_platform_bus() and 'straitforward' arm_load_kernel()
-had to converted to machine_done notifier and that lead to
-yet another machine_done notifier to keep it working
-arm_register_platform_bus_fdt_creator().
+load_dtb() depends on arm_load_kernel() to figure out place
+in RAM where it should be loaded, but it's not required for
+arm_load_kernel() to work. Sometimes it's neccesary for
+devices added with -device/device_add to be enumerated in
+DTB as well, which's lead to [1] and surrounding commits to
+add 2 more machine_done notifiers with non obvious ordering
+to make dynamic sysbus devices initialization happen in
+the right order.
 
-Instead of hiding resource assignment in platform-bus-device
-to magically initialize sysbus devices, use device plug
-callback and assign resources explicitly at board level
-at the moment each -device option is being processed.
+However instead of moving whole arm_load_kernel() in to
+machine_done, it's sufficient to move only load_dtb() into
+virt_machine_done() notifier and remove ArmLoadKernelNotifier/
+/PlatformBusFDTNotifierParams notifiers, which saves us ~90LOC
+and simplifies code flow quite a bit.
+Later would allow to consolidate DTB generation within one
+function for 'mach-virt' board and make it reentrant so it
+could generate updated DTB in device hotplug secenarios.
 
-That adds a bunch of machine declaration boiler plate to
-e500plat board, similar to ARM/x86 but gets rid of hidden
-machine_done notifier and would allow to remove the dependent
-notifiers in ARM code simplifying it and making code flow
-easier to follow.
+While at it rename load_dtb() to arm_load_dtb() since it's
+public now.
+
+Add additional field skip_dtb_autoload to struct arm_boot_info
+to allow manual DTB load later in mach-virt and to avoid touching
+all other boards to explicitly call arm_load_dtb().
+
+ 1) (ac9d32e hw/arm/boot: arm_load_kernel implemented as a machine init done notifier)
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: agraf@suse.de
-CC: david@gibson.dropbear.id.au
-CC: qemu-ppc@nongnu.org
-
 v2:
-  - don't save original MachineClass::get_hotplug_handler, just overwrite it.
-    (there isn't any use case for chaining get_hotplug_handler() yet,
-     so keep things simple for now) (David Gibson <david@gibson.dropbear.id.au>)
-  - s/hotpug/hotplug/ (Peter Maydell <peter.maydell@linaro.org>)
-  - ppc: rebase on top (ppc: e500: switch E500 based machines to full  machine definition)
+  - fix rebase conflicts due to dropped
+        [PATCH for-2.13 1/4] arm: reuse  arm_boot_address_space() in armv7m_load_kernel()
+  - add doc comment to new skip_dtb_autoload field
 ---
- hw/ppc/e500.h             |  5 +++++
- include/hw/arm/virt.h     |  1 +
- include/hw/platform-bus.h |  4 ++--
- hw/arm/sysbus-fdt.c       |  3 ---
- hw/arm/virt.c             | 31 +++++++++++++++++++++++++++++++
- hw/core/platform-bus.c    | 29 +++++------------------------
- hw/ppc/e500.c             | 38 +++++++++++++++++---------------------
- hw/ppc/e500plat.c         | 31 +++++++++++++++++++++++++++++++
- 8 files changed, 92 insertions(+), 50 deletions(-)
+ include/hw/arm/arm.h        | 44 +++++++++++++++++++++-------
+ include/hw/arm/sysbus-fdt.h | 37 +++++------------------
+ hw/arm/boot.c               | 71 ++++++++++++---------------------------------
+ hw/arm/sysbus-fdt.c         | 64 ++++------------------------------------
+ hw/arm/virt.c               | 64 +++++++++++++++++++---------------------
+ 5 files changed, 95 insertions(+), 185 deletions(-)
 
-diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-index 621403b..3fd9f82 100644
---- a/hw/ppc/e500.h
-+++ b/hw/ppc/e500.h
-@@ -2,11 +2,16 @@
- #define PPCE500_H
+diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+index ce769bd..7039956 100644
+--- a/include/hw/arm/arm.h
++++ b/include/hw/arm/arm.h
+@@ -39,15 +39,6 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+  */
+ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size);
  
- #include "hw/boards.h"
-+#include "hw/platform-bus.h"
- 
- typedef struct PPCE500MachineState {
-     /*< private >*/
-     MachineState parent_obj;
- 
-+    /* points to instance of TYPE_PLATFORM_BUS_DEVICE if
-+     * board supports dynamic sysbus devices
+-/*
+- * struct used as a parameter of the arm_load_kernel machine init
+- * done notifier
+- */
+-typedef struct {
+-    Notifier notifier; /* actual notifier */
+-    ARMCPU *cpu; /* handle to the first cpu object */
+-} ArmLoadKernelNotifier;
+-
+ /* arm_boot.c */
+ struct arm_boot_info {
+     uint64_t ram_size;
+@@ -56,6 +47,13 @@ struct arm_boot_info {
+     const char *initrd_filename;
+     const char *dtb_filename;
+     hwaddr loader_start;
++    hwaddr dtb_start;
++    hwaddr dtb_limit;
++    /* If set to True, arm_load_kernel() will not load DTB.
++     * It allows board to load DTB manually later.
++     * (default: False)
 +     */
-+    PlatformBusDevice *pbus_dev;
- } PPCE500MachineState;
++    bool skip_dtb_autoload;
+     /* multicore boards that use the default secondary core boot functions
+      * need to put the address of the secondary boot code, the boot reg,
+      * and the GIC address in the next 3 values, respectively. boards that
+@@ -95,7 +93,6 @@ struct arm_boot_info {
+      */
+     void (*modify_dtb)(const struct arm_boot_info *info, void *fdt);
+     /* machine init done notifier executing arm_load_dtb */
+-    ArmLoadKernelNotifier load_kernel_notifier;
+     /* Used internally by arm_boot.c */
+     int is_linux;
+     hwaddr initrd_start;
+@@ -143,6 +140,33 @@ struct arm_boot_info {
+  */
+ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info);
  
- typedef struct PPCE500MachineClass {
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index ba0c1a4..e4e3e46 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -91,6 +91,7 @@ typedef struct {
- typedef struct {
-     MachineState parent;
-     Notifier machine_done;
-+    DeviceState *platform_bus_dev;
-     FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
-index a00775c..19e20c5 100644
---- a/include/hw/platform-bus.h
-+++ b/include/hw/platform-bus.h
-@@ -37,8 +37,6 @@ typedef struct PlatformBusDevice PlatformBusDevice;
- struct PlatformBusDevice {
-     /*< private >*/
-     SysBusDevice parent_obj;
--    Notifier notifier;
--    bool done_gathering;
- 
-     /*< public >*/
-     uint32_t mmio_size;
-@@ -54,4 +52,6 @@ int platform_bus_get_irqn(PlatformBusDevice *platform_bus, SysBusDevice *sbdev,
- hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-                                   int n);
- 
-+void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev);
++AddressSpace *arm_boot_address_space(ARMCPU *cpu,
++                                     const struct arm_boot_info *info);
 +
- #endif /* HW_PLATFORM_BUS_H */
++/**
++ * arm_load_dtb() - load a device tree binary image into memory
++ * @addr:       the address to load the image at
++ * @binfo:      struct describing the boot environment
++ * @addr_limit: upper limit of the available memory area at @addr
++ * @as:         address space to load image to
++ *
++ * Load a device tree supplied by the machine or by the user  with the
++ * '-dtb' command line option, and put it at offset @addr in target
++ * memory.
++ *
++ * If @addr_limit contains a meaningful value (i.e., it is strictly greater
++ * than @addr), the device tree is only loaded if its size does not exceed
++ * the limit.
++ *
++ * Returns: the size of the device tree image on success,
++ *          0 if the image size exceeds the limit,
++ *          -1 on errors.
++ *
++ * Note: Must not be called unless have_dtb(binfo) is true.
++ */
++int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
++                 hwaddr addr_limit, AddressSpace *as);
++
+ /* Write a secure board setup routine with a dummy handler for SMCs */
+ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+                                             const struct arm_boot_info *info,
+diff --git a/include/hw/arm/sysbus-fdt.h b/include/hw/arm/sysbus-fdt.h
+index e15bb81..340c382 100644
+--- a/include/hw/arm/sysbus-fdt.h
++++ b/include/hw/arm/sysbus-fdt.h
+@@ -24,37 +24,14 @@
+ #ifndef HW_ARM_SYSBUS_FDT_H
+ #define HW_ARM_SYSBUS_FDT_H
+ 
+-#include "hw/arm/arm.h"
+-#include "qemu-common.h"
+-#include "hw/sysbus.h"
+-
+-/*
+- * struct that contains dimensioning parameters of the platform bus
+- */
+-typedef struct {
+-    hwaddr platform_bus_base; /* start address of the bus */
+-    hwaddr platform_bus_size; /* size of the bus */
+-    int platform_bus_first_irq; /* first hwirq assigned to the bus */
+-    int platform_bus_num_irqs; /* number of hwirq assigned to the bus */
+-} ARMPlatformBusSystemParams;
+-
+-/*
+- * struct that contains all relevant info to build the fdt nodes of
+- * platform bus and attached dynamic sysbus devices
+- * in the future might be augmented with additional info
+- * such as PHY, CLK handles ...
+- */
+-typedef struct {
+-    const ARMPlatformBusSystemParams *system_params;
+-    struct arm_boot_info *binfo;
+-    const char *intc; /* parent interrupt controller name */
+-} ARMPlatformBusFDTParams;
++#include "exec/hwaddr.h"
+ 
+ /**
+- * arm_register_platform_bus_fdt_creator - register a machine init done
+- * notifier that creates the device tree nodes of the platform bus and
+- * associated dynamic sysbus devices
++ * platform_bus_add_all_fdt_nodes - create all the platform bus nodes
++ *
++ * builds the parent platform bus node and all the nodes of dynamic
++ * sysbus devices attached to it.
+  */
+-void arm_register_platform_bus_fdt_creator(ARMPlatformBusFDTParams *fdt_params);
+-
++void platform_bus_add_all_fdt_nodes(void *fdt, const char *intc, hwaddr addr,
++                                    hwaddr bus_size, int irq_start);
+ #endif
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 9ae6ab2..1f89bc1 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -36,8 +36,8 @@
+ #define ARM64_TEXT_OFFSET_OFFSET    8
+ #define ARM64_MAGIC_OFFSET          56
+ 
+-static AddressSpace *arm_boot_address_space(ARMCPU *cpu,
+-                                            const struct arm_boot_info *info)
++AddressSpace *arm_boot_address_space(ARMCPU *cpu,
++                                     const struct arm_boot_info *info)
+ {
+     /* Return the address space to use for bootloader reads and writes.
+      * We prefer the secure address space if the CPU has it and we're
+@@ -486,29 +486,8 @@ static void fdt_add_psci_node(void *fdt)
+     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+ }
+ 
+-/**
+- * load_dtb() - load a device tree binary image into memory
+- * @addr:       the address to load the image at
+- * @binfo:      struct describing the boot environment
+- * @addr_limit: upper limit of the available memory area at @addr
+- * @as:         address space to load image to
+- *
+- * Load a device tree supplied by the machine or by the user  with the
+- * '-dtb' command line option, and put it at offset @addr in target
+- * memory.
+- *
+- * If @addr_limit contains a meaningful value (i.e., it is strictly greater
+- * than @addr), the device tree is only loaded if its size does not exceed
+- * the limit.
+- *
+- * Returns: the size of the device tree image on success,
+- *          0 if the image size exceeds the limit,
+- *          -1 on errors.
+- *
+- * Note: Must not be called unless have_dtb(binfo) is true.
+- */
+-static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+-                    hwaddr addr_limit, AddressSpace *as)
++int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
++                 hwaddr addr_limit, AddressSpace *as)
+ {
+     void *fdt = NULL;
+     int size, rc;
+@@ -935,7 +914,7 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
+     return size;
+ }
+ 
+-static void arm_load_kernel_notify(Notifier *notifier, void *data)
++void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+ {
+     CPUState *cs;
+     int kernel_size;
+@@ -945,11 +924,6 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+     int elf_machine;
+     hwaddr entry;
+     static const ARMInsnFixup *primary_loader;
+-    ArmLoadKernelNotifier *n = DO_UPCAST(ArmLoadKernelNotifier,
+-                                         notifier, notifier);
+-    ARMCPU *cpu = n->cpu;
+-    struct arm_boot_info *info =
+-        container_of(n, struct arm_boot_info, load_kernel_notifier);
+     AddressSpace *as = arm_boot_address_space(cpu, info);
+ 
+     /* The board code is not supposed to set secure_board_setup unless
+@@ -968,9 +942,7 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+              * the kernel is supposed to be loaded by the bootloader), copy the
+              * DTB to the base of RAM for the bootloader to pick up.
+              */
+-            if (load_dtb(info->loader_start, info, 0, as) < 0) {
+-                exit(1);
+-            }
++            info->dtb_start = info->loader_start;
+         }
+ 
+         if (info->kernel_filename) {
+@@ -1050,15 +1022,14 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+          */
+         if (elf_low_addr > info->loader_start
+             || elf_high_addr < info->loader_start) {
+-            /* Pass elf_low_addr as address limit to load_dtb if it may be
++            /* Set elf_low_addr as address limit for arm_load_dtb if it may be
+              * pointing into RAM, otherwise pass '0' (no limit)
+              */
+             if (elf_low_addr < info->loader_start) {
+                 elf_low_addr = 0;
+             }
+-            if (load_dtb(info->loader_start, info, elf_low_addr, as) < 0) {
+-                exit(1);
+-            }
++            info->dtb_start = info->loader_start;
++            info->dtb_limit = elf_low_addr;
+         }
+     }
+     entry = elf_entry;
+@@ -1116,7 +1087,6 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+          */
+         if (have_dtb(info)) {
+             hwaddr align;
+-            hwaddr dtb_start;
+ 
+             if (elf_machine == EM_AARCH64) {
+                 /*
+@@ -1136,11 +1106,9 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+             }
+ 
+             /* Place the DTB after the initrd in memory with alignment. */
+-            dtb_start = QEMU_ALIGN_UP(info->initrd_start + initrd_size, align);
+-            if (load_dtb(dtb_start, info, 0, as) < 0) {
+-                exit(1);
+-            }
+-            fixupcontext[FIXUP_ARGPTR] = dtb_start;
++            info->dtb_start = QEMU_ALIGN_UP(info->initrd_start + initrd_size,
++                                           align);
++            fixupcontext[FIXUP_ARGPTR] = info->dtb_start;
+         } else {
+             fixupcontext[FIXUP_ARGPTR] = info->loader_start + KERNEL_ARGS_ADDR;
+             if (info->ram_size >= (1ULL << 32)) {
+@@ -1173,15 +1141,6 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+     for (cs = CPU(cpu); cs; cs = CPU_NEXT(cs)) {
+         ARM_CPU(cs)->env.boot_info = info;
+     }
+-}
+-
+-void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+-{
+-    CPUState *cs;
+-
+-    info->load_kernel_notifier.cpu = cpu;
+-    info->load_kernel_notifier.notifier.notify = arm_load_kernel_notify;
+-    qemu_add_machine_init_done_notifier(&info->load_kernel_notifier.notifier);
+ 
+     /* CPU objects (unlike devices) are not automatically reset on system
+      * reset, so we must always register a handler to do so. If we're
+@@ -1191,6 +1150,12 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+     for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+         qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+     }
++
++    if (!info->skip_dtb_autoload) {
++        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
++            exit(1);
++        }
++    }
+ }
+ 
+ static const TypeInfo arm_linux_boot_if_info = {
 diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index d68e3dc..80ff70e 100644
+index 80ff70e..a4dea93 100644
 --- a/hw/arm/sysbus-fdt.c
 +++ b/hw/arm/sysbus-fdt.c
-@@ -506,9 +506,6 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
+@@ -49,15 +49,6 @@ typedef struct PlatformBusFDTData {
+     PlatformBusDevice *pbus;
+ } PlatformBusFDTData;
+ 
+-/*
+- * struct used when calling the machine init done notifier
+- * that constructs the fdt nodes of platform bus devices
+- */
+-typedef struct PlatformBusFDTNotifierParams {
+-    Notifier notifier;
+-    ARMPlatformBusFDTParams *fdt_params;
+-} PlatformBusFDTNotifierParams;
+-
+ /* struct that associates a device type name and a node creation function */
+ typedef struct NodeCreationPair {
+     const char *typename;
+@@ -453,42 +444,17 @@ static void add_fdt_node(SysBusDevice *sbdev, void *opaque)
+     exit(1);
+ }
+ 
+-/**
+- * add_all_platform_bus_fdt_nodes - create all the platform bus nodes
+- *
+- * builds the parent platform bus node and all the nodes of dynamic
+- * sysbus devices attached to it.
+- */
+-static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
++void platform_bus_add_all_fdt_nodes(void *fdt, const char *intc, hwaddr addr,
++                                    hwaddr bus_size, int irq_start)
+ {
+     const char platcomp[] = "qemu,platform\0simple-bus";
+-    PlatformBusDevice *pbus;
+     DeviceState *dev;
++    PlatformBusDevice *pbus;
+     gchar *node;
+-    uint64_t addr, size;
+-    int irq_start, dtb_size;
+-    struct arm_boot_info *info = fdt_params->binfo;
+-    const ARMPlatformBusSystemParams *params = fdt_params->system_params;
+-    const char *intc = fdt_params->intc;
+-    void *fdt = info->get_dtb(info, &dtb_size);
+-
+-    /*
+-     * If the user provided a dtb, we assume the dynamic sysbus nodes
+-     * already are integrated there. This corresponds to a use case where
+-     * the dynamic sysbus nodes are complex and their generation is not yet
+-     * supported. In that case the user can take charge of the guest dt
+-     * while qemu takes charge of the qom stuff.
+-     */
+-    if (info->dtb_filename) {
+-        return;
+-    }
+ 
+     assert(fdt);
+ 
+-    node = g_strdup_printf("/platform@%"PRIx64, params->platform_bus_base);
+-    addr = params->platform_bus_base;
+-    size = params->platform_bus_size;
+-    irq_start = params->platform_bus_first_irq;
++    node = g_strdup_printf("/platform@%"PRIx64, addr);
+ 
+     /* Create a /platform node that we can put all devices into */
+     qemu_fdt_add_subnode(fdt, node);
+@@ -499,10 +465,11 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
+      */
+     qemu_fdt_setprop_cells(fdt, node, "#size-cells", 1);
+     qemu_fdt_setprop_cells(fdt, node, "#address-cells", 1);
+-    qemu_fdt_setprop_cells(fdt, node, "ranges", 0, addr >> 32, addr, size);
++    qemu_fdt_setprop_cells(fdt, node, "ranges", 0, addr >> 32, addr, bus_size);
+ 
+     qemu_fdt_setprop_phandle(fdt, node, "interrupt-parent", intc);
+ 
++
      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
      pbus = PLATFORM_BUS_DEVICE(dev);
  
--    /* We can only create dt nodes for dynamic devices when they're ready */
--    assert(pbus->done_gathering);
--
-     PlatformBusFDTData data = {
-         .fdt = fdt,
-         .irq_start = irq_start,
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 94dcb12..112c367 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1087,6 +1087,7 @@ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-     qdev_prop_set_uint32(dev, "mmio_size",
-         platform_bus_params.platform_bus_size);
-     qdev_init_nofail(dev);
-+    vms->platform_bus_dev = dev;
-     s = SYS_BUS_DEVICE(dev);
- 
-     for (i = 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
-@@ -1536,9 +1537,33 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
- 
-+static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-+                                        DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+        if (vms->platform_bus_dev) {
-+            platform_bus_link_device(PLATFORM_BUS_DEVICE(vms->platform_bus_dev),
-+                                     SYS_BUS_DEVICE(dev));
-+        }
-+    }
-+}
-+
-+static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-+                                                        DeviceState *dev)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+        return HOTPLUG_HANDLER(machine);
-+    }
-+
-+    return NULL;
-+}
-+
- static void virt_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
- 
-     mc->init = machvirt_init;
-     /* Start max_cpus at the maximum QEMU supports. We'll further restrict
-@@ -1557,6 +1582,8 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-+    mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-+    hc->plug = virt_machine_device_plug_cb;
- }
- 
- static const TypeInfo virt_machine_info = {
-@@ -1566,6 +1593,10 @@ static const TypeInfo virt_machine_info = {
-     .instance_size = sizeof(VirtMachineState),
-     .class_size    = sizeof(VirtMachineClass),
-     .class_init    = virt_machine_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+         { TYPE_HOTPLUG_HANDLER },
-+         { }
-+    },
- };
- 
- static void machvirt_machine_init(void)
-diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-index 33d32fb..807cb5c 100644
---- a/hw/core/platform-bus.c
-+++ b/hw/core/platform-bus.c
-@@ -103,7 +103,6 @@ static void plaform_bus_refresh_irqs(PlatformBusDevice *pbus)
- {
-     bitmap_zero(pbus->used_irqs, pbus->num_irqs);
-     foreach_dynamic_sysbus_device(platform_bus_count_irqs, pbus);
--    pbus->done_gathering = true;
- }
- 
- static void platform_bus_map_irq(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-@@ -163,12 +162,11 @@ static void platform_bus_map_mmio(PlatformBusDevice *pbus, SysBusDevice *sbdev,
- }
- 
- /*
-- * For each sysbus device, look for unassigned IRQ lines as well as
-- * unassociated MMIO regions. Connect them to the platform bus if available.
-+ * Look for unassigned IRQ lines as well as unassociated MMIO regions.
-+ * Connect them to the platform bus if available.
-  */
--static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
-+void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev)
- {
--    PlatformBusDevice *pbus = opaque;
-     int i;
- 
-     for (i = 0; sysbus_has_irq(sbdev, i); i++) {
-@@ -180,19 +178,6 @@ static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
-     }
- }
- 
--static void platform_bus_init_notify(Notifier *notifier, void *data)
--{
--    PlatformBusDevice *pb = container_of(notifier, PlatformBusDevice, notifier);
--
--    /*
--     * Generate a bitmap of used IRQ lines, as the user might have specified
--     * them on the command line.
--     */
--    plaform_bus_refresh_irqs(pb);
--
--    foreach_dynamic_sysbus_device(link_sysbus_device, pb);
--}
--
- static void platform_bus_realize(DeviceState *dev, Error **errp)
- {
-     PlatformBusDevice *pbus;
-@@ -211,12 +196,8 @@ static void platform_bus_realize(DeviceState *dev, Error **errp)
-         sysbus_init_irq(d, &pbus->irqs[i]);
-     }
- 
--    /*
--     * Register notifier that allows us to gather dangling devices once the
--     * machine is completely assembled
--     */
--    pbus->notifier.notify = platform_bus_init_notify;
--    qemu_add_machine_init_done_notifier(&pbus->notifier);
-+    /* some devices might be initialized before so update used IRQs map */
-+    plaform_bus_refresh_irqs(pbus);
- }
- 
- static Property platform_bus_properties[] = {
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 30b42a8..e91a5f6 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -221,16 +221,15 @@ static void sysbus_device_create_devtree(SysBusDevice *sbdev, void *opaque)
-     }
- }
- 
--static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
-+static void platform_bus_create_devtree(PPCE500MachineState *pms,
-                                         void *fdt, const char *mpic)
- {
-+    const PPCE500MachineClass *pmc = PPCE500_MACHINE_GET_CLASS(pms);
-     gchar *node = g_strdup_printf("/platform@%"PRIx64, pmc->platform_bus_base);
-     const char platcomp[] = "qemu,platform\0simple-bus";
-     uint64_t addr = pmc->platform_bus_base;
-     uint64_t size = pmc->platform_bus_size;
-     int irq_start = pmc->platform_bus_first_irq;
--    PlatformBusDevice *pbus;
--    DeviceState *dev;
- 
-     /* Create a /platform node that we can put all devices into */
- 
-@@ -245,22 +244,17 @@ static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
- 
-     qemu_fdt_setprop_phandle(fdt, node, "interrupt-parent", mpic);
- 
--    dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
--    pbus = PLATFORM_BUS_DEVICE(dev);
--
--    /* We can only create dt nodes for dynamic devices when they're ready */
--    if (pbus->done_gathering) {
--        PlatformDevtreeData data = {
--            .fdt = fdt,
--            .mpic = mpic,
--            .irq_start = irq_start,
--            .node = node,
--            .pbus = pbus,
--        };
-+    /* Create dt nodes for dynamic devices */
-+    PlatformDevtreeData data = {
-+        .fdt = fdt,
-+        .mpic = mpic,
-+        .irq_start = irq_start,
-+        .node = node,
-+        .pbus = pms->pbus_dev,
-+    };
- 
--        /* Loop through all dynamic sysbus devices and create nodes for them */
--        foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
--    }
-+    /* Loop through all dynamic sysbus devices and create nodes for them */
-+    foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
+@@ -518,22 +485,3 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
  
      g_free(node);
  }
-@@ -527,8 +521,8 @@ static int ppce500_load_device_tree(PPCE500MachineState *pms,
-         create_dt_mpc8xxx_gpio(fdt, soc, mpic);
+-
+-static void platform_bus_fdt_notify(Notifier *notifier, void *data)
+-{
+-    PlatformBusFDTNotifierParams *p = DO_UPCAST(PlatformBusFDTNotifierParams,
+-                                                notifier, notifier);
+-
+-    add_all_platform_bus_fdt_nodes(p->fdt_params);
+-    g_free(p->fdt_params);
+-    g_free(p);
+-}
+-
+-void arm_register_platform_bus_fdt_creator(ARMPlatformBusFDTParams *fdt_params)
+-{
+-    PlatformBusFDTNotifierParams *p = g_new(PlatformBusFDTNotifierParams, 1);
+-
+-    p->fdt_params = fdt_params;
+-    p->notifier.notify = platform_bus_fdt_notify;
+-    qemu_add_machine_init_done_notifier(&p->notifier);
+-}
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 112c367..1402149 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -93,8 +93,6 @@
+ 
+ #define PLATFORM_BUS_NUM_IRQS 64
+ 
+-static ARMPlatformBusSystemParams platform_bus_params;
+-
+ /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+  * RAM can go up to the 256GB mark, leaving 256GB of the physical
+  * address space unallocated and free for future use between 256G and 512G.
+@@ -1063,40 +1061,23 @@ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
+     DeviceState *dev;
+     SysBusDevice *s;
+     int i;
+-    ARMPlatformBusFDTParams *fdt_params = g_new(ARMPlatformBusFDTParams, 1);
+     MemoryRegion *sysmem = get_system_memory();
+ 
+-    platform_bus_params.platform_bus_base = vms->memmap[VIRT_PLATFORM_BUS].base;
+-    platform_bus_params.platform_bus_size = vms->memmap[VIRT_PLATFORM_BUS].size;
+-    platform_bus_params.platform_bus_first_irq = vms->irqmap[VIRT_PLATFORM_BUS];
+-    platform_bus_params.platform_bus_num_irqs = PLATFORM_BUS_NUM_IRQS;
+-
+-    fdt_params->system_params = &platform_bus_params;
+-    fdt_params->binfo = &vms->bootinfo;
+-    fdt_params->intc = "/intc";
+-    /*
+-     * register a machine init done notifier that creates the device tree
+-     * nodes of the platform bus and its children dynamic sysbus devices
+-     */
+-    arm_register_platform_bus_fdt_creator(fdt_params);
+-
+     dev = qdev_create(NULL, TYPE_PLATFORM_BUS_DEVICE);
+     dev->id = TYPE_PLATFORM_BUS_DEVICE;
+-    qdev_prop_set_uint32(dev, "num_irqs",
+-        platform_bus_params.platform_bus_num_irqs);
+-    qdev_prop_set_uint32(dev, "mmio_size",
+-        platform_bus_params.platform_bus_size);
++    qdev_prop_set_uint32(dev, "num_irqs", PLATFORM_BUS_NUM_IRQS);
++    qdev_prop_set_uint32(dev, "mmio_size", vms->memmap[VIRT_PLATFORM_BUS].size);
+     qdev_init_nofail(dev);
+     vms->platform_bus_dev = dev;
+-    s = SYS_BUS_DEVICE(dev);
+ 
+-    for (i = 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
+-        int irqn = platform_bus_params.platform_bus_first_irq + i;
++    s = SYS_BUS_DEVICE(dev);
++    for (i = 0; i < PLATFORM_BUS_NUM_IRQS; i++) {
++        int irqn = vms->irqmap[VIRT_PLATFORM_BUS] + i;
+         sysbus_connect_irq(s, i, pic[irqn]);
      }
  
--    if (pmc->has_platform_bus) {
--        platform_bus_create_devtree(pmc, fdt, mpic);
-+    if (pms->pbus_dev) {
-+        platform_bus_create_devtree(pms, fdt, mpic);
-     }
- 
-     pmc->fixup_devtree(fdt);
-@@ -946,8 +940,9 @@ void ppce500_init(MachineState *machine)
-         qdev_prop_set_uint32(dev, "num_irqs", pmc->platform_bus_num_irqs);
-         qdev_prop_set_uint32(dev, "mmio_size", pmc->platform_bus_size);
-         qdev_init_nofail(dev);
--        s = SYS_BUS_DEVICE(dev);
-+        pms->pbus_dev = PLATFORM_BUS_DEVICE(dev);
- 
-+        s = SYS_BUS_DEVICE(pms->pbus_dev);
-         for (i = 0; i < pmc->platform_bus_num_irqs; i++) {
-             int irqn = pmc->platform_bus_first_irq + i;
-             sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
-@@ -1090,6 +1085,7 @@ static const TypeInfo ppce500_info = {
-     .name          = TYPE_PPCE500_MACHINE,
-     .parent        = TYPE_MACHINE,
-     .abstract      = true,
-+    .instance_size = sizeof(PPCE500MachineState),
-     .class_size    = sizeof(PPCE500MachineClass),
- };
- 
-diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-index f69aadb..1a469ba 100644
---- a/hw/ppc/e500plat.c
-+++ b/hw/ppc/e500plat.c
-@@ -43,13 +43,40 @@ static void e500plat_init(MachineState *machine)
-     ppce500_init(machine);
+     memory_region_add_subregion(sysmem,
+-                                platform_bus_params.platform_bus_base,
++                                vms->memmap[VIRT_PLATFORM_BUS].base,
+                                 sysbus_mmio_get_region(s, 0));
  }
  
-+static void e500plat_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp)
-+{
-+    PPCE500MachineState *pms = PPCE500_MACHINE(hotplug_dev);
-+
-+    if (pms->pbus_dev) {
-+        if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+            platform_bus_link_device(pms->pbus_dev, SYS_BUS_DEVICE(dev));
-+        }
-+    }
-+}
-+
-+static
-+HotplugHandler *e500plat_machine_get_hotpug_handler(MachineState *machine,
-+                                                    DeviceState *dev)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+        return HOTPLUG_HANDLER(machine);
-+    }
-+
-+    return NULL;
-+}
-+
- #define TYPE_E500PLAT_MACHINE  MACHINE_TYPE_NAME("ppce500")
- 
- static void e500plat_machine_class_init(ObjectClass *oc, void *data)
+@@ -1167,6 +1148,26 @@ void virt_machine_done(Notifier *notifier, void *data)
  {
-     PPCE500MachineClass *pmc = PPCE500_MACHINE_CLASS(oc);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
-     MachineClass *mc = MACHINE_CLASS(oc);
- 
-+    mc->get_hotplug_handler = e500plat_machine_get_hotpug_handler;
-+    hc->plug = e500plat_machine_device_plug_cb;
+     VirtMachineState *vms = container_of(notifier, VirtMachineState,
+                                          machine_done);
++    ARMCPU *cpu = ARM_CPU(first_cpu);
++    struct arm_boot_info *info = &vms->bootinfo;
++    AddressSpace *as = arm_boot_address_space(cpu, info);
 +
-     pmc->pci_first_slot = 0x1;
-     pmc->pci_nr_slots = PCI_SLOT_MAX - 1;
-     pmc->fixup_devtree = e500plat_fixup_devtree;
-@@ -77,6 +104,10 @@ static const TypeInfo e500plat_info = {
-     .name          = TYPE_E500PLAT_MACHINE,
-     .parent        = TYPE_PPCE500_MACHINE,
-     .class_init    = e500plat_machine_class_init,
-+    .interfaces    = (InterfaceInfo[]) {
-+         { TYPE_HOTPLUG_HANDLER },
-+         { }
++    /*
++     * If the user provided a dtb, we assume the dynamic sysbus nodes
++     * already are integrated there. This corresponds to a use case where
++     * the dynamic sysbus nodes are complex and their generation is not yet
++     * supported. In that case the user can take charge of the guest dt
++     * while qemu takes charge of the qom stuff.
++     */
++    if (info->dtb_filename == NULL) {
++        platform_bus_add_all_fdt_nodes(vms->fdt, "/intc",
++                                       vms->memmap[VIRT_PLATFORM_BUS].base,
++                                       vms->memmap[VIRT_PLATFORM_BUS].size,
++                                       vms->irqmap[VIRT_PLATFORM_BUS]);
 +    }
- };
++    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
++        exit(1);
++    }
  
- static void e500plat_register_types(void)
+     virt_acpi_setup(vms);
+     virt_build_smbios(vms);
+@@ -1394,8 +1395,7 @@ static void machvirt_init(MachineState *machine)
+     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
+     rom_set_fw(vms->fw_cfg);
+ 
+-    vms->machine_done.notify = virt_machine_done;
+-    qemu_add_machine_init_done_notifier(&vms->machine_done);
++    create_platform_bus(vms, pic);
+ 
+     vms->bootinfo.ram_size = machine->ram_size;
+     vms->bootinfo.kernel_filename = machine->kernel_filename;
+@@ -1405,16 +1405,12 @@ static void machvirt_init(MachineState *machine)
+     vms->bootinfo.board_id = -1;
+     vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+     vms->bootinfo.get_dtb = machvirt_dtb;
++    vms->bootinfo.skip_dtb_autoload = true;
+     vms->bootinfo.firmware_loaded = firmware_loaded;
+     arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
+ 
+-    /*
+-     * arm_load_kernel machine init done notifier registration must
+-     * happen before the platform_bus_create call. In this latter,
+-     * another notifier is registered which adds platform bus nodes.
+-     * Notifiers are executed in registration reverse order.
+-     */
+-    create_platform_bus(vms, pic);
++    vms->machine_done.notify = virt_machine_done;
++    qemu_add_machine_init_done_notifier(&vms->machine_done);
+ }
+ 
+ static bool virt_get_secure(Object *obj, Error **errp)
 -- 
 2.7.4
