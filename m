@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f8dPH-0002RC-4O
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 23:05:18 -0400
+	(envelope-from <famz@redhat.com>) id 1f8dPO-0002cH-2Y
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 23:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f8dPF-0002X5-S4
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 23:05:15 -0400
+	(envelope-from <famz@redhat.com>) id 1f8dPM-0002eL-En
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 23:05:22 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 18 Apr 2018 11:04:21 +0800
-Message-Id: <20180418030424.28980-5-famz@redhat.com>
+Date: Wed, 18 Apr 2018 11:04:22 +0800
+Message-Id: <20180418030424.28980-6-famz@redhat.com>
 In-Reply-To: <20180418030424.28980-1-famz@redhat.com>
 References: <20180418030424.28980-1-famz@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH v2 4/7] file-posix: Implement
- bdrv_co_copy_range
+Subject: [Qemu-devel] [RFC PATCH v2 5/7] iscsi: Implement copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,209 +22,354 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-With copy_file_range(2), we can implement the bdrv_co_copy_range
-semantics.
+Issue EXTENDED COPY (LID1) command to implement the copy_range API.
+
+The parameter data construction code is ported from libiscsi's
+iscsi-dd.c.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c      | 99 +++++++++++++++++++++++++++++++++++++++++++++++--
- include/block/raw-aio.h | 10 ++++-
- 2 files changed, 104 insertions(+), 5 deletions(-)
+ block/iscsi.c            | 266 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/scsi/constants.h |   3 +
+ 2 files changed, 269 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 3794c0007a..45ad543481 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -100,6 +100,7 @@
- #ifdef CONFIG_XFS
- #include <xfs/xfs.h>
- #endif
-+#include <sys/syscall.h>
+diff --git a/block/iscsi.c b/block/iscsi.c
+index f5aecfc883..7d17e03ad3 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -68,6 +68,7 @@ typedef struct IscsiLun {
+     QemuMutex mutex;
+     struct scsi_inquiry_logical_block_provisioning lbp;
+     struct scsi_inquiry_block_limits bl;
++    struct scsi_inquiry_device_designator *dd;
+     unsigned char *zeroblock;
+     /* The allocmap tracks which clusters (pages) on the iSCSI target are
+      * allocated and which are not. In case a target returns zeros for
+@@ -1740,6 +1741,29 @@ static QemuOptsList runtime_opts = {
+     },
+ };
  
- //#define DEBUG_BLOCK
- 
-@@ -185,6 +186,8 @@ typedef struct RawPosixAIOData {
- #define aio_ioctl_cmd   aio_nbytes /* for QEMU_AIO_IOCTL */
-     off_t aio_offset;
-     int aio_type;
-+    int fd2;
-+    off_t offset2;
- } RawPosixAIOData;
- 
- #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-@@ -1421,6 +1424,48 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
-     return -ENOTSUP;
- }
- 
-+#ifdef __NR_copy_file_range
-+#define HAS_COPY_FILE_RANGE
-+#endif
-+
-+#ifdef HAS_COPY_FILE_RANGE
-+static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
-+                             off_t *out_off, size_t len, unsigned int flags)
++static void iscsi_save_designator(IscsiLun *lun,
++                                  struct scsi_inquiry_device_identification *inq_di)
 +{
-+    return syscall(__NR_copy_file_range, in_fd, in_off, out_fd,
-+                   out_off, len, flags);
-+}
-+#endif
++    struct scsi_inquiry_device_designator *desig, *copy = NULL;
 +
-+static ssize_t handle_aiocb_copy_range(RawPosixAIOData *aiocb)
-+{
-+#ifndef HAS_COPY_FILE_RANGE
-+    return -ENOTSUP;
-+#else
-+    uint64_t bytes = aiocb->aio_nbytes;
-+    off_t in_off = aiocb->aio_offset;
-+    off_t out_off = aiocb->offset2;
-+
-+    while (bytes) {
-+        ssize_t ret = copy_file_range(aiocb->aio_fildes, &in_off,
-+                                      aiocb->fd2, &out_off,
-+                                      bytes, 0);
-+        if (ret == -EINTR) {
++    for (desig = inq_di->designators; desig; desig = desig->next) {
++        if (desig->association ||
++            desig->designator_type > SCSI_DESIGNATOR_TYPE_NAA) {
 +            continue;
 +        }
-+        if (ret < 0) {
-+            return -errno;
++        /* NAA works better than T10 vendor ID based designator. */
++        if (!copy || copy->designator_type < desig->designator_type) {
++            copy = desig;
 +        }
-+        if (!ret) {
-+            /* No progress (e.g. when beyond EOF), fall back to buffer I/O. */
-+            return -ENOTSUP;
-+        }
-+        bytes -= ret;
 +    }
-+    return 0;
-+#endif
++    if (copy) {
++        lun->dd = g_new(struct scsi_inquiry_device_designator, 1);
++        *lun->dd = *copy;
++        lun->dd->designator = g_malloc(copy->designator_length);
++        memcpy(lun->dd->designator, copy->designator, copy->designator_length);
++    }
 +}
 +
- static ssize_t handle_aiocb_discard(RawPosixAIOData *aiocb)
+ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+                       Error **errp)
  {
-     int ret = -EOPNOTSUPP;
-@@ -1501,6 +1546,9 @@ static int aio_worker(void *arg)
-     case QEMU_AIO_WRITE_ZEROES:
-         ret = handle_aiocb_write_zeroes(aiocb);
-         break;
-+    case QEMU_AIO_COPY_RANGE:
-+        ret = handle_aiocb_copy_range(aiocb);
-+        break;
-     default:
-         fprintf(stderr, "invalid aio request (0x%x)\n", aiocb->aio_type);
-         ret = -EINVAL;
-@@ -1511,9 +1559,10 @@ static int aio_worker(void *arg)
-     return ret;
+@@ -1922,6 +1946,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+         struct scsi_task *inq_task;
+         struct scsi_inquiry_logical_block_provisioning *inq_lbp;
+         struct scsi_inquiry_block_limits *inq_bl;
++        struct scsi_inquiry_device_identification *inq_di;
+         switch (inq_vpd->pages[i]) {
+         case SCSI_INQUIRY_PAGECODE_LOGICAL_BLOCK_PROVISIONING:
+             inq_task = iscsi_do_inquiry(iscsilun->iscsi, iscsilun->lun, 1,
+@@ -1947,6 +1972,17 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+                    sizeof(struct scsi_inquiry_block_limits));
+             scsi_free_scsi_task(inq_task);
+             break;
++        case SCSI_INQUIRY_PAGECODE_DEVICE_IDENTIFICATION:
++            inq_task = iscsi_do_inquiry(iscsilun->iscsi, iscsilun->lun, 1,
++                                    SCSI_INQUIRY_PAGECODE_DEVICE_IDENTIFICATION,
++                                    (void **) &inq_di, errp);
++            if (inq_task == NULL) {
++                ret = -EINVAL;
++                goto out;
++            }
++            iscsi_save_designator(iscsilun, inq_di);
++            scsi_free_scsi_task(inq_task);
++            break;
+         default:
+             break;
+         }
+@@ -2003,6 +2039,8 @@ static void iscsi_close(BlockDriverState *bs)
+         iscsi_logout_sync(iscsi);
+     }
+     iscsi_destroy_context(iscsi);
++    g_free(iscsilun->dd->designator);
++    g_free(iscsilun->dd);
+     g_free(iscsilun->zeroblock);
+     iscsi_allocmap_free(iscsilun);
+     qemu_mutex_destroy(&iscsilun->mutex);
+@@ -2184,6 +2222,230 @@ static void coroutine_fn iscsi_co_invalidate_cache(BlockDriverState *bs,
+     iscsi_allocmap_invalidate(iscsilun);
  }
  
--static int paio_submit_co(BlockDriverState *bs, int fd,
--                          int64_t offset, QEMUIOVector *qiov,
--                          int bytes, int type)
-+static int paio_submit_co_full(BlockDriverState *bs, int fd,
-+                               int64_t offset, int fd2, int64_t offset2,
-+                               QEMUIOVector *qiov,
-+                               int bytes, int type)
- {
-     RawPosixAIOData *acb = g_new(RawPosixAIOData, 1);
-     ThreadPool *pool;
-@@ -1521,6 +1570,8 @@ static int paio_submit_co(BlockDriverState *bs, int fd,
-     acb->bs = bs;
-     acb->aio_type = type;
-     acb->aio_fildes = fd;
-+    acb->fd2 = fd2;
-+    acb->offset2 = offset2;
- 
-     acb->aio_nbytes = bytes;
-     acb->aio_offset = offset;
-@@ -1536,6 +1587,13 @@ static int paio_submit_co(BlockDriverState *bs, int fd,
-     return thread_pool_submit_co(pool, aio_worker, acb);
- }
- 
-+static inline int paio_submit_co(BlockDriverState *bs, int fd,
-+                                 int64_t offset, QEMUIOVector *qiov,
-+                                 int bytes, int type)
-+{
-+    return paio_submit_co_full(bs, fd, offset, -1, 0, qiov, bytes, type);
-+}
-+
- static BlockAIOCB *paio_submit(BlockDriverState *bs, int fd,
-         int64_t offset, QEMUIOVector *qiov, int bytes,
-         BlockCompletionFunc *cb, void *opaque, int type)
-@@ -2312,6 +2370,35 @@ static void raw_abort_perm_update(BlockDriverState *bs)
-     raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
- }
- 
-+static int coroutine_fn raw_co_copy_range_from(BlockDriverState *bs,
-+                                  BdrvChild *src, uint64_t src_offset,
-+                                  BdrvChild *dst, uint64_t dst_offset,
-+                                  uint64_t bytes, BdrvRequestFlags flags)
++static int coroutine_fn iscsi_co_copy_range_from(BlockDriverState *bs,
++                                                 BdrvChild *src,
++                                                 uint64_t src_offset,
++                                                 BdrvChild *dst,
++                                                 uint64_t dst_offset,
++                                                 uint64_t bytes,
++                                                 BdrvRequestFlags flags)
 +{
 +    return bdrv_co_copy_range_to(src, src_offset, dst, dst_offset, bytes, flags);
 +}
 +
-+static int coroutine_fn raw_co_copy_range_to(BlockDriverState *bs,
-+                                             BdrvChild *src, uint64_t src_offset,
-+                                             BdrvChild *dst, uint64_t dst_offset,
-+                                             uint64_t bytes, BdrvRequestFlags flags)
++static struct scsi_task *iscsi_xcopy_task(int param_len)
 +{
-+    BDRVRawState *s = bs->opaque;
-+    BDRVRawState *src_s;
++    struct scsi_task *task;
 +
-+    assert(dst->bs == bs);
-+    if (src->bs->drv->bdrv_co_copy_range_to != raw_co_copy_range_to) {
++    task = g_new0(struct scsi_task, 1);
++
++    task->cdb[0]     = EXTENDED_COPY;
++    task->cdb[10]    = (param_len >> 24) & 0xFF;
++    task->cdb[11]    = (param_len >> 16) & 0xFF;
++    task->cdb[12]    = (param_len >> 8) & 0xFF;
++    task->cdb[13]    = param_len & 0xFF;
++    task->cdb_size   = 16;
++    task->xfer_dir   = SCSI_XFER_WRITE;
++    task->expxferlen = param_len;
++
++    return task;
++}
++
++static int iscsi_populate_target_desc(unsigned char *desc, IscsiLun *lun)
++{
++    struct scsi_inquiry_device_designator *dd = lun->dd;
++
++    memset(desc, 0, 32);
++    desc[0] = IDENT_DESCR_TGT_DESCR;
++    desc[4] = dd->code_set;
++    desc[5] = (dd->designator_type & 0xF)
++        | ((dd->association & 3) << 4);
++    desc[7] = dd->designator_length;
++    memcpy(desc + 8, dd->designator, dd->designator_length);
++
++    desc[28] = 0;
++    desc[29] = (lun->block_size >> 16) & 0xFF;
++    desc[30] = (lun->block_size >> 8) & 0xFF;
++    desc[31] = lun->block_size & 0xFF;
++
++    return 32;
++}
++
++static int iscsi_xcopy_desc_hdr(uint8_t *hdr, int dc, int cat, int src_index,
++                                int dst_index)
++{
++    int desc_len = 28;
++
++    hdr[0] = 0x02; /* BLK_TO_BLK_SEG_DESCR */
++    hdr[1] = ((dc << 1) | cat) & 0xFF;
++    hdr[2] = (desc_len >> 8) & 0xFF;
++    /* don't account for the first 4 bytes in descriptor header*/
++    hdr[3] = (desc_len - 4 /* SEG_DESC_SRC_INDEX_OFFSET */) & 0xFF;
++    hdr[4] = (src_index >> 8) & 0xFF;
++    hdr[5] = src_index & 0xFF;
++    hdr[6] = (dst_index >> 8) & 0xFF;
++    hdr[7] = dst_index & 0xFF;
++
++    return desc_len;
++}
++
++static int iscsi_xcopy_populate_desc(uint8_t *desc, int dc, int cat,
++                                     int src_index, int dst_index, int num_blks,
++                                     uint64_t src_lba, uint64_t dst_lba)
++{
++    int desc_len = iscsi_xcopy_desc_hdr(desc, dc, cat,
++                                        src_index, dst_index);
++
++    desc[10] = (num_blks >> 8) & 0xFF;
++    desc[11] = num_blks & 0xFF;
++    desc[12] = (src_lba >> 56) & 0xFF;
++    desc[13] = (src_lba >> 48) & 0xFF;
++    desc[14] = (src_lba >> 40) & 0xFF;
++    desc[15] = (src_lba >> 32) & 0xFF;
++    desc[16] = (src_lba >> 24) & 0xFF;
++    desc[17] = (src_lba >> 16) & 0xFF;
++    desc[18] = (src_lba >> 8) & 0xFF;
++    desc[19] = src_lba & 0xFF;
++    desc[20] = (dst_lba >> 56) & 0xFF;
++    desc[21] = (dst_lba >> 48) & 0xFF;
++    desc[22] = (dst_lba >> 40) & 0xFF;
++    desc[23] = (dst_lba >> 32) & 0xFF;
++    desc[24] = (dst_lba >> 24) & 0xFF;
++    desc[25] = (dst_lba >> 16) & 0xFF;
++    desc[26] = (dst_lba >> 8) & 0xFF;
++    desc[27] = dst_lba & 0xFF;
++
++    return desc_len;
++}
++
++static void iscsi_xcopy_populate_header(unsigned char *buf, int list_id, int str,
++                                        int list_id_usage, int prio,
++                                        int tgt_desc_len,
++                                        int seg_desc_len, int inline_data_len)
++{
++    buf[0] = list_id;
++    buf[1] = ((str & 1) << 5) | ((list_id_usage & 3) << 3) | (prio & 7);
++    buf[2] = (tgt_desc_len >> 8) & 0xFF;
++    buf[3] = tgt_desc_len & 0xFF;
++    buf[8] = (seg_desc_len >> 24) & 0xFF;
++    buf[9] = (seg_desc_len >> 16) & 0xFF;
++    buf[10] = (seg_desc_len >> 8) & 0xFF;
++    buf[11] = seg_desc_len & 0xFF;
++    buf[12] = (inline_data_len >> 24) & 0xFF;
++    buf[13] = (inline_data_len >> 16) & 0xFF;
++    buf[14] = (inline_data_len >> 8) & 0xFF;
++    buf[15] = inline_data_len & 0xFF;
++}
++
++static void iscsi_xcopy_data(struct iscsi_data *data,
++                             IscsiLun *src, int64_t src_lba,
++                             IscsiLun *dst, int64_t dst_lba,
++                             int num_blocks)
++{
++    uint8_t *buf;
++    int offset;
++    int tgt_desc_len, seg_desc_len;
++
++    data->size = XCOPY_DESC_OFFSET +
++                 32 * 2 +    /* IDENT_DESCR_TGT_DESCR */
++                 28;         /* BLK_TO_BLK_SEG_DESCR */
++    data->data = g_malloc0(data->size);
++    buf = data->data;
++
++    /* Initialise CSCD list with one src + one dst descriptor */
++    offset = XCOPY_DESC_OFFSET;
++    offset += iscsi_populate_target_desc(buf + offset, src);
++    offset += iscsi_populate_target_desc(buf + offset, dst);
++    tgt_desc_len = offset - XCOPY_DESC_OFFSET;
++
++    /* Initialise one segment descriptor */
++    seg_desc_len = iscsi_xcopy_populate_desc(buf + offset, 0, 0,
++                                             0, 1, num_blocks,
++                                             src_lba, dst_lba);
++    offset += seg_desc_len;
++
++    /* Initialise the parameter list header */
++    iscsi_xcopy_populate_header(buf, 1, 0, 2 /* LIST_ID_USAGE_DISCARD */,
++                                0, tgt_desc_len, seg_desc_len, 0);
++}
++
++static int coroutine_fn iscsi_co_copy_range_to(BlockDriverState *bs,
++                                               BdrvChild *src,
++                                               uint64_t src_offset,
++                                               BdrvChild *dst,
++                                               uint64_t dst_offset,
++                                               uint64_t bytes,
++                                               BdrvRequestFlags flags)
++{
++    IscsiLun *dst_lun = dst->bs->opaque;
++    IscsiLun *src_lun;
++    struct IscsiTask iscsi_task;
++    struct iscsi_data data;
++    int r = 0;
++    int block_size;
++
++    if (src->bs->drv->bdrv_co_copy_range_to != iscsi_co_copy_range_to) {
++        return -ENOTSUP;
++    }
++    src_lun = src->bs->opaque;
++
++    if (!src_lun->dd || !dst_lun->dd) {
++        return -ENOTSUP;
++    }
++    if (!is_byte_request_lun_aligned(dst_offset, bytes, dst_lun)) {
++        return -ENOTSUP;
++    }
++    if (!is_byte_request_lun_aligned(src_offset, bytes, src_lun)) {
++        return -ENOTSUP;
++    }
++    if (dst_lun->block_size != src_lun->block_size ||
++        !dst_lun->block_size) {
 +        return -ENOTSUP;
 +    }
 +
-+    src_s = src->opaque;
-+    if (fd_open(bs) < 0 || fd_open(bs) < 0) {
-+        return -EIO;
++    block_size = dst_lun->block_size;
++    iscsi_xcopy_data(&data,
++                     src_lun, src_offset / block_size,
++                     dst_lun, dst_offset / block_size,
++                     bytes / block_size);
++
++    iscsi_co_init_iscsitask(dst_lun, &iscsi_task);
++
++    qemu_mutex_lock(&dst_lun->mutex);
++    iscsi_task.task = iscsi_xcopy_task(data.size);
++retry:
++    if (iscsi_scsi_command_async(dst_lun->iscsi, dst_lun->lun,
++                                 iscsi_task.task, iscsi_co_generic_cb,
++                                 &data,
++                                 &iscsi_task) != 0) {
++        r = -EIO;
++        goto out_unlock;
 +    }
-+    return paio_submit_co_full(bs, src_s->fd, src_offset, s->fd, dst_offset,
-+                               NULL, bytes, QEMU_AIO_COPY_RANGE);
++
++    while (!iscsi_task.complete) {
++        iscsi_set_events(dst_lun);
++        qemu_mutex_unlock(&dst_lun->mutex);
++        qemu_coroutine_yield();
++        qemu_mutex_lock(&dst_lun->mutex);
++    }
++
++    if (iscsi_task.do_retry) {
++        iscsi_task.complete = 0;
++        goto retry;
++    }
++
++    if (iscsi_task.status != SCSI_STATUS_GOOD) {
++        r = iscsi_task.err_code;
++        goto out_unlock;
++    }
++
++out_unlock:
++    g_free(iscsi_task.task);
++    qemu_mutex_unlock(&dst_lun->mutex);
++    g_free(iscsi_task.err_str);
++    return r;
 +}
 +
- BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-@@ -2334,6 +2421,8 @@ BlockDriver bdrv_file = {
-     .bdrv_co_pwritev        = raw_co_pwritev,
-     .bdrv_aio_flush = raw_aio_flush,
-     .bdrv_aio_pdiscard = raw_aio_pdiscard,
-+    .bdrv_co_copy_range_from = raw_co_copy_range_from,
-+    .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-@@ -2811,6 +2900,10 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_co_pwritev        = raw_co_pwritev,
-     .bdrv_aio_flush	= raw_aio_flush,
-     .bdrv_aio_pdiscard   = hdev_aio_pdiscard,
-+    .bdrv_co_copy_range_from = raw_co_copy_range_from,
-+    .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-+    .bdrv_co_copy_range_from = raw_co_copy_range_from,
-+    .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
-index a4cdbbf1b7..324053020b 100644
---- a/include/block/raw-aio.h
-+++ b/include/block/raw-aio.h
-@@ -25,9 +25,15 @@
- #define QEMU_AIO_FLUSH        0x0008
- #define QEMU_AIO_DISCARD      0x0010
- #define QEMU_AIO_WRITE_ZEROES 0x0020
-+#define QEMU_AIO_COPY_RANGE   0x0040
- #define QEMU_AIO_TYPE_MASK \
--        (QEMU_AIO_READ|QEMU_AIO_WRITE|QEMU_AIO_IOCTL|QEMU_AIO_FLUSH| \
--         QEMU_AIO_DISCARD|QEMU_AIO_WRITE_ZEROES)
-+        (QEMU_AIO_READ | \
-+         QEMU_AIO_WRITE | \
-+         QEMU_AIO_IOCTL | \
-+         QEMU_AIO_FLUSH | \
-+         QEMU_AIO_DISCARD | \
-+         QEMU_AIO_WRITE_ZEROES | \
-+         QEMU_AIO_COPY_RANGE)
+ static QemuOptsList iscsi_create_opts = {
+     .name = "iscsi-create-opts",
+     .head = QTAILQ_HEAD_INITIALIZER(iscsi_create_opts.head),
+@@ -2218,6 +2480,8 @@ static BlockDriver bdrv_iscsi = {
  
- /* AIO flags */
- #define QEMU_AIO_MISALIGNED   0x1000
+     .bdrv_co_block_status  = iscsi_co_block_status,
+     .bdrv_co_pdiscard      = iscsi_co_pdiscard,
++    .bdrv_co_copy_range_from = iscsi_co_copy_range_from,
++    .bdrv_co_copy_range_to  = iscsi_co_copy_range_to,
+     .bdrv_co_pwrite_zeroes = iscsi_co_pwrite_zeroes,
+     .bdrv_co_readv         = iscsi_co_readv,
+     .bdrv_co_writev_flags  = iscsi_co_writev_flags,
+@@ -2253,6 +2517,8 @@ static BlockDriver bdrv_iser = {
+ 
+     .bdrv_co_block_status  = iscsi_co_block_status,
+     .bdrv_co_pdiscard      = iscsi_co_pdiscard,
++    .bdrv_co_copy_range_from = iscsi_co_copy_range_from,
++    .bdrv_co_copy_range_to  = iscsi_co_copy_range_to,
+     .bdrv_co_pwrite_zeroes = iscsi_co_pwrite_zeroes,
+     .bdrv_co_readv         = iscsi_co_readv,
+     .bdrv_co_writev_flags  = iscsi_co_writev_flags,
+diff --git a/include/scsi/constants.h b/include/scsi/constants.h
+index a141dd71f8..a4a393ff1f 100644
+--- a/include/scsi/constants.h
++++ b/include/scsi/constants.h
+@@ -311,4 +311,7 @@
+ #define MMC_PROFILE_HDDVD_RW_DL         0x005A
+ #define MMC_PROFILE_INVALID             0xFFFF
+ 
++#define XCOPY_DESC_OFFSET 16
++#define IDENT_DESCR_TGT_DESCR 0xE4
++
+ #endif
 -- 
 2.14.3
