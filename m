@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8o7o-0000ah-3Z
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:31:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8o8g-0001E8-Ez
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1f8o7l-0005U7-02
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:31:56 -0400
-Date: Wed, 18 Apr 2018 10:31:37 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20180418143137.GR24561@codeaurora.org>
-References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-	<1523997485-1905-22-git-send-email-alindsay@codeaurora.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8o8f-0005lA-Io
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 10:32:50 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180416181844.7851-1-marcandre.lureau@redhat.com>
+	<CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
+	<20180416184406.GC14488@redhat.com>
+	<CAFEAcA_uS7f-uf+-OkcskdHG3=eTgr92Mw46nk430q27-wve4g@mail.gmail.com>
+	<19b7bccd-2282-5c94-fe7c-68f72ccbaba7@amsat.org>
+	<CAJ+F1CJ4HurD8=OC+qhHSEuNDkO7_QQaiJtH_RVHSu4-xzrqag@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d6ab2b72-2694-6c78-d44d-edc3110d0a93@amsat.org>
+Date: Wed, 18 Apr 2018 11:32:36 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1523997485-1905-22-git-send-email-alindsay@codeaurora.org>
-Subject: Re: [Qemu-devel] [PATCH v4 21/21] target/arm: Send interrupts on
- PMU counter overflow
+In-Reply-To: <CAJ+F1CJ4HurD8=OC+qhHSEuNDkO7_QQaiJtH_RVHSu4-xzrqag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] mux: fix ctrl-a b again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-stable <qemu-stable@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Apr 17 16:38, Aaron Lindsay wrote:
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 046e37c..2efdc63 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -973,6 +986,11 @@ static uint64_t cycles_get_count(CPUARMState *env)
->  }
->  
->  #ifndef CONFIG_USER_ONLY
-> +static int64_t cycles_ns_per(uint64_t cycles)
-> +{
-> +    return ARM_CPU_FREQ / NANOSECONDS_PER_SECOND;
-> +}
+Hi Marc-André,
 
-This should be:
-    return (ARM_CPU_FREQ / NANOSECONDS_PER_SECOND) * cycles;
+On 04/18/2018 07:36 AM, Marc-André Lureau wrote:
+> In  commit cd9526ab7c04f2c32c63340b04401f6ed25682b9
+> Author: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Date:   Thu Mar 8 23:39:32 2018 +0100
+> 
+>     hw/isa/superio: Factor out the serial code from pc87312.c
+> 
+> You changed from:
+> 
+> -            if (chr == NULL) {
+> -                snprintf(name, sizeof(name), "ser%d", i);
+> -                chr = qemu_chr_new(name, "null");
+> -            }
+> 
+> to:
+> 
+> +            if (chr == NULL || chr->be) {
+> +                name = g_strdup_printf("discarding-serial%d", i);
+> +                chr = qemu_chr_new(name, "null");
+> +            } else {
+> +                name = g_strdup_printf("serial%d", i);
+> +            }
+> 
+> Why do you check if chr->be ? In case of a mux chardev, it may already
+> have an active frontend (yeah be is CharBackend which is the frontend,
+> I still can't grasp that either, please Paolo change your mind! ;).
+> And this is the job for a mux chardev, handling several frontends.
 
-This took me a while to catch because it doesn't actually affect
-functional correctness, but means QEMU slows down because the timer
-callback is called every ns...
+I was afraid this refactor could be related.
 
-> @@ -1215,13 +1259,24 @@ void pmccntr_op_start(CPUARMState *env)
->  void pmccntr_op_finish(CPUARMState *env)
->  {
->      if (pmu_counter_enabled(env, 31)) {
-> -        uint64_t prev_cycles = env->cp15.c15_ccnt_delta;
-> +#ifndef CONFIG_USER_ONLY
-> +        uint64_t delta = ((env->cp15.c9_pmcr & PMCRLC) ?
-> +                UINT64_MAX : UINT32_MAX) - (uint32_t)env->cp15.c15_ccnt + 1;
+IIRC I had troubles running "qemu-system-alpha -append console=srm" but
+I tried again with/without the chr->be check and it works fine...
 
-I also shouldn't be casting to a uint32_t if PMCR.LC is set. I've fixed
-these locally for the next round.
+Anyway the new code is buggy, this is wrong (simplified):
 
--Aaron
+ if (chr->be) chr = qemu_chr_new(name, "null");
 
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+> 
+> Furthermore, there is a better API for checking the limit of a
+> chardev: qemu_chr_is_busy(). Accessing char/fe internal structure
+> should warn you something could be done better.
+
+This method is static (unexposed).
