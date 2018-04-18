@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8ldT-0001NJ-81
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:52:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f8lgi-0002kr-8c
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8ldQ-00054a-3K
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:52:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57338 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f8ldP-00054S-VB
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:52:24 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<c5e3f942-2c0e-9809-32ae-df97eaf2b7cd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <762b3dc8-a86f-a21f-1e21-334ec46677ef@redhat.com>
-Date: Wed, 18 Apr 2018 13:52:19 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1f8lgf-0006oB-3j
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 07:55:48 -0400
+References: <20180416181844.7851-1-marcandre.lureau@redhat.com>
+	<CAFEAcA8sX8e9VHdOjhV9VabuVKW=HKiF-bHz3XhCEkRNEyjnDQ@mail.gmail.com>
+	<20180416184406.GC14488@redhat.com>
+	<CAFEAcA_uS7f-uf+-OkcskdHG3=eTgr92Mw46nk430q27-wve4g@mail.gmail.com>
+	<19b7bccd-2282-5c94-fe7c-68f72ccbaba7@amsat.org>
+	<CAJ+F1CJ4HurD8=OC+qhHSEuNDkO7_QQaiJtH_RVHSu4-xzrqag@mail.gmail.com>
+	<860de622-d4cc-d1bf-ae27-e4d70d5d22f0@redhat.com>
+	<CAJ+F1C+eHYnjZkqh=cFSm7Dw8Udbf-g+-Ck2sgVkqxFQhLxXjA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4a75a9c0-8cf5-5ec1-8edc-e768f360e96f@redhat.com>
+Date: Wed, 18 Apr 2018 13:55:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <c5e3f942-2c0e-9809-32ae-df97eaf2b7cd@redhat.com>
+In-Reply-To: <CAJ+F1C+eHYnjZkqh=cFSm7Dw8Udbf-g+-Ck2sgVkqxFQhLxXjA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] mux: fix ctrl-a b again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/18/18 11:43, Paolo Bonzini wrote:
-> On 18/04/2018 00:40, Laszlo Ersek wrote:
->> +#
->> +# Lists firmware types commonly used with QEMU virtual machines.
->> +#
->> +# @bios: The firmware was built from the SeaBIOS project.
->> +#
->> +# @slof: The firmware was built from the Slimline Open Firmware project.
->> +#
->> +# @uboot: The firmware was built from the U-Boot project.
->> +#
->> +# @uefi: The firmware was built from the edk2 (EFI Development Kit II) project.
->> +#
->> +# Since: 2.13
->> +##
->> +{ 'enum' : 'FirmwareType',
->> +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }
-> 
-> A very basic question (so not likely a suggestion for change).  Why
-> wouldn't these be features too?  For example a UEFI with CSM could
-> expose both uefi and bios, a u-boot with UEFI support could expose both
-> uboot and uefi, etc.
+On 18/04/2018 13:35, Marc-Andr=C3=A9 Lureau wrote:
+>> CharBackend is not the frontend, it is *used* by the front-end.  It is
+>> the qemu_chr_* functions that are named wrong (they're named according
+>> to the user rather than the recipient).
+> If I follow you and the naming, you have this in mind:
+>=20
+> - Chardev: stdio, mux, ringbuf, pty, file, null etc..
+> - CharBackend: the "user" end
+> - frontend: the "user"
 
-Good point. I considered "type" to be a given, from the initial
-brainstorming, but if Dan is OK with your suggestion, I can turn these
-into features as well.
+The frontend is the device, the monitor, etc.  The backend is how the
+frontend sees a Chardev, it never talks to it directly.
 
-> Perhaps there are two dimensions, the FirmwareType tells you how to
-> configure it and the FirmwareFeature tells you the APIs it exposes to
-> the guest?
+Perhaps the confusing part is that the backend is also how the Chardev
+talks to the frontend?
 
-I don't know enough firmware types to answer this :) I believe I agree
-about the FirmwareFeature statement (if we also include "platform
-requirements" there), but I have no clue about any generalizations for
-firmware configuration.
+Paolo
 
-Thanks,
-Laszlo
+> It is quite confusing to me that CharBackend is for the "user"
+> frontend, and the backend of Chardev.
+>
+> You have to switch your mind
+> depending on the context or the point of view.
+>=20
+>  I'd rather use that terminology:
+>=20
+> - ChardevBackend: stdio, mux, ringbuf, pty, file, null etc..
+> - CharFrontend: the "user" end
+> - frontend the "user"
+>=20
+> This way, there is only one direction from backend to frontend
+> (regardless of the point of view from chardev to frontend)
