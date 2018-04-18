@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1f8mhq-0001u7-If
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:01:03 -0400
+	(envelope-from <olaf@aepfle.de>) id 1f8mlz-0003SQ-NN
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1f8mhl-0003Ta-5l
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:01:02 -0400
-Date: Wed, 18 Apr 2018 15:00:40 +0200
+	(envelope-from <olaf@aepfle.de>) id 1f8mlt-0005Oo-Rs
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:05:19 -0400
+Date: Wed, 18 Apr 2018 15:04:49 +0200
 From: Olaf Hering <olaf@aepfle.de>
-Message-ID: <20180418150029.30c5d1bb.olaf@aepfle.de>
-In-Reply-To: <20180418124753.GM27579@redhat.com>
+Message-ID: <20180418150449.0cefd440.olaf@aepfle.de>
+In-Reply-To: <152405603679.1932.900049084322274960@71c20359a636>
 References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418124753.GM27579@redhat.com>
+	<152405603679.1932.900049084322274960@71c20359a636>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/DN7LZlIsuduvQZTnacYL_7M";
+	boundary="Sig_/=.VWlI_aO1xeAccL12h9kWX";
 	protocol="application/pgp-signature"
 Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
 List-Id: <qemu-devel.nongnu.org>
@@ -24,34 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: no-reply@patchew.org
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-trivial@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, kraxel@redhat.com, pbonzini@redhat.com
 
---Sig_/DN7LZlIsuduvQZTnacYL_7M
-Content-Type: text/plain; charset=UTF-8
+--Sig_/=.VWlI_aO1xeAccL12h9kWX
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Am Wed, 18 Apr 2018 13:47:53 +0100
-schrieb Daniel P. Berrang=C3=A9 <berrange@redhat.com>:
+Am Wed, 18 Apr 2018 05:53:58 -0700 (PDT)
+schrieb no-reply@patchew.org:
 
-> IIRC, one of Peters desired build targets required 2.22, but I guess we
-> missed this bug because that platform would not enable vfio functionality=
- ?
+> This series failed docker-build@min-glib build test.
 
-Does the check in configure need a wrap "if Linux", just as the Makefile do=
-es?
+I guess that test must be fixed either way because it does not test what it=
+ is supposed to test...
 
 Olaf
 
---Sig_/DN7LZlIsuduvQZTnacYL_7M
+--Sig_/=.VWlI_aO1xeAccL12h9kWX
 Content-Type: application/pgp-signature
 Content-Description: Digitale Signatur von OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCWtdBeAAKCRBdQqD6ppg2
-focNAJ4+3ZKIBxbc+HcMpF2RNI2LO9uyfQCdG2wu3phutai9uuGECZrd/WnNyo0=
-=I1vq
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCWtdCcQAKCRBdQqD6ppg2
+fqg6AJ0WOoSQgXga0Mkg4PKSc2ZKDxmjsQCgm8GzRqD4YAENlWcZnTrzuZq1BI4=
+=LSgf
 -----END PGP SIGNATURE-----
 
---Sig_/DN7LZlIsuduvQZTnacYL_7M--
+--Sig_/=.VWlI_aO1xeAccL12h9kWX--
