@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8nTE-0004Y9-Eg
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:50:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f8nTW-0004qh-Oe
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8nTD-0008Vu-JD
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:50:00 -0400
-References: <20180227155514.16721-1-eblake@redhat.com>
-	<20180227162944.17343-2-eblake@redhat.com>
-	<w51vaehpfzw.fsf@maestria.local.igalia.com>
-	<89477aaf-a1af-861d-fcd5-5bfe2143f8b8@redhat.com>
-	<w51po4pp54z.fsf@maestria.local.igalia.com>
-	<f1d1c403-1a2a-aee2-5fe6-7cfbb81339d6@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5430e92a-db1e-e853-e7d8-1b31cbfc0edc@redhat.com>
-Date: Wed, 18 Apr 2018 08:49:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1f8nTV-0000Cj-Nu
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:50:18 -0400
+Date: Wed, 18 Apr 2018 15:50:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180418135009.GF4971@localhost.localdomain>
+References: <20180405170619.20480-1-kwolf@redhat.com>
+	<99b844f2-7784-225a-37c4-77dad444fbd6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f1d1c403-1a2a-aee2-5fe6-7cfbb81339d6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dPKjYJMMpOLJSZ54fHoHi3GFKO0wQUSrr"
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] qcow2: Document some maximum size
- constraints
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="kORqDWCi7qDJ0mEj"
+Content-Disposition: inline
+In-Reply-To: <99b844f2-7784-225a-37c4-77dad444fbd6@redhat.com>
+Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
+ authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +25,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, jdurgin@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dPKjYJMMpOLJSZ54fHoHi3GFKO0wQUSrr
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <5430e92a-db1e-e853-e7d8-1b31cbfc0edc@redhat.com>
-Subject: Re: [PATCH v4 2/5] qcow2: Document some maximum size constraints
-References: <20180227155514.16721-1-eblake@redhat.com>
- <20180227162944.17343-2-eblake@redhat.com>
- <w51vaehpfzw.fsf@maestria.local.igalia.com>
- <89477aaf-a1af-861d-fcd5-5bfe2143f8b8@redhat.com>
- <w51po4pp54z.fsf@maestria.local.igalia.com>
- <f1d1c403-1a2a-aee2-5fe6-7cfbb81339d6@redhat.com>
-In-Reply-To: <f1d1c403-1a2a-aee2-5fe6-7cfbb81339d6@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--kORqDWCi7qDJ0mEj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 04/13/2018 12:08 PM, Max Reitz wrote:
-
->>>> With 512 byte clusters and 64 bit refcount entries I still get 8 PB,=
-
->>>> way over what's limited by the L1/L2 tables (128 GB).
->>>
->>> Do I need to make any modifications to the sentence, then?
->>
->> I guess what surprised me the first time that I read it was that it
->> suggests that this has to be taken into account when calculating the
->> physical limits of an image, while in practice it can be ignored.
->>
->> You could say something like=20
->>
->>   Although the larger the cluster size, the larger the offsets that ca=
-n
->>   be covered by the refcount table, in practice these limits cannot be=
-
->>   reached because they are larger than the ones imposed by other data
->>   structures.
+Am 18.04.2018 um 15:26 hat Eric Blake geschrieben:
+> On 04/05/2018 12:06 PM, Kevin Wolf wrote:
+> > The legacy command line syntax supports a "password-secret" option that
+> > allows to pass an authentication key to Ceph. This was not supported in
+> > QMP so far.
+> >=20
+> > This patch introduces authentication options in the QAPI schema, makes
+> > them do the corresponding rados_conf_set() calls and adds compatibility
+> > code that translates the old "password-secret" option both for opening
+> > and creating images to the new set of options.
+> >=20
+> > Note that the old option didn't allow to explicitly specify the set of
+> > allowed authentication schemes. The compatibility code assumes that if
+> > "password-secret" is given, only the cephx scheme is allowed. If it's
+> > missing, both none and cephx are allowed because the configuration file
+> > could still provide a key.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
 >=20
-> Are there any updates here?  I guess I personally would just drop the
-> whole paragraph, because I think it really doesn't matter...
+> > Any thoughts on the proposed QAPI schema or the two implementation
+> > problems are welcome.
+> >=20
+>=20
+> >  qapi/block-core.json |  22 +++++++++++
+> >  block/rbd.c          | 102 ++++++++++++++++++++++++++++++++++++++-----=
+--------
+> >  2 files changed, 99 insertions(+), 25 deletions(-)
+> >=20
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index c50517bff3..d5ce588add 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -3170,6 +3170,19 @@
+> > =20
+> > =20
+> >  ##
+> > +# @RbdAuthCephx:
+> > +#
+> > +# @key-secret:         ID of a QCryptoSecret object providing a key fo=
+r cephx
+> > +#                      authentication. If not specified, a key from the
+> > +#                      specified configuration file, or the system def=
+ault
+> > +#                      configuration is used, if present.
+> > +#
+> > +# Since: 2.13
+> > +##
+> > +{ 'struct': 'RbdAuthCephx',
+> > +  'data': { '*key-secret': 'str' } }
+> > +
+> > +##
+> >  # @BlockdevOptionsRbd:
+> >  #
+> >  # @pool:               Ceph pool name.
+> > @@ -3184,6 +3197,13 @@
+> >  #
+> >  # @user:               Ceph id name.
+> >  #
+> > +# @auth-none:          true if connecting to a server without authenti=
+cation
+> > +#                      should be allowed (default: false; since 2.13)
+> > +#
+> > +# @auth-cephx:         Configuration for cephx authentication if speci=
+fied. If
+> > +#                      not specified, cephx authentication is not allo=
+wed.
+> > +#                      (since 2.13)
+> > +#
+> >  # @server:             Monitor host address and port.  This maps
+> >  #                      to the "mon_host" Ceph option.
+> >  #
+> > @@ -3195,6 +3215,8 @@
+> >              '*conf': 'str',
+> >              '*snapshot': 'str',
+> >              '*user': 'str',
+> > +            '*auth-none': 'bool',
+> > +            '*auth-cephx': 'RbdAuthCephx',
+> >              '*server': ['InetSocketAddressBase'] } }
+>=20
+> Would it be better to have this be a flat union with 'auth' with enum
+> values 'none', 'cephx', 'both' as a discriminator that determines which
+> additional fields can be present?  Or does that require that we first
+> fix the QAPI generator to allow nesting a flat union within another flat
+> union (probably doable, just no one has needed it before now)?  Is it
+> also time to improve the QAPI generator to allow a default value to the
+> discriminator field, rather than requiring the field to be present?
 
-Yeah, I need to post a v5 of this series now that 2.13 is nearly open.
+Both options can be enabled at the same time, so that the client
+connects to a server no matter whether it does 'cephx' authentication or
+only 'none. This is even the default for rbd driver (in the existing
+command line interface, but I think we need to stay compatible with it).
+With a union you would have to explicitly choose one or the other, but
+could never accept both.
 
->=20
-> Also note that the maximum file size of ext4 is 16 PB (for 4 kB blocks)=
-=2E
->  OK, it's bigger for XFS, but that still gives some perspective.
->=20
-> Also, long before anyone is going to complain about the specification
-> failing to mention that limit, they are going to complain that qemu
-> refuses to open their image (because of its limit on the reftable size)=
-=2E
->=20
-> Max
->=20
->> although I'm sure that you can come up with a better wording than mine=
- :)
->>
->> Berto
->>
->=20
->=20
+The other option we were considering was a list of authentication
+options, which would be easier to implement, but isn't really an
+accurate representation of what we really accept. There is no way we
+could meaningfully implement something like this:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+    'auth': [ { 'type': 'cephx', 'key-secret': 'foo' },
+              { 'type': 'cephx', 'key-secret': 'bar' } ]
 
+Because Ceph only allows us to enable the 'cephx' authentication method
+and to set a single key for it.
 
---dPKjYJMMpOLJSZ54fHoHi3GFKO0wQUSrr
+Kevin
+
+--kORqDWCi7qDJ0mEj
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrXTQMACgkQp6FrSiUn
-Q2qTLAgAncTmDTUIzwGREGNyYZW+uGNCf/UVSN8XKteS6IH4GBYA6Uf7DrfbGeiw
-8k8wLynC41tRshMtovoXPfKfk9Kt828gAHcv0AMSmJZJKAPczUiq6KftkBgIbK+D
-xeNMSJARzIS/xDtvNPxfi9BqYgQkmeGD1f5EZQzmo/OvcAFZG+l2oHXlQuYGLfwh
-uT/lFyV5MjRGcAke/NuL/Sty4zTNsBsvoEMGyvGqah1F/nWyAlHpCl6uasyCIafu
-I1vWIpALe/cxXcfTb17IEVPKuKC8kW2WQFHb8aTMD9URpDoUHtQWa86y8SfmQqz8
-9vHc6BOmdfHEpFVSHP+Z50eDKDS+sQ==
-=LV+l
+iQIcBAEBAgAGBQJa100RAAoJEH8JsnLIjy/WjKUP/id5t5PBW5Kx1O/anU6AGUtH
+X/P0b26gb1vp/xBAkqR6S1W3IEKSA6+QHcB9qHzRt+q0h1mkQ2UVXsIBtmgWVpUm
+rPLOYcu3DsSqhZ5PJSijb/njgqHt/aPv+DB6PD8TN/8xgf3u2DwTSDLZIdR90LJP
+GNsvf/PO8nqoKJSBWZxBELSi7zR+0oCmMJ/tGmucvE46gKV7C69V0TeyFyQ9mkHa
+iDbF4wUdk+HZgXZOaOxCOV6h/vpiI/EUW+XNZZrSoZbbPoVLaviI1SfZWaqWJUWh
+2Aoy04lG6aP9hortr12Lgj6rjrpuGQL6BAF2IDKOSZ6lzp5vNgEMYPjL1fVboWmd
+zi1n7QPlB+dee2ylKLmzCAliDz+7lc1j35MhJsqA149ka6N1G5DaPlbXyJcCZB1I
+0OMs8lZQF/hmeuQ9EOuj4NOl9FnQ6zfOTppi1qRkwAePIeku46Oo/AiXt1isdEQF
+tubP+fyffJfJsECkf2wsM1vHjgC3NT1cyLMiBhAlT3mfFud63RFQr7oKG5CvbVTT
+zC2aB0Jw5Odqqktq1hJ9+7WqAvOvBOwBoJ0AO5Z6/Wi4WNTK7vvhLV2uziK/T1wX
+65zOtFiKHiasJE2O1RtBFEaF86PBf42JOdZkADX/aYNBi9hgg5mvPVCQBrEyCfS8
+a+t3uDXobidZe70n2GLg
+=Bctt
 -----END PGP SIGNATURE-----
 
---dPKjYJMMpOLJSZ54fHoHi3GFKO0wQUSrr--
+--kORqDWCi7qDJ0mEj--
