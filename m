@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f8pwp-0005Gr-Gp
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:28:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8pxv-0005xs-DN
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1f8pwn-0004TF-Fx
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:28:43 -0400
-Date: Wed, 18 Apr 2018 18:28:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180418162823.GH4971@localhost.localdomain>
-References: <20180405170619.20480-1-kwolf@redhat.com>
-	<87d0ywv9j0.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f8pxr-0004rN-GL
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:29:51 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1524061685-83305-1-git-send-email-imammedo@redhat.com>
+	<1524061685-83305-5-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <061e192f-b147-026c-4269-0a7bc8da76a4@amsat.org>
+Date: Wed, 18 Apr 2018 13:29:31 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d0ywv9j0.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
- authentication scheme
+In-Reply-To: <1524061685-83305-5-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.13 v2 4/5]
+ platform-bus-device: use device plug callback instead of machine_done
+ notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,361 +30,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, jdurgin@redhat.com, qemu-devel@nongnu.org, jcody@redhat.com, mreitz@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, agraf@suse.de, eric.auger@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Am 18.04.2018 um 17:06 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
+On 04/18/2018 11:28 AM, Igor Mammedov wrote:
+> platform-bus were using machine_done notifier to get and map
+> (assign irq/mmio resources) dynamically added sysbus devices
+> after all '-device' options had been processed.
+> That however creates non obvious dependencies on ordering of
+> machine_done notifiers and requires carefull line juggling
+> to keep it working. For example see comment above
+> create_platform_bus() and 'straitforward' arm_load_kernel()
+> had to converted to machine_done notifier and that lead to
+> yet another machine_done notifier to keep it working
+> arm_register_platform_bus_fdt_creator().
 > 
-> > The legacy command line syntax supports a "password-secret" option that
-> > allows to pass an authentication key to Ceph. This was not supported in
-> > QMP so far.
+> Instead of hiding resource assignment in platform-bus-device
+> to magically initialize sysbus devices, use device plug
+> callback and assign resources explicitly at board level
+> at the moment each -device option is being processed.
 > 
-> We tried during development of v2.9.0 (commit 0a55679b4a5), but reverted
-> before the release:
+> That adds a bunch of machine declaration boiler plate to
+> e500plat board, similar to ARM/x86 but gets rid of hidden
+> machine_done notifier and would allow to remove the dependent
+> notifiers in ARM code simplifying it and making code flow
+> easier to follow.
 > 
-> commit 464444fcc161284ac0e743b99251debc297d5236
-> Author: Markus Armbruster <armbru@redhat.com>
-> Date:   Tue Mar 28 10:56:06 2017 +0200
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: agraf@suse.de
+> CC: david@gibson.dropbear.id.au
+> CC: qemu-ppc@nongnu.org
 > 
->     rbd: Revert -blockdev and -drive parameter auth-supported
->     
->     This reverts half of commit 0a55679.  We're having second thoughts on
->     the QAPI schema (and thus the external interface), and haven't reached
->     consensus, yet.  Issues include:
->     
->     * The implementation uses deprecated rados_conf_set() key
->       "auth_supported".  No biggie.
->     
->     * The implementation makes -drive silently ignore invalid parameters
->       "auth" and "auth-supported.*.X" where X isn't "auth".  Fixable (in
->       fact I'm going to fix similar bugs around parameter server), so
->       again no biggie.
->     
->     * BlockdevOptionsRbd member @password-secret applies only to
->       authentication method cephx.  Should it be a variant member of
->       RbdAuthMethod?
->     
->     * BlockdevOptionsRbd member @user could apply to both methods cephx
->       and none, but I'm not sure it's actually used with none.  If it
->       isn't, should it be a variant member of RbdAuthMethod?
->     
->     * The client offers a *set* of authentication methods, not a list.
->       Should the methods be optional members of BlockdevOptionsRbd instead
->       of members of list @auth-supported?  The latter begs the question
->       what multiple entries for the same method mean.  Trivial question
->       now that RbdAuthMethod contains nothing but @type, but less so when
->       RbdAuthMethod acquires other members, such the ones discussed above.
->     
->     * How BlockdevOptionsRbd member @auth-supported interacts with
->       settings from a configuration file specified with @conf is
->       undocumented.  I suspect it's untested, too.
->     
->     Let's avoid painting ourselves into a corner now, and revert the
->     feature for 2.9.
+> v2:
+>   - don't save original MachineClass::get_hotplug_handler, just overwrite it.
+>     (there isn't any use case for chaining get_hotplug_handler() yet,
+>      so keep things simple for now) (David Gibson <david@gibson.dropbear.id.au>)
+>   - s/hotpug/hotplug/ (Peter Maydell <peter.maydell@linaro.org>)
+>   - ppc: rebase on top (ppc: e500: switch E500 based machines to full  machine definition)
+> ---
+>  hw/ppc/e500.h             |  5 +++++
+>  include/hw/arm/virt.h     |  1 +
+>  include/hw/platform-bus.h |  4 ++--
+>  hw/arm/sysbus-fdt.c       |  3 ---
+>  hw/arm/virt.c             | 31 +++++++++++++++++++++++++++++++
+>  hw/core/platform-bus.c    | 29 +++++------------------------
+>  hw/ppc/e500.c             | 38 +++++++++++++++++---------------------
+>  hw/ppc/e500plat.c         | 31 +++++++++++++++++++++++++++++++
+>  8 files changed, 92 insertions(+), 50 deletions(-)
+> 
+> diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
+> index 621403b..3fd9f82 100644
+> --- a/hw/ppc/e500.h
+> +++ b/hw/ppc/e500.h
+> @@ -2,11 +2,16 @@
+>  #define PPCE500_H
+>  
+>  #include "hw/boards.h"
+> +#include "hw/platform-bus.h"
+>  
+>  typedef struct PPCE500MachineState {
+>      /*< private >*/
+>      MachineState parent_obj;
+>  
+> +    /* points to instance of TYPE_PLATFORM_BUS_DEVICE if
+> +     * board supports dynamic sysbus devices
+> +     */
+> +    PlatformBusDevice *pbus_dev;
+>  } PPCE500MachineState;
+>  
+>  typedef struct PPCE500MachineClass {
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index ba0c1a4..e4e3e46 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -91,6 +91,7 @@ typedef struct {
+>  typedef struct {
+>      MachineState parent;
+>      Notifier machine_done;
+> +    DeviceState *platform_bus_dev;
+>      FWCfgState *fw_cfg;
+>      bool secure;
+>      bool highmem;
+> diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
+> index a00775c..19e20c5 100644
+> --- a/include/hw/platform-bus.h
+> +++ b/include/hw/platform-bus.h
+> @@ -37,8 +37,6 @@ typedef struct PlatformBusDevice PlatformBusDevice;
+>  struct PlatformBusDevice {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> -    Notifier notifier;
+> -    bool done_gathering;
+>  
+>      /*< public >*/
+>      uint32_t mmio_size;
+> @@ -54,4 +52,6 @@ int platform_bus_get_irqn(PlatformBusDevice *platform_bus, SysBusDevice *sbdev,
+>  hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+>                                    int n);
+>  
+> +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev);
+> +
+>  #endif /* HW_PLATFORM_BUS_H */
+> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+> index d68e3dc..80ff70e 100644
+> --- a/hw/arm/sysbus-fdt.c
+> +++ b/hw/arm/sysbus-fdt.c
+> @@ -506,9 +506,6 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fdt_params)
+>      dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
+>      pbus = PLATFORM_BUS_DEVICE(dev);
+>  
+> -    /* We can only create dt nodes for dynamic devices when they're ready */
+> -    assert(pbus->done_gathering);
+> -
+>      PlatformBusFDTData data = {
+>          .fdt = fdt,
+>          .irq_start = irq_start,
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 94dcb12..112c367 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1087,6 +1087,7 @@ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
+>      qdev_prop_set_uint32(dev, "mmio_size",
+>          platform_bus_params.platform_bus_size);
+>      qdev_init_nofail(dev);
+> +    vms->platform_bus_dev = dev;
+>      s = SYS_BUS_DEVICE(dev);
+>  
+>      for (i = 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
+> @@ -1536,9 +1537,33 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>      return ms->possible_cpus;
+>  }
+>  
+> +static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+> +                                        DeviceState *dev, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        if (vms->platform_bus_dev) {
 
-We tried to address all of these points in the schema of this RFC. Maybe
-things become easier if we compromise on some.
+Inverting the if conditions is probably cheaper.
 
->     Note that users can still configure authentication methods with a
->     configuration file.  They probably do that anyway if they use Ceph
->     outside QEMU as well.
+> +            platform_bus_link_device(PLATFORM_BUS_DEVICE(vms->platform_bus_dev),
+> +                                     SYS_BUS_DEVICE(dev));
+> +        }
+> +    }
+> +}
+> +
+> +static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+> +                                                        DeviceState *dev)
+> +{
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        return HOTPLUG_HANDLER(machine);
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>  
+>      mc->init = machvirt_init;
+>      /* Start max_cpus at the maximum QEMU supports. We'll further restrict
+> @@ -1557,6 +1582,8 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
+> +    mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+> +    hc->plug = virt_machine_device_plug_cb;
+>  }
+>  
+>  static const TypeInfo virt_machine_info = {
+> @@ -1566,6 +1593,10 @@ static const TypeInfo virt_machine_info = {
+>      .instance_size = sizeof(VirtMachineState),
+>      .class_size    = sizeof(VirtMachineClass),
+>      .class_init    = virt_machine_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +         { TYPE_HOTPLUG_HANDLER },
+> +         { }
+> +    },
+>  };
+>  
+>  static void machvirt_machine_init(void)
+> diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
+> index 33d32fb..807cb5c 100644
+> --- a/hw/core/platform-bus.c
+> +++ b/hw/core/platform-bus.c
+> @@ -103,7 +103,6 @@ static void plaform_bus_refresh_irqs(PlatformBusDevice *pbus)
+>  {
+>      bitmap_zero(pbus->used_irqs, pbus->num_irqs);
+>      foreach_dynamic_sysbus_device(platform_bus_count_irqs, pbus);
+> -    pbus->done_gathering = true;
+>  }
+>  
+>  static void platform_bus_map_irq(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+> @@ -163,12 +162,11 @@ static void platform_bus_map_mmio(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+>  }
+>  
+>  /*
+> - * For each sysbus device, look for unassigned IRQ lines as well as
+> - * unassociated MMIO regions. Connect them to the platform bus if available.
+> + * Look for unassigned IRQ lines as well as unassociated MMIO regions.
+> + * Connect them to the platform bus if available.
+>   */
+> -static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
+> +void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbdev)
+>  {
+> -    PlatformBusDevice *pbus = opaque;
+>      int i;
+>  
+>      for (i = 0; sysbus_has_irq(sbdev, i); i++) {
+> @@ -180,19 +178,6 @@ static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
+>      }
+>  }
+>  
+> -static void platform_bus_init_notify(Notifier *notifier, void *data)
+> -{
+> -    PlatformBusDevice *pb = container_of(notifier, PlatformBusDevice, notifier);
+> -
+> -    /*
+> -     * Generate a bitmap of used IRQ lines, as the user might have specified
+> -     * them on the command line.
+> -     */
+> -    plaform_bus_refresh_irqs(pb);
+> -
+> -    foreach_dynamic_sysbus_device(link_sysbus_device, pb);
+> -}
+> -
+>  static void platform_bus_realize(DeviceState *dev, Error **errp)
+>  {
+>      PlatformBusDevice *pbus;
+> @@ -211,12 +196,8 @@ static void platform_bus_realize(DeviceState *dev, Error **errp)
+>          sysbus_init_irq(d, &pbus->irqs[i]);
+>      }
+>  
+> -    /*
+> -     * Register notifier that allows us to gather dangling devices once the
+> -     * machine is completely assembled
+> -     */
+> -    pbus->notifier.notify = platform_bus_init_notify;
+> -    qemu_add_machine_init_done_notifier(&pbus->notifier);
+> +    /* some devices might be initialized before so update used IRQs map */
+> +    plaform_bus_refresh_irqs(pbus);
+>  }
+>  
+>  static Property platform_bus_properties[] = {
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 30b42a8..e91a5f6 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -221,16 +221,15 @@ static void sysbus_device_create_devtree(SysBusDevice *sbdev, void *opaque)
+>      }
+>  }
+>  
+> -static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
+> +static void platform_bus_create_devtree(PPCE500MachineState *pms,
+>                                          void *fdt, const char *mpic)
+>  {
+> +    const PPCE500MachineClass *pmc = PPCE500_MACHINE_GET_CLASS(pms);
+>      gchar *node = g_strdup_printf("/platform@%"PRIx64, pmc->platform_bus_base);
+>      const char platcomp[] = "qemu,platform\0simple-bus";
+>      uint64_t addr = pmc->platform_bus_base;
+>      uint64_t size = pmc->platform_bus_size;
+>      int irq_start = pmc->platform_bus_first_irq;
+> -    PlatformBusDevice *pbus;
+> -    DeviceState *dev;
+>  
+>      /* Create a /platform node that we can put all devices into */
+>  
+> @@ -245,22 +244,17 @@ static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
+>  
+>      qemu_fdt_setprop_phandle(fdt, node, "interrupt-parent", mpic);
+>  
+> -    dev = qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
+> -    pbus = PLATFORM_BUS_DEVICE(dev);
+> -
+> -    /* We can only create dt nodes for dynamic devices when they're ready */
+> -    if (pbus->done_gathering) {
+> -        PlatformDevtreeData data = {
+> -            .fdt = fdt,
+> -            .mpic = mpic,
+> -            .irq_start = irq_start,
+> -            .node = node,
+> -            .pbus = pbus,
+> -        };
+> +    /* Create dt nodes for dynamic devices */
+> +    PlatformDevtreeData data = {
+> +        .fdt = fdt,
+> +        .mpic = mpic,
+> +        .irq_start = irq_start,
+> +        .node = node,
+> +        .pbus = pms->pbus_dev,
+> +    };
+>  
+> -        /* Loop through all dynamic sysbus devices and create nodes for them */
+> -        foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
+> -    }
+> +    /* Loop through all dynamic sysbus devices and create nodes for them */
+> +    foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
+>  
+>      g_free(node);
+>  }
+> @@ -527,8 +521,8 @@ static int ppce500_load_device_tree(PPCE500MachineState *pms,
+>          create_dt_mpc8xxx_gpio(fdt, soc, mpic);
+>      }
+>  
+> -    if (pmc->has_platform_bus) {
+> -        platform_bus_create_devtree(pmc, fdt, mpic);
+> +    if (pms->pbus_dev) {
+> +        platform_bus_create_devtree(pms, fdt, mpic);
+>      }
+>  
+>      pmc->fixup_devtree(fdt);
+> @@ -946,8 +940,9 @@ void ppce500_init(MachineState *machine)
+>          qdev_prop_set_uint32(dev, "num_irqs", pmc->platform_bus_num_irqs);
+>          qdev_prop_set_uint32(dev, "mmio_size", pmc->platform_bus_size);
+>          qdev_init_nofail(dev);
+> -        s = SYS_BUS_DEVICE(dev);
+> +        pms->pbus_dev = PLATFORM_BUS_DEVICE(dev);
+>  
+> +        s = SYS_BUS_DEVICE(pms->pbus_dev);
+>          for (i = 0; i < pmc->platform_bus_num_irqs; i++) {
+>              int irqn = pmc->platform_bus_first_irq + i;
+>              sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
+> @@ -1090,6 +1085,7 @@ static const TypeInfo ppce500_info = {
+>      .name          = TYPE_PPCE500_MACHINE,
+>      .parent        = TYPE_MACHINE,
+>      .abstract      = true,
+> +    .instance_size = sizeof(PPCE500MachineState),
+>      .class_size    = sizeof(PPCE500MachineClass),
+>  };
+>  
+> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
+> index f69aadb..1a469ba 100644
+> --- a/hw/ppc/e500plat.c
+> +++ b/hw/ppc/e500plat.c
+> @@ -43,13 +43,40 @@ static void e500plat_init(MachineState *machine)
+>      ppce500_init(machine);
+>  }
+>  
+> +static void e500plat_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+> +                                            DeviceState *dev, Error **errp)
+> +{
+> +    PPCE500MachineState *pms = PPCE500_MACHINE(hotplug_dev);
+> +
+> +    if (pms->pbus_dev) {
+> +        if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
 
-This solution that we originally intended to offer was dismissed by
-libvirt as unpractical: libvirt allows the user to specify both a config
-file and a key, and if it wanted to use a config file to pass the key,
-it would have to create a merged config file and keep it sync with the
-user config file at all times. Understandable that they want to avoid
-this.
+Here you do it!
 
->     Further note that this doesn't affect use of key "auth-supported" in
->     -drive file=rbd:...:key=value.
->     
->     qemu_rbd_array_opts()'s parameter @type now must be RBD_MON_HOST,
->     which is silly.  This will be cleaned up shortly.
->     
->     Signed-off-by: Markus Armbruster <armbru@redhat.com>
->     Reviewed-by: Max Reitz <mreitz@redhat.com>
->     Reviewed-by: Eric Blake <eblake@redhat.com>
->     Reviewed-by: Jeff Cody <jcody@redhat.com>
->     Message-id: 1490691368-32099-9-git-send-email-armbru@redhat.com
->     Signed-off-by: Jeff Cody <jcody@redhat.com>
+> +            platform_bus_link_device(pms->pbus_dev, SYS_BUS_DEVICE(dev));
+> +        }
+> +    }
+> +}
+> +
+> +static
+> +HotplugHandler *e500plat_machine_get_hotpug_handler(MachineState *machine,
+> +                                                    DeviceState *dev)
+> +{
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
+> +        return HOTPLUG_HANDLER(machine);
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  #define TYPE_E500PLAT_MACHINE  MACHINE_TYPE_NAME("ppce500")
+>  
+>  static void e500plat_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      PPCE500MachineClass *pmc = PPCE500_MACHINE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>      MachineClass *mc = MACHINE_CLASS(oc);
+>  
+> +    mc->get_hotplug_handler = e500plat_machine_get_hotpug_handler;
+> +    hc->plug = e500plat_machine_device_plug_cb;
+> +
+>      pmc->pci_first_slot = 0x1;
+>      pmc->pci_nr_slots = PCI_SLOT_MAX - 1;
+>      pmc->fixup_devtree = e500plat_fixup_devtree;
+> @@ -77,6 +104,10 @@ static const TypeInfo e500plat_info = {
+>      .name          = TYPE_E500PLAT_MACHINE,
+>      .parent        = TYPE_PPCE500_MACHINE,
+>      .class_init    = e500plat_machine_class_init,
+> +    .interfaces    = (InterfaceInfo[]) {
+> +         { TYPE_HOTPLUG_HANDLER },
+> +         { }
+> +    }
+>  };
+>  
+>  static void e500plat_register_types(void)
 > 
-> > This patch introduces authentication options in the QAPI schema, makes
-> > them do the corresponding rados_conf_set() calls and adds compatibility
-> > code that translates the old "password-secret" option both for opening
-> 
-> Suggest 'the old "password-secret" command line option parameter'.
-> 
-> > and creating images to the new set of options.
-> >
-> > Note that the old option didn't allow to explicitly specify the set of
-> 
-> Likewise, 'the old option parameter'.
-> 
-> > allowed authentication schemes. The compatibility code assumes that if
-> > "password-secret" is given, only the cephx scheme is allowed. If it's
-> > missing, both none and cephx are allowed because the configuration file
-> > could still provide a key.
-> 
-> This is a bit terse for readers who aren't familiar with the way things
-> work now (or have since forgotten pretty much everything about it, like
-> me).
-> 
-> Perhaps spelling out how the compatibility code translates the old
-> option parameter to BlockdevOptionsRbd would help.
-> 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >
-> > This doesn't actually work correctly yet because the way that options
-> > are passed through the block layer (QAPI -> QemuOpts -> QDict). Before
-> > we fix or hack around this, let's make sure this is the schema that we
-> > want.
-> 
-> Makes sense.
-> 
-> > The two known problems are:
-> >
-> > 1. QDict *options in qemu_rbd_open() may contain options either in their
-> >    proper QObject types (if passed from blockdev-add) or as strings
-> >    (-drive). Both forms can be mixed in the same options QDict.
-> 
-> Remind me, how can such a mix happen?
 
-The way I'm aware of is that you use blockdev-add, so you get the real
-types for some options, and then the block layer adds strings for
-default values.
-
-> >    rbd uses the keyval visitor to convert the options into a QAPI
-> >    object. This means that it requires all options to be strings. This
-> >    patch, however, introduces a bool property, so the visitor breaks
-> >    when it gets its input from blockdev-add.
-> >
-> >    Options to hack around the problem:
-> >
-> >    a. Do an extra conversion step or two and go through QemuOpts like
-> >       some other block drivers. When I offered something like this to
-> >       Markus a while ago in a similar case, he rejected the idea.
-> 
-> Going through QemuOpts just to get rid of strings is a bit like going
-> down Niagara Falls in a barrel just to get rid of sleepiness: it'll do
-> that, sure, but it's probably not all it'll do.
-
-Nice comparison. I tend to agree, though there is much more precedence
-for this one than for all other options. Almost all block drivers use
-QemuOpts to parse their driver-specific options from the QDict.
-
-> >    b. Introduce a qdict_stringify_entries() that just does what its name
-> >       says. It would be called before the running keyval visitor so that
-> >       only strings will be present in the QDict.
-> 
-> Precedence: a bunch of other QDict operations that are used only by the
-> block layer.  One more won't make a difference, I guess.
-> 
-> Aside: I'm tempted to move them out of qdict.h to reduce the temptation
-> to use them outside the block layer.
-
-Unrelated cleanup, but seems reasonable. block/qdict.h?
-
-> >    c. Do a local one-off hack that checks if the entry with the key
-> >       "auth-none" is a QBool, and if so, overwrite it with a string. The
-> >       problem will reappear with the next non-string option.
-> 
-> Defensible only if we're fairly confident such options will remain rare.
-> 
-> >    (d. Get rid of the QDict detour and work only with QAPI objects
-> >        everywhere. Support rbd authentication only in QEMU 4.0.)
-> 
-> This is of course the proper solution, but it's a big project that will
-> take time.  The occasional stop gaps are unavoidable.  We just need to
-> take care not to spend all of our cycles on stop gaps, and none on
-> actual progress.
-> 
->      e. Make the keyval visitor accept scalars other than strings.
-> 
-> More efficient than b., doubt it matters.  Complicates the visitor.
-> Harder to back out than b. when we no longer need it.
-> 
-> I'm leaning towards b.
-
-Okay, that's what I was leaning towards, too.
-
-> > 2. The proposed schema allows 'auth-cephx': {} as a valid option with
-> >    the meaning that the cephx authentication scheme is enabled, but no
-> >    key is given (e.g. it is taken from the config file).
-> 
-> Apropos config file: we need to be careful to maintain the QAPI schema's
-> promise that "Values in the configuration file will be overridden by
-> options specified via QAPI."
-
-Yes, though it's made a bit easier by the fact that most options are
-implemented with a rados_conf_set() call. If you call the function, you
-override the config, if not, you don't.
-
-> >    However, an empty dict cannot currently be represented by flattened
-> >    QDicts.
-> 
-> Flattening a QDict moves nested scalars to the root (with dotted keys),
-> and drops nested non-scalars, i.e. QDict, QList.  A nested empty QDict
-> (or QList) vanishes without trace.
-> 
-> >            We need to find a way to enable this. I think this will be
-> >    externally visible because it directly translates into the dotted
-> >    syntax of -blockdev, so we may want to be careful.
-> 
-> Quote keyval.c:
-> 
->  * Design flaw: there is no way to denote an empty array or non-root
->  * object.  While interpreting "key absent" as empty seems natural
->  * (removing a key-val from the input string removes the member when
->  * there are more, so why not when it's the last), it doesn't work:
->  * "key absent" already means "optional object/array absent", which
->  * isn't the same as "empty object/array present".
-> 
-> Getting that syntax right was hairy (you'll probably remember the
-> lengthy e-mail discussions).  I'm reluctant to revisit it.  We concluded
-> back then that dotted key syntax capable of expressing arbitrary JSON
-> wasn't in the cards, but that the cases it can't do are so exotic that
-> users should just fall back to JSON.  And that would be my advice here.
-> 
-> Can we design a schema that avoids this case?  Let's see below.
-
-Can we design such a schema? Yes.
-
-Will we like it enough to accept it as a compromise? Maybe.
-
-> > Any thoughts on the proposed QAPI schema or the two implementation
-> > problems are welcome.
-> >
-> >  qapi/block-core.json |  22 +++++++++++
-> >  block/rbd.c          | 102 ++++++++++++++++++++++++++++++++++++++-------------
-> >  2 files changed, 99 insertions(+), 25 deletions(-)
-> >
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index c50517bff3..d5ce588add 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -3170,6 +3170,19 @@
-> >  
-> >  
-> >  ##
-> > +# @RbdAuthCephx:
-> > +#
-> > +# @key-secret:         ID of a QCryptoSecret object providing a key for cephx
-> > +#                      authentication. If not specified, a key from the
-> > +#                      specified configuration file, or the system default
-> > +#                      configuration is used, if present.
-> > +#
-> > +# Since: 2.13
-> > +##
-> > +{ 'struct': 'RbdAuthCephx',
-> > +  'data': { '*key-secret': 'str' } }
-> > +
-> > +##
-> >  # @BlockdevOptionsRbd:
-> >  #
-> >  # @pool:               Ceph pool name.
-> > @@ -3184,6 +3197,13 @@
-> >  #
-> >  # @user:               Ceph id name.
-> >  #
-> > +# @auth-none:          true if connecting to a server without authentication
-> > +#                      should be allowed (default: false; since 2.13)
-> > +#
-> > +# @auth-cephx:         Configuration for cephx authentication if specified. If
-> > +#                      not specified, cephx authentication is not allowed.
-> > +#                      (since 2.13)
-> > +#
-> >  # @server:             Monitor host address and port.  This maps
-> >  #                      to the "mon_host" Ceph option.
-> >  #
-> > @@ -3195,6 +3215,8 @@
-> >              '*conf': 'str',
-> >              '*snapshot': 'str',
-> >              '*user': 'str',
-> > +            '*auth-none': 'bool',
-> > +            '*auth-cephx': 'RbdAuthCephx',
-> >              '*server': ['InetSocketAddressBase'] } }
-> >  
-> >  ##
-> 
-> Two new optional members @auth-none, @auth-cephx.
-> 
-> For backwards compatibility, behavior needs to remain unchanged when
-> both are absent.  What is the behavior we need to preserve?  Config
-> file, then default?
-
-Yes. (rados_conf_set("auth_client_required") is not called at all.)
-
-> The schema permits four cases, which get translated to an auth client
-> required setting by qemu_rbd_set_auth(), visible below:
-> 
-> (1) just auth-none: we set auth_client_required to "none"
-> 
-> (2) just auth-cephx: we set auth_client_required to "cephx"
-> 
-> (3) both: we set auth_client_required to "none;cephx", which I can't
->     find in the documentation right now, but according to my notes means
->     "either method"
-
-The state of the Ceph documentation indeed wasn't very helpful. On the
-other hand, I'm afraid we're not in a position to complain about bad
-documentation...
-
-> (4) neither: rejected with "No authentication scheme allowed"
->     Uh, why isn't this a compatibility break?  Or am I confused?
-
-It is, and that is one of the reasons why this patch is broken. I failed
-to mention this in the commit message, but I replied to the patch the
-next day to add this.
-
-> When auth-cephx is present, we get subcases
-> 
-> (2a) and (3a) key-secret present: key is in the QCryptoSecret named, and
-> we set
-> 
-> (2b) and (3b) key-secret absent: key must be provided some other way,
->      say in a configuration file, default keyring, whatever, or else
->      we'll fail somehow, I guess
-> 
-> Related: existing BlockdevOptionsRbd member @user.  As far as I know,
-> it's meaningless with auth-none.
-
-I don't know otherwise and suspect you are right, but Jeff and I
-couldn't find any definite confirmation for this assumption, so we left
-it where it is instead of moving it into RbdAuthCephx.
-
-> Ways to avoid the troublesome auth-cephx: {}:
-> 
-> (A) Make auth-cephx a bool, rely on the other ways to provide the key
-> 
-> (B) Make auth-cephx a bool and add the @key-secret member next to it
-> 
->     Like @user, the member is meaningless with auth-none.
-> 
-> (C) Make auth-cephx.key-secret a mandatory StrOrNull
-> 
->     Should take care of "vanishes on flattening" problem, but dotted key
->     syntax is still screwed: since any value is a valid string, there's
->     none left for null.  My take would be that if you want to say
->     auth-cephx.key-secret: {}, you get to say it in JSON.
-> 
->     Aside: check_alternate() tries to catch such alternates, but we
->     failed to update it when we added first class null.  *sigh*
-> 
-> Which one do you hate least?
-
-What should happen with null when you stringify it? If we want to take
-the options QDict, stringify all entries and run them through the keyval
-visitor, I'm almost sure that null will be lost.
-
-So (A) doesn't work unless we can specify what "other ways" are that are
-acceptable for libvirt, and (C) probably doesn't play well with b. above
-(the qdict_stringify_entries() for handling mixed type QDicts).
-
-Looks like only (B) is left as viable, so that's automatically the one I
-hate least of these. If we can fix the problems, I think I'd prefer (C),
-though.
-
-Kevin
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
