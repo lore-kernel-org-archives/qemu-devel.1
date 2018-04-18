@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8k3k-0006A0-8W
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 06:11:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1f8k5i-0007DN-Gf
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 06:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8k3c-0008Uw-BV
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 06:11:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56142 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1f8k5e-0001sF-IH
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 06:13:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49850 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8k3c-0008Uc-6V
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 06:11:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3EF09722C3
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 10:11:16 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 18 Apr 2018 11:11:10 +0100
-Message-Id: <20180418101110.9563-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8k5e-0001rt-DE
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 06:13:26 -0400
+Date: Wed, 18 Apr 2018 11:13:21 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180418101321.GD27579@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAMxP3BSFEuknshd05kSn8EjNuv8F8aPGuNFG3qUd0Ap6GbZFrQ@mail.gmail.com>
+	<18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
+	<CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
+	<CAMxP3BRXh8MLz2KQ_bG-v0KzrL9CxG7bCbtsEfijJ2DUFAbjUA@mail.gmail.com>
+	<CAFEAcA-sGiZFdAa8Gnfbo_=o-ZZbChyDJAV9oGmMTBC8BNS3sQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] configure: add sanity check to catch builds
- from "git archive"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-sGiZFdAa8Gnfbo_=o-ZZbChyDJAV9oGmMTBC8BNS3sQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Latest v2.12.0-rc4 has compiling error, rc3 is OK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Bob Chen <a175818323@gmail.com>, Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>
 
-The "git archive" feature creates tarballs which are missing all
-submodule content. GitHub unhelpfully provides users with "Download"
-links that claim to give them valid source release tarballs. These
-GitHub archives will not be buildable as they are created by the
-"git archive" feature and so are missing content. The user gets
-unhelpful messages from make such as:
+On Wed, Apr 18, 2018 at 10:29:35AM +0100, Peter Maydell wrote:
+> On 18 April 2018 at 09:09, Bob Chen <a175818323@gmail.com> wrote:
+> > I found that it has nothing to do with the release version, but the github
+> > one is just not able to work...
+> >
+> > So what github and qemu.org provide are totally different things?
+> 
+> The "tarballs" from github don't work and can't work, but
+> github provides no mechanism for the project to say "don't
+> create this page". You can complain to github about this
+> if you like.
+> 
+> You're best off starting with the project's own web
+> page: https://www.qemu.org/ -- we use github only as
+> a sort of backup git server in case our own is down.
 
-  fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or directo=
-ry
+I sent a patch that adds a sanity check to configure to try to catch this
+mistake - it would also affect people who created tarballs with a plain
+"git archive" command
 
-By adding a sanity check we can give users an informative message about
-what they've done wrong.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- configure | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/configure b/configure
-index 0a19b033bc..9f3777da1b 100755
---- a/configure
-+++ b/configure
-@@ -296,6 +296,21 @@ then
- else
-     git_update=3Dno
-     git_submodules=3D""
-+
-+    if ! test -f "$source_path/ui/keycodemapdb/README"
-+    then
-+        echo
-+        echo "ERROR: missing file $source_path/ui/keycodemapdb/README"
-+        echo
-+        echo "This is not a GIT checkout but module content appears to"
-+        echo "be missing. Do not use 'git archive' or GitHub download li=
-nks"
-+        echo "to acquire QEMU source archives. Non-GIT builds are only"
-+        echo "supported with source archives linked from:"
-+        echo
-+        echo "  https://www.qemu.org/download/"
-+        echo
-+        exit 1
-+    fi
- fi
- git=3D"git"
-=20
---=20
-2.14.3
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
