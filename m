@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f8ecZ-0006CC-0d
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:23:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1f8f4L-0005Hg-AE
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f8ecU-0001mo-Tz
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:23:02 -0400
-Date: Wed, 18 Apr 2018 13:33:44 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180418033344.GF2317@umbus.fritz.box>
-References: <20180416085512.4011-1-bharata@linux.vnet.ibm.com>
-	<20180417011427.GE20551@umbus.fritz.box>
-	<20180417090909.GB3942@in.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="A9z/3b/E4MkkD+7G"
-Content-Disposition: inline
-In-Reply-To: <20180417090909.GB3942@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: Support ibm,
- dynamic-memory-v2 property
+	(envelope-from <peterx@redhat.com>) id 1f8f4I-0001mM-6s
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:51:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41960 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f8f4I-0001kv-1V
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 00:51:42 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 18 Apr 2018 12:51:21 +0800
+Message-Id: <20180418045121.14233-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH] intel-iommu: send PSI always when notify_unmap
+ set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +22,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Jintack Lim <jintack@cs.columbia.edu>, Eric Auger <eric.auger@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexander Witte <alexander.witte@baicanada.com>
 
+During IOVA page table walk, there is a special case when:
 
---A9z/3b/E4MkkD+7G
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+- notify_unmap is set, meanwhile
+- entry is invalid
 
-On Tue, Apr 17, 2018 at 02:39:09PM +0530, Bharata B Rao wrote:
-> On Tue, Apr 17, 2018 at 11:14:27AM +1000, David Gibson wrote:
-> > >  static void spapr_machine_2_12_class_options(MachineClass *mc)
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index d60b7c6d7a..5e044c44af 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -149,6 +149,7 @@ struct sPAPRMachineState {
-> > >      sPAPROptionVector *ov5;         /* QEMU-supported option vectors=
- */
-> > >      sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option v=
-ectors */
-> > >      uint32_t max_compat_pvr;
-> > > +    bool use_ibm_dynamic_memory_v2;
-> >=20
-> > TBH, I'm not really sure we even need to adjust this by machine type.
->=20
-> There are other similar features controlled by ov5 bits that
-> are also determined by machine type version:
->=20
-> Memory hotplug support -- sPAPRMachineClass.dr_lmb_enabled
-> Dedicated HP event support -- sPAPRMachineState.use_hotplug_event_source
+In the past, we skip the entry always.  This is not correct.  We should
+send UNMAP notification to registered notifiers in this case.  Otherwise
+some stall pages will still be mapped in the host even if L1 guest
+unmapped them already.
 
-As for user settability the issue isn't that it's set by ov5, but what
-the effect of the feature is.  Those other features alter runtime
-hypervisor behaviour and that behaviour has to remain the same across
-a migration.  Therefore we have to keep the behaviour consistent for
-old machine types.
+Without this patch, nested device assignment to L2 guests might dump
+some errors like:
 
-This feature affects only boot time behaviour.  It has a similar
-effect to what a firmware update might, on real hardware.  Furthermore
-the way CAS and the device tree work, this is vanishingly unlikely to
-break existing guests.
+qemu-system-x86_64: VFIO_MAP_DMA: -17
+qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+                    0x7f89a920d000) = -17 (File exists)
 
-> Are you saying that presence of ibm,dynamic-memory-v2 probably shouldn't
-> be dependent on machine type ?
+To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
+affected by this problem).
 
-Yes, I am.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+To test nested assignment, one also needs to apply below patchset:
+https://lkml.org/lkml/2018/4/18/5
+---
+ hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 30 insertions(+), 12 deletions(-)
 
---A9z/3b/E4MkkD+7G
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrWvJYACgkQbDjKyiDZ
-s5JBTQ//UV/k2LEfWYU53Brqf3C05hSTKkR+7xaJ4tQtakvK8sXVBT5oeH6wSDa2
-W6If9d401Hn0+uCc5a4R1v8e2cveAN/N/mc/yS/m4nd+bpUOJcL1AeAEpVlLlzEC
-vwBnoBN5fo+hqdYQIaN0Futn0z6L7A3Y75/kOS1rcEW6L1Hk4w5m9l/tHAMhaZgm
-vjtZ9iI5Uj6IiTkP9VblqUGmXOKH12GJlDvLT3gZ9/UuF+Bgv4Lqp77/4d5bMSaP
-aLxa53azmdyFfE1sjVOYPqMOxtznAcq4QwaDEhpiGXWCVh9xnH8qQ4F5/MY3/A1o
-kLHM/YPd9QG2RJrbJLSzNHQr6VELQR8I2zA+Qn9EbtFzyXj6ZL7efjj/kVDj6eru
-/pL1NSAWV0zYmf/4gT5mTVVn3V8J+HNvNtYo5WrY3jtRdCKqwKNeyHgoeCvDymRf
-MTOtVrBTjcgQYi+fR0boAw2IF9qjymDPmMwF7l1w6YVibAjFlsqC0U6yyIqtk7V3
-DXykSh3khC+Fuf5QopmJnkx1l9ziCsYzwqmp5iP3+SPiS7NiWbZteJiJJaNwTmpP
-mpdPDKQX20BjUFGSZz1rw/pi1SIDN3z43owJ2f2vJ+b7zMxawwGZFgl5b18mFU6K
-6ch3Q4LcnUGWDucebJjbBrG2+s3IMKy4vg+7fHgiGi5uVky0v8c=
-=/b7S
------END PGP SIGNATURE-----
-
---A9z/3b/E4MkkD+7G--
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index fb31de9416..b359efd6f9 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+ 
+ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+ 
++static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
++                             vtd_page_walk_hook hook_fn, void *private)
++{
++    assert(hook_fn);
++    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
++                            entry->addr_mask, entry->perm);
++    return hook_fn(entry, private);
++}
++
+ /**
+  * vtd_page_walk_level - walk over specific level for IOVA range
+  *
+@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+          */
+         entry_valid = read_cur | write_cur;
+ 
++        entry.target_as = &address_space_memory;
++        entry.iova = iova & subpage_mask;
++        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
++        entry.addr_mask = ~subpage_mask;
++
+         if (vtd_is_last_slpte(slpte, level)) {
+-            entry.target_as = &address_space_memory;
+-            entry.iova = iova & subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+-            entry.addr_mask = ~subpage_mask;
+-            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+             if (!entry_valid && !notify_unmap) {
+                 trace_vtd_page_walk_skip_perm(iova, iova_next);
+                 goto next;
+             }
+-            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+-                                    entry.addr_mask, entry.perm);
+-            if (hook_fn) {
+-                ret = hook_fn(&entry, private);
+-                if (ret < 0) {
+-                    return ret;
+-                }
++            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++            if (ret < 0) {
++                return ret;
+             }
+         } else {
+             if (!entry_valid) {
+-                trace_vtd_page_walk_skip_perm(iova, iova_next);
++                if (notify_unmap) {
++                    /*
++                     * The whole entry is invalid; unmap it all.
++                     * Translated address is meaningless, zero it.
++                     */
++                    entry.translated_addr = 0x0;
++                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++                    if (ret < 0) {
++                        return ret;
++                    }
++                } else {
++                    trace_vtd_page_walk_skip_perm(iova, iova_next);
++                }
+                 goto next;
+             }
+             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+-- 
+2.14.3
