@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8Zih-00031K-Bu
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 19:09:04 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1f8bb7-0007Ix-PQ
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 21:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f8Zig-00023p-IX
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 19:09:03 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:45591)
+	(envelope-from <kernellwp@gmail.com>) id 1f8bb6-00052r-Ec
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 21:09:21 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:46224)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f8Zig-000222-DV
-	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 19:09:02 -0400
-Received: by mail-oi0-x236.google.com with SMTP id j10-v6so5489148oii.12
-	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 16:09:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1f8bb6-00052U-9j
+	for qemu-devel@nongnu.org; Tue, 17 Apr 2018 21:09:20 -0400
+Received: by mail-oi0-x241.google.com with SMTP id e123-v6so76034oih.13
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 18:09:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2=rYDZ7yVEHrENzWYsdDHf8DFba9ymffsVwHXvVP4ew@mail.gmail.com>
-References: <20180416135442.30606-1-alex.bennee@linaro.org>
-	<20180417190439.GA28717@flamenco>
-	<CAFEAcA87BUwn96GY5esyNBtoGQY+myVAX9XoPW02gpaJbqyBzg@mail.gmail.com>
-	<20180417212710.GA10948@flamenco>
-	<CAFEAcA9PS2FNSq0VFgO652RaemTViGKzOQStiycqFB8DDhy_ig@mail.gmail.com>
-	<20180417223837.GA25085@flamenco>
-	<cee77754-64f5-e4e2-6462-f70603655e3e@linaro.org>
-	<CAFEAcA_2=rYDZ7yVEHrENzWYsdDHf8DFba9ymffsVwHXvVP4ew@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Apr 2018 00:08:41 +0100
-Message-ID: <CAFEAcA9pOVf1LwMGgwfPWy8KRG8k-EFzscWGmPrUo-9NT7J=QA@mail.gmail.com>
+In-Reply-To: <20180417201904-mutt-send-email-mst@kernel.org>
+References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
+	<20180417201904-mutt-send-email-mst@kernel.org>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Wed, 18 Apr 2018 09:09:19 +0800
+Message-ID: <CANRm+CxGRxrpybqjqicauF2ROZs7+76uReMBmpNRdzM=dDWUZg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: check for Inf / x or 0 / x
- before /0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +30,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 18 April 2018 at 00:01, Peter Maydell <peter.maydell@linaro.org> wrote:
-> I don't have the original IEEE754 spec to hand though;
-> that may have left this unspecified.
+2018-04-18 2:08 GMT+08:00 Michael S. Tsirkin <mst@redhat.com>:
+> On Tue, Apr 17, 2018 at 01:24:15AM -0700, Wanpeng Li wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
+>>
+>> This patch adds support for KVM_CAP_X86_DISABLE_EXITS. Provides userspac=
+e with
+>> per-VM capability(KVM_CAP_X86_DISABLE_EXITS) to not intercept MWAIT/HLT/=
+PAUSE
+>> in order that to improve latency in some workloads.
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>> ---
+>>
+>>  linux-headers/linux/kvm.h |  6 +++++-
+>>  target/i386/cpu.h         |  2 ++
+>>  target/i386/kvm.c         | 16 ++++++++++++++++
+>>  3 files changed, 23 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>> index a167be8..857df15 100644
+>> --- a/linux-headers/linux/kvm.h
+>> +++ b/linux-headers/linux/kvm.h
+>> @@ -925,7 +925,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_S390_GS 140
+>>  #define KVM_CAP_S390_AIS 141
+>>  #define KVM_CAP_SPAPR_TCE_VFIO 142
+>> -#define KVM_CAP_X86_GUEST_MWAIT 143
+>> +#define KVM_CAP_X86_DISABLE_EXITS 143
+>>  #define KVM_CAP_ARM_USER_IRQ 144
+>>  #define KVM_CAP_S390_CMMA_MIGRATION 145
+>>  #define KVM_CAP_PPC_FWNMI 146
+>> @@ -1508,6 +1508,10 @@ struct kvm_assigned_msix_entry {
+>>  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+>>  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+>>
+>> +#define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+>> +#define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+>> +#define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+>> +
+>>  /* Available with KVM_CAP_ARM_USER_IRQ */
+>>
+>>  /* Bits for run->s.regs.device_irq_level */
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index 1b219fa..965de1b 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -685,6 +685,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumu=
+lation Single Precision */
+>>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control *=
+/
+>>
+>> +#define KVM_PV_UNHALT (1U << 7)
+>> +
+>
+> Why don't we use KVM_FEATURE_PV_UNHALT from kvm_para.h?
+>
+>>  #define KVM_HINTS_DEDICATED (1U << 0)
+>>
+>
+> BTW I wonder whether we should switch to a value from
+> kvm_para.h? I'll send a version to do it, pls take a look.
 
-Having located a copy of 754-1985 I think that also is
-clear enough that float-float conversion is an operation
-that must quieten SNaN and raise Invalid.
+Yeah, your patchset looks good.
 
-thanks
--- PMM
+Regards,
+Wanpeng Li
+
+>
+>
+>>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Predi=
+ction Barrier */
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index 6c49954..3e99830 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -1029,6 +1029,22 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>          }
+>>      }
+>>
+>> +    if (env->features[FEAT_KVM_HINTS] & KVM_HINTS_DEDICATED) {
+>> +        int disable_exits =3D kvm_check_extension(cs->kvm_state, KVM_CA=
+P_X86_DISABLE_EXITS);
+>> +
+>> +        if (disable_exits) {
+>> +            disable_exits &=3D (KVM_X86_DISABLE_EXITS_MWAIT |
+>> +                              KVM_X86_DISABLE_EXITS_HLT |
+>> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+>> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
+>> +                disable_exits &=3D ~KVM_X86_DISABLE_EXITS_HLT;
+>> +            }
+>> +        }
+>> +        if (kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS,=
+ 0, disable_exits)) {
+>> +            error_report("kvm: DISABLE EXITS not supported");
+>> +        }
+>> +    }
+>> +
+>>      qemu_add_vm_change_state_handler(cpu_update_state, env);
+>>
+>>      c =3D cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+>> --
+>> 2.7.4
