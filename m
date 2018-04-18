@@ -1,18 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8p0y-0004lk-TU
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:28:57 -0400
+	(envelope-from <lersek@redhat.com>) id 1f8p2B-0005hc-EI
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:30:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8p0u-0006Mb-TI
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:28:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35940 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1f8p27-0006pK-8m
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:30:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39042 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f8p0u-0006MQ-Nn
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:28:52 -0400
-Date: Wed, 18 Apr 2018 16:28:41 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180418152841.GZ27579@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f8p27-0006pE-3p
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:30:07 -0400
+From: Laszlo Ersek <lersek@redhat.com>
 References: <20180417224054.26363-1-lersek@redhat.com>
 	<c5e3f942-2c0e-9809-32ae-df97eaf2b7cd@redhat.com>
 	<762b3dc8-a86f-a21f-1e21-334ec46677ef@redhat.com>
@@ -20,10 +17,13 @@ References: <20180417224054.26363-1-lersek@redhat.com>
 	<f16c1406-78ac-d275-63e9-90de3beac9f0@redhat.com>
 	<b0d8036a-4ce0-de5c-88ac-28360658e1e2@redhat.com>
 	<e11087c0-1a4c-3f01-c93f-c12657f40eae@redhat.com>
+Message-ID: <77256bc4-fa52-ff4a-0672-ce743768b1e6@redhat.com>
+Date: Wed, 18 Apr 2018 17:30:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 In-Reply-To: <e11087c0-1a4c-3f01-c93f-c12657f40eae@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,20 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Apr 18, 2018 at 05:27:32PM +0200, Laszlo Ersek wrote:
+On 04/18/18 17:27, Laszlo Ersek wrote:
 > On 04/18/18 17:17, Eric Blake wrote:
-> > On 04/18/2018 07:40 AM, Laszlo Ersek wrote:
-> > 
-> >> Is it guaranteed that lists in JSON keep the order of the elements?
-> >> Because, dictionaries definitely don't promise any ordering between the
-> >> keys.
-> > 
-> > Yes, JSON lists preserve order (and we have to explicitly document cases
-> > where order within a list is not significant).
-> > 
+>> On 04/18/2018 07:40 AM, Laszlo Ersek wrote:
+>>
+>>> Is it guaranteed that lists in JSON keep the order of the elements?
+>>> Because, dictionaries definitely don't promise any ordering between the
+>>> keys.
+>>
+>> Yes, JSON lists preserve order (and we have to explicitly document cases
+>> where order within a list is not significant).
+>>
 > 
 > Thanks.
 > 
@@ -68,12 +68,9 @@ On Wed, Apr 18, 2018 at 05:27:32PM +0200, Laszlo Ersek wrote:
 > 
 > Thoughts? :)
 
-Keeping type separate from features is fine by me.
+I mean I realize I just reinvented Paolo's point from
+<http://mid.mail-archive.com/c5e3f942-2c0e-9809-32ae-df97eaf2b7cd@redhat.com>
+:) I don't intend to claim the idea, I just needed some time to
+understand it.
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Laszlo
