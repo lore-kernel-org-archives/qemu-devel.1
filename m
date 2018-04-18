@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f8hTD-0003Lb-FL
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:25:37 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f8hi4-0000D6-HR
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f8hTB-0006wc-Po
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:25:35 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180310082746.24198-1-jsnow@redhat.com>
-	<87zi22c5i0.fsf@dusky.pond.sub.org>
-	<e06b144e-9676-0b08-d6e9-35101a7cef84@redhat.com>
-Date: Wed, 18 Apr 2018 09:25:14 +0200
-In-Reply-To: <e06b144e-9676-0b08-d6e9-35101a7cef84@redhat.com> (John Snow's
-	message of "Tue, 17 Apr 2018 12:56:16 -0400")
-Message-ID: <8736zt2cyt.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1f8hhz-00064O-Is
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:40:56 -0400
+Date: Wed, 18 Apr 2018 09:40:29 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180418094029.14b64108.cohuck@redhat.com>
+In-Reply-To: <354ba31f-7502-b873-e254-fe3dbfc07b54@de.ibm.com>
+References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1808b8f3-9cff-c849-d012-b23f29d1c11f@redhat.com>
+	<354ba31f-7502-b873-e254-fe3dbfc07b54@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 00/21] blockjobs: add explicit job
- management
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
+ for AP device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,205 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-John Snow <jsnow@redhat.com> writes:
+On Tue, 17 Apr 2018 20:21:31 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 04/17/2018 09:44 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> This series seeks to address two distinct but closely related issues
->>> concerning the job management API.
->>>
->>> (1) For jobs that complete when a monitor is not attached and receiving
->>>     events or notifications, there's no way to discern the job's final
->>>     return code. Jobs must remain in the query list until dismissed
->>>     for reliable management.
->>>
->>> (2) Jobs that change the block graph structure at an indeterminate point
->>>     after the job starts compete with the management layer that relies
->>>     on that graph structure to issue meaningful commands.
->>>
->>>     This structure should change only at the behest of the management
->>>     API, and not asynchronously at unknown points in time. Before a job
->>>     issues such changes, it must rely on explicit and synchronous
->>>     confirmation from the management API.
->>>
->>> These changes are implemented by formalizing a State Transition Machine
->>> for the BlockJob subsystem.
->>>
->>> Job States:
->>>
->>> UNDEFINED       Default state. Internal state only.
->>> CREATED         Job has been created
->>> RUNNING         Job has been started and is running
->>> PAUSED          Job is not ready and has been paused
->>> READY           Job is ready and is running
->>> STANDBY         Job is ready and is paused
->>>
->>> WAITING         Job is waiting on peers in transaction
->>> PENDING         Job is waiting on ACK from QMP
->>> ABORTING        Job is aborting or has been cancelled
->>> CONCLUDED       Job has finished and has a retcode available
->>> NULL            Job is being dismantled. Internal state only.
->>>
->>> Job Verbs:
->>>
->
-> Backporting your quote up here:
->
->> For each job verb and job state: what's the new job state?
->>
->
-> That's not always 1:1, though I tried to address it in the commit messages.
+> On 04/16/2018 05:44 PM, David Hildenbrand wrote:
+> >   
+> >>  
+> >> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> >> index 0cdbc15..0d5b0f7 100644
+> >> --- a/target/s390x/gen-features.c
+> >> +++ b/target/s390x/gen-features.c
+> >> @@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
+> >>      S390_FEAT_ADAPTER_INT_SUPPRESSION,
+> >>      S390_FEAT_EDAT_2,
+> >>      S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
+> >> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
+> >> +    S390_FEAT_AP_FACILITIES_TEST,
+> >> +    S390_FEAT_AP,
+> >>  };
+> >>    
+> > 
+> > Now I have to ask a very stupid question:
+> > 
+> > I heard that the execution controls in the SIE block for AP are one of
+> > the oldest ones we have around. How can it be that the AP feature cannot
+> > be used before zEC12?  
+> 
+> It was a suggestion from the crypto team due to testability. Nobody has a z196
+> with the older cards.
+> 
 
-Let me rephrase my question then.  For each job verb and job state: what
-are the possible new job states?  If there's more than one, what's the
-condition for each?
-
-I appreciate commit messages explaining that, but having complete state
-machine documentation in one place (a comment or in docs/) would be
-nice, wouldn't it?
-
->>> CANCEL          Instructs a running job to terminate with error,
->>>                 (Except when that job is READY, which produces no error.)
->
-> CANCEL will take a job to either NULL... (this is the early abort
-> pathway, prior to the job being fully realized.)
->
-> ...or to ABORTING (from CREATED once it has fully realized the job, or
-> from RUNNING, READY, WAITING, or PENDING.)
->
->>> PAUSE           Request a job to pause.
->
-> issued to RUNNING or READY, transitions to PAUSED or STANDBY respectively.
->
->>> RESUME          Request a job to resume from a pause.
->
-> issued to PAUSED or STANDBY, transitions to RUNNING or READY respectively.
->
->>> SET-SPEED       Change the speed limiting parameter of a job.
->
-> No run state change.
->
->>> COMPLETE        Ask a READY job to finish and exit.
->>>
->
-> Issued to a READY job, transitions to WAITING.
->
->>> FINALIZE        Ask a PENDING job to perform its graph finalization.
->
-> Issued to a PENDING job, transitions to CONCLUDED.
->
->>> DISMISS         Finish cleaning up an empty job.
->> 
->
-> Issued to a CONCLUDED job, transitions to NULL.
->
->
->>> And here's my stab at a diagram:
->>>
->>>                  +---------+
->>>                  |UNDEFINED|
->>>                  +--+------+
->>>                     |
->>>                  +--v----+
->>>        +---------+CREATED+-----------------+
->>>        |         +--+----+                 |
->>>        |            |                      |
->>>        |         +--+----+     +------+    |
->>>        +---------+RUNNING<----->PAUSED|    |
->>>        |         +--+-+--+     +------+    |
->>>        |            | |                    |
->>>        |            | +------------------+ |
->>>        |            |                    | |
->>>        |         +--v--+       +-------+ | |
->>>        +---------+READY<------->STANDBY| | |
->>>        |         +--+--+       +-------+ | |
->>>        |            |                    | |
->>>        |         +--v----+               | |
->>>        +---------+WAITING<---------------+ |
->>>        |         +--+----+                 |
->>>        |            |                      |
->>>        |         +--v----+                 |
->>>        +---------+PENDING|                 |
->>>        |         +--+----+                 |
->>>        |            |                      |
->>>     +--v-----+   +--v------+               |
->>>     |ABORTING+--->CONCLUDED|               |
->>>     +--------+   +--+------+               |
->>>                     |                      |
->>>                  +--v-+                    |
->>>                  |NULL<--------------------+
->>>                  +----+
->> 
->> Is this diagram missing a few arrowheads?  E.g. on the edge between
->> RUNNING and WAITING.
->> 
->
-> Apparently yes. :\
->
-> (Secretly fixed up in my reply.)
->
->> Might push the limits of ASCII art, but here goes anyway: can we label
->> the arrows with job verbs?
->> 
->
-> Can you recommend a tool to help me do that? I've been using asciiflow
-> infinity (http://asciiflow.com) and it's not very good, but I don't have
-> anything better.
-
-I do my ASCII art in Emacs picture-mode.
-
->> Can you briefly explain how this state machine addresses (1) and (2)?
->> 
->
-> (1) The CONCLUDED state allows jobs to persist in the job query list
-> after they would have disappeared in 2.11-era QEMU. This lets us query
-> for completion codes and to dismiss the job at our own leisure.
-
-Got it.
-
-> (2) The PENDING state allows jobs to wait in a nearly-completed state,
-> pending authorization from the QMP client to make graph changes.
-> Otherwise, the job has to asynchronously perform this cleanup and the
-> exact point in time is unknowable to the QMP client. By making a PENDING
-> state and a finalize callback (.prepare), we can make this portion of a
-> job's task synchronous.
-
-This provides for jobs modifying the graph on job completion.  It
-doesn't provide for jobs modifying the graph while they run.  Fine with
-me; we're not aware of a use for messing with the graph in the middle of
-a job.
-
-> "John, you added more than two states..."
->
-> Yup, this was to help simplify the existing state machine, believe it or
-> not. I modeled all jobs as transactions to eliminate different cleanup
-> routing and added two new interim states;
->
-> - WAITING
-> - ABORTING
->
-> to help make assertions about the valid transitions jobs can make. The
-> ABORTING state helps make it clear when a job is allowed to fail (and
-> emit QMP events related to such).
->
-> The WAITING state is simply advisory to help a client know that a job is
-> "finished" but cannot yet receive further instruction because of peers
-> in a transaction. This helps me to add nice QMP errors for any verbs
-> issued to such jobs. "Sorry pal, this job is waiting and can't hear you
-> right now!"
->
-> This kept the code cleaner than adding a bunch of very fragile boolean
-> error-checking pathways in dozens of helper functions to help avoid
-> illegal instructions on jobs not prepared to receive those instructions.
->
-> So these two new states don't help accomplish (1) or (2) strictly, but
-> they do facilitate the code additions that _do_ a lot less ugly.
-
-Thanks!
-
-Looks like a fine starting point for in-tree state machine documentation
-:)
+Might be worth adding a note to that respect?
