@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8qVF-0003bw-Ll
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:04:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1f8qW6-00046A-UH
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8qVB-0006RQ-LU
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:04:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37798 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f8qVB-0006R2-G4
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:04:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CA6C54022909
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 17:04:08 +0000 (UTC)
-References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
-	<20180417133602.23832-2-marcandre.lureau@redhat.com>
-	<ea5c5be8-2e0f-ed00-8ce1-aee6d6e117d4@redhat.com>
-	<87po2wsbu6.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <444fc8f7-b86a-6b5b-f49d-34b9608164e6@redhat.com>
-Date: Wed, 18 Apr 2018 12:04:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1f8qW5-0006zh-Q8
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:05:10 -0400
+Date: Wed, 18 Apr 2018 18:04:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180418170457.GC27579@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180405170619.20480-1-kwolf@redhat.com>
+	<87d0ywv9j0.fsf@dusky.pond.sub.org>
+	<20180418162823.GH4971@localhost.localdomain>
+	<20180418163458.GB27579@redhat.com>
+	<20180418165208.GI4971@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <87po2wsbu6.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uCM6eUMgNI7ocoDqE4FlDc9X5f389rbAq"
-Subject: Re: [Qemu-devel] [PATCH v5 1/5] qobject: ensure base is at offset 0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180418165208.GI4971@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
+ authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, jdurgin@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uCM6eUMgNI7ocoDqE4FlDc9X5f389rbAq
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, pbonzini@redhat.com
-Message-ID: <444fc8f7-b86a-6b5b-f49d-34b9608164e6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/5] qobject: ensure base is at offset 0
-References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
- <20180417133602.23832-2-marcandre.lureau@redhat.com>
- <ea5c5be8-2e0f-ed00-8ce1-aee6d6e117d4@redhat.com>
- <87po2wsbu6.fsf@dusky.pond.sub.org>
-In-Reply-To: <87po2wsbu6.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/18/2018 11:45 AM, Markus Armbruster wrote:
-
->> Might also be worth mentioning that this explicitly guarantees that
->> existing casts work correctly (even though we'd prefer to get rid of
->> such casts in any location except the qobject.h macros); Markus pointe=
-d out:
->>
->>>> Uh, there's another reason: existing type casts from QObject * to
->>>> subtypes.  I just spotted one in tests/check-qdict.c:
->>>>
->>>>     dst =3D (QDict *)qdict_crumple(src, &error_abort);
+On Wed, Apr 18, 2018 at 06:52:08PM +0200, Kevin Wolf wrote:
+> Am 18.04.2018 um 18:34 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > On Wed, Apr 18, 2018 at 06:28:23PM +0200, Kevin Wolf wrote:
+> > > Am 18.04.2018 um 17:06 hat Markus Armbruster geschrieben:
+> >=20
+> > > >     Note that users can still configure authentication methods wi=
+th a
+> > > >     configuration file.  They probably do that anyway if they use=
+ Ceph
+> > > >     outside QEMU as well.
+> > >=20
+> > > This solution that we originally intended to offer was dismissed by
+> > > libvirt as unpractical: libvirt allows the user to specify both a c=
+onfig
+> > > file and a key, and if it wanted to use a config file to pass the k=
+ey,
+> > > it would have to create a merged config file and keep it sync with =
+the
+> > > user config file at all times. Understandable that they want to avo=
+id
+> > > this.
+> >=20
+> > Even if the config file does have auth info setup, we can't assume th=
+at
+> > the QEMU VMs are supposed to use the same auth info. In fact to prope=
+rly
+> > protect against compromised QEMU, ideally every QEMU would use a comp=
+letely
+> > separate RBD user+password, so that compromised QEMU can't then acces=
+s
+> > RBD disks belonging to a different user.
+> >=20
+> > So from libvirt POV we want to pretend the config file does not exist=
+ at
+> > all and explicitly pass everything that is needed via normal per-disk
+> > setup for blockdev.
 >=20
-> As far as I'm concerned, that's the real reason.  The simplification
-> plus the check to make it safe seems like a wash.
+> From the rbd driver:
 >=20
-> The cast I spotted appears to be the only one, though:
+>  * The "conf" option specifies a Ceph configuration file to read.  If
+>  * it is not specified, we will read from the default Ceph locations
+>  * (e.g., /etc/ceph/ceph.conf).  To avoid reading _any_ configuration
+>  * file, specify conf=3D/dev/null.
 >=20
->     $ git-grep '(Q[A-Z][a-z]* \*)'
->     hmp.c:    qmp_device_add((QDict *)qdict, NULL, &err);
->     include/qapi/qmp/qobject.h:        return (QObject *)obj;
->     qobject/qobject.c:static void (*qdestroy[QTYPE__MAX])(QObject *) =3D=
- {
->     tests/check-qdict.c:    dst =3D (QDict *)qdict_crumple(src, &error_=
-abort);
->=20
-> The first two cast away const, the third isn't a type cast.  The fourth=
+> So what we actually expected libvirt to do is to create a config file
+> for each rbd image and pass that to qemu. However, libvirt allows the
+> user to specify their own config file and passes that, and therefore
+> doesn't want to create its own config file. If the user doesn't specify
+> a config file, libvirt should probably indeed use /dev/null at least.
 
-> one should use qobject_to() instead, regardless of this patch.
->=20
-> Do we want to force base to come first anyway?
->=20
-> Where does PATCH 2 exploit "base first"?
+Yeah this is a mess - I wish we had never allowed users to pass a config
+file, and had used /dev/null all the time. Unfortunately changing either
+of these aspects would cause backcompat problems for existing deployments
+now :-( So we just have to accept that the global config file is always
+in present, but none the less libvirt should try to specify things as
+fully as possible.
 
-It doesn't, but PATCH 4 does:
-
->  /**
->   * qobject_ref(): Increment QObject's reference count
-> + *
-> + * Returns: the same @obj. The type of @obj will be propagated to the
-> + * return type.
->   */
-> -#define qobject_ref(obj) qobject_ref_impl(QOBJECT(obj))
-> +#define qobject_ref(obj) ((typeof(obj)) qobject_ref_impl(QOBJECT(obj))=
-)
-> =20
-
-
+Regards,
+Daniel
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---uCM6eUMgNI7ocoDqE4FlDc9X5f389rbAq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrXeoEACgkQp6FrSiUn
-Q2pCXAf/SXA8gttvNqTiOliPPtrwRvT0hato+3tCCH3Supp5cMmCzyAGjwZbGsr4
-jD3TtdPNqEc35fpe50QufCpndTYYDzycOGJ9krhsEJeWue8gcc+BJJywfOFsPyOW
-SKF8/JHiRaP1w9J/vUJmPsOT1w4HXQYtUC2ZtTz6lRWwUglirRwTK2+FUXYre59I
-bmVUU8W5yQqbv5fOHAgwDBc7zD5sA0l7WhNDHe5NH503B0vxVW6L+FrnImX6VwIG
-Wrialn5BJrRT4b6GK3r32A0d/HY4h1UDZv4FBBxHL6YFISMBuO0261IVm3RzyzK2
-ZCxOc8oDQ/To8To0RNdO0HKzHbIKAQ==
-=uknG
------END PGP SIGNATURE-----
-
---uCM6eUMgNI7ocoDqE4FlDc9X5f389rbAq--
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
