@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f8mE5-0008Bc-PU
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:30:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1f8mFb-0000el-Jh
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f8mE2-0002EO-KA
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:30:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34444 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f8mE2-0002EB-CY
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:30:14 -0400
-Date: Wed, 18 Apr 2018 14:30:02 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180418123002.7hiu2hr6rdxvab5u@sirius.home.kraxel.org>
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
-	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
-	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
-	<20180418115734.GG27579@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180418115734.GG27579@redhat.com>
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+	(envelope-from <thuth@redhat.com>) id 1f8mFa-0003Dr-Ms
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:31:51 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 18 Apr 2018 14:31:43 +0200
+Message-Id: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 for-2.13 0/4] pc-bios/s390-ccw: Network boot
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +18,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-  Hi,
+Some patches to improve the network boot experience on s390x:
 
-> So now the question is should this string be declared to be
-> glob format, or regex format. Regex is more flexible, but
-> regex syntax is ill-defined because every regex engine is
-> slightly different.
+First, make sure that we shut down the virtio-net device before jumping
+into the kernel. Otherwise some incoming packets might destroy some of
+the kernel's data if it has not taken over the device yet.
 
-I'd go for glob.  It's good enough for the version number and
-most likely we don't need anything else.
+Then the last two patches add support for loading kernels via
+configuration files - pxelinux-style and .INS-file style. This way
+you don't have to manually glue your ramdisk to your kernel anymore,
+so this should be quite a relieve for all users who want to boot
+Linux via the network.
 
-And the machine types are a list, so there is still the option
-to just have multiple entries in case it turns out we need
-something glob can't cover with a single entry.
+The config file parsers have been completely written by myself from
+scratch and only tested with some config files that I came up with
+on my own. So if anybody has some pre-existing pxelinux config files
+already for booting a s390x, I'd appreciate some testing to see whether
+this works as expected for you, too!
 
-cheers,
-  Gerd
+Thomas Huth (4):
+  pc-bios/s390-ccw/net: Split up net_load() into init, load and uninit
+    parts
+  pc-bios/s390-ccw/net: Stop virtio-net device before jumping into the
+    OS
+  pc-bios/s390-ccw/net: Add support for pxelinux-style config files
+  pc-bios/s390-ccw/net: Add support for .INS config files
+
+ pc-bios/s390-ccw/netboot.mak  |   5 +-
+ pc-bios/s390-ccw/netmain.c    | 312 ++++++++++++++++++++++++++++++++++++++----
+ pc-bios/s390-ccw/virtio-net.c |   8 ++
+ pc-bios/s390-ccw/virtio.c     |  19 ++-
+ pc-bios/s390-ccw/virtio.h     |   3 +
+ 5 files changed, 312 insertions(+), 35 deletions(-)
+
+-- 
+1.8.3.1
