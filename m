@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f8grs-0006gA-Pf
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 02:47:03 -0400
+	(envelope-from <a175818323@gmail.com>) id 1f8gxJ-0008OY-TH
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 02:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f8grp-00048a-Li
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 02:47:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39614)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
-	id 1f8grp-000481-Bs
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 02:46:57 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3I6kTQ8121314
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 02:46:55 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hdwb208b9-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 02:46:55 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
-	Wed, 18 Apr 2018 07:46:52 +0100
-Date: Wed, 18 Apr 2018 12:16:41 +0530
-From: Balamuruhan S <bala24@linux.vnet.ibm.com>
-References: <20180417132317.6910-1-bala24@linux.vnet.ibm.com>
-	<20180417132317.6910-2-bala24@linux.vnet.ibm.com>
-	<20180418005550.GC2317@umbus.fritz.box>
-	<20180418005726.GD2317@umbus.fritz.box>
+	(envelope-from <a175818323@gmail.com>) id 1f8gxJ-0006u6-0n
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 02:52:37 -0400
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:41108)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1f8gxI-0006th-Qo
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 02:52:36 -0400
+Received: by mail-io0-x22f.google.com with SMTP id r69-v6so1160122iod.8
+	for <qemu-devel@nongnu.org>; Tue, 17 Apr 2018 23:52:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180418005726.GD2317@umbus.fritz.box>
-Message-Id: <20180418064641.GA12871@9.122.211.20>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] migration: calculate
- expected_downtime with ram_bytes_remaining()
+In-Reply-To: <18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
+References: <CAMxP3BSFEuknshd05kSn8EjNuv8F8aPGuNFG3qUd0Ap6GbZFrQ@mail.gmail.com>
+	<18e4de85-274e-54aa-e34e-4fd3f82e40e2@weilnetz.de>
+From: Bob Chen <a175818323@gmail.com>
+Date: Wed, 18 Apr 2018 14:52:35 +0800
+Message-ID: <CAMxP3BThUkaPWRq=D2AhecGgpmC-F=_fGbBQX-oyaqMs95s3Pw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Latest v2.12.0-rc4 has compiling error, rc3 is OK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,101 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: dgilbert@redhat.com, amit.shah@redhat.com, mdroth@linux.vnet.ibm.com, quintela@redhat.com, qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Apr 18, 2018 at 10:57:26AM +1000, David Gibson wrote:
-> On Wed, Apr 18, 2018 at 10:55:50AM +1000, David Gibson wrote:
-> > On Tue, Apr 17, 2018 at 06:53:17PM +0530, Balamuruhan S wrote:
-> > > expected_downtime value is not accurate with dirty_pages_rate * page_size,
-> > > using ram_bytes_remaining would yeild it correct.
-> > 
-> > This commit message hasn't been changed since v1, but the patch is
-> > doing something completely different.  I think most of the info from
-> > your cover letter needs to be in here.
-> > 
-> > > 
-> > > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> > > ---
-> > >  migration/migration.c | 6 +++---
-> > >  migration/migration.h | 1 +
-> > >  2 files changed, 4 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index 52a5092add..4d866bb920 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -614,7 +614,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-> > >      }
-> > >  
-> > >      if (s->state != MIGRATION_STATUS_COMPLETED) {
-> > > -        info->ram->remaining = ram_bytes_remaining();
-> > > +        info->ram->remaining = s->ram_bytes_remaining;
-> > >          info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
-> > >      }
-> > >  }
-> > > @@ -2227,6 +2227,7 @@ static void migration_update_counters(MigrationState *s,
-> > >      transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-> > >      time_spent = current_time - s->iteration_start_time;
-> > >      bandwidth = (double)transferred / time_spent;
-> > > +    s->ram_bytes_remaining = ram_bytes_remaining();
-> > >      s->threshold_size = bandwidth * s->parameters.downtime_limit;
-> > >  
-> > >      s->mbps = (((double) transferred * 8.0) /
-> > > @@ -2237,8 +2238,7 @@ static void migration_update_counters(MigrationState *s,
-> > >       * recalculate. 10000 is a small enough number for our purposes
-> > >       */
-> > >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
-> > > -        s->expected_downtime = ram_counters.dirty_pages_rate *
-> > > -            qemu_target_page_size() / bandwidth;
-> > > +        s->expected_downtime = s->ram_bytes_remaining / bandwidth;
-> > >      }
-> 
-> ..but more importantly, I still think this change is bogus.  expected
-> downtime is not the same thing as remaining ram / bandwidth.
+No, I downloaded the release tarball from github.
 
-I tested precopy migration of 16M HP backed P8 guest from P8 to 1G P9 host
-and observed precopy migration was infinite with expected_downtime set as
-downtime-limit.
+2018-04-18 14:25 GMT+08:00 Stefan Weil <sw@weilnetz.de>:
 
-During the discussion for Bug RH1560562, Michael Roth quoted that
-
-One thing to note: in my testing I found that the "expected downtime" value
-seems inaccurate in this scenario. To find a max downtime that allowed
-migration to complete I had to divide "remaining ram" by "throughput" from
-"info migrate" (after the initial pre-copy pass through ram, i.e. once
-"dirty pages" value starts getting reported and we're just sending dirtied
-pages).
-
-Later by trying it precopy migration could able to complete with this
-approach.
-
-adding Michael Roth in cc.
-
-Regards,
-Bala
-
-> 
-> > >  
-> > >      qemu_file_reset_rate_limit(s->to_dst_file);
-> > > diff --git a/migration/migration.h b/migration/migration.h
-> > > index 8d2f320c48..8584f8e22e 100644
-> > > --- a/migration/migration.h
-> > > +++ b/migration/migration.h
-> > > @@ -128,6 +128,7 @@ struct MigrationState
-> > >      int64_t downtime_start;
-> > >      int64_t downtime;
-> > >      int64_t expected_downtime;
-> > > +    int64_t ram_bytes_remaining;
-> > >      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-> > >      int64_t setup_time;
-> > >      /*
-> > 
-> 
-> 
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+> Am 18.04.2018 um 08:19 schrieb Bob Chen:
+> > fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or
+> directory
+> >
+> > Build on my CentOS 7.
+> >
+>
+> That file is generated during the build. rc4 compiles in my test on
+> Debian. Did you start your build from a fresh git clone?
+>
+> Stefan
+>
