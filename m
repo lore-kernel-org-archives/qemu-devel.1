@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f8r69-0007Vl-3y
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:42:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1f8rHn-0003N2-Lt
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f8r67-0000me-E8
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:42:25 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180310082746.24198-1-jsnow@redhat.com>
-	<87zi22c5i0.fsf@dusky.pond.sub.org>
-	<e06b144e-9676-0b08-d6e9-35101a7cef84@redhat.com>
-	<8736zt2cyt.fsf@dusky.pond.sub.org>
-	<9a57da6e-b7a3-16e2-c404-b35d29e1b317@redhat.com>
-Date: Wed, 18 Apr 2018 19:42:12 +0200
-In-Reply-To: <9a57da6e-b7a3-16e2-c404-b35d29e1b317@redhat.com> (John Snow's
-	message of "Wed, 18 Apr 2018 13:29:45 -0400")
-Message-ID: <874lk8pg23.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1f8rHj-0005hV-3F
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:54:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55582 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1f8rHi-0005hF-Uj
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 13:54:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E29EB406E8C3
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 17:54:18 +0000 (UTC)
+Date: Wed, 18 Apr 2018 19:54:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180418195412.63a76412.cohuck@redhat.com>
+In-Reply-To: <20180418171151.5263-1-berrange@redhat.com>
+References: <20180418171151.5263-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 00/21] blockjobs: add explicit job
- management
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] configure: add sanity check to catch
+ builds from "git archive"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,230 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-John Snow <jsnow@redhat.com> writes:
+On Wed, 18 Apr 2018 18:11:51 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-> On 04/18/2018 03:25 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> On 04/17/2018 09:44 AM, Markus Armbruster wrote:
->>>> John Snow <jsnow@redhat.com> writes:
->>>>
->>>>> This series seeks to address two distinct but closely related issues
->>>>> concerning the job management API.
->>>>>
->>>>> (1) For jobs that complete when a monitor is not attached and receiving
->>>>>     events or notifications, there's no way to discern the job's final
->>>>>     return code. Jobs must remain in the query list until dismissed
->>>>>     for reliable management.
->>>>>
->>>>> (2) Jobs that change the block graph structure at an indeterminate point
->>>>>     after the job starts compete with the management layer that relies
->>>>>     on that graph structure to issue meaningful commands.
->>>>>
->>>>>     This structure should change only at the behest of the management
->>>>>     API, and not asynchronously at unknown points in time. Before a job
->>>>>     issues such changes, it must rely on explicit and synchronous
->>>>>     confirmation from the management API.
->>>>>
->>>>> These changes are implemented by formalizing a State Transition Machine
->>>>> for the BlockJob subsystem.
->>>>>
->>>>> Job States:
->>>>>
->>>>> UNDEFINED       Default state. Internal state only.
->>>>> CREATED         Job has been created
->>>>> RUNNING         Job has been started and is running
->>>>> PAUSED          Job is not ready and has been paused
->>>>> READY           Job is ready and is running
->>>>> STANDBY         Job is ready and is paused
->>>>>
->>>>> WAITING         Job is waiting on peers in transaction
->>>>> PENDING         Job is waiting on ACK from QMP
->>>>> ABORTING        Job is aborting or has been cancelled
->>>>> CONCLUDED       Job has finished and has a retcode available
->>>>> NULL            Job is being dismantled. Internal state only.
->>>>>
->>>>> Job Verbs:
->>>>>
->>>
->>> Backporting your quote up here:
->>>
->>>> For each job verb and job state: what's the new job state?
->>>>
->>>
->>> That's not always 1:1, though I tried to address it in the commit messages.
->> 
->> Let me rephrase my question then.  For each job verb and job state: what
->> are the possible new job states?  If there's more than one, what's the
->> condition for each?
->> 
->
-> Is my answer below not sufficient? Maybe you're asking "Can you write
-> this up in a formal document" instead, or did I miss explaining something?
+> The "git archive" feature creates tarballs which are missing all
+> submodule content. GitHub unhelpfully provides users with "Download"
+> links that claim to give them valid source release tarballs. These
+> GitHub archives will not be buildable as they are created by the
+> "git archive" feature and so are missing content. The user gets
+> unhelpful messages from make such as:
+>=20
+>   fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or directo=
+ry
+>=20
+> By adding a sanity check we can give users an informative message about
+> what they've done wrong.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  configure | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>=20
+> diff --git a/configure b/configure
+> index 0a19b033bc..089b00068c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -296,6 +296,24 @@ then
+>  else
+>      git_update=3Dno
+>      git_submodules=3D""
+> +
+> +    if ! test -f "$source_path/ui/keycodemapdb/README"
+> +    then
+> +        echo
+> +        echo "ERROR: missing file $source_path/ui/keycodemapdb/README"
+> +        echo
+> +        echo "This is not a GIT checkout but module content appears to"
+> +        echo "be missing. Do not use 'git archive' or GitHub download li=
+nks"
+> +        echo "to acquire QEMU source archives. Non-GIT builds are only"
+> +        echo "supported with source archives linked from:"
+> +        echo
+> +        echo "  https://www.qemu.org/download/"
+> +        echo
+> +        echo "Developers working with GIT can use scripts/archive-source=
+.sh"
+> +        echo "if they need to create valid source archives."
+> +        echo
+> +        exit 1
+> +    fi
+>  fi
+>  git=3D"git"
+> =20
 
-Your answer was fine.  I blame my one-pass reply writing.
-
-Nevertheless:
-
->> I appreciate commit messages explaining that, but having complete state
->> machine documentation in one place (a comment or in docs/) would be
->> nice, wouldn't it?
-
-Pretty-please?
-
->>>>> CANCEL          Instructs a running job to terminate with error,
->>>>>                 (Except when that job is READY, which produces no error.)
->>>
->>> CANCEL will take a job to either NULL... (this is the early abort
->>> pathway, prior to the job being fully realized.)
->>>
->>> ...or to ABORTING (from CREATED once it has fully realized the job, or
->>> from RUNNING, READY, WAITING, or PENDING.)
->>>
->>>>> PAUSE           Request a job to pause.
->>>
->>> issued to RUNNING or READY, transitions to PAUSED or STANDBY respectively.
->>>
->>>>> RESUME          Request a job to resume from a pause.
->>>
->>> issued to PAUSED or STANDBY, transitions to RUNNING or READY respectively.
->>>
->>>>> SET-SPEED       Change the speed limiting parameter of a job.
->>>
->>> No run state change.
->>>
->>>>> COMPLETE        Ask a READY job to finish and exit.
->>>>>
->>>
->>> Issued to a READY job, transitions to WAITING.
->>>
->>>>> FINALIZE        Ask a PENDING job to perform its graph finalization.
->>>
->>> Issued to a PENDING job, transitions to CONCLUDED.
->>>
->>>>> DISMISS         Finish cleaning up an empty job.
->>>>
->>>
->>> Issued to a CONCLUDED job, transitions to NULL.
->>>
->>>
->>>>> And here's my stab at a diagram:
->>>>>
->>>>>                  +---------+
->>>>>                  |UNDEFINED|
->>>>>                  +--+------+
->>>>>                     |
->>>>>                  +--v----+
->>>>>        +---------+CREATED+-----------------+
->>>>>        |         +--+----+                 |
->>>>>        |            |                      |
->>>>>        |         +--+----+     +------+    |
->>>>>        +---------+RUNNING<----->PAUSED|    |
->>>>>        |         +--+-+--+     +------+    |
->>>>>        |            | |                    |
->>>>>        |            | +------------------+ |
->>>>>        |            |                    | |
->>>>>        |         +--v--+       +-------+ | |
->>>>>        +---------+READY<------->STANDBY| | |
->>>>>        |         +--+--+       +-------+ | |
->>>>>        |            |                    | |
->>>>>        |         +--v----+               | |
->>>>>        +---------+WAITING<---------------+ |
->>>>>        |         +--+----+                 |
->>>>>        |            |                      |
->>>>>        |         +--v----+                 |
->>>>>        +---------+PENDING|                 |
->>>>>        |         +--+----+                 |
->>>>>        |            |                      |
->>>>>     +--v-----+   +--v------+               |
->>>>>     |ABORTING+--->CONCLUDED|               |
->>>>>     +--------+   +--+------+               |
->>>>>                     |                      |
->>>>>                  +--v-+                    |
->>>>>                  |NULL<--------------------+
->>>>>                  +----+
->>>>
->>>> Is this diagram missing a few arrowheads?  E.g. on the edge between
->>>> RUNNING and WAITING.
->>>>
->>>
->>> Apparently yes. :\
->>>
->>> (Secretly fixed up in my reply.)
->>>
->>>> Might push the limits of ASCII art, but here goes anyway: can we label
->>>> the arrows with job verbs?
->>>>
->>>
->>> Can you recommend a tool to help me do that? I've been using asciiflow
->>> infinity (http://asciiflow.com) and it's not very good, but I don't have
->>> anything better.
->> 
->> I do my ASCII art in Emacs picture-mode.
->> 
->>>> Can you briefly explain how this state machine addresses (1) and (2)?
->>>>
->>>
->>> (1) The CONCLUDED state allows jobs to persist in the job query list
->>> after they would have disappeared in 2.11-era QEMU. This lets us query
->>> for completion codes and to dismiss the job at our own leisure.
->> 
->> Got it.
->> 
->>> (2) The PENDING state allows jobs to wait in a nearly-completed state,
->>> pending authorization from the QMP client to make graph changes.
->>> Otherwise, the job has to asynchronously perform this cleanup and the
->>> exact point in time is unknowable to the QMP client. By making a PENDING
->>> state and a finalize callback (.prepare), we can make this portion of a
->>> job's task synchronous.
->> 
->> This provides for jobs modifying the graph on job completion.  It
->> doesn't provide for jobs modifying the graph while they run.  Fine with
->> me; we're not aware of a use for messing with the graph in the middle of
->> a job.
->> 
->
-> I didn't consider this possibility. The concept could in theory be
-> expanded to arbitrary sync points, but I'm not going to worry about that
-> until the need arises.
-
-Makes sense.
-
->>> "John, you added more than two states..."
->>>
->>> Yup, this was to help simplify the existing state machine, believe it or
->>> not. I modeled all jobs as transactions to eliminate different cleanup
->>> routing and added two new interim states;
->>>
->>> - WAITING
->>> - ABORTING
->>>
->>> to help make assertions about the valid transitions jobs can make. The
->>> ABORTING state helps make it clear when a job is allowed to fail (and
->>> emit QMP events related to such).
->>>
->>> The WAITING state is simply advisory to help a client know that a job is
->>> "finished" but cannot yet receive further instruction because of peers
->>> in a transaction. This helps me to add nice QMP errors for any verbs
->>> issued to such jobs. "Sorry pal, this job is waiting and can't hear you
->>> right now!"
->>>
->>> This kept the code cleaner than adding a bunch of very fragile boolean
->>> error-checking pathways in dozens of helper functions to help avoid
->>> illegal instructions on jobs not prepared to receive those instructions.
->>>
->>> So these two new states don't help accomplish (1) or (2) strictly, but
->>> they do facilitate the code additions that _do_ a lot less ugly.
->> 
->
-> I really bungled that sentence.
-
-No problem, I got it anyway :)
-
->> Thanks!
->> 
->> Looks like a fine starting point for in-tree state machine documentation
->> :)
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
