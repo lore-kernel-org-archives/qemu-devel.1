@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8nAf-0004bt-Vt
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:30:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1f8nED-0006rr-K5
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:34:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f8nAb-0006I0-4p
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:30:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59728 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f8nAa-0006Hf-Ux
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:30:45 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
-	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
-	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
-	<20180418122312.ebmd2nrtvk2h5e45@sirius.home.kraxel.org>
-	<f8c3945f-d2e7-e4a4-2b38-2736acd99e7c@redhat.com>
-	<20180418130619.cmyyyl7fj2wfum7k@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0545cc73-d821-c2d9-e4ab-938e58c34c2b@redhat.com>
-Date: Wed, 18 Apr 2018 15:30:36 +0200
+	(envelope-from <eblake@redhat.com>) id 1f8nE9-0000CO-Gy
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:34:29 -0400
+References: <20180418123838.3511-1-olaf@aepfle.de>
+	<20180418124753.GM27579@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7d58cb4c-9202-34d1-bfe0-1e4edc108be1@redhat.com>
+Date: Wed, 18 Apr 2018 08:34:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180418130619.cmyyyl7fj2wfum7k@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+In-Reply-To: <20180418124753.GM27579@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TJUIfCo0r3vzTVK9QJFaplcfNvBGuAHBG"
+Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Olaf Hering <olaf@aepfle.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 04/18/18 15:06, Gerd Hoffmann wrote:
->>> Other question:  Do we want allow to specify which certs/keys are
->>> enrolled?  Which would probably mean to drop "enrolled-keys" from
->>> features and make it an optional string instead,
->>
->> Not an enum? "Microsoft" below should be an enum constant, shouldn't it?
-> 
-> I don't think so.  If we want allow other certificate providers (not
-> sure it makes sense as all physical hardware actually runs with the
-> microsoft certificates), then we don't want a fixed list here.  So any
-> CA can be listed, be it microsoft, redhat, canonical, verisign or
-> kraxel.org ;)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TJUIfCo0r3vzTVK9QJFaplcfNvBGuAHBG
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
+ Olaf Hering <olaf@aepfle.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>,
+ qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7d58cb4c-9202-34d1-bfe0-1e4edc108be1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+References: <20180418123838.3511-1-olaf@aepfle.de>
+ <20180418124753.GM27579@redhat.com>
+In-Reply-To: <20180418124753.GM27579@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I agree (obviously), but then, at what detail do we stop?
+On 04/18/2018 07:47 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Apr 18, 2018 at 02:38:37PM +0200, Olaf Hering wrote:
+>> Since usage of g_realloc_n was introduced, glib-2.22 can not be used a=
+nymore.
+>> Fixes commit 418026ca43 ("util: Introduce vfio helpers")
+>=20
+> Normally we expect ./include/glib-compat.h to be changed in this scenar=
+io
+> to add compat for the missing symbol.
 
-Because, if we go for full flexibility, then we should formalize:
-- the certificate that goes into PK,
-- the list of certificates that go into KEK,
-- the list of certificates that go into db,
+Or rewrite the offending addition of g_realloc_n to use something like
+g_renew that IS available in 2.22 (this is not the first time the issue
+has appeared; see commit 071d405, for example).
 
-and we should likely formalize "certificate" itself as the following pair:
-- human-readable description (possibly the Common Name of the Subject),
-- SHA256 digest (fingerprint) of the certificate.
+>=20
+> IIRC, one of Peters desired build targets required 2.22, but I guess we=
 
-I do think this would totally be overkill, but I don't know where to
-draw the line
-- between the currently proposed @enrolled-keys (or similar enums that
-  stand for well-defined "constellations")
-- and the full details as described above.
+> missed this bug because that platform would not enable vfio functionali=
+ty ?
 
-A simple string like "Microsoft" doesn't seem to me helpful for either
-the user or management software -- the former won't know what
-"Microsoft" stands for, and the latter won't want to look for free-form
-strings. (Same issue as with @tags vs. @features.)
+Which platform?  CentOS 6 is at glib 2.28; we also require 2.30 for
+building on mingw.  I'm not seeing an easy document that says which
+distros we still actively support, and which culprit distro has the
+oldest glib.
 
-Thanks
-Laszlo
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TJUIfCo0r3vzTVK9QJFaplcfNvBGuAHBG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrXSVUACgkQp6FrSiUn
+Q2q00wgApfrqgOUKX1cVqPnX/1M0/2BgOwI6fLdEiqj+FeEciWhHv0hVqa1m8RWP
+qkukskBa+jlu4EnK+lnruNyZG7idmekrOZCCR7YUwNIgn5OsCMh+3jYKyMpmlaL1
+p/OohKzFozkWLbazBUdXrGfiefckrpSK+Pmrk2xW5JAVWeQkNRG7eRQF/tS+ua9k
+Xi0fPWzGpWq4CqOqwRXkZTtY2nTZDvYVRGu2BSkdNztepYpY483lLgZ2UPFA5vTj
+HzHDUpIWfU9t9/SsVYr0rCx4ac9uIhQGNhzYRA3fPrYSSNkmBMN3awUkPCJpG3m0
+CyYUHzVRSm6etpH7gggz2HcLSEwbRQ==
+=mcva
+-----END PGP SIGNATURE-----
+
+--TJUIfCo0r3vzTVK9QJFaplcfNvBGuAHBG--
