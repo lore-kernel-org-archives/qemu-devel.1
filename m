@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8pEu-0003UX-Lu
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:43:21 -0400
+	(envelope-from <mst@redhat.com>) id 1f8pb4-0003Ep-JO
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:06:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f8pEq-0005mu-Hd
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 11:43:20 -0400
-References: <20180418145443.6332-1-olaf@aepfle.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <502db955-6c66-3255-0ea8-9a00876607e5@redhat.com>
-Date: Wed, 18 Apr 2018 17:42:57 +0200
+	(envelope-from <mst@redhat.com>) id 1f8pb3-000145-Ht
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:06:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f8pb3-00013a-BZ
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 12:06:13 -0400
+Date: Wed, 18 Apr 2018 19:05:15 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180418190435-mutt-send-email-mst@kernel.org>
+References: <1523991487-241006-1-git-send-email-mst@redhat.com>
+	<1523991487-241006-2-git-send-email-mst@redhat.com>
+	<20180418095426.08ca87ec.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180418145443.6332-1-olaf@aepfle.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] configure: require glib-2.24 on Linux
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180418095426.08ca87ec.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] update-linux-headers.sh: drop
+ kvm_para.h hacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>, qemu-trivial@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Wanpeng Li <kernellwp@gmail.com>, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Brijesh Singh <brijesh.singh@amd.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 18/04/2018 16:54, Olaf Hering wrote:
-> Since usage of g_realloc_n was introduced, glib-2.22 can not be used
-> anymore on Linux. Leave non-Linux unchanged because one developer system
-> still uses it.
-> Fixes commit 418026ca43 ("util: Introduce vfio helpers")
+On Wed, Apr 18, 2018 at 09:54:26AM +0200, Cornelia Huck wrote:
+> On Tue, 17 Apr 2018 21:58:21 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Signed-off-by: Olaf Hering <olaf@aepfle.de>
-> ---
->  configure | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> > It turns out (as will be clear from follow-up patches)
+> > we do not really need any kvm para macros host side
+> > for now, except on x86, and there we need it
+> > unconditionally whether we run on kvm or we don't.
+> > 
+> > Import the x86 asm/kvm_para.h into standard-headers,
+> > follow-up patches remove a bunch of code using this.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  scripts/update-linux-headers.sh | 16 +++++-----------
+> >  1 file changed, 5 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+> > index 5b1d8dc..a017b53 100755
+> > --- a/scripts/update-linux-headers.sh
+> > +++ b/scripts/update-linux-headers.sh
+> > @@ -43,6 +43,7 @@ cp_portable() {
+> >                                       -e 'limits' \
+> >                                       -e 'linux/kernel' \
+> >                                       -e 'linux/sysinfo' \
+> > +                                     -e 'asm-generic/kvm_para' \
+> >                                       > /dev/null  
+> >      then
+> >          echo "Unexpected #include in input file $f".
+> > @@ -98,13 +99,9 @@ for arch in $ARCHLIST; do
+> >  
+> >      rm -rf "$output/linux-headers/asm-$arch"
+> >      mkdir -p "$output/linux-headers/asm-$arch"
+> > -    for header in kvm.h kvm_para.h unistd.h; do
+> > +    for header in kvm.h unistd.h; do
+> >          cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+> >      done
+> > -    if [ $arch = powerpc ]; then
+> > -        cp "$tmpdir/include/asm/epapr_hcalls.h" "$output/linux-headers/asm-powerpc/"
+> > -    fi
 > 
-> diff --git a/configure b/configure
-> index 6e9b994f21..ca19a66726 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3369,7 +3369,11 @@ fi
->  if test "$mingw32" = yes; then
->      glib_req_ver=2.30
->  else
-> -    glib_req_ver=2.22
-> +    if test "$targetos" = Linux; then
-> +       glib_req_ver=2.24
-> +    else
-> +       glib_req_ver=2.22
-> +    fi
->  fi
->  glib_modules=gthread-2.0
->  if test "$modules" = yes; then
+> Hm, why are you dropping this one?
 > 
+> (The other changes look sane.)
 
-I think for 2.12 it's okay to just document this.  For 2.13 we should
-raise the bar uniformly (and anyway remove g_realloc_n in favor of g_renew).
+Because it's only used by kvm_para.h. Isn't it?
 
-Paolo
+-- 
+MST
