@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8n6u-0002J9-Ft
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:26:57 -0400
+	(envelope-from <saipava@xilinx.com>) id 1f8hLP-0000pn-Cl
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:17:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f8n6t-0004ek-5L
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:26:56 -0400
-References: <20180405170619.20480-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <99b844f2-7784-225a-37c4-77dad444fbd6@redhat.com>
-Date: Wed, 18 Apr 2018 08:26:39 -0500
+	(envelope-from <saipava@xilinx.com>) id 1f8hLM-00037T-5a
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:17:31 -0400
+Received: from mail-sn1nam02on0068.outbound.protection.outlook.com
+	([104.47.36.68]:63500
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1f8hLL-00036X-QK
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:17:28 -0400
+From: Sai Pavan Boddu <saipava@xilinx.com>
+Date: Wed, 18 Apr 2018 07:17:24 +0000
+Message-ID: <MWHPR02MB2478491B07FF972D6475F853CAB60@MWHPR02MB2478.namprd02.prod.outlook.com>
+References: <1523974696-1965-1-git-send-email-saipava@xilinx.com>
+	<1523974696-1965-2-git-send-email-saipava@xilinx.com>
+	<CAAYMZQu5JOTOp3K4awXPvzbaE7oqvK0XqqoNzKjB5ShR=BJnzQ@mail.gmail.com>
+In-Reply-To: <CAAYMZQu5JOTOp3K4awXPvzbaE7oqvK0XqqoNzKjB5ShR=BJnzQ@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <20180405170619.20480-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vGPgxWeb5EKqVq3RE0dj1YCKp4vZvRK7i"
-Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
- authentication scheme
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] xilinx_spips: send dummy only if
+ cmd requires it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jdurgin@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: francisco iglesias <frasse.iglesias@gmail.com>
+Cc: "alistair@alistair23.me" <alistair@alistair23.me>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Edde <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vGPgxWeb5EKqVq3RE0dj1YCKp4vZvRK7i
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jdurgin@redhat.com, jcody@redhat.com,
- armbru@redhat.com, qemu-devel@nongnu.org
-Message-ID: <99b844f2-7784-225a-37c4-77dad444fbd6@redhat.com>
-Subject: Re: [RFC][BROKEN] rbd: Allow configuration of authentication scheme
-References: <20180405170619.20480-1-kwolf@redhat.com>
-In-Reply-To: <20180405170619.20480-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/05/2018 12:06 PM, Kevin Wolf wrote:
-> The legacy command line syntax supports a "password-secret" option that=
-
-> allows to pass an authentication key to Ceph. This was not supported in=
-
-> QMP so far.
->=20
-> This patch introduces authentication options in the QAPI schema, makes
-> them do the corresponding rados_conf_set() calls and adds compatibility=
-
-> code that translates the old "password-secret" option both for opening
-> and creating images to the new set of options.
->=20
-> Note that the old option didn't allow to explicitly specify the set of
-> allowed authentication schemes. The compatibility code assumes that if
-> "password-secret" is given, only the cephx scheme is allowed. If it's
-> missing, both none and cephx are allowed because the configuration file=
-
-> could still provide a key.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
-
-> Any thoughts on the proposed QAPI schema or the two implementation
-> problems are welcome.
->=20
-
->  qapi/block-core.json |  22 +++++++++++
->  block/rbd.c          | 102 ++++++++++++++++++++++++++++++++++++++-----=
---------
->  2 files changed, 99 insertions(+), 25 deletions(-)
->=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index c50517bff3..d5ce588add 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3170,6 +3170,19 @@
-> =20
-> =20
->  ##
-> +# @RbdAuthCephx:
-> +#
-> +# @key-secret:         ID of a QCryptoSecret object providing a key fo=
-r cephx
-> +#                      authentication. If not specified, a key from th=
-e
-> +#                      specified configuration file, or the system def=
-ault
-> +#                      configuration is used, if present.
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'RbdAuthCephx',
-> +  'data': { '*key-secret': 'str' } }
-> +
-> +##
->  # @BlockdevOptionsRbd:
->  #
->  # @pool:               Ceph pool name.
-> @@ -3184,6 +3197,13 @@
->  #
->  # @user:               Ceph id name.
->  #
-> +# @auth-none:          true if connecting to a server without authenti=
-cation
-> +#                      should be allowed (default: false; since 2.13)
-> +#
-> +# @auth-cephx:         Configuration for cephx authentication if speci=
-fied. If
-> +#                      not specified, cephx authentication is not allo=
-wed.
-> +#                      (since 2.13)
-> +#
->  # @server:             Monitor host address and port.  This maps
->  #                      to the "mon_host" Ceph option.
->  #
-> @@ -3195,6 +3215,8 @@
->              '*conf': 'str',
->              '*snapshot': 'str',
->              '*user': 'str',
-> +            '*auth-none': 'bool',
-> +            '*auth-cephx': 'RbdAuthCephx',
->              '*server': ['InetSocketAddressBase'] } }
-
-Would it be better to have this be a flat union with 'auth' with enum
-values 'none', 'cephx', 'both' as a discriminator that determines which
-additional fields can be present?  Or does that require that we first
-fix the QAPI generator to allow nesting a flat union within another flat
-union (probably doable, just no one has needed it before now)?  Is it
-also time to improve the QAPI generator to allow a default value to the
-discriminator field, rather than requiring the field to be present?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---vGPgxWeb5EKqVq3RE0dj1YCKp4vZvRK7i
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrXR48ACgkQp6FrSiUn
-Q2qn3ggAsMMrj3nI9ZB0R7SlL/QbevW3ujv//GmnWvjyakkjiwJa2NebsqNdIWak
-FFniODvh3x0EXARZGcR/zDTkBOnUl913gKBGl0D9P3iTCV82fako88QGjg2vzLQh
-hgy5jGy8V818PIDUkn4jMervvKUBEBGH83rQUEoZ6oL4Htl5gTyfI2sBgMDZSF9o
-/k2nhpgY+CQfR/FzRW/JzkU4EtpMG+Xr1IsaJoc5/i848+mUilsqZ5+9BQZeOSs6
-sOsyaKB4yHv1wf2pYKHBjXIEu5sPmLcFUwkEFTZlVBJq3HbRkXMFpLHDpJzLCaUg
-poc3S/cPlTI3I20jvWo2AvLERxjiag==
-=dH2c
------END PGP SIGNATURE-----
-
---vGPgxWeb5EKqVq3RE0dj1YCKp4vZvRK7i--
+SGkgRnJhbmNpc2NvLA0KDQpGcm9tOiBmcmFuY2lzY28gaWdsZXNpYXMgW21haWx0bzpmcmFzc2Uu
+aWdsZXNpYXNAZ21haWwuY29tXQ0KU2VudDogV2VkbmVzZGF5LCBBcHJpbCAxOCwgMjAxOCA0OjEz
+IEFNDQpUbzogU2FpIFBhdmFuIEJvZGR1IDxzYWlwYXZhQHhpbGlueC5jb20+DQpDYzogYWxpc3Rh
+aXJAYWxpc3RhaXIyMy5tZTsgY3Jvc3Rod2FpdGUucGV0ZXJAZ21haWwuY29tOyBQZXRlciBNYXlk
+ZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZGRlIDxlZGdhci5pZ2xlc2lhc0BnbWFp
+bC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcgRGV2ZWxvcGVycyA8cWVtdS1kZXZlbEBub25n
+bnUub3JnPg0KU3ViamVjdDogUmU6IFtQQVRDSCB2MSAxLzFdIHhpbGlueF9zcGlwczogc2VuZCBk
+dW1teSBvbmx5IGlmIGNtZCByZXF1aXJlcyBpdA0KDQpIaSBTYWksDQoNCltQQVRDSCB2MV0geGls
+aW54X3NwaXBzOiBzZW5kIGR1bW15IG9ubHkgaWYgY21kIHJlcXVpcmVzIGl0DQoNCnMvZHVtbXkv
+ZHVtbXkgY3ljbGVzLw0KDQpPbiAxNyBBcHJpbCAyMDE4IGF0IDE2OjE4LCBTYWkgUGF2YW4gQm9k
+ZHUgPHNhaS5wYXZhbi5ib2RkdUB4aWxpbnguY29tPG1haWx0bzpzYWkucGF2YW4uYm9kZHVAeGls
+aW54LmNvbT4+IHdyb3RlOg0KRm9yIGFsbCB0aGUgY29tbWFuZHMsIHdoaWNoIGRvIG5vdCBoYXZl
+IGFuIGVudHJ5IGluDQp4aWxpbnhfc3BpcHNfbnVtX2R1bW1pZXMsIHByZXNlbnQgbG9naWMgc2Vu
+ZHMgZHVtbXkgYnl0ZSB3aGVuIGV2ZXIgd2UNCg0Kcy9kdW1teSBieXRlL2R1bW15IGN5Y2xlcy8N
+Cg0KYXJlIGluIFNOT09QX05PTkUgc3RhdGUsIGZpeCBpdCB0byBzZW5kIG9ubHkgaWYgY21kIHJl
+cXVpcmVzIHRoZW0uDQpzL2ZpeCBpdCB0byBzZW5kIG9ubHkgaWYgY21kL2ZpeCBpdCB0byBvbmx5
+IHNlbmQgZHVtbXkgY3ljbGVzIGlmIHRoZSBjb21tYW5kLw0KDQpPbmx5IHRyYW5zbWl0IG1heCBv
+ZiAxIGR1bW15IGJ5dGUoaS5lIDggY3ljbGVzKSBpcyBhIHNpbmdsZSBzbm9vcCBjeWNsZS4NCkFu
+ZCBhbHNvIGNvbnZlcnQgZHVtbXkgYnl0ZXMgdG8gY3ljbGVzIChyZXF1aXJlZCBieSBtMjVwODAp
+Lg0KDQpNYXliZSBpdCBpcyBiZXR0ZXIgdG8gZHJvcCB0aGlzIHR3byBsYXN0IGxpbmVzICh3YXMg
+YWxyZWFkeSBkb25lIGJlZm9yZSBzbyBpdCBjb3VsZCBiZSBtaXNsZWFkaW5nIHdoZW4gcmVhZGlu
+ZyBnaXQgaGlzdG9yeSkuDQoNCg0KU2lnbmVkLW9mZi1ieTogU2FpIFBhdmFuIEJvZGR1IDxzYWlw
+YXZhQHhpbGlueC5jb208bWFpbHRvOnNhaXBhdmFAeGlsaW54LmNvbT4+DQotLS0NCiBody9zc2kv
+eGlsaW54X3NwaXBzLmMgfCAxMyArKysrKysrKysrLS0tDQogMSBmaWxlIGNoYW5nZWQsIDEwIGlu
+c2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9ody9zc2kveGlsaW54
+X3NwaXBzLmMgYi9ody9zc2kveGlsaW54X3NwaXBzLmMNCmluZGV4IDQyNmY5NzEuLjgyNzg5MzAg
+MTAwNjQ0DQotLS0gYS9ody9zc2kveGlsaW54X3NwaXBzLmMNCisrKyBiL2h3L3NzaS94aWxpbnhf
+c3BpcHMuYw0KQEAgLTYyNywxMCArNjI3LDE3IEBAIHN0YXRpYyB2b2lkIHhpbGlueF9zcGlwc19m
+bHVzaF90eGZpZm8oWGlsaW54U1BJUFMgKnMpDQogICAgICAgICAgICAgICAgIHR4X3J4W2ldID0g
+dHg7DQogICAgICAgICAgICAgfQ0KICAgICAgICAgfSBlbHNlIHsNCi0gICAgICAgICAgICAvKiBF
+eHRyYWN0IGEgZHVtbXkgYnl0ZSBhbmQgZ2VuZXJhdGUgZHVtbXkgY3ljbGVzIGFjY29yZGluZyB0
+byB0aGUNCi0gICAgICAgICAgICAgKiBsaW5rIHN0YXRlICovDQogICAgICAgICAgICAgdHggPSBm
+aWZvOF9wb3AoJnMtPnR4X2ZpZm8pOw0KLSAgICAgICAgICAgIGR1bW15X2N5Y2xlcyA9IDggLyBz
+LT5saW5rX3N0YXRlOw0KKyAgICAgICAgICAgIGlmIChzLT5jbWRfZHVtbWllcyA+IDApIHsNCisg
+ICAgICAgICAgICAgICAgLyogRXh0cmFjdCBhIGR1bW15IGJ5dGUgYW5kIGdlbmVyYXRlIGR1bW15
+IGN5Y2xlcyBhY2NvcmRpbmcgdG8NCisgICAgICAgICAgICAgICAgICogdGhlIGxpbmsgc3RhdGUg
+Ki8NCisgICAgICAgICAgICAgICAgIGR1bW15X2N5Y2xlcyA9IChzLT5jbWRfZHVtbWllcyA/IDEg
+OiAwKSAqIDggLyBzLT5saW5rX3N0YXRlOw0KKyAgICAgICAgICAgICAgICAgcy0+Y21kX2R1bW1p
+ZXMtLTsNCisgICAgICAgICAgICB9IGVsc2Ugew0KKyAgICAgICAgICAgICAgICBmb3IgKGkgPSAw
+OyBpIDwgbnVtX2VmZmVjdGl2ZV9idXNzZXMocyk7ICsraSkgew0KKyAgICAgICAgICAgICAgICAg
+ICAgdHhfcnhbaV0gPSB0eDsNCisgICAgICAgICAgICAgICAgfQ0KKyAgICAgICAgICAgIH0NCiAg
+ICAgICAgIH0NCg0KQ291bGQgd2UgcmVwbGFjZSBhYm92ZSB3aXRoIGJlbG93IGluIHRoZSBzYW1l
+IGlmIGxhZGRlciBzbyB3ZSBkb24ndCBjb21wbGljYXRlIHRoZSBjb2RlIG1vcmUgdGhhbiBuZWNl
+c3Nhcnk/IChTaG91bGQgZ2l2ZSB0aGUgc2FtZSByZXN1bHQgd2hlbiBudW1fZWZmZWN0aXZlX2J1
+c3NlcyA9PSAxKQ0KDQotICAgICAgICB9IGVsc2UgaWYgKHMtPnNub29wX3N0YXRlID09IFNOT09Q
+X1NUUklQSU5HKSB7DQorICAgICAgICB9IGVsc2UgaWYgKHMtPnNub29wX3N0YXRlID09IFNOT09Q
+X1NUUklQSU5HIHx8DQorICAgICAgICAgICAgICAgICAgIHMtPnNub29wX3N0YXRlID09IFNOT09Q
+X05PTkUpIHsNCltTYWkgUGF2YW4gQm9kZHVdIFllcywgdGhpcyBjYW4gYmUgZG9uZS4gQXMgU05P
+T1BfTk9ORSBzdGF0ZSBpcyBtb3ZlZCBhYm92ZSwgdGhlIGxhc3QgYm90dG9tIGVsc2UgY2FuIGJl
+IHVzZWQgb25seSB0byBpc3N1ZSBkdW1teSBjeWNsZXMuIEkgd2lsbCBzZW5kIFYyIHdpdGggYWJv
+dmUgY2hhbmdlcyBhbmQgY29tbWl0IG1lc3NhZ2UgZml4ZWQuDQoNClJlZ2FyZHMsDQpTYWkgUGF2
+YW4NCg0KDQpUaGFuayB5b3UhDQoNCkJlc3QgcmVnYXJkcywNCkZyYW5jaXNjbyBJZ2xlc2lhcw0K
+DQoNCg0KICAgICAgICAgZm9yIChpID0gMDsgaSA8IG51bV9lZmZlY3RpdmVfYnVzc2VzKHMpOyAr
+K2kpIHsNCi0tDQoyLjcuNA0KDQo=
