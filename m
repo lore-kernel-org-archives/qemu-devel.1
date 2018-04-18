@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <saipava@xilinx.com>) id 1f8hLP-0000pn-Cl
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:17:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f8nA1-000459-4H
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:30:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <saipava@xilinx.com>) id 1f8hLM-00037T-5a
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:17:31 -0400
-Received: from mail-sn1nam02on0068.outbound.protection.outlook.com
-	([104.47.36.68]:63500
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1f8hLL-00036X-QK
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 03:17:28 -0400
-From: Sai Pavan Boddu <saipava@xilinx.com>
-Date: Wed, 18 Apr 2018 07:17:24 +0000
-Message-ID: <MWHPR02MB2478491B07FF972D6475F853CAB60@MWHPR02MB2478.namprd02.prod.outlook.com>
-References: <1523974696-1965-1-git-send-email-saipava@xilinx.com>
-	<1523974696-1965-2-git-send-email-saipava@xilinx.com>
-	<CAAYMZQu5JOTOp3K4awXPvzbaE7oqvK0XqqoNzKjB5ShR=BJnzQ@mail.gmail.com>
-In-Reply-To: <CAAYMZQu5JOTOp3K4awXPvzbaE7oqvK0XqqoNzKjB5ShR=BJnzQ@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1f8nA0-0005xx-Ba
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:30:09 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:40290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f8nA0-0005xa-6Z
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 09:30:08 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id x9-v6so1560652oig.7
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 06:30:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] xilinx_spips: send dummy only if
- cmd requires it
+In-Reply-To: <20180418124753.GM27579@redhat.com>
+References: <20180418123838.3511-1-olaf@aepfle.de>
+	<20180418124753.GM27579@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 18 Apr 2018 14:29:47 +0100
+Message-ID: <CAFEAcA_TtC-p4JJFRPaBFwim1a8J9G+z79KAK8vqrTx7ZKjOKg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: francisco iglesias <frasse.iglesias@gmail.com>
-Cc: "alistair@alistair23.me" <alistair@alistair23.me>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Edde <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Olaf Hering <olaf@aepfle.de>, QEMU Trivial <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-SGkgRnJhbmNpc2NvLA0KDQpGcm9tOiBmcmFuY2lzY28gaWdsZXNpYXMgW21haWx0bzpmcmFzc2Uu
-aWdsZXNpYXNAZ21haWwuY29tXQ0KU2VudDogV2VkbmVzZGF5LCBBcHJpbCAxOCwgMjAxOCA0OjEz
-IEFNDQpUbzogU2FpIFBhdmFuIEJvZGR1IDxzYWlwYXZhQHhpbGlueC5jb20+DQpDYzogYWxpc3Rh
-aXJAYWxpc3RhaXIyMy5tZTsgY3Jvc3Rod2FpdGUucGV0ZXJAZ21haWwuY29tOyBQZXRlciBNYXlk
-ZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZGRlIDxlZGdhci5pZ2xlc2lhc0BnbWFp
-bC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcgRGV2ZWxvcGVycyA8cWVtdS1kZXZlbEBub25n
-bnUub3JnPg0KU3ViamVjdDogUmU6IFtQQVRDSCB2MSAxLzFdIHhpbGlueF9zcGlwczogc2VuZCBk
-dW1teSBvbmx5IGlmIGNtZCByZXF1aXJlcyBpdA0KDQpIaSBTYWksDQoNCltQQVRDSCB2MV0geGls
-aW54X3NwaXBzOiBzZW5kIGR1bW15IG9ubHkgaWYgY21kIHJlcXVpcmVzIGl0DQoNCnMvZHVtbXkv
-ZHVtbXkgY3ljbGVzLw0KDQpPbiAxNyBBcHJpbCAyMDE4IGF0IDE2OjE4LCBTYWkgUGF2YW4gQm9k
-ZHUgPHNhaS5wYXZhbi5ib2RkdUB4aWxpbnguY29tPG1haWx0bzpzYWkucGF2YW4uYm9kZHVAeGls
-aW54LmNvbT4+IHdyb3RlOg0KRm9yIGFsbCB0aGUgY29tbWFuZHMsIHdoaWNoIGRvIG5vdCBoYXZl
-IGFuIGVudHJ5IGluDQp4aWxpbnhfc3BpcHNfbnVtX2R1bW1pZXMsIHByZXNlbnQgbG9naWMgc2Vu
-ZHMgZHVtbXkgYnl0ZSB3aGVuIGV2ZXIgd2UNCg0Kcy9kdW1teSBieXRlL2R1bW15IGN5Y2xlcy8N
-Cg0KYXJlIGluIFNOT09QX05PTkUgc3RhdGUsIGZpeCBpdCB0byBzZW5kIG9ubHkgaWYgY21kIHJl
-cXVpcmVzIHRoZW0uDQpzL2ZpeCBpdCB0byBzZW5kIG9ubHkgaWYgY21kL2ZpeCBpdCB0byBvbmx5
-IHNlbmQgZHVtbXkgY3ljbGVzIGlmIHRoZSBjb21tYW5kLw0KDQpPbmx5IHRyYW5zbWl0IG1heCBv
-ZiAxIGR1bW15IGJ5dGUoaS5lIDggY3ljbGVzKSBpcyBhIHNpbmdsZSBzbm9vcCBjeWNsZS4NCkFu
-ZCBhbHNvIGNvbnZlcnQgZHVtbXkgYnl0ZXMgdG8gY3ljbGVzIChyZXF1aXJlZCBieSBtMjVwODAp
-Lg0KDQpNYXliZSBpdCBpcyBiZXR0ZXIgdG8gZHJvcCB0aGlzIHR3byBsYXN0IGxpbmVzICh3YXMg
-YWxyZWFkeSBkb25lIGJlZm9yZSBzbyBpdCBjb3VsZCBiZSBtaXNsZWFkaW5nIHdoZW4gcmVhZGlu
-ZyBnaXQgaGlzdG9yeSkuDQoNCg0KU2lnbmVkLW9mZi1ieTogU2FpIFBhdmFuIEJvZGR1IDxzYWlw
-YXZhQHhpbGlueC5jb208bWFpbHRvOnNhaXBhdmFAeGlsaW54LmNvbT4+DQotLS0NCiBody9zc2kv
-eGlsaW54X3NwaXBzLmMgfCAxMyArKysrKysrKysrLS0tDQogMSBmaWxlIGNoYW5nZWQsIDEwIGlu
-c2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9ody9zc2kveGlsaW54
-X3NwaXBzLmMgYi9ody9zc2kveGlsaW54X3NwaXBzLmMNCmluZGV4IDQyNmY5NzEuLjgyNzg5MzAg
-MTAwNjQ0DQotLS0gYS9ody9zc2kveGlsaW54X3NwaXBzLmMNCisrKyBiL2h3L3NzaS94aWxpbnhf
-c3BpcHMuYw0KQEAgLTYyNywxMCArNjI3LDE3IEBAIHN0YXRpYyB2b2lkIHhpbGlueF9zcGlwc19m
-bHVzaF90eGZpZm8oWGlsaW54U1BJUFMgKnMpDQogICAgICAgICAgICAgICAgIHR4X3J4W2ldID0g
-dHg7DQogICAgICAgICAgICAgfQ0KICAgICAgICAgfSBlbHNlIHsNCi0gICAgICAgICAgICAvKiBF
-eHRyYWN0IGEgZHVtbXkgYnl0ZSBhbmQgZ2VuZXJhdGUgZHVtbXkgY3ljbGVzIGFjY29yZGluZyB0
-byB0aGUNCi0gICAgICAgICAgICAgKiBsaW5rIHN0YXRlICovDQogICAgICAgICAgICAgdHggPSBm
-aWZvOF9wb3AoJnMtPnR4X2ZpZm8pOw0KLSAgICAgICAgICAgIGR1bW15X2N5Y2xlcyA9IDggLyBz
-LT5saW5rX3N0YXRlOw0KKyAgICAgICAgICAgIGlmIChzLT5jbWRfZHVtbWllcyA+IDApIHsNCisg
-ICAgICAgICAgICAgICAgLyogRXh0cmFjdCBhIGR1bW15IGJ5dGUgYW5kIGdlbmVyYXRlIGR1bW15
-IGN5Y2xlcyBhY2NvcmRpbmcgdG8NCisgICAgICAgICAgICAgICAgICogdGhlIGxpbmsgc3RhdGUg
-Ki8NCisgICAgICAgICAgICAgICAgIGR1bW15X2N5Y2xlcyA9IChzLT5jbWRfZHVtbWllcyA/IDEg
-OiAwKSAqIDggLyBzLT5saW5rX3N0YXRlOw0KKyAgICAgICAgICAgICAgICAgcy0+Y21kX2R1bW1p
-ZXMtLTsNCisgICAgICAgICAgICB9IGVsc2Ugew0KKyAgICAgICAgICAgICAgICBmb3IgKGkgPSAw
-OyBpIDwgbnVtX2VmZmVjdGl2ZV9idXNzZXMocyk7ICsraSkgew0KKyAgICAgICAgICAgICAgICAg
-ICAgdHhfcnhbaV0gPSB0eDsNCisgICAgICAgICAgICAgICAgfQ0KKyAgICAgICAgICAgIH0NCiAg
-ICAgICAgIH0NCg0KQ291bGQgd2UgcmVwbGFjZSBhYm92ZSB3aXRoIGJlbG93IGluIHRoZSBzYW1l
-IGlmIGxhZGRlciBzbyB3ZSBkb24ndCBjb21wbGljYXRlIHRoZSBjb2RlIG1vcmUgdGhhbiBuZWNl
-c3Nhcnk/IChTaG91bGQgZ2l2ZSB0aGUgc2FtZSByZXN1bHQgd2hlbiBudW1fZWZmZWN0aXZlX2J1
-c3NlcyA9PSAxKQ0KDQotICAgICAgICB9IGVsc2UgaWYgKHMtPnNub29wX3N0YXRlID09IFNOT09Q
-X1NUUklQSU5HKSB7DQorICAgICAgICB9IGVsc2UgaWYgKHMtPnNub29wX3N0YXRlID09IFNOT09Q
-X1NUUklQSU5HIHx8DQorICAgICAgICAgICAgICAgICAgIHMtPnNub29wX3N0YXRlID09IFNOT09Q
-X05PTkUpIHsNCltTYWkgUGF2YW4gQm9kZHVdIFllcywgdGhpcyBjYW4gYmUgZG9uZS4gQXMgU05P
-T1BfTk9ORSBzdGF0ZSBpcyBtb3ZlZCBhYm92ZSwgdGhlIGxhc3QgYm90dG9tIGVsc2UgY2FuIGJl
-IHVzZWQgb25seSB0byBpc3N1ZSBkdW1teSBjeWNsZXMuIEkgd2lsbCBzZW5kIFYyIHdpdGggYWJv
-dmUgY2hhbmdlcyBhbmQgY29tbWl0IG1lc3NhZ2UgZml4ZWQuDQoNClJlZ2FyZHMsDQpTYWkgUGF2
-YW4NCg0KDQpUaGFuayB5b3UhDQoNCkJlc3QgcmVnYXJkcywNCkZyYW5jaXNjbyBJZ2xlc2lhcw0K
-DQoNCg0KICAgICAgICAgZm9yIChpID0gMDsgaSA8IG51bV9lZmZlY3RpdmVfYnVzc2VzKHMpOyAr
-K2kpIHsNCi0tDQoyLjcuNA0KDQo=
+On 18 April 2018 at 13:47, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
+ote:
+> On Wed, Apr 18, 2018 at 02:38:37PM +0200, Olaf Hering wrote:
+>> Since usage of g_realloc_n was introduced, glib-2.22 can not be used any=
+more.
+>> Fixes commit 418026ca43 ("util: Introduce vfio helpers")
+>
+> Normally we expect ./include/glib-compat.h to be changed in this scenario
+> to add compat for the missing symbol.
+>
+> IIRC, one of Peters desired build targets required 2.22, but I guess we
+> missed this bug because that platform would not enable vfio functionality=
+ ?
+
+Yes, my OSX build system is on glib 2.22. It's using 'fink' for 3rd
+party library installations, and they somehow seem to have got stuck
+on 2.22. Looking at the website the project seems to have basically
+stagnated, and I guess I need to move to homebrew at some point
+(likely after we get 2.12 out the door). But for the moment this
+patch would break my pullrequest testing builds.
+
+thanks
+-- PMM
