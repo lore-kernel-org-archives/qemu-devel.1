@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8mcx-0006i5-FS
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:56:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1f8mdm-0007Gj-FL
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f8mct-00017I-LR
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:55:59 -0400
-Date: Wed, 18 Apr 2018 13:55:45 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180418125545.GN27579@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418144538.4aa2f492.cohuck@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1f8mdi-0001xZ-Kp
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:56:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59024 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f8mdi-0001x4-Gg
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 08:56:46 -0400
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
+	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+	<20180418090457.dqg5gxnzobdofkao@sirius.home.kraxel.org>
+	<b3298c44-4cdf-1936-fb69-32d308ff3a25@redhat.com>
+	<20180418122312.ebmd2nrtvk2h5e45@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f8c3945f-d2e7-e4a4-2b38-2736acd99e7c@redhat.com>
+Date: Wed, 18 Apr 2018 14:56:34 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180418122312.ebmd2nrtvk2h5e45@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180418144538.4aa2f492.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Apr 18, 2018 at 02:45:38PM +0200, Cornelia Huck wrote:
-> On Wed, 18 Apr 2018 14:38:37 +0200
-> Olaf Hering <olaf@aepfle.de> wrote:
+On 04/18/18 14:23, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> > Since usage of g_realloc_n was introduced, glib-2.22 can not be used anymore.
-> > Fixes commit 418026ca43 ("util: Introduce vfio helpers")
-> > 
-> > Signed-off-by: Olaf Hering <olaf@aepfle.de>
-> > ---
-> >  configure | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/configure b/configure
-> > index 6e9b994f21..81760ef45a 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -3369,7 +3369,7 @@ fi
-> >  if test "$mingw32" = yes; then
-> >      glib_req_ver=2.30
-> >  else
-> > -    glib_req_ver=2.22
-> > +    glib_req_ver=2.24
-> >  fi
-> >  glib_modules=gthread-2.0
-> >  if test "$modules" = yes; then
-> > 
+>> Hmmm, I'm not sure I agree. One use case is that you want a domain
+>> config in which well-known OS-es, signed by the MS UEFI certs, just boot
+>> with SB enabled. (Some of our internal folks really want this.)
+>>
+>> Another use case is that you want a domain in which SB *can* be enabled,
+>> but your installer is signed with a different certificate chain (or it
+>> is unsigned), and with *just* the MS certs enrolled, it wouldn't boot at
+>> all. So you want the SB *feature*, but definitely not the initial
+>> enrollment / SB *operational mode*.
 > 
-> Are we ready to give up support for whatever distro is still on 2.22?
-> (If yes, can we bump to an even newer glib version?) Or should we
-> rather solve this by adding a g_realloc_n implementation for that case?
+> So "secure-boot-enrolled-keys" also has SB turned on.
 
-Version 2.22 was released in Sep 2009, so coming up for 9 years old now.
+Yes.
 
-At some point we should to declare that platforms shipping >= NNN year
-old versions of software are not a desirable target for QEMU. What is
-our desired NNN value - 9 years feels awfully long to me.
+>> For me to understand you better, are you suggesting merely that I:
+>>
+>> - rename @secure-boot-enrolled-keys to @enrolled-keys, and
+>>
+>> - drop the reference to @secure-boot from the end of the @enrolled-keys
+>>   documentation paragraph? (Namely, "@secure-boot-enrolled-keys is only
+>>   valid if the firmware also supports @secure-boot").
+> 
+> Yes.  So "secure-boot" specifies "firmware binary supports secure-boot"
+> and "enrolled-keys" specifies "firmware nvram template has keys enrolled
+> (and SB enabled).
 
-For libvirt we recently decided to become more aggressive[1] in culling old
-distros as supportable targets, declaring we'll only support non-EOL
-distros (for short life distros), or for long life distros (RHEL, LTS, etc)
-the most recent version, and the recent minus-1 for 2 years overlap.
+OK.
 
-Should we formalize similar guidelines for QEMU to give developers a
-guide for when it is reasonable to increase the min required version of
-any 3rd party library ?  glib is a mandatory dep, but we've countless
-other optional libraries we might wish to increase min versions for too,
-and no guide on when it is reasonable todo so.
+> Other question:  Do we want allow to specify which certs/keys are
+> enrolled?  Which would probably mean to drop "enrolled-keys" from
+> features and make it an optional string instead,
 
-Regards,
-Daniel
+Not an enum? "Microsoft" below should be an enum constant, shouldn't it?
 
-[1]   https://libvirt.org/platforms.html
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> then specify
+> "'enrolled-keys' : 'Microsoft'" in the json file.
+
+If this is really necessary (up to Dan :) ), I'm down with it.
+
+Thanks
+Laszlo
