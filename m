@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f9C5m-0004qk-0K
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:07:26 -0400
+	(envelope-from <groug@kaod.org>) id 1f9C7V-0006MT-3I
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f9C5g-0006kK-FG
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:07:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58004 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1f9C7Q-0000uf-Fo
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:09:13 -0400
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:33376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f9C5g-0006jx-91
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:07:20 -0400
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-7-tiwei.bie@intel.com>
-	<20180418192154-mutt-send-email-mst@kernel.org>
-	<20180419111439.i6gfhnept6wy7uzp@debian>
-	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
-	<c41439d6-69b7-474a-530f-07ffb5f1b9e6@redhat.com>
-	<20180419180912-mutt-send-email-mst@kernel.org>
-	<174b5e48-dfde-cb5f-e664-39d43a20a629@redhat.com>
-	<20180419185630-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <380b6838-7249-fec1-8ebb-1b899830a9a0@redhat.com>
-Date: Thu, 19 Apr 2018 18:07:07 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f9C7Q-0000qu-9O
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:09:08 -0400
+Received: from player791.ha.ovh.net (unknown [10.109.105.44])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 78E6912AD21
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 18:09:06 +0200 (CEST)
+Date: Thu, 19 Apr 2018 18:08:51 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180419180851.461a0db3@bahia.lan>
+In-Reply-To: <065165b5-3ab4-ae1a-f72c-c04f911656c3@redhat.com>
+References: <20180419072123.682-1-david@gibson.dropbear.id.au>
+	<20180419143318.4e24edaf@redhat.com>
+	<20180419145840.324602ff.cohuck@redhat.com>
+	<77d0717b-6eba-8b20-6691-c3085937604b@de.ibm.com>
+	<065165b5-3ab4-ae1a-f72c-c04f911656c3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180419185630-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v3 6/6] vhost-user:
- support registering external host notifiers
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.13] Clear mem_path if we
+ fall back to anonymous RAM allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +34,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Liang, Cunming" <cunming.liang@intel.com>, "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan,
-	Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, pbonzini@redhat.com
 
-On 19/04/2018 17:59, Michael S. Tsirkin wrote:
-> On Thu, Apr 19, 2018 at 05:51:51PM +0200, Paolo Bonzini wrote:
->> On 19/04/2018 17:19, Michael S. Tsirkin wrote:
->>>> - if we make it 1 when weak barriers are needed, the device also needs
->>>> to nack feature negotiation (not allow setting the FEATURES_OK) if the
->>>> bit is not set by the driver.
->>>>  However, that is not enough.  Live
->>>> migration assumes that it is okay to migrate a virtual machine from a
->>>> source that doesn't support a feature to a destination that supports it.
->>>>  In this case, it would assume that it is okay to migrate from software
->>>> virtio to hardware virtio.  This is wrong because the destination would
->>>> use weak barriers
->>>
->>> You can't migrate between systems with different sets of device features
->>> right now.
->>
->> Yes, you can, exactly because some features are defined not by the
->> machine type but rather by the host kernel.  See virtio_net_get_features
->> in QEMU's hw/virtio/virtio-net.c, and virtio_set_features_nocheck in
->> QEMU's hw/virtio/virtio.c.
+On Thu, 19 Apr 2018 16:11:37 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 19.04.2018 15:34, Christian Borntraeger wrote:
+> > 
+> > 
+> > On 04/19/2018 02:58 PM, Cornelia Huck wrote:  
+> >> On Thu, 19 Apr 2018 14:33:18 +0200
+> >> Igor Mammedov <imammedo@redhat.com> wrote:
+> >>  
+> >>> On Thu, 19 Apr 2018 17:21:23 +1000
+> >>> David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>>  
+> >>>> If the -mem-path option is set, we attempt to map the guest's RAM from a
+> >>>> file in the given path; it's usually used to back guest RAM with hugepages.
+> >>>> If we're unable to (e.g. not enough free hugepages) then we fall back to
+> >>>> allocating normal anonymous pages.  This behaviour can be surprising, but a
+> >>>> comment in allocate_system_memory_nonnuma() suggests it's legacy behaviour
+> >>>> we can't change.
+> >>>>
+> >>>> What really isn't ok, though, is that in this case we leave mem_path set.
+> >>>> That means functions which attempt to determine the pagesize of main RAM
+> >>>> can erroneously think it is hugepage based on the requested path, even
+> >>>> though it's not.
+> >>>>
+> >>>> This is particular bad for the pseries machine type.  KVM HV limitations
+> >>>> mean the guest can't use pagesizes larger than the host page size used to
+> >>>> back RAM.  That means that such a fallback, rather than merely giving
+> >>>> poorer performance that expected will cause the guest to freeze up early in
+> >>>> boot as it attempts to use large page mappings that can't work.
+> >>>>
+> >>>> This patch addresses the problem by clearing the mem_path variable when we
+> >>>> fall back to anonymous pages, meaning that subsequent attempts to
+> >>>> determine the RAM page size will get an accurate result.
+> >>>>
+> >>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>> ---
+> >>>>  numa.c | 1 +
+> >>>>  1 file changed, 1 insertion(+)
+> >>>>
+> >>>> Paolo et al, as with my earlier patches adding some extensions to the
+> >>>> helpers for determining backing page sizes, if there are no objections
+> >>>> can I get an ack to merge this via my ppc tree?
+> >>>>
+> >>>> diff --git a/numa.c b/numa.c
+> >>>> index 1116c90af9..78a869e598 100644
+> >>>> --- a/numa.c
+> >>>> +++ b/numa.c
+> >>>> @@ -469,6 +469,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+> >>>>              /* Legacy behavior: if allocation failed, fall back to
+> >>>>               * regular RAM allocation.
+> >>>>               */
+> >>>> +            mem_path = NULL;
+> >>>>              memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
+> >>>>          }
+> >>>>  #else    
+> >>>
+> >>> mem_path is also used by kvm_s390_apply_cpu_model(),
+> >>> and in ccw_init() memory is initialized before CPUs are
+
+Something similar happens with spapr: kvm_fixup_page_sizes() calls
+qemu_getrampagesize() during CPU start, which happens before the machine
+init calls allocate_system_memory_nonnuma(). Shouldn't we allocate memory
+before calling spapr_init_cpus() in spapr_machine_init() then ?
+
+> >>> so if QEM was started with -mem-path, then before patch
+> >>> created CPU won't have CMM enabled and print warning:
+> >>>   
+> >>>  "CMM will not be enabled because it is not compatible with hugetlbfs."
+> >>>
+> >>> and after patch it might enable CMM if we clear mem_path.
+> >>> So question is do we care about this?  
+> >>
+> >> I don't quite remember the cmm semantics here -- Christian?  
+> > 
+> > The CMMA interface does not work on large pages. I think the kernel will react
+> > with EFAULT in some cases (cmma migration and others) so qemu will probably fail
+> > unexpectedly. 
+> > 
+> > But this patch seems to only clear mem-path if we do not allocate at all from
+> > hugetlbfs. So things should be ok, no?
+> > 
+> >   
 > 
-> Oh you are right. Well we can just special-case that one :)
+> This even looks like the right thing to me, as hugetlbfs was never
+> supported.
+> 
 
-Anything wrong with bumping the PCI revision?
-
-Paolo
+Unrelated to this patch, -mem-path can be passed something that doesn't sit
+in a hugetlbfs, in which case we use getpagesize()... is there a reason for
+kvm_s390_enable_cmma() to filter out this case as well ? Or should we rather
+check mem_path isn't NULL and points to a hugetlbfs ?
