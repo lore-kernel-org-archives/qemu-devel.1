@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98vs-0008U1-7o
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:02 -0400
+	(envelope-from <clg@kaod.org>) id 1f98w3-0000G1-EM
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98vo-0008T0-A9
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:00 -0400
-Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:45698)
+	(envelope-from <clg@kaod.org>) id 1f98vz-00008Y-GQ
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:11 -0400
+Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:33167)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98vn-0008Rn-WD
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:56 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.108.57])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 8B7D01574EE
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:44:54 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98vz-00007l-78
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:07 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.105.55])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BC817167D19
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:45:05 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Apr 2018 14:43:08 +0200
-Message-Id: <20180419124331.3915-13-clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:43:10 +0200
+Message-Id: <20180419124331.3915-15-clg@kaod.org>
 In-Reply-To: <20180419124331.3915-1-clg@kaod.org>
 References: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/35] spapr: add a sPAPRXive object to the
- machine
+Subject: [Qemu-devel] [PATCH v3 14/35] spapr: add device tree support for
+ the XIVE exploitation mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,178 +33,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The sPAPRXive object is designed to be always available, so it is
-created unconditionally on newer machines. Depending on the
-configuration and the guest capabilities, the CAS negotiation process
-will decide which interrupt mode to activate: legacy or XIVE
-exploitation.
+The XIVE interface for the guest is described in the device tree under
+the "interrupt-controller" node. A couple of new properties are
+specific to XIVE :
 
-The XIVE model makes use of the full range of the IRQ number space.
-The IRQ numbers for the CPU IPIs in XIVE are allocated at the bottom
-of this space, below XICS_IRQ_BASE, to preserve compatibility with
-XICS which does not use that range.
+ - "reg"
 
-That leaves us with 4K possible IPIs. This should be enough for
-sometime given that the maximum number of CPUs is 1024 for the sPAPR
-machine under QEMU. For the record, the biggest POWER8 or POWER9
-system has a maximum of 1536 HW threads (16 sockets, 192 cores, SMT8).
+   contains the base address and size of the thread interrupt
+   managnement areas (TIMA), also called rings, for the User level and
+   for the Guest OS level. Only the Guest OS level is taken into
+   account today.
 
-Also make sure that the allocated IRQ numbers are kept in sync between
-XICS and XIVE, when available.
+ - "ibm,xive-eq-sizes"
+
+   the size of the event queues. One cell per size supported, contains
+   log2 of size, in ascending order.
+
+ - "ibm,xive-lisn-ranges"
+
+   the IRQ interrupt number ranges assigned to the guest for the IPIs.
+
+and also under the root node :
+
+ - "ibm,plat-res-int-priorities"
+
+   contains a list of priorities that the hypervisor has reserved for
+   its own use. OPAL uses the priority 7 queue to automatically
+   escalate interrupts for all other queues (DD2.X POWER9). So only
+   priorities [0..6] are allowed for the guest.
+
+When the XIVE exploitation interrupt mode is activated after the CAS
+negotiation, the machine will perform a reboot to rebuild the device
+tree.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
-
- Changes since v2 :
-
- - introduced the xive_system_init() routine
- - handled vsmt by moving the allocation of the IPIS after the CPUs
-   are initialized
-
- hw/ppc/spapr.c         | 63 ++++++++++++++++++++++++++++++++++++++++++++=
+ hw/intc/spapr_xive_hcall.c  | 64 +++++++++++++++++++++++++++++++++++++++=
 ++++++
- include/hw/ppc/spapr.h |  2 ++
- 2 files changed, 65 insertions(+)
+ hw/ppc/spapr.c              |  7 ++++-
+ hw/ppc/spapr_hcall.c        |  6 +++++
+ include/hw/ppc/spapr_xive.h |  2 ++
+ 4 files changed, 78 insertions(+), 1 deletion(-)
 
+diff --git a/hw/intc/spapr_xive_hcall.c b/hw/intc/spapr_xive_hcall.c
+index 9f3d579bba2c..7dcb1f90ae5b 100644
+--- a/hw/intc/spapr_xive_hcall.c
++++ b/hw/intc/spapr_xive_hcall.c
+@@ -857,3 +857,67 @@ void spapr_xive_hcall_init(sPAPRMachineState *spapr)
+     spapr_register_hypercall(H_INT_SYNC, h_int_sync);
+     spapr_register_hypercall(H_INT_RESET, h_int_reset);
+ }
++
++void spapr_dt_xive(sPAPRMachineState *spapr, int nr_servers,
++                   void *fdt, uint32_t phandle)
++{
++    sPAPRXive *xive =3D spapr->xive;
++    int node;
++    uint64_t timas[2 * 2];
++    /* Interrupt number ranges for the IPIs */
++    uint32_t lisn_ranges[] =3D {
++        cpu_to_be32(0),
++        cpu_to_be32(nr_servers),
++    };
++    uint32_t eq_sizes[] =3D {
++        cpu_to_be32(12), /* 4K */
++        cpu_to_be32(16), /* 64K */
++        cpu_to_be32(21), /* 2M */
++        cpu_to_be32(24), /* 16M */
++    };
++    /* The following array is in sync with the 'priority_is_valid'
++     * routine above. Linux is expected to choose priority 6.
++     */
++    uint32_t plat_res_int_priorities[] =3D {
++        cpu_to_be32(7),    /* start */
++        cpu_to_be32(0xf8), /* count */
++    };
++    int i;
++    gchar *nodename;
++
++    /* Thread Interrupt Management Area : User and OS views */
++    for (i =3D 0; i < 2; i++) {
++        timas[i * 2] =3D cpu_to_be64(xive->tm_base + i * (1ull << TM_SHI=
+FT));
++        timas[i * 2 + 1] =3D cpu_to_be64(1ull << TM_SHIFT);
++    }
++
++    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64, xive->=
+tm_base);
++    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
++    g_free(nodename);
++
++    _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
++    _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
++
++    _FDT(fdt_setprop_string(fdt, node, "compatible", "ibm,power-ivpe"));
++    _FDT(fdt_setprop(fdt, node, "ibm,xive-eq-sizes", eq_sizes,
++                     sizeof(eq_sizes)));
++    _FDT(fdt_setprop(fdt, node, "ibm,xive-lisn-ranges", lisn_ranges,
++                     sizeof(lisn_ranges)));
++
++    /* For Linux to link the LSIs to the main interrupt controller.
++     * These properties are not in XIVE exploitation mode sPAPR
++     * specs
++     */
++    _FDT(fdt_setprop(fdt, node, "interrupt-controller", NULL, 0));
++    _FDT(fdt_setprop_cell(fdt, node, "#interrupt-cells", 2));
++
++    /* For SLOF */
++    _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
++    _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
++
++    /* The "ibm,plat-res-int-priorities" property defines the priority
++     * ranges reserved by the hypervisor
++     */
++    _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
++                     plat_res_int_priorities, sizeof(plat_res_int_priori=
+ties)));
++}
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b459c0076792..8bbd2a677935 100644
+index 7a65dcde3ff7..d4bc6f56c9d4 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -56,6 +56,7 @@
- #include "hw/ppc/spapr_vio.h"
- #include "hw/pci-host/spapr.h"
- #include "hw/ppc/xics.h"
-+#include "hw/ppc/spapr_xive.h"
- #include "hw/pci/msi.h"
+@@ -1188,7 +1188,12 @@ static void *spapr_build_fdt(sPAPRMachineState *sp=
+apr,
+     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
 =20
- #include "hw/pci/pci.h"
-@@ -209,6 +210,48 @@ static void xics_system_init(MachineState *machine, =
-int nr_irqs, Error **errp)
+     /* /interrupt controller */
+-    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
++    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
++        spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
++    } else {
++        /* Populate device tree for XIVE */
++        spapr_dt_xive(spapr, xics_max_server_number(spapr), fdt, PHANDLE=
+_XICP);
++    }
+=20
+     ret =3D spapr_populate_memory(spapr, fdt);
+     if (ret < 0) {
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 16bccdd5c012..3215c3b4aec3 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1655,6 +1655,12 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+             (spapr_h_cas_compose_response(spapr, args[1], args[2],
+                                           ov5_updates) !=3D 0);
      }
- }
-=20
-+static sPAPRXive *spapr_xive_create(sPAPRMachineState *spapr,
-+                                    const char *type_xive, int nr_irqs,
-+                                    Error **errp)
-+{
-+    Error *local_err =3D NULL;
-+    Object *obj;
 +
-+    obj =3D object_new(type_xive);
-+    object_property_add_child(OBJECT(spapr), "xive", obj, &error_abort);
-+    object_property_set_int(obj, nr_irqs, "nr-irqs",  &local_err);
-+    if (local_err) {
-+        goto error;
-+    }
-+    object_property_set_bool(obj, true, "realized", &local_err);
-+    if (local_err) {
-+        goto error;
++    /* We need to rebuild the device tree for XIVE, generate a reset */
++    if (!spapr->cas_reboot) {
++        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EXPL=
+OIT);
 +    }
 +
-+    qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
-+    return SPAPR_XIVE(obj);
-+error:
-+    error_propagate(errp, local_err);
-+    return NULL;
-+}
-+
-+static void xive_system_init(MachineState *machine, int nr_irqs, Error *=
-*errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-+
-+    /* We don't have KVM support yet, so check for irqchip=3Don */
-+    if (kvm_enabled() && machine_kernel_irqchip_required(machine)) {
-+        error_report("kernel_irqchip requested. no XIVE support");
-+        exit(1);
-+    }
-+
-+    if (spapr->xive) {
-+        return;
-+    }
-+
-+    spapr->xive =3D spapr_xive_create(spapr, TYPE_SPAPR_XIVE, nr_irqs, e=
-rrp);
-+}
-+
- static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu=
-,
-                                   int smt_threads)
- {
-@@ -2473,6 +2516,12 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-     /* Set up Interrupt Controller before we create the VCPUs */
-     xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
+     spapr_ovec_cleanup(ov5_updates);
 =20
-+    if (spapr->xive_exploitation) {
-+        /* XIVE uses the full range of IRQ numbers. */
-+        xive_system_init(machine, XICS_IRQ_BASE + XICS_IRQS_SPAPR,
-+                         &error_fatal);
-+    }
-+
-     /* Set up containers for ibm,client-architecture-support negotiated =
-options
-      */
-     spapr->ov5 =3D spapr_ovec_new();
-@@ -2503,6 +2552,14 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-     /* init CPUs */
-     spapr_init_cpus(spapr);
+     if (spapr->cas_reboot) {
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 49c78b8e33c6..416f51404ce2 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -46,5 +46,7 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor=
+ *mon);
+ typedef struct sPAPRMachineState sPAPRMachineState;
 =20
-+    /* Allocate the first IRQ numbers for the CPU IPIs, below
-+     * XICS_IRQ_BASE, which is unused by XICS. */
-+    if (spapr->xive_exploitation) {
-+        for (i =3D 0; i < xics_max_server_number(spapr); ++i) {
-+            spapr_xive_irq_enable(spapr->xive, i, false);
-+        }
-+    }
-+
-     if (kvm_enabled()) {
-         /* Enable H_LOGICAL_CI_* so SLOF can talk to in-kernel devices *=
-/
-         kvmppc_enable_logical_ci_hcalls();
-@@ -3752,6 +3809,9 @@ static int ics_find_free_block(ICSState *ics, int n=
-um, int alignnum)
- static void spapr_irq_set_lsi(sPAPRMachineState *spapr, int irq, bool ls=
-i)
- {
-     ics_set_irq_type(spapr->ics, irq - spapr->ics->offset, lsi);
-+    if (spapr->xive_exploitation) {
-+        spapr_xive_irq_enable(spapr->xive, irq, lsi);
-+    }
- }
+ void spapr_xive_hcall_init(sPAPRMachineState *spapr);
++void spapr_dt_xive(sPAPRMachineState *spapr, int nr_servers, void *fdt,
++                   uint32_t phandle);
 =20
- int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-@@ -3842,6 +3902,9 @@ void spapr_irq_free(sPAPRMachineState *spapr, int i=
-rq, int num)
-             memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
-         }
-     }
-+    if (spapr->xive_exploitation) {
-+        spapr_xive_irq_disable(spapr->xive, irq);
-+    }
- }
-=20
- qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 3f8980310492..875f658973a1 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -14,6 +14,7 @@ struct sPAPRNVRAM;
- typedef struct sPAPREventLogEntry sPAPREventLogEntry;
- typedef struct sPAPREventSource sPAPREventSource;
- typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-+typedef struct sPAPRXive sPAPRXive;
-=20
- #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
- #define SPAPR_ENTRY_POINT       0x100
-@@ -166,6 +167,7 @@ struct sPAPRMachineState {
-=20
-     const char *icp_type;
-     uint8_t xive_exploitation;
-+    sPAPRXive  *xive;
-=20
-     bool cmd_line_caps[SPAPR_CAP_NUM];
-     sPAPRCapabilities def, eff, mig;
+ #endif /* PPC_SPAPR_XIVE_H */
 --=20
 2.13.6
