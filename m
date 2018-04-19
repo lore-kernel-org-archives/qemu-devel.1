@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51134)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f95O2-00071J-Vd
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:57:52 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52062)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1f95Q5-0007xE-Ii
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f95Nz-000424-Ti
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:57:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56516 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f95Nz-00040U-LV
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:57:47 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d83f2e6c-1fe1-324d-aa09-459d37cab292@redhat.com>
-Date: Thu, 19 Apr 2018 10:57:22 +0200
+	(envelope-from <n54@gmx.com>) id 1f95Q4-0005DU-Sn
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:59:57 -0400
+References: <20180418123838.3511-1-olaf@aepfle.de>
+	<20180418144538.4aa2f492.cohuck@redhat.com>
+	<20180418125545.GN27579@redhat.com> <87sh7rvf27.fsf@dusky.pond.sub.org>
+	<20180419093024.27c77433.olaf@aepfle.de>
+	<20180419075958.GD10259@redhat.com>
+	<CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <71ff6ce5-c878-de18-5d03-bb4a8b66a98a@gmx.com>
+Date: Thu, 19 Apr 2018 11:01:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180417224054.26363-1-lersek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+In-Reply-To: <CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GsdJWqCo4910G8fLK8MvGDsiRkCRPuXpS"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v1] configure: require
+ glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Olaf Hering <olaf@aepfle.de>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 18.04.2018 00:40, Laszlo Ersek wrote:
-> Add a schema that describes the different uses and properties of virtual
-> machine firmware.
-> 
-> Each firmware executable installed on a host system should come with at
-> least one JSON file that conforms to this schema. Each file informs the
-> management applications about the firmware's properties and one possible
-> use case / feature set.
-> 
-> In addition, a configuration directory with symlinks to the JSON files
-> should exist, with the symlinks carefully named to reflect a priority
-> order. Management applications can then search this directory in priority
-> order for the first firmware description that satisfies their search
-> criteria. The found JSON file provides the management layer with domain
-> configuration bits that are required to run the firmware binary for a
-> certain use case or feature set.
-[...]
-> +##
-> +# @FirmwareMappingFlash:
-> +#
-> +# Describes loading and mapping properties for the firmware executable and its
-> +# accompanying NVRAM file, when @FirmwareDevice is @flash.
-> +#
-> +# @executable: Identifies the firmware executable. The firmware executable may
-> +#              be shared by multiple virtual machine definitions. The
-> +#              corresponding QEMU command line option is "-drive
-> +#              if=pflash,unit=0,readonly=on,file=@executable.@pathname,format=@executable.@format".
-> +#
-> +# @nvram_template: Identifies the NVRAM template compatible with @executable.
-> +#                  Management software instantiates an individual copy -- a
-> +#                  specific NVRAM file -- from @nvram_template.@pathname for
-> +#                  each new virtual machine definition created.
-> +#                  @nvram_template.@pathname itself is never mapped into
-> +#                  virtual machines, only individual copies of it are. An NVRAM
-> +#                  file is typically used for persistently storing the
-> +#                  non-volatile UEFI variables of a virtual machine definition.
-> +#                  The corresponding QEMU command line option is "-drive
-> +#                  if=pflash,unit=1,readonly=off,file=PATHNAME_OF_PRIVATE_NVRAM_FILE,format=@nvram_template.@format".
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct' : 'FirmwareMappingFlash',
-> +  'data'   : { 'executable'     : 'FirmwareFlashFile',
-> +               'nvram_template' : 'FirmwareFlashFile' } }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GsdJWqCo4910G8fLK8MvGDsiRkCRPuXpS
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Olaf Hering <olaf@aepfle.de>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <71ff6ce5-c878-de18-5d03-bb4a8b66a98a@gmx.com>
+Subject: Re: [Qemu-trivial] [Qemu-devel] [PATCH v1] configure: require
+ glib-2.24
+References: <20180418123838.3511-1-olaf@aepfle.de>
+ <20180418144538.4aa2f492.cohuck@redhat.com>
+ <20180418125545.GN27579@redhat.com> <87sh7rvf27.fsf@dusky.pond.sub.org>
+ <20180419093024.27c77433.olaf@aepfle.de> <20180419075958.GD10259@redhat.com>
+ <CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I think it's more common to use "-" than "_" in these json files, so
-maybe better use "nvram-template" instead of "nvram_template" ?
+On 19.04.2018 10:54, Peter Maydell wrote:
+> On 19 April 2018 at 08:59, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+>> I wouldn't say people don't care about SLE11 (or other similarly old d=
+istros
+>> like RHEL-6). Rather the view in libvirt was that if a user is stuck o=
+n such
+>> an old distro, they are likely doing that because they want the stabil=
+ity
+>> inherant in running fixed software versions for years. IOW it is unlik=
+ely
+>> that they want the stability of an old distro, combined with cutting e=
+dge
+>> libvirt and/or QEMU.
+>=20
+> Well, it depends. You might be stuck with an old distro because
+> some software you want to run depends on it, but also want to run
+> newer versions of some programs like QEMU. If you're in that
+> boat you can probably live with having to also compile a newer
+> version of glib to go with your newer QEMU, though. I think the
+> policy as outlined in that libvirt page seems a good one (it's
+> basically a codification of what we've been doing already), with
+> a few tweaks -- I think we still believe we support some older
+> OSX releases, and would want to mention NetBSD/OpenBSD I guess.
+>=20
 
- Thomas
+In NetBSD we don't really support pkgsrc branches more than quarterly
+and keep using usually the recent releases.
+
+> thanks
+> -- PMM
+>=20
+
+
+
+--GsdJWqCo4910G8fLK8MvGDsiRkCRPuXpS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlrYWwUMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsrJIQALDlGqzgpSybC8zRwsEt2y9fpGqm1/Kwj0XL7HSZ
+xlVIqsAZqikZxXJKrHZgEj+6TTVp0SwfEEUkN++PzHydvay/NtvOEUWEphLrY4J+
+CYF/IlvVmVEM7jbWcpLwn4WRiza0I2TLESnR2yPGu0+phKiuaLgvnyCcgKKoohzV
+UcV1IlPRz618SHwxTvc00uwD+cXZC3n16ncr66Ifpgowz/P+yGDttrL/P917tKzu
+Vy6HNjKUupoEHek0KIygYydZXV7AEvKN5knNHqWj+rJFlBFFFZOpaNr7oWFuCSRH
+M4E1Mm/Zp8vBTYfzL2gn0e8w5nFe7bX3i8uvHmby1j9BuBocupUZxjBPDzKsesVR
+SLXcP556jIhfnGKun1mdumtYtCMlqB+b+p6qcL4TOm//oABJyN2iTSV8krCgfnT5
+fajr6unmUjqr2rRrpFX9Pa4804iJzOZEiJHGlZNLZ4KNXUsLDqvXwvex/0D1hFbE
+PKGv4FSLlzHYdeTToUO49p3o6xjN8rwBAOZPOjAGZxqlEwsts6VCKY/PghF3Q1Vh
+L9SJY2/TxDgoa8/AglnBotGRs3k5VrOUb4ZdCE3IfiIuKnTrURg0LHrVzHnVAZZl
+8yMXEbMnHcS31UKEkNhz2KX+rubG2FQ4/RowS7WI4zCR3eFF/7DM2iH8FAw3l031
+/OIw
+=Ph2C
+-----END PGP SIGNATURE-----
+
+--GsdJWqCo4910G8fLK8MvGDsiRkCRPuXpS--
