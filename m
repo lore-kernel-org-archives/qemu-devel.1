@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f95n0-0004ET-Kv
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:23:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f96Ai-0007GJ-3a
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f95mw-0005AA-N1
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:23:38 -0400
-Date: Thu, 19 Apr 2018 10:23:20 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180419092320.GJ10259@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418144538.4aa2f492.cohuck@redhat.com>
-	<20180418125545.GN27579@redhat.com>
-	<87sh7rvf27.fsf@dusky.pond.sub.org>
-	<20180419093024.27c77433.olaf@aepfle.de>
-	<20180419075958.GD10259@redhat.com>
-	<CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
-	<20180419092017.olujzxzlwvjlt6en@sirius.home.kraxel.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1f96Ah-0004aj-2w
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:48:08 -0400
+Date: Thu, 19 Apr 2018 19:47:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180419094745.GL2317@umbus.fritz.box>
+References: <1524061685-83305-1-git-send-email-imammedo@redhat.com>
+	<1524061685-83305-3-git-send-email-imammedo@redhat.com>
+	<20180419041520.GJ2317@umbus.fritz.box>
+	<20180419103019.39f8850a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DN8g+DOX2TxGxleI"
 Content-Disposition: inline
-In-Reply-To: <20180419092017.olujzxzlwvjlt6en@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+In-Reply-To: <20180419103019.39f8850a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.13 v2 2/5] ppc: e500: switch E500
+ based machines to full machine definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com, Alexander Graf <agraf@suse.de>, "open list:e500" <qemu-ppc@nongnu.org>
 
-On Thu, Apr 19, 2018 at 11:20:17AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > Well, it depends. You might be stuck with an old distro because
-> > some software you want to run depends on it, but also want to run
-> > newer versions of some programs like QEMU. If you're in that
-> > boat you can probably live with having to also compile a newer
-> > version of glib to go with your newer QEMU, though.
-> 
-> Core libraries like glib might not be that easy, I've seen updating glib
-> breaking apps in the past.
 
-You would likely just have to build it all into /opt/qemu so it is
-isolated from whatever the distro included. 
+--DN8g+DOX2TxGxleI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Thu, Apr 19, 2018 at 10:30:19AM +0200, Igor Mammedov wrote:
+> On Thu, 19 Apr 2018 14:15:20 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Wed, Apr 18, 2018 at 04:28:02PM +0200, Igor Mammedov wrote:
+> > > Convert PPCE500Params to PCCE500MachineClass which it essentially is,
+> > > and introduce PCCE500MachineState to keep track of E500 specific
+> > > state instead of adding global variables or extra parameters to
+> > > functions when we need to keep data beyond machine init
+> > > (i.e. make it look like typical fully defined machine).
+> > >=20
+> > > It's pretty shallow conversion instead of currently used trivial
+> > > DEFINE_MACHINE() macro. It adds extra 60LOC of boilerplate code
+> > > of full machine definition.
+> > >=20
+> > > The patch on top[1] will use PCCE500MachineState to keep track of
+> > > platform_bus device and add E500Plate specific machine class
+> > > to use HOTPLUG_HANDLER for explicitly initializing dynamic
+> > > sysbus devices at the time they are added instead of delaying
+> > > it to machine done time by platform_bus_init_notify() which is
+> > > being removed.
+> > >=20
+> > > 1)  <1523551221-11612-3-git-send-email-imammedo@redhat.com>
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > Suggested-by: David Gibson <david@gibson.dropbear.id.au> =20
+> >=20
+> > As noted elsewhere, I've already merged this into my ppc-for-2.13
+> > tree.  However, don't let that stop you from posting and/or queueing
+> > it elsewhere.  Whoever ends up merging first once 2.13 opens, it
+> > should be easy to resolve.
+> Yep, that's been intention, i.e. have whole series on list so
+> reader won't have to hunt for queued dependencies in different trees.
+> After all it's trivial to fix merge conflict when path is merged
+> in several trees.
+
+Right, I figured.  Just making sure it was clear that me merging it
+didn't mean I wanted you to exclude it from your own queue.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--DN8g+DOX2TxGxleI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrYZbsACgkQbDjKyiDZ
+s5LFFRAA5Z8F1NFJOFnX/sfhoF79+ECjJubBvFOQV/xnzTwBeDqDcguyJIAx27bA
+xbp5RFs7e2E7aaGf49vINGrdR6vVygoOEXfXtSDYkBzAK7e3gm3sldSTj/KFRlaP
+h1FBzMme4tSmFYkEFD6xgNvY05VG27PEpv/9oEzTAPWwSpWRBorG0eFchsieySNu
+IBPgEiDO3DFHZVfYLyEOzhPMoZBoHlnekpWllRhx00ARpY8twRXk8dma4qu5mt7+
+0pHJrQ206Bi6xeHKYdYJovZfu+YhCogkvoXM+P7TKVq0AEAzy8ly9urDy2H4sscc
+N9vPI87RDL0aKkKph8k6tn3pjg0DckGTI8iqWjvmlCV4GE8yHQyI4/9GClYbq2pC
+bUdnPZe4O/RZfhW499bXfDJny89bun9JXv0rbLPbPYYm6o8/cQmEf7Q177eJGh2p
+7/2mTJsLcSsK7FH8y47eHiO+XAGKw2v3CgOlnq6yol5Moyp9zayuIGvpj7bVjJdY
+2IzeVsXMQDWslpBxRYh2JehDS57djygwKWwCFFeiUxUdKOOiHpSzrEDhr0f70Z9S
+CpdPZ4639U7bhv4qbT5lp/0Vuszt1bOoh6XzmJwdOErh88aFeFxIXYYzq/v19nKt
+VQ90KpEK6Ri6zpz04nJLNMS3RCQtFGwoCXKMcRFQbB6p301WSJk=
+=yfHk
+-----END PGP SIGNATURE-----
+
+--DN8g+DOX2TxGxleI--
