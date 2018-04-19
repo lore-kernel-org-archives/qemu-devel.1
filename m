@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f9I9G-0002lO-KH
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 18:35:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f9IL1-0008Dj-1l
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 18:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f9I9C-0006yp-Fh
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 18:35:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46402 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f9I9C-0006vl-AM
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 18:35:22 -0400
-References: <20180212072207.9367-1-armbru@redhat.com>
-	<20180212072207.9367-15-armbru@redhat.com>
-	<CAMxuvaxFtRUrzJsgyG+sF+ZyppB=dZx_UW=Jjw6tuWpj1O92sw@mail.gmail.com>
-	<87muzzingj.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b5cd1476-87b6-a629-290c-70d97a5bbc80@redhat.com>
-Date: Thu, 19 Apr 2018 17:35:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1f9IKz-0006Js-Rs
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 18:47:35 -0400
+References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
+	<20180416114414.18406-6-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <3cd7df2d-f741-4283-2612-87d98151c6a4@redhat.com>
+Date: Thu, 19 Apr 2018 18:47:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <87muzzingj.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Lp1A89c2C0zq46MMRNafOyPGHiqz9YQSE"
-Subject: Re: [Qemu-devel] [PATCH RFC 14/14] qapi: Add #if conditions to
- commands, events, types, visitors
+In-Reply-To: <20180416114414.18406-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/7] blockdev: refactor
+ block-dirty-bitmap-clear transaction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +25,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lp1A89c2C0zq46MMRNafOyPGHiqz9YQSE
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <b5cd1476-87b6-a629-290c-70d97a5bbc80@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 14/14] qapi: Add #if conditions to
- commands, events, types, visitors
-References: <20180212072207.9367-1-armbru@redhat.com>
- <20180212072207.9367-15-armbru@redhat.com>
- <CAMxuvaxFtRUrzJsgyG+sF+ZyppB=dZx_UW=Jjw6tuWpj1O92sw@mail.gmail.com>
- <87muzzingj.fsf@dusky.pond.sub.org>
-In-Reply-To: <87muzzingj.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/23/2018 12:13 PM, Markus Armbruster wrote:
-
-[reviving this RFC]
-
->=20
-> For what it's worth, I disliked the decorator magic enough to write thi=
-s
-> series.
->=20
->>                Furthermore, I don't fancy much having to redo and tune=
-
->> the generation *again* to fix the inden, extra-spaces etc that were
->> fixed after several revisions (it takes hours to get there, it's
->> boring). Can't we go first with my approach and then look at replacing=
-
->> it? Can't one add a "FIXME: replace the decorator with something less
->> magic" at ifcond_decorator definition for now? Is this code so
->> critical that it has to be the way you want in the first place? The
->> approach to take it first and improve it worked very well for
->> qapi2texi, it just took a few more days for you (and reviewers) to
->> improve it. I'd suggest we work that way instead of having me rewrite
->> and rewrite until you are happy (which is something I can't do right
->> without many painful iterations for you and me).
->=20
-> This is up to the backup QAPI maintainer now :)
-
-Except my (cop-out?) decision was that it was not 2.12 material, so now
-that 2.13 is opening up it's somewhat back to you...
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 
---Lp1A89c2C0zq46MMRNafOyPGHiqz9YQSE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 04/16/2018 07:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+> bdrv_clear_dirty_bitmap do not fail, so we can call it in transaction
+> commit, avoiding any rollback.
+> 
+> After this, bdrv_undo_clear_dirty_bitmap() becomes unused, so, drop it.
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrZGaYACgkQp6FrSiUn
-Q2pltAf9HWYmvZcpnWP6y1e32IyD7Wf7+HULdWv8jplb4binEEyZRDSVmd961hQ0
-Oo9f3+vr02HOT96fMElrXBvegomCRcw1D3r1v0NC7+IEUTZ8RqUzDYiU5zC5uyJb
-dYhUGDsEYz6PypSyuwC87g0UMdhqVuFDD1OL9g3EqhP+13xsG2GHXQLV+D5HD/No
-6QfnwSS3niMKPUfYCNilQkVrBUvygDiS0jMNjckuBXVoMYCZAr4DXfCH4q1S36CP
-I/B6P703dMw2Vh5KvWnfDvnFrEm9dR2HKKcaj95janopn2Au+laDDnvkG8y3HXIt
-SrBz9Fh0ZMi8sLh1YMek0a0kYCSZUw==
-=5nIL
------END PGP SIGNATURE-----
+I'm trying to remember why we ever bothered doing it the other way. Is
+it because of timings with respect to other operations and we wanted the
+"clear" to take effect sooner rather than later to co-operate with other
+commands?
 
---Lp1A89c2C0zq46MMRNafOyPGHiqz9YQSE--
+(You and Nikolay hinted about similar problems in the Libvirt PULL api
+thread, too. It continues to be an issue.)
+
+Hopping in my time machine:
+
+https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg01229.html
+
+(Oh, I wrote it...)
+
+Looks like it was a conscious decision to avoid ordering conflicts with
+other block jobs.
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/block_int.h |  1 -
+>  block/dirty-bitmap.c      |  9 ---------
+>  blockdev.c                | 16 +---------------
+>  3 files changed, 1 insertion(+), 25 deletions(-)
+> 
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 189666efa5..22059c8119 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -1087,7 +1087,6 @@ bool blk_dev_is_medium_locked(BlockBackend *blk);
+>  void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
+>  
+>  void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
+> -void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in);
+>  
+>  void bdrv_inc_in_flight(BlockDriverState *bs);
+>  void bdrv_dec_in_flight(BlockDriverState *bs);
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 1812e17549..3c69a8eed9 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -607,15 +607,6 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+>      bdrv_dirty_bitmap_unlock(bitmap);
+>  }
+>  
+> -void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
+> -{
+> -    HBitmap *tmp = bitmap->bitmap;
+> -    assert(bdrv_dirty_bitmap_enabled(bitmap));
+> -    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+> -    bitmap->bitmap = in;
+> -    hbitmap_free(tmp);
+> -}
+> -
+>  uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
+>                                                uint64_t offset, uint64_t bytes)
+>  {
+> diff --git a/blockdev.c b/blockdev.c
+> index c31bf3d98d..88eae60c1c 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2050,7 +2050,6 @@ typedef struct BlockDirtyBitmapState {
+>      BlkActionState common;
+>      BdrvDirtyBitmap *bitmap;
+>      BlockDriverState *bs;
+> -    HBitmap *backup;
+>      bool prepared;
+>  } BlockDirtyBitmapState;
+>  
+> @@ -2129,18 +2128,6 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
+>          error_setg(errp, "Cannot clear a readonly bitmap");
+>          return;
+>      }
+> -
+> -    bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
+> -}
+> -
+> -static void block_dirty_bitmap_clear_abort(BlkActionState *common)
+> -{
+> -    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+> -                                             common, common);
+> -
+> -    if (state->backup) {
+> -        bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
+> -    }
+>  }
+>  
+>  static void block_dirty_bitmap_clear_commit(BlkActionState *common)
+> @@ -2148,7 +2135,7 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
+>      BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+>                                               common, common);
+>  
+> -    hbitmap_free(state->backup);
+> +    bdrv_clear_dirty_bitmap(state->bitmap, NULL);
+>  }
+>  
+>  static void abort_prepare(BlkActionState *common, Error **errp)
+> @@ -2210,7 +2197,6 @@ static const BlkActionOps actions[] = {
+>          .instance_size = sizeof(BlockDirtyBitmapState),
+>          .prepare = block_dirty_bitmap_clear_prepare,
+>          .commit = block_dirty_bitmap_clear_commit,
+> -        .abort = block_dirty_bitmap_clear_abort,
+>      }
+>  };
+>  
+> 
