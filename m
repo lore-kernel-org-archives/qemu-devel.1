@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9A5q-00069b-CS
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f9A5r-0006Ab-BZ
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9A5p-0002dY-4O
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:22 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37488)
+	(envelope-from <alex.bennee@linaro.org>) id 1f9A5q-0002h2-CD
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:23 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34856)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9A5o-0002bI-Qu
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:21 -0400
-Received: by mail-wr0-x242.google.com with SMTP id f14-v6so14351717wre.4
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:59:20 -0700 (PDT)
+	id 1f9A5q-0002er-52
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:22 -0400
+Received: by mail-wr0-x241.google.com with SMTP id w3-v6so14354563wrg.2
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:59:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Apr 2018 14:58:53 +0100
-Message-Id: <20180419135901.30035-36-alex.bennee@linaro.org>
+Date: Thu, 19 Apr 2018 14:58:40 +0100
+Message-Id: <20180419135901.30035-23-alex.bennee@linaro.org>
 In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
 References: <20180419135901.30035-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 35/43] tests/tcg/Makefile: update to be
- called from Makefile.target
+Subject: [Qemu-devel] [PATCH v2 22/43] tests/tcg/x86_64: add Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,197 +32,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This make is now invoked from each individual target make with the
-appropriate CC and EXTRA_CFLAGS set for each guest. It then includes
-additional Makefile.targets from:
-
-  - tests/tcg/multiarch (always)
-  - tests/tcg/$(TARGET_BASE_ARCH) (if available)
-  - tests/tcg/$(TARGET_NAME)
-
-The order is important as the later Makefile's may want to suppress
-TESTS from it's base arch profile. Each included Makefile.target is
-responsible for adding TESTS as well as defining any special build
-instructions for individual tests.
+The sources for x86_64 are shared in the i386 directory which will be
+included thanks to TARGET_BASE_ARCH. However not all sources build so
+we need to filter out the ones we can't build in the 64 bit world.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v2
-  - cleaner approach to include sub makefiles
-  - move TESTS/VPATH manipulation into sub-makefile
-  - avoid double inclusion when TARGET_BASE_ARCH==TARGET_NAME
----
- tests/tcg/Makefile | 153 +++++++++++----------------------------------
- 1 file changed, 38 insertions(+), 115 deletions(-)
+ tests/tcg/i386/Makefile.target   |  2 +-
+ tests/tcg/x86_64/Makefile.target | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+ create mode 100644 tests/tcg/x86_64/Makefile.target
 
-diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-index e12395117a..b9291acc89 100644
---- a/tests/tcg/Makefile
-+++ b/tests/tcg/Makefile
-@@ -1,125 +1,48 @@
---include ../../config-host.mak
---include $(SRC_PATH)/rules.mak
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index a6cc76664c..3a2736616c 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -7,7 +7,7 @@ VPATH 		+= $(I386_SRC)
+ 
+ I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
+ I386_TESTS=$(I386_SRCS:.c=)
+-
++I386_ONLY_TESTS=$(filter-out test-i386-ssse3, $(I386_TESTS))
+ # Update TESTS
+ TESTS+=$(I386_ONLY_TESTS)
+ 
+diff --git a/tests/tcg/x86_64/Makefile.target b/tests/tcg/x86_64/Makefile.target
+new file mode 100644
+index 0000000000..74f170b9ed
+--- /dev/null
++++ b/tests/tcg/x86_64/Makefile.target
+@@ -0,0 +1,15 @@
 +# -*- Mode: makefile -*-
 +#
-+# TCG tests
++# x86_64 tests - included from tests/tcg/Makefile.target
 +#
-+# These are complicated by the fact we want to build them for guest
-+# systems. This requires knowing what guests we are building and which
-+# ones we have cross-compilers for or docker images with
-+# cross-compilers.
++# Currently we only build test-x86_64 and test-i386-ssse3 from
++# $(SRC)/tests/tcg/i386/
 +#
-+# The tests themselves should be as minimal as possible as
-+# cross-compilers don't always have a large amount of libraries
-+# available.
-+#
-+# We only include the host build system for SRC_PATH and we don't
-+# bother with the common rules.mk. We expect CC/LD to have been set for
-+# us from the parent make as well as being passed EXTRA_CFLAGS.
-+#
-+# We also expect to be in the tests build dir for the FOO-linux-user.
-+#
- 
--$(call set-vpath, $(SRC_PATH)/tests/tcg)
-+-include ../../config-host.mak
-+-include ../config-target.mak
- 
--QEMU=../../i386-linux-user/qemu-i386
--QEMU_X86_64=../../x86_64-linux-user/qemu-x86_64
--CC_X86_64=$(CC_I386) -m64
-+# Tests we are building
-+TESTS=
- 
--QEMU_INCLUDES += -I../..
--CFLAGS=-Wall -O2 -g -fno-strict-aliasing
--#CFLAGS+=-msse2
-+# Start with a blank slate, the build targets get to add stuff first
-+CFLAGS=
-+QEMU_CFLAGS=
- LDFLAGS=
- 
--# TODO: automatically detect ARM and MIPS compilers, and run those too
--
--# runcom maps page 0, so it requires root privileges
--# also, pi_10.com runs indefinitely
--
--I386_TESTS=hello-i386 \
--	   sha1-i386 \
--	   test-i386 \
--	   test-i386-fprem \
--	   # runcom
--
--# native i386 compilers sometimes are not biarch.  assume cross-compilers are
--ifneq ($(ARCH),i386)
--I386_TESTS+=run-test-x86_64
--endif
--
--TESTS = test_path
--ifneq ($(call find-in-path, $(CC_I386)),)
--TESTS += $(I386_TESTS)
-+# The order we include is important. We include multiarch, base arch and finally arch
-+-include $(SRC_PATH)/tests/tcg/multiarch/Makefile.target
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.target
-+ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.target
- endif
- 
--all: $(patsubst %,run-%,$(TESTS))
--test: all
--
--# rules to run tests
--
--.PHONY: $(patsubst %,run-%,$(TESTS))
--
--run-%: %
--	-$(QEMU) ./$*
--
--run-hello-i386: hello-i386
--run-sha1-i386: sha1-i386
--
--run-test-i386: test-i386
--	./test-i386 > test-i386.ref
--	-$(QEMU) test-i386 > test-i386.out
--	@if diff -u test-i386.ref test-i386.out ; then echo "Auto Test OK"; fi
--
--run-test-i386-fprem: test-i386-fprem
--	./test-i386-fprem > test-i386-fprem.ref
--	-$(QEMU) test-i386-fprem > test-i386-fprem.out
--	@if diff -u test-i386-fprem.ref test-i386-fprem.out ; then echo "Auto Test OK"; fi
--
--run-test-x86_64: test-x86_64
--	./test-x86_64 > test-x86_64.ref
--	-$(QEMU_X86_64) test-x86_64 > test-x86_64.out
--	@if diff -u test-x86_64.ref test-x86_64.out ; then echo "Auto Test OK"; fi
--
--
--run-runcom: runcom
--	-$(QEMU) ./runcom $(SRC_PATH)/tests/pi_10.com
--
--run-test_path: test_path
--	./test_path
--
--# rules to compile tests
--
--hello-i386: hello-i386.c
--	$(CC_I386) -nostdlib $(CFLAGS) -static $(LDFLAGS) -o $@ $<
--	strip $@
--
--# i386/x86_64 emulation test (test various opcodes) */
--test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S \
--           test-i386.h test-i386-shift.h test-i386-muldiv.h
--	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ \
--              $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
--
--test-i386-fprem: test-i386-fprem.c
--	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $^
--
--test-x86_64: test-i386.c \
--           test-i386.h test-i386-shift.h test-i386-muldiv.h
--	$(CC_X86_64) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $(<D)/test-i386.c -lm
--
--# vm86 test
--runcom: runcom.c
--	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
--
--# speed test
--sha1-i386: sha1.c
--	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
--
--# arm test
--hello-arm: hello-arm.o
--	arm-linux-ld -o $@ $<
--
--hello-arm.o: hello-arm.c
--	arm-linux-gcc -Wall -g -O2 -c -o $@ $<
--
--test-arm-iwmmxt: test-arm-iwmmxt.s
--	cpp < $< | arm-linux-gnu-gcc -Wall -static -march=iwmmxt -mabi=aapcs -x assembler - -o $@
--
--# MIPS test
--hello-mips: hello-mips.c
--	mips-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
--
--hello-mipsel: hello-mips.c
--	mipsel-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
-+# Add the common build options
-+CFLAGS+=-Wall -O0 -g -fno-strict-aliasing
-+LDFLAGS+=-static
- 
--# testsuite for the CRIS port.
--test-cris:
--	$(MAKE) -C cris check
-+%: %.c
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
- 
--# testsuite for the LM32 port.
--test-lm32:
--	$(MAKE) -C lm32 check
-+all: $(TESTS)
- 
--clean:
--	rm -f *~ *.o test-i386.out test-i386.ref \
--           test-x86_64.log test-x86_64.ref qruncom $(TESTS)
-+# There is no clean target, the calling make just rm's the tests build dir
++
++X86_64_TESTS=$(filter-out $(I386_ONLY_TESTS), $(TESTS))
++X86_64_TESTS+=test-x86_64
++TESTS:=$(X86_64_TESTS)
++
++test-x86_64: LDFLAGS+=-lm -lc
++test-x86_64: test-i386.c test-i386.h test-i386-shift.h test-i386-muldiv.h
++	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 -- 
 2.17.0
