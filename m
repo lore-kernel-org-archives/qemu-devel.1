@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f9HAN-0006ky-9P
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:32:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1f9HEn-000239-Nk
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f9HAJ-0003ii-Bb
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:32:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38316 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1f9HEj-0007bj-Qe
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:37:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46094 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f9HAJ-0003gT-7J
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:32:27 -0400
-References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
-	<20180417205913.GC29865@localhost.localdomain>
-	<02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
-	<20180419195610.GA29865@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <98f48c44-e55a-2bd2-0d41-5643f35bce68@redhat.com>
-Date: Thu, 19 Apr 2018 23:32:16 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f9HEj-0007bY-LE
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:37:01 -0400
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
+	<20180419135901.30035-4-alex.bennee@linaro.org>
+	<e35eeb70-4bbc-a0fe-2903-6cf58d1729fe@linaro.org>
+	<48da6bcd-ecab-52d1-aee1-ed99be90d428@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3bff98d5-9ce7-68eb-c8d6-731a8458ab9d@redhat.com>
+Date: Thu, 19 Apr 2018 16:36:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180419195610.GA29865@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
- KVM_CAP_X86_DISABLE_EXITS
+In-Reply-To: <48da6bcd-ecab-52d1-aee1-ed99be90d428@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="syrIqcZBX8RwYkXJRjcUgwjCUrdANC2X8"
+Subject: Re: [Qemu-devel] [PATCH v2 03/43] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-On 19/04/2018 21:56, Eduardo Habkost wrote:
-> On Thu, Apr 19, 2018 at 05:48:57PM +0200, Paolo Bonzini wrote:
->> On 17/04/2018 22:59, Eduardo Habkost wrote:
->>>> +        if (disable_exits) {
->>>> +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
->>>> +                              KVM_X86_DISABLE_EXITS_HLT |
->>>> +                              KVM_X86_DISABLE_EXITS_PAUSE);
->>>> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
->>>> +                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
->>>> +            }
->>>
->>> In the future, if we decide to enable kvm-pv-unhalt by default,
->>> should "-cpu ...,kvm-hint-dedicated=on" disable kvm-pv-unhalt
->>> automatically, or should we require an explicit
->>> "kvm-hint-dedicated=on,kvm-pv-unhalt=off" option?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--syrIqcZBX8RwYkXJRjcUgwjCUrdANC2X8
+From: Eric Blake <eblake@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org, cota@braap.org, famz@redhat.com,
+ berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com,
+ aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
+Message-ID: <3bff98d5-9ce7-68eb-c8d6-731a8458ab9d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/43] configure: add support for
+ --cross-cc-FOO
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
+ <20180419135901.30035-4-alex.bennee@linaro.org>
+ <e35eeb70-4bbc-a0fe-2903-6cf58d1729fe@linaro.org>
+ <48da6bcd-ecab-52d1-aee1-ed99be90d428@linaro.org>
+In-Reply-To: <48da6bcd-ecab-52d1-aee1-ed99be90d428@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/19/2018 03:47 PM, Richard Henderson wrote:
+> On 04/19/2018 10:41 AM, Richard Henderson wrote:
+>> On 04/19/2018 03:58 AM, Alex Benn=C3=A9e wrote:
+>>> +  --cross-cc-*) cc_arch=3D${opt#--cross-cc-}
+>>> +                eval "cross_cc_${cc_arch}=3D\$optarg"
 >>
->> It should be automatic.
+>> This doesn't work as intended.
 >>
->>> For today's defaults, this patch solves the problem, only one
->>> thing is missing before I give my R-b: we need to clearly
->>> document what exactly are the consequences and requirements of
->>> setting kvm-hint-dedicated=on (I'm not sure if the best place for
->>> this is qemu-options.hx, x86_cpu_list(), or somewhere else).
+>> Given e.g. --cross-cc-aarch64=3Daarch64-linux-gcc
 >>
->> I don't think we have a good place for this kind of documentation,
->> unfortunately.  Right now it is mentioned in
->> Documentation/virtual/kvm/cpuid.txt.
-> 
-> With this patch, the QEMU option will do more than just setting
-> the CPUID bit, that's why I miss more detailed documentation on
-> the QEMU side.  But I agree we have no obvious place for that
-> documentation.
-> 
-> In the worst case we can just add a code comment on top of
-> feature_word_info[FEAT_KVM_HINTS].feat_names warning that
-> kvm-hint-dedicated won't just enable the flag on CPUID and has
-> other side-effects.
+>> + cc_arch=3Daarch64=3Daarch64-linux-gcc
+>> + eval 'cross_cc_aarch64=3Daarch64-linux-gcc=3D$optarg'
+>> ++ cross_cc_aarch64=3Daarch64-linux-gcc=3Daarch64-linux-gcc
+>>
+>> Which sets the variable "cross_cc_aarch64"
+>> to "aarch64-linux-gcc=3Daarch64-linux-gcc".
+>> Which of course won't exist to execute.
+>=20
+> -  --cross-cc-*) cc_arch=3D${opt#--cross-cc-}
+> +  --cross-cc-*) cc_arch=3D$(expr "$opt" : '--cross-cc-\([^=3D]*\)')
 
-Maybe we should use "-realtime dedicated=on" instead of, or in addition
-to kvm-hint-dedicated=on?
+Forking an expr subshell may not be needed; how about:
 
-Thanks,
+--cross-cc-*) cc_arch=3D${opt#--cross-cc-}; cc_arch=3D${cc_arch%%=3D*}
 
-Paolo
+to strip both the --cross-cc- prefix, and any suffix starting at the
+first =3D.
+
+>=20
+> seems to do the trick.  Obviously a similar change will be needed for
+> --cross-cc-flags-*.
+>=20
+>=20
+> r~
+>=20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--syrIqcZBX8RwYkXJRjcUgwjCUrdANC2X8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrZC/gACgkQp6FrSiUn
+Q2rQcwgAq7oJYuNTrGTHvyBTpwrgQXc9GOsY6pqTQYeC6wZ+8/hB3rw+BGcTHNH1
+gETjlh7dqtKm5qJPxJdRsFCLhNjbk+SW3JCQjkv8pC+GnALx4ms7VsIYFkRy23Xf
+6LnOxdKzjzS94A3S/9t5RCqh48951V4l0Q3ZyVv2WDc0qKq6cIOpt3wyu8mPJCS1
+EClOVZFZP2ZX5C5piMR4w5dhVwXrIO34bI5f198dXzprTnQpfmk0aEaQM8UvqOn4
+rtyOqgxhFicu0ZDKDuwSi1euPaChcFAlqdSWhycsuCKQoX7ECrP3iPKe3+8w/zxL
+81KTLuT0x2xpfI6OwA2ZyxPLkMFs6g==
+=dQRM
+-----END PGP SIGNATURE-----
+
+--syrIqcZBX8RwYkXJRjcUgwjCUrdANC2X8--
