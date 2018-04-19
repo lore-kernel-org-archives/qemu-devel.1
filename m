@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60623)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Ch0-0002Hd-IU
+	id 1f9Ch0-0002Hp-R7
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgz-0006H6-6B
+	id 1f9Cgz-0006HC-7q
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:54 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:53489)
+Received: from smtp03.citrix.com ([162.221.156.55]:53463)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgy-0006EO-QV
+	id 1f9Cgy-00069l-RB
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:53 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 19 Apr 2018 17:45:07 +0100
-Message-ID: <1524156319-11465-5-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 19 Apr 2018 17:45:10 +0100
+Message-ID: <1524156319-11465-8-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 04/16] xen: restrict: use
- xentoolcore_restrict_all
+Subject: [Qemu-devel] [PATCH 07/16] xen: move xc_interface compatibility
+ fallback further up the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +32,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-And insist that it works.
+We are going to want to use the dummy xendevicemodel_handle type in
+new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+section.  So we need to provide that definition, or (as applicable)
+include the appropriate header, earlier in the file.
 
-Drop individual use of xendevicemodel_restrict and
-xenforeignmemory_restrict.  These are not actually effective in this
-version of qemu, because qemu has a large number of fds open onto
-various Xen control devices.
+(Ideally the newer compatibility layers would be at the bottom of the
+file, so that they can naturally benefit from the compatibility layers
+for earlier version.  But that's rather too much for this series.)
 
-The restriction arrangements are still not right, because the
-restriction needs to be done very late - after qemu has opened all of
-its control fds.
-
-xentoolcore_restrict_all and xentoolcore.h are available in Xen 4.10
-and later, only.  Provide a compatibility stub.  And drop the
-compatibility stubs for the old functions.
+No functional change.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
-v2: Modify the compatibility code, too.
-    Bump this patch ahead of "defer call to xen_restrict until running"
-    Retain call to xentoolcore_restrict_all
+v2: New patch in v2 of the series
 ---
- include/hw/xen/xen_common.h | 46 +++++++++++----------------------------------
- 1 file changed, 11 insertions(+), 35 deletions(-)
+ include/hw/xen/xen_common.h | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 64a978e..1766bb9 100644
+index 1766bb9..60c4ebb 100644
 --- a/include/hw/xen/xen_common.h
 +++ b/include/hw/xen/xen_common.h
-@@ -91,6 +91,16 @@ static inline void *xenforeignmemory_map2(xenforeignmemory_handle *h,
-     return xenforeignmemory_map(h, dom, prot, pages, arr, err);
- }
+@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
  
-+static inline int xentoolcore_restrict_all(domid_t domid)
-+{
-+    errno = ENOTTY;
-+    return -1;
-+}
+ extern xenforeignmemory_handle *xen_fmem;
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
 +
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
++typedef xc_interface xendevicemodel_handle;
 +
-+#include <xentoolcore.h>
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
 +
- #endif
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
++#include <xendevicemodel.h>
++
++#endif
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+ 
+ #define XEN_COMPAT_PHYSMAP
+@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
  
  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-@@ -218,20 +228,6 @@ static inline int xendevicemodel_set_mem_type(
+ 
+-typedef xc_interface xendevicemodel_handle;
+-
+ static inline xendevicemodel_handle *xendevicemodel_open(
+     struct xentoollog_logger *logger, unsigned int open_flags)
+ {
+@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
  }
  
--static inline int xendevicemodel_restrict(
--    xendevicemodel_handle *dmod, domid_t domid)
--{
--    errno = ENOTTY;
--    return -1;
--}
+-#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
 -
--static inline int xenforeignmemory_restrict(
--    xenforeignmemory_handle *fmem, domid_t domid)
--{
--    errno = ENOTTY;
--    return -1;
--}
+-#undef XC_WANT_COMPAT_DEVICEMODEL_API
+-#include <xendevicemodel.h>
 -
- #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ #endif
  
- #undef XC_WANT_COMPAT_DEVICEMODEL_API
-@@ -290,28 +286,8 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
- static inline int xen_restrict(domid_t domid)
- {
-     int rc;
--
--    /* Attempt to restrict devicemodel operations */
--    rc = xendevicemodel_restrict(xen_dmod, domid);
-+    rc = xentoolcore_restrict_all(domid);
-     trace_xen_domid_restrict(rc ? errno : 0);
--
--    if (rc < 0) {
--        /*
--         * If errno is ENOTTY then restriction is not implemented so
--         * there's no point in trying to restrict other types of
--         * operation, but it should not be treated as a failure.
--         */
--        if (errno == ENOTTY) {
--            return 0;
--        }
--
--        return rc;
--    }
--
--    /* Restrict foreignmemory operations */
--    rc = xenforeignmemory_restrict(xen_fmem, domid);
--    trace_xen_domid_restrict(rc ? errno : 0);
--
-     return rc;
- }
- 
+ extern xendevicemodel_handle *xen_dmod;
 -- 
 2.1.4
