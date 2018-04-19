@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9ADx-0004df-TD
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:48 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f9AE1-0004kQ-3Q
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9ADt-0005NA-DE
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:45 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43740)
+	(envelope-from <alex.bennee@linaro.org>) id 1f9ADu-0005PK-IV
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:49 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33673)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9ADt-0005LH-47
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:41 -0400
-Received: by mail-wr0-x244.google.com with SMTP id u4-v6so14413631wrg.10
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 07:07:41 -0700 (PDT)
+	id 1f9ADu-0005O5-B7
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:42 -0400
+Received: by mail-wr0-x242.google.com with SMTP id z73-v6so14456909wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 07:07:42 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Apr 2018 14:58:47 +0100
-Message-Id: <20180419135901.30035-30-alex.bennee@linaro.org>
+Date: Thu, 19 Apr 2018 14:58:49 +0100
+Message-Id: <20180419135901.30035-32-alex.bennee@linaro.org>
 In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
 References: <20180419135901.30035-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 29/43] tests/tcg/aarch64: userspace system
- register test
+Subject: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +30,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Yongbok Kim <yongbok.kim@mips.com>
+
+This doesn't add any additional tests but enables building the
+multiarch tests for MIPS using docker cross compilers. We don't have a
+cross compiler for mips64 big endian though.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/aarch64/Makefile.target |  2 +-
- tests/tcg/aarch64/sysregs.c       | 14 ++++++++++++++
- 2 files changed, 15 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/aarch64/sysregs.c
+ tests/tcg/mips/Makefile.include | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+ create mode 100644 tests/tcg/mips/Makefile.include
 
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 26be1c58ef..0727bd3bd2 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -7,7 +7,7 @@ VPATH 		+= $(AARCH64_SRC)
- 
- # we don't build any of the ARM tests
- AARCH64_TESTS=$(filter-out $(ARM_TESTS), $(TESTS))
--AARCH64_TESTS+=fcvt
-+AARCH64_TESTS+=fcvt sysregs
- TESTS:=$(AARCH64_TESTS)
- 
- fcvt: LDFLAGS+=-lm
-diff --git a/tests/tcg/aarch64/sysregs.c b/tests/tcg/aarch64/sysregs.c
+diff --git a/tests/tcg/mips/Makefile.include b/tests/tcg/mips/Makefile.include
 new file mode 100644
-index 0000000000..0cd0c42d8c
+index 0000000000..a9beceb623
 --- /dev/null
-+++ b/tests/tcg/aarch64/sysregs.c
-@@ -0,0 +1,14 @@
-+#include <stdio.h>
++++ b/tests/tcg/mips/Makefile.include
+@@ -0,0 +1,17 @@
++#
++# Makefile.include for all MIPs targets
++#
++# As Debian doesn't support mip64 in big endian mode the only way to
++# build BE is to pass a working cross compiler to ./configure
++#
 +
-+#define get_cpu_reg(id) ({                                      \
-+                unsigned long __val;                            \
-+                asm("mrs %0, "#id : "=r" (__val));              \
-+                printf("%-20s: 0x%016lx\n", #id, __val);        \
-+        })
-+
-+int main(void)
-+{
-+    get_cpu_reg(cntvct_el0);
-+    get_cpu_reg(cntfrq_el0);
-+    return 0;
-+}
++ifeq ($(TARGET_NAME),mips64el)
++DOCKER_IMAGE=debian-mips64el-cross
++DOCKER_CROSS_COMPILER=mips64el-linux-gnuabi64-gcc
++else ifeq ($(TARGET_NAME),mipsel)
++DOCKER_IMAGE=debian-mipsel-cross
++DOCKER_CROSS_COMPILER=mipsel-linux-gnu-gcc
++else ifeq ($(TARGET_NAME),mips)
++DOCKER_IMAGE=debian-mips-cross
++DOCKER_CROSS_COMPILER=mips-linux-gnu-gcc
++endif
 -- 
 2.17.0
