@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9A5c-0005vz-Ig
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f9A5f-0005x5-3Z
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9A5b-00026K-27
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:08 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:43743)
+	(envelope-from <alex.bennee@linaro.org>) id 1f9A5d-00028G-Vw
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:11 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37484)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9A5a-00025g-Qq
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:06 -0400
-Received: by mail-wr0-x233.google.com with SMTP id u4-v6so14330461wrg.10
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:59:06 -0700 (PDT)
+	id 1f9A5d-00027P-O8
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:09 -0400
+Received: by mail-wr0-x242.google.com with SMTP id f14-v6so14349860wre.4
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:59:09 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Apr 2018 14:58:21 +0100
-Message-Id: <20180419135901.30035-4-alex.bennee@linaro.org>
+Date: Thu, 19 Apr 2018 14:58:24 +0100
+Message-Id: <20180419135901.30035-7-alex.bennee@linaro.org>
 In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
 References: <20180419135901.30035-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/43] configure: add support for
- --cross-cc-FOO
+Subject: [Qemu-devel] [PATCH v2 06/43] configure: set cross_cc_FOO for host
+ compiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,153 +33,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This allows us to specify cross compilers for our guests. This is
-useful for building test images/programs. Currently we re-run the
-compile test for each target. I couldn't think of a way to cache the
-value for a given arch without getting messier configure code.
-
-The cross compiler for the guest is visible to each target as
-CROSS_CC_GUEST in config-target.mak.
+We can build tests for the host system with the compiler that we have
+selected.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- configure | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ configure | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index b0ae632ee4..0dca341f2a 100755
+index 29af33716d..44d310a692 100755
 --- a/configure
 +++ b/configure
-@@ -453,6 +453,13 @@ vxhs=""
- libxml2=""
- docker="no"
- 
-+# cross compilers defaults, can be overridden with --cross-cc-ARCH
-+cross_cc_aarch64="aarch64-linux-gnu-gcc"
-+cross_cc_arm="arm-linux-gnueabihf-gcc"
-+cross_cc_powerpc="powerpc-linux-gnu-gcc"
-+
-+enabled_cross_compilers=""
-+
- supported_cpu="no"
- supported_os="no"
- bogus_os="no"
-@@ -483,6 +490,11 @@ for opt do
-   ;;
-   --disable-debug-info) debug_info="no"
-   ;;
-+  --cross-cc-*[!a-zA-Z0-9_0]=*) error_exit "Passed bad --cross-cc-FOO option"
-+  ;;
-+  --cross-cc-*) cc_arch=${opt#--cross-cc-}
-+                eval "cross_cc_${cc_arch}=\$optarg"
-+  ;;
-   esac
- done
- # OS specific
-@@ -675,10 +687,12 @@ case "$cpu" in
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
-     supported_cpu="yes"
-+    cross_cc_i386=gcc
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
-     supported_cpu="yes"
-+    cross_cc_x86_64=gcc
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
-@@ -912,6 +926,8 @@ for opt do
-   ;;
-   --disable-debug-info)
-   ;;
-+  --cross-cc-*)
-+  ;;
-   --enable-modules)
-       modules="yes"
-   ;;
-@@ -6777,6 +6793,8 @@ case "$target" in
-     ;;
+@@ -1416,30 +1416,44 @@ case "$cpu" in
+     ppc)
+            CPU_CFLAGS="-m32"
+            LDFLAGS="-m32 $LDFLAGS"
++           cross_cc_powerpc=$cc
++           cross_cc_cflags_powerpc=$CPU_CFLAGS
+            ;;
+     ppc64)
+            CPU_CFLAGS="-m64"
+            LDFLAGS="-m64 $LDFLAGS"
++           cross_cc_ppc64=$cc
++           cross_cc_cflags_ppc64=$CPU_CFLAGS
+            ;;
+     sparc)
+            CPU_CFLAGS="-m32 -mv8plus -mcpu=ultrasparc"
+            LDFLAGS="-m32 -mv8plus $LDFLAGS"
++           cross_cc_sparc=$cc
++           cross_cc_cflags_sparc=$CPU_CFLAGS
+            ;;
+     sparc64)
+            CPU_CFLAGS="-m64 -mcpu=ultrasparc"
+            LDFLAGS="-m64 $LDFLAGS"
++           cross_cc_sparc64=$cc
++           cross_cc_cflags_sparc64=$CPU_CFLAGS
+            ;;
+     s390)
+            CPU_CFLAGS="-m31"
+            LDFLAGS="-m31 $LDFLAGS"
++           cross_cc_s390=$cc
++           cross_cc_cflags_s390=$CPU_CFLAGS
+            ;;
+     s390x)
+            CPU_CFLAGS="-m64"
+            LDFLAGS="-m64 $LDFLAGS"
++           cross_cc_s390x=$cc
++           cross_cc_cflags_s390x=$CPU_CFLAGS
+            ;;
+     i386)
+            CPU_CFLAGS="-m32"
+            LDFLAGS="-m32 $LDFLAGS"
++           cross_cc_i386=$cc
++           cross_cc_cflags_i386=$CPU_CFLAGS
+            ;;
+     x86_64)
+            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
+@@ -1454,7 +1468,7 @@ case "$cpu" in
+            CPU_CFLAGS="-mx32"
+            LDFLAGS="-mx32 $LDFLAGS"
+            cross_cc_i386=$cc
+-           cross_cc_cflags_i386="-m32"
++           cross_cc_cflags_i386=$CPU_CFLAGS
+            ;;
+     # No special flags required for other host CPUs
  esac
- 
-+target_compiler=""
-+
- mkdir -p $target_dir
- echo "# Automatically generated by configure - do not modify" > $config_target_mak
- 
-@@ -6805,6 +6823,7 @@ case "$target_name" in
-     bflt="yes"
-     mttcg="yes"
-     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-+    target_compiler=$cross_cc_arm
-   ;;
-   aarch64|aarch64_be)
-     TARGET_ARCH=aarch64
-@@ -6812,6 +6831,7 @@ case "$target_name" in
-     bflt="yes"
-     mttcg="yes"
-     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-+    target_compiler=$cross_cc_aarch64
-   ;;
-   cris)
-   ;;
-@@ -6853,6 +6873,7 @@ case "$target_name" in
-   ;;
-   ppc)
-     gdb_xml_files="power-core.xml power-fpu.xml power-altivec.xml power-spe.xml"
-+    target_compiler=$cross_cc_powerpc
-   ;;
-   ppcemb)
-     TARGET_BASE_ARCH=ppc
-@@ -6927,6 +6948,25 @@ if [ "$TARGET_BASE_ARCH" = "" ]; then
-   TARGET_BASE_ARCH=$TARGET_ARCH
- fi
- 
-+# Do we have a cross compiler for this target?
-+if has $target_compiler; then
-+
-+    cat > $TMPC << EOF
-+#include <stdio.h>
-+int main(void) {
-+    printf("Hello World!\n");
-+}
-+EOF
-+
-+    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
-+        target_compiler=""
-+    else
-+        enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
-+    fi
-+else
-+    target_compiler=""
-+fi
-+
- symlink "$source_path/Makefile.target" "$target_dir/Makefile"
- 
- upper() {
-@@ -7000,6 +7040,10 @@ if test "$target_bsd_user" = "yes" ; then
-   echo "CONFIG_BSD_USER=y" >> $config_target_mak
- fi
- 
-+if test -n "$target_compiler"; then
-+  echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
-+fi
-+
- # generate QEMU_CFLAGS/LDFLAGS for targets
- 
- cflags=""
-@@ -7122,6 +7166,12 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
- 
- done # for target in $targets
- 
-+if test -n "$enabled_cross_compilers"; then
-+    echo
-+    echo "NOTE: cross-compilers enabled:"
-+    printf '%s\n' $enabled_cross_compilers | sort -u
-+fi
-+
- if [ "$dtc_internal" = "yes" ]; then
-   echo "config-host.h: subdir-dtc" >> $config_host_mak
- fi
 -- 
 2.17.0
