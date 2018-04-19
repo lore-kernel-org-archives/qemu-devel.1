@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f94Qs-0007Yh-Ra
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:56:44 -0400
+	(envelope-from <imammedo@redhat.com>) id 1f94UK-0000RD-TE
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f94Qp-0005k2-Oa
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:56:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42264 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1f94UC-0007pE-0n
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:00:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59562 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f94Qp-0005jj-JE
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:56:39 -0400
-Date: Thu, 19 Apr 2018 08:56:29 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180419075629.GC10259@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<87po2wzysh.fsf@dusky.pond.sub.org>
-	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
-	<87in8nvdpn.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1f94UB-0007os-RP
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:00:07 -0400
+Date: Thu, 19 Apr 2018 10:00:04 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180419100004.0b560c85@redhat.com>
+In-Reply-To: <87d0yx2dqp.fsf@dusky.pond.sub.org>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<87zi21apkh.fsf@dusky.pond.sub.org>
+	<20180417142739.GV29865@localhost.localdomain>
+	<20180417174110.1a7f1daf@redhat.com>
+	<20180417204135.GB29865@localhost.localdomain>
+	<87d0yx2dqp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87in8nvdpn.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
+ machine_init() from QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +33,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Thu, Apr 19, 2018 at 09:48:36AM +0200, Markus Armbruster wrote:
-> Laszlo Ersek <lersek@redhat.com> writes:
+On Wed, 18 Apr 2018 09:08:30 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 > 
-> > On 04/18/18 10:47, Markus Armbruster wrote:
-> >> Laszlo Ersek <lersek@redhat.com> writes:
-> >
-> >>> +##
-> >>> +# @FirmwareArchitecture:
-> >>> +#
-> >>> +# Defines the target architectures (emulator binaries) that firmware may
-> >>> +# execute on.
-> >>> +#
-> >>> +# @aarch64: The firmware can be executed by the qemu-system-aarch64 emulator.
-> >>> +#
-> >>> +# @arm: The firmware can be executed by the qemu-system-arm emulator.
-> >>> +#
-> >>> +# @i386: The firmware can be executed by the qemu-system-i386 emulator.
-> >>> +#
-> >>> +# @x86_64: The firmware can be executed by the qemu-system-x86_64 emulator.
-> >>> +#
-> >>> +# Since: 2.13
-> >>> +##
-> >>> +{ 'enum' : 'FirmwareArchitecture',
-> >>> +  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] }
+> > On Tue, Apr 17, 2018 at 05:41:10PM +0200, Igor Mammedov wrote:  
+> >> On Tue, 17 Apr 2018 11:27:39 -0300
+> >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >>   
+> >> > On Tue, Apr 17, 2018 at 04:13:34PM +0200, Markus Armbruster wrote:  
+> >> > > Igor Mammedov <imammedo@redhat.com> writes:
+> >> > > 
+> >> > > [...]    
+> >> > > > Series allows to configure NUMA mapping at runtime using QMP
+> >> > > > interface. For that to happen it introduces a new '-preconfig' CLI option
+> >> > > > which allows to pause QEMU before machine_init() is run and
+> >> > > > adds new set-numa-node QMP command which in conjunction with
+> >> > > > query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
+> >> > > >
+> >> > > > Later we can modify other commands to run early, for example device_add.
+> >> > > > I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
+> >> > > > paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
+> >> > > > stage it's considered hotplug already), so SPAPR had to work around the issue.    
+> >> > > 
+> >> > > That instance is just stupidity / laziness, I think: we consider any
+> >> > > plug after machine creation a hot plug.  Real machines remain cold until
+> >> > > you press the power button.  Our virtual machines should remain cold
+> >> > > until they start running, i.e. with -S until the first "cont".  
+> >> It probably would be too risky to change semantics of -S from hotplug to coldplug.
+> >> But even if we were easy it won't matter in case if dynamic configuration
+> >> done properly. More on it below.
+> >>   
+> >> > > I vaguely remember me asking this before, but your answer didn't make it
+> >> > > into this cover letter, which gives me a pretext to ask again instead of
+> >> > > looking it up in the archives: what exactly prevents us from keeping the
+> >> > > machine cold enough for numa configuration until the first "cont"?    
+> >> > 
+> >> > I also think this would be better, but it seems to be difficult
+> >> > in practice, see:
+> >> > http://mid.mail-archive.com/20180323210532.GD28161@localhost.localdomain  
 > >> 
-> >> Partial dupe of CpuInfoArch from misc.json.  Neither covers all our
-> >> target architectures.  Should we have one that does in common.json
-> >> instead?
+> >> In addition to Eduardo's reply, here is what I've answered back
+> >> when you've asked question the 1st time (v2 late at -S pause point reconfig):
+> >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg504140.html
+> >> 
+> >> In short:
+> >> I think it's wrong in general doing fixups after machine is build
+> >> instead of getting correct configuration before building machine.
+> >> That's going to be complex and fragile and might be hard to do at
+> >> all depending on what we are fixing up.  
 > >
-> > If we had one there, I'd use it here :)
-> >
-> > For collecting the arch identifiers, is it OK to run "./configure
-> > --help", and look for the "*-softmmu" options under
-> > "--target-list=LIST"? Because that's what I need here; the qemu-system-*
-> > emulators.
-> 
-> configure gets its list like this:
-> 
->     default_target_list=""
-> 
->     mak_wilds=""
-> 
->     if [ "$softmmu" = "yes" ]; then
->         mak_wilds="${mak_wilds} $source_path/default-configs/*-softmmu.mak"
->     fi
->     if [ "$linux_user" = "yes" ]; then
->         mak_wilds="${mak_wilds} $source_path/default-configs/*-linux-user.mak"
->     fi
->     if [ "$bsd_user" = "yes" ]; then
->         mak_wilds="${mak_wilds} $source_path/default-configs/*-bsd-user.mak"
->     fi
-> 
->     for config in $mak_wilds; do
->         default_target_list="${default_target_list} $(basename "$config" .mak)"
->     done
-> 
-> Since we use QMP only in system emulation, a QAPI enum limited to the
-> system emulation targets makes sense.
-> 
-> Replacing CpuInfoArch by such an enum will change the discriminator
-> value from "other" to the real architecture, with the obvious
-> compatibility concerns.  But we've accepted similar changes twice
-> already: commit 9d0306dfdfb and commit 25fa194b7b1, both v2.12.0-rc0.
-> 
-> "other" was a bad idea.  Hindsight 20/20.
-> 
-> Getting rid of it in one go rather than piecemeal seems like the least
-> bad way out.  Too late for 2.12, though.  Eric, what do you think?
+> > What "building the machine" should mean, exactly, for external
+> > users?
+under "building machine", I've meant machine_run_board_init()
+and all follow up steps to machine_done stage.
 
-Given the context in which this "other" value is used, I think it is
-reasonable to kill it and put a full arch list in there.
+> > The main question I'd like to see answered is: why exactly we
+> > must "build" the machine before the first "cont" is issued when
+> > using -S?  Why can't we delay everything to "cont" when using -S?  
+Nor sure what question is about,
+Did you mean if it were possible to postpone machine_run_board_init()
+and all later steps to -S/cont time?
+ 
+> > Is it just because it's a long and complex task?  Does that mean
+> > we might still do that eventually, and eliminate the
+> > prelaunch/preconfig distinction in the distant future?  
+> 
+> Why would anyone want to use -S going forward?  For reasons other "we've
+> always used -S, and can't be bothered to change".
+We should be able to deprecate/remove -S once we can do all
+initial configuration that's possible to do there at
+preconfig time.
+ 
+> > Even if we follow your approach, we need to answer these
+> > questions.  I'm sure we will try to reorder initialization steps
+> > between the preconfig/prelaunch states in the future, and we
+> > shouldn't break any expectations from external users when doing
+> > that.
+As minimum I expect -preconfig to be a runtime equivalent to CLI,
+with difference that it will be interactive and use QMP interface.
+As long as it sits between CLI parsing and the rest of initialization
+it shouldn't break that.
 
-No app is likely to be accessing the struct under "other" because it
-is just an empty placeholder.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Moreover, the questions need to be answered in Git.  Commit message,
+> comments, docs/, use your judgement.
+I've thought that commit messages/patches were describing introduced
+changes sufficiently. But I've been sitting on these patches for
+a long time and what's obvious to me might be not so clear to others.
+I might just not see what's missing. Any suggestions to improve it
+are welcome.
