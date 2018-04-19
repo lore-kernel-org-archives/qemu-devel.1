@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f96sq-0000KZ-B8
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:33:45 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1f97Ak-0005UG-Sv
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:52:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f96sn-00010M-5x
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:33:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60132 helo=mx1.redhat.com)
+	(envelope-from <frederic.konrad@adacore.com>) id 1f97Ah-000688-Rt
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:52:14 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:53259
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f96sm-00010E-W3
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:33:41 -0400
-References: <20180329032149.44685-1-aik@ozlabs.ru>
-	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
-	<d8efb96c-75a0-86fd-3615-57e9099afb5c@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <75bf706c-d2f2-e715-5b07-b651881e0a5e@redhat.com>
-Date: Thu, 19 Apr 2018 12:33:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <d8efb96c-75a0-86fd-3615-57e9099afb5c@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
- in "info mtree"
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1f97Ah-00066z-Lz
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:52:11 -0400
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Date: Thu, 19 Apr 2018 12:51:43 +0200
+Message-Id: <1524135103-30477-1-git-send-email-frederic.konrad@adacore.com>
+Subject: [Qemu-devel] [PATCH] riscv: requires libfdt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de, frederic.konrad@adacore.com
 
-On 19/04/2018 04:41, Alexey Kardashevskiy wrote:
-> it just seems to
-> be a real case and majority of object_get_canonical_path_component() users
-> do not test the returned pointer.
-> 
-> ===================
-> diff --git a/qom/object.c b/qom/object.c
-> index 4677951..0c2d5c2 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -1645,7 +1645,9 @@ gchar *object_get_canonical_path_component(Object *obj)
->      GHashTableIter iter;
-> 
->      g_assert(obj);
-> -    g_assert(obj->parent != NULL);
+When compiling on a machine without libfdt installed the configure script
+should try to get libfdt from the git or should die because otherwise
+CONFIG_LIBFDT is not set and the build process end in an error in the link
+phase.. eg:
 
-I agree but why wouldn't the caller have crashed anyway on this assertion?
+hw/riscv/virt.o: In function `riscv_virt_board_init':
+qemu/src/hw/riscv/virt.c:317: undefined reference to `qemu_fdt_setprop_cell'
+qemu/src/hw/riscv/virt.c:319: undefined reference to `qemu_fdt_setprop_cell'
+qemu/src/hw/riscv/virt.c:345: undefined reference to `qemu_fdt_dumpdtb'
+collect2: error: ld returned 1 exit status
+make[1]: *** [qemu-system-riscv64] Error 1
+make: *** [subdir-riscv64-softmmu] Error 2
 
-> as QMP crashes QEMU with this:
-> 
-> {"execute": "qom-get", "arguments": {"path":
-> "/machine/unattached/device[3]/smram[0]", "property": "container"}}
-> 
-> with the patch it returns:
-> 
-> {'return': '/<no-parent>/mem-container-smram[0]'}
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The root cause of this is that the accelerator object is not added to
-the QOM object tree.
-
-Paolo
+diff --git a/configure b/configure
+index 0a19b03..1587f08 100755
+--- a/configure
++++ b/configure
+@@ -3732,7 +3732,7 @@ fi
+ fdt_required=no
+ for target in $target_list; do
+   case $target in
+-    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips64el-softmmu)
++    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips64el-softmmu|riscv64-softmmu)
+       fdt_required=yes
+     ;;
+   esac
+-- 
+1.8.3.1
