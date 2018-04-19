@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1f9Gzx-0005ad-VX
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:47 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f9H00-0005dA-CW
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1f9Gzs-0000wt-Vb
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:45 -0400
-Received: from mail-sn1nam02on0076.outbound.protection.outlook.com
-	([104.47.36.76]:28349
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1f9Gzs-0000vn-Kc
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:40 -0400
-Date: Thu, 19 Apr 2018 23:21:24 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180419212124.4wssvsbv7ka2jodh@toto>
-References: <20180419112131.16932-1-edgar.iglesias@gmail.com>
-	<20180419112131.16932-2-edgar.iglesias@gmail.com>
-	<4439efca-e41e-14f8-85ff-89478608c80a@linaro.org>
-	<20180419203347.5m4bwxmkkesergbx@toto>
-	<f4c1406a-2151-0027-8b6c-10e5ce215ad7@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1f9Gzz-00013y-BC
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:48 -0400
+References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
+	<20180416114414.18406-3-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d387ba9f-89f8-db99-ddf5-38ab05c515ff@redhat.com>
+Date: Thu, 19 Apr 2018 17:21:37 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <f4c1406a-2151-0027-8b6c-10e5ce215ad7@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v1 1/5] target-microblaze: Respect MSR.PVR
- as read-only
+In-Reply-To: <20180416114414.18406-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] dirty-bitmaps: fix comment about
+ dirty_bitmap_mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, sai.pavan.boddu@xilinx.com, peter.maydell@linaro.org, alistair@alistair23.me, frasse.iglesias@gmail.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, Apr 19, 2018 at 11:17:58AM -1000, Richard Henderson wrote:
-> On 04/19/2018 10:33 AM, Edgar E. Iglesias wrote:
-> > On Thu, Apr 19, 2018 at 09:56:40AM -1000, Richard Henderson wrote:
-> >> On 04/19/2018 01:21 AM, Edgar E. Iglesias wrote:
-> >>>  static inline void msr_write(DisasContext *dc, TCGv v)
-> >>>  {
-> >>> -    TCGv t;
-> >>> -
-> >>> -    t = tcg_temp_new();
-> >>>      dc->cpustate_changed = 1;
-> >>>      /* PVR bit is not writable.  */
-> >>> -    tcg_gen_andi_tl(t, v, ~MSR_PVR);
-> >>> -    tcg_gen_andi_tl(cpu_SR[SR_MSR], cpu_SR[SR_MSR], MSR_PVR);
-> >>> -    tcg_gen_or_tl(cpu_SR[SR_MSR], cpu_SR[SR_MSR], v);
-> >>> -    tcg_temp_free(t);
-> >>> +    tcg_gen_deposit_tl(cpu_SR[SR_MSR], v, cpu_SR[SR_MSR], MSR_PVR_SHIFT, 1);
-> >>>  }
-> >>
-> >> Um... the old code was correct, but the new code isn't.
-> >>
-> >> The new code sets msr to v, with bit 10 set to the old msr bit 0.
-> >>
-> >> Why do you believe the old code to be wrong?
-> > 
-> > The old code was incorrectly ORing v instead of t...
+
+
+On 04/16/2018 07:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Clarify first two cases and fix Modify -> Any access in third case.
+> Also, drop 'only' from third case, as it a bit confuses, when thinking
+> about case where we modify BdrvDirtyBitmap and access HBitmap.
 > 
-> Ah, yes.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/block_int.h | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 > 
-> > What about the following?
-> >     tcg_gen_shri_tl(cpu_SR[SR_MSR], cpu_SR[SR_MSR], MSR_PVR_SHIFT);
-> >     tcg_gen_deposit_tl(cpu_SR[SR_MSR], v, cpu_SR[SR_MSR], MSR_PVR_SHIFT, 1);
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index c4dd1d4bb8..189666efa5 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -709,10 +709,14 @@ struct BlockDriverState {
+>      uint64_t write_threshold_offset;
+>      NotifierWithReturn write_threshold_notifier;
+>  
+> -    /* Writing to the list requires the BQL _and_ the dirty_bitmap_mutex.
+> -     * Reading from the list can be done with either the BQL or the
+> -     * dirty_bitmap_mutex.  Modifying a bitmap only requires
+> -     * dirty_bitmap_mutex.  */
+> +    /* Writing to the list (i.e. to any field of BdrvDirtyBitmap or to the
+> +     * list-head) requires both the BQL _and_ the dirty_bitmap_mutex.
+> +     *
+> +     * Reading from the list (from any field of BdrvDirtyBitmap or from the
+> +     * list-head) can be done with either the BQL or the dirty_bitmap_mutex.
+> +     *
+> +     * Any access to underlying HBitmap requires dirty_bitmap_mutex.
+
+"to the underlying HBitmap," probably.
+
+> +     */
+>      QemuMutex dirty_bitmap_mutex;
+>      QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
+>  
 > 
-> *shrug* While that would be functional, I don't think it's any better than just
-> fixing the typo in the OR.
 
-Allright, I'll fix the typo and send out a v2.
-
-Thanks for catching this.
-
-Cheers,
-Edgar
+Reviewed-by: John Snow <jsnow@redhat.com>
