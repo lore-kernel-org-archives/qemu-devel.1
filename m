@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934P-0005Wq-1v
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f934R-0005Xp-LN
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934O-0005Qm-9Q
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f934Q-0005Sr-Nd
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:27 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 19 Apr 2018 16:29:13 +1000
-Message-Id: <20180419062917.31486-4-david@gibson.dropbear.id.au>
+Date: Thu, 19 Apr 2018 16:29:17 +1000
+Message-Id: <20180419062917.31486-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180419062917.31486-1-david@gibson.dropbear.id.au>
 References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC for-2.13 3/7] target/ppc: Add
- ppc_hash64_filter_pagesizes()
+Subject: [Qemu-devel] [RFC for-2.13 7/7] spapr_pci: Remove unhelpful
+ pagesize warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,101 +23,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-The paravirtualized PAPR platform sometimes needs to restrict the guest to
-using only some of the page sizes actually supported by the host's MMU.
-At the moment this is handled in KVM specific code, but for consistency we
-want to apply the same limitations to all accelerators.
+By default, the IOMMU model built into the spapr virtual PCI host bridge
+supports 4kiB and 64kiB IOMMU page sizes.  However this can be overridden
+which may be desirable to allow larger IOMMU page sizes when running a
+guest with hugepage backing and passthrough devices.  For that reason a
+warning was printed when the device wasn't configured to allow the pagesize
+with which guest RAM is backed.
 
-This makes a start on this by providing a helper function in the cpu code
-to allow platform code to remove some of the cpu's page size definitions
-via a caller supplied callback.
+Experience has proven, however, that this message is more confusing than
+useful.  Worse it sometimes makes little sense when the host-available page
+sizes don't match those available on the guest, which can happen with
+a POWER8 guest running on a POWER9 KVM host.
+
+Long term we do want better handling to allow large IOMMU page sizes to be
+used, but for now this parameter and warning don't really accomplish it.
+So, remove the message, pending a better solution.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/mmu-hash64.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/ppc/mmu-hash64.h |  3 +++
- 2 files changed, 62 insertions(+)
+ hw/ppc/spapr_pci.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index a1db20e3a8..b6e62864fd 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -1165,3 +1165,62 @@ const PPCHash64Options ppc_hash64_opts_POWER7 = {
-         },
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 39a14980d3..f936ce63ef 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1717,13 +1717,6 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
      }
- };
-+
-+void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
-+                                 bool (*cb)(void *, uint32_t, uint32_t),
-+                                 void *opaque)
-+{
-+    PPCHash64Options *opts = cpu->hash64_opts;
-+    int i;
-+    int n = 0;
-+    bool ci_largepage = false;
-+
-+    assert(opts);
-+
-+    n = 0;
-+    for (i = 0; i < ARRAY_SIZE(opts->sps); i++) {
-+        PPCHash64SegmentPageSizes *sps = &opts->sps[i];
-+        int j;
-+        int m = 0;
-+
-+        assert(n <= i);
-+
-+        if (!sps->page_shift) {
-+            break;
-+        }
-+
-+        for (j = 0; j < ARRAY_SIZE(sps->enc); j++) {
-+            PPCHash64PageSize *ps = &sps->enc[j];
-+
-+            assert(m <= j);
-+            if (!ps->page_shift) {
-+                break;
-+            }
-+
-+            if (cb(opaque, sps->page_shift, ps->page_shift)) {
-+                if (ps->page_shift == 16) {
-+                    ci_largepage = true;
-+                }
-+                sps->enc[m++] = *ps;
-+            }
-+        }
-+
-+        /* Clear rest of the row */
-+        for (j = m; j < ARRAY_SIZE(sps->enc); j++) {
-+            memset(&sps->enc[j], 0, sizeof(sps->enc[j]));
-+        }
-+
-+        if (m) {
-+            n++;
-+        }
-+    }
-+
-+    /* Clear the rest of the table */
-+    for (i = n; i < ARRAY_SIZE(opts->sps); i++) {
-+        memset(&opts->sps[i], 0, sizeof(opts->sps[i]));
-+    }
-+
-+    if (!ci_largepage) {
-+        opts->flags &= ~PPC_HASH64_CI_LARGEPAGE;
-+    }
-+}
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index f23b78d787..1aa2453497 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -20,6 +20,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
- void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val);
- void ppc_hash64_init(PowerPCCPU *cpu);
- void ppc_hash64_finalize(PowerPCCPU *cpu);
-+void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
-+                                 bool (*cb)(void *, uint32_t, uint32_t),
-+                                 void *opaque);
- #endif
  
- /*
+     /* DMA setup */
+-    if (((sphb->page_size_mask & qemu_getrampagesize()) == 0)
+-        && kvm_enabled()) {
+-        warn_report("System page size 0x%lx is not enabled in page_size_mask "
+-                    "(0x%"PRIx64"). Performance may be slow",
+-                    qemu_getrampagesize(), sphb->page_size_mask);
+-    }
+-
+     for (i = 0; i < windows_supported; ++i) {
+         tcet = spapr_tce_new_table(DEVICE(sphb), sphb->dma_liobn[i]);
+         if (!tcet) {
 -- 
 2.14.3
