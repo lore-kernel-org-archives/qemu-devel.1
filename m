@@ -1,30 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f901A-0006sc-TL
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 23:13:54 -0400
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f90Ef-0002EX-JZ
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 23:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f9017-0005iw-ND
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 23:13:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41698 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f9017-0005iY-Hu
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 23:13:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D3C6DEB703
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 03:13:43 +0000 (UTC)
-Date: Thu, 19 Apr 2018 11:13:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180419031335.GH14841@xz-mi>
-References: <20180418090622.20073-1-peterx@redhat.com>
-	<20180419015631.GE29462@lemon.usersys.redhat.com>
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1f90Eb-0003av-4B
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 23:27:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59612)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1f90Ea-0003a1-SL
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 23:27:45 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3J3Q4EZ028717
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 23:27:43 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2heekjjdn4-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 23:27:42 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Wed, 18 Apr 2018 23:27:41 -0400
+References: <16124cce-593c-8191-074c-19164acc3626@linux.vnet.ibm.com>
+	<20180418140458.GA2723@work-vm>
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Date: Thu, 19 Apr 2018 11:27:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180419015631.GE29462@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] QemuMutex: support --enable-debug-mutex
+In-Reply-To: <20180418140458.GA2723@work-vm>
+Content-Type: text/plain; charset=gbk
+Message-Id: <3c7d3fa5-f8be-bf8d-c855-70985d035231@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Why is there no qom_get in hmp.c?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,97 +41,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, armbru@redhat.com, berrange@redhat.com
 
-On Thu, Apr 19, 2018 at 09:56:31AM +0800, Fam Zheng wrote:
-> On Wed, 04/18 17:06, Peter Xu wrote:
-> > We have had some tracing tools for mutex but it's not easy to use them
-> > for e.g. dead locks.  Let's provide "--enable-debug-mutex" parameter
-> > when configure to allow QemuMutex to store the last owner that took
-> > specific lock.  It might be extremely easy to use this tool to debug
-> > deadlocks since we can directly know who took the lock then as long as
-> > we can have a gdb attached to the process.
-> > 
-> > CC: Paolo Bonzini <pbonzini@redhat.com>
-> > CC: Stefan Hajnoczi <stefanha@redhat.com>
-> > CC: Fam Zheng <famz@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> > v2:
-> > - fix "--disable-debug-mutex" not working..
-> > ---
-> >  configure                   | 10 ++++++++++
-> >  include/qemu/thread-posix.h |  4 ++++
-> >  util/qemu-thread-posix.c    |  4 ++++
-> >  3 files changed, 18 insertions(+)
-> > 
-> > diff --git a/configure b/configure
-> > index 0a19b033bc..a80af735b2 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -451,6 +451,7 @@ jemalloc="no"
-> >  replication="yes"
-> >  vxhs=""
-> >  libxml2=""
-> > +debug_mutex="no"
-> >  
-> >  supported_cpu="no"
-> >  supported_os="no"
-> > @@ -1374,6 +1375,10 @@ for opt do
-> >    ;;
-> >    --disable-git-update) git_update=no
-> >    ;;
-> > +  --enable-debug-mutex) debug_mutex=yes
-> > +  ;;
-> > +  --disable-debug-mutex) debug_mutex=no
-> > +  ;;
-> >    *)
-> >        echo "ERROR: unknown option $opt"
-> >        echo "Try '$0 --help' for more information"
-> > @@ -1631,6 +1636,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-> >    crypto-afalg    Linux AF_ALG crypto backend driver
-> >    vhost-user      vhost-user support
-> >    capstone        capstone disassembler support
-> > +  debug-mutex     mutex debugging support
-> >  
-> >  NOTE: The object files are built at the place where configure is launched
-> >  EOF
-> > @@ -5874,6 +5880,7 @@ echo "avx2 optimization $avx2_opt"
-> >  echo "replication support $replication"
-> >  echo "VxHS block device $vxhs"
-> >  echo "capstone          $capstone"
-> > +echo "mutex debugging   $debug_mutex"
-> >  
-> >  if test "$sdl_too_old" = "yes"; then
-> >  echo "-> Your SDL version is too old - please upgrade to have SDL support"
-> > @@ -6602,6 +6609,9 @@ fi
-> >  if test "$capstone" != "no" ; then
-> >    echo "CONFIG_CAPSTONE=y" >> $config_host_mak
-> >  fi
-> > +if test "$debug_mutex" = "yes" ; then
-> > +  echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
-> > +fi
-> >  
-> >  # Hold two types of flag:
-> >  #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
-> > diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
-> > index f3f47e426f..fd27b34128 100644
-> > --- a/include/qemu/thread-posix.h
-> > +++ b/include/qemu/thread-posix.h
-> > @@ -12,6 +12,10 @@ typedef QemuMutex QemuRecMutex;
-> >  
-> >  struct QemuMutex {
-> >      pthread_mutex_t lock;
-> > +#ifdef CONFIG_DEBUG_MUTEX
-> > +    const char *file;
-> > +    int line;
-> > +#endif
-> 
-> These look quite cheap, why we need a configure option to enable it?
 
-Yeah; I am not 100% sure about whether it's cheap or not, hence with
-that.  I can remove that part if we are sure we want it always.
 
--- 
-Peter Xu
+=D4=DA 2018/4/18 22:04, Dr. David Alan Gilbert =D0=B4=B5=C0:
+> * QingFeng Hao (haoqf@linux.vnet.ibm.com) wrote:
+>> Hi all,
+>> I did some investigation and found that "virsh qemu-monitor-command" s=
+upports qom-get,
+>> but qemu hmp doesn't. However, in hmp.c there are qom_list and qom_set=
+. It confused me
+>> and my question is: why is this? And how can I get a property's value =
+in hmp? e.g.
+>> qemu-system-* -nodefaults -machine accel=3Dqtest -no-shutdown -nograph=
+ic -monitor stdio -serial none -hda /root/t.qcow2
+>> "info qtree" can only get a few properties.
+>=20
+> I did try that in 2016 (see my series from about September); but it got
+> bogged down in trying to fix output visitors; it's possible the visitor
+> code has been fixed since then though.
+>=20
+Thanks! I used your patch with a bit fix of compilation to test, which ca=
+n work and
+print the json format string for structure property. The prior discussion=
+s seem
+no any eventual conclusion with some tricks.
+
+> The 'Show values and description when using "qom-list"' patch
+> that Ricardo Perez Blanco posted would do something similar.
+Yes, I saw the patch. thanks
+>=20
+> Dave
+>=20
+>> Thanks a lot!
+>> --=20
+>> Regards
+>> QingFeng Hao
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+
+--=20
+Regards
+QingFeng Hao
