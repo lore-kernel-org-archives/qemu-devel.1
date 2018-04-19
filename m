@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9A5s-0006BP-1a
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:26 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9A5m-0002T1-2r
+	(envelope-from <alex.bennee@linaro.org>) id 1f9A5q-00069b-CS
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:24 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34143)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1f9A5p-0002dY-4O
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:22 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37488)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9A5l-0002PK-Qd
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:18 -0400
-Received: by mail-wr0-x243.google.com with SMTP id d19-v6so14369031wre.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:59:17 -0700 (PDT)
+	id 1f9A5o-0002bI-Qu
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:59:21 -0400
+Received: by mail-wr0-x242.google.com with SMTP id f14-v6so14351717wre.4
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:59:20 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Apr 2018 14:58:31 +0100
-Message-Id: <20180419135901.30035-14-alex.bennee@linaro.org>
+Date: Thu, 19 Apr 2018 14:58:53 +0100
+Message-Id: <20180419135901.30035-36-alex.bennee@linaro.org>
 In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
 References: <20180419135901.30035-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 13/43] tests/tcg/multiarch: Build fix for
- linux-test
+Subject: [Qemu-devel] [PATCH v2 35/43] tests/tcg/Makefile: update to be
+ called from Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,225 +33,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
+This make is now invoked from each individual target make with the
+appropriate CC and EXTRA_CFLAGS set for each guest. It then includes
+additional Makefile.targets from:
 
-To keep the compiler happy, and to fit in our buildsys flags:
+  - tests/tcg/multiarch (always)
+  - tests/tcg/$(TARGET_BASE_ARCH) (if available)
+  - tests/tcg/$(TARGET_NAME)
 
-- Make local functions "static"
-- #ifdef out unused functions
-- drop cutils/osdep dependencies
+The order is important as the later Makefile's may want to suppress
+TESTS from it's base arch profile. Each included Makefile.target is
+responsible for adding TESTS as well as defining any special build
+instructions for individual tests.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-[AJB: drop cutils/osdep dependencies]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- tests/tcg/multiarch/linux-test.c | 68 ++++++++++----------------------
- 1 file changed, 21 insertions(+), 47 deletions(-)
 
-diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-index 5070d31446..4457bd04ba 100644
---- a/tests/tcg/multiarch/linux-test.c
-+++ b/tests/tcg/multiarch/linux-test.c
-@@ -16,7 +16,6 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
--#define _GNU_SOURCE
- #include <stdarg.h>
- #include <stdlib.h>
- #include <stdio.h>
-@@ -31,6 +30,7 @@
- #include <utime.h>
- #include <time.h>
- #include <sys/time.h>
-+#include <sys/resource.h>
- #include <sys/uio.h>
- #include <sys/socket.h>
- #include <netinet/in.h>
-@@ -39,13 +39,12 @@
- #include <dirent.h>
- #include <setjmp.h>
- #include <sys/shm.h>
--#include "qemu/cutils.h"
+---
+v2
+  - cleaner approach to include sub makefiles
+  - move TESTS/VPATH manipulation into sub-makefile
+  - avoid double inclusion when TARGET_BASE_ARCH==TARGET_NAME
+---
+ tests/tcg/Makefile | 153 +++++++++++----------------------------------
+ 1 file changed, 38 insertions(+), 115 deletions(-)
+
+diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
+index e12395117a..b9291acc89 100644
+--- a/tests/tcg/Makefile
++++ b/tests/tcg/Makefile
+@@ -1,125 +1,48 @@
+--include ../../config-host.mak
+--include $(SRC_PATH)/rules.mak
++# -*- Mode: makefile -*-
++#
++# TCG tests
++#
++# These are complicated by the fact we want to build them for guest
++# systems. This requires knowing what guests we are building and which
++# ones we have cross-compilers for or docker images with
++# cross-compilers.
++#
++# The tests themselves should be as minimal as possible as
++# cross-compilers don't always have a large amount of libraries
++# available.
++#
++# We only include the host build system for SRC_PATH and we don't
++# bother with the common rules.mk. We expect CC/LD to have been set for
++# us from the parent make as well as being passed EXTRA_CFLAGS.
++#
++# We also expect to be in the tests build dir for the FOO-linux-user.
++#
  
- #define TESTPATH "/tmp/linux-test.tmp"
- #define TESTPORT 7654
- #define STACK_SIZE 16384
+-$(call set-vpath, $(SRC_PATH)/tests/tcg)
++-include ../../config-host.mak
++-include ../config-target.mak
  
--void error1(const char *filename, int line, const char *fmt, ...)
-+static void error1(const char *filename, int line, const char *fmt, ...)
- {
-     va_list ap;
-     va_start(ap, fmt);
-@@ -56,7 +55,7 @@ void error1(const char *filename, int line, const char *fmt, ...)
-     exit(1);
- }
+-QEMU=../../i386-linux-user/qemu-i386
+-QEMU_X86_64=../../x86_64-linux-user/qemu-x86_64
+-CC_X86_64=$(CC_I386) -m64
++# Tests we are building
++TESTS=
  
--int __chk_error(const char *filename, int line, int ret)
-+static int __chk_error(const char *filename, int line, int ret)
- {
-     if (ret < 0) {
-         error1(filename, line, "%m (ret=%d, errno=%d)",
-@@ -73,7 +72,7 @@ int __chk_error(const char *filename, int line, int ret)
+-QEMU_INCLUDES += -I../..
+-CFLAGS=-Wall -O2 -g -fno-strict-aliasing
+-#CFLAGS+=-msse2
++# Start with a blank slate, the build targets get to add stuff first
++CFLAGS=
++QEMU_CFLAGS=
+ LDFLAGS=
  
- #define FILE_BUF_SIZE 300
- 
--void test_file(void)
-+static void test_file(void)
- {
-     int fd, i, len, ret;
-     uint8_t buf[FILE_BUF_SIZE];
-@@ -210,7 +209,7 @@ void test_file(void)
-     chk_error(rmdir(TESTPATH));
- }
- 
--void test_fork(void)
-+static void test_fork(void)
- {
-     int pid, status;
- 
-@@ -224,7 +223,7 @@ void test_fork(void)
-         error("waitpid status=0x%x", status);
- }
- 
--void test_time(void)
-+static void test_time(void)
- {
-     struct timeval tv, tv2;
-     struct timespec ts, rem;
-@@ -251,34 +250,7 @@ void test_time(void)
-         error("getrusage");
- }
- 
--void pstrcpy(char *buf, int buf_size, const char *str)
--{
--    int c;
--    char *q = buf;
+-# TODO: automatically detect ARM and MIPS compilers, and run those too
 -
--    if (buf_size <= 0)
--        return;
+-# runcom maps page 0, so it requires root privileges
+-# also, pi_10.com runs indefinitely
 -
--    for(;;) {
--        c = *str++;
--        if (c == 0 || q >= buf + buf_size - 1)
--            break;
--        *q++ = c;
--    }
--    *q = '\0';
--}
+-I386_TESTS=hello-i386 \
+-	   sha1-i386 \
+-	   test-i386 \
+-	   test-i386-fprem \
+-	   # runcom
 -
--/* strcat and truncate. */
--char *pstrcat(char *buf, int buf_size, const char *s)
--{
--    int len;
--    len = strlen(buf);
--    if (len < buf_size)
--        pstrcpy(buf + len, buf_size - len, s);
--    return buf;
--}
+-# native i386 compilers sometimes are not biarch.  assume cross-compilers are
+-ifneq ($(ARCH),i386)
+-I386_TESTS+=run-test-x86_64
+-endif
 -
--int server_socket(void)
-+static int server_socket(void)
- {
-     int val, fd;
-     struct sockaddr_in sockaddr;
-@@ -298,7 +270,7 @@ int server_socket(void)
+-TESTS = test_path
+-ifneq ($(call find-in-path, $(CC_I386)),)
+-TESTS += $(I386_TESTS)
++# The order we include is important. We include multiarch, base arch and finally arch
++-include $(SRC_PATH)/tests/tcg/multiarch/Makefile.target
++-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.target
++ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
++-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.target
+ endif
  
- }
+-all: $(patsubst %,run-%,$(TESTS))
+-test: all
+-
+-# rules to run tests
+-
+-.PHONY: $(patsubst %,run-%,$(TESTS))
+-
+-run-%: %
+-	-$(QEMU) ./$*
+-
+-run-hello-i386: hello-i386
+-run-sha1-i386: sha1-i386
+-
+-run-test-i386: test-i386
+-	./test-i386 > test-i386.ref
+-	-$(QEMU) test-i386 > test-i386.out
+-	@if diff -u test-i386.ref test-i386.out ; then echo "Auto Test OK"; fi
+-
+-run-test-i386-fprem: test-i386-fprem
+-	./test-i386-fprem > test-i386-fprem.ref
+-	-$(QEMU) test-i386-fprem > test-i386-fprem.out
+-	@if diff -u test-i386-fprem.ref test-i386-fprem.out ; then echo "Auto Test OK"; fi
+-
+-run-test-x86_64: test-x86_64
+-	./test-x86_64 > test-x86_64.ref
+-	-$(QEMU_X86_64) test-x86_64 > test-x86_64.out
+-	@if diff -u test-x86_64.ref test-x86_64.out ; then echo "Auto Test OK"; fi
+-
+-
+-run-runcom: runcom
+-	-$(QEMU) ./runcom $(SRC_PATH)/tests/pi_10.com
+-
+-run-test_path: test_path
+-	./test_path
+-
+-# rules to compile tests
+-
+-hello-i386: hello-i386.c
+-	$(CC_I386) -nostdlib $(CFLAGS) -static $(LDFLAGS) -o $@ $<
+-	strip $@
+-
+-# i386/x86_64 emulation test (test various opcodes) */
+-test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S \
+-           test-i386.h test-i386-shift.h test-i386-muldiv.h
+-	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ \
+-              $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
+-
+-test-i386-fprem: test-i386-fprem.c
+-	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $^
+-
+-test-x86_64: test-i386.c \
+-           test-i386.h test-i386-shift.h test-i386-muldiv.h
+-	$(CC_X86_64) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $(<D)/test-i386.c -lm
+-
+-# vm86 test
+-runcom: runcom.c
+-	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
+-
+-# speed test
+-sha1-i386: sha1.c
+-	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
+-
+-# arm test
+-hello-arm: hello-arm.o
+-	arm-linux-ld -o $@ $<
+-
+-hello-arm.o: hello-arm.c
+-	arm-linux-gcc -Wall -g -O2 -c -o $@ $<
+-
+-test-arm-iwmmxt: test-arm-iwmmxt.s
+-	cpp < $< | arm-linux-gnu-gcc -Wall -static -march=iwmmxt -mabi=aapcs -x assembler - -o $@
+-
+-# MIPS test
+-hello-mips: hello-mips.c
+-	mips-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
+-
+-hello-mipsel: hello-mips.c
+-	mipsel-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
++# Add the common build options
++CFLAGS+=-Wall -O0 -g -fno-strict-aliasing
++LDFLAGS+=-static
  
--int client_socket(void)
-+static int client_socket(void)
- {
-     int fd;
-     struct sockaddr_in sockaddr;
-@@ -312,9 +284,9 @@ int client_socket(void)
-     return fd;
- }
+-# testsuite for the CRIS port.
+-test-cris:
+-	$(MAKE) -C cris check
++%: %.c
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
  
--const char socket_msg[] = "hello socket\n";
-+static const char socket_msg[] = "hello socket\n";
+-# testsuite for the LM32 port.
+-test-lm32:
+-	$(MAKE) -C lm32 check
++all: $(TESTS)
  
--void test_socket(void)
-+static void test_socket(void)
- {
-     int server_fd, client_fd, fd, pid, ret, val;
-     struct sockaddr_in sockaddr;
-@@ -348,9 +320,10 @@ void test_socket(void)
-     chk_error(close(server_fd));
- }
- 
-+#if 0
- #define WCOUNT_MAX 512
- 
--void test_pipe(void)
-+static void test_pipe(void)
- {
-     fd_set rfds, wfds;
-     int fds[2], fd_max, ret;
-@@ -391,10 +364,10 @@ void test_pipe(void)
-     chk_error(close(fds[1]));
- }
- 
--int thread1_res;
--int thread2_res;
-+static int thread1_res;
-+static int thread2_res;
- 
--int thread1_func(void *arg)
-+static int thread1_func(void *arg)
- {
-     int i;
-     for(i=0;i<5;i++) {
-@@ -404,7 +377,7 @@ int thread1_func(void *arg)
-     return 0;
- }
- 
--int thread2_func(void *arg)
-+static int thread2_func(void *arg)
- {
-     int i;
-     for(i=0;i<6;i++) {
-@@ -435,27 +408,28 @@ void test_clone(void)
-         thread2_res != 6)
-         error("clone");
- }
-+#endif
- 
- /***********************************/
- 
- volatile int alarm_count;
- jmp_buf jmp_env;
- 
--void sig_alarm(int sig)
-+static void sig_alarm(int sig)
- {
-     if (sig != SIGALRM)
-         error("signal");
-     alarm_count++;
- }
- 
--void sig_segv(int sig, siginfo_t *info, void *puc)
-+static void sig_segv(int sig, siginfo_t *info, void *puc)
- {
-     if (sig != SIGSEGV)
-         error("signal");
-     longjmp(jmp_env, 1);
- }
- 
--void test_signal(void)
-+static void test_signal(void)
- {
-     struct sigaction act;
-     struct itimerval it, oit;
-@@ -510,7 +484,7 @@ void test_signal(void)
- 
- #define SHM_SIZE 32768
- 
--void test_shm(void)
-+static void test_shm(void)
- {
-     void *ptr;
-     int shmid;
+-clean:
+-	rm -f *~ *.o test-i386.out test-i386.ref \
+-           test-x86_64.log test-x86_64.ref qruncom $(TESTS)
++# There is no clean target, the calling make just rm's the tests build dir
 -- 
 2.17.0
