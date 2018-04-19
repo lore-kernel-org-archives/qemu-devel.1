@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1f941e-0004iA-5z
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:30:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f945e-0006Gg-QD
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1f941d-0007hB-Cs
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:30:38 -0400
-Date: Thu, 19 Apr 2018 09:30:24 +0200
-From: Olaf Hering <olaf@aepfle.de>
-Message-ID: <20180419093024.27c77433.olaf@aepfle.de>
-In-Reply-To: <87sh7rvf27.fsf@dusky.pond.sub.org>
-References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418144538.4aa2f492.cohuck@redhat.com>
-	<20180418125545.GN27579@redhat.com>
-	<87sh7rvf27.fsf@dusky.pond.sub.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1f945d-0001HM-SK
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:34:46 -0400
+Date: Thu, 19 Apr 2018 17:34:38 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180419073438.GK2317@umbus.fritz.box>
+References: <20180419064735.29928-1-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/2Z+D0DuBWfubgNZlmcQTGyb";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3MHXEHrrXKLGx71o"
+Content-Disposition: inline
+In-Reply-To: <20180419064735.29928-1-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4] spapr: Support ibm,
+ dynamic-memory-v2 property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Philippe =?UTF-8?B?TWF0?= =?UTF-8?B?aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, "open list:All patches CC
-	here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com, imammedo@redhat.com
 
---Sig_/2Z+D0DuBWfubgNZlmcQTGyb
-Content-Type: text/plain; charset=US-ASCII
+
+--3MHXEHrrXKLGx71o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am Thu, 19 Apr 2018 09:19:28 +0200
-schrieb Markus Armbruster <armbru@redhat.com>:
+On Thu, Apr 19, 2018 at 12:17:35PM +0530, Bharata B Rao wrote:
+> The new property ibm,dynamic-memory-v2 allows memory to be represented
+> in a more compact manner in device tree.
+>=20
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-> > [1]   https://libvirt.org/platforms.html =20
-> This policy looks sensible to me
+Applied to ppc-for-2.13.
 
-Unless I misinterpret that, noone cares about SLE11 anymore.
-So, just wipe that single one developer system with glib-2.22 and move on.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Olaf
-
---Sig_/2Z+D0DuBWfubgNZlmcQTGyb
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
+--3MHXEHrrXKLGx71o
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCWthFkAAKCRBdQqD6ppg2
-fsQsAKC52LDE4Rmca0SaU4bxxQlPcZYr/ACeN4xsFVQY99sG6zhvViPIqxj6LLE=
-=u8yC
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrYRokACgkQbDjKyiDZ
+s5KQvA//ZOwByJfOsEZXT62iZO6xh+dJdxUZMH99xxjd8WPEDJZRoRi2HVEN10CM
+6Ys4PYo+dSXM8LEDUWjK7b6S6mVZkrUmbMUPcQgLpixQiMRH8snCX1wVpGRwuh5j
+hx4ZZ7Y92YqbpM3CaulxW8w6MG1VFb6jSJwjrLf3ObQFHSTS+yp+QmDdTSQNt3aG
+igLGKfGTTokzJ6sRbj9HBxNn0WaLjFvumBuYYtO0iNNEd7pt0LIyYX/TO8yV3uG2
+g//5qYfzkHmI8QFDURjN2rSE1YP07QjrytbrCiwrmmQDv7gLApyzKqh9HkY67iVg
+xodFTmNisi+3klsXH3qBtmk5quYt5bbp2zQxXa5zmNnfPuldT41KLPEs7HsVgRf2
+uM5swcZxxdvvnBsvk35z/S2zmwLRIQVgFF9nXGuEvHY71WTGc6RWGE3IcsMKVnoH
+heWA1Re6bhASEZ/GHWnVJoNRWOcrm1/3QaCcpl9hBv9fLzE9OTjPrsI2uDycXDQG
+ScZeHUVlR1989QKblyouNf7oXzxQXq9kYcCiAsKT07lQSz0KUlHUkuiCA/h/QIGx
+01pj0eyKGF3hrvHqzKsb7C1QF2Y14me1T4ZzzD03naH2TT77rUHk9/6oTLJKgtBU
+pTk/ko+3MQckbs0HVKdLPtvvBHDwHMm+eIUAjQJPakxGMPhXUdo=
+=B/pF
 -----END PGP SIGNATURE-----
 
---Sig_/2Z+D0DuBWfubgNZlmcQTGyb--
+--3MHXEHrrXKLGx71o--
