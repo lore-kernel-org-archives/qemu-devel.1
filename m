@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9Ctl-0005FP-KP
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:59:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f9CuW-0005y5-SC
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9Cti-0007oL-Hm
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:59:05 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180419142106.9694-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fe11dfb7-a5e9-1b85-3f65-e3639f463558@amsat.org>
-Date: Thu, 19 Apr 2018 13:58:59 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1f9CuT-0008Ex-OE
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:59:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59384 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f9CuT-0008EI-Ik
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:59:49 -0400
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-7-tiwei.bie@intel.com>
+	<20180418192154-mutt-send-email-mst@kernel.org>
+	<20180419111439.i6gfhnept6wy7uzp@debian>
+	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
+	<20180419182035-mutt-send-email-mst@kernel.org>
+	<f123c3a5-f7a3-a0e3-ffc7-b57e19610a9b@redhat.com>
+	<D0158A423229094DA7ABF71CF2FA0DA34E950C67@SHSMSX104.ccr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <28ab1675-15ae-dab4-fd71-7632666f57fc@redhat.com>
+Date: Thu, 19 Apr 2018 18:59:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180419142106.9694-1-peter.maydell@linaro.org>
+In-Reply-To: <D0158A423229094DA7ABF71CF2FA0DA34E950C67@SHSMSX104.ccr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Use v7m_stack_read() for
- reading the frame signature
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v3 6/6] vhost-user:
+ support registering external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: "Liang, Cunming" <cunming.liang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan,
+	Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
 
-On 04/19/2018 11:21 AM, Peter Maydell wrote:
-> In commit 95695effe8caa552b8f2 we changed the v7M/v8M stack
-> pop code to use a new v7m_stack_read() function that checks
-> whether the read should fail due to an MPU or bus abort.
-> We missed one call though, the one which reads the signature
-> word for the callee-saved register part of the frame.
+On 19/04/2018 18:52, Liang, Cunming wrote:
+>>> Oh you are right.
+>>> 
+>>> So it's only needed for non-intel platforms or when packets are
+>>> in WC memory then. And I don't know whether dpdk ever puts
+>>> packets in WC memory.
+>>> 
+>>> I guess we'll cross this bridge when we get to it.
+>> Non-TSO architectures seem important...
+>
+> I'm not familiar with Non-TSO, trying to understand the difference
+> according to the feature set. Let's say non-TSO architectures do not
+> set 'weak_barriers'. Then mandatory barrier is used for software. HW
+> offload on that platform would choose different feature set against
+> software? If it's not, essentially we're worried about live migration
+> from a TSO to a non-TSO architectures platform?
 
-Good catch.
+I'm worried about live migration from software virtio to hardware virtio
+on non-TSO architectures.  For example, on ARM you would have a "dmb
+ishst" (smp_wmb) for software virtio and a "dsb st" (wmb) or "dmb oshst"
+(dma_wmb) for hardware virtio.
 
-> Correct the omission.
+For this to work, you would have to set up the VM so that it uses the
+heavier barriers from the beginning, even when backed by software virtio.
 
-I checked, this was the unique omission.
-
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  target/arm/helper.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index b14fdab140..2ebd086ef2 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6913,7 +6913,6 @@ static bool v7m_push_stack(ARMCPU *cpu)
->  static void do_v7m_exception_exit(ARMCPU *cpu)
->  {
->      CPUARMState *env = &cpu->env;
-> -    CPUState *cs = CPU(cpu);
->      uint32_t excret;
->      uint32_t xpsr;
->      bool ufault = false;
-> @@ -7112,9 +7111,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->              ((excret & R_V7M_EXCRET_ES_MASK) == 0 ||
->               (excret & R_V7M_EXCRET_DCRS_MASK) == 0)) {
->              uint32_t expected_sig = 0xfefa125b;
-> -            uint32_t actual_sig = ldl_phys(cs->as, frameptr);
-> +            uint32_t actual_sig;
->  
-> -            if (expected_sig != actual_sig) {
-> +            pop_ok = v7m_stack_read(cpu, &actual_sig, frameptr, mmu_idx);
-> +
-> +            if (pop_ok && expected_sig != actual_sig) {
->                  /* Take a SecureFault on the current stack */
->                  env->v7m.sfsr |= R_V7M_SFSR_INVIS_MASK;
->                  armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-> @@ -7125,7 +7126,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->                  return;
->              }
->  
-> -            pop_ok =
-> +            pop_ok = pop_ok &&
->                  v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
->                  v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
->                  v7m_stack_read(cpu, &env->regs[5], frameptr + 0xc, mmu_idx) &&
-> 
+Paolo
