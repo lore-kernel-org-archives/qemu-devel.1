@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60534)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Ch1-0002Hx-71
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:56 -0400
+	id 1f9Cgy-0002GI-Qn
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgz-0006HL-Bg
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:55 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:53478)
+	id 1f9Cgx-0006Es-GG
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:52 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:53463)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgz-0006C9-0d
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:53 -0400
+	id 1f9Cgx-00069l-2W
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:51 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 19 Apr 2018 17:45:13 +0100
-Message-ID: <1524156319-11465-11-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 19 Apr 2018 17:45:14 +0100
+Message-ID: <1524156319-11465-12-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 10/16] os-posix: Provide new -runas <uid>:<gid>
- facility
+Subject: [Qemu-devel] [PATCH 11/16] xen: Use newly added dmops for mapping
+ VGA memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,166 +30,201 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>
 
-This allows the caller to specify a uid and gid to use, even if there
-is no corresponding password entry.  This will be useful in certain
-Xen configurations.
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
 
-We don't support just -runas <uid> because: (i) deprivileging without
-calling setgroups would be ineffective (ii) given only a uid we don't
-know what gid we ought to use (since uids may eppear in multiple
-passwd file entries with different gids).
+Xen unstable (to be in 4.11) has two new dmops, relocate_memory and
+pin_memory_cacheattr. Use these to set up the VGA memory, replacing the
+previous calls to libxc. This allows the VGA console to work properly
+when QEMU is running restricted (-xen-domid-restrict).
 
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Daniel P. Berrange <berrange@redhat.com>
-CC: Michael Tokarev <mjt@tls.msk.ru>
+Wrapper functions are provided to allow QEMU to work with older versions
+of Xen.
+
+Tweak the error handling while making this change:
+* Report pin_memory_cacheattr errors.
+* Report errors even when DEBUG_HVM is not set. This is useful for
+trying to understand why VGA is not working, since otherwise it just
+fails silently.
+* Fix the return values when an error occurs. The functions now
+consistently return -1 and set errno.
+
+CC: Ian Jackson <ian.jackson@eu.citrix.com>
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Reviewed-by: Ian Jackson <ian.jackson@eu.citrix.com>
+Signed-off-by: Ian Jackson <ian.jackson@eu.citrix.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
-v7: Be much more explicit about legal combinations of user_{pwd,uid,gid}.
-    Rely more on qemu_stroul being sane, dropping pointless
-     pre-assignments of errno and lv.
-    Retain optarg in error message about -runas argument.
-    Rebase over introduction of error_report in change_process_uid.
-v6.1: Fix constness of qemu_strtoul end pointer parameter.
-v6: Use qemu_strtoul for the first strtoul.
-    Use error_report rather than fprintf to print usage error message.
-    Fix an error message which still referred to . rather than :
-v5: Use : rather than . to separate uid from gid
-v4: Changed to reuse option -runas
-v3: Error messages fixed.  Thanks to Peter Maydell and Ross Lagerwall.
+v6.1: Fix printf formats to match types in error_report messages
+      Fix spurious \n in error_report messages
+      Fix { } style issue
+v6: New patch in this version of the series
 ---
- os-posix.c      | 77 ++++++++++++++++++++++++++++++++++++++++++++++++---------
- qemu-options.hx |  3 ++-
- 2 files changed, 67 insertions(+), 13 deletions(-)
+ configure                   | 19 +++++++++++++++++
+ hw/i386/xen/xen-hvm.c       | 50 ++++++++++++++++++++++++---------------------
+ include/hw/xen/xen_common.h | 32 +++++++++++++++++++++++++++++
+ 3 files changed, 78 insertions(+), 23 deletions(-)
 
-diff --git a/os-posix.c b/os-posix.c
-index 560db95..0f59566 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -41,7 +41,14 @@
- #include <sys/prctl.h>
- #endif
- 
--static struct passwd *user_pwd;
-+/*
-+ * Must set all three of these at once.
-+ * Legal combinations are              unset   by name   by uid
-+ */
-+static struct passwd *user_pwd;    /*   NULL   non-NULL   NULL   */
-+static uid_t user_uid = (uid_t)-1; /*   -1      -1        >=0    */
-+static gid_t user_gid = (gid_t)-1; /*   -1      -1        >=0    */
+diff --git a/configure b/configure
+index f580255..d5435ff 100755
+--- a/configure
++++ b/configure
+@@ -2218,6 +2218,25 @@ EOF
+     # Xen unstable
+     elif
+         cat > $TMPC <<EOF &&
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
++#define __XEN_TOOLS__
++#include <xendevicemodel.h>
++int main(void) {
++  xendevicemodel_handle *xd;
 +
- static const char *chroot_dir;
- static int daemonize;
- static int daemon_pipe;
-@@ -127,6 +134,33 @@ void os_set_proc_name(const char *s)
- #endif
++  xd = xendevicemodel_open(0, 0);
++  xendevicemodel_pin_memory_cacheattr(xd, 0, 0, 0, 0);
++
++  return 0;
++}
++EOF
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
++      then
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
++      xen_ctrl_version=41100
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+ #include <xenforeignmemory.h>
+ #include <xentoolcore.h>
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index fb727bc..caa563b 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -347,7 +347,7 @@ static int xen_add_to_physmap(XenIOState *state,
+                               MemoryRegion *mr,
+                               hwaddr offset_within_region)
+ {
+-    unsigned long i = 0;
++    unsigned long nr_pages;
+     int rc = 0;
+     XenPhysmap *physmap = NULL;
+     hwaddr pfn, start_gpfn;
+@@ -396,22 +396,26 @@ go_physmap:
+ 
+     pfn = phys_offset >> TARGET_PAGE_BITS;
+     start_gpfn = start_addr >> TARGET_PAGE_BITS;
+-    for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
+-        unsigned long idx = pfn + i;
+-        xen_pfn_t gpfn = start_gpfn + i;
+-
+-        rc = xen_xc_domain_add_to_physmap(xen_xc, xen_domid, XENMAPSPACE_gmfn, idx, gpfn);
+-        if (rc) {
+-            DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
+-                    PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
+-            return -rc;
+-        }
++    nr_pages = size >> TARGET_PAGE_BITS;
++    rc = xendevicemodel_relocate_memory(xen_dmod, xen_domid, nr_pages, pfn,
++                                        start_gpfn);
++    if (rc) {
++        int saved_errno = errno;
++
++        error_report("relocate_memory %lu pages from GFN %"HWADDR_PRIx
++                     " to GFN %"HWADDR_PRIx" failed: %s",
++                     nr_pages, pfn, start_gpfn, strerror(saved_errno));
++        errno = saved_errno;
++        return -1;
+     }
+ 
+-    xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
++    rc = xendevicemodel_pin_memory_cacheattr(xen_dmod, xen_domid,
+                                    start_addr >> TARGET_PAGE_BITS,
+                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
+                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
++    if (rc) {
++        error_report("pin_memory_cacheattr failed: %s", strerror(errno));
++    }
+     return xen_save_physmap(state, physmap);
  }
  
+@@ -419,7 +423,6 @@ static int xen_remove_from_physmap(XenIOState *state,
+                                    hwaddr start_addr,
+                                    ram_addr_t size)
+ {
+-    unsigned long i = 0;
+     int rc = 0;
+     XenPhysmap *physmap = NULL;
+     hwaddr phys_offset = 0;
+@@ -438,16 +441,17 @@ static int xen_remove_from_physmap(XenIOState *state,
+     size >>= TARGET_PAGE_BITS;
+     start_addr >>= TARGET_PAGE_BITS;
+     phys_offset >>= TARGET_PAGE_BITS;
+-    for (i = 0; i < size; i++) {
+-        xen_pfn_t idx = start_addr + i;
+-        xen_pfn_t gpfn = phys_offset + i;
+-
+-        rc = xen_xc_domain_add_to_physmap(xen_xc, xen_domid, XENMAPSPACE_gmfn, idx, gpfn);
+-        if (rc) {
+-            fprintf(stderr, "add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
+-                    PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
+-            return -rc;
+-        }
++    rc = xendevicemodel_relocate_memory(xen_dmod, xen_domid, size, start_addr,
++                                        phys_offset);
++    if (rc) {
++        int saved_errno = errno;
 +
-+static bool os_parse_runas_uid_gid(const char *optarg)
++        error_report("relocate_memory "RAM_ADDR_FMT" pages"
++                     " from GFN %"HWADDR_PRIx
++                     " to GFN %"HWADDR_PRIx" failed: %s",
++                     size, start_addr, phys_offset, strerror(saved_errno));
++        errno = saved_errno;
++        return -1;
+     }
+ 
+     QLIST_REMOVE(physmap, list);
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 4bd30a3..2eed6fc 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -89,6 +89,38 @@ typedef xc_interface xendevicemodel_handle;
+ 
+ #endif
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100
++
++static inline int xendevicemodel_relocate_memory(
++    xendevicemodel_handle *dmod, domid_t domid, uint32_t size, uint64_t src_gfn,
++    uint64_t dst_gfn)
 +{
-+    unsigned long lv;
-+    const char *ep;
-+    uid_t got_uid;
-+    gid_t got_gid;
++    uint32_t i;
 +    int rc;
 +
-+    rc = qemu_strtoul(optarg, &ep, 0, &lv);
-+    got_uid = lv; /* overflow here is ID in C99 */
-+    if (rc || *ep != ':' || got_uid != lv || got_uid == (uid_t)-1) {
-+        return false;
++    for (i = 0; i < size; i++) {
++        unsigned long idx = src_gfn + i;
++        xen_pfn_t gpfn = dst_gfn + i;
++
++        rc = xc_domain_add_to_physmap(xen_xc, domid, XENMAPSPACE_gmfn, idx,
++                                      gpfn);
++        if (rc) {
++            return rc;
++        }
 +    }
 +
-+    rc = qemu_strtoul(ep + 1, 0, 0, &lv);
-+    got_gid = lv; /* overflow here is ID in C99 */
-+    if (rc || got_gid != lv || got_gid == (gid_t)-1) {
-+        return false;
-+    }
-+
-+    user_pwd = NULL;
-+    user_uid = got_uid;
-+    user_gid = got_gid;
-+    return true;
++    return 0;
 +}
 +
- /*
-  * Parse OS specific command line options.
-  * return 0 if option handled, -1 otherwise
-@@ -144,8 +178,13 @@ void os_parse_cmd_args(int index, const char *optarg)
- #endif
-     case QEMU_OPTION_runas:
-         user_pwd = getpwnam(optarg);
--        if (!user_pwd) {
--            fprintf(stderr, "User \"%s\" doesn't exist\n", optarg);
-+        if (user_pwd) {
-+            user_uid = -1;
-+            user_gid = -1;
-+        } else if (!os_parse_runas_uid_gid(optarg)) {
-+            error_report("User \"%s\" doesn't exist"
-+                         " (and is not <uid>:<gid>)",
-+                         optarg);
-             exit(1);
-         }
-         break;
-@@ -165,18 +204,32 @@ void os_parse_cmd_args(int index, const char *optarg)
- 
- static void change_process_uid(void)
- {
--    if (user_pwd) {
--        if (setgid(user_pwd->pw_gid) < 0) {
--            error_report("Failed to setgid(%d)", user_pwd->pw_gid);
-+    assert((user_uid == (uid_t)-1) || user_pwd == NULL);
-+    assert((user_uid == (uid_t)-1) ==
-+           (user_gid == (gid_t)-1));
++static inline int xendevicemodel_pin_memory_cacheattr(
++    xendevicemodel_handle *dmod, domid_t domid, uint64_t start, uint64_t end,
++    uint32_t type)
++{
++    return xc_domain_pin_memory_cacheattr(xen_xc, domid, start, end, type);
++}
 +
-+    if (user_pwd || user_uid != (uid_t)-1) {
-+        gid_t intended_gid = user_pwd ? user_pwd->pw_gid : user_gid;
-+        uid_t intended_uid = user_pwd ? user_pwd->pw_uid : user_uid;
-+        if (setgid(intended_gid) < 0) {
-+            error_report("Failed to setgid(%d)", intended_gid);
-             exit(1);
-         }
--        if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
--            error_report("Failed to initgroups(\"%s\", %d)",
--                         user_pwd->pw_name, user_pwd->pw_gid);
--            exit(1);
-+        if (user_pwd) {
-+            if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
-+                error_report("Failed to initgroups(\"%s\", %d)",
-+                        user_pwd->pw_name, user_pwd->pw_gid);
-+                exit(1);
-+            }
-+        } else {
-+            if (setgroups(1, &user_gid) < 0) {
-+                error_report("Failed to setgroups(1, [%d])",
-+                        user_gid);
-+                exit(1);
-+            }
-         }
--        if (setuid(user_pwd->pw_uid) < 0) {
--            error_report("Failed to setuid(%d)", user_pwd->pw_uid);
-+        if (setuid(intended_uid) < 0) {
-+            error_report("Failed to setuid(%d)", intended_uid);
-             exit(1);
-         }
-         if (setuid(0) != -1) {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ca4e412..5fbf966 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3765,7 +3765,8 @@ ETEXI
++#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100 */
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
  
- #ifndef _WIN32
- DEF("runas", HAS_ARG, QEMU_OPTION_runas, \
--    "-runas user     change to user id user just before starting the VM\n",
-+    "-runas user     change to user id user just before starting the VM\n" \
-+    "                user can be numeric uid:gid instead\n",
-     QEMU_ARCH_ALL)
- #endif
- STEXI
+ #define XEN_COMPAT_PHYSMAP
 -- 
 2.1.4
