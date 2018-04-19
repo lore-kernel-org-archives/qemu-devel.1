@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f9CvL-0006hp-FN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:00:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f9Cyd-0000vk-B8
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:04:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f9CvF-0000Lv-Lw
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:00:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59466 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9CvF-0000Lo-G9
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:00:37 -0400
-Date: Thu, 19 Apr 2018 20:00:34 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180419195651-mutt-send-email-mst@kernel.org>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-7-tiwei.bie@intel.com>
-	<20180418192154-mutt-send-email-mst@kernel.org>
-	<20180419111439.i6gfhnept6wy7uzp@debian>
-	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
-	<20180419182035-mutt-send-email-mst@kernel.org>
-	<f123c3a5-f7a3-a0e3-ffc7-b57e19610a9b@redhat.com>
-	<D0158A423229094DA7ABF71CF2FA0DA34E950C67@SHSMSX104.ccr.corp.intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1f9Cya-00030c-3Y
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:04:07 -0400
+Resent-Message-Id: <E1f9Cya-00030c-3Y@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f9CyZ-000306-R7
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:04:04 -0400
+In-Reply-To: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152415740858.2064.14835831859507660143@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D0158A423229094DA7ABF71CF2FA0DA34E950C67@SHSMSX104.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] vhost-user: support registering
- external host notifiers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 19 Apr 2018 10:03:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v7 00/16] xen: xen-domid-restrict
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liang, Cunming" <cunming.liang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@lists.xenproject.org
 
-On Thu, Apr 19, 2018 at 04:52:20PM +0000, Liang, Cunming wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> > Sent: Thursday, April 19, 2018 11:52 PM
-> > To: Michael S. Tsirkin <mst@redhat.com>; Liang, Cunming
-> > <cunming.liang@intel.com>
-> > Cc: Bie, Tiwei <tiwei.bie@intel.com>; jasowang@redhat.com;
-> > alex.williamson@redhat.com; stefanha@redhat.com; qemu-devel@nongnu.org;
-> > virtio-dev@lists.oasis-open.org; Daly, Dan <dan.daly@intel.com>; Tan, Jianfeng
-> > <jianfeng.tan@intel.com>; Wang, Zhihong <zhihong.wang@intel.com>; Wang,
-> > Xiao W <xiao.w.wang@intel.com>
-> > Subject: Re: [PATCH v3 6/6] vhost-user: support registering external host
-> > notifiers
-> > 
-> > On 19/04/2018 17:42, Michael S. Tsirkin wrote:
-> > >> A compiler barrier is enough on strongly-ordered memory platform.
-> > >> As it doesn't re-order store, PCI device won't see a stale index
-> > >> value. But a weakly-ordered memory needs sfence.
-> > >
-> > > Oh you are right.
-> > >
-> > > So it's only needed for non-intel platforms or when packets are in WC
-> > > memory then. And I don't know whether dpdk ever puts packets in WC
-> > > memory.
-> > >
-> > > I guess we'll cross this bridge when we get to it.
-> > 
-> > Non-TSO architectures seem important...
-> 
-> I'm not familiar with Non-TSO, trying to understand the difference
-> according to the feature set. Let's say non-TSO architectures do not
-> set 'weak_barriers'. Then mandatory barrier is used for software. HW
-> offload on that platform would choose different feature set against
-> software? 
-
-Right. We'll need a flag for this feature for starters. It doesn't exist
-:) Paolo also points out that we should then add code to disallow
-migration between setups with and without the feature.
-
-> If it's not, essentially we're worried about live migration from a TSO to a non-TSO architectures platform?
-
-Probably not.
-
-> > 
-> > Paolo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjQxNTYzMTktMTE0NjUtMS1naXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBl
+dS5jaXRyaXguY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMTZdIHhlbjog
+eGVuLWRvbWlkLXJlc3RyaWN0IGltcHJvdmVtZW50cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
+QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
+dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
+Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
+Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
+CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
+YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTI0MTU2MzE5LTExNDY1LTEtZ2l0LXNlbmQtZW1h
+aWwtaWFuLmphY2tzb25AZXUuY2l0cml4LmNvbSAtPiBwYXRjaGV3LzE1MjQxNTYzMTktMTE0NjUt
+MS1naXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBldS5jaXRyaXguY29tClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKNzkxZGViYTAwYiBjb25maWd1cmU6IGRvX2NvbXBpbGVyOiBEdW1w
+IHNvbWUgZXh0cmEgaW5mbyB1bmRlciBiYXNoCmIxMGE3NDk2MTYgb3MtcG9zaXg6IGNsZWFudXA6
+IFJlcGxhY2UgcGVycm9yIHdpdGggZXJyb3JfcmVwb3J0CmY2ZWUxOTNlMDMgb3MtcG9zaXg6IGNs
+ZWFudXA6IFJlcGxhY2UgZnByaW50ZiB3aXRoIGVycm9yX3JlcG9ydCBpbiByZW1haW5pbmcgY2Fs
+bCBzaXRlcwozOGE0NGJhODcyIHhlbjogRXhwZWN0IHhlbnN0b3JlIHdyaXRlIHRvIGZhaWwgd2hl
+biByZXN0cmljdGVkCjQ4NjIyOTJjMWQgeGVuOiBSZW1vdmUgbm93LW9ic29sZXRlIHhlbl94Y19k
+b21haW5fYWRkX3RvX3BoeXNtYXAKOWE3MTNlMzU2NSB4ZW46IFVzZSBuZXdseSBhZGRlZCBkbW9w
+cyBmb3IgbWFwcGluZyBWR0EgbWVtb3J5Cjc1ZWJiZmViMzAgb3MtcG9zaXg6IFByb3ZpZGUgbmV3
+IC1ydW5hcyA8dWlkPjo8Z2lkPiBmYWNpbGl0eQowMTNjYjcwY2Q0IG9zLXBvc2l4OiBjbGVhbnVw
+OiBSZXBsYWNlIGZwcmludGZzIHdpdGggZXJyb3JfcmVwb3J0IGluIGNoYW5nZV9wcm9jZXNzX3Vp
+ZAo1ODFlNDc2MDA4IHhlbjogZGVzdHJveV9odm1fZG9tYWluOiBUcnkgeGVuZGV2aWNlbW9kZWxf
+c2h1dGRvd24KZTEzZTg5MGI5MyB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBhdGliaWxpdHkg
+ZmFsbGJhY2sgZnVydGhlciB1cCB0aGUgZmlsZQpkYWVlYjE2ODMxIHhlbjogZGVzdHJveV9odm1f
+ZG9tYWluOiBNb3ZlIHJlYXNvbiBpbnRvIGEgdmFyaWFibGUKOWIwMzdjYTJhYiB4ZW46IGRlZmVy
+IGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QKNTk3
+NjRhMjg4NyB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3RfYWxsCjExYzEz
+OTI5YTYgeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUKNGZiYmQ4ZTdkNiBBY2NlbENsYXNz
+OiBJbnRyb2R1Y2UgYWNjZWxfc2V0dXBfcG9zdAplNTcyMDMxY2JhIGNoZWNrcGF0Y2g6IEFkZCB4
+ZW5kZXZpY2Vtb2RlbF9oYW5kbGUgdG8gdGhlIGxpc3Qgb2YgdHlwZXMKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTY6IGNoZWNrcGF0Y2g6IEFkZCB4ZW5kZXZpY2Vtb2Rl
+bF9oYW5kbGUgdG8gdGhlIGxpc3Qgb2YgdHlwZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNjogQWNj
+ZWxDbGFzczogSW50cm9kdWNlIGFjY2VsX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8x
+NjogeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xNjog
+eGVuOiByZXN0cmljdDogdXNlIHhlbnRvb2xjb3JlX3Jlc3RyaWN0X2FsbC4uLgpDaGVja2luZyBQ
+QVRDSCA1LzE2OiB4ZW46IGRlZmVyIGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVm
+b3JlIG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xNjogeGVuOiBkZXN0cm95X2h2
+bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCA3
+LzE2OiB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBhdGliaWxpdHkgZmFsbGJhY2sgZnVydGhl
+ciB1cCB0aGUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCA4LzE2OiB4ZW46IGRlc3Ryb3lfaHZtX2Rv
+bWFpbjogVHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3duLi4uCkNoZWNraW5nIFBBVENIIDkvMTY6
+IG9zLXBvc2l4OiBjbGVhbnVwOiBSZXBsYWNlIGZwcmludGZzIHdpdGggZXJyb3JfcmVwb3J0IGlu
+IGNoYW5nZV9wcm9jZXNzX3VpZC4uLgpDaGVja2luZyBQQVRDSCAxMC8xNjogb3MtcG9zaXg6IFBy
+b3ZpZGUgbmV3IC1ydW5hcyA8dWlkPjo8Z2lkPiBmYWNpbGl0eS4uLgpDaGVja2luZyBQQVRDSCAx
+MS8xNjogeGVuOiBVc2UgbmV3bHkgYWRkZWQgZG1vcHMgZm9yIG1hcHBpbmcgVkdBIG1lbW9yeS4u
+LgpDaGVja2luZyBQQVRDSCAxMi8xNjogeGVuOiBSZW1vdmUgbm93LW9ic29sZXRlIHhlbl94Y19k
+b21haW5fYWRkX3RvX3BoeXNtYXAuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTY6IHhlbjogRXhwZWN0
+IHhlbnN0b3JlIHdyaXRlIHRvIGZhaWwgd2hlbiByZXN0cmljdGVkLi4uCkNoZWNraW5nIFBBVENI
+IDE0LzE2OiBvcy1wb3NpeDogY2xlYW51cDogUmVwbGFjZSBmcHJpbnRmIHdpdGggZXJyb3JfcmVw
+b3J0IGluIHJlbWFpbmluZyBjYWxsIHNpdGVzLi4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91
+bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzIzOiBGSUxFOiBvcy1wb3NpeC5jOjEzMjoKKyAgICBl
+cnJvcl9yZXBvcnQoIkNoYW5nZSBvZiBwcm9jZXNzIG5hbWUgbm90IHN1cHBvcnRlZCBieSB5b3Vy
+IE9TXG4iKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTUv
+MTY6IG9zLXBvc2l4OiBjbGVhbnVwOiBSZXBsYWNlIHBlcnJvciB3aXRoIGVycm9yX3JlcG9ydC4u
+LgpDaGVja2luZyBQQVRDSCAxNi8xNjogY29uZmlndXJlOiBkb19jb21waWxlcjogRHVtcCBzb21l
+IGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
