@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f9GN7-0004Gx-LF
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:41:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f9GTM-00071r-UD
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f9GN4-0001sy-IW
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:41:37 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:46118)
+	(envelope-from <richard.henderson@linaro.org>) id 1f9GTJ-0004Cs-Ib
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:48:04 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:42738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f9GN4-0001qE-C4
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:41:34 -0400
-Received: by mail-pg0-x242.google.com with SMTP id t12so3033438pgp.13
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 13:41:34 -0700 (PDT)
+	id 1f9GTJ-00041c-9K
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:48:01 -0400
+Received: by mail-pl0-x241.google.com with SMTP id t20-v6so3929133ply.9
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 13:48:01 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 References: <20180419135901.30035-1-alex.bennee@linaro.org>
 	<20180419135901.30035-4-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e35eeb70-4bbc-a0fe-2903-6cf58d1729fe@linaro.org>
-Date: Thu, 19 Apr 2018 10:41:28 -1000
+	<e35eeb70-4bbc-a0fe-2903-6cf58d1729fe@linaro.org>
+Message-ID: <48da6bcd-ecab-52d1-aee1-ed99be90d428@linaro.org>
+Date: Thu, 19 Apr 2018 10:47:55 -1000
 MIME-Version: 1.0
-In-Reply-To: <20180419135901.30035-4-alex.bennee@linaro.org>
+In-Reply-To: <e35eeb70-4bbc-a0fe-2903-6cf58d1729fe@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -35,21 +36,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org
 
-On 04/19/2018 03:58 AM, Alex Bennée wrote:
-> +  --cross-cc-*) cc_arch=${opt#--cross-cc-}
-> +                eval "cross_cc_${cc_arch}=\$optarg"
+On 04/19/2018 10:41 AM, Richard Henderson wrote:
+> On 04/19/2018 03:58 AM, Alex Bennée wrote:
+>> +  --cross-cc-*) cc_arch=${opt#--cross-cc-}
+>> +                eval "cross_cc_${cc_arch}=\$optarg"
+> 
+> This doesn't work as intended.
+> 
+> Given e.g. --cross-cc-aarch64=aarch64-linux-gcc
+> 
+> + cc_arch=aarch64=aarch64-linux-gcc
+> + eval 'cross_cc_aarch64=aarch64-linux-gcc=$optarg'
+> ++ cross_cc_aarch64=aarch64-linux-gcc=aarch64-linux-gcc
+> 
+> Which sets the variable "cross_cc_aarch64"
+> to "aarch64-linux-gcc=aarch64-linux-gcc".
+> Which of course won't exist to execute.
 
-This doesn't work as intended.
+-  --cross-cc-*) cc_arch=${opt#--cross-cc-}
++  --cross-cc-*) cc_arch=$(expr "$opt" : '--cross-cc-\([^=]*\)')
 
-Given e.g. --cross-cc-aarch64=aarch64-linux-gcc
-
-+ cc_arch=aarch64=aarch64-linux-gcc
-+ eval 'cross_cc_aarch64=aarch64-linux-gcc=$optarg'
-++ cross_cc_aarch64=aarch64-linux-gcc=aarch64-linux-gcc
-
-Which sets the variable "cross_cc_aarch64"
-to "aarch64-linux-gcc=aarch64-linux-gcc".
-Which of course won't exist to execute.
+seems to do the trick.  Obviously a similar change will be needed for
+--cross-cc-flags-*.
 
 
 r~
