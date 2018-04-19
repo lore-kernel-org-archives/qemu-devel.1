@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f9FSa-0003DB-Pc
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:43:15 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f9Fef-0008Mo-Bm
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f9FSW-0003To-47
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:43:12 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:58339)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9FSV-0003Rb-Me
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:43:08 -0400
-Date: Thu, 19 Apr 2018 15:43:01 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180419194301.GA22127@flamenco>
-References: <20180418090622.20073-1-peterx@redhat.com>
-	<20180419015631.GE29462@lemon.usersys.redhat.com>
-	<20180419031335.GH14841@xz-mi>
+	(envelope-from <jsnow@redhat.com>) id 1f9Fee-0008Qp-HQ
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:55:41 -0400
+References: <20180328133845.20632-1-berto@igalia.com>
+	<6e396823-f99c-2917-ccc5-04dda4a48f39@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c0ab098c-cc61-ed0e-ff9d-711a91ceafcf@redhat.com>
+Date: Thu, 19 Apr 2018 15:55:16 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180419031335.GH14841@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v2] QemuMutex: support --enable-debug-mutex
+In-Reply-To: <6e396823-f99c-2917-ccc5-04dda4a48f39@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scripts/dump-qcow2.pl: Script to dump
+ qcow2 metadata
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, Apr 19, 2018 at 11:13:35 +0800, Peter Xu wrote:
-> On Thu, Apr 19, 2018 at 09:56:31AM +0800, Fam Zheng wrote:
-(snip)
-> > > @@ -12,6 +12,10 @@ typedef QemuMutex QemuRecMutex;
-> > >  
-> > >  struct QemuMutex {
-> > >      pthread_mutex_t lock;
-> > > +#ifdef CONFIG_DEBUG_MUTEX
-> > > +    const char *file;
-> > > +    int line;
-> > > +#endif
-> > 
-> > These look quite cheap, why we need a configure option to enable it?
+
+
+On 04/13/2018 10:45 AM, Max Reitz wrote:
+> On 2018-03-28 15:38, Alberto Garcia wrote:
+>> This script takes a qcow2 image and dumps its metadata: header,
+>> snapshot table and some extensions (although not all qcow2 features
+>> are supported yet).
+>>
+>> It can also display a list of all host clusters and the guest -> host
+>> address mappings, so it's useful to debug allocations.
+>>
+>> The image is assumed not to be corrupted, and this script does not do
+>> consistency checks (yet).
+>>
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  scripts/dump-qcow2.pl | 425 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 425 insertions(+)
+>>  create mode 100755 scripts/dump-qcow2.pl
 > 
-> Yeah; I am not 100% sure about whether it's cheap or not, hence with
-> that.  I can remove that part if we are sure we want it always.
+> First of all: The main reason I haven't reviewed this so far is because
+> I don't like Perl.
+> 
 
-I can think of a few good reasons not to enable these by default.
+You know, I hadn't realized it was perl... I sat down to review it just
+now and I'm probably not qualified to review anything in perl.
 
-* Adds 12 bytes to struct QemuMutex on 64-bit hosts.
-* Increases slightly the critical region (the assignment happens
-  once the lock has been acquired)
-  + This is measurable for a single-thread with a microbenchmark:
-Before (no --enable-debug-mutex):
-$ taskset -c 0 tests/atomic_add-bench -n 1 -m -d 10
-Parameters:
- # of threads:      1
- duration:          10
- ops' range:        1024
-Results:
-Duration:            10 s
- Throughput:         57.59 Mops/s
- Throughput/thread:  57.59 Mops/s/thread
+> OK, now that that's out of the way...  I'm wondering why you want to add
+> this to the qemu tree?  If you'd written an iotest that would make use
+> of it, sure.  But if it's just for debugging, then I'd personally think
+> it would be better to just add it to a private repository.  That would
+> give you more freedom to extend it, too.
+> 
+> (I know John has an own script for debugging qcow2 images.)
+> 
 
-After (with --enable-debug-mutex):
-$ taskset -c 0 tests/atomic_add-bench -n 1 -m -d 10
-Parameters:
- # of threads:      1
- duration:          10
- ops' range:        1024
-Results:
-Duration:            10 s
- Throughput:         56.25 Mops/s
- Throughput/thread:  56.25 Mops/s/thread
+(Very famously broken when trying to read compressed clusters!)
 
-NB. The -m option for atomic_add-bench is not upstream yet, but
-feel free to cherry-pick this commit: 
-  https://github.com/cota/qemu/commit/f04f34df
+> Of course the nice thing about putting it into the qemu repository would
+> be that people would be able to find it.  But then again, we could
+> probably achieve the same with a Wiki page.
+> 
 
-  + A longer critical section can impact scalability, especially
-    for large core counts.
+Yeah, having debug tools in the tree is nice sometimes; but perhaps a
+document with lists of pointers to tools we use to debug these things
+would be as good for now.
 
-Also note that there are some alternatives to this.
-On POSIX systems when I need to debug mutexes I just revert
-24fa904 ("qemu-thread: do not use PTHREAD_MUTEX_ERRORCHECK",
-2015-03-10). Note that this doesn't work well with fork() in
-linux-user, but I rarely need that.
-
-Another alternative is to trace mutex_lock, that will give
-you the same info although at higher overhead (in both runtime
-and disk usage).
-
-So I'm not against this, but please keep it configured out.
-BTW you might also want to add the file/line pair to
-qemu-thread-win32.c, or hide the configure option to Windows
-users.
-
-Thanks,
-
-		Emilio
+> Max
+> 
