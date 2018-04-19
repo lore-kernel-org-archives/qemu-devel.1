@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934R-0005Xp-LN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f934T-0005ZZ-62
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934Q-0005Sr-Nd
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f934Q-0005Sw-OM
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:29 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 19 Apr 2018 16:29:17 +1000
-Message-Id: <20180419062917.31486-8-david@gibson.dropbear.id.au>
+Date: Thu, 19 Apr 2018 16:29:15 +1000
+Message-Id: <20180419062917.31486-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180419062917.31486-1-david@gibson.dropbear.id.au>
 References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC for-2.13 7/7] spapr_pci: Remove unhelpful
- pagesize warning
+Subject: [Qemu-devel] [RFC for-2.13 5/7] spapr: Limit available pagesizes to
+ provide a consistent guest environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-By default, the IOMMU model built into the spapr virtual PCI host bridge
-supports 4kiB and 64kiB IOMMU page sizes.  However this can be overridden
-which may be desirable to allow larger IOMMU page sizes when running a
-guest with hugepage backing and passthrough devices.  For that reason a
-warning was printed when the device wasn't configured to allow the pagesize
-with which guest RAM is backed.
+KVM HV has some limitations (deriving from the hardware) that mean not all
+host-cpu supported pagesizes may be usable in the guest.  At present this
+means that KVM guests and TCG guests may see different available page sizes
+even if they notionally have the same vcpu model.  This is confusing and
+also prevents migration between TCG and KVM.
 
-Experience has proven, however, that this message is more confusing than
-useful.  Worse it sometimes makes little sense when the host-available page
-sizes don't match those available on the guest, which can happen with
-a POWER8 guest running on a POWER9 KVM host.
-
-Long term we do want better handling to allow large IOMMU page sizes to be
-used, but for now this parameter and warning don't really accomplish it.
-So, remove the message, pending a better solution.
+This patch makes the environment consistent by always allowing the same set
+of pagesizes.  Since we can't remove the KVM limitations, we do this by
+always applying the same limitations it has, even to TCG guests.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_pci.c | 7 -------
- 1 file changed, 7 deletions(-)
+ hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 39a14980d3..f936ce63ef 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1717,13 +1717,6 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-     }
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index e71de14ffb..5a247f190f 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -331,6 +331,38 @@ static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
+     spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+ }
  
-     /* DMA setup */
--    if (((sphb->page_size_mask & qemu_getrampagesize()) == 0)
--        && kvm_enabled()) {
--        warn_report("System page size 0x%lx is not enabled in page_size_mask "
--                    "(0x%"PRIx64"). Performance may be slow",
--                    qemu_getrampagesize(), sphb->page_size_mask);
--    }
--
-     for (i = 0; i < windows_supported; ++i) {
-         tcet = spapr_tce_new_table(DEVICE(sphb), sphb->dma_liobn[i]);
-         if (!tcet) {
++static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint32_t pshift)
++{
++    unsigned maxshift = *((unsigned *)opaque);
++
++    assert(pshift >= seg_pshift);
++
++    /* Don't allow the guest to use pages bigger than the configured
++     * maximum size */
++    if (pshift > maxshift) {
++        return false;
++    }
++
++    /* For whatever reason, KVM doesn't allow multiple pagesizes
++     * within a segment, *except* for the case of 16M pages in a 4k or
++     * 64k segment.  Always exclude other cases, so that TCG and KVM
++     * guests see a consistent environment */
++    if ((pshift != seg_pshift) && (pshift != 24)) {
++        return false;
++    }
++
++    return true;
++}
++
++static void cap_hpt_mps_cpu_apply(sPAPRMachineState *spapr,
++                                   PowerPCCPU *cpu,
++                                   uint8_t val, Error **errp)
++{
++    unsigned maxshift = val;
++
++    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
++}
++
+ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_HTM] = {
+         .name = "htm",
+@@ -398,6 +430,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .set = spapr_cap_set_int,
+         .type = "int",
+         .apply = cap_hpt_mps_apply,
++        .cpu_apply = cap_hpt_mps_cpu_apply,
+     },
+ };
+ 
 -- 
 2.14.3
