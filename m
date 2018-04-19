@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9Czi-0001pG-2I
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:05:15 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f9D9D-0002NN-Dq
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9Czh-0003zc-2a
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:05:13 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:41824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9Czg-0003z0-U0
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:05:12 -0400
-Received: by mail-qk0-x243.google.com with SMTP id s78so6007265qkl.8
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 10:05:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<20180419135901.30035-32-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8ccf1143-5895-ca8b-eea5-c7d96c992455@amsat.org>
-Date: Thu, 19 Apr 2018 14:05:07 -0300
+	(envelope-from <no-reply@patchew.org>) id 1f9D99-0003Ev-1P
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:15:03 -0400
+Resent-Message-Id: <E1f9D99-0003Ev-1P@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21094)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f9D98-0003Dn-Q4
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 13:14:58 -0400
+In-Reply-To: <20180419164642.9536-1-f4bug@amsat.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152415807703.2064.16441329757011640419@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <20180419135901.30035-32-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for
- MIPS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 19 Apr 2018 10:14:38 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/7] avocado: Add acceptance tests
+ parsing the Linux boot console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +29,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
+To: f4bug@amsat.org
+Cc: famz@redhat.com, ldoktor@redhat.com, crosa@redhat.com, apahim@redhat.com, stefanha@gmail.com, xiang.zheng@linaro.orgfamz@redhat.com, alex.bennee@linaro.org, alistair23@gmail.com, qemu-devel@nongnu.org
 
-On 04/19/2018 10:58 AM, Alex Bennée wrote:
-> This doesn't add any additional tests but enables building the
-> multiarch tests for MIPS using docker cross compilers. We don't have a
-> cross compiler for mips64 big endian though.
-
-Oh we have one, using CFLAGS+=-EB
-
-we don't have cross libraries although.
-
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/tcg/mips/Makefile.include | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->  create mode 100644 tests/tcg/mips/Makefile.include
-> 
-> diff --git a/tests/tcg/mips/Makefile.include b/tests/tcg/mips/Makefile.include
-> new file mode 100644
-> index 0000000000..a9beceb623
-> --- /dev/null
-> +++ b/tests/tcg/mips/Makefile.include
-> @@ -0,0 +1,17 @@
-> +#
-> +# Makefile.include for all MIPs targets
-> +#
-> +# As Debian doesn't support mip64 in big endian mode the only way to
-> +# build BE is to pass a working cross compiler to ./configure
-> +#
-> +
-> +ifeq ($(TARGET_NAME),mips64el)
-> +DOCKER_IMAGE=debian-mips64el-cross
-> +DOCKER_CROSS_COMPILER=mips64el-linux-gnuabi64-gcc
-> +else ifeq ($(TARGET_NAME),mipsel)
-> +DOCKER_IMAGE=debian-mipsel-cross
-> +DOCKER_CROSS_COMPILER=mipsel-linux-gnu-gcc
-> +else ifeq ($(TARGET_NAME),mips)
-> +DOCKER_IMAGE=debian-mips-cross
-> +DOCKER_CROSS_COMPILER=mips-linux-gnu-gcc
-> +endif
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDE5MTY0NjQyLjk1MzYtMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC83XSBhdm9jYWRvOiBBZGQgYWNjZXB0YW5jZSB0ZXN0
+cyBwYXJzaW5nIHRoZSBMaW51eCBib290IGNvbnNvbGUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
+YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
+IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
+Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
+bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
+VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
+Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcg
+dXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNDEzNTEwMy0zMDQ3Ny0xLWdpdC1zZW5kLWVt
+YWlsLWZyZWRlcmljLmtvbnJhZEBhZGFjb3JlLmNvbSAtPiBwYXRjaGV3LzE1MjQxMzUxMDMtMzA0
+NzctMS1naXQtc2VuZC1lbWFpbC1mcmVkZXJpYy5rb25yYWRAYWRhY29yZS5jb20KICogW25ldyB0
+YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQxOTE2NDY0Mi45NTM2LTEtZjRidWdAYW1z
+YXQub3JnIC0+IHBhdGNoZXcvMjAxODA0MTkxNjQ2NDIuOTUzNi0xLWY0YnVnQGFtc2F0Lm9yZwpT
+d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjEzN2IxZjg5NDMgYXZvY2FkbzogQWRkIHRl
+c3RzIGJvb3RpbmcgdGhlIE1hbHRhIG1hY2hpbmUKZWM0YTE5ZjU2YiBhdm9jYWRvOiBBZGQgYSB0
+ZXN0IHBhcnNpbmcgTGludXgga2VybmVsIGJvb3RpbmcgY29uc29sZQpkYzYxOGIzNjliIGF2b2Nh
+ZG86IEFkZCBhbiBvcHRpb25hbCBmbGFnICdsb2dpbicgdG8gZ2V0X2NvbnNvbGUoKQoxOWEzNjY2
+NzEzIHFlbXUucHk6IEF2b2lkIGRlcHJlY2F0ZWQgdGVtcGZpbGUubWt0ZW1wKCkKOTliYjRhYzky
+YiBxZW11LnB5OiBDaGVjayBjb25zb2xlIGFyY2ggaXMgc3VwcG9ydGVkIGJlZm9yZSBjYWxsaW5n
+IG1rdGVtcCgpCjE2MzMxOGI4MTMgYXZvY2FkbzogVXBkYXRlIHB5dGhvbiBzY3JpcHRzIHRvIHVw
+c3RyZWFtIGNvZGViYXNlCjYyMTUxMmI4NmIgQVZPQ0FET19RRU1VOiBTbmFwc2hvdCBjb21taXQK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogQVZPQ0FET19RRU1VOiBT
+bmFwc2hvdCBjb21taXQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQxMjog
+RklMRTogdGVzdHMvYXZvY2Fkby9hdm9jYWRvX3FlbXUvdGVzdC5weToxMjE6CisgICAgOnJhaXNl
+IFFFTVVMb2dpblByb2Nlc3NUZXJtaW5hdGVkRXJyb3I6IElmIHRoZSBjbGllbnQgdGVybWluYXRl
+cyBkdXJpbmcgbG9naW4KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MTI6IEZJ
+TEU6IHRlc3RzL2F2b2NhZG8vYXZvY2Fkb19xZW11L3Rlc3QucHk6MjIxOgorICAgICAgICAgICAg
+cmFpc2UgUUVNVUxvZ2luUHJvY2Vzc1Rlcm1pbmF0ZWRFcnJvcihkZXRhaWxzLnN0YXR1cywgZGV0
+YWlscy5vdXRwdXQpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzg5OiBGSUxF
+OiB0ZXN0cy9hdm9jYWRvL3Rlc3RfaW5mb19tZW1kZXZfaG9zdF9ub2Rlcy5weTo0OToKKyAgICAg
+ICAgY21kID0gJ29iamVjdF9hZGQgbWVtb3J5LWJhY2tlbmQtcmFtLGlkPW1lbTEsaG9zdC1ub2Rl
+cz0wLHNpemU9MkcscG9saWN5PWJpbmQnCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojODQxOiBGSUxFOiB0ZXN0cy9hdm9jYWRvL3Rlc3RfbmVjLXVzYi14aGNpLnB5OjI5OgorICAg
+ICAgICBzZWxmLnZtLmFyZ3MuZXh0ZW5kKFsnLWRldmljZScsICduZWMtdXNiLXhoY2ksaWQ9eGhj
+aTEsYnVzPWJyaWRnZTEsYWRkcj0weDMnXSkKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojODQyOiBGSUxFOiB0ZXN0cy9hdm9jYWRvL3Rlc3RfbmVjLXVzYi14aGNpLnB5OjMwOgorICAg
+ICAgICBzZWxmLnZtLmFyZ3MuZXh0ZW5kKFsnLWRyaXZlJywgJ2ZpbGU9JXMsZm9ybWF0PXJhdyxp
+ZD1kcml2ZV91c2IsaWY9bm9uZScgJSB1c2JkZXZpY2VdKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiM4NDM6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9uZWMtdXNiLXhoY2kucHk6
+MzE6CisgICAgICAgIHNlbGYudm0uYXJncy5leHRlbmQoWyctZGV2aWNlJywgJ3VzYi1zdG9yYWdl
+LGRyaXZlPWRyaXZlX3VzYixpZD1kZXZpY2VfdXNiLGJ1cz14aGNpMS4wJ10pCgpFUlJPUjogbGlu
+ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwMzk6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9vdm1m
+X3dpdGhfMjQwX3ZjcHVzLnB5OjIyOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBkZWZhdWx0PScvdXNyL3NoYXJlL2VkazIvb3ZtZi9PVk1GX0NPREUuc2VjYm9vdC5m
+ZCcpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA0MTogRklMRTogdGVzdHMv
+YXZvY2Fkby90ZXN0X292bWZfd2l0aF8yNDBfdmNwdXMucHk6MjQ6CisgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGRlZmF1bHQ9Jy91c3Ivc2hhcmUvZWRrMi9vdm1mL09W
+TUZfVkFSUy5mZCcpCgp0b3RhbDogMyBlcnJvcnMsIDUgd2FybmluZ3MsIDExMzIgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
+Q0ggMi83OiBhdm9jYWRvOiBVcGRhdGUgcHl0aG9uIHNjcmlwdHMgdG8gdXBzdHJlYW0gY29kZWJh
+c2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMy83OiBxZW11LnB5OiBDaGVjayBjb25zb2xlIGFyY2ggaXMg
+c3VwcG9ydGVkIGJlZm9yZSBjYWxsaW5nIG1rdGVtcCgpLi4uCkNoZWNraW5nIFBBVENIIDQvNzog
+cWVtdS5weTogQXZvaWQgZGVwcmVjYXRlZCB0ZW1wZmlsZS5ta3RlbXAoKS4uLgpDaGVja2luZyBQ
+QVRDSCA1Lzc6IGF2b2NhZG86IEFkZCBhbiBvcHRpb25hbCBmbGFnICdsb2dpbicgdG8gZ2V0X2Nv
+bnNvbGUoKS4uLgpDaGVja2luZyBQQVRDSCA2Lzc6IGF2b2NhZG86IEFkZCBhIHRlc3QgcGFyc2lu
+ZyBMaW51eCBrZXJuZWwgYm9vdGluZyBjb25zb2xlLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojNzI6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9saW51eC1ib290LWNvbnNvbGUu
+cHk6NTM6CisgICAgICAgIHJldHVybiAnaHR0cDovL2FyY2hpdmUuZGViaWFuLm9yZy9kZWJpYW4v
+ZGlzdHMvbGVubnkvbWFpbi9pbnN0YWxsZXItYWxwaGEvY3VycmVudC9pbWFnZXMvY2Ryb20vdm1s
+aW51eicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODE6IEZJTEU6IHRlc3RzL2F2
+b2NhZG8vdGVzdF9saW51eC1ib290LWNvbnNvbGUucHk6NjI6CisgICAgICAgIHNlbGYudm0uX2Fy
+Z3MuZXh0ZW5kKFsnLWNoYXJkZXYnLCAnc29ja2V0LGlkPXNybSxzZXJ2ZXIsbm93YWl0LHBhdGg9
+JyArIHNlbGYuY29uc29sZV9wYXRoXSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiM5NTogRklMRTogdGVzdHMvYXZvY2Fkby90ZXN0X2xpbnV4LWJvb3QtY29uc29sZS5weTo3NjoK
+KyAgICAgICAgY29uc29sZSA9IHNlbGYudm0uZ2V0X2NvbnNvbGUoY29uc29sZV9hZGRyZXNzPXNl
+bGYuY29uc29sZV9wYXRoLCBsb2dpbj1GYWxzZSkKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojOTc6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9saW51eC1ib290LWNvbnNvbGUucHk6
+Nzg6CisgICAgICAgIGJvb3Rsb2cgPSBjb25zb2xlLnJlYWRfdW50aWxfYW55X2xpbmVfbWF0Y2hl
+cyhbIktlcm5lbCBwYW5pYyAtIG5vdCBzeW5jaW5nOiBWRlM6IFVuYWJsZSB0byBtb3VudCByb290
+IGZzIl0sIHRpbWVvdXQ9MzAuMClbMV0KCnRvdGFsOiAzIGVycm9ycywgMSB3YXJuaW5ncywgOTEg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
+Y2tpbmcgUEFUQ0ggNy83OiBhdm9jYWRvOiBBZGQgdGVzdHMgYm9vdGluZyB0aGUgTWFsdGEgbWFj
+aGluZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRlc3Rz
+L2F2b2NhZG8vdGVzdF9saW51eC1ib290LWNvbnNvbGUucHk6OTk6CisgICAgICAgIHJldHVybiAn
+aHR0cDovL3Blb3BsZS5kZWJpYW4ub3JnL35hdXJlbDMyL3FlbXUvbWlwcy92bWxpbnV4LTIuNi4z
+Mi01LTRrYy1tYWx0YScKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzk6IEZJTEU6
+IHRlc3RzL2F2b2NhZG8vdGVzdF9saW51eC1ib290LWNvbnNvbGUucHk6MTA4OgorICAgICAgICBz
+ZWxmLnZtLl9hcmdzLmV4dGVuZChbJy1jaGFyZGV2JywgJ3NvY2tldCxpZD11YXJ0MCxzZXJ2ZXIs
+bm93YWl0LHBhdGg9JyArIHNlbGYuY29uc29sZV9wYXRoXSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM1MTogRklMRTogdGVzdHMvYXZvY2Fkby90ZXN0X2xpbnV4LWJvb3QtY29u
+c29sZS5weToxMjA6CisgICAgICAgIGNvbnNvbGUgPSBzZWxmLnZtLmdldF9jb25zb2xlKGNvbnNv
+bGVfYWRkcmVzcz1zZWxmLmNvbnNvbGVfcGF0aCwgbG9naW49RmFsc2UpCgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzUzOiBGSUxFOiB0ZXN0cy9hdm9jYWRvL3Rlc3RfbGludXgtYm9v
+dC1jb25zb2xlLnB5OjEyMjoKKyAgICAgICAgYm9vdGxvZyA9IGNvbnNvbGUucmVhZF91bnRpbF9h
+bnlfbGluZV9tYXRjaGVzKFsiS2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IFZGUzogVW5hYmxl
+IHRvIG1vdW50IHJvb3QgZnMiXSwgdGltZW91dD02LjApWzFdCgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojNjc6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9saW51eC1ib290LWNv
+bnNvbGUucHk6MTM2OgorIyBGSVhNRSB0aGlzIGlzIGEgY29weSBvZiBUZXN0TWlwczRrY01hbHRh
+Qm9vdDJfNiB3aXRoIGEgZGlmZmVyZW50IHRoZSBrZXJuZWwgdXJsCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNzY6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9saW51eC1ib290
+LWNvbnNvbGUucHk6MTQ1OgorICAgICAgICByZXR1cm4gJ2h0dHA6Ly9wZW9wbGUuZGViaWFuLm9y
+Zy9+YXVyZWwzMi9xZW11L21pcHMvdm1saW51eC0zLjIuMC00LTRrYy1tYWx0YScKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODU6IEZJTEU6IHRlc3RzL2F2b2NhZG8vdGVzdF9saW51
+eC1ib290LWNvbnNvbGUucHk6MTU0OgorICAgICAgICBzZWxmLnZtLl9hcmdzLmV4dGVuZChbJy1j
+aGFyZGV2JywgJ3NvY2tldCxpZD11YXJ0MCxzZXJ2ZXIsbm93YWl0LHBhdGg9JyArIHNlbGYuY29u
+c29sZV9wYXRoXSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5NzogRklMRTog
+dGVzdHMvYXZvY2Fkby90ZXN0X2xpbnV4LWJvb3QtY29uc29sZS5weToxNjY6CisgICAgICAgIGNv
+bnNvbGUgPSBzZWxmLnZtLmdldF9jb25zb2xlKGNvbnNvbGVfYWRkcmVzcz1zZWxmLmNvbnNvbGVf
+cGF0aCwgbG9naW49RmFsc2UpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzk5OiBG
+SUxFOiB0ZXN0cy9hdm9jYWRvL3Rlc3RfbGludXgtYm9vdC1jb25zb2xlLnB5OjE2ODoKKyAgICAg
+ICAgYm9vdGxvZyA9IGNvbnNvbGUucmVhZF91bnRpbF9hbnlfbGluZV9tYXRjaGVzKFsiS2VybmVs
+IHBhbmljIC0gbm90IHN5bmNpbmc6IFZGUzogVW5hYmxlIHRvIG1vdW50IHJvb3QgZnMiXSwgdGlt
+ZW91dD02LjApWzFdCgp0b3RhbDogNCBlcnJvcnMsIDUgd2FybmluZ3MsIDEwMCBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
