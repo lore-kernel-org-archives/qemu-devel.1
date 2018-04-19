@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98wo-00013M-Ft
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:02 -0400
+	(envelope-from <clg@kaod.org>) id 1f98wt-00017y-FS
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98wk-0000g8-It
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:58 -0400
-Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:38248)
+	(envelope-from <clg@kaod.org>) id 1f98wp-0000lR-JN
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:03 -0400
+Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:52756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98wk-0000f6-7v
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:54 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.122.78])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id AA69AF025C
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:45:52 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98wp-0000jc-AT
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:59 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.122.116])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 18854BCA88
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:45:58 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Apr 2018 14:43:18 +0200
-Message-Id: <20180419124331.3915-23-clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:43:19 +0200
+Message-Id: <20180419124331.3915-24-clg@kaod.org>
 In-Reply-To: <20180419124331.3915-1-clg@kaod.org>
 References: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 22/35] spapr: add classes for the XIVE models
+Subject: [Qemu-devel] [PATCH v3 23/35] target/ppc/kvm: add Linux KVM
+ definitions for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,344 +33,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The XIVE models for the emulated and the KVM mode will have a lot in
-common. Introduce some classes to handle the differences, mostly to
-synchronize the state with KVM for the monitor and migration. This is
-very much like XICS is doing.
+These define a new capability and a new KVM device for the XIVE native
+exploitation interrupt mode. New ioctls are also introduced to
+initialize the KVM device and handle VM migration.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/spapr_xive.c        | 32 ++++++++++++++++++
- hw/intc/xive.c              | 79 +++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/spapr_xive.h | 13 ++++++++
- include/hw/ppc/xive.h       | 30 +++++++++++++++++
- 4 files changed, 154 insertions(+)
+ linux-headers/asm-powerpc/kvm.h | 18 ++++++++++++++++++
+ linux-headers/linux/kvm.h       |  3 +++
+ target/ppc/kvm.c                |  7 +++++++
+ target/ppc/kvm_ppc.h            |  6 ++++++
+ 4 files changed, 34 insertions(+)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 98e067bfc90c..f0c2fe52b3c6 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -20,8 +20,13 @@
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
+kvm.h
+index 833ed9a16adf..530c068fd850 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -480,6 +480,16 @@ struct kvm_ppc_cpu_char {
+ #define  KVM_REG_PPC_ICP_PPRI_SHIFT	16	/* pending irq priority */
+ #define  KVM_REG_PPC_ICP_PPRI_MASK	0xff
 =20
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
- {
-+    sPAPRXiveClass *sxc =3D SPAPR_XIVE_GET_CLASS(xive);
-     int i;
-=20
-+    if (sxc->synchronize_state) {
-+        sxc->synchronize_state(xive);
-+    }
++#define KVM_REG_PPC_VP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U128 | 0x8d)
++#define KVM_REG_PPC_VP_EQ0	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x8e)
++#define KVM_REG_PPC_VP_EQ1	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x8f)
++#define KVM_REG_PPC_VP_EQ2	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x90)
++#define KVM_REG_PPC_VP_EQ3	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x91)
++#define KVM_REG_PPC_VP_EQ4	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x92)
++#define KVM_REG_PPC_VP_EQ5	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x93)
++#define KVM_REG_PPC_VP_EQ6	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x94)
++#define KVM_REG_PPC_VP_EQ7	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x95)
 +
-     xive_source_pic_print_info(&xive->source, mon);
+ /* Device control API: PPC-specific devices */
+ #define KVM_DEV_MPIC_GRP_MISC		1
+ #define   KVM_DEV_MPIC_BASE_ADDR	0	/* 64-bit */
+@@ -673,4 +683,12 @@ struct kvm_ppc_cpu_char {
+ #define  KVM_XICS_PRESENTED		(1ULL << 43)
+ #define  KVM_XICS_QUEUED		(1ULL << 44)
 =20
-     monitor_printf(mon, "IVE Table\n");
-@@ -150,6 +155,30 @@ static XiveEQ *spapr_xive_get_eq(XiveFabric *xf, uin=
-t32_t eq_idx)
-     return xive_nvt_eq_get(nvt, SPAPR_XIVE_EQ_PRIO(eq_idx));
- }
++/* POWER9 XIVE Interrupt Controller */
++#define KVM_DEV_XIVE_GRP_SOURCES	1	/* 64-bit source attributes */
++#define KVM_DEV_XIVE_GRP_CTRL		2
++#define   KVM_DEV_XIVE_GET_ESB_FD	1
++#define   KVM_DEV_XIVE_GET_TIMA_FD	2
++#define   KVM_DEV_XIVE_VC_BASE		3
++#define KVM_DEV_XIVE_GRP_IVE		3	/* 64-bit source attributes */
++
+ #endif /* __LINUX_KVM_POWERPC_H */
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index a167be89d1ec..2c20d34f194b 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -936,6 +936,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_GET_CPU_CHAR 151
+ #define KVM_CAP_S390_BPB 152
+ #define KVM_CAP_GET_MSR_FEATURES 153
++#define KVM_CAP_PPC_IRQ_XIVE 154
 =20
-+static int vmstate_spapr_xive_pre_save(void *opaque)
-+{
-+    sPAPRXive *xive =3D opaque;
-+    sPAPRXiveClass *sxc =3D SPAPR_XIVE_GET_CLASS(xive);
-+
-+    if (sxc->pre_save) {
-+        sxc->pre_save(xive);
-+    }
-+
-+    return 0;
-+}
-+
-+static int vmstate_spapr_xive_post_load(void *opaque, int version_id)
-+{
-+    sPAPRXive *xive =3D opaque;
-+    sPAPRXiveClass *sxc =3D SPAPR_XIVE_GET_CLASS(xive);
-+
-+    if (sxc->post_load) {
-+        sxc->post_load(xive, version_id);
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_spapr_xive_ive =3D {
-     .name =3D TYPE_SPAPR_XIVE "/ive",
-     .version_id =3D 1,
-@@ -164,6 +193,8 @@ static const VMStateDescription vmstate_spapr_xive =3D=
- {
-     .name =3D TYPE_SPAPR_XIVE,
-     .version_id =3D 1,
-     .minimum_version_id =3D 1,
-+    .pre_save =3D vmstate_spapr_xive_pre_save,
-+    .post_load =3D vmstate_spapr_xive_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
-         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(ivt, sPAPRXive, nr_irqs,
-@@ -199,6 +230,7 @@ static const TypeInfo spapr_xive_info =3D {
-     .instance_init =3D spapr_xive_init,
-     .instance_size =3D sizeof(sPAPRXive),
-     .class_init =3D spapr_xive_class_init,
-+    .class_size =3D sizeof(sPAPRXiveClass),
-     .interfaces =3D (InterfaceInfo[]) {
-             { TYPE_XIVE_FABRIC },
-             { },
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 2daa36f77a6b..11af3bf1184a 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -349,9 +349,14 @@ static char *xive_nvt_ring_print(uint8_t *ring)
+ #ifdef KVM_CAP_IRQ_ROUTING
 =20
- void xive_nvt_pic_print_info(XiveNVT *nvt, Monitor *mon)
- {
-+    XiveNVTClass *xnc =3D XIVE_NVT_GET_CLASS(nvt);
-     int cpu_index =3D nvt->cs ? nvt->cs->cpu_index : -1;
-     char *s;
-=20
-+    if (xnc->synchronize_state) {
-+        xnc->synchronize_state(nvt);
-+    }
-+
-     monitor_printf(mon, "CPU[%04x]: QW    NSR CPPR IPB LSMFB ACK# INC AG=
-E PIPR"
-                    " W2\n", cpu_index);
-=20
-@@ -366,6 +371,7 @@ void xive_nvt_pic_print_info(XiveNVT *nvt, Monitor *m=
-on)
- static void xive_nvt_reset(void *dev)
- {
-     XiveNVT *nvt =3D XIVE_NVT(dev);
-+    XiveNVTClass *xnc =3D XIVE_NVT_GET_CLASS(nvt);
-     int i;
-=20
-     memset(nvt->regs, 0, sizeof(nvt->regs));
-@@ -378,11 +384,16 @@ static void xive_nvt_reset(void *dev)
-     for (i =3D 0; i < ARRAY_SIZE(nvt->eqt); i++) {
-         xive_eq_reset(&nvt->eqt[i]);
-     }
-+
-+    if (xnc->reset) {
-+        xnc->reset(nvt);
-+    }
- }
-=20
- static void xive_nvt_realize(DeviceState *dev, Error **errp)
- {
-     XiveNVT *nvt =3D XIVE_NVT(dev);
-+    XiveNVTClass *xnc =3D XIVE_NVT_GET_CLASS(nvt);
-     PowerPCCPU *cpu;
-     CPUPPCState *env;
-     Object *obj;
-@@ -410,6 +421,10 @@ static void xive_nvt_realize(DeviceState *dev, Error=
- **errp)
-         return;
-     }
-=20
-+    if (xnc->realize) {
-+        xnc->realize(nvt, errp);
-+    }
-+
-     qemu_register_reset(xive_nvt_reset, dev);
- }
-=20
-@@ -442,10 +457,36 @@ static const VMStateDescription vmstate_xive_nvt_eq=
- =3D {
-     },
+@@ -1159,6 +1160,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
+ 	KVM_DEV_TYPE_ARM_VGIC_ITS,
+ #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
++	KVM_DEV_TYPE_XIVE,
++#define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+ 	KVM_DEV_TYPE_MAX,
  };
 =20
-+static int vmstate_xive_nvt_pre_save(void *opaque)
-+{
-+    XiveNVT *nvt =3D opaque;
-+    XiveNVTClass *xnc =3D XIVE_NVT_GET_CLASS(nvt);
-+
-+    if (xnc->pre_save) {
-+        xnc->pre_save(nvt);
-+    }
-+
-+    return 0;
-+}
-+
-+static int vmstate_xive_nvt_post_load(void *opaque, int version_id)
-+{
-+    XiveNVT *nvt =3D opaque;
-+    XiveNVTClass *xnc =3D XIVE_NVT_GET_CLASS(nvt);
-+
-+    if (xnc->post_load) {
-+        xnc->post_load(nvt, version_id);
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_xive_nvt =3D {
-     .name =3D TYPE_XIVE_NVT,
-     .version_id =3D 1,
-     .minimum_version_id =3D 1,
-+    .pre_save =3D vmstate_xive_nvt_pre_save,
-+    .post_load =3D vmstate_xive_nvt_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_BUFFER(regs, XiveNVT),
-         VMSTATE_STRUCT_ARRAY(eqt, XiveNVT, (XIVE_PRIORITY_MAX + 1), 1,
-@@ -470,6 +511,7 @@ static const TypeInfo xive_nvt_info =3D {
-     .instance_size =3D sizeof(XiveNVT),
-     .instance_init =3D xive_nvt_init,
-     .class_init    =3D xive_nvt_class_init,
-+    .class_size    =3D sizeof(XiveNVTClass),
- };
-=20
- /*
-@@ -819,8 +861,13 @@ static void xive_source_set_irq(void *opaque, int sr=
-cno, int val)
-=20
- void xive_source_pic_print_info(XiveSource *xsrc, Monitor *mon)
- {
-+    XiveSourceClass *xsc =3D XIVE_SOURCE_GET_CLASS(xsrc);
-     int i;
-=20
-+    if (xsc->synchronize_state) {
-+        xsc->synchronize_state(xsrc);
-+    }
-+
-     monitor_printf(mon, "XIVE Source %6x ..%6x\n",
-                    xsrc->offset, xsrc->offset + xsrc->nr_irqs - 1);
-     for (i =3D 0; i < xsrc->nr_irqs; i++) {
-@@ -840,6 +887,7 @@ void xive_source_pic_print_info(XiveSource *xsrc, Mon=
-itor *mon)
- static void xive_source_reset(DeviceState *dev)
- {
-     XiveSource *xsrc =3D XIVE_SOURCE(dev);
-+    XiveSourceClass *xsc =3D XIVE_SOURCE_GET_CLASS(xsrc);
-     int i;
-=20
-     /* Keep the IRQ type */
-@@ -849,6 +897,10 @@ static void xive_source_reset(DeviceState *dev)
-=20
-     /* SBEs are initialized to 0b01 which corresponds to "ints off" */
-     memset(xsrc->sbe, 0x55, xsrc->sbe_size);
-+
-+    if (xsc->reset) {
-+        xsc->reset(xsrc);
-+    }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 79a436a38457..f5d770a77651 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -87,6 +87,7 @@ static int cap_fixup_hcalls;
+ static int cap_htm;             /* Hardware transactional memory support=
+ */
+ static int cap_mmu_radix;
+ static int cap_mmu_hash_v3;
++static int cap_xive;
+ static int cap_resize_hpt;
+ static int cap_ppc_pvr_compat;
+ static int cap_ppc_safe_cache;
+@@ -150,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+     cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+     cap_mmu_hash_v3 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V=
+3);
++    cap_xive =3D kvm_vm_check_extension(s, KVM_CAP_PPC_IRQ_XIVE);
+     cap_resize_hpt =3D kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HP=
+T);
+     kvmppc_get_cpu_characteristics(s);
+     /*
+@@ -2461,6 +2463,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+     return cap_mmu_hash_v3;
  }
 =20
- static void xive_source_realize(DeviceState *dev, Error **errp)
-@@ -895,10 +947,36 @@ static void xive_source_realize(DeviceState *dev, E=
-rror **errp)
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xsrc->esb_mmio);
++bool kvmppc_has_cap_xive(void)
++{
++    return cap_xive;
++}
++
+ static void kvmppc_get_cpu_characteristics(KVMState *s)
+ {
+     struct kvm_ppc_cpu_char c;
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 4d2789eef6ef..fef6b5d9ce9f 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -60,6 +60,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
+ bool kvmppc_has_cap_htm(void);
+ bool kvmppc_has_cap_mmu_radix(void);
+ bool kvmppc_has_cap_mmu_hash_v3(void);
++bool kvmppc_has_cap_xive(void);
+ int kvmppc_get_cap_safe_cache(void);
+ int kvmppc_get_cap_safe_bounds_check(void);
+ int kvmppc_get_cap_safe_indirect_branch(void);
+@@ -299,6 +300,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
+     return false;
  }
 =20
-+static int vmstate_xive_source_pre_save(void *opaque)
++static inline bool kvmppc_has_cap_xive(void)
 +{
-+    XiveSource *xsrc =3D opaque;
-+    XiveSourceClass *xsc =3D XIVE_SOURCE_GET_CLASS(xsrc);
-+
-+    if (xsc->pre_save) {
-+        xsc->pre_save(xsrc);
-+    }
-+
-+    return 0;
++    return false;
 +}
 +
-+static int vmstate_xive_source_post_load(void *opaque, int version_id)
-+{
-+    XiveSource *xsrc =3D opaque;
-+    XiveSourceClass *xsc =3D XIVE_SOURCE_GET_CLASS(xsrc);
-+
-+    if (xsc->post_load) {
-+        xsc->post_load(xsrc, version_id);
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_xive_source =3D {
-     .name =3D TYPE_XIVE_SOURCE,
-     .version_id =3D 1,
-     .minimum_version_id =3D 1,
-+    .pre_save =3D vmstate_xive_source_pre_save,
-+    .post_load =3D vmstate_xive_source_post_load,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_UINT32_EQUAL(nr_irqs, XiveSource, NULL),
-         VMSTATE_VBUFFER_UINT32(sbe, XiveSource, 1, NULL, sbe_size),
-@@ -934,6 +1012,7 @@ static const TypeInfo xive_source_info =3D {
-     .parent        =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(XiveSource),
-     .class_init    =3D xive_source_class_init,
-+    .class_size    =3D sizeof(XiveSourceClass),
- };
-=20
- static void xive_register_types(void)
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index df87e68b3d05..41e2784403b2 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -32,6 +32,19 @@ typedef struct sPAPRXive {
-     MemoryRegion tm_mmio_os;
- } sPAPRXive;
-=20
-+#define SPAPR_XIVE_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(sPAPRXiveClass, (klass), TYPE_SPAPR_XIVE)
-+#define SPAPR_XIVE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(sPAPRXiveClass, (obj), TYPE_SPAPR_XIVE)
-+
-+typedef struct sPAPRXiveClass {
-+    SysBusDeviceClass parent_class;
-+
-+    void (*synchronize_state)(sPAPRXive *xive);
-+    void (*pre_save)(sPAPRXive *xsrc);
-+    int (*post_load)(sPAPRXive *xsrc, int version_id);
-+} sPAPRXiveClass;
-+
- bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi);
- bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 24ce58812a7c..36de10af0109 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -60,6 +60,20 @@ typedef struct XiveSource {
-     XiveFabric   *xive;
- } XiveSource;
-=20
-+#define XIVE_SOURCE_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(XiveSourceClass, (klass), TYPE_XIVE_SOURCE)
-+#define XIVE_SOURCE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(XiveSourceClass, (obj), TYPE_XIVE_SOURCE)
-+
-+typedef struct XiveSourceClass {
-+    SysBusDeviceClass parent_class;
-+
-+    void (*synchronize_state)(XiveSource *xsrc);
-+    void (*reset)(XiveSource *xsrc);
-+    void (*pre_save)(XiveSource *xsrc);
-+    int (*post_load)(XiveSource *xsrc, int version_id);
-+} XiveSourceClass;
-+
- /*
-  * ESB MMIO setting. Can be one page, for both source triggering and
-  * source management, or two different pages. See below for magic
-@@ -186,6 +200,22 @@ typedef struct XiveNVT {
-     XiveEQ    eqt[XIVE_PRIORITY_MAX + 1];
- } XiveNVT;
-=20
-+
-+#define XIVE_NVT_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(XiveNVTClass, (klass), TYPE_XIVE_NVT)
-+#define XIVE_NVT_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(XiveNVTClass, (obj), TYPE_XIVE_NVT)
-+
-+typedef struct XiveNVTClass {
-+    DeviceClass parent_class;
-+
-+    void (*realize)(XiveNVT *nvt, Error **errp);
-+    void (*synchronize_state)(XiveNVT *nvt);
-+    void (*reset)(XiveNVT *nvt);
-+    void (*pre_save)(XiveNVT *nvt);
-+    int (*post_load)(XiveNVT *nvt, int version_id);
-+} XiveNVTClass;
-+
- extern const MemoryRegionOps xive_tm_user_ops;
- extern const MemoryRegionOps xive_tm_os_ops;
-=20
+ static inline int kvmppc_get_cap_safe_cache(void)
+ {
+     return 0;
 --=20
 2.13.6
