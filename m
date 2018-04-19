@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f9Gyh-0004ec-RY
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:20:28 -0400
+	(envelope-from <edgari@xilinx.com>) id 1f9Gzx-0005ad-VX
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1f9Gyc-0006qU-Ld
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:20:27 -0400
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:44841)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1f9Gyc-0006mY-Ey
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:20:22 -0400
-Received: by mail-pg0-x231.google.com with SMTP id l12so3071402pgp.11
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:20:22 -0700 (PDT)
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<20180419135901.30035-13-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fb2feaf5-740b-9d6e-5895-b11e0020a66c@linaro.org>
-Date: Thu, 19 Apr 2018 11:20:16 -1000
+	(envelope-from <edgari@xilinx.com>) id 1f9Gzs-0000wt-Vb
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:45 -0400
+Received: from mail-sn1nam02on0076.outbound.protection.outlook.com
+	([104.47.36.76]:28349
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1f9Gzs-0000vn-Kc
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:21:40 -0400
+Date: Thu, 19 Apr 2018 23:21:24 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20180419212124.4wssvsbv7ka2jodh@toto>
+References: <20180419112131.16932-1-edgar.iglesias@gmail.com>
+	<20180419112131.16932-2-edgar.iglesias@gmail.com>
+	<4439efca-e41e-14f8-85ff-89478608c80a@linaro.org>
+	<20180419203347.5m4bwxmkkesergbx@toto>
+	<f4c1406a-2151-0027-8b6c-10e5ce215ad7@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180419135901.30035-13-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/43] tests/tcg: move architecture
- independent tests into subdir
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <f4c1406a-2151-0027-8b6c-10e5ce215ad7@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] target-microblaze: Respect MSR.PVR
+ as read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, sai.pavan.boddu@xilinx.com, peter.maydell@linaro.org, alistair@alistair23.me, frasse.iglesias@gmail.com
 
-On 04/19/2018 03:58 AM, Alex Bennée wrote:
-> We will want to build these for all supported guest architectures so
-> lets move them all into one place. We also drop test_path at this
-> point because it needs qemu utils and glib bits which is hard to
-> support for cross compiling.
+On Thu, Apr 19, 2018 at 11:17:58AM -1000, Richard Henderson wrote:
+> On 04/19/2018 10:33 AM, Edgar E. Iglesias wrote:
+> > On Thu, Apr 19, 2018 at 09:56:40AM -1000, Richard Henderson wrote:
+> >> On 04/19/2018 01:21 AM, Edgar E. Iglesias wrote:
+> >>>  static inline void msr_write(DisasContext *dc, TCGv v)
+> >>>  {
+> >>> -    TCGv t;
+> >>> -
+> >>> -    t = tcg_temp_new();
+> >>>      dc->cpustate_changed = 1;
+> >>>      /* PVR bit is not writable.  */
+> >>> -    tcg_gen_andi_tl(t, v, ~MSR_PVR);
+> >>> -    tcg_gen_andi_tl(cpu_SR[SR_MSR], cpu_SR[SR_MSR], MSR_PVR);
+> >>> -    tcg_gen_or_tl(cpu_SR[SR_MSR], cpu_SR[SR_MSR], v);
+> >>> -    tcg_temp_free(t);
+> >>> +    tcg_gen_deposit_tl(cpu_SR[SR_MSR], v, cpu_SR[SR_MSR], MSR_PVR_SHIFT, 1);
+> >>>  }
+> >>
+> >> Um... the old code was correct, but the new code isn't.
+> >>
+> >> The new code sets msr to v, with bit 10 set to the old msr bit 0.
+> >>
+> >> Why do you believe the old code to be wrong?
+> > 
+> > The old code was incorrectly ORing v instead of t...
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Ah, yes.
 > 
-> ---
-> v2
->   - move VPATH and TESTs setup into multiarch/Makefile.target
->   - remove moved bits from tests/tcg/Makefile
-> ---
+> > What about the following?
+> >     tcg_gen_shri_tl(cpu_SR[SR_MSR], cpu_SR[SR_MSR], MSR_PVR_SHIFT);
+> >     tcg_gen_deposit_tl(cpu_SR[SR_MSR], v, cpu_SR[SR_MSR], MSR_PVR_SHIFT, 1);
+> 
+> *shrug* While that would be functional, I don't think it's any better than just
+> fixing the typo in the OR.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Allright, I'll fix the typo and send out a v2.
 
+Thanks for catching this.
 
-r~
+Cheers,
+Edgar
