@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f9AHx-0008Kj-Qq
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:11:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f9ANN-0004dz-Na
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:17:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f9AHt-0001Ul-4b
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:11:53 -0400
-References: <20180419072123.682-1-david@gibson.dropbear.id.au>
-	<20180419143318.4e24edaf@redhat.com>
-	<20180419145840.324602ff.cohuck@redhat.com>
-	<77d0717b-6eba-8b20-6691-c3085937604b@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <065165b5-3ab4-ae1a-f72c-c04f911656c3@redhat.com>
-Date: Thu, 19 Apr 2018 16:11:37 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1f9ANM-00064F-Md
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:17:29 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40968)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f9ANM-00063n-FU
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:17:28 -0400
+Received: by mail-wr0-x241.google.com with SMTP id v24-v6so14503846wra.8
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 07:17:28 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 19 Apr 2018 14:58:54 +0100
+Message-Id: <20180419135901.30035-37-alex.bennee@linaro.org>
+In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <77d0717b-6eba-8b20-6691-c3085937604b@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.13] Clear mem_path if we
- fall back to anonymous RAM allocation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 36/43] Makefile.target: add
+ (clean-)guest-tests targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +30,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, groug@kaod.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, pbonzini@redhat.com
+To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 19.04.2018 15:34, Christian Borntraeger wrote:
-> 
-> 
-> On 04/19/2018 02:58 PM, Cornelia Huck wrote:
->> On Thu, 19 Apr 2018 14:33:18 +0200
->> Igor Mammedov <imammedo@redhat.com> wrote:
->>
->>> On Thu, 19 Apr 2018 17:21:23 +1000
->>> David Gibson <david@gibson.dropbear.id.au> wrote:
->>>
->>>> If the -mem-path option is set, we attempt to map the guest's RAM from a
->>>> file in the given path; it's usually used to back guest RAM with hugepages.
->>>> If we're unable to (e.g. not enough free hugepages) then we fall back to
->>>> allocating normal anonymous pages.  This behaviour can be surprising, but a
->>>> comment in allocate_system_memory_nonnuma() suggests it's legacy behaviour
->>>> we can't change.
->>>>
->>>> What really isn't ok, though, is that in this case we leave mem_path set.
->>>> That means functions which attempt to determine the pagesize of main RAM
->>>> can erroneously think it is hugepage based on the requested path, even
->>>> though it's not.
->>>>
->>>> This is particular bad for the pseries machine type.  KVM HV limitations
->>>> mean the guest can't use pagesizes larger than the host page size used to
->>>> back RAM.  That means that such a fallback, rather than merely giving
->>>> poorer performance that expected will cause the guest to freeze up early in
->>>> boot as it attempts to use large page mappings that can't work.
->>>>
->>>> This patch addresses the problem by clearing the mem_path variable when we
->>>> fall back to anonymous pages, meaning that subsequent attempts to
->>>> determine the RAM page size will get an accurate result.
->>>>
->>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>>> ---
->>>>  numa.c | 1 +
->>>>  1 file changed, 1 insertion(+)
->>>>
->>>> Paolo et al, as with my earlier patches adding some extensions to the
->>>> helpers for determining backing page sizes, if there are no objections
->>>> can I get an ack to merge this via my ppc tree?
->>>>
->>>> diff --git a/numa.c b/numa.c
->>>> index 1116c90af9..78a869e598 100644
->>>> --- a/numa.c
->>>> +++ b/numa.c
->>>> @@ -469,6 +469,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
->>>>              /* Legacy behavior: if allocation failed, fall back to
->>>>               * regular RAM allocation.
->>>>               */
->>>> +            mem_path = NULL;
->>>>              memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
->>>>          }
->>>>  #else  
->>>
->>> mem_path is also used by kvm_s390_apply_cpu_model(),
->>> and in ccw_init() memory is initialized before CPUs are
->>> so if QEM was started with -mem-path, then before patch
->>> created CPU won't have CMM enabled and print warning:
->>>   
->>>  "CMM will not be enabled because it is not compatible with hugetlbfs."
->>>
->>> and after patch it might enable CMM if we clear mem_path.
->>> So question is do we care about this?
->>
->> I don't quite remember the cmm semantics here -- Christian?
-> 
-> The CMMA interface does not work on large pages. I think the kernel will react
-> with EFAULT in some cases (cmma migration and others) so qemu will probably fail
-> unexpectedly. 
-> 
-> But this patch seems to only clear mem-path if we do not allocate at all from
-> hugetlbfs. So things should be ok, no?
-> 
-> 
+Now all the build infrastructure is in place we can build tests for
+each guest that we support. That support mainly depends on having
+cross compilers installed or docker setup. To keep all the logic for
+that together we put the rules in tests/tcg/Makefile.include and
+include it from the main Makefile.target.
 
-This even looks like the right thing to me, as hugetlbfs was never
-supported.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ Makefile.target            |  5 +++
+ tests/tcg/Makefile.include | 79 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+ create mode 100644 tests/tcg/Makefile.include
 
+diff --git a/Makefile.target b/Makefile.target
+index d0ec77a307..a30fd40257 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -36,6 +36,11 @@ endif
+ PROGS=$(QEMU_PROG) $(QEMU_PROGW)
+ STPFILES=
+ 
++# Makefile Tests
++ifdef CONFIG_USER_ONLY
++include $(SRC_PATH)/tests/tcg/Makefile.include
++endif
++
+ config-target.h: config-target.h-timestamp
+ config-target.h-timestamp: config-target.mak
+ 
+diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
+new file mode 100644
+index 0000000000..cb8bb36026
+--- /dev/null
++++ b/tests/tcg/Makefile.include
+@@ -0,0 +1,79 @@
++# -*- Mode: makefile -*-
++#
++# TCG tests (per-target rules)
++#
++# This Makefile fragement is included from the per-target
++# Makefile.target so will be invoked for each linux-user program we
++# build. We have two options for compiling, either using a configured
++# guest compiler or calling one of our docker images to do it for us.
++#
++
++# The per ARCH makefile, if it exists holds extra information about
++# useful docker images or alternative compiler flags. Include it if it
++# exists
++
++ARCH_MAKEFILE=$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
++CHECK_INCLUDE=$(wildcard $(ARCH_MAKEFILE))
++
++ifeq ($(ARCH_MAKEFILE),$(CHECK_INCLUDE))
++include $(ARCH_MAKEFILE)
++endif
++
++GUEST_BUILD=
++
++# Support installed Cross Compilers
++
++ifdef CROSS_CC_GUEST
++
++.PHONY: cross-build-guest-tests
++cross-build-guest-tests:
++	$(call quiet-command, \
++          (mkdir -p tests && cd tests && \
++	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=$(TARGET_NAME) CC=$(CROSS_CC_GUEST)), \
++	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
++
++
++GUEST_BUILD=cross-build-guest-tests
++
++endif
++
++# Support building with Docker
++
++ifeq ($(HAVE_USER_DOCKER)$(GUEST_BUILD),y)
++ifneq ($(DOCKER_IMAGE),)
++
++# We also need the Docker make rules to depend on
++include $(SRC_PATH)/tests/docker/Makefile.include
++
++DOCKER_COMPILE_CMD="$(DOCKER_SCRIPT) cc --user $(shell id -u) \
++		--cc $(DOCKER_CROSS_COMPILER) \
++		-i qemu:$(DOCKER_IMAGE) \
++		-s $(SRC_PATH) -- "
++DOCKER_PREREQ=docker-image-$(DOCKER_IMAGE)
++
++.PHONY: docker-build-guest-tests
++docker-build-guest-tests: $(DOCKER_PREREQ)
++	$(call quiet-command, \
++          (mkdir -p tests && cd tests && \
++	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=$(TARGET_NAME) CC=$(DOCKER_COMPILE_CMD)), \
++	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER_IMAGE)")
++
++GUEST_BUILD=docker-build-guest-tests
++
++endif
++endif
++
++# Final targets
++.PHONY: guest-tests
++
++ifneq ($(GUEST_BUILD),)
++guest-tests: $(GUEST_BUILD)
++else
++guest-tests:
++	$(call quiet-command, /bin/true, "CROSS-BUILD", "$(TARGET_NAME) guest-tests SKIPPED")
++endif
++
++# It doesn't mater if these don't exits
++.PHONY: clean-guest-tests
++clean-guest-tests:
++	rm -rf tests || echo "no $(TARGET_NAME) tests to remove"
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.0
