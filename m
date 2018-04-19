@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f8yy8-0006YT-Jm
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 22:06:42 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1f8zWU-00076m-QK
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 22:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f8yy4-00047G-Lb
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 22:06:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55444 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f8yy4-00046l-FE
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 22:06:36 -0400
-Date: Thu, 19 Apr 2018 10:06:22 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180419020622.GF29462@lemon.usersys.redhat.com>
-References: <20180312131806.23209-1-stefanha@redhat.com>
-	<43378184-a291-263f-b8b2-dedc455622e3@redhat.com>
-	<87604rp7im.fsf@dusky.pond.sub.org>
+	(envelope-from <aik@ozlabs.ru>) id 1f8zWR-0001w8-ID
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 22:42:10 -0400
+Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:36711)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1f8zWR-0001vG-4T
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 22:42:07 -0400
+Received: by mail-pl0-x22e.google.com with SMTP id m7-v6so2305401plt.3
+	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 19:42:06 -0700 (PDT)
+References: <20180329032149.44685-1-aik@ozlabs.ru>
+	<bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <d8efb96c-75a0-86fd-3615-57e9099afb5c@ozlabs.ru>
+Date: Thu, 19 Apr 2018 12:41:59 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87604rp7im.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
- file changes
+In-Reply-To: <bc4100f4-0a01-a526-c6ce-c2602a96e28a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: memory/hmp: Print owners/parents
+ in "info mtree"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +31,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Mon, 04/16 16:09, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+On 12/4/18 7:15 pm, Paolo Bonzini wrote:
+> On 29/03/2018 05:21, Alexey Kardashevskiy wrote:
+>> +    DeviceState *dev = (DeviceState *) object_dynamic_cast(obj, TYPE_DEVICE);
+>> +    const char *id = object_property_print(obj, "id", true, NULL);
 > 
-> > On 12.03.2018 14:18, Stefan Hajnoczi wrote:
-> >> Warn if files are added/renamed/deleted without MAINTAINERS file
-> >> changes.  This has helped me in Linux and we could benefit from this
-> >> check in QEMU.
-> >> 
-> >> This patch is a manual cherry-pick of Linux commit
-> >> 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warning on
-> >> file add/move/delete") by Joe Perches <joe@perches.com>.
-> >>
-> >> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> I learnt now about commit e1ff3c67e8544f41f1bea76ba76385faee0d2bb7 and I
+> find it a mistake.  The "id" is available through
+> object_get_canonical_path_component.  Can you change the "id" assignment
+> to use object_get_canonical_path_component instead?
+
+Uff. I did some tests and found that this is needed, at least. I can also
+returning NULL from object_get_canonical_path_component(), it just seems to
+be a real case and majority of object_get_canonical_path_component() users
+do not test the returned pointer.
+
+===================
+diff --git a/qom/object.c b/qom/object.c
+index 4677951..0c2d5c2 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1645,7 +1645,9 @@ gchar *object_get_canonical_path_component(Object *obj)
+     GHashTableIter iter;
+
+     g_assert(obj);
+-    g_assert(obj->parent != NULL);
++    if (!obj->parent) {
++        return g_strdup("<no-parent>");
++    }
+
+     g_hash_table_iter_init(&iter, obj->parent->properties);
+     while (g_hash_table_iter_next(&iter, NULL, (gpointer *)&prop)) {
+@@ -1668,7 +1670,7 @@ gchar *object_get_canonical_path(Object *obj)
+     Object *root = object_get_root();
+     char *newpath, *path = NULL;
+
+-    while (obj != root) {
++    while (obj && obj != root) {
+         char *component = object_get_canonical_path_component(obj);
+
+         if (path) {
+@@ -1681,6 +1683,8 @@ gchar *object_get_canonical_path(Object *obj)
+         }
+
+         obj = obj->parent;
++        if (!obj)
++            printf("+++Q+++ (%u) %s %u\n", getpid(), __func__, __LINE__);
+     }
+
+====================
+
+
+as QMP crashes QEMU with this:
+
+{"execute": "qom-get", "arguments": {"path":
+"/machine/unattached/device[3]/smram[0]", "property": "container"}}
+
+with the patch it returns:
+
+{'return': '/<no-parent>/mem-container-smram[0]'}
+
+
+Without the patch it crashes as:
+
+(gdb) bt
+#0  object_get_canonical_path (obj=0x0) at /home/aik/p/qemu/qom/object.c:1687
+#1  0x0000555555829676 in memory_region_get_container (obj=0x555556d5c6e0,
+v=0x555557a7c530, name=0x5555569a4fe0 "container", opaque=0x0,
+errp=0x7fffffffda58) at /home/aik/p/qemu/memory.c:1172
+#2  0x0000555555bf719a in object_property_get (obj=0x555556d5c6e0,
+v=0x555557a7c530, name=0x5555569a4fe0 "container", errp=0x7fffffffda58) at
+/home/aik/p/qemu/qom/object.c:1107
+#3  0x0000555555bfa2de in object_property_get_qobject (obj=0x555556d5c6e0,
+name=0x5555569a4fe0 "container", errp=0x7fffffffdae8) at
+/home/aik/p/qemu/qom/qom-qobject.c:39
+#4  0x00005555559963cf in qmp_qom_get (path=0x5555576e5680
+"/machine/unattached/device[3]/smram[0]", property=0x5555569a4fe0
+"container", errp=0x7fffffffdae8) at /home/aik/p/qemu/qmp.c:271
+#5  0x000055555598de6c in qmp_marshal_qom_get (args=0x5555573b5720,
+ret=0x7fffffffdb60, errp=0x7fffffffdb58) at qapi/qapi-commands-misc.c:1249
+#6  0x0000555555d155ad in do_qmp_dispatch (cmds=0x55555645a3e0
+<qmp_commands>, request=0x5555573aff80, errp=0x7fffffffdbb0) at
+/home/aik/p/qemu/qapi/qmp-dispatch.c:111
+#7  0x0000555555d1576d in qmp_dispatch (cmds=0x55555645a3e0 <qmp_commands>,
+request=0x5555573aff80) at /home/aik/p/qemu/qapi/qmp-dispatch.c:160
+#8  0x0000555555819361 in monitor_qmp_dispatch_one (req_obj=0x555556fd7ee0)
+at /home/aik/p/qemu/monitor.c:4091
+#9  0x0000555555819573 in monitor_qmp_bh_dispatcher (data=0x0) at
+/home/aik/p/qemu/monitor.c:4149
+#10 0x0000555555d23df9 in aio_bh_call (bh=0x555556a1a650) at
+/home/aik/p/qemu/util/async.c:90
+#11 0x0000555555d23e91 in aio_bh_poll (ctx=0x5555569f0ce0) at
+/home/aik/p/qemu/util/async.c:118
+#12 0x0000555555d28a92 in aio_dispatch (ctx=0x5555569f0ce0) at
+/home/aik/p/qemu/util/aio-posix.c:436
+#13 0x0000555555d2422c in aio_ctx_dispatch (source=0x5555569f0ce0,
+callback=0x0, user_data=0x0) at /home/aik/p/qemu/util/async.c:261
+#14 0x00007ffff4cc6b77 in ?? ()
+#15 0x0000000000000000 in ?? ()
+
+
+It is fc27/x86_64 both host and guest, QMP issues when guest booted to the
+login prompt (so I'd not expect any hotplugs) and I have no idea what smram
+is and what its parent should be.
+
+
+>> +    const char *name = object_property_print(obj, "name", true, NULL);
 > 
-> We should really keep upstream's S-o-b intact.  I'd keep the whole
-> commit message intact:
+> Who defines a name property?
+
+Nothing, not sure why I put it here in the first place, will remove.
+
 > 
->     From 7fb819c27bf47041a13feed93f86a15bdb2c681f Mon Sep 17 00:00:00 2001
->     From: Joe Perches <joe@perches.com>
->     Date: Wed, 6 Aug 2014 16:10:59 -0700
->     Subject: [PATCH] checkpatch: emit a warning on file add/move/delete
+>> +    mon_printf(f, " %s:{", label);
+>> +    if (dev) {
+>> +        mon_printf(f, "dev");
+>> +        if (dev->id) {
+>> +            mon_printf(f, " id=%s", dev->id);
+>> +        }
+>> +    } else {
+>> +        mon_printf(f, "obj");
 > 
->     Whenever files are added, moved, or deleted, the MAINTAINERS file
->     patterns can be out of sync or outdated.
+>> +    }
+>> +    if (name) {
+>> +        mon_printf(f, " name=%s ", name);
+>> +    }
+>> +    if (id) {
+>> +        mon_printf(f, " id=%s ", id);
+>> +    }
+>> +    if (dev && (!name && !id && !dev->id)) {
+>> +        mon_printf(f, " path=%s", dev->canonical_path);
 > 
->     To try to keep MAINTAINERS more up-to-date, add a one-time warning
->     whenever a patch does any of those.
+> Why not print the path for the !dev case?  I think we can just have
 > 
->     Signed-off-by: Joe Perches <joe@perches.com>
->     Acked-by: Andy Whitcroft <apw@canonical.com>
->     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
->     Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
->     [Cherry picked from Linux commit 13f1937ef33950b1112049972249e6191b82e6c9]
->     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>     mon_prinf(f, " %s:{%s", label, dev ? "dev" : "obj");
+>     if (dev ? dev->id : id) {
+>         mon_printf(f, " id=%s", dev ? dev->id : id);
+>     } else {
+>         canonical_path = object_get_canonical_path(...)
+>         mon_printf(f, " path=%s", canonical_path);
+>         g_free(canonical_path);
+>     }
+
+Makes sense, assuming the issue above is fixed.
+
+
 > 
-> Created by running "git-format-patch -1 13f1937ef33" in the kernel,
-> feeding that to git-am (patch doesn't apply), patch -p1 your patch,
-> git-am --continue, git-commit --amend to add a backporting note and your
-> S-o-b.
+> Thanks,
 > 
-> >> ---
-> >> Note the 80-char lines are from upstream code.  Keep them as-is.
-> >> 
-> >>  scripts/checkpatch.pl | 19 +++++++++++++++++++
-> >>  1 file changed, 19 insertions(+)
-> >> 
-> >> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> >> index d1fe79bcc4..d0d8f63d48 100755
-> >> --- a/scripts/checkpatch.pl
-> >> +++ b/scripts/checkpatch.pl
-> >> @@ -1177,6 +1177,7 @@ sub process {
-> >>  	our $clean = 1;
-> >>  	my $signoff = 0;
-> >>  	my $is_patch = 0;
-> >> +	my $reported_maintainer_file = 0;
-> >>  
-> >>  	our @report = ();
-> >>  	our $cnt_lines = 0;
-> >> @@ -1379,6 +1380,24 @@ sub process {
-> >>  			}
-> >>  		}
-> >>  
-> >> +# Check if MAINTAINERS is being updated.  If so, there's probably no need to
-> >> +# emit the "does MAINTAINERS need updating?" message on file add/move/delete
-> >> +		if ($line =~ /^\s*MAINTAINERS\s*\|/) {
-> >> +			$reported_maintainer_file = 1;
-> >> +		}
-> >> +
-> >> +# Check for added, moved or deleted files
-> >> +		if (!$reported_maintainer_file &&
-> >> +		    ($line =~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
-> >> +		     $line =~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
-> >> +		     ($line =~ /\{\s*([\w\/\.\-]*)\s*\=\>\s*([\w\/\.\-]*)\s*\}/ &&
-> >> +		      (defined($1) || defined($2))))) {
-> >> +			$is_patch = 1;
-> >> +			$reported_maintainer_file = 1;
-> >> +			WARN("added, moved or deleted file(s), does MAINTAINERS need updating?\n" .
-> >> +				$herecurr);
-> >
-> > Could you please turn this into a notification instead of a warning? For
-> > rationale, please see the discussion of this patch last year:
-> >
-> > http://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05753.html
-> 
-> Quoting that one:
-> 
->     I think chances are high that it still pops up quite frequently with
->     false positives:
-> 
->     1) The above regex only triggers for patches that contain a diffstat. If
->     you run the script on patches without diffstat, you always get the
->     warning as soon as you add, delete or move a file, even if you update
->     the MAINTAINERS file in the same patch.
-> 
-> "Doctor, it hurts when I create patches without a diffstat."
-> 
->     2) I think it is quite common in patch series to first introduce new
->     files in the first patches, and then update MAINTAINERS only once at the
->     end.
-> 
-> That's an okay thing to do now.  But is it a valid reason to block
-> tooling improvements that will help us stop the constant trickle of new
-> files without a maintainer?  Having to update MAINTAINERS along the way
-> isn't *that* much of a burden; we'll get used to it.
-> 
->     3) The MAINTAINERS file often covers whole folders with wildcard
->     expressions. So if you add/delete/rename a file within such a folder,
->     you don't need to update MAINTAINERS thanks to the wildcard.
-> 
-> True.  Perhaps the kernel would appreciate a suitable checkpatch.pl
-> improvement.
-> 
->     I guess people might be annoyed if checkpatch.pl throws a warning in
->     these cases. So a "NOTE: ..." sounds more sane to me. But if you like,
->     we can also start with a WARNING first and only ease it if people start
->     to complain?
-> 
-> I'd stick to the upstream version.  But if it takes deviations to get
-> this improvement accepted, I can live with them, as long as patchew
-> still flags offenders.
+> Paolo
 > 
 
-Patchew doesn't speak up unless there is an "error". Warnings and notes are not
-complained about to keep good signal-to-noise ratio.
 
-Fam
+-- 
+Alexey
