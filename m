@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f91QS-0005y9-CN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 00:44:05 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f91RW-0006i6-Um
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 00:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f91QO-0003Zx-56
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 00:44:04 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f91QN-0003Zl-Vf
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 00:44:00 -0400
-Received: by mail-pf0-x243.google.com with SMTP id g14so2015304pfh.3
-	for <qemu-devel@nongnu.org>; Wed, 18 Apr 2018 21:43:59 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-From: Michael Clark <mjc@sifive.com>
-In-Reply-To: <CA+ZOyaj_4my=u4-MkAbyoee5ORnRq6nyaU+HhX1K6t2+Cn5RHg@mail.gmail.com>
-Date: Thu, 19 Apr 2018 16:43:52 +1200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <3EFD5845-5CE7-45F5-AE4C-0C86CAFAA200@sifive.com>
-References: <CA+ZOyaj_4my=u4-MkAbyoee5ORnRq6nyaU+HhX1K6t2+Cn5RHg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [sw-dev] The problem of write misa on QEMU and BBL
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1f91RS-0004LS-22
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 00:45:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49242
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1f91RR-0004JN-Rk
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 00:45:05 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3J4hwsN080551
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 00:45:01 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hek632muu-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 00:45:01 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Thu, 19 Apr 2018 05:44:59 +0100
+Date: Thu, 19 Apr 2018 10:14:52 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20180417132317.6910-1-bala24@linux.vnet.ibm.com>
+	<20180417132317.6910-2-bala24@linux.vnet.ibm.com>
+	<20180418005550.GC2317@umbus.fritz.box>
+	<20180418005726.GD2317@umbus.fritz.box>
+	<20180418064641.GA12871@9.122.211.20>
+	<20180418083632.GB2710@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180418083632.GB2710@work-vm>
+Message-Id: <20180419044452.GA11708@9.122.211.20>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] migration: calculate
+ expected_downtime with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +47,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zong Li <zongbox@gmail.com>
-Cc: Zong Li <zong@andestech.com>, Andrew Waterman <andrew@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: amit.shah@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Hi Zong,
+On Wed, Apr 18, 2018 at 09:36:33AM +0100, Dr. David Alan Gilbert wrote:
+> * Balamuruhan S (bala24@linux.vnet.ibm.com) wrote:
+> > On Wed, Apr 18, 2018 at 10:57:26AM +1000, David Gibson wrote:
+> > > On Wed, Apr 18, 2018 at 10:55:50AM +1000, David Gibson wrote:
+> > > > On Tue, Apr 17, 2018 at 06:53:17PM +0530, Balamuruhan S wrote:
+> > > > > expected_downtime value is not accurate with dirty_pages_rate * page_size,
+> > > > > using ram_bytes_remaining would yeild it correct.
+> > > > 
+> > > > This commit message hasn't been changed since v1, but the patch is
+> > > > doing something completely different.  I think most of the info from
+> > > > your cover letter needs to be in here.
+> > > > 
+> > > > > 
+> > > > > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> > > > > ---
+> > > > >  migration/migration.c | 6 +++---
+> > > > >  migration/migration.h | 1 +
+> > > > >  2 files changed, 4 insertions(+), 3 deletions(-)
+> > > > > 
+> > > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > > index 52a5092add..4d866bb920 100644
+> > > > > --- a/migration/migration.c
+> > > > > +++ b/migration/migration.c
+> > > > > @@ -614,7 +614,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+> > > > >      }
+> > > > >  
+> > > > >      if (s->state != MIGRATION_STATUS_COMPLETED) {
+> > > > > -        info->ram->remaining = ram_bytes_remaining();
+> > > > > +        info->ram->remaining = s->ram_bytes_remaining;
+> > > > >          info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
+> > > > >      }
+> > > > >  }
+> > > > > @@ -2227,6 +2227,7 @@ static void migration_update_counters(MigrationState *s,
+> > > > >      transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
+> > > > >      time_spent = current_time - s->iteration_start_time;
+> > > > >      bandwidth = (double)transferred / time_spent;
+> > > > > +    s->ram_bytes_remaining = ram_bytes_remaining();
+> > > > >      s->threshold_size = bandwidth * s->parameters.downtime_limit;
+> > > > >  
+> > > > >      s->mbps = (((double) transferred * 8.0) /
+> > > > > @@ -2237,8 +2238,7 @@ static void migration_update_counters(MigrationState *s,
+> > > > >       * recalculate. 10000 is a small enough number for our purposes
+> > > > >       */
+> > > > >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
+> > > > > -        s->expected_downtime = ram_counters.dirty_pages_rate *
+> > > > > -            qemu_target_page_size() / bandwidth;
+> > > > > +        s->expected_downtime = s->ram_bytes_remaining / bandwidth;
+> > > > >      }
+> > > 
+> > > ..but more importantly, I still think this change is bogus.  expected
+> > > downtime is not the same thing as remaining ram / bandwidth.
+> > 
+> > I tested precopy migration of 16M HP backed P8 guest from P8 to 1G P9 host
+> > and observed precopy migration was infinite with expected_downtime set as
+> > downtime-limit.
+> 
+> Did you debug why it was infinite? Which component of the calculation
+> had gone wrong and why?
+> 
+> > During the discussion for Bug RH1560562, Michael Roth quoted that
+> > 
+> > One thing to note: in my testing I found that the "expected downtime" value
+> > seems inaccurate in this scenario. To find a max downtime that allowed
+> > migration to complete I had to divide "remaining ram" by "throughput" from
+> > "info migrate" (after the initial pre-copy pass through ram, i.e. once
+> > "dirty pages" value starts getting reported and we're just sending dirtied
+> > pages).
+> > 
+> > Later by trying it precopy migration could able to complete with this
+> > approach.
+> > 
+> > adding Michael Roth in cc.
+> 
+> We should try and _understand_ the rational for the change, not just go
+> with it.  Now, remember that whatever we do is just an estimate and
 
-> On 19/04/2018, at 2:40 PM, Zong Li <zongbox@gmail.com> wrote:
->=20
-> Hi all,
->=20
-> For BBL part, in fp_init at machine/minit.c,
-> it will clear the D and F bits of misa register, and assertion that
-> the bits is cleared.
-> But the misa is WARL register, so there is no effect for writing it,
-> and the assertion not be true.
-> So is there has necessary to do that if toolchain not support D and F =
-extension?
->=20
-> For QEMU part, when writing misa, it will trigger the illegal
-> instruction exception, but I think that the WARL allow write behavior?
+I have made the change based on my understanding,
 
-QEMU in the riscv-all branch should have WARL behavior.
+Currently the calculation is,
 
-- https://github.com/riscv/riscv-qemu/commits/riscv-all
+expected_downtime = (dirty_pages_rate * qemu_target_page_size) / bandwidth
 
-There is a bug in upstream. We have submitted patches to fix the issue =
-for review on the qemu-devel mailing list. The patch series will be =
-submitted for upstream review again shortly. We were holding off on the =
-series as we didn=E2=80=99t classify it as a =E2=80=9Ccritical bug=E2=80=9D=
- as QEMU was in soft-freeze for 2.12 and we weren=E2=80=99t able to get =
-review in time to include this fix in the 2.12 release.
+dirty_pages_rate = No of dirty pages / time =>  its unit (1 / seconds)
+qemu_target_page_size => its unit (bytes)
 
-See =E2=80=9CNo traps on writes to misa,minstret,mcycle"
+dirty_pages_rate * qemu_target_page_size => bytes/seconds
 
-- https://github.com/riscv/riscv-qemu/commits/qemu-2.13-for-upstream
+bandwidth = bytes transferred / time => bytes/seconds
 
-The history is that there were several unimplemented CSRs that had =
-printf followed by exit. Richard Henderson said we should fix this. I =
-changed several CSRs to cause illegal instruction traps instead of =
-calling exit. That was a mistake as CSRs that don=E2=80=99t support =
-write are WARL (Write Any Read Legal). It was certainly better than =
-having the simulation exit as a cpu doesn=E2=80=99t typically have a way =
-to =E2=80=9Dexit=E2=80=9D like a C program, nevertheless trapping was =
-wrong. My mistake. See here for the history:
+dividing this would not be a measurement of time.
 
-- =
-https://github.com/riscv/riscv-qemu/blob/ff36f2f77ec3e6a6211c63bfe1707ec05=
-7b12f7d/target-riscv/op_helper.c
+> there will be lots of cases where it's bad - so be careful what you're
+> using it for - you definitely should NOT use the value in any automated
+> system.
 
-The implementation in the current tree is quite different. We have =
-recently made the CSR system more modular so that with minor changes, =
-custom CPUs will be able to hook their own control and status registers.
+I agree with it and I would not use it in automated system.
 
-- =
-https://github.com/riscv/riscv-qemu/blob/qemu-2.13-for-upstream/target/ris=
-cv/csr.c#L780-L867
+> My problem with just using ram_bytes_remaining is that it doesn't take
+> into account the rate at which the guest is changing RAM - which feels
+> like it's the important measure for expected downtime.
 
-See these changes:
+ram_bytes_remaining = ram_state->migration_dirty_pages * TARGET_PAGE_SIZE
 
-- =
-https://github.com/riscv/riscv-qemu/commit/9d9c1bfef911c520a35bd3f8c0ed2e1=
-4cc96bbb7
-- =
-https://github.com/riscv/riscv-qemu/commit/b5a4cd79ce6c7fbb65fdcf078fb9a83=
-91da1d6b1
+This means ram_bytes_remaining is proportional to guest changing RAM, so
+we can consider this change would yield expected_downtime
 
-We know have a flexible system that will allow implementations to hook =
-per-cpu control and status registers, and we have predicates that make =
-CSRs appear on some processor but not on others. i.e. if misa.S is not =
-present, then S-mode s* CSRs will trap. Sometimes WARL is the correct =
-behaviour, but sometimes trapping is the correct behaviour i.e. if the =
-processor does not implement S-mode.
-
-misa traps on write should only affect bootloaders as Supervisor=E2=80=99s=
- like Linux don=E2=80=99t yet have access to the isa register. It=E2=80=99=
-s not a major issuse.
-
-Michael.=
+Regards,
+Bala
+> 
+> Dave
+> 
+> > Regards,
+> > Bala
+> > 
+> > > 
+> > > > >  
+> > > > >      qemu_file_reset_rate_limit(s->to_dst_file);
+> > > > > diff --git a/migration/migration.h b/migration/migration.h
+> > > > > index 8d2f320c48..8584f8e22e 100644
+> > > > > --- a/migration/migration.h
+> > > > > +++ b/migration/migration.h
+> > > > > @@ -128,6 +128,7 @@ struct MigrationState
+> > > > >      int64_t downtime_start;
+> > > > >      int64_t downtime;
+> > > > >      int64_t expected_downtime;
+> > > > > +    int64_t ram_bytes_remaining;
+> > > > >      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+> > > > >      int64_t setup_time;
+> > > > >      /*
+> > > > 
+> > > 
+> > > 
+> > > 
+> > > -- 
+> > > David Gibson			| I'll have my music baroque, and my code
+> > > david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> > > 				| _way_ _around_!
+> > > http://www.ozlabs.org/~dgibson
+> > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
