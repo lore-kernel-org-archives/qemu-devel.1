@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f9ByR-00075N-4w
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:52 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f9C0z-0000ve-Uv
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:02:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f9ByM-0008LX-7Q
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46062 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9ByM-0008KW-3M
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:46 -0400
-Date: Thu, 19 Apr 2018 18:59:40 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180419185630-mutt-send-email-mst@kernel.org>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-7-tiwei.bie@intel.com>
-	<20180418192154-mutt-send-email-mst@kernel.org>
-	<20180419111439.i6gfhnept6wy7uzp@debian>
-	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
-	<c41439d6-69b7-474a-530f-07ffb5f1b9e6@redhat.com>
-	<20180419180912-mutt-send-email-mst@kernel.org>
-	<174b5e48-dfde-cb5f-e664-39d43a20a629@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f9C0z-0003Qt-5S
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:02:30 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1f9C0y-0003Pf-U3
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:02:29 -0400
+Received: by mail-wr0-x243.google.com with SMTP id h3-v6so15471197wrh.5
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:02:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <174b5e48-dfde-cb5f-e664-39d43a20a629@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v3 6/6] vhost-user:
- support registering external host notifiers
+In-Reply-To: <86162f1a-842b-f7aa-7781-f4260309925f@redhat.com>
+References: <20180419150145.24795-1-marcandre.lureau@redhat.com>
+	<86162f1a-842b-f7aa-7781-f4260309925f@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 19 Apr 2018 18:02:26 +0200
+Message-ID: <CAJ+F1C+ffbXOU7+xr_mhcXxt2=zu76URC4kFLM-7EskKrhj0XQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] Simplify qobject refcount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Liang, Cunming" <cunming.liang@intel.com>, "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Apr 19, 2018 at 05:51:51PM +0200, Paolo Bonzini wrote:
-> On 19/04/2018 17:19, Michael S. Tsirkin wrote:
-> >> - if we make it 1 when weak barriers are needed, the device also needs
-> >> to nack feature negotiation (not allow setting the FEATURES_OK) if the
-> >> bit is not set by the driver.
-> >>  However, that is not enough.  Live
-> >> migration assumes that it is okay to migrate a virtual machine from a
-> >> source that doesn't support a feature to a destination that supports it.
-> >>  In this case, it would assume that it is okay to migrate from software
-> >> virtio to hardware virtio.  This is wrong because the destination would
-> >> use weak barriers
-> > 
-> > You can't migrate between systems with different sets of device features
-> > right now.
-> 
-> Yes, you can, exactly because some features are defined not by the
-> machine type but rather by the host kernel.  See virtio_net_get_features
-> in QEMU's hw/virtio/virtio-net.c, and virtio_set_features_nocheck in
-> QEMU's hw/virtio/virtio.c.
-> 
-> Thanks,
-> 
-> Paolo
+Hi
 
-Oh you are right. Well we can just special-case that one :)
+On Thu, Apr 19, 2018 at 5:45 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 04/19/2018 10:01 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi,
+>>
+>> This series aims to get rid of the distinction between QObject, that
+>> must use qobject_incref/qobject_decref and its various derived types
+>> that have to use QINCREF/QDECREF. Instead, replace it with
+>> qobject_ref/qobject_unref for all types.
+>
+> Related question: should we do the same thing for qdict_put() vs.
+> qdict_put_obj()?  That is, now that we have an easy way to always use
+> QOBJECT(), it makes more sense to just have:
+>
+> QObject *o;
+> QDict *d;
+> qdict_put(dict, key1, o);
+> qdict_put(dict, key2, d);
+>
+> rather than having to distinguish based on the type of the third argument=
+.
+>
+> Similar for QList additions.
 
--- 
-MST
+Good idea, that would be a lovely follow-up indeed.
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
