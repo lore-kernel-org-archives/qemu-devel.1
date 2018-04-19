@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934P-0005Wz-DZ
+	(envelope-from <dgibson@ozlabs.org>) id 1f934P-0005Wq-1v
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934O-0005QL-5V
+	(envelope-from <dgibson@ozlabs.org>) id 1f934O-0005Qm-9Q
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:25 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 19 Apr 2018 16:29:12 +1000
-Message-Id: <20180419062917.31486-3-david@gibson.dropbear.id.au>
+Date: Thu, 19 Apr 2018 16:29:13 +1000
+Message-Id: <20180419062917.31486-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180419062917.31486-1-david@gibson.dropbear.id.au>
 References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC for-2.13 2/7] spapr: Use maximum page size
- capability to simplify memory backend checking
+Subject: [Qemu-devel] [RFC for-2.13 3/7] target/ppc: Add
+ ppc_hash64_filter_pagesizes()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,186 +23,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-The way we used to handle KVM allowable guest pagesizes for PAPR guests
-required some convoluted checking of memory attached to the guest.
+The paravirtualized PAPR platform sometimes needs to restrict the guest to
+using only some of the page sizes actually supported by the host's MMU.
+At the moment this is handled in KVM specific code, but for consistency we
+want to apply the same limitations to all accelerators.
 
-The allowable pagesizes advertised to the guest cpus depended on the memory
-which was attached at boot, but then we needed to ensure that any memory
-later hotplugged didn't change which pagesizes were allowed.
-
-Now that we have an explicit machine option to control the allowable
-maximum pagesize we can simplify this.  We just check all memory backends
-against that declared pagesize.  We check base and cold-plugged memory at
-reset time, and hotplugged memory at pre_plug() time.
+This makes a start on this by providing a helper function in the cpu code
+to allow platform code to remove some of the cpu's page size definitions
+via a caller supplied callback.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         | 17 +++++++----------
- hw/ppc/spapr_caps.c    | 20 ++++++++++++++++++++
- include/hw/ppc/spapr.h |  3 +++
- target/ppc/kvm.c       | 19 ++++++++++---------
- target/ppc/kvm_ppc.h   |  6 +++---
- 5 files changed, 43 insertions(+), 22 deletions(-)
+ target/ppc/mmu-hash64.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
+ target/ppc/mmu-hash64.h |  3 +++
+ 2 files changed, 62 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 36e41aff71..0a0fec4140 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3035,11 +3035,13 @@ out:
- static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                   Error **errp)
- {
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr;
-     uint64_t size;
--    char *mem_dev;
-+    Object *memdev;
-+    hwaddr pagesize;
- 
-     mr = ddc->get_memory_region(dimm, errp);
-     if (!mr) {
-@@ -3053,15 +3055,10 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index a1db20e3a8..b6e62864fd 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1165,3 +1165,62 @@ const PPCHash64Options ppc_hash64_opts_POWER7 = {
+         },
      }
- 
--    mem_dev = object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PROP, NULL);
--    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
--        error_setg(errp, "Memory backend has bad page size. "
--                   "Use 'memory-backend-file' with correct mem-path.");
--        goto out;
--    }
--
--out:
--    g_free(mem_dev);
-+    memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
-+                                      &error_abort);
-+    pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
-+    spapr_check_pagesize(spapr, pagesize, errp);
- }
- 
- struct sPAPRDIMMState {
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index cbc41f5b20..5762b88689 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -26,6 +26,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
-+#include "exec/ram_addr.h"
- #include "target/ppc/cpu.h"
- #include "target/ppc/mmu-hash64.h"
- #include "cpu-models.h"
-@@ -299,6 +300,23 @@ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
- 
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
- 
-+void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-+                          Error **errp)
-+{
-+    hwaddr maxpagesize = (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MPS]);
+ };
 +
-+    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
-+        return;
++void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
++                                 bool (*cb)(void *, uint32_t, uint32_t),
++                                 void *opaque)
++{
++    PPCHash64Options *opts = cpu->hash64_opts;
++    int i;
++    int n = 0;
++    bool ci_largepage = false;
++
++    assert(opts);
++
++    n = 0;
++    for (i = 0; i < ARRAY_SIZE(opts->sps); i++) {
++        PPCHash64SegmentPageSizes *sps = &opts->sps[i];
++        int j;
++        int m = 0;
++
++        assert(n <= i);
++
++        if (!sps->page_shift) {
++            break;
++        }
++
++        for (j = 0; j < ARRAY_SIZE(sps->enc); j++) {
++            PPCHash64PageSize *ps = &sps->enc[j];
++
++            assert(m <= j);
++            if (!ps->page_shift) {
++                break;
++            }
++
++            if (cb(opaque, sps->page_shift, ps->page_shift)) {
++                if (ps->page_shift == 16) {
++                    ci_largepage = true;
++                }
++                sps->enc[m++] = *ps;
++            }
++        }
++
++        /* Clear rest of the row */
++        for (j = m; j < ARRAY_SIZE(sps->enc); j++) {
++            memset(&sps->enc[j], 0, sizeof(sps->enc[j]));
++        }
++
++        if (m) {
++            n++;
++        }
 +    }
 +
-+    if (maxpagesize > pagesize) {
-+        error_setg(errp,
-+                   "Can't support %"HWADDR_PRIu" kiB guest pages with %"
-+                   HWADDR_PRIu" kiB host pages with this KVM implementation",
-+                   maxpagesize >> 10, pagesize >> 10);
++    /* Clear the rest of the table */
++    for (i = n; i < ARRAY_SIZE(opts->sps); i++) {
++        memset(&opts->sps[i], 0, sizeof(opts->sps[i]));
++    }
++
++    if (!ci_largepage) {
++        opts->flags &= ~PPC_HASH64_CI_LARGEPAGE;
 +    }
 +}
-+
- static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
-                               uint8_t val, Error **errp)
- {
-@@ -307,6 +325,8 @@ static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
-     } else if (val < 16) {
-         warn_report("Many PAPR guests require 64kiB pages (cap-hpt-mps >= 16)");
-     }
-+
-+    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
- }
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index f23b78d787..1aa2453497 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -20,6 +20,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
+ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val);
+ void ppc_hash64_init(PowerPCCPU *cpu);
+ void ppc_hash64_finalize(PowerPCCPU *cpu);
++void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
++                                 bool (*cb)(void *, uint32_t, uint32_t),
++                                 void *opaque);
+ #endif
  
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 60ed3a5657..a3d616c612 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -805,4 +805,7 @@ void spapr_caps_reset(sPAPRMachineState *spapr);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
- int spapr_caps_post_migration(sPAPRMachineState *spapr);
- 
-+void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-+                          Error **errp);
-+
- #endif /* HW_SPAPR_H */
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index e4341d6ff7..defbb08931 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -490,12 +490,18 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-     }
- }
- 
--bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-+bool kvmppc_hpt_needs_host_contiguous_pages(void)
- {
--    Object *mem_obj = object_resolve_path(obj_path, NULL);
--    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
-+    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-+    static struct kvm_ppc_smmu_info smmu_info;
-+
-+    if (!kvm_enabled()) {
-+        return false;
-+    }
- 
--    return pagesize >= max_cpu_page_size;
-+    kvm_get_smmu_info(cpu, &smmu_info);
-+
-+    return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
- }
- 
- #else /* defined (TARGET_PPC64) */
-@@ -504,11 +510,6 @@ static inline void kvm_fixup_page_sizes(PowerPCCPU *cpu)
- {
- }
- 
--bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
--{
--    return true;
--}
--
- #endif /* !defined (TARGET_PPC64) */
- 
- unsigned long kvm_arch_vcpu_id(CPUState *cpu)
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index e2840e1d33..443fca0a4e 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -70,7 +70,7 @@ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
- int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
- bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
- 
--bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-+bool kvmppc_hpt_needs_host_contiguous_pages(void);
- 
- #else
- 
-@@ -222,9 +222,9 @@ static inline uint64_t kvmppc_rma_size(uint64_t current_size,
-     return ram_size;
- }
- 
--static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-+static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
- {
--    return true;
-+    return false;
- }
- 
- static inline bool kvmppc_has_cap_spapr_vfio(void)
+ /*
 -- 
 2.14.3
