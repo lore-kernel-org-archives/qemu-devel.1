@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9CUa-0002TP-O2
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:33:05 -0400
+	(envelope-from <mst@redhat.com>) id 1f9CWg-0003aJ-1r
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9CUV-0001SO-SA
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:33:04 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:52348)
+	(envelope-from <mst@redhat.com>) id 1f9CWb-0003H6-69
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:35:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59214 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9CUV-0001PL-K1
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:32:59 -0400
-From: Ian Jackson <ian.jackson@citrix.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9CWa-0003GM-VL
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:35:09 -0400
+Date: Thu, 19 Apr 2018 19:34:57 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180419190000-mutt-send-email-mst@kernel.org>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-7-tiwei.bie@intel.com>
+	<20180418192154-mutt-send-email-mst@kernel.org>
+	<20180419111439.i6gfhnept6wy7uzp@debian>
+	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
+	<20180419182035-mutt-send-email-mst@kernel.org>
+	<f123c3a5-f7a3-a0e3-ffc7-b57e19610a9b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23256.50356.85322.950961@mariner.uk.xensource.com>
-Date: Thu, 19 Apr 2018 17:32:52 +0100
-In-Reply-To: <23224.64658.859133.831793@mariner.uk.xensource.com>
-References: <1520535787-6223-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1520535787-6223-2-git-send-email-ian.jackson@eu.citrix.com>
-	<e2f1cee4-8dad-d901-ae2f-51495a855b4e@redhat.com>
-	<23224.64658.859133.831793@mariner.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH 01/12] checkpatch: Add
- xendevicemodel_handle to the list of types
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f123c3a5-f7a3-a0e3-ffc7-b57e19610a9b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] vhost-user: support registering
+ external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Eric  Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Liang, Cunming" <cunming.liang@intel.com>, "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
 
-Ian Jackson writes ("Re: [PATCH 01/12] checkpatch: Add xendevicemodel_handle to the list of types"):
-> Paolo Bonzini writes ("Re: [PATCH 01/12] checkpatch: Add xendevicemodel_handle to the list of types"):
-> > Or just rename it so that it is CamelCase.  Then checkpatch will be happy.
+On Thu, Apr 19, 2018 at 05:52:23PM +0200, Paolo Bonzini wrote:
+> On 19/04/2018 17:42, Michael S. Tsirkin wrote:
+> >> A compiler barrier is enough on strongly-ordered memory platform.
+> >> As it doesn't re-order store, PCI device won't see a stale index
+> >> value. But a weakly-ordered memory needs sfence.
+> > 
+> > Oh you are right.
+> > 
+> > So it's only needed for non-intel platforms or when packets are in
+> > WC memory then. And I don't know whether dpdk ever puts packets in WC
+> > memory.
+> > 
+> > I guess we'll cross this bridge when we get to it.
 > 
-> I can do that if you want,
+> Non-TSO architectures seem important...
+> 
+> Paolo
 
-No I can't, because it's from the Xen headers, not a qemu type.
+Only if there are virtio offload engines on platforms with these
+architectures :) Worth working on for sure but doesn't have to block
+this patchset.
 
-I have added a note to the commit message for the checkpatch commit.
-
-Ian.
+-- 
+MST
