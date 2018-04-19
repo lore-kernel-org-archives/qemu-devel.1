@@ -1,28 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f99O3-0007g1-0a
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:14:11 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f99UU-0004dG-3b
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f99Nx-0002Pf-Dk
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:14:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53862 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f99Nx-0002Oy-9C
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:14:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
-	<87r2nbwv9j.fsf@dusky.pond.sub.org>
-	<CAJ+F1CLAh8kg6YH1jZPBy1Ec+A4bQP-05yo9BqKqdyqEWL-e+A@mail.gmail.com>
-	<CAJ+F1CJ3Ok335xo+LSoBMmMF1D+BRuaQLJuO3Zp0pR8_r5YABw@mail.gmail.com>
-Date: Thu, 19 Apr 2018 15:13:59 +0200
-In-Reply-To: <CAJ+F1CJ3Ok335xo+LSoBMmMF1D+BRuaQLJuO3Zp0pR8_r5YABw@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 19 Apr 2018
-	13:48:12 +0200")
-Message-ID: <8736zr5ofc.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Simplify qobject refcount
+	(envelope-from <kraxel@redhat.com>) id 1f99UQ-0006L5-Tw
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:20:46 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 19 Apr 2018 15:20:24 +0200
+Message-Id: <20180419132026.5494-3-kraxel@redhat.com>
+In-Reply-To: <20180419132026.5494-1-kraxel@redhat.com>
+References: <20180419132026.5494-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/4] ui: switch trivial displays to qapi parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +19,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Drop the option-less display types (egl-headless, curses, none) from
+parse_display(), so they'll be handled by parse_display_qapi().
 
-> Hi
->
-> On Thu, Apr 19, 2018 at 12:09 PM, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
->>> On the one hand, we provide safe conversion macros QOBJECT() and
->>> qobject_to().  By the way, shouting one but not the other is a bit ugly.
->>
->> QOBJECT is static upcast, the compiler will shout.
->> qobject_to() is dynamic downcast, the runtime shout.
->
-> Actually it doesn't shout, it merely tries and return NULL if it can't
-> do it. So I understand what you mean now. So it's a balance, but so
-> far, it seems those 2 fit our needs.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ vl.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Misunderstanding?  By "shouting", I meant spelling all-caps.
-
-The convention to shout macros makes sense because you generally need to
-know when something's a macro.  In cases where you don't need to know,
-it's okay not to shout.
-
->> I don't like to spent too much time on this, yet as you said, this is
->> a lovely improvement, so is there any real blocker left?
->
-> I'll try to address your comments from v5 patches and send a v6.
-
-Thanks!
+diff --git a/vl.c b/vl.c
+index 784c3fb795..39303d6b55 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2188,10 +2188,6 @@ static void parse_display(const char *p)
+             error_report("VNC requires a display argument vnc=<display>");
+             exit(1);
+         }
+-    } else if (strstart(p, "egl-headless", &opts)) {
+-        dpy.type = DISPLAY_TYPE_EGL_HEADLESS;
+-    } else if (strstart(p, "curses", &opts)) {
+-        dpy.type = DISPLAY_TYPE_CURSES;
+     } else if (strstart(p, "gtk", &opts)) {
+         dpy.type = DISPLAY_TYPE_GTK;
+         while (*opts) {
+@@ -2224,8 +2220,6 @@ static void parse_display(const char *p)
+             }
+             opts = nextopt;
+         }
+-    } else if (strstart(p, "none", &opts)) {
+-        dpy.type = DISPLAY_TYPE_NONE;
+     } else {
+         parse_display_qapi(p);
+     }
+-- 
+2.9.3
