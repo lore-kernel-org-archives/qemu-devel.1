@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60537)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgz-0002GT-I1
+	id 1f9Cgy-0002GJ-Rq
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgy-0006GR-KU
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:53 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:53478)
+	id 1f9Cgx-0006Fh-Vl
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:52 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:53463)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgy-0006C9-BV
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:52 -0400
+	id 1f9Cgx-00069l-MW
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:51 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 19 Apr 2018 17:45:09 +0100
-Message-ID: <1524156319-11465-7-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 19 Apr 2018 17:45:11 +0100
+Message-ID: <1524156319-11465-9-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 06/16] xen: destroy_hvm_domain: Move reason
- into a variable
+Subject: [Qemu-devel] [PATCH 08/16] xen: destroy_hvm_domain: Try
+ xendevicemodel_shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +32,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-We are going to want to reuse this.
+xc_interface_open etc. is not going to work if we have dropped
+privilege, but xendevicemodel_shutdown will if everything is new
+enough.
 
-No functional change.
+xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
+provide a stub for earlier versions.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/i386/xen/xen-hvm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+v6.1: Fix { } style issue
+v6: Do not print message about harmless condition in ENOTTY case.
+v2: Add compatibility stub for Xen < 4.10.
+    Fix coding style.
+
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+---
+ hw/i386/xen/xen-hvm.c       | 12 ++++++++++++
+ include/hw/xen/xen_common.h |  7 +++++++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 9c3b6b3..3590d99 100644
+index 3590d99..fb727bc 100644
 --- a/hw/i386/xen/xen-hvm.c
 +++ b/hw/i386/xen/xen-hvm.c
-@@ -1387,12 +1387,13 @@ void destroy_hvm_domain(bool reboot)
+@@ -1386,9 +1386,21 @@ void destroy_hvm_domain(bool reboot)
+ {
      xc_interface *xc_handle;
      int sts;
++    int rc;
  
-+    unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
+     unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
+ 
++    if (xen_dmod) {
++        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
++        if (!rc) {
++            return;
++        }
++        if (errno != ENOTTY /* old Xen */) {
++            perror("xendevicemodel_shutdown failed");
++        }
++        /* well, try the old thing then */
++    }
 +
      xc_handle = xc_interface_open(0, 0, 0);
      if (xc_handle == NULL) {
          fprintf(stderr, "Cannot acquire xenctrl handle\n");
-     } else {
--        sts = xc_domain_shutdown(xc_handle, xen_domid,
--                                 reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff);
-+        sts = xc_domain_shutdown(xc_handle, xen_domid, reason);
-         if (sts != 0) {
-             fprintf(stderr, "xc_domain_shutdown failed to issue %s, "
-                     "sts %d, %s\n", reboot ? "reboot" : "poweroff",
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 60c4ebb..4bd30a3 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -108,6 +108,13 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+     return -1;
+ }
+ 
++static inline int xendevicemodel_shutdown(xendevicemodel_handle *dmod,
++                                          domid_t domid, unsigned int reason)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
+ 
+ #include <xentoolcore.h>
 -- 
 2.1.4
