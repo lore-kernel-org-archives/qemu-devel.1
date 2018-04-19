@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934T-0005ZZ-62
+	(envelope-from <dgibson@ozlabs.org>) id 1f934S-0005Z8-U3
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934Q-0005Sw-OM
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f934O-0005Qf-8j
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:28 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 19 Apr 2018 16:29:15 +1000
-Message-Id: <20180419062917.31486-6-david@gibson.dropbear.id.au>
+Date: Thu, 19 Apr 2018 16:29:11 +1000
+Message-Id: <20180419062917.31486-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20180419062917.31486-1-david@gibson.dropbear.id.au>
 References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC for-2.13 5/7] spapr: Limit available pagesizes to
- provide a consistent guest environment
+Subject: [Qemu-devel] [RFC for-2.13 1/7] spapr: Maximum (HPT) pagesize
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +23,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-KVM HV has some limitations (deriving from the hardware) that mean not all
-host-cpu supported pagesizes may be usable in the guest.  At present this
-means that KVM guests and TCG guests may see different available page sizes
-even if they notionally have the same vcpu model.  This is confusing and
-also prevents migration between TCG and KVM.
+The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV means
+that every page that the guest puts in the pagetables must be truly
+physically contiguous, not just GPA-contiguous.  In effect this means that
+an HPT guest can't use any pagesizes greater than the host page size used
+to back its memory.
 
-This patch makes the environment consistent by always allowing the same set
-of pagesizes.  Since we can't remove the KVM limitations, we do this by
-always applying the same limitations it has, even to TCG guests.
+At present we handle this by changing what we advertise to the guest based
+on the backing pagesizes.  This is pretty bad, because it means the guest
+sees a different environment depending on what should be host configuration
+details.
+
+As a start on fixing this, we add a new capability parameter to the pseries
+machine type which gives the maximum allowed pagesizes for an HPT guest (as
+a shift).  For now we just create and validate the parameter without making
+it do anything.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ hw/ppc/spapr.c         |  1 +
+ hw/ppc/spapr_caps.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  4 +++-
+ 3 files changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index e71de14ffb..5a247f190f 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -331,6 +331,38 @@ static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
-     spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index bdf72e1e89..36e41aff71 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3876,6 +3876,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
+     smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
+     smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
++    smc->default_caps.caps[SPAPR_CAP_HPT_MPS] = 16; /* Allow 64kiB pages */
+     spapr_caps_add_properties(smc, &error_abort);
  }
  
-+static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint32_t pshift)
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 531e145114..cbc41f5b20 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -27,6 +27,7 @@
+ #include "qapi/visitor.h"
+ #include "sysemu/hw_accel.h"
+ #include "target/ppc/cpu.h"
++#include "target/ppc/mmu-hash64.h"
+ #include "cpu-models.h"
+ #include "kvm_ppc.h"
+ 
+@@ -142,6 +143,39 @@ out:
+     g_free(val);
+ }
+ 
++static void spapr_cap_get_int(Object *obj, Visitor *v, const char *name,
++                               void *opaque, Error **errp)
 +{
-+    unsigned maxshift = *((unsigned *)opaque);
++    sPAPRCapabilityInfo *cap = opaque;
++    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
++    int64_t value = spapr_get_cap(spapr, cap->index);
 +
-+    assert(pshift >= seg_pshift);
-+
-+    /* Don't allow the guest to use pages bigger than the configured
-+     * maximum size */
-+    if (pshift > maxshift) {
-+        return false;
-+    }
-+
-+    /* For whatever reason, KVM doesn't allow multiple pagesizes
-+     * within a segment, *except* for the case of 16M pages in a 4k or
-+     * 64k segment.  Always exclude other cases, so that TCG and KVM
-+     * guests see a consistent environment */
-+    if ((pshift != seg_pshift) && (pshift != 24)) {
-+        return false;
-+    }
-+
-+    return true;
++    visit_type_int(v, name, &value, errp);
 +}
 +
-+static void cap_hpt_mps_cpu_apply(sPAPRMachineState *spapr,
-+                                   PowerPCCPU *cpu,
-+                                   uint8_t val, Error **errp)
++static void spapr_cap_set_int(Object *obj, Visitor *v, const char *name,
++                               void *opaque, Error **errp)
 +{
-+    unsigned maxshift = val;
++    sPAPRCapabilityInfo *cap = opaque;
++    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
++    int64_t value;
++    Error *local_err = NULL;
 +
-+    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
++    visit_type_int(v, name, &value, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    if ((value < 0) || (value > 255)) {
++        error_setg(errp, "Value for %s out of range (0..255)", name);
++        return;
++    }
++
++    spapr->cmd_line_caps[cap->index] = true;
++    spapr->eff.caps[cap->index] = value;
++}
++
+ static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error **errp)
+ {
+     if (!val) {
+@@ -265,6 +299,16 @@ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+ 
+ #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
+ 
++static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
++                              uint8_t val, Error **errp)
++{
++    if (val < 12) {
++        error_setg(errp, "Require at least 4kiB pages (cap-hpt-mps >= 12)");
++    } else if (val < 16) {
++        warn_report("Many PAPR guests require 64kiB pages (cap-hpt-mps >= 16)");
++    }
 +}
 +
  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
      [SPAPR_CAP_HTM] = {
          .name = "htm",
-@@ -398,6 +430,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .set = spapr_cap_set_int,
-         .type = "int",
-         .apply = cap_hpt_mps_apply,
-+        .cpu_apply = cap_hpt_mps_cpu_apply,
+@@ -324,6 +368,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .possible = &cap_ibs_possible,
+         .apply = cap_safe_indirect_branch_apply,
      },
++    [SPAPR_CAP_HPT_MPS] = {
++        .name = "hpt-mps",
++        .description = "Maximum page shift for Hash Page Table guests (12, 16, 24, 34)",
++        .index = SPAPR_CAP_HPT_MPS,
++        .get = spapr_cap_get_int,
++        .set = spapr_cap_set_int,
++        .type = "int",
++        .apply = cap_hpt_mps_apply,
++    },
  };
  
+ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index d60b7c6d7a..60ed3a5657 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -66,8 +66,10 @@ typedef enum {
+ #define SPAPR_CAP_SBBC                  0x04
+ /* Indirect Branch Serialisation */
+ #define SPAPR_CAP_IBS                   0x05
++/* HPT Maximum Page Shift */
++#define SPAPR_CAP_HPT_MPS               0x06
+ /* Num Caps */
+-#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
++#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MPS + 1)
+ 
+ /*
+  * Capability Values
 -- 
 2.14.3
