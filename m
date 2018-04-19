@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f91ol-0005cM-9X
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:09:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1f920R-0000Ht-0b
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f91oi-0005ya-3g
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:09:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46494 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f91oh-0005yB-Uv
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:09:08 -0400
-References: <20180312131806.23209-1-stefanha@redhat.com>
-	<43378184-a291-263f-b8b2-dedc455622e3@redhat.com>
-	<87604rp7im.fsf@dusky.pond.sub.org>
-	<20180419020622.GF29462@lemon.usersys.redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1f920N-0004MV-Qb
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:21:14 -0400
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-2-git-send-email-thuth@redhat.com>
+	<1170d2d8-a77e-1839-ae64-81f791b3d4e1@linux.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e89d215e-8845-5392-dde3-9eb8c6fb2281@redhat.com>
-Date: Thu, 19 Apr 2018 07:08:55 +0200
+Message-ID: <5dd02aa8-b3de-affd-cec8-52aed0552763@redhat.com>
+Date: Thu, 19 Apr 2018 07:20:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180419020622.GF29462@lemon.usersys.redhat.com>
+In-Reply-To: <1170d2d8-a77e-1839-ae64-81f791b3d4e1@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn about missing MAINTAINERS
- file changes
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 1/4]
+ pc-bios/s390-ccw/net: Split up net_load() into init, load and uninit parts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-On 19.04.2018 04:06, Fam Zheng wrote:
-> On Mon, 04/16 16:09, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
+On 18.04.2018 20:11, Farhan Ali wrote:
+>=20
+>=20
+> On 04/18/2018 08:31 AM, Thomas Huth wrote:
+>> When we want to support pxelinux-style network booting later, we've go=
+t
+>> to do several TFTP transfers - and we do not want to apply for a new I=
+P
+>> address via DHCP each time. So split up net_load into three parts:
 >>
->>> On 12.03.2018 14:18, Stefan Hajnoczi wrote:
->>>> Warn if files are added/renamed/deleted without MAINTAINERS file
->>>> changes.  This has helped me in Linux and we could benefit from this
->>>> check in QEMU.
->>>>
->>>> This patch is a manual cherry-pick of Linux commit
->>>> 13f1937ef33950b1112049972249e6191b82e6c9 ("checkpatch: emit a warnin=
-g on
->>>> file add/move/delete") by Joe Perches <joe@perches.com>.
->>>>
->>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> 1. net_init(), which initializes virtio-net, gets an IP address via DH=
+CP
+>> =C2=A0=C2=A0=C2=A0 and prints out the related information.
 >>
->> We should really keep upstream's S-o-b intact.  I'd keep the whole
->> commit message intact:
+>> 2. The tftp_load call is now moved directly into the main() function
 >>
->>     From 7fb819c27bf47041a13feed93f86a15bdb2c681f Mon Sep 17 00:00:00 =
-2001
->>     From: Joe Perches <joe@perches.com>
->>     Date: Wed, 6 Aug 2014 16:10:59 -0700
->>     Subject: [PATCH] checkpatch: emit a warning on file add/move/delet=
-e
+>> 3. A new net_uninit() function which should tear down the network stac=
+k
+>> =C2=A0=C2=A0=C2=A0 before we are done in the firmware.
 >>
->>     Whenever files are added, moved, or deleted, the MAINTAINERS file
->>     patterns can be out of sync or outdated.
+>> This will make it easier to extend the code in the next patches.
 >>
->>     To try to keep MAINTAINERS more up-to-date, add a one-time warning
->>     whenever a patch does any of those.
->>
->>     Signed-off-by: Joe Perches <joe@perches.com>
->>     Acked-by: Andy Whitcroft <apw@canonical.com>
->>     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
->>     Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
->>     [Cherry picked from Linux commit 13f1937ef33950b1112049972249e6191=
-b82e6c9]
->>     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>
->> Created by running "git-format-patch -1 13f1937ef33" in the kernel,
->> feeding that to git-am (patch doesn't apply), patch -p1 your patch,
->> git-am --continue, git-commit --amend to add a backporting note and yo=
-ur
->> S-o-b.
->>
->>>> ---
->>>> Note the 80-char lines are from upstream code.  Keep them as-is.
->>>>
->>>>  scripts/checkpatch.pl | 19 +++++++++++++++++++
->>>>  1 file changed, 19 insertions(+)
->>>>
->>>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
->>>> index d1fe79bcc4..d0d8f63d48 100755
->>>> --- a/scripts/checkpatch.pl
->>>> +++ b/scripts/checkpatch.pl
->>>> @@ -1177,6 +1177,7 @@ sub process {
->>>>  	our $clean =3D 1;
->>>>  	my $signoff =3D 0;
->>>>  	my $is_patch =3D 0;
->>>> +	my $reported_maintainer_file =3D 0;
->>>> =20
->>>>  	our @report =3D ();
->>>>  	our $cnt_lines =3D 0;
->>>> @@ -1379,6 +1380,24 @@ sub process {
->>>>  			}
->>>>  		}
->>>> =20
->>>> +# Check if MAINTAINERS is being updated.  If so, there's probably n=
-o need to
->>>> +# emit the "does MAINTAINERS need updating?" message on file add/mo=
-ve/delete
->>>> +		if ($line =3D~ /^\s*MAINTAINERS\s*\|/) {
->>>> +			$reported_maintainer_file =3D 1;
->>>> +		}
->>>> +
->>>> +# Check for added, moved or deleted files
->>>> +		if (!$reported_maintainer_file &&
->>>> +		    ($line =3D~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
->>>> +		     $line =3D~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
->>>> +		     ($line =3D~ /\{\s*([\w\/\.\-]*)\s*\=3D\>\s*([\w\/\.\-]*)\s*\=
-}/ &&
->>>> +		      (defined($1) || defined($2))))) {
->>>> +			$is_patch =3D 1;
->>>> +			$reported_maintainer_file =3D 1;
->>>> +			WARN("added, moved or deleted file(s), does MAINTAINERS need upd=
-ating?\n" .
->>>> +				$herecurr);
->>>
->>> Could you please turn this into a notification instead of a warning? =
-For
->>> rationale, please see the discussion of this patch last year:
->>>
->>> http://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05753.html
-[...]
-> Patchew doesn't speak up unless there is an "error". Warnings and notes=
- are not
-> complained about to keep good signal-to-noise ratio.
+>> Signed-off-by: Thomas Huth<thuth@redhat.com>
+>=20
+>=20
+> Just a minor nit, if we could rename *_uninit functions to
+> destroy/release? I think it's just easier to read
 
-Ah, ok, didn't know that, that makes sense. Then I'm fine with the code
-above. But while you're at it, could you please also include the other
-patches that I posted last year, e.g. to warn on wrong utf-8 in the
-message? We've had mojibaked commit messages a couple of times already,
-and I hope that patch will help to reduce this a little bit...
+Sure. Completely unrepresentative statistics from my QEMU repository:
+
+$ grep -r uninit . | wc -l
+212
+$ grep -r destroy . | wc -l
+904
+$ grep -r release . | wc -l
+1133
+
+So I think I'll go with "release".
 
  Thomas
