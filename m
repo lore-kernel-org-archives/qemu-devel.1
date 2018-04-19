@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f9THB-0002c8-0r
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:28:22 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f9TSK-0006pj-5m
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:39:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f9TH6-0004Iw-Nt
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:28:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33918 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f9TH6-0004Gw-HH
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:28:16 -0400
-Date: Fri, 20 Apr 2018 11:28:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180420102803.GF2533@work-vm>
-References: <20180417132317.6910-1-bala24@linux.vnet.ibm.com>
-	<20180417132317.6910-2-bala24@linux.vnet.ibm.com>
-	<20180418005550.GC2317@umbus.fritz.box>
-	<20180418005726.GD2317@umbus.fritz.box>
-	<20180418064641.GA12871@9.122.211.20>
-	<20180418083632.GB2710@work-vm>
-	<20180419044452.GA11708@9.122.211.20>
-	<20180419112404.GC2730@work-vm>
-	<20180420054712.GH2434@umbus.fritz.box>
+	(envelope-from <no-reply@patchew.org>) id 1f9TSF-0006nm-Qt
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:39:52 -0400
+Resent-Message-Id: <E1f9TSF-0006nm-Qt@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21095)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f9TSF-0006n0-Iq
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:39:47 -0400
+In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152414955803.2028.8088558080536578862@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180420054712.GH2434@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] migration: calculate
- expected_downtime with ram_bytes_remaining()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 19 Apr 2018 07:52:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/43] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,192 +28,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Balamuruhan S <bala24@linux.vnet.ibm.com>, quintela@redhat.com, qemu-devel@nongnu.org
+To: alex.bennee@linaro.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, cota@braap.orgfamz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-* David Gibson (david@gibson.dropbear.id.au) wrote:
-> On Thu, Apr 19, 2018 at 12:24:04PM +0100, Dr. David Alan Gilbert wrote:
-> > * Balamuruhan S (bala24@linux.vnet.ibm.com) wrote:
-> > > On Wed, Apr 18, 2018 at 09:36:33AM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Balamuruhan S (bala24@linux.vnet.ibm.com) wrote:
-> > > > > On Wed, Apr 18, 2018 at 10:57:26AM +1000, David Gibson wrote:
-> > > > > > On Wed, Apr 18, 2018 at 10:55:50AM +1000, David Gibson wrote:
-> > > > > > > On Tue, Apr 17, 2018 at 06:53:17PM +0530, Balamuruhan S wrote:
-> > > > > > > > expected_downtime value is not accurate with dirty_pages_rate * page_size,
-> > > > > > > > using ram_bytes_remaining would yeild it correct.
-> > > > > > > 
-> > > > > > > This commit message hasn't been changed since v1, but the patch is
-> > > > > > > doing something completely different.  I think most of the info from
-> > > > > > > your cover letter needs to be in here.
-> > > > > > > 
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> > > > > > > > ---
-> > > > > > > >  migration/migration.c | 6 +++---
-> > > > > > > >  migration/migration.h | 1 +
-> > > > > > > >  2 files changed, 4 insertions(+), 3 deletions(-)
-> > > > > > > > 
-> > > > > > > > diff --git a/migration/migration.c b/migration/migration.c
-> > > > > > > > index 52a5092add..4d866bb920 100644
-> > > > > > > > --- a/migration/migration.c
-> > > > > > > > +++ b/migration/migration.c
-> > > > > > > > @@ -614,7 +614,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-> > > > > > > >      }
-> > > > > > > >  
-> > > > > > > >      if (s->state != MIGRATION_STATUS_COMPLETED) {
-> > > > > > > > -        info->ram->remaining = ram_bytes_remaining();
-> > > > > > > > +        info->ram->remaining = s->ram_bytes_remaining;
-> > > > > > > >          info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
-> > > > > > > >      }
-> > > > > > > >  }
-> > > > > > > > @@ -2227,6 +2227,7 @@ static void migration_update_counters(MigrationState *s,
-> > > > > > > >      transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-> > > > > > > >      time_spent = current_time - s->iteration_start_time;
-> > > > > > > >      bandwidth = (double)transferred / time_spent;
-> > > > > > > > +    s->ram_bytes_remaining = ram_bytes_remaining();
-> > > > > > > >      s->threshold_size = bandwidth * s->parameters.downtime_limit;
-> > > > > > > >  
-> > > > > > > >      s->mbps = (((double) transferred * 8.0) /
-> > > > > > > > @@ -2237,8 +2238,7 @@ static void migration_update_counters(MigrationState *s,
-> > > > > > > >       * recalculate. 10000 is a small enough number for our purposes
-> > > > > > > >       */
-> > > > > > > >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
-> > > > > > > > -        s->expected_downtime = ram_counters.dirty_pages_rate *
-> > > > > > > > -            qemu_target_page_size() / bandwidth;
-> > > > > > > > +        s->expected_downtime = s->ram_bytes_remaining / bandwidth;
-> > > > > > > >      }
-> > > > > > 
-> > > > > > ..but more importantly, I still think this change is bogus.  expected
-> > > > > > downtime is not the same thing as remaining ram / bandwidth.
-> > > > > 
-> > > > > I tested precopy migration of 16M HP backed P8 guest from P8 to 1G P9 host
-> > > > > and observed precopy migration was infinite with expected_downtime set as
-> > > > > downtime-limit.
-> > > > 
-> > > > Did you debug why it was infinite? Which component of the calculation
-> > > > had gone wrong and why?
-> > > > 
-> > > > > During the discussion for Bug RH1560562, Michael Roth quoted that
-> > > > > 
-> > > > > One thing to note: in my testing I found that the "expected downtime" value
-> > > > > seems inaccurate in this scenario. To find a max downtime that allowed
-> > > > > migration to complete I had to divide "remaining ram" by "throughput" from
-> > > > > "info migrate" (after the initial pre-copy pass through ram, i.e. once
-> > > > > "dirty pages" value starts getting reported and we're just sending dirtied
-> > > > > pages).
-> > > > > 
-> > > > > Later by trying it precopy migration could able to complete with this
-> > > > > approach.
-> > > > > 
-> > > > > adding Michael Roth in cc.
-> > > > 
-> > > > We should try and _understand_ the rational for the change, not just go
-> > > > with it.  Now, remember that whatever we do is just an estimate and
-> > > 
-> > > I have made the change based on my understanding,
-> > > 
-> > > Currently the calculation is,
-> > > 
-> > > expected_downtime = (dirty_pages_rate * qemu_target_page_size) / bandwidth
-> > > 
-> > > dirty_pages_rate = No of dirty pages / time =>  its unit (1 / seconds)
-> > > qemu_target_page_size => its unit (bytes)
-> > > 
-> > > dirty_pages_rate * qemu_target_page_size => bytes/seconds
-> > > 
-> > > bandwidth = bytes transferred / time => bytes/seconds
-> > > 
-> > > dividing this would not be a measurement of time.
-> > 
-> > OK, that argument makes sense to me about why it feels broken; but see
-> > below.
-> > 
-> > > > there will be lots of cases where it's bad - so be careful what you're
-> > > > using it for - you definitely should NOT use the value in any automated
-> > > > system.
-> > > 
-> > > I agree with it and I would not use it in automated system.
-> > > 
-> > > > My problem with just using ram_bytes_remaining is that it doesn't take
-> > > > into account the rate at which the guest is changing RAM - which feels
-> > > > like it's the important measure for expected downtime.
-> > > 
-> > > ram_bytes_remaining = ram_state->migration_dirty_pages * TARGET_PAGE_SIZE
-> > > 
-> > > This means ram_bytes_remaining is proportional to guest changing RAM, so
-> > > we can consider this change would yield expected_downtime
-> > 
-> > ram_bytes_remaining comes from the *current* number of dirty pages, so it
-> > tells you how much you have to transmit, but if the guest wasn't
-> > changing RAM, then that just tells you how much longer you have to keep
-> > going - not the amount of downtime required.  e.g. right at the start of
-> > migration you might have 16G of dirty-pages, but you don't need downtime
-> > to transmit them all.
-> > 
-> > It's actually slightly different, because migration_update_counters is
-> > called in the main iteration loop after an iteration and I think that
-> > means it only ends up there either at the end of migration OR when
-> > qemu_file_rate_limit(f) causes ram_save_iterate to return to the main
-> > loop; so you've got the number of dirty pages when it's interrupted by
-> > rate limiting.
-> > 
-> > So I don't think the use of ram_bytes_remaining is right either.
-> > 
-> > What is the right answer?
-> > I'm not sure; but:
-> > 
-> >    a) If the bandwidth is lower then you can see the downtime should be
-> > longer; so  having x/bandwidth  makes sense
-> >    b) If the guest is dirtying RAM faster then you can see the downtime
-> > should be longer;  so having  dirty_pages_rate on the top seems right.
-> > 
-> > So you can kind of see where the calculation above comes from.
-> > 
-> > I can't convince myself of any calculation that actually works!
-> > 
-> > Lets imagine a setup with a guest dirtying memory at 'Dr' Bytes/s
-> > with the bandwidth (Bw), and we enter an iteration with
-> > 'Db' bytes dirty:
-> > 
-> >   The time for that iteration is:
-> >      It   = Db / Bw
-> > 
-> >   during that time we've dirtied 'Dr' more RAM, so at the end of
-> > it we have:
-> >      Db' = Dr * It
-> >          = Dr * Db
-> >            -------
-> >               Bw
-> > 
-> > But then if you follow that, in any case where Dr < Bw that iterates
-> > down to Db' being ~0  irrespective of what that ration is - but that
-> > makes no sense.
-> 
-> So, as per our IRC discussion, this is pretty hard.
-> 
-> That said, I think Bala's proposed patch is better than what we have
-> now.  It will initially be a gross over-estimate, but for for
-> non-converging migrations it should approach a reasonable estimate
-> later on.  What we have now can never really be right.
-> 
-> So while it would be nice to have some better modelling of this long
-> term, in the short term I think it makes sense to apply Bala's patch.
-
-I'd like to see where the original one was going wrong for Bala; my
-problem is that for me, the old code (which logically is wrong) is
-giving sensible results here, within a factor of 2 of the actual
-downtime I needed to set.  The code maybe wrong, but the results are
-reasonably right.
-
-iDave
-
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDE5MTM1OTAxLjMwMDM1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzQzXSBmaXggYnVpbGRpbmcgb2YgdGVz
+dHMvdGNnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3
+LzIwMTgwNDExMTg1NDI1LjI0NjEtMS1tcmVpdHpAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgw
+NDExMTg1NDI1LjI0NjEtMS1tcmVpdHpAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzIwMTgwNDE5MTM1OTAxLjMwMDM1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
+ZyAtPiBwYXRjaGV3LzIwMTgwNDE5MTM1OTAxLjMwMDM1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
+ZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJjZjIxMGRlMjUgdGVzdHM6IGZwLXRl
+c3QgYWRkIGZjdnQgc3VwcG9ydCAoIUlOQ09NUExFVEUgV0lQKQpjNTlhY2UzODBjIHRlc3RzL3Rj
+ZzogZGlzYWJsZSBmcC10ZXN0IGZvciAzMiBiaXQgKEhBQ0shKQozZjZkNmIzN2IzIHRlc3RzL3Rj
+Zy9tdWx0aWFyY2g6IGFkZCBmcC10ZXN0IGludG8gbXVsdGlhcmNoIHNldAphMzk0MjkwM2Q4IHRl
+c3RzOiBhZGQgZnAtdGVzdCwgYSBmbG9hdGluZyBwb2ludCB0ZXN0IHN1aXRlCjkzNjM3YWQ3OGYg
+c29mdGZsb2F0OiBkbyBub3QgaW5jbHVkZSBnbGliIGhlYWRlcnMKNmNlZTkwZmNlOSBvc2RlcDog
+ZGlzYWJsZSBnbGliLWNvbXBhdC5oIGluY2x1ZGUgd2l0aCBRRU1VX05PX0dMSUIKM2Y3NmIxNDhl
+MyB0ZXN0cy9NYWtlZmlsZS5pbmNsdWRlOiBhZGQgKGNsZWFuLSljaGVjay10Y2cgdGFyZ2V0cwoy
+YjA5ZGUzMTBiIE1ha2VmaWxlLnRhcmdldDogYWRkIChjbGVhbi0pZ3Vlc3QtdGVzdHMgdGFyZ2V0
+cwo2NGYzMmEzNDdjIHRlc3RzL3RjZy9NYWtlZmlsZTogdXBkYXRlIHRvIGJlIGNhbGxlZCBmcm9t
+IE1ha2VmaWxlLnRhcmdldApiNmRkMWM0MjU3IHRlc3RzL3RjZzogZW5hYmxlIGJ1aWxkaW5nIGZv
+ciBwcGM2NAplZDUxNmM1NmM5IHRlc3RzL3RjZzogZW5hYmxlIGJ1aWxkaW5nIGZvciBzMzkweAph
+ZjA0NWMwMGM4IHRlc3RzL3RjZy9taXBzOiBpbmNsdWRlIGNvbW1vbiBtaXBzIGhlbGxvLW1pcHMK
+OWM4NTczZTNhZCB0ZXN0cy90Y2c6IGVuYWJsZSBidWlsZGluZyBmb3IgTUlQUwo4MDFkYmJhNGFl
+IHRlc3RzL3RjZzogbW92ZSBNSVBTIHNwZWNpZmljIHRlc3RzIGludG8gc3ViZGlyCjg0MjAzMGFh
+ODIgdGVzdHMvdGNnL2FhcmNoNjQ6IHVzZXJzcGFjZSBzeXN0ZW0gcmVnaXN0ZXIgdGVzdAphNjQ2
+NDRiNjNiIHRlc3RzL3RjZy9hYXJjaDY0OiBhZGQgZmN2dCB0ZXN0IGNhc2VzIGZvciBBQXJjaDY0
+CjFjOWJkNzEyOTMgdGVzdHMvdGNnL2FhcmNoNjQ6IGFkZCBNYWtlZmlsZS50YXJnZXQKYzUyZTJm
+MWM0OSB0ZXN0cy90Y2cvYXJtOiBmaXggdXAgdGVzdC1hcm0taXdtbXh0IHRlc3QKZDE0YmRjZWIx
+NCB0ZXN0cy90Y2c6IG1vdmUgQVJNIHNwZWNpZmljIHRlc3RzIGludG8gc3ViZGlyCmE5Mjk3NDNl
+NmMgdGVzdHMvdGNnL2kzODYvdGVzdC1pMzg2OiBmaXggcHJpbnRmIGZvcm1hdAoxYWIxNjFiMmU1
+IHRlc3RzL3RjZy9pMzg2L3Rlc3QtaTM4NjogdXNlIG1vZGVybiB2ZWN0b3Jfc2l6ZSBhdHRyaWJ1
+dGVzCjRhMDU5MGJhNWUgdGVzdHMvdGNnL3g4Nl82NDogYWRkIE1ha2VmaWxlLnRhcmdldAo3NzMy
+Y2EwMTFmIHRlc3RzL3RjZy9pMzg2OiBkaXNhYmxlIGkzODYgdmVyc2lvbiBvZiB0ZXN0LWkzODYt
+c3NzZQpmOTVjMTJkMzlkIHRlc3RzL3RjZy9pMzg2OiBmaXggdGVzdC1pMzg2LWZwcmVtCjQwNzgy
+YmNkNjkgdGVzdHMvdGNnL2kzODY6IGZpeCB0ZXN0LWkzODYKZWEwY2MzNmQzYSB0ZXN0cy90Y2cv
+aTM4NjogQnVpbGQgZml4IGZvciBoZWxsby1pMzg2CmY4NjM0Mjc0MmQgdGVzdHMvdGNnOiBlbmFi
+bGUgYnVpbGRpbmcgZm9yIGkzODYKYzVkZGQxNzg1YyBkb2NrZXI6IEFkZCBmZWRvcmEtaTM4Ni1j
+cm9zcyBpbWFnZQo1OGQzMWZmYzg1IHRlc3RzL3RjZzogbW92ZSBpMzg2IHNwZWNpZmljIHRlc3Rz
+IGludG8gc3ViZGlyCjBmMzIyYjJmOGEgdGVzdHMvdGNnL211bHRpYXJjaDogZW5hYmxlIGFkZGl0
+aW9uYWwgbGludXgtdGVzdCB0ZXN0cwpkMmI2NDk0MTlhIHRlc3RzL3RjZy9tdWx0aWFyY2g6IEJ1
+aWxkIGZpeCBmb3IgbGludXgtdGVzdAo3YzI3MGE1ODE4IHRlc3RzL3RjZzogbW92ZSBhcmNoaXRl
+Y3R1cmUgaW5kZXBlbmRlbnQgdGVzdHMgaW50byBzdWJkaXIKZmUwNGYyYTU4ZSBkb2NrZXI6IE1h
+a2VmaWxlLmluY2x1ZGUgaW50cm9kdWNlIERPQ0tFUl9TQ1JJUFQKMzg3MDkwY2RlNSBkb2NrZXI6
+IGFsbG93ICJjYyIgY29tbWFuZCB0byBydW4gaW4gdXNlciBjb250ZXh0CmNjN2UzMjI1YzIgZG9j
+a2VyOiBleHRlbmQgImNjIiBjb21tYW5kIHRvIGFjY2VwdCBjb21waWxlcgpiMjA5OGNhMWNhIGRv
+Y2tlcjogQWRkICJjYyIgc3ViY29tbWFuZAozMDdhNjBhZGYyIE1ha2VmaWxlOiBSZW5hbWUgVEFS
+R0VUX0RJUlMgdG8gVEFSR0VUX0xJU1QKZDYxNTdjNTI2MiBjb25maWd1cmU6IHNldCBjcm9zc19j
+Y19GT08gZm9yIGhvc3QgY29tcGlsZXIKMmFmY2U1ZmM0ZCBjb25maWd1cmU6IGFsbG93IHVzZXIg
+dG8gc3BlY2lmeSAtLWNyb3NzLWNjLWNmbGFncy1mb289CmVmZDI2MTZiOGUgY29uZmlndXJlOiBt
+b3ZlIGkzODZfY2MgdG8gY3Jvc3NfY2NfaTM4Ngo4ODc5NDFhOTFjIGNvbmZpZ3VyZTogYWRkIHN1
+cHBvcnQgZm9yIC0tY3Jvc3MtY2MtRk9PCjk0N2Q5OWZhZTcgY29uZmlndXJlOiBhZGQgdGVzdCBm
+b3IgZG9ja2VyIGF2YWlsYWJpbGl0eQo3ZTQxOTcxZGNhIGRvY2tlcjogYWRkICJwcm9iZSIgY29t
+bWFuZCBmb3IgY29uZmlndXJlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzQzOiBkb2NrZXI6IGFkZCAicHJvYmUiIGNvbW1hbmQgZm9yIGNvbmZpZ3VyZS4uLgpDaGVja2lu
+ZyBQQVRDSCAyLzQzOiBjb25maWd1cmU6IGFkZCB0ZXN0IGZvciBkb2NrZXIgYXZhaWxhYmlsaXR5
+Li4uCkNoZWNraW5nIFBBVENIIDMvNDM6IGNvbmZpZ3VyZTogYWRkIHN1cHBvcnQgZm9yIC0tY3Jv
+c3MtY2MtRk9PLi4uCkNoZWNraW5nIFBBVENIIDQvNDM6IGNvbmZpZ3VyZTogbW92ZSBpMzg2X2Nj
+IHRvIGNyb3NzX2NjX2kzODYuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80MzogY29uZmlndXJlOiBhbGxv
+dyB1c2VyIHRvIHNwZWNpZnkgLS1jcm9zcy1jYy1jZmxhZ3MtZm9vPS4uLgpDaGVja2luZyBQQVRD
+SCA2LzQzOiBjb25maWd1cmU6IHNldCBjcm9zc19jY19GT08gZm9yIGhvc3QgY29tcGlsZXIuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNy80MzogTWFrZWZpbGU6IFJlbmFtZSBUQVJHRVRfRElSUyB0byBUQVJH
+RVRfTElTVC4uLgpDaGVja2luZyBQQVRDSCA4LzQzOiBkb2NrZXI6IEFkZCAiY2MiIHN1YmNvbW1h
+bmQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS80MzogZG9ja2VyOiBleHRlbmQgImNjIiBjb21tYW5kIHRv
+IGFjY2VwdCBjb21waWxlci4uLgpDaGVja2luZyBQQVRDSCAxMC80MzogZG9ja2VyOiBhbGxvdyAi
+Y2MiIGNvbW1hbmQgdG8gcnVuIGluIHVzZXIgY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAxMS80
+MzogZG9ja2VyOiBNYWtlZmlsZS5pbmNsdWRlIGludHJvZHVjZSBET0NLRVJfU0NSSVBULi4uCkNo
+ZWNraW5nIFBBVENIIDEyLzQzOiB0ZXN0cy90Y2c6IG1vdmUgYXJjaGl0ZWN0dXJlIGluZGVwZW5k
+ZW50IHRlc3RzIGludG8gc3ViZGlyLi4uCkNoZWNraW5nIFBBVENIIDEzLzQzOiB0ZXN0cy90Y2cv
+bXVsdGlhcmNoOiBCdWlsZCBmaXggZm9yIGxpbnV4LXRlc3QuLi4KRVJST1I6IGlmIHRoaXMgY29k
+ZSBpcyByZWR1bmRhbnQgY29uc2lkZXIgcmVtb3ZpbmcgaXQKIzE1MzogRklMRTogdGVzdHMvdGNn
+L211bHRpYXJjaC9saW51eC10ZXN0LmM6MzIzOgorI2lmIDAKCnRvdGFsOiAxIGVycm9ycywgMCB3
+YXJuaW5ncywgMTg1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE0LzQzOiB0ZXN0cy90Y2cvbXVsdGlhcmNoOiBlbmFi
+bGUgYWRkaXRpb25hbCBsaW51eC10ZXN0IHRlc3RzLi4uCkNoZWNraW5nIFBBVENIIDE1LzQzOiB0
+ZXN0cy90Y2c6IG1vdmUgaTM4NiBzcGVjaWZpYyB0ZXN0cyBpbnRvIHN1YmRpci4uLgpDaGVja2lu
+ZyBQQVRDSCAxNi80MzogZG9ja2VyOiBBZGQgZmVkb3JhLWkzODYtY3Jvc3MgaW1hZ2UuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTcvNDM6IHRlc3RzL3RjZzogZW5hYmxlIGJ1aWxkaW5nIGZvciBpMzg2Li4u
+CkNoZWNraW5nIFBBVENIIDE4LzQzOiB0ZXN0cy90Y2cvaTM4NjogQnVpbGQgZml4IGZvciBoZWxs
+by1pMzg2Li4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMy
+MTogRklMRTogdGVzdHMvdGNnL2kzODYvaGVsbG8taTM4Ni5jOjIzOgordm9pZCBfc3RhcnQodm9p
+ZCk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTkvNDM6IHRl
+c3RzL3RjZy9pMzg2OiBmaXggdGVzdC1pMzg2Li4uCkNoZWNraW5nIFBBVENIIDIwLzQzOiB0ZXN0
+cy90Y2cvaTM4NjogZml4IHRlc3QtaTM4Ni1mcHJlbS4uLgpDaGVja2luZyBQQVRDSCAyMS80Mzog
+dGVzdHMvdGNnL2kzODY6IGRpc2FibGUgaTM4NiB2ZXJzaW9uIG9mIHRlc3QtaTM4Ni1zc3NlLi4u
+CkNoZWNraW5nIFBBVENIIDIyLzQzOiB0ZXN0cy90Y2cveDg2XzY0OiBhZGQgTWFrZWZpbGUudGFy
+Z2V0Li4uCkNoZWNraW5nIFBBVENIIDIzLzQzOiB0ZXN0cy90Y2cvaTM4Ni90ZXN0LWkzODY6IHVz
+ZSBtb2Rlcm4gdmVjdG9yX3NpemUgYXR0cmlidXRlcy4uLgpDaGVja2luZyBQQVRDSCAyNC80Mzog
+dGVzdHMvdGNnL2kzODYvdGVzdC1pMzg2OiBmaXggcHJpbnRmIGZvcm1hdC4uLgpDaGVja2luZyBQ
+QVRDSCAyNS80MzogdGVzdHMvdGNnOiBtb3ZlIEFSTSBzcGVjaWZpYyB0ZXN0cyBpbnRvIHN1YmRp
+ci4uLgpDaGVja2luZyBQQVRDSCAyNi80MzogdGVzdHMvdGNnL2FybTogZml4IHVwIHRlc3QtYXJt
+LWl3bW14dCB0ZXN0Li4uCkNoZWNraW5nIFBBVENIIDI3LzQzOiB0ZXN0cy90Y2cvYWFyY2g2NDog
+YWRkIE1ha2VmaWxlLnRhcmdldC4uLgpDaGVja2luZyBQQVRDSCAyOC80MzogdGVzdHMvdGNnL2Fh
+cmNoNjQ6IGFkZCBmY3Z0IHRlc3QgY2FzZXMgZm9yIEFBcmNoNjQuLi4KRVJST1I6IHNwYWNlIHBy
+b2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMyODE6IEZJTEU6IHRlc3Rz
+L3RjZy9hYXJjaDY0L2ZjdnQuYzoyNDQ6CisgICAgICAgIDogLyogbm8gb3V0cHV0ICovIDogW2Zs
+YWdzXSAibiIgKDEgPDwgMjYpIDogIngxIiApOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
+b3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyODE6IEZJTEU6IHRlc3RzL3RjZy9hYXJj
+aDY0L2ZjdnQuYzoyNDQ6CisgICAgICAgIDogLyogbm8gb3V0cHV0ICovIDogW2ZsYWdzXSAibiIg
+KDEgPDwgMjYpIDogIngxIiApOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNTg3IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDI5LzQzOiB0ZXN0cy90Y2cvYWFyY2g2NDogdXNlcnNwYWNlIHN5c3RlbSByZWdp
+c3RlciB0ZXN0Li4uCkNoZWNraW5nIFBBVENIIDMwLzQzOiB0ZXN0cy90Y2c6IG1vdmUgTUlQUyBz
+cGVjaWZpYyB0ZXN0cyBpbnRvIHN1YmRpci4uLgpDaGVja2luZyBQQVRDSCAzMS80MzogdGVzdHMv
+dGNnOiBlbmFibGUgYnVpbGRpbmcgZm9yIE1JUFMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNDM6IHRl
+c3RzL3RjZy9taXBzOiBpbmNsdWRlIGNvbW1vbiBtaXBzIGhlbGxvLW1pcHMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMzMvNDM6IHRlc3RzL3RjZzogZW5hYmxlIGJ1aWxkaW5nIGZvciBzMzkweC4uLgpDaGVj
+a2luZyBQQVRDSCAzNC80MzogdGVzdHMvdGNnOiBlbmFibGUgYnVpbGRpbmcgZm9yIHBwYzY0Li4u
+CkNoZWNraW5nIFBBVENIIDM1LzQzOiB0ZXN0cy90Y2cvTWFrZWZpbGU6IHVwZGF0ZSB0byBiZSBj
+YWxsZWQgZnJvbSBNYWtlZmlsZS50YXJnZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNDM6IE1ha2Vm
+aWxlLnRhcmdldDogYWRkIChjbGVhbi0pZ3Vlc3QtdGVzdHMgdGFyZ2V0cy4uLgpDaGVja2luZyBQ
+QVRDSCAzNy80MzogdGVzdHMvTWFrZWZpbGUuaW5jbHVkZTogYWRkIChjbGVhbi0pY2hlY2stdGNn
+IHRhcmdldHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzgvNDM6IG9zZGVwOiBkaXNhYmxlIGdsaWItY29t
+cGF0LmggaW5jbHVkZSB3aXRoIFFFTVVfTk9fR0xJQi4uLgpDaGVja2luZyBQQVRDSCAzOS80Mzog
+c29mdGZsb2F0OiBkbyBub3QgaW5jbHVkZSBnbGliIGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NDAvNDM6IHRlc3RzOiBhZGQgZnAtdGVzdCwgYSBmbG9hdGluZyBwb2ludCB0ZXN0IHN1aXRlLi4u
+CkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4g
+cGFyZW50aGVzaXMKIzM4MjogRklMRTogdGVzdHMvZnAvZnAtdGVzdC5jOjIyMToKKyNkZWZpbmUg
+UFJfRVhDRVBUSU9OUyh4KSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAg
+ICAoKHgpICYgU1RBTkRBUkRfRVhDRVBUSU9OUyA/ICIiIDogIm5vbmUiKSwgICAgICBcCisgICAg
+ICAgICgoKHgpICYgZmxvYXRfZmxhZ19pbmV4YWN0KSAgID8gIngiIDogIiIpLCAgICAgIFwKKyAg
+ICAgICAgKCgoeCkgJiBmbG9hdF9mbGFnX3VuZGVyZmxvdykgPyAidSIgOiAiIiksICAgICAgXAor
+ICAgICAgICAoKCh4KSAmIGZsb2F0X2ZsYWdfb3ZlcmZsb3cpICA/ICJvIiA6ICIiKSwgICAgICBc
+CisgICAgICAgICgoKHgpICYgZmxvYXRfZmxhZ19kaXZieXplcm8pID8gInoiIDogIiIpLCAgICAg
+IFwKKyAgICAgICAgKCgoeCkgJiBmbG9hdF9mbGFnX2ludmFsaWQpICAgPyAiaSIgOiAiIikKCkVS
+Uk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvdWwgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b3Vs
+CiM4NDQ6IEZJTEU6IHRlc3RzL2ZwL2ZwLXRlc3QuYzo2ODM6CisgICAgICAgICAgICBzaWduaWZp
+Y2FuZCA9IHN0cnRvdWwoJnBbM10sICZwb3MsIDE2KTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBx
+ZW11X3N0cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojODQ5OiBGSUxFOiB0ZXN0cy9mcC9m
+cC10ZXN0LmM6Njg4OgorICAgICAgICAgICAgZXhwb25lbnQgPSBzdHJ0b2wocG9zLCAmcG9zLCAx
+MCkgKyAxMjc7CgpFUlJPUjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVu
+Y2UgdG8gc3RydG91bAojODc0OiBGSUxFOiB0ZXN0cy9mcC9mcC10ZXN0LmM6NzEzOgorICAgICAg
+ICAgICAgc2lnbmlmaWNhbmQgPSBzdHJ0b3VsKCZwWzNdLCAmcG9zLCAxNik7CgpFUlJPUjogY29u
+c2lkZXIgdXNpbmcgcWVtdV9zdHJ0b2wgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2wKIzg3OTogRklM
+RTogdGVzdHMvZnAvZnAtdGVzdC5jOjcxODoKKyAgICAgICAgICAgIGV4cG9uZW50ID0gc3RydG9s
+KHBvcywgJnBvcywgMTApICsgMTAyMzsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRv
+ZiBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvZgojODk4OiBGSUxFOiB0ZXN0cy9mcC9mcC10ZXN0LmM6
+NzM3OgorICAgICAgICAgICAgZmxvYXQgZiA9IHN0cnRvZihwLCAmcG9zKTsKCkVSUk9SOiBleHRl
+cm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxMTg3OiBGSUxFOiB0ZXN0cy9mcC9m
+cC10ZXN0LmM6MTAyNjoKKyAgICBpbnQgaHNlYXJjaF9yKEVOVFJZIGl0ZW0sIEFDVElPTiBhY3Rp
+b24sIEVOVFJZICoqcmV0dmFsLAoKdG90YWw6IDcgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjMzIGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDQxLzQzOiB0ZXN0cy90Y2cvbXVsdGlhcmNoOiBhZGQgZnAtdGVzdCBpbnRvIG11
+bHRpYXJjaCBzZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDIvNDM6IHRlc3RzL3RjZzogZGlzYWJsZSBm
+cC10ZXN0IGZvciAzMiBiaXQgKEhBQ0shKS4uLgpDaGVja2luZyBQQVRDSCA0My80MzogdGVzdHM6
+IGZwLXRlc3QgYWRkIGZjdnQgc3VwcG9ydCAoIUlOQ09NUExFVEUgV0lQKS4uLgpFUlJPUjogY29u
+c2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvdWxsCiM1OTE6
+IEZJTEU6IHRlc3RzL2ZwL2ZwLXRlc3QuYzoxMTUwOgorICAgICAgICByZXN1bHQgPSBzdHJ0b3Vs
+bChwLCAmZW5kLCAxNik7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY0NCBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
